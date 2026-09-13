@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="천안아산역 팀의 제로 트러스트 LLM 보안 관제 시뮬레이터" />
+    <title>천안아산역 | Zero Trust SecOps</title>
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <header class="station-header">
+      <div class="header-rail" aria-hidden="true"></div>
+      <div class="header-inner">
+        <div class="brand-block">
+          <span class="eyebrow">WE-MEET · BLUE SEMESTER</span>
+          <strong>ZERO TRUST SECURITY LINE</strong>
+        </div>
+        <div class="station-sign" aria-label="팀 이름 천안아산역">
+          <span class="station-code">ZT 01</span>
+          <span class="station-name">천안아산역</span>
+          <span class="station-en">CHEONAN·ASAN</span>
+        </div>
+        <div class="system-state">
+          <span id="healthDot" class="health-dot"></span>
+          <span id="healthText">시스템 확인 중</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero shell">
+        <div>
+          <p class="section-kicker">SECURITY OPERATIONS CONTROL</p>
+          <h1>접근 이벤트에서<br /><span>대응 판단까지</span></h1>
+          <p class="hero-copy">
+            사용자·기기·네트워크·자원 정보를 함께 확인하고, LLM 분석 결과에
+            정책 안전장치를 적용하는 제로 트러스트 관제 시뮬레이션입니다.
+          </p>
+        </div>
+        <ol class="route-map" aria-label="분석 단계">
+          <li><span>01</span><strong>이벤트 수집</strong><small>합성 보안 로그</small></li>
+          <li><span>02</span><strong>맥락 검증</strong><small>6개 접근 신호</small></li>
+          <li><span>03</span><strong>LLM 분석</strong><small>구조화 위험 판정</small></li>
+          <li><span>04</span><strong>정책 확인</strong><small>사람 검토·허용 목록</small></li>
+        </ol>
+      </section>
+
+      <section class="workspace shell">
+        <div class="panel scenarios-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">SCENARIO BOARD</p>
+              <h2>시나리오 선택</h2>
+            </div>
+            <span id="scenarioCount" class="count-badge">0개</span>
+          </div>
+          <div id="scenarioGrid" class="scenario-grid" aria-live="polite"></div>
+        </div>
+
+        <aside class="panel control-panel">
+          <p class="section-kicker">DEPARTURE INFORMATION</p>
+          <div id="selectedScenario" class="selected-scenario">
+            <span class="empty-code">--</span>
+            <h2>시나리오를 선택하세요</h2>
+            <p>왼쪽 목록에서 분석할 합성 이벤트를 고를 수 있습니다.</p>
+          </div>
+          <button id="analyzeButton" class="primary-button" type="button" disabled>
+            <span>선택 시나리오 분석</span>
+            <span aria-hidden="true">→</span>
+          </button>
+          <p id="runState" class="run-state" aria-live="polite">
+            실제 계정이나 시스템에는 어떠한 조치도 수행하지 않습니다.
+          </p>
+        </aside>
+      </section>
+
+      <section id="resultSection" class="result-section shell" aria-live="polite">
+        <div class="section-heading-row">
+          <div>
+            <p class="section-kicker">LATEST ARRIVAL</p>
+            <h2>최근 분석 결과</h2>
+          </div>
+          <span id="resultAnalyzer" class="outline-badge">대기 중</span>
+        </div>
+
+        <div id="resultEmpty" class="result-empty">
+          <span class="pulse-ring" aria-hidden="true"></span>
+          <p>시나리오를 실행하면 위험 판단과 대응 미리보기가 이곳에 표시됩니다.</p>
+        </div>
+
+        <div id="resultContent" class="result-content" hidden>
+          <article id="riskCard" class="risk-card">
+            <p>RISK SCORE</p>
+            <div class="score-line">
+              <strong id="riskScore">0</strong><span>/100</span>
+            </div>
+            <div class="score-track"><span id="scoreBar"></span></div>
+            <span id="riskLevel" class="risk-level">LOW</span>
+          </article>
+
+          <article class="assessment-card">
+            <div class="assessment-title">
+              <div>
+                <p class="card-label">판단 유형</p>
+                <h3 id="violationType">-</h3>
+              </div>
+              <span id="confidence">신뢰도 -</span>
+            </div>
+            <p id="rationale" class="rationale"></p>
+            <div>
+              <p class="card-label">판단 근거</p>
+              <div id="evidenceList" class="evidence-list"></div>
+            </div>
+          </article>
+
+          <article class="decision-card">
+            <p class="card-label">대응 미리보기</p>
+            <h3 id="recommendedAction">-</h3>
+            <p id="decisionReason"></p>
+            <div class="decision-meta">
+              <span id="reviewState">검토 상태</span>
+              <span id="latency">응답 시간</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="summary-section shell">
+        <div class="section-heading-row">
+          <div>
+            <p class="section-kicker">OPERATION LOG</p>
+            <h2>분석 현황</h2>
+          </div>
+          <button id="refreshButton" class="text-button" type="button">새로고침</button>
+        </div>
+        <div class="metric-grid">
+          <article><span>누적 분석</span><strong id="totalAnalyses">0</strong></article>
+          <article><span>고위험 이상</span><strong id="highRiskCount">0</strong></article>
+          <article><span>OpenAI 분석</span><strong id="openaiCount">0</strong></article>
+          <article><span>최근 이벤트</span><strong id="latestEvent">-</strong></article>
+        </div>
+        <div class="history-wrap">
+          <table>
+            <thead>
+              <tr><th>시각</th><th>이벤트</th><th>분석기</th><th>위험도</th><th>대응</th></tr>
+            </thead>
+            <tbody id="historyBody">
+              <tr><td colspan="5" class="table-empty">기록을 불러오는 중입니다.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="shell">
+      <span>천안아산역 · Zero Trust LLM SecOps</span>
+      <span>SIMULATION ONLY · v0.2</span>
+    </footer>
+  </body>
+</html>
