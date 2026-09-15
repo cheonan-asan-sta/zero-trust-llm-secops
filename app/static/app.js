@@ -2,6 +2,8 @@ const state = {
   scenarios: [],
   selected: null,
   running: false,
+  analyzerMode: "rule",
+  evaluating: false,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -51,6 +53,7 @@ async function request(path, options = {}) {
 }
 
 function setHealth(health) {
+  state.analyzerMode = health.analyzer_mode;
   $("healthDot").className = "health-dot online";
   $("healthText").textContent = `${health.analyzer_mode.toUpperCase()} · 정상 운영`;
 }
@@ -99,7 +102,7 @@ function selectScenario(scenario) {
   const title = document.createElement("h2");
   title.textContent = scenario.name;
   const description = document.createElement("p");
-  description.textContent = `${scenario.attack_tactic} 관점의 합성 이벤트입니다. 예상 위험도는 ${riskLabels[scenario.expected_risk]}이며, 분석 결과와 정답 정보는 분리됩니다.`;
+  description.textContent = `${scenario.attack_tactic} 관점의 합성 이벤트입니다. ${scenario.detection_conditions.length}개 구조화 조건으로 교차 확인하며, 예상 위험도와 분석 입력은 분리됩니다.`;
   container.append(code, title, description);
   $("analyzeButton").disabled = false;
 }
@@ -154,6 +157,14 @@ function renderResult(result) {
     ? "● 사람 검토 필요"
     : "● 자동 정책 확인 완료";
   $("latency").textContent = `응답 시간 ${(result.latency_ms / 1000).toFixed(2)}초`;
+
+  const controls = $("decisionControls");
+  controls.replaceChildren();
+  (decision.controls_applied || []).forEach((item) => {
+    const chip = document.createElement("span");
+    chip.textContent = item;
+    controls.append(chip);
+  });
 
   const evidence = $("evidenceList");
   evidence.replaceChildren();
@@ -222,9 +233,46 @@ async function refreshSummary() {
       (metrics.risk_counts.HIGH || 0) + (metrics.risk_counts.CRITICAL || 0);
     $("openaiCount").textContent = metrics.analyzer_counts.openai || 0;
     $("latestEvent").textContent = metrics.latest_event_id || "-";
+    $("averageLatency").textContent = `${metrics.average_latency_ms.toFixed(1)}ms`;
+    $("p95Latency").textContent = `${metrics.p95_latency_ms.toFixed(1)}ms`;
     renderHistory(results);
   } catch (_) {
     $("historyBody").innerHTML = '<tr><td colspan="5" class="table-empty">기록을 불러오지 못했습니다.</td></tr>';
+  }
+}
+
+function formatPercent(value) {
+  return `${Math.round(value * 100)}%`;
+}
+
+async function runEvaluation() {
+  if (state.evaluating) return;
+  state.evaluating = true;
+  $("evaluationButton").disabled = true;
+  $("evaluationButton").textContent = "평가 진행 중…";
+  $("evaluationState").textContent = `${state.analyzerMode.toUpperCase()} 분석기로 기준 사례를 반복 확인하고 있습니다.`;
+
+  try {
+    const result = await request("/evaluation/run", {
+      method: "POST",
+      body: JSON.stringify({ analyzer: state.analyzerMode, runs_per_scenario: 1 }),
+    });
+    $("evaluationGrid").hidden = false;
+    $("riskAccuracy").textContent = formatPercent(result.risk_accuracy);
+    $("actionAccuracy").textContent = formatPercent(result.action_accuracy);
+    $("threatF1").textContent = formatPercent(result.threat_f1);
+    $("jsonValidity").textContent = formatPercent(result.json_valid_rate);
+    $("evaluationP95").textContent = `${result.p95_latency_ms.toFixed(1)}ms`;
+    const passed = Object.values(result.targets_met).every(Boolean);
+    $("targetResult").textContent = passed ? "통과" : "보완 필요";
+    $("targetResult").className = passed ? "metric-pass" : "metric-fail";
+    $("evaluationState").textContent = `${result.total_cases}개 사례 평가 완료 · ${result.analyzer.toUpperCase()} 분석기`;
+  } catch (error) {
+    $("evaluationState").textContent = `평가하지 못했습니다: ${error.message}`;
+  } finally {
+    state.evaluating = false;
+    $("evaluationButton").disabled = false;
+    $("evaluationButton").textContent = "8개 기준 사례 평가";
   }
 }
 
@@ -243,4 +291,5 @@ async function initialize() {
 
 $("analyzeButton").addEventListener("click", runAnalysis);
 $("refreshButton").addEventListener("click", refreshSummary);
+$("evaluationButton").addEventListener("click", runEvaluation);
 initialize();

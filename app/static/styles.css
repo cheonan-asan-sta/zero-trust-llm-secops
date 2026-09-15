@@ -256,13 +256,24 @@ h1 span { color: var(--blue); }
 .decision-card h3 { margin-top: 10px; color: var(--blue); }
 .decision-card > p:not(.card-label) { margin-top: 24px; color: #415064; font-size: 12px; line-height: 1.65; }
 .decision-meta { margin-top: 24px; padding-top: 15px; display: grid; gap: 7px; border-top: 1px solid #cbdced; color: var(--muted); font-size: 10px; }
+.control-list { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 5px; }
+.control-list span { padding: 4px 6px; border-radius: 4px; background: rgba(22, 100, 192, 0.1); color: var(--blue); font-size: 8px; font-weight: 800; }
 
 .metric-grid { margin-top: 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .metric-grid article { padding: 18px; border: 1px solid var(--line); border-radius: 10px; display: grid; gap: 8px; }
 .metric-grid span { color: var(--muted); font-size: 11px; }
 .metric-grid strong { font-size: 26px; letter-spacing: -0.05em; overflow-wrap: anywhere; }
-.metric-grid article:last-child strong { font-size: 14px; letter-spacing: -0.02em; }
+.operation-metrics article:nth-child(4) strong { font-size: 14px; letter-spacing: -0.02em; }
 .text-button { border: 0; background: none; color: var(--blue); font-size: 11px; font-weight: 800; cursor: pointer; }
+.secondary-button { padding: 10px 14px; border: 1px solid var(--blue); border-radius: 8px; background: white; color: var(--blue); font-size: 11px; font-weight: 800; cursor: pointer; }
+.secondary-button:hover:not(:disabled) { background: #eef5fc; }
+.secondary-button:disabled { opacity: 0.55; cursor: wait; }
+.evaluation-state { margin: 16px 0 0; color: var(--muted); font-size: 12px; }
+.evaluation-grid { grid-template-columns: repeat(6, 1fr); }
+.evaluation-grid strong { font-size: 21px; }
+.metric-pass { color: var(--green); }
+.metric-fail { color: var(--orange); }
+.operation-metrics { grid-template-columns: repeat(6, 1fr); }
 
 .history-wrap { margin-top: 18px; overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 12px; }
@@ -287,6 +298,7 @@ footer { padding-block: 32px 48px; display: flex; justify-content: space-between
   .result-content { grid-template-columns: 1fr 1fr; }
   .risk-card { grid-row: span 2; }
   .metric-grid { grid-template-columns: repeat(2, 1fr); }
+  .operation-metrics { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 620px) {
@@ -303,5 +315,6 @@ footer { padding-block: 32px 48px; display: flex; justify-content: space-between
   .panel, .result-section, .summary-section { padding: 21px; }
   .result-content { grid-template-columns: 1fr; }
   .metric-grid { grid-template-columns: 1fr 1fr; }
+  .operation-metrics { grid-template-columns: 1fr 1fr; }
   footer { gap: 20px; }
 }

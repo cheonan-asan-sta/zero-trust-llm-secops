@@ -1,0 +1,174 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Serverless deployment for the Zero Trust LLM SecOps demo
+
+Parameters:
+  ImageIdentifier:
+    Type: String
+    Description: Immutable ECR image URI including its tag
+  FunctionName:
+    Type: String
+    Default: zero-trust-llm-secops
+  TableName:
+    Type: String
+    Default: zero-trust-llm-secops-audit
+  AnalyzerMode:
+    Type: String
+    Default: rule
+    AllowedValues:
+      - rule
+      - openai
+      - hybrid
+  OpenAIModel:
+    Type: String
+    Default: gpt-5.4-mini
+  OpenAIApiKeySecretArn:
+    Type: String
+    Default: ""
+    NoEcho: true
+  FunctionUrlAuthType:
+    Type: String
+    Default: NONE
+    AllowedValues:
+      - NONE
+      - AWS_IAM
+
+Conditions:
+  HasOpenAISecret: !Not [!Equals [!Ref OpenAIApiKeySecretArn, ""]]
+  HasPublicUrl: !Equals [!Ref FunctionUrlAuthType, NONE]
+
+Resources:
+  AuditTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Ref TableName
+      BillingMode: PAY_PER_REQUEST
+      DeletionProtectionEnabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+      AttributeDefinitions:
+        - AttributeName: analysis_id
+          AttributeType: S
+        - AttributeName: event_id
+          AttributeType: S
+        - AttributeName: record_type
+          AttributeType: S
+        - AttributeName: analyzed_at
+          AttributeType: S
+      KeySchema:
+        - AttributeName: analysis_id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: EventIndex
+          KeySchema:
+            - AttributeName: event_id
+              KeyType: HASH
+            - AttributeName: analyzed_at
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: RecentIndex
+          KeySchema:
+            - AttributeName: record_type
+              KeyType: HASH
+            - AttributeName: analyzed_at
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+  FunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: WriteAndReadAuditRecords
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource:
+                  - !GetAtt AuditTable.Arn
+                  - !Sub "${AuditTable.Arn}/index/*"
+              - !If
+                - HasOpenAISecret
+                - Effect: Allow
+                  Action: secretsmanager:GetSecretValue
+                  Resource: !Ref OpenAIApiKeySecretArn
+                - !Ref AWS::NoValue
+
+  WebFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: AuditTable
+    Properties:
+      FunctionName: !Ref FunctionName
+      PackageType: Image
+      Code:
+        ImageUri: !Ref ImageIdentifier
+      Role: !GetAtt FunctionRole.Arn
+      Architectures:
+        - x86_64
+      MemorySize: 1024
+      Timeout: 180
+      Environment:
+        Variables:
+          ANALYZER_MODE: !Ref AnalyzerMode
+          OPENAI_MODEL: !Ref OpenAIModel
+          OPENAI_API_KEY_SECRET_ARN: !If
+            - HasOpenAISecret
+            - !Ref OpenAIApiKeySecretArn
+            - ""
+          AUDIT_BACKEND: dynamodb
+          DYNAMODB_TABLE_NAME: !Ref AuditTable
+          AWS_REGION: !Ref AWS::Region
+      LoggingConfig:
+        LogFormat: JSON
+        ApplicationLogLevel: INFO
+        SystemLogLevel: WARN
+
+  FunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      TargetFunctionArn: !GetAtt WebFunction.Arn
+      AuthType: !Ref FunctionUrlAuthType
+      InvokeMode: BUFFERED
+
+  FunctionUrlPermission:
+    Type: AWS::Lambda::Permission
+    Condition: HasPublicUrl
+    Properties:
+      FunctionName: !Ref WebFunction
+      Action: lambda:InvokeFunctionUrl
+      Principal: "*"
+      FunctionUrlAuthType: NONE
+
+  FunctionInvokePermission:
+    Type: AWS::Lambda::Permission
+    Condition: HasPublicUrl
+    Properties:
+      FunctionName: !Ref WebFunction
+      Action: lambda:InvokeFunction
+      Principal: "*"
+      InvokedViaFunctionUrl: true
+
+Outputs:
+  FunctionArn:
+    Value: !GetAtt WebFunction.Arn
+  ServiceUrl:
+    Value: !GetAtt FunctionUrl.FunctionUrl
+  AuditTableName:
+    Value: !Ref AuditTable

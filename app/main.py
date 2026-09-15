@@ -1,3 +1,4 @@
+import asyncio
 from functools import lru_cache
 from pathlib import Path
 from time import perf_counter
@@ -5,12 +6,18 @@ from time import perf_counter
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from mangum import Mangum
 
-from app.analyzers import OpenAIAnalyzer, RuleBasedAnalyzer
+from app.analyzers import HybridAnalyzer, OpenAIAnalyzer, RuleBasedAnalyzer
 from app.analyzers.base import Analyzer
 from app.config import get_settings
 from app.models import (
     AnalysisResult,
+    BatchAnalysisRequest,
+    BatchAnalysisResult,
+    EvaluationRequest,
+    EvaluationSummary,
+    EventScenarioEvaluation,
     MetricsSummary,
     PolicyDecision,
     ResponsePreviewRequest,
@@ -19,8 +26,10 @@ from app.models import (
     SimulationRequest,
 )
 from app.scenarios import SCENARIOS, generate_events, get_scenario
-from app.services.audit import AuditStore
+from app.services.audit import create_audit_store
+from app.services.evaluation import run_evaluation
 from app.services.policy import enforce_assessment_safety, response_preview
+from app.services.scenario_evaluator import evaluate_scenarios
 
 settings = get_settings()
 static_dir = Path(__file__).parent / "static"
@@ -30,14 +39,20 @@ app = FastAPI(
     description="합성 이벤트 기반 제로 트러스트 위험 분석 및 대응 시뮬레이션 API",
 )
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
-audit_store = AuditStore(settings.audit_log_path)
+audit_store = create_audit_store(settings)
 
 
 @lru_cache
 def get_analyzer() -> Analyzer:
     current = get_settings()
-    if current.analyzer_mode == "openai":
-        return OpenAIAnalyzer(current)
+    return build_analyzer(current.analyzer_mode)
+
+
+def build_analyzer(mode: str) -> Analyzer:
+    if mode == "openai":
+        return OpenAIAnalyzer(get_settings())
+    if mode == "hybrid":
+        return HybridAnalyzer(get_settings())
     return RuleBasedAnalyzer()
 
 
@@ -47,6 +62,7 @@ def health() -> dict:
         "status": "ok",
         "version": settings.app_version,
         "analyzer_mode": settings.analyzer_mode,
+        "audit_backend": settings.audit_backend,
     }
 
 
@@ -76,21 +92,54 @@ def simulate(request: SimulationRequest) -> list[SecurityEvent]:
         raise HTTPException(status_code=404, detail=f"Unknown scenario: {exc.args[0]}") from exc
 
 
+@app.post("/scenarios/evaluate", response_model=EventScenarioEvaluation)
+def evaluate_event_scenarios(event: SecurityEvent) -> EventScenarioEvaluation:
+    return evaluate_scenarios(event, SCENARIOS)
+
+
 @app.post("/analysis", response_model=AnalysisResult)
 async def analyze(event: SecurityEvent) -> AnalysisResult:
-    started = perf_counter()
     try:
         analyzer = get_analyzer()
     except ValueError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
     try:
-        assessment = await analyzer.analyze(event)
+        return await _analyze_event(event, analyzer)
     except Exception as exc:
         raise HTTPException(status_code=502, detail="Analysis provider failed") from exc
 
-    safe_assessment = enforce_assessment_safety(assessment)
-    decision = response_preview(safe_assessment)
+
+@app.post("/analysis/batch", response_model=BatchAnalysisResult)
+async def analyze_batch(request: BatchAnalysisRequest) -> BatchAnalysisResult:
+    try:
+        analyzer = get_analyzer()
+    except ValueError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    semaphore = asyncio.Semaphore(3)
+
+    async def analyze_with_limit(event: SecurityEvent) -> AnalysisResult:
+        async with semaphore:
+            return await _analyze_event(event, analyzer)
+
+    try:
+        results = await asyncio.gather(*(analyze_with_limit(event) for event in request.events))
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail="Batch analysis provider failed") from exc
+    return BatchAnalysisResult(
+        analyzer=analyzer.name,
+        requested=len(request.events),
+        completed=len(results),
+        results=results,
+    )
+
+
+async def _analyze_event(event: SecurityEvent, analyzer: Analyzer) -> AnalysisResult:
+    started = perf_counter()
+    assessment = await analyzer.analyze(event)
+    safe_assessment = enforce_assessment_safety(assessment, event)
+    decision = response_preview(safe_assessment, event)
     result = AnalysisResult(
         event_id=event.event_id,
         analyzer=analyzer.name,
@@ -104,7 +153,16 @@ async def analyze(event: SecurityEvent) -> AnalysisResult:
 
 @app.post("/response/preview", response_model=PolicyDecision)
 def preview(request: ResponsePreviewRequest) -> PolicyDecision:
-    return response_preview(request.assessment)
+    return response_preview(request.assessment, request.event)
+
+
+@app.post("/evaluation/run", response_model=EvaluationSummary)
+async def evaluate(request: EvaluationRequest) -> EvaluationSummary:
+    try:
+        analyzer = build_analyzer(request.analyzer)
+    except ValueError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    return await run_evaluation(analyzer, request.runs_per_scenario)
 
 
 @app.get("/metrics", response_model=MetricsSummary)
@@ -124,3 +182,6 @@ def result(event_id: str) -> AnalysisResult:
     if record is None:
         raise HTTPException(status_code=404, detail="Result not found")
     return record
+
+
+handler = Mangum(app, lifespan="off")

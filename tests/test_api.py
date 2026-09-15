@@ -80,3 +80,15 @@ def test_metrics_and_recent_results_include_completed_analysis() -> None:
     assert recent.status_code == 200
     assert recent.json()[0]["event_id"] == "evt-zt-s03"
     assert "analyzed_at" in recent.json()[0]
+
+
+def test_batch_analysis_processes_multiple_events() -> None:
+    events = client.post("/events/simulate", json={"count": 3}).json()
+    response = client.post("/analysis/batch", json={"events": events})
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["analyzer"] == "rule"
+    assert payload["requested"] == 3
+    assert payload["completed"] == 3
+    assert len(payload["results"]) == 3

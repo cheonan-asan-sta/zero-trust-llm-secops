@@ -2,12 +2,28 @@ from copy import deepcopy
 
 from app.models import (
     AttackTechnique,
+    ConditionOperator,
     RecommendedAction,
     RiskLevel,
     ScenarioCategory,
+    ScenarioCondition,
     ScenarioSummary,
     SecurityEvent,
 )
+
+
+def _condition(
+    field: str,
+    operator: ConditionOperator,
+    value: object,
+    description: str,
+) -> ScenarioCondition:
+    return ScenarioCondition(
+        field=field,
+        operator=operator,
+        value=value,
+        description=description,
+    )
 
 SCENARIOS = [
     ScenarioSummary(
@@ -21,6 +37,26 @@ SCENARIOS = [
             "device.security_posture = healthy",
             "auth_context.mfa = success",
             "resource.required_role = user.role",
+            "network.access_method = office",
+            "action = READ",
+        ],
+        detection_conditions=[
+            _condition("device.managed", ConditionOperator.EQUALS, True, "관리 기기"),
+            _condition(
+                "device.security_posture", ConditionOperator.EQUALS, "healthy", "건강한 기기"
+            ),
+            _condition("auth_context.mfa", ConditionOperator.EQUALS, "success", "MFA 성공"),
+            _condition("user.role", ConditionOperator.EQUALS, "analyst", "분석가 역할"),
+            _condition(
+                "resource.required_role",
+                ConditionOperator.EQUALS,
+                "analyst",
+                "자원 요구 역할 일치",
+            ),
+            _condition(
+                "network.access_method", ConditionOperator.EQUALS, "office", "사내망 접속"
+            ),
+            _condition("action", ConditionOperator.EQUALS, "READ", "일반 조회 요청"),
         ],
         expected_risk=RiskLevel.LOW,
         expected_action=RecommendedAction.ALLOW,
@@ -37,6 +73,16 @@ SCENARIOS = [
             "auth_context.mfa = success",
             "behavior.request_rate = normal",
         ],
+        detection_conditions=[
+            _condition("network.access_method", ConditionOperator.EQUALS, "vpn", "VPN 접속"),
+            _condition(
+                "network.location_anomaly", ConditionOperator.EQUALS, False, "위치 이상 없음"
+            ),
+            _condition("auth_context.mfa", ConditionOperator.EQUALS, "success", "MFA 성공"),
+            _condition(
+                "behavior.request_rate", ConditionOperator.EQUALS, "normal", "정상 요청 빈도"
+            ),
+        ],
         expected_risk=RiskLevel.LOW,
         expected_action=RecommendedAction.ALLOW,
     ),
@@ -51,6 +97,27 @@ SCENARIOS = [
             "resource.required_role = backup-operator",
             "behavior.download_volume_mb >= 500",
             "behavior.policy_exception_approved = true",
+        ],
+        detection_conditions=[
+            _condition("user.role", ConditionOperator.EQUALS, "backup-operator", "백업 담당자"),
+            _condition(
+                "resource.required_role",
+                ConditionOperator.EQUALS,
+                "backup-operator",
+                "백업 자원 역할 일치",
+            ),
+            _condition(
+                "behavior.download_volume_mb",
+                ConditionOperator.GREATER_THAN_OR_EQUAL,
+                500,
+                "500MB 이상 다운로드",
+            ),
+            _condition(
+                "behavior.policy_exception_approved",
+                ConditionOperator.EQUALS,
+                True,
+                "유효한 정책 예외 승인",
+            ),
         ],
         normal_exceptions=["승인된 백업 또는 데이터 이관 작업"],
         expected_risk=RiskLevel.MEDIUM,
@@ -76,6 +143,22 @@ SCENARIOS = [
             "network.location_anomaly = true",
             "resource.sensitivity = critical",
         ],
+        detection_conditions=[
+            _condition("auth_context.mfa", ConditionOperator.EQUALS, "failed", "MFA 실패"),
+            _condition(
+                "auth_context.failed_attempts",
+                ConditionOperator.GREATER_THAN_OR_EQUAL,
+                3,
+                "로그인 3회 이상 실패",
+            ),
+            _condition("device.managed", ConditionOperator.EQUALS, False, "미관리 기기"),
+            _condition(
+                "network.location_anomaly", ConditionOperator.EQUALS, True, "비정상 위치"
+            ),
+            _condition(
+                "resource.sensitivity", ConditionOperator.EQUALS, "critical", "치명 자원 접근"
+            ),
+        ],
         normal_exceptions=["출장이나 VPN 출구 변경으로 인한 위치 변화"],
         expected_risk=RiskLevel.CRITICAL,
         expected_action=RecommendedAction.HOLD_FOR_REVIEW,
@@ -99,6 +182,16 @@ SCENARIOS = [
             "behavior.new_device = true",
             "network.access_method = remote",
         ],
+        detection_conditions=[
+            _condition("device.managed", ConditionOperator.EQUALS, False, "미관리 기기"),
+            _condition(
+                "device.security_posture", ConditionOperator.EQUALS, "unknown", "보안 상태 불명"
+            ),
+            _condition("behavior.new_device", ConditionOperator.EQUALS, True, "새 기기"),
+            _condition(
+                "network.access_method", ConditionOperator.EQUALS, "remote", "원격 접속"
+            ),
+        ],
         normal_exceptions=["아직 등록되지 않은 신규 지급 장비", "사전 승인된 BYOD 접근"],
         expected_risk=RiskLevel.MEDIUM,
         expected_action=RecommendedAction.REQUIRE_MFA,
@@ -121,6 +214,24 @@ SCENARIOS = [
             "action = ADMIN",
             "resource.sensitivity = critical",
             "auth_context.failed_attempts >= 3",
+        ],
+        detection_conditions=[
+            _condition(
+                "resource.required_role",
+                ConditionOperator.NOT_EQUALS,
+                "analyst",
+                "요청자 역할과 다른 권한 필요",
+            ),
+            _condition("action", ConditionOperator.EQUALS, "ADMIN", "관리자 기능 요청"),
+            _condition(
+                "resource.sensitivity", ConditionOperator.EQUALS, "critical", "치명 자원 접근"
+            ),
+            _condition(
+                "auth_context.failed_attempts",
+                ConditionOperator.GREATER_THAN_OR_EQUAL,
+                3,
+                "로그인 3회 이상 실패",
+            ),
         ],
         normal_exceptions=["사전 승인된 긴급 권한", "직무 변경 후 동기화 지연"],
         expected_risk=RiskLevel.HIGH,
@@ -146,6 +257,24 @@ SCENARIOS = [
             "network.location_anomaly = true",
             "device.security_posture = at_risk",
         ],
+        detection_conditions=[
+            _condition("action", ConditionOperator.EQUALS, "REMOTE_ACCESS", "원격 접근 요청"),
+            _condition(
+                "behavior.distinct_resources_10m",
+                ConditionOperator.GREATER_THAN_OR_EQUAL,
+                8,
+                "10분 내 8개 이상 자원 접근",
+            ),
+            _condition(
+                "behavior.request_rate", ConditionOperator.EQUALS, "high", "높은 요청 빈도"
+            ),
+            _condition(
+                "network.location_anomaly", ConditionOperator.EQUALS, True, "비정상 위치"
+            ),
+            _condition(
+                "device.security_posture", ConditionOperator.EQUALS, "at_risk", "취약한 기기"
+            ),
+        ],
         normal_exceptions=["승인된 배포 자동화", "장애 대응을 위한 운영자의 원격 접근"],
         expected_risk=RiskLevel.HIGH,
         expected_action=RecommendedAction.HOLD_FOR_REVIEW,
@@ -169,6 +298,27 @@ SCENARIOS = [
             "behavior.download_volume_mb >= 500",
             "behavior.unusual_time = true",
             "behavior.policy_exception_approved = false",
+        ],
+        detection_conditions=[
+            _condition(
+                "resource.sensitivity", ConditionOperator.EQUALS, "critical", "치명 자원 접근"
+            ),
+            _condition("action", ConditionOperator.EQUALS, "DOWNLOAD", "다운로드 요청"),
+            _condition(
+                "behavior.download_volume_mb",
+                ConditionOperator.GREATER_THAN_OR_EQUAL,
+                500,
+                "500MB 이상 다운로드",
+            ),
+            _condition(
+                "behavior.unusual_time", ConditionOperator.EQUALS, True, "비정상 시간대"
+            ),
+            _condition(
+                "behavior.policy_exception_approved",
+                ConditionOperator.EQUALS,
+                False,
+                "정책 예외 미승인",
+            ),
         ],
         normal_exceptions=["승인된 백업", "사전 검토를 거친 데이터 이관 작업"],
         expected_risk=RiskLevel.HIGH,
@@ -223,7 +373,7 @@ _BASE = {
         "new_device": False,
         "unusual_time": False,
         "request_rate": "normal",
-        "download_volume_mb": 2,
+        "download_volume_mb": 0,
         "distinct_resources_10m": 1,
         "policy_exception_approved": False,
     },
@@ -270,7 +420,23 @@ def synthetic_events() -> list[SecurityEvent]:
                 "required_role": "backup-operator",
             },
             action="DOWNLOAD",
-            behavior={"download_volume_mb": 700, "policy_exception_approved": True},
+            behavior={
+                "download_volume_mb": 700,
+                "policy_exception_approved": True,
+                "policy_exception": {
+                    "exception_id": "EXC-BACKUP-01",
+                    "approved_by": "security-manager",
+                    "reason": "정기 백업 작업 승인",
+                    "valid_from": "2026-09-01T00:00:00+09:00",
+                    "valid_until": "2026-09-30T23:59:59+09:00",
+                    "scope": {
+                        "roles": ["backup-operator"],
+                        "resource_ids": ["backup-approved-01"],
+                        "actions": ["DOWNLOAD"],
+                        "max_download_volume_mb": 1000,
+                    },
+                },
+            },
         ),
         _build(
             "evt-zt-s01",

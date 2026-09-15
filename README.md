@@ -8,13 +8,19 @@ LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 �
 - 제로 트러스트 판단에 필요한 공통 이벤트 모델
 - 정상 3건과 위협 5건으로 구성된 합성 이벤트
 - ATT&CK 기법·관찰 신호·정상 예외를 포함한 3주차 위협 시나리오 카탈로그
+- 설명 문자열과 분리된 실행 가능한 시나리오 탐지 조건
+- 승인자·유효기간·대상·용량 범위를 검증하는 정책 예외
 - 규칙 기반 위험 분석기
-- OpenAI Structured Outputs 기반 선택형 LLM 분석기
+- 확신이 낮은 사례만 LLM으로 교차 검토하는 하이브리드 분석기
+- 10개 Few-shot 예시와 OpenAI Structured Outputs 기반 선택형 LLM 분석기
 - 정책 안전장치와 대응 미리보기
 - 재시작 후에도 복원되는 JSONL 감사 기록
-- 누적 분석·위험도·분석기별 현황 API
+- AWS 배포 시 DynamoDB에 보존되는 감사 기록
+- 단건·최대 20건 병렬 분석과 시나리오 자동 매칭 API
+- 정확도·F1·JSON 유효율·평균/P95 응답시간 평가 API
 - 천안아산역 콘셉트의 한국어 관제 대시보드
 - FastAPI 엔드포인트와 자동 테스트
+- AWS 계정 보호 장치가 포함된 Lambda 컨테이너 배포 정의
 
 실제 계정 차단, 권한 변경, 세션 격리는 수행하지 않습니다.
 
@@ -65,6 +71,17 @@ OPENAI_MODEL=gpt-5.4-mini
 
 OpenAI SDK는 환경변수의 키를 자동으로 읽으며, 분석 결과는 Pydantic 모델에 맞춘 구조화 출력으로 받습니다.
 
+### 하이브리드 모드
+
+규칙 분석의 신뢰도가 기준값 이상이면 즉시 결과를 반환하고, 애매한 사례만 OpenAI로 교차 검토합니다. API 호출량과 지연을 줄이면서 LLM 호출 실패 시 규칙 결과와 사람 검토 전환으로 안전하게 복구합니다.
+
+```dotenv
+ANALYZER_MODE=hybrid
+OPENAI_API_KEY=발급받은_키
+HYBRID_CONFIDENCE_THRESHOLD=0.85
+HYBRID_LLM_TIMEOUT_SECONDS=2.5
+```
+
 ## 주요 API
 
 | 메서드 | 경로 | 설명 |
@@ -74,6 +91,9 @@ OpenAI SDK는 환경변수의 키를 자동으로 읽으며, 분석 결과는 Py
 | GET | `/scenarios/{scenario_id}` | ATT&CK 매핑과 관찰 신호를 포함한 시나리오 정의 |
 | POST | `/events/simulate` | 합성 이벤트 생성 |
 | POST | `/analysis` | 이벤트 위험 분석과 정책 검토 |
+| POST | `/analysis/batch` | 최대 20개 이벤트 제한 병렬 분석 |
+| POST | `/scenarios/evaluate` | 구조화 조건으로 시나리오 일치도 계산 |
+| POST | `/evaluation/run` | 기준 사례 정확도·F1·유효율·지연시간 측정 |
 | POST | `/response/preview` | 실제 조치 없는 대응 미리보기 |
 | GET | `/metrics` | 누적 분석 현황 요약 |
 | GET | `/results?limit=20` | 최근 분석 결과 목록 |
@@ -93,7 +113,29 @@ app/
 tests/             API와 정책 테스트
 runtime/           실행 중 생성되는 감사 기록
 docs/week03/       3주차 위협 모델·이벤트 스키마·아키텍처 산출물
+docs/week04/       정책 예외·조건 평가·가속 개발 산출물
+infra/             ECR·Lambda·DynamoDB CloudFormation
+scripts/           대상 계정 검증이 포함된 AWS 배포 스크립트
 ```
+
+## AWS 배포
+
+배포 대상 계정은 `172585182454`, 기본 리전은 서울(`ap-northeast-2`)이다. 배포 스크립트는 현재 AWS 자격 증명의 계정 번호가 다르면 이미지 업로드나 리소스 생성을 시작하기 전에 중단한다.
+
+```powershell
+.\scripts\deploy-aws.ps1 -Profile 대상_계정_프로필
+```
+
+기본 배포는 API 비용이 들지 않는 `rule` 분석 모드다. `openai`와 `hybrid` 모드는 키를 코드나 명령행 평문으로 전달하지 않고 AWS Secrets Manager의 비밀 ARN을 사용한다.
+
+```powershell
+.\scripts\deploy-aws.ps1 `
+  -Profile 대상_계정_프로필 `
+  -AnalyzerMode hybrid `
+  -OpenAIApiKeySecretArn arn:aws:secretsmanager:ap-northeast-2:172585182454:secret:이름
+```
+
+배포 구성은 ECR 이미지 스캔, HTTPS Lambda 함수 URL, 최소 권한 실행 역할, 암호화·시점 복구·삭제 방지를 적용한 DynamoDB 감사 테이블을 만든다. `rule` 모드 웹 엔드포인트는 공개 데모용이므로 실제 기업 이벤트나 개인정보를 입력하지 않는다. 비용이 발생할 수 있는 `openai`와 `hybrid` 모드는 자동으로 AWS IAM 인증을 요구해 익명 호출을 막는다.
 
 ## 안전 원칙
 

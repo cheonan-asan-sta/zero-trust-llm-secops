@@ -1,6 +1,7 @@
 from datetime import UTC, datetime
 from enum import Enum
 from typing import Annotated, Literal, Self
+from uuid import uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -34,10 +35,95 @@ class RecommendedAction(str, Enum):
     HOLD_FOR_REVIEW = "HOLD_FOR_REVIEW"
 
 
+class EventAction(str, Enum):
+    LOGIN = "LOGIN"
+    READ = "READ"
+    DOWNLOAD = "DOWNLOAD"
+    ADMIN = "ADMIN"
+    REMOTE_ACCESS = "REMOTE_ACCESS"
+
+
 class ScenarioCategory(str, Enum):
     NORMAL = "NORMAL"
     NORMAL_EXCEPTION = "NORMAL_EXCEPTION"
     THREAT = "THREAT"
+
+
+class ConditionOperator(str, Enum):
+    EQUALS = "eq"
+    NOT_EQUALS = "ne"
+    GREATER_THAN = "gt"
+    GREATER_THAN_OR_EQUAL = "gte"
+    LESS_THAN = "lt"
+    LESS_THAN_OR_EQUAL = "lte"
+    IN = "in"
+    NOT_IN = "not_in"
+
+
+class ExceptionScope(StrictModel):
+    user_ids: list[Annotated[str, Field(min_length=1, max_length=64)]] = Field(
+        default_factory=list,
+        max_length=20,
+    )
+    roles: list[Annotated[str, Field(min_length=1, max_length=64)]] = Field(
+        default_factory=list,
+        max_length=20,
+    )
+    resource_ids: list[Annotated[str, Field(min_length=1, max_length=128)]] = Field(
+        default_factory=list,
+        max_length=20,
+    )
+    resource_types: list[Annotated[str, Field(min_length=1, max_length=64)]] = Field(
+        default_factory=list,
+        max_length=20,
+    )
+    actions: list[EventAction] = Field(default_factory=list, max_length=5)
+    max_download_volume_mb: float | None = Field(default=None, gt=0)
+
+
+class PolicyException(StrictModel):
+    exception_id: str = Field(pattern=r"^EXC-[A-Z0-9-]{3,48}$")
+    approved_by: str = Field(min_length=2, max_length=64)
+    reason: str = Field(min_length=5, max_length=300)
+    valid_from: datetime
+    valid_until: datetime
+    scope: ExceptionScope
+
+    @model_validator(mode="after")
+    def validate_time_window(self) -> Self:
+        for field_name, value in (
+            ("valid_from", self.valid_from),
+            ("valid_until", self.valid_until),
+        ):
+            if value.tzinfo is None or value.utcoffset() is None:
+                raise ValueError(f"{field_name} must include a timezone")
+        if self.valid_until <= self.valid_from:
+            raise ValueError("valid_until must be later than valid_from")
+        return self
+
+    def applies_to(
+        self,
+        *,
+        timestamp: datetime,
+        user_id: str,
+        role: str,
+        resource_id: str,
+        resource_type: str,
+        action: EventAction,
+        download_volume_mb: float,
+    ) -> bool:
+        scope = self.scope
+        checks = (
+            self.valid_from <= timestamp <= self.valid_until,
+            not scope.user_ids or user_id in scope.user_ids,
+            not scope.roles or role in scope.roles,
+            not scope.resource_ids or resource_id in scope.resource_ids,
+            not scope.resource_types or resource_type in scope.resource_types,
+            not scope.actions or action in scope.actions,
+            scope.max_download_volume_mb is None
+            or download_volume_mb <= scope.max_download_volume_mb,
+        )
+        return all(checks)
 
 
 class UserContext(StrictModel):
@@ -80,7 +166,16 @@ class BehaviorContext(StrictModel):
     download_volume_mb: float = Field(default=0, ge=0)
     distinct_resources_10m: int = Field(default=1, ge=0)
     policy_exception_approved: bool = False
+    policy_exception: PolicyException | None = None
     event_text: str | None = Field(default=None, max_length=500)
+
+    @model_validator(mode="after")
+    def exception_requires_approval_flag(self) -> Self:
+        if self.policy_exception_approved != (self.policy_exception is not None):
+            raise ValueError(
+                "policy_exception_approved must be true exactly when policy_exception is supplied"
+            )
+        return self
 
 
 class GroundTruth(StrictModel):
@@ -96,7 +191,7 @@ class SecurityEvent(StrictModel):
     device: DeviceContext
     network: NetworkContext
     resource: ResourceContext
-    action: Literal["LOGIN", "READ", "DOWNLOAD", "ADMIN", "REMOTE_ACCESS"]
+    action: EventAction
     auth_context: AuthContext
     behavior: BehaviorContext
     ground_truth: GroundTruth | None = None
@@ -107,6 +202,31 @@ class SecurityEvent(StrictModel):
         if value.tzinfo is None or value.utcoffset() is None:
             raise ValueError("timestamp must include a timezone")
         return value
+
+    @model_validator(mode="after")
+    def validate_context_consistency(self) -> Self:
+        if self.action != EventAction.DOWNLOAD and self.behavior.download_volume_mb > 0:
+            raise ValueError("download_volume_mb must be zero unless action is DOWNLOAD")
+        if self.auth_context.mfa == "failed" and self.auth_context.failed_attempts == 0:
+            raise ValueError("failed MFA requires at least one failed attempt")
+        if self.action == EventAction.REMOTE_ACCESS and self.network.access_method not in {
+            "remote",
+            "vpn",
+        }:
+            raise ValueError("REMOTE_ACCESS requires a remote or vpn access method")
+
+        exception = self.behavior.policy_exception
+        if exception and not exception.applies_to(
+            timestamp=self.timestamp,
+            user_id=self.user.user_id,
+            role=self.user.role,
+            resource_id=self.resource.resource_id,
+            resource_type=self.resource.resource_type,
+            action=self.action,
+            download_volume_mb=self.behavior.download_volume_mb,
+        ):
+            raise ValueError("policy_exception does not apply to this event context")
+        return self
 
     def analysis_payload(self) -> dict:
         return self.model_dump(mode="json", exclude={"ground_truth"})
@@ -132,15 +252,29 @@ class PolicyDecision(StrictModel):
     allowed: bool
     requires_human_review: bool
     reason: str
+    controls_applied: list[str] = Field(default_factory=list, max_length=20)
+    exception_id: str | None = None
 
 
 class AnalysisResult(StrictModel):
+    analysis_id: str = Field(default_factory=lambda: uuid4().hex)
     event_id: str
-    analyzer: Literal["rule", "openai"]
+    analyzer: Literal["rule", "openai", "hybrid"]
     assessment: SecurityAssessment
     policy_decision: PolicyDecision
     latency_ms: float = Field(ge=0)
     analyzed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+
+class BatchAnalysisRequest(StrictModel):
+    events: list[SecurityEvent] = Field(min_length=1, max_length=20)
+
+
+class BatchAnalysisResult(StrictModel):
+    analyzer: Literal["rule", "openai", "hybrid"]
+    requested: int = Field(ge=1, le=20)
+    completed: int = Field(ge=0, le=20)
+    results: list[AnalysisResult]
 
 
 class MetricsSummary(StrictModel):
@@ -149,6 +283,8 @@ class MetricsSummary(StrictModel):
     action_counts: dict[str, int]
     analyzer_counts: dict[str, int]
     latest_event_id: str | None = None
+    average_latency_ms: float = Field(default=0, ge=0)
+    p95_latency_ms: float = Field(default=0, ge=0)
 
 
 class SimulationRequest(StrictModel):
@@ -159,6 +295,38 @@ class SimulationRequest(StrictModel):
 class ResponsePreviewRequest(StrictModel):
     event_id: str
     assessment: SecurityAssessment
+    event: SecurityEvent | None = None
+
+
+ConditionScalar = bool | int | float | str
+
+
+class ScenarioCondition(StrictModel):
+    field: str = Field(
+        pattern=(
+            r"^(user|device|network|resource|auth_context|behavior)\."
+            r"[a-z][a-z0-9_]*$|^action$"
+        )
+    )
+    operator: ConditionOperator
+    value: ConditionScalar | list[ConditionScalar]
+    description: str = Field(min_length=3, max_length=160)
+
+    @model_validator(mode="after")
+    def operator_matches_value(self) -> Self:
+        is_collection = isinstance(self.value, list)
+        if self.operator in {ConditionOperator.IN, ConditionOperator.NOT_IN} and not is_collection:
+            raise ValueError("in and not_in conditions require a list value")
+        if self.operator not in {ConditionOperator.IN, ConditionOperator.NOT_IN} and is_collection:
+            raise ValueError("only in and not_in conditions accept a list value")
+        if self.operator in {
+            ConditionOperator.GREATER_THAN,
+            ConditionOperator.GREATER_THAN_OR_EQUAL,
+            ConditionOperator.LESS_THAN,
+            ConditionOperator.LESS_THAN_OR_EQUAL,
+        } and (is_collection or isinstance(self.value, (bool, str))):
+            raise ValueError("ordered comparisons require a numeric value")
+        return self
 
 
 class AttackTechnique(StrictModel):
@@ -179,6 +347,8 @@ class ScenarioSummary(StrictModel):
     observable_signals: list[Annotated[str, Field(min_length=1, max_length=160)]] = Field(
         min_length=1, max_length=20
     )
+    detection_conditions: list[ScenarioCondition] = Field(min_length=1, max_length=20)
+    detection_logic: Literal["all", "any"] = "all"
     normal_exceptions: list[Annotated[str, Field(min_length=1, max_length=160)]] = Field(
         default_factory=list, max_length=10
     )
@@ -192,3 +362,60 @@ class ScenarioSummary(StrictModel):
         if self.category != ScenarioCategory.THREAT and self.attack_techniques:
             raise ValueError("normal scenarios must not claim an ATT&CK technique")
         return self
+
+
+class ScenarioMatch(StrictModel):
+    scenario_id: str
+    name: str
+    matched: bool
+    coverage: float = Field(ge=0, le=1)
+    matched_conditions: list[str]
+    unmet_conditions: list[str]
+
+
+class EventScenarioEvaluation(StrictModel):
+    event_id: str
+    best_match: str | None
+    matches: list[ScenarioMatch]
+
+
+class EvaluationRequest(StrictModel):
+    analyzer: Literal["rule", "openai", "hybrid"] = "rule"
+    runs_per_scenario: int = Field(default=1, ge=1, le=3)
+
+
+class EvaluationCaseResult(StrictModel):
+    event_id: str
+    scenario_id: str
+    expected_risk: RiskLevel
+    actual_risk: RiskLevel | None
+    expected_action: RecommendedAction
+    actual_action: RecommendedAction | None
+    risk_correct: bool
+    action_correct: bool
+    threat_expected: bool
+    threat_detected: bool
+    json_valid: bool = True
+    latency_ms: float = Field(ge=0)
+
+
+class EvaluationTargets(StrictModel):
+    risk_accuracy: float = Field(default=0.7, ge=0, le=1)
+    json_valid_rate: float = Field(default=0.9, ge=0, le=1)
+    p95_latency_ms: float = Field(default=3000, gt=0)
+
+
+class EvaluationSummary(StrictModel):
+    analyzer: Literal["rule", "openai", "hybrid"]
+    total_cases: int = Field(ge=1)
+    risk_accuracy: float = Field(ge=0, le=1)
+    action_accuracy: float = Field(ge=0, le=1)
+    threat_precision: float = Field(ge=0, le=1)
+    threat_recall: float = Field(ge=0, le=1)
+    threat_f1: float = Field(ge=0, le=1)
+    json_valid_rate: float = Field(ge=0, le=1)
+    average_latency_ms: float = Field(ge=0)
+    p95_latency_ms: float = Field(ge=0)
+    targets: EvaluationTargets = Field(default_factory=EvaluationTargets)
+    targets_met: dict[str, bool]
+    cases: list[EvaluationCaseResult]

@@ -123,7 +123,31 @@
               <span id="reviewState">검토 상태</span>
               <span id="latency">응답 시간</span>
             </div>
+            <div id="decisionControls" class="control-list" aria-label="적용된 안전 통제"></div>
           </article>
+        </div>
+      </section>
+
+      <section class="summary-section shell evaluation-section">
+        <div class="section-heading-row">
+          <div>
+            <p class="section-kicker">QUALITY CHECKPOINT</p>
+            <h2>반복 평가</h2>
+          </div>
+          <button id="evaluationButton" class="secondary-button" type="button">
+            8개 기준 사례 평가
+          </button>
+        </div>
+        <p id="evaluationState" class="evaluation-state">
+          위험도 정확도 70%, JSON 유효율 90%, P95 응답 3초 이내 목표를 확인합니다.
+        </p>
+        <div id="evaluationGrid" class="metric-grid evaluation-grid" hidden>
+          <article><span>위험도 정확도</span><strong id="riskAccuracy">-</strong></article>
+          <article><span>대응 정확도</span><strong id="actionAccuracy">-</strong></article>
+          <article><span>위협 F1</span><strong id="threatF1">-</strong></article>
+          <article><span>JSON 유효율</span><strong id="jsonValidity">-</strong></article>
+          <article><span>P95 응답</span><strong id="evaluationP95">-</strong></article>
+          <article><span>목표 판정</span><strong id="targetResult">-</strong></article>
         </div>
       </section>
 
@@ -135,11 +159,13 @@
           </div>
           <button id="refreshButton" class="text-button" type="button">새로고침</button>
         </div>
-        <div class="metric-grid">
+        <div class="metric-grid operation-metrics">
           <article><span>누적 분석</span><strong id="totalAnalyses">0</strong></article>
           <article><span>고위험 이상</span><strong id="highRiskCount">0</strong></article>
           <article><span>OpenAI 분석</span><strong id="openaiCount">0</strong></article>
           <article><span>최근 이벤트</span><strong id="latestEvent">-</strong></article>
+          <article><span>평균 응답</span><strong id="averageLatency">0ms</strong></article>
+          <article><span>P95 응답</span><strong id="p95Latency">0ms</strong></article>
         </div>
         <div class="history-wrap">
           <table>
@@ -156,7 +182,7 @@
 
     <footer class="shell">
       <span>천안아산역 · Zero Trust LLM SecOps</span>
-      <span>SIMULATION ONLY · v0.2</span>
+      <span>SIMULATION ONLY · v0.3</span>
     </footer>
   </body>
 </html>

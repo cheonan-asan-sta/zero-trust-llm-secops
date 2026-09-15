@@ -11,15 +11,25 @@ class RuleBasedAnalyzer:
     name = "rule"
 
     async def analyze(self, event: SecurityEvent) -> SecurityAssessment:
+        return self.assess(event)
+
+    def assess(self, event: SecurityEvent) -> SecurityAssessment:
         score, evidence, labels = self._score(event)
         risk_level = self._risk_level(score)
         violation = self._violation_type(event)
-        action = self._recommended_action(risk_level, violation)
+        action = self.recommended_action(risk_level, violation)
 
         if labels:
             rationale = "위험 판단에 사용한 신호: " + ", ".join(labels) + "."
         else:
             rationale = "등록된 기기와 정상 접근 패턴이 확인되어 위험 신호가 낮습니다."
+
+        if not evidence:
+            confidence = 0.95
+        elif event.behavior.policy_exception is not None:
+            confidence = 0.9
+        else:
+            confidence = min(0.72 + len(evidence) * 0.03, 0.93)
 
         return SecurityAssessment(
             risk_score=score,
@@ -27,7 +37,7 @@ class RuleBasedAnalyzer:
             violation_type=violation,
             rationale=rationale,
             recommended_action=action,
-            confidence=min(0.72 + len(evidence) * 0.03, 0.93),
+            confidence=confidence,
             evidence=evidence,
             requires_human_review=risk_level in {RiskLevel.HIGH, RiskLevel.CRITICAL},
         )
@@ -144,7 +154,7 @@ class RuleBasedAnalyzer:
         return ViolationType.NORMAL
 
     @staticmethod
-    def _recommended_action(risk_level: RiskLevel, violation: ViolationType) -> RecommendedAction:
+    def recommended_action(risk_level: RiskLevel, violation: ViolationType) -> RecommendedAction:
         if risk_level == RiskLevel.CRITICAL:
             return RecommendedAction.HOLD_FOR_REVIEW
         if risk_level == RiskLevel.HIGH:

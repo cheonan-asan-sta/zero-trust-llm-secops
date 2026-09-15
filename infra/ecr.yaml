@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Container registry for the Zero Trust LLM SecOps demo
+
+Parameters:
+  RepositoryName:
+    Type: String
+    Default: zero-trust-llm-secops
+
+Resources:
+  ContainerRepository:
+    Type: AWS::ECR::Repository
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      RepositoryName: !Ref RepositoryName
+      EncryptionConfiguration:
+        EncryptionType: AES256
+      ImageScanningConfiguration:
+        ScanOnPush: true
+      ImageTagMutability: IMMUTABLE
+      LifecyclePolicy:
+        LifecyclePolicyText: >-
+          {"rules":[{"rulePriority":1,"description":"Keep the newest ten images","selection":{"tagStatus":"any","countType":"imageCountMoreThan","countNumber":10},"action":{"type":"expire"}}]}
+
+Outputs:
+  RepositoryUri:
+    Value: !GetAtt ContainerRepository.RepositoryUri
+  RepositoryArn:
+    Value: !GetAtt ContainerRepository.Arn
