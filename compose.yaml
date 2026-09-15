@@ -1,0 +1,27 @@
+name: zero-trust-llm-secops
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: zero-trust-llm-secops:local
+    environment:
+      ANALYZER_MODE: rule
+      AUDIT_BACKEND: jsonl
+      AUDIT_LOG_PATH: /data/audit.jsonl
+    ports:
+      - "127.0.0.1:${SECOPS_PORT:-8000}:8000"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    volumes:
+      - secops-audit:/data
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: "no"
+
+volumes:
+  secops-audit:

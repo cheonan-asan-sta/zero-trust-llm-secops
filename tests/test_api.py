@@ -17,6 +17,7 @@ def test_dashboard_is_available() -> None:
     assert response.status_code == 200
     assert "천안아산역" in response.text
     assert "Zero Trust SecOps" in response.text
+    assert "AI 교차분석" in response.text
 
 
 def test_default_simulation_returns_eight_events() -> None:

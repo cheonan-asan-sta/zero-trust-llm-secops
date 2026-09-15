@@ -21,6 +21,7 @@ LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 �
 - 천안아산역 콘셉트의 한국어 관제 대시보드
 - FastAPI 엔드포인트와 자동 테스트
 - AWS 계정 보호 장치가 포함된 Lambda 컨테이너 배포 정의
+- API 키 없이 전체 검증 가능한 로컬 Docker·Compose 경로
 
 실제 계정 차단, 권한 변경, 세션 격리는 수행하지 않습니다.
 
@@ -45,6 +46,28 @@ uvicorn app.main:app --reload
 
 ```powershell
 pytest -q
+```
+
+## 비용 없는 Docker 실행과 검증
+
+로컬 Docker는 `rule` 모드만 사용하므로 OpenAI API와 AWS 비용이 발생하지 않습니다. 컨테이너는 비루트 사용자, 읽기 전용 파일 시스템, Linux capability 제거, 추가 권한 획득 금지 설정으로 실행됩니다.
+
+```powershell
+docker compose up --build
+```
+
+브라우저에서 http://127.0.0.1:8000/ 을 열고 사용할 수 있습니다. 종료할 때는 다음 명령을 실행합니다.
+
+```powershell
+docker compose down
+```
+
+로컬 감사 기록까지 함께 지우려면 `docker compose down --volumes`를 사용합니다.
+
+Docker 내부 코드 검사·단위 테스트와 실제 API 스모크 테스트를 한 번에 실행하려면 다음 스크립트를 사용합니다. 테스트 컨테이너는 성공 여부와 관계없이 자동으로 제거됩니다.
+
+```powershell
+.\scripts\test-docker.ps1
 ```
 
 ## 분석 모드
@@ -114,6 +137,7 @@ tests/             API와 정책 테스트
 runtime/           실행 중 생성되는 감사 기록
 docs/week03/       3주차 위협 모델·이벤트 스키마·아키텍처 산출물
 docs/week04/       정책 예외·조건 평가·가속 개발 산출물
+docs/week05/       비용 없는 로컬 Docker 검증 산출물
 infra/             ECR·Lambda·DynamoDB CloudFormation
 scripts/           대상 계정 검증이 포함된 AWS 배포 스크립트
 ```

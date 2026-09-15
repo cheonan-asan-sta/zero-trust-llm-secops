@@ -23,5 +23,11 @@ jobs:
         run: python -m ruff check .
       - name: Run tests
         run: python -m pytest -q
+      - name: Run tests in Docker
+        run: |
+          docker build --file Dockerfile.test --tag zero-trust-llm-secops:ci-tests .
+          docker run --rm zero-trust-llm-secops:ci-tests
+      - name: Build application image
+        run: docker build --platform linux/amd64 --provenance=false --file Dockerfile --tag zero-trust-llm-secops:ci .
       - name: Build Lambda image
-        run: docker build --file Dockerfile.lambda --tag zero-trust-llm-secops:ci .
+        run: docker build --platform linux/amd64 --provenance=false --file Dockerfile.lambda --tag zero-trust-llm-secops:lambda-ci .

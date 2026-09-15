@@ -1,0 +1,27 @@
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    ANALYZER_MODE=rule \
+    AUDIT_BACKEND=jsonl \
+    AUDIT_LOG_PATH=/tmp/audit.jsonl
+
+WORKDIR /workspace
+
+COPY pyproject.toml README.md ./
+COPY app ./app
+
+RUN find app -type f -name "*.py" -exec chmod 0644 {} + \
+    && pip install --no-cache-dir ".[dev]"
+
+COPY tests ./tests
+COPY docs ./docs
+COPY infra ./infra
+COPY scripts ./scripts
+COPY .github ./.github
+COPY Dockerfile Dockerfile.lambda Dockerfile.test compose.yaml ./
+
+RUN find tests -type f -name "*.py" -exec chmod 0644 {} +
+
+CMD ["sh", "-c", "python -m ruff check . && python -m pytest -q"]

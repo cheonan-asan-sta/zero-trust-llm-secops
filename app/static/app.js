@@ -33,6 +33,12 @@ const actionLabels = {
   HOLD_FOR_REVIEW: "사람 검토 대기",
 };
 
+const analyzerLabels = {
+  rule: "규칙 분석",
+  openai: "OpenAI 분석",
+  hybrid: "하이브리드 분석",
+};
+
 async function request(path, options = {}) {
   const response = await fetch(path, {
     headers: { "Content-Type": "application/json", ...(options.headers || {}) },
@@ -119,7 +125,8 @@ function setRunning(running, message, isError = false) {
 
 async function runAnalysis() {
   if (!state.selected || state.running) return;
-  setRunning(true, "합성 이벤트를 생성하고 OpenAI 분석 및 정책 검증을 진행하고 있습니다.");
+  const analyzerLabel = analyzerLabels[state.analyzerMode] || state.analyzerMode.toUpperCase();
+  setRunning(true, `합성 이벤트를 생성하고 ${analyzerLabel} 및 정책 검증을 진행하고 있습니다.`);
 
   try {
     const events = await request("/events/simulate", {
@@ -231,7 +238,8 @@ async function refreshSummary() {
     $("totalAnalyses").textContent = metrics.total_analyses;
     $("highRiskCount").textContent =
       (metrics.risk_counts.HIGH || 0) + (metrics.risk_counts.CRITICAL || 0);
-    $("openaiCount").textContent = metrics.analyzer_counts.openai || 0;
+    $("openaiCount").textContent =
+      (metrics.analyzer_counts.openai || 0) + (metrics.analyzer_counts.hybrid || 0);
     $("latestEvent").textContent = metrics.latest_event_id || "-";
     $("averageLatency").textContent = `${metrics.average_latency_ms.toFixed(1)}ms`;
     $("p95Latency").textContent = `${metrics.p95_latency_ms.toFixed(1)}ms`;
