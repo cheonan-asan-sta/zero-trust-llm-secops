@@ -134,7 +134,6 @@ Resources:
             - ""
           AUDIT_BACKEND: dynamodb
           DYNAMODB_TABLE_NAME: !Ref AuditTable
-          AWS_REGION: !Ref AWS::Region
       LoggingConfig:
         LogFormat: JSON
         ApplicationLogLevel: INFO

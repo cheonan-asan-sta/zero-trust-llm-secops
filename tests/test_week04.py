@@ -1,4 +1,5 @@
 import asyncio
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -55,3 +56,17 @@ def test_policy_preview_reports_validated_exception() -> None:
 
     assert decision.exception_id == "EXC-BACKUP-01"
     assert "scoped-exception-validated" in decision.controls_applied
+
+
+def test_lambda_template_avoids_reserved_environment_variables() -> None:
+    template = Path("infra/lambda.yaml").read_text(encoding="utf-8")
+
+    assert "AWS_REGION:" not in template
+
+
+def test_deployment_builds_lambda_compatible_image_and_stops_on_native_errors() -> None:
+    script = Path("scripts/deploy-aws.ps1").read_text(encoding="utf-8")
+
+    assert "$PSNativeCommandUseErrorActionPreference = $true" in script
+    assert "--platform linux/amd64" in script
+    assert "--provenance=false" in script

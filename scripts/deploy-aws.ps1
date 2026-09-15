@@ -11,6 +11,9 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    $PSNativeCommandUseErrorActionPreference = $true
+}
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $awsArgs = @()
 if ($Profile) {
@@ -58,7 +61,12 @@ aws @awsArgs ecr get-login-password --region $Region |
     docker login --username AWS --password-stdin $registryHost | Out-Null
 
 $imageIdentifier = "${repositoryUri}:${ImageTag}"
-docker build --file "$projectRoot\Dockerfile.lambda" --tag $imageIdentifier $projectRoot
+docker build `
+    --platform linux/amd64 `
+    --provenance=false `
+    --file "$projectRoot\Dockerfile.lambda" `
+    --tag $imageIdentifier `
+    $projectRoot
 docker push $imageIdentifier
 
 $appParameters = @(
