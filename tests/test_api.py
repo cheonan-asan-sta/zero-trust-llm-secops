@@ -25,6 +25,22 @@ def test_default_simulation_returns_eight_events() -> None:
     assert len(response.json()) == 8
 
 
+def test_scenario_detail_exposes_week3_threat_model() -> None:
+    response = client.get("/scenarios/ZT-S04")
+
+    assert response.status_code == 200
+    scenario = response.json()
+    assert scenario["category"] == "THREAT"
+    assert scenario["attack_techniques"][0]["technique_id"] == "T1021"
+    assert "behavior.distinct_resources_10m >= 8" in scenario["observable_signals"]
+    assert scenario["normal_exceptions"]
+
+
+def test_unknown_scenario_detail_returns_404() -> None:
+    response = client.get("/scenarios/DOES-NOT-EXIST")
+    assert response.status_code == 404
+
+
 def test_analysis_excludes_ground_truth_and_requires_review() -> None:
     event_response = client.post(
         "/events/simulate",

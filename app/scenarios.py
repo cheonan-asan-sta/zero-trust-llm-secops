@@ -1,8 +1,10 @@
 from copy import deepcopy
 
 from app.models import (
+    AttackTechnique,
     RecommendedAction,
     RiskLevel,
+    ScenarioCategory,
     ScenarioSummary,
     SecurityEvent,
 )
@@ -11,52 +13,179 @@ SCENARIOS = [
     ScenarioSummary(
         scenario_id="NORMAL-01",
         name="관리 기기의 일반 문서 조회",
+        category=ScenarioCategory.NORMAL,
+        description="관리 중인 건강한 기기에서 인증을 완료한 사용자가 업무 범위의 문서를 조회한다.",
         attack_tactic="Normal",
+        observable_signals=[
+            "device.managed = true",
+            "device.security_posture = healthy",
+            "auth_context.mfa = success",
+            "resource.required_role = user.role",
+        ],
         expected_risk=RiskLevel.LOW,
+        expected_action=RecommendedAction.ALLOW,
     ),
     ScenarioSummary(
         scenario_id="NORMAL-02",
         name="VPN 접속 후 MFA 성공",
+        category=ScenarioCategory.NORMAL,
+        description="승인된 VPN을 통해 접속한 사용자가 MFA를 완료하고 일반 자원을 조회한다.",
         attack_tactic="Normal",
+        observable_signals=[
+            "network.access_method = vpn",
+            "network.location_anomaly = false",
+            "auth_context.mfa = success",
+            "behavior.request_rate = normal",
+        ],
         expected_risk=RiskLevel.LOW,
+        expected_action=RecommendedAction.ALLOW,
     ),
     ScenarioSummary(
         scenario_id="NORMAL-03",
         name="승인된 대용량 백업",
+        category=ScenarioCategory.NORMAL_EXCEPTION,
+        description="백업 담당자가 사전 승인된 예외 정책에 따라 민감 자료를 대용량으로 다운로드한다.",
         attack_tactic="Normal exception",
+        observable_signals=[
+            "user.role = backup-operator",
+            "resource.required_role = backup-operator",
+            "behavior.download_volume_mb >= 500",
+            "behavior.policy_exception_approved = true",
+        ],
+        normal_exceptions=["승인된 백업 또는 데이터 이관 작업"],
         expected_risk=RiskLevel.MEDIUM,
+        expected_action=RecommendedAction.REQUIRE_MFA,
     ),
     ScenarioSummary(
         scenario_id="ZT-S01",
         name="탈취 계정의 비정상 접근",
+        category=ScenarioCategory.THREAT,
+        description="새 기기와 비정상 위치에서 MFA가 반복 실패한 후 민감 자료에 접근하려는 사건을 검토한다.",
         attack_tactic="Credential Access",
+        attack_techniques=[
+            AttackTechnique(
+                technique_id="T1110",
+                name="Brute Force",
+                reference_url="https://attack.mitre.org/techniques/T1110/",
+            )
+        ],
+        observable_signals=[
+            "auth_context.mfa = failed",
+            "auth_context.failed_attempts >= 3",
+            "device.managed = false",
+            "network.location_anomaly = true",
+            "resource.sensitivity = critical",
+        ],
+        normal_exceptions=["출장이나 VPN 출구 변경으로 인한 위치 변화"],
         expected_risk=RiskLevel.CRITICAL,
+        expected_action=RecommendedAction.HOLD_FOR_REVIEW,
     ),
     ScenarioSummary(
         scenario_id="ZT-S02",
         name="관리되지 않은 기기의 접근",
+        category=ScenarioCategory.THREAT,
+        description="등록되지 않은 새 기기가 원격 경로로 업무 자원에 접근하려는 사건을 검토한다.",
         attack_tactic="Initial Access",
+        attack_techniques=[
+            AttackTechnique(
+                technique_id="T1133",
+                name="External Remote Services",
+                reference_url="https://attack.mitre.org/techniques/T1133/",
+            )
+        ],
+        observable_signals=[
+            "device.managed = false",
+            "device.security_posture = unknown",
+            "behavior.new_device = true",
+            "network.access_method = remote",
+        ],
+        normal_exceptions=["아직 등록되지 않은 신규 지급 장비", "사전 승인된 BYOD 접근"],
         expected_risk=RiskLevel.MEDIUM,
+        expected_action=RecommendedAction.REQUIRE_MFA,
     ),
     ScenarioSummary(
         scenario_id="ZT-S03",
         name="권한 범위 초과",
+        category=ScenarioCategory.THREAT,
+        description="일반 분석가 계정이 관리자 콘솔과 상위 권한을 반복해 요청하는 사건을 검토한다.",
         attack_tactic="Privilege Escalation",
+        attack_techniques=[
+            AttackTechnique(
+                technique_id="T1098",
+                name="Account Manipulation",
+                reference_url="https://attack.mitre.org/techniques/T1098/",
+            )
+        ],
+        observable_signals=[
+            "resource.required_role != user.role",
+            "action = ADMIN",
+            "resource.sensitivity = critical",
+            "auth_context.failed_attempts >= 3",
+        ],
+        normal_exceptions=["사전 승인된 긴급 권한", "직무 변경 후 동기화 지연"],
         expected_risk=RiskLevel.HIGH,
+        expected_action=RecommendedAction.REDUCE_PRIVILEGE,
     ),
     ScenarioSummary(
         scenario_id="ZT-S04",
         name="내부 횡단 이동 의심",
+        category=ScenarioCategory.THREAT,
+        description="원격 접근 상태에서 짧은 시간 동안 여러 내부 자원을 이동하며 요청하는 사건을 검토한다.",
         attack_tactic="Lateral Movement",
+        attack_techniques=[
+            AttackTechnique(
+                technique_id="T1021",
+                name="Remote Services",
+                reference_url="https://attack.mitre.org/techniques/T1021/",
+            )
+        ],
+        observable_signals=[
+            "action = REMOTE_ACCESS",
+            "behavior.distinct_resources_10m >= 8",
+            "behavior.request_rate = high",
+            "network.location_anomaly = true",
+            "device.security_posture = at_risk",
+        ],
+        normal_exceptions=["승인된 배포 자동화", "장애 대응을 위한 운영자의 원격 접근"],
         expected_risk=RiskLevel.HIGH,
+        expected_action=RecommendedAction.HOLD_FOR_REVIEW,
     ),
     ScenarioSummary(
         scenario_id="ZT-S05",
         name="정책 위반 데이터 접근",
-        attack_tactic="Collection / Exfiltration",
+        category=ScenarioCategory.THREAT,
+        description="비정상 시간대에 사전 예외 승인 없이 고민감 자료를 대용량으로 다운로드하는 사건을 검토한다.",
+        attack_tactic="Exfiltration",
+        attack_techniques=[
+            AttackTechnique(
+                technique_id="T1020",
+                name="Automated Exfiltration",
+                reference_url="https://attack.mitre.org/techniques/T1020/",
+            )
+        ],
+        observable_signals=[
+            "resource.sensitivity = critical",
+            "action = DOWNLOAD",
+            "behavior.download_volume_mb >= 500",
+            "behavior.unusual_time = true",
+            "behavior.policy_exception_approved = false",
+        ],
+        normal_exceptions=["승인된 백업", "사전 검토를 거친 데이터 이관 작업"],
         expected_risk=RiskLevel.HIGH,
+        expected_action=RecommendedAction.HOLD_FOR_REVIEW,
     ),
 ]
+
+SCENARIO_INDEX = {scenario.scenario_id: scenario for scenario in SCENARIOS}
+if len(SCENARIO_INDEX) != len(SCENARIOS):
+    raise RuntimeError("scenario_id values must be unique")
+
+
+def get_scenario(scenario_id: str) -> ScenarioSummary:
+    try:
+        return SCENARIO_INDEX[scenario_id]
+    except KeyError:
+        raise KeyError(scenario_id) from None
 
 
 _BASE = {
@@ -114,18 +243,12 @@ def _build(event_id: str, scenario_id: str, **overrides) -> SecurityEvent:
 
 
 def _ground_truth(scenario_id: str) -> dict:
-    mapping = {
-        "NORMAL-01": (RiskLevel.LOW, RecommendedAction.ALLOW),
-        "NORMAL-02": (RiskLevel.LOW, RecommendedAction.ALLOW),
-        "NORMAL-03": (RiskLevel.MEDIUM, RecommendedAction.REQUIRE_MFA),
-        "ZT-S01": (RiskLevel.CRITICAL, RecommendedAction.HOLD_FOR_REVIEW),
-        "ZT-S02": (RiskLevel.MEDIUM, RecommendedAction.REQUIRE_MFA),
-        "ZT-S03": (RiskLevel.HIGH, RecommendedAction.REDUCE_PRIVILEGE),
-        "ZT-S04": (RiskLevel.HIGH, RecommendedAction.HOLD_FOR_REVIEW),
-        "ZT-S05": (RiskLevel.HIGH, RecommendedAction.HOLD_FOR_REVIEW),
+    scenario = get_scenario(scenario_id)
+    return {
+        "scenario_id": scenario_id,
+        "risk_level": scenario.expected_risk,
+        "expected_action": scenario.expected_action,
     }
-    risk, action = mapping[scenario_id]
-    return {"scenario_id": scenario_id, "risk_level": risk, "expected_action": action}
 
 
 def synthetic_events() -> list[SecurityEvent]:

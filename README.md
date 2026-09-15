@@ -7,6 +7,7 @@ LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 �
 
 - 제로 트러스트 판단에 필요한 공통 이벤트 모델
 - 정상 3건과 위협 5건으로 구성된 합성 이벤트
+- ATT&CK 기법·관찰 신호·정상 예외를 포함한 3주차 위협 시나리오 카탈로그
 - 규칙 기반 위험 분석기
 - OpenAI Structured Outputs 기반 선택형 LLM 분석기
 - 정책 안전장치와 대응 미리보기
@@ -70,6 +71,7 @@ OpenAI SDK는 환경변수의 키를 자동으로 읽으며, 분석 결과는 Py
 |---|---|---|
 | GET | `/health` | 서버와 분석 모드 확인 |
 | GET | `/scenarios` | 준비된 합성 시나리오 목록 |
+| GET | `/scenarios/{scenario_id}` | ATT&CK 매핑과 관찰 신호를 포함한 시나리오 정의 |
 | POST | `/events/simulate` | 합성 이벤트 생성 |
 | POST | `/analysis` | 이벤트 위험 분석과 정책 검토 |
 | POST | `/response/preview` | 실제 조치 없는 대응 미리보기 |
@@ -90,6 +92,7 @@ app/
   static/           관제 대시보드 화면
 tests/             API와 정책 테스트
 runtime/           실행 중 생성되는 감사 기록
+docs/week03/       3주차 위협 모델·이벤트 스키마·아키텍처 산출물
 ```
 
 ## 안전 원칙

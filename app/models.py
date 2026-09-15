@@ -1,8 +1,8 @@
 from datetime import UTC, datetime
 from enum import Enum
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class StrictModel(BaseModel):
@@ -32,6 +32,12 @@ class RecommendedAction(str, Enum):
     REDUCE_PRIVILEGE = "REDUCE_PRIVILEGE"
     ISOLATE_SESSION = "ISOLATE_SESSION"
     HOLD_FOR_REVIEW = "HOLD_FOR_REVIEW"
+
+
+class ScenarioCategory(str, Enum):
+    NORMAL = "NORMAL"
+    NORMAL_EXCEPTION = "NORMAL_EXCEPTION"
+    THREAT = "THREAT"
 
 
 class UserContext(StrictModel):
@@ -155,8 +161,34 @@ class ResponsePreviewRequest(StrictModel):
     assessment: SecurityAssessment
 
 
+class AttackTechnique(StrictModel):
+    technique_id: str = Field(pattern=r"^T\d{4}(?:\.\d{3})?$")
+    name: str = Field(min_length=1, max_length=128)
+    reference_url: str = Field(
+        pattern=r"^https://attack\.mitre\.org/techniques/T\d{4}(?:/\d{3})?/$"
+    )
+
+
 class ScenarioSummary(StrictModel):
     scenario_id: str
     name: str
+    category: ScenarioCategory
+    description: str = Field(min_length=10, max_length=500)
     attack_tactic: str
+    attack_techniques: list[AttackTechnique] = Field(default_factory=list, max_length=5)
+    observable_signals: list[Annotated[str, Field(min_length=1, max_length=160)]] = Field(
+        min_length=1, max_length=20
+    )
+    normal_exceptions: list[Annotated[str, Field(min_length=1, max_length=160)]] = Field(
+        default_factory=list, max_length=10
+    )
     expected_risk: RiskLevel
+    expected_action: RecommendedAction
+
+    @model_validator(mode="after")
+    def threat_requires_attack_mapping(self) -> Self:
+        if self.category == ScenarioCategory.THREAT and not self.attack_techniques:
+            raise ValueError("threat scenarios require at least one ATT&CK technique")
+        if self.category != ScenarioCategory.THREAT and self.attack_techniques:
+            raise ValueError("normal scenarios must not claim an ATT&CK technique")
+        return self

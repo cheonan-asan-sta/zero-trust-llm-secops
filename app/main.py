@@ -18,7 +18,7 @@ from app.models import (
     SecurityEvent,
     SimulationRequest,
 )
-from app.scenarios import SCENARIOS, generate_events
+from app.scenarios import SCENARIOS, generate_events, get_scenario
 from app.services.audit import AuditStore
 from app.services.policy import enforce_assessment_safety, response_preview
 
@@ -58,6 +58,14 @@ def dashboard() -> FileResponse:
 @app.get("/scenarios", response_model=list[ScenarioSummary])
 def scenarios() -> list[ScenarioSummary]:
     return SCENARIOS
+
+
+@app.get("/scenarios/{scenario_id}", response_model=ScenarioSummary)
+def scenario(scenario_id: str) -> ScenarioSummary:
+    try:
+        return get_scenario(scenario_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"Unknown scenario: {exc.args[0]}") from exc
 
 
 @app.post("/events/simulate", response_model=list[SecurityEvent])
