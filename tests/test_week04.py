@@ -66,7 +66,9 @@ def test_lambda_template_avoids_reserved_environment_variables() -> None:
 
 def test_deployment_builds_lambda_compatible_image_and_stops_on_native_errors() -> None:
     script = Path("scripts/deploy-aws.ps1").read_text(encoding="utf-8")
+    dockerfile = Path("Dockerfile.lambda").read_text(encoding="utf-8")
 
     assert "$PSNativeCommandUseErrorActionPreference = $true" in script
     assert "--platform linux/amd64" in script
     assert "--provenance=false" in script
+    assert "dnf upgrade -y" in dockerfile

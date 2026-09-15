@@ -1,5 +1,7 @@
 FROM public.ecr.aws/lambda/python:3.12
 
+RUN dnf upgrade -y && dnf clean all
+
 COPY pyproject.toml README.md ./
 COPY app ./app
 
