@@ -1,5 +1,5 @@
 {
-  "registry_version": "2026.09.1",
+  "registry_version": "2026.09.2",
   "controls": [
     {
       "control_id": "GOV-01",
@@ -370,7 +370,7 @@
       "evidence": [],
       "reviewed_on": "2026-09-16",
       "review_due_on": "2026-12-16",
-      "target_version": "0.9.0"
+      "target_version": "0.10.0"
     },
     {
       "control_id": "EVAL-01",
@@ -574,7 +574,7 @@
       "title": "OCSF 기반 이벤트 정규화와 변환 이력",
       "domain": "data_quality",
       "priority": "P0",
-      "status": "planned",
+      "status": "implemented",
       "owner_role": "security-data-engineering",
       "objective": "서로 다른 보안 로그를 공통 스키마로 정규화하고 원본 해시, 변환기 버전, 누락 필드와 실패 사유를 보존한다.",
       "acceptance_criteria": [
@@ -593,7 +593,20 @@
           "url": "https://www.nia.or.kr/site/nia_kor/ex/bbs/View.do?bcIdx=28109&cbIdx=90549&parentSeq=28109"
         }
       ],
-      "evidence": [],
+      "evidence": [
+        {
+          "evidence_id": "EVD-DATA-01-CODE",
+          "kind": "code",
+          "location": "app/services/ocsf.py",
+          "description": "OCSF 1.9.0 class mapping, canonical source hash and deterministic provenance implementation."
+        },
+        {
+          "evidence_id": "EVD-DATA-01-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_detection_pipeline.py",
+          "description": "Authentication and API class mapping, type UID, digest and ground-truth exclusion regression tests."
+        }
+      ],
       "reviewed_on": "2026-09-16",
       "review_due_on": "2026-12-16",
       "target_version": "0.9.0"
@@ -603,7 +616,7 @@
       "title": "Sigma 탐지 규칙의 버전·시험·승격 관리",
       "domain": "detection_engineering",
       "priority": "P0",
-      "status": "planned",
+      "status": "partially_implemented",
       "owner_role": "detection-engineering",
       "objective": "탐지 논리를 이식 가능한 규칙으로 분리하고 로그원, 오탐, ATT&CK, 버전과 시험 결과를 관리한다.",
       "acceptance_criteria": [
@@ -622,10 +635,29 @@
           "url": "https://attack.mitre.org/"
         }
       ],
-      "evidence": [],
+      "evidence": [
+        {
+          "evidence_id": "EVD-DET-01-CODE",
+          "kind": "code",
+          "location": "app/services/sigma.py",
+          "description": "Fail-closed Sigma 2.1 rule loader, lifecycle validation and safe condition evaluator."
+        },
+        {
+          "evidence_id": "EVD-DET-01-CONFIG",
+          "kind": "configuration",
+          "location": "app/data/sigma/data_exfiltration.yml",
+          "description": "Representative packaged OCSF-taxonomy Sigma rule with approval and test metadata."
+        },
+        {
+          "evidence_id": "EVD-DET-01-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_detection_pipeline.py",
+          "description": "Five threat and three normal scenario replay tests plus unsupported-rule rejection tests."
+        }
+      ],
       "reviewed_on": "2026-09-16",
       "review_due_on": "2026-12-16",
-      "target_version": "0.9.0"
+      "target_version": "0.10.0"
     },
     {
       "control_id": "RES-01",

@@ -1,0 +1,33 @@
+title: Zero Trust Unmanaged Device Access
+id: 9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e
+status: test
+description: Detects access from a new unmanaged device with unknown security posture.
+author: Cheonan-Asan Team
+date: '2026-09-16'
+modified: '2026-09-16'
+taxonomy: ocsf
+references:
+    - https://attack.mitre.org/techniques/T1133/
+logsource:
+    category: api
+    product: zero_trust_secops
+detection:
+    selection:
+        class_uid: 6003
+        unmapped.device.managed: false
+        unmapped.device.security_posture: unknown
+        unmapped.behavior.new_device: true
+    condition: selection
+falsepositives:
+    - Approved onboarding or BYOD registration windows.
+level: medium
+tags:
+    - attack.initial-access
+    - attack.t1133
+x_secops:
+    lifecycle: approved
+    version: 1.0.0
+    approved_by: security-owner
+    approved_on: '2026-09-16'
+    test_case_ids:
+        - ZT-S02

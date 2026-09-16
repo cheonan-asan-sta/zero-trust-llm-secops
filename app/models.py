@@ -63,6 +63,20 @@ class EvidenceKind(str, Enum):
     DOCUMENTATION = "documentation"
 
 
+class SigmaRuleLifecycle(str, Enum):
+    DRAFT = "draft"
+    APPROVED = "approved"
+    RETIRED = "retired"
+
+
+class SigmaRuleLevel(str, Enum):
+    INFORMATIONAL = "informational"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    CRITICAL = "critical"
+
+
 class EventAction(str, Enum):
     LOGIN = "LOGIN"
     READ = "READ"
@@ -260,6 +274,146 @@ class SecurityEvent(StrictModel):
         return self.model_dump(mode="json", exclude={"ground_truth"})
 
 
+class OCSFFingerprint(StrictModel):
+    algorithm_id: Literal[3] = 3
+    algorithm: Literal["SHA-256"] = "SHA-256"
+    value: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+
+class OCSFProduct(StrictModel):
+    name: str = Field(min_length=2, max_length=120)
+    vendor_name: str = Field(min_length=2, max_length=120)
+    version: str = Field(min_length=1, max_length=40)
+
+
+class OCSFMetadata(StrictModel):
+    version: Literal["1.9.0"] = "1.9.0"
+    uid: str = Field(min_length=1, max_length=128)
+    correlation_uid: str = Field(min_length=1, max_length=128)
+    original_time: str = Field(min_length=10, max_length=64)
+    product: OCSFProduct
+
+
+class OCSFUser(StrictModel):
+    uid: str = Field(min_length=1, max_length=128)
+    role: str = Field(min_length=1, max_length=64)
+
+
+class OCSFActor(StrictModel):
+    user: OCSFUser
+
+
+class OCSFEndpoint(StrictModel):
+    ip: str = Field(min_length=3, max_length=64)
+    location: str = Field(min_length=1, max_length=120)
+
+
+class OCSFDevice(StrictModel):
+    uid: str = Field(min_length=1, max_length=128)
+    name: str = Field(min_length=1, max_length=128)
+
+
+class OCSFResource(StrictModel):
+    uid: str = Field(min_length=1, max_length=128)
+    type: str = Field(min_length=1, max_length=80)
+
+
+class OCSFService(StrictModel):
+    name: str = Field(min_length=2, max_length=120)
+
+
+class OCSFAPI(StrictModel):
+    operation: str = Field(min_length=2, max_length=120)
+    service: OCSFService
+
+
+class OCSFEvent(StrictModel):
+    time: int = Field(ge=0)
+    category_uid: Literal[3, 6]
+    category_name: Literal["Identity & Access Management", "Application Activity"]
+    class_uid: Literal[3002, 6003]
+    class_name: Literal["Authentication", "API Activity"]
+    activity_id: int = Field(ge=0, le=99)
+    activity_name: str = Field(min_length=2, max_length=80)
+    type_uid: int = Field(ge=0)
+    type_name: str = Field(min_length=4, max_length=160)
+    severity_id: Literal[1] = 1
+    status_id: Literal[1, 2]
+    status: Literal["Success", "Failure"]
+    message: str = Field(min_length=5, max_length=500)
+    metadata: OCSFMetadata
+    actor: OCSFActor
+    user: OCSFUser | None = None
+    src_endpoint: OCSFEndpoint
+    device: OCSFDevice
+    resources: list[OCSFResource] = Field(min_length=1, max_length=20)
+    api: OCSFAPI | None = None
+    service: OCSFService | None = None
+    is_mfa: bool | None = None
+    is_remote: bool | None = None
+    raw_data_hash: OCSFFingerprint
+    unmapped: dict[str, object]
+
+    @model_validator(mode="after")
+    def validate_classification(self) -> Self:
+        if self.type_uid != self.class_uid * 100 + self.activity_id:
+            raise ValueError("type_uid must combine class_uid and activity_id")
+        expected_category = 3 if self.class_uid == 3002 else 6
+        if self.category_uid != expected_category:
+            raise ValueError("category_uid does not match class_uid")
+        if self.class_uid == 3002 and (self.user is None or self.service is None):
+            raise ValueError("authentication events require user and service")
+        if self.class_uid == 6003 and self.api is None:
+            raise ValueError("API activity events require api details")
+        return self
+
+
+class NormalizationProvenance(StrictModel):
+    source_format: Literal["zero-trust-security-event-v1"]
+    source_event_id: str = Field(min_length=1, max_length=128)
+    source_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    target_schema: Literal["OCSF"]
+    schema_version: Literal["1.9.0"]
+    transformer_name: Literal["zero-trust-ocsf-mapper"]
+    transformer_version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
+    mapping_digest_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+
+class NormalizedSecurityEvent(StrictModel):
+    event: OCSFEvent
+    provenance: NormalizationProvenance
+
+
+class SigmaRuleSummary(StrictModel):
+    rule_id: str = Field(min_length=36, max_length=36)
+    title: str = Field(min_length=3, max_length=256)
+    status: Literal["experimental", "test", "stable", "deprecated", "unsupported"]
+    lifecycle: SigmaRuleLifecycle
+    level: SigmaRuleLevel
+    version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
+    digest_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    tags: list[str] = Field(default_factory=list, max_length=30)
+    test_case_ids: list[str] = Field(default_factory=list, max_length=50)
+
+
+class SigmaDetectionMatch(SigmaRuleSummary):
+    matched_selectors: list[str] = Field(min_length=1, max_length=30)
+
+
+class SigmaDetectionResult(StrictModel):
+    engine_version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
+    specification_version: Literal["2.1.0"]
+    ruleset_digest_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    evaluated_rule_count: int = Field(ge=0)
+    matches: list[SigmaDetectionMatch] = Field(default_factory=list, max_length=100)
+    highest_level: SigmaRuleLevel | None = None
+
+
+class DetectionPipelineResult(StrictModel):
+    normalized: NormalizedSecurityEvent
+    detection: SigmaDetectionResult
+
+
 class SecurityAssessment(StrictModel):
     risk_score: int = Field(ge=0, le=100)
     risk_level: RiskLevel
@@ -290,6 +444,8 @@ class AnalysisResult(StrictModel):
     analyzer: Literal["rule", "openai", "hybrid"]
     assessment: SecurityAssessment
     policy_decision: PolicyDecision
+    normalized_event: NormalizedSecurityEvent | None = None
+    detection: SigmaDetectionResult | None = None
     latency_ms: float = Field(ge=0)
     analyzed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     tenant_id: str = Field(default="local", pattern=r"^[a-zA-Z0-9._-]{1,64}$")

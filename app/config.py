@@ -8,7 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "Zero Trust LLM SecOps"
-    app_version: str = "0.8.0"
+    app_version: str = "0.9.0"
     app_environment: Literal["local", "test", "production"] = "local"
     analyzer_mode: Literal["rule", "openai", "hybrid"] = "rule"
     openai_api_key: SecretStr | None = None

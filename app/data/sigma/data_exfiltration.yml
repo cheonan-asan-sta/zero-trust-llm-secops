@@ -1,0 +1,35 @@
+title: Zero Trust Unapproved Bulk Download
+id: ce5f6071-8293-4eaf-801b-2c3d4e5f6071
+status: test
+description: Detects unapproved bulk downloads of critically sensitive resources.
+author: Cheonan-Asan Team
+date: '2026-09-16'
+modified: '2026-09-16'
+taxonomy: ocsf
+references:
+    - https://attack.mitre.org/techniques/T1020/
+logsource:
+    category: api
+    product: zero_trust_secops
+detection:
+    selection:
+        class_uid: 6003
+        unmapped.source_action: DOWNLOAD
+        unmapped.resource.sensitivity: critical
+        unmapped.behavior.download_volume_mb|gte: 500
+    filter_approved:
+        unmapped.behavior.policy_exception_approved: true
+    condition: selection and not filter_approved
+falsepositives:
+    - Approved backups or reviewed data migration jobs.
+level: high
+tags:
+    - attack.exfiltration
+    - attack.t1020
+x_secops:
+    lifecycle: approved
+    version: 1.0.0
+    approved_by: security-owner
+    approved_on: '2026-09-16'
+    test_case_ids:
+        - ZT-S05

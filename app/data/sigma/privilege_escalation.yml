@@ -1,0 +1,32 @@
+title: Zero Trust Privilege Scope Mismatch
+id: ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f
+status: test
+description: Detects administrative access where the required role differs from the actor role.
+author: Cheonan-Asan Team
+date: '2026-09-16'
+modified: '2026-09-16'
+taxonomy: ocsf
+references:
+    - https://attack.mitre.org/techniques/T1098/
+logsource:
+    category: api
+    product: zero_trust_secops
+detection:
+    selection:
+        class_uid: 6003
+        unmapped.source_action: ADMIN
+        unmapped.resource.required_role|neq|fieldref: actor.user.role
+    condition: selection
+falsepositives:
+    - Approved emergency privilege activation.
+level: high
+tags:
+    - attack.privilege-escalation
+    - attack.t1098
+x_secops:
+    lifecycle: approved
+    version: 1.0.0
+    approved_by: security-owner
+    approved_on: '2026-09-16'
+    test_case_ids:
+        - ZT-S03

@@ -38,13 +38,13 @@ def test_assurance_summary_is_reproducible_and_does_not_claim_full_compliance() 
     assert summary.valid is True
     assert summary.total_controls == 18
     assert summary.status_counts == {
-        "implemented": 7,
-        "partially_implemented": 5,
-        "planned": 6,
+        "implemented": 8,
+        "partially_implemented": 6,
+        "planned": 4,
         "not_applicable": 0,
     }
-    assert summary.implementation_rate == pytest.approx(0.5278)
-    assert summary.evidence_count == 23
+    assert summary.implementation_rate == pytest.approx(0.6111)
+    assert summary.evidence_count == 28
     assert summary.overdue_control_ids == []
     assert summary.registry_digest_sha256 == sha256(
         json.dumps(
@@ -61,7 +61,7 @@ def test_assurance_summary_and_admin_control_api() -> None:
     summary = client.get("/assurance/summary")
     filtered = client.get(
         "/assurance/controls",
-        params={"status": "planned", "domain": "data_quality"},
+        params={"status": "implemented", "domain": "data_quality"},
     )
     detail = client.get("/assurance/controls/ai-02")
 

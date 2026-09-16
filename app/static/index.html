@@ -35,14 +35,14 @@
           <p class="section-kicker">SECURITY OPERATIONS CONTROL</p>
           <h1>접근 이벤트에서<br /><span>대응 판단까지</span></h1>
           <p class="hero-copy">
-            사용자·기기·네트워크·자원 정보를 함께 확인하고, LLM 분석 결과에
+            사용자·기기·네트워크·자원 정보를 OCSF로 정규화하고, Sigma와 LLM 분석 결과에
             정책 안전장치를 적용하는 제로 트러스트 관제 시뮬레이션입니다.
           </p>
         </div>
         <ol class="route-map" aria-label="분석 단계">
           <li><span>01</span><strong>이벤트 수집</strong><small>합성 보안 로그</small></li>
-          <li><span>02</span><strong>맥락 검증</strong><small>6개 접근 신호</small></li>
-          <li><span>03</span><strong>위험 분석</strong><small>규칙·선택형 LLM</small></li>
+          <li><span>02</span><strong>OCSF 정규화</strong><small>원본·매핑 해시</small></li>
+          <li><span>03</span><strong>위험 분석</strong><small>Sigma·규칙·LLM</small></li>
           <li><span>04</span><strong>정책 확인</strong><small>사람 검토·허용 목록</small></li>
         </ol>
       </section>
@@ -112,6 +112,14 @@
             <div>
               <p class="card-label">판단 근거</p>
               <div id="evidenceList" class="evidence-list"></div>
+            </div>
+            <div class="detection-proof">
+              <div class="detection-proof-heading">
+                <p class="card-label">표준 탐지 근거</p>
+                <span id="pipelineVersion">OCSF · SIGMA</span>
+              </div>
+              <div id="detectionMatches" class="detection-list"></div>
+              <small id="detectionDigest">규칙 버전과 입력 해시를 확인하고 있습니다.</small>
             </div>
           </article>
 

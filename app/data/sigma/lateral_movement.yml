@@ -1,0 +1,34 @@
+title: Zero Trust Lateral Movement Pattern
+id: bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60
+status: test
+description: Detects remote access combined with rapid access to many resources.
+author: Cheonan-Asan Team
+date: '2026-09-16'
+modified: '2026-09-16'
+taxonomy: ocsf
+references:
+    - https://attack.mitre.org/techniques/T1021/
+logsource:
+    category: api
+    product: zero_trust_secops
+detection:
+    selection_activity:
+        class_uid: 6003
+        unmapped.source_action: REMOTE_ACCESS
+    selection_behavior:
+        unmapped.behavior.distinct_resources_10m|gte: 8
+        unmapped.behavior.request_rate: high
+    condition: all of selection_*
+falsepositives:
+    - Approved deployment automation or incident response activity.
+level: high
+tags:
+    - attack.lateral-movement
+    - attack.t1021
+x_secops:
+    lifecycle: approved
+    version: 1.0.0
+    approved_by: security-owner
+    approved_on: '2026-09-16'
+    test_case_ids:
+        - ZT-S04

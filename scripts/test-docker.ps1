@@ -58,7 +58,7 @@ try {
     if (-not $health -or $health.status -ne "ok" -or $health.analyzer_mode -ne "rule") {
         throw "Container health check did not become ready in rule mode."
     }
-    if ($health.version -ne "0.8.0" -or $health.auth_mode -ne "disabled") {
+    if ($health.version -ne "0.9.0" -or $health.auth_mode -ne "disabled") {
         throw "Container did not start with the expected local security profile."
     }
     $readiness = Invoke-RestMethod -Method Get -Uri "$baseUrl/health/ready" -TimeoutSec 2
@@ -66,7 +66,10 @@ try {
         $readiness.status -ne "ready" -or
         -not $readiness.audit.ok -or
         -not $readiness.assurance.valid -or
-        $readiness.assurance.total_controls -ne 18
+        $readiness.assurance.total_controls -ne 18 -or
+        $readiness.normalization.schema_version -ne "1.9.0" -or
+        -not $readiness.detection.valid -or
+        $readiness.detection.approved_rule_count -ne 5
     ) {
         throw "Audit or assurance registry integrity readiness check failed."
     }
@@ -105,6 +108,13 @@ try {
     if ($analysis.review_status -ne "PENDING") {
         throw "High-risk analysis did not enter the review queue."
     }
+    if (
+        $analysis.normalized_event.provenance.schema_version -ne "1.9.0" -or
+        $analysis.detection.evaluated_rule_count -ne 5 -or
+        $analysis.detection.matches.Count -lt 1
+    ) {
+        throw "OCSF normalization or Sigma detection evidence is missing."
+    }
 
     $reviewUrl = "$baseUrl/results/$($analysis.event_id)/review"
     $inReview = Invoke-RestMethod `
@@ -141,6 +151,8 @@ try {
         audit_integrity = $readiness.audit.ok
         assurance_registry_integrity = $readiness.assurance.valid
         assurance_control_count = $readiness.assurance.total_controls
+        ocsf_schema_version = $readiness.normalization.schema_version
+        sigma_rules = $readiness.detection.approved_rule_count
         evaluation_cases = $evaluation.total_cases
         risk_accuracy = $evaluation.risk_accuracy
         action_accuracy = $evaluation.action_accuracy

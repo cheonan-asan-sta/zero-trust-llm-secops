@@ -23,10 +23,12 @@ from app.models import (
     BatchAnalysisResult,
     ControlRecord,
     ControlStatus,
+    DetectionPipelineResult,
     EvaluationRequest,
     EvaluationSummary,
     EventScenarioEvaluation,
     MetricsSummary,
+    NormalizedSecurityEvent,
     PolicyDecision,
     ResponsePreviewRequest,
     ReviewStatus,
@@ -34,6 +36,7 @@ from app.models import (
     RiskLevel,
     ScenarioSummary,
     SecurityEvent,
+    SigmaRuleSummary,
     SimulationRequest,
 )
 from app.scenarios import SCENARIOS, generate_events, get_scenario
@@ -41,8 +44,10 @@ from app.security import Principal, Role, require_roles
 from app.services.assurance import get_assurance_registry
 from app.services.audit import create_audit_store
 from app.services.evaluation import run_evaluation
+from app.services.ocsf import get_ocsf_normalizer
 from app.services.policy import enforce_assessment_safety, response_preview
 from app.services.scenario_evaluator import evaluate_scenarios
+from app.services.sigma import get_sigma_engine
 
 settings = get_settings()
 static_dir = Path(__file__).parent / "static"
@@ -60,6 +65,8 @@ app.add_middleware(RequestContextMiddleware)
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 audit_store = create_audit_store(settings)
 assurance_registry = get_assurance_registry()
+ocsf_normalizer = get_ocsf_normalizer()
+sigma_engine = get_sigma_engine()
 analysis_capacity = asyncio.Semaphore(settings.analysis_max_concurrency)
 
 ViewerPrincipal = Annotated[Principal, Depends(require_roles(Role.VIEWER))]
@@ -107,7 +114,7 @@ def liveness() -> dict:
 def readiness() -> Response:
     integrity = audit_store.integrity()
     assurance = assurance_registry.summary()
-    ready = integrity["ok"] and assurance.valid
+    ready = integrity["ok"] and assurance.valid and sigma_engine.valid
     payload = {
         "status": "ready" if ready else "degraded",
         "audit": integrity,
@@ -117,6 +124,22 @@ def readiness() -> Response:
             "registry_digest_sha256": assurance.registry_digest_sha256,
             "total_controls": assurance.total_controls,
             "overdue_control_count": len(assurance.overdue_control_ids),
+        },
+        "normalization": {
+            "valid": True,
+            "schema": "OCSF",
+            "schema_version": ocsf_normalizer.schema_version,
+            "transformer_version": ocsf_normalizer.transformer_version,
+            "mapping_digest_sha256": ocsf_normalizer.mapping_digest_sha256,
+        },
+        "detection": {
+            "valid": sigma_engine.valid,
+            "specification": "Sigma",
+            "specification_version": "2.1.0",
+            "loaded_rule_count": len(sigma_engine.summaries()),
+            "approved_rule_count": len(sigma_engine.approved_rules),
+            "ruleset_digest_sha256": sigma_engine.ruleset_digest_sha256,
+            "validation_issue_count": len(sigma_engine.validation_issues),
         },
     }
     return JSONResponse(payload, status_code=200 if ready else 503)
@@ -146,6 +169,25 @@ def simulate(request: SimulationRequest, _: AnalystPrincipal) -> list[SecurityEv
         return generate_events(request.scenario_id, request.count)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Unknown scenario: {exc.args[0]}") from exc
+
+
+@app.post("/events/normalize", response_model=NormalizedSecurityEvent)
+def normalize_event(event: SecurityEvent, _: AnalystPrincipal) -> NormalizedSecurityEvent:
+    return ocsf_normalizer.normalize(event)
+
+
+@app.post("/detections/evaluate", response_model=DetectionPipelineResult)
+def evaluate_detections(event: SecurityEvent, _: AnalystPrincipal) -> DetectionPipelineResult:
+    normalized = ocsf_normalizer.normalize(event)
+    return DetectionPipelineResult(
+        normalized=normalized,
+        detection=sigma_engine.evaluate(normalized),
+    )
+
+
+@app.get("/detections/rules", response_model=list[SigmaRuleSummary])
+def detection_rules(_: ViewerPrincipal) -> list[SigmaRuleSummary]:
+    return sigma_engine.summaries()
 
 
 @app.post("/scenarios/evaluate", response_model=EventScenarioEvaluation)
@@ -231,6 +273,8 @@ async def _analyze_event(
         raise AnalysisCapacityExceeded from exc
     try:
         started = perf_counter()
+        normalized = ocsf_normalizer.normalize(event)
+        detection = sigma_engine.evaluate(normalized)
         assessment = await analyzer.analyze(event)
         safe_assessment = enforce_assessment_safety(assessment, event)
         decision = response_preview(safe_assessment, event)
@@ -239,6 +283,8 @@ async def _analyze_event(
             analyzer=analyzer.name,
             assessment=safe_assessment,
             policy_decision=decision,
+            normalized_event=normalized,
+            detection=detection,
             latency_ms=round((perf_counter() - started) * 1000, 2),
             tenant_id=principal.tenant_id,
             actor_id=principal.subject,

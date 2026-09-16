@@ -312,6 +312,13 @@ h1 span { color: var(--blue); }
 .assurance-domains { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px; }
 .assurance-domains span { padding: 6px 8px; border-radius: 5px; background: #edf4fb; color: #45627f; font-size: 9px; font-weight: 800; text-transform: uppercase; }
 .assurance-notice { margin: 16px 0 0; color: var(--muted); font-size: 10px; line-height: 1.6; }
+.detection-proof { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.detection-proof-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.detection-proof-heading span { color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: 0.08em; }
+.detection-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.detection-list span { padding: 6px 8px; border-radius: 5px; background: #edf4fb; color: #45627f; font-size: 9px; font-weight: 800; }
+.detection-list span[data-level="high"], .detection-list span[data-level="critical"] { background: #fff1ed; color: #a1452e; }
+.detection-proof small { display: block; margin-top: 8px; color: var(--muted); font-size: 9px; overflow-wrap: anywhere; }
 .metric-pass { color: var(--green); }
 .metric-fail { color: var(--orange); }
 .evaluation-details { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }

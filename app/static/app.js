@@ -194,6 +194,32 @@ function renderResult(result, shouldScroll = true) {
     evidence.append(chip);
   });
 
+  const detection = result.detection;
+  const normalized = result.normalized_event;
+  const detectionList = $("detectionMatches");
+  detectionList.replaceChildren();
+  if (detection && normalized) {
+    $("pipelineVersion").textContent = `OCSF ${normalized.provenance.schema_version} · SIGMA ${detection.specification_version}`;
+    const matches = detection.matches || [];
+    if (matches.length) {
+      matches.forEach((match) => {
+        const chip = document.createElement("span");
+        chip.dataset.level = match.level;
+        chip.textContent = `${match.title} · v${match.version}`;
+        detectionList.append(chip);
+      });
+    } else {
+      const chip = document.createElement("span");
+      chip.dataset.level = "informational";
+      chip.textContent = "승인 규칙 일치 없음";
+      detectionList.append(chip);
+    }
+    $("detectionDigest").textContent = `${detection.evaluated_rule_count}개 승인 규칙 · 입력 ${normalized.provenance.source_sha256.slice(0, 12)}… · 규칙집 ${detection.ruleset_digest_sha256.slice(0, 12)}…`;
+  } else {
+    $("pipelineVersion").textContent = "이전 분석 기록";
+    $("detectionDigest").textContent = "이 기록에는 표준화·탐지 버전 정보가 없습니다.";
+  }
+
   renderReviewWorkflow(result);
   if (shouldScroll) {
     $("resultSection").scrollIntoView({ behavior: "smooth", block: "start" });
