@@ -305,10 +305,13 @@ h1 span { color: var(--blue); }
 .secondary-button:hover:not(:disabled) { background: #eef5fc; }
 .secondary-button:disabled { opacity: 0.55; cursor: wait; }
 .evaluation-state { margin: 16px 0 0; color: var(--muted); font-size: 12px; }
-.evaluation-grid { grid-template-columns: repeat(6, 1fr); }
+.evaluation-grid { grid-template-columns: repeat(5, 1fr); }
 .evaluation-grid strong { font-size: 21px; }
 .metric-pass { color: var(--green); }
 .metric-fail { color: var(--orange); }
+.evaluation-details { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+.diagnostic-heading { display: flex; justify-content: space-between; gap: 16px; font-size: 12px; }
+.diagnostic-heading span { color: var(--muted); font-size: 10px; }
 .operation-metrics { grid-template-columns: repeat(7, 1fr); }
 
 .history-wrap { margin-top: 18px; overflow-x: auto; }

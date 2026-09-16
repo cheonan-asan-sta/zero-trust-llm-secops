@@ -74,7 +74,7 @@ try {
         -Method Post `
         -Uri "$baseUrl/evaluation/run" `
         -ContentType "application/json" `
-        -Body '{"analyzer":"rule","runs_per_scenario":1}'
+        -Body '{"analyzer":"rule","runs_per_scenario":5,"concurrency":4}'
 
     if ($analysis.assessment.risk_level -notin @("HIGH", "CRITICAL")) {
         throw "Threat smoke test returned an unexpectedly low risk."
@@ -104,6 +104,9 @@ try {
     if (-not ($evaluation.targets_met.PSObject.Properties.Value -notcontains $false)) {
         throw "Rule evaluation did not meet every target."
     }
+    if ($evaluation.error_count -ne 0 -or $evaluation.total_cases -ne 40) {
+        throw "Stability evaluation returned errors or an unexpected sample size."
+    }
 
     [ordered]@{
         status = "passed"
@@ -115,6 +118,9 @@ try {
         evaluation_cases = $evaluation.total_cases
         risk_accuracy = $evaluation.risk_accuracy
         action_accuracy = $evaluation.action_accuracy
+        error_rate = $evaluation.error_rate
+        throughput_per_second = $evaluation.throughput_per_second
+        p50_latency_ms = $evaluation.p50_latency_ms
         p95_latency_ms = $evaluation.p95_latency_ms
     } | ConvertTo-Json -Compress
 } catch {

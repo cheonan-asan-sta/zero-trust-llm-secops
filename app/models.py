@@ -468,7 +468,8 @@ class EventScenarioEvaluation(StrictModel):
 
 class EvaluationRequest(StrictModel):
     analyzer: Literal["rule", "openai", "hybrid"] = "rule"
-    runs_per_scenario: int = Field(default=1, ge=1, le=3)
+    runs_per_scenario: int = Field(default=1, ge=1, le=10)
+    concurrency: int = Field(default=4, ge=1, le=10)
 
 
 class EvaluationCaseResult(StrictModel):
@@ -484,11 +485,25 @@ class EvaluationCaseResult(StrictModel):
     threat_detected: bool
     json_valid: bool = True
     latency_ms: float = Field(ge=0)
+    error_category: Literal["timeout", "provider", "validation", "runtime"] | None = None
+
+
+class ScenarioEvaluationSummary(StrictModel):
+    scenario_id: str
+    total_cases: int = Field(ge=1)
+    risk_accuracy: float = Field(ge=0, le=1)
+    action_accuracy: float = Field(ge=0, le=1)
+    error_count: int = Field(ge=0)
+    average_latency_ms: float = Field(ge=0)
+    p95_latency_ms: float = Field(ge=0)
 
 
 class EvaluationTargets(StrictModel):
     risk_accuracy: float = Field(default=0.7, ge=0, le=1)
+    action_accuracy: float = Field(default=0.7, ge=0, le=1)
+    threat_f1: float = Field(default=0.8, ge=0, le=1)
     json_valid_rate: float = Field(default=0.9, ge=0, le=1)
+    maximum_error_rate: float = Field(default=0.05, ge=0, le=1)
     p95_latency_ms: float = Field(default=3000, gt=0)
 
 
@@ -501,8 +516,17 @@ class EvaluationSummary(StrictModel):
     threat_recall: float = Field(ge=0, le=1)
     threat_f1: float = Field(ge=0, le=1)
     json_valid_rate: float = Field(ge=0, le=1)
+    error_count: int = Field(ge=0)
+    error_rate: float = Field(ge=0, le=1)
+    error_categories: dict[str, int]
+    duration_ms: float = Field(ge=0)
+    throughput_per_second: float = Field(ge=0)
     average_latency_ms: float = Field(ge=0)
+    p50_latency_ms: float = Field(ge=0)
     p95_latency_ms: float = Field(ge=0)
+    p99_latency_ms: float = Field(ge=0)
+    risk_confusion_matrix: dict[str, dict[str, int]]
+    scenario_breakdown: list[ScenarioEvaluationSummary]
     targets: EvaluationTargets = Field(default_factory=EvaluationTargets)
     targets_met: dict[str, bool]
     cases: list[EvaluationCaseResult]

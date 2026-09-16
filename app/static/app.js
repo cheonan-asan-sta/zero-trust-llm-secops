@@ -356,6 +356,30 @@ function formatPercent(value) {
   return `${Math.round(value * 100)}%`;
 }
 
+function renderEvaluationDetails(result) {
+  const body = $("evaluationBody");
+  body.replaceChildren();
+  result.scenario_breakdown.forEach((scenario) => {
+    const row = document.createElement("tr");
+    const values = [
+      scenario.scenario_id,
+      scenario.total_cases,
+      formatPercent(scenario.risk_accuracy),
+      formatPercent(scenario.action_accuracy),
+      scenario.error_count,
+      `${scenario.p95_latency_ms.toFixed(1)}ms`,
+    ];
+    values.forEach((value) => {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      row.append(cell);
+    });
+    body.append(row);
+  });
+  $("evaluationDuration").textContent = `전체 ${result.duration_ms.toFixed(1)}ms · 동시 처리 4건`;
+  $("evaluationDetails").hidden = false;
+}
+
 async function runEvaluation() {
   if (state.evaluating) return;
   state.evaluating = true;
@@ -366,24 +390,28 @@ async function runEvaluation() {
   try {
     const result = await request("/evaluation/run", {
       method: "POST",
-      body: JSON.stringify({ analyzer: state.analyzerMode, runs_per_scenario: 1 }),
+      body: JSON.stringify({ analyzer: state.analyzerMode, runs_per_scenario: 5, concurrency: 4 }),
     });
     $("evaluationGrid").hidden = false;
     $("riskAccuracy").textContent = formatPercent(result.risk_accuracy);
     $("actionAccuracy").textContent = formatPercent(result.action_accuracy);
     $("threatF1").textContent = formatPercent(result.threat_f1);
     $("jsonValidity").textContent = formatPercent(result.json_valid_rate);
+    $("evaluationErrorRate").textContent = formatPercent(result.error_rate);
+    $("evaluationThroughput").textContent = `${result.throughput_per_second.toFixed(1)}/초`;
+    $("evaluationP50").textContent = `${result.p50_latency_ms.toFixed(1)}ms`;
     $("evaluationP95").textContent = `${result.p95_latency_ms.toFixed(1)}ms`;
     const passed = Object.values(result.targets_met).every(Boolean);
     $("targetResult").textContent = passed ? "통과" : "보완 필요";
     $("targetResult").className = passed ? "metric-pass" : "metric-fail";
+    renderEvaluationDetails(result);
     $("evaluationState").textContent = `${result.total_cases}개 사례 평가 완료 · ${result.analyzer.toUpperCase()} 분석기`;
   } catch (error) {
     $("evaluationState").textContent = `평가하지 못했습니다: ${error.message}`;
   } finally {
     state.evaluating = false;
     $("evaluationButton").disabled = false;
-    $("evaluationButton").textContent = "8개 기준 사례 평가";
+    $("evaluationButton").textContent = "40개 안정성 평가";
   }
 }
 

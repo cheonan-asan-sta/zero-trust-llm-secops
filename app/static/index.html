@@ -155,19 +155,36 @@
             <h2>반복 평가</h2>
           </div>
           <button id="evaluationButton" class="secondary-button" type="button">
-            8개 기준 사례 평가
+            40개 안정성 평가
           </button>
         </div>
         <p id="evaluationState" class="evaluation-state">
-          위험도 정확도 70%, JSON 유효율 90%, P95 응답 3초 이내 목표를 확인합니다.
+          8개 시나리오를 5회 반복해 정확도, 오류율, 처리량, 응답시간을 확인합니다.
         </p>
         <div id="evaluationGrid" class="metric-grid evaluation-grid" hidden>
           <article><span>위험도 정확도</span><strong id="riskAccuracy">-</strong></article>
           <article><span>대응 정확도</span><strong id="actionAccuracy">-</strong></article>
           <article><span>위협 F1</span><strong id="threatF1">-</strong></article>
           <article><span>JSON 유효율</span><strong id="jsonValidity">-</strong></article>
+          <article><span>오류율</span><strong id="evaluationErrorRate">-</strong></article>
+          <article><span>처리량</span><strong id="evaluationThroughput">-</strong></article>
+          <article><span>P50 응답</span><strong id="evaluationP50">-</strong></article>
           <article><span>P95 응답</span><strong id="evaluationP95">-</strong></article>
           <article><span>목표 판정</span><strong id="targetResult">-</strong></article>
+        </div>
+        <div id="evaluationDetails" class="evaluation-details" hidden>
+          <div class="diagnostic-heading">
+            <strong>시나리오별 진단</strong>
+            <span id="evaluationDuration">-</span>
+          </div>
+          <div class="history-wrap">
+            <table>
+              <thead>
+                <tr><th>시나리오</th><th>표본</th><th>위험도 정확도</th><th>대응 정확도</th><th>오류</th><th>P95</th></tr>
+              </thead>
+              <tbody id="evaluationBody"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -203,7 +220,7 @@
 
     <footer class="shell">
       <span>천안아산역 · Zero Trust LLM SecOps</span>
-      <span>SIMULATION ONLY · v0.5</span>
+      <span>SIMULATION ONLY · v0.6</span>
     </footer>
   </body>
 </html>

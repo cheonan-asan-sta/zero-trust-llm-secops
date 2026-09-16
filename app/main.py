@@ -166,7 +166,7 @@ async def evaluate(request: EvaluationRequest) -> EvaluationSummary:
         analyzer = build_analyzer(request.analyzer)
     except ValueError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
-    return await run_evaluation(analyzer, request.runs_per_scenario)
+    return await run_evaluation(analyzer, request.runs_per_scenario, request.concurrency)
 
 
 @app.get("/metrics", response_model=MetricsSummary)
