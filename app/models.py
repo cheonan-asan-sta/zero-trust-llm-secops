@@ -272,6 +272,9 @@ class AnalysisResult(StrictModel):
     policy_decision: PolicyDecision
     latency_ms: float = Field(ge=0)
     analyzed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    tenant_id: str = Field(default="local", pattern=r"^[a-zA-Z0-9._-]{1,64}$")
+    actor_id: str = Field(default="local-operator", min_length=1, max_length=128)
+    request_id: str = Field(default="legacy", min_length=1, max_length=128)
     review_status: ReviewStatus
     reviewer: str | None = Field(default=None, min_length=2, max_length=64)
     review_note: str | None = Field(default=None, min_length=3, max_length=500)
@@ -321,12 +324,14 @@ class AnalysisResult(StrictModel):
 
 class ReviewUpdateRequest(StrictModel):
     status: ReviewStatus
-    reviewer: str = Field(min_length=2, max_length=64)
+    reviewer: str | None = Field(default=None, min_length=2, max_length=64)
     note: str | None = Field(default=None, min_length=3, max_length=500)
 
     @field_validator("reviewer")
     @classmethod
-    def normalize_reviewer(cls, value: str) -> str:
+    def normalize_reviewer(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
         normalized = value.strip()
         if len(normalized) < 2:
             raise ValueError("reviewer must contain at least two visible characters")

@@ -58,6 +58,24 @@ try {
     if (-not $health -or $health.status -ne "ok" -or $health.analyzer_mode -ne "rule") {
         throw "Container health check did not become ready in rule mode."
     }
+    if ($health.version -ne "0.7.0" -or $health.auth_mode -ne "disabled") {
+        throw "Container did not start with the expected local security profile."
+    }
+    $readiness = Invoke-RestMethod -Method Get -Uri "$baseUrl/health/ready" -TimeoutSec 2
+    if ($readiness.status -ne "ready" -or -not $readiness.audit.ok) {
+        throw "Audit integrity readiness check failed."
+    }
+    $headerCheck = Invoke-WebRequest `
+        -Method Get `
+        -Uri "$baseUrl/health/live" `
+        -Headers @{ "X-Request-ID" = "docker-qa-request" } `
+        -TimeoutSec 2
+    if (
+        $headerCheck.Headers["X-Request-ID"] -ne "docker-qa-request" -or
+        $headerCheck.Headers["X-Content-Type-Options"] -ne "nosniff"
+    ) {
+        throw "Request tracing or security headers are missing."
+    }
 
     $events = Invoke-RestMethod `
         -Method Post `
@@ -115,6 +133,7 @@ try {
         risk = $analysis.assessment.risk_level
         action = $analysis.assessment.recommended_action
         review_status = $resolved.review_status
+        audit_integrity = $readiness.audit.ok
         evaluation_cases = $evaluation.total_cases
         risk_accuracy = $evaluation.risk_accuracy
         action_accuracy = $evaluation.action_accuracy

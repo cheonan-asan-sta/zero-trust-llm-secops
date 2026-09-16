@@ -7,7 +7,9 @@ services:
       dockerfile: Dockerfile
     image: zero-trust-llm-secops:local
     environment:
+      APP_ENVIRONMENT: local
       ANALYZER_MODE: rule
+      AUTH_MODE: disabled
       AUDIT_BACKEND: jsonl
       AUDIT_LOG_PATH: /data/audit.jsonl
     ports:

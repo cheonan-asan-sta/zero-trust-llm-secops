@@ -21,6 +21,10 @@ LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 �
 - 정확도·F1·JSON 유효율·평균/P95 응답시간 평가 API
 - 제한 병렬 반복 평가와 P50·P95·P99·처리량 측정
 - 오류 유형·혼동 행렬·시나리오별 품질 진단
+- OIDC·해시 기반 API 키 인증과 역할 기반 접근 제어
+- 인증된 테넌트별 분석·감사 결과 격리
+- 요청 추적 ID, 보안 헤더, 본문 크기·분석 동시성 제한
+- Prometheus 메트릭과 JSONL 감사 로그 해시 체인
 - 천안아산역 콘셉트의 한국어 관제 대시보드
 - FastAPI 엔드포인트와 자동 테스트
 - AWS 계정 보호 장치가 포함된 Lambda 컨테이너 배포 정의
@@ -30,7 +34,24 @@ LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 �
 
 ## 개발 주차 산출물
 
-수행계획서의 목표와 실제 코드·검증 근거를 연결한 3~14주차 기록은 [주차별 산출물 색인](docs/README.md)에서 확인할 수 있습니다. 기능 개발 기준으로 14주차 성능 검증·고도화 범위까지 완료했습니다.
+수행계획서의 목표와 실제 코드·검증 근거를 연결한 3~14주차 기록은 [주차별 산출물 색인](docs/README.md)에서 확인할 수 있습니다. 기업 적용을 위한 보안 기준선과 남은 운영 검증 항목은 [기업 적용 준비도](docs/enterprise-readiness.md)에 정리했습니다.
+
+## 기업용 보안 모드
+
+로컬 Docker는 비용 없는 개발 편의를 위해 인증이 꺼진 `local` 환경으로 실행됩니다. 실제 조직 환경에서는 `APP_ENVIRONMENT=production`과 `AUTH_MODE=oidc`를 사용해야 하며, 인증을 끈 프로덕션 설정은 시작 단계에서 거부됩니다.
+
+```dotenv
+APP_ENVIRONMENT=production
+AUTH_MODE=oidc
+OIDC_ISSUER=https://identity.example.com
+OIDC_AUDIENCE=zero-trust-secops
+OIDC_JWKS_URL=https://identity.example.com/.well-known/jwks.json
+ALLOWED_HOSTS=secops.example.com
+```
+
+OIDC 토큰은 RS256 서명, 발급자, 대상, 만료시간과 필수 사용자·테넌트·역할 클레임을 확인합니다. 역할은 `viewer`, `analyst`, `responder`, `admin`이며 조회, 분석, 검토 처리, 품질 평가 권한을 분리합니다. 서비스 연동용 API 키 모드도 제공하지만 실제 키 대신 SHA-256 해시만 설정에 보관합니다.
+
+현재 구현은 기업 도입을 위한 기술 기준선입니다. 실제 운영 전에는 조직 IdP 연결, API Gateway/WAF 기반 분산 속도 제한, SIEM 전송, 보존·개인정보 정책, 장애 복구 훈련과 외부 침투시험을 완료해야 합니다.
 
 ## 빠른 시작
 
@@ -117,6 +138,8 @@ HYBRID_LLM_TIMEOUT_SECONDS=2.5
 | 메서드 | 경로 | 설명 |
 |---|---|---|
 | GET | `/health` | 서버와 분석 모드 확인 |
+| GET | `/health/live` | 공개 가능한 최소 생존 확인 |
+| GET | `/health/ready` | 감사 저장소 무결성을 포함한 준비 상태 |
 | GET | `/scenarios` | 준비된 합성 시나리오 목록 |
 | GET | `/scenarios/{scenario_id}` | ATT&CK 매핑과 관찰 신호를 포함한 시나리오 정의 |
 | POST | `/events/simulate` | 합성 이벤트 생성 |
@@ -128,6 +151,7 @@ HYBRID_LLM_TIMEOUT_SECONDS=2.5
 | GET | `/metrics` | 누적 분석 현황 요약 |
 | GET | `/results?limit=20` | 최근 분석 결과 목록 |
 | GET | `/results/{event_id}` | 최근 분석 결과 조회 |
+| GET | `/internal/metrics` | 관리자 전용 Prometheus 메트릭 |
 
 ## 폴더 구조
 
@@ -154,6 +178,7 @@ docs/week11/       통합 API·평가·배포 검증 산출물
 docs/week12/       대시보드·분석가 검토·MVP 완료 산출물
 docs/week13/       반복 성능 측정·제한 병렬화 산출물
 docs/week14/       오류 진단·품질 대시보드 고도화 산출물
+docs/enterprise-readiness.md  기업 적용 보안 기준선과 운영 전 검증 게이트
 infra/             ECR·Lambda·DynamoDB CloudFormation
 scripts/           대상 계정 검증이 포함된 AWS 배포 스크립트
 ```
@@ -175,7 +200,7 @@ scripts/           대상 계정 검증이 포함된 AWS 배포 스크립트
   -OpenAIApiKeySecretArn arn:aws:secretsmanager:ap-northeast-2:172585182454:secret:이름
 ```
 
-배포 구성은 ECR 이미지 스캔, HTTPS Lambda 함수 URL, 최소 권한 실행 역할, 암호화·시점 복구·삭제 방지를 적용한 DynamoDB 감사 테이블을 만든다. `rule` 모드 웹 엔드포인트는 공개 데모용이므로 실제 기업 이벤트나 개인정보를 입력하지 않는다. 비용이 발생할 수 있는 `openai`와 `hybrid` 모드는 자동으로 AWS IAM 인증을 요구해 익명 호출을 막는다.
+배포 구성은 ECR 이미지 스캔, AWS IAM 인증이 필요한 HTTPS Lambda 함수 URL, 최소 권한 실행 역할, 암호화·시점 복구·삭제 방지를 적용한 테넌트 인식 DynamoDB 감사 테이블을 만든다. 모든 분석 모드가 IAM 인증을 요구하며 실제 기업 이벤트나 개인정보를 사용하는 운영 배포에는 별도 OIDC/API Gateway 통합이 필요하다.
 
 ## 안전 원칙
 

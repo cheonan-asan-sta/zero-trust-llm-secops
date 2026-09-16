@@ -32,7 +32,7 @@ if ($AnalyzerMode -ne "rule" -and -not $OpenAIApiKeySecretArn) {
     throw "OpenAI and hybrid modes require an AWS Secrets Manager ARN via -OpenAIApiKeySecretArn."
 }
 
-$functionUrlAuthType = if ($AnalyzerMode -ne "rule") { "AWS_IAM" } else { "NONE" }
+$functionUrlAuthType = "AWS_IAM"
 
 $currentAccount = (aws @awsArgs sts get-caller-identity --query Account --output text).Trim()
 if ($currentAccount -ne $TargetAccount) {

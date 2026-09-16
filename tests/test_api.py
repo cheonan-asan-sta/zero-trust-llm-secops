@@ -1,5 +1,8 @@
+from hashlib import sha256
+
 from fastapi.testclient import TestClient
 
+from app.config import Settings
 from app.main import app
 
 client = TestClient(app)
@@ -10,6 +13,90 @@ def test_health() -> None:
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
     assert response.json()["analyzer_mode"] == "rule"
+    assert response.headers["x-content-type-options"] == "nosniff"
+    assert response.headers["x-frame-options"] == "DENY"
+
+
+def test_request_id_is_validated_and_returned() -> None:
+    accepted = client.get("/health", headers={"X-Request-ID": "request-12345678"})
+    replaced = client.get("/health", headers={"X-Request-ID": "bad id"})
+
+    assert accepted.headers["x-request-id"] == "request-12345678"
+    assert replaced.headers["x-request-id"] != "bad id"
+    assert len(replaced.headers["x-request-id"]) == 32
+
+
+def test_oversized_request_is_rejected_before_validation() -> None:
+    response = client.post(
+        "/analysis",
+        content="x" * 1_048_577,
+        headers={"Content-Type": "application/json"},
+    )
+
+    assert response.status_code == 413
+
+
+def test_prometheus_metrics_are_available_to_local_admin() -> None:
+    response = client.get("/internal/metrics")
+
+    assert response.status_code == 200
+    assert "secops_http_requests_total" in response.text
+
+
+def test_api_key_authentication_and_role_enforcement(monkeypatch) -> None:
+    api_key = "test-enterprise-key"
+    protected_settings = Settings(
+        auth_mode="api_key",
+        api_key_sha256=sha256(api_key.encode()).hexdigest(),
+        api_key_roles="viewer",
+        api_key_tenant_id="tenant-a",
+    )
+    monkeypatch.setattr("app.security.get_settings", lambda: protected_settings)
+
+    missing = client.get("/scenarios")
+    allowed = client.get("/scenarios", headers={"X-API-Key": api_key})
+    forbidden = client.post(
+        "/events/simulate",
+        headers={"X-API-Key": api_key},
+        json={"count": 1},
+    )
+
+    assert missing.status_code == 401
+    assert allowed.status_code == 200
+    assert forbidden.status_code == 403
+
+
+def test_api_results_are_isolated_by_authenticated_tenant(monkeypatch) -> None:
+    key_a = "tenant-a-key"
+    settings_a = Settings(
+        auth_mode="api_key",
+        api_key_sha256=sha256(key_a.encode()).hexdigest(),
+        api_key_roles="analyst,responder,viewer",
+        api_key_tenant_id="tenant-a",
+    )
+    monkeypatch.setattr("app.security.get_settings", lambda: settings_a)
+    event = client.post(
+        "/events/simulate",
+        headers={"X-API-Key": key_a},
+        json={"scenario_id": "ZT-S05", "count": 1},
+    ).json()[0]
+    created = client.post("/analysis", headers={"X-API-Key": key_a}, json=event)
+    assert created.status_code == 200
+    assert created.json()["tenant_id"] == "tenant-a"
+
+    key_b = "tenant-b-key"
+    settings_b = Settings(
+        auth_mode="api_key",
+        api_key_sha256=sha256(key_b.encode()).hexdigest(),
+        api_key_roles="viewer",
+        api_key_tenant_id="tenant-b",
+    )
+    monkeypatch.setattr("app.security.get_settings", lambda: settings_b)
+
+    hidden = client.get(f"/results/{event['event_id']}", headers={"X-API-Key": key_b})
+    tenant_b_metrics = client.get("/metrics", headers={"X-API-Key": key_b})
+    assert hidden.status_code == 404
+    assert tenant_b_metrics.json()["total_analyses"] == 0
 
 
 def test_dashboard_is_available() -> None:

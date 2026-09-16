@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Serverless deployment for the Zero Trust LLM SecOps demo
+Description: Hardened serverless deployment for the Zero Trust LLM SecOps service
 
 Parameters:
   ImageIdentifier:
@@ -27,7 +27,7 @@ Parameters:
     NoEcho: true
   FunctionUrlAuthType:
     Type: String
-    Default: NONE
+    Default: AWS_IAM
     AllowedValues:
       - NONE
       - AWS_IAM
@@ -52,9 +52,9 @@ Resources:
       AttributeDefinitions:
         - AttributeName: analysis_id
           AttributeType: S
-        - AttributeName: event_id
+        - AttributeName: tenant_event_key
           AttributeType: S
-        - AttributeName: record_type
+        - AttributeName: tenant_id
           AttributeType: S
         - AttributeName: analyzed_at
           AttributeType: S
@@ -62,17 +62,17 @@ Resources:
         - AttributeName: analysis_id
           KeyType: HASH
       GlobalSecondaryIndexes:
-        - IndexName: EventIndex
+        - IndexName: TenantEventIndex
           KeySchema:
-            - AttributeName: event_id
+            - AttributeName: tenant_event_key
               KeyType: HASH
             - AttributeName: analyzed_at
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
-        - IndexName: RecentIndex
+        - IndexName: TenantRecentIndex
           KeySchema:
-            - AttributeName: record_type
+            - AttributeName: tenant_id
               KeyType: HASH
             - AttributeName: analyzed_at
               KeyType: RANGE

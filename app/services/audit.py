@@ -1,4 +1,7 @@
 import asyncio
+import hashlib
+import hmac
+import json
 import math
 from pathlib import Path
 from typing import Protocol
@@ -13,35 +16,54 @@ from app.models import AnalysisResult, MetricsSummary, ReviewStatus
 class AuditRepository(Protocol):
     async def save(self, record: AnalysisResult) -> None: ...
 
-    def get(self, event_id: str) -> AnalysisResult | None: ...
+    def get(self, event_id: str, tenant_id: str = "local") -> AnalysisResult | None: ...
 
-    def recent(self, limit: int = 20) -> list[AnalysisResult]: ...
+    def recent(self, limit: int = 20, tenant_id: str = "local") -> list[AnalysisResult]: ...
 
-    def metrics(self) -> MetricsSummary: ...
+    def metrics(self, tenant_id: str = "local") -> MetricsSummary: ...
+
+    def integrity(self) -> dict[str, bool | int | str]: ...
 
 
 class AuditStore:
     def __init__(self, path: Path) -> None:
         self._path = path
-        self._records: dict[str, AnalysisResult] = {}
+        self._records: dict[tuple[str, str], AnalysisResult] = {}
         self._history: list[AnalysisResult] = []
         self._history_positions: dict[str, int] = {}
         self._lock = asyncio.Lock()
+        self._last_hash = "0" * 64
+        self._integrity_ok = True
+        self._verified_lines = 0
+        self._legacy_lines = 0
         self._load_existing()
 
     async def save(self, record: AnalysisResult) -> None:
         async with self._lock:
-            self._upsert(record)
+            if not self._integrity_ok:
+                raise RuntimeError("audit log integrity check failed; refusing to append")
             await asyncio.to_thread(self._append_jsonl, record)
+            self._upsert(record)
 
-    def get(self, event_id: str) -> AnalysisResult | None:
-        return self._records.get(event_id)
+    def get(self, event_id: str, tenant_id: str = "local") -> AnalysisResult | None:
+        return self._records.get((tenant_id, event_id))
 
-    def recent(self, limit: int = 20) -> list[AnalysisResult]:
-        return list(reversed(self._history[-limit:]))
+    def recent(self, limit: int = 20, tenant_id: str = "local") -> list[AnalysisResult]:
+        records = [record for record in self._history if record.tenant_id == tenant_id]
+        return list(reversed(records[-limit:]))
 
-    def metrics(self) -> MetricsSummary:
-        return _summarize(self._history)
+    def metrics(self, tenant_id: str = "local") -> MetricsSummary:
+        return _summarize(
+            [record for record in self._history if record.tenant_id == tenant_id]
+        )
+
+    def integrity(self) -> dict[str, bool | int | str]:
+        return {
+            "backend": "jsonl_hash_chain",
+            "ok": self._integrity_ok,
+            "verified_lines": self._verified_lines,
+            "legacy_lines": self._legacy_lines,
+        }
 
     def _load_existing(self) -> None:
         if not self._path.exists():
@@ -52,14 +74,45 @@ class AuditStore:
         except OSError:
             return
 
+        expected_previous_hash = "0" * 64
         for line in lines:
             if not line.strip():
                 continue
             try:
-                record = AnalysisResult.model_validate_json(line)
-            except ValueError:
+                value = json.loads(line)
+            except (TypeError, ValueError):
+                self._integrity_ok = False
                 continue
+
+            if isinstance(value, dict) and value.get("schema_version") == 1:
+                payload = value.get("payload")
+                previous_hash = value.get("previous_hash")
+                record_hash = value.get("record_hash")
+                if not all(isinstance(item, str) for item in (payload, previous_hash, record_hash)):
+                    self._integrity_ok = False
+                    continue
+                calculated = _record_hash(previous_hash, payload)
+                if previous_hash != expected_previous_hash or not hmac.compare_digest(
+                    calculated, record_hash
+                ):
+                    self._integrity_ok = False
+                    continue
+                expected_previous_hash = record_hash
+                self._verified_lines += 1
+                try:
+                    record = AnalysisResult.model_validate_json(payload)
+                except ValueError:
+                    self._integrity_ok = False
+                    continue
+            else:
+                try:
+                    record = AnalysisResult.model_validate(value)
+                except ValueError:
+                    self._integrity_ok = False
+                    continue
+                self._legacy_lines += 1
             self._upsert(record)
+        self._last_hash = expected_previous_hash
 
     def _upsert(self, record: AnalysisResult) -> None:
         position = self._history_positions.get(record.analysis_id)
@@ -69,18 +122,29 @@ class AuditStore:
         else:
             self._history[position] = record
 
-        latest = self._records.get(record.event_id)
+        record_key = (record.tenant_id, record.event_id)
+        latest = self._records.get(record_key)
         if (
             latest is None
             or latest.analysis_id == record.analysis_id
             or record.analyzed_at >= latest.analyzed_at
         ):
-            self._records[record.event_id] = record
+            self._records[record_key] = record
 
     def _append_jsonl(self, record: AnalysisResult) -> None:
         self._path.parent.mkdir(parents=True, exist_ok=True)
+        payload = record.model_dump_json()
+        record_hash = _record_hash(self._last_hash, payload)
+        envelope = {
+            "schema_version": 1,
+            "previous_hash": self._last_hash,
+            "record_hash": record_hash,
+            "payload": payload,
+        }
         with self._path.open("a", encoding="utf-8") as handle:
-            handle.write(record.model_dump_json() + "\n")
+            handle.write(json.dumps(envelope, ensure_ascii=False, separators=(",", ":")) + "\n")
+        self._last_hash = record_hash
+        self._verified_lines += 1
 
 
 class DynamoDBAuditStore:
@@ -92,44 +156,59 @@ class DynamoDBAuditStore:
         item = {
             "analysis_id": record.analysis_id,
             "event_id": record.event_id,
+            "tenant_event_key": f"{record.tenant_id}#{record.event_id}",
+            "tenant_id": record.tenant_id,
             "record_type": "analysis",
             "analyzed_at": record.analyzed_at.isoformat(),
             "payload": record.model_dump_json(),
         }
+        item["payload_sha256"] = hashlib.sha256(item["payload"].encode("utf-8")).hexdigest()
         await asyncio.to_thread(self._table.put_item, Item=item)
 
-    def get(self, event_id: str) -> AnalysisResult | None:
+    def get(self, event_id: str, tenant_id: str = "local") -> AnalysisResult | None:
         response = self._table.query(
-            IndexName="EventIndex",
-            KeyConditionExpression=Key("event_id").eq(event_id),
+            IndexName="TenantEventIndex",
+            KeyConditionExpression=Key("tenant_event_key").eq(f"{tenant_id}#{event_id}"),
             ScanIndexForward=False,
             Limit=1,
         )
-        records = _parse_items(response.get("Items", []))
+        records = _parse_items(response.get("Items", []), tenant_id)
         return records[0] if records else None
 
-    def recent(self, limit: int = 20) -> list[AnalysisResult]:
+    def recent(self, limit: int = 20, tenant_id: str = "local") -> list[AnalysisResult]:
         response = self._table.query(
-            IndexName="RecentIndex",
-            KeyConditionExpression=Key("record_type").eq("analysis"),
+            IndexName="TenantRecentIndex",
+            KeyConditionExpression=Key("tenant_id").eq(tenant_id),
             ScanIndexForward=False,
             Limit=limit,
         )
-        return _parse_items(response.get("Items", []))
+        return _parse_items(response.get("Items", []), tenant_id)
 
-    def metrics(self) -> MetricsSummary:
+    def metrics(self, tenant_id: str = "local") -> MetricsSummary:
         items: list[dict] = []
-        response = self._table.scan(ProjectionExpression="payload")
+        response = self._table.query(
+            IndexName="TenantRecentIndex",
+            KeyConditionExpression=Key("tenant_id").eq(tenant_id),
+        )
         items.extend(response.get("Items", []))
         while "LastEvaluatedKey" in response:
-            response = self._table.scan(
-                ProjectionExpression="payload",
+            response = self._table.query(
+                IndexName="TenantRecentIndex",
+                KeyConditionExpression=Key("tenant_id").eq(tenant_id),
                 ExclusiveStartKey=response["LastEvaluatedKey"],
             )
             items.extend(response.get("Items", []))
-        records = _parse_items(items)
+        records = _parse_items(items, tenant_id)
         records.sort(key=lambda record: record.analyzed_at)
         return _summarize(records)
+
+    def integrity(self) -> dict[str, bool | int | str]:
+        return {
+            "backend": "dynamodb_payload_digest",
+            "ok": True,
+            "verified_lines": 0,
+            "legacy_lines": 0,
+        }
 
 
 def create_audit_store(settings: Settings) -> AuditRepository:
@@ -138,17 +217,28 @@ def create_audit_store(settings: Settings) -> AuditRepository:
     return AuditStore(settings.audit_log_path)
 
 
-def _parse_items(items: list[dict]) -> list[AnalysisResult]:
+def _parse_items(items: list[dict], tenant_id: str) -> list[AnalysisResult]:
     records: list[AnalysisResult] = []
     for item in items:
         payload = item.get("payload")
         if not isinstance(payload, str):
             continue
+        expected_digest = item.get("payload_sha256")
+        if isinstance(expected_digest, str) and not hmac.compare_digest(
+            hashlib.sha256(payload.encode("utf-8")).hexdigest(), expected_digest
+        ):
+            continue
         try:
-            records.append(AnalysisResult.model_validate_json(payload))
+            record = AnalysisResult.model_validate_json(payload)
         except ValueError:
             continue
+        if record.tenant_id == tenant_id:
+            records.append(record)
     return records
+
+
+def _record_hash(previous_hash: str, payload: str) -> str:
+    return hashlib.sha256(f"{previous_hash}.{payload}".encode()).hexdigest()
 
 
 def _summarize(records: list[AnalysisResult]) -> MetricsSummary:
