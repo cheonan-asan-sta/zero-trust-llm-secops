@@ -34,7 +34,7 @@ LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 �
 
 ## 개발 주차 산출물
 
-수행계획서의 목표와 실제 코드·검증 근거를 연결한 3~14주차 기록은 [주차별 산출물 색인](docs/README.md)에서 확인할 수 있습니다. 기업 적용을 위한 보안 기준선과 남은 운영 검증 항목은 [기업 적용 준비도](docs/enterprise-readiness.md), 실제 사례·논문과 다음 구현 순서는 [고도화 딥 리서치](docs/deep-research-enterprise-secops.md)에 정리했습니다.
+수행계획서의 목표와 실제 코드·검증 근거를 연결한 3~14주차 기록은 [주차별 산출물 색인](docs/README.md)에서 확인할 수 있습니다. 기업 적용을 위한 보안 기준선과 남은 운영 검증 항목은 [기업 적용 준비도](docs/enterprise-readiness.md), 실제 사례·논문과 다음 구현 순서는 [고도화 딥 리서치](docs/deep-research-enterprise-secops.md), 국내외 공공기관·금융권·표준·기업 실무 자료와 추가 논문은 [기업·공공부문 참고자료 카탈로그](docs/reference-catalog-enterprise-public-sector.md)에 정리했습니다.
 
 ## 기업용 보안 모드
 
