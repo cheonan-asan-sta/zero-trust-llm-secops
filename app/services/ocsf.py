@@ -21,7 +21,7 @@ from app.models import (
 )
 
 OCSF_SCHEMA_VERSION = "1.9.0"
-TRANSFORMER_VERSION = "0.12.0"
+TRANSFORMER_VERSION = "0.13.0"
 
 _MAPPING_SPEC = {
     "schema": f"OCSF {OCSF_SCHEMA_VERSION}",

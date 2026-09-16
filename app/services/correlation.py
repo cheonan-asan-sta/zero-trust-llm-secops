@@ -18,7 +18,7 @@ from app.models import (
     SigmaRuleLevel,
 )
 
-CORRELATION_VERSION = "0.12.0"
+CORRELATION_VERSION = "0.13.0"
 _LEVEL_ORDER = {
     SigmaRuleLevel.INFORMATIONAL: 1,
     SigmaRuleLevel.LOW: 2,

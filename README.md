@@ -32,6 +32,7 @@ LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 �
 - 사용자·IP·기기·자원·탐지 규칙 엔터티 그래프와 5분·30분·24시간 창 기반 OCSF Incident Finding 상관분석
 - 동일 증거가 여러 시간창에서 재발견될 때 가장 짧은 창 결과만 남기는 결정적 사고 중복 제거
 - 규칙별 혼동행렬·Precision·Recall·F1·오탐률, 파싱 성공률, OCSF 매핑률과 실패 폐쇄형 품질 게이트
+- 공개 데이터셋별 사건 Precision·Recall·F1·오상관률, 시간창·그래프·중복 제거 정확도와 재현 지문
 - 공공·기업 보안 기준 18개를 구현·부분 구현·계획으로 구분한 기계판독 통제대장
 - 완료 통제의 코드·구성·자동 시험 증거를 강제하는 보증 검증기와 준비도 API
 - 천안아산역 콘셉트의 한국어 관제 대시보드
@@ -163,6 +164,7 @@ HYBRID_LLM_TIMEOUT_SECONDS=2.5
 | POST | `/replay/public/run` | 공개 로그 12건의 탐지·오탐·사고 상관분석 회귀시험 |
 | POST | `/replay/public/{dataset_id}` | 지정한 공개 데이터셋만 오프라인 재생 |
 | GET | `/evaluation/detection-quality` | 공개 정답 표본의 전체·규칙별 탐지 품질과 회귀 게이트 조회 |
+| GET | `/evaluation/incident-quality` | 공개 정답 표본의 사건 분류·시간창·그래프·중복 제거 품질 게이트 조회 |
 | POST | `/analysis` | 이벤트 위험 분석과 정책 검토 |
 | POST | `/analysis/batch` | 최대 20개 이벤트 제한 병렬 분석 |
 | POST | `/scenarios/evaluate` | 구조화 조건으로 시나리오 일치도 계산 |

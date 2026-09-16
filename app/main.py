@@ -30,6 +30,7 @@ from app.models import (
     EvaluationRequest,
     EvaluationSummary,
     EventScenarioEvaluation,
+    IncidentQualityReport,
     MetricsSummary,
     NormalizedSecurityEvent,
     PolicyDecision,
@@ -52,6 +53,7 @@ from app.services.audit import create_audit_store
 from app.services.correlation import get_correlation_engine
 from app.services.detection_quality import get_detection_quality_service
 from app.services.evaluation import run_evaluation
+from app.services.incident_quality import get_incident_quality_service
 from app.services.ocsf import get_ocsf_normalizer
 from app.services.policy import enforce_assessment_safety, response_preview
 from app.services.public_replay import get_public_replay_service
@@ -79,6 +81,7 @@ sigma_engine = get_sigma_engine()
 correlation_engine = get_correlation_engine()
 public_replay_service = get_public_replay_service()
 detection_quality_service = get_detection_quality_service()
+incident_quality_service = get_incident_quality_service()
 analysis_capacity = asyncio.Semaphore(settings.analysis_max_concurrency)
 
 ViewerPrincipal = Annotated[Principal, Depends(require_roles(Role.VIEWER))]
@@ -131,6 +134,11 @@ def readiness() -> Response:
         if public_replay_service.valid and sigma_engine.valid
         else None
     )
+    incident_quality = (
+        incident_quality_service.evaluate("readiness")
+        if public_replay_service.valid and sigma_engine.valid
+        else None
+    )
     ready = (
         integrity["ok"]
         and assurance.valid
@@ -138,6 +146,8 @@ def readiness() -> Response:
         and public_replay_service.valid
         and quality is not None
         and quality.gate_passed
+        and incident_quality is not None
+        and incident_quality.gate_passed
     )
     payload = {
         "status": "ready" if ready else "degraded",
@@ -192,6 +202,36 @@ def readiness() -> Response:
             "rule_coverage_rate": quality.rule_coverage_rate if quality else None,
             "evaluation_fingerprint_sha256": (
                 quality.evaluation_fingerprint_sha256 if quality else None
+            ),
+        },
+        "incident_quality": {
+            "valid": incident_quality is not None and incident_quality.gate_passed,
+            "version": incident_quality_service.version,
+            "positive_dataset_support": (
+                incident_quality.positive_dataset_support if incident_quality else None
+            ),
+            "negative_dataset_support": (
+                incident_quality.negative_dataset_support if incident_quality else None
+            ),
+            "precision": incident_quality.precision if incident_quality else None,
+            "recall": incident_quality.recall if incident_quality else None,
+            "f1": incident_quality.f1 if incident_quality else None,
+            "false_positive_rate": (
+                incident_quality.false_positive_rate if incident_quality else None
+            ),
+            "window_accuracy": (
+                incident_quality.window_accuracy if incident_quality else None
+            ),
+            "graph_structure_accuracy": (
+                incident_quality.graph_structure_accuracy if incident_quality else None
+            ),
+            "deduplication_accuracy": (
+                incident_quality.deduplication_accuracy if incident_quality else None
+            ),
+            "evaluation_fingerprint_sha256": (
+                incident_quality.evaluation_fingerprint_sha256
+                if incident_quality
+                else None
             ),
         },
     }
@@ -290,6 +330,13 @@ def detection_quality(principal: ViewerPrincipal) -> DetectionQualityReport:
     if not public_replay_service.valid or not sigma_engine.valid:
         raise HTTPException(status_code=503, detail="Detection quality inputs failed validation")
     return detection_quality_service.evaluate(principal.tenant_id)
+
+
+@app.get("/evaluation/incident-quality", response_model=IncidentQualityReport)
+def incident_quality(principal: ViewerPrincipal) -> IncidentQualityReport:
+    if not public_replay_service.valid or not sigma_engine.valid:
+        raise HTTPException(status_code=503, detail="Incident quality inputs failed validation")
+    return incident_quality_service.evaluate(principal.tenant_id)
 
 
 @app.post("/scenarios/evaluate", response_model=EventScenarioEvaluation)

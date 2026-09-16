@@ -14,6 +14,7 @@ from app.models import (
     DetectionQualityTargets,
     DeviceContext,
     EventAction,
+    IncidentQualityTargets,
     NetworkContext,
     PublicReplayDataset,
     PublicReplayRecordResult,
@@ -27,7 +28,7 @@ from app.services.correlation import CorrelationEngine, get_correlation_engine
 from app.services.ocsf import OCSFNormalizer, get_ocsf_normalizer
 from app.services.sigma import SigmaEngine, get_sigma_engine
 
-REPLAY_VERSION = "0.12.0"
+REPLAY_VERSION = "0.13.0"
 _WINDOWS_NAMESPACE = "http://schemas.microsoft.com/win/2004/08/events/event"
 _WINDOWS = {"event": _WINDOWS_NAMESPACE}
 
@@ -47,6 +48,7 @@ class PublicReplayService:
         self.validation_issues: list[str] = []
         self._datasets: list[PublicReplayDataset] = []
         self.quality_targets = DetectionQualityTargets()
+        self.incident_quality_targets = IncidentQualityTargets()
         self.manifest_digest_sha256 = ""
         self._load_manifest()
 
@@ -98,10 +100,20 @@ class PublicReplayService:
         observed_rule_ids = {
             match.rule_id for item in replayed for match in item.detection.matches
         }
-        expectation_met = (
+        observed_windows = sorted(incident.window_minutes for incident in correlation.incidents)
+        observed_deduplicated_count = sum(
+            summary.deduplicated_count for summary in correlation.window_summaries
+        )
+        detection_expectation_met = (
             finding_count == dataset.expected_finding_count
-            and correlation.incident_count == dataset.expected_incident_count
             and observed_rule_ids == set(dataset.expected_rule_ids)
+        )
+        incident_expectation_met = (
+            correlation.incident_count == dataset.expected_incident_count
+            and observed_windows == dataset.expected_incident_windows_minutes
+            and correlation.entity_graph.node_count == dataset.expected_entity_node_count
+            and correlation.entity_graph.edge_count == dataset.expected_entity_edge_count
+            and observed_deduplicated_count == dataset.expected_deduplicated_count
         )
         return PublicReplayResult(
             dataset=dataset,
@@ -111,7 +123,9 @@ class PublicReplayService:
             window_summaries=correlation.window_summaries,
             entity_graph=correlation.entity_graph,
             incidents=correlation.incidents,
-            expectation_met=expectation_met,
+            detection_expectation_met=detection_expectation_met,
+            incident_expectation_met=incident_expectation_met,
+            expectation_met=detection_expectation_met and incident_expectation_met,
         )
 
     def _load_manifest(self) -> None:
@@ -130,6 +144,9 @@ class PublicReplayService:
         try:
             self.quality_targets = DetectionQualityTargets.model_validate(
                 payload.get("quality_targets", {})
+            )
+            self.incident_quality_targets = IncidentQualityTargets.model_validate(
+                payload.get("incident_quality_targets", {})
             )
         except (TypeError, ValueError) as exc:
             self.validation_issues.append(f"public replay quality targets are invalid: {exc}")

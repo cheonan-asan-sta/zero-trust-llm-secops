@@ -12,7 +12,7 @@ from app.models import (
 from app.services.public_replay import PublicReplayService, get_public_replay_service
 from app.services.sigma import SigmaEngine, get_sigma_engine
 
-EVALUATION_VERSION = "0.12.0"
+EVALUATION_VERSION = "0.13.0"
 
 
 class DetectionQualityService:
@@ -74,7 +74,9 @@ class DetectionQualityService:
                 mapping_rate >= targets.minimum_mapping_completeness
             ),
             "rule_coverage_rate": coverage_rate >= targets.minimum_rule_coverage_rate,
-            "dataset_expectations": suite.expectations_met,
+            "dataset_expectations": all(
+                result.detection_expectation_met for result in suite.results
+            ),
         }
         fingerprint = _fingerprint(
             self._replay_service.manifest_digest_sha256,

@@ -601,6 +601,10 @@ class PublicReplayDataset(StrictModel):
     ] = Field(default_factory=list, max_length=20)
     expected_finding_count: int = Field(ge=0, le=1000)
     expected_incident_count: int = Field(ge=0, le=100)
+    expected_incident_windows_minutes: list[int] = Field(default_factory=list, max_length=100)
+    expected_entity_node_count: int = Field(ge=0, le=5000)
+    expected_entity_edge_count: int = Field(ge=0, le=20000)
+    expected_deduplicated_count: int = Field(ge=0, le=1000)
     attack_techniques: list[str] = Field(default_factory=list, max_length=20)
     record_count: int = Field(ge=1, le=1000)
 
@@ -613,6 +617,12 @@ class PublicReplayDataset(StrictModel):
             raise ValueError("threat datasets require findings and benign datasets require zero")
         if len(set(self.expected_rule_ids)) != len(self.expected_rule_ids):
             raise ValueError("expected rule identifiers must be unique")
+        if len(self.expected_incident_windows_minutes) != self.expected_incident_count:
+            raise ValueError("expected incident windows must match expected incident count")
+        if self.expected_incident_windows_minutes != sorted(
+            self.expected_incident_windows_minutes
+        ):
+            raise ValueError("expected incident windows must be sorted")
         return self
 
 
@@ -632,6 +642,8 @@ class PublicReplayResult(StrictModel):
     window_summaries: list[CorrelationWindowSummary] = Field(min_length=1, max_length=6)
     entity_graph: CorrelationEntityGraph
     incidents: list[OCSFIncidentFinding] = Field(default_factory=list, max_length=100)
+    detection_expectation_met: bool
+    incident_expectation_met: bool
     expectation_met: bool
 
 
@@ -702,6 +714,63 @@ class DetectionQualityReport(StrictModel):
     targets_met: dict[str, bool]
     gate_passed: bool
     rules: list[RuleDetectionQuality] = Field(min_length=1, max_length=100)
+
+
+class IncidentQualityTargets(StrictModel):
+    minimum_dataset_count: int = Field(default=3, ge=1, le=100)
+    minimum_positive_dataset_support: int = Field(default=1, ge=1, le=100)
+    minimum_negative_dataset_support: int = Field(default=2, ge=1, le=100)
+    minimum_precision: float = Field(default=0.95, ge=0, le=1)
+    minimum_recall: float = Field(default=0.95, ge=0, le=1)
+    minimum_f1: float = Field(default=0.95, ge=0, le=1)
+    maximum_false_positive_rate: float = Field(default=0.05, ge=0, le=1)
+    minimum_window_accuracy: float = Field(default=1.0, ge=0, le=1)
+    minimum_graph_structure_accuracy: float = Field(default=1.0, ge=0, le=1)
+    minimum_deduplication_accuracy: float = Field(default=1.0, ge=0, le=1)
+
+
+class IncidentDatasetQuality(StrictModel):
+    dataset_id: str = Field(pattern=r"^[a-z0-9][a-z0-9-]{2,63}$")
+    expected_incident_count: int = Field(ge=0)
+    observed_incident_count: int = Field(ge=0)
+    expected_windows_minutes: list[int] = Field(default_factory=list, max_length=100)
+    observed_windows_minutes: list[int] = Field(default_factory=list, max_length=100)
+    expected_entity_node_count: int = Field(ge=0)
+    observed_entity_node_count: int = Field(ge=0)
+    expected_entity_edge_count: int = Field(ge=0)
+    observed_entity_edge_count: int = Field(ge=0)
+    expected_deduplicated_count: int = Field(ge=0)
+    observed_deduplicated_count: int = Field(ge=0)
+    incident_classification_correct: bool
+    window_match: bool
+    graph_structure_match: bool
+    deduplication_match: bool
+
+
+class IncidentQualityReport(StrictModel):
+    evaluation_version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
+    manifest_digest_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    correlation_version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
+    evaluation_fingerprint_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    dataset_count: int = Field(ge=1)
+    positive_dataset_support: int = Field(ge=0)
+    negative_dataset_support: int = Field(ge=0)
+    confusion: DetectionConfusionCounts
+    precision: float = Field(ge=0, le=1)
+    recall: float = Field(ge=0, le=1)
+    f1: float = Field(ge=0, le=1)
+    false_positive_rate: float = Field(ge=0, le=1)
+    window_evaluated_dataset_count: int = Field(ge=0)
+    window_match_count: int = Field(ge=0)
+    window_accuracy: float = Field(ge=0, le=1)
+    graph_structure_match_count: int = Field(ge=0)
+    graph_structure_accuracy: float = Field(ge=0, le=1)
+    deduplication_match_count: int = Field(ge=0)
+    deduplication_accuracy: float = Field(ge=0, le=1)
+    targets: IncidentQualityTargets
+    targets_met: dict[str, bool]
+    gate_passed: bool
+    datasets: list[IncidentDatasetQuality] = Field(min_length=1, max_length=100)
 
 
 class SecurityAssessment(StrictModel):

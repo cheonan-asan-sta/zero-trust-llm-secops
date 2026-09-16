@@ -538,6 +538,49 @@ function renderQualityDetails(result) {
   $("qualityDetails").hidden = false;
 }
 
+function renderIncidentQualityDetails(result) {
+  $("incidentPrecision").textContent = formatPercent(result.precision);
+  $("incidentRecall").textContent = formatPercent(result.recall);
+  $("incidentF1").textContent = formatPercent(result.f1);
+  $("incidentFpr").textContent = formatPercent(result.false_positive_rate);
+  $("incidentWindowAccuracy").textContent = formatPercent(result.window_accuracy);
+  $("incidentGraphAccuracy").textContent = formatPercent(result.graph_structure_accuracy);
+  $("incidentDedupAccuracy").textContent = formatPercent(result.deduplication_accuracy);
+  $("incidentSupport").textContent = `${result.positive_dataset_support} · ${result.negative_dataset_support}`;
+  $("incidentQualityGate").textContent = result.gate_passed ? "통과" : "보완 필요";
+  $("incidentQualityGate").className = result.gate_passed ? "metric-pass" : "metric-fail";
+  $("incidentQualityFingerprint").textContent = `평가 지문 ${result.evaluation_fingerprint_sha256.slice(0, 12)}`;
+
+  const body = $("incidentQualityBody");
+  body.replaceChildren();
+  result.datasets.forEach((dataset) => {
+    const passed = dataset.incident_classification_correct
+      && dataset.window_match
+      && dataset.graph_structure_match
+      && dataset.deduplication_match;
+    const row = document.createElement("tr");
+    const values = [
+      dataset.dataset_id,
+      dataset.expected_incident_count,
+      dataset.observed_incident_count,
+      dataset.observed_windows_minutes.length
+        ? dataset.observed_windows_minutes.map((window) => `${window}분`).join(" · ")
+        : "없음",
+      `${dataset.observed_entity_node_count}/${dataset.expected_entity_node_count} 노드 · ${dataset.observed_entity_edge_count}/${dataset.expected_entity_edge_count} 연결`,
+      `${dataset.observed_deduplicated_count}/${dataset.expected_deduplicated_count}`,
+      passed ? "통과" : "보완 필요",
+    ];
+    values.forEach((value, index) => {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      if (index === 6) cell.className = passed ? "metric-pass" : "metric-fail";
+      row.append(cell);
+    });
+    body.append(row);
+  });
+  $("incidentQualityDetails").hidden = false;
+}
+
 async function runPublicReplay() {
   if (state.replaying) return;
   state.replaying = true;
@@ -546,9 +589,10 @@ async function runPublicReplay() {
   $("replayState").textContent = "공개 로그 무결성, 탐지 결과와 사고 상관관계를 확인하고 있습니다.";
 
   try {
-    const [result, quality] = await Promise.all([
+    const [result, quality, incidentQuality] = await Promise.all([
       request("/replay/public/run", { method: "POST" }),
       request("/evaluation/detection-quality"),
+      request("/evaluation/incident-quality"),
     ]);
     $("replayGrid").hidden = false;
     $("replayDatasetCount").textContent = result.dataset_count;
@@ -559,8 +603,9 @@ async function runPublicReplay() {
     $("replayExpectation").className = result.expectations_met ? "metric-pass" : "metric-fail";
     renderReplayDetails(result);
     renderQualityDetails(quality);
-    $("replayState").textContent = result.expectations_met && quality.gate_passed
-      ? "공격 탐지, 정상 로그 오탐 억제와 정량 품질 기준을 모두 통과했습니다."
+    renderIncidentQualityDetails(incidentQuality);
+    $("replayState").textContent = result.expectations_met && quality.gate_passed && incidentQuality.gate_passed
+      ? "탐지·사건 상관분석과 정상 로그 오탐 억제의 정량 품질 기준을 모두 통과했습니다."
       : "공개 로그 회귀 기준을 통과하지 못한 항목이 있습니다.";
   } catch (error) {
     $("replayState").textContent = `공개 로그를 재생하지 못했습니다: ${error.message}`;

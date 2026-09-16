@@ -53,6 +53,8 @@ def test_public_attack_and_benign_replays_meet_regression_expectations() -> None
     assert suite.incident_count == 1
     assert suite.expectations_met is True
     assert attack.expectation_met is True
+    assert attack.detection_expectation_met is True
+    assert attack.incident_expectation_met is True
     assert attack.finding_count == 4
     assert len(attack.incidents) == 1
     assert attack.incidents[0].class_uid == 2005
@@ -136,7 +138,7 @@ def test_readiness_includes_correlation_and_public_replay_integrity() -> None:
     payload = response.json()
 
     assert response.status_code == 200
-    assert payload["correlation"]["version"] == "0.12.0"
+    assert payload["correlation"]["version"] == "0.13.0"
     assert payload["correlation"]["output_class_uid"] == 2005
     assert payload["correlation"]["windows_minutes"] == [5, 30, 1440]
     assert payload["correlation"]["entity_graph_enabled"] is True

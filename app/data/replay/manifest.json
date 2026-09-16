@@ -1,5 +1,5 @@
 {
-  "manifest_version": "2026.09.2",
+  "manifest_version": "2026.09.3",
   "quality_targets": {
     "minimum_dataset_count": 3,
     "minimum_precision": 0.95,
@@ -9,6 +9,18 @@
     "minimum_parse_success_rate": 1.0,
     "minimum_mapping_completeness": 1.0,
     "minimum_rule_coverage_rate": 0.3
+  },
+  "incident_quality_targets": {
+    "minimum_dataset_count": 3,
+    "minimum_positive_dataset_support": 1,
+    "minimum_negative_dataset_support": 2,
+    "minimum_precision": 0.95,
+    "minimum_recall": 0.95,
+    "minimum_f1": 0.95,
+    "maximum_false_positive_rate": 0.05,
+    "minimum_window_accuracy": 1.0,
+    "minimum_graph_structure_accuracy": 1.0,
+    "minimum_deduplication_accuracy": 1.0
   },
   "datasets": [
     {
@@ -26,6 +38,10 @@
       "expected_rule_ids": ["d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"],
       "expected_finding_count": 4,
       "expected_incident_count": 1,
+      "expected_incident_windows_minutes": [5],
+      "expected_entity_node_count": 6,
+      "expected_entity_edge_count": 6,
+      "expected_deduplicated_count": 2,
       "attack_techniques": ["T1021.001"],
       "record_count": 4
     },
@@ -44,6 +60,10 @@
       "expected_rule_ids": ["8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"],
       "expected_finding_count": 4,
       "expected_incident_count": 0,
+      "expected_incident_windows_minutes": [],
+      "expected_entity_node_count": 5,
+      "expected_entity_edge_count": 4,
+      "expected_deduplicated_count": 0,
       "attack_techniques": ["T1110.001"],
       "record_count": 4
     },
@@ -62,6 +82,10 @@
       "expected_rule_ids": [],
       "expected_finding_count": 0,
       "expected_incident_count": 0,
+      "expected_incident_windows_minutes": [],
+      "expected_entity_node_count": 0,
+      "expected_entity_edge_count": 0,
+      "expected_deduplicated_count": 0,
       "attack_techniques": [],
       "record_count": 4
     }

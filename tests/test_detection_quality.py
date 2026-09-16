@@ -74,7 +74,7 @@ def test_detection_quality_api_exposes_metrics_and_rule_coverage() -> None:
     payload = response.json()
 
     assert response.status_code == 200
-    assert payload["evaluation_version"] == "0.12.0"
+    assert payload["evaluation_version"] == "0.13.0"
     assert payload["gate_passed"] is True
     assert payload["supported_rule_count"] == 2
     assert payload["approved_rule_count"] == 6

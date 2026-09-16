@@ -58,7 +58,7 @@ try {
     if (-not $health -or $health.status -ne "ok" -or $health.analyzer_mode -ne "rule") {
         throw "Container health check did not become ready in rule mode."
     }
-    if ($health.version -ne "0.12.0" -or $health.auth_mode -ne "disabled") {
+    if ($health.version -ne "0.13.0" -or $health.auth_mode -ne "disabled") {
         throw "Container did not start with the expected local security profile."
     }
     $readiness = Invoke-RestMethod -Method Get -Uri "$baseUrl/health/ready" -TimeoutSec 2
@@ -76,7 +76,10 @@ try {
         -not $readiness.public_replay.valid -or
         $readiness.public_replay.dataset_count -ne 3 -or
         -not $readiness.detection_quality.valid -or
-        $readiness.detection_quality.f1 -lt 0.95
+        $readiness.detection_quality.f1 -lt 0.95 -or
+        -not $readiness.incident_quality.valid -or
+        $readiness.incident_quality.f1 -lt 0.95 -or
+        $readiness.incident_quality.graph_structure_accuracy -lt 1.0
     ) {
         throw "Audit or assurance registry integrity readiness check failed."
     }
@@ -115,6 +118,9 @@ try {
     $detectionQuality = Invoke-RestMethod `
         -Method Get `
         -Uri "$baseUrl/evaluation/detection-quality"
+    $incidentQuality = Invoke-RestMethod `
+        -Method Get `
+        -Uri "$baseUrl/evaluation/incident-quality"
 
     if ($analysis.assessment.risk_level -notin @("HIGH", "CRITICAL")) {
         throw "Threat smoke test returned an unexpectedly low risk."
@@ -174,6 +180,17 @@ try {
     ) {
         throw "Detection quality regression gate failed."
     }
+    if (
+        -not $incidentQuality.gate_passed -or
+        $incidentQuality.precision -lt 0.95 -or
+        $incidentQuality.recall -lt 0.95 -or
+        $incidentQuality.false_positive_rate -gt 0.05 -or
+        $incidentQuality.window_accuracy -lt 1.0 -or
+        $incidentQuality.graph_structure_accuracy -lt 1.0 -or
+        $incidentQuality.deduplication_accuracy -lt 1.0
+    ) {
+        throw "Incident quality regression gate failed."
+    }
 
     [ordered]@{
         status = "passed"
@@ -192,6 +209,12 @@ try {
         detection_precision = $detectionQuality.precision
         detection_recall = $detectionQuality.recall
         detection_rule_coverage = $detectionQuality.rule_coverage_rate
+        incident_precision = $incidentQuality.precision
+        incident_recall = $incidentQuality.recall
+        incident_false_positive_rate = $incidentQuality.false_positive_rate
+        incident_window_accuracy = $incidentQuality.window_accuracy
+        incident_graph_accuracy = $incidentQuality.graph_structure_accuracy
+        incident_deduplication_accuracy = $incidentQuality.deduplication_accuracy
         evaluation_cases = $evaluation.total_cases
         risk_accuracy = $evaluation.risk_accuracy
         action_accuracy = $evaluation.action_accuracy

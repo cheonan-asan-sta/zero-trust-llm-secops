@@ -1,5 +1,5 @@
 {
-  "registry_version": "2026.09.5",
+  "registry_version": "2026.09.6",
   "controls": [
     {
       "control_id": "GOV-01",
@@ -384,6 +384,7 @@
         "평가가 비용 없는 규칙 분석기로 오프라인 실행된다.",
         "전체 평균과 시나리오별 결과, 오류 분류와 목표 통과 여부가 함께 반환된다.",
         "공개 공격·정상 로그에서 규칙별 precision, recall, F1, 오탐률, 파싱 성공률과 OCSF 매핑률을 산출한다.",
+        "공개 데이터셋에서 사건 단위 precision, recall, F1, 잘못 묶인 비율, 시간창·그래프·중복 제거 정확도를 산출한다.",
         "정량 품질 기준이 미달되면 준비 상태가 실패 폐쇄 방식으로 전환된다."
       ],
       "sources": [
@@ -428,11 +429,29 @@
           "kind": "automated_test",
           "location": "tests/test_detection_quality.py",
           "description": "Precision, recall, F1, 오탐률, 파싱·매핑률, 규칙 표본 범위와 평가 지문 회귀 검증"
+        },
+        {
+          "evidence_id": "EVD-EVAL-INCIDENT-QUALITY-CODE",
+          "kind": "code",
+          "location": "app/services/incident_quality.py",
+          "description": "공개 표본의 사건 혼동행렬, 시간창·그래프·중복 제거 정확도와 재현 가능한 평가 지문 생성"
+        },
+        {
+          "evidence_id": "EVD-EVAL-INCIDENT-QUALITY-POLICY",
+          "kind": "configuration",
+          "location": "app/data/replay/manifest.json",
+          "description": "데이터셋별 기대 사고·시간창·그래프 구조·중복 제거 수와 실패 폐쇄형 사건 품질 목표"
+        },
+        {
+          "evidence_id": "EVD-EVAL-INCIDENT-QUALITY-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_incident_quality.py",
+          "description": "사건 precision·recall·F1, 오상관률, 그래프·시간창·중복 제거 정확도와 표본 부족 실패 회귀 검증"
         }
       ],
       "reviewed_on": "2026-09-16",
       "review_due_on": "2026-12-16",
-      "target_version": "0.8.0"
+      "target_version": "0.13.0"
     },
     {
       "control_id": "EVAL-02",
