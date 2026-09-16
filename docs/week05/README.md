@@ -9,7 +9,7 @@ AWS와 OpenAI API를 호출하지 않고도 배포 이미지와 동일한 애플
 - 비루트 `secops` 사용자로 실행하는 로컬 애플리케이션 이미지
 - 읽기 전용 루트 파일 시스템, 전체 Linux capability 제거, 추가 권한 획득 차단
 - 컨테이너 자체 상태 확인과 JSONL 감사 기록 전용 볼륨
-- 코드 검사와 43개 단위 테스트를 수행하는 `Dockerfile.test`
+- 코드 검사와 현재 47개 단위 테스트를 수행하는 `Dockerfile.test`
 - 상태 확인, 위협 분석·정책 판정, 8개 기준 사례 평가를 잇는 PowerShell 스모크 테스트
 - API 키와 `.env.local`을 Docker 빌드 컨텍스트에서 제외
 
