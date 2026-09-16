@@ -32,22 +32,24 @@ def test_public_replay_manifest_and_fixtures_are_integrity_checked() -> None:
     assert service.valid is True
     assert service.validation_issues == []
     assert len(service.manifest_digest_sha256) == 64
-    assert len(datasets) == 2
+    assert len(datasets) == 3
     assert {dataset.license for dataset in datasets} == {"Apache-2.0", "MIT"}
     assert all(len(dataset.source_revision) == 40 for dataset in datasets)
     assert all(len(dataset.source_artifact_sha256) == 64 for dataset in datasets)
     assert all(len(dataset.fixture_sha256) == 64 for dataset in datasets)
+    assert service.quality_targets.minimum_precision == 0.95
 
 
 def test_public_attack_and_benign_replays_meet_regression_expectations() -> None:
     suite = get_public_replay_service().run_all("local")
     by_id = {result.dataset.dataset_id: result for result in suite.results}
     attack = by_id["splunk-rdp-session-established"]
+    credential_attack = by_id["splunk-aws-console-login-failures"]
     benign = by_id["microsoft-sentinel-wiz-audit"]
 
-    assert suite.dataset_count == 2
-    assert suite.event_count == 8
-    assert suite.finding_count == 4
+    assert suite.dataset_count == 3
+    assert suite.event_count == 12
+    assert suite.finding_count == 8
     assert suite.incident_count == 1
     assert suite.expectations_met is True
     assert attack.expectation_met is True
@@ -57,6 +59,14 @@ def test_public_attack_and_benign_replays_meet_regression_expectations() -> None
     assert attack.incidents[0].type_uid == 200501
     assert "repeated_detection_across_resources" in attack.incidents[0].correlation_reasons
     assert "attack.t1021.001" in attack.incidents[0].attack_tags
+    assert credential_attack.expectation_met is True
+    assert credential_attack.finding_count == 4
+    assert credential_attack.incidents == []
+    assert all(
+        record.converted_event.auth_context.authentication_result == "failure"
+        for record in credential_attack.records
+    )
+    assert all(record.normalized.event.status == "Failure" for record in credential_attack.records)
     assert benign.expectation_met is True
     assert benign.finding_count == 0
     assert benign.incidents == []
@@ -110,7 +120,7 @@ def test_correlation_and_public_replay_apis() -> None:
     assert correlation.json()["incident_count"] == 1
     assert correlation.json()["incidents"][0]["class_uid"] == 2005
     assert datasets.status_code == 200
-    assert len(datasets.json()) == 2
+    assert len(datasets.json()) == 3
     assert suite.status_code == 200
     assert suite.json()["expectations_met"] is True
     assert missing.status_code == 404
@@ -121,8 +131,10 @@ def test_readiness_includes_correlation_and_public_replay_integrity() -> None:
     payload = response.json()
 
     assert response.status_code == 200
-    assert payload["correlation"]["version"] == "0.10.0"
+    assert payload["correlation"]["version"] == "0.11.0"
     assert payload["correlation"]["output_class_uid"] == 2005
     assert payload["public_replay"]["valid"] is True
-    assert payload["public_replay"]["dataset_count"] == 2
+    assert payload["public_replay"]["dataset_count"] == 3
     assert payload["public_replay"]["validation_issue_count"] == 0
+    assert payload["detection_quality"]["valid"] is True
+    assert payload["detection_quality"]["f1"] == 1.0

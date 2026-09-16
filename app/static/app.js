@@ -499,6 +499,43 @@ function renderReplayDetails(result) {
   $("replayDetails").hidden = false;
 }
 
+function renderQualityDetails(result) {
+  $("qualityPrecision").textContent = formatPercent(result.precision);
+  $("qualityRecall").textContent = formatPercent(result.recall);
+  $("qualityF1").textContent = formatPercent(result.f1);
+  $("qualityFpr").textContent = formatPercent(result.false_positive_rate);
+  $("qualityParseRate").textContent = formatPercent(result.parse_success_rate);
+  $("qualityMappingRate").textContent = formatPercent(result.mapping_completeness);
+  $("qualityRuleCoverage").textContent = `${result.supported_rule_count}/${result.approved_rule_count}`;
+  $("qualityGate").textContent = result.gate_passed ? "통과" : "보완 필요";
+  $("qualityGate").className = result.gate_passed ? "metric-pass" : "metric-fail";
+  $("qualityFingerprint").textContent = `평가 지문 ${result.evaluation_fingerprint_sha256.slice(0, 12)}`;
+
+  const body = $("qualityRuleBody");
+  body.replaceChildren();
+  result.rules.forEach((rule) => {
+    const evaluated = rule.evaluation_status === "evaluated";
+    const row = document.createElement("tr");
+    const values = [
+      rule.title,
+      rule.positive_support,
+      evaluated ? formatPercent(rule.precision) : "-",
+      evaluated ? formatPercent(rule.recall) : "-",
+      evaluated ? formatPercent(rule.f1) : "-",
+      formatPercent(rule.false_positive_rate),
+      evaluated ? (rule.targets_met ? "통과" : "보완 필요") : "표본 없음",
+    ];
+    values.forEach((value, index) => {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      if (index === 6 && evaluated) cell.className = rule.targets_met ? "metric-pass" : "metric-fail";
+      row.append(cell);
+    });
+    body.append(row);
+  });
+  $("qualityDetails").hidden = false;
+}
+
 async function runPublicReplay() {
   if (state.replaying) return;
   state.replaying = true;
@@ -507,7 +544,10 @@ async function runPublicReplay() {
   $("replayState").textContent = "공개 로그 무결성, 탐지 결과와 사고 상관관계를 확인하고 있습니다.";
 
   try {
-    const result = await request("/replay/public/run", { method: "POST" });
+    const [result, quality] = await Promise.all([
+      request("/replay/public/run", { method: "POST" }),
+      request("/evaluation/detection-quality"),
+    ]);
     $("replayGrid").hidden = false;
     $("replayDatasetCount").textContent = result.dataset_count;
     $("replayEventCount").textContent = result.event_count;
@@ -516,15 +556,16 @@ async function runPublicReplay() {
     $("replayExpectation").textContent = result.expectations_met ? "통과" : "보완 필요";
     $("replayExpectation").className = result.expectations_met ? "metric-pass" : "metric-fail";
     renderReplayDetails(result);
-    $("replayState").textContent = result.expectations_met
-      ? "공격 탐지와 정상 로그 오탐 억제 기준을 모두 통과했습니다."
+    renderQualityDetails(quality);
+    $("replayState").textContent = result.expectations_met && quality.gate_passed
+      ? "공격 탐지, 정상 로그 오탐 억제와 정량 품질 기준을 모두 통과했습니다."
       : "공개 로그 회귀 기준을 통과하지 못한 항목이 있습니다.";
   } catch (error) {
     $("replayState").textContent = `공개 로그를 재생하지 못했습니다: ${error.message}`;
   } finally {
     state.replaying = false;
     $("replayButton").disabled = false;
-    $("replayButton").textContent = "공개 로그 8건 재생";
+    $("replayButton").textContent = "공개 로그 12건 재생";
   }
 }
 

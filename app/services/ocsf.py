@@ -21,7 +21,7 @@ from app.models import (
 )
 
 OCSF_SCHEMA_VERSION = "1.9.0"
-TRANSFORMER_VERSION = "0.10.0"
+TRANSFORMER_VERSION = "0.11.0"
 
 _MAPPING_SPEC = {
     "schema": f"OCSF {OCSF_SCHEMA_VERSION}",
@@ -30,6 +30,7 @@ _MAPPING_SPEC = {
         "category_uid": 3,
         "class_uid": 3002,
         "activity": {EventAction.LOGIN.value: 1},
+        "status_source": "auth_context.authentication_result",
     },
     "api_activity": {
         "actions": [
@@ -107,7 +108,11 @@ class OCSFNormalizer:
             authentication_user = None
             authentication_service = None
 
-        status_id = 2 if source.auth_context.mfa == "failed" else 1
+        authentication_failed = (
+            source.auth_context.authentication_result == "failure"
+            or source.auth_context.mfa == "failed"
+        )
+        status_id = 2 if authentication_failed else 1
         status = "Failure" if status_id == 2 else "Success"
         event = OCSFEvent(
             time=int(source.timestamp.timestamp() * 1000),

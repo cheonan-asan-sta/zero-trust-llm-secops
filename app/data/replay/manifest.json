@@ -1,5 +1,15 @@
 {
-  "manifest_version": "2026.09.1",
+  "manifest_version": "2026.09.2",
+  "quality_targets": {
+    "minimum_dataset_count": 3,
+    "minimum_precision": 0.95,
+    "minimum_recall": 0.95,
+    "minimum_f1": 0.95,
+    "maximum_false_positive_rate": 0.05,
+    "minimum_parse_success_rate": 1.0,
+    "minimum_mapping_completeness": 1.0,
+    "minimum_rule_coverage_rate": 0.3
+  },
   "datasets": [
     {
       "dataset_id": "splunk-rdp-session-established",
@@ -13,7 +23,28 @@
       "fixture_sha256": "801e46d2c0e771e9a9b28d0579ba740f511358949b835367f80271b4392ed486",
       "license": "Apache-2.0",
       "expected_label": "threat",
+      "expected_rule_ids": ["d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"],
+      "expected_finding_count": 4,
+      "expected_incident_count": 1,
       "attack_techniques": ["T1021.001"],
+      "record_count": 4
+    },
+    {
+      "dataset_id": "splunk-aws-console-login-failures",
+      "title": "Splunk Attack Data - AWS Console Login Failures",
+      "provider": "Splunk Attack Data",
+      "adapter": "aws_cloudtrail_console_login",
+      "fixture_name": "splunk-aws-console-login-failures.jsonl",
+      "source_url": "https://media.githubusercontent.com/media/splunk/attack_data/be1980668e58497d23ba77ba25769996c4d1efaa/datasets/attack_techniques/T1110.001/aws_login_failure/aws_cloudtrail_events.json",
+      "source_revision": "be1980668e58497d23ba77ba25769996c4d1efaa",
+      "source_artifact_sha256": "d9d0ebbaf9a6aebd504b03f665eb1f35dfee4e34c0c6a5cf1c5318b7a12c1e9b",
+      "fixture_sha256": "7bc7fc2237bdbab84c8d70f3243dac849c181196892beaadf75ebfa5f2e9d02b",
+      "license": "Apache-2.0",
+      "expected_label": "threat",
+      "expected_rule_ids": ["8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"],
+      "expected_finding_count": 4,
+      "expected_incident_count": 0,
+      "attack_techniques": ["T1110.001"],
       "record_count": 4
     },
     {
@@ -28,6 +59,9 @@
       "fixture_sha256": "4bc25e2e6ae2cb4b80d2d135fb401d073e2c66e2d183dd5cabb574cde27ebc3b",
       "license": "MIT",
       "expected_label": "benign",
+      "expected_rule_ids": [],
+      "expected_finding_count": 0,
+      "expected_incident_count": 0,
       "attack_techniques": [],
       "record_count": 4
     }

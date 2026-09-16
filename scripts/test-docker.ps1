@@ -58,7 +58,7 @@ try {
     if (-not $health -or $health.status -ne "ok" -or $health.analyzer_mode -ne "rule") {
         throw "Container health check did not become ready in rule mode."
     }
-    if ($health.version -ne "0.10.0" -or $health.auth_mode -ne "disabled") {
+    if ($health.version -ne "0.11.0" -or $health.auth_mode -ne "disabled") {
         throw "Container did not start with the expected local security profile."
     }
     $readiness = Invoke-RestMethod -Method Get -Uri "$baseUrl/health/ready" -TimeoutSec 2
@@ -72,7 +72,9 @@ try {
         $readiness.detection.approved_rule_count -ne 6 -or
         $readiness.correlation.output_class_uid -ne 2005 -or
         -not $readiness.public_replay.valid -or
-        $readiness.public_replay.dataset_count -ne 2
+        $readiness.public_replay.dataset_count -ne 3 -or
+        -not $readiness.detection_quality.valid -or
+        $readiness.detection_quality.f1 -lt 0.95
     ) {
         throw "Audit or assurance registry integrity readiness check failed."
     }
@@ -108,6 +110,9 @@ try {
         -Method Post `
         -Uri "$baseUrl/replay/public/run" `
         -ContentType "application/json"
+    $detectionQuality = Invoke-RestMethod `
+        -Method Get `
+        -Uri "$baseUrl/evaluation/detection-quality"
 
     if ($analysis.assessment.risk_level -notin @("HIGH", "CRITICAL")) {
         throw "Threat smoke test returned an unexpectedly low risk."
@@ -149,11 +154,21 @@ try {
     }
     if (
         -not $publicReplay.expectations_met -or
-        $publicReplay.dataset_count -ne 2 -or
-        $publicReplay.event_count -ne 8 -or
+        $publicReplay.dataset_count -ne 3 -or
+        $publicReplay.event_count -ne 12 -or
         $publicReplay.incident_count -ne 1
     ) {
         throw "Public attack/benign replay or incident correlation failed."
+    }
+    if (
+        -not $detectionQuality.gate_passed -or
+        $detectionQuality.precision -lt 0.95 -or
+        $detectionQuality.recall -lt 0.95 -or
+        $detectionQuality.false_positive_rate -gt 0.05 -or
+        $detectionQuality.parse_success_rate -lt 1.0 -or
+        $detectionQuality.mapping_completeness -lt 1.0
+    ) {
+        throw "Detection quality regression gate failed."
     }
 
     [ordered]@{
@@ -170,6 +185,9 @@ try {
         sigma_rules = $readiness.detection.approved_rule_count
         public_replay_events = $publicReplay.event_count
         correlated_incidents = $publicReplay.incident_count
+        detection_precision = $detectionQuality.precision
+        detection_recall = $detectionQuality.recall
+        detection_rule_coverage = $detectionQuality.rule_coverage_rate
         evaluation_cases = $evaluation.total_cases
         risk_accuracy = $evaluation.risk_accuracy
         action_accuracy = $evaluation.action_accuracy

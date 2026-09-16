@@ -108,6 +108,7 @@ def test_dashboard_is_available() -> None:
     assert "ANALYST REVIEW" in response.text
     assert "보안 통제 준비도" in response.text
     assert "공개 로그 회귀 검증" in response.text
+    assert "탐지 품질 게이트" in response.text
     assert "표준 탐지 근거" in response.text
 
 

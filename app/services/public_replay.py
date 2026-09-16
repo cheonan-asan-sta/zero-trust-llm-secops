@@ -1,6 +1,7 @@
 import json
 import re
 import xml.etree.ElementTree as ET
+from collections import Counter
 from datetime import datetime
 from functools import lru_cache
 from hashlib import sha256
@@ -10,11 +11,11 @@ from app.models import (
     AuthContext,
     BehaviorContext,
     DetectionPipelineResult,
+    DetectionQualityTargets,
     DeviceContext,
     EventAction,
     NetworkContext,
     PublicReplayDataset,
-    PublicReplayLabel,
     PublicReplayRecordResult,
     PublicReplayResult,
     PublicReplaySuiteResult,
@@ -26,7 +27,7 @@ from app.services.correlation import CorrelationEngine, get_correlation_engine
 from app.services.ocsf import OCSFNormalizer, get_ocsf_normalizer
 from app.services.sigma import SigmaEngine, get_sigma_engine
 
-REPLAY_VERSION = "0.10.0"
+REPLAY_VERSION = "0.11.0"
 _WINDOWS_NAMESPACE = "http://schemas.microsoft.com/win/2004/08/events/event"
 _WINDOWS = {"event": _WINDOWS_NAMESPACE}
 
@@ -45,6 +46,7 @@ class PublicReplayService:
         self._correlation_engine = correlation_engine
         self.validation_issues: list[str] = []
         self._datasets: list[PublicReplayDataset] = []
+        self.quality_targets = DetectionQualityTargets()
         self.manifest_digest_sha256 = ""
         self._load_manifest()
 
@@ -93,10 +95,14 @@ class PublicReplayService:
             )
         correlation = self._correlation_engine.correlate(pipelines, tenant_id)
         finding_count = sum(len(item.detection.matches) for item in replayed)
-        if dataset.expected_label == PublicReplayLabel.THREAT:
-            expectation_met = finding_count > 0 and correlation.incident_count > 0
-        else:
-            expectation_met = finding_count == 0 and correlation.incident_count == 0
+        observed_rule_ids = {
+            match.rule_id for item in replayed for match in item.detection.matches
+        }
+        expectation_met = (
+            finding_count == dataset.expected_finding_count
+            and correlation.incident_count == dataset.expected_incident_count
+            and observed_rule_ids == set(dataset.expected_rule_ids)
+        )
         return PublicReplayResult(
             dataset=dataset,
             adapter_version=REPLAY_VERSION,
@@ -119,14 +125,27 @@ class PublicReplayService:
         if not isinstance(payload, dict) or not isinstance(payload.get("datasets"), list):
             self.validation_issues.append("public replay manifest requires a datasets list")
             return
+        try:
+            self.quality_targets = DetectionQualityTargets.model_validate(
+                payload.get("quality_targets", {})
+            )
+        except (TypeError, ValueError) as exc:
+            self.validation_issues.append(f"public replay quality targets are invalid: {exc}")
+            return
 
         seen_ids: set[str] = set()
+        approved_rule_ids = {rule.rule_id for rule in self._sigma_engine.summaries()}
         for document in payload["datasets"]:
             try:
                 dataset = PublicReplayDataset.model_validate(document)
                 if dataset.dataset_id in seen_ids:
                     raise ValueError(f"duplicate public replay dataset: {dataset.dataset_id}")
                 seen_ids.add(dataset.dataset_id)
+                unknown_rules = set(dataset.expected_rule_ids) - approved_rule_ids
+                if unknown_rules:
+                    raise ValueError(
+                        f"unknown expected rules for {dataset.dataset_id}: {sorted(unknown_rules)}"
+                    )
                 fixture = resource_root.joinpath(dataset.fixture_name)
                 fixture_bytes = fixture.read_bytes()
                 fixture_digest = sha256(fixture_bytes).hexdigest()
@@ -156,7 +175,9 @@ class PublicReplayService:
         fixture_bytes = fixture.read_bytes()
         if dataset.adapter == "windows_event_xml":
             return _parse_windows_events(fixture_bytes)
-        return _parse_wiz_events(fixture_bytes)
+        if dataset.adapter == "wiz_audit_json":
+            return _parse_wiz_events(fixture_bytes)
+        return _parse_aws_console_failures(fixture_bytes)
 
 
 def _parse_windows_events(data: bytes) -> list[tuple[str, str, SecurityEvent]]:
@@ -200,7 +221,11 @@ def _parse_windows_events(data: bytes) -> list[tuple[str, str, SecurityEvent]]:
                 required_role="administrator",
             ),
             action=EventAction.REMOTE_ACCESS,
-            auth_context=AuthContext(mfa="unknown", failed_attempts=0),
+            auth_context=AuthContext(
+                authentication_result="success",
+                mfa="unknown",
+                failed_attempts=0,
+            ),
             behavior=BehaviorContext(
                 event_text="Windows Security Event 4624 Logon Type 10"
             ),
@@ -253,8 +278,72 @@ def _parse_wiz_events(data: bytes) -> list[tuple[str, str, SecurityEvent]]:
                 required_role="cloud-user",
             ),
             action=EventAction.LOGIN,
-            auth_context=AuthContext(mfa="unknown", failed_attempts=0),
+            auth_context=AuthContext(
+                authentication_result="success",
+                mfa="unknown",
+                failed_attempts=0,
+            ),
             behavior=BehaviorContext(event_text="Wiz audit successful login"),
+        )
+        records.append((record_id, sha256(raw_record).hexdigest(), event))
+    return records
+
+
+def _parse_aws_console_failures(data: bytes) -> list[tuple[str, str, SecurityEvent]]:
+    source_lines = [line.strip() for line in data.splitlines() if line.strip()]
+    documents = [json.loads(line) for line in source_lines]
+    if not all(isinstance(document, dict) for document in documents):
+        raise TypeError("AWS CloudTrail fixture records must be objects")
+
+    failure_counts = Counter(
+        _required_json_string(document, "sourceIPAddress") for document in documents
+    )
+    records: list[tuple[str, str, SecurityEvent]] = []
+    for raw_record, document in zip(source_lines, documents, strict=True):
+        identity = document.get("userIdentity")
+        response = document.get("responseElements")
+        if not isinstance(identity, dict) or not isinstance(response, dict):
+            raise TypeError("AWS CloudTrail record is missing identity or response context")
+        if document.get("eventName") != "ConsoleLogin" or response.get("ConsoleLogin") != "Failure":
+            raise ValueError("AWS CloudTrail replay accepts failed ConsoleLogin records only")
+
+        record_id = _required_json_string(document, "eventID")
+        source_ip = _required_json_string(document, "sourceIPAddress")
+        account_id = _required_json_string(identity, "accountId")
+        user_id = _required_json_string(identity, "userName")
+        region = _required_json_string(document, "awsRegion")
+        failures = failure_counts[source_ip]
+        event = SecurityEvent(
+            event_id=f"public-splunk-aws-{record_id}",
+            timestamp=_parse_timestamp(_required_json_string(document, "eventTime")),
+            user=UserContext(user_id=user_id, role="cloud-user", active=True),
+            device=DeviceContext(
+                device_id=f"aws-console-{source_ip}",
+                managed=False,
+                security_posture="unknown",
+            ),
+            network=NetworkContext(
+                ip=source_ip,
+                location=f"aws-{region}",
+                access_method="remote",
+                location_anomaly=False,
+            ),
+            resource=ResourceContext(
+                resource_id=f"aws-account-{account_id}",
+                resource_type="cloud-account",
+                sensitivity="critical",
+                required_role="cloud-user",
+            ),
+            action=EventAction.LOGIN,
+            auth_context=AuthContext(
+                authentication_result="failure",
+                mfa="unknown",
+                failed_attempts=failures,
+            ),
+            behavior=BehaviorContext(
+                request_rate="high" if failures >= 3 else "normal",
+                event_text="AWS CloudTrail ConsoleLogin Failure",
+            ),
         )
         records.append((record_id, sha256(raw_record).hexdigest(), event))
     return records

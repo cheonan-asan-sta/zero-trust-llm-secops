@@ -188,11 +188,11 @@
             <h2>공개 로그 회귀 검증</h2>
           </div>
           <button id="replayButton" class="secondary-button" type="button">
-            공개 로그 8건 재생
+            공개 로그 12건 재생
           </button>
         </div>
         <p id="replayState" class="evaluation-state">
-          고정된 Splunk 공격 로그와 Microsoft Sentinel 정상 로그를 오프라인으로 재생합니다.
+          고정된 Splunk RDP·AWS 인증 실패 로그와 Microsoft Sentinel 정상 로그를 오프라인으로 재생합니다.
         </p>
         <div id="replayGrid" class="metric-grid replay-grid" hidden>
           <article><span>데이터셋</span><strong id="replayDatasetCount">-</strong></article>
@@ -212,6 +212,33 @@
           </div>
           <p class="assurance-notice">
             원본 커밋과 SHA-256이 고정된 공개 시험 자료만 사용하며 외부 시스템에는 연결하지 않습니다.
+          </p>
+        </div>
+        <div id="qualityDetails" class="evaluation-details" hidden>
+          <div class="diagnostic-heading">
+            <strong>탐지 품질 게이트</strong>
+            <span id="qualityFingerprint">-</span>
+          </div>
+          <div class="metric-grid quality-grid">
+            <article><span>Precision</span><strong id="qualityPrecision">-</strong></article>
+            <article><span>Recall</span><strong id="qualityRecall">-</strong></article>
+            <article><span>F1</span><strong id="qualityF1">-</strong></article>
+            <article><span>오탐률</span><strong id="qualityFpr">-</strong></article>
+            <article><span>파싱 성공률</span><strong id="qualityParseRate">-</strong></article>
+            <article><span>OCSF 매핑률</span><strong id="qualityMappingRate">-</strong></article>
+            <article><span>공개 표본 규칙</span><strong id="qualityRuleCoverage">-</strong></article>
+            <article><span>품질 판정</span><strong id="qualityGate">-</strong></article>
+          </div>
+          <div class="history-wrap">
+            <table>
+              <thead>
+                <tr><th>규칙</th><th>공격 표본</th><th>Precision</th><th>Recall</th><th>F1</th><th>오탐률</th><th>판정</th></tr>
+              </thead>
+              <tbody id="qualityRuleBody"></tbody>
+            </table>
+          </div>
+          <p class="assurance-notice">
+            공개 양성 표본이 없는 규칙은 통과로 간주하지 않고 ‘표본 없음’으로 별도 표시합니다.
           </p>
         </div>
       </section>

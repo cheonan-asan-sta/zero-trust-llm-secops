@@ -1,5 +1,5 @@
 {
-  "registry_version": "2026.09.3",
+  "registry_version": "2026.09.4",
   "controls": [
     {
       "control_id": "GOV-01",
@@ -379,10 +379,12 @@
       "priority": "P0",
       "status": "implemented",
       "owner_role": "quality-assurance",
-      "objective": "고정 시나리오에서 위험도, 대응, F1, 오류, 지연과 처리량을 반복 측정한다.",
+      "objective": "고정 시나리오와 출처가 고정된 공개 로그에서 위험도, 대응, 규칙별 탐지 품질, 오류, 지연과 처리량을 반복 측정한다.",
       "acceptance_criteria": [
         "평가가 비용 없는 규칙 분석기로 오프라인 실행된다.",
-        "전체 평균과 시나리오별 결과, 오류 분류와 목표 통과 여부가 함께 반환된다."
+        "전체 평균과 시나리오별 결과, 오류 분류와 목표 통과 여부가 함께 반환된다.",
+        "공개 공격·정상 로그에서 규칙별 precision, recall, F1, 오탐률, 파싱 성공률과 OCSF 매핑률을 산출한다.",
+        "정량 품질 기준이 미달되면 준비 상태가 실패 폐쇄 방식으로 전환된다."
       ],
       "sources": [
         {
@@ -408,6 +410,24 @@
           "kind": "automated_test",
           "location": "tests/test_evaluation.py::test_rule_evaluation_meets_project_targets",
           "description": "규칙 기반 평가 목표와 결과 구조 검증"
+        },
+        {
+          "evidence_id": "EVD-EVAL-DETECTION-QUALITY-CODE",
+          "kind": "code",
+          "location": "app/services/detection_quality.py",
+          "description": "공개 표본의 규칙별 혼동행렬, 품질 지표, 매핑 완전성과 재현 가능한 평가 지문 생성"
+        },
+        {
+          "evidence_id": "EVD-EVAL-DETECTION-QUALITY-POLICY",
+          "kind": "configuration",
+          "location": "app/data/replay/manifest.json",
+          "description": "버전 관리되는 정답 규칙, 기대 탐지·사고 수와 실패 폐쇄형 정량 품질 목표"
+        },
+        {
+          "evidence_id": "EVD-EVAL-DETECTION-QUALITY-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_detection_quality.py",
+          "description": "Precision, recall, F1, 오탐률, 파싱·매핑률, 규칙 표본 범위와 평가 지문 회귀 검증"
         }
       ],
       "reviewed_on": "2026-09-16",

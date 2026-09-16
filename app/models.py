@@ -201,6 +201,7 @@ class ResourceContext(StrictModel):
 
 
 class AuthContext(StrictModel):
+    authentication_result: Literal["success", "failure", "unknown"] = "unknown"
     mfa: Literal["not_required", "success", "failed", "unknown"] = "unknown"
     failed_attempts: int = Field(default=0, ge=0, le=100)
     session_age_minutes: int = Field(default=0, ge=0)
@@ -497,7 +498,11 @@ class PublicReplayDataset(StrictModel):
     dataset_id: str = Field(pattern=r"^[a-z0-9][a-z0-9-]{2,63}$")
     title: str = Field(min_length=5, max_length=160)
     provider: str = Field(min_length=2, max_length=120)
-    adapter: Literal["windows_event_xml", "wiz_audit_json"]
+    adapter: Literal[
+        "windows_event_xml",
+        "wiz_audit_json",
+        "aws_cloudtrail_console_login",
+    ]
     fixture_name: str = Field(pattern=r"^[a-zA-Z0-9_.-]{3,120}$")
     source_url: str = Field(pattern=r"^https://", max_length=700)
     source_revision: str = Field(pattern=r"^[a-f0-9]{40}$")
@@ -505,8 +510,24 @@ class PublicReplayDataset(StrictModel):
     fixture_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     license: Literal["Apache-2.0", "MIT"]
     expected_label: PublicReplayLabel
+    expected_rule_ids: list[
+        Annotated[str, Field(pattern=r"^[a-f0-9]{8}-[a-f0-9-]{27}$")]
+    ] = Field(default_factory=list, max_length=20)
+    expected_finding_count: int = Field(ge=0, le=1000)
+    expected_incident_count: int = Field(ge=0, le=100)
     attack_techniques: list[str] = Field(default_factory=list, max_length=20)
     record_count: int = Field(ge=1, le=1000)
+
+    @model_validator(mode="after")
+    def validate_expected_outcome(self) -> Self:
+        has_positive_label = self.expected_label == PublicReplayLabel.THREAT
+        if has_positive_label != bool(self.expected_rule_ids):
+            raise ValueError("threat datasets require expected rules and benign datasets forbid them")
+        if has_positive_label != (self.expected_finding_count > 0):
+            raise ValueError("threat datasets require findings and benign datasets require zero")
+        if len(set(self.expected_rule_ids)) != len(self.expected_rule_ids):
+            raise ValueError("expected rule identifiers must be unique")
+        return self
 
 
 class PublicReplayRecordResult(StrictModel):
@@ -534,6 +555,65 @@ class PublicReplaySuiteResult(StrictModel):
     incident_count: int = Field(ge=0)
     expectations_met: bool
     results: list[PublicReplayResult] = Field(min_length=1, max_length=20)
+
+
+class DetectionQualityTargets(StrictModel):
+    minimum_dataset_count: int = Field(default=3, ge=1, le=100)
+    minimum_precision: float = Field(default=0.95, ge=0, le=1)
+    minimum_recall: float = Field(default=0.95, ge=0, le=1)
+    minimum_f1: float = Field(default=0.95, ge=0, le=1)
+    maximum_false_positive_rate: float = Field(default=0.05, ge=0, le=1)
+    minimum_parse_success_rate: float = Field(default=1.0, ge=0, le=1)
+    minimum_mapping_completeness: float = Field(default=1.0, ge=0, le=1)
+    minimum_rule_coverage_rate: float = Field(default=0.3, ge=0, le=1)
+
+
+class DetectionConfusionCounts(StrictModel):
+    true_positive: int = Field(ge=0)
+    false_positive: int = Field(ge=0)
+    false_negative: int = Field(ge=0)
+    true_negative: int = Field(ge=0)
+
+
+class RuleDetectionQuality(StrictModel):
+    rule_id: str = Field(min_length=36, max_length=36)
+    title: str = Field(min_length=3, max_length=256)
+    evaluation_status: Literal["evaluated", "no_positive_support"]
+    positive_support: int = Field(ge=0)
+    negative_support: int = Field(ge=0)
+    confusion: DetectionConfusionCounts
+    precision: float | None = Field(default=None, ge=0, le=1)
+    recall: float | None = Field(default=None, ge=0, le=1)
+    f1: float | None = Field(default=None, ge=0, le=1)
+    false_positive_rate: float = Field(ge=0, le=1)
+    targets_met: bool | None = None
+
+
+class DetectionQualityReport(StrictModel):
+    evaluation_version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
+    manifest_digest_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    ruleset_digest_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    evaluation_fingerprint_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    dataset_count: int = Field(ge=1)
+    declared_record_count: int = Field(ge=1)
+    parsed_record_count: int = Field(ge=0)
+    parse_failure_count: int = Field(ge=0)
+    parse_success_rate: float = Field(ge=0, le=1)
+    mapped_field_count: int = Field(ge=0)
+    required_field_count: int = Field(ge=1)
+    mapping_completeness: float = Field(ge=0, le=1)
+    confusion: DetectionConfusionCounts
+    precision: float = Field(ge=0, le=1)
+    recall: float = Field(ge=0, le=1)
+    f1: float = Field(ge=0, le=1)
+    false_positive_rate: float = Field(ge=0, le=1)
+    approved_rule_count: int = Field(ge=1)
+    supported_rule_count: int = Field(ge=0)
+    rule_coverage_rate: float = Field(ge=0, le=1)
+    targets: DetectionQualityTargets
+    targets_met: dict[str, bool]
+    gate_passed: bool
+    rules: list[RuleDetectionQuality] = Field(min_length=1, max_length=100)
 
 
 class SecurityAssessment(StrictModel):

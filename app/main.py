@@ -26,6 +26,7 @@ from app.models import (
     CorrelationRequest,
     CorrelationResult,
     DetectionPipelineResult,
+    DetectionQualityReport,
     EvaluationRequest,
     EvaluationSummary,
     EventScenarioEvaluation,
@@ -49,6 +50,7 @@ from app.security import Principal, Role, require_roles
 from app.services.assurance import get_assurance_registry
 from app.services.audit import create_audit_store
 from app.services.correlation import get_correlation_engine
+from app.services.detection_quality import get_detection_quality_service
 from app.services.evaluation import run_evaluation
 from app.services.ocsf import get_ocsf_normalizer
 from app.services.policy import enforce_assessment_safety, response_preview
@@ -61,7 +63,7 @@ static_dir = Path(__file__).parent / "static"
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
-    description="합성 이벤트 기반 제로 트러스트 위험 분석 및 대응 시뮬레이션 API",
+    description="합성·공개 이벤트 기반 제로 트러스트 탐지 품질 및 대응 시뮬레이션 API",
     docs_url=None if settings.app_environment == "production" else "/docs",
     redoc_url=None if settings.app_environment == "production" else "/redoc",
     openapi_url=None if settings.app_environment == "production" else "/openapi.json",
@@ -76,6 +78,7 @@ ocsf_normalizer = get_ocsf_normalizer()
 sigma_engine = get_sigma_engine()
 correlation_engine = get_correlation_engine()
 public_replay_service = get_public_replay_service()
+detection_quality_service = get_detection_quality_service()
 analysis_capacity = asyncio.Semaphore(settings.analysis_max_concurrency)
 
 ViewerPrincipal = Annotated[Principal, Depends(require_roles(Role.VIEWER))]
@@ -123,11 +126,18 @@ def liveness() -> dict:
 def readiness() -> Response:
     integrity = audit_store.integrity()
     assurance = assurance_registry.summary()
+    quality = (
+        detection_quality_service.evaluate("readiness")
+        if public_replay_service.valid and sigma_engine.valid
+        else None
+    )
     ready = (
         integrity["ok"]
         and assurance.valid
         and sigma_engine.valid
         and public_replay_service.valid
+        and quality is not None
+        and quality.gate_passed
     )
     payload = {
         "status": "ready" if ready else "degraded",
@@ -167,6 +177,20 @@ def readiness() -> Response:
             "dataset_count": len(public_replay_service.datasets()),
             "manifest_digest_sha256": public_replay_service.manifest_digest_sha256,
             "validation_issue_count": len(public_replay_service.validation_issues),
+        },
+        "detection_quality": {
+            "valid": quality is not None and quality.gate_passed,
+            "version": detection_quality_service.version,
+            "precision": quality.precision if quality else None,
+            "recall": quality.recall if quality else None,
+            "f1": quality.f1 if quality else None,
+            "false_positive_rate": quality.false_positive_rate if quality else None,
+            "parse_success_rate": quality.parse_success_rate if quality else None,
+            "mapping_completeness": quality.mapping_completeness if quality else None,
+            "rule_coverage_rate": quality.rule_coverage_rate if quality else None,
+            "evaluation_fingerprint_sha256": (
+                quality.evaluation_fingerprint_sha256 if quality else None
+            ),
         },
     }
     return JSONResponse(payload, status_code=200 if ready else 503)
@@ -257,6 +281,13 @@ def run_public_replay_dataset(
         return public_replay_service.run_dataset(dataset_id, principal.tenant_id)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail="Public replay dataset not found") from exc
+
+
+@app.get("/evaluation/detection-quality", response_model=DetectionQualityReport)
+def detection_quality(principal: ViewerPrincipal) -> DetectionQualityReport:
+    if not public_replay_service.valid or not sigma_engine.valid:
+        raise HTTPException(status_code=503, detail="Detection quality inputs failed validation")
+    return detection_quality_service.evaluate(principal.tenant_id)
 
 
 @app.post("/scenarios/evaluate", response_model=EventScenarioEvaluation)

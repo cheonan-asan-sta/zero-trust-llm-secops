@@ -1,0 +1,2 @@
+# Replay fixture hashes are byte-exact and must remain stable across operating systems.
+app/data/replay/** text eol=lf
