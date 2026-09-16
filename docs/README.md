@@ -25,7 +25,7 @@
 - 기업 보안 기준선: OIDC·RBAC·테넌트 격리·요청 추적·감사 해시 체인·Prometheus 메트릭
 - 검증: pytest 61건, 40건 반복 성능 평가, 비용 없는 Docker 종단 테스트, 브라우저 UI 검증
 
-기업 운영 전 남은 조직별 검증 항목은 [기업 적용 준비도](enterprise-readiness.md)에서 관리한다.
+기업 운영 전 남은 조직별 검증 항목은 [기업 적용 준비도](enterprise-readiness.md)에서 관리한다. 실제 도입 사례와 논문을 현재 코드의 고도화 순서로 연결한 근거는 [Zero Trust LLM SecOps 고도화 딥 리서치](deep-research-enterprise-secops.md)에 정리했다.
 
 ## 안전 범위
 
