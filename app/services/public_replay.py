@@ -28,7 +28,7 @@ from app.services.correlation import CorrelationEngine, get_correlation_engine
 from app.services.ocsf import OCSFNormalizer, get_ocsf_normalizer
 from app.services.sigma import SigmaEngine, get_sigma_engine
 
-REPLAY_VERSION = "0.14.0"
+REPLAY_VERSION = "0.15.0"
 _WINDOWS_NAMESPACE = "http://schemas.microsoft.com/win/2004/08/events/event"
 _WINDOWS = {"event": _WINDOWS_NAMESPACE}
 

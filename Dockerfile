@@ -8,7 +8,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     ANALYZER_MODE=rule \
     AUDIT_BACKEND=jsonl \
     AUDIT_LOG_PATH=/data/audit.jsonl \
-    CASE_LOG_PATH=/data/cases.jsonl
+    CASE_LOG_PATH=/data/cases.jsonl \
+    OUTBOX_LOG_PATH=/data/integration-outbox.jsonl
 
 WORKDIR /app
 

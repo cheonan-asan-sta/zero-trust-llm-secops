@@ -138,7 +138,7 @@ def test_readiness_includes_correlation_and_public_replay_integrity() -> None:
     payload = response.json()
 
     assert response.status_code == 200
-    assert payload["correlation"]["version"] == "0.14.0"
+    assert payload["correlation"]["version"] == "0.15.0"
     assert payload["correlation"]["output_class_uid"] == 2005
     assert payload["correlation"]["windows_minutes"] == [5, 30, 1440]
     assert payload["correlation"]["entity_graph_enabled"] is True

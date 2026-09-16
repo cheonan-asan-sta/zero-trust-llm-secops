@@ -21,7 +21,7 @@ from app.models import (
     OCSFIncidentFinding,
 )
 
-CASE_MANAGEMENT_VERSION = "0.14.0"
+CASE_MANAGEMENT_VERSION = "0.15.0"
 
 ALLOWED_TRANSITIONS: dict[IncidentCaseStatus, set[IncidentCaseStatus]] = {
     IncidentCaseStatus.NEW: {IncidentCaseStatus.TRIAGED},
@@ -66,6 +66,10 @@ class CaseRepository(Protocol):
     def metrics(self, tenant_id: str = "local") -> IncidentCaseMetrics: ...
 
     def integrity(self) -> dict[str, bool | int | str]: ...
+
+
+class CaseEventPublisher(Protocol):
+    async def reconcile_case(self, record: IncidentCase) -> tuple[int, int]: ...
 
 
 class CaseStore:
@@ -296,8 +300,13 @@ class DynamoDBCaseStore:
 
 
 class IncidentCaseService:
-    def __init__(self, store: CaseRepository) -> None:
+    def __init__(
+        self,
+        store: CaseRepository,
+        event_publisher: CaseEventPublisher | None = None,
+    ) -> None:
         self.store = store
+        self.event_publisher = event_publisher
 
     async def create_from_correlation(
         self,
@@ -318,6 +327,8 @@ class IncidentCaseService:
                     raise CaseConflictError("case identifier already exists with different evidence")
                 cases.append(existing)
                 reused_count += 1
+                if self.event_publisher is not None:
+                    await self.event_publisher.reconcile_case(existing)
                 continue
 
             now = datetime.now(UTC)
@@ -357,6 +368,8 @@ class IncidentCaseService:
             else:
                 created_count += 1
             cases.append(record)
+            if self.event_publisher is not None:
+                await self.event_publisher.reconcile_case(record)
         return cases, created_count, reused_count
 
     async def transition(
@@ -369,6 +382,8 @@ class IncidentCaseService:
         existing = self.store.get(case_id, tenant_id)
         if existing is None:
             raise CaseNotFoundError(case_id)
+        if self.event_publisher is not None:
+            await self.event_publisher.reconcile_case(existing)
         if request.expected_version != existing.version:
             raise CaseConflictError(
                 f"case version conflict: expected {existing.version}, got {request.expected_version}"
@@ -404,6 +419,8 @@ class IncidentCaseService:
         )
         updated = IncidentCase.model_validate(updated.model_dump())
         await self.store.save(updated)
+        if self.event_publisher is not None:
+            await self.event_publisher.reconcile_case(updated)
         return updated
 
 

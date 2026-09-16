@@ -317,6 +317,12 @@ h1 span { color: var(--blue); }
 .case-status.new, .case-status.triaged { color: var(--orange); }
 .case-status.investigating, .case-status.contained { color: var(--blue); }
 .case-status.resolved, .case-status.closed { color: var(--green); }
+.outbox-metrics { grid-template-columns: repeat(5, 1fr); }
+.outbox-metrics strong { font-size: 22px; }
+.delivery-status { font-weight: 900; }
+.delivery-status.pending, .delivery-status.retry_scheduled { color: var(--orange); }
+.delivery-status.delivered { color: var(--green); }
+.delivery-status.dead_letter { color: var(--red); }
 .assurance-grid { grid-template-columns: repeat(6, 1fr); }
 .assurance-grid strong { font-size: 24px; }
 .assurance-domains { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px; }

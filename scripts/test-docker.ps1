@@ -43,6 +43,7 @@ try {
         --tmpfs /data:rw,noexec,nosuid,uid=10001,gid=10001,mode=0700,size=64m `
         --env ANALYZER_MODE=rule `
         --env CASE_LOG_PATH=/data/cases.jsonl `
+        --env OUTBOX_LOG_PATH=/data/integration-outbox.jsonl `
         --publish "127.0.0.1:${Port}:8000" `
         $ImageTag | Out-Null
 
@@ -59,7 +60,7 @@ try {
     if (-not $health -or $health.status -ne "ok" -or $health.analyzer_mode -ne "rule") {
         throw "Container health check did not become ready in rule mode."
     }
-    if ($health.version -ne "0.14.0" -or $health.auth_mode -ne "disabled") {
+    if ($health.version -ne "0.15.0" -or $health.auth_mode -ne "disabled") {
         throw "Container did not start with the expected local security profile."
     }
     $readiness = Invoke-RestMethod -Method Get -Uri "$baseUrl/health/ready" -TimeoutSec 2
@@ -68,6 +69,8 @@ try {
         -not $readiness.audit.ok -or
         -not $readiness.case_management.valid -or
         $readiness.case_management.response_mode -ne "simulation" -or
+        -not $readiness.integration_outbox.valid -or
+        $readiness.integration_outbox.external_delivery_enabled -or
         -not $readiness.assurance.valid -or
         $readiness.assurance.total_controls -ne 18 -or
         $readiness.normalization.schema_version -ne "1.9.0" -or
@@ -164,6 +167,38 @@ try {
             } | ConvertTo-Json -Compress)
     }
     $caseMetrics = Invoke-RestMethod -Method Get -Uri "$baseUrl/cases/metrics"
+    $outboxRecords = Invoke-RestMethod -Method Get -Uri "$baseUrl/integrations/outbox?limit=100"
+    $caseOutboxRecords = @(
+        $outboxRecords | Where-Object { $_.event.subject -eq $caseRecord.case_id }
+    )
+    if (
+        $caseOutboxRecords.Count -ne 6 -or
+        @($caseOutboxRecords | Select-Object -ExpandProperty event | Select-Object -ExpandProperty id | Sort-Object -Unique).Count -ne 6
+    ) {
+        throw "Case lifecycle did not generate six unique CloudEvents."
+    }
+    $createdDelivery = $caseOutboxRecords | Where-Object { $_.event.data.case_version -eq 1 }
+    $closedDelivery = $caseOutboxRecords | Where-Object { $_.event.data.case_version -eq 6 }
+    $deliveredEvent = Invoke-RestMethod `
+        -Method Post `
+        -Uri "$baseUrl/integrations/outbox/$($createdDelivery.event.id)/attempt" `
+        -ContentType "application/json" `
+        -Body (@{
+            outcome = "delivered"
+            expected_version = $createdDelivery.version
+            note = "Docker QA simulated a successful SIEM acknowledgement."
+        } | ConvertTo-Json -Compress)
+    $deadLetterEvent = Invoke-RestMethod `
+        -Method Post `
+        -Uri "$baseUrl/integrations/outbox/$($closedDelivery.event.id)/attempt" `
+        -ContentType "application/json" `
+        -Body (@{
+            outcome = "permanent_failure"
+            expected_version = $closedDelivery.version
+            error_code = "DESTINATION_REJECTED"
+            note = "Docker QA simulated a permanent ITSM rejection."
+        } | ConvertTo-Json -Compress)
+    $outboxMetrics = Invoke-RestMethod -Method Get -Uri "$baseUrl/integrations/outbox/metrics"
     $caseReadiness = Invoke-RestMethod -Method Get -Uri "$baseUrl/health/ready"
     if (
         $caseRecord.status -ne "CLOSED" -or
@@ -171,8 +206,15 @@ try {
         $caseRecord.history.Count -ne 6 -or
         $caseMetrics.total_cases -ne 1 -or
         $caseMetrics.open_case_count -ne 0 -or
+        $deliveredEvent.status -ne "DELIVERED" -or
+        $deadLetterEvent.status -ne "DEAD_LETTER" -or
+        $outboxMetrics.total_events -ne 6 -or
+        $outboxMetrics.delivered_count -ne 1 -or
+        $outboxMetrics.dead_letter_count -ne 1 -or
         -not $caseReadiness.case_management.ok -or
-        $caseReadiness.case_management.verified_lines -ne 6
+        $caseReadiness.case_management.verified_lines -ne 6 -or
+        -not $caseReadiness.integration_outbox.ok -or
+        $caseReadiness.integration_outbox.verified_lines -ne 8
     ) {
         throw "Incident case lifecycle, metrics, or hash-chain readiness check failed."
     }
@@ -258,6 +300,9 @@ try {
         case_integrity = $caseReadiness.case_management.ok
         case_status = $caseRecord.status
         case_version = $caseRecord.version
+        integration_events = $outboxMetrics.total_events
+        integration_delivered = $outboxMetrics.delivered_count
+        integration_dead_letter = $outboxMetrics.dead_letter_count
         assurance_registry_integrity = $readiness.assurance.valid
         assurance_control_count = $readiness.assurance.total_controls
         ocsf_schema_version = $readiness.normalization.schema_version

@@ -423,19 +423,61 @@ function renderCases(cases) {
   });
 }
 
+function renderOutbox(records) {
+  const body = $("outboxBody");
+  body.replaceChildren();
+  if (!records.length) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 6;
+    cell.className = "table-empty";
+    cell.textContent = "아직 생성된 연동 이벤트가 없습니다.";
+    row.append(cell);
+    body.append(row);
+    return;
+  }
+  records.forEach((record) => {
+    const row = document.createElement("tr");
+    const values = [
+      formatTime(record.event.time),
+      record.event.id,
+      `v${record.event.data.case_version}`,
+      record.status,
+      `${record.attempt_count}/${record.max_attempts}`,
+      formatTime(record.next_attempt_at),
+    ];
+    values.forEach((value, index) => {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      if (index === 3) cell.className = `delivery-status ${record.status.toLowerCase()}`;
+      row.append(cell);
+    });
+    body.append(row);
+  });
+}
+
 async function refreshCases() {
   try {
-    const [metrics, cases] = await Promise.all([
+    const [metrics, cases, outboxMetrics, outboxRecords] = await Promise.all([
       request("/cases/metrics"),
       request("/cases?limit=8"),
+      request("/integrations/outbox/metrics"),
+      request("/integrations/outbox?limit=8"),
     ]);
     $("caseTotal").textContent = metrics.total_cases;
     $("caseOpen").textContent = metrics.open_case_count;
     $("caseUnassigned").textContent = metrics.unassigned_case_count;
     $("caseLatest").textContent = metrics.latest_case_id || "-";
     renderCases(cases);
+    $("outboxPending").textContent = outboxMetrics.pending_count;
+    $("outboxRetry").textContent = outboxMetrics.retry_scheduled_count;
+    $("outboxDelivered").textContent = outboxMetrics.delivered_count;
+    $("outboxDeadLetter").textContent = outboxMetrics.dead_letter_count;
+    $("outboxDue").textContent = outboxMetrics.due_count;
+    renderOutbox(outboxRecords);
   } catch (_) {
     $("caseBody").innerHTML = '<tr><td colspan="6" class="table-empty">케이스를 불러오지 못했습니다.</td></tr>';
+    $("outboxBody").innerHTML = '<tr><td colspan="6" class="table-empty">연동 이벤트를 불러오지 못했습니다.</td></tr>';
   }
 }
 

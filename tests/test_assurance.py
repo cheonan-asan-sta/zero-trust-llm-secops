@@ -39,12 +39,12 @@ def test_assurance_summary_is_reproducible_and_does_not_claim_full_compliance() 
     assert summary.total_controls == 18
     assert summary.status_counts == {
         "implemented": 9,
-        "partially_implemented": 5,
-        "planned": 4,
+        "partially_implemented": 6,
+        "planned": 3,
         "not_applicable": 0,
     }
-    assert summary.implementation_rate == pytest.approx(0.6389)
-    assert summary.evidence_count == 43
+    assert summary.implementation_rate == pytest.approx(0.6667)
+    assert summary.evidence_count == 46
     assert summary.overdue_control_ids == []
     assert summary.registry_digest_sha256 == sha256(
         json.dumps(

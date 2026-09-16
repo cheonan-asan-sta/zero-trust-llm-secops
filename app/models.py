@@ -52,6 +52,13 @@ class IncidentCaseStatus(str, Enum):
     CLOSED = "CLOSED"
 
 
+class IntegrationDeliveryStatus(str, Enum):
+    PENDING = "PENDING"
+    RETRY_SCHEDULED = "RETRY_SCHEDULED"
+    DELIVERED = "DELIVERED"
+    DEAD_LETTER = "DEAD_LETTER"
+
+
 class ControlStatus(str, Enum):
     IMPLEMENTED = "implemented"
     PARTIAL = "partially_implemented"
@@ -723,6 +730,170 @@ class IncidentCaseMetrics(StrictModel):
     unassigned_case_count: int = Field(ge=0)
     status_counts: dict[str, int]
     latest_case_id: str | None = None
+
+
+class IncidentCaseIntegrationData(StrictModel):
+    case_id: str = Field(pattern=r"^case-[a-f0-9]{32}$")
+    incident_uid: str = Field(pattern=r"^inc-[a-f0-9]{32}$")
+    case_version: int = Field(ge=1, le=100)
+    status: IncidentCaseStatus
+    previous_status: IncidentCaseStatus | None = None
+    severity_id: Literal[3, 4, 5]
+    title: str = Field(min_length=5, max_length=200)
+    assignee: str | None = Field(default=None, min_length=2, max_length=128)
+    evidence_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    response_mode: Literal["simulation"] = "simulation"
+    occurred_at: datetime
+
+    @field_validator("occurred_at")
+    @classmethod
+    def validate_occurred_at(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("occurred_at must include a timezone")
+        return value
+
+
+class IncidentCaseCloudEvent(StrictModel):
+    specversion: Literal["1.0"] = "1.0"
+    id: str = Field(pattern=r"^evt-[a-f0-9]{32}$")
+    source: str = Field(pattern=r"^/tenants/[a-zA-Z0-9._-]+/cases$")
+    type: Literal[
+        "io.blue-semester.secops.incident-case.created",
+        "io.blue-semester.secops.incident-case.status-changed",
+    ]
+    subject: str = Field(pattern=r"^case-[a-f0-9]{32}$")
+    time: datetime
+    datacontenttype: Literal["application/json"] = "application/json"
+    dataschema: Literal["https://schema.ocsf.io/1.9.0/classes/incident_finding"] = (
+        "https://schema.ocsf.io/1.9.0/classes/incident_finding"
+    )
+    tenant_id: str = Field(pattern=r"^[a-zA-Z0-9._-]{1,64}$")
+    data: IncidentCaseIntegrationData
+    data_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+    @model_validator(mode="after")
+    def validate_event_contract(self) -> Self:
+        if self.time.tzinfo is None or self.time.utcoffset() is None:
+            raise ValueError("CloudEvent time must include a timezone")
+        if self.subject != self.data.case_id:
+            raise ValueError("CloudEvent subject must match the case identifier")
+        if self.time != self.data.occurred_at:
+            raise ValueError("CloudEvent time must match the case occurrence time")
+        if self.data.case_version == 1:
+            if self.type != "io.blue-semester.secops.incident-case.created":
+                raise ValueError("case version 1 must use the created event type")
+            if self.data.previous_status is not None:
+                raise ValueError("created case events cannot have a previous status")
+        elif self.type != "io.blue-semester.secops.incident-case.status-changed":
+            raise ValueError("later case versions must use the status-changed event type")
+        return self
+
+
+class IntegrationDeliveryHistoryEntry(StrictModel):
+    sequence: int = Field(ge=1, le=20)
+    status: IntegrationDeliveryStatus
+    recorded_at: datetime
+    actor_id: str = Field(min_length=1, max_length=128)
+    note: str = Field(min_length=3, max_length=500)
+    attempt_number: int = Field(ge=0, le=10)
+    error_code: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]{2,63}$")
+
+    @field_validator("recorded_at")
+    @classmethod
+    def validate_recorded_at(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("recorded_at must include a timezone")
+        return value
+
+
+class IntegrationOutboxRecord(StrictModel):
+    event: IncidentCaseCloudEvent
+    status: IntegrationDeliveryStatus = IntegrationDeliveryStatus.PENDING
+    version: int = Field(ge=1, le=20)
+    attempt_count: int = Field(default=0, ge=0, le=10)
+    max_attempts: int = Field(default=3, ge=1, le=10)
+    next_attempt_at: datetime | None = None
+    delivered_at: datetime | None = None
+    last_error_code: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]{2,63}$")
+    history: list[IntegrationDeliveryHistoryEntry] = Field(min_length=1, max_length=20)
+    delivery_mode: Literal["simulation"] = "simulation"
+
+    @model_validator(mode="after")
+    def validate_delivery_state(self) -> Self:
+        for field_name, value in (
+            ("next_attempt_at", self.next_attempt_at),
+            ("delivered_at", self.delivered_at),
+        ):
+            if value is not None and (value.tzinfo is None or value.utcoffset() is None):
+                raise ValueError(f"{field_name} must include a timezone")
+        if self.version != len(self.history):
+            raise ValueError("outbox version must match the history length")
+        for index, entry in enumerate(self.history, start=1):
+            if entry.sequence != index:
+                raise ValueError("delivery history sequence must be contiguous")
+            if index > 1 and entry.recorded_at < self.history[index - 2].recorded_at:
+                raise ValueError("delivery history timestamps must be monotonic")
+        if self.status != self.history[-1].status:
+            raise ValueError("delivery status must match the latest history entry")
+        if self.attempt_count != self.history[-1].attempt_number:
+            raise ValueError("attempt count must match the latest history entry")
+        if self.attempt_count > self.max_attempts:
+            raise ValueError("attempt count cannot exceed max_attempts")
+        if self.status == IntegrationDeliveryStatus.PENDING:
+            if self.attempt_count != 0 or self.next_attempt_at is None:
+                raise ValueError("pending deliveries require an initial due time")
+        elif self.status == IntegrationDeliveryStatus.RETRY_SCHEDULED:
+            if self.next_attempt_at is None or self.last_error_code is None:
+                raise ValueError("scheduled retries require a due time and error code")
+        elif self.status == IntegrationDeliveryStatus.DELIVERED:
+            if self.delivered_at is None or self.next_attempt_at is not None:
+                raise ValueError("delivered events require delivered_at and no retry time")
+            if self.last_error_code is not None:
+                raise ValueError("delivered events cannot retain an error code")
+        elif self.status == IntegrationDeliveryStatus.DEAD_LETTER and (
+            self.last_error_code is None or self.next_attempt_at is not None
+        ):
+            raise ValueError("dead-letter events require an error and no retry time")
+        return self
+
+
+class IntegrationDeliveryUpdateRequest(StrictModel):
+    outcome: Literal["delivered", "retryable_failure", "permanent_failure"]
+    expected_version: int = Field(ge=1, le=19)
+    error_code: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]{2,63}$")
+    note: str = Field(min_length=3, max_length=500)
+
+    @field_validator("note")
+    @classmethod
+    def normalize_delivery_note(cls, value: str) -> str:
+        normalized = value.strip()
+        if len(normalized) < 3:
+            raise ValueError("note must contain at least three visible characters")
+        return normalized
+
+    @model_validator(mode="after")
+    def validate_outcome(self) -> Self:
+        if self.outcome == "delivered" and self.error_code is not None:
+            raise ValueError("delivered outcomes cannot include an error code")
+        if self.outcome != "delivered" and self.error_code is None:
+            raise ValueError("failed outcomes require an error code")
+        return self
+
+
+class IntegrationOutboxMetrics(StrictModel):
+    total_events: int = Field(ge=0)
+    pending_count: int = Field(ge=0)
+    retry_scheduled_count: int = Field(ge=0)
+    due_count: int = Field(ge=0)
+    delivered_count: int = Field(ge=0)
+    dead_letter_count: int = Field(ge=0)
+    latest_event_id: str | None = None
+
+
+class IntegrationReconcileResult(StrictModel):
+    scanned_case_count: int = Field(ge=0)
+    created_event_count: int = Field(ge=0)
+    reused_event_count: int = Field(ge=0)
 
 
 class PublicReplayDataset(StrictModel):

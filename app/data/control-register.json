@@ -1,5 +1,5 @@
 {
-  "registry_version": "2026.09.7",
+  "registry_version": "2026.09.8",
   "controls": [
     {
       "control_id": "GOV-01",
@@ -235,7 +235,7 @@
       "title": "중앙 SIEM 전송과 로그 보존 정책",
       "domain": "logging_monitoring",
       "priority": "P1",
-      "status": "planned",
+      "status": "partially_implemented",
       "owner_role": "security-operations",
       "objective": "인증, 정책, 분석, 검토와 관리자 행위를 중앙 SIEM으로 전송하고 보존·접근·삭제 정책을 적용한다.",
       "acceptance_criteria": [
@@ -254,10 +254,29 @@
           "url": "https://www.cisa.gov/sites/default/files/2024-02/Joint-Guidance-Identifying-and-Mitigating-LOTL_V3508c.pdf"
         }
       ],
-      "evidence": [],
+      "evidence": [
+        {
+          "evidence_id": "EVD-LOG-OUTBOX-CODE",
+          "kind": "code",
+          "location": "app/services/integration_outbox.py",
+          "description": "케이스 변경을 CloudEvents 1.0으로 투영하고 재시도·지수 백오프·실패 보관·누락 복구를 관리하는 내구성 아웃박스"
+        },
+        {
+          "evidence_id": "EVD-LOG-OUTBOX-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_integration_outbox.py",
+          "description": "이벤트 결정성, 중복 방지, 누락 복구, 테넌트 격리, 재시도 예약, 종결 상태와 로그 변조 차단 시험"
+        },
+        {
+          "evidence_id": "EVD-LOG-OUTBOX-CONFIG",
+          "kind": "configuration",
+          "location": "compose.yaml",
+          "description": "감사·케이스와 분리된 연동 아웃박스 경로 및 기본 외부 전송 비활성화 구성"
+        }
+      ],
       "reviewed_on": "2026-09-16",
       "review_due_on": "2026-12-16",
-      "target_version": "0.10.0"
+      "target_version": "0.15.0"
     },
     {
       "control_id": "AI-01",

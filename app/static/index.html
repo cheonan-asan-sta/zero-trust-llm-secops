@@ -303,6 +303,29 @@
         <p class="assurance-notice">
           신규→분류→조사→봉쇄→해결→종결 순서를 강제하며 모든 변경은 증거 지문과 함께 해시 체인에 기록됩니다.
         </p>
+        <div class="evaluation-details" id="outboxDetails">
+          <div class="diagnostic-heading">
+            <strong>SIEM·ITSM 연동 아웃박스</strong>
+            <span>CloudEvents 1.0 · 외부 전송 비활성화</span>
+          </div>
+          <div class="metric-grid outbox-metrics">
+            <article><span>전송 대기</span><strong id="outboxPending">0</strong></article>
+            <article><span>재시도 예약</span><strong id="outboxRetry">0</strong></article>
+            <article><span>전달 완료</span><strong id="outboxDelivered">0</strong></article>
+            <article><span>실패 보관</span><strong id="outboxDeadLetter">0</strong></article>
+            <article><span>지금 처리 가능</span><strong id="outboxDue">0</strong></article>
+          </div>
+          <div class="history-wrap">
+            <table>
+              <thead>
+                <tr><th>발생 시각</th><th>이벤트</th><th>케이스 버전</th><th>상태</th><th>시도</th><th>다음 시도</th></tr>
+              </thead>
+              <tbody id="outboxBody">
+                <tr><td colspan="6" class="table-empty">연동 이벤트를 불러오는 중입니다.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </section>
 
       <section class="summary-section shell evaluation-section">

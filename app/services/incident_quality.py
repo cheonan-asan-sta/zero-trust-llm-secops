@@ -11,7 +11,7 @@ from app.models import (
 from app.services.correlation import CorrelationEngine, get_correlation_engine
 from app.services.public_replay import PublicReplayService, get_public_replay_service
 
-EVALUATION_VERSION = "0.14.0"
+EVALUATION_VERSION = "0.15.0"
 
 
 class IncidentQualityService:

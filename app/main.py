@@ -38,6 +38,11 @@ from app.models import (
     IncidentCaseStatus,
     IncidentCaseUpdateRequest,
     IncidentQualityReport,
+    IntegrationDeliveryStatus,
+    IntegrationDeliveryUpdateRequest,
+    IntegrationOutboxMetrics,
+    IntegrationOutboxRecord,
+    IntegrationReconcileResult,
     MetricsSummary,
     NormalizedSecurityEvent,
     PolicyDecision,
@@ -69,6 +74,14 @@ from app.services.correlation import get_correlation_engine
 from app.services.detection_quality import get_detection_quality_service
 from app.services.evaluation import run_evaluation
 from app.services.incident_quality import get_incident_quality_service
+from app.services.integration_outbox import (
+    IntegrationOutboxService,
+    OutboxConflictError,
+    OutboxNotDueError,
+    OutboxNotFoundError,
+    OutboxTerminalStateError,
+    create_integration_outbox_store,
+)
 from app.services.ocsf import get_ocsf_normalizer
 from app.services.policy import enforce_assessment_safety, response_preview
 from app.services.public_replay import get_public_replay_service
@@ -91,7 +104,9 @@ app.add_middleware(RequestContextMiddleware)
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 audit_store = create_audit_store(settings)
 case_store = create_case_store(settings)
-case_service = IncidentCaseService(case_store)
+integration_outbox_store = create_integration_outbox_store(settings)
+integration_outbox_service = IntegrationOutboxService(integration_outbox_store)
+case_service = IncidentCaseService(case_store, integration_outbox_service)
 assurance_registry = get_assurance_registry()
 ocsf_normalizer = get_ocsf_normalizer()
 sigma_engine = get_sigma_engine()
@@ -133,6 +148,7 @@ def health() -> dict:
         "analyzer_mode": settings.analyzer_mode,
         "audit_backend": settings.audit_backend,
         "case_backend": case_store.integrity()["backend"],
+        "integration_outbox_backend": integration_outbox_store.integrity()["backend"],
         "auth_mode": settings.auth_mode,
         "environment": settings.app_environment,
     }
@@ -147,6 +163,7 @@ def liveness() -> dict:
 def readiness() -> Response:
     integrity = audit_store.integrity()
     case_integrity = case_store.integrity()
+    outbox_integrity = integration_outbox_store.integrity()
     assurance = assurance_registry.summary()
     quality = (
         detection_quality_service.evaluate("readiness")
@@ -161,6 +178,7 @@ def readiness() -> Response:
     ready = (
         integrity["ok"]
         and case_integrity["ok"]
+        and outbox_integrity["ok"]
         and assurance.valid
         and sigma_engine.valid
         and public_replay_service.valid
@@ -178,6 +196,13 @@ def readiness() -> Response:
             "lifecycle": [status.value for status in IncidentCaseStatus],
             "response_mode": "simulation",
             "allowed_transition_count": sum(len(values) for values in ALLOWED_TRANSITIONS.values()),
+        },
+        "integration_outbox": {
+            **outbox_integrity,
+            "valid": outbox_integrity["ok"],
+            "format": "CloudEvents 1.0",
+            "data_schema": "OCSF 1.9.0 Incident Finding",
+            "external_delivery_enabled": False,
         },
         "assurance": {
             "valid": assurance.valid,
@@ -399,6 +424,87 @@ async def update_case(
     except CaseNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Case not found") from exc
     except (CaseConflictError, InvalidCaseTransitionError) as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.get("/integrations/outbox/metrics", response_model=IntegrationOutboxMetrics)
+def integration_outbox_metrics(principal: ViewerPrincipal) -> IntegrationOutboxMetrics:
+    return integration_outbox_store.metrics(principal.tenant_id)
+
+
+@app.get("/integrations/outbox", response_model=list[IntegrationOutboxRecord])
+def recent_integration_events(
+    principal: ViewerPrincipal,
+    limit: int = 20,
+    status: IntegrationDeliveryStatus | None = None,
+    due_only: bool = False,
+) -> list[IntegrationOutboxRecord]:
+    safe_limit = min(max(limit, 1), 100)
+    records = integration_outbox_store.recent(100, principal.tenant_id, status)
+    if due_only:
+        now = datetime.now(UTC)
+        records = [
+            record
+            for record in records
+            if record.status
+            in {
+                IntegrationDeliveryStatus.PENDING,
+                IntegrationDeliveryStatus.RETRY_SCHEDULED,
+            }
+            and record.next_attempt_at is not None
+            and record.next_attempt_at <= now
+        ]
+    return records[:safe_limit]
+
+
+@app.post("/integrations/outbox/reconcile", response_model=IntegrationReconcileResult)
+async def reconcile_integration_outbox(
+    principal: AdminPrincipal,
+) -> IntegrationReconcileResult:
+    cases = case_store.recent(10000, principal.tenant_id)
+    try:
+        created, reused = await integration_outbox_service.reconcile_cases(cases)
+    except (OutboxConflictError, RuntimeError) as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    return IntegrationReconcileResult(
+        scanned_case_count=len(cases),
+        created_event_count=created,
+        reused_event_count=reused,
+    )
+
+
+@app.get("/integrations/outbox/{event_id}", response_model=IntegrationOutboxRecord)
+def integration_event_detail(
+    event_id: str,
+    principal: ViewerPrincipal,
+) -> IntegrationOutboxRecord:
+    record = integration_outbox_store.get(event_id, principal.tenant_id)
+    if record is None:
+        raise HTTPException(status_code=404, detail="Integration event not found")
+    return record
+
+
+@app.post(
+    "/integrations/outbox/{event_id}/attempt",
+    response_model=IntegrationOutboxRecord,
+)
+async def record_integration_attempt(
+    event_id: str,
+    request: IntegrationDeliveryUpdateRequest,
+    principal: ResponderPrincipal,
+) -> IntegrationOutboxRecord:
+    try:
+        return await integration_outbox_service.record_attempt(
+            event_id,
+            principal.tenant_id,
+            principal.subject,
+            request,
+        )
+    except OutboxNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Integration event not found") from exc
+    except (OutboxConflictError, OutboxNotDueError, OutboxTerminalStateError) as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
