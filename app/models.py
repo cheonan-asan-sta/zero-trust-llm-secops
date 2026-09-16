@@ -421,10 +421,32 @@ class DetectionPipelineResult(StrictModel):
 
 
 class CorrelationPolicy(StrictModel):
-    window_minutes: int = Field(default=30, ge=1, le=1440)
+    window_minutes: int | None = Field(default=None, ge=1, le=1440)
+    windows_minutes: list[int] = Field(
+        default_factory=lambda: [5, 30, 1440],
+        min_length=1,
+        max_length=6,
+    )
     minimum_distinct_rules: int = Field(default=2, ge=2, le=20)
     minimum_repeated_events: int = Field(default=3, ge=2, le=100)
     minimum_distinct_resources: int = Field(default=2, ge=2, le=100)
+
+    @model_validator(mode="after")
+    def validate_windows(self) -> Self:
+        if "window_minutes" in self.model_fields_set and "windows_minutes" in self.model_fields_set:
+            raise ValueError("use either window_minutes or windows_minutes, not both")
+        windows = self.effective_windows_minutes
+        if any(window < 1 or window > 1440 for window in windows):
+            raise ValueError("correlation windows must be between 1 and 1440 minutes")
+        if windows != sorted(set(windows)):
+            raise ValueError("correlation windows must be unique and strictly ascending")
+        return self
+
+    @property
+    def effective_windows_minutes(self) -> list[int]:
+        if self.window_minutes is not None:
+            return [self.window_minutes]
+        return list(self.windows_minutes)
 
 
 class CorrelationRequest(StrictModel):
@@ -440,6 +462,65 @@ class IncidentFindingEvidence(StrictModel):
     level: SigmaRuleLevel
     source_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     resource_uid: str = Field(min_length=1, max_length=128)
+
+
+class CorrelationEntityNode(StrictModel):
+    entity_uid: str = Field(pattern=r"^ent-[a-f0-9]{32}$")
+    entity_type: Literal["user", "source_ip", "device", "resource", "detection_rule"]
+    value: str = Field(min_length=1, max_length=256)
+    first_seen: int = Field(ge=0)
+    last_seen: int = Field(ge=0)
+    event_ids: list[str] = Field(min_length=1, max_length=100)
+
+    @model_validator(mode="after")
+    def validate_observation_window(self) -> Self:
+        if self.last_seen < self.first_seen:
+            raise ValueError("entity last_seen must not be earlier than first_seen")
+        return self
+
+
+class CorrelationEntityEdge(StrictModel):
+    edge_uid: str = Field(pattern=r"^edge-[a-f0-9]{32}$")
+    source_entity_uid: str = Field(pattern=r"^ent-[a-f0-9]{32}$")
+    target_entity_uid: str = Field(pattern=r"^ent-[a-f0-9]{32}$")
+    relationship: Literal[
+        "originated_from",
+        "used_device",
+        "accessed_resource",
+        "triggered_rule",
+    ]
+    first_seen: int = Field(ge=0)
+    last_seen: int = Field(ge=0)
+    event_ids: list[str] = Field(min_length=1, max_length=100)
+    observation_count: int = Field(ge=1, le=100)
+
+    @model_validator(mode="after")
+    def validate_observation_window(self) -> Self:
+        if self.last_seen < self.first_seen:
+            raise ValueError("edge last_seen must not be earlier than first_seen")
+        return self
+
+
+class CorrelationEntityGraph(StrictModel):
+    node_count: int = Field(ge=0)
+    edge_count: int = Field(ge=0)
+    nodes: list[CorrelationEntityNode] = Field(default_factory=list, max_length=5000)
+    edges: list[CorrelationEntityEdge] = Field(default_factory=list, max_length=20000)
+    graph_digest_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+    @model_validator(mode="after")
+    def validate_counts(self) -> Self:
+        if self.node_count != len(self.nodes) or self.edge_count != len(self.edges):
+            raise ValueError("entity graph counts must match node and edge lists")
+        return self
+
+
+class CorrelationWindowSummary(StrictModel):
+    window_minutes: int = Field(ge=1, le=1440)
+    evaluated_group_count: int = Field(ge=0)
+    candidate_count: int = Field(ge=0)
+    incident_count: int = Field(ge=0)
+    deduplicated_count: int = Field(ge=0)
 
 
 class OCSFIncidentFinding(StrictModel):
@@ -460,6 +541,7 @@ class OCSFIncidentFinding(StrictModel):
     title: str = Field(min_length=5, max_length=200)
     desc: str = Field(min_length=10, max_length=500)
     confidence_score: int = Field(ge=0, le=100)
+    window_minutes: int = Field(ge=1, le=1440)
     start_time: int = Field(ge=0)
     end_time: int = Field(ge=0)
     assignee_group: Literal["Security Operations"] = "Security Operations"
@@ -470,6 +552,7 @@ class OCSFIncidentFinding(StrictModel):
     device_ids: list[str] = Field(min_length=1, max_length=100)
     resource_ids: list[str] = Field(min_length=1, max_length=100)
     attack_tags: list[str] = Field(default_factory=list, max_length=100)
+    entity_uids: list[str] = Field(min_length=1, max_length=500)
     correlation_reasons: list[
         Literal["multi_rule_attack_chain", "repeated_detection_across_resources"]
     ] = Field(min_length=1, max_length=2)
@@ -491,6 +574,9 @@ class CorrelationResult(StrictModel):
     analyzed_event_count: int = Field(ge=0)
     finding_count: int = Field(ge=0)
     incident_count: int = Field(ge=0)
+    windows_evaluated: list[int] = Field(min_length=1, max_length=6)
+    window_summaries: list[CorrelationWindowSummary] = Field(min_length=1, max_length=6)
+    entity_graph: CorrelationEntityGraph
     incidents: list[OCSFIncidentFinding] = Field(default_factory=list, max_length=100)
 
 
@@ -543,6 +629,8 @@ class PublicReplayResult(StrictModel):
     adapter_version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
     records: list[PublicReplayRecordResult] = Field(min_length=1, max_length=1000)
     finding_count: int = Field(ge=0)
+    window_summaries: list[CorrelationWindowSummary] = Field(min_length=1, max_length=6)
+    entity_graph: CorrelationEntityGraph
     incidents: list[OCSFIncidentFinding] = Field(default_factory=list, max_length=100)
     expectation_met: bool
 

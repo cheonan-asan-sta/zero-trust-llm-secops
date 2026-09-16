@@ -57,6 +57,9 @@ def test_public_attack_and_benign_replays_meet_regression_expectations() -> None
     assert len(attack.incidents) == 1
     assert attack.incidents[0].class_uid == 2005
     assert attack.incidents[0].type_uid == 200501
+    assert attack.incidents[0].window_minutes == 5
+    assert attack.entity_graph.node_count > 0
+    assert attack.entity_graph.edge_count > 0
     assert "repeated_detection_across_resources" in attack.incidents[0].correlation_reasons
     assert "attack.t1021.001" in attack.incidents[0].attack_tags
     assert credential_attack.expectation_met is True
@@ -119,6 +122,8 @@ def test_correlation_and_public_replay_apis() -> None:
     assert correlation.status_code == 200
     assert correlation.json()["incident_count"] == 1
     assert correlation.json()["incidents"][0]["class_uid"] == 2005
+    assert correlation.json()["windows_evaluated"] == [5, 30, 1440]
+    assert correlation.json()["entity_graph"]["node_count"] == 16
     assert datasets.status_code == 200
     assert len(datasets.json()) == 3
     assert suite.status_code == 200
@@ -131,8 +136,10 @@ def test_readiness_includes_correlation_and_public_replay_integrity() -> None:
     payload = response.json()
 
     assert response.status_code == 200
-    assert payload["correlation"]["version"] == "0.11.0"
+    assert payload["correlation"]["version"] == "0.12.0"
     assert payload["correlation"]["output_class_uid"] == 2005
+    assert payload["correlation"]["windows_minutes"] == [5, 30, 1440]
+    assert payload["correlation"]["entity_graph_enabled"] is True
     assert payload["public_replay"]["valid"] is True
     assert payload["public_replay"]["dataset_count"] == 3
     assert payload["public_replay"]["validation_issue_count"] == 0

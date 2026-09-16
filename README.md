@@ -29,7 +29,8 @@ LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 �
 - Sigma 2.1 YAML 규칙의 버전·승인·시험 메타데이터 및 실패 폐쇄형 로컬 탐지 엔진
 - 위협 5건·정상 3건 재생 시험과 분석 결과의 규칙집·입력 해시 증적
 - 커밋·라이선스·SHA-256이 고정된 Splunk RDP·AWS 인증 실패 및 Microsoft Sentinel 정상 로그 오프라인 재생
-- 사용자·IP·시간창 기반 다중 규칙 공격 체인과 반복 원격접속의 OCSF Incident Finding 상관분석
+- 사용자·IP·기기·자원·탐지 규칙 엔터티 그래프와 5분·30분·24시간 창 기반 OCSF Incident Finding 상관분석
+- 동일 증거가 여러 시간창에서 재발견될 때 가장 짧은 창 결과만 남기는 결정적 사고 중복 제거
 - 규칙별 혼동행렬·Precision·Recall·F1·오탐률, 파싱 성공률, OCSF 매핑률과 실패 폐쇄형 품질 게이트
 - 공공·기업 보안 기준 18개를 구현·부분 구현·계획으로 구분한 기계판독 통제대장
 - 완료 통제의 코드·구성·자동 시험 증거를 강제하는 보증 검증기와 준비도 API
@@ -157,7 +158,7 @@ HYBRID_LLM_TIMEOUT_SECONDS=2.5
 | POST | `/events/normalize` | 입력을 OCSF 1.9.0 이벤트와 변환 이력으로 정규화 |
 | POST | `/detections/evaluate` | OCSF 정규화 후 승인된 Sigma 규칙 재생 |
 | GET | `/detections/rules` | 규칙 상태·버전·해시·시험 사례 목록 |
-| POST | `/incidents/correlate` | 최대 100개 이벤트의 공격 체인을 OCSF Incident Finding으로 상관분석 |
+| POST | `/incidents/correlate` | 최대 100개 이벤트를 다중 시간창·엔터티 그래프로 연결해 OCSF Incident Finding 생성 |
 | GET | `/replay/public/datasets` | 고정된 공개 공격·정상 데이터셋의 출처·라이선스·해시 조회 |
 | POST | `/replay/public/run` | 공개 로그 12건의 탐지·오탐·사고 상관분석 회귀시험 |
 | POST | `/replay/public/{dataset_id}` | 지정한 공개 데이터셋만 오프라인 재생 |

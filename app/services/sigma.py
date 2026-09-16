@@ -19,7 +19,7 @@ from app.models import (
     SigmaRuleSummary,
 )
 
-ENGINE_VERSION = "0.11.0"
+ENGINE_VERSION = "0.12.0"
 SIGMA_SPECIFICATION_VERSION = "2.1.0"
 _RULE_STATUSES = {"experimental", "test", "stable", "deprecated", "unsupported"}
 _SUPPORTED_MODIFIERS = {

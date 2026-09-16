@@ -1,5 +1,5 @@
 {
-  "registry_version": "2026.09.4",
+  "registry_version": "2026.09.5",
   "controls": [
     {
       "control_id": "GOV-01",
@@ -595,11 +595,23 @@
           "kind": "automated_test",
           "location": "tests/test_correlation_replay.py",
           "description": "시간 창, 공유 엔터티, 반복 자원 조건과 순서 독립 사고 식별자 회귀 시험"
+        },
+        {
+          "evidence_id": "EVD-IR-ENTITY-GRAPH-CODE",
+          "kind": "code",
+          "location": "app/services/correlation.py",
+          "description": "사용자·IP·기기·자원·탐지 규칙을 테넌트 범위 엔터티 그래프로 연결하고 5분·30분·24시간 창의 중복 사고를 제거하는 구현"
+        },
+        {
+          "evidence_id": "EVD-IR-ENTITY-GRAPH-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_entity_graph_correlation.py",
+          "description": "그래프 결정성·테넌트 격리·관계 완전성·다중 시간창·중복 제거의 회귀 시험"
         }
       ],
       "reviewed_on": "2026-09-16",
       "review_due_on": "2026-12-16",
-      "target_version": "0.10.0"
+      "target_version": "0.12.0"
     },
     {
       "control_id": "DATA-01",

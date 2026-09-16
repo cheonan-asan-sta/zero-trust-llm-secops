@@ -486,12 +486,14 @@ function renderReplayDetails(result) {
       item.records.length,
       item.finding_count,
       item.incidents.length,
+      item.window_summaries.map((summary) => `${summary.window_minutes}분`).join(" · "),
+      `${item.entity_graph.node_count} 노드 / ${item.entity_graph.edge_count} 연결`,
       item.expectation_met ? "통과" : "보완 필요",
     ];
     values.forEach((value, index) => {
       const cell = document.createElement("td");
       cell.textContent = value;
-      if (index === 5) cell.className = item.expectation_met ? "metric-pass" : "metric-fail";
+      if (index === 7) cell.className = item.expectation_met ? "metric-pass" : "metric-fail";
       row.append(cell);
     });
     body.append(row);

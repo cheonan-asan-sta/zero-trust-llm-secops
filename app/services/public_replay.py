@@ -27,7 +27,7 @@ from app.services.correlation import CorrelationEngine, get_correlation_engine
 from app.services.ocsf import OCSFNormalizer, get_ocsf_normalizer
 from app.services.sigma import SigmaEngine, get_sigma_engine
 
-REPLAY_VERSION = "0.11.0"
+REPLAY_VERSION = "0.12.0"
 _WINDOWS_NAMESPACE = "http://schemas.microsoft.com/win/2004/08/events/event"
 _WINDOWS = {"event": _WINDOWS_NAMESPACE}
 
@@ -108,6 +108,8 @@ class PublicReplayService:
             adapter_version=REPLAY_VERSION,
             records=replayed,
             finding_count=finding_count,
+            window_summaries=correlation.window_summaries,
+            entity_graph=correlation.entity_graph,
             incidents=correlation.incidents,
             expectation_met=expectation_met,
         )

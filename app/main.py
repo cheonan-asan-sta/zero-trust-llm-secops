@@ -170,6 +170,8 @@ def readiness() -> Response:
             "version": correlation_engine.version,
             "output_class": "OCSF Incident Finding",
             "output_class_uid": 2005,
+            "windows_minutes": [5, 30, 1440],
+            "entity_graph_enabled": True,
         },
         "public_replay": {
             "valid": public_replay_service.valid,

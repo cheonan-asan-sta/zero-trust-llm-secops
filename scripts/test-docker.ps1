@@ -58,7 +58,7 @@ try {
     if (-not $health -or $health.status -ne "ok" -or $health.analyzer_mode -ne "rule") {
         throw "Container health check did not become ready in rule mode."
     }
-    if ($health.version -ne "0.11.0" -or $health.auth_mode -ne "disabled") {
+    if ($health.version -ne "0.12.0" -or $health.auth_mode -ne "disabled") {
         throw "Container did not start with the expected local security profile."
     }
     $readiness = Invoke-RestMethod -Method Get -Uri "$baseUrl/health/ready" -TimeoutSec 2
@@ -71,6 +71,8 @@ try {
         -not $readiness.detection.valid -or
         $readiness.detection.approved_rule_count -ne 6 -or
         $readiness.correlation.output_class_uid -ne 2005 -or
+        -not $readiness.correlation.entity_graph_enabled -or
+        ($readiness.correlation.windows_minutes -join ",") -ne "5,30,1440" -or
         -not $readiness.public_replay.valid -or
         $readiness.public_replay.dataset_count -ne 3 -or
         -not $readiness.detection_quality.valid -or
@@ -156,7 +158,9 @@ try {
         -not $publicReplay.expectations_met -or
         $publicReplay.dataset_count -ne 3 -or
         $publicReplay.event_count -ne 12 -or
-        $publicReplay.incident_count -ne 1
+        $publicReplay.incident_count -ne 1 -or
+        $publicReplay.results[0].entity_graph.node_count -lt 1 -or
+        $publicReplay.results[0].incidents[0].window_minutes -ne 5
     ) {
         throw "Public attack/benign replay or incident correlation failed."
     }
