@@ -1,4 +1,5 @@
 import asyncio
+from datetime import UTC, datetime
 from functools import lru_cache
 from pathlib import Path
 from time import perf_counter
@@ -21,6 +22,9 @@ from app.models import (
     MetricsSummary,
     PolicyDecision,
     ResponsePreviewRequest,
+    ReviewStatus,
+    ReviewUpdateRequest,
+    RiskLevel,
     ScenarioSummary,
     SecurityEvent,
     SimulationRequest,
@@ -171,9 +175,58 @@ def metrics() -> MetricsSummary:
 
 
 @app.get("/results", response_model=list[AnalysisResult])
-def recent_results(limit: int = 20) -> list[AnalysisResult]:
+def recent_results(
+    limit: int = 20,
+    review_status: ReviewStatus | None = None,
+    risk_level: RiskLevel | None = None,
+) -> list[AnalysisResult]:
     safe_limit = min(max(limit, 1), 100)
-    return audit_store.recent(safe_limit)
+    records = audit_store.recent(100)
+    if review_status is not None:
+        records = [record for record in records if record.review_status == review_status]
+    if risk_level is not None:
+        records = [record for record in records if record.assessment.risk_level == risk_level]
+    return records[:safe_limit]
+
+
+@app.patch("/results/{event_id}/review", response_model=AnalysisResult)
+async def update_review(event_id: str, request: ReviewUpdateRequest) -> AnalysisResult:
+    record = audit_store.get(event_id)
+    if record is None:
+        raise HTTPException(status_code=404, detail="Result not found")
+    if record.review_status == ReviewStatus.NOT_REQUIRED:
+        raise HTTPException(status_code=409, detail="This result does not require human review")
+
+    allowed_transitions = {
+        ReviewStatus.PENDING: {
+            ReviewStatus.IN_REVIEW,
+            ReviewStatus.RESOLVED,
+            ReviewStatus.DISMISSED,
+        },
+        ReviewStatus.IN_REVIEW: {
+            ReviewStatus.IN_REVIEW,
+            ReviewStatus.RESOLVED,
+            ReviewStatus.DISMISSED,
+        },
+        ReviewStatus.RESOLVED: {ReviewStatus.IN_REVIEW},
+        ReviewStatus.DISMISSED: {ReviewStatus.IN_REVIEW},
+    }
+    if request.status not in allowed_transitions.get(record.review_status, set()):
+        raise HTTPException(
+            status_code=409,
+            detail=f"Cannot change review from {record.review_status.value} to {request.status.value}",
+        )
+
+    payload = record.model_dump()
+    payload.update(
+        review_status=request.status,
+        reviewer=request.reviewer,
+        review_note=request.note,
+        review_updated_at=datetime.now(UTC),
+    )
+    updated = AnalysisResult.model_validate(payload)
+    await audit_store.save(updated)
+    return updated
 
 
 @app.get("/results/{event_id}", response_model=AnalysisResult)

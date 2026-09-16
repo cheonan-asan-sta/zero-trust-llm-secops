@@ -79,6 +79,28 @@ try {
     if ($analysis.assessment.risk_level -notin @("HIGH", "CRITICAL")) {
         throw "Threat smoke test returned an unexpectedly low risk."
     }
+    if ($analysis.review_status -ne "PENDING") {
+        throw "High-risk analysis did not enter the review queue."
+    }
+
+    $reviewUrl = "$baseUrl/results/$($analysis.event_id)/review"
+    $inReview = Invoke-RestMethod `
+        -Method Patch `
+        -Uri $reviewUrl `
+        -ContentType "application/json" `
+        -Body '{"status":"IN_REVIEW","reviewer":"Docker QA"}'
+    if ($inReview.review_status -ne "IN_REVIEW") {
+        throw "Analysis could not be assigned to an analyst."
+    }
+    $resolved = Invoke-RestMethod `
+        -Method Patch `
+        -Uri $reviewUrl `
+        -ContentType "application/json" `
+        -Body '{"status":"RESOLVED","reviewer":"Docker QA","note":"Cost-free container smoke test completed."}'
+    if ($resolved.review_status -ne "RESOLVED") {
+        throw "Analysis review could not be resolved."
+    }
+
     if (-not ($evaluation.targets_met.PSObject.Properties.Value -notcontains $false)) {
         throw "Rule evaluation did not meet every target."
     }
@@ -89,6 +111,7 @@ try {
         event_id = $analysis.event_id
         risk = $analysis.assessment.risk_level
         action = $analysis.assessment.recommended_action
+        review_status = $resolved.review_status
         evaluation_cases = $evaluation.total_cases
         risk_accuracy = $evaluation.risk_accuracy
         action_accuracy = $evaluation.action_accuracy

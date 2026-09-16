@@ -7,7 +7,7 @@ import boto3
 from boto3.dynamodb.conditions import Key
 
 from app.config import Settings
-from app.models import AnalysisResult, MetricsSummary
+from app.models import AnalysisResult, MetricsSummary, ReviewStatus
 
 
 class AuditRepository(Protocol):
@@ -25,13 +25,13 @@ class AuditStore:
         self._path = path
         self._records: dict[str, AnalysisResult] = {}
         self._history: list[AnalysisResult] = []
+        self._history_positions: dict[str, int] = {}
         self._lock = asyncio.Lock()
         self._load_existing()
 
     async def save(self, record: AnalysisResult) -> None:
         async with self._lock:
-            self._records[record.event_id] = record
-            self._history.append(record)
+            self._upsert(record)
             await asyncio.to_thread(self._append_jsonl, record)
 
     def get(self, event_id: str) -> AnalysisResult | None:
@@ -59,8 +59,23 @@ class AuditStore:
                 record = AnalysisResult.model_validate_json(line)
             except ValueError:
                 continue
-            self._records[record.event_id] = record
+            self._upsert(record)
+
+    def _upsert(self, record: AnalysisResult) -> None:
+        position = self._history_positions.get(record.analysis_id)
+        if position is None:
+            self._history_positions[record.analysis_id] = len(self._history)
             self._history.append(record)
+        else:
+            self._history[position] = record
+
+        latest = self._records.get(record.event_id)
+        if (
+            latest is None
+            or latest.analysis_id == record.analysis_id
+            or record.analyzed_at >= latest.analyzed_at
+        ):
+            self._records[record.event_id] = record
 
     def _append_jsonl(self, record: AnalysisResult) -> None:
         self._path.parent.mkdir(parents=True, exist_ok=True)
@@ -140,6 +155,7 @@ def _summarize(records: list[AnalysisResult]) -> MetricsSummary:
     risk_counts: dict[str, int] = {}
     action_counts: dict[str, int] = {}
     analyzer_counts: dict[str, int] = {}
+    review_counts: dict[str, int] = {}
 
     for record in records:
         risk = record.assessment.risk_level.value
@@ -147,6 +163,8 @@ def _summarize(records: list[AnalysisResult]) -> MetricsSummary:
         risk_counts[risk] = risk_counts.get(risk, 0) + 1
         action_counts[action] = action_counts.get(action, 0) + 1
         analyzer_counts[record.analyzer] = analyzer_counts.get(record.analyzer, 0) + 1
+        review = record.review_status.value
+        review_counts[review] = review_counts.get(review, 0) + 1
 
     latest = records[-1].event_id if records else None
     latencies = sorted(record.latency_ms for record in records)
@@ -158,6 +176,11 @@ def _summarize(records: list[AnalysisResult]) -> MetricsSummary:
         risk_counts=risk_counts,
         action_counts=action_counts,
         analyzer_counts=analyzer_counts,
+        review_counts=review_counts,
+        pending_review_count=(
+            review_counts.get(ReviewStatus.PENDING.value, 0)
+            + review_counts.get(ReviewStatus.IN_REVIEW.value, 0)
+        ),
         latest_event_id=latest,
         average_latency_ms=round(average_latency, 2),
         p95_latency_ms=round(p95_latency, 2),

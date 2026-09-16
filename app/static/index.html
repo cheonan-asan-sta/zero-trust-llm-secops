@@ -124,6 +124,26 @@
               <span id="latency">응답 시간</span>
             </div>
             <div id="decisionControls" class="control-list" aria-label="적용된 안전 통제"></div>
+            <div id="reviewWorkflow" class="review-workflow" hidden>
+              <div class="review-heading">
+                <span>ANALYST REVIEW</span>
+                <strong id="reviewStatusBadge">검토 대기</strong>
+              </div>
+              <label>
+                담당자
+                <input id="reviewerInput" type="text" maxlength="64" placeholder="담당자 이름" />
+              </label>
+              <label>
+                검토 메모
+                <textarea id="reviewNoteInput" maxlength="500" rows="3" placeholder="판단 근거와 후속 조치를 기록하세요"></textarea>
+              </label>
+              <div class="review-actions">
+                <button type="button" data-review-status="IN_REVIEW">검토 시작</button>
+                <button type="button" data-review-status="RESOLVED">해결 완료</button>
+                <button type="button" data-review-status="DISMISSED">오탐 처리</button>
+              </div>
+              <p id="reviewFeedback" class="review-feedback" aria-live="polite"></p>
+            </div>
           </article>
         </div>
       </section>
@@ -162,6 +182,7 @@
         <div class="metric-grid operation-metrics">
           <article><span>누적 분석</span><strong id="totalAnalyses">0</strong></article>
           <article><span>고위험 이상</span><strong id="highRiskCount">0</strong></article>
+          <article><span>검토 진행</span><strong id="pendingReviewCount">0</strong></article>
           <article><span>AI 교차분석</span><strong id="openaiCount">0</strong></article>
           <article><span>최근 이벤트</span><strong id="latestEvent">-</strong></article>
           <article><span>평균 응답</span><strong id="averageLatency">0ms</strong></article>
@@ -170,10 +191,10 @@
         <div class="history-wrap">
           <table>
             <thead>
-              <tr><th>시각</th><th>이벤트</th><th>분석기</th><th>위험도</th><th>대응</th></tr>
+              <tr><th>시각</th><th>이벤트</th><th>분석기</th><th>위험도</th><th>대응</th><th>검토</th><th></th></tr>
             </thead>
             <tbody id="historyBody">
-              <tr><td colspan="5" class="table-empty">기록을 불러오는 중입니다.</td></tr>
+              <tr><td colspan="7" class="table-empty">기록을 불러오는 중입니다.</td></tr>
             </tbody>
           </table>
         </div>
@@ -182,7 +203,7 @@
 
     <footer class="shell">
       <span>천안아산역 · Zero Trust LLM SecOps</span>
-      <span>SIMULATION ONLY · v0.4</span>
+      <span>SIMULATION ONLY · v0.5</span>
     </footer>
   </body>
 </html>

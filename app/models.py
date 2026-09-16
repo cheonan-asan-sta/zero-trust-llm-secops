@@ -35,6 +35,14 @@ class RecommendedAction(str, Enum):
     HOLD_FOR_REVIEW = "HOLD_FOR_REVIEW"
 
 
+class ReviewStatus(str, Enum):
+    NOT_REQUIRED = "NOT_REQUIRED"
+    PENDING = "PENDING"
+    IN_REVIEW = "IN_REVIEW"
+    RESOLVED = "RESOLVED"
+    DISMISSED = "DISMISSED"
+
+
 class EventAction(str, Enum):
     LOGIN = "LOGIN"
     READ = "READ"
@@ -264,6 +272,83 @@ class AnalysisResult(StrictModel):
     policy_decision: PolicyDecision
     latency_ms: float = Field(ge=0)
     analyzed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    review_status: ReviewStatus
+    reviewer: str | None = Field(default=None, min_length=2, max_length=64)
+    review_note: str | None = Field(default=None, min_length=3, max_length=500)
+    review_updated_at: datetime | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def default_review_status(cls, value: object) -> object:
+        if not isinstance(value, dict) or "review_status" in value:
+            return value
+        decision = value.get("policy_decision")
+        if isinstance(decision, dict):
+            requires_review = bool(decision.get("requires_human_review"))
+        else:
+            requires_review = bool(getattr(decision, "requires_human_review", False))
+        return {
+            **value,
+            "review_status": (
+                ReviewStatus.PENDING if requires_review else ReviewStatus.NOT_REQUIRED
+            ),
+        }
+
+    @model_validator(mode="after")
+    def validate_review_metadata(self) -> Self:
+        active_statuses = {
+            ReviewStatus.IN_REVIEW,
+            ReviewStatus.RESOLVED,
+            ReviewStatus.DISMISSED,
+        }
+        if self.review_status in active_statuses:
+            if self.reviewer is None or self.review_updated_at is None:
+                raise ValueError("reviewer and review_updated_at are required for reviewed results")
+            if (
+                self.review_status in {ReviewStatus.RESOLVED, ReviewStatus.DISMISSED}
+                and not self.review_note
+            ):
+                raise ValueError("resolved or dismissed reviews require a note")
+        elif any((self.reviewer, self.review_note, self.review_updated_at)):
+            raise ValueError("unreviewed results cannot contain review metadata")
+        if self.review_updated_at is not None and (
+            self.review_updated_at.tzinfo is None
+            or self.review_updated_at.utcoffset() is None
+        ):
+            raise ValueError("review_updated_at must include a timezone")
+        return self
+
+
+class ReviewUpdateRequest(StrictModel):
+    status: ReviewStatus
+    reviewer: str = Field(min_length=2, max_length=64)
+    note: str | None = Field(default=None, min_length=3, max_length=500)
+
+    @field_validator("reviewer")
+    @classmethod
+    def normalize_reviewer(cls, value: str) -> str:
+        normalized = value.strip()
+        if len(normalized) < 2:
+            raise ValueError("reviewer must contain at least two visible characters")
+        return normalized
+
+    @field_validator("note")
+    @classmethod
+    def normalize_note(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        normalized = value.strip()
+        if len(normalized) < 3:
+            raise ValueError("note must contain at least three visible characters")
+        return normalized
+
+    @model_validator(mode="after")
+    def validate_review_transition_request(self) -> Self:
+        if self.status in {ReviewStatus.NOT_REQUIRED, ReviewStatus.PENDING}:
+            raise ValueError("review updates require an active or terminal status")
+        if self.status in {ReviewStatus.RESOLVED, ReviewStatus.DISMISSED} and not self.note:
+            raise ValueError("resolved or dismissed reviews require a note")
+        return self
 
 
 class BatchAnalysisRequest(StrictModel):
@@ -282,6 +367,8 @@ class MetricsSummary(StrictModel):
     risk_counts: dict[str, int]
     action_counts: dict[str, int]
     analyzer_counts: dict[str, int]
+    review_counts: dict[str, int]
+    pending_review_count: int = Field(default=0, ge=0)
     latest_event_id: str | None = None
     average_latency_ms: float = Field(default=0, ge=0)
     p95_latency_ms: float = Field(default=0, ge=0)

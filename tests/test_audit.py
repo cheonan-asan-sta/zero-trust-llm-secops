@@ -1,7 +1,8 @@
 import asyncio
+from datetime import UTC, datetime
 
 from app.analyzers.rule_based import RuleBasedAnalyzer
-from app.models import AnalysisResult
+from app.models import AnalysisResult, ReviewStatus
 from app.scenarios import synthetic_events
 from app.services.audit import AuditStore, DynamoDBAuditStore
 from app.services.policy import response_preview
@@ -26,6 +27,38 @@ def test_audit_history_survives_restart(tmp_path) -> None:
     assert restored_store.get(event.event_id) is not None
     assert restored_store.metrics().total_analyses == 1
     assert restored_store.recent(1)[0].event_id == event.event_id
+
+
+def test_review_update_replaces_audit_snapshot_without_double_counting(tmp_path) -> None:
+    event = synthetic_events()[4]
+    assessment = asyncio.run(RuleBasedAnalyzer().analyze(event))
+    result = AnalysisResult(
+        event_id=event.event_id,
+        analyzer="rule",
+        assessment=assessment,
+        policy_decision=response_preview(assessment, event),
+        latency_ms=1.5,
+    )
+    log_path = tmp_path / "audit.jsonl"
+    store = AuditStore(log_path)
+    asyncio.run(store.save(result))
+
+    updated = AnalysisResult.model_validate(
+        {
+            **result.model_dump(),
+            "review_status": ReviewStatus.RESOLVED,
+            "reviewer": "보안담당자",
+            "review_note": "승인되지 않은 다운로드 세션을 종료했습니다.",
+            "review_updated_at": datetime.now(UTC),
+        }
+    )
+    asyncio.run(store.save(updated))
+
+    restored = AuditStore(log_path)
+    assert restored.metrics().total_analyses == 1
+    assert restored.metrics().pending_review_count == 0
+    assert restored.get(event.event_id).review_status == ReviewStatus.RESOLVED
+    assert restored.recent(1)[0].reviewer == "보안담당자"
 
 
 class _FakeDynamoTable:

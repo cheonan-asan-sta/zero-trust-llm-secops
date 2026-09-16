@@ -18,6 +18,7 @@ def test_dashboard_is_available() -> None:
     assert "천안아산역" in response.text
     assert "Zero Trust SecOps" in response.text
     assert "AI 교차분석" in response.text
+    assert "ANALYST REVIEW" in response.text
 
 
 def test_default_simulation_returns_eight_events() -> None:
@@ -55,6 +56,7 @@ def test_analysis_excludes_ground_truth_and_requires_review() -> None:
     assert result["assessment"]["risk_level"] in {"HIGH", "CRITICAL"}
     assert result["assessment"]["requires_human_review"] is True
     assert result["policy_decision"]["mode"] == "simulation"
+    assert result["review_status"] == "PENDING"
 
 
 def test_unknown_scenario_returns_404() -> None:
@@ -81,6 +83,7 @@ def test_metrics_and_recent_results_include_completed_analysis() -> None:
     assert recent.status_code == 200
     assert recent.json()[0]["event_id"] == "evt-zt-s03"
     assert "analyzed_at" in recent.json()[0]
+    assert "pending_review_count" in metrics.json()
 
 
 def test_batch_analysis_processes_multiple_events() -> None:
@@ -93,3 +96,81 @@ def test_batch_analysis_processes_multiple_events() -> None:
     assert payload["requested"] == 3
     assert payload["completed"] == 3
     assert len(payload["results"]) == 3
+
+
+def test_high_risk_result_can_be_reviewed_and_resolved() -> None:
+    event = client.post(
+        "/events/simulate",
+        json={"scenario_id": "ZT-S05", "count": 1},
+    ).json()[0]
+    analysis = client.post("/analysis", json=event).json()
+
+    started = client.patch(
+        f"/results/{analysis['event_id']}/review",
+        json={"status": "IN_REVIEW", "reviewer": "김분석"},
+    )
+    assert started.status_code == 200
+    assert started.json()["review_status"] == "IN_REVIEW"
+    assert started.json()["reviewer"] == "김분석"
+
+    resolved = client.patch(
+        f"/results/{analysis['event_id']}/review",
+        json={
+            "status": "RESOLVED",
+            "reviewer": "김분석",
+            "note": "유출 의심 세션을 확인하고 대응 미리보기를 승인했습니다.",
+        },
+    )
+    assert resolved.status_code == 200
+    assert resolved.json()["review_status"] == "RESOLVED"
+    assert resolved.json()["review_updated_at"] is not None
+
+    filtered = client.get("/results", params={"review_status": "RESOLVED"})
+    assert filtered.status_code == 200
+    assert any(item["analysis_id"] == analysis["analysis_id"] for item in filtered.json())
+
+    invalid_terminal_change = client.patch(
+        f"/results/{analysis['event_id']}/review",
+        json={
+            "status": "DISMISSED",
+            "reviewer": "김분석",
+            "note": "해결된 사건을 곧바로 오탐으로 바꾸려는 요청입니다.",
+        },
+    )
+    assert invalid_terminal_change.status_code == 409
+
+    reopened = client.patch(
+        f"/results/{analysis['event_id']}/review",
+        json={"status": "IN_REVIEW", "reviewer": "김분석", "note": "추가 검토를 시작합니다."},
+    )
+    assert reopened.status_code == 200
+    assert reopened.json()["review_status"] == "IN_REVIEW"
+
+
+def test_terminal_review_requires_a_note() -> None:
+    event = client.post(
+        "/events/simulate",
+        json={"scenario_id": "ZT-S04", "count": 1},
+    ).json()[0]
+    analysis = client.post("/analysis", json=event).json()
+
+    response = client.patch(
+        f"/results/{analysis['event_id']}/review",
+        json={"status": "DISMISSED", "reviewer": "김분석"},
+    )
+    assert response.status_code == 422
+
+
+def test_normal_result_cannot_enter_review_workflow() -> None:
+    event = client.post(
+        "/events/simulate",
+        json={"scenario_id": "NORMAL-01", "count": 1},
+    ).json()[0]
+    analysis = client.post("/analysis", json=event).json()
+    assert analysis["review_status"] == "NOT_REQUIRED"
+
+    response = client.patch(
+        f"/results/{analysis['event_id']}/review",
+        json={"status": "IN_REVIEW", "reviewer": "김분석"},
+    )
+    assert response.status_code == 409

@@ -4,6 +4,8 @@ const state = {
   running: false,
   analyzerMode: "rule",
   evaluating: false,
+  latestResult: null,
+  reviewing: false,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -37,6 +39,14 @@ const analyzerLabels = {
   rule: "규칙 분석",
   openai: "OpenAI 분석",
   hybrid: "하이브리드 분석",
+};
+
+const reviewStatusLabels = {
+  NOT_REQUIRED: "검토 불필요",
+  PENDING: "검토 대기",
+  IN_REVIEW: "조사 중",
+  RESOLVED: "해결 완료",
+  DISMISSED: "오탐 처리",
 };
 
 async function request(path, options = {}) {
@@ -145,7 +155,8 @@ async function runAnalysis() {
   }
 }
 
-function renderResult(result) {
+function renderResult(result, shouldScroll = true) {
+  state.latestResult = result;
   const assessment = result.assessment;
   const decision = result.policy_decision;
   $("resultEmpty").hidden = true;
@@ -182,7 +193,81 @@ function renderResult(result) {
     evidence.append(chip);
   });
 
-  $("resultSection").scrollIntoView({ behavior: "smooth", block: "start" });
+  renderReviewWorkflow(result);
+  if (shouldScroll) {
+    $("resultSection").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+function renderReviewWorkflow(result) {
+  const workflow = $("reviewWorkflow");
+  const status = result.review_status || "NOT_REQUIRED";
+  workflow.hidden = status === "NOT_REQUIRED";
+  if (workflow.hidden) return;
+
+  const badge = $("reviewStatusBadge");
+  badge.textContent = reviewStatusLabels[status] || status;
+  badge.dataset.status = status;
+  $("reviewerInput").value = result.reviewer || $("reviewerInput").value;
+  $("reviewNoteInput").value = result.review_note || "";
+  $("reviewFeedback").textContent = result.review_updated_at
+    ? `${formatTime(result.review_updated_at)} · ${result.reviewer}`
+    : "담당자를 지정해 검토를 시작하세요.";
+
+  const allowedTransitions = {
+    PENDING: ["IN_REVIEW", "RESOLVED", "DISMISSED"],
+    IN_REVIEW: ["IN_REVIEW", "RESOLVED", "DISMISSED"],
+    RESOLVED: ["IN_REVIEW"],
+    DISMISSED: ["IN_REVIEW"],
+  };
+  document.querySelectorAll("[data-review-status]").forEach((button) => {
+    const targetStatus = button.dataset.reviewStatus;
+    button.disabled = state.reviewing || !allowedTransitions[status]?.includes(targetStatus);
+    if (targetStatus === "IN_REVIEW") {
+      button.textContent = ["RESOLVED", "DISMISSED"].includes(status)
+        ? "검토 재개"
+        : status === "IN_REVIEW"
+          ? "메모 저장"
+          : "검토 시작";
+    }
+  });
+}
+
+async function submitReview(status) {
+  if (!state.latestResult || state.reviewing) return;
+  const reviewer = $("reviewerInput").value.trim();
+  const note = $("reviewNoteInput").value.trim();
+  if (reviewer.length < 2) {
+    $("reviewFeedback").textContent = "담당자 이름을 두 글자 이상 입력하세요.";
+    return;
+  }
+  if (["RESOLVED", "DISMISSED"].includes(status) && note.length < 3) {
+    $("reviewFeedback").textContent = "완료 또는 오탐 처리에는 검토 메모가 필요합니다.";
+    return;
+  }
+
+  state.reviewing = true;
+  $("reviewFeedback").textContent = "검토 상태를 저장하고 있습니다…";
+  document.querySelectorAll("[data-review-status]").forEach((button) => {
+    button.disabled = true;
+  });
+
+  try {
+    const updated = await request(
+      `/results/${encodeURIComponent(state.latestResult.event_id)}/review`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ status, reviewer, note: note || null }),
+      },
+    );
+    state.reviewing = false;
+    renderResult(updated, false);
+    await refreshSummary();
+  } catch (error) {
+    state.reviewing = false;
+    renderReviewWorkflow(state.latestResult);
+    $("reviewFeedback").textContent = `저장하지 못했습니다: ${error.message}`;
+  }
 }
 
 function formatTime(value) {
@@ -202,7 +287,7 @@ function renderHistory(results) {
   if (!results.length) {
     const row = document.createElement("tr");
     const cell = document.createElement("td");
-    cell.colSpan = 5;
+    cell.colSpan = 7;
     cell.className = "table-empty";
     cell.textContent = "아직 분석 기록이 없습니다.";
     row.append(cell);
@@ -225,6 +310,23 @@ function renderHistory(results) {
       if (index === 3) cell.className = `table-risk ${value}`;
       row.append(cell);
     });
+
+    const reviewCell = document.createElement("td");
+    const reviewBadge = document.createElement("span");
+    const reviewStatus = result.review_status || "NOT_REQUIRED";
+    reviewBadge.className = `review-badge ${reviewStatus.toLowerCase()}`;
+    reviewBadge.textContent = reviewStatusLabels[reviewStatus] || reviewStatus;
+    reviewCell.append(reviewBadge);
+    row.append(reviewCell);
+
+    const actionCell = document.createElement("td");
+    const openButton = document.createElement("button");
+    openButton.type = "button";
+    openButton.className = "table-action";
+    openButton.textContent = "열기";
+    openButton.addEventListener("click", () => renderResult(result));
+    actionCell.append(openButton);
+    row.append(actionCell);
     body.append(row);
   });
 }
@@ -238,6 +340,7 @@ async function refreshSummary() {
     $("totalAnalyses").textContent = metrics.total_analyses;
     $("highRiskCount").textContent =
       (metrics.risk_counts.HIGH || 0) + (metrics.risk_counts.CRITICAL || 0);
+    $("pendingReviewCount").textContent = metrics.pending_review_count || 0;
     $("openaiCount").textContent =
       (metrics.analyzer_counts.openai || 0) + (metrics.analyzer_counts.hybrid || 0);
     $("latestEvent").textContent = metrics.latest_event_id || "-";
@@ -245,7 +348,7 @@ async function refreshSummary() {
     $("p95Latency").textContent = `${metrics.p95_latency_ms.toFixed(1)}ms`;
     renderHistory(results);
   } catch (_) {
-    $("historyBody").innerHTML = '<tr><td colspan="5" class="table-empty">기록을 불러오지 못했습니다.</td></tr>';
+    $("historyBody").innerHTML = '<tr><td colspan="7" class="table-empty">기록을 불러오지 못했습니다.</td></tr>';
   }
 }
 
@@ -300,4 +403,7 @@ async function initialize() {
 $("analyzeButton").addEventListener("click", runAnalysis);
 $("refreshButton").addEventListener("click", refreshSummary);
 $("evaluationButton").addEventListener("click", runEvaluation);
+document.querySelectorAll("[data-review-status]").forEach((button) => {
+  button.addEventListener("click", () => submitReview(button.dataset.reviewStatus));
+});
 initialize();
