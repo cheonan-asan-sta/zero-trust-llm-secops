@@ -23,6 +23,7 @@ from app.models import (
     BatchAnalysisResult,
     ControlRecord,
     ControlStatus,
+    CorrelationPolicy,
     CorrelationRequest,
     CorrelationResult,
     DetectionPipelineResult,
@@ -30,6 +31,12 @@ from app.models import (
     EvaluationRequest,
     EvaluationSummary,
     EventScenarioEvaluation,
+    IncidentCase,
+    IncidentCaseCreateRequest,
+    IncidentCaseCreateResult,
+    IncidentCaseMetrics,
+    IncidentCaseStatus,
+    IncidentCaseUpdateRequest,
     IncidentQualityReport,
     MetricsSummary,
     NormalizedSecurityEvent,
@@ -50,6 +57,14 @@ from app.scenarios import SCENARIOS, generate_events, get_scenario
 from app.security import Principal, Role, require_roles
 from app.services.assurance import get_assurance_registry
 from app.services.audit import create_audit_store
+from app.services.cases import (
+    ALLOWED_TRANSITIONS,
+    CaseConflictError,
+    CaseNotFoundError,
+    IncidentCaseService,
+    InvalidCaseTransitionError,
+    create_case_store,
+)
 from app.services.correlation import get_correlation_engine
 from app.services.detection_quality import get_detection_quality_service
 from app.services.evaluation import run_evaluation
@@ -75,6 +90,8 @@ app.add_middleware(RequestBodyLimitMiddleware, max_bytes=settings.api_max_body_b
 app.add_middleware(RequestContextMiddleware)
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 audit_store = create_audit_store(settings)
+case_store = create_case_store(settings)
+case_service = IncidentCaseService(case_store)
 assurance_registry = get_assurance_registry()
 ocsf_normalizer = get_ocsf_normalizer()
 sigma_engine = get_sigma_engine()
@@ -115,6 +132,7 @@ def health() -> dict:
         "version": settings.app_version,
         "analyzer_mode": settings.analyzer_mode,
         "audit_backend": settings.audit_backend,
+        "case_backend": case_store.integrity()["backend"],
         "auth_mode": settings.auth_mode,
         "environment": settings.app_environment,
     }
@@ -128,6 +146,7 @@ def liveness() -> dict:
 @app.get("/health/ready")
 def readiness() -> Response:
     integrity = audit_store.integrity()
+    case_integrity = case_store.integrity()
     assurance = assurance_registry.summary()
     quality = (
         detection_quality_service.evaluate("readiness")
@@ -141,6 +160,7 @@ def readiness() -> Response:
     )
     ready = (
         integrity["ok"]
+        and case_integrity["ok"]
         and assurance.valid
         and sigma_engine.valid
         and public_replay_service.valid
@@ -152,6 +172,13 @@ def readiness() -> Response:
     payload = {
         "status": "ready" if ready else "degraded",
         "audit": integrity,
+        "case_management": {
+            **case_integrity,
+            "valid": case_integrity["ok"],
+            "lifecycle": [status.value for status in IncidentCaseStatus],
+            "response_mode": "simulation",
+            "allowed_transition_count": sum(len(values) for values in ALLOWED_TRANSITIONS.values()),
+        },
         "assurance": {
             "valid": assurance.valid,
             "registry_version": assurance.registry_version,
@@ -288,8 +315,16 @@ def correlate_incidents(
     request: CorrelationRequest,
     principal: AnalystPrincipal,
 ) -> CorrelationResult:
+    return _correlate(request.events, request.policy, principal.tenant_id)
+
+
+def _correlate(
+    events: list[SecurityEvent],
+    policy: CorrelationPolicy,
+    tenant_id: str,
+) -> CorrelationResult:
     pipelines = []
-    for event in request.events:
+    for event in events:
         normalized = ocsf_normalizer.normalize(event)
         pipelines.append(
             DetectionPipelineResult(
@@ -297,7 +332,76 @@ def correlate_incidents(
                 detection=sigma_engine.evaluate(normalized),
             )
         )
-    return correlation_engine.correlate(pipelines, principal.tenant_id, request.policy)
+    return correlation_engine.correlate(pipelines, tenant_id, policy)
+
+
+@app.post("/cases/from-events", response_model=IncidentCaseCreateResult)
+async def create_cases_from_events(
+    request: IncidentCaseCreateRequest,
+    principal: AnalystPrincipal,
+) -> IncidentCaseCreateResult:
+    correlation = _correlate(request.events, request.policy, principal.tenant_id)
+    try:
+        cases, created_count, reused_count = await case_service.create_from_correlation(
+            correlation,
+            principal.tenant_id,
+            principal.subject,
+            request.note,
+        )
+    except CaseConflictError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    return IncidentCaseCreateResult(
+        correlation=correlation,
+        created_case_count=created_count,
+        reused_case_count=reused_count,
+        cases=cases,
+    )
+
+
+@app.get("/cases/metrics", response_model=IncidentCaseMetrics)
+def case_metrics(principal: ViewerPrincipal) -> IncidentCaseMetrics:
+    return case_store.metrics(principal.tenant_id)
+
+
+@app.get("/cases", response_model=list[IncidentCase])
+def recent_cases(
+    principal: ViewerPrincipal,
+    limit: int = 20,
+    status: IncidentCaseStatus | None = None,
+) -> list[IncidentCase]:
+    safe_limit = min(max(limit, 1), 100)
+    return case_store.recent(safe_limit, principal.tenant_id, status)
+
+
+@app.get("/cases/{case_id}", response_model=IncidentCase)
+def case_detail(case_id: str, principal: ViewerPrincipal) -> IncidentCase:
+    record = case_store.get(case_id, principal.tenant_id)
+    if record is None:
+        raise HTTPException(status_code=404, detail="Case not found")
+    return record
+
+
+@app.patch("/cases/{case_id}", response_model=IncidentCase)
+async def update_case(
+    case_id: str,
+    request: IncidentCaseUpdateRequest,
+    principal: ResponderPrincipal,
+) -> IncidentCase:
+    try:
+        return await case_service.transition(
+            case_id,
+            principal.tenant_id,
+            principal.subject,
+            request,
+        )
+    except CaseNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Case not found") from exc
+    except (CaseConflictError, InvalidCaseTransitionError) as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @app.get("/replay/public/datasets", response_model=list[PublicReplayDataset])

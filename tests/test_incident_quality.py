@@ -75,7 +75,7 @@ def test_incident_quality_fingerprint_is_reproducible_and_tenant_independent() -
     assert len(tenant_a.evaluation_fingerprint_sha256) == 64
     assert tenant_a.evaluation_fingerprint_sha256 == tenant_b.evaluation_fingerprint_sha256
     assert tenant_a.manifest_digest_sha256 == tenant_b.manifest_digest_sha256
-    assert tenant_a.correlation_version == "0.13.0"
+    assert tenant_a.correlation_version == "0.14.0"
 
 
 def test_incident_quality_api_and_readiness_expose_gate() -> None:
@@ -83,7 +83,7 @@ def test_incident_quality_api_and_readiness_expose_gate() -> None:
     readiness = client.get("/health/ready")
 
     assert response.status_code == 200
-    assert response.json()["evaluation_version"] == "0.13.0"
+    assert response.json()["evaluation_version"] == "0.14.0"
     assert response.json()["gate_passed"] is True
     assert response.json()["positive_dataset_support"] == 1
     assert readiness.status_code == 200

@@ -43,6 +43,15 @@ class ReviewStatus(str, Enum):
     DISMISSED = "DISMISSED"
 
 
+class IncidentCaseStatus(str, Enum):
+    NEW = "NEW"
+    TRIAGED = "TRIAGED"
+    INVESTIGATING = "INVESTIGATING"
+    CONTAINED = "CONTAINED"
+    RESOLVED = "RESOLVED"
+    CLOSED = "CLOSED"
+
+
 class ControlStatus(str, Enum):
     IMPLEMENTED = "implemented"
     PARTIAL = "partially_implemented"
@@ -578,6 +587,142 @@ class CorrelationResult(StrictModel):
     window_summaries: list[CorrelationWindowSummary] = Field(min_length=1, max_length=6)
     entity_graph: CorrelationEntityGraph
     incidents: list[OCSFIncidentFinding] = Field(default_factory=list, max_length=100)
+
+
+class IncidentCaseHistoryEntry(StrictModel):
+    sequence: int = Field(ge=1, le=100)
+    from_status: IncidentCaseStatus | None = None
+    to_status: IncidentCaseStatus
+    changed_at: datetime
+    actor_id: str = Field(min_length=1, max_length=128)
+    note: str = Field(min_length=3, max_length=500)
+    assignee: str | None = Field(default=None, min_length=2, max_length=128)
+    evidence_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+    @field_validator("changed_at")
+    @classmethod
+    def validate_changed_at(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("changed_at must include a timezone")
+        return value
+
+
+class IncidentCase(StrictModel):
+    case_id: str = Field(pattern=r"^case-[a-f0-9]{32}$")
+    incident_uid: str = Field(pattern=r"^inc-[a-f0-9]{32}$")
+    title: str = Field(min_length=5, max_length=200)
+    severity_id: Literal[3, 4, 5]
+    status: IncidentCaseStatus = IncidentCaseStatus.NEW
+    tenant_id: str = Field(pattern=r"^[a-zA-Z0-9._-]{1,64}$")
+    assignee: str | None = Field(default=None, min_length=2, max_length=128)
+    created_at: datetime
+    updated_at: datetime
+    version: int = Field(ge=1, le=100)
+    incident: OCSFIncidentFinding
+    evidence_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    history: list[IncidentCaseHistoryEntry] = Field(min_length=1, max_length=100)
+    requires_human_review: Literal[True] = True
+    response_mode: Literal["simulation"] = "simulation"
+
+    @model_validator(mode="after")
+    def validate_case_consistency(self) -> Self:
+        for field_name, value in (
+            ("created_at", self.created_at),
+            ("updated_at", self.updated_at),
+        ):
+            if value.tzinfo is None or value.utcoffset() is None:
+                raise ValueError(f"{field_name} must include a timezone")
+        if self.updated_at < self.created_at:
+            raise ValueError("updated_at must not precede created_at")
+        if self.incident_uid != self.incident.incident_uid:
+            raise ValueError("case incident_uid must match the incident snapshot")
+        if self.tenant_id != self.incident.tenant_id:
+            raise ValueError("case tenant_id must match the incident snapshot")
+        if self.title != self.incident.title or self.severity_id != self.incident.severity_id:
+            raise ValueError("case title and severity must match the incident snapshot")
+        if self.version != len(self.history):
+            raise ValueError("case version must match the history length")
+        for index, entry in enumerate(self.history, start=1):
+            if entry.sequence != index:
+                raise ValueError("case history sequence must be contiguous")
+            if entry.evidence_sha256 != self.evidence_sha256:
+                raise ValueError("case history must retain the immutable evidence digest")
+            if index == 1:
+                if entry.from_status is not None or entry.to_status != IncidentCaseStatus.NEW:
+                    raise ValueError("case history must begin with NEW")
+            else:
+                previous = self.history[index - 2]
+                if entry.from_status != previous.to_status:
+                    raise ValueError("case history status chain is invalid")
+            if index > 1 and entry.changed_at < self.history[index - 2].changed_at:
+                raise ValueError("case history timestamps must be monotonic")
+        if self.status != self.history[-1].to_status:
+            raise ValueError("case status must match the latest history entry")
+        if self.updated_at != self.history[-1].changed_at:
+            raise ValueError("case updated_at must match the latest history entry")
+        return self
+
+
+class IncidentCaseCreateRequest(CorrelationRequest):
+    note: str = Field(
+        default="Case created from correlated incident evidence.",
+        min_length=3,
+        max_length=500,
+    )
+
+    @field_validator("note")
+    @classmethod
+    def normalize_note(cls, value: str) -> str:
+        normalized = value.strip()
+        if len(normalized) < 3:
+            raise ValueError("note must contain at least three visible characters")
+        return normalized
+
+
+class IncidentCaseCreateResult(StrictModel):
+    correlation: CorrelationResult
+    created_case_count: int = Field(ge=0, le=100)
+    reused_case_count: int = Field(ge=0, le=100)
+    cases: list[IncidentCase] = Field(default_factory=list, max_length=100)
+
+    @model_validator(mode="after")
+    def validate_counts(self) -> Self:
+        if self.created_case_count + self.reused_case_count != len(self.cases):
+            raise ValueError("case creation counts must match returned cases")
+        return self
+
+
+class IncidentCaseUpdateRequest(StrictModel):
+    status: IncidentCaseStatus
+    expected_version: int = Field(ge=1, le=99)
+    assignee: str | None = Field(default=None, min_length=2, max_length=128)
+    note: str = Field(min_length=3, max_length=500)
+
+    @field_validator("assignee")
+    @classmethod
+    def normalize_assignee(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        normalized = value.strip()
+        if len(normalized) < 2:
+            raise ValueError("assignee must contain at least two visible characters")
+        return normalized
+
+    @field_validator("note")
+    @classmethod
+    def normalize_update_note(cls, value: str) -> str:
+        normalized = value.strip()
+        if len(normalized) < 3:
+            raise ValueError("note must contain at least three visible characters")
+        return normalized
+
+
+class IncidentCaseMetrics(StrictModel):
+    total_cases: int = Field(ge=0)
+    open_case_count: int = Field(ge=0)
+    unassigned_case_count: int = Field(ge=0)
+    status_counts: dict[str, int]
+    latest_case_id: str | None = None
 
 
 class PublicReplayDataset(StrictModel):

@@ -12,7 +12,7 @@ from app.models import (
 from app.services.public_replay import PublicReplayService, get_public_replay_service
 from app.services.sigma import SigmaEngine, get_sigma_engine
 
-EVALUATION_VERSION = "0.13.0"
+EVALUATION_VERSION = "0.14.0"
 
 
 class DetectionQualityService:

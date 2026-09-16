@@ -7,6 +7,7 @@ const state = {
   latestResult: null,
   reviewing: false,
   replaying: false,
+  caseCreating: false,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -48,6 +49,15 @@ const reviewStatusLabels = {
   IN_REVIEW: "조사 중",
   RESOLVED: "해결 완료",
   DISMISSED: "오탐 처리",
+};
+
+const caseStatusLabels = {
+  NEW: "신규",
+  TRIAGED: "분류 완료",
+  INVESTIGATING: "조사 중",
+  CONTAINED: "봉쇄 확인",
+  RESOLVED: "해결 완료",
+  CLOSED: "종결",
 };
 
 async function request(path, options = {}) {
@@ -380,6 +390,90 @@ async function refreshSummary() {
   }
 }
 
+function renderCases(cases) {
+  const body = $("caseBody");
+  body.replaceChildren();
+  if (!cases.length) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 6;
+    cell.className = "table-empty";
+    cell.textContent = "아직 생성된 사고 케이스가 없습니다.";
+    row.append(cell);
+    body.append(row);
+    return;
+  }
+  cases.forEach((record) => {
+    const row = document.createElement("tr");
+    const values = [
+      formatTime(record.updated_at),
+      record.case_id,
+      record.severity_id,
+      caseStatusLabels[record.status] || record.status,
+      record.assignee || "미배정",
+      `v${record.version}`,
+    ];
+    values.forEach((value, index) => {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      if (index === 3) cell.className = `case-status ${record.status.toLowerCase()}`;
+      row.append(cell);
+    });
+    body.append(row);
+  });
+}
+
+async function refreshCases() {
+  try {
+    const [metrics, cases] = await Promise.all([
+      request("/cases/metrics"),
+      request("/cases?limit=8"),
+    ]);
+    $("caseTotal").textContent = metrics.total_cases;
+    $("caseOpen").textContent = metrics.open_case_count;
+    $("caseUnassigned").textContent = metrics.unassigned_case_count;
+    $("caseLatest").textContent = metrics.latest_case_id || "-";
+    renderCases(cases);
+  } catch (_) {
+    $("caseBody").innerHTML = '<tr><td colspan="6" class="table-empty">케이스를 불러오지 못했습니다.</td></tr>';
+  }
+}
+
+async function createDemoCase() {
+  if (state.caseCreating) return;
+  state.caseCreating = true;
+  $("caseCreateButton").disabled = true;
+  $("caseCreateButton").textContent = "상관분석 중…";
+  $("caseState").textContent = "5개 합성 공격 이벤트를 묶어 사고 근거와 케이스를 생성하고 있습니다.";
+  try {
+    const threatScenarios = state.scenarios.filter((scenario) => scenario.category === "THREAT");
+    const generated = await Promise.all(
+      threatScenarios.map((scenario) => request("/events/simulate", {
+        method: "POST",
+        body: JSON.stringify({ scenario_id: scenario.scenario_id, count: 1 }),
+      })),
+    );
+    const events = generated.flat();
+    const result = await request("/cases/from-events", {
+      method: "POST",
+      body: JSON.stringify({
+        events,
+        note: "대시보드에서 합성 공격 체인의 상관분석 결과를 케이스로 생성했습니다.",
+      }),
+    });
+    await refreshCases();
+    $("caseState").textContent = result.created_case_count
+      ? "새 사고 케이스를 생성했습니다. 실제 조치는 수행되지 않았으며 담당자 분류를 기다립니다."
+      : "동일한 증거의 기존 케이스를 재사용했습니다. 중복 케이스는 생성하지 않았습니다.";
+  } catch (error) {
+    $("caseState").textContent = `케이스를 생성하지 못했습니다: ${error.message}`;
+  } finally {
+    state.caseCreating = false;
+    $("caseCreateButton").disabled = false;
+    $("caseCreateButton").textContent = "합성 공격 케이스 생성";
+  }
+}
+
 function formatPercent(value) {
   return `${Math.round(value * 100)}%`;
 }
@@ -626,13 +720,14 @@ async function initialize() {
     setHealthError();
     $("scenarioGrid").textContent = "서버와 연결되지 않았습니다.";
   }
-  await Promise.all([refreshSummary(), loadAssuranceSummary()]);
+  await Promise.all([refreshSummary(), refreshCases(), loadAssuranceSummary()]);
 }
 
 $("analyzeButton").addEventListener("click", runAnalysis);
 $("refreshButton").addEventListener("click", refreshSummary);
 $("evaluationButton").addEventListener("click", runEvaluation);
 $("replayButton").addEventListener("click", runPublicReplay);
+$("caseCreateButton").addEventListener("click", createDemoCase);
 document.querySelectorAll("[data-review-status]").forEach((button) => {
   button.addEventListener("click", () => submitReview(button.dataset.reviewStatus));
 });

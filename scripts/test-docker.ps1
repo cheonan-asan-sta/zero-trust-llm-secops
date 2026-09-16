@@ -42,6 +42,7 @@ try {
         --tmpfs /tmp:rw,noexec,nosuid,size=64m `
         --tmpfs /data:rw,noexec,nosuid,uid=10001,gid=10001,mode=0700,size=64m `
         --env ANALYZER_MODE=rule `
+        --env CASE_LOG_PATH=/data/cases.jsonl `
         --publish "127.0.0.1:${Port}:8000" `
         $ImageTag | Out-Null
 
@@ -58,13 +59,15 @@ try {
     if (-not $health -or $health.status -ne "ok" -or $health.analyzer_mode -ne "rule") {
         throw "Container health check did not become ready in rule mode."
     }
-    if ($health.version -ne "0.13.0" -or $health.auth_mode -ne "disabled") {
+    if ($health.version -ne "0.14.0" -or $health.auth_mode -ne "disabled") {
         throw "Container did not start with the expected local security profile."
     }
     $readiness = Invoke-RestMethod -Method Get -Uri "$baseUrl/health/ready" -TimeoutSec 2
     if (
         $readiness.status -ne "ready" -or
         -not $readiness.audit.ok -or
+        -not $readiness.case_management.valid -or
+        $readiness.case_management.response_mode -ne "simulation" -or
         -not $readiness.assurance.valid -or
         $readiness.assurance.total_controls -ne 18 -or
         $readiness.normalization.schema_version -ne "1.9.0" -or
@@ -121,6 +124,58 @@ try {
     $incidentQuality = Invoke-RestMethod `
         -Method Get `
         -Uri "$baseUrl/evaluation/incident-quality"
+
+    $caseEvents = @()
+    foreach ($scenarioId in @("ZT-S01", "ZT-S02", "ZT-S03", "ZT-S04", "ZT-S05")) {
+        $generated = Invoke-RestMethod `
+            -Method Post `
+            -Uri "$baseUrl/events/simulate" `
+            -ContentType "application/json" `
+            -Body (@{ scenario_id = $scenarioId; count = 1 } | ConvertTo-Json -Compress)
+        $caseEvents += @($generated)[0]
+    }
+    $caseCreation = Invoke-RestMethod `
+        -Method Post `
+        -Uri "$baseUrl/cases/from-events" `
+        -ContentType "application/json" `
+        -Body (@{
+            events = $caseEvents
+            note = "Docker QA correlated synthetic evidence into an incident case."
+        } | ConvertTo-Json -Depth 20 -Compress)
+    if (
+        $caseCreation.created_case_count -ne 1 -or
+        $caseCreation.reused_case_count -ne 0 -or
+        $caseCreation.cases[0].status -ne "NEW" -or
+        $caseCreation.cases[0].response_mode -ne "simulation"
+    ) {
+        throw "Incident case creation did not produce one simulation-only NEW case."
+    }
+    $caseRecord = $caseCreation.cases[0]
+    foreach ($nextStatus in @("TRIAGED", "INVESTIGATING", "CONTAINED", "RESOLVED", "CLOSED")) {
+        $caseRecord = Invoke-RestMethod `
+            -Method Patch `
+            -Uri "$baseUrl/cases/$($caseRecord.case_id)" `
+            -ContentType "application/json" `
+            -Body (@{
+                status = $nextStatus
+                expected_version = $caseRecord.version
+                assignee = "Docker QA"
+                note = "Docker QA verified the $nextStatus lifecycle checkpoint."
+            } | ConvertTo-Json -Compress)
+    }
+    $caseMetrics = Invoke-RestMethod -Method Get -Uri "$baseUrl/cases/metrics"
+    $caseReadiness = Invoke-RestMethod -Method Get -Uri "$baseUrl/health/ready"
+    if (
+        $caseRecord.status -ne "CLOSED" -or
+        $caseRecord.version -ne 6 -or
+        $caseRecord.history.Count -ne 6 -or
+        $caseMetrics.total_cases -ne 1 -or
+        $caseMetrics.open_case_count -ne 0 -or
+        -not $caseReadiness.case_management.ok -or
+        $caseReadiness.case_management.verified_lines -ne 6
+    ) {
+        throw "Incident case lifecycle, metrics, or hash-chain readiness check failed."
+    }
 
     if ($analysis.assessment.risk_level -notin @("HIGH", "CRITICAL")) {
         throw "Threat smoke test returned an unexpectedly low risk."
@@ -200,6 +255,9 @@ try {
         action = $analysis.assessment.recommended_action
         review_status = $resolved.review_status
         audit_integrity = $readiness.audit.ok
+        case_integrity = $caseReadiness.case_management.ok
+        case_status = $caseRecord.status
+        case_version = $caseRecord.version
         assurance_registry_integrity = $readiness.assurance.valid
         assurance_control_count = $readiness.assurance.total_controls
         ocsf_schema_version = $readiness.normalization.schema_version

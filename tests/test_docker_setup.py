@@ -8,12 +8,14 @@ def test_local_image_runs_as_non_root_with_healthcheck() -> None:
     assert "--uid 10001" in dockerfile
     assert "HEALTHCHECK" in dockerfile
     assert "ANALYZER_MODE=rule" in dockerfile
+    assert "CASE_LOG_PATH=/data/cases.jsonl" in dockerfile
 
 
 def test_compose_uses_cost_free_restricted_rule_mode() -> None:
     compose = Path("compose.yaml").read_text(encoding="utf-8")
 
     assert "ANALYZER_MODE: rule" in compose
+    assert "CASE_LOG_PATH: /data/cases.jsonl" in compose
     assert "read_only: true" in compose
     assert "no-new-privileges:true" in compose
     assert "cap_drop:" in compose

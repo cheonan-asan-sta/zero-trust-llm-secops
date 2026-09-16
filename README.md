@@ -33,6 +33,8 @@ LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 �
 - 동일 증거가 여러 시간창에서 재발견될 때 가장 짧은 창 결과만 남기는 결정적 사고 중복 제거
 - 규칙별 혼동행렬·Precision·Recall·F1·오탐률, 파싱 성공률, OCSF 매핑률과 실패 폐쇄형 품질 게이트
 - 공개 데이터셋별 사건 Precision·Recall·F1·오상관률, 시간창·그래프·중복 제거 정확도와 재현 지문
+- 상관분석 결과를 테넌트별 사고 케이스로 보존하고 신규→분류→조사→봉쇄→해결→종결 순서를 강제하는 수명주기
+- 담당자·변경 메모·불변 증거 지문·전체 이력과 낙관적 버전 잠금을 갖춘 케이스 저장소
 - 공공·기업 보안 기준 18개를 구현·부분 구현·계획으로 구분한 기계판독 통제대장
 - 완료 통제의 코드·구성·자동 시험 증거를 강제하는 보증 검증기와 준비도 API
 - 천안아산역 콘셉트의 한국어 관제 대시보드
@@ -100,7 +102,7 @@ docker compose up --build
 docker compose down
 ```
 
-로컬 감사 기록까지 함께 지우려면 `docker compose down --volumes`를 사용합니다.
+로컬 감사·사고 케이스 기록까지 함께 지우려면 `docker compose down --volumes`를 사용합니다.
 
 Docker 내부 코드 검사·단위 테스트와 실제 API 스모크 테스트를 한 번에 실행하려면 다음 스크립트를 사용합니다. 테스트 컨테이너는 성공 여부와 관계없이 자동으로 제거됩니다.
 
@@ -160,6 +162,11 @@ HYBRID_LLM_TIMEOUT_SECONDS=2.5
 | POST | `/detections/evaluate` | OCSF 정규화 후 승인된 Sigma 규칙 재생 |
 | GET | `/detections/rules` | 규칙 상태·버전·해시·시험 사례 목록 |
 | POST | `/incidents/correlate` | 최대 100개 이벤트를 다중 시간창·엔터티 그래프로 연결해 OCSF Incident Finding 생성 |
+| POST | `/cases/from-events` | 이벤트 상관분석 후 중복 없는 테넌트별 사고 케이스 생성 |
+| GET | `/cases` | 현재 테넌트의 최근 사고 케이스와 상태 조회 |
+| GET | `/cases/metrics` | 전체·진행 중·미배정 사고 케이스 집계 |
+| GET | `/cases/{case_id}` | 증거 지문과 변경 이력을 포함한 케이스 상세 조회 |
+| PATCH | `/cases/{case_id}` | responder 권한으로 버전 확인 후 승인된 다음 상태로 전환 |
 | GET | `/replay/public/datasets` | 고정된 공개 공격·정상 데이터셋의 출처·라이선스·해시 조회 |
 | POST | `/replay/public/run` | 공개 로그 12건의 탐지·오탐·사고 상관분석 회귀시험 |
 | POST | `/replay/public/{dataset_id}` | 지정한 공개 데이터셋만 오프라인 재생 |
@@ -181,14 +188,14 @@ HYBRID_LLM_TIMEOUT_SECONDS=2.5
 app/
   analyzers/       규칙 기반 및 OpenAI 분석기
   data/            기계판독 통제대장, Sigma 규칙, 고정 공개 로그 표본
-  services/        정책·감사·보증·OCSF·Sigma·공개 재생·탐지 품질·사고 상관분석
+  services/        정책·감사·보증·OCSF·Sigma·공개 재생·탐지 품질·사고 상관분석·케이스 관리
   config.py        환경변수 설정
   main.py          FastAPI 엔드포인트
   models.py        이벤트 및 분석 결과 모델
   scenarios.py     합성 이벤트 8건
   static/           관제 대시보드 화면
 tests/             API와 정책 테스트
-runtime/           실행 중 생성되는 감사 기록
+runtime/           실행 중 생성되는 감사·사고 케이스 기록
 docs/week03/       3주차 위협 모델·이벤트 스키마·아키텍처 산출물
 docs/week04/       정책 예외·조건 평가·가속 개발 산출물
 docs/week05/       비용 없는 로컬 Docker 검증 산출물

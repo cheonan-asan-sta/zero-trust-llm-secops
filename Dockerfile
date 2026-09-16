@@ -7,7 +7,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_RETRIES=5 \
     ANALYZER_MODE=rule \
     AUDIT_BACKEND=jsonl \
-    AUDIT_LOG_PATH=/data/audit.jsonl
+    AUDIT_LOG_PATH=/data/audit.jsonl \
+    CASE_LOG_PATH=/data/cases.jsonl
 
 WORKDIR /app
 

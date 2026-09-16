@@ -311,6 +311,12 @@ h1 span { color: var(--blue); }
 .replay-grid strong { font-size: 22px; }
 .quality-grid { grid-template-columns: repeat(4, 1fr); }
 .quality-grid strong { font-size: 20px; }
+.case-metrics { grid-template-columns: repeat(4, 1fr); }
+.case-metrics article:nth-child(4) strong { font-size: 13px; letter-spacing: -0.02em; }
+.case-status { font-weight: 900; }
+.case-status.new, .case-status.triaged { color: var(--orange); }
+.case-status.investigating, .case-status.contained { color: var(--blue); }
+.case-status.resolved, .case-status.closed { color: var(--green); }
 .assurance-grid { grid-template-columns: repeat(6, 1fr); }
 .assurance-grid strong { font-size: 24px; }
 .assurance-domains { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px; }

@@ -271,6 +271,40 @@
         </div>
       </section>
 
+      <section class="summary-section shell case-section">
+        <div class="section-heading-row">
+          <div>
+            <p class="section-kicker">INCIDENT CASE MANAGEMENT</p>
+            <h2>사고 케이스</h2>
+          </div>
+          <button id="caseCreateButton" class="secondary-button" type="button">
+            합성 공격 케이스 생성
+          </button>
+        </div>
+        <p id="caseState" class="evaluation-state">
+          상관분석된 사고를 사람 검토가 필요한 케이스로 보존합니다. 실제 차단 조치는 실행하지 않습니다.
+        </p>
+        <div class="metric-grid case-metrics">
+          <article><span>전체 케이스</span><strong id="caseTotal">0</strong></article>
+          <article><span>진행 중</span><strong id="caseOpen">0</strong></article>
+          <article><span>미배정</span><strong id="caseUnassigned">0</strong></article>
+          <article><span>최근 케이스</span><strong id="caseLatest">-</strong></article>
+        </div>
+        <div class="history-wrap">
+          <table>
+            <thead>
+              <tr><th>갱신 시각</th><th>케이스</th><th>심각도</th><th>상태</th><th>담당자</th><th>버전</th></tr>
+            </thead>
+            <tbody id="caseBody">
+              <tr><td colspan="6" class="table-empty">케이스를 불러오는 중입니다.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="assurance-notice">
+          신규→분류→조사→봉쇄→해결→종결 순서를 강제하며 모든 변경은 증거 지문과 함께 해시 체인에 기록됩니다.
+        </p>
+      </section>
+
       <section class="summary-section shell evaluation-section">
         <div class="section-heading-row">
           <div>

@@ -1,5 +1,5 @@
 {
-  "registry_version": "2026.09.6",
+  "registry_version": "2026.09.7",
   "controls": [
     {
       "control_id": "GOV-01",
@@ -626,11 +626,29 @@
           "kind": "automated_test",
           "location": "tests/test_entity_graph_correlation.py",
           "description": "그래프 결정성·테넌트 격리·관계 완전성·다중 시간창·중복 제거의 회귀 시험"
+        },
+        {
+          "evidence_id": "EVD-IR-CASE-CODE",
+          "kind": "code",
+          "location": "app/services/cases.py",
+          "description": "테넌트별 사고 케이스, 승인된 수명주기, 낙관적 버전 잠금과 증거 지문 보존 구현"
+        },
+        {
+          "evidence_id": "EVD-IR-CASE-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_incident_cases.py",
+          "description": "중복 방지, 상태 전이, 테넌트 격리, 동시 갱신 충돌과 로컬 로그 변조 차단 회귀 시험"
+        },
+        {
+          "evidence_id": "EVD-IR-CASE-CONFIG",
+          "kind": "configuration",
+          "location": "compose.yaml",
+          "description": "비용 없는 로컬 규칙 모드에서 사고 케이스 저장 경로를 격리된 데이터 볼륨에 배치"
         }
       ],
       "reviewed_on": "2026-09-16",
       "review_due_on": "2026-12-16",
-      "target_version": "0.12.0"
+      "target_version": "0.14.0"
     },
     {
       "control_id": "DATA-01",
