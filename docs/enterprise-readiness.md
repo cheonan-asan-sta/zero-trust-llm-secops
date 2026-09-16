@@ -2,7 +2,9 @@
 
 ## 현재 판정
 
-버전 0.7.0은 기업 적용을 위한 1차 보안 기준선을 구현했다. 인증과 권한, 테넌트 격리, 요청 추적, 감사 무결성, 관측성과 자원 보호를 코드와 자동 테스트로 검증했다. 다만 특정 기업의 IdP, SIEM, 개인정보 정책과 운영 절차가 연결되지 않았으므로 아직 운영 승인 또는 보안 인증을 받은 제품으로 간주하지 않는다.
+버전 0.8.0은 기업 적용을 위한 1차 보안 기준선과 공공·기업 요구사항을 연결하는 보증 기준선을 구현했다. 인증과 권한, 테넌트 격리, 요청 추적, 감사 무결성, 관측성과 자원 보호를 코드와 자동 테스트로 검증하고 KISA, 개인정보보호위원회, NIA, NIST, CISA, ENISA, OWASP와 MITRE 자료에서 도출한 18개 통제를 기계판독 대장으로 관리한다.
+
+현재 통제대장은 구현 완료 7개, 부분 구현 5개, 계획 6개다. 가중 구현률은 52.78%지만 이는 인증이나 규정 준수율이 아니다. 특정 기업의 IdP, SIEM, 개인정보 정책과 운영 절차가 연결되지 않았으므로 아직 운영 승인 또는 보안 인증을 받은 제품으로 간주하지 않는다.
 
 ## 적용한 보안 기준선
 
@@ -19,6 +21,9 @@
 | 추적성 | 모든 응답에 검증된 X-Request-ID를 반환하고 분석 결과에 요청·사용자 식별자 기록 | 요청 ID 회귀 테스트 |
 | 관측성 | 경로별 요청 수와 응답시간을 관리자 전용 Prometheus 형식으로 제공 | 메트릭 엔드포인트 테스트 |
 | 배포 입구 | Lambda 함수 URL의 기본·스크립트 배포 인증을 AWS IAM으로 고정 | 정적 구성 점검 |
+| 통제 보증 | 18개 통제의 소유자·상태·기준·출처·증적·검토일과 SHA-256 대장 지문 | 스키마·중복·증적 경로·권한 테스트 |
+
+통제 요약은 `/assurance/summary`, 관리자 상세 증적은 `/assurance/controls`에서 확인한다. `/health/ready`는 감사 로그뿐 아니라 통제대장 구조 무결성도 확인한다. 구현 완료 상태는 코드 또는 구성 증거와 자동 시험 증거가 모두 존재할 때만 허용한다.
 
 ## 운영 전 필수 게이트
 
@@ -38,5 +43,9 @@
 - [NIST SP 800-207A Cloud Native Access Control](https://csrc.nist.gov/pubs/sp/800/207/a/final)
 - [OWASP API Security Top 10 2023](https://owasp.org/projects/api-security-project)
 - [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html)
+- [KISA 제로트러스트 가이드라인 2.0](https://www.kisa.or.kr/2060204/form?page=1&postSeq=18)
+- [NIST Cybersecurity Framework 2.0](https://www.nist.gov/publications/nist-cybersecurity-framework-csf-20)
+- [UK AI Cyber Security Code of Practice](https://www.gov.uk/government/publications/ai-cyber-security-code-of-practice)
+- [MITRE ATLAS](https://atlas.mitre.org/)
 
 NIST의 원칙에 따라 네트워크 위치만으로 신뢰하지 않고 사용자·서비스 신원과 자원 접근 정책을 요청마다 확인한다. OWASP API Security의 객체 수준 권한·인증 위험을 줄이기 위해 테넌트 범위 조회와 역할 검사를 각 API 함수에 적용한다.

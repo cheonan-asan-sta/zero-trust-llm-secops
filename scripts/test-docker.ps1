@@ -58,12 +58,17 @@ try {
     if (-not $health -or $health.status -ne "ok" -or $health.analyzer_mode -ne "rule") {
         throw "Container health check did not become ready in rule mode."
     }
-    if ($health.version -ne "0.7.0" -or $health.auth_mode -ne "disabled") {
+    if ($health.version -ne "0.8.0" -or $health.auth_mode -ne "disabled") {
         throw "Container did not start with the expected local security profile."
     }
     $readiness = Invoke-RestMethod -Method Get -Uri "$baseUrl/health/ready" -TimeoutSec 2
-    if ($readiness.status -ne "ready" -or -not $readiness.audit.ok) {
-        throw "Audit integrity readiness check failed."
+    if (
+        $readiness.status -ne "ready" -or
+        -not $readiness.audit.ok -or
+        -not $readiness.assurance.valid -or
+        $readiness.assurance.total_controls -ne 18
+    ) {
+        throw "Audit or assurance registry integrity readiness check failed."
     }
     $headerCheck = Invoke-WebRequest `
         -Method Get `
@@ -134,6 +139,8 @@ try {
         action = $analysis.assessment.recommended_action
         review_status = $resolved.review_status
         audit_integrity = $readiness.audit.ok
+        assurance_registry_integrity = $readiness.assurance.valid
+        assurance_control_count = $readiness.assurance.total_controls
         evaluation_cases = $evaluation.total_cases
         risk_accuracy = $evaluation.risk_accuracy
         action_accuracy = $evaluation.action_accuracy

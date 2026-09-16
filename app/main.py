@@ -18,8 +18,11 @@ from app.config import get_settings
 from app.middleware import RequestBodyLimitMiddleware, RequestContextMiddleware
 from app.models import (
     AnalysisResult,
+    AssuranceSummary,
     BatchAnalysisRequest,
     BatchAnalysisResult,
+    ControlRecord,
+    ControlStatus,
     EvaluationRequest,
     EvaluationSummary,
     EventScenarioEvaluation,
@@ -35,6 +38,7 @@ from app.models import (
 )
 from app.scenarios import SCENARIOS, generate_events, get_scenario
 from app.security import Principal, Role, require_roles
+from app.services.assurance import get_assurance_registry
 from app.services.audit import create_audit_store
 from app.services.evaluation import run_evaluation
 from app.services.policy import enforce_assessment_safety, response_preview
@@ -55,6 +59,7 @@ app.add_middleware(RequestBodyLimitMiddleware, max_bytes=settings.api_max_body_b
 app.add_middleware(RequestContextMiddleware)
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 audit_store = create_audit_store(settings)
+assurance_registry = get_assurance_registry()
 analysis_capacity = asyncio.Semaphore(settings.analysis_max_concurrency)
 
 ViewerPrincipal = Annotated[Principal, Depends(require_roles(Role.VIEWER))]
@@ -101,8 +106,20 @@ def liveness() -> dict:
 @app.get("/health/ready")
 def readiness() -> Response:
     integrity = audit_store.integrity()
-    payload = {"status": "ready" if integrity["ok"] else "degraded", "audit": integrity}
-    return JSONResponse(payload, status_code=200 if integrity["ok"] else 503)
+    assurance = assurance_registry.summary()
+    ready = integrity["ok"] and assurance.valid
+    payload = {
+        "status": "ready" if ready else "degraded",
+        "audit": integrity,
+        "assurance": {
+            "valid": assurance.valid,
+            "registry_version": assurance.registry_version,
+            "registry_digest_sha256": assurance.registry_digest_sha256,
+            "total_controls": assurance.total_controls,
+            "overdue_control_count": len(assurance.overdue_control_ids),
+        },
+    }
+    return JSONResponse(payload, status_code=200 if ready else 503)
 
 
 @app.get("/", include_in_schema=False)
@@ -255,6 +272,33 @@ def metrics(principal: ViewerPrincipal) -> MetricsSummary:
 @app.get("/internal/metrics", include_in_schema=False)
 def prometheus_metrics(_: AdminPrincipal) -> Response:
     return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+
+@app.get("/assurance/summary", response_model=AssuranceSummary)
+def assurance_summary(_: ViewerPrincipal) -> AssuranceSummary:
+    return assurance_registry.summary()
+
+
+@app.get("/assurance/controls", response_model=list[ControlRecord])
+def assurance_controls(
+    _: AdminPrincipal,
+    status: ControlStatus | None = None,
+    domain: str | None = None,
+) -> list[ControlRecord]:
+    controls = assurance_registry.controls
+    if status is not None:
+        controls = [control for control in controls if control.status == status]
+    if domain is not None:
+        controls = [control for control in controls if control.domain == domain]
+    return controls
+
+
+@app.get("/assurance/controls/{control_id}", response_model=ControlRecord)
+def assurance_control(control_id: str, _: AdminPrincipal) -> ControlRecord:
+    try:
+        return assurance_registry.get(control_id.upper())
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail="Control not found") from exc
 
 
 @app.get("/results", response_model=list[AnalysisResult])

@@ -72,6 +72,7 @@ function setHealth(health) {
   state.analyzerMode = health.analyzer_mode;
   $("healthDot").className = "health-dot online";
   $("healthText").textContent = `${health.analyzer_mode.toUpperCase()} · 정상 운영`;
+  $("footerVersion").textContent = `SIMULATION ONLY · v${health.version}`;
 }
 
 function setHealthError() {
@@ -356,6 +357,38 @@ function formatPercent(value) {
   return `${Math.round(value * 100)}%`;
 }
 
+function renderAssurance(summary) {
+  $("assuranceRegistryVersion").textContent = `REGISTRY ${summary.registry_version}`;
+  $("assuranceRate").textContent = formatPercent(summary.implementation_rate);
+  $("implementedControls").textContent = summary.status_counts.implemented || 0;
+  $("partialControls").textContent = summary.status_counts.partially_implemented || 0;
+  $("plannedControls").textContent = summary.status_counts.planned || 0;
+  $("assuranceEvidence").textContent = summary.evidence_count;
+  $("overdueControls").textContent = summary.overdue_control_ids.length;
+  $("overdueControls").className = summary.overdue_control_ids.length
+    ? "metric-fail"
+    : "metric-pass";
+  $("assuranceState").textContent = summary.valid
+    ? `${summary.total_controls}개 통제의 구조와 증적 연결을 확인했습니다.`
+    : "통제대장 구조를 다시 확인해야 합니다.";
+
+  const domains = $("assuranceDomains");
+  domains.replaceChildren();
+  Object.entries(summary.domain_counts).forEach(([domain, count]) => {
+    const item = document.createElement("span");
+    item.textContent = `${domain.replaceAll("_", " ")} · ${count}`;
+    domains.append(item);
+  });
+}
+
+async function loadAssuranceSummary() {
+  try {
+    renderAssurance(await request("/assurance/summary"));
+  } catch (error) {
+    $("assuranceState").textContent = `통제 준비도를 불러오지 못했습니다: ${error.message}`;
+  }
+}
+
 function renderEvaluationDetails(result) {
   const body = $("evaluationBody");
   body.replaceChildren();
@@ -425,7 +458,7 @@ async function initialize() {
     setHealthError();
     $("scenarioGrid").textContent = "서버와 연결되지 않았습니다.";
   }
-  await refreshSummary();
+  await Promise.all([refreshSummary(), loadAssuranceSummary()]);
 }
 
 $("analyzeButton").addEventListener("click", runAnalysis);

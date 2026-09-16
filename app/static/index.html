@@ -148,6 +148,31 @@
         </div>
       </section>
 
+      <section class="summary-section shell assurance-section">
+        <div class="section-heading-row">
+          <div>
+            <p class="section-kicker">ASSURANCE REGISTER</p>
+            <h2>보안 통제 준비도</h2>
+          </div>
+          <span id="assuranceRegistryVersion" class="outline-badge">불러오는 중</span>
+        </div>
+        <p id="assuranceState" class="evaluation-state">
+          공공·기업 보안 기준과 현재 구현·시험 증거를 교차 확인하고 있습니다.
+        </p>
+        <div class="metric-grid assurance-grid">
+          <article><span>가중 구현률</span><strong id="assuranceRate">-</strong></article>
+          <article><span>구현 완료</span><strong id="implementedControls">-</strong></article>
+          <article><span>부분 구현</span><strong id="partialControls">-</strong></article>
+          <article><span>구현 예정</span><strong id="plannedControls">-</strong></article>
+          <article><span>연결된 증적</span><strong id="assuranceEvidence">-</strong></article>
+          <article><span>검토 기한 초과</span><strong id="overdueControls">-</strong></article>
+        </div>
+        <div id="assuranceDomains" class="assurance-domains" aria-label="통제 영역별 개수"></div>
+        <p class="assurance-notice">
+          구현률은 인증이나 규정 준수 선언이 아닙니다. 완료 통제는 코드·구성 및 자동 시험 증거가 모두 있을 때만 집계합니다.
+        </p>
+      </section>
+
       <section class="summary-section shell evaluation-section">
         <div class="section-heading-row">
           <div>
@@ -220,7 +245,7 @@
 
     <footer class="shell">
       <span>천안아산역 · Zero Trust LLM SecOps</span>
-      <span>SIMULATION ONLY · v0.7</span>
+      <span id="footerVersion">SIMULATION ONLY</span>
     </footer>
   </body>
 </html>

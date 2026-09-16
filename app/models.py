@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from enum import Enum
 from typing import Annotated, Literal, Self
 from uuid import uuid4
@@ -41,6 +41,26 @@ class ReviewStatus(str, Enum):
     IN_REVIEW = "IN_REVIEW"
     RESOLVED = "RESOLVED"
     DISMISSED = "DISMISSED"
+
+
+class ControlStatus(str, Enum):
+    IMPLEMENTED = "implemented"
+    PARTIAL = "partially_implemented"
+    PLANNED = "planned"
+    NOT_APPLICABLE = "not_applicable"
+
+
+class ControlPriority(str, Enum):
+    P0 = "P0"
+    P1 = "P1"
+    P2 = "P2"
+
+
+class EvidenceKind(str, Enum):
+    AUTOMATED_TEST = "automated_test"
+    CODE = "code"
+    CONFIGURATION = "configuration"
+    DOCUMENTATION = "documentation"
 
 
 class EventAction(str, Enum):
@@ -377,6 +397,81 @@ class MetricsSummary(StrictModel):
     latest_event_id: str | None = None
     average_latency_ms: float = Field(default=0, ge=0)
     p95_latency_ms: float = Field(default=0, ge=0)
+
+
+class ControlSource(StrictModel):
+    framework: str = Field(min_length=2, max_length=120)
+    reference: str = Field(min_length=2, max_length=200)
+    url: str = Field(pattern=r"^https://", max_length=500)
+
+
+class ControlEvidence(StrictModel):
+    evidence_id: str = Field(pattern=r"^EVD-[A-Z0-9-]{3,64}$")
+    kind: EvidenceKind
+    location: str = Field(min_length=3, max_length=300)
+    description: str = Field(min_length=5, max_length=300)
+
+
+class ControlRecord(StrictModel):
+    control_id: str = Field(pattern=r"^[A-Z][A-Z0-9]{1,7}-\d{2}$")
+    title: str = Field(min_length=3, max_length=160)
+    domain: str = Field(pattern=r"^[a-z][a-z0-9_]{2,39}$")
+    priority: ControlPriority
+    status: ControlStatus
+    owner_role: str = Field(min_length=2, max_length=80)
+    objective: str = Field(min_length=10, max_length=500)
+    acceptance_criteria: list[Annotated[str, Field(min_length=5, max_length=300)]] = Field(
+        min_length=1,
+        max_length=12,
+    )
+    sources: list[ControlSource] = Field(min_length=1, max_length=12)
+    evidence: list[ControlEvidence] = Field(default_factory=list, max_length=30)
+    reviewed_on: date
+    review_due_on: date
+    target_version: str = Field(min_length=1, max_length=40)
+
+    @model_validator(mode="after")
+    def validate_assurance_claim(self) -> Self:
+        if self.review_due_on <= self.reviewed_on:
+            raise ValueError("review_due_on must be later than reviewed_on")
+        evidence_kinds = {item.kind for item in self.evidence}
+        if self.status == ControlStatus.IMPLEMENTED:
+            if EvidenceKind.AUTOMATED_TEST not in evidence_kinds:
+                raise ValueError("implemented controls require automated test evidence")
+            if not evidence_kinds.intersection(
+                {EvidenceKind.CODE, EvidenceKind.CONFIGURATION}
+            ):
+                raise ValueError("implemented controls require code or configuration evidence")
+        if self.status == ControlStatus.PARTIAL and not self.evidence:
+            raise ValueError("partially implemented controls require evidence")
+        return self
+
+
+class ControlRegistryPayload(StrictModel):
+    registry_version: str = Field(pattern=r"^\d{4}\.\d{2}\.\d+$")
+    controls: list[ControlRecord] = Field(min_length=1, max_length=500)
+
+    @model_validator(mode="after")
+    def control_ids_must_be_unique(self) -> Self:
+        identifiers = [control.control_id for control in self.controls]
+        if len(identifiers) != len(set(identifiers)):
+            raise ValueError("control IDs must be unique")
+        return self
+
+
+class AssuranceSummary(StrictModel):
+    registry_version: str
+    registry_digest_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    as_of: date
+    valid: bool
+    total_controls: int = Field(ge=0)
+    applicable_controls: int = Field(ge=0)
+    implementation_rate: float = Field(ge=0, le=1)
+    status_counts: dict[str, int]
+    priority_counts: dict[str, int]
+    domain_counts: dict[str, int]
+    evidence_count: int = Field(ge=0)
+    overdue_control_ids: list[str]
 
 
 class SimulationRequest(StrictModel):

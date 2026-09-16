@@ -1,0 +1,673 @@
+{
+  "registry_version": "2026.09.1",
+  "controls": [
+    {
+      "control_id": "GOV-01",
+      "title": "AI 보안 통제 소유권과 검토 주기",
+      "domain": "governance",
+      "priority": "P0",
+      "status": "partially_implemented",
+      "owner_role": "security-governance",
+      "objective": "각 보안 통제에 책임자, 구현 상태, 합격 기준, 근거 자료와 다음 검토일을 지정한다.",
+      "acceptance_criteria": [
+        "모든 통제에 소유자와 검토 기한이 존재한다.",
+        "구현 완료 주장은 코드 또는 구성과 자동 시험 증거를 모두 가진다."
+      ],
+      "sources": [
+        {
+          "framework": "NIST CSF 2.0",
+          "reference": "Govern function",
+          "url": "https://www.nist.gov/publications/nist-cybersecurity-framework-csf-20"
+        },
+        {
+          "framework": "ISMS-P",
+          "reference": "관리체계 수립 및 운영",
+          "url": "https://isms.kisa.or.kr/ntcn/rcsrm/selectGnrlRcsrmList.do"
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "EVD-GOV-REGISTER",
+          "kind": "documentation",
+          "location": "docs/reference-catalog-enterprise-public-sector.md",
+          "description": "통제, 시험과 증적을 연결하는 공공·기업 기준 카탈로그"
+        }
+      ],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.8.0"
+    },
+    {
+      "control_id": "GOV-02",
+      "title": "고영향 AI 해당 여부와 금지 용도 검토",
+      "domain": "governance",
+      "priority": "P1",
+      "status": "planned",
+      "owner_role": "product-governance",
+      "objective": "서비스 목적과 적용 영역을 기준으로 고영향 AI 해당 여부와 금지 용도를 출시 전에 검토한다.",
+      "acceptance_criteria": [
+        "출시 후보마다 고영향 해당 여부와 판단 근거가 승인 기록으로 남는다.",
+        "금지 용도와 허용 용도가 시스템 카드와 이용자 고지에 일치한다."
+      ],
+      "sources": [
+        {
+          "framework": "대한민국 인공지능기본법",
+          "reference": "제33조 고영향 인공지능의 확인",
+          "url": "https://www.law.go.kr/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1031810895"
+        },
+        {
+          "framework": "NIA AI 기본법 이행 지원",
+          "reference": "고영향·영향평가 가이드라인",
+          "url": "https://www.nia.or.kr/site/nia_kor/ex/bbs/View.do?bcIdx=28987&cbIdx=99835&parentSeq=28987"
+        }
+      ],
+      "evidence": [],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.10.0"
+    },
+    {
+      "control_id": "ZT-01",
+      "title": "강한 신원 검증과 역할 기반 최소 권한",
+      "domain": "identity_access",
+      "priority": "P0",
+      "status": "partially_implemented",
+      "owner_role": "identity-security",
+      "objective": "서명된 연합 신원, 테넌트와 역할을 검증하고 업무별 최소 권한을 적용한다.",
+      "acceptance_criteria": [
+        "프로덕션은 인증 비활성 구성을 거부한다.",
+        "OIDC 토큰의 서명, 발급자, 대상, 만료, 사용자, 테넌트와 역할을 검증한다.",
+        "향후 기기 상태와 인증 강도를 매 요청의 정책 입력으로 사용한다."
+      ],
+      "sources": [
+        {
+          "framework": "KISA 제로트러스트 가이드라인 2.0",
+          "reference": "식별자·기기 핵심 요소",
+          "url": "https://www.kisa.or.kr/2060204/form?page=1&postSeq=18"
+        },
+        {
+          "framework": "NIST SP 800-63-4",
+          "reference": "Digital Identity Guidelines",
+          "url": "https://csrc.nist.gov/pubs/sp/800/63/4/final"
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "EVD-ZT-OIDC-CODE",
+          "kind": "code",
+          "location": "app/security.py",
+          "description": "OIDC와 API 키 인증 및 역할 상속 구현"
+        },
+        {
+          "evidence_id": "EVD-ZT-OIDC-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_security.py::test_oidc_principal_validates_signature_issuer_audience_and_claims",
+          "description": "OIDC 서명, 발급자, 대상과 필수 클레임 검증 시험"
+        }
+      ],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.9.0"
+    },
+    {
+      "control_id": "ZT-02",
+      "title": "테넌트별 분석·감사 데이터 격리",
+      "domain": "identity_access",
+      "priority": "P0",
+      "status": "implemented",
+      "owner_role": "application-security",
+      "objective": "인증된 테넌트가 다른 테넌트의 분석 결과, 이력과 지표를 조회할 수 없게 한다.",
+      "acceptance_criteria": [
+        "모든 결과 조회와 지표 집계가 인증 주체의 테넌트로 제한된다.",
+        "다른 테넌트의 이벤트 식별자를 알아도 결과를 조회할 수 없다."
+      ],
+      "sources": [
+        {
+          "framework": "NIST SP 800-53 Rev.5",
+          "reference": "AC Access Control family",
+          "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final"
+        },
+        {
+          "framework": "KISA 제로트러스트 가이드라인 2.0",
+          "reference": "최소 권한과 지속 검증",
+          "url": "https://www.kisa.or.kr/2060204/form?page=1&postSeq=18"
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "EVD-ZT-TENANT-CODE",
+          "kind": "code",
+          "location": "app/services/audit.py",
+          "description": "테넌트 식별자를 적용한 감사 저장소 조회와 집계"
+        },
+        {
+          "evidence_id": "EVD-ZT-TENANT-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_api.py::test_api_results_are_isolated_by_authenticated_tenant",
+          "description": "교차 테넌트 결과와 지표 비공개 시험"
+        }
+      ],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.8.0"
+    },
+    {
+      "control_id": "ZT-03",
+      "title": "정책 예외의 승인·범위·유효기간 검증",
+      "domain": "policy_enforcement",
+      "priority": "P0",
+      "status": "implemented",
+      "owner_role": "zero-trust-policy",
+      "objective": "정책 예외가 승인자, 기간, 사용자, 자원, 행위와 용량 범위를 만족할 때만 적용되게 한다.",
+      "acceptance_criteria": [
+        "만료되거나 요청 범위를 벗어난 예외는 입력 검증 단계에서 거부된다.",
+        "적용된 예외 식별자와 통제가 대응 미리보기에 기록된다."
+      ],
+      "sources": [
+        {
+          "framework": "KISA 제로트러스트 가이드라인 2.0",
+          "reference": "동적 정책과 최소 권한",
+          "url": "https://www.kisa.or.kr/2060204/form?page=1&postSeq=18"
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "EVD-ZT-EXCEPTION-CODE",
+          "kind": "code",
+          "location": "app/models.py",
+          "description": "승인된 정책 예외의 시간과 대상 범위 검증 모델"
+        },
+        {
+          "evidence_id": "EVD-ZT-EXCEPTION-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_week04.py::test_expired_policy_exception_is_rejected",
+          "description": "만료된 정책 예외 거부 시험"
+        }
+      ],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.8.0"
+    },
+    {
+      "control_id": "LOG-01",
+      "title": "감사 기록 무결성과 변조 탐지",
+      "domain": "logging_monitoring",
+      "priority": "P0",
+      "status": "implemented",
+      "owner_role": "security-operations",
+      "objective": "분석과 검토 기록을 해시 체인으로 연결하고 변조가 발견되면 추가 기록을 거부한다.",
+      "acceptance_criteria": [
+        "감사 파일의 기존 레코드가 변경되면 무결성 검사가 실패한다.",
+        "무결성 실패 상태에서는 새 감사 레코드를 추가하지 않는다."
+      ],
+      "sources": [
+        {
+          "framework": "NSA Visibility and Analytics",
+          "reference": "central logging and security analytics",
+          "url": "https://www.nsa.gov/Cybersecurity/ZIG/Pillars/Visibility-and-Analytics-Pillar/"
+        },
+        {
+          "framework": "NIST SP 800-92",
+          "reference": "Computer Security Log Management",
+          "url": "https://csrc.nist.gov/pubs/sp/800/92/final"
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "EVD-LOG-HASH-CODE",
+          "kind": "code",
+          "location": "app/services/audit.py",
+          "description": "JSONL 감사 로그의 이전 해시와 현재 레코드 해시 연결"
+        },
+        {
+          "evidence_id": "EVD-LOG-HASH-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_audit.py::test_audit_hash_chain_detects_tampering_and_refuses_append",
+          "description": "변조 탐지와 추가 기록 거부 시험"
+        }
+      ],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.8.0"
+    },
+    {
+      "control_id": "LOG-02",
+      "title": "중앙 SIEM 전송과 로그 보존 정책",
+      "domain": "logging_monitoring",
+      "priority": "P1",
+      "status": "planned",
+      "owner_role": "security-operations",
+      "objective": "인증, 정책, 분석, 검토와 관리자 행위를 중앙 SIEM으로 전송하고 보존·접근·삭제 정책을 적용한다.",
+      "acceptance_criteria": [
+        "전송 실패가 별도 지표와 경보로 노출된다.",
+        "로그 유형별 보존기간과 접근권한이 승인되고 자동 만료된다."
+      ],
+      "sources": [
+        {
+          "framework": "CISA Secure by Demand",
+          "reference": "Evidence of Intrusions and baseline security logs",
+          "url": "https://www.cisa.gov/sites/default/files/2024-08/SecureByDemandGuide_080624_508c.pdf"
+        },
+        {
+          "framework": "CISA LOTL Guidance",
+          "reference": "centralized out-of-band logging",
+          "url": "https://www.cisa.gov/sites/default/files/2024-02/Joint-Guidance-Identifying-and-Mitigating-LOTL_V3508c.pdf"
+        }
+      ],
+      "evidence": [],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.10.0"
+    },
+    {
+      "control_id": "AI-01",
+      "title": "비신뢰 로그와 LLM 지시 경계 분리",
+      "domain": "ai_application_security",
+      "priority": "P0",
+      "status": "implemented",
+      "owner_role": "ai-security",
+      "objective": "이벤트 자유 텍스트를 명령이 아닌 비신뢰 데이터로 전달하고 평가용 정답을 모델 입력에서 제외한다.",
+      "acceptance_criteria": [
+        "이벤트 내부 지시 문자열은 이벤트 데이터 경계를 벗어나지 않는다.",
+        "ground_truth 필드는 모든 분석 입력에서 제외된다."
+      ],
+      "sources": [
+        {
+          "framework": "KISA AI 보안 위협 대응 매뉴얼",
+          "reference": "생성형 AI 입력·응용 위협 대응",
+          "url": "https://www.kisa.or.kr/401/form?lang_type=KO&postSeq=3712"
+        },
+        {
+          "framework": "OWASP LLM Top 10 2025",
+          "reference": "Prompt Injection",
+          "url": "https://genai.owasp.org/resource/owasp-top-10-for-llm-applications-2025/"
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "EVD-AI-BOUNDARY-CODE",
+          "kind": "code",
+          "location": "app/prompting.py",
+          "description": "시스템 지시와 직렬화된 이벤트 데이터의 메시지 분리"
+        },
+        {
+          "evidence_id": "EVD-AI-BOUNDARY-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_prompting.py::test_prompt_injection_text_is_kept_inside_event_data",
+          "description": "프롬프트 인젝션 문자열의 데이터 경계 유지 시험"
+        }
+      ],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.8.0"
+    },
+    {
+      "control_id": "AI-02",
+      "title": "고위험·불확실 결과의 사람 감독",
+      "domain": "human_oversight",
+      "priority": "P0",
+      "status": "implemented",
+      "owner_role": "soc-response",
+      "objective": "고위험 또는 낮은 신뢰도의 결과를 자동 실행하지 않고 담당자 검토와 근거 기록으로 전환한다.",
+      "acceptance_criteria": [
+        "고위험 분석은 검토 대기 상태와 시뮬레이션 대응만 생성한다.",
+        "해결과 오탐 종료에는 담당자와 검토 메모가 필요하다."
+      ],
+      "sources": [
+        {
+          "framework": "대한민국 인공지능기본법",
+          "reference": "제34조 사람의 관리·감독",
+          "url": "https://law.go.kr/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1031810839"
+        },
+        {
+          "framework": "UK AI Cyber Security Code of Practice",
+          "reference": "Human responsibility and oversight",
+          "url": "https://www.gov.uk/government/publications/ai-cyber-security-code-of-practice/code-of-practice-for-the-cyber-security-of-ai"
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "EVD-AI-REVIEW-CODE",
+          "kind": "code",
+          "location": "app/main.py",
+          "description": "분석가 검토 상태 전이와 종결 메모 검증"
+        },
+        {
+          "evidence_id": "EVD-AI-REVIEW-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_api.py::test_high_risk_result_can_be_reviewed_and_resolved",
+          "description": "고위험 결과의 검토 시작, 해결, 잘못된 전이 거부 시험"
+        }
+      ],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.8.0"
+    },
+    {
+      "control_id": "PRIV-01",
+      "title": "개인정보 최소화·보존·삭제 전파",
+      "domain": "privacy_data",
+      "priority": "P0",
+      "status": "planned",
+      "owner_role": "privacy-officer",
+      "objective": "원본 로그, 정규화 이벤트, LLM 입력, 분석 결과와 백업에 데이터 최소화와 보존·삭제 규칙을 적용한다.",
+      "acceptance_criteria": [
+        "데이터 종류별 목적, 민감도, 위치, 보존기간과 삭제 책임자가 등록된다.",
+        "삭제 요청이 파생 데이터, 캐시와 백업까지 전달되는 자동 시험이 존재한다."
+      ],
+      "sources": [
+        {
+          "framework": "개인정보보호위원회 AI 프라이버시 위험관리 모델",
+          "reference": "AI 수명주기 개인정보 위험관리",
+          "url": "https://www.privacy.go.kr/front/bbs/bbsView.do?bbsNo=BBSMSTR_000000000049&bbscttNo=20799"
+        },
+        {
+          "framework": "CNIL AI and GDPR",
+          "reference": "purpose limitation, minimisation and DPIA",
+          "url": "https://www.cnil.fr/en/ai-system-development-cnils-recommendations-to-comply-gdpr"
+        }
+      ],
+      "evidence": [],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.9.0"
+    },
+    {
+      "control_id": "EVAL-01",
+      "title": "재현 가능한 정확도·안전성 평가",
+      "domain": "evaluation_assurance",
+      "priority": "P0",
+      "status": "implemented",
+      "owner_role": "quality-assurance",
+      "objective": "고정 시나리오에서 위험도, 대응, F1, 오류, 지연과 처리량을 반복 측정한다.",
+      "acceptance_criteria": [
+        "평가가 비용 없는 규칙 분석기로 오프라인 실행된다.",
+        "전체 평균과 시나리오별 결과, 오류 분류와 목표 통과 여부가 함께 반환된다."
+      ],
+      "sources": [
+        {
+          "framework": "NIST ARIA",
+          "reference": "model testing, red-teaming and field testing",
+          "url": "https://ai-challenges.nist.gov/aria"
+        },
+        {
+          "framework": "UK Introduction to AI Assurance",
+          "reference": "measure, evaluate and communicate",
+          "url": "https://www.gov.uk/government/publications/introduction-to-ai-assurance"
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "EVD-EVAL-HARNESS-CODE",
+          "kind": "code",
+          "location": "app/services/evaluation.py",
+          "description": "제한 병렬 반복 평가와 세부 지표 생성"
+        },
+        {
+          "evidence_id": "EVD-EVAL-HARNESS-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_evaluation.py::test_rule_evaluation_meets_project_targets",
+          "description": "규칙 기반 평가 목표와 결과 구조 검증"
+        }
+      ],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.8.0"
+    },
+    {
+      "control_id": "EVAL-02",
+      "title": "적대적 프롬프트와 정상 유용성 동시 평가",
+      "domain": "evaluation_assurance",
+      "priority": "P1",
+      "status": "partially_implemented",
+      "owner_role": "ai-red-team",
+      "objective": "프롬프트 인젝션, 정보 유출과 과도한 권한 공격 성공률을 정상 업무 성공률과 함께 평가한다.",
+      "acceptance_criteria": [
+        "공격 성공률과 정상 업무 성공률이 동일 보고서에서 비교된다.",
+        "직접·간접 인젝션과 다중 단계 공격의 고정 회귀세트가 존재한다."
+      ],
+      "sources": [
+        {
+          "framework": "AgentDojo",
+          "reference": "NeurIPS 2024 dynamic agent security evaluation",
+          "url": "https://proceedings.nips.cc/paper_files/paper/2024/hash/97091a5177d8dc64b1da8bf3e1f6fb54-Abstract-Datasets_and_Benchmarks_Track.html"
+        },
+        {
+          "framework": "MITRE ATLAS",
+          "reference": "adversarial threats to AI systems",
+          "url": "https://atlas.mitre.org/"
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "EVD-EVAL-INJECTION-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_prompting.py::test_prompt_injection_text_is_kept_inside_event_data",
+          "description": "직접 인젝션 문자열의 경계 시험만 구현된 현재 부분 증거"
+        }
+      ],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.10.0"
+    },
+    {
+      "control_id": "SDLC-01",
+      "title": "안전한 기본값과 프로덕션 구성 실패 방지",
+      "domain": "secure_development",
+      "priority": "P0",
+      "status": "implemented",
+      "owner_role": "platform-security",
+      "objective": "인증 없는 프로덕션 실행을 거부하고 로컬 컨테이너도 비루트·읽기 전용·최소 권한으로 실행한다.",
+      "acceptance_criteria": [
+        "프로덕션 인증 비활성화와 평문 API 키 구성이 시작 전에 실패한다.",
+        "로컬 컨테이너가 비루트 사용자와 제한된 권한으로 실행된다."
+      ],
+      "sources": [
+        {
+          "framework": "CISA Secure by Design",
+          "reference": "secure by default",
+          "url": "https://www.cisa.gov/sites/default/files/2023-06/principles_approaches_for_security-by-design-default_508c.pdf"
+        },
+        {
+          "framework": "NIST SP 800-218 SSDF",
+          "reference": "Secure Software Development Framework",
+          "url": "https://csrc.nist.gov/pubs/sp/800/218/final"
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "EVD-SDLC-CONFIG-CODE",
+          "kind": "configuration",
+          "location": "app/config.py",
+          "description": "프로덕션 인증과 자격증명 구성의 시작 시 검증"
+        },
+        {
+          "evidence_id": "EVD-SDLC-CONFIG-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_enterprise_config.py::test_production_rejects_disabled_authentication",
+          "description": "인증 없는 프로덕션 구성 거부 시험"
+        },
+        {
+          "evidence_id": "EVD-SDLC-DOCKER-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_docker_setup.py::test_local_image_runs_as_non_root_with_healthcheck",
+          "description": "비루트 컨테이너와 상태 확인 구성 시험"
+        }
+      ],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.8.0"
+    },
+    {
+      "control_id": "SUP-01",
+      "title": "SBOM과 빌드·모델 출처 검증",
+      "domain": "supply_chain",
+      "priority": "P1",
+      "status": "planned",
+      "owner_role": "software-supply-chain",
+      "objective": "코드 의존성, 컨테이너, 모델, 규칙과 정책 번들의 구성요소와 출처를 생성·서명·검증한다.",
+      "acceptance_criteria": [
+        "출시 아티팩트마다 기계판독 SBOM과 빌드 출처 증명이 생성된다.",
+        "배포 전에 서명, 출처와 승인된 소스 개정이 검증된다."
+      ],
+      "sources": [
+        {
+          "framework": "CISA SBOM Minimum Elements",
+          "reference": "Data Fields, Automation Support, Practices and Processes",
+          "url": "https://www.cisa.gov/sites/default/files/2025-08/2025_CISA_SBOM_Minimum_Elements.pdf"
+        },
+        {
+          "framework": "SLSA v1.2",
+          "reference": "build and source provenance",
+          "url": "https://slsa.dev/spec/v1.2/"
+        }
+      ],
+      "evidence": [],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.10.0"
+    },
+    {
+      "control_id": "IR-01",
+      "title": "AI·보안 사고 대응과 사후 검토",
+      "domain": "incident_response",
+      "priority": "P1",
+      "status": "partially_implemented",
+      "owner_role": "incident-commander",
+      "objective": "경보 검토를 사고 분류, 봉쇄, 복구, 통지와 사후 개선까지 이어지는 승인된 플레이북으로 관리한다.",
+      "acceptance_criteria": [
+        "사고 등급별 담당자, 승인자, 통지 대상과 시간 기준이 정의된다.",
+        "테이블톱 훈련 결과와 후속 개선 항목이 통제 증거로 남는다."
+      ],
+      "sources": [
+        {
+          "framework": "NIST SP 800-61 Rev.3",
+          "reference": "Incident Response Recommendations and Considerations",
+          "url": "https://csrc.nist.gov/pubs/sp/800/61/r3/final"
+        },
+        {
+          "framework": "UK AI Cyber Security Code of Practice",
+          "reference": "monitoring and incident management",
+          "url": "https://www.gov.uk/government/publications/ai-cyber-security-code-of-practice"
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "EVD-IR-REVIEW-CODE",
+          "kind": "code",
+          "location": "app/main.py",
+          "description": "분석 결과의 조사·해결·오탐 검토 상태 흐름"
+        },
+        {
+          "evidence_id": "EVD-IR-READINESS-DOC",
+          "kind": "documentation",
+          "location": "docs/enterprise-readiness.md",
+          "description": "기업 운영 전 사고 대응과 복구 검증 게이트"
+        }
+      ],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.10.0"
+    },
+    {
+      "control_id": "DATA-01",
+      "title": "OCSF 기반 이벤트 정규화와 변환 이력",
+      "domain": "data_quality",
+      "priority": "P0",
+      "status": "planned",
+      "owner_role": "security-data-engineering",
+      "objective": "서로 다른 보안 로그를 공통 스키마로 정규화하고 원본 해시, 변환기 버전, 누락 필드와 실패 사유를 보존한다.",
+      "acceptance_criteria": [
+        "선정 로그원의 필수 필드 매핑률이 95퍼센트 이상이다.",
+        "변환 실패와 누락 필드가 무시되지 않고 별도 오류 결과로 기록된다."
+      ],
+      "sources": [
+        {
+          "framework": "OCSF",
+          "reference": "Open Cybersecurity Schema Framework",
+          "url": "https://ocsf.io/"
+        },
+        {
+          "framework": "NIA AI 데이터 품질관리 가이드라인 v3.5",
+          "reference": "AI 데이터 품질관리",
+          "url": "https://www.nia.or.kr/site/nia_kor/ex/bbs/View.do?bcIdx=28109&cbIdx=90549&parentSeq=28109"
+        }
+      ],
+      "evidence": [],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.9.0"
+    },
+    {
+      "control_id": "DET-01",
+      "title": "Sigma 탐지 규칙의 버전·시험·승격 관리",
+      "domain": "detection_engineering",
+      "priority": "P0",
+      "status": "planned",
+      "owner_role": "detection-engineering",
+      "objective": "탐지 논리를 이식 가능한 규칙으로 분리하고 로그원, 오탐, ATT&CK, 버전과 시험 결과를 관리한다.",
+      "acceptance_criteria": [
+        "모든 운영 규칙에 버전, 소유자, 로그원, 오탐과 ATT&CK 메타데이터가 있다.",
+        "공개 로그 재생 시험을 통과하지 않은 규칙은 운영 상태로 승격할 수 없다."
+      ],
+      "sources": [
+        {
+          "framework": "Sigma",
+          "reference": "Sigma rule specification and basics",
+          "url": "https://sigmahq.io/docs/basics/rules.html"
+        },
+        {
+          "framework": "MITRE ATT&CK",
+          "reference": "Enterprise techniques",
+          "url": "https://attack.mitre.org/"
+        }
+      ],
+      "evidence": [],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.9.0"
+    },
+    {
+      "control_id": "RES-01",
+      "title": "분석 공급자 장애와 감사 저장소 복구",
+      "domain": "resilience",
+      "priority": "P1",
+      "status": "partially_implemented",
+      "owner_role": "service-reliability",
+      "objective": "LLM, IdP, 저장소와 네트워크 장애 시 안전하게 성능을 낮추고 규칙 분석과 감사 무결성을 유지한다.",
+      "acceptance_criteria": [
+        "LLM 실패와 시간초과가 규칙 결과와 사람 검토로 복구된다.",
+        "IdP·저장소 장애와 복원 절차를 정기적으로 주입 시험한다."
+      ],
+      "sources": [
+        {
+          "framework": "ENISA NIS2 Technical Implementation Guidance",
+          "reference": "business continuity and crisis management",
+          "url": "https://www.enisa.europa.eu/publications/nis2-technical-implementation-guidance"
+        },
+        {
+          "framework": "금융보안원 클라우드 보안관리 참고자료",
+          "reference": "백업·이중화와 복구 통제",
+          "url": "https://www.fsec.or.kr/bbs/detail?bbsNo=11797&menuNo=69"
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "EVD-RES-FALLBACK-CODE",
+          "kind": "code",
+          "location": "app/analyzers/hybrid.py",
+          "description": "LLM 실패와 제한시간 초과 시 규칙 결과로 안전하게 복구"
+        },
+        {
+          "evidence_id": "EVD-RES-FALLBACK-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_hybrid_analyzer.py::test_llm_failure_falls_back_to_rule_and_requires_review",
+          "description": "공급자 실패 시 규칙 폴백과 사람 검토 전환 시험"
+        }
+      ],
+      "reviewed_on": "2026-09-16",
+      "review_due_on": "2026-12-16",
+      "target_version": "0.10.0"
+    }
+  ]
+}

@@ -106,6 +106,7 @@ def test_dashboard_is_available() -> None:
     assert "Zero Trust SecOps" in response.text
     assert "AI 교차분석" in response.text
     assert "ANALYST REVIEW" in response.text
+    assert "보안 통제 준비도" in response.text
 
 
 def test_default_simulation_returns_eight_events() -> None:

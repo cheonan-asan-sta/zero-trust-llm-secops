@@ -307,6 +307,11 @@ h1 span { color: var(--blue); }
 .evaluation-state { margin: 16px 0 0; color: var(--muted); font-size: 12px; }
 .evaluation-grid { grid-template-columns: repeat(5, 1fr); }
 .evaluation-grid strong { font-size: 21px; }
+.assurance-grid { grid-template-columns: repeat(6, 1fr); }
+.assurance-grid strong { font-size: 24px; }
+.assurance-domains { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px; }
+.assurance-domains span { padding: 6px 8px; border-radius: 5px; background: #edf4fb; color: #45627f; font-size: 9px; font-weight: 800; text-transform: uppercase; }
+.assurance-notice { margin: 16px 0 0; color: var(--muted); font-size: 10px; line-height: 1.6; }
 .metric-pass { color: var(--green); }
 .metric-fail { color: var(--orange); }
 .evaluation-details { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
@@ -339,6 +344,7 @@ footer { padding-block: 32px 48px; display: flex; justify-content: space-between
   .risk-card { grid-row: span 2; }
   .metric-grid { grid-template-columns: repeat(2, 1fr); }
   .operation-metrics { grid-template-columns: repeat(3, 1fr); }
+  .assurance-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 620px) {
@@ -356,5 +362,6 @@ footer { padding-block: 32px 48px; display: flex; justify-content: space-between
   .result-content { grid-template-columns: 1fr; }
   .metric-grid { grid-template-columns: 1fr 1fr; }
   .operation-metrics { grid-template-columns: 1fr 1fr; }
+  .assurance-grid { grid-template-columns: 1fr 1fr; }
   footer { gap: 20px; }
 }
