@@ -77,6 +77,11 @@ class SigmaRuleLevel(str, Enum):
     CRITICAL = "critical"
 
 
+class PublicReplayLabel(str, Enum):
+    THREAT = "threat"
+    BENIGN = "benign"
+
+
 class EventAction(str, Enum):
     LOGIN = "LOGIN"
     READ = "READ"
@@ -412,6 +417,123 @@ class SigmaDetectionResult(StrictModel):
 class DetectionPipelineResult(StrictModel):
     normalized: NormalizedSecurityEvent
     detection: SigmaDetectionResult
+
+
+class CorrelationPolicy(StrictModel):
+    window_minutes: int = Field(default=30, ge=1, le=1440)
+    minimum_distinct_rules: int = Field(default=2, ge=2, le=20)
+    minimum_repeated_events: int = Field(default=3, ge=2, le=100)
+    minimum_distinct_resources: int = Field(default=2, ge=2, le=100)
+
+
+class CorrelationRequest(StrictModel):
+    events: list[SecurityEvent] = Field(min_length=2, max_length=100)
+    policy: CorrelationPolicy = Field(default_factory=CorrelationPolicy)
+
+
+class IncidentFindingEvidence(StrictModel):
+    source_event_id: str = Field(min_length=1, max_length=128)
+    time: int = Field(ge=0)
+    rule_id: str = Field(min_length=36, max_length=36)
+    rule_title: str = Field(min_length=3, max_length=256)
+    level: SigmaRuleLevel
+    source_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    resource_uid: str = Field(min_length=1, max_length=128)
+
+
+class OCSFIncidentFinding(StrictModel):
+    schema_version: Literal["1.9.0"] = "1.9.0"
+    time: int = Field(ge=0)
+    category_uid: Literal[2] = 2
+    category_name: Literal["Findings"] = "Findings"
+    class_uid: Literal[2005] = 2005
+    class_name: Literal["Incident Finding"] = "Incident Finding"
+    activity_id: Literal[1] = 1
+    activity_name: Literal["Create"] = "Create"
+    type_uid: Literal[200501] = 200501
+    type_name: Literal["Incident Finding: Create"] = "Incident Finding: Create"
+    status_id: Literal[1] = 1
+    status: Literal["New"] = "New"
+    severity_id: Literal[3, 4, 5]
+    incident_uid: str = Field(pattern=r"^inc-[a-f0-9]{32}$")
+    title: str = Field(min_length=5, max_length=200)
+    desc: str = Field(min_length=10, max_length=500)
+    confidence_score: int = Field(ge=0, le=100)
+    start_time: int = Field(ge=0)
+    end_time: int = Field(ge=0)
+    assignee_group: Literal["Security Operations"] = "Security Operations"
+    finding_info_list: list[IncidentFindingEvidence] = Field(min_length=2, max_length=200)
+    event_ids: list[str] = Field(min_length=2, max_length=100)
+    user_ids: list[str] = Field(min_length=1, max_length=100)
+    source_ips: list[str] = Field(min_length=1, max_length=100)
+    device_ids: list[str] = Field(min_length=1, max_length=100)
+    resource_ids: list[str] = Field(min_length=1, max_length=100)
+    attack_tags: list[str] = Field(default_factory=list, max_length=100)
+    correlation_reasons: list[
+        Literal["multi_rule_attack_chain", "repeated_detection_across_resources"]
+    ] = Field(min_length=1, max_length=2)
+    requires_human_review: Literal[True] = True
+    tenant_id: str = Field(pattern=r"^[a-zA-Z0-9._-]{1,64}$")
+
+    @model_validator(mode="after")
+    def validate_incident_window(self) -> Self:
+        if self.end_time < self.start_time:
+            raise ValueError("incident end_time must not be earlier than start_time")
+        if self.time < self.end_time:
+            raise ValueError("incident creation time must not precede its final finding")
+        return self
+
+
+class CorrelationResult(StrictModel):
+    correlation_version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
+    ocsf_schema_version: Literal["1.9.0"] = "1.9.0"
+    analyzed_event_count: int = Field(ge=0)
+    finding_count: int = Field(ge=0)
+    incident_count: int = Field(ge=0)
+    incidents: list[OCSFIncidentFinding] = Field(default_factory=list, max_length=100)
+
+
+class PublicReplayDataset(StrictModel):
+    dataset_id: str = Field(pattern=r"^[a-z0-9][a-z0-9-]{2,63}$")
+    title: str = Field(min_length=5, max_length=160)
+    provider: str = Field(min_length=2, max_length=120)
+    adapter: Literal["windows_event_xml", "wiz_audit_json"]
+    fixture_name: str = Field(pattern=r"^[a-zA-Z0-9_.-]{3,120}$")
+    source_url: str = Field(pattern=r"^https://", max_length=700)
+    source_revision: str = Field(pattern=r"^[a-f0-9]{40}$")
+    source_artifact_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    fixture_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    license: Literal["Apache-2.0", "MIT"]
+    expected_label: PublicReplayLabel
+    attack_techniques: list[str] = Field(default_factory=list, max_length=20)
+    record_count: int = Field(ge=1, le=1000)
+
+
+class PublicReplayRecordResult(StrictModel):
+    source_record_id: str = Field(min_length=1, max_length=128)
+    raw_record_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    converted_event: SecurityEvent
+    normalized: NormalizedSecurityEvent
+    detection: SigmaDetectionResult
+
+
+class PublicReplayResult(StrictModel):
+    dataset: PublicReplayDataset
+    adapter_version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
+    records: list[PublicReplayRecordResult] = Field(min_length=1, max_length=1000)
+    finding_count: int = Field(ge=0)
+    incidents: list[OCSFIncidentFinding] = Field(default_factory=list, max_length=100)
+    expectation_met: bool
+
+
+class PublicReplaySuiteResult(StrictModel):
+    replay_version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
+    dataset_count: int = Field(ge=1)
+    event_count: int = Field(ge=1)
+    finding_count: int = Field(ge=0)
+    incident_count: int = Field(ge=0)
+    expectations_met: bool
+    results: list[PublicReplayResult] = Field(min_length=1, max_length=20)
 
 
 class SecurityAssessment(StrictModel):

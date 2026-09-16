@@ -23,6 +23,8 @@ from app.models import (
     BatchAnalysisResult,
     ControlRecord,
     ControlStatus,
+    CorrelationRequest,
+    CorrelationResult,
     DetectionPipelineResult,
     EvaluationRequest,
     EvaluationSummary,
@@ -30,6 +32,9 @@ from app.models import (
     MetricsSummary,
     NormalizedSecurityEvent,
     PolicyDecision,
+    PublicReplayDataset,
+    PublicReplayResult,
+    PublicReplaySuiteResult,
     ResponsePreviewRequest,
     ReviewStatus,
     ReviewUpdateRequest,
@@ -43,9 +48,11 @@ from app.scenarios import SCENARIOS, generate_events, get_scenario
 from app.security import Principal, Role, require_roles
 from app.services.assurance import get_assurance_registry
 from app.services.audit import create_audit_store
+from app.services.correlation import get_correlation_engine
 from app.services.evaluation import run_evaluation
 from app.services.ocsf import get_ocsf_normalizer
 from app.services.policy import enforce_assessment_safety, response_preview
+from app.services.public_replay import get_public_replay_service
 from app.services.scenario_evaluator import evaluate_scenarios
 from app.services.sigma import get_sigma_engine
 
@@ -67,6 +74,8 @@ audit_store = create_audit_store(settings)
 assurance_registry = get_assurance_registry()
 ocsf_normalizer = get_ocsf_normalizer()
 sigma_engine = get_sigma_engine()
+correlation_engine = get_correlation_engine()
+public_replay_service = get_public_replay_service()
 analysis_capacity = asyncio.Semaphore(settings.analysis_max_concurrency)
 
 ViewerPrincipal = Annotated[Principal, Depends(require_roles(Role.VIEWER))]
@@ -114,7 +123,12 @@ def liveness() -> dict:
 def readiness() -> Response:
     integrity = audit_store.integrity()
     assurance = assurance_registry.summary()
-    ready = integrity["ok"] and assurance.valid and sigma_engine.valid
+    ready = (
+        integrity["ok"]
+        and assurance.valid
+        and sigma_engine.valid
+        and public_replay_service.valid
+    )
     payload = {
         "status": "ready" if ready else "degraded",
         "audit": integrity,
@@ -140,6 +154,19 @@ def readiness() -> Response:
             "approved_rule_count": len(sigma_engine.approved_rules),
             "ruleset_digest_sha256": sigma_engine.ruleset_digest_sha256,
             "validation_issue_count": len(sigma_engine.validation_issues),
+        },
+        "correlation": {
+            "valid": True,
+            "version": correlation_engine.version,
+            "output_class": "OCSF Incident Finding",
+            "output_class_uid": 2005,
+        },
+        "public_replay": {
+            "valid": public_replay_service.valid,
+            "version": public_replay_service.version,
+            "dataset_count": len(public_replay_service.datasets()),
+            "manifest_digest_sha256": public_replay_service.manifest_digest_sha256,
+            "validation_issue_count": len(public_replay_service.validation_issues),
         },
     }
     return JSONResponse(payload, status_code=200 if ready else 503)
@@ -188,6 +215,48 @@ def evaluate_detections(event: SecurityEvent, _: AnalystPrincipal) -> DetectionP
 @app.get("/detections/rules", response_model=list[SigmaRuleSummary])
 def detection_rules(_: ViewerPrincipal) -> list[SigmaRuleSummary]:
     return sigma_engine.summaries()
+
+
+@app.post("/incidents/correlate", response_model=CorrelationResult)
+def correlate_incidents(
+    request: CorrelationRequest,
+    principal: AnalystPrincipal,
+) -> CorrelationResult:
+    pipelines = []
+    for event in request.events:
+        normalized = ocsf_normalizer.normalize(event)
+        pipelines.append(
+            DetectionPipelineResult(
+                normalized=normalized,
+                detection=sigma_engine.evaluate(normalized),
+            )
+        )
+    return correlation_engine.correlate(pipelines, principal.tenant_id, request.policy)
+
+
+@app.get("/replay/public/datasets", response_model=list[PublicReplayDataset])
+def public_replay_datasets(_: ViewerPrincipal) -> list[PublicReplayDataset]:
+    return public_replay_service.datasets()
+
+
+@app.post("/replay/public/run", response_model=PublicReplaySuiteResult)
+def run_public_replay(principal: AnalystPrincipal) -> PublicReplaySuiteResult:
+    if not public_replay_service.valid:
+        raise HTTPException(status_code=503, detail="Public replay fixtures failed validation")
+    return public_replay_service.run_all(principal.tenant_id)
+
+
+@app.post("/replay/public/{dataset_id}", response_model=PublicReplayResult)
+def run_public_replay_dataset(
+    dataset_id: str,
+    principal: AnalystPrincipal,
+) -> PublicReplayResult:
+    if not public_replay_service.valid:
+        raise HTTPException(status_code=503, detail="Public replay fixtures failed validation")
+    try:
+        return public_replay_service.run_dataset(dataset_id, principal.tenant_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail="Public replay dataset not found") from exc
 
 
 @app.post("/scenarios/evaluate", response_model=EventScenarioEvaluation)

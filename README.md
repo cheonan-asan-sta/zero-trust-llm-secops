@@ -1,7 +1,7 @@
 # zero-trust-llm-secops
 
 LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 프레임워크의 시연용 웹 애플리케이션입니다.
-합성 보안 이벤트를 입력받아 위험도를 분석하고, 실제 시스템을 변경하지 않는 대응 미리보기를 반환합니다.
+합성·공개 보안 이벤트를 정규화·탐지·상관분석하고, 실제 시스템을 변경하지 않는 대응 미리보기를 반환합니다.
 
 ## 현재 구현 범위
 
@@ -28,6 +28,8 @@ LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 �
 - OCSF 1.9.0 Authentication·API Activity 정규화와 원본·매핑 SHA-256 변환 이력
 - Sigma 2.1 YAML 규칙의 버전·승인·시험 메타데이터 및 실패 폐쇄형 로컬 탐지 엔진
 - 위협 5건·정상 3건 재생 시험과 분석 결과의 규칙집·입력 해시 증적
+- 커밋·라이선스·SHA-256이 고정된 Splunk 공격 및 Microsoft Sentinel 정상 로그 오프라인 재생
+- 사용자·IP·시간창 기반 다중 규칙 공격 체인과 반복 원격접속의 OCSF Incident Finding 상관분석
 - 공공·기업 보안 기준 18개를 구현·부분 구현·계획으로 구분한 기계판독 통제대장
 - 완료 통제의 코드·구성·자동 시험 증거를 강제하는 보증 검증기와 준비도 API
 - 천안아산역 콘셉트의 한국어 관제 대시보드
@@ -144,7 +146,7 @@ HYBRID_LLM_TIMEOUT_SECONDS=2.5
 |---|---|---|
 | GET | `/health` | 서버와 분석 모드 확인 |
 | GET | `/health/live` | 공개 가능한 최소 생존 확인 |
-| GET | `/health/ready` | 감사·통제대장·OCSF 매핑·Sigma 규칙집 무결성을 포함한 준비 상태 |
+| GET | `/health/ready` | 감사·통제대장·OCSF·Sigma·상관분석·공개 재생 자료 무결성을 포함한 준비 상태 |
 | GET | `/assurance/summary` | 통제 구현·증적·검토기한 요약 |
 | GET | `/assurance/controls` | 관리자 전용 통제·근거·증적 목록 |
 | GET | `/assurance/controls/{control_id}` | 관리자 전용 개별 통제 상세 |
@@ -154,6 +156,10 @@ HYBRID_LLM_TIMEOUT_SECONDS=2.5
 | POST | `/events/normalize` | 입력을 OCSF 1.9.0 이벤트와 변환 이력으로 정규화 |
 | POST | `/detections/evaluate` | OCSF 정규화 후 승인된 Sigma 규칙 재생 |
 | GET | `/detections/rules` | 규칙 상태·버전·해시·시험 사례 목록 |
+| POST | `/incidents/correlate` | 최대 100개 이벤트의 공격 체인을 OCSF Incident Finding으로 상관분석 |
+| GET | `/replay/public/datasets` | 고정된 공개 공격·정상 데이터셋의 출처·라이선스·해시 조회 |
+| POST | `/replay/public/run` | 공개 로그 8건의 탐지·오탐·사고 상관분석 회귀시험 |
+| POST | `/replay/public/{dataset_id}` | 지정한 공개 데이터셋만 오프라인 재생 |
 | POST | `/analysis` | 이벤트 위험 분석과 정책 검토 |
 | POST | `/analysis/batch` | 최대 20개 이벤트 제한 병렬 분석 |
 | POST | `/scenarios/evaluate` | 구조화 조건으로 시나리오 일치도 계산 |
@@ -169,8 +175,8 @@ HYBRID_LLM_TIMEOUT_SECONDS=2.5
 ```text
 app/
   analyzers/       규칙 기반 및 OpenAI 분석기
-  data/            기계판독 보안 통제대장과 Sigma YAML 규칙
-  services/        정책·감사·보증·OCSF 정규화·Sigma 탐지
+  data/            기계판독 통제대장, Sigma 규칙, 고정 공개 로그 표본
+  services/        정책·감사·보증·OCSF·Sigma·공개 재생·사고 상관분석
   config.py        환경변수 설정
   main.py          FastAPI 엔드포인트
   models.py        이벤트 및 분석 결과 모델
@@ -228,3 +234,6 @@ scripts/           대상 계정 검증이 포함된 AWS 배포 스크립트
 
 - [OpenAI API Quickstart](https://developers.openai.com/api/docs/quickstart)
 - [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs)
+- [OCSF 1.9.0 Incident Finding](https://github.com/ocsf/ocsf-schema/blob/v1.9.0/events/findings/incident_finding.json)
+- [Splunk Attack Data](https://github.com/splunk/attack_data)
+- [Microsoft Sentinel Sample Data](https://github.com/Azure/Azure-Sentinel/tree/master/Sample%20Data)

@@ -307,6 +307,8 @@ h1 span { color: var(--blue); }
 .evaluation-state { margin: 16px 0 0; color: var(--muted); font-size: 12px; }
 .evaluation-grid { grid-template-columns: repeat(5, 1fr); }
 .evaluation-grid strong { font-size: 21px; }
+.replay-grid { grid-template-columns: repeat(5, 1fr); }
+.replay-grid strong { font-size: 22px; }
 .assurance-grid { grid-template-columns: repeat(6, 1fr); }
 .assurance-grid strong { font-size: 24px; }
 .assurance-domains { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px; }

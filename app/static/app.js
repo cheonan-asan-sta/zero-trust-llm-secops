@@ -6,6 +6,7 @@ const state = {
   evaluating: false,
   latestResult: null,
   reviewing: false,
+  replaying: false,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -474,6 +475,59 @@ async function runEvaluation() {
   }
 }
 
+function renderReplayDetails(result) {
+  const body = $("replayBody");
+  body.replaceChildren();
+  result.results.forEach((item) => {
+    const row = document.createElement("tr");
+    const values = [
+      item.dataset.provider,
+      item.dataset.expected_label === "threat" ? "공격" : "정상",
+      item.records.length,
+      item.finding_count,
+      item.incidents.length,
+      item.expectation_met ? "통과" : "보완 필요",
+    ];
+    values.forEach((value, index) => {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      if (index === 5) cell.className = item.expectation_met ? "metric-pass" : "metric-fail";
+      row.append(cell);
+    });
+    body.append(row);
+  });
+  $("replayDetails").hidden = false;
+}
+
+async function runPublicReplay() {
+  if (state.replaying) return;
+  state.replaying = true;
+  $("replayButton").disabled = true;
+  $("replayButton").textContent = "재생 검증 중…";
+  $("replayState").textContent = "공개 로그 무결성, 탐지 결과와 사고 상관관계를 확인하고 있습니다.";
+
+  try {
+    const result = await request("/replay/public/run", { method: "POST" });
+    $("replayGrid").hidden = false;
+    $("replayDatasetCount").textContent = result.dataset_count;
+    $("replayEventCount").textContent = result.event_count;
+    $("replayFindingCount").textContent = result.finding_count;
+    $("replayIncidentCount").textContent = result.incident_count;
+    $("replayExpectation").textContent = result.expectations_met ? "통과" : "보완 필요";
+    $("replayExpectation").className = result.expectations_met ? "metric-pass" : "metric-fail";
+    renderReplayDetails(result);
+    $("replayState").textContent = result.expectations_met
+      ? "공격 탐지와 정상 로그 오탐 억제 기준을 모두 통과했습니다."
+      : "공개 로그 회귀 기준을 통과하지 못한 항목이 있습니다.";
+  } catch (error) {
+    $("replayState").textContent = `공개 로그를 재생하지 못했습니다: ${error.message}`;
+  } finally {
+    state.replaying = false;
+    $("replayButton").disabled = false;
+    $("replayButton").textContent = "공개 로그 8건 재생";
+  }
+}
+
 async function initialize() {
   try {
     const [health, scenarios] = await Promise.all([request("/health"), request("/scenarios")]);
@@ -490,6 +544,7 @@ async function initialize() {
 $("analyzeButton").addEventListener("click", runAnalysis);
 $("refreshButton").addEventListener("click", refreshSummary);
 $("evaluationButton").addEventListener("click", runEvaluation);
+$("replayButton").addEventListener("click", runPublicReplay);
 document.querySelectorAll("[data-review-status]").forEach((button) => {
   button.addEventListener("click", () => submitReview(button.dataset.reviewStatus));
 });

@@ -1,10 +1,14 @@
 FROM public.ecr.aws/lambda/python:3.12
 
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_DEFAULT_TIMEOUT=300 \
+    PIP_RETRIES=5
+
 RUN dnf upgrade -y && dnf clean all
 
 COPY pyproject.toml README.md ./
 COPY app ./app
 
-RUN pip install --no-cache-dir .
+RUN --mount=type=cache,target=/root/.cache/pip pip install .
 
 CMD ["app.main.handler"]

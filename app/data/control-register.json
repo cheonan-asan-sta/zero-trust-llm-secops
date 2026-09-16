@@ -1,5 +1,5 @@
 {
-  "registry_version": "2026.09.2",
+  "registry_version": "2026.09.3",
   "controls": [
     {
       "control_id": "GOV-01",
@@ -563,6 +563,18 @@
           "kind": "documentation",
           "location": "docs/enterprise-readiness.md",
           "description": "기업 운영 전 사고 대응과 복구 검증 게이트"
+        },
+        {
+          "evidence_id": "EVD-IR-CORRELATION-CODE",
+          "kind": "code",
+          "location": "app/services/correlation.py",
+          "description": "다중 규칙 공격 체인과 반복 원격 접근을 OCSF Incident Finding으로 묶는 결정적 상관분석 구현"
+        },
+        {
+          "evidence_id": "EVD-IR-CORRELATION-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_correlation_replay.py",
+          "description": "시간 창, 공유 엔터티, 반복 자원 조건과 순서 독립 사고 식별자 회귀 시험"
         }
       ],
       "reviewed_on": "2026-09-16",
@@ -616,7 +628,7 @@
       "title": "Sigma 탐지 규칙의 버전·시험·승격 관리",
       "domain": "detection_engineering",
       "priority": "P0",
-      "status": "partially_implemented",
+      "status": "implemented",
       "owner_role": "detection-engineering",
       "objective": "탐지 논리를 이식 가능한 규칙으로 분리하고 로그원, 오탐, ATT&CK, 버전과 시험 결과를 관리한다.",
       "acceptance_criteria": [
@@ -653,6 +665,18 @@
           "kind": "automated_test",
           "location": "tests/test_detection_pipeline.py",
           "description": "Five threat and three normal scenario replay tests plus unsupported-rule rejection tests."
+        },
+        {
+          "evidence_id": "EVD-DET-01-PUBLIC-REPLAY",
+          "kind": "configuration",
+          "location": "app/data/replay/manifest.json",
+          "description": "Pinned Splunk attack and Microsoft Sentinel benign fixtures with source revisions, licenses and SHA-256 integrity metadata."
+        },
+        {
+          "evidence_id": "EVD-DET-01-PUBLIC-TEST",
+          "kind": "automated_test",
+          "location": "tests/test_correlation_replay.py",
+          "description": "Offline public attack and benign log replay with detection, false-positive and incident-correlation assertions."
         }
       ],
       "reviewed_on": "2026-09-16",

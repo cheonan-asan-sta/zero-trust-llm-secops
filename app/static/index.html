@@ -36,14 +36,14 @@
           <h1>접근 이벤트에서<br /><span>대응 판단까지</span></h1>
           <p class="hero-copy">
             사용자·기기·네트워크·자원 정보를 OCSF로 정규화하고, Sigma와 LLM 분석 결과에
-            정책 안전장치를 적용하는 제로 트러스트 관제 시뮬레이션입니다.
+            정책 안전장치와 사고 상관분석을 적용하는 제로 트러스트 관제 시뮬레이션입니다.
           </p>
         </div>
         <ol class="route-map" aria-label="분석 단계">
           <li><span>01</span><strong>이벤트 수집</strong><small>합성 보안 로그</small></li>
           <li><span>02</span><strong>OCSF 정규화</strong><small>원본·매핑 해시</small></li>
           <li><span>03</span><strong>위험 분석</strong><small>Sigma·규칙·LLM</small></li>
-          <li><span>04</span><strong>정책 확인</strong><small>사람 검토·허용 목록</small></li>
+          <li><span>04</span><strong>사고 판단</strong><small>상관분석·사람 검토</small></li>
         </ol>
       </section>
 
@@ -179,6 +179,41 @@
         <p class="assurance-notice">
           구현률은 인증이나 규정 준수 선언이 아닙니다. 완료 통제는 코드·구성 및 자동 시험 증거가 모두 있을 때만 집계합니다.
         </p>
+      </section>
+
+      <section class="summary-section shell replay-section">
+        <div class="section-heading-row">
+          <div>
+            <p class="section-kicker">PUBLIC LOG REPLAY</p>
+            <h2>공개 로그 회귀 검증</h2>
+          </div>
+          <button id="replayButton" class="secondary-button" type="button">
+            공개 로그 8건 재생
+          </button>
+        </div>
+        <p id="replayState" class="evaluation-state">
+          고정된 Splunk 공격 로그와 Microsoft Sentinel 정상 로그를 오프라인으로 재생합니다.
+        </p>
+        <div id="replayGrid" class="metric-grid replay-grid" hidden>
+          <article><span>데이터셋</span><strong id="replayDatasetCount">-</strong></article>
+          <article><span>재생 이벤트</span><strong id="replayEventCount">-</strong></article>
+          <article><span>탐지 결과</span><strong id="replayFindingCount">-</strong></article>
+          <article><span>연결된 사고</span><strong id="replayIncidentCount">-</strong></article>
+          <article><span>기대 결과</span><strong id="replayExpectation">-</strong></article>
+        </div>
+        <div id="replayDetails" class="evaluation-details" hidden>
+          <div class="history-wrap">
+            <table>
+              <thead>
+                <tr><th>공급자</th><th>구분</th><th>이벤트</th><th>탐지</th><th>사고</th><th>판정</th></tr>
+              </thead>
+              <tbody id="replayBody"></tbody>
+            </table>
+          </div>
+          <p class="assurance-notice">
+            원본 커밋과 SHA-256이 고정된 공개 시험 자료만 사용하며 외부 시스템에는 연결하지 않습니다.
+          </p>
+        </div>
       </section>
 
       <section class="summary-section shell evaluation-section">

@@ -1,0 +1,35 @@
+{
+  "manifest_version": "2026.09.1",
+  "datasets": [
+    {
+      "dataset_id": "splunk-rdp-session-established",
+      "title": "Splunk Attack Data - RDP Session Established",
+      "provider": "Splunk Attack Data",
+      "adapter": "windows_event_xml",
+      "fixture_name": "splunk-rdp-session-established.xml",
+      "source_url": "https://media.githubusercontent.com/media/splunk/attack_data/be1980668e58497d23ba77ba25769996c4d1efaa/datasets/attack_techniques/T1021.001/rdp_session_established/4624_10_logon.log",
+      "source_revision": "be1980668e58497d23ba77ba25769996c4d1efaa",
+      "source_artifact_sha256": "03a9cef0403dda73c10b0b27f051e39d9dd7b3ab05514c59b1ef11fef60c56df",
+      "fixture_sha256": "801e46d2c0e771e9a9b28d0579ba740f511358949b835367f80271b4392ed486",
+      "license": "Apache-2.0",
+      "expected_label": "threat",
+      "attack_techniques": ["T1021.001"],
+      "record_count": 4
+    },
+    {
+      "dataset_id": "microsoft-sentinel-wiz-audit",
+      "title": "Microsoft Sentinel - Wiz Audit Login Samples",
+      "provider": "Microsoft Sentinel",
+      "adapter": "wiz_audit_json",
+      "fixture_name": "microsoft-sentinel-wiz-audit.json",
+      "source_url": "https://raw.githubusercontent.com/Azure/Azure-Sentinel/7ca9800582967401b7073a0f27518666fc4da3d5/Sample%20Data/Custom/Wiz/WizAuditLogs_RawLogs.json",
+      "source_revision": "7ca9800582967401b7073a0f27518666fc4da3d5",
+      "source_artifact_sha256": "895cdbafd831ef576adacd2259d56066fbb8564c4a8a4347080cadf82cd1fb6b",
+      "fixture_sha256": "4bc25e2e6ae2cb4b80d2d135fb401d073e2c66e2d183dd5cabb574cde27ebc3b",
+      "license": "MIT",
+      "expected_label": "benign",
+      "attack_techniques": [],
+      "record_count": 4
+    }
+  ]
+}

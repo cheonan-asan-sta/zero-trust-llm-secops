@@ -2,9 +2,9 @@
 
 ## 현재 판정
 
-버전 0.9.0은 기업 적용을 위한 1차 보안 기준선과 공공·기업 요구사항을 연결하는 보증 기준선에 OCSF 1.9.0 정규화와 Sigma 2.1 탐지 데이터 계보를 추가했다. 인증과 권한, 테넌트 격리, 요청 추적, 감사 무결성, 관측성과 자원 보호를 코드와 자동 테스트로 검증하고 KISA, 개인정보보호위원회, NIA, NIST, CISA, ENISA, OWASP와 MITRE 자료에서 도출한 18개 통제를 기계판독 대장으로 관리한다.
+버전 0.10.0은 OCSF 1.9.0 정규화와 Sigma 2.1 탐지 데이터 계보에 공개 로그 회귀시험과 OCSF Incident Finding 상관분석을 추가했다. 인증과 권한, 테넌트 격리, 요청 추적, 감사 무결성, 관측성과 자원 보호를 코드와 자동 테스트로 검증하고 KISA, 개인정보보호위원회, NIA, NIST, CISA, ENISA, OWASP와 MITRE 자료에서 도출한 18개 통제를 기계판독 대장으로 관리한다.
 
-현재 통제대장은 구현 완료 8개, 부분 구현 6개, 계획 4개다. 가중 구현률은 61.11%지만 이는 인증이나 규정 준수율이 아니다. OCSF는 현재 합성 이벤트 입력 형식에 대해 검증했으며 Sigma는 로컬 시험 상태다. 특정 기업의 IdP, SIEM, 실제 로그, 개인정보 정책과 운영 절차가 연결되지 않았으므로 아직 운영 승인 또는 보안 인증을 받은 제품으로 간주하지 않는다.
+현재 통제대장은 구현 완료 9개, 부분 구현 5개, 계획 4개다. 가중 구현률은 63.89%지만 이는 인증이나 규정 준수율이 아니다. Splunk Attack Data 공격 표본과 Microsoft Sentinel 정상 표본으로 탐지·오탐 회귀시험을 수행했지만 규칙 상태는 계속 `test`다. 특정 기업의 IdP, SIEM, 전체 로그 분포, 개인정보 정책과 운영 절차가 연결되지 않았으므로 아직 운영 승인 또는 보안 인증을 받은 제품으로 간주하지 않는다.
 
 ## 적용한 보안 기준선
 
@@ -22,10 +22,12 @@
 | 관측성 | 경로별 요청 수와 응답시간을 관리자 전용 Prometheus 형식으로 제공 | 메트릭 엔드포인트 테스트 |
 | 이벤트 정규화 | OCSF 1.9.0 Authentication·API Activity 분류, type UID, 원본 해시와 매핑 버전 | 클래스·해시·정답 분리·결정성 테스트 |
 | 탐지 규칙 | Sigma 2.1 YAML, 수치·필드참조·필터 조건, 버전·승인·시험 메타데이터와 규칙집 해시 | 위협 5건·정상 3건 재생 및 미지원 규칙 거부 테스트 |
+| 공개 로그 회귀 | 원본 커밋·라이선스·원본 및 표본 SHA-256을 고정하고 네트워크 없이 재생 | Splunk RDP 공격 4건 탐지, Sentinel 정상 로그인 4건 오탐 0건 |
+| 사고 상관분석 | 사용자·IP·30분 시간창으로 다중 규칙 및 다중 자원 반복 탐지를 Incident Finding 2005로 집계 | 순서 독립 사건 ID, 시간창·자원 임계값·공격 체인 테스트 |
 | 배포 입구 | Lambda 함수 URL의 기본·스크립트 배포 인증을 AWS IAM으로 고정 | 정적 구성 점검 |
 | 통제 보증 | 18개 통제의 소유자·상태·기준·출처·증적·검토일과 SHA-256 대장 지문 | 스키마·중복·증적 경로·권한 테스트 |
 
-통제 요약은 `/assurance/summary`, 관리자 상세 증적은 `/assurance/controls`에서 확인한다. `/health/ready`는 감사 로그, 통제대장, OCSF 매핑과 Sigma 규칙집 무결성을 확인한다. 구현 완료 상태는 코드 또는 구성 증거와 자동 시험 증거가 모두 존재할 때만 허용한다. Sigma 통제는 합성 재생까지 구현했지만 공개 외부 로그 재생 전이므로 부분 구현으로 유지한다.
+통제 요약은 `/assurance/summary`, 관리자 상세 증적은 `/assurance/controls`에서 확인한다. `/health/ready`는 감사 로그, 통제대장, OCSF 매핑, Sigma 규칙집과 공개 표본 무결성을 확인한다. 구현 완료 상태는 코드 또는 구성 증거와 자동 시험 증거가 모두 존재할 때만 허용한다. Sigma 통제는 공개 공격·정상 로그 회귀 증거가 연결되어 구현 완료로 판정했지만, 실제 조직 로그에서의 운영 승격은 별도 승인 대상이다.
 
 ## 운영 전 필수 게이트
 
@@ -38,7 +40,7 @@
 5. 운영 부하와 장애 조건에서 가용성, 백업 복원, RTO·RPO, 경보와 당직 절차를 훈련한다.
 6. SAST, SCA, SBOM, 이미지 서명·스캔, DAST와 독립 침투시험의 발견 사항을 해소한다.
 7. 모델 변경 승인, 프롬프트 공격 평가, 오탐·미탐 기준, 사람 검토 책임과 롤백 절차를 문서화한다.
-8. Loghub·OTRF 등 이용조건을 확인한 공개 로그 표본으로 파서 매핑률, Sigma 오탐·미탐과 규칙 승격을 재검증한다.
+8. 더 넓은 Loghub·OTRF·조직 로그 분포에서 파서 매핑률, 규칙별 precision·recall·FPR과 드리프트를 측정한 뒤 `test` 규칙의 `stable` 승격을 승인한다.
 
 ## 설계 기준
 
@@ -52,5 +54,8 @@
 - [MITRE ATLAS](https://atlas.mitre.org/)
 - [OCSF 1.9.0](https://github.com/ocsf/ocsf-schema/releases/tag/v1.9.0)
 - [Sigma Specification 2.1](https://sigmahq.io/sigma-specification/specification/sigma-rules-specification.html)
+- [OCSF 1.9.0 Incident Finding](https://github.com/ocsf/ocsf-schema/blob/v1.9.0/events/findings/incident_finding.json)
+- [Splunk Attack Data](https://github.com/splunk/attack_data)
+- [Microsoft Sentinel Sample Data](https://github.com/Azure/Azure-Sentinel/tree/master/Sample%20Data)
 
 NIST의 원칙에 따라 네트워크 위치만으로 신뢰하지 않고 사용자·서비스 신원과 자원 접근 정책을 요청마다 확인한다. OWASP API Security의 객체 수준 권한·인증 위험을 줄이기 위해 테넌트 범위 조회와 역할 검사를 각 API 함수에 적용한다.

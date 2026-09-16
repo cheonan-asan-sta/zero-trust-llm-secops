@@ -58,7 +58,7 @@ try {
     if (-not $health -or $health.status -ne "ok" -or $health.analyzer_mode -ne "rule") {
         throw "Container health check did not become ready in rule mode."
     }
-    if ($health.version -ne "0.9.0" -or $health.auth_mode -ne "disabled") {
+    if ($health.version -ne "0.10.0" -or $health.auth_mode -ne "disabled") {
         throw "Container did not start with the expected local security profile."
     }
     $readiness = Invoke-RestMethod -Method Get -Uri "$baseUrl/health/ready" -TimeoutSec 2
@@ -69,7 +69,10 @@ try {
         $readiness.assurance.total_controls -ne 18 -or
         $readiness.normalization.schema_version -ne "1.9.0" -or
         -not $readiness.detection.valid -or
-        $readiness.detection.approved_rule_count -ne 5
+        $readiness.detection.approved_rule_count -ne 6 -or
+        $readiness.correlation.output_class_uid -ne 2005 -or
+        -not $readiness.public_replay.valid -or
+        $readiness.public_replay.dataset_count -ne 2
     ) {
         throw "Audit or assurance registry integrity readiness check failed."
     }
@@ -101,6 +104,10 @@ try {
         -Uri "$baseUrl/evaluation/run" `
         -ContentType "application/json" `
         -Body '{"analyzer":"rule","runs_per_scenario":5,"concurrency":4}'
+    $publicReplay = Invoke-RestMethod `
+        -Method Post `
+        -Uri "$baseUrl/replay/public/run" `
+        -ContentType "application/json"
 
     if ($analysis.assessment.risk_level -notin @("HIGH", "CRITICAL")) {
         throw "Threat smoke test returned an unexpectedly low risk."
@@ -110,7 +117,7 @@ try {
     }
     if (
         $analysis.normalized_event.provenance.schema_version -ne "1.9.0" -or
-        $analysis.detection.evaluated_rule_count -ne 5 -or
+        $analysis.detection.evaluated_rule_count -ne 6 -or
         $analysis.detection.matches.Count -lt 1
     ) {
         throw "OCSF normalization or Sigma detection evidence is missing."
@@ -140,6 +147,14 @@ try {
     if ($evaluation.error_count -ne 0 -or $evaluation.total_cases -ne 40) {
         throw "Stability evaluation returned errors or an unexpected sample size."
     }
+    if (
+        -not $publicReplay.expectations_met -or
+        $publicReplay.dataset_count -ne 2 -or
+        $publicReplay.event_count -ne 8 -or
+        $publicReplay.incident_count -ne 1
+    ) {
+        throw "Public attack/benign replay or incident correlation failed."
+    }
 
     [ordered]@{
         status = "passed"
@@ -153,6 +168,8 @@ try {
         assurance_control_count = $readiness.assurance.total_controls
         ocsf_schema_version = $readiness.normalization.schema_version
         sigma_rules = $readiness.detection.approved_rule_count
+        public_replay_events = $publicReplay.event_count
+        correlated_incidents = $publicReplay.incident_count
         evaluation_cases = $evaluation.total_cases
         risk_accuracy = $evaluation.risk_accuracy
         action_accuracy = $evaluation.action_accuracy

@@ -80,8 +80,8 @@ def test_packaged_sigma_rules_are_valid_versioned_and_approved() -> None:
 
     assert engine.valid is True
     assert engine.validation_issues == []
-    assert len(summaries) == 5
-    assert len(engine.approved_rules) == 5
+    assert len(summaries) == 6
+    assert len(engine.approved_rules) == 6
     assert all(rule.version == "1.0.0" for rule in summaries)
     assert all(rule.test_case_ids for rule in summaries)
     assert len(engine.ruleset_digest_sha256) == 64
@@ -138,10 +138,10 @@ def test_pipeline_apis_and_analysis_return_versioned_detection_evidence() -> Non
     assert detection.status_code == 200
     assert detection.json()["detection"]["matches"][0]["version"] == "1.0.0"
     assert rules.status_code == 200
-    assert len(rules.json()) == 5
+    assert len(rules.json()) == 6
     assert analysis.status_code == 200
     assert analysis.json()["normalized_event"]["provenance"]["schema_version"] == "1.9.0"
-    assert analysis.json()["detection"]["evaluated_rule_count"] == 5
+    assert analysis.json()["detection"]["evaluated_rule_count"] == 6
 
 
 def test_readiness_includes_normalization_and_detection_integrity() -> None:
@@ -152,5 +152,5 @@ def test_readiness_includes_normalization_and_detection_integrity() -> None:
     assert payload["normalization"]["schema_version"] == "1.9.0"
     assert len(payload["normalization"]["mapping_digest_sha256"]) == 64
     assert payload["detection"]["valid"] is True
-    assert payload["detection"]["approved_rule_count"] == 5
+    assert payload["detection"]["approved_rule_count"] == 6
     assert payload["detection"]["validation_issue_count"] == 0
