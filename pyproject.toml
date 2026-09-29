@@ -6,6 +6,7 @@ build-backend = "hatchling.build"
 name = "zero-trust-llm-secops"
 version = "0.15.0"
 description = "LLM-assisted Zero Trust security event analysis and response simulation"
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
