@@ -87,6 +87,7 @@ from app.services.policy import enforce_assessment_safety, response_preview
 from app.services.public_replay import get_public_replay_service
 from app.services.scenario_evaluator import evaluate_scenarios
 from app.services.sigma import get_sigma_engine
+from app.services.trusted_signals import SignalVerifier
 from app.services.zero_trust import ZeroTrustOperations
 from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
 
@@ -118,7 +119,8 @@ detection_quality_service = get_detection_quality_service()
 incident_quality_service = get_incident_quality_service()
 analysis_capacity = asyncio.Semaphore(settings.analysis_max_concurrency)
 zero_trust_operations = (
-    ZeroTrustOperations(settings.zero_trust_db_path)
+    ZeroTrustOperations(settings.zero_trust_db_path,
+                        signal_verifier=SignalVerifier(settings.trusted_signal_sources_path))
     if settings.app_environment != "production" else None
 )
 app.include_router(zero_trust_router(zero_trust_operations))

@@ -11,6 +11,7 @@ htmlcov/
 runtime/*.jsonl
 runtime/*.log
 runtime/*.sqlite3*
+runtime/local-collector/
 .idea/
 .vscode/
 

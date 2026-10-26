@@ -52,7 +52,7 @@
           <div><p class="section-kicker">ZERO TRUST OPERATIONS</p><h2>지속 세션 검증과 접근 통제</h2></div>
           <button id="ztStart" class="secondary-button" type="button">정상 세션 시작</button>
         </div>
-        <p class="evaluation-state">모의 신원과 기기 신호로 정책을 평가합니다. 허용은 자원·행위·시간에 묶이며, 업무 자원 집행도 이 로컬 시연 안에서만 동작합니다.</p>
+        <p class="evaluation-state">아래 버튼은 서명 없는 모의 신호로 정책을 평가합니다. 허용은 자원·행위·시간에 묶이며, 업무 자원 집행도 이 로컬 시연 안에서만 동작합니다.</p>
         <div class="metric-grid">
           <article><span>접근 판단</span><strong id="ztDecision">대기</strong></article>
           <article><span>세션 상태</span><strong id="ztStatus">-</strong></article>
@@ -69,6 +69,19 @@
         <div class="history-wrap"><table>
           <thead><tr><th>버전</th><th>자원</th><th>판단</th><th>위험</th><th>판단 근거</th><th>허용 만료</th></tr></thead>
           <tbody id="ztHistory"><tr><td colspan="6" class="table-empty">아직 평가한 세션이 없습니다.</td></tr></tbody>
+        </table></div>
+      </section>
+
+      <section class="summary-section shell" id="trustedSignalsSection">
+        <div class="section-heading-row">
+          <div><p class="section-kicker">VERIFIED SIGNAL SOURCE</p><h2>서명 수집기 세션</h2></div>
+          <button id="ztSignedRefresh" class="secondary-button" type="button">서명 세션 조회</button>
+        </div>
+        <p class="evaluation-state">별도 로컬 수집기가 보낸 신호의 출처와 재인증 상태를 조회합니다. 서명은 출처와 무결성을 확인하며, 실제 사용자 인증이나 기기 안전성을 보증하지 않습니다.</p>
+        <p id="ztSignalStatus" class="evaluation-state" aria-live="polite">서명 세션 조회를 누르면 수집기 등록 상태와 최근 세션을 확인할 수 있습니다.</p>
+        <div class="history-wrap"><table>
+          <thead><tr><th>세션</th><th>수집기 / 키</th><th>버전</th><th>판단</th><th>재인증</th><th>판단 근거</th></tr></thead>
+          <tbody id="ztSignedSessions"><tr><td colspan="6" class="table-empty">아직 조회하지 않았습니다.</td></tr></tbody>
         </table></div>
       </section>
 

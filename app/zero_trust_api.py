@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Response
 
 from app.security import Principal, Role, require_roles
+from app.services.trusted_signals import SignalRegistryUnavailable, SignalRejected
 from app.services.zero_trust import (
     JournalUnavailable,
     SessionConflict,
@@ -16,6 +17,7 @@ from app.zero_trust_models import (
     SessionEvaluationRequest,
     SessionEvaluationResult,
     SessionRevocationRequest,
+    SignedSessionSignal,
     ZeroTrustPolicyBundle,
 )
 
@@ -40,6 +42,14 @@ def zero_trust_router(service: ZeroTrustOperations | None) -> APIRouter:
     @router.post("/sessions/evaluate", response_model=SessionEvaluationResult)
     def evaluate(request: SessionEvaluationRequest, principal: Analyst, operations: Service):
         return operations.evaluate(request, principal)
+
+    @router.post("/signals/evaluate", response_model=SessionEvaluationResult)
+    def evaluate_signed(request: SignedSessionSignal, principal: Analyst, operations: Service):
+        return operations.evaluate_signed(request, principal)
+
+    @router.get("/signals/status")
+    def signals_status(principal: Viewer, operations: Service):
+        return operations.signal_verifier.readiness(principal.tenant_id)
 
     @router.get("/sessions", response_model=list[SessionDecision])
     def sessions(principal: Viewer, operations: Service):
@@ -67,6 +77,16 @@ def zero_trust_router(service: ZeroTrustOperations | None) -> APIRouter:
 
 def install_zero_trust_error_handlers(app):
     from fastapi.responses import JSONResponse
+
+    @app.exception_handler(SignalRejected)
+    async def rejected_signal(_request, _exc):
+        return JSONResponse({"detail": "Signal source, signature, scope or freshness rejected"},
+                            status_code=401)
+
+    @app.exception_handler(SignalRegistryUnavailable)
+    async def unavailable_sources(_request, _exc):
+        return JSONResponse({"detail": "Trusted signal registry unavailable; access denied"},
+                            status_code=503)
 
     @app.exception_handler(SessionConflict)
     async def conflict(_request, _exc):

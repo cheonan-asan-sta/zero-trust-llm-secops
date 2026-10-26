@@ -776,7 +776,50 @@ const ztReasons = {
   SESSION_NOT_AUTHORIZED: "세션 허용 회수 또는 추가 검증 필요", GRANT_INVALID: "유효한 허용 없음",
   SCOPE_DENIED: "허용 범위 밖의 접근", POLICY_CHANGED: "정책 변경으로 허용 만료",
   GRANT_EXPIRED: "허용 유효기간 만료", GRANT_ALREADY_USED: "이미 사용한 허용",
+  SIGNED_MFA_CHALLENGE_REQUIRED: "현재 재인증 요청에 연결된 서명 신호 필요",
+  SIGNAL_SOURCE_REVOKED: "수집기 신뢰 설정 변경 또는 키 만료",
+  SIGNAL_PROOF_EXPIRED: "서명 신호 만료",
 };
+
+async function refreshSignedSessions() {
+  const button = $("ztSignedRefresh");
+  button.disabled = true;
+  try {
+    const [status, sessions] = await Promise.all([
+      request("/zero-trust/signals/status"), request("/zero-trust/sessions"),
+    ]);
+    $("ztSignalStatus").textContent = !status.ok ? "수집기 등록 정보를 읽을 수 없어 서명 접근을 차단합니다."
+      : status.configured ? `공개키 등록 정보 정상 · 등록 수집기 ${status.source_count}개`
+      : "서명 수집기가 설정되지 않았습니다. 로컬 수집기를 설정한 뒤 조회하세요.";
+    const rows = sessions.filter((session) => session.signal_trust === "verified_source");
+    const body = $("ztSignedSessions");
+    body.replaceChildren();
+    rows.forEach((session) => {
+      const row = document.createElement("tr");
+      const challenge = session.challenge_expires_at
+        ? `대기 · ${new Date(session.challenge_expires_at).toLocaleTimeString("ko-KR")}까지` : "대기 요청 없음";
+      [session.session_id, `${session.signal_source_id} / ${session.signal_key_id}`, session.version,
+        `${ztDecisions[session.decision]} · ${ztStatuses[session.status]}`, challenge,
+        session.reason_codes.map((code) => ztReasons[code] || code).join(" · "),
+      ].forEach((value) => { const cell = document.createElement("td"); cell.textContent = value; row.append(cell); });
+      body.append(row);
+    });
+    if (!rows.length) {
+      const row = document.createElement("tr");
+      const cell = document.createElement("td");
+      cell.colSpan = 6;
+      cell.className = "table-empty";
+      cell.textContent = "최근 100개 세션에 서명 수집기 세션이 없습니다.";
+      row.append(cell);
+      body.append(row);
+    }
+  } catch (error) {
+    $("ztSignalStatus").textContent = `서명 세션 조회 실패: ${error.message}`;
+    $("ztSignedSessions").replaceChildren();
+  } finally {
+    button.disabled = false;
+  }
+}
 
 async function renderZt(session) {
   $("ztDecision").textContent = ztDecisions[session.decision];
@@ -855,6 +898,7 @@ $("ztAccess").addEventListener("click", () => operateZt("access"));
 $("ztChallenge").addEventListener("click", () => operateZt("challenge"));
 $("ztRecover").addEventListener("click", () => operateZt("recover"));
 $("ztCompromise").addEventListener("click", () => operateZt("compromise"));
+$("ztSignedRefresh").addEventListener("click", refreshSignedSessions);
 
 $("analyzeButton").addEventListener("click", runAnalysis);
 $("refreshButton").addEventListener("click", refreshSummary);

@@ -14,6 +14,7 @@ from app.models import ResourceContext
 from app.security import Principal
 from app.services.ocsf import get_ocsf_normalizer
 from app.services.sigma import get_sigma_engine
+from app.services.trusted_signals import SignalVerifier, VerifiedSignal
 from app.zero_trust_models import (
     ProtectedAccessRequest,
     ProtectedAccessResult,
@@ -21,6 +22,7 @@ from app.zero_trust_models import (
     SessionEvaluationRequest,
     SessionEvaluationResult,
     SessionRevocationRequest,
+    SignedSessionSignal,
     ZeroTrustPolicyBundle,
 )
 
@@ -54,8 +56,10 @@ class ZeroTrustOperations:
     before deriving sessions/grants, so there is no unverified mutable projection.
     """
 
-    def __init__(self, path: Path, policy_path: Path = POLICY_PATH) -> None:
+    def __init__(self, path: Path, policy_path: Path = POLICY_PATH,
+                 signal_verifier: SignalVerifier | None = None) -> None:
         self.path = path
+        self.signal_verifier = signal_verifier or SignalVerifier()
         self.policy = ZeroTrustPolicyBundle.model_validate_json(policy_path.read_text("utf-8"))
         self.policy_digest = _digest(self.policy.model_dump_json())
         self.resources = {item.resource_id: item for item in self.policy.resources}
@@ -120,7 +124,9 @@ class ZeroTrustOperations:
     def integrity(self):
         try:
             with self._transaction() as transaction:
-                return {"ok": True, "verified_entries": len(transaction[1]),
+                signals = self.signal_verifier.readiness()
+                return {"ok": signals["ok"], "verified_entries": len(transaction[1]),
+                        "trusted_signals": signals,
                         "mode": "local_simulation", "policy_version": self.policy.version,
                         "policy_digest_sha256": self.policy_digest}
         except JournalUnavailable:
@@ -151,15 +157,33 @@ class ZeroTrustOperations:
         self, request: SessionEvaluationRequest, principal: Principal,
         *, now: datetime | None = None,
     ) -> SessionEvaluationResult:
+        return self._evaluate(request, principal, now=now or datetime.now(UTC))
+
+    def evaluate_signed(self, signal: SignedSessionSignal, principal: Principal,
+                        *, now: datetime | None = None) -> SessionEvaluationResult:
+        now = now or datetime.now(UTC)
+        proof = self.signal_verifier.verify(signal, principal, now)
+        request = SessionEvaluationRequest(session_id=signal.session_id,
+                                           expected_version=signal.expected_version,
+                                           event=signal.event)
+        return self._evaluate(request, principal, now=now, proof=proof)
+
+    def _evaluate(self, request: SessionEvaluationRequest, principal: Principal,
+                  *, now: datetime, proof: VerifiedSignal | None = None) -> SessionEvaluationResult:
         now = now or datetime.now(UTC)
         event = request.event
-        digest = _digest(_canonical(event.analysis_payload()))
+        digest = proof.input_digest if proof else _digest(_canonical(event.analysis_payload()))
         with self._transaction() as transaction:
             _, entries, _ = transaction
             existing = self._latest(entries, principal.tenant_id, request.session_id)
             previous = SessionDecision.model_validate(existing["session"]) if existing else None
             if previous and previous.operator_id != principal.subject:
                 raise SessionConflict("session belongs to another simulation operator")
+            trust = "verified_source" if proof else "demo"
+            if previous and (previous.signal_trust != trust or (
+                proof is not None and previous.signal_source_id != proof.source_id
+            )):
+                raise SessionConflict("session signal trust or source cannot change")
             duplicate = next((entry for entry in entries if entry["kind"] == "decision"
                               and entry["session"]["tenant_id"] == principal.tenant_id
                               and entry["session"]["event_id"] == event.event_id), None)
@@ -240,13 +264,41 @@ class ZeroTrustOperations:
             if expected == 199:
                 hold = True
                 reasons.append("SESSION_HISTORY_CAPACITY")
+            challenge_verified = False
+            if proof and previous and previous.challenge_id is not None:
+                challenge_verified = bool(
+                    previous.challenge_id and proof.challenge_id == previous.challenge_id
+                    and previous.challenge_expires_at and previous.challenge_expires_at > now
+                    and proof.issued_at > previous.evaluated_at
+                    and event.auth_context.mfa == "success"
+                )
+                if not challenge_verified:
+                    step_up = True
+                    reasons.append("SIGNED_MFA_CHALLENGE_REQUIRED")
+            elif proof and proof.challenge_id is not None:
+                raise SessionConflict("no outstanding challenge for this proof")
             decision = "DENY" if deny else "HOLD" if hold else "STEP_UP" if step_up else "ALLOW"
             status = {"DENY": "REVOKED", "HOLD": "HELD", "STEP_UP": "STEP_UP_REQUIRED", "ALLOW": "ACTIVE"}[decision]
+            challenge_id = None
+            challenge_expires = None
+            if proof and decision != "DENY" and (
+                decision == "STEP_UP" or (previous and previous.challenge_id
+                                           and not (challenge_verified and decision == "ALLOW"))
+            ):
+                if (previous and previous.challenge_id
+                        and previous.challenge_expires_at and previous.challenge_expires_at > now):
+                    challenge_id = previous.challenge_id
+                    challenge_expires = previous.challenge_expires_at
+                else:
+                    challenge_id = secrets.token_urlsafe(32)
+                    challenge_expires = now + timedelta(seconds=120)
             token = secrets.token_urlsafe(32) if decision == "ALLOW" else None
             expires = min(
                 now + timedelta(seconds=resource.grant_ttl_seconds),
                 event.timestamp + timedelta(seconds=resource.max_signal_age_seconds),
             ) if token else None
+            if expires and proof:
+                expires = min(expires, proof.expires_at)
             session = SessionDecision(
                 session_id=request.session_id, tenant_id=principal.tenant_id,
                 operator_id=principal.subject, user_id=event.user.user_id,
@@ -258,6 +310,11 @@ class ZeroTrustOperations:
                 matched_rule_ids=matched, policy_version=self.policy.version,
                 policy_digest_sha256=self.policy_digest, input_digest_sha256=digest,
                 grant_expires_at=expires,
+                signal_trust=trust, signal_source_id=proof.source_id if proof else None,
+                signal_key_id=proof.key_id if proof else None,
+                signal_source_digest=proof.source_digest if proof else None,
+                signal_expires_at=proof.expires_at if proof else None,
+                challenge_id=challenge_id, challenge_expires_at=challenge_expires,
             )
             self._append(transaction, {"kind": "decision", "session": session.model_dump(mode="json"),
                                        "grant_hash": _digest(token) if token else None})
@@ -276,7 +333,8 @@ class ZeroTrustOperations:
             session = SessionDecision.model_validate({**previous.model_dump(),
                 "version": previous.version + 1, "decision": "DENY", "status": "REVOKED",
                 "event_id": "revoke-" + secrets.token_hex(12), "evaluated_at": now,
-                "reason_codes": ["OPERATOR_REVOKED"], "grant_expires_at": None})
+                "reason_codes": ["OPERATOR_REVOKED"], "grant_expires_at": None,
+                "challenge_id": None, "challenge_expires_at": None})
             self._append(transaction, {"kind": "decision", "session": session.model_dump(mode="json"),
                                        "grant_hash": None, "revoked_by": principal.subject,
                                        "note": request.note})
@@ -304,6 +362,14 @@ class ZeroTrustOperations:
                         reason = "SCOPE_DENIED"
                     elif session.policy_digest_sha256 != self.policy_digest:
                         reason = "POLICY_CHANGED"
+                    elif session.signal_trust == "verified_source" and (
+                        session.signal_source_digest != self.signal_verifier.source_digest(
+                            principal.tenant_id, session.signal_source_id, session.signal_key_id, now
+                        )
+                    ):
+                        reason = "SIGNAL_SOURCE_REVOKED"
+                    elif session.signal_expires_at is not None and session.signal_expires_at <= now:
+                        reason = "SIGNAL_PROOF_EXPIRED"
                     elif (session.evaluated_at > now or session.grant_expires_at is None
                           or session.grant_expires_at <= now):
                         reason = "GRANT_EXPIRED"
