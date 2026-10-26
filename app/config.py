@@ -8,7 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "Zero Trust LLM SecOps"
-    app_version: str = "0.15.0"
+    app_version: str = "0.16.0"
     app_environment: Literal["local", "test", "production"] = "local"
     analyzer_mode: Literal["rule", "openai", "hybrid"] = "rule"
     openai_api_key: SecretStr | None = None
@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     audit_log_path: Path = Path("runtime/audit.jsonl")
     case_log_path: Path = Path("runtime/cases.jsonl")
     outbox_log_path: Path = Path("runtime/integration-outbox.jsonl")
+    zero_trust_db_path: Path = Path("runtime/zero-trust.sqlite3")
     audit_backend: Literal["jsonl", "dynamodb"] = "jsonl"
     dynamodb_table_name: str = "zero-trust-llm-secops-audit"
     aws_region: str = "ap-northeast-2"

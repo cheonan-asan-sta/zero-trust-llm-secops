@@ -9,7 +9,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     AUDIT_BACKEND=jsonl \
     AUDIT_LOG_PATH=/data/audit.jsonl \
     CASE_LOG_PATH=/data/cases.jsonl \
-    OUTBOX_LOG_PATH=/data/integration-outbox.jsonl
+    OUTBOX_LOG_PATH=/data/integration-outbox.jsonl \
+    ZERO_TRUST_DB_PATH=/data/zero-trust.sqlite3
 
 WORKDIR /app
 

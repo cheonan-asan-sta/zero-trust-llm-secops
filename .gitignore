@@ -10,6 +10,7 @@ htmlcov/
 !.env.example
 runtime/*.jsonl
 runtime/*.log
+runtime/*.sqlite3*
 .idea/
 .vscode/
 

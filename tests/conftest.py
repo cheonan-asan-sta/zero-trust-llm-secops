@@ -9,3 +9,4 @@ os.environ["AUTH_MODE"] = "disabled"
 os.environ["AUDIT_LOG_PATH"] = str(Path(_test_runtime.name) / "audit.jsonl")
 os.environ["CASE_LOG_PATH"] = str(Path(_test_runtime.name) / "cases.jsonl")
 os.environ["OUTBOX_LOG_PATH"] = str(Path(_test_runtime.name) / "integration-outbox.jsonl")
+os.environ["ZERO_TRUST_DB_PATH"] = str(Path(_test_runtime.name) / "zero-trust.sqlite3")

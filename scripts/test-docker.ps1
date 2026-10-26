@@ -60,7 +60,7 @@ try {
     if (-not $health -or $health.status -ne "ok" -or $health.analyzer_mode -ne "rule") {
         throw "Container health check did not become ready in rule mode."
     }
-    if ($health.version -ne "0.15.0" -or $health.auth_mode -ne "disabled") {
+    if ($health.version -ne "0.16.0" -or $health.auth_mode -ne "disabled") {
         throw "Container did not start with the expected local security profile."
     }
     $readiness = Invoke-RestMethod -Method Get -Uri "$baseUrl/health/ready" -TimeoutSec 2
@@ -89,6 +89,53 @@ try {
     ) {
         throw "Audit or assurance registry integrity readiness check failed."
     }
+    if (-not $readiness.zero_trust_operations.ok) {
+        throw "Zero Trust operational journal is not ready."
+    }
+    $ztEvents = Invoke-RestMethod -Method Post -Uri "$baseUrl/events/simulate" `
+        -ContentType "application/json" -Body '{"scenario_id":"NORMAL-01","count":1}'
+    $ztEvent = $ztEvents[0]
+    $ztEvent.event_id = "docker-zt-allow"
+    $ztEvent.timestamp = [DateTimeOffset]::UtcNow.ToString("o")
+    $ztEvent.user.role = "employee"
+    $ztEvent.auth_context.authentication_result = "success"
+    $ztEvent.auth_context.mfa = "success"
+    $ztEvent.resource.resource_id = "zt-demo-documents"
+    $ztRequest = @{ session_id = "docker-zt-session"; expected_version = 0; event = $ztEvent }
+    $ztAllowed = Invoke-RestMethod -Method Post -Uri "$baseUrl/zero-trust/sessions/evaluate" `
+        -ContentType "application/json" -Body ($ztRequest | ConvertTo-Json -Depth 20)
+    if ($ztAllowed.session.decision -ne "ALLOW" -or -not $ztAllowed.grant_token) {
+        throw "Zero Trust normal session was not authorized."
+    }
+    $ztAccessBody = @{session_id="docker-zt-session"; resource_id="zt-demo-documents";
+        action="READ"; grant_token=$ztAllowed.grant_token} | ConvertTo-Json
+    $ztAccess = Invoke-RestMethod -Method Post -Uri "$baseUrl/zero-trust/protected-access" `
+        -ContentType "application/json" -Body $ztAccessBody
+    if (-not $ztAccess.allowed) { throw "Local PEP did not allow the scoped grant." }
+    $ztEvent.event_id = "docker-zt-refresh"
+    $ztEvent.timestamp = [DateTimeOffset]::UtcNow.ToString("o")
+    $ztRequest.expected_version = 1
+    $ztFresh = Invoke-RestMethod -Method Post -Uri "$baseUrl/zero-trust/sessions/evaluate" `
+        -ContentType "application/json" -Body ($ztRequest | ConvertTo-Json -Depth 20)
+    $ztEvent.event_id = "docker-zt-compromised"
+    $ztEvent.timestamp = [DateTimeOffset]::UtcNow.ToString("o")
+    $ztEvent.device.security_posture = "compromised"
+    $ztRequest.expected_version = 2
+    $ztRevoked = Invoke-RestMethod -Method Post -Uri "$baseUrl/zero-trust/sessions/evaluate" `
+        -ContentType "application/json" -Body ($ztRequest | ConvertTo-Json -Depth 20)
+    if ($ztRevoked.session.status -ne "REVOKED") { throw "Risk change did not revoke the session." }
+    $ztDenied = $false
+    try {
+        Invoke-RestMethod -Method Post -Uri "$baseUrl/zero-trust/protected-access" `
+            -ContentType "application/json" -Body (@{session_id="docker-zt-session";
+                resource_id="zt-demo-documents"; action="READ";
+                grant_token=$ztFresh.grant_token} | ConvertTo-Json) | Out-Null
+    } catch {
+        if ([int]$_.Exception.Response.StatusCode -ne 403) { throw }
+        $ztDenied = $true
+    }
+    if (-not $ztDenied) { throw "PEP accepted a revoked unused grant." }
+
     $headerCheck = Invoke-WebRequest `
         -Method Get `
         -Uri "$baseUrl/health/live" `
@@ -303,6 +350,7 @@ try {
         integration_events = $outboxMetrics.total_events
         integration_delivered = $outboxMetrics.delivered_count
         integration_dead_letter = $outboxMetrics.dead_letter_count
+        zero_trust_revoked_grant_denied = $ztDenied
         assurance_registry_integrity = $readiness.assurance.valid
         assurance_control_count = $readiness.assurance.total_controls
         ocsf_schema_version = $readiness.normalization.schema_version

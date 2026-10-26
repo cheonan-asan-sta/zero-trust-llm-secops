@@ -87,6 +87,8 @@ from app.services.policy import enforce_assessment_safety, response_preview
 from app.services.public_replay import get_public_replay_service
 from app.services.scenario_evaluator import evaluate_scenarios
 from app.services.sigma import get_sigma_engine
+from app.services.zero_trust import ZeroTrustOperations
+from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
 
 settings = get_settings()
 static_dir = Path(__file__).parent / "static"
@@ -115,6 +117,12 @@ public_replay_service = get_public_replay_service()
 detection_quality_service = get_detection_quality_service()
 incident_quality_service = get_incident_quality_service()
 analysis_capacity = asyncio.Semaphore(settings.analysis_max_concurrency)
+zero_trust_operations = (
+    ZeroTrustOperations(settings.zero_trust_db_path)
+    if settings.app_environment != "production" else None
+)
+app.include_router(zero_trust_router(zero_trust_operations))
+install_zero_trust_error_handlers(app)
 
 ViewerPrincipal = Annotated[Principal, Depends(require_roles(Role.VIEWER))]
 AnalystPrincipal = Annotated[Principal, Depends(require_roles(Role.ANALYST))]
@@ -161,6 +169,9 @@ def liveness() -> dict:
 
 @app.get("/health/ready")
 def readiness() -> Response:
+    zero_trust_integrity = (
+        zero_trust_operations.integrity() if zero_trust_operations else {"ok": True, "enabled": False}
+    )
     integrity = audit_store.integrity()
     case_integrity = case_store.integrity()
     outbox_integrity = integration_outbox_store.integrity()
@@ -177,6 +188,7 @@ def readiness() -> Response:
     )
     ready = (
         integrity["ok"]
+        and zero_trust_integrity["ok"]
         and case_integrity["ok"]
         and outbox_integrity["ok"]
         and assurance.valid
@@ -204,6 +216,7 @@ def readiness() -> Response:
             "data_schema": "OCSF 1.9.0 Incident Finding",
             "external_delivery_enabled": False,
         },
+        "zero_trust_operations": zero_trust_integrity,
         "assurance": {
             "valid": assurance.valid,
             "registry_version": assurance.registry_version,

@@ -1,0 +1,83 @@
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, Response
+
+from app.security import Principal, Role, require_roles
+from app.services.zero_trust import (
+    JournalUnavailable,
+    SessionConflict,
+    SessionMissing,
+    ZeroTrustOperations,
+)
+from app.zero_trust_models import (
+    ProtectedAccessRequest,
+    ProtectedAccessResult,
+    SessionDecision,
+    SessionEvaluationRequest,
+    SessionEvaluationResult,
+    SessionRevocationRequest,
+    ZeroTrustPolicyBundle,
+)
+
+Viewer = Annotated[Principal, Depends(require_roles(Role.VIEWER))]
+Analyst = Annotated[Principal, Depends(require_roles(Role.ANALYST))]
+Responder = Annotated[Principal, Depends(require_roles(Role.RESPONDER))]
+
+
+def zero_trust_router(service: ZeroTrustOperations | None) -> APIRouter:
+    def available() -> ZeroTrustOperations:
+        if service is None:
+            raise HTTPException(404, "Local Zero Trust simulation is disabled in production")
+        return service
+
+    Service = Annotated[ZeroTrustOperations, Depends(available)]
+    router = APIRouter(prefix="/zero-trust", tags=["Zero Trust operations simulation"])
+
+    @router.get("/policies", response_model=ZeroTrustPolicyBundle)
+    def policies(_: Viewer, operations: Service):
+        return operations.policy
+
+    @router.post("/sessions/evaluate", response_model=SessionEvaluationResult)
+    def evaluate(request: SessionEvaluationRequest, principal: Analyst, operations: Service):
+        return operations.evaluate(request, principal)
+
+    @router.get("/sessions", response_model=list[SessionDecision])
+    def sessions(principal: Viewer, operations: Service):
+        return operations.sessions(principal)
+
+    @router.get("/sessions/{session_id}", response_model=list[SessionDecision])
+    def history(session_id: str, principal: Viewer, operations: Service):
+        return operations.history(session_id, principal)
+
+    @router.post("/sessions/{session_id}/revoke", response_model=SessionDecision)
+    def revoke(session_id: str, request: SessionRevocationRequest,
+               principal: Responder, operations: Service):
+        return operations.revoke(session_id, request, principal)
+
+    @router.post("/protected-access", response_model=ProtectedAccessResult)
+    def protected_access(request: ProtectedAccessRequest, principal: Analyst,
+                         operations: Service, response: Response):
+        result = operations.access(request, principal)
+        if not result.allowed:
+            response.status_code = 403
+        return result
+
+    return router
+
+
+def install_zero_trust_error_handlers(app):
+    from fastapi.responses import JSONResponse
+
+    @app.exception_handler(SessionConflict)
+    async def conflict(_request, _exc):
+        return JSONResponse({"detail": "Session version, identity, order or event conflict"},
+                            status_code=409)
+
+    @app.exception_handler(SessionMissing)
+    async def missing(_request, _exc):
+        return JSONResponse({"detail": "Session not found"}, status_code=404)
+
+    @app.exception_handler(JournalUnavailable)
+    async def unavailable(_request, _exc):
+        return JSONResponse({"detail": "Zero Trust journal unavailable; access denied"},
+                            status_code=503)

@@ -33,10 +33,10 @@
       <section class="hero shell">
         <div>
           <p class="section-kicker">SECURITY OPERATIONS CONTROL</p>
-          <h1>접근 이벤트에서<br /><span>대응 판단까지</span></h1>
+          <h1>접근 요청마다 검증하고<br /><span>세션 위험에 따라 통제</span></h1>
           <p class="hero-copy">
-            사용자·기기·네트워크·자원 정보를 OCSF로 정규화하고, Sigma와 LLM 분석 결과에
-            정책 안전장치와 사고 상관분석을 적용하는 제로 트러스트 관제 시뮬레이션입니다.
+            사용자·기기·자원 정책을 확인하고 새 이벤트마다 세션의 위험을 다시 판단합니다.
+            허용의 범위와 시간을 제한하고 위험이 바뀌면 다음 접근을 거부하는 로컬 제로 트러스트 운영 시뮬레이션입니다.
           </p>
         </div>
         <ol class="route-map" aria-label="분석 단계">
@@ -45,6 +45,31 @@
           <li><span>03</span><strong>위험 분석</strong><small>Sigma·규칙·LLM</small></li>
           <li><span>04</span><strong>사고 판단</strong><small>상관분석·사람 검토</small></li>
         </ol>
+      </section>
+
+      <section class="summary-section shell" id="zeroTrustSection">
+        <div class="section-heading-row">
+          <div><p class="section-kicker">ZERO TRUST OPERATIONS</p><h2>지속 세션 검증과 접근 통제</h2></div>
+          <button id="ztStart" class="secondary-button" type="button">정상 세션 시작</button>
+        </div>
+        <p class="evaluation-state">모의 신원과 기기 신호로 정책을 평가합니다. 허용은 자원·행위·시간에 묶이며, 업무 자원 집행도 이 로컬 시연 안에서만 동작합니다.</p>
+        <div class="metric-grid">
+          <article><span>접근 판단</span><strong id="ztDecision">대기</strong></article>
+          <article><span>세션 상태</span><strong id="ztStatus">-</strong></article>
+          <article><span>위험 점수</span><strong id="ztRisk">-</strong></article>
+          <article><span>정책 버전</span><strong id="ztPolicy">-</strong></article>
+        </div>
+        <div class="zt-actions">
+          <button id="ztAccess" class="secondary-button" type="button" disabled>모의 문서 접근</button>
+          <button id="ztChallenge" class="secondary-button" type="button" disabled>MFA 미확인 재평가</button>
+          <button id="ztRecover" class="secondary-button" type="button" disabled>MFA 성공 재평가</button>
+          <button id="ztCompromise" class="secondary-button" type="button" disabled>기기 침해 재평가</button>
+        </div>
+        <p id="ztFeedback" class="evaluation-state" aria-live="polite">정상 세션을 시작한 뒤 접근을 시험하고, 신호를 바꿔 재평가해 보세요.</p>
+        <div class="history-wrap"><table>
+          <thead><tr><th>버전</th><th>자원</th><th>판단</th><th>위험</th><th>판단 근거</th><th>허용 만료</th></tr></thead>
+          <tbody id="ztHistory"><tr><td colspan="6" class="table-empty">아직 평가한 세션이 없습니다.</td></tr></tbody>
+        </table></div>
       </section>
 
       <section class="workspace shell">
