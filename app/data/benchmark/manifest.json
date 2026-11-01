@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0",
+  "source_kind": "authored_synthetic",
+  "license": "MIT",
+  "label_policy": "Operationally unauthorized or malicious activity; approved business activity is benign, even if an alert fires.",
+  "review_status": "author_assigned_pending_independent_team_review",
+  "family_count": 72,
+  "case_count": 720,
+  "variants_per_family": 10,
+  "generator_sha256": "ed2513a7d2901360c55c22785e0f1eab6b2496c17c4c3660901ccd5da77445bf",
+  "catalog_sha256": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+  "cases_sha256": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f",
+  "targets": {
+    "minimum_precision": 0.95,
+    "minimum_recall": 0.95,
+    "minimum_f1": 0.95,
+    "maximum_false_positive_rate": 0.05,
+    "minimum_positive_families_per_rule": 2,
+    "minimum_negative_families": 12
+  }
+}

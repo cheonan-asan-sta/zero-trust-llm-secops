@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 from functools import lru_cache
 from pathlib import Path
 from time import perf_counter
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import FileResponse, JSONResponse
@@ -71,6 +71,7 @@ from app.services.cases import (
     create_case_store,
 )
 from app.services.correlation import get_correlation_engine
+from app.services.detection_benchmark import BenchmarkUnavailable, get_detection_benchmark
 from app.services.detection_quality import get_detection_quality_service
 from app.services.evaluation import run_evaluation
 from app.services.incident_quality import get_incident_quality_service
@@ -562,6 +563,17 @@ def incident_quality(principal: ViewerPrincipal) -> IncidentQualityReport:
     if not public_replay_service.valid or not sigma_engine.valid:
         raise HTTPException(status_code=503, detail="Incident quality inputs failed validation")
     return incident_quality_service.evaluate(principal.tenant_id)
+
+
+@app.get("/evaluation/detection-benchmark")
+def detection_benchmark(
+    _: ViewerPrincipal,
+    split: Literal["development", "holdout"] = "holdout",
+) -> dict:
+    try:
+        return get_detection_benchmark().evaluate(split)
+    except BenchmarkUnavailable as exc:
+        raise HTTPException(status_code=503, detail="Detection benchmark inputs failed validation") from exc
 
 
 @app.post("/scenarios/evaluate", response_model=EventScenarioEvaluation)

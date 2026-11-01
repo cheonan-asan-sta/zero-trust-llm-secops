@@ -741,7 +741,7 @@ async function runPublicReplay() {
     renderQualityDetails(quality);
     renderIncidentQualityDetails(incidentQuality);
     $("replayState").textContent = result.expectations_met && quality.gate_passed && incidentQuality.gate_passed
-      ? "탐지·사건 상관분석과 정상 로그 오탐 억제의 정량 품질 기준을 모두 통과했습니다."
+      ? "공개 고정 표본 12건의 회귀 기준을 통과했습니다. 확장 합성 평가와 실제 기업 성능은 별도로 확인해야 합니다."
       : "공개 로그 회귀 기준을 통과하지 못한 항목이 있습니다.";
   } catch (error) {
     $("replayState").textContent = `공개 로그를 재생하지 못했습니다: ${error.message}`;
