@@ -1,0 +1,470 @@
+# 다른 AI 작업자를 위한 프로젝트 인수인계서
+
+이 문서는 다른 AI 또는 개발자가 `zero-trust-llm-secops` 저장소를 처음 열었을 때 현재 상태를 오해하지 않고 안전하게 작업을 이어가기 위한 기준 문서다.
+
+갱신일: 2026년 11월 1일. 프로젝트의 핵심은 **제로트러스트 오퍼레이션**이다. 아래 기능·평가 기준 커밋은 `68519f5`이며 실제 최신 HEAD는 `git log -1`로 확인한다. 현재는 개선 전 탐지 기준선을 보존하는 단계이므로 점수가 낮더라도 규칙·임계값·정규화·정책 집행을 임의로 개선하지 않는다.
+
+## 1. 한눈에 보는 프로젝트
+
+| 항목 | 내용 |
+|---|---|
+| 프로젝트명 | LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 프레임워크 구축 |
+| 팀명 | 천안아산역 |
+| 팀원 | 채희주, 김택희 |
+| 저장소 | `https://github.com/cheonan-asan-sta/zero-trust-llm-secops` |
+| 패키지 버전 | `0.17.0` |
+| 언어·프레임워크 | Python 3.11 이상, FastAPI, Pydantic, pytest |
+| 기본 분석 모드 | API 비용이 들지 않는 `rule` 모드 |
+| 현재 작업 브랜치 | 로컬 `aitest` |
+| 기능·평가 기준 커밋 | `68519f5 Record pre-improvement detection benchmark with 720 labeled cases` |
+| 핵심 안전 경계 | 실제 계정 차단, 권한 변경, 세션 격리, 외부 SIEM·ITSM 전송을 수행하지 않음 |
+
+이 프로젝트는 합성 이벤트와 출처가 고정된 공개 보안 로그를 받아 다음 작업을 수행하는 시연용 SecOps 애플리케이션이다.
+
+1. 공통 `SecurityEvent` 형식으로 입력을 검증한다.
+2. OCSF 1.9.0 형식으로 정규화하고 원본·변환 해시를 남긴다.
+3. Sigma 2.1 규칙으로 탐지한다.
+4. 규칙 기반, OpenAI 또는 하이브리드 분석기로 위험도와 근거를 구조화한다.
+5. 정책 허용 범위와 사람 검토 필요 여부를 확인한다.
+6. 여러 이벤트를 엔터티 그래프와 시간창으로 상관분석한다.
+7. 사고 케이스와 변경 이력을 저장한다.
+8. 외부 연동용 CloudEvents를 아웃박스에 보존하지만 실제 목적지 전송은 기본적으로 수행하지 않는다.
+9. local/test 전용 제로트러스트 경로에서 서명·범위·신선도와 사용자·기기·자원·행위를 검증한다.
+10. 세션별 단기·단일 사용 허용을 발급하고 위험 변화·키 폐기 시 회수하여 다음 모의 자원 접근을 거부한다.
+
+실제 IdP·MFA·EDR 증명, 상시 신호 수신/관련 세션 자동 재평가, 독립 업무 서비스 PEP는 아직 미완료다. 서명은 등록 수집기의 출처·무결성을 확인하며 그 주장의 진실성을 보장하지 않는다. 새 경로는 production에서 비활성화된다.
+
+## 2. 학사 일정과 실제 코드 진척 구분
+
+이 저장소는 계획보다 빠르게 구현되었다. 발표자료나 주차별 보고서를 작성할 때 실제 코드의 모든 기능을 해당 주차 성과로 쓰면 안 된다.
+
+- 중간 영상의 1~6주차 범위: 제로 트러스트 학습, 위협 시나리오, 이벤트 모델, 합성 로그, Structured Outputs, 로컬 Docker 검증까지다.
+- 현재 코드 범위: 계획서의 3~14주차 개발 항목과 이후 기업 적용 고도화 기능까지 구현되어 있다.
+- 15~16주차 최종 보고서와 발표는 아직 별도 작성 대상이다.
+- 주차별 근거는 반드시 [`docs/README.md`](docs/README.md)와 각 `docs/weekXX/README.md`를 기준으로 사용한다.
+
+## 3. 현재 Git 상태
+
+문서 작성 시점의 상태는 다음과 같다.
+
+```text
+branch: aitest
+feature/evaluation baseline: 68519f5
+remote: origin -> https://github.com/cheonan-asan-sta/zero-trust-llm-secops.git
+
+aitest: 현재 v0.17.0 구현과 개선 전 탐지 평가
+실제 원격 상태: git ls-remote --heads origin으로 확인
+```
+
+주의사항:
+
+- 2026년 11월 1일 사용자가 현재 코드를 GitHub에 올리도록 요청했다. 대상은 기존 작업 브랜치 `aitest`이며 `main` 병합·강제 푸시는 포함하지 않는다. 실제 게시 상태는 원격 브랜치와 로컬 HEAD 일치 여부로 확인한다.
+- `docs.zip`, `docs/week03.zip`은 추적되지 않은 사용자 파일이다. 요청 없이 삭제, 이동, 커밋하지 않는다.
+- 기존 브랜치를 강제로 재설정하거나 사용자 변경사항을 되돌리지 않는다.
+- 사용자가 지정한 브랜치와 기존 승인을 따른다. 인증정보·실행 데이터·사용자 압축본은 업로드하지 않는다.
+
+## 4. 전체 처리 구조
+
+### 보안 이벤트 분석 경로
+
+```text
+SecurityEvent
+  -> 입력 모델 검증
+  -> 규칙 기반 / OpenAI / 하이브리드 분석
+  -> SecurityAssessment
+  -> 정책 안전장치와 대응 미리보기
+  -> AnalysisResult
+  -> JSONL 또는 DynamoDB 감사 기록
+  -> 분석가 검토 상태 갱신
+```
+
+### 탐지·사고 관리 경로
+
+```text
+SecurityEvent
+  -> OCSF 1.9.0 정규화
+  -> Sigma 2.1 규칙 탐지
+  -> 5분·30분·24시간 상관분석
+  -> OCSF Incident Finding
+  -> 테넌트별 Incident Case
+  -> CloudEvents 1.0 Integration Outbox
+  -> 전달 상태 기록과 재시도 관리
+```
+
+두 경로 모두 실제 보안 시스템을 변경하지 않는다. 대응은 `simulation` 미리보기이며 외부 전달도 로컬 상태 머신에 머문다.
+
+### 제로트러스트 운영 경로
+
+```text
+서명 수집기 -> 출처/범위/신선도 검증 -> 규칙+Sigma 및 자원 정책
+  -> 세션 판단/버전/단일 사용 허용 -> 모의 PEP -> 모의 자원 200 또는 403
+  -> 위험 재평가/키 폐기 -> 이전 허용 회수 -> 다음 접근 거부
+```
+
+v0.16은 세션·자원 정책·허용 소비/회수, v0.17은 Ed25519 서명·120초 재인증 챌린지·키 회전/폐기를 추가했다. `/analysis`의 선택적 LLM과 케이스 경로가 완성된 하나의 자동 집행 체인으로 통합된 것은 아니다. LLM은 필수 검증이나 최종 허용·회수를 대체하지 않는다.
+
+## 5. 폴더 구조와 역할
+
+```text
+zero-trust-llm-secops/
+├─ app/                     FastAPI 애플리케이션
+│  ├─ analyzers/            규칙·OpenAI·하이브리드 분석기
+│  ├─ data/                 통제대장, Sigma 규칙, 공개 재생 표본
+│  │  ├─ replay/            출처·라이선스·해시가 고정된 공개 로그
+│  │  └─ sigma/             로컬 Sigma YAML 규칙
+│  ├─ services/             정책, 감사, 탐지, 상관분석, 케이스 등 도메인 서비스
+│  └─ static/               한국어 관제 대시보드
+├─ tests/                   단위·API·통합·회귀 테스트
+├─ docs/                    주차별 산출물과 기업 적용 문서
+├─ infra/                   AWS CloudFormation 정의
+├─ scripts/                 Docker 시험과 AWS 배포 스크립트
+├─ .github/workflows/       CI 정의
+├─ runtime/                 실행 중 생성되는 로컬 JSONL 데이터
+├─ compose.yaml             비용 없는 로컬 실행 구성
+├─ Dockerfile               애플리케이션 이미지
+├─ Dockerfile.test          검사·테스트 전용 이미지
+├─ Dockerfile.lambda        AWS Lambda 컨테이너 이미지
+├─ pyproject.toml           패키지·의존성·pytest·ruff 설정
+├─ .env.example             비밀값 없는 환경변수 예시
+└─ README.md                사용자용 전체 기능·실행·API 설명
+```
+
+### `app/`
+
+애플리케이션의 모든 실행 코드가 있다.
+
+| 파일·폴더 | 역할 |
+|---|---|
+| `main.py` | FastAPI 앱 생성, 의존성 연결, 모든 HTTP 엔드포인트 정의 |
+| `models.py` | 이벤트, OCSF, 탐지, 분석, 케이스, 아웃박스, 평가 모델과 교차 필드 검증 |
+| `config.py` | `.env.local`과 환경변수 로딩, 운영 환경의 안전하지 않은 설정 거부 |
+| `security.py` | 비활성·API 키·OIDC 인증, 역할 기반 권한, 테넌트 주체 생성 |
+| `middleware.py` | 요청 ID, 본문 크기 제한, 보안 헤더, Prometheus 요청 지표 |
+| `scenarios.py` | 정상 3건과 위협 5건, 시나리오 조건, 합성 이벤트 생성 |
+| `prompting.py` | Few-shot 선택, LLM 입력 생성, 자유 텍스트를 데이터로 다루는 프롬프트 경계 |
+| `analyzers/` | 분석기 인터페이스와 세 가지 분석 모드 |
+| `services/` | 도메인별 처리 로직과 저장소 구현 |
+| `data/` | 버전 관리되는 규칙·통제·공개 데이터 |
+| `static/` | 대시보드 HTML, CSS, JavaScript, 파비콘 |
+
+### `app/analyzers/`
+
+| 파일 | 역할 |
+|---|---|
+| `base.py` | 분석기가 따라야 하는 `Analyzer` 프로토콜 |
+| `rule_based.py` | API 키 없이 결정적으로 동작하는 기본 위험 분석기 |
+| `openai_analyzer.py` | OpenAI Structured Outputs로 `SecurityAssessment`를 생성하는 선택 기능 |
+| `hybrid.py` | 규칙 결과가 애매할 때만 LLM을 호출하고 실패 시 안전하게 규칙 결과로 복구 |
+
+분석기를 변경할 때는 `ground_truth`가 LLM 입력으로 전달되지 않는지, 낮은 신뢰도와 고위험 결과가 사람 검토로 전환되는지 확인한다.
+
+### `app/services/`
+
+| 파일 | 역할 |
+|---|---|
+| `policy.py` | 위험 점수·등급 일관성, 허용 대응 목록, 정책 예외, 대응 미리보기 |
+| `scenario_evaluator.py` | 구조화된 조건으로 이벤트와 시나리오의 일치도 계산 |
+| `evaluation.py` | 반복 평가, 정확도, JSON 유효율, 지연시간과 오류 진단 |
+| `audit.py` | JSONL·DynamoDB 감사 저장, 테넌트 격리, SHA-256 해시 체인 |
+| `assurance.py` | 기계판독 통제대장 검증과 구현 증적 조회 |
+| `ocsf.py` | `SecurityEvent`를 OCSF 1.9.0 Authentication·API Activity로 변환 |
+| `sigma.py` | 승인·버전·시험 메타데이터가 있는 Sigma 2.1 로컬 탐지 엔진 |
+| `public_replay.py` | 고정된 Splunk·Microsoft Sentinel 표본을 네트워크 없이 재생 |
+| `detection_quality.py` | 규칙별 혼동행렬, Precision, Recall, F1, 오탐률과 품질 게이트 |
+| `correlation.py` | 엔터티 그래프와 다중 시간창으로 Incident Finding 생성 및 중복 제거 |
+| `incident_quality.py` | 사건 단위 Precision·Recall·F1, 오상관률과 구조 품질 게이트 |
+| `cases.py` | 사고 케이스 생성·저장·상태 전이·버전 충돌 방지·증거 지문 |
+| `integration_outbox.py` | 케이스 버전을 CloudEvents로 투영하고 대기·재시도·완료·실패 상태 관리 |
+| `zero_trust.py` | 세션 정책 판단, 허용 발급·소비·회수, SQLite 상태와 저널 |
+| `trusted_signals.py` | Ed25519 서명·범위·신선도·키 수명주기 검증 |
+| `detection_benchmark.py` | 합성 개발/평가 분리, 혼동행렬·계열 부트스트랩·품질 게이트 |
+
+### `app/data/`
+
+| 위치 | 역할 |
+|---|---|
+| `control-register.json` | 18개 기업·공공 보안 통제와 코드·시험 증거를 연결한 대장 |
+| `sigma/*.yml` | 계정 침해, 미관리 기기, 권한 상승, 내부 확산, 데이터 유출 규칙 |
+| `replay/manifest.json` | 공개 표본의 출처, 커밋, 라이선스, SHA-256, 기대 결과 |
+| `replay/*.json*`, `*.xml` | 오프라인 재생용 공격·정상 이벤트 표본 |
+| `replay/NOTICE.md` | 공개 데이터 출처와 라이선스 안내 |
+| `benchmark/` | 합성 720건·72계열, 분할·라벨 근거·생성기/자료 지문 |
+| `zero-trust-policies.json` | 서버 소유 자원·행위·역할·허용/신호 유효기간 정책 |
+
+데이터 파일을 수정하면 관련 해시, manifest, 품질 목표, 테스트도 함께 갱신해야 한다.
+
+### `app/static/`
+
+| 파일 | 역할 |
+|---|---|
+| `index.html` | 관제 대시보드 구조 |
+| `styles.css` | 천안아산역을 연상시키는 남색·파랑·노랑 화면 스타일 |
+| `app.js` | API 호출, 시나리오 선택, 분석·탐지·케이스 결과 표시 |
+| `favicon.svg` | 프로젝트 아이콘 |
+
+프론트엔드는 별도 빌드 도구 없이 FastAPI가 정적 파일로 제공한다.
+
+### `tests/`
+
+최신 Windows 로컬 기준 421건 통과다. 매개변수별 시험 조건을 포함한 건수이며 코드 커버리지나 탐지 품질 합격을 뜻하지 않는다.
+
+| 영역 | 주요 파일 |
+|---|---|
+| 모델·시나리오·프롬프트 | `test_models.py`, `test_scenarios.py`, `test_prompting.py` |
+| 분석기·정책 | `test_openai_analyzer.py`, `test_hybrid_analyzer.py`, `test_policy.py` |
+| API·인증·설정 | `test_api.py`, `test_security.py`, `test_enterprise_config.py` |
+| 감사·보증 | `test_audit.py`, `test_assurance.py` |
+| OCSF·Sigma·공개 재생 | `test_detection_pipeline.py`, `test_correlation_replay.py` |
+| 탐지·사건 품질 | `test_detection_quality.py`, `test_incident_quality.py` |
+| 엔터티 상관분석 | `test_entity_graph_correlation.py` |
+| 사고 케이스 | `test_incident_cases.py` |
+| 연동 아웃박스 | `test_integration_outbox.py` |
+| Docker·배포 설정 | `test_docker_setup.py` |
+| 반복 평가 | `test_evaluation.py` |
+| 제로트러스트·서명 | `test_zero_trust_operations.py`, `test_trusted_signals.py` |
+| 추가 회귀 204건 | `zero_trust/test_session_regressions.py`, `test_signal_regressions.py`, `test_api_regressions.py`, `test_identity_regressions.py` |
+| 확대 평가기 40건 | `test_detection_benchmark.py` |
+
+새 기능은 정상 경로뿐 아니라 인증 실패, 테넌트 분리, 잘못된 상태 전이, 위변조, LLM 실패 같은 실패 경로도 테스트한다.
+
+### `docs/`
+
+| 위치 | 역할 |
+|---|---|
+| `README.md` | 계획 주차와 실제 구현 근거를 연결하는 색인 |
+| `week03/` | 위협 모델, 이벤트 스키마, 요구사항, 아키텍처 |
+| `week04/` | 탐지 조건, 정책 예외, 평가 설계 |
+| `week05/` | 비용 없는 Docker 검증 |
+| `week06/` | 합성 이벤트, Few-shot, 구조화 출력 |
+| `week07/`~`week14/` | 분석기, 정책, API, UI, 성능·오류 진단 산출물 |
+| `enterprise-readiness.md` | 현재 통제 상태와 실제 기업 운영 전 필수 게이트 |
+| `deep-research-enterprise-secops.md` | 실무 사례·논문 기반 고도화 우선순위 |
+| `reference-catalog-enterprise-public-sector.md` | 기업·공공·금융·표준 참고자료 목록 |
+| `zero-trust-operations.md` | 제로트러스트 원칙·코드·시험·실환경 한계 |
+| `mentoring-priority-roadmap.md` | 멘토링 M1~M8·인프라 I1~I8·남은 주간 일정 |
+| `team-responsibilities.md`, `roles/`, `역할분담_주간계획_한눈에보기.md` | 공동 경계·개인 계획·주간 역할 표 |
+| `model-candidate-review.md` | Jev·Laya 등을 포함한 작업별 AI 비교 후보 |
+| `technology-selection-plan.md`, `technology-decisions/` | 도구 C01~C10 비교 계획·선정 대장·빈 양식 |
+| `benchmark-results/` | 개선 전 개발/평가 예측·오류·지표 JSON 원자료 |
+
+보고서나 발표자료의 성과 문구는 코드만 보고 추정하지 말고 해당 주차 문서를 근거로 작성한다.
+
+### `infra/`
+
+| 파일 | 역할 |
+|---|---|
+| `ecr.yaml` | ECR 저장소와 이미지 스캔 설정 |
+| `lambda.yaml` | Lambda 컨테이너, IAM 인증 함수 URL, 실행 역할, DynamoDB 저장 구성 |
+
+이 폴더는 실제 AWS 리소스를 만들 수 있다. 사용자 요청 없이 배포하거나 삭제하지 않는다.
+
+### `scripts/`
+
+| 파일 | 역할 |
+|---|---|
+| `test-docker.ps1` | Docker 안에서 Ruff, pytest, API 스모크 테스트 실행 |
+| `deploy-aws.ps1` | AWS 계정 `172585182454` 확인 후 이미지 빌드·ECR 업로드·CloudFormation 배포 |
+| `local_signal_collector.py` | 별도 임시 키를 쓰는 루프백 서명 수집기 시연 |
+| `build_detection_benchmark.py`, `evaluate_detection_benchmark.py` | 합성 평가 자료 생성·검증·개선 전 성능 보고 |
+
+배포 스크립트는 비용과 외부 상태 변경을 일으킬 수 있으므로 명시적인 배포 요청이 있을 때만 실행한다.
+
+### `runtime/`
+
+실행 중 생성되는 다음 로컬 상태를 담는다.
+
+- `audit.jsonl`: 분석 결과와 검토 이력
+- `cases.jsonl`: 사고 케이스와 상태 변경 이력
+- `integration-outbox.jsonl`: 외부 연동 대기·재시도·완료 상태
+
+파일들은 해시 체인으로 연결된다. 테스트 목적이 아니면 직접 편집하지 않는다. 저장소에 없을 수도 있으며 실행 시 생성된다.
+
+## 6. 실행 방법
+
+### 기존 가상환경 사용
+
+현재 로컬에는 `.venv`가 있다.
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+uvicorn app.main:app --reload
+```
+
+접속 주소:
+
+- 대시보드: `http://127.0.0.1:8000/`
+- API 문서: `http://127.0.0.1:8000/docs`
+- 상태 확인: `http://127.0.0.1:8000/health`
+
+### 새 환경 구성
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e ".[dev]"
+uvicorn app.main:app --reload
+```
+
+### Docker 실행
+
+```powershell
+docker compose up --build
+docker compose down
+```
+
+로컬 Docker는 `rule` 모드, 인증 비활성, 읽기 전용 파일시스템, 비루트 사용자로 실행된다. 감사·케이스·아웃박스 볼륨까지 삭제하려는 경우에만 사용자의 의도를 확인한 뒤 `docker compose down --volumes`를 실행한다.
+
+## 7. 환경변수와 비밀정보
+
+- `.env.example`은 비밀값 없는 설정 예시다.
+- `.env.local`은 로컬 전용이며 Git에 포함하면 안 된다.
+- 다른 AI는 `.env.local`의 값을 출력, 로그, 문서 또는 커밋에 복사하지 않는다.
+- 기본 개발은 `ANALYZER_MODE=rule`로 충분하다.
+- OpenAI 또는 하이브리드 모드가 필요할 때만 기존 `.env.local`을 재사용한다.
+- AWS 배포에서는 API 키 평문 대신 Secrets Manager ARN을 사용한다.
+
+주요 분석 모드:
+
+```dotenv
+ANALYZER_MODE=rule
+ANALYZER_MODE=openai
+ANALYZER_MODE=hybrid
+```
+
+운영 환경에서 `AUTH_MODE=disabled`는 설정 검증 단계에서 거부된다.
+
+## 8. 테스트 기준선
+
+2026년 11월 1일 기존 `.venv`의 Windows 로컬 기준:
+
+```text
+pytest: 421 passed, 3 dependency deprecation warnings
+ruff:   All checks passed
+JavaScript syntax: passed
+```
+
+검증 명령:
+
+```powershell
+.\.venv\Scripts\python.exe -m ruff check .
+.\.venv\Scripts\python.exe -m pytest -q
+```
+
+Docker 포함 종단 검증:
+
+```powershell
+.\scripts\test-docker.ps1
+```
+
+경고 3건은 현재 Starlette TestClient, AnyIO 별칭, Mangum 이벤트 루프 관련 의존성 폐기 예정 경고다. 테스트 실패는 아니지만 의존성을 갱신할 때 회귀 여부를 확인한다.
+
+최근 컨테이너 시험은 Docker 엔진이 꺼져 있어 실행하지 않았다. 10월 27일 로컬·Docker 177건 통과는 이전 기록이며 Docker 421건을 확인한 것으로 쓰지 않는다.
+
+### 개선 전 탐지 평가
+
+- 기존 공개 원본 12건은 고정 회귀 표본으로 보존한다. 새 합성 자료는 720건(정상360·위협360), 72계열, 고유 신호 패턴631개다.
+- 개발·평가 각360건이며 계열·세션·사용자·기기·동일 신호 패턴의 분할 간 중복은 0이다. 라벨은 작성자 부여 상태로 독립 팀 검토가 남아 있다.
+- holdout: TP90·FP50·FN90·TN130, 정밀도64.29%·재현율50.00%·F1 56.25%·오탐률27.78%.
+- 목표 P/R/F1≥95%, 오탐률≤5%에 미달한다. `gate_passed=false`이며 결과를 좋게 만들기 위한 탐지 수정은 하지 않는다.
+- 이는 Sigma 이벤트 경보 품질이며 LLM 또는 PEP 전체 성능이 아니다. 합성 자료를 기업 모집단 성능이나 외부 블라인드 평가로 표현하지 않는다.
+- API: `GET /evaluation/detection-benchmark?split=holdout`(viewer), CLI: `python -m scripts.evaluate_detection_benchmark --require-targets`. 목표 미달 시 종료 코드1은 정상적인 품질 게이트 실패다.
+
+전체 방법·불확실성·규칙별 결과는 `docs/week04/detection-and-evaluation.md`와 `docs/benchmark-results/`를 따른다.
+
+### 역할과 일정
+
+채희주는 설계·AI와 인프라 구성/실행/장애 주입/자원·지연·복구 측정/원자료/선정 근거를 주담당한다. 김택희는 백엔드·데이터·앱 지표·기능/상태 시험과 M6 모델 평가 실행기·집계를 담당한다. 공동 통합·상대 재현을 수행하며 예정 배정을 과거 실적으로 소급하지 않는다.
+
+미완료 멘토링 M3 지속 검증→M4 GuardDuty 공식 형식 로컬 입력→M5 안전한 독립 집행을 우선한다. 11/29 기능 동결, 12/6 제출 가능본, 12/7~13 잠정 최종 제출이며 공식 일정은 미확정이다. 대시보드는 자체 개발하고 모델·도구 후보는 비교 계획이지 도입 결과가 아니다.
+
+## 9. 작업 종류별 시작 위치
+
+| 요청 | 먼저 볼 위치 | 함께 확인할 테스트 |
+|---|---|---|
+| API 추가·수정 | `app/main.py`, `app/models.py` | `tests/test_api.py` |
+| 이벤트 모델 변경 | `app/models.py`, `app/scenarios.py` | `test_models.py`, `test_scenarios.py` |
+| LLM 프롬프트·출력 | `app/prompting.py`, `app/analyzers/openai_analyzer.py` | `test_prompting.py`, `test_openai_analyzer.py` |
+| 위험 분석 로직 | `app/analyzers/`, `app/services/policy.py` | `test_policy.py`, `test_hybrid_analyzer.py` |
+| 인증·권한 | `app/security.py`, `app/config.py` | `test_security.py`, `test_enterprise_config.py` |
+| 감사 저장 | `app/services/audit.py` | `test_audit.py` |
+| OCSF 정규화 | `app/services/ocsf.py` | `test_detection_pipeline.py` |
+| Sigma 규칙 | `app/services/sigma.py`, `app/data/sigma/` | `test_detection_pipeline.py` |
+| 공개 로그 재생 | `app/services/public_replay.py`, `app/data/replay/` | `test_correlation_replay.py` |
+| 사건 상관분석 | `app/services/correlation.py` | `test_entity_graph_correlation.py` |
+| 품질 지표 | `detection_quality.py`, `incident_quality.py` | 같은 이름의 테스트 파일 |
+| 사고 케이스 | `app/services/cases.py` | `test_incident_cases.py` |
+| 외부 연동 상태 | `app/services/integration_outbox.py` | `test_integration_outbox.py` |
+| 대시보드 | `app/static/` | API 회귀 테스트와 브라우저 확인 |
+| AWS 배포 | `infra/`, `scripts/deploy-aws.ps1` | `test_docker_setup.py`와 계정 확인 |
+| 주차 보고서 | `docs/README.md`, `docs/weekXX/` | 코드 커밋과 실제 산출물 대조 |
+
+## 10. 안전·설계 불변 조건
+
+다음 조건은 기능을 추가해도 유지한다.
+
+1. `ground_truth`는 평가 전용이며 분석기와 LLM 입력에서 제외한다.
+2. 이벤트의 자유 텍스트는 지시가 아니라 분석 대상 데이터로 취급한다.
+3. 고위험, 낮은 신뢰도, 규칙과 LLM이 불일치하는 결과는 사람 검토로 전환한다.
+4. 추천 대응은 허용된 열거형 안에서만 선택한다.
+5. 고위험 대응은 모의 미리보기·승인 범위다. 제로트러스트 경로의 허용·회수·집행은 local/test 모의 자원에 한정한다.
+6. 테넌트가 다른 분석 결과, 케이스, 아웃박스 이벤트에 접근할 수 없어야 한다.
+7. 감사·케이스·아웃박스 해시 체인이 손상되면 실패 폐쇄한다.
+8. 공개 데이터와 탐지 규칙의 출처, 라이선스, 버전, 해시를 보존한다.
+9. `production` 환경은 인증 없이 시작할 수 없다.
+10. 실제 AWS 변경, 외부 전송, 유료 API 호출은 사용자의 명시적 요청 범위에서만 수행한다.
+
+## 11. 현재 한계와 다음 우선순위
+
+현재 코드는 기업 도입을 위한 기술 기준선이지 운영 승인이나 보안 인증을 받은 제품이 아니다.
+
+주요 미완료 항목:
+
+- 실제 기업 IdP와 OIDC 역할 매핑 검증
+- API Gateway 또는 사내 게이트웨이의 속도 제한·WAF·TLS 정책
+- 조직의 개인정보·보존·데이터 지역성 정책 승인
+- 더 넓고 독립적으로 라벨된 공격·정상 데이터셋 평가
+- 운영 부하, 장애 복구, RTO·RPO, 경보·당직 훈련
+- SAST, SCA, SBOM, 이미지 서명, DAST, 외부 침투시험
+- 프롬프트 공격과 모델 변경에 대한 승인·롤백 절차
+- 실제 SIEM·ITSM 커넥터, 목적지 인증, 재전송·충돌 처리
+- 15~16주차 최종 보고서와 발표자료
+
+현재 실행 순서는 [`docs/mentoring-priority-roadmap.md`](docs/mentoring-priority-roadmap.md), 운영 한계는 [`docs/enterprise-readiness.md`](docs/enterprise-readiness.md)를 기준으로 한다. GitHub 업로드 요청은 AWS 배포·새 도구 설치·유료 모델 호출·탐지 개선을 뜻하지 않는다.
+
+## 12. 다른 AI의 권장 작업 절차
+
+1. 이 문서와 `README.md`, 관련 `docs/weekXX/README.md`를 먼저 읽는다.
+2. `git status --short --branch`로 사용자 파일과 현재 브랜치를 확인한다.
+3. 요청과 관련된 모듈·테스트만 우선 읽는다.
+4. 구현 전에 안전 불변 조건과 실제 외부 상태 변경 여부를 확인한다.
+5. 코드를 수정하면 같은 영역의 실패 경로 테스트를 추가한다.
+6. Ruff와 전체 pytest를 실행한다.
+7. 기능 진척과 학사 주차를 구분해 문서를 갱신한다.
+8. 실제 키, 개인정보, 기업 로그, AWS 자격증명을 출력하거나 커밋하지 않는다.
+9. 배포, 푸시, 실제 외부 연동은 사용자가 요청한 경우에만 수행한다.
+
+## 13. 다른 AI에게 전달할 시작 프롬프트 예시
+
+```text
+이 저장소는 아주대학교 파란학기 천안아산역 팀의 zero-trust-llm-secops 프로젝트다.
+먼저 AI_HANDOFF.md와 README.md를 읽고, git status와 현재 브랜치를 확인해라.
+현재 실제 코드는 v0.17.0까지 구현되어 있지만 학사 주차별 성과는 docs/README.md와
+docs/weekXX 문서에 맞춰 구분해야 한다.
+
+실제 계정 차단, 권한 변경, 세션 격리, 외부 SIEM·ITSM 전송은 구현 범위가 아니다.
+.env.local의 비밀값을 출력하거나 커밋하지 말고, ground_truth를 분석기 입력에 넣지 마라.
+사용자 파일과 기존 변경사항을 보존하고, 작업 후 Ruff와 전체 pytest를 실행해라.
+개선 전 탐지 결과를 보존하고 탐지 규칙·임계값을 임의로 개선하지 마라.
+
+이번 요청: [여기에 수행할 작업을 적기]
+```
+
+## 14. 가장 먼저 읽을 문서
+
+1. [`README.md`](README.md): 실행 방법, 전체 기능, API 목록
+2. [`docs/README.md`](docs/README.md): 계획 주차와 실제 구현 연결
+3. [`docs/enterprise-readiness.md`](docs/enterprise-readiness.md): 현재 보안 기준선과 남은 운영 검증
+4. [`docs/deep-research-enterprise-secops.md`](docs/deep-research-enterprise-secops.md): 다음 고도화 근거
+5. 작업 대상과 관련된 `docs/weekXX/README.md`와 테스트 파일
+6. [`docs/zero-trust-operations.md`](docs/zero-trust-operations.md): 핵심 운영 경로와 한계
+7. [`docs/mentoring-priority-roadmap.md`](docs/mentoring-priority-roadmap.md): 현재 피드백 우선순위와 비용 경계
