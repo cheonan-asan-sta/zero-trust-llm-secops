@@ -113,8 +113,8 @@ async def _oidc_principal(
         raise _unauthorized()
     try:
         claims = await asyncio.to_thread(_decode_oidc_token, credentials.credentials, settings)
-        subject = str(claims["sub"])
-        tenant_id = str(claims[settings.oidc_tenant_claim])
+        subject = claims["sub"]
+        tenant_id = claims[settings.oidc_tenant_claim]
         roles = _parse_roles(claims.get(settings.oidc_roles_claim))
     except HTTPException:
         raise
@@ -125,7 +125,9 @@ async def _oidc_principal(
         ) from exc
     except (InvalidTokenError, PyJWKClientError, KeyError, TypeError, ValueError) as exc:
         raise _unauthorized("Invalid identity token") from exc
-    if not subject or not _TENANT_PATTERN.fullmatch(tenant_id):
+    # Preserve claim types: coercing null, numbers or booleans creates unintended tenant IDs.
+    if (not isinstance(subject, str) or not subject
+            or not isinstance(tenant_id, str) or not _TENANT_PATTERN.fullmatch(tenant_id)):
         raise _unauthorized("Token identity claims are invalid")
     return Principal(
         subject=subject[:128],
