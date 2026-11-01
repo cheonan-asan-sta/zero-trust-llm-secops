@@ -16,6 +16,8 @@
 
 운영 대시보드는 기존 자체 화면을 확장한다. Grafana·Perses는 필수 도입에서 제외하고, 메트릭·경보·접근 집행·공급망 검사 도구는 [전체 계획의 오픈소스 선정 기준](mentoring-priority-roadmap.md)에 따라 비교한다. step-ca·osquery 등 추가 후보는 핵심 경로 안정 후 필요가 확인될 때 검토하며 아직 설치하지 않았다.
 
+오픈소스·다른 프로그램·직접 구현·기존 재사용은 [기술 비교·선정 실행 계획](technology-selection-plan.md)에 따라 시험 적용 후 비교한다. C01~C03 실제 비교, C04~C09 필요 판정·조건부 시험/보류, C10 AI 평가를 주간 작업과 개인별 역할에 연결했다. [선정 대장](technology-decisions/README.md)과 [근거 작성 양식](technology-decisions/decision-template.md)을 사용하며 현재 신규 도구의 실제 측정·채택 결과는 없다.
+
 | 계획 구간 | 계획 목표 | 구현 상태 | 근거 |
 |---|---|---|---|
 | 3~4주차 | 위협 시나리오·아키텍처 설계 | 완료 | [3주차](week03/README.md), [4주차](week04/README.md) |
