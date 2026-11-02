@@ -16,6 +16,7 @@ WORKDIR /app
 
 COPY pyproject.toml README.md ./
 COPY app ./app
+COPY scripts ./scripts
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     groupadd --gid 10001 secops \

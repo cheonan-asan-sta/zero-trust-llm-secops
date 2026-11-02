@@ -2,7 +2,15 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Response
 
+from app.continuous_signal_models import SignedContinuousSignal
 from app.security import Principal, Role, require_roles
+from app.services.continuous_signals import ContinuousSignalService
+from app.services.signal_inbox import (
+    InboxConflict,
+    InboxFull,
+    InboxMissing,
+    InboxUnavailable,
+)
 from app.services.trusted_signals import SignalRegistryUnavailable, SignalRejected
 from app.services.zero_trust import (
     JournalUnavailable,
@@ -26,14 +34,34 @@ Analyst = Annotated[Principal, Depends(require_roles(Role.ANALYST))]
 Responder = Annotated[Principal, Depends(require_roles(Role.RESPONDER))]
 
 
-def zero_trust_router(service: ZeroTrustOperations | None) -> APIRouter:
+def zero_trust_router(service: ZeroTrustOperations | None,
+                      inbox_service: ContinuousSignalService | None = None) -> APIRouter:
     def available() -> ZeroTrustOperations:
         if service is None:
             raise HTTPException(404, "Local Zero Trust simulation is disabled in production")
         return service
 
     Service = Annotated[ZeroTrustOperations, Depends(available)]
+    def intake_available() -> ContinuousSignalService:
+        available()
+        if inbox_service is None:
+            raise HTTPException(404, "Continuous signal intake is not configured")
+        return inbox_service
+
+    Intake = Annotated[ContinuousSignalService, Depends(intake_available)]
     router = APIRouter(prefix="/zero-trust", tags=["Zero Trust operations simulation"])
+
+    @router.post("/signals/inbox", status_code=202)
+    def receive_signal(request: SignedContinuousSignal, principal: Analyst, intake: Intake):
+        return intake.accept(request, principal)
+
+    @router.get("/signals/inbox")
+    def inbox_summary(principal: Viewer, intake: Intake):
+        return intake.summary(principal)
+
+    @router.get("/signals/inbox/{event_id}")
+    def signal_receipt(event_id: str, principal: Viewer, intake: Intake):
+        return intake.receipt(event_id, principal)
 
     @router.get("/policies", response_model=ZeroTrustPolicyBundle)
     def policies(_: Viewer, operations: Service):
@@ -77,6 +105,25 @@ def zero_trust_router(service: ZeroTrustOperations | None) -> APIRouter:
 
 def install_zero_trust_error_handlers(app):
     from fastapi.responses import JSONResponse
+
+    @app.exception_handler(InboxConflict)
+    async def conflicting_delivery(_request, _exc):
+        return JSONResponse({"detail": "Signal event identifier already has different input"},
+                            status_code=409)
+
+    @app.exception_handler(InboxFull)
+    async def full_inbox(_request, _exc):
+        return JSONResponse({"detail": "Signal inbox capacity reached; delivery not accepted"},
+                            status_code=429, headers={"Retry-After": "1"})
+
+    @app.exception_handler(InboxMissing)
+    async def missing_delivery(_request, _exc):
+        return JSONResponse({"detail": "Signal receipt not found"}, status_code=404)
+
+    @app.exception_handler(InboxUnavailable)
+    async def unavailable_inbox(_request, _exc):
+        return JSONResponse({"detail": "Signal inbox unavailable; delivery not acknowledged"},
+                            status_code=503)
 
     @app.exception_handler(SignalRejected)
     async def rejected_signal(_request, _exc):

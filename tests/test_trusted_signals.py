@@ -278,10 +278,17 @@ def test_signed_signal_api_enforces_verification_and_local_boundary(setup):
 def test_verified_session_cannot_switch_to_another_registered_source(setup):
     service, key, registry, path = setup
     evaluate(service, signal(key))
-    registry["sources"].append({**registry["sources"][0], "source_id": "another-idp"})
+    another_key = Ed25519PrivateKey.generate()
+    another_public = another_key.public_key().public_bytes(
+        serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo,
+    ).decode()
+    registry["sources"].append({
+        **registry["sources"][0], "source_id": "another-idp",
+        "keys": [{**registry["sources"][0]["keys"][0], "public_key_pem": another_public}],
+    })
     path.write_text(json.dumps(registry), encoding="utf-8")
     with pytest.raises(SessionConflict):
-        evaluate(service, signal(key, version=1, event_id="switch-source", source_id="another-idp",
+        evaluate(service, signal(another_key, version=1, event_id="switch-source", source_id="another-idp",
                                  when=NOW + timedelta(seconds=1)))
 
 

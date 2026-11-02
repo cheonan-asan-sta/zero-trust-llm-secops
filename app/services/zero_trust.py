@@ -10,11 +10,12 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from app.analyzers.rule_based import RuleBasedAnalyzer
+from app.continuous_signal_models import ObservationApplication, SignedContinuousSignal
 from app.models import ResourceContext
 from app.security import Principal
 from app.services.ocsf import get_ocsf_normalizer
 from app.services.sigma import get_sigma_engine
-from app.services.trusted_signals import SignalVerifier, VerifiedSignal
+from app.services.trusted_signals import SignalVerifier, VerifiedSignal, canonical_observation
 from app.zero_trust_models import (
     ProtectedAccessRequest,
     ProtectedAccessResult,
@@ -27,6 +28,7 @@ from app.zero_trust_models import (
 )
 
 POLICY_PATH = Path(__file__).parents[1] / "data" / "zero-trust-policies.json"
+_RESTRICTION_RANK = {"ALLOW": 0, "STEP_UP": 1, "HOLD": 2, "DENY": 3}
 
 
 class SessionConflict(ValueError):
@@ -81,7 +83,7 @@ class ZeroTrustOperations:
                 rows = connection.execute(
                     "SELECT seq,payload,previous_hash,record_hash FROM journal ORDER BY seq"
                 ).fetchall()
-                if len(rows) >= 10000:
+                if len(rows) > 10000:
                     raise JournalUnavailable("local journal capacity reached")
                 previous = "0" * 64
                 entries = []
@@ -93,11 +95,13 @@ class ZeroTrustOperations:
                     entry = json.loads(payload)
                     if entry["kind"] == "decision":
                         SessionDecision.model_validate(entry["session"])
+                    elif entry["kind"] == "observation":
+                        ObservationApplication.model_validate(entry)
                     elif entry["kind"] != "access":
                         raise JournalUnavailable("unknown journal entry")
                     entries.append(entry)
                     previous = digest
-                yield connection, entries, previous
+                yield [connection, entries, previous]
         except (sqlite3.Error, OSError, ValueError, KeyError, TypeError) as exc:
             if isinstance(exc, SessionConflict):
                 raise
@@ -106,11 +110,16 @@ class ZeroTrustOperations:
     @staticmethod
     def _append(transaction, entry):
         connection, entries, previous = transaction
+        if len(entries) >= 10000:
+            raise JournalUnavailable("local journal capacity reached")
         payload = _canonical(entry)
+        record_hash = _digest(previous + "." + payload)
         connection.execute(
             "INSERT INTO journal VALUES (?,?,?,?)",
-            (len(entries) + 1, payload, previous, _digest(previous + "." + payload)),
+            (len(entries) + 1, payload, previous, record_hash),
         )
+        entries.append(entry)
+        transaction[2] = record_hash
 
     @staticmethod
     def _latest(entries, tenant_id, session_id):
@@ -167,6 +176,144 @@ class ZeroTrustOperations:
                                            expected_version=signal.expected_version,
                                            event=signal.event)
         return self._evaluate(request, principal, now=now, proof=proof)
+
+    @staticmethod
+    def _restriction_for(observation):
+        if observation.kind == "identity":
+            if not observation.active or observation.authentication_result == "failure":
+                return "DENY"
+            if observation.authentication_result == "unknown":
+                return "HOLD"
+        else:
+            if not observation.managed or observation.security_posture == "compromised":
+                return "DENY"
+            if observation.security_posture == "unknown":
+                return "HOLD"
+            if observation.security_posture == "at_risk":
+                return "STEP_UP"
+        return None
+
+    @staticmethod
+    def _observation_restriction(entries, tenant_id, user_id, device_id):
+        """Restrictions are sticky until a future explicit, reviewed recovery protocol.
+
+        A positive or out-of-order observation cannot erase earlier adverse evidence,
+        and a fresh synchronous event or a new session cannot bypass that evidence.
+        """
+        restrictions = [
+            entry["restriction"] for entry in entries
+            if entry["kind"] == "observation" and entry["tenant_id"] == tenant_id
+            and entry["restriction"] is not None
+            and entry["observation"]["subject_id"] == (
+                user_id if entry["observation"]["kind"] == "identity" else device_id
+            )
+        ]
+        return max(restrictions, key=_RESTRICTION_RANK.__getitem__, default=None)
+
+    @staticmethod
+    def _observation_result(entries, tenant_id, event_id, input_digest):
+        duplicate = next((entry for entry in entries if entry["kind"] == "observation"
+                          and entry["tenant_id"] == tenant_id
+                          and entry["event_id"] == event_id), None)
+        if duplicate is None:
+            return None
+        marker = ObservationApplication.model_validate(duplicate)
+        if not hmac.compare_digest(marker.input_digest_sha256, input_digest):
+            raise SessionConflict("observation identifier reused with different input")
+        return {"matched_sessions": marker.matched_sessions, "changed_sessions": 0,
+                "stale": marker.stale, "duplicate": True}
+
+    def observation_result(self, tenant_id: str, event_id: str, input_digest: str) -> dict | None:
+        """Read committed effects for ACK recovery without performing new effects.
+
+        The entire bounded journal chain is validated. This lookup does not require
+        the original signing authority to remain valid: source/key revocation must
+        prevent new processing, not conceal a transaction already committed before
+        a worker died. A tenant, event or digest mismatch never replays effects.
+        """
+        with self._transaction() as transaction:
+            return self._observation_result(transaction[1], tenant_id, event_id, input_digest)
+
+    def apply_observation(
+        self, signal: SignedContinuousSignal, input_digest: str,
+        *, now: datetime | None = None,
+    ) -> dict:
+        """Apply an authenticated durable observation atomically and without new grants.
+
+        The receiver verifies freshness before acknowledging durable storage. The
+        worker must reverify current source/key/scope with verify_observation before
+        calling this method, even on retry. Expiry during queue delay does not prevent
+        adverse restrictions; positive observations never clear state or prove MFA.
+        Older adverse evidence may only strengthen restrictions and is reported stale.
+        """
+        now = now or datetime.now(UTC)
+        if not hmac.compare_digest(input_digest, hashlib.sha256(canonical_observation(signal)).hexdigest()):
+            raise SessionConflict("observation digest mismatch")
+        with self._transaction() as transaction:
+            entries = transaction[1]
+            duplicate = self._observation_result(
+                entries, signal.tenant_id, signal.event_id, input_digest,
+            )
+            if duplicate:
+                return duplicate
+            matching_observations = [entry for entry in entries
+                                     if entry["kind"] == "observation"
+                                     and entry["tenant_id"] == signal.tenant_id
+                                     and entry["observation"]["kind"] == signal.observation.kind
+                                     and entry["observation"]["subject_id"]
+                                     == signal.observation.subject_id]
+            stale = any(signal.observed_at <= datetime.fromisoformat(entry["observed_at"])
+                        for entry in matching_observations)
+            restriction = self._restriction_for(signal.observation)
+            latest = {}
+            for entry in entries:
+                if entry["kind"] == "decision" and entry["session"]["tenant_id"] == signal.tenant_id:
+                    session = entry["session"]
+                    latest[session["session_id"]] = session
+            matched = [SessionDecision.model_validate(session) for session in latest.values()
+                       if (session["user_id"] if signal.observation.kind == "identity"
+                           else session["device_id"]) == signal.observation.subject_id]
+            changed = []
+            for previous in matched:
+                if restriction is None or _RESTRICTION_RANK[restriction] <= _RESTRICTION_RANK[previous.decision]:
+                    continue
+                if previous.version >= 200:
+                    raise SessionConflict("session history capacity reached")
+                reason = f"CONTINUOUS_{signal.observation.kind.upper()}_{restriction}"
+                session = SessionDecision.model_validate({
+                    **previous.model_dump(), "version": previous.version + 1,
+                    "event_id": "obs-" + _digest(signal.tenant_id + "." + signal.event_id
+                                                 + "." + previous.session_id),
+                    "evaluated_at": now, "decision": restriction,
+                    "status": {"STEP_UP": "STEP_UP_REQUIRED", "HOLD": "HELD",
+                               "DENY": "REVOKED"}[restriction],
+                    "risk_score": max(previous.risk_score, 75 if restriction == "DENY" else 25),
+                    "reason_codes": list(dict.fromkeys([*previous.reason_codes, reason])),
+                    "evidence": [*previous.evidence,
+                                 (f"{signal.observation.kind}:{signal.observation.subject_id}:"
+                                  f"{signal.event_id}")],
+                    "input_digest_sha256": input_digest, "grant_expires_at": None,
+                    "challenge_id": None, "challenge_expires_at": None,
+                })
+                changed.append(session)
+            # Preflight every bound before the first write; SQLite also rolls back
+            # the whole fanout if a later append or marker insertion fails.
+            if len(entries) + len(changed) + 1 > 10000:
+                raise JournalUnavailable("local journal capacity reached")
+            for session in changed:
+                self._append(transaction, {"kind": "decision",
+                    "session": session.model_dump(mode="json"), "grant_hash": None,
+                    "observation_event_id": signal.event_id})
+            marker = ObservationApplication(
+                tenant_id=signal.tenant_id, event_id=signal.event_id,
+                source_id=signal.source_id, key_id=signal.key_id,
+                input_digest_sha256=input_digest, observed_at=signal.observed_at, recorded_at=now,
+                observation=signal.observation, restriction=restriction,
+                matched_sessions=len(matched), changed_sessions=len(changed), stale=stale,
+            )
+            self._append(transaction, marker.model_dump(mode="json"))
+            return {"matched_sessions": len(matched), "changed_sessions": len(changed),
+                    "stale": stale, "duplicate": False}
 
     def _evaluate(self, request: SessionEvaluationRequest, principal: Principal,
                   *, now: datetime, proof: VerifiedSignal | None = None) -> SessionEvaluationResult:
@@ -261,6 +408,14 @@ class ZeroTrustOperations:
             elif risk >= 25 or event.device.security_posture == "at_risk":
                 step_up = True
                 reasons.append("ELEVATED_RISK")
+            observation_restriction = self._observation_restriction(
+                entries, principal.tenant_id, event.user.user_id, event.device.device_id,
+            )
+            if observation_restriction:
+                deny = deny or observation_restriction == "DENY"
+                hold = hold or observation_restriction == "HOLD"
+                step_up = step_up or observation_restriction == "STEP_UP"
+                reasons.append("CONTINUOUS_OBSERVATION_" + observation_restriction)
             if expected == 199:
                 hold = True
                 reasons.append("SESSION_HISTORY_CAPACITY")

@@ -1,0 +1,41 @@
+# Local-only overlay: only public-key registrations are mounted into the services.
+services:
+  app:
+    environment:
+      TRUSTED_SIGNAL_SOURCES_PATH: /signals/sources.json
+    volumes:
+      - type: bind
+        source: ${SIGNAL_REGISTRY_PATH:?Set SIGNAL_REGISTRY_PATH to the public registry file}
+        target: /signals/sources.json
+        read_only: true
+        bind:
+          create_host_path: false
+  signal-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: zero-trust-llm-secops:local
+    command: ["python", "-m", "scripts.signal_worker"]
+    environment:
+      APP_ENVIRONMENT: local
+      ANALYZER_MODE: rule
+      ZERO_TRUST_DB_PATH: /data/zero-trust.sqlite3
+      TRUSTED_SIGNAL_SOURCES_PATH: /signals/sources.json
+    volumes:
+      - secops-audit:/data
+      - type: bind
+        source: ${SIGNAL_REGISTRY_PATH:?Set SIGNAL_REGISTRY_PATH to the public registry file}
+        target: /signals/sources.json
+        read_only: true
+        bind:
+          create_host_path: false
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      disable: true
+    restart: unless-stopped
