@@ -70,6 +70,7 @@ from app.services.cases import (
     InvalidCaseTransitionError,
     create_case_store,
 )
+from app.services.continuous_signals import ContinuousSignalService
 from app.services.correlation import get_correlation_engine
 from app.services.detection_benchmark import BenchmarkUnavailable, get_detection_benchmark
 from app.services.detection_quality import get_detection_quality_service
@@ -88,6 +89,7 @@ from app.services.policy import enforce_assessment_safety, response_preview
 from app.services.public_replay import get_public_replay_service
 from app.services.scenario_evaluator import evaluate_scenarios
 from app.services.sigma import get_sigma_engine
+from app.services.signal_inbox import SignalInbox
 from app.services.trusted_signals import SignalVerifier
 from app.services.zero_trust import ZeroTrustOperations
 from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
@@ -124,7 +126,17 @@ zero_trust_operations = (
                         signal_verifier=SignalVerifier(settings.trusted_signal_sources_path))
     if settings.app_environment != "production" else None
 )
-app.include_router(zero_trust_router(zero_trust_operations))
+continuous_signal_service = (
+    ContinuousSignalService(zero_trust_operations, SignalInbox(
+        settings.zero_trust_db_path,
+        max_pending=settings.signal_inbox_max_pending,
+        max_records=settings.signal_inbox_max_records,
+        max_attempts=settings.signal_inbox_max_attempts,
+        lease_seconds=settings.signal_inbox_lease_seconds,
+        retry_seconds=settings.signal_inbox_retry_seconds,
+    )) if zero_trust_operations else None
+)
+app.include_router(zero_trust_router(zero_trust_operations, continuous_signal_service))
 install_zero_trust_error_handlers(app)
 
 ViewerPrincipal = Annotated[Principal, Depends(require_roles(Role.VIEWER))]
@@ -175,6 +187,10 @@ def readiness() -> Response:
     zero_trust_integrity = (
         zero_trust_operations.integrity() if zero_trust_operations else {"ok": True, "enabled": False}
     )
+    inbox_integrity = (
+        continuous_signal_service.inbox.integrity()
+        if continuous_signal_service else {"ok": True, "enabled": False}
+    )
     integrity = audit_store.integrity()
     case_integrity = case_store.integrity()
     outbox_integrity = integration_outbox_store.integrity()
@@ -192,6 +208,7 @@ def readiness() -> Response:
     ready = (
         integrity["ok"]
         and zero_trust_integrity["ok"]
+        and inbox_integrity["ok"]
         and case_integrity["ok"]
         and outbox_integrity["ok"]
         and assurance.valid
@@ -204,6 +221,7 @@ def readiness() -> Response:
     )
     payload = {
         "status": "ready" if ready else "degraded",
+        "signal_inbox": inbox_integrity,
         "audit": integrity,
         "case_management": {
             **case_integrity,

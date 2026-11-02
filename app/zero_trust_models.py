@@ -116,6 +116,9 @@ class TrustedSignalSource(StrictModel):
     user_ids: list[str] = Field(min_length=1, max_length=100)
     device_ids: list[str] = Field(min_length=1, max_length=100)
     roles: list[str] = Field(min_length=1, max_length=20)
+    # Empty preserves legacy full-session-only authority. Nonempty sources are
+    # observation-only and cannot use the old full-session proof endpoint.
+    observation_kinds: list[Literal["identity", "device"]] = Field(default_factory=list, max_length=2)
     keys: list[SignalKey] = Field(min_length=1, max_length=10)
 
 
