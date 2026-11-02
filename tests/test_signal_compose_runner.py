@@ -1,6 +1,7 @@
 """Driver safety contracts; real Docker/HTTP checks run explicitly through its CLI."""
 
 import json
+import os
 import stat
 import subprocess
 from datetime import UTC, datetime
@@ -11,18 +12,19 @@ from app.zero_trust_models import SignedSessionSignal
 from scripts import test_signal_compose as runner
 
 
-def test_generated_registry_has_separate_authorities_and_private_keys_stay_host_only(tmp_path):
+def test_generated_registry_has_separate_authorities_and_never_persists_private_keys(tmp_path):
     assets = runner.initialize_assets(tmp_path / "compose-unique")
     registry = json.loads(assets["registry"].read_text("utf-8"))
     session, identity = registry["sources"]
     assert session["observation_kinds"] == [] and identity["observation_kinds"] == ["identity"]
     assert session["keys"][0]["public_key_pem"] != identity["keys"][0]["public_key_pem"]
     assert "PRIVATE KEY" not in assets["registry"].read_text("utf-8")
-    assert stat.S_IMODE(assets["registry"].stat().st_mode) == 0o644
-    for kind in ("session", "identity"):
-        path = assets["directory"] / f"private-{kind}.pem"
-        assert stat.S_IMODE(path.stat().st_mode) == 0o600
-        assert path.name not in assets["override"].read_text("utf-8")
+    if os.name == "posix":
+        assert stat.S_IMODE(assets["registry"].stat().st_mode) == 0o644
+    for path in assets["directory"].rglob("*"):
+        if path.is_file():
+            assert b"PRIVATE KEY" not in path.read_bytes()
+    assert not list(assets["directory"].glob("private*"))
     verifier = SignalVerifier(assets["registry"])
     principal = Principal("local-operator", "local", frozenset({Role.ADMIN}), "disabled")
     signed = SignedSessionSignal.model_validate(runner.signed_session(
@@ -33,18 +35,19 @@ def test_generated_registry_has_separate_authorities_and_private_keys_stay_host_
     assert verifier.verify_observation(observation, principal, datetime.now(UTC)).source_id == "m3check-identity"
 
 
-def test_optional_share_receives_only_public_registry_and_keeps_private_assets_at_home(tmp_path):
+def test_optional_share_receives_only_public_registry_and_no_private_key_files(tmp_path):
     home = tmp_path / "host-only" / "compose-unique"
     shared = tmp_path / "ascii-shared"
     assets = runner.initialize_assets(home, shared, "secops-m3check-test")
     public_directory = shared / "secops-m3check-test"
     assert assets["registry"] == public_directory / "public-sources.json"
     assert sorted(path.name for path in public_directory.iterdir()) == ["public-sources.json"]
-    assert stat.S_IMODE(public_directory.stat().st_mode) == 0o755
-    assert stat.S_IMODE(assets["registry"].stat().st_mode) == 0o644
+    if os.name == "posix":
+        assert stat.S_IMODE(public_directory.stat().st_mode) == 0o755
+        assert stat.S_IMODE(assets["registry"].stat().st_mode) == 0o644
     assert "PRIVATE KEY" not in assets["registry"].read_text("utf-8")
-    assert (home / "private-session.pem").is_file()
-    assert (home / "private-identity.pem").is_file()
+    assert not list(home.glob("private*"))
+    assert set(assets["keys"]) == {"session", "identity"}
     assert assets["override"].parent == home
 
 

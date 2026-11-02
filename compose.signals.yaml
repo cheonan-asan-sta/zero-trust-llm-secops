@@ -16,6 +16,8 @@ services:
       dockerfile: Dockerfile
     image: zero-trust-llm-secops:local
     command: ["python", "-m", "scripts.signal_worker"]
+    # This worker uses only the shared SQLite volume and public registry.
+    network_mode: none
     environment:
       APP_ENVIRONMENT: local
       ANALYZER_MODE: rule

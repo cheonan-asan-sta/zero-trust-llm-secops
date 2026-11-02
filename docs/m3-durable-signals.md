@@ -4,6 +4,8 @@
 
 ## 처리 경계
 
+11월 3일 추가된 [Windows/Docker 인프라 재현·측정](m3-infrastructure-measurement.md)은 기존 기능 시연을 재사용한다. 최신 시험 실행기는 개인키를 파일로 저장하지 않고 worker를 `network_mode: none`으로 실행한다. 앞선 [11월 2일 Docker 검증](m3-docker-validation.md)의 키 파일·네트워크·환경 기록은 당시 실행 결과로 보존한다.
+
 ```text
 인증된 analyst + 등록 수집기의 서명된 관측
   → 종류·주체·테넌트·키·신선도 검증

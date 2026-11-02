@@ -1,4 +1,4 @@
-"""Exercise the real local app/worker Compose stack with isolated data and host-only keys.
+"""Exercise the real local app/worker stack with isolated data and in-memory private keys.
 
 Run: python -m scripts.test_signal_compose --report runtime/m3-validation/compose-report.json
 Docker context/host environment is inherited. No AWS, paid model, or external log input is used.
@@ -53,18 +53,17 @@ def available_port():
 
 
 def initialize_assets(directory: Path, registry_directory: Path | None = None, project: str | None = None):
-    """Only the public registry below is ever mounted into either container."""
+    """Keep signing keys in memory; mount only the public registry into containers.
+
+    POSIX chmod bits do not provide private-file protection on Windows. This
+    short-lived driver does not need to persist private keys on either platform.
+    """
     directory.mkdir(parents=True, exist_ok=False, mode=0o700)
     os.chmod(directory, 0o700)
     now = datetime.now(UTC)
     keys = {kind: Ed25519PrivateKey.generate() for kind in ("session", "identity")}
     sources = []
     for kind, key in keys.items():
-        path = directory / f"private-{kind}.pem"
-        private = key.private_bytes(serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8,
-                                    serialization.NoEncryption())
-        with os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "wb") as handle:
-            handle.write(private)
         sources.append({
             "source_id": f"m3check-{kind}", "tenant_id": TENANT,
             "user_ids": USERS, "device_ids": DEVICES, "roles": ["employee"],
@@ -174,7 +173,8 @@ class Compose:
     def run(self, *args, timeout=120):
         try:
             result = subprocess.run([*self.command, *args], cwd=ROOT, env=self.env,
-                                    capture_output=True, text=True, timeout=timeout, check=False)
+                                    capture_output=True, text=True, encoding="utf-8", errors="replace",
+                                    timeout=timeout, check=False)
         except subprocess.TimeoutExpired as exc:
             self.save_log(args, exc.stdout, exc.stderr, None)
             raise CheckFailed("compose_" + args[0] + "_timeout") from exc
