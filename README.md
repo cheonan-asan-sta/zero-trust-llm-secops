@@ -5,6 +5,14 @@ LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 �
 
 다른 AI 또는 개발자가 작업을 이어갈 때는 [프로젝트 인수인계서](AI_HANDOFF.md)에서 현재 브랜치, 폴더별 역할, 안전 원칙, 검증 절차를 먼저 확인합니다.
 
+## 2026년 11월 3일 후속 공급망 비교·모델 계약
+
+PR #2를 `aitest`에 병합하고 `feature/chaeheeju-c03-supply-chain`에서
+[C03 로컬 공급망 비교](docs/technology-decisions/C03-supply-chain.md)와
+[M6/C10 후보·평가 계약 초안](docs/m6-evaluation-contract.md)을 추가했습니다.
+고정 출처·서명/지문의 두 검사 구성을 같은 이미지에서 비교하며, 새 모델은 실제 호출하지 않았습니다.
+도구의 운영 채택·독립 재현·모델 성능 검증은 후속 작업입니다. 기존 탐지 기준선은 보존합니다.
+
 ## 2026년 11월 3일 인프라 재현·측정
 
 희주 담당 변경은 `feature/chaeheeju-m3-infra-validation`에서 진행하며

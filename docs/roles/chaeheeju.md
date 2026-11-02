@@ -4,7 +4,7 @@
 
 기존 역할에 따라 제로트러스트 설계·AI 분석과 인프라의 구성·실행·측정을 맡는다. 서버·도구를 직접 실행하고 장애·자원·지연·복구 원자료를 남긴다. 김택희와 입력·저장·정책·집행 계약을 맞추고 상대 구현을 검증한다. 아래 항목은 예정 업무다.
 
-2026년 11월 3일 수행 기록: 동료의 M3 PR #1을 `aitest`에서 받은 뒤 `feature/chaeheeju-m3-infra-validation`에서 Windows/Docker 재현과 반복 측정을 진행했다. 실제 결과·조건·한계는 [인프라 측정 기록](../m3-infrastructure-measurement.md)을 따른다. 이는 이 대화의 도구를 통한 실행이며 다른 팀원의 검토·전체 주간 계획 완료로 기록하지 않는다. 개인 이름 브랜치와 PR 기록은 [작업 절차](../contribution-workflow.md)를 따른다. C03·신규 모델 비교·운영 복원은 여전히 후속 작업이다.
+2026년 11월 3일 수행 기록: 동료의 M3 PR #1을 `aitest`에서 받은 뒤 `feature/chaeheeju-m3-infra-validation`에서 Windows/Docker 재현과 반복 측정을 진행하고 [PR #2](https://github.com/cheonan-asan-sta/zero-trust-llm-secops/pull/2)로 병합했다. 실제 결과·조건·한계는 [인프라 측정 기록](../m3-infrastructure-measurement.md)을 따른다. 후속 `feature/chaeheeju-c03-supply-chain`에서 [C03 첫 비교](../technology-decisions/C03-supply-chain.md)와 [M6 후보·조건 계약](../m6-evaluation-contract.md)을 진행했다. 이는 이 대화의 도구를 통한 실행이며 다른 팀원의 검토·전체 주간 계획 완료로 기록하지 않는다. 개인 이름 브랜치와 PR 기록은 [작업 절차](../contribution-workflow.md)를 따른다. C03 채택·독립 재현, 신규 모델 실제 비교·운영 복원은 여전히 후속 작업이다.
 
 ## 1 담당 범위와 이번 주 실행
 
@@ -50,6 +50,6 @@
 
 완료 기록에는 작업 ID·날짜·버전·실행자·측정자·원자료·기대/실제·상대 검증자·남은 결함을 남긴다. 인프라 후보별 측정/집계와 채택·미채택 근거를 작성해 상대 검토를 받는다. 설치 성공이나 계획 배정을 과거 기여·비교 완료로 기록하지 않는다.
 
-개발은 로컬 Docker Compose에서 수행한다. 유료 모델 비교는 합의한 요청·토큰·금액·시간 상한으로 별도 실행한다. AWS 생성·배포, GitHub 업로드와 실계정 변경은 수행하지 않는다. API 키나 서명 개인키를 문서·화면·이미지에 넣지 않는다.
+개발은 로컬 Docker Compose에서 수행한다. 유료 모델 비교는 합의한 요청·토큰·금액·시간 상한으로 별도 실행한다. AWS 생성·배포와 실계정 변경은 수행하지 않는다. GitHub 업로드·병합은 사용자가 요청한 개인 브랜치·PR 절차를 따른다. API 키나 서명 개인키를 문서·화면·이미지에 넣지 않는다.
 
 역할 근거는 기존 수행계획서의 「역할 분담 및 협업 방법」이다. [멘토링 우선 계획](../mentoring-priority-roadmap.md), [모델 검토](../model-candidate-review.md), [역할·협업 기준](../team-responsibilities.md), [기술 비교 계획](../technology-selection-plan.md)·[선정 대장](../technology-decisions/README.md)·[근거 양식](../technology-decisions/decision-template.md)을 따른다. 이 문서와 Word 공유본을 함께 갱신한다.

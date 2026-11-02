@@ -1,0 +1,131 @@
+{
+  "schema": "m6-evaluation-contract-1",
+  "as_of": "2026-11-03",
+  "status": "design_only_no_provider_calls",
+  "execution_owner": "김택희: 평가 실행기·집계; 채희주: 후보·안전·예산·인프라 조건",
+  "safety": {
+    "mode": "shadow_only",
+    "allow_external_tools": false,
+    "allow_policy_write": false,
+    "allow_permission_grant_or_restore": false,
+    "allow_real_identity_data": false,
+    "change_detection_baseline": false,
+    "on_missing_invalid_refused_timeout": "abstain_keep_existing_policy_and_record_failure"
+  },
+  "budget_proposal": {
+    "enabled": false,
+    "aggregate_usd": 5,
+    "aggregate_requests_including_retries": 120,
+    "wall_seconds": 1200,
+    "per_request_timeout_seconds": 30,
+    "concurrency": 1,
+    "max_explicit_retries": 1,
+    "sdk_automatic_retries": 0,
+    "max_input_tokens_per_provider": 4096,
+    "max_billed_output_tokens": 1024,
+    "charge_unknown_price": "do_not_call",
+    "reserve_worst_case_cost_before_dispatch": true,
+    "release_reservation_only_after_usage_is_reconciled": true
+  },
+  "tasks": {
+    "classification": {
+      "labels": ["normal", "threat", "unknown"],
+      "common_fields": ["case_id", "predicted_label", "status"],
+      "optional_fields": ["class_probabilities", "evidence_ids"],
+      "evidence_ids_must_exist_in_input": true,
+      "probability_is_not_authorization": true
+    },
+    "explanation": {
+      "applicable_to": "generative_models_only",
+      "required_fields": ["case_id", "summary", "evidence_ids", "limitations"],
+      "forbidden_fields": ["executable_command", "access_token", "grant_permission"]
+    }
+  },
+  "candidates": [
+    {
+      "id": "rule-frozen-v0.17.0",
+      "role": "unchanged_baseline",
+      "tasks": ["classification"],
+      "provider_calls": false
+    },
+    {
+      "id": "gpt-6.1-sol",
+      "role": "generative_baseline_candidate",
+      "endpoint": "Responses API",
+      "reasoning_effort": "low",
+      "tasks": ["classification", "explanation"],
+      "standard_usd_per_million": {"input": 2, "output": 10},
+      "requires": ["record_resolved_model_and_request_settings", "strict_output_validation"]
+    },
+    {
+      "id": "claude-sonnet-5-5",
+      "role": "other_provider_candidate",
+      "endpoint": "Claude Messages API",
+      "effort": "low_proposal_verify_supported_settings_before_execution",
+      "tasks": ["classification", "explanation"],
+      "standard_usd_per_million": {"input": 2, "output": 10},
+      "requires": ["record_resolved_model_and_request_settings", "strict_output_validation"]
+    },
+    {
+      "id": "gpt-6-luna",
+      "role": "conditional_low_cost_candidate_after_baseline_pair",
+      "endpoint": "Responses API",
+      "reasoning_effort": "none",
+      "tasks": ["classification", "explanation"],
+      "standard_usd_per_million": {"input": 0.1, "output": 0.5}
+    },
+    {
+      "id": "Jev",
+      "role": "typed_decision_candidate",
+      "requested_model": "jev-1.13.0",
+      "model_pin_status": "official_example_only_verify_available_version_before_execution",
+      "tasks": ["classification"],
+      "price_verified": false,
+      "requires": ["pin_available_version", "verify_billing_and_retention", "probability_calibration_on_dev_only"]
+    },
+    {
+      "id": "convaiinnovations/laya",
+      "revision": "7b928d828b7b0e022f929d9bd2e44165aa270148",
+      "subfolder": "multilingual",
+      "role": "local_typed_decision_candidate",
+      "tasks": ["classification"],
+      "license": "Apache-2.0_per_model_card",
+      "limits_proposal": {"cpus": 2, "memory_bytes": 4294967296, "concurrency": 1},
+      "requires": ["pin_and_review_runtime_dependencies", "verify_weight_hashes", "safetensors_only",
+                   "no_unreviewed_remote_code", "test_korean_and_english_separately"]
+    },
+    {
+      "id": "tfidf-logistic-regression",
+      "role": "simple_classification_reference_not_implemented",
+      "tasks": ["classification"],
+      "fit_split": "development_only"
+    }
+  ],
+  "pilot": {
+    "split": "development_only",
+    "unique_cases": 24,
+    "normal_cases": 12,
+    "threat_cases": 12,
+    "repeat_each_case": 1,
+    "run_required_pair_first": true,
+    "primary_metric_unit": "unique_case_not_model_answers",
+    "holdout_tuning": false,
+    "independent_label_review_required_for_final_claims": true,
+    "all_candidates_must_use_same_canonical_inputs": true,
+    "tasks_must_be_reported_separately": true
+  },
+  "result_fields": ["run_id", "source_commit", "dataset_sha256", "split_manifest_sha256",
+    "case_id", "input_sha256", "prompt_contract_sha256", "provider", "requested_model", "resolved_model",
+    "revision", "settings", "attempt", "started_at", "elapsed_ms", "status", "output_schema_valid",
+    "predicted_label", "evidence_ids", "usage", "reserved_usd", "actual_or_unreconciled_usd",
+    "response_sha256", "local_resource_measurements"],
+  "sources": [
+    "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+    "https://developers.openai.com/api/docs/models/gpt-6-luna",
+    "https://platform.claude.com/docs/en/models/overview",
+    "https://docs.typesafe.ai/introduction",
+    "https://docs.typesafe.ai/introduction/quickstart",
+    "https://huggingface.co/convaiinnovations/laya",
+    "https://huggingface.co/api/models/convaiinnovations/laya"
+  ]
+}
