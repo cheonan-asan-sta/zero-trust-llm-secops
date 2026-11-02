@@ -1,5 +1,18 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 3일 희주 담당 인프라 작업
+
+- 원격 `aitest`의 PR #1 병합 커밋 `82285c6`를 받아 `feature/chaeheeju-m3-infra-validation`에서 작업합니다.
+- 사용자 요청에 따라 희주 작업은 `feature/chaeheeju-<작업명>` 브랜치와 `aitest` 대상 PR로 남깁니다.
+  직접 통합 브랜치에 푸시하지 않고 [작업 절차](docs/contribution-workflow.md)를 따릅니다.
+- 기존 M3 구현을 재사용하며 탐지 규칙·임계값·개선 전 평가 자료는 변경하지 않습니다.
+- 시험 개인키는 메모리에서만 사용하고 공개 등록 JSON만 마운트합니다. Windows에서 POSIX 모드 비트를
+  그대로 요구하던 시험을 플랫폼 계약에 맞췄습니다. worker는 공유 SQLite만 필요해 네트워크를 제거했습니다.
+- `python -m scripts.measure_signal_infrastructure --repeats 3`으로 격리 반복·자원·지연을 기록합니다.
+  시연 부하·소표본 결과이며 서비스 SLA·실제 IdP/EDR·mTLS·독립 PEP·RTO/RPO 완료로 사용하지 않습니다.
+- 실행·표본·실제 결과·한계는 [인프라 측정 기록](docs/m3-infrastructure-measurement.md)을 우선합니다.
+  아래 11월 2일과 11월 1일 기록은 당시 기준선으로 보존합니다.
+
 ## 2026년 11월 2일 로컬 개발 업데이트
 
 - 작업 브랜치: `feature/m3-durable-signals`, 시작 커밋: `71cbfc0`. M3 구현·검증 결과이며
