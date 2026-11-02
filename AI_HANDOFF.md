@@ -1,5 +1,20 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 3일 후속 C03·M6 계약
+
+- PR #2는 `aitest`의 `b4660ad`에 병합했습니다. 현재 후속 작업은
+  `feature/chaeheeju-c03-supply-chain`에서 진행하며 별도 PR로 기록합니다.
+- [C03 로컬 비교](docs/technology-decisions/C03-supply-chain.md): 공식 고정 바이너리의 서명/지문 검증,
+  같은 이미지 tar에서 Syft+Grype와 Trivy의 오프라인 반복·설치 metadata 대조·작은 advisory 대조군입니다.
+  실제 결과와 보관 위치·한계를 확인하고 스캐너 채택·독립 재현 완료로 오해하지 않습니다.
+- [M6/C10 평가 계약](docs/m6-evaluation-contract.md)과 [JSON](infra/model-evaluation-contract.json)은
+  후보·질문·안전·비용 조건 초안입니다. 유료 호출·키 등록·새 공급자 실행기·제품 연결은 하지 않았습니다.
+  생성형 설명과 Jev/Laya 분류를 분리하고 AI 단독 권한 허용/복구를 금지합니다.
+- 이번 변경은 탐지 규칙·임계값·정규화·정책 및 개선 전 품질 결과를 바꾸지 않습니다.
+  AWS/실계정 변경 없이 로컬에서 시험합니다. 아래 과거 기록은 당시 상태로 보존합니다.
+- C03 도구의 변조/경로·체크섬·패키지 버전·집계 검증 21건을 추가해 전체 566건을
+  Windows와 Linux Docker에서 통과했습니다. 각각 기존 경고 3개/2개이며 탐지 품질 목표 통과를 뜻하지 않습니다.
+
 ## 2026년 11월 3일 희주 담당 인프라 작업
 
 - 원격 `aitest`의 PR #1 병합 커밋 `82285c6`를 받아 `feature/chaeheeju-m3-infra-validation`에서 작업합니다.

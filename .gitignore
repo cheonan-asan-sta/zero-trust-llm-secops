@@ -14,6 +14,7 @@ runtime/*.sqlite3*
 runtime/local-collector/
 runtime/detection-benchmark/
 runtime/m3-validation/
+runtime/c03/
 .idea/
 .vscode/
 
