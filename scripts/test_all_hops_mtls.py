@@ -73,14 +73,20 @@ class AllHopsLab(TLSLab):
     def make_fixtures(self):
         return self.ca, self.leaves
 
+    def graph_authority(self):
+        return authority("All-hops ephemeral CA")
+
+    def trust_bundle(self, ca):
+        return ca[1].public_bytes(serialization.Encoding.PEM).decode()
+
     def trial(self, candidate, iteration):
         # The I2 adversarial fixture retains its own CA. Native services share that same CA
         # only when explicitly created here, before the core starts.
         self.ca, self.leaves = fixtures()
         # Generate one CA for the expanded graph (including I2 fixtures) so all expected
         # clients can be checked using the same protected trust registry.
-        ca = authority("All-hops ephemeral CA")
-        self.ca = ca[1].public_bytes(serialization.Encoding.PEM).decode()
+        ca = self.graph_authority()
+        self.ca = self.trust_bundle(ca)
         names = {"server": ("gateway", True), "server-next": ("gateway", True),
             "bridge": ("pep-bridge", False), "bridge-next": ("pep-bridge", False), "collector": ("collector", False),
             "unknown": ("pep-bridge", False), "wrong-eku": ("pep-bridge", True)}
@@ -167,7 +173,10 @@ class AllHopsLab(TLSLab):
             argv = ["nginx", "-c", "/config/all-hops.conf", "-g", "daemon off;"]
             mounts = [m for m in mounts if "dst=/config/nginx.conf" not in m]
             mounts.append(f"type=bind,src={ROOT / 'infra/mtls/all-hops-nginx.conf'},dst=/config/all-hops.conf,readonly")
-        return super().start(name, network, argv, mounts=mounts, **kwargs)
+        return super().start(name, network, self.service_command(label, argv), mounts=mounts, **kwargs)
+
+    def service_command(self, label, argv):
+        return argv
 
     def request(self, container, request):
         if (isinstance(request, dict) and container == self.prefix + "-core-a"

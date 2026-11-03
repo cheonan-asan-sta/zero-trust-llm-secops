@@ -1,0 +1,28 @@
+{
+  "schema": "c04-tools-1",
+  "platform": "linux/amd64",
+  "tools": [
+    {
+      "name": "step-ca",
+      "repo": "smallstep/certificates",
+      "tag": "v0.30.2",
+      "asset": {
+        "name": "step-ca_linux_amd64.tar.gz",
+        "browser_download_url": "https://github.com/smallstep/certificates/releases/download/v0.30.2/step-ca_linux_amd64.tar.gz",
+        "digest": "sha256:1726ee7b6a24c67abb8c9e96ad671623b29b3d34f6a712f7087495f31331e54b"
+      },
+      "binary": "step-ca"
+    },
+    {
+      "name": "step",
+      "repo": "smallstep/cli",
+      "tag": "v0.31.0",
+      "asset": {
+        "name": "step_linux_amd64.tar.gz",
+        "browser_download_url": "https://github.com/smallstep/cli/releases/download/v0.31.0/step_linux_amd64.tar.gz",
+        "digest": "sha256:2bc654b26ca467848edb764620d6f17febea9d7d3629368b76dd20ce40c6ef32"
+      },
+      "binary": "step"
+    }
+  ]
+}

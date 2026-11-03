@@ -1,0 +1,38 @@
+# C04: 로컬 인증서 발급·갱신 선정 기록
+
+2026-11-03 · 대상: 선택한 로컬 mTLS 운영 경로 · 운영 배포/독립 검토는 별도
+
+사용자가 자동 발급·갱신을 요청해 기존 조건부 시험의 필요 조건이 충족됐다. 수동 CA/교체는 [이전 I2](../i2-service-mtls.md)의
+기준선이며, 이번에는 [실행·제약](../certificate-automation.md)에 따라 `step-ca`를 연결한다.
+
+| 요구 | 고정 인증서·수동 교체 기준선 | 로컬 step-ca + 제어기 | 판정 근거 |
+|---|---|---|---|
+| 서비스 상호 인증 | 기존 mTLS에서 가능 | 기존 mTLS 유지 | TLS 적용만으로 자동화 도구가 필요한 것은 아님 |
+| 무인 발급 | 명시적인 드라이버/운영자 키·파일 작업 필요 | 서비스/SAN/용도/CSR에 묶인 일회용 grant | 권한 없는 발급·grant 재사용과 인증 실패 검사 |
+| 기한 전 갱신 | 자동 스케줄 없음 | timer + 제한된 재시도 + 상태/journal | 실제 짧은 수명의 고정/자동 인증서 비교 |
+| 정확한 leaf pin 배포 | 운영자가 갱신과 함께 맞춰야 함 | 신규 등록→교체/재읽기→구 지문 제거 | CA만 설치해서 해결되지 않아 최소 연결 제어기 추가 |
+| 만료/CA 장애 | 만료 시 거부, 수동 복구 필요 | 유효 인증서는 계속 사용, 만료 후 자동 재등록 금지 | 가용성 때문에 신원을 자동 복원하지 않음 |
+| 폐기/재시작 | 기존 peer pin 제거 | CA 갱신 거부와 서비스 pin 제거를 구분, DB/journal 재사용 | CA 폐기만으로 즉시 모든 연결 종료를 주장하지 않음 |
+| 운영 부담 | 단순한 폐쇄 시험에 적합 | CA DB/키/제어기·reload의 추가 운영 필요 | 자동화 요구가 명시된 이번 범위에 한해 채택 |
+
+선정은 **후속 로컬 기준선으로 step-ca를 채택**하는 것이다. 전사 PKI나 관리형 서비스와 동일 조건의
+성능/비용 비교를 했다는 뜻이 아니다. 기존 수동 구성을 삭제하지 않으며 Kubernetes 기반 대안은 이번에
+설치·시험하지 않았다. 중앙 제어기의 leaf 키 접근과 단일 writer 규칙, root/issuer 수명 관리·HSM·HA·
+전용 만료 경보·독립 재현의 운영 부담을 남은 과제로 기록한다.
+
+실제 고정 버전에서 serverAuth 전용 인증서는 `/renew`가 거부됐다. 서버 EKU를 넓히는 방식 대신
+제어면 전용 등록 JWK 키로 서버별 재발급을 제한했다. own-root X5C 대안은 Sign template의 제한이
+CA 관리 API 전체의 권한 제한이 되지 않아 최종 구성에서 제외했다. 이 판단은
+[X5C AuthorizeRevoke](https://github.com/smallstep/certificates/blob/v0.30.2/authority/provisioner/x5c.go)와
+[CA revoke 처리](https://github.com/smallstep/certificates/blob/v0.30.2/api/revoke.go)의 검토에 근거하며,
+이전 구성에서 교차 폐기 공격을 실제 성공시켰다는 뜻은 아니다. 최종 구성은 일반 client의 다른 신원
+폐기와 다른 서버 발급 요청을 실제로 거부하는지 검사한다.
+
+공식 기능: [step-ca](https://smallstep.com/docs/step-ca/), [renew와 서비스 재적용](https://smallstep.com/docs/step-cli/reference/ca/renew/).
+실제 우리 구성의 통과 수·실패 이력·실행 이미지와 입력 지문은 최종 공개 실행 증거를 따른다.
+
+최종 실측은 [공개 원자료](../infrastructure-results/c04-certificates-windows-20261103.json)에 있다.
+새 CA/상태로 2회·총 306개 통합 검사와 Windows/Linux 각각 전체 739건을 통과했다. 활성 신원 50개의
+자동 발급/갱신과 서버 14개의 새 TLS 지문, 정적/자동 30초 인증서의 만료 동작·CA/제어기 재시작·
+폐기 유지·권한 경계를 확인했다. 초기/중단 prototype은 최종 합계에서 제외했다. 배경 부하를 통제하지
+않았고 수동과 자동의 발급 시점이 달라 속도나 성능 SLA의 우열을 주장하지 않는다.

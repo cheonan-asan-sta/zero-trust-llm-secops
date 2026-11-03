@@ -1,5 +1,26 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 3일 후속 C04 인증서 수명 자동화
+
+- PR #7 병합 `aitest` `1775491`에서 `feature/chaeheeju-certificate-automation`로 진행합니다.
+  [범위/재현/한계](docs/certificate-automation.md), [선정 기록](docs/technology-decisions/C04-certificate-lifecycle.md),
+  [계약](infra/mtls/certificate-lifecycle-contract.json)을 확인합니다.
+- step-ca 0.30.2/CLI 0.31.0을 고정 출처/SHA-256으로 확인합니다. 루트 개인키는 드라이버 RAM에만,
+  온라인 중간 CA는 암호화 키·부팅 암호·DB를 전용 Linux 볼륨에 둡니다. 제어기는 CA 키/Socket이 없습니다.
+- clientAuth는 mTLS로 갱신합니다. serverAuth 전용 `/renew`는 실제 버전에서 거부되어 서버별
+  `renew-<서버>`에 연결된 제어면 전용 JWK 서명키로 제한된 재발급을 사용합니다. 일반 CA client 인증서에
+  관리 권한을 주는 범용 X5C provisioner는 설치하지 않습니다. 서버 EKU를 넓히거나 업무 역할을 주지 않습니다.
+- 단일 publisher/journal, 새 pin 겹침→인증서 교체→reload ack/실제 TLS 관측→구 pin 제거를 연결합니다.
+  운영자 정책 변경은 pause/ack를 지켜야 하며 분산 writer·anti-rollback을 구현한 것은 아닙니다.
+- 최초 grant는 CSR에 묶어 사용 후 지우고, 만료한 관리 신원의 자동 재등록을 하지 않습니다.
+  CA 폐기와 즉시 peer pin 제거, 서버 leaf 폐기와 별도 발급 권한 폐기를 구분합니다.
+- 실제 반복 결과는 위 문서/공개 증거를 따릅니다. 앱 탐지/정책/개선 전 품질은 보존하고,
+  Codex 도구 실행을 팀원 수동 실행·독립 검토로 소급하지 않습니다. 운영 CA/HA/HSM/독립 재현은 후속입니다.
+- 최종: 2회 × 153 = 306개 통합 검사, Windows/Linux 전체 각각 739건과 Ruff 통과.
+  회당 50개 활성 신원의 발급/타이머 갱신과 서버 14개의 새 TLS 지문을 확인했습니다.
+  [공개 증거](docs/infrastructure-results/c04-certificates-windows-20261103.json)에 초기/중단 시도를 분리했습니다.
+  시험 8개 프로젝트 자원/전용 이미지 잔여는 0이며 시작 때 실행 중인 다른 Docker 작업은 보존했습니다.
+
 ## 2026년 11월 3일 후속 선택 경로 전체 mTLS
 
 - PR #6 병합 `aitest` `f7fc48d`에서 `feature/chaeheeju-mtls-all-hops`로 진행합니다.
