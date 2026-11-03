@@ -83,12 +83,15 @@ class CertificateLab(AllHopsLab):
         self.networks.append(self.ca_network)
         self.ca_volume = self.volume(self.prefix + "-ca-state")
         files = bootstrap.ca_files(self.offline_root, self.issuer, [p[0] for p in self.provisioners.values()] +
-            [bootstrap.server_renewal_provisioner(name, serialization.load_pem_private_key(self.renewal_materials[name]["key"].encode(), password=None).public_key()) for name in SERVERS])
+            [bootstrap.server_renewal_provisioner(name, self.server_signing_key(name).public_key()) for name in SERVERS])
         self.write_assets(self.ca_volume, files)
         self.ca_server = self.prefix + "-ca"
         Lab.start(self, self.ca_server, self.ca_network, ["/tools/step-ca", "/ca/ca.json", "--password-file", "/ca/password.txt"],
                   alias="ca", mounts=[f"type=volume,src={self.ca_volume},dst=/ca"], memory=256, cpus=1)
         return self.issuer
+
+    def server_signing_key(self, name):
+        return serialization.load_pem_private_key(self.renewal_materials[name]["key"].encode(), password=None)
 
     def trust_bundle(self, ca):
         return self.offline_root[1].public_bytes(serialization.Encoding.PEM).decode() + ca[1].public_bytes(serialization.Encoding.PEM).decode()

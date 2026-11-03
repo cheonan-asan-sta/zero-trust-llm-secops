@@ -1,5 +1,13 @@
 # C04: 로컬 인증서 발급·갱신 선정 기록
 
+후속 [개인키 교체](../private-key-rotation.md)는 step-ca를 재사용한다. clientAuth의 mTLS `/rekey`와
+serverAuth의 기존 제한된 발급 경로에 새 키 CSR을 연결하고, 세대별 파일과 서비스 재적용·구 serial
+자체 폐기를 직접 구성한다. 단순 CLI 덮어쓰기는 여러 파일을 한꺼번에 교체하지 않아 서비스 설정 전환을
+별도 journal로 연결했다. CA/JWK 관리 키 교체·HSM·운영 PKI 선정은 이 결과에 포함하지 않는다.
+후속 실측은 [개인키 교체 원자료](../infrastructure-results/c04-key-rotation-windows-20261103.json)에 있다.
+새 CA/상태 2회·348개 통합 assertion과 Windows/Linux 각각 전체 766건을 통과했다. 회당 신원 48개가
+3회 이상 교체했고 서버 14개의 TLS와 업무/경보를 확인했다. 초기 검증 실행기 실패는 합계에서 분리했다.
+
 2026-11-03 · 대상: 선택한 로컬 mTLS 운영 경로 · 운영 배포/독립 검토는 별도
 
 사용자가 자동 발급·갱신을 요청해 기존 조건부 시험의 필요 조건이 충족됐다. 수동 CA/교체는 [이전 I2](../i2-service-mtls.md)의

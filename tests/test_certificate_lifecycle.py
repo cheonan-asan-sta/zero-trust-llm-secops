@@ -21,6 +21,7 @@ from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
 
 from scripts import certificate_authority as ca
 from scripts import certificate_controller as controller
+from scripts import certificate_key_rotation as rotation
 
 
 @pytest.fixture
@@ -367,3 +368,242 @@ def test_renewal_timeout_leaves_no_candidate_file(tmp_path, monkeypatch):
     with pytest.raises(subprocess.TimeoutExpired):
         controller.renewal({"id": "id", "certificates": ["leaf.pem"], "key": "leaf.key", "purpose": "clientAuth"}, tmp_path)
     assert not (tmp_path / "id.renew.pem").exists()
+
+
+@pytest.fixture
+def rotating(tmp_path, pki, monkeypatch):
+    """Exercise the real journal/files; private test PEM is intercepted in RAM."""
+    private = {}
+    original_atomic, original_read, original_exists, original_unlink = controller.atomic, Path.read_bytes, Path.exists, Path.unlink
+    def atomic(path, body):
+        path = Path(path)
+        if path.suffix == ".key":
+            private[path] = body.encode() if isinstance(body, str) else body
+        else:
+            original_atomic(path, body)
+    monkeypatch.setattr(controller, "atomic", atomic)
+    monkeypatch.setattr(Path, "read_bytes", lambda p: private[p] if p in private else original_read(p))
+    monkeypatch.setattr(Path, "exists", lambda p: p in private or original_exists(p))
+    def unlink(path, **kwargs):
+        if path in private:
+            del private[path]
+        else:
+            original_unlink(path, **kwargs)
+    monkeypatch.setattr(Path, "unlink", unlink)
+    controller.atomic(tmp_path / "leaf.pem", pki.old)
+    controller.atomic(tmp_path / "leaf.key", pki.key.private_bytes(serialization.Encoding.PEM,
+        serialization.PrivateFormat.PKCS8, serialization.NoEncryption()))
+    (tmp_path / "issuer.pem").write_text(pki.issuer_pem)
+    profile, peers, raw = [tmp_path / name for name in ["profile.json", "peers.json", "config.yml"]]
+    controller.save(profile, {"cert": "leaf.pem", "key": "leaf.key", "server_pins": ["a" * 64]})
+    controller.save(peers, {"peers": {controller.fingerprint(pki.old): "collector"}})
+    raw.write_text("cert_file: /service-tls/leaf.pem\nkey_file: /service-tls/leaf.key\n")
+    c = controller.metadata(pki.old) | {"id": "id", "generation": 1, "candidate": None,
+        "key": str(tmp_path / "leaf.key"), "certificates": [str(tmp_path / "leaf.pem")],
+        "assets": [{"cert": str(tmp_path / "leaf.pem"), "key": str(tmp_path / "leaf.key")}],
+        "current": pki.old, "bindings": [{"path": str(peers), "field": "peers", "role": "collector"}],
+        "retry_at": 0, "failures": 0}
+    state = {"credentials": {"id": c}, "transaction": None}
+    cfg = {"disabled": [], "scoped": Path, "policies": [str(profile), str(peers)], "overlap_seconds": 0,
+        "renew_before": {}, "key_rotation": {"interval_seconds": 3600, "cleanup_grace_seconds": 0,
+                                              "configuration_files": [str(raw)]}}
+    calls = []
+    def post(directory, target, payload, **kwargs):
+        calls.append((target, payload, kwargs))
+        if target == "/1.0/revoke":
+            return 200, {"status": "ok"}
+        key = serialization.load_pem_private_key(private[Path(c["pending_key"]["key"])], password=None)
+        return 201, {"certChain": [pki.cert(public_key=key.public_key()), pki.issuer_pem]}
+    monkeypatch.setattr(controller, "ca_post", post)
+    monkeypatch.setattr(controller, "readiness", lambda *a: None)
+    def prepare():
+        rotation.prepare_key(c, cfg, state, tmp_path)
+        c["candidate"] = rotation.request_certificate(c, state, cfg, tmp_path)
+        state["transaction"] = rotation.plan_rotation(cfg, state, ["id"])
+        controller.save(tmp_path / "state.json", state)
+    return SimpleNamespace(c=c, cfg=cfg, state=state, prepare=prepare, private=private,
+        directory=tmp_path, profile=profile, peers=peers, raw=raw, calls=calls, pki=pki)
+
+
+def test_rekey_uses_new_key_csr_and_old_identity_for_mtls(rotating):
+    r = rotating
+    r.prepare()
+    target, payload, authentication = r.calls[0]
+    assert target == "/1.0/rekey" and authentication["identity"]["key"] == str(r.directory / "leaf.key")
+    csr = x509.load_pem_x509_csr(payload["csr"].encode())
+    assert csr.is_signature_valid
+    assert rotation.public_hash(csr.public_key()) != rotation.public_hash(r.pki.key.public_key())
+    assert "PRIVATE KEY" not in (r.directory / "state.json").read_text()
+    assert json.loads(r.profile.read_bytes())["key"] == "leaf.key"
+
+
+def test_key_intent_is_journaled_before_first_private_write(rotating, monkeypatch):
+    r = rotating
+    actual = controller.atomic
+    def inspect(path, body):
+        if Path(path).suffix == ".key":
+            journal = json.loads((r.directory / "state.json").read_bytes())
+            assert str(path) in {a["key"] for a in journal["credentials"]["id"]["pending_key"]["assets"]}
+        actual(path, body)
+    monkeypatch.setattr(controller, "atomic", inspect)
+    rotation.prepare_key(r.c, r.cfg, r.state, r.directory)
+
+
+def test_restart_reuses_pending_private_key_without_creating_more_files(rotating):
+    r = rotating
+    rotation.prepare_key(r.c, r.cfg, r.state, r.directory)
+    old = dict(r.private)
+    recovered = json.loads((r.directory / "state.json").read_bytes())
+    rotation.prepare_key(recovered["credentials"]["id"], r.cfg, recovered, r.directory)
+    assert r.private == old
+
+
+@pytest.mark.parametrize("reason", ["expired", "disabled", "retired", "old_inventory"])
+def test_rekey_cannot_resurrect_unavailable_identity(rotating, reason):
+    r = rotating
+    if reason == "expired":
+        r.c["not_after"] = 0
+    elif reason == "disabled":
+        r.cfg["disabled"] = ["id"]
+    elif reason == "retired":
+        r.c["inhibited"] = True
+    else:
+        r.c.pop("assets")
+    with pytest.raises(controller.LifecycleError):
+        rotation.prepare_key(r.c, r.cfg, r.state, r.directory)
+    assert not r.c.get("pending_key")
+
+
+@pytest.mark.parametrize("failure", ["stage", "activate_profile", "activate_config", "retire", "unlink"])
+@pytest.mark.parametrize("after_commit", [False, True])
+def test_rekey_crash_replays_every_switch_without_mixing_key_pairs(rotating, monkeypatch, failure, after_commit):
+    r = rotating
+    r.prepare()
+    actual_atomic, actual_unlink = controller.atomic, Path.unlink
+    tripped = False
+    def atomic(path, body):
+        nonlocal tripped
+        path = Path(path)
+        text = body.decode() if isinstance(body, bytes) else body
+        trigger = ((failure == "stage" and path == r.peers and controller.fingerprint(r.pki.old) in text and controller.fingerprint(r.c["candidate"]) in text)
+            or (failure == "activate_profile" and path == r.profile and "-r" in text)
+            or (failure == "activate_config" and path == r.raw and "-r" in text)
+            or (failure == "retire" and path == r.peers and controller.fingerprint(r.pki.old) not in text))
+        if trigger and not tripped:
+            tripped = True
+            if after_commit:
+                actual_atomic(path, body)
+            raise OSError("simulated interruption")
+        actual_atomic(path, body)
+    def unlink(path, **kwargs):
+        nonlocal tripped
+        if failure == "unlink" and path == r.directory / "leaf.key" and not tripped:
+            tripped = True
+            if after_commit:
+                actual_unlink(path, **kwargs)
+            raise OSError("simulated interruption")
+        actual_unlink(path, **kwargs)
+    monkeypatch.setattr(controller, "atomic", atomic)
+    monkeypatch.setattr(Path, "unlink", unlink)
+    with pytest.raises(OSError):
+        controller.publish(r.cfg, r.state, r.directory)
+    recovered = json.loads((r.directory / "state.json").read_bytes())
+    monkeypatch.setattr(controller, "atomic", actual_atomic)
+    monkeypatch.setattr(Path, "unlink", actual_unlink)
+    controller.publish(r.cfg, recovered, r.directory)
+    assert recovered["transaction"] is None
+    assert recovered["credentials"]["id"]["key_generation"] == 1
+    profile = json.loads(r.profile.read_bytes())
+    pem = x509.load_pem_x509_certificate((r.directory / profile["cert"]).read_bytes())
+    key = serialization.load_pem_private_key(r.private[r.directory / profile["key"]], password=None)
+    assert rotation.public_hash(pem.public_key()) == rotation.public_hash(key.public_key())
+    assert not (r.directory / "leaf.key").exists() and not (r.directory / "leaf.pem").exists()
+    assert (r.directory / profile["key"]).name in r.raw.read_text()
+
+
+def test_reload_failure_preserves_old_files_and_overlap(rotating, monkeypatch):
+    r = rotating
+    r.prepare()
+    def fail(*args):
+        raise controller.LifecycleError("reload_ack_missing")
+    monkeypatch.setattr(controller, "readiness", fail)
+    with pytest.raises(controller.LifecycleError):
+        controller.publish(r.cfg, r.state, r.directory)
+    assert (r.directory / "leaf.key").exists()
+    assert controller.fingerprint(r.pki.old) in json.loads(r.peers.read_bytes())["peers"]
+    assert r.state["transaction"]["phase"] == "activated"
+
+
+@pytest.mark.parametrize("asset", ["key", "cert"])
+def test_candidate_asset_tampering_never_switches_profiles(rotating, asset):
+    r = rotating
+    r.prepare()
+    path = Path(r.c["pending_key"]["assets"][0][asset])
+    if asset == "key":
+        r.private[path] = r.private[r.directory / "leaf.key"]
+    else:
+        path.write_text(r.pki.old)
+    with pytest.raises(controller.LifecycleError):
+        controller.publish(r.cfg, r.state, r.directory)
+    assert json.loads(r.profile.read_bytes())["key"] == "leaf.key"
+
+
+def test_ca_rekey_failure_never_changes_active_pair(rotating, monkeypatch):
+    r = rotating
+    rotation.prepare_key(r.c, r.cfg, r.state, r.directory)
+    monkeypatch.setattr(controller, "ca_post", lambda *a, **kw: (403, {}))
+    with pytest.raises(controller.LifecycleError):
+        rotation.request_certificate(r.c, r.state, r.cfg, r.directory)
+    assert r.c["candidate"] is None
+    assert json.loads(r.profile.read_bytes())["key"] == "leaf.key"
+
+
+def test_unconfirmed_old_serial_revocation_retains_old_key_for_retry(rotating, monkeypatch):
+    r = rotating
+    r.prepare()
+    monkeypatch.setattr(controller, "ca_post", lambda *a, **kw: (403, {"message": "not authorized"}))
+    with pytest.raises(controller.LifecycleError, match="revocation_unconfirmed"):
+        controller.publish(r.cfg, r.state, r.directory)
+    assert r.state["transaction"]["phase"] == "revoking" and (r.directory / "leaf.key").exists()
+    monkeypatch.setattr(controller, "ca_post", lambda *a, **kw: (403, {"message": "certificate already revoked"}))
+    controller.publish(r.cfg, r.state, r.directory)
+    assert r.state["transaction"] is None and not (r.directory / "leaf.key").exists()
+
+
+def test_retired_binding_stays_inhibited_during_rekey_plan(rotating):
+    r = rotating
+    r.prepare()
+    controller.save(r.peers, {"peers": {}})
+    with pytest.raises(controller.LifecycleError, match="retired_binding"):
+        rotation.plan_rotation(r.cfg, r.state, ["id"])
+    assert r.c["inhibited"]
+
+
+def test_rekey_timer_works_before_certificate_renewal_threshold(rotating):
+    r = rotating
+    assert controller.selected(r.cfg, r.state, time.time()) == ["id"]
+    r.c["last_key_rotation"] = time.time()
+    r.cfg["renew_before"] = {"collector": 1}
+    assert controller.selected(r.cfg, r.state, time.time()) == []
+
+
+@pytest.mark.parametrize("asset", ["cert", "key"])
+def test_operator_changed_active_assets_are_not_replaced_or_silently_restored(rotating, asset):
+    r = rotating
+    if asset == "cert":
+        (r.directory / "leaf.pem").write_text(r.pki.new)
+    else:
+        key = ec.generate_private_key(ec.SECP256R1())
+        r.private[r.directory / "leaf.key"] = key.private_bytes(serialization.Encoding.PEM,
+            serialization.PrivateFormat.PKCS8, serialization.NoEncryption())
+    with pytest.raises(controller.LifecycleError, match="active_asset_changed"):
+        rotation.prepare_key(r.c, r.cfg, r.state, r.directory)
+    assert not r.c.get("pending_key")
+
+
+def test_shared_leaf_is_revoked_once_for_multiple_service_copies(rotating):
+    r = rotating
+    r.prepare()
+    r.state["transaction"]["retired"].append(dict(r.state["transaction"]["retired"][0]))
+    controller.publish(r.cfg, r.state, r.directory)
+    assert len([call for call in r.calls if call[0] == "/1.0/revoke"]) == 1

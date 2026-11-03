@@ -1,5 +1,21 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 3일 후속 C04 서비스 개인키 자동 교체
+
+- PR #8 병합 `aitest` `e8e7867`에서 `feature/chaeheeju-private-key-rotation`으로 진행한다.
+  [구현·재현·한계](docs/private-key-rotation.md)와 [계약](infra/mtls/private-key-rotation-contract.json)을 확인한다.
+- 명시적 `key_rotation` 모드만 leaf 키를 교체한다. 기본 동일 키 갱신은 유지한다. 관리 mTLS 키도 교체하지만
+  CA 루트/issuer와 별도 등록 JWK 서명키는 제외하며, JWK 키는 관리 mTLS 키와 독립적으로 생성한다.
+- immutable 세대별 파일→겹침 pin→profile/config 원자 전환→reload ack/실제 TLS→구 pin 제거→구 client
+  serial 자체 폐기→유예 후 구 파일 unlink 순서다. journal에 private PEM을 저장하지 않는다.
+- 단일 publisher/운영자 pause/ack 규칙과 만료·retired·disabled 거부를 유지한다. unlink는 물리 소거나
+  메모리/백업 키 제거가 아니다. HSM/HA/운영 배포/독립 재현과 별도로 기록한다. 아래 C04 결과는 이전 기준선이다.
+- 최종 2회 × 174 = 348개 통합 assertion, Windows/Linux 각각 전체 766건과 Ruff를 통과했다.
+  회당 48개 신원·14개 서버, 3회 이상 새 키 전환·실제 activated 단계 중단 복구·CA 장애 후 복구를 확인했다.
+  등록 JWK 교차 발급 401은 별도 검사 1건이다. [공개 증거](docs/infrastructure-results/c04-key-rotation-windows-20261103.json)를 따른다.
+  초기 null 세대 비교 TypeError·3개 신원 빠른 시험은 최종 합계에서 제외했다. 3개 프로젝트/단위 이미지 잔여 0,
+  기존 Docker 작업과 사용자 ZIP은 보존했다. 앱·탐지·정책 소스는 변경하지 않았다.
+
 ## 2026년 11월 3일 후속 C04 인증서 수명 자동화
 
 - PR #7 병합 `aitest` `1775491`에서 `feature/chaeheeju-certificate-automation`로 진행합니다.

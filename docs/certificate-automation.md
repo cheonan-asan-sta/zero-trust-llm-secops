@@ -1,5 +1,8 @@
 # 로컬 인증서 자동 발급·갱신
 
+후속 [개인키 자동 교체](private-key-rotation.md)를 별도 opt-in 모드로 추가했다. 아래 동일 키 갱신과
+이전 실행 결과는 기준선으로 보존한다. 새 키 모드의 범위·결과·재현은 후속 문서를 따른다.
+
 2026-11-03 · 기준 `aitest` `1775491` · `feature/chaeheeju-certificate-automation`
 
 채희주 담당 인프라 범위에서 Codex가 구현·실행·검증한다. 김택희 담당 앱·탐지·정책·worker를 재사용하며

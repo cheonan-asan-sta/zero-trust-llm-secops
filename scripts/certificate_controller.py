@@ -3,7 +3,7 @@
 Trusted control plane, not a workload identity attestor. No Docker socket, CA
 signing/root key, HTTP fallback or automatic expired re-enrollment. Delegated
 server provisioner keys are restricted to this control plane's private volumes.
-Renewal preserves the private key; rekey/root rotation are separate operations.
+Renewal preserves the private key unless the explicit key_rotation profile is enabled.
 """
 
 import argparse
@@ -27,7 +27,7 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
 
-from scripts.certificate_authority import server_renewal_token
+from scripts.certificate_authority import bootstrap_token, public_jwk, server_renewal_token
 
 
 class LifecycleError(ValueError):
@@ -156,11 +156,15 @@ def cas(path, before, after):
     save(path, after)
 
 
-def ca_post(state_dir, target, payload):
-    if target not in {"/1.0/sign", "/1.0/revoke"}:
+def ca_post(state_dir, target, payload, *, identity=None):
+    if target not in {"/1.0/sign", "/1.0/revoke", "/1.0/rekey"}:
         raise LifecycleError("ca_route")
+    if target == "/1.0/rekey" and identity is None:
+        raise LifecycleError("rekey_requires_mtls")
     context = ssl.create_default_context(cafile=str(state_dir / "root.pem"))
     context.minimum_version = ssl.TLSVersion.TLSv1_2
+    if identity is not None:
+        context.load_cert_chain(identity["certificates"][0], identity["key"])
     connection = http.client.HTTPSConnection("ca", 9000, context=context, timeout=3)
     try:
         connection.connect()  # Server authentication precedes the one-time credential.
@@ -186,6 +190,19 @@ def config(path):
         return p
     for name in value["policies"] + [p for pair in value["extra_certificates"] for p in pair]:
         scoped(name)
+    for signer_path in value.get("server_signers", {}).values():
+        scoped(signer_path)
+    if value.get("key_rotation"):
+        rotation = value["key_rotation"]
+        if (not isinstance(rotation, dict)
+                or type(rotation.get("interval_seconds")) not in {int, float} or rotation["interval_seconds"] < 1
+                or type(rotation.get("cleanup_grace_seconds")) not in {int, float}
+                or not 0 <= rotation["cleanup_grace_seconds"] <= 300):
+            raise LifecycleError("key_rotation_schedule")
+        for configuration_path in rotation.get("configuration_files", []):
+            scoped(configuration_path)
+        if set(value.get("server_renewal", {})) != set(value.get("server_signers", {})):
+            raise LifecycleError("separate_server_signers_required")
     value["scoped"] = scoped
     return value
 
@@ -216,8 +233,9 @@ def inventory(cfg, state_dir):
             credentials[uid] = info | {"id": uid, "csr": csr, "key": key_path, "certificates": [],
                 "bindings": [{"path": p, "field": field, "role": role} for p, data in documents.items()
                              for field, role in bindings(data, uid)], "generation": 0,
-                "current": old, "candidate": None, "failures": 0, "retry_at": 0}
+                "current": old, "candidate": None, "failures": 0, "retry_at": 0, "assets": []}
         credentials[uid]["certificates"].append(certificate_path)
+        credentials[uid]["assets"].append({"cert": certificate_path, "key": key_path})
     if not credentials or len(credentials) > 64:
         raise LifecycleError("credential_count")
     state = {"schema": "certificate-lifecycle-1", "credentials": credentials, "transaction": None}
@@ -251,8 +269,12 @@ def server_reissue(c, state, cfg, state_dir):
             or helper["not_after"] <= time.time() or c["not_after"] <= time.time()):
         raise LifecycleError("server_renewal_identity_unavailable")
     proof = Path(helper["certificates"][0]).read_text()
-    key = serialization.load_pem_private_key(Path(helper["key"]).read_bytes(), password=None)
-    token = server_renewal_token(c["name"], proof, key, c["csr"])
+    signer = cfg.get("server_signers", {}).get(c["name"])
+    key = serialization.load_pem_private_key(Path(signer or helper["key"]).read_bytes(), password=None)
+    if signer:
+        token = bootstrap_token({"name": "server-renewal-" + c["name"], "key": public_jwk(key.public_key())}, key, c["csr"], seconds=60)
+    else:
+        token = server_renewal_token(c["name"], proof, key, c["csr"])
     code, response = ca_post(state_dir, "/1.0/sign", {"csr": c["csr"], "ott": token, "notAfter": "20m"})
     if code != 201:
         raise LifecycleError("server_reissue_denied")
@@ -277,18 +299,23 @@ def selected(cfg, state, now):
         if c["generation"] and c["not_after"] <= now:
             c["status"] = "expired_reenrollment_required"
             continue
-        if c["candidate"] or (c["retry_at"] <= now and (c["generation"] == 0 or c["not_after"] - now <= cfg["renew_before"].get(c["name"], 400))):
+        key_due = bool(cfg.get("key_rotation") and now - c.get("last_key_rotation", 0) >= cfg["key_rotation"]["interval_seconds"])
+        if c["candidate"] or (c["retry_at"] <= now and (key_due or c["generation"] == 0 or c["not_after"] - now <= cfg["renew_before"].get(c["name"], 400))):
             chosen.add(uid)
     # Reloading clients and servers in one process is one publication group.
     for group in cfg.get("reload_groups", []):
         related = {uid for uid, c in state["credentials"].items()
                    if any(str(Path(p).parent) == group["root"] for p in c["certificates"])}
         if chosen & related:
-            chosen |= {uid for uid in related if uid not in cfg.get("disabled", []) and not state["credentials"][uid].get("inhibited")}
+            chosen |= {uid for uid in related if uid not in cfg.get("disabled", []) and not state["credentials"][uid].get("inhibited")
+                       and state["credentials"][uid]["not_after"] > now and state["credentials"][uid]["retry_at"] <= now}
     return sorted(chosen)
 
 
 def plan(cfg, state, identifiers):
+    if any(state["credentials"][uid].get("pending_key") for uid in identifiers):
+        from scripts.certificate_key_rotation import plan_rotation
+        return plan_rotation(cfg, state, identifiers)
     documents = {p: json.loads(Path(p).read_bytes()) for p in cfg["policies"]}
     mapping = {}
     for uid in identifiers:
@@ -324,7 +351,8 @@ def readiness(cfg, state, state_dir):
     paths = {p for c in pending for p in c["certificates"]}
     for group in cfg.get("reload_groups", []):
         if any(str(Path(p).parent) == group["root"] for p in paths):
-            digest = hashlib.sha256(b"".join(Path(p).read_bytes() for p in group["files"])).hexdigest()
+            from scripts.certificate_reload_runner import watch_digest
+            digest = watch_digest(group["files"], group.get("resolve_tls", False))
             if Path(group["ack"]).read_text().strip() != digest:
                 raise LifecycleError("reload_ack_missing")
     for c in pending:
@@ -339,6 +367,9 @@ def readiness(cfg, state, state_dir):
 
 def publish(cfg, state, state_dir):
     txn = state["transaction"]
+    if txn.get("kind") == "key_rotation":
+        from scripts.certificate_key_rotation import publish_rotation
+        return publish_rotation(cfg, state, state_dir)
     if set(txn["credentials"]) & set(cfg.get("disabled", [])):
         raise LifecycleError("identity_disabled_during_publication")
     if txn["phase"] != "retiring" and any(metadata(state["credentials"][uid]["candidate"])["not_after"] <= time.time() for uid in txn["credentials"]):
@@ -385,7 +416,7 @@ def status(state, state_dir):
         "paused": state.get("paused_ack", False),
         "server_observations": state.get("server_observations", {}),
         "last_error": state.get("last_error"), "credentials": {uid: {k: c.get(k) for k in
-            ["name", "purpose", "fingerprint", "serial", "not_after", "generation", "status", "failures"]}
+            ["name", "purpose", "fingerprint", "serial", "not_after", "generation", "status", "failures", "key_generation", "public_key_sha256"]}
             for uid, c in state["credentials"].items()}})
 
 
@@ -394,9 +425,19 @@ def tick(cfg, state, state_dir):
         publish(cfg, state, state_dir)
         return
     chosen = selected(cfg, state, time.time())
+    if cfg.get("key_rotation") and any(state["credentials"][uid]["generation"] == 0 for uid in chosen):
+        # Partial first enrollment must finish before mixing in a rekey transaction.
+        chosen = [uid for uid in chosen if state["credentials"][uid]["generation"] == 0]
     bootstrap_path = state_dir / "bootstrap.json"
     bootstrap = json.loads(bootstrap_path.read_bytes()) if bootstrap_path.exists() else {}
     issuer = (state_dir / "issuer.pem").read_text()
+    if cfg.get("key_rotation"):
+        from scripts.certificate_key_rotation import prepare_key
+        for uid in chosen:
+            c = state["credentials"][uid]
+            if c["generation"] and not c["candidate"]:
+                prepare_key(c, cfg, state, state_dir)
+                save(state_dir / "state.json", state)
     def get_candidate(uid):
         c = state["credentials"][uid]
         if c["candidate"]:
@@ -409,8 +450,12 @@ def tick(cfg, state, state_dir):
                     raise LifecycleError("enrollment_denied")
                 new = issued_chain(response)
             else:
-                new = server_reissue(c, state, cfg, state_dir) if c["purpose"] == "serverAuth" else renewal(c, state_dir)
-            key = serialization.load_pem_private_key(Path(c["key"]).read_bytes(), password=None)
+                if c.get("pending_key"):
+                    from scripts.certificate_key_rotation import request_certificate
+                    new = request_certificate(c, state, cfg, state_dir)
+                else:
+                    new = server_reissue(c, state, cfg, state_dir) if c["purpose"] == "serverAuth" else renewal(c, state_dir)
+            key = serialization.load_pem_private_key(Path((c.get("pending_key") or {}).get("key", c["key"])).read_bytes(), password=None)
             validate_candidate(c["current"], new, issuer, key)
             return uid, new, None
         except (OSError, ValueError, TypeError, KeyError, http.client.HTTPException, subprocess.SubprocessError):
