@@ -16,6 +16,7 @@ runtime/detection-benchmark/
 runtime/m3-validation/
 runtime/c03/
 runtime/c01/
+runtime/c02/
 .idea/
 .vscode/
 

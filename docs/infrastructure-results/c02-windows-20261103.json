@@ -1,0 +1,6107 @@
+{
+  "schema": "c02-pilot-1",
+  "started_at": "2026-11-03T05:47:38.328434+00:00",
+  "completed": true,
+  "source_commit": "9f61f35696ec9c79e94608a3ac4550a33bd6eaa7",
+  "tools": {
+    "schema": "c02-tools-1",
+    "platform": "linux/amd64",
+    "tools": {
+      "nginx": {
+        "version": "1.30.6",
+        "image": "nginx@sha256:b565a9579cdabe43de09a5a278dc95ceee721dae1cacf85247effc4f6630d511"
+      },
+      "envoy": {
+        "version": "1.40.2",
+        "image": "envoyproxy/envoy@sha256:49d3e8b6246d1a804acffaebe42f2799edc77b77a37a97709ef742af90b6d223"
+      }
+    }
+  },
+  "contract": {
+    "schema": "c02-contract-1",
+    "scope": "local/test independent synthetic document server; HTTP GET /documents only",
+    "policy": "unchanged zt-policy-2026.10.1; docs READ grant TTL 60 seconds",
+    "authorization": "existing /zero-trust/protected-access atomically consumes one-use core grant",
+    "handoff": "hashed bounded RAM capability, 3 second TTL, one-use GET/path binding; service-authenticated consume",
+    "deny_assertion": "non-2xx, no protected fixture body hash, zero additional resource deliveries",
+    "allow_assertion": "200, exact protected fixture body hash, one additional resource delivery",
+    "concurrency": "8 requests share one core grant; exactly one resource delivery",
+    "repeats": 3,
+    "candidate_order": "alternate starting candidate each repeat",
+    "expected_checks": [
+      "valid_once",
+      "grant_replay",
+      "concurrent_single_use",
+      "concurrent_replay",
+      "missing_x-api-key",
+      "missing_x-session-id",
+      "missing_x-grant-token",
+      "bad_api_key",
+      "wrong_grant",
+      "unknown_session",
+      "resource_scope_mismatch",
+      "duplicate_credentials",
+      "method_post",
+      "method_head",
+      "method_put",
+      "method_delete",
+      "method_options",
+      "path_0",
+      "path_1",
+      "path_2",
+      "path_3",
+      "path_4",
+      "path_5",
+      "path_6",
+      "spoofed_headers_cannot_change_scope",
+      "binding_b",
+      "binding_c",
+      "revoked_before_request",
+      "signed_proof_expired",
+      "direct_client_resource",
+      "direct_client_core",
+      "resource_forged_handoff",
+      "bridge_restart_loses_pending_handoff",
+      "bridge_restart_no_grant_refund",
+      "signed_adverse_signal_revokes_before_request",
+      "unrelated_user_still_allowed",
+      "pdp_timeout",
+      "pdp_unavailable",
+      "grant_expired_unchanged_60s_policy",
+      "signing_key_disabled",
+      "auth_bridge_unavailable",
+      "bridge_restart_no_replay"
+    ],
+    "limitations": [
+      "No production adoption, independent teammate review or high-load SLA assertion",
+      "Core grant consumption is authorization point; revocation does not cancel an already authorized in-flight request",
+      "No atomic transaction spanning core journal and business action; delivery failure does not refund a consumed grant",
+      "Local internal HTTP only; production TLS/mTLS, OIDC/IdP mapping, HA and resource streaming are not validated"
+    ]
+  },
+  "protected_fixture_sha256": "6576278a8de2bfa294d84e6fbe0e8e6f9a32c9a753f48070eb4c3e63d5e4ca9a",
+  "conditions": {
+    "network": "internal Docker networks; no published ports",
+    "uid": 10001,
+    "proxy_cpu_budget": 1,
+    "proxy_memory_bytes": 268435456,
+    "proxy_workers": 1,
+    "handoff_ttl_seconds": 3,
+    "grant_ttl_seconds": 60,
+    "timing": "client HTTP duration inside container; excludes Docker exec startup",
+    "authorization_point": "existing core SQLite grant-consumption transaction"
+  },
+  "runs": [
+    {
+      "candidate": "nginx",
+      "iteration": 1,
+      "checks": [
+        {
+          "label": "valid_once",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            90.7147329999134
+          ]
+        },
+        {
+          "label": "grant_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            25.025206000009348
+          ]
+        },
+        {
+          "label": "concurrent_single_use",
+          "passed": true,
+          "statuses": [
+            403,
+            403,
+            403,
+            200,
+            403,
+            403,
+            403,
+            403
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            82.52438400018036,
+            341.7003960000784,
+            341.5367529999003,
+            240.835326000024,
+            339.131038000005,
+            361.10750700004246,
+            239.10405600008744,
+            376.57402399986495
+          ]
+        },
+        {
+          "label": "concurrent_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            24.276490999909583
+          ]
+        },
+        {
+          "label": "missing_x-api-key",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            5.40787799991449
+          ]
+        },
+        {
+          "label": "missing_x-session-id",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.6381590000946744
+          ]
+        },
+        {
+          "label": "missing_x-grant-token",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.436407000028339
+          ]
+        },
+        {
+          "label": "bad_api_key",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            8.175045999905706
+          ]
+        },
+        {
+          "label": "wrong_grant",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            22.061989000121685
+          ]
+        },
+        {
+          "label": "unknown_session",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            22.60320999994292
+          ]
+        },
+        {
+          "label": "resource_scope_mismatch",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            22.065758000053393
+          ],
+          "core_reason": "SCOPE_DENIED"
+        },
+        {
+          "label": "duplicate_credentials",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.6713369998342387
+          ]
+        },
+        {
+          "label": "method_post",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.7919409999885829
+          ]
+        },
+        {
+          "label": "method_head",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.9478179999860004
+          ]
+        },
+        {
+          "label": "method_put",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.9167200000774756
+          ]
+        },
+        {
+          "label": "method_delete",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.8629200001450954
+          ]
+        },
+        {
+          "label": "method_options",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.1889459999565588
+          ]
+        },
+        {
+          "label": "path_0",
+          "passed": true,
+          "statuses": [
+            404
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.8335790000728593
+          ]
+        },
+        {
+          "label": "path_1",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.953954999886264
+          ]
+        },
+        {
+          "label": "path_2",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.8197170000130427
+          ]
+        },
+        {
+          "label": "path_3",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.7940830000734422
+          ]
+        },
+        {
+          "label": "path_4",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.7920259999991686
+          ]
+        },
+        {
+          "label": "path_5",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.8303299998715374
+          ]
+        },
+        {
+          "label": "path_6",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.8116859999063308
+          ]
+        },
+        {
+          "label": "spoofed_headers_cannot_change_scope",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            35.719823999897926
+          ]
+        },
+        {
+          "label": "binding_b",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            21.18881000001238
+          ]
+        },
+        {
+          "label": "binding_c",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            22.6247189998503
+          ]
+        },
+        {
+          "label": "revoked_before_request",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            22.22208199987108
+          ],
+          "core_reason": "SESSION_NOT_AUTHORIZED"
+        },
+        {
+          "label": "signed_proof_expired",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            44.027876999962245
+          ],
+          "core_reason": "SIGNAL_PROOF_EXPIRED"
+        },
+        {
+          "label": "direct_client_resource",
+          "passed": true,
+          "statuses": [
+            0
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.5209890000514861
+          ]
+        },
+        {
+          "label": "direct_client_core",
+          "passed": true,
+          "statuses": [
+            0
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.43689800008905877
+          ]
+        },
+        {
+          "label": "resource_forged_handoff",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            8.972797000069477
+          ]
+        },
+        {
+          "label": "bridge_restart_loses_pending_handoff",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            7.899845000110872
+          ]
+        },
+        {
+          "label": "bridge_restart_no_grant_refund",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            34.99004800005423
+          ]
+        },
+        {
+          "label": "signed_adverse_signal_revokes_before_request",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            24.132187000077465
+          ],
+          "core_reason": "SESSION_NOT_AUTHORIZED"
+        },
+        {
+          "label": "unrelated_user_still_allowed",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            37.939880000067205
+          ]
+        },
+        {
+          "label": "pdp_timeout",
+          "passed": true,
+          "statuses": [
+            500
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1009.9213490000238
+          ]
+        },
+        {
+          "label": "pdp_unavailable",
+          "passed": true,
+          "statuses": [
+            500
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            9.160104000102365
+          ]
+        },
+        {
+          "label": "grant_expired_unchanged_60s_policy",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            36.99714699996548
+          ],
+          "core_reason": "GRANT_EXPIRED"
+        },
+        {
+          "label": "signing_key_disabled",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            38.781997999876694
+          ],
+          "core_reason": "SIGNAL_SOURCE_REVOKED"
+        },
+        {
+          "label": "auth_bridge_unavailable",
+          "passed": true,
+          "statuses": [
+            500
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1002.3397129998557
+          ]
+        },
+        {
+          "label": "bridge_restart_no_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            37.946491999946375
+          ]
+        }
+      ],
+      "completed": true,
+      "started_at": "2026-11-03T05:48:06.590477+00:00",
+      "hardening": [
+        {
+          "service": "core-a",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "core-b",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "core-c",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "bridge",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "resource",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "client",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "proxy",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 1000000000
+        }
+      ],
+      "worker_network": "none",
+      "resource_samples": [
+        {
+          "at": "2026-11-03T05:48:09.657424+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2432696,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 4220,
+          "network_tx_bytes_estimate": 1480,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:11.899836+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.25,
+          "memory_bytes_estimate": 2543845,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 39200,
+          "network_tx_bytes_estimate": 37000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:14.143561+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.03,
+          "memory_bytes_estimate": 2543845,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 40300,
+          "network_tx_bytes_estimate": 38200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:16.390994+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2543845,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 40300,
+          "network_tx_bytes_estimate": 38200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:18.711235+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2543845,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 40400,
+          "network_tx_bytes_estimate": 38200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:20.943760+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.03,
+          "memory_bytes_estimate": 2543845,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 41600,
+          "network_tx_bytes_estimate": 39400,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:23.189873+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2543845,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 41600,
+          "network_tx_bytes_estimate": 39400,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:25.430804+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2543845,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 41600,
+          "network_tx_bytes_estimate": 39400,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:27.668864+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.1,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 44500,
+          "network_tx_bytes_estimate": 42300,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:29.925691+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 45600,
+          "network_tx_bytes_estimate": 43600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:32.172294+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:34.424447+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:36.660390+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:38.903467+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:41.146359+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:43.401114+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:45.649346+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:47.891094+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:50.138013+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:52.370864+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:54.613817+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:56.842053+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:48:59.087029+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:49:01.331341+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:49:03.561675+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:49:05.811455+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:49:08.043861+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:49:10.277269+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:49:12.514582+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2543845,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46600,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:49:14.754120+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.07,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 48800,
+          "network_tx_bytes_estimate": 47200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:49:16.990256+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2543845,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 48800,
+          "network_tx_bytes_estimate": 47200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:49:19.223968+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.02,
+          "memory_bytes_estimate": 2552234,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 49500,
+          "network_tx_bytes_estimate": 48000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:49:21.473265+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 49600,
+          "network_tx_bytes_estimate": 48000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        }
+      ],
+      "resource_errors": [],
+      "finished_at": "2026-11-03T05:49:21.732883+00:00",
+      "http_duration": {
+        "n": 49,
+        "p50_ms": 22.065758000053393,
+        "p95_ms": 376.57402399986495,
+        "max_ms": 1009.9213490000238
+      }
+    },
+    {
+      "candidate": "envoy",
+      "iteration": 1,
+      "checks": [
+        {
+          "label": "valid_once",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            37.397319000092466
+          ]
+        },
+        {
+          "label": "grant_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            25.935449999906268
+          ]
+        },
+        {
+          "label": "concurrent_single_use",
+          "passed": true,
+          "statuses": [
+            200,
+            403,
+            403,
+            403,
+            403,
+            403,
+            403,
+            403
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            156.14746400001422,
+            264.9538640000628,
+            422.5206739999976,
+            448.5889549998774,
+            365.7791770001495,
+            402.59979899997234,
+            386.3864420000027,
+            166.18831300002057
+          ]
+        },
+        {
+          "label": "concurrent_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            28.493553000089378
+          ]
+        },
+        {
+          "label": "missing_x-api-key",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            6.646985000088534
+          ]
+        },
+        {
+          "label": "missing_x-session-id",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.112500000066575
+          ]
+        },
+        {
+          "label": "missing_x-grant-token",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.5550469999870984
+          ]
+        },
+        {
+          "label": "bad_api_key",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            10.07284599995728
+          ]
+        },
+        {
+          "label": "wrong_grant",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            24.602681000033044
+          ]
+        },
+        {
+          "label": "unknown_session",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            25.074829999994108
+          ]
+        },
+        {
+          "label": "resource_scope_mismatch",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            24.54665200002637
+          ],
+          "core_reason": "SCOPE_DENIED"
+        },
+        {
+          "label": "duplicate_credentials",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.191528999901493
+          ]
+        },
+        {
+          "label": "method_post",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.507742000034341
+          ]
+        },
+        {
+          "label": "method_head",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.8580339999516582
+          ]
+        },
+        {
+          "label": "method_put",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.0283420001305785
+          ]
+        },
+        {
+          "label": "method_delete",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.8761320000066917
+          ]
+        },
+        {
+          "label": "method_options",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.899019999882512
+          ]
+        },
+        {
+          "label": "path_0",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.114772999902925
+          ]
+        },
+        {
+          "label": "path_1",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.1975479999127856
+          ]
+        },
+        {
+          "label": "path_2",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.471512999818515
+          ]
+        },
+        {
+          "label": "path_3",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.1391010000115784
+          ]
+        },
+        {
+          "label": "path_4",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            31.67158999985986
+          ]
+        },
+        {
+          "label": "path_5",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.0348310001736536
+          ]
+        },
+        {
+          "label": "path_6",
+          "passed": true,
+          "statuses": [
+            400
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.1290139998436644
+          ]
+        },
+        {
+          "label": "spoofed_headers_cannot_change_scope",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            36.2454380001509
+          ]
+        },
+        {
+          "label": "binding_b",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            23.410465000097247
+          ]
+        },
+        {
+          "label": "binding_c",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            23.74495799995202
+          ]
+        },
+        {
+          "label": "revoked_before_request",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            32.69636800018816
+          ],
+          "core_reason": "SESSION_NOT_AUTHORIZED"
+        },
+        {
+          "label": "signed_proof_expired",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            36.72476099995947
+          ],
+          "core_reason": "SIGNAL_PROOF_EXPIRED"
+        },
+        {
+          "label": "direct_client_resource",
+          "passed": true,
+          "statuses": [
+            0
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.5038239999066718
+          ]
+        },
+        {
+          "label": "direct_client_core",
+          "passed": true,
+          "statuses": [
+            0
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.43425100011518225
+          ]
+        },
+        {
+          "label": "resource_forged_handoff",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            7.971999999881518
+          ]
+        },
+        {
+          "label": "bridge_restart_loses_pending_handoff",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            8.256791999883717
+          ]
+        },
+        {
+          "label": "bridge_restart_no_grant_refund",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            28.645992000065235
+          ]
+        },
+        {
+          "label": "signed_adverse_signal_revokes_before_request",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            24.001494999993156
+          ],
+          "core_reason": "SESSION_NOT_AUTHORIZED"
+        },
+        {
+          "label": "unrelated_user_still_allowed",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            34.948326000176166
+          ]
+        },
+        {
+          "label": "pdp_timeout",
+          "passed": true,
+          "statuses": [
+            503
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1009.6091130001241
+          ]
+        },
+        {
+          "label": "pdp_unavailable",
+          "passed": true,
+          "statuses": [
+            503
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            8.295618999909493
+          ]
+        },
+        {
+          "label": "grant_expired_unchanged_60s_policy",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            33.403913000029206
+          ],
+          "core_reason": "GRANT_EXPIRED"
+        },
+        {
+          "label": "signing_key_disabled",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            49.59576400005972
+          ],
+          "core_reason": "SIGNAL_SOURCE_REVOKED"
+        },
+        {
+          "label": "auth_bridge_unavailable",
+          "passed": true,
+          "statuses": [
+            503
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1003.8232220001646
+          ]
+        },
+        {
+          "label": "bridge_restart_no_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            40.07695100017372
+          ]
+        }
+      ],
+      "completed": true,
+      "started_at": "2026-11-03T05:49:56.192213+00:00",
+      "hardening": [
+        {
+          "service": "core-a",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "core-b",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "core-c",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "bridge",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "resource",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "client",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "proxy",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 1000000000
+        }
+      ],
+      "worker_network": "none",
+      "resource_samples": [
+        {
+          "at": "2026-11-03T05:49:59.251838+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.09,
+          "memory_bytes_estimate": 19325256,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 4310,
+          "network_tx_bytes_estimate": 1320,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:01.511357+00:00",
+          "service": "envoy",
+          "cpu_percent": 1.44,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 44900,
+          "network_tx_bytes_estimate": 38200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:03.742514+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.2,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46000,
+          "network_tx_bytes_estimate": 39200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:05.995554+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.17,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46000,
+          "network_tx_bytes_estimate": 39200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:08.242985+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.11,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46000,
+          "network_tx_bytes_estimate": 39200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:10.484367+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.17,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46100,
+          "network_tx_bytes_estimate": 39200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:12.722925+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.11,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 47300,
+          "network_tx_bytes_estimate": 40300,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:14.955758+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.11,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 47300,
+          "network_tx_bytes_estimate": 40300,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:17.232154+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.11,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 47300,
+          "network_tx_bytes_estimate": 40300,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:19.481336+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.19,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 51300,
+          "network_tx_bytes_estimate": 44100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:21.731873+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.12,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:23.986930+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.12,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:26.247571+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.14,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:28.509240+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.13,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:30.740815+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.19,
+          "memory_bytes_estimate": 19440599,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:32.988235+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.14,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:35.226232+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.17,
+          "memory_bytes_estimate": 19440599,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:37.456888+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.12,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:39.694682+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.13,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:41.932837+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.13,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:44.179790+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.14,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:46.426077+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.15,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:48.681629+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.13,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:50.920891+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.17,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:53.160541+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.14,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:55.464543+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.22,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:57.708258+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.09,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:50:59.946246+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.1,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:51:02.188013+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.09,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52500,
+          "network_tx_bytes_estimate": 45100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:51:04.456753+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.28,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 53600,
+          "network_tx_bytes_estimate": 46100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:51:06.709106+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.12,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 54700,
+          "network_tx_bytes_estimate": 47100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:51:08.947952+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.2,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 55400,
+          "network_tx_bytes_estimate": 47500,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:51:11.200107+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.12,
+          "memory_bytes_estimate": 19314770,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 55500,
+          "network_tx_bytes_estimate": 47500,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        }
+      ],
+      "resource_errors": [],
+      "finished_at": "2026-11-03T05:51:11.624230+00:00",
+      "http_duration": {
+        "n": 49,
+        "p50_ms": 24.54665200002637,
+        "p95_ms": 448.5889549998774,
+        "max_ms": 1009.6091130001241
+      }
+    },
+    {
+      "candidate": "envoy",
+      "iteration": 2,
+      "checks": [
+        {
+          "label": "valid_once",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            40.141680000033375
+          ]
+        },
+        {
+          "label": "grant_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            26.00769900004707
+          ]
+        },
+        {
+          "label": "concurrent_single_use",
+          "passed": true,
+          "statuses": [
+            403,
+            200,
+            403,
+            403,
+            403,
+            403,
+            403,
+            403
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            268.07617800000116,
+            152.79981999992742,
+            283.08907900009217,
+            378.5055680000369,
+            441.9274659999246,
+            360.3388280000672,
+            414.83405899998615,
+            395.80878099991423
+          ]
+        },
+        {
+          "label": "concurrent_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            26.399924000088504
+          ]
+        },
+        {
+          "label": "missing_x-api-key",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            6.8412140001328225
+          ]
+        },
+        {
+          "label": "missing_x-session-id",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.2437119998812705
+          ]
+        },
+        {
+          "label": "missing_x-grant-token",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.361092999990433
+          ]
+        },
+        {
+          "label": "bad_api_key",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            9.263392000093518
+          ]
+        },
+        {
+          "label": "wrong_grant",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            32.23097799991592
+          ]
+        },
+        {
+          "label": "unknown_session",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            23.00462800008063
+          ]
+        },
+        {
+          "label": "resource_scope_mismatch",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            23.67846299989651
+          ],
+          "core_reason": "SCOPE_DENIED"
+        },
+        {
+          "label": "duplicate_credentials",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.1839959999852
+          ]
+        },
+        {
+          "label": "method_post",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.1496809999916877
+          ]
+        },
+        {
+          "label": "method_head",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.0971030000964674
+          ]
+        },
+        {
+          "label": "method_put",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.9752430000608001
+          ]
+        },
+        {
+          "label": "method_delete",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.037048000147479
+          ]
+        },
+        {
+          "label": "method_options",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.347192000115683
+          ]
+        },
+        {
+          "label": "path_0",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.1262730001581076
+          ]
+        },
+        {
+          "label": "path_1",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.5276449998727912
+          ]
+        },
+        {
+          "label": "path_2",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.0026089998737007
+          ]
+        },
+        {
+          "label": "path_3",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.047804000085307
+          ]
+        },
+        {
+          "label": "path_4",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            29.737224999962564
+          ]
+        },
+        {
+          "label": "path_5",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.9309740000608144
+          ]
+        },
+        {
+          "label": "path_6",
+          "passed": true,
+          "statuses": [
+            400
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.033841999969809
+          ]
+        },
+        {
+          "label": "spoofed_headers_cannot_change_scope",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            38.01139699999112
+          ]
+        },
+        {
+          "label": "binding_b",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            23.165330999972866
+          ]
+        },
+        {
+          "label": "binding_c",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            31.52149700008522
+          ]
+        },
+        {
+          "label": "revoked_before_request",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            27.664534999985335
+          ],
+          "core_reason": "SESSION_NOT_AUTHORIZED"
+        },
+        {
+          "label": "signed_proof_expired",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            32.188529999984894
+          ],
+          "core_reason": "SIGNAL_PROOF_EXPIRED"
+        },
+        {
+          "label": "direct_client_resource",
+          "passed": true,
+          "statuses": [
+            0
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.6120059999830119
+          ]
+        },
+        {
+          "label": "direct_client_core",
+          "passed": true,
+          "statuses": [
+            0
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.5646730000989919
+          ]
+        },
+        {
+          "label": "resource_forged_handoff",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            9.369207999952778
+          ]
+        },
+        {
+          "label": "bridge_restart_loses_pending_handoff",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            8.224650000101974
+          ]
+        },
+        {
+          "label": "bridge_restart_no_grant_refund",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            60.8499429999938
+          ]
+        },
+        {
+          "label": "signed_adverse_signal_revokes_before_request",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            23.468237999850317
+          ],
+          "core_reason": "SESSION_NOT_AUTHORIZED"
+        },
+        {
+          "label": "unrelated_user_still_allowed",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            36.993865000113146
+          ]
+        },
+        {
+          "label": "pdp_timeout",
+          "passed": true,
+          "statuses": [
+            503
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1009.4281649999175
+          ]
+        },
+        {
+          "label": "pdp_unavailable",
+          "passed": true,
+          "statuses": [
+            503
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            8.460612999897421
+          ]
+        },
+        {
+          "label": "grant_expired_unchanged_60s_policy",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            32.52560700002505
+          ],
+          "core_reason": "GRANT_EXPIRED"
+        },
+        {
+          "label": "signing_key_disabled",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            48.07201299990993
+          ],
+          "core_reason": "SIGNAL_SOURCE_REVOKED"
+        },
+        {
+          "label": "auth_bridge_unavailable",
+          "passed": true,
+          "statuses": [
+            503
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1004.1408550000597
+          ]
+        },
+        {
+          "label": "bridge_restart_no_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            110.02992399994582
+          ]
+        }
+      ],
+      "completed": true,
+      "started_at": "2026-11-03T05:51:46.495933+00:00",
+      "hardening": [
+        {
+          "service": "core-a",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "core-b",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "core-c",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "bridge",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "resource",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "client",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "proxy",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 1000000000
+        }
+      ],
+      "worker_network": "none",
+      "resource_samples": [
+        {
+          "at": "2026-11-03T05:51:49.618300+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.1,
+          "memory_bytes_estimate": 19482542,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 4220,
+          "network_tx_bytes_estimate": 1320,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:51:51.868490+00:00",
+          "service": "envoy",
+          "cpu_percent": 1.45,
+          "memory_bytes_estimate": 19482542,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 44700,
+          "network_tx_bytes_estimate": 38300,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:51:54.108783+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.25,
+          "memory_bytes_estimate": 19482542,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 45800,
+          "network_tx_bytes_estimate": 39300,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:51:56.354717+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.11,
+          "memory_bytes_estimate": 19493028,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 45800,
+          "network_tx_bytes_estimate": 39300,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:51:58.651219+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.11,
+          "memory_bytes_estimate": 19493028,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 45900,
+          "network_tx_bytes_estimate": 39300,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:00.897009+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.17,
+          "memory_bytes_estimate": 19482542,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46000,
+          "network_tx_bytes_estimate": 39300,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:03.140200+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.12,
+          "memory_bytes_estimate": 19482542,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 47100,
+          "network_tx_bytes_estimate": 40300,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:05.380461+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.15,
+          "memory_bytes_estimate": 19618857,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 47100,
+          "network_tx_bytes_estimate": 40300,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:07.619165+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.12,
+          "memory_bytes_estimate": 19482542,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 47200,
+          "network_tx_bytes_estimate": 40400,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:09.857534+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.19,
+          "memory_bytes_estimate": 19482542,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 51200,
+          "network_tx_bytes_estimate": 44200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:12.108642+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.13,
+          "memory_bytes_estimate": 19493028,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:14.346181+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.11,
+          "memory_bytes_estimate": 19493028,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:16.582686+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.11,
+          "memory_bytes_estimate": 19493028,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:18.819606+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.11,
+          "memory_bytes_estimate": 19493028,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:21.057014+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.18,
+          "memory_bytes_estimate": 19482542,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:23.290917+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.12,
+          "memory_bytes_estimate": 19482542,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:25.527607+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.22,
+          "memory_bytes_estimate": 19493028,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:27.779887+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.15,
+          "memory_bytes_estimate": 19493028,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:30.031249+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.14,
+          "memory_bytes_estimate": 19493028,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:32.268761+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.13,
+          "memory_bytes_estimate": 19482542,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:34.514660+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.12,
+          "memory_bytes_estimate": 19482542,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:36.763193+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.13,
+          "memory_bytes_estimate": 19618857,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:39.005712+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.11,
+          "memory_bytes_estimate": 19618857,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:41.243389+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.11,
+          "memory_bytes_estimate": 19618857,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:43.485657+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.1,
+          "memory_bytes_estimate": 19618857,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:45.726014+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.2,
+          "memory_bytes_estimate": 19618857,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:47.969209+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.11,
+          "memory_bytes_estimate": 19618857,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:50.206442+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.13,
+          "memory_bytes_estimate": 19618857,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:52.446160+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.11,
+          "memory_bytes_estimate": 19482542,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:54.685222+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.11,
+          "memory_bytes_estimate": 19482542,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:56.935284+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.12,
+          "memory_bytes_estimate": 19482542,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 54500,
+          "network_tx_bytes_estimate": 47200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:52:59.169214+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.19,
+          "memory_bytes_estimate": 19493028,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 55200,
+          "network_tx_bytes_estimate": 47600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:53:01.418263+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.11,
+          "memory_bytes_estimate": 19482542,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 55300,
+          "network_tx_bytes_estimate": 47600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        }
+      ],
+      "resource_errors": [],
+      "finished_at": "2026-11-03T05:53:02.110146+00:00",
+      "http_duration": {
+        "n": 49,
+        "p50_ms": 23.67846299989651,
+        "p95_ms": 441.9274659999246,
+        "max_ms": 1009.4281649999175
+      }
+    },
+    {
+      "candidate": "nginx",
+      "iteration": 2,
+      "checks": [
+        {
+          "label": "valid_once",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            46.69998899998973
+          ]
+        },
+        {
+          "label": "grant_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            28.84986399999434
+          ]
+        },
+        {
+          "label": "concurrent_single_use",
+          "passed": true,
+          "statuses": [
+            200,
+            403,
+            403,
+            403,
+            403,
+            403,
+            403,
+            403
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            175.1419290001195,
+            406.3410820001536,
+            374.2901600001005,
+            484.90462899985687,
+            457.18803499994465,
+            421.8758859999525,
+            530.5062049999378,
+            504.84159500001624
+          ]
+        },
+        {
+          "label": "concurrent_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            28.62732100015819
+          ]
+        },
+        {
+          "label": "missing_x-api-key",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            5.759163999982775
+          ]
+        },
+        {
+          "label": "missing_x-session-id",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.4534010001625575
+          ]
+        },
+        {
+          "label": "missing_x-grant-token",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.1223249998456595
+          ]
+        },
+        {
+          "label": "bad_api_key",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            10.688677999951324
+          ]
+        },
+        {
+          "label": "wrong_grant",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            24.068446999990556
+          ]
+        },
+        {
+          "label": "unknown_session",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            27.411067999992156
+          ]
+        },
+        {
+          "label": "resource_scope_mismatch",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            25.516896999988603
+          ],
+          "core_reason": "SCOPE_DENIED"
+        },
+        {
+          "label": "duplicate_credentials",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.5572909999264084
+          ]
+        },
+        {
+          "label": "method_post",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.7831630000509904
+          ]
+        },
+        {
+          "label": "method_head",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.7851479999771982
+          ]
+        },
+        {
+          "label": "method_put",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.8180219999758265
+          ]
+        },
+        {
+          "label": "method_delete",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.9154060001037578
+          ]
+        },
+        {
+          "label": "method_options",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.8826270000099612
+          ]
+        },
+        {
+          "label": "path_0",
+          "passed": true,
+          "statuses": [
+            404
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.8787750000465167
+          ]
+        },
+        {
+          "label": "path_1",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.8953550000114774
+          ]
+        },
+        {
+          "label": "path_2",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.7977999998729501
+          ]
+        },
+        {
+          "label": "path_3",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.283523999973113
+          ]
+        },
+        {
+          "label": "path_4",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.8119780000015453
+          ]
+        },
+        {
+          "label": "path_5",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.867513000002873
+          ]
+        },
+        {
+          "label": "path_6",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.991798000086419
+          ]
+        },
+        {
+          "label": "spoofed_headers_cannot_change_scope",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            39.398307999817916
+          ]
+        },
+        {
+          "label": "binding_b",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            23.215748999973584
+          ]
+        },
+        {
+          "label": "binding_c",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            23.978179000096134
+          ]
+        },
+        {
+          "label": "revoked_before_request",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            24.52685899993412
+          ],
+          "core_reason": "SESSION_NOT_AUTHORIZED"
+        },
+        {
+          "label": "signed_proof_expired",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            37.983403999987786
+          ],
+          "core_reason": "SIGNAL_PROOF_EXPIRED"
+        },
+        {
+          "label": "direct_client_resource",
+          "passed": true,
+          "statuses": [
+            0
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.6554399999458838
+          ]
+        },
+        {
+          "label": "direct_client_core",
+          "passed": true,
+          "statuses": [
+            0
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.5257190000520495
+          ]
+        },
+        {
+          "label": "resource_forged_handoff",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            9.795395000082863
+          ]
+        },
+        {
+          "label": "bridge_restart_loses_pending_handoff",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            8.786076999967918
+          ]
+        },
+        {
+          "label": "bridge_restart_no_grant_refund",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            100.9732529998928
+          ]
+        },
+        {
+          "label": "signed_adverse_signal_revokes_before_request",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            39.06991700000617
+          ],
+          "core_reason": "SESSION_NOT_AUTHORIZED"
+        },
+        {
+          "label": "unrelated_user_still_allowed",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            40.796081000053164
+          ]
+        },
+        {
+          "label": "pdp_timeout",
+          "passed": true,
+          "statuses": [
+            500
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1009.2687639998985
+          ]
+        },
+        {
+          "label": "pdp_unavailable",
+          "passed": true,
+          "statuses": [
+            500
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            8.18640000011328
+          ]
+        },
+        {
+          "label": "grant_expired_unchanged_60s_policy",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            30.568840999876556
+          ],
+          "core_reason": "GRANT_EXPIRED"
+        },
+        {
+          "label": "signing_key_disabled",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            46.50290099993981
+          ],
+          "core_reason": "SIGNAL_SOURCE_REVOKED"
+        },
+        {
+          "label": "auth_bridge_unavailable",
+          "passed": true,
+          "statuses": [
+            500
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1002.6810629999545
+          ]
+        },
+        {
+          "label": "bridge_restart_no_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            30.082076000098823
+          ]
+        }
+      ],
+      "completed": true,
+      "started_at": "2026-11-03T05:53:37.773394+00:00",
+      "hardening": [
+        {
+          "service": "core-a",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "core-b",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "core-c",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "bridge",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "resource",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "client",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "proxy",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 1000000000
+        }
+      ],
+      "worker_network": "none",
+      "resource_samples": [
+        {
+          "at": "2026-11-03T05:53:40.899767+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2441085,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 3830,
+          "network_tx_bytes_estimate": 1550,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:53:43.152719+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.38,
+          "memory_bytes_estimate": 2563768,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 39000,
+          "network_tx_bytes_estimate": 37000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:53:45.391394+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.04,
+          "memory_bytes_estimate": 2563768,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 40100,
+          "network_tx_bytes_estimate": 38200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:53:47.643815+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2563768,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 40100,
+          "network_tx_bytes_estimate": 38200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:53:49.996758+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2563768,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 40200,
+          "network_tx_bytes_estimate": 38200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:53:52.238453+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2563768,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 40200,
+          "network_tx_bytes_estimate": 38200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:53:54.499841+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2563768,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 41400,
+          "network_tx_bytes_estimate": 39400,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:53:56.734817+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2563768,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 41400,
+          "network_tx_bytes_estimate": 39400,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:53:58.987035+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2563768,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 41400,
+          "network_tx_bytes_estimate": 39400,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:01.255123+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.02,
+          "memory_bytes_estimate": 2567963,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 44900,
+          "network_tx_bytes_estimate": 42800,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:03.497610+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.04,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:05.751064+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:08.006759+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:10.256149+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:12.504039+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:14.751913+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:16.994539+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:19.241639+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:21.488212+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:23.739902+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:25.992435+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:28.246409+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:30.492076+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:32.729952+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:34.974587+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:37.218608+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:39.462717+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2567963,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:41.713546+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2567963,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:43.965958+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2567963,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46300,
+          "network_tx_bytes_estimate": 44900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:46.232858+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.04,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 47400,
+          "network_tx_bytes_estimate": 46000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:48.487179+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2567963,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 48500,
+          "network_tx_bytes_estimate": 47200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:50.744543+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.02,
+          "memory_bytes_estimate": 2572157,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 49200,
+          "network_tx_bytes_estimate": 47900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:54:52.999003+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2567963,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 49300,
+          "network_tx_bytes_estimate": 47900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        }
+      ],
+      "resource_errors": [],
+      "finished_at": "2026-11-03T05:54:53.611431+00:00",
+      "http_duration": {
+        "n": 49,
+        "p50_ms": 24.068446999990556,
+        "p95_ms": 530.5062049999378,
+        "max_ms": 1009.2687639998985
+      }
+    },
+    {
+      "candidate": "nginx",
+      "iteration": 3,
+      "checks": [
+        {
+          "label": "valid_once",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            42.03708300019571
+          ]
+        },
+        {
+          "label": "grant_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            26.34609800020371
+          ]
+        },
+        {
+          "label": "concurrent_single_use",
+          "passed": true,
+          "statuses": [
+            403,
+            403,
+            200,
+            403,
+            403,
+            403,
+            403,
+            403
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            385.21296899989466,
+            307.9968900001404,
+            194.1801459997805,
+            328.7732539999979,
+            344.63653099987823,
+            389.3022709999059,
+            211.12426899981074,
+            408.81399799991414
+          ]
+        },
+        {
+          "label": "concurrent_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            27.340700999957335
+          ]
+        },
+        {
+          "label": "missing_x-api-key",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            5.835074999822609
+          ]
+        },
+        {
+          "label": "missing_x-session-id",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.437797999869872
+          ]
+        },
+        {
+          "label": "missing_x-grant-token",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.6978340001969627
+          ]
+        },
+        {
+          "label": "bad_api_key",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            10.9966649999933
+          ]
+        },
+        {
+          "label": "wrong_grant",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            23.746036000147797
+          ]
+        },
+        {
+          "label": "unknown_session",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            23.59055100009755
+          ]
+        },
+        {
+          "label": "resource_scope_mismatch",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            24.312712999972064
+          ],
+          "core_reason": "SCOPE_DENIED"
+        },
+        {
+          "label": "duplicate_credentials",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.0445940001536655
+          ]
+        },
+        {
+          "label": "method_post",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.9586300000137271
+          ]
+        },
+        {
+          "label": "method_head",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.9560240000610065
+          ]
+        },
+        {
+          "label": "method_put",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.9508089999599179
+          ]
+        },
+        {
+          "label": "method_delete",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.8501590000378201
+          ]
+        },
+        {
+          "label": "method_options",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.8282310000140569
+          ]
+        },
+        {
+          "label": "path_0",
+          "passed": true,
+          "statuses": [
+            404
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.7824449999134231
+          ]
+        },
+        {
+          "label": "path_1",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.8601839999755612
+          ]
+        },
+        {
+          "label": "path_2",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.8663219998652494
+          ]
+        },
+        {
+          "label": "path_3",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.7425350001994957
+          ]
+        },
+        {
+          "label": "path_4",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.7753969998702814
+          ]
+        },
+        {
+          "label": "path_5",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.7426340000620257
+          ]
+        },
+        {
+          "label": "path_6",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.7734499999969557
+          ]
+        },
+        {
+          "label": "spoofed_headers_cannot_change_scope",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            45.75854399990931
+          ]
+        },
+        {
+          "label": "binding_b",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            28.009449999899516
+          ]
+        },
+        {
+          "label": "binding_c",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            24.288596999895162
+          ]
+        },
+        {
+          "label": "revoked_before_request",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            26.295584999843413
+          ],
+          "core_reason": "SESSION_NOT_AUTHORIZED"
+        },
+        {
+          "label": "signed_proof_expired",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            35.619537999991735
+          ],
+          "core_reason": "SIGNAL_PROOF_EXPIRED"
+        },
+        {
+          "label": "direct_client_resource",
+          "passed": true,
+          "statuses": [
+            0
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.5408629999692494
+          ]
+        },
+        {
+          "label": "direct_client_core",
+          "passed": true,
+          "statuses": [
+            0
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.5274190000363888
+          ]
+        },
+        {
+          "label": "resource_forged_handoff",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            9.28500199984228
+          ]
+        },
+        {
+          "label": "bridge_restart_loses_pending_handoff",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            7.989350999878297
+          ]
+        },
+        {
+          "label": "bridge_restart_no_grant_refund",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            37.238724000189904
+          ]
+        },
+        {
+          "label": "signed_adverse_signal_revokes_before_request",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            25.482706000047983
+          ],
+          "core_reason": "SESSION_NOT_AUTHORIZED"
+        },
+        {
+          "label": "unrelated_user_still_allowed",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            38.40057499996874
+          ]
+        },
+        {
+          "label": "pdp_timeout",
+          "passed": true,
+          "statuses": [
+            500
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1009.012845000143
+          ]
+        },
+        {
+          "label": "pdp_unavailable",
+          "passed": true,
+          "statuses": [
+            500
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            10.156972000004316
+          ]
+        },
+        {
+          "label": "grant_expired_unchanged_60s_policy",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            30.815722000170354
+          ],
+          "core_reason": "GRANT_EXPIRED"
+        },
+        {
+          "label": "signing_key_disabled",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            46.01092699999754
+          ],
+          "core_reason": "SIGNAL_SOURCE_REVOKED"
+        },
+        {
+          "label": "auth_bridge_unavailable",
+          "passed": true,
+          "statuses": [
+            500
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1002.3374229999717
+          ]
+        },
+        {
+          "label": "bridge_restart_no_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            34.584635000101116
+          ]
+        }
+      ],
+      "completed": true,
+      "started_at": "2026-11-03T05:55:28.665032+00:00",
+      "hardening": [
+        {
+          "service": "core-a",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "core-b",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "core-c",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "bridge",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "resource",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "client",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "proxy",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 1000000000
+        }
+      ],
+      "worker_network": "none",
+      "resource_samples": [
+        {
+          "at": "2026-11-03T05:55:31.772896+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2428502,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 3980,
+          "network_tx_bytes_estimate": 1480,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:55:34.027537+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.3,
+          "memory_bytes_estimate": 2543845,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 39200,
+          "network_tx_bytes_estimate": 36800,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:55:36.274553+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.04,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 40300,
+          "network_tx_bytes_estimate": 37900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:55:38.519810+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 40300,
+          "network_tx_bytes_estimate": 37900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:55:40.822329+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 40300,
+          "network_tx_bytes_estimate": 37900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:55:43.058764+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 40400,
+          "network_tx_bytes_estimate": 37900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:55:45.309141+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 41500,
+          "network_tx_bytes_estimate": 39100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:55:47.543627+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 41500,
+          "network_tx_bytes_estimate": 39100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:55:49.789900+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 41600,
+          "network_tx_bytes_estimate": 39200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:55:52.026069+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.02,
+          "memory_bytes_estimate": 2552234,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 45500,
+          "network_tx_bytes_estimate": 43200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:55:54.283174+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:55:56.534202+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:55:58.769584+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:01.041956+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:03.286170+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:05.537937+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:07.793553+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:10.045067+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:12.291436+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:14.531206+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:16.782599+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:19.026066+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:21.275185+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:23.517905+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:25.757516+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:27.991191+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:30.233281+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:32.481056+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:34.736912+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46500,
+          "network_tx_bytes_estimate": 44600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:36.981940+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.04,
+          "memory_bytes_estimate": 2552234,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 47600,
+          "network_tx_bytes_estimate": 45700,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:39.217660+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2548040,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 48700,
+          "network_tx_bytes_estimate": 46900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:41.470511+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.02,
+          "memory_bytes_estimate": 2552234,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 49400,
+          "network_tx_bytes_estimate": 47600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-03T05:56:43.716733+00:00",
+          "service": "nginx",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 2552234,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 49500,
+          "network_tx_bytes_estimate": 47600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        }
+      ],
+      "resource_errors": [],
+      "finished_at": "2026-11-03T05:56:44.305441+00:00",
+      "http_duration": {
+        "n": 49,
+        "p50_ms": 24.288596999895162,
+        "p95_ms": 408.81399799991414,
+        "max_ms": 1009.012845000143
+      }
+    },
+    {
+      "candidate": "envoy",
+      "iteration": 3,
+      "checks": [
+        {
+          "label": "valid_once",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            43.26623299994026
+          ]
+        },
+        {
+          "label": "grant_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            31.014987999924415
+          ]
+        },
+        {
+          "label": "concurrent_single_use",
+          "passed": true,
+          "statuses": [
+            200,
+            403,
+            403,
+            403,
+            403,
+            403,
+            403,
+            403
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            111.6890710000007,
+            401.5571899999486,
+            499.68021099994075,
+            471.2601450000875,
+            592.079134999949,
+            269.3220119999751,
+            519.2983279998771,
+            553.322843999922
+          ]
+        },
+        {
+          "label": "concurrent_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            35.67366599986599
+          ]
+        },
+        {
+          "label": "missing_x-api-key",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            6.679114000007758
+          ]
+        },
+        {
+          "label": "missing_x-session-id",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.848070000027292
+          ]
+        },
+        {
+          "label": "missing_x-grant-token",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.3969179999312473
+          ]
+        },
+        {
+          "label": "bad_api_key",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            10.420777000035741
+          ]
+        },
+        {
+          "label": "wrong_grant",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            24.26684900001419
+          ]
+        },
+        {
+          "label": "unknown_session",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            24.38960699987547
+          ]
+        },
+        {
+          "label": "resource_scope_mismatch",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            24.218205000124726
+          ],
+          "core_reason": "SCOPE_DENIED"
+        },
+        {
+          "label": "duplicate_credentials",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.541333999943163
+          ]
+        },
+        {
+          "label": "method_post",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            3.0424110000240034
+          ]
+        },
+        {
+          "label": "method_head",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.5164549999772134
+          ]
+        },
+        {
+          "label": "method_put",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.6531029998295708
+          ]
+        },
+        {
+          "label": "method_delete",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.493237999942721
+          ]
+        },
+        {
+          "label": "method_options",
+          "passed": true,
+          "statuses": [
+            405
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.859391000129108
+          ]
+        },
+        {
+          "label": "path_0",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.208173000099123
+          ]
+        },
+        {
+          "label": "path_1",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.9251169999279227
+          ]
+        },
+        {
+          "label": "path_2",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.451038999879529
+          ]
+        },
+        {
+          "label": "path_3",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.424838000024465
+          ]
+        },
+        {
+          "label": "path_4",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            26.866251000001284
+          ]
+        },
+        {
+          "label": "path_5",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            2.262550999830637
+          ]
+        },
+        {
+          "label": "path_6",
+          "passed": true,
+          "statuses": [
+            400
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1.0105860001203837
+          ]
+        },
+        {
+          "label": "spoofed_headers_cannot_change_scope",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            33.54607699998269
+          ]
+        },
+        {
+          "label": "binding_b",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            21.142247999932806
+          ]
+        },
+        {
+          "label": "binding_c",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            21.034297000142033
+          ]
+        },
+        {
+          "label": "revoked_before_request",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            31.013178999955926
+          ],
+          "core_reason": "SESSION_NOT_AUTHORIZED"
+        },
+        {
+          "label": "signed_proof_expired",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            26.003082999977778
+          ],
+          "core_reason": "SIGNAL_PROOF_EXPIRED"
+        },
+        {
+          "label": "direct_client_resource",
+          "passed": true,
+          "statuses": [
+            0
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.7089679997989151
+          ]
+        },
+        {
+          "label": "direct_client_core",
+          "passed": true,
+          "statuses": [
+            0
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            0.6411229999230272
+          ]
+        },
+        {
+          "label": "resource_forged_handoff",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            7.899545999862312
+          ]
+        },
+        {
+          "label": "bridge_restart_loses_pending_handoff",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            7.7882709999812505
+          ]
+        },
+        {
+          "label": "bridge_restart_no_grant_refund",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            29.42139399988264
+          ]
+        },
+        {
+          "label": "signed_adverse_signal_revokes_before_request",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            25.67859700002373
+          ],
+          "core_reason": "SESSION_NOT_AUTHORIZED"
+        },
+        {
+          "label": "unrelated_user_still_allowed",
+          "passed": true,
+          "statuses": [
+            200
+          ],
+          "resource_deliveries": 1,
+          "http_ms": [
+            38.76893500000733
+          ]
+        },
+        {
+          "label": "pdp_timeout",
+          "passed": true,
+          "statuses": [
+            503
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1009.7462910000559
+          ]
+        },
+        {
+          "label": "pdp_unavailable",
+          "passed": true,
+          "statuses": [
+            503
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            7.3463009998704365
+          ]
+        },
+        {
+          "label": "grant_expired_unchanged_60s_policy",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            46.39622900003815
+          ],
+          "core_reason": "GRANT_EXPIRED"
+        },
+        {
+          "label": "signing_key_disabled",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            49.141975999873466
+          ],
+          "core_reason": "SIGNAL_SOURCE_REVOKED"
+        },
+        {
+          "label": "auth_bridge_unavailable",
+          "passed": true,
+          "statuses": [
+            503
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            1004.3765810000878
+          ]
+        },
+        {
+          "label": "bridge_restart_no_replay",
+          "passed": true,
+          "statuses": [
+            403
+          ],
+          "resource_deliveries": 0,
+          "http_ms": [
+            30.42004100007034
+          ]
+        }
+      ],
+      "completed": true,
+      "started_at": "2026-11-03T05:57:20.884927+00:00",
+      "hardening": [
+        {
+          "service": "core-a",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "core-b",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "core-c",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 500000000
+        },
+        {
+          "service": "bridge",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "resource",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "client",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 134217728,
+          "nano_cpus": 250000000
+        },
+        {
+          "service": "proxy",
+          "uid": "10001:10001",
+          "read_only": true,
+          "cap_drop_all": true,
+          "no_new_privileges": true,
+          "published_ports": false,
+          "memory_bytes": 268435456,
+          "nano_cpus": 1000000000
+        }
+      ],
+      "worker_network": "none",
+      "resource_samples": [
+        {
+          "at": "2026-11-03T05:57:24.202444+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.13,
+          "memory_bytes_estimate": 19199427,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 4220,
+          "network_tx_bytes_estimate": 1320,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:57:26.448983+00:00",
+          "service": "envoy",
+          "cpu_percent": 2.16,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 44800,
+          "network_tx_bytes_estimate": 38200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:57:28.700985+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.2,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 45900,
+          "network_tx_bytes_estimate": 39200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:57:30.954571+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.12,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 45900,
+          "network_tx_bytes_estimate": 39200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:57:33.205639+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.12,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 45900,
+          "network_tx_bytes_estimate": 39200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:57:35.440547+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.17,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 46000,
+          "network_tx_bytes_estimate": 39200,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:57:37.684767+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.13,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 47200,
+          "network_tx_bytes_estimate": 40300,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:57:39.929515+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.18,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 47200,
+          "network_tx_bytes_estimate": 40300,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:57:42.170698+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.13,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 47200,
+          "network_tx_bytes_estimate": 40300,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:57:44.410640+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.2,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 51200,
+          "network_tx_bytes_estimate": 44100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:57:46.696148+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.22,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:57:48.937042+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.14,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:57:51.178496+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.13,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:57:53.411833+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.13,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:57:55.647381+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.21,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:57:57.886431+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.12,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:00.131793+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.21,
+          "memory_bytes_estimate": 19335741,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:02.368058+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.13,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:04.596132+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.16,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:06.824266+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.12,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:09.058000+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.13,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:11.291497+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.14,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:13.529968+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.14,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:15.773730+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.14,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:18.012691+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.14,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:20.258077+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.21,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:22.492054+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.14,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:24.732991+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.2,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:26.968516+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.16,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:29.285798+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.21,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 52300,
+          "network_tx_bytes_estimate": 45000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:31.557676+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.16,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 54500,
+          "network_tx_bytes_estimate": 47100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:33.938309+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.19,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 55000,
+          "network_tx_bytes_estimate": 47300,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:36.262285+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.18,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 55300,
+          "network_tx_bytes_estimate": 47500,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-03T05:58:38.571332+00:00",
+          "service": "envoy",
+          "cpu_percent": 0.19,
+          "memory_bytes_estimate": 19209912,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 55400,
+          "network_tx_bytes_estimate": 47500,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        }
+      ],
+      "resource_errors": [],
+      "finished_at": "2026-11-03T05:58:39.005972+00:00",
+      "http_duration": {
+        "n": 49,
+        "p50_ms": 24.26684900001419,
+        "p95_ms": 592.079134999949,
+        "max_ms": 1009.7462910000559
+      }
+    }
+  ],
+  "app_image_id": "sha256:fcbfc21f906f858f014edc802a27e0b59294ce44f9e52c29ff275830635dccfb",
+  "nginx_auth_request_module_verified": true,
+  "source_input_sha256": {
+    "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+    "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+    "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+    "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+    "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+    "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+    "app/config.py": "27abe1679ef3147f9eb28920299c68dbf93932e05bda6035a64d7b0ac1d2fcb2",
+    "app/continuous_signal_models.py": "895b017d7c666923639088281f71ef64386977e381c5b8060c3123d174be34ae",
+    "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+    "app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+    "app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+    "app/data/control-register.json": "a8884d1269874e18a6b5261940d9e498c8509c51d0f134ea252e6b04a327c201",
+    "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+    "app/data/replay/manifest.json": "bc974726efe7f2b98119af04b9b624ba4b18a4588b2d5ff8a4c441d4beb232e9",
+    "app/data/replay/microsoft-sentinel-wiz-audit.json": "4bc25e2e6ae2cb4b80d2d135fb401d073e2c66e2d183dd5cabb574cde27ebc3b",
+    "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+    "app/data/sigma/credential_anomaly.yml": "27ee3ff5ce6eb25bdffeb5d25a59998b21c799fcff48768204be57f2974b4086",
+    "app/data/sigma/data_exfiltration.yml": "e378a7df56ac30a3c5568d42e86be53bfd43ce88489ae500c84d16e8ee8466e7",
+    "app/data/sigma/lateral_movement.yml": "cd13987a9a7ae36d57f718a2b9a87cb0fb224e5a78380311dec8edcd78dfe0c8",
+    "app/data/sigma/privilege_escalation.yml": "337b23a4ba5bed1081828f30d771f777628d8bdd88ee1298a776e7f3f21eb880",
+    "app/data/sigma/remote_desktop_logon.yml": "35a4a4fbe7ae16484a16a4287e6287239697648018be40dd4e9c33e04b0c61ee",
+    "app/data/sigma/unmanaged_device_access.yml": "b0c3ef8498458e9d687c32ca554147de44db7cdf84857eacf4224050b8122004",
+    "app/data/zero-trust-policies.json": "ab3acc5b14ba5a4af640240cc781d1ea63523a096d7e5c2dfd3d912dc468d0f9",
+    "app/main.py": "c04fb9ff8011a463994a95eed78d577512434500d2e89d0ce424161b9e2fce34",
+    "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+    "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+    "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+    "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+    "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+    "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+    "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+    "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+    "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+    "app/services/continuous_signals.py": "05115d837dc2c00b56aafbe8833b047c0cd9fb1854fff20ba7db03db261ca2a3",
+    "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+    "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+    "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+    "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+    "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+    "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+    "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+    "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+    "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+    "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+    "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+    "app/services/signal_inbox.py": "03b2d65ded032c5dd3c55434fa538afdc5604e72f54ddce2581e146cf05378b8",
+    "app/services/trusted_signals.py": "1c4908fed64712b1206bca5ae9b0f7175f315a1952e3703d764c9bb2477bb1e0",
+    "app/services/zero_trust.py": "88b40b4932138aa6832e9f6e5f7e5277baa5b1dcf44f0a737a2a6b2ec6ff64b8",
+    "app/zero_trust_api.py": "556fda2b67c9a20077b65c5f03c121e5deffd4a48d9f651ff1b7409f26b1b491",
+    "app/zero_trust_models.py": "1c466b491a923a23ce618e776660193c9bae4bef8a5026e39d8ac310a4ae7992",
+    "Dockerfile": "2278c841e2f77eda77f5ed282abd5f35ddf50f2e3dd2e890c36967804f4db219",
+    "pyproject.toml": "2526459dd7d900b61568e35d167a5157ccb427513a61bc9053f63cc486edd8a5",
+    "scripts/pep_lab.py": "566eaeb20d880545b5544fac7185890be30e71ef3f62c7fc8c02af653a78a97b",
+    "scripts/compare_pep.py": "79fa6ca7008bf5715ba8734a15f9858970d5ec772b96cd51fd1f816b317ffec0",
+    "infra/pep/contract.json": "dafb14514c4b1ec07282fab1dca80f0f509b368936d6ab09b03601f9e4dc171c",
+    "infra/pep/envoy.yaml": "78a73d32d1551bede27a2cc0bcff77d1625324a61ed6f27526b532861baf057c",
+    "infra/pep/nginx.conf": "f5486bcbe05cd4c1dba2755a81c5d64984e414d74e693868cbbfb68e4a26fc56",
+    "infra/pep/tools.lock.json": "69b9ddd436c4aed7fd27b70afad40fe3740e5b4b0c5a50fbe503b1a93f654e66"
+  },
+  "comparison": {
+    "nginx": {
+      "repeats": 3,
+      "checks_passed": 126,
+      "client_requests": 147,
+      "resource_deliveries": 12,
+      "allowed_http_duration": {
+        "n": 12,
+        "p50_ms": 42.03708300019571,
+        "p95_ms": 240.835326000024,
+        "max_ms": 240.835326000024
+      },
+      "resource_samples": 99,
+      "memory_peak_bytes_estimate": 2572157,
+      "cpu_peak_percent": 0.38
+    },
+    "envoy": {
+      "repeats": 3,
+      "checks_passed": 126,
+      "client_requests": 147,
+      "resource_deliveries": 12,
+      "allowed_http_duration": {
+        "n": 12,
+        "p50_ms": 38.01139699999112,
+        "p95_ms": 156.14746400001422,
+        "max_ms": 156.14746400001422
+      },
+      "resource_samples": 100,
+      "memory_peak_bytes_estimate": 19618857,
+      "cpu_peak_percent": 2.16
+    }
+  },
+  "finished_at": "2026-11-03T05:58:51.622723+00:00",
+  "cleanup": {
+    "containers_remaining": 0,
+    "volumes_remaining": 0,
+    "networks_remaining": 0
+  },
+  "execution_context": {
+    "method": "Codex-assisted tool execution in Chaeheeju infrastructure workstream",
+    "independent_teammate_review": false,
+    "aws_or_paid_model_calls": false,
+    "app_detector_policy_changes": false,
+    "source_hashes_rechecked": true
+  },
+  "validation": {
+    "windows_pytest": {
+      "passed": 630,
+      "existing_warnings": 3
+    },
+    "linux_docker_pytest": {
+      "passed": 630,
+      "existing_warnings": 2
+    },
+    "ruff": "passed",
+    "new_boundary_regressions": 39,
+    "note": "Unit suite validates bridge/resource/probe. Final real proxy runs validate the final harness wiring. PR CI checks the committed head."
+  },
+  "environment": {
+    "host": "Windows-11-10.0.26300-SP0",
+    "python": "3.12.9",
+    "docker": {
+      "engine": "29.8.2",
+      "os": "Docker Desktop",
+      "kernel": "5.15.167.4-microsoft-standard-WSL2",
+      "cpus": 18,
+      "memory_bytes": 8104210432
+    },
+    "background_load": {
+      "existing_control_plane_container_auto_resumed_at_engine_start": true,
+      "included_in_candidate_stats": false,
+      "shared_host_background_load_controlled": false,
+      "existing_container_deleted": false
+    }
+  },
+  "preparation_attempts": [
+    {
+      "directory": "runtime/c02/pilot",
+      "completed": false,
+      "failure": "c02_timeout_proxy_ready",
+      "note": "NGINX read-only default temp directory",
+      "runs": []
+    },
+    {
+      "directory": "runtime/c02/pilot2",
+      "completed": false,
+      "failure": "c02_timeout_adverse_processed",
+      "note": "Networkless worker inherited HTTP API-key mode without key hash",
+      "runs": [
+        {
+          "candidate": "nginx",
+          "checks": 34,
+          "completed": false
+        }
+      ]
+    },
+    {
+      "directory": "runtime/c02/pilot3",
+      "completed": false,
+      "failure": "c02_timeout_proxy_ready",
+      "note": "Envoy YAML mounted with .conf suffix and parsed as JSON",
+      "runs": [
+        {
+          "candidate": "nginx",
+          "checks": 42,
+          "completed": true
+        }
+      ]
+    },
+    {
+      "directory": "runtime/c02/pilot4",
+      "completed": true,
+      "failure": null,
+      "note": "Envoy-only wiring and reason-code verification; excluded from final repetitions",
+      "runs": [
+        {
+          "candidate": "envoy",
+          "checks": 42,
+          "completed": true
+        }
+      ]
+    }
+  ]
+}
