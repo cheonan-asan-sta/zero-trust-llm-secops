@@ -1,5 +1,12 @@
 # C04: 로컬 인증서 발급·갱신 선정 기록
 
+후속 [CA 프로세스 고가용성](../ca-high-availability.md)은 기존 step-ca를 2대로 재사용하고 CA 상태만
+PostgreSQL에 공유한다. Badger 파일 공유는 동시 접근을 지원하지 않아 제외한다. MySQL도 공식 지원
+대안이지만 이번에 실제 설치·성능 비교하지 않았으므로 우열을 주장하지 않는다. PostgreSQL은 로컬 무료
+실행·인증서 기반 TLS·격리 수준 제어를 적용할 수 있어 선택했고 노드별 mTLS·SERIALIZABLE을 검증한다.
+관리 클라이언트에서 전환해 별도 LB의 장애점을 추가하지 않는다. 단일 주소가 필요한 외부 클라이언트의
+LB 이중화나 DB 복제/호스트 HA는 별도다. 기존 수동/단일 CA 결과는 당시 기준선으로 보존한다.
+
 후속 [CA·JWK 자동 교체](../authority-key-rotation.md)는 기존 step-ca를 유지한다. 루트 서명 작업을 일반
 발급/leaf 제어기와 분리한 network=none custodian에서 실행하고 공개 서명 계획·겹침 신뢰·이행 barrier를
 연결한다. JWK는 발급을 quiesce한 뒤 같은 이름의 등록 공개키를 교체한다. 이름을 보존해야 client의

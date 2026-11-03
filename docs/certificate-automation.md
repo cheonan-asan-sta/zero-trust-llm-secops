@@ -1,5 +1,8 @@
 # 로컬 인증서 자동 발급·갱신
 
+후속 [CA 프로세스 HA](ca-high-availability.md)는 공유 PostgreSQL·CA 2대·관리 클라이언트 연결 전환을
+별도 opt-in 프로필로 추가한다. 아래 단일 CA/CLI 갱신 시험은 당시 기준선이며 DB/호스트 HA와 구분한다.
+
 후속 [CA·발급 JWK 자동 교체](authority-key-rotation.md)는 별도 네트워크 없는 custodian·암호화 보관함·
 신뢰 이행 프로필을 추가한다. 아래 RAM 전용 루트·기본 갱신 기록은 당시 기준선이다.
 

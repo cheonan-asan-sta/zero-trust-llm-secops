@@ -1,5 +1,9 @@
 # 로컬 CA·발급 JWK 서명키 자동 교체
 
+후속 [CA 프로세스 고가용성](ca-high-availability.md)은 공유 PostgreSQL·CA 2대·관리 클라이언트 전환을
+추가한다. 키 교체는 모든 노드의 새 issuer/JWK와 구 JWK 거부를 확인하며, 아래 단일 CA 결과는 당시
+기준선으로 보존한다. DB/호스트 이중화·무중단 키 교체는 후속 범위와도 구분한다.
+
 2026-11-03 · 기준 `aitest` `4d74f06` · `feature/chaeheeju-authority-key-rotation`
 
 [서비스 개인키 교체](private-key-rotation.md)에 이어 **루트 CA·중간 CA 개인키와 등록된 발급용 JWK 키**를

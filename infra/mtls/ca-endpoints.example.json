@@ -1,0 +1,5 @@
+{
+  "schema": "ca-endpoints-1",
+  "hosts": ["ca-a", "ca-b"],
+  "connect_timeout_seconds": 1
+}

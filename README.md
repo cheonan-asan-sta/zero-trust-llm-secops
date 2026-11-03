@@ -5,6 +5,22 @@ LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 �
 
 다른 AI 또는 개발자가 작업을 이어갈 때는 [프로젝트 인수인계서](AI_HANDOFF.md)에서 현재 브랜치, 폴더별 역할, 안전 원칙, 검증 절차를 먼저 확인합니다.
 
+## 2026년 11월 3일 후속 CA 프로세스 고가용성
+
+[CA 프로세스 고가용성](docs/ca-high-availability.md)은 두 CA와 공유 PostgreSQL, 관리 클라이언트의
+연결 장애 전환을 연결합니다. DB에는 별도 노드별 mTLS·서버 이름 검증·최소 권한·SERIALIZABLE 격리를
+적용합니다. 모든 CA의 새 issuer/JWK·구 키 거부를 확인해야 자동 키 교체가 완료됩니다.
+한 Docker 호스트의 CA 프로세스 장애 대응이며 DB/호스트 이중화·무중단 키 교체와 구분합니다.
+
+```powershell
+.venv\Scripts\python.exe -m scripts.test_ca_high_availability --repeats 2 --directory runtime/c02/c04/ha-reproduce
+```
+
+새 CA/DB 2회·총 **444개** 통합 검사와 Windows/Linux 전체 **각 870건**을 통과했습니다.
+모든 노드의 구 JWK 요청 792개 거부와 실제 부분 배포 중단 복구도 확인했습니다.
+HA 가속 canary는 정적/자동 모두 90초이며 이전 30초 실패·재현 조건·운영 한계는
+[검증 기록](docs/ca-high-availability.md#검증-기록)에 구분했습니다. 시험 자원은 정리했습니다.
+
 ## 2026년 11월 3일 후속 CA·발급 JWK 키 자동 교체
 
 [CA·JWK 자동 교체](docs/authority-key-rotation.md)는 네트워크 없는 관리 작업과 암호화 보관함을 사용해

@@ -1,5 +1,28 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 3일 후속 CA 프로세스 고가용성
+
+- PR #10 병합 `aitest` `0c32273`에서 `feature/chaeheeju-ca-high-availability`로 진행한다.
+  [구현·재현·한계](docs/ca-high-availability.md)와 [계약](infra/mtls/ca-ha-contract.json)을 확인한다.
+- CA 두 프로세스는 같은 온라인 issuer 설정을 읽기 전용으로 사용하고 단일 PostgreSQL의 발급/토큰/폐기
+  상태를 공유한다. DB 전용 내부망·독립 transport PKI·노드별 mTLS·verify-full·최소 권한 역할을 적용한다.
+  앱 SQLite나 기존 Badger 운영 DB를 마이그레이션하지 않는다. DB/호스트 이중화는 별도다.
+- `ca-endpoints.json`이 있는 관리 프로필만 연결 장애 시 승인 CA로 전환한다. TLS 인증 오류·전송한 POST·
+  401/403은 다른 노드로 재시도하지 않는다. 같은 일회용 토큰의 동시 소비에는 SERIALIZABLE 충돌 거부를
+  사용한다. 전체 CA/ACME/admin API의 분산 트랜잭션 보장이나 성공 exactly-once로 확대하지 않는다.
+- 키 교체는 단일 조정기·leaf pause/ack를 유지하고 모든 pinned CA의 새 issuer TLS·개별 새 JWK 발급·각
+  구 JWK의 개별 거부를 확인한다. 순차 재시작이어도 발급 유지보수 중단이 가능하다. 무중단 SLA는 아니다.
+- 실제 검사 수·실패·이미지/소스 지문·정리는 위 검증 문서를 따른다. 팀원 독립 검토·운영 배포·HSM·DB
+  transport PKI 자동 수명 관리는 후속이다. 아래 HA 미완료 표기는 이전 프로필의 당시 범위로 보존한다.
+
+- 최종 HA 90초 canary/여유 60초 프로필로 새 CA/DB 2회 × 222 = 444개, Windows/Linux 각각 전체
+  870건과 Ruff 통과. 새 단위 사례 52개, 회당 48개 활성 신원/14개 TLS 서버/3 authority epoch,
+  양 CA의 구 JWK 새 요청 총 792개 거부를 확인했다. 중단 배포 48개/46개 각각 동일 후보를 복구했다.
+  [공개 증거](docs/infrastructure-results/c04-ca-ha-windows-20261103.json)에 초기 bootstrap 파일 assertion,
+  전체 batch 가정 assertion, 30초 canary의 실제 만료 실패를 최종 합계와 분리했다. 소진 파일 삭제를
+  배포 성공과 분리하고 전체 키 보존/실제 중단 후보 재사용/전체 이행을 따로 검증한다. 30초 HA SLA
+  통과로 표현하지 않는다. 5개 프로젝트 자원/전용 태그와 단위 이미지 4개의 잔여 0, 기존 Docker/ZIP 보존.
+
 ## 2026년 11월 3일 후속 CA·발급 JWK 키 자동 교체
 
 - PR #9 병합 `aitest` `4d74f06`에서 `feature/chaeheeju-authority-key-rotation`으로 진행한다.
