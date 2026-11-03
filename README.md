@@ -5,6 +5,20 @@ LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 �
 
 다른 AI 또는 개발자가 작업을 이어갈 때는 [프로젝트 인수인계서](AI_HANDOFF.md)에서 현재 브랜치, 폴더별 역할, 안전 원칙, 검증 절차를 먼저 확인합니다.
 
+## 2026년 11월 3일 후속 서비스 개인키 자동 교체
+
+[개인키 자동 교체](docs/private-key-rotation.md)는 새 키·인증서 세대를 준비하고 profile/config 전환·
+실제 TLS 확인·구 pin/serial 폐기·구 파일 정리를 연결합니다. 관리용 mTLS 키도 대상이며 CA와 등록 JWK
+서명키 교체는 별도입니다. 기존 동일 키 인증서 갱신 경로를 보존합니다.
+
+```powershell
+.venv\Scripts\python.exe -m scripts.test_private_key_rotation --directory runtime/c02/c04/rekey-reproduce --repeats 2
+```
+
+새 CA/상태로 2회·총 **348개** 통합 검사, Windows/Linux 전체 **각 766건**과 Ruff를 통과했습니다.
+회당 활성 신원 48개가 세 차례 이상 키를 교체하고 서버 14개가 새 TLS 인증서를 제공했습니다.
+실험 자원은 정리했으며 [원자료·초기 실패·운영 한계](docs/private-key-rotation.md)를 함께 기록했습니다.
+
 ## 2026년 11월 3일 후속 인증서 자동 발급·갱신
 
 [인증서 수명 자동화](docs/certificate-automation.md)는 선택한 mTLS 경로에 로컬 step-ca·타이머·지문 배포·

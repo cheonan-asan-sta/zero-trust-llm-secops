@@ -1,0 +1,16 @@
+{
+  "roots": ["/managed/gateway", "/managed/collector", "/managed/renewal"],
+  "policies": ["/managed/gateway/profile.json", "/managed/collector/profile.json", "/managed/renewal/renew-gateway.json"],
+  "extra_certificates": [],
+  "allowed_provisioners": ["gateway-serverAuth", "collector-clientAuth", "renew-gateway-clientAuth"],
+  "server_renewal": {"gateway": "renew-gateway"},
+  "server_signers": {"gateway": "/managed/renewal/sign-gateway.key"},
+  "probes": [{"server_name": "gateway", "host": "gateway", "port": 8443, "profile": "/managed/collector/profile.json"}],
+  "reload_groups": [],
+  "key_rotation": {"interval_seconds": 600, "cleanup_grace_seconds": 3, "configuration_files": []},
+  "renew_before": {"gateway": 400, "collector": 400, "renew-gateway": 1200},
+  "interval_seconds": 2,
+  "overlap_seconds": 2,
+  "disabled": [],
+  "paused": false
+}

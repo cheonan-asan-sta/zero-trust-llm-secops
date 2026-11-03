@@ -21,6 +21,10 @@
 
 ## 비교 대상과 적용 범위
 
+11/3 후속 [개인키 자동 교체](private-key-rotation.md)는 step-ca의 실제 mTLS rekey와 기존 서버 제한 발급을
+재사용해 leaf 키 교체를 적용한다. CA/JWK 서명키 교체·HSM/HA·독립 재현은 남은 운영 조건에 포함한다.
+아래 이전 I2/전체 hop의 C04 보류 표기는 당시 기준선이며 현재 상태는 이 후속 기록을 우선한다.
+
 11/3 사용자의 자동 발급·갱신 요청으로 C04의 조건부 시험 필요가 확인됐다. [C04 선정 기록](technology-decisions/C04-certificate-lifecycle.md)과
 [실행/권한 범위](certificate-automation.md)에 로컬 step-ca·CSR 제한·타이머·pin 배포·재적용을 연결한다.
 운영 CA/키 유출 대응/독립 재현과 기존 기한은 별도로 유지한다.

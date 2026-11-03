@@ -8,6 +8,10 @@
 
 ## 1 담당 범위와 이번 주 실행
 
+11/3 추가 [개인키 자동 교체](../private-key-rotation.md): leaf 키 생성·CSR·설정/pin 배포·서비스 반영·
+구 serial/파일 정리·장애/중단 복구의 로컬 구성·실행·측정과 문서를 담당한다. 관리 mTLS 키와 CA 등록
+JWK 서명키를 분리한다. CA 키 교체/HSM/운영 배포와 김택희 독립 재현은 완료로 기록하지 않는다.
+
 11/3 후속 수행: `feature/chaeheeju-c01-observability`에서 [C01 수집/경보 비교](../technology-decisions/C01-observability.md)를 진행했다.
 기존 앱의 viewer 요약 API를 그대로 사용하고 최소 권한 수집기·망 분리·같은 경보의 두 구성을 직접 실행/측정한다.
 최종 채택·타 팀원 재현·고부하/운영 인증 검증은 별도이며 김택희의 교차 검토 완료로 기록하지 않는다.
