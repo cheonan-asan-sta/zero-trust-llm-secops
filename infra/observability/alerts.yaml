@@ -1,0 +1,24 @@
+groups:
+  - name: c01-zero-trust-operations
+    interval: 1s
+    rules:
+      - alert: C01SignalQueueBacklog
+        expr: secops_signal_inbox_records{state="pending"} > 0 and on(job,instance) secops_signal_inbox_oldest_pending_age_seconds > 3
+        for: 2s
+        labels:
+          severity: warning
+      - alert: C01SignalCollectionUnavailable
+        expr: secops_signal_collection_success == 0
+        for: 2s
+        labels:
+          severity: critical
+      - alert: C01ExporterDown
+        expr: up{job="zt-signals"} == 0 or absent(up{job="zt-signals"})
+        for: 2s
+        labels:
+          severity: critical
+      - alert: C01SignalProcessingFailed
+        expr: secops_signal_inbox_records{state="failed"} > 0
+        for: 2s
+        labels:
+          severity: critical
