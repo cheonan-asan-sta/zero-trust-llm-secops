@@ -106,7 +106,7 @@ class QuietHandler(BaseHTTPRequestHandler):
     do_PUT = do_DELETE = do_OPTIONS = do_PATCH = do_HEAD
 
 
-def authorization_handler(core, tickets):
+def authorization_handler(core, tickets, tls_profile=None):
     class Authorize(QuietHandler):
         def do_GET(self):
             try:
@@ -121,15 +121,20 @@ def authorization_handler(core, tickets):
             except ValueError:
                 return self.reply(403)
             try:
-                status, body = upstream(core + "/zero-trust/protected-access", {
+                payload = {
                     "session_id": session, "grant_token": grant,
-                    "resource_id": "zt-demo-documents", "action": "READ"}, {"X-API-Key": key})
+                    "resource_id": "zt-demo-documents", "action": "READ"}
+                if tls_profile is None:
+                    status, body = upstream(core + "/zero-trust/protected-access", payload, {"X-API-Key": key})
+                else:
+                    from scripts.mtls_transport import request
+                    status, body = request(tls_profile, "/zero-trust/protected-access", payload, {"X-API-Key": key})
                 version = strict_allow(status, body)
                 if version is None:
                     return self.reply(403 if status in {401, 403, 404, 422} else 503)
                 token = tickets.issue(session, version)
                 return self.reply(200, headers={"X-PEP-Handoff": token})
-            except (OSError, ValueError, http.client.HTTPException):
+            except (OSError, ValueError, KeyError, TypeError, http.client.HTTPException):
                 return self.reply(503)
 
         def do_POST(self):
@@ -225,6 +230,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=["bridge", "resource", "probe", "rpc-probe"])
     parser.add_argument("--secret-file", type=Path)
+    parser.add_argument("--core-tls-profile", type=Path)
     args = parser.parse_args()
     def dispatch(request):
         if isinstance(request, list):
@@ -249,7 +255,7 @@ def main():
         tickets = Handoffs()
         private = ThreadingHTTPServer(("0.0.0.0", 8082), consume_handler(secret, tickets))
         threading.Thread(target=private.serve_forever, daemon=True).start()
-        handler = authorization_handler("http://core:8000", tickets)
+        handler = authorization_handler("http://core:8000", tickets, args.core_tls_profile)
         port = 8081
     else:
         handler, port = resource_handler("http://bridge:8082", secret), 8083

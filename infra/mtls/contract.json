@@ -1,0 +1,25 @@
+{
+  "schema": "i2-mtls-contract-1",
+  "scope": "NGINX C02 PEP bridge to existing core API through dedicated mTLS gateway",
+  "checks_per_trial": 30,
+  "expected_checks": [
+    "missing", "foreign", "expired", "future", "wrong-eku", "wrong-host", "wrong-pin",
+    "trusted_ca_unknown_leaf_cannot_spoof_identity", "collector_cannot_access_pep_route",
+    "bridge_cannot_revoke", "query_cannot_change_route", "encoded_path_rejected", "double_slash_wire_target_rejected",
+    "mtls_does_not_replace_api_key", "trusted_bridge_reaches_existing_api",
+    "server-expired", "server-future", "server-wrong-name", "server-wrong-eku", "server_repair_valid_identity",
+    "client_rotation_overlap_old", "client_rotation_overlap_new", "client_pin_revoked_next_request",
+    "new_client_after_retirement", "server_rotation_stale_pin_no_credentials_sent", "server_rotation_new_pin",
+    "malformed_policy_fail_closed", "policy_repair_requires_still_registered_identity",
+    "repair_does_not_restore_revoked_client", "bridge_no_direct_plaintext_core_route"
+  ],
+  "repeats": 3,
+  "tls": "TLS 1.2 minimum; chain, EKU, time, server DNS name, SHA-256 leaf pins",
+  "identity": "Exact client certificate fingerprint to server-owned service identity; request header identity ignored",
+  "authorization": "Service path scope AND existing application API-key role/tenant/session checks",
+  "rotation": "Explicit overlap and retirement; fresh TLS contexts and per-request peer policy reload; no HTTP fallback",
+  "keys": "CA private keys RAM only; leaf private keys RAM and own 0600 Linux volumes only; no host key files",
+  "network": "All internal; no host ports/socket; bridge has no plaintext core network route",
+  "reused_checks_per_trial": 42,
+  "not_completed": ["other service hops remain HTTP", "production IdP/TLS deployment", "HA", "CA/CRL/OCSP automation", "step-ca comparative trial", "independent teammate review", "in-flight business cancellation"]
+}
