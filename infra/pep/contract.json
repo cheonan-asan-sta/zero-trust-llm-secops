@@ -1,0 +1,31 @@
+{
+  "schema": "c02-contract-1",
+  "scope": "local/test independent synthetic document server; HTTP GET /documents only",
+  "policy": "unchanged zt-policy-2026.10.1; docs READ grant TTL 60 seconds",
+  "authorization": "existing /zero-trust/protected-access atomically consumes one-use core grant",
+  "handoff": "hashed bounded RAM capability, 3 second TTL, one-use GET/path binding; service-authenticated consume",
+  "deny_assertion": "non-2xx, no protected fixture body hash, zero additional resource deliveries",
+  "allow_assertion": "200, exact protected fixture body hash, one additional resource delivery",
+  "concurrency": "8 requests share one core grant; exactly one resource delivery",
+  "repeats": 3,
+  "candidate_order": "alternate starting candidate each repeat",
+  "expected_checks": [
+    "valid_once", "grant_replay", "concurrent_single_use", "concurrent_replay",
+    "missing_x-api-key", "missing_x-session-id", "missing_x-grant-token", "bad_api_key",
+    "wrong_grant", "unknown_session", "resource_scope_mismatch", "duplicate_credentials",
+    "method_post", "method_head", "method_put", "method_delete", "method_options",
+    "path_0", "path_1", "path_2", "path_3", "path_4", "path_5", "path_6",
+    "spoofed_headers_cannot_change_scope", "binding_b", "binding_c", "revoked_before_request",
+    "signed_proof_expired", "direct_client_resource", "direct_client_core", "resource_forged_handoff",
+    "bridge_restart_loses_pending_handoff", "bridge_restart_no_grant_refund",
+    "signed_adverse_signal_revokes_before_request", "unrelated_user_still_allowed",
+    "pdp_timeout", "pdp_unavailable", "grant_expired_unchanged_60s_policy", "signing_key_disabled",
+    "auth_bridge_unavailable", "bridge_restart_no_replay"
+  ],
+  "limitations": [
+    "No production adoption, independent teammate review or high-load SLA assertion",
+    "Core grant consumption is authorization point; revocation does not cancel an already authorized in-flight request",
+    "No atomic transaction spanning core journal and business action; delivery failure does not refund a consumed grant",
+    "Local internal HTTP only; production TLS/mTLS, OIDC/IdP mapping, HA and resource streaming are not validated"
+  ]
+}

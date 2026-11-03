@@ -1,5 +1,21 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 3일 후속 C02 HTTP 집행
+
+- PR #4 병합 `aitest` `9f61f35`에서 `feature/chaeheeju-c02-pep`로 진행합니다.
+- [C02 기록](docs/technology-decisions/C02-http-pep.md)과 [계약](infra/pep/contract.json),
+  [고정 이미지](infra/pep/tools.lock.json)를 확인합니다. 기존 앱/정책/탐지 소스는 바꾸지 않습니다.
+- `python -m scripts.compare_pep --repeats 3`은 두 프록시를 같은 core API와 별도 자원 서버에 연결합니다.
+  core grant를 소비한 뒤 3초짜리 일회용 handoff로 문서를 전달하며, 장애에 재허용/환불하지 않습니다.
+- 위험 신호 내구 접수·기존 networkless worker 처리·관련 세션 제한·다음 HTTP 거부를 연결합니다.
+  직접 접근·헤더 위조·동시 소비·테넌트/운영자·회수·만료·키 폐기·장애/재시작도 대조합니다.
+- 인가 시점은 core SQLite 트랜잭션입니다. 이미 허용된 in-flight 요청을 회수로 취소하거나 업무와
+  원자적으로 커밋하는 구현은 아닙니다. 운영 TLS/IdP/HA/고부하·영속 업무 감사·독립 재현은 후속입니다.
+- 최종 반복·검증·초기 실패와 한계는 C02 문서/원자료를 따릅니다. 아래 기록은 당시 상태로 보존합니다.
+- 최종 각 3회·42개씩 총 252개 검사와 Windows/Linux Docker 전체 630건을 통과했습니다.
+  [공개 실측](docs/infrastructure-results/c02-windows-20261103.json)에 준비 실패를 분리했고, 소스 지문도 재검사했습니다.
+  로컬 통합 NGINX를 잠정 제안하되 관측 지연은 Envoy가 낮았음을 보존합니다. 운영 채택·독립 검토는 후속입니다.
+
 ## 2026년 11월 3일 후속 C01 관측·경보
 
 - PR #3까지 병합한 `aitest` `719f069`에서 `feature/chaeheeju-c01-observability`로 작업합니다.
