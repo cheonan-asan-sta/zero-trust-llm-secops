@@ -106,10 +106,13 @@ class QuietHandler(BaseHTTPRequestHandler):
     do_PUT = do_DELETE = do_OPTIONS = do_PATCH = do_HEAD
 
 
-def authorization_handler(core, tickets, tls_profile=None):
+def authorization_handler(core, tickets, tls_profile=None, forwarded_profile=None):
     class Authorize(QuietHandler):
         def do_GET(self):
             try:
+                if forwarded_profile is not None and getattr(self, "service_identity", None) != "bridge-probe":
+                    from scripts.mtls_native import forwarded_client
+                    forwarded_client(self.headers, forwarded_profile)
                 target = self.path
                 if target == "/_authorize":
                     target = single(self.headers, "X-C02-Target", r"/documents")
@@ -118,7 +121,7 @@ def authorization_handler(core, tickets, tls_profile=None):
                 key = single(self.headers, "X-API-Key", r"[A-Za-z0-9_-]{32,128}")
                 session = single(self.headers, "X-Session-ID", r"[A-Za-z0-9][A-Za-z0-9._-]{2,63}")
                 grant = single(self.headers, "X-Grant-Token", r"[A-Za-z0-9_-]{32,128}")
-            except ValueError:
+            except (OSError, ValueError, KeyError, TypeError):
                 return self.reply(403)
             try:
                 payload = {
@@ -167,7 +170,7 @@ def consume_handler(secret, tickets):
     return Consume
 
 
-def resource_handler(bridge, secret):
+def resource_handler(bridge, secret, tls_profile=None):
     class Resource(QuietHandler):
         served, lock = 0, threading.Lock()
 
@@ -182,11 +185,15 @@ def resource_handler(bridge, secret):
             except ValueError:
                 return self.reply(403)
             try:
-                status, _ = upstream(bridge + "/consume", {"token": token, "method": "GET", "path": PATH},
-                                     {"Authorization": "Bearer " + secret})
+                payload = {"token": token, "method": "GET", "path": PATH}
+                if tls_profile is None:
+                    status, _ = upstream(bridge + "/consume", payload, {"Authorization": "Bearer " + secret})
+                else:
+                    from scripts.mtls_transport import request
+                    status, _ = request(tls_profile, "/consume", payload, {"Authorization": "Bearer " + secret})
                 if status != 200:
                     return self.reply(403)
-            except (OSError, ValueError, http.client.HTTPException):
+            except (OSError, ValueError, KeyError, TypeError, http.client.HTTPException):
                 return self.reply(503)
             with self.lock:
                 type(self).served += 1
@@ -201,8 +208,28 @@ def probe(request):
     """Raw headers preserve duplicate-header tests; never follow redirects/retry."""
     started = time.perf_counter()
     try:
-        connection = http.client.HTTPConnection(request.get("host", "127.0.0.1"),
-                                                request.get("port", 8000), timeout=4)
+        if request.get("collector_transport"):
+            from scripts.local_signal_collector import _post
+            from scripts.mtls_transport import profile
+            path = Path(request["tls_profile"])
+            endpoint = profile(path)
+            observed = {}
+            status, decoded = _post(f"https://{endpoint['host']}:{endpoint['port']}", request["path"],
+                request["payload"], tls_profile=path, headers=dict(request.get("headers", [])), observed=observed)
+            body = json.dumps(decoded).encode()
+            result = {"status": status, "body_sha256": hashlib.sha256(body).hexdigest(), **observed}
+            if request.get("private_control"):
+                result["body"] = body.decode()
+            return result | {"elapsed_ms": (time.perf_counter() - started) * 1000}
+        if request.get("tls_profile"):
+            from scripts.mtls_transport import PinnedConnection
+            connection = PinnedConnection(Path(request["tls_profile"]))
+            connection.connect()
+            tls_version = connection.sock.version()
+        else:
+            connection = http.client.HTTPConnection(request.get("host", "127.0.0.1"),
+                                                    request.get("port", 8000), timeout=4)
+            tls_version = None
         connection.putrequest(request.get("method", "GET"), request["path"])
         for name, value in request.get("headers", []):
             connection.putheader(name, value)
@@ -217,11 +244,14 @@ def probe(request):
         if len(body) > 65536:
             raise ValueError("oversize")
         result = {"status": response.status, "body_sha256": hashlib.sha256(body).hexdigest()}
+        result["transport_denied"] = response.getheader("X-Secops-Transport-Denied") == "1"
+        if tls_version:
+            result["tls_version"] = tls_version
         if request.get("private_control"):
             result["body"] = body.decode()
             result["handoff"] = response.getheader("X-PEP-Handoff")
         connection.close()
-    except (OSError, ValueError, http.client.HTTPException):
+    except (OSError, ValueError, KeyError, TypeError, http.client.HTTPException):
         result = {"status": 0, "body_sha256": None}
     return result | {"elapsed_ms": (time.perf_counter() - started) * 1000}
 
@@ -231,6 +261,10 @@ def main():
     parser.add_argument("mode", choices=["bridge", "resource", "probe", "rpc-probe"])
     parser.add_argument("--secret-file", type=Path)
     parser.add_argument("--core-tls-profile", type=Path)
+    parser.add_argument("--server-tls-profile", type=Path)
+    parser.add_argument("--consume-server-profile", type=Path)
+    parser.add_argument("--consume-tls-profile", type=Path)
+    parser.add_argument("--forwarded-profile", type=Path)
     args = parser.parse_args()
     def dispatch(request):
         if isinstance(request, list):
@@ -253,13 +287,21 @@ def main():
         raise ValueError("invalid_service_secret")
     if args.mode == "bridge":
         tickets = Handoffs()
-        private = ThreadingHTTPServer(("0.0.0.0", 8082), consume_handler(secret, tickets))
+        if args.consume_server_profile:
+            from scripts.mtls_native import NativeServer
+            private = NativeServer(("0.0.0.0", 8082), args.consume_server_profile, consume_handler(secret, tickets))
+        else:
+            private = ThreadingHTTPServer(("0.0.0.0", 8082), consume_handler(secret, tickets))
         threading.Thread(target=private.serve_forever, daemon=True).start()
-        handler = authorization_handler("http://core:8000", tickets, args.core_tls_profile)
+        handler = authorization_handler("http://core:8000", tickets, args.core_tls_profile, args.forwarded_profile)
         port = 8081
     else:
-        handler, port = resource_handler("http://bridge:8082", secret), 8083
-    ThreadingHTTPServer(("0.0.0.0", port), handler).serve_forever()
+        handler, port = resource_handler("http://bridge:8082", secret, args.consume_tls_profile), 8083
+    if args.server_tls_profile:
+        from scripts.mtls_native import NativeServer
+        NativeServer(("0.0.0.0", port), args.server_tls_profile, handler).serve_forever()
+    else:
+        ThreadingHTTPServer(("0.0.0.0", port), handler).serve_forever()
 
 
 if __name__ == "__main__":

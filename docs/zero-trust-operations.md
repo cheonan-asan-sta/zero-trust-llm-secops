@@ -14,6 +14,10 @@
 
 ## 적용 범위
 
+후속 [선택 운영 경로 전체 mTLS](all-hops-mtls.md)는 core 직접 TLS, 프록시/자원/consume, 실제 수집기와
+관측/경보·관리 조회까지 확장한다. API 사용자 권한과 이벤트 증명을 전송 신원으로 대체하지 않는다.
+HTTP 비교 프로필은 보존하며 운영 배포/자동 CA 완료와 구분한다.
+
 11/3 추가 [I2 서비스 mTLS](i2-service-mtls.md)는 C02 PEP bridge→인가 gateway의 서비스 인증을 연결한다.
 TLS chain/시간/EKU/서버 이름/pin과 서비스 호출 범위를 검사한 뒤에도 기존 API 키·역할·테넌트·서명·
 grant 검사를 유지한다. gateway 뒤와 다른 hop은 HTTP이며 운영 신원/CA 배포 완료를 뜻하지 않는다.

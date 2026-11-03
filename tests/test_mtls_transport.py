@@ -166,3 +166,10 @@ def test_pep_missing_tls_profile_never_falls_back_to_http(monkeypatch, tmp_path)
             ["X-API-Key", "k" * 43], ["X-Session-ID", "session-one"], ["X-Grant-Token", "g" * 43]]})
         assert response["status"] == 503
         assert not tickets.entries
+
+
+def test_gateway_missing_native_tls_backend_profile_never_falls_back(boundary, tmp_path):
+    gateway, calls, _ = boundary
+    gateway.backend_profile = tmp_path / "missing.json"
+    assert send(gateway)["status"] == 503
+    assert not calls

@@ -1,3 +1,4 @@
+# HTTP-only local comparison baseline. For the mTLS graph see docs/all-hops-mtls.md.
 name: zero-trust-llm-secops
 
 services:
