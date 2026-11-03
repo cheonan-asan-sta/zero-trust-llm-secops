@@ -1,5 +1,24 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 3일 후속 CA·발급 JWK 키 자동 교체
+
+- PR #9 병합 `aitest` `4d74f06`에서 `feature/chaeheeju-authority-key-rotation`으로 진행한다.
+  [구현·운영 경계](docs/authority-key-rotation.md)와 [계약](infra/mtls/authority-rotation-contract.json)을 확인한다.
+- 신뢰된 호스트 조정기와 `network=none` custodian을 분리한다. 새 프로필은 루트/중간/전체 JWK를 인증
+  암호화한 Linux bundle에 보관한다. 이전 RAM 전용 루트 프로필은 그대로다. 보관함 암호도 같은 볼륨에
+  있으므로 HSM/물리적 air gap/독립 secret manager 보호가 아니다. 온라인 CA·leaf에는 보관함/socket을 주지 않는다.
+- 이전 루트 서명 계획·단일 writer·leaf pause/ack·겹침 신뢰→CA/JWK 등록 교체→모든 활성 leaf의 새 issuer/
+  epoch·TLS 확인→구 신뢰 제거→구 JWK 모두 거부→구 비밀 파일 제거 순서다. 별도 committing 단계로 재개한다.
+- CA/JWK별 타이머를 독립 검증한다. 부트스트랩 52개와 서버 JWK 14개를 모두 교체하되 이름·용도·정책을
+  보존한다. issuer-only 교체는 훔친 구 중간 CA 체인의 active 폐기가 아니다. 정상 교체/사고 복구도 구분한다.
+- 앱·탐지·정책·개선 전 품질은 변경하지 않는다. 팀원 독립 검토·운영 배포/HA·저장소 anti-rollback·물리 소거는 후속이다.
+- 최종 새 CA/상태 2회 × 197 = 394개 통합 assertion, Windows/Linux 각각 전체 818건과 Ruff를 통과했다.
+  회당 48개 신원/14개 TLS 서버, root+issuer+JWK→issuer+JWK→JWK 3 epoch과 각 66개 구 JWK 요청 거부를 확인했다.
+  별도 3개 신원 루트1→루트2 반복의 구 root TLS 거부/현재 root 200은 보조 검사 3건으로 합계에서 분리한다.
+  [공개 증거](docs/infrastructure-results/c04-authority-rotation-windows-20261103.json)에 소스/이미지 지문·실패·정리를 보존했다.
+  초기 policy 함수/상속 dict 이름 충돌과 smoke Host 설정을 고친 후 전체 반복을 검증했다. 5개 프로젝트/단위 이미지
+  잔여 0이며 기존 Docker 작업·사용자 ZIP은 보존했다. 아래 CA/JWK 미구현 표기는 이전 프로필의 당시 범위다.
+
 ## 2026년 11월 3일 후속 C04 서비스 개인키 자동 교체
 
 - PR #8 병합 `aitest` `e8e7867`에서 `feature/chaeheeju-private-key-rotation`으로 진행한다.

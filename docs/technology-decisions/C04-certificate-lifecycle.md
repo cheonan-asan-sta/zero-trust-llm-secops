@@ -1,5 +1,14 @@
 # C04: 로컬 인증서 발급·갱신 선정 기록
 
+후속 [CA·JWK 자동 교체](../authority-key-rotation.md)는 기존 step-ca를 유지한다. 루트 서명 작업을 일반
+발급/leaf 제어기와 분리한 network=none custodian에서 실행하고 공개 서명 계획·겹침 신뢰·이행 barrier를
+연결한다. JWK는 발급을 quiesce한 뒤 같은 이름의 등록 공개키를 교체한다. 이름을 보존해야 client의
+인증서 기반 갱신이 이어지며, 임의 이름 중복 등록이나 오래된 서명키 허용을 해결책으로 쓰지 않는다.
+소프트웨어 보관함 암호도 같은 볼륨에 있으므로 HSM/KMS 보호와 동일하지 않다. 운영/독립 재현은 별도다.
+후속 [원자료](../infrastructure-results/c04-authority-rotation-windows-20261103.json)는 새 CA/상태 2회·394개
+통합 assertion과 Windows/Linux 각각 전체 818건, 66개 등록 키의 독립 타이머·48개 신원/14개 서버 이행을
+기록한다. 별도 루트1→루트2의 새 TLS 거부/정상 대조와 초기 실행기 실패는 최종 합계와 분리했다.
+
 후속 [개인키 교체](../private-key-rotation.md)는 step-ca를 재사용한다. clientAuth의 mTLS `/rekey`와
 serverAuth의 기존 제한된 발급 경로에 새 키 CSR을 연결하고, 세대별 파일과 서비스 재적용·구 serial
 자체 폐기를 직접 구성한다. 단순 CLI 덮어쓰기는 여러 파일을 한꺼번에 교체하지 않아 서비스 설정 전환을

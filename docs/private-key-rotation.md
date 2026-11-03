@@ -1,5 +1,8 @@
 # 로컬 서비스 개인키 자동 교체
 
+후속 [CA·발급 JWK 자동 교체](authority-key-rotation.md)는 별도 프로필로 구현한다. 아래 leaf-only 범위와
+기존 검증 결과는 기준선으로 보존하며, CA 키의 보관 방식·실제 결과·한계는 후속 문서를 따른다.
+
 2026-11-03 · 기준 `aitest` `e8e7867` · `feature/chaeheeju-private-key-rotation`
 
 [C04 인증서 자동화](certificate-automation.md)의 기존 동일 키 갱신을 보존하고, 명시적으로 활성화하는
