@@ -1,5 +1,22 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 3일 후속 C01 관측·경보
+
+- PR #3까지 병합한 `aitest` `719f069`에서 `feature/chaeheeju-c01-observability`로 작업합니다.
+- [C01 기록](docs/technology-decisions/C01-observability.md), [계약](infra/observability/contract.json),
+  [공통 경보](infra/observability/alerts.yaml), [고정 도구](infra/observability/tools.lock.json)를 확인합니다.
+- 새 exporter는 기존 viewer inbox API의 aggregate만 GET하며 DB/정책에 쓰지 않습니다.
+  수집 실패에는 오래된 큐 수치를 제공하지 않고 별도 failure gauge를 냅니다.
+- `python -m scripts.compare_observability --repeats 3`은 내부망에서 두 구성을 실제 시험하며
+  서명 개인키는 메모리, 임시 토큰은 전용 Linux 볼륨에만 둡니다. 호스트 공개 포트·Docker socket 마운트가 없습니다.
+- 초기 연결·query lookback 설정 실패도 보존합니다. 성공 반복과 독립 재현·운영 채택을 구분합니다.
+  실제 IdP/EDR·운영 TLS/인가·HA·고부하/장기 보존·알림 무손실 검증은 미완료입니다.
+- 기존 앱 소스·탐지 기준선은 유지하며 AWS/유료 모델을 호출하지 않습니다. 아래 기록은 당시 상태로 보존합니다.
+- 최종 후보당 3회·18개씩 총 108개 기록 검사를 통과했습니다. 신규 보안/정합성 회귀 25건을 포함한 전체
+  Windows/Linux Docker 591건이 각각 통과했습니다. [실측 요약](docs/infrastructure-results/c01-windows-20261103.json)에
+  같은 대상·fingerprint·startsAt·구간 인덱스로 검증한 알림, 자원·초기 실패와 한계를 남깁니다.
+  후속 로컬 통합 기준선은 Prometheus+Alertmanager를 잠정 제안하며 운영 채택은 보류합니다.
+
 ## 2026년 11월 3일 후속 C03·M6 계약
 
 - PR #2는 `aitest`의 `b4660ad`에 병합했습니다. 현재 후속 작업은

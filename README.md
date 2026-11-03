@@ -5,6 +5,13 @@ LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 �
 
 다른 AI 또는 개발자가 작업을 이어갈 때는 [프로젝트 인수인계서](AI_HANDOFF.md)에서 현재 브랜치, 폴더별 역할, 안전 원칙, 검증 절차를 먼저 확인합니다.
 
+## 2026년 11월 3일 후속 관측·경보
+
+[C01 비교](docs/technology-decisions/C01-observability.md)에 기존 viewer 요약 API를 재사용한
+읽기 전용 exporter와 공통 경보, Prometheus/Alertmanager 및 VictoriaMetrics/vmalert/Alertmanager의
+격리 실행기를 추가했습니다. 지연된 신호·수집 실패·수집기 중단·처리 실패와 복구를 로컬에서 확인합니다.
+앱 탐지/정책은 보존하며 경보의 운영 채택·독립 재현은 후속입니다.
+
 ## 2026년 11월 3일 후속 공급망 비교·모델 계약
 
 PR #2를 `aitest`에 병합하고 `feature/chaeheeju-c03-supply-chain`에서
