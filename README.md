@@ -5,6 +5,20 @@ LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 �
 
 다른 AI 또는 개발자가 작업을 이어갈 때는 [프로젝트 인수인계서](AI_HANDOFF.md)에서 현재 브랜치, 폴더별 역할, 안전 원칙, 검증 절차를 먼저 확인합니다.
 
+## 2026년 11월 3일 후속 인증서 자동 발급·갱신
+
+[인증서 수명 자동화](docs/certificate-automation.md)는 선택한 mTLS 경로에 로컬 step-ca·타이머·지문 배포·
+서비스 재적용을 연결합니다. clientAuth 자체 갱신과 서버별 별도 신원으로 제한한 serverAuth 재발급을
+구분하며, 만료/폐기/CA 장애에 권한을 자동 복원하지 않습니다. 기존 수동/HTTP 비교 구성은 보존합니다.
+
+```powershell
+.venv\Scripts\python.exe -m scripts.test_certificate_automation --directory runtime/c02/c04/reproduce --repeats 2
+```
+
+실제 결과·초기 실패·키/운영 범위와 [C04 선정 근거](docs/technology-decisions/C04-certificate-lifecycle.md)를 확인합니다.
+새 CA로 2회·총 306개 통합 검사와 Windows/Linux 전체 각각 739건을 통과했습니다. 활성 신원 50개의
+자동 발급/갱신과 서버 14개의 새 TLS 인증서를 확인했고, 시험 자원은 정리했습니다.
+
 ## 2026년 11월 3일 후속 전체 통신 mTLS
 
 [선택한 로컬 운영 경로 전체 mTLS](docs/all-hops-mtls.md)는 프록시·core·문서 자원·수집기와

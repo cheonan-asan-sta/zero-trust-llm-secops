@@ -3,3 +3,4 @@ app/data/replay/** text eol=lf
 app/data/benchmark/** text eol=lf
 docs/benchmark-results/** text eol=lf
 docs/infrastructure-results/** text eol=lf
+infra/mtls/nginx-renewal.sh text eol=lf
