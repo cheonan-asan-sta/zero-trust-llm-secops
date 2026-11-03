@@ -1,0 +1,44 @@
+{
+  "schema": "ca-high-availability-contract-1",
+  "scope": "Two CA processes on one Docker host; shared single PostgreSQL; opt-in managed client connection failover",
+  "database": "Independent transport PKI, server verify-full + per-node mTLS client keys, scoped role, SERIALIZABLE transactions",
+  "retry_boundary": "Fail over only during connection/TLS establishment on network failure; TLS authentication failures and sent POSTs do not retry",
+  "maintenance": "Leaf publisher stays paused during controlled CA generation/configuration change; every node proves new issuer/JWK before migration and old JWK denial before retirement",
+  "expected_checks": [
+    "both_registered_ca_nodes_issue_valid_scoped_certificates",
+    "both_ca_database_connections_use_verified_client_tls",
+    "database_role_is_unprivileged_and_transactions_serializable",
+    "database_rejects_plain",
+    "database_rejects_no_client_certificate",
+    "database_rejects_wrong_server_name",
+    "shared_one_time_token_has_exactly_one_winner_across_nodes",
+    "token_consumed_on_ca_a_is_denied_by_ca_b",
+    "certificate_revoked_on_ca_a_cannot_renew_on_ca_b",
+    "fresh_issuance_survives_primary_stop",
+    "mtls_renewal_survives_primary_stop",
+    "fresh_issuance_survives_primary_pause",
+    "mtls_renewal_survives_primary_pause",
+    "fresh_issuance_survives_primary_disconnect",
+    "mtls_renewal_survives_primary_disconnect",
+    "fresh_issuance_survives_secondary_stop",
+    "automatic_leaf_rekey_and_pin_publication_continue_on_survivor",
+    "issuance_fails_closed_when_all_ca_unavailable",
+    "existing_protected_access_continues_during_all_ca_outage",
+    "issuance_fails_closed_when_database_unavailable",
+    "existing_protected_access_continues_during_database_outage",
+    "used_token_state_survives_both_ca_and_database_restarts",
+    "revoked_certificate_stays_denied_after_ca_and_database_restarts"
+  ],
+  "rotation_checks": [
+    "all_ca_nodes_prove_current_issuer_and_new_jwk_before_leaf_migration",
+    "all_ca_nodes_reject_every_old_jwk_before_old_key_retirement"
+  ],
+  "limitations": [
+    "No database replication/failover or multi-host HA",
+    "No zero-downtime authority-key ceremony or maintenance SLA",
+    "No HSM, anti-rollback, compromised-root recovery or active CRL/OCSP",
+    "No generic automatic retry of ambiguous write outcomes",
+    "No general claim of ACME/admin API transaction correctness",
+    "No automatic lifecycle rotation of the separate database transport PKI"
+  ]
+}

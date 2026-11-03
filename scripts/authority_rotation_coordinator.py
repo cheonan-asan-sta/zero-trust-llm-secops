@@ -27,6 +27,15 @@ class DockerBackend:
         for name in [profile["ca"]["name"], profile["leaf"]["name"], *profile["volumes"].values()]:
             if not re.fullmatch(re.escape(self.project) + r"-[A-Za-z0-9_.-]+", name):
                 raise LifecycleError("authority_docker_scope")
+        replicas = profile.get("ca_replicas")
+        if replicas is not None and (not isinstance(replicas, list) or not 2 <= len(replicas) <= 4
+                    or any(not isinstance(r, dict) or set(r) != {"name", "id", "endpoint"}
+                        or not re.fullmatch(re.escape(self.project) + r"-[A-Za-z0-9_.-]+", r.get("name", ""))
+                        or not re.fullmatch(r"[a-f0-9]{64}", r.get("id", ""))
+                        or not re.fullmatch(r"ca-[a-z0-9](?:[a-z0-9-]{0,30}[a-z0-9])?", r.get("endpoint", "")) for r in replicas)
+                    or any(len({r[field] for r in replicas}) != len(replicas) for field in ["name", "id", "endpoint"])
+                    or {k: replicas[0][k] for k in ["name", "id"]} != profile["ca"]):
+            raise LifecycleError("authority_ca_replica_scope")
 
     def command(self, args, payload=None, timeout=30):
         try:
@@ -40,12 +49,18 @@ class DockerBackend:
         return response.stdout
 
     def owned(self, role):
-        expected = self.profile[role]
+        return self.owned_container(self.profile[role])
+
+    def owned_container(self, expected):
         found = json.loads(self.command(["inspect", expected["name"]]))[0]
         if found["Id"] != expected["id"] or found["Name"] != "/" + expected["name"] or found["Image"] != self.profile["image"]:
             raise LifecycleError("authority_container_replaced")
         if any(m["Destination"].endswith("docker.sock") or m["Destination"] == "/vault" for m in found["Mounts"]):
             raise LifecycleError("authority_online_vault_exposure")
+        if self.profile.get("ca_replicas") and expected["name"] != self.profile["leaf"]["name"]:
+            mounts = [m for m in found["Mounts"] if m["Destination"] == "/ca"]
+            if len(mounts) != 1 or mounts[0].get("Name") != self.profile["volumes"]["ca"] or mounts[0].get("RW"):
+                raise LifecycleError("authority_replica_configuration_mount")
         return expected["name"]
 
     def leaf(self, operation, plan=None, **fields):
@@ -73,7 +88,24 @@ class DockerBackend:
             raise
 
     def restart_ca(self):
-        self.command(["restart", "--time", "2", self.owned("ca")])
+        if not self.profile.get("ca_replicas"):
+            self.command(["restart", "--time", "2", self.owned("ca")])
+            return
+        # Validate every pinned object before mutating any. Key ceremonies keep
+        # the leaf publisher paused until all nodes prove the new configuration.
+        replicas = self.profile["ca_replicas"]
+        names = [self.owned_container(replica) for replica in replicas]
+        for name, replica in zip(names, replicas, strict=True):
+            self.command(["restart", "--time", "2", name])
+            deadline = time.monotonic() + 20
+            while True:
+                try:
+                    self.leaf("endpoint_health", endpoint=replica["endpoint"])
+                    break
+                except LifecycleError:
+                    if time.monotonic() >= deadline:
+                        raise LifecycleError("authority_replica_restart_unhealthy") from None
+                    time.sleep(.4)
 
 
 class Coordinator:
@@ -118,9 +150,17 @@ class Coordinator:
             s["phase"] = "ca_activated"
         elif phase == "ca_activated":
             s["evidence"]["new_ca_tls"] = b.leaf("health", plan)
-            probe = b.leaf("probe_csr", plan)
-            b.custodian("probe", probe)
-            s["evidence"]["new_jwk_issuance"] = b.leaf("probe", plan)
+            if self.profile.get("ca_replicas"):
+                observations = {}
+                for replica in self.profile["ca_replicas"]:
+                    probe = b.leaf("probe_csr", plan)
+                    b.custodian("probe", probe)  # Fresh nonce per shared-DB node.
+                    observations[replica["endpoint"]] = b.leaf("probe", plan, endpoint=replica["endpoint"])
+                s["evidence"]["new_jwk_issuance"] = {"replicas": observations}
+            else:
+                probe = b.leaf("probe_csr", plan)
+                b.custodian("probe", probe)
+                s["evidence"]["new_jwk_issuance"] = b.leaf("probe", plan)
             s["phase"] = "leaf_activating"
         elif phase == "leaf_activating":
             b.leaf("activate", plan)
@@ -142,8 +182,19 @@ class Coordinator:
             s["evidence"]["final_ca_tls"] = b.leaf("health", plan)
             s["evidence"]["final_services"] = b.leaf("verify", plan)
             if plan["changed"]["jwk"]:
-                b.custodian("old-probes")
-                s["evidence"]["old_jwks"] = b.leaf("old_keys_denied", plan)
+                if self.profile.get("ca_replicas"):
+                    observations = {}
+                    for replica in self.profile["ca_replicas"]:
+                        b.custodian("old-probes")  # Fresh CSR/nonce per node, never a replay rejection.
+                        observations[replica["endpoint"]] = b.leaf("old_keys_denied", plan, endpoint=replica["endpoint"])
+                    counts = {value["denied"] for value in observations.values()}
+                    if len(counts) != 1:
+                        raise LifecycleError("authority_replica_old_key_coverage")
+                    s["evidence"]["old_jwks"] = {"denied": counts.pop(), "replicas": observations,
+                        "total_denied": sum(value["denied"] for value in observations.values())}
+                else:
+                    b.custodian("old-probes")
+                    s["evidence"]["old_jwks"] = b.leaf("old_keys_denied", plan)
                 b.leaf("health", plan)  # Positive CA control after the denied requests.
             s["phase"] = "committing"
         elif phase == "committing":

@@ -14,6 +14,10 @@
 
 ## 적용 범위
 
+후속 [CA 프로세스 HA](ca-high-availability.md)는 CA 2대·공유 PostgreSQL·DB 전용 mTLS를 연결한다.
+인증 전 연결 장애만 다른 CA로 전환하고 전송한 일회용 요청·TLS 인증 실패·권한 거부는 재시도하지 않는다.
+노드별 발급/폐기 상태와 모든 CA의 키 교체 장벽을 검증한다. 앱 권한·SQLite·탐지 기준선과 DB/호스트 HA는 별도다.
+
 후속 [CA·JWK 키 교체](authority-key-rotation.md)는 이전 루트 서명 계획·겹침 신뢰·전 신원 issuer 이행·
 구 JWK 발급 거부와 구 파일 정리를 연결한다. root 보관함은 온라인 CA/leaf와 분리한 network=none 작업에서
 사용하며 소프트웨어 보관함/HSM·정상 키 교체/사고 복구를 구분한다. 앱 권한·탐지 기준선은 유지한다.

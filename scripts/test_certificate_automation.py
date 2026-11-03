@@ -164,7 +164,8 @@ class CertificateLab(AllHopsLab):
             "extra_certificates": extras, "allowed_provisioners": list(self.provisioners), "probes": list(probes),
             "reload_groups": list(reload_groups), "unmanaged_profiles": list(unmanaged),
             "server_renewal": {name: "renew-" + name for name in SERVERS},
-            "renew_before": {name: 3590 if name.startswith("renew-") else 1190 for name in SERVERS + CLIENTS} | {"auto-canary": 22},
+            "renew_before": {name: 3590 if name.startswith("renew-") else 1190 for name in SERVERS + CLIENTS}
+                | {"auto-canary": getattr(self, "canary_renew_before_seconds", 22)},
             "interval_seconds": .3, "overlap_seconds": 1, "disabled": []}
         self.write_assets(self.controller_volume, {"config.json": json.dumps(self.controller_config),
             "root.pem": self.offline_root[1].public_bytes(serialization.Encoding.PEM).decode(),
@@ -175,7 +176,8 @@ class CertificateLab(AllHopsLab):
         for uid, c in inventory.items():
             provisioner, key = self.provisioners[c["name"] + "-" + c["purpose"]]
             grants[uid] = {"token": bootstrap.bootstrap_token(provisioner, key, c["csr"], seconds=600),
-                           "duration": "30s" if c["name"] == "auto-canary" else "1h" if c["name"].startswith("renew-") else "20m"}
+                           "duration": f"{getattr(self, 'canary_lifetime_seconds', 30)}s" if c["name"] == "auto-canary"
+                               else "1h" if c["name"].startswith("renew-") else "20m"}
         return grants
 
     def start_controller(self, inventory, *, additional=()):
@@ -298,7 +300,7 @@ class CertificateLab(AllHopsLab):
         provisioner, signing_key = self.provisioners["static-canary-clientAuth"]
         static_grant = bootstrap.bootstrap_token(provisioner, signing_key, static_csr)
         result = json.loads(self.helper(["-m", "scripts.certificate_controller", "rpc"], {"operation": "ca_post", "path": "/1.0/sign",
-            "payload": {"csr": static_csr, "ott": static_grant, "notAfter": "30s"}}))
+            "payload": {"csr": static_csr, "ott": static_grant, "notAfter": f"{getattr(self, 'canary_lifetime_seconds', 30)}s"}}))
         flow.require(result["status"] == 201, "c04_static_issued")
         static_certificate = issued_chain(result["result"])
         self.write_assets(self.canary_volume, {"static.pem": static_certificate})
@@ -309,7 +311,7 @@ class CertificateLab(AllHopsLab):
         initial_static = json.loads(self.helper(["-m", "scripts.pep_lab", "probe"],
             {"tls_profile": "/managed/canaries/static.json", "path": "/health/live"}, network=self.graph_networks["core"]))
         flow.require(initial_static["status"] == 200, "c04_static_initial_access")
-        add("static_client_initially_valid", lifetime_seconds=30)
+        add("static_client_initially_valid", lifetime_seconds=getattr(self, "canary_lifetime_seconds", 30))
         manifest = json.loads(self.helper(["-m", "scripts.certificate_controller", "init"], network="none"))
         self.start_controller(manifest, additional=[(n, "certificate-controller") for n in self.graph_networks.values() if n != self.ca_network])
         self.wait(lambda: all_at_generation(1), "c04_all_enrolled", timeout=65)
@@ -409,10 +411,11 @@ class CertificateLab(AllHopsLab):
         self.document_access(record, keys, "after-renewal")
         add("document_access_after_automatic_cutover", resource_deliveries=1)
         self.paused(False)
-        # Both comparison credentials were issued for 30 seconds by this same CA.
-        self.wait(lambda: time.time() > metadata(static_certificate)["not_after"] + 1, "c04_static_expired", timeout=40)
+        # Both comparison credentials have the same explicitly recorded lifetime.
+        self.wait(lambda: time.time() > metadata(static_certificate)["not_after"] + 1, "c04_static_expired",
+            timeout=getattr(self, "canary_lifetime_seconds", 30) + 10)
         flow.require(probe_canary("static")["status"] == 0 and probe_canary("auto")["status"] == 200, "c04_static_vs_automatic")
-        add("equal_lifetime_static_expires_automatic_stays_valid", lifetime_seconds=30)
+        add("equal_lifetime_static_expires_automatic_stays_valid", lifetime_seconds=getattr(self, "canary_lifetime_seconds", 30))
         self.paused(True)
         before_restart = self.status()
         self.close_probe(self.controller)
@@ -430,7 +433,8 @@ class CertificateLab(AllHopsLab):
         try:
             self.document_access(record, keys, "ca-unavailable")
             add("valid_service_credentials_continue_during_ca_outage", resource_deliveries=1)
-            self.wait(lambda: current_named("auto-canary")[1]["not_after"] < time.time() - 1, "c04_auto_expires_during_outage", timeout=45)
+            self.wait(lambda: current_named("auto-canary")[1]["not_after"] < time.time() - 1, "c04_auto_expires_during_outage",
+                timeout=getattr(self, "canary_lifetime_seconds", 30) + 15)
             flow.require(probe_canary("auto")["status"] == 0, "c04_outage_expired_denied")
             add("expired_client_fails_closed_during_ca_outage")
         finally:

@@ -15,6 +15,12 @@ from scripts.compare_supply_chain import sha256
 from scripts.test_certificate_automation import SERVERS, CertificateLab
 
 
+def verify_interrupted_rotation(snapshot, active):
+    pending, retained = snapshot["pending"], snapshot["active_keys_present"]
+    flow.require(bool(pending) and set(pending) <= active and set(retained) == active
+        and all(retained.values()) and all(c["old_keys_present"] for c in pending.values()), "rekey_reload_retains_old_keys")
+
+
 class KeyRotationLab(CertificateLab):
     def __init__(self, directory):
         super().__init__(directory)
@@ -170,32 +176,46 @@ print(json.dumps({'status':code}))""")
         self.wait(lambda: self.status()["paused"], "rekey_restart_paused")
         self.paused(False)
         self.wait(lambda: self.status()["phase"] == "activated" and self.status()["last_error"], "rekey_blocked_reload", timeout=60)
-        pending = self.private_rpc("""import json
+        snapshot = self.private_rpc("""import json,sys
 from pathlib import Path
 from scripts.certificate_controller import fingerprint
-s=json.loads(Path('/state/state.json').read_bytes());out={}
+s=json.loads(Path('/state/state.json').read_bytes());out={};active=set(json.load(sys.stdin))
 for uid in s['transaction']['credentials']:
  c=s['credentials'][uid];out[uid]={'public_key_sha256':c['pending_key']['public_key_sha256'],'fingerprint':fingerprint(c['candidate']),
-  'old_keys_present':all(Path(a['key']).exists() for a in c['assets'])}
-print(json.dumps(out))""")
-        flow.require(set(pending) == active and all(c["old_keys_present"] for c in pending.values()), "rekey_reload_retains_old_keys")
+  'generation':c['generation'],'old_keys_present':all(Path(a['key']).exists() for a in c['assets'])}
+print(json.dumps({'pending':out,'active_keys_present':{uid:all(Path(a['key']).exists() for a in s['credentials'][uid]['assets']) for uid in active}}))""", sorted(active))
+        record["key_rotation_interrupted_public_snapshot"] = snapshot
+        self.save()
+        verify_interrupted_rotation(snapshot, active)
+        pending = snapshot["pending"]
         add("reload_unconfirmed_retains_old_keys_before_cleanup")
         self.close_probe(self.controller)
         command(["docker", "stop", "--time", "2", self.controller])
         group["ack"] = original_ack
-        self.controller_config["key_rotation"]["interval_seconds"] = 60
+        # An SQL conflict can split one scheduled wave into several publications.
+        # First observe this exact interrupted transaction before another timer
+        # can replace its recovered keys; then prove every active identity rotates.
+        self.controller_config["key_rotation"]["interval_seconds"] = 600
         self.write_assets(self.controller_volume, {"config.json": json.dumps(self.controller_config)})
         command(["docker", "start", self.controller])
-        self.wait(lambda: all_rotated(2), "rekey_second_timer", timeout=90)
+        def resumed_pending():
+            current = self.status()
+            return current["phase"] is None and all(current["credentials"][uid]["generation"] > c["generation"] for uid, c in pending.items())
+        self.wait(resumed_pending, "rekey_resumed_pending", timeout=90)
         self.paused(True)
         add("controller_crash_resumes_activated_key_publication")
+        recovered, after_restart = self.audit(), self.status()
+        flow.require(all(recovered[uid]["public_key_sha256"] == c["public_key_sha256"]
+            and after_restart["credentials"][uid]["fingerprint"] == c["fingerprint"] for uid, c in pending.items()), "rekey_pending_keys_reused")
+        record["key_rotation_recovered_pending_public_audit"] = {uid: recovered[uid] for uid in pending}
+        add("crash_recovery_uses_same_pending_keys_without_reissuance")
+        self.controller_config["key_rotation"]["interval_seconds"] = 8
+        self.paused(False)
+        self.wait(lambda: all_rotated(2), "rekey_second_timer", timeout=90)
+        self.paused(True)
         second = self.audit()
         flow.require(all(second[uid]["public_key_sha256"] != first[uid]["public_key_sha256"] for uid in active), "rekey_second_new_keys")
         record["key_rotation_second_public_audit"] = second
-        after_restart = self.status()
-        flow.require(all(second[uid]["public_key_sha256"] == pending[uid]["public_key_sha256"]
-                         and after_restart["credentials"][uid]["fingerprint"] == pending[uid]["fingerprint"] for uid in active), "rekey_pending_keys_reused")
-        add("crash_recovery_uses_same_pending_keys_without_reissuance")
         add("controller_restart_and_timer_rotate_all_keys_again", identities=len(active))
         self.assert_removed(first, active)
         add("second_rotation_removes_first_generation_key_files")

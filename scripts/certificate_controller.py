@@ -156,18 +156,20 @@ def cas(path, before, after):
     save(path, after)
 
 
-def ca_post(state_dir, target, payload, *, identity=None):
-    if target not in {"/1.0/sign", "/1.0/revoke", "/1.0/rekey"}:
+def ca_post(state_dir, target, payload, *, identity=None, endpoint=None):
+    if target not in {"/1.0/sign", "/1.0/revoke", "/1.0/rekey", "/1.0/renew"}:
         raise LifecycleError("ca_route")
-    if target == "/1.0/rekey" and identity is None:
+    if target in {"/1.0/rekey", "/1.0/renew"} and identity is None:
         raise LifecycleError("rekey_requires_mtls")
     context = ssl.create_default_context(cafile=str(state_dir / "root.pem"))
     context.minimum_version = ssl.TLSVersion.TLSv1_2
     if identity is not None:
         context.load_cert_chain(identity["certificates"][0], identity["key"])
-    connection = http.client.HTTPSConnection("ca", 9000, context=context, timeout=3)
+    from scripts.ca_endpoints import connect
+    connection, _ = connect(state_dir, context, endpoint=endpoint)
     try:
-        connection.connect()  # Server authentication precedes the one-time credential.
+        # Only connect/TLS establishment can fail over. A lost POST response can
+        # already have consumed its one-time token: never replay it on another CA.
         connection.request("POST", target, json.dumps(payload).encode(), {"Content-Type": "application/json"})
         response = connection.getresponse()
         raw = response.read(131073)
@@ -247,6 +249,11 @@ def inventory(cfg, state_dir):
 def renewal(c, state_dir):
     if c["purpose"] != "clientAuth":
         raise LifecycleError("server_requires_scoped_renewal_identity")
+    if (state_dir / "ca-endpoints.json").exists():
+        code, response = ca_post(state_dir, "/1.0/renew", {}, identity=c)
+        if code != 201:
+            raise LifecycleError("renewal_denied")
+        return issued_chain(response)
     output = state_dir / (c["id"] + ".renew.pem")
     command = ["/tools/step", "ca", "renew", c["certificates"][0], c["key"], "--force", "--out", str(output),
                "--ca-url", "https://ca:9000", "--root", str(state_dir / "root.pem")]
@@ -422,6 +429,12 @@ def status(state, state_dir):
 
 
 def tick(cfg, state, state_dir):
+    bootstrap_path = state_dir / "bootstrap.json"
+    bootstrap = json.loads(bootstrap_path.read_bytes()) if bootstrap_path.exists() else {}
+    # Recovery/publication may return or fail before a new issuance round. An
+    # exhausted bootstrap file must not depend on publication completing.
+    if not bootstrap and bootstrap_path.exists():
+        bootstrap_path.unlink()
     if state["transaction"]:
         publish(cfg, state, state_dir)
         return
@@ -429,8 +442,6 @@ def tick(cfg, state, state_dir):
     if cfg.get("key_rotation") and any(state["credentials"][uid]["generation"] == 0 for uid in chosen):
         # Partial first enrollment must finish before mixing in a rekey transaction.
         chosen = [uid for uid in chosen if state["credentials"][uid]["generation"] == 0]
-    bootstrap_path = state_dir / "bootstrap.json"
-    bootstrap = json.loads(bootstrap_path.read_bytes()) if bootstrap_path.exists() else {}
     issuer = (state_dir / "issuer.pem").read_text()
     if cfg.get("key_rotation"):
         from scripts.certificate_key_rotation import prepare_key
@@ -472,15 +483,16 @@ def tick(cfg, state, state_dir):
                 save(state_dir / "state.json", state)  # Persist candidate before deleting its used bootstrap token.
                 bootstrap.pop(uid, None)
                 if bootstrap_path.exists():
-                    save(bootstrap_path, bootstrap)
+                    if bootstrap:
+                        save(bootstrap_path, bootstrap)
+                    else:
+                        bootstrap_path.unlink()
             save(state_dir / "state.json", state)
     ready = [uid for uid in chosen if state["credentials"][uid]["candidate"]]
     if ready:
         state["transaction"] = plan(cfg, state, ready)
         save(state_dir / "state.json", state)
         publish(cfg, state, state_dir)
-    if not bootstrap and bootstrap_path.exists():
-        bootstrap_path.unlink()
 
 
 def main():
@@ -512,10 +524,14 @@ def main():
                 except (OSError, ValueError, subprocess.SubprocessError):
                     print(json.dumps({"allowed": False}))
             else:
-                result = subprocess.run(["/tools/step", "ca", "revoke", "--cert", c["certificates"][0],
-                    "--key", c["key"], "--ca-url", "https://ca:9000", "--root", str(state_dir / "root.pem")],
-                    capture_output=True, timeout=5, check=False)
-                print(json.dumps({"revoked": result.returncode == 0}))
+                if (state_dir / "ca-endpoints.json").exists():
+                    code, _ = ca_post(state_dir, "/1.0/revoke", {"serial": c["serial"], "passive": True}, identity=c)
+                    print(json.dumps({"revoked": code == 200}))
+                else:
+                    result = subprocess.run(["/tools/step", "ca", "revoke", "--cert", c["certificates"][0],
+                        "--key", c["key"], "--ca-url", "https://ca:9000", "--root", str(state_dir / "root.pem")],
+                        capture_output=True, timeout=5, check=False)
+                    print(json.dumps({"revoked": result.returncode == 0}))
         else:
             raise LifecycleError("rpc_operation")
         return

@@ -1,7 +1,6 @@
 """Trusted Docker-exec control bridge; no listening management API or CA keys."""
 
 import json
-import socket
 import ssl
 import sys
 import time
@@ -13,6 +12,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 
 from scripts import certificate_controller as leaf
 from scripts.authority_custodian import digest, verify_plan
+from scripts.ca_endpoints import connect, endpoints
 
 DIRECTORY = Path("/state")
 
@@ -55,10 +55,17 @@ def wire_ready(cfg, state, identifiers):
 
 def ca_health(plan):
     context = ssl.create_default_context(cafile=str(DIRECTORY / "root.pem"))
-    with socket.create_connection(("ca", 9000), timeout=2) as raw, context.wrap_socket(raw, server_hostname="ca") as sock:
-        certificate = x509.load_der_x509_certificate(sock.getpeercert(binary_form=True))
-        certificate.verify_directly_issued_by(x509.load_pem_x509_certificate(plan["issuer"].encode()))
-        return {"tls_version": sock.version(), "issuer": leaf.fingerprint(plan["issuer"])}
+    hosts, _ = endpoints(DIRECTORY)
+    observations = {}
+    for host in hosts:
+        connection, _ = connect(DIRECTORY, context, endpoint=host)
+        try:
+            certificate = x509.load_der_x509_certificate(connection.sock.getpeercert(binary_form=True))
+            certificate.verify_directly_issued_by(x509.load_pem_x509_certificate(plan["issuer"].encode()))
+            observations[host] = {"tls_version": connection.sock.version(), "issuer": leaf.fingerprint(plan["issuer"])}
+        finally:
+            connection.close()
+    return observations["ca"] if hosts == ["ca"] else {"replicas": observations}
 
 
 def dispatch(request):
@@ -72,6 +79,17 @@ def dispatch(request):
         return {"paused": bool(state.get("paused_ack") and not state["transaction"])}
     if operation == "status":
         return {"paused": bool(state.get("paused_ack") and not state["transaction"])}
+    if operation == "endpoint_health":
+        context = ssl.create_default_context(cafile=str(DIRECTORY / "root.pem"))
+        connection, host = connect(DIRECTORY, context, endpoint=request["endpoint"])
+        try:
+            connection.request("GET", "/health")
+            response = connection.getresponse()
+            if response.status != 200 or json.loads(response.read(4096)).get("status") != "ok":
+                raise leaf.LifecycleError("authority_replica_unhealthy")
+            return {"endpoint": host, "healthy": True}
+        finally:
+            connection.close()
     plan = request["plan"]
     ledger_path = DIRECTORY / "authority-transition.json"
     ledger = json.loads(ledger_path.read_bytes()) if ledger_path.exists() else None
@@ -115,7 +133,8 @@ def dispatch(request):
         paused(cfg, state)
         payload_path = DIRECTORY / "authority-probe.json"
         try:
-            code, response = leaf.ca_post(DIRECTORY, "/1.0/sign", json.loads(payload_path.read_bytes()))
+            options = {"endpoint": request["endpoint"]} if request.get("endpoint") else {}
+            code, response = leaf.ca_post(DIRECTORY, "/1.0/sign", json.loads(payload_path.read_bytes()), **options)
             if code != 201:
                 raise leaf.LifecycleError("new_jwk_issuance_denied")
             certificate = leaf.issued_chain(response)
@@ -160,8 +179,9 @@ def dispatch(request):
         path = DIRECTORY / "authority-old-probes.json"
         try:
             requests = json.loads(path.read_bytes())
+            options = {"endpoint": request["endpoint"]} if request.get("endpoint") else {}
             with ThreadPoolExecutor(max_workers=8) as pool:
-                statuses = list(pool.map(lambda payload: leaf.ca_post(DIRECTORY, "/1.0/sign", payload)[0], requests))
+                statuses = list(pool.map(lambda payload: leaf.ca_post(DIRECTORY, "/1.0/sign", payload, **options)[0], requests))
             if not statuses or any(code not in {401, 403} for code in statuses):
                 raise leaf.LifecycleError("retired_jwk_still_authorized")
             return {"denied": len(statuses), "statuses": statuses}
