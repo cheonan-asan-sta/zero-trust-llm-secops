@@ -52,9 +52,32 @@ class _NoRedirect(HTTPRedirectHandler):
         raise ValueError("Collector API redirects are not allowed")
 
 
-def _post(base_url: str, path: str, data: dict):
+def _target(base_url: str, tls_profile: Path | None = None):
+    target = urlsplit(base_url)
+    if (target.username or target.password or target.path not in {"", "/"}
+            or target.query or target.fragment):
+        raise ValueError("Collector API endpoint must be an origin; HTTP requires loopback without TLS")
+    if tls_profile is not None:
+        from scripts.mtls_transport import profile
+        config = profile(tls_profile)
+        if (target.scheme != "https" or target.hostname != config["host"]
+                or (target.port or 443) != config["port"]):
+            raise ValueError("Collector HTTPS endpoint must match its TLS profile")
+    elif target.scheme != "http" or target.hostname not in {"127.0.0.1", "localhost", "::1"}:
+        raise ValueError("Collector demo only supports an HTTP loopback API without a TLS profile")
+    return base_url.rstrip("/")
+
+
+def _post(base_url: str, path: str, data: dict, *, tls_profile: Path | None = None,
+          headers: dict | None = None, observed: dict | None = None):
+    base_url = _target(base_url, tls_profile)
+    if tls_profile is not None:
+        from scripts.mtls_transport import request as tls_request
+        # No redirect, retry or HTTP fallback; verify the server before writing the signal.
+        status, body = tls_request(tls_profile, path, data, headers or {}, observed=observed)
+        return status, json.loads(body)
     request = Request(base_url + path, data=json.dumps(data).encode(), method="POST",
-                      headers={"Content-Type": "application/json"})
+                      headers={"Content-Type": "application/json", **(headers or {})})
     try:
         with build_opener(_NoRedirect).open(request, timeout=10) as response:
             return response.status, json.load(response)
@@ -62,13 +85,15 @@ def _post(base_url: str, path: str, data: dict):
         return exc.code, json.load(exc)
 
 
-def demonstrate(directory: Path, base_url: str, tenant: str) -> dict:
-    target = urlsplit(base_url)
-    if (target.scheme != "http" or target.hostname not in {"127.0.0.1", "localhost", "::1"}
-            or target.username or target.password or target.path not in {"", "/"}
-            or target.query or target.fragment):
-        raise ValueError("Collector demo only supports an HTTP loopback API")
-    base_url = base_url.rstrip("/")
+def demonstrate(directory: Path, base_url: str, tenant: str, *, tls_profile: Path | None = None,
+                access_tls_profile: Path | None = None) -> dict:
+    base_url = _target(base_url, tls_profile)
+    if tls_profile is not None:
+        if access_tls_profile is None:
+            raise ValueError("mTLS demo needs a separate protected-access client profile")
+        _target(base_url, access_tls_profile)
+    elif access_tls_profile is not None:
+        raise ValueError("Protected-access TLS profile requires a collector TLS profile")
     private = serialization.load_pem_private_key((directory / "private.pem").read_bytes(), password=None)
     if not isinstance(private, Ed25519PrivateKey):
         raise TypeError("Expected an Ed25519 collector key")
@@ -92,7 +117,8 @@ def demonstrate(directory: Path, base_url: str, tenant: str) -> dict:
         })
         signature = base64.urlsafe_b64encode(private.sign(canonical_signal(signal))).decode().rstrip("=")
         signal = signal.model_copy(update={"signature": signature})
-        status, result = _post(base_url, "/zero-trust/signals/evaluate", signal.model_dump(mode="json"))
+        status, result = _post(base_url, "/zero-trust/signals/evaluate", signal.model_dump(mode="json"),
+                               tls_profile=tls_profile)
         if status != 200:
             raise RuntimeError(f"Signed collector request failed with HTTP {status}")
         version = result["session"]["version"]
@@ -102,7 +128,7 @@ def demonstrate(directory: Path, base_url: str, tenant: str) -> dict:
         return _post(base_url, "/zero-trust/protected-access", {
             "session_id": session_id, "resource_id": "zt-demo-documents", "action": "READ",
             "grant_token": token,
-        })[0]
+        }, tls_profile=access_tls_profile)[0]
 
     initial = evaluate()
     assert initial["session"]["signal_trust"] == "verified_source"
@@ -130,11 +156,15 @@ def main():
     parser.add_argument("--directory", required=True, type=Path)
     parser.add_argument("--tenant", default="local")
     parser.add_argument("--base-url", default="http://127.0.0.1:18080")
+    parser.add_argument("--tls-profile", type=Path)
+    parser.add_argument("--access-tls-profile", type=Path,
+                        help="Separate pep-bridge identity; never broaden the collector's route scope")
     args = parser.parse_args()
     if args.operation == "init":
         result = initialize(args.directory, args.tenant)
     else:
-        result = demonstrate(args.directory, args.base_url, args.tenant)
+        result = demonstrate(args.directory, args.base_url, args.tenant,
+                             tls_profile=args.tls_profile, access_tls_profile=args.access_tls_profile)
     print(json.dumps(result, ensure_ascii=False))
 
 

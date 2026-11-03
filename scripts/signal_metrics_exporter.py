@@ -7,6 +7,7 @@ production transport, credentials and endpoint protection need separate validati
 
 import argparse
 import hmac
+import http.client
 import json
 import math
 import os
@@ -66,7 +67,17 @@ class NoRedirect(HTTPRedirectHandler):
         return None
 
 
-def fetch_summary(url, key, *, timeout=.5):
+def fetch_summary(url, key, *, timeout=.5, tls_profile=None):
+    if tls_profile is not None:
+        from scripts.mtls_transport import profile, request
+        parsed = urlsplit(validate_upstream(url))
+        configured = profile(tls_profile)
+        if parsed.scheme != "https" or parsed.hostname != configured["host"] or parsed.port != configured["port"]:
+            raise ValueError("tls_upstream_mismatch")
+        status, raw = request(tls_profile, parsed.path, None, {"X-API-Key": key}, method="GET")
+        if status != 200:
+            raise ValueError("tls_upstream_denied")
+        return render_summary(json.loads(raw))
     request = Request(validate_upstream(url), headers={"X-API-Key": key, "Accept": "application/json"})
     opener = build_opener(ProxyHandler({}), NoRedirect())
     with opener.open(request, timeout=timeout) as response:
@@ -79,14 +90,14 @@ def fetch_summary(url, key, *, timeout=.5):
 def metrics(url, key, fetch=fetch_summary):
     try:
         result = fetch(url, key)
-    except (OSError, ValueError, TypeError):
+    except (OSError, ValueError, TypeError, KeyError, http.client.HTTPException):
         # No stale queue values and no server payload/URL/credential in the error surface.
         return "# TYPE secops_signal_collection_success gauge\nsecops_signal_collection_success 0\n"
     return ("# TYPE secops_signal_collection_success gauge\nsecops_signal_collection_success 1\n"
             + result)
 
 
-def handler(url, key, token):
+def handler(url, key, token, tls_profile=None):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *_):
             pass
@@ -103,7 +114,10 @@ def handler(url, key, token):
                 self.send_header("Content-Length", "0")
                 self.end_headers()
                 return
-            body = metrics(url, key).encode()
+            if tls_profile is None:
+                body = metrics(url, key).encode()
+            else:
+                body = metrics(url, key, lambda u, k: fetch_summary(u, k, tls_profile=tls_profile)).encode()
             self.send_response(200)
             self.send_header("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
             self.send_header("Cache-Control", "no-store")
@@ -119,12 +133,19 @@ def main():
     parser.add_argument("--token-file", type=Path, required=True)
     parser.add_argument("--listen", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=9101)
+    parser.add_argument("--server-tls-profile", type=Path)
+    parser.add_argument("--upstream-tls-profile", type=Path)
     args = parser.parse_args()
     token = args.token_file.read_text(encoding="utf-8").strip()
     key = os.environ.get("C01_UPSTREAM_API_KEY", "")
     if not 32 <= len(token) <= 128 or not key:
         raise ValueError("credentials_required")
-    server = ThreadingHTTPServer((args.listen, args.port), handler(validate_upstream(args.upstream), key, token))
+    service = handler(validate_upstream(args.upstream), key, token, args.upstream_tls_profile)
+    if args.server_tls_profile:
+        from scripts.mtls_native import NativeServer
+        server = NativeServer((args.listen, args.port), args.server_tls_profile, service)
+    else:
+        server = ThreadingHTTPServer((args.listen, args.port), service)
     server.daemon_threads = True
     server.serve_forever()
 

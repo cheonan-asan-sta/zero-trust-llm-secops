@@ -38,7 +38,7 @@ class TLSLab(Lab):
             "--entrypoint", "python", "--interactive", self.image, "-c", WRITE], input=json.dumps(files))
 
     def prepare_transport(self, prefix, networks):
-        self.ca, self.leaves = fixtures()
+        self.ca, self.leaves = self.make_fixtures()
         front = prefix + "-mtls"
         command(["docker", "network", "create", "--internal", "--label", "secops.c02=" + self.ident, front])
         self.networks.append(front)
@@ -78,6 +78,9 @@ class TLSLab(Lab):
             data.update(cert=None, key=None)
             return {"ca.pem": self.ca, "profile.json": json.dumps(data)}
         return {"ca.pem": self.ca, credential + ".pem": cert["cert"], credential + ".key": cert["key"], "profile.json": json.dumps(data)}
+
+    def make_fixtures(self):
+        return fixtures()
 
     def transport_checks(self, prefix, record, keys, bridge):
         record["transport_checks"] = []

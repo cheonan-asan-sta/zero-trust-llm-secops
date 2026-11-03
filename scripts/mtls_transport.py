@@ -20,6 +20,19 @@ from pathlib import Path
 ROUTES = {
     "pep-bridge": [("POST", r"/zero-trust/protected-access")],
     "collector": [("POST", r"/zero-trust/signals/(?:evaluate|inbox)")],
+    "api-gateway": [("POST", r"/zero-trust/(?:protected-access|signals/(?:evaluate|inbox))")],
+    "core-operator": [("GET", r"/(?:health/live|zero-trust/(?:signals/inbox(?:/[A-Za-z0-9._-]+)?|sessions(?:/[A-Za-z0-9._-]+)?))"),
+                      ("POST", r"/zero-trust/(?:signals/(?:evaluate|inbox)|protected-access|sessions/[A-Za-z0-9._-]+/revoke)")],
+    "proxy-auth": [("GET", r"/_authorize")],
+    "bridge-probe": [("GET", r"/(?:documents|_authorize)")],
+    "proxy-resource": [("GET", r"/documents")],
+    "resource-consumer": [("POST", r"/consume")],
+    "resource-auditor": [("GET", r"/_stats")],
+    "transport-auditor": [("GET", r"/_transport/stats")],
+    "metrics-reader": [("GET", r"/zero-trust/signals/inbox")],
+    "scrape-agent": [("GET", r"/metrics")],
+    "alert-manager": [("POST", r"/events")],
+    "sink-auditor": [("GET", r"/events")],
 }
 
 
@@ -106,7 +119,7 @@ def request(path, target, payload, headers, method="POST", observed=None):
         connection.connect()  # Verify chain, hostname AND pin before writing credentials/body.
         if observed is not None:
             observed.update(tls_version=connection.sock.version(), cipher=connection.sock.cipher()[0])
-        data = json.dumps(payload).encode() if payload is not None else None
+        data = payload if isinstance(payload, bytes) else json.dumps(payload).encode() if payload is not None else None
         connection.request(method, target, body=data, headers={"Content-Type": "application/json", **headers})
         response = connection.getresponse()
         body = response.read(65537)
@@ -134,8 +147,9 @@ class Quiet(BaseHTTPRequestHandler):
 class Gateway(ThreadingHTTPServer):
     daemon_threads = True
 
-    def __init__(self, address, path, backend="core", backend_port=8000):
+    def __init__(self, address, path, backend="core", backend_port=8000, backend_profile=None, secure_stats=False):
         self.path, self.backend, self.backend_port = path, backend, backend_port
+        self.backend_profile, self.secure_stats = backend_profile, secure_stats
         self.counts, self.count_lock = Counter(), threading.Lock()
         server_context(path)  # Refuse an invalid initial configuration.
         super().__init__(address, GatewayHandler)
@@ -164,6 +178,14 @@ class GatewayHandler(Quiet):
         try:
             identity = server_policy(self.server.path)["peers"].get(
                 hashlib.sha256(self.connection.getpeercert(binary_form=True)).hexdigest())
+            if getattr(self.server, "secure_stats", False) and self.command == "GET" and self.path == "/_transport/stats":
+                if identity != "transport-auditor":
+                    return self.reply(403)
+                with self.server.count_lock:
+                    snapshot = dict(self.server.counts)
+                    snapshot["http_requests"] -= 1  # Management reads do not contaminate data-plane assertions.
+                    self.server.counts["http_requests"] -= 1
+                return self.reply(200, json.dumps(snapshot).encode())
             lengths = self.headers.get_all("Content-Length", [])
             keys = self.headers.get_all("X-API-Key", [])
             if (self.headers.get_all("Transfer-Encoding") or len(lengths) != 1
@@ -182,8 +204,12 @@ class GatewayHandler(Quiet):
                        for method, pattern in ROUTES[identity]):
                 self.server.count("scope_denied")
                 return self.reply(403)
-            connection = http.client.HTTPConnection(self.server.backend, self.server.backend_port, timeout=1)
+            backend_profile = getattr(self.server, "backend_profile", None)
+            connection = (PinnedConnection(backend_profile) if backend_profile
+                          else http.client.HTTPConnection(self.server.backend, self.server.backend_port, timeout=1))
             try:
+                if backend_profile:
+                    connection.connect()  # Authenticate the native core before transmitting the API key.
                 self.server.count("forwarded")
                 connection.request(self.command, target, body, {"Content-Type": "application/json", "X-API-Key": keys[0]})
                 response = connection.getresponse()
@@ -204,6 +230,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=["serve", "probe"])
     parser.add_argument("--profile", type=Path, required=True)
+    parser.add_argument("--backend-profile", type=Path)
+    parser.add_argument("--secure-stats", action="store_true")
+    parser.add_argument("--stats-profile", type=Path)
     args = parser.parse_args()
     if args.mode == "probe":
         data = json.load(sys.stdin)
@@ -220,13 +249,20 @@ def main():
             result = {"status": 0, "body_sha256": None}
         print(json.dumps(result))
         return
-    gateway = Gateway(("0.0.0.0", 8443), args.profile)
+    gateway = Gateway(("0.0.0.0", 8443), args.profile, backend_profile=args.backend_profile, secure_stats=args.secure_stats)
+    if args.secure_stats and not args.stats_profile:
+        gateway.serve_forever()
+        return
 
     class Stats(Quiet):
         def do_GET(self):
             with gateway.count_lock:
                 self.reply(200, json.dumps(dict(gateway.counts)).encode())
-    stats = ThreadingHTTPServer(("127.0.0.1", 8444), Stats)
+    if args.stats_profile:
+        from scripts.mtls_native import NativeServer
+        stats = NativeServer(("0.0.0.0", 8444), args.stats_profile, Stats)
+    else:
+        stats = ThreadingHTTPServer(("127.0.0.1", 8444), Stats)
     threading.Thread(target=stats.serve_forever, daemon=True).start()
     gateway.serve_forever()
 

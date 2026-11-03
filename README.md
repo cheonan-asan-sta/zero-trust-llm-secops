@@ -5,6 +5,21 @@ LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 �
 
 다른 AI 또는 개발자가 작업을 이어갈 때는 [프로젝트 인수인계서](AI_HANDOFF.md)에서 현재 브랜치, 폴더별 역할, 안전 원칙, 검증 절차를 먼저 확인합니다.
 
+## 2026년 11월 3일 후속 전체 통신 mTLS
+
+[선택한 로컬 운영 경로 전체 mTLS](docs/all-hops-mtls.md)는 프록시·core·문서 자원·수집기와
+Prometheus/Alertmanager 관측 경로, 관리 조회까지 암호화·상호 인증합니다. core도 TLS를 직접 받으며
+평문 gateway backend나 관리 포트를 남기지 않습니다. 기존 사용자/API 키·서명·grant 판단은 유지합니다.
+
+```powershell
+.venv\Scripts\python.exe -m scripts.test_all_hops_mtls --directory runtime/c02/all-hops/reproduce --repeats 3
+```
+
+기존 `compose.yaml`과 C01/C02 후보 비교 명령은 **HTTP 재현 기준선**입니다. 해당 실행을 mTLS 적용
+상태로 오해하지 않도록 구분합니다. 위 보안 프로필의 실제 결과·조건·운영 과제는 연결 문서를 확인합니다.
+Windows/Linux Docker 각각 전체 687건과 통합 반복 검사 460개(그래프 기준 3회 + 실제 수집기 최종 1회)를
+통과했습니다. 실제 위험 관찰의 mTLS 접수→network=none worker 처리→다음 문서 접근 거부를 확인했습니다.
+
 ## 2026년 11월 3일 후속 HTTP 접근 집행
 
 후속 [I2 서비스 mTLS](docs/i2-service-mtls.md)는 이 흐름의 PEP→인가 API 경계에 인증서·서비스별 경로·

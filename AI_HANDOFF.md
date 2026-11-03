@@ -1,5 +1,23 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 3일 후속 선택 경로 전체 mTLS
+
+- PR #6 병합 `aitest` `f7fc48d`에서 `feature/chaeheeju-mtls-all-hops`로 진행합니다.
+  [전체 경로/한계](docs/all-hops-mtls.md)와 [계약](infra/mtls/all-hops-contract.json)을 확인합니다.
+- NGINX front/auth/resource, bridge/gateway/native core/consume, 실제 수집기 입력과 선택한
+  Prometheus/exporter/Alertmanager/receiver, 관리 조회에 mTLS를 적용합니다. worker는 network=none입니다.
+- `python -m scripts.test_all_hops_mtls --repeats 3`은 기존 I2 30·새 경로 43·C02 42개를 반복합니다.
+  파일 IPC·호스트 Docker exec 파이프·공개 artifact 다운로드와 서비스 네트워크를 구분합니다.
+- native core는 앱 소스를 바꾸지 않고 실제 TLS peer를 Uvicorn h11 guard에 연결합니다.
+  peer/header 위조·평문·pin 취소·grant 소비 상태와 실제 firing/resolved의 동일 episode를 확인합니다.
+- Python endpoint의 leaf pin, NGINX/Go의 CA/이름/SAN 검증을 구분합니다. 운영 CA/CRL/OCSP/HA/
+  정책 anti-rollback·진행 중 업무 취소·독립 재현은 미완료입니다. 과거 HTTP 비교 기록은 보존합니다.
+- 실제 실행·측정은 Codex 도구 보조이며 팀원 수동 실행/독립 검토로 소급하지 않습니다. 탐지 기준선은 유지합니다.
+- 최종 검증: Windows/Linux Docker 각각 전체 687건과 Ruff 통과. mTLS 그래프 3회 345개 +
+  실제 수집기 `_post`/지속 관찰 연결 후 최종 1회 115개, 합계 460개 반복 검사를 통과했습니다.
+  앞선 3회와 최종 수집기 구현 1회는 [공개 증거](docs/infrastructure-results/all-hops-mtls-windows-20261103.json)의
+  입력 지문/이미지로 구분합니다. 시험 자원·전용 이미지 정리 후 Docker Desktop은 종료했습니다.
+
 ## 2026년 11월 3일 후속 I2 서비스 mTLS
 
 - PR #5 병합 `aitest` `87f24f6`에서 `feature/chaeheeju-i2-mtls`로 진행합니다.

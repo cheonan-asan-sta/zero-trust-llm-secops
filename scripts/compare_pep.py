@@ -152,6 +152,7 @@ class Lab:
         prefix = f"{self.ident}-{iteration}-{candidate}"
         directory = self.directory / prefix
         assets = flow.initialize_assets(directory)
+        self.trial_assets = assets  # RAM-only signer access for transport integration subclasses.
         registry = json.loads(assets["registry"].read_text())
         registry["sources"][0]["roles"].append("administrator")
         other = json.loads(json.dumps(registry["sources"][0]))
@@ -272,7 +273,8 @@ class Lab:
             flow.require(all(r["body_sha256"] != pep.DOCUMENT_HASH for r in rows if r not in successful), "c02_leak_" + label)
             flow.require(served() - before == allowed, "c02_resource_count_" + label)
             record["checks"].append({"label": label, "passed": True, "statuses": [r["status"] for r in rows],
-                "resource_deliveries": allowed, "http_ms": [r["elapsed_ms"] for r in rows]})
+                "resource_deliveries": allowed, "http_ms": [r["elapsed_ms"] for r in rows],
+                "tls_versions": sorted({r["tls_version"] for r in rows if r.get("tls_version")})})
             self.save()
 
         try:
