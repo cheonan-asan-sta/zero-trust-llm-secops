@@ -299,7 +299,8 @@ def selected(cfg, state, now):
         if c["generation"] and c["not_after"] <= now:
             c["status"] = "expired_reenrollment_required"
             continue
-        key_due = bool(cfg.get("key_rotation") and now - c.get("last_key_rotation", 0) >= cfg["key_rotation"]["interval_seconds"])
+        key_due = bool(cfg.get("key_rotation") and (now - c.get("last_key_rotation", 0) >= cfg["key_rotation"]["interval_seconds"]
+                       or c.get("authority_epoch", 0) != cfg.get("authority_epoch", 0)))
         if c["candidate"] or (c["retry_at"] <= now and (key_due or c["generation"] == 0 or c["not_after"] - now <= cfg["renew_before"].get(c["name"], 400))):
             chosen.add(uid)
     # Reloading clients and servers in one process is one publication group.
@@ -416,7 +417,7 @@ def status(state, state_dir):
         "paused": state.get("paused_ack", False),
         "server_observations": state.get("server_observations", {}),
         "last_error": state.get("last_error"), "credentials": {uid: {k: c.get(k) for k in
-            ["name", "purpose", "fingerprint", "serial", "not_after", "generation", "status", "failures", "key_generation", "public_key_sha256"]}
+            ["name", "purpose", "fingerprint", "serial", "not_after", "generation", "status", "failures", "key_generation", "public_key_sha256", "authority_epoch"]}
             for uid, c in state["credentials"].items()}})
 
 

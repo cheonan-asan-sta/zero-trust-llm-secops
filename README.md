@@ -5,6 +5,20 @@ LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 �
 
 다른 AI 또는 개발자가 작업을 이어갈 때는 [프로젝트 인수인계서](AI_HANDOFF.md)에서 현재 브랜치, 폴더별 역할, 안전 원칙, 검증 절차를 먼저 확인합니다.
 
+## 2026년 11월 3일 후속 CA·발급 JWK 키 자동 교체
+
+[CA·JWK 자동 교체](docs/authority-key-rotation.md)는 네트워크 없는 관리 작업과 암호화 보관함을 사용해
+루트·중간 CA·등록 발급 JWK 키를 별도 타이머로 교체합니다. 신뢰 겹침 배포·발급 pause·새 CA로 leaf
+이행·실제 TLS 확인·구 JWK 거부·구 파일 정리를 연결합니다. HSM·물리적 air gap·운영 HA와 구분합니다.
+
+```powershell
+.venv\Scripts\python.exe -m scripts.test_authority_key_rotation --directory runtime/c02/c04/authority-reproduce --repeats 2
+```
+
+새 CA/상태 2회·총 **394개** 통합 검사, Windows/Linux 전체 **각 818건**과 Ruff를 통과했습니다.
+회당 활성 신원 48개·서버 14개를 이행하고 JWK 66개를 각 epoch에 교체했습니다. 별도 루트1→루트2
+반복과 새 TLS의 구 루트 거부/현재 루트 200 대조도 통과했으며, [원자료·초기 실패·한계](docs/authority-key-rotation.md)를 남겼습니다.
+
 ## 2026년 11월 3일 후속 서비스 개인키 자동 교체
 
 [개인키 자동 교체](docs/private-key-rotation.md)는 새 키·인증서 세대를 준비하고 profile/config 전환·

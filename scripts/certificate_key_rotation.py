@@ -186,6 +186,7 @@ def publish_rotation(cfg, state, state_dir):
                 certificates=[a["cert"] for a in pending["assets"]], assets=pending["assets"],
                 generation=c["generation"] + 1, key_generation=c.get("key_generation", 0) + 1,
                 public_key_sha256=pending["public_key_sha256"], pending_key=None,
+                authority_epoch=cfg.get("authority_epoch", 0),
                 last_key_rotation=time.time(), status="active", failures=0, retry_at=0)
         txn.update(phase="revoking", committed_at=time.time())
         lifecycle.save(state_dir / "state.json", state)
