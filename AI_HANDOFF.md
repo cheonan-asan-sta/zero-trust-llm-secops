@@ -1,5 +1,22 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 3일 후속 I2 서비스 mTLS
+
+- PR #5 병합 `aitest` `87f24f6`에서 `feature/chaeheeju-i2-mtls`로 진행합니다.
+  [I2 경계/검증/한계](docs/i2-service-mtls.md), [계약](infra/mtls/contract.json)을 확인합니다.
+- C02의 기본 HTTP 실행은 유지하고 별도 실행기가 PEP bridge→인가 gateway에 mTLS를 연결합니다.
+  chain/시간/EKU/서버 이름/leaf pin과 서비스별 경로를 검사하며 기존 앱 API 키/역할도 유지합니다.
+- `python -m scripts.test_mtls_infrastructure --repeats 3`은 Linux 전용 임시 키 볼륨과 내부망만 씁니다.
+  개인키는 호스트 파일이나 OS trust store에 쓰지 않습니다. runtime 경로는 기존 C02 실행기 아래입니다.
+- client/server 인증서 교체·pin 폐기·잘못된 설정과 기존 C02의 위험 신호→회수→다음 문서 거부를 검증합니다.
+  실제 결과는 I2 문서/공개 원자료를 따릅니다. 앱 탐지·정책·개선 전 평가 기준선은 바꾸지 않습니다.
+- gateway 뒤와 다른 hop은 HTTP입니다. 운영 배포/IdP/CA 자동화/CRL·OCSP/HA/독립 검토는 후속입니다.
+  C04 step-ca는 자동 발급 요구가 확인될 때 비교하며 이번 도입/비교 완료로 기록하지 않습니다.
+
+I2 추가 결과: 3회 × 72개 = 216개 통합 검사, Windows/Linux Docker 전체 655건을 통과했습니다.
+[I2 공개 증거](docs/infrastructure-results/i2-mtls-windows-20261103.json)에 TLSv1.3 관측과 초기 시도를
+분리했습니다. 폐기 정책의 과거 버전 복원을 막는 anti-rollback은 미구현이며 다른 hop·운영 배포는 후속입니다.
+
 ## 2026년 11월 3일 후속 C02 HTTP 집행
 
 - PR #4 병합 `aitest` `9f61f35`에서 `feature/chaeheeju-c02-pep`로 진행합니다.

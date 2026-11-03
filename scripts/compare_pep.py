@@ -51,10 +51,10 @@ class Lab:
     def save(self):
         (self.directory / "summary.json").write_text(json.dumps(self.report, indent=2) + "\n", encoding="utf-8")
 
-    def prepare(self):
+    def prepare(self, candidates=("nginx", "envoy")):
         command(["docker", "build", "--tag", self.image, str(ROOT)], timeout=900)
         self.report["app_image_id"] = command(["docker", "image", "inspect", self.image, "--format", "{{.Id}} "]).strip()
-        for tool in self.lock["tools"].values():
+        for tool in [self.lock["tools"][candidate] for candidate in candidates]:
             command(["docker", "pull", "--platform", "linux/amd64", tool["image"]], timeout=600)
         version = subprocess.run(["docker", "run", "--rm", "--network", "none", "--entrypoint", "nginx",
             self.lock["tools"]["nginx"]["image"], "-V"], capture_output=True, text=True, check=True)
@@ -141,6 +141,12 @@ class Lab:
             time.sleep(.3)
         raise flow.CheckFailed("c02_timeout_" + label)
 
+    def prepare_transport(self, prefix, networks):
+        return {"network": networks["core"], "mounts": [], "args": []}
+
+    def transport_checks(self, prefix, record, keys, bridge):
+        """Optional transport experiment; original C02 behavior remains HTTP."""
+
     def trial(self, candidate, iteration):
         print(json.dumps({"candidate": candidate, "iteration": iteration, "stage": "starting"}), flush=True)
         prefix = f"{self.ident}-{iteration}-{candidate}"
@@ -179,9 +185,10 @@ class Lab:
                     "API_KEY_SUBJECT": "operator-" + kind, "API_KEY_TENANT_ID": "other" if kind == "b" else "local"})
             self.wait(lambda n=name: self.request(n, {"path": "/health/live"})["status"] == 200, "core_ready")
         mounts = [f"type=volume,src={secretvol},dst=/data,readonly"]
+        transport = self.prepare_transport(prefix, networks)
         bridge, resource, client = [prefix + "-" + label for label in ["bridge", "resource", "client"]]
-        self.start(bridge, networks["auth"], ["python", "-m", "scripts.pep_lab", "bridge", "--secret-file", "/data/secret"], mounts=mounts, alias="bridge")
-        self.connect(networks["core"], bridge, "bridge")
+        self.start(bridge, networks["auth"], ["python", "-m", "scripts.pep_lab", "bridge", "--secret-file", "/data/secret", *transport["args"]], mounts=mounts + transport["mounts"], alias="bridge")
+        self.connect(transport["network"], bridge, "bridge")
         self.connect(networks["consume"], bridge, "bridge")
         self.start(resource, networks["resource"], ["python", "-m", "scripts.pep_lab", "resource", "--secret-file", "/data/secret"], mounts=mounts, alias="resource")
         self.connect(networks["consume"], resource, "resource")
@@ -269,6 +276,7 @@ class Lab:
             self.save()
 
         try:
+            self.transport_checks(prefix, record, keys, bridge)
             valid = mint()
             check("valid_once", access(valid), 1)
             check("grant_replay", access(valid))
