@@ -1,5 +1,9 @@
 # 개발 주차별 산출물
 
+11/4 후속: [전환 실행기 컨테이너 유실 복구](actor-container-recovery.md).
+`recover-takeover`의 이전 ID 부재·양 기록/owner 검증, 같은 전환 재개, 삭제 실험·결과와 한계를 설명한다.
+기존 [같은 실행기 재시작](executor-transition-recovery.md) 다음 단계다.
+
 11/4 후속 [관리 호스트 전환 실행기 재개](executor-transition-recovery.md)는 고정 actor의 중단을 같은
 ID/저장소에서 명시적으로 이어간다. pending 차단·부분 사본/owner 검증·완료 후 새 상태 보존을 추가하며
 물리 HA·유실한 미완료 actor 재생성·독립 검토 완료와 구분한다.

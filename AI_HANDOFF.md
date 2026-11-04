@@ -1,5 +1,18 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 4일 후속 전환 실행기 컨테이너 유실 복구
+
+- 기준 `aitest` `5d957aa`(PR #18), 작업 브랜치 `feature/chaeheeju-actor-container-recovery`.
+  [명시적 복구·재현·한계](docs/actor-container-recovery.md)를 먼저 읽는다.
+- `recover-takeover`만 유실한 미완료 actor의 대체를 허용한다. 모든 이전 ID의 Docker 전체 부재,
+  양 공개 기록/owner/이미지/예약 객체/원본 지문을 생성 전과 생존 flock 안에서 다시 확인한다.
+- `executor-transition-2`의 `actor.predecessors`(최대16)와 checkpoint-bound 복구 표식으로 식별자만 이전한다.
+  같은 작업 ID/epoch/계획을 이어가며 완료 시 actor를 다시 만들거나 보안 상태를 되복제하지 않는다.
+- `resume-takeover`는 같은 고정 컨테이너 재개다. 일반 사본 불일치/불확실한 식별자 이전은 조사 대상으로
+  거부한다. Docker 관리자 신뢰·생존 볼륨/이미지·같은 물리 PC 조건, 팀원 독립 검토 미완료를 유지한다.
+- 새 단위/실제 삭제 실험과 기존 CA/DB/관리 상태 회귀 결과는 위 문서·공개 JSON에 기록한다.
+  AWS/유료 LLM 호출·탐지 기준 변경·개인 ZIP/기존 Docker 변경 없이 로컬에서 실행한다.
+
 ## 2026년 11월 4일 후속 호스트 전환 실행기 중단 복구
 
 - PR #15는 `aitest` `ee8067b`에 병합됐고 병합 후 CI도 통과했다. 후속 브랜치는

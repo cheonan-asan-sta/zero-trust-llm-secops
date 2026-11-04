@@ -1,5 +1,13 @@
 # zero-trust-llm-secops
 
+## 2026년 11월 4일 후속 전환 실행기 컨테이너 유실 복구
+
+[컨테이너 유실 복구](docs/actor-container-recovery.md)는 기존 실행기 ID의 실제 부재, 남은 전환 기록과
+상대 사본·owner·예약 자원의 일치를 확인한 뒤 `recover-takeover`로 같은 작업을 이어갑니다.
+전환 ID/epoch는 유지하고 이전 실행기 ID 이력을 남깁니다. 완료 상태는 다시 복제하지 않아 이후의
+토큰 소비를 보존합니다. 기존 `resume-takeover`의 같은 컨테이너 재시작과 구분합니다.
+검증 수치와 자원 정리 결과는 연결 문서의 공개 원자료에 기록합니다. 같은 PC/부모 Docker/생존 저장소 조건입니다.
+
 ## 2026년 11월 4일 후속 관리 호스트 전환 실행기 재개
 
 [전환 실행기 중단 복구](docs/executor-transition-recovery.md)는 같은 고정 컨테이너의 PID 1을 다시 시작해

@@ -1,6 +1,7 @@
-"""Explicit resume of a pinned stopped maintenance actor; no automatic election.
+"""Explicit resume/replacement of a pinned maintenance actor; no automatic election.
 
-The same single PID-1 container and survivor-volume flock serialize every restart.
+The fixed PID-1 actor name and survivor-volume flock serialize every restart.
+Missing actors require checkpoint-bound identity transfer and absent predecessors.
 Its public intent is mirrored before mutations; online work refuses pending intent.
 """
 
@@ -21,6 +22,8 @@ NAME='executor-transition.json'
 FAULTS='executor-transition-faults.json'
 ENV='SECOPS_EXECUTOR_TRANSITION'
 CUT_ENV='SECOPS_EXECUTOR_TRANSITION_CUTS'
+RECOVERY_ENV='SECOPS_EXECUTOR_ACTOR_RECOVERY'
+RECOVERY_LABEL='secops.executor-recovery'
 LABEL='secops.executor-transition'
 PHASES=('intent','fenced','volumes','copied','owners','workers','published','retired','complete')
 CUTS=('after_intent','after_fence','volume_created','after_copy','owner_a_written','worker_created','after_publish','after_complete')
@@ -43,7 +46,7 @@ def planned(original,target):
 def validate(record):
     from scripts.executor_cluster import Cluster
     try:
-        if (set(record)!=FIELDS or record['schema']!='executor-transition-1'
+        if (set(record)!=FIELDS or record['schema'] not in {'executor-transition-1','executor-transition-2'}
                 or not re.fullmatch(r'[a-f0-9]{32}',record['id']) or record['phase'] not in PHASES
                 or type(record['discard']) is not bool):raise ValueError
         old=Cluster(record['original']);new=Cluster(record['planned']);target=record['target']
@@ -53,8 +56,13 @@ def validate(record):
             if old.d['hosts'][site]['worker'] is None:raise ValueError
             expected['hosts'][site]['worker']=new.d['hosts'][site]['worker']
         if expected!=new.d:raise ValueError
-        if (set(record['actor'])!={'name','id'} or record['actor']['name']!=old.project+'-executor-takeover-lock'
+        actor_fields={'name','id'} if record['schema']=='executor-transition-1' else {'name','id','predecessors'}
+        if (set(record['actor'])!=actor_fields or record['actor']['name']!=old.project+'-executor-takeover-lock'
                 or not re.fullmatch(r'[a-f0-9]{64}',record['actor']['id'])):raise ValueError
+        if record['schema']=='executor-transition-2':
+            lineage=record['actor']['predecessors']
+            if (not isinstance(lineage,list) or not 1<=len(lineage)<=16 or len(set(lineage))!=len(lineage)
+                    or record['actor']['id'] in lineage or any(not re.fullmatch(r'[a-f0-9]{64}',v) for v in lineage)):raise ValueError
         if PHASES.index(record['phase'])>=1:
             if (not isinstance(record['profile_hashes'],dict) or not {'profile.json','cluster.json'}<=set(record['profile_hashes'])
                     or not set(record['profile_hashes'])<=CORE
@@ -111,9 +119,41 @@ def tree_hashes(value):return {k:digest(v) for k,v in value.items()}
 
 def receipt(record):
     old=record['original'];source=old['active']
-    return {'active':record['target'],'executor_epoch':record['planned']['epoch'],'fenced':record['fenced'],
+    value={'active':record['target'],'executor_epoch':record['planned']['epoch'],'fenced':record['fenced'],
         'settled':record['settled'],'retired_storage':{k:old['hosts'][source][k] for k in ['journal','owner']},
         'discarded':record['discard'],'operator_transition_id':record['id'],'operator_actor_id':record['actor']['id']}
+    if record['schema']=='executor-transition-2':value['operator_actor_predecessors']=record['actor']['predecessors']
+    return value
+
+
+def record_request(record):
+    return {'schema':'executor-operator-request-1','id':record['id'],'original':record['original'],
+        'target':record['target'],'discard':record['discard']}
+
+
+def recovery_proof(value,request):
+    try:
+        if (set(value)!={'schema','previous_actor','record_sha256','request_sha256','nonce'} or value['schema']!='executor-actor-recovery-1'
+                or not re.fullmatch(r'[a-f0-9]{64}',value['previous_actor']) or not re.fullmatch(r'[a-f0-9]{64}',value['record_sha256'])
+                or value['request_sha256']!=digest(request) or not re.fullmatch(r'[a-f0-9]{32}',value['nonce'])):raise ValueError
+    except (ValueError,KeyError,TypeError):raise LifecycleError('executor_actor_recovery_proof_invalid') from None
+    return value
+
+
+def require_absent(c,ids):
+    for ident in ids:
+        if c.raw(['ps','--all','--no-trunc','--filter','id='+ident,'--format','{{.ID}}']).split():
+            raise LifecycleError('executor_actor_predecessor_present')
+
+
+def rebind_record(record,ident,proof):
+    validate(record);request=record_request(record);recovery_proof(proof,request)
+    if (record['phase']=='complete' or proof['previous_actor']!=record['actor']['id'] or proof['record_sha256']!=digest(record)
+            or not re.fullmatch(r'[a-f0-9]{64}',ident)):
+        raise LifecycleError('executor_actor_recovery_checkpoint_mismatch')
+    result=copy.deepcopy(record);lineage=[*record['actor'].get('predecessors',[]),record['actor']['id']]
+    result['schema']='executor-transition-2';result['actor']={**record['actor'],'id':ident,'predecessors':lineage}
+    return validate(result)
 
 
 def request_cluster(request):
@@ -128,7 +168,7 @@ def request_cluster(request):
     except (ValueError,TypeError,KeyError):raise LifecycleError('executor_operator_request_invalid') from None
 
 
-def actor_args(request,cuts=()):
+def actor_args(request,cuts=(),recovery=None):
     c=request_cluster(request);target=request['target'];volume=c.d['hosts'][target]['journal']
     args=['create','--name',c.project+'-executor-takeover-lock','--label','secops.c02='+c.project,
         '--label','secops.executor-cluster='+c.project,'--label','secops.executor-kind=operator','--label',LABEL+'='+request['id'],
@@ -140,7 +180,13 @@ def actor_args(request,cuts=()):
     if cuts:
         if len(set(cuts))!=len(cuts) or not set(cuts)<=set(CUTS):raise LifecycleError('executor_operator_test_cut_scope')
         args+=['--env',CUT_ENV+'='+json.dumps(list(cuts),separators=(',',':'))]
-    return [*args,'--entrypoint','python',c.d['executor_image'],'-m','scripts.executor_transition','test-actor' if cuts else 'actor']
+    mode='test-actor' if cuts else 'actor'
+    if recovery is not None:
+        recovery_proof(recovery,request)
+        args+=['--env',RECOVERY_ENV+'='+json.dumps(recovery,sort_keys=True,separators=(',',':')),
+            '--label',RECOVERY_LABEL+'='+recovery['nonce']]
+        mode='test-recover-actor' if cuts else 'recover-actor'
+    return [*args,'--entrypoint','python',c.d['executor_image'],'-m','scripts.executor_transition',mode]
 
 
 def lookup(c,name):
@@ -161,11 +207,19 @@ def verify_actor(c,found,request):
     expected=dict(v.split('=',1) for v in json.loads(c.raw(['image','inspect',c.d['executor_image']]))[0]['Config'].get('Env') or [])
     expected.update({'DOCKER_HOST':'unix:///var/run/docker.sock',ENV:json.dumps(request,sort_keys=True,separators=(',',':'))})
     if cuts:expected[CUT_ENV]=json.dumps(cuts,separators=(',',':'))
+    mode='test-actor' if cuts else 'actor'
+    if RECOVERY_ENV in values:
+        try:proof=recovery_proof(json.loads(values[RECOVERY_ENV]),request)
+        except (ValueError,TypeError):raise LifecycleError('executor_operator_replaced') from None
+        if labels.get(RECOVERY_LABEL)!=proof['nonce']:raise LifecycleError('executor_operator_replaced')
+        expected[RECOVERY_ENV]=json.dumps(proof,sort_keys=True,separators=(',',':'))
+        mode='test-recover-actor' if cuts else 'recover-actor'
+    elif RECOVERY_LABEL in labels:raise LifecycleError('executor_operator_replaced')
     mounts={m['Destination']:(m.get('Name') if m['Type']=='volume' else m.get('Source'),m['RW']) for m in found['Mounts'] if m['Type']!='tmpfs'}
     if (found['Name']!='/'+c.project+'-executor-takeover-lock' or found['Image']!=c.d['executor_image']
             or labels.get('secops.executor-cluster')!=c.project or labels.get('secops.executor-kind')!='operator'
             or labels.get(LABEL)!=request['id'] or cfg['User']!='10001:10001' or cfg['Entrypoint']!=['python']
-            or cfg['Cmd']!=['-m','scripts.executor_transition','test-actor' if cuts else 'actor']
+            or cfg['Cmd']!=['-m','scripts.executor_transition',mode]
             or len(env)!=len(expected) or values!=expected
             or mounts!={'/data':(c.d['hosts'][request['target']]['journal'],True),'/var/run/docker.sock':('/var/run/docker.sock',True)}
             or h['NetworkMode']!='none' or not h['ReadonlyRootfs'] or h.get('Privileged') or h.get('CapAdd')
@@ -179,6 +233,7 @@ def verify_actor(c,found,request):
 def complete_result(record):
     from scripts.executor_cluster import Cluster
     c=Cluster(record['planned'])
+    require_absent(c,record['actor'].get('predecessors',[]))
     for site in ['a','b']:
         files=c.disk(c.d['hosts'][site]['journal'],'read')
         if files.get(NAME)!=envelope(record) or files.get('cluster.json')!=c.d:
@@ -235,7 +290,7 @@ def resume_operator(anchor,site,journal,owner):
     record=read_record(files[NAME]) if NAME in files else None
     if found is None:
         if record is None or record['phase']!='complete':raise LifecycleError('executor_operator_missing')
-        request={'schema':'executor-operator-request-1','id':record['id'],'original':record['original'],'target':record['target'],'discard':record['discard']}
+        request=record_request(record)
         if c.raw(['ps','--all','--quiet','--filter','id='+record['actor']['id']]).split():
             raise LifecycleError('executor_operator_identity_changed')
         value=True
@@ -244,13 +299,101 @@ def resume_operator(anchor,site,journal,owner):
         except (ValueError,KeyError,TypeError):raise LifecycleError('executor_operator_replaced') from None
         original=request_cluster(request);verify_actor(original,found,request)
         if record and record['id']==request['id'] and record['actor']['id']!=found['Id']:
-            raise LifecycleError('executor_operator_identity_changed')
+            values=dict(v.split('=',1) for v in found['Config']['Env'])
+            if RECOVERY_ENV not in values:raise LifecycleError('executor_operator_identity_changed')
+            rebind_record(record,found['Id'],json.loads(values[RECOVERY_ENV]))
         value=None
     original=request_cluster(request)
     if (original.anchor()!=anchor or request['target']!=site or original.d['hosts'][site]['journal']!=journal
             or original.d['hosts'][site]['owner']!=owner):raise LifecycleError('executor_operator_recovery_anchor')
     for kind in ['journal','owner']:original.verify_volume(site,kind)
     return complete_result(record) if value is not None else run_actor(original,found,request)
+
+
+def recovery_evidence(c,record,bound=None):
+    """Read-only cross-check before a replacement is allowed to bind intent.
+
+    A peer-only identity write is accepted only for this exact pinned candidate.
+    Other replica disagreement is an investigation boundary, never an election.
+    """
+    from scripts.executor_cluster import Cluster
+    validate(record);old=Cluster(record['original']);new=Cluster(copy.deepcopy(record['planned']));target=record['target'];source=old.d['active']
+    if c.d!=old.d:raise LifecycleError('executor_actor_recovery_request_mismatch')
+    require_absent(c,[*record['actor'].get('predecessors',[]),record['actor']['id']])
+    for kind in ['journal','owner']:old.verify_volume(target,kind)
+    replica=new if PHASES.index(record['phase'])>=3 else old
+    replica.verify_volume(source,'journal')
+    peer=replica.disk(replica.d['hosts'][source]['journal'],'read')
+    allowed_records=[envelope(record)]
+    if bound is not None:allowed_records.append(envelope(bound))
+    if peer.get(NAME) not in allowed_records:
+        raise LifecycleError('executor_actor_recovery_replica_disagreement')
+    files=old.disk(old.d['hosts'][target]['journal'],'read')
+    if files.get(NAME)!=envelope(record):raise LifecycleError('executor_actor_recovery_source_changed')
+    index=PHASES.index(record['phase'])
+    if index>=2:
+        for kind in ['journal','owner']:
+            new.verify_volume(source,kind)
+            meta=json.loads(new.raw(['volume','inspect',new.d['hosts'][source][kind]]))[0]
+            if meta.get('Labels',{}).get(LABEL)!=record['id']:
+                raise LifecycleError('executor_actor_recovery_volume_conflict')
+    if index<3:
+        for site in ['a','b']:
+            old.verify_volume(site,'owner')
+            if old.disk(old.d['hosts'][site]['owner'],'read').get('owner.json')!=old.role():
+                raise LifecycleError('executor_actor_recovery_owner_conflict')
+    else:
+        for site in ['a','b']:
+            new.verify_volume(site,'owner');state=new.disk(new.d['hosts'][site]['owner'],'read')
+            allowed=[{'owner.json':new.role()}]
+            if index==3:allowed+=([{'owner.json':old.role()}] if site==target else [{}])
+            if state not in allowed:raise LifecycleError('executor_actor_recovery_owner_conflict')
+    core=core_files(files)
+    if index==0:
+        if core.get('cluster.json')!=old.d:raise LifecycleError('executor_actor_recovery_cluster_conflict')
+    else:
+        expected=dict(record['profile_hashes']);actual=tree_hashes(core)
+        if index>=5:
+            if core.get('cluster.json') not in [old.d,new.d]:raise LifecycleError('executor_actor_recovery_cluster_conflict')
+            actual.pop('cluster.json');expected.pop('cluster.json')
+        if actual!=expected:raise LifecycleError('executor_actor_recovery_source_changed')
+    if index>=4:
+        for site in ['a','b']:
+            host=new.d['hosts'][site];name=new.project+f'-executor-{site}-e{new.d["epoch"]}'
+            found=lookup(new,name)
+            if found is None:
+                if host['worker'] is not None:raise LifecycleError('executor_operator_worker_missing')
+                continue
+            if found['Config']['Labels'].get(LABEL)!=record['id']:raise LifecycleError('executor_operator_worker_replaced')
+            if host['worker'] is None:host['worker']={'name':name,'id':found['Id']}
+            new.verify_worker(site,found)
+
+
+def recover_operator(anchor,site,journal,owner,*,cuts=(),create_only=False):
+    """Explicit replacement; no implicit missing-actor recreation in resume()."""
+    from scripts.executor_cluster import Cluster
+    proto={**anchor,'active':site,'epoch':1,'hosts':{s:{'generation':1,'worker':None,
+        'journal':anchor['project']+f'-executor-{s}-g1-journal','owner':anchor['project']+f'-executor-{s}-g1-owner'} for s in ['a','b']}}
+    reader=Cluster(proto)
+    if not re.fullmatch(re.escape(reader.project)+r'-executor-'+re.escape(site)+r'-g[0-9]+-journal',journal):
+        raise LifecycleError('executor_operator_recovery_scope')
+    files=reader.disk(journal,'read')
+    if NAME not in files:raise LifecycleError('executor_actor_recovery_intent_missing')
+    record=read_record(files[NAME]);request=record_request(record);c=request_cluster(request)
+    if c.anchor()!=anchor or record['target']!=site or c.d['hosts'][site]['journal']!=journal or c.d['hosts'][site]['owner']!=owner:
+        raise LifecycleError('executor_operator_recovery_anchor')
+    found=lookup(c,c.project+'-executor-takeover-lock')
+    if found is not None:return resume_operator(anchor,site,journal,owner)
+    require_absent(c,[*record['actor'].get('predecessors',[]),record['actor']['id']])
+    if record['phase']=='complete':return resume_operator(anchor,site,journal,owner)
+    recovery_evidence(c,record)
+    proof={'schema':'executor-actor-recovery-1','previous_actor':record['actor']['id'],'record_sha256':digest(record),
+        'request_sha256':digest(request),'nonce':uuid.uuid4().hex}
+    ident=c.raw(actor_args(request,cuts,recovery=proof)).strip();found=lookup(c,c.project+'-executor-takeover-lock')
+    if found is None or found['Id']!=ident:raise LifecycleError('executor_operator_create_unconfirmed')
+    verify_actor(c,found,request)
+    if create_only:return {'created_actor':ident,'transition_id':record['id']}
+    return run_actor(c,found,request)
 
 
 class Actor:
@@ -268,8 +411,20 @@ class Actor:
                 'planned':planned(self.old.d,request['target']),'target':request['target'],'discard':request['discard'],
                 'actor':{'id':found['Id'],'name':found['Name'][1:]},'profile_hashes':None,'fenced':[],'settled':None,'receipt':None}
         if (current['id']!=request['id'] or current['original']!=request['original'] or current['target']!=request['target']
-                or current['discard']!=request['discard'] or current['actor']['id']!=found['Id']):
+                or current['discard']!=request['discard']):
             raise LifecycleError('executor_operator_identity_changed')
+        proof=json.loads(os.environ[RECOVERY_ENV]) if RECOVERY_ENV in os.environ else None
+        if current['actor']['id']!=found['Id']:
+            if proof is None:raise LifecycleError('executor_operator_identity_changed')
+            rebound=rebind_record(current,found['Id'],proof)
+            recovery_evidence(self.old,current,bound=rebound)
+            current=rebound
+            self.r=current;self.new=Cluster(current['planned']);self.new.operator_id=request['id'];self.save()
+        elif proof is not None:
+            recovery_proof(proof,request)
+            if current['actor'].get('predecessors',[])[-1:]!=[proof['previous_actor']]:
+                raise LifecycleError('executor_actor_recovery_checkpoint_mismatch')
+        require_absent(self.old,current['actor'].get('predecessors',[]))
         self.r=validate(current);self.new=Cluster(self.r['planned']);self.new.operator_id=request['id']
 
     def save(self,phase=None):
@@ -279,7 +434,7 @@ class Actor:
         self.old.disk(peer,'write',files={NAME:value});write_path(self.root/NAME,value)
 
     def cut(self,point):
-        if sys.argv[-1]!='test-actor' or point not in json.loads(os.environ.get(CUT_ENV,'[]')):return
+        if sys.argv[-1] not in {'test-actor','test-recover-actor'} or point not in json.loads(os.environ.get(CUT_ENV,'[]')):return
         path=self.root/FAULTS;used=json.loads(path.read_bytes()) if path.exists() else {}
         if point in used.get(self.r['id'],[]):return
         used.setdefault(self.r['id'],[]).append(point);write_path(path,used);os._exit(73)
