@@ -294,7 +294,7 @@ class Actor:
                 if time.monotonic()>=deadline:raise
                 time.sleep(.5)
 
-    def hosts_ready(self):
+    def hosts_ready(self,*,allow_start=True):
         pending=[]
         for s,node in self.b.hosts.items():
             if self.b.inner(s,['info','--format','{{.ID}}']).strip()!=self.m['inner'][s]['daemon_id']:raise LifecycleError('services_inner_daemon_changed')
@@ -305,6 +305,8 @@ class Actor:
             for expected in self.m['inner'][s]['containers'].values():
                 item=json.loads(self.b.inner(s,['inspect',expected['id']]))[0];check_pin(item,expected)
                 pending.append((s,item))
+        if not allow_start and any(not item['State']['Running'] for _,item in pending):
+            raise LifecycleError('services_live_inner_outage_requires_quiescence')
         for s,item in pending:
             if not item['State']['Running']:self.b.inner(s,['start',item['Id']])
         return True
@@ -321,7 +323,7 @@ class Actor:
         found=self.outer();services=[v for k,v in found.items() if self.m['outer'][k]['role']!='worker']
         online=all(i['State']['Running'] for i in services)
         if self.r['phase']=='complete' and online:
-            self.wait(self.hosts_ready);self.wait(self.healthy_databases)
+            self.wait(lambda:self.hosts_ready(allow_start=False));self.wait(self.healthy_databases)
             for s in ['a','b']:self.b.node_health(s)
             if any(not found[k]['State']['Running'] for k,v in self.m['outer'].items() if v['role']=='worker'):
                 self.start({'worker'})
@@ -341,7 +343,7 @@ class Actor:
         current=self.b.offline_witness('status')
         opening=PHASES.index(self.r['phase'])>=PHASES.index('opening')
         if opening and all(g['State']['Running'] for g in gateways) and not current['frozen']:
-            self.wait(self.hosts_ready);self.wait(self.healthy_databases)
+            self.wait(lambda:self.hosts_ready(allow_start=False));self.wait(self.healthy_databases)
         else:
             if any(g['State']['Running'] for g in gateways) and not current['frozen']:raise LifecycleError('services_admission_not_closed')
             proof=storage_proof(self.b)

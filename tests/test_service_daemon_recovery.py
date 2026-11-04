@@ -123,18 +123,23 @@ def test_completed_online_retry_does_not_reclose_or_validate_an_old_snapshot(mon
     actor=recovery.Actor.__new__(recovery.Actor);actor.m=manifest();actor.r=record('complete')
     actor.r['receipt']={'id':actor.m['id'],'cycle':1,'accepted_after_open':True}
     actor.outer=lambda:{k:found(i,True) for i,k in enumerate(actor.m['outer'],1)}
-    actor.hosts_ready=lambda:True;actor.healthy_databases=lambda:True;actor.wait=lambda f:f()
+    host_checks=[]
+    actor.hosts_ready=lambda **kwargs:host_checks.append(kwargs['allow_start']) or True
+    actor.healthy_databases=lambda:True;actor.wait=lambda f:f()
     class Backend:
         def node_health(self,s):return True
     actor.b=Backend();monkeypatch.setattr(recovery,'storage_proof',lambda b:pytest.fail('replayed old security snapshot'))
     actor.advance=lambda phase:pytest.fail('changed completed phase')
     assert actor.run()==actor.r['receipt']
+    assert host_checks==[False]
 
 
 def test_opened_resume_preserves_new_consumption_without_freeze_or_checkpoint(monkeypatch):
     actor=recovery.Actor.__new__(recovery.Actor);actor.m=manifest();actor.r=record('leaf');actor.c=Cluster(original())
     actor.outer=lambda:{k:found(i,True) for i,k in enumerate(actor.m['outer'],1)}
-    actor.hosts_ready=lambda:True;actor.healthy_databases=lambda:True;actor.wait=lambda f:f();calls=[]
+    host_checks=[]
+    actor.hosts_ready=lambda **kwargs:host_checks.append(kwargs['allow_start']) or True
+    actor.healthy_databases=lambda:True;actor.wait=lambda f:f();calls=[]
     actor.start=lambda roles:calls.append(roles)
     actor.advance=lambda phase:actor.r.update(phase=phase)
     class Backend:
@@ -145,6 +150,7 @@ def test_opened_resume_preserves_new_consumption_without_freeze_or_checkpoint(mo
     actor.b=Backend();monkeypatch.setattr(recovery,'storage_proof',lambda b:pytest.fail('new security state was compared to old baseline'))
     assert actor.run()['cycle']==1
     assert calls==[{'leaf','worker'}]
+    assert host_checks==[False]
 
 
 @pytest.mark.parametrize('closed',[False,True])
@@ -193,7 +199,7 @@ def test_completed_online_retry_restores_only_stopped_fixed_workers(monkeypatch)
     actor=recovery.Actor.__new__(recovery.Actor);actor.m=manifest();actor.r=record('complete')
     actor.r['receipt']={'id':actor.m['id'],'cycle':1}
     items={k:found(i,entry['role']!='worker') for i,(k,entry) in enumerate(actor.m['outer'].items(),1)}
-    actor.outer=lambda:items;actor.wait=lambda call:call();actor.hosts_ready=lambda:True;actor.healthy_databases=lambda:True
+    actor.outer=lambda:items;actor.wait=lambda call:call();actor.hosts_ready=lambda **kwargs:True;actor.healthy_databases=lambda:True
     calls=[]
     def start(roles):
         calls.append(roles)
@@ -205,3 +211,27 @@ def test_completed_online_retry_restores_only_stopped_fixed_workers(monkeypatch)
     actor.b=Backend();monkeypatch.setattr(recovery,'storage_proof',lambda b:pytest.fail('rechecked old snapshot'))
     assert actor.run()==actor.r['receipt']
     assert calls==[{'worker'}]
+
+
+@pytest.mark.parametrize('stopped_role',['database','ca'])
+def test_open_admission_inner_health_check_never_starts_a_newly_stopped_service(monkeypatch,stopped_role):
+    actor=recovery.Actor.__new__(recovery.Actor);actor.m=manifest();actor.c=object()
+    actor.m['inner']={};items={};hosts={}
+    for index,site in enumerate(['a','b'],1):
+        host=found(index,True);host['NetworkSettings']['Networks']['n']['IPAddress']=f'172.20.0.{index}'
+        hosts[site]={'id':host['Id'],'address':f'172.20.0.{index}'};items[host['Id']]=host
+        inner={}
+        for offset,role in enumerate(['database','ca'],10):
+            item=found(index*100+offset,not (site=='a' and role==stopped_role));items[item['Id']]=item
+            inner[role]=recovery.pin(item,role)
+        actor.m['inner'][site]={'daemon_id':'engine-'+site,'volumes':{},'containers':inner}
+    class Backend:
+        def __init__(self):self.profile={'cluster_network':'n'}
+        def inner(self,site,args):
+            if args[0]=='info':return 'engine-'+site
+            if args[0]=='inspect':return json.dumps([items[args[1]]])
+            pytest.fail('started an inner service while admission was open')
+    actor.b=Backend();actor.b.hosts=hosts
+    monkeypatch.setattr(recovery,'inspect',lambda c,ident:items[ident])
+    with pytest.raises(LifecycleError,match='live_inner_outage_requires_quiescence'):
+        actor.hosts_ready(allow_start=False)

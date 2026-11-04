@@ -119,6 +119,16 @@ class ServiceLab(ExecutorLab):
         flow.require(self.ca_call(self.current_request(),endpoint='ca-a')['status']==201,'services_fresh_nonce_failed')
         flow.require(self.backend.leaf('status')['paused'],'services_leaf_intent_changed')
         self.service_check('completed_retry_preserves_new_and_old_consumption_revocation_and_leaf_pause')
+        standby='b' if seal['primary']=='a' else 'a'
+        host=self.backend.profile['service_hosts'][standby]['id'];database=seal['inner'][standby]['containers']['database']['id']
+        self.executors.raw(['exec',host,'docker','stop','--time','2',database])
+        try:
+            self.recover_services(expected='services_live_inner_outage_requires_quiescence',cuts=False)
+            item=json.loads(self.executors.raw(['exec',host,'docker','inspect',database]))[0]
+            flow.require(not item['State']['Running'],'services_completed_retry_started_partial_database')
+        finally:self.executors.raw(['exec',host,'docker','start',database])
+        flow.require(self.recover_services(cuts=False)==receipt,'services_partial_outage_changed_receipt')
+        self.service_check('completed_retry_refuses_new_inner_database_outage_without_start_or_state_reset')
         parent.restart();receipt2=self.recover_services(cuts=False)
         flow.require(receipt2['cycle']==2 and receipt2['services']==receipt['services'],'services_next_restart_recreated_objects')
         self.backend=Remote(self.executors);self.sync()

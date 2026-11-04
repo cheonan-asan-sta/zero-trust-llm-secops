@@ -4,6 +4,8 @@
 
 - 기준 PR #23 `9088245`, 이름 브랜치 `feature/chaeheeju-service-daemon-recovery`.
   [서비스 manifest·단계·실행·한계](docs/service-daemon-recovery.md)를 읽는다.
+- 동료 PR #24 `e9ae427`의 inbox 보관 이관을 `3d5acb2`로 보존 결합했다. README 양 안내를 유지했고,
+  실제 서비스 실험과 최종 회귀는 이 결합 코드로 실행한다. 동료 앱 변경을 이번 작업 기여로 기록하지 않는다.
 - `scripts.service_daemon_recovery`의 `seal/recover`: 같은 부모/내부 Engine·고정 서비스/볼륨·현재 관리/실행 역할을
   검사하고 최신 인증 checkpoint·DB 역할/동기 복제 확인 뒤 접속을 연다. 모든 대상은 사전 고정 ID 또는 명시 extras다.
 - 기존 authority lease 아래 전용 공개 journal과 동일 actor로 재개한다. pending/busy/사본 충돌·생존 미완료 작업·
