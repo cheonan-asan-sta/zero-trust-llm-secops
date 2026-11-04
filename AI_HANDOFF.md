@@ -1,5 +1,25 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 4일 CA DB·서비스 호스트 복구
+
+- `aitest` `b6e35be`에서 `feature/chaeheeju-db-host-recovery`로 진행한다.
+  [구현·복원 절차·검증·한계](docs/ca-db-host-recovery.md)를 먼저 확인한다.
+- `scripts.test_ca_host_recovery`는 별도 Docker 데몬/저장소의 CA+DB 두 노드와 remote_apply 복제를
+  구성한다. `scripts.ca_host_recovery`는 고정 소유 객체의 정지를 증명한 뒤에만 승격하며, 재가입은 새 저장소에
+  reseed한다. 자동 네트워크 분할 선출이 아니고 실제 PC/관리 영역은 단일 장애점이다.
+- 독립 관문 journal은 전달 전 intent를 기록한다. 암호화 백업의 authority/DB incarnation 및 최신 보안
+  checkpoint와의 일치를 검사하고, 이전 dump 복원 후 토큰 소비·폐기를 재적용한 뒤 접속을 연다.
+  관리 영역까지의 재해 복구·전역 antirollback·앱 SQLite 복구로 확대하지 않는다.
+- 키 교체의 기존 모든 노드 증명 장벽은 `service_hosts` 프로필에서 새 backend를 사용한다. 기본 프로필과
+  앱/탐지/개선 전 평가 기준선은 보존한다. 실행 결과·실패·정리는 위 문서와 공개 증거를 따른다.
+- DinD 호스트만 신뢰된 privileged 시험 서버다. 일반 CA/leaf에 부모 Docker socket·root/JWK 보관함을
+  연결하지 않는다. 백업/오류 후 leaf pause 유지와 수동 복구 조건을 문서에서 확인한다.
+- 최종 새 클러스터 1회·33개 검사, Windows/Linux 각 917개(신규 47개), Ruff 통과. daemon 5개를
+  관측하고 seal 후 cold restore 329.891초, 유효 토큰/폐기 인증서 거부와 새 nonce 양 CA 발급을 확인했다.
+  [공개 근거](docs/infrastructure-results/c04-ca-db-recovery-windows-20261104.json)에 예비 실패도 구분한다.
+  내부 CA/DB는 `unless-stopped`, 봉쇄 대상 외부 host는 검증된 `no` 정책이다. 전용 container/volume/
+  network/image tag 0, 기존 Docker/ZIP 보존. Docker Desktop/물리 PC/관리 영역 전체 HA는 미완료다.
+
 ## 2026년 11월 3일 후속 CA 프로세스 고가용성
 
 - PR #10 병합 `aitest` `0c32273`에서 `feature/chaeheeju-ca-high-availability`로 진행한다.

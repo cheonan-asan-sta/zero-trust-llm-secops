@@ -1,5 +1,15 @@
 # C04: 로컬 인증서 발급·갱신 선정 기록
 
+11/4 [DB·서비스 호스트 복구](../ca-db-host-recovery.md)는 같은 PostgreSQL의 물리 동기 복제를 선택한다.
+논리 복제·DB 파일 공유를 추가하지 않고 WAL 순서와 remote_apply를 검증한다. 승격은 명시적 정지 증명을
+필요로 하므로 Patroni/etcd 자동 선출을 도입한 것으로 기록하지 않는다. 재가입은 기존 primary 파일의
+재사용 대신 새 저장소의 `pg_basebackup`을 사용한다. 로컬 privileged DinD는 서로 다른 데몬/저장소의
+장애 주입을 위한 선택이며 물리 호스트 분리나 다른 HA 제품과의 성능 우열을 증명하지 않는다.
+백업 복원은 최신 독립 보안 checkpoint와 대조하고, 과거 키 세대로의 임의 rollback은 거부한다.
+실제 검증은 [33개 검사·Windows/Linux 각 917개·복원 329.891초의 공개 근거](../infrastructure-results/c04-ca-db-recovery-windows-20261104.json)를 따른다.
+내부 CA/DB의 재시작 정책은 `unless-stopped`, 봉쇄 대상 외부 host는 `no`로 구분해 검증한다.
+초기 재기동·harness 제한·준비 단계·앱 process 시험의 예비 실패는 최종 결과와 분리했다.
+
 후속 [CA 프로세스 고가용성](../ca-high-availability.md)은 기존 step-ca를 2대로 재사용하고 CA 상태만
 PostgreSQL에 공유한다. Badger 파일 공유는 동시 접근을 지원하지 않아 제외한다. MySQL도 공식 지원
 대안이지만 이번에 실제 설치·성능 비교하지 않았으므로 우열을 주장하지 않는다. PostgreSQL은 로컬 무료
