@@ -1,5 +1,6 @@
 """Security boundaries of the persistent local mTLS container runtime."""
 
+import base64
 import hashlib
 import json
 import shlex
@@ -9,7 +10,10 @@ from types import SimpleNamespace
 import pytest
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
+from app.services.trusted_signals import canonical_signal
+from app.zero_trust_models import SignedSessionSignal
 from scripts import continuous_mtls_assets as helpers
 from scripts import continuous_mtls_runtime as runtime
 from scripts import test_continuous_mtls_runtime as runtime_checks
@@ -19,6 +23,25 @@ PROJECT = "kmtls-012345abcdef"
 APP_IMAGE = "secops-runtime:contract-test"
 NGINX_IMAGE = "nginx:contract-test"
 SERVICES = {"app", "gateway", "bridge", "resource", "proxy", "collector", "worker", "watchdog", "operator"}
+
+
+def test_runtime_mint_binds_a_separate_source_to_its_operator_key(tmp_path, monkeypatch):
+    key = Ed25519PrivateKey.generate()
+    (tmp_path / "tail-private.pem").write_bytes(key.private_bytes(
+        serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()))
+    monkeypatch.setattr(helpers, "AUTH", tmp_path)
+    monkeypatch.setattr(helpers, "_request", lambda request: request)
+    result = helpers.mint({"session_id": "runtime-key-selection", "source_id": "separate-source",
+                           "signing_key_file": "tail-private.pem"})
+    signal = SignedSessionSignal.model_validate(result["body"])
+    assert signal.source_id == "separate-source" and signal.expected_version == 0
+    key.public_key().verify(base64.urlsafe_b64decode(signal.signature + "=="), canonical_signal(signal))
+
+
+@pytest.mark.parametrize("key_file", ["../session-private.pem", "/tmp/session-private.pem", "..-private.pem", True])
+def test_runtime_mint_never_reads_a_key_outside_its_operator_volume(key_file):
+    with pytest.raises(ValueError, match="filename"):
+        helpers.mint({"session_id": "runtime-invalid-key-path", "signing_key_file": key_file})
 
 
 def test_runtime_writer_retries_the_same_complete_event_after_busy_or_lost_reply():
