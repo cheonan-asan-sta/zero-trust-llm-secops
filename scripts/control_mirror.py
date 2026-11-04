@@ -43,6 +43,8 @@ def configuration():
 
 
 def guard(cfg=None):
+    from scripts.executor_fence import guard as executor_guard
+    executor_guard()
     cfg = configuration() if cfg is None else cfg
     if cfg is None:
         return None

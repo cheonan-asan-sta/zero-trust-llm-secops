@@ -1,5 +1,9 @@
 # 관리 영역 이중화와 명시적 전환
 
+후속 [관리 실행 호스트·기록 이중화](executor-host-high-availability.md)는 관리 cell과 별개로 두 실행기와
+독립 journal/owner를 둔다. 실행기·그 기록 볼륨을 제거한 뒤 생존 사본으로 전환을 재개한다. 같은 부모
+Docker/물리 PC, 수동 봉쇄와 운영자 전환 중단의 수동 조사 조건은 남는다. 아래 결과는 이전 cell 시험이다.
+
 후속 [관리 전환 중단 복구](control-transition-recovery.md)는 새 이미지/관리 프로필에서 전환
 조정기의 프로세스 종료를 공개 journal과 명시적 `resume`으로 이어간다. 아래 20개 결과와 중간 종료
 미지원 표기는 이전 구현 당시 기록이다. 임의 authority 단계·호스트/journal 전체 손실까지 확장하지 않는다.
