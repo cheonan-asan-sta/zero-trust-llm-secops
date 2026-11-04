@@ -1,5 +1,8 @@
 # 개발 주차별 산출물
 
+11/4 후속: [부모 Docker 데몬 재시작 복구](parent-docker-recovery.md).
+사전 Engine ID seal·같은 저장소 검증·정지 worker 복원·live-restore 거부와 실제 격리 데몬 검증을 설명한다.
+
 11/4 후속: [전환 실행기 컨테이너 유실 복구](actor-container-recovery.md).
 `recover-takeover`의 이전 ID 부재·양 기록/owner 검증, 같은 전환 재개, 삭제 실험·결과와 한계를 설명한다.
 기존 [같은 실행기 재시작](executor-transition-recovery.md) 다음 단계다.

@@ -1,5 +1,10 @@
 # C04: 로컬 인증서 발급·갱신 선정 기록
 
+11/4 후속 [부모 Docker 데몬 재시작 복구](../parent-docker-recovery.md)는 정상 상태의 Engine ID
+seal과 기존 양 journal/owner·고정 worker 검증을 선택했다. 정지 worker를 복원하면서 완료 후 과거 상태
+복제를 피하려는 선택이며, live-restore된 미완료 작업·다른 데몬·충돌은 거부한다. 실제 daemon 재시작과
+합성 marker 범위를 기록하고 기존 실제 CA 캠페인·물리 HA·독립 검토와 구분한다.
+
 11/4 후속 [전환 실행기 컨테이너 유실 복구](../actor-container-recovery.md)는 생존한 공개 기록과
 Docker 전체 ID 부재를 근거로 대체 실행기의 식별자를 명시적으로 이전한다. 고정 이름과 Linux flock,
 기록/owner 재검증을 재사용해 같은 작업을 이어가는 선택이다. 충돌 시 추측/자동 선출 대신 거부한다.
