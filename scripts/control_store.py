@@ -78,20 +78,33 @@ def validate(roots, expected):
             'plan_hash':control.get('plan') and hashlib.sha256(json.dumps(control['plan'],sort_keys=True,separators=(',',':')).encode()).hexdigest()}
 
 
+def copy_replica(sources, targets, *, expected=None):
+    source_digest = tree_digest(sources)
+    if expected is not None and source_digest != expected:
+        raise LifecycleError('control_replica_source_changed')
+    for n, source in sources.items():
+        target = targets[n]
+        known = files(source); existing = files(target)
+        if expected is None and any(target.iterdir()):
+            raise LifecycleError('control_target_not_empty')
+        for name,p in existing.items():
+            if name not in known or p.read_bytes() != known[name].read_bytes():
+                raise LifecycleError('control_replica_partial_conflict')
+        for name,p in known.items():
+            dest=target/name;dest.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
+            replace_file(dest,p.read_bytes());durable_parent(dest)
+    if tree_digest(targets) != source_digest:
+        raise LifecycleError('control_replica_copy_mismatch')
+    return {'copied':True,'tree_sha256':source_digest}
+
+
 def dispatch(req):
     op = req['operation']
-    if op == 'copy':
-        sources = {n:Path('/source')/n for n in COMPONENTS}
-        for n in COMPONENTS:
-            target = Path('/target')/n
-            if any(target.iterdir()):
-                raise LifecycleError('control_target_not_empty')
-            for name,p in files(sources[n]).items():
-                dest = target/name; dest.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-                replace_file(dest,p.read_bytes()); durable_parent(dest)
-        if tree_digest(sources) != tree_digest({n:Path('/target')/n for n in COMPONENTS}):
-            raise LifecycleError('control_replica_copy_mismatch')
-        return {'copied':True,'tree_sha256':tree_digest(sources)}
+    if op in {'copy','copy_resume'}:
+        if op == 'copy_resume' and not isinstance(req.get('expected'),str):
+            raise LifecycleError('control_replica_expected_digest')
+        return copy_replica({n:Path('/source')/n for n in COMPONENTS},
+            {n:Path('/target')/n for n in COMPONENTS},expected=req.get('expected') if op=='copy_resume' else None)
     if op == 'validate':
         return validate({n:Path('/source')/n for n in COMPONENTS},req['expected'])
     if op == 'initialize':

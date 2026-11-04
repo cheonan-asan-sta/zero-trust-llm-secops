@@ -17,7 +17,7 @@ from scripts.control_plane_ha import Management
 from scripts.test_authority_key_rotation import AuthorityLab
 from scripts.test_ca_host_recovery import RecoveryLab
 
-SOURCES=['scripts/control_mirror.py','scripts/control_store.py','scripts/control_plane_ha.py','scripts/test_control_plane_ha.py']
+SOURCES=['scripts/control_transition.py','scripts/control_mirror.py','scripts/control_store.py','scripts/control_plane_ha.py','scripts/test_control_plane_ha.py']
 IMPORTED={p:sha256(ROOT/p) for p in SOURCES}
 
 
