@@ -50,6 +50,8 @@ class Store:
                 raise LifecycleError('executor_storage_missing')
         except (OSError,ValueError,TypeError):
             raise LifecycleError('executor_stale_or_incomplete_owner') from None
+        from scripts.executor_transition import guard_pair
+        guard_pair(self.root,self.peer,c['expected'])
 
     def pair(self,path):
         path=Path(path)

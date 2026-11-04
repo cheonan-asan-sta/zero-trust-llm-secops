@@ -2,6 +2,9 @@
 
 2026-11-04 · 기존 로컬 관리 이중화의 후속 · 새 코드가 포함된 시험 이미지/관리 프로필 대상
 
+관리 호스트를 바꾸는 실행기 자체가 종료된 경우에는 후속 [operator 재개](executor-transition-recovery.md)의
+`resume-takeover`를 먼저 사용한다. 이후 아래 관리 cell 전환의 `resume`을 이어간다. 두 journal/epoch를 구분한다.
+
 후속 [관리 실행 호스트·기록 이중화](executor-host-high-availability.md)는 아래 단일 실행 호스트/journal
 생존 조건을 별도 시험 프로필에서 보완한다. 두 실행기·별도 journal·명시적 봉쇄 후 생존 사본 재개를 사용한다.
 아래 기존 검증 수치/단일 호스트 설명은 당시 결과이며 물리 PC/Docker 전체 HA 조건은 여전히 남는다.
