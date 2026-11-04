@@ -12,12 +12,35 @@ from cryptography.hazmat.primitives import serialization
 
 from scripts import continuous_mtls_assets as helpers
 from scripts import continuous_mtls_runtime as runtime
+from scripts import test_continuous_mtls_runtime as runtime_checks
 from scripts.continuous_mtls_runtime import compose_spec
 
 PROJECT = "kmtls-012345abcdef"
 APP_IMAGE = "secops-runtime:contract-test"
 NGINX_IMAGE = "nginx:contract-test"
 SERVICES = {"app", "gateway", "bridge", "resource", "proxy", "collector", "worker", "watchdog", "operator"}
+
+
+def test_runtime_writer_retries_the_same_complete_event_after_busy_or_lost_reply():
+    sent = []
+
+    def execute(service, argv, payload):
+        assert service == "collector" and argv[-1] == "append"
+        sent.append(payload)
+        if len(sent) < 3:
+            # First a busy input lock, then an append committed before its reply
+            # was lost. Both retries must retain the original observation time.
+            raise runtime.RuntimeFailure("runtime_command_failed_1")
+        return '{"appended":true}'
+
+    checks = object.__new__(runtime_checks.Checks)
+    checks.runtime = SimpleNamespace(execute=execute,
+                                    wait=lambda predicate: runtime.Runtime.wait(predicate, timeout=3))
+    checks.append("same-source-event", active=True, other=True)
+    assert len(sent) == 3 and len(set(sent)) == 1
+    event = json.loads(sent[0])
+    assert event["event_id"] == "same-source-event"
+    assert event["observed_at"] and event["subject"] == helpers.OTHER
 
 
 def mounts(service):
@@ -357,14 +380,14 @@ def test_service_wrapper_executes_tls_daemon_and_keeps_credentials_out_of_argv(m
     assert helpers.os.environ["ANALYZER_MODE"] == "rule"
     if role == "collector":
         assert "scripts.continuous_signal_collector" in argv and "run" in argv
-        assert argv[argv.index("--directory") + 1] == "/collector/producer"
+        assert argv[argv.index("--directory") + 1] == str(Path("/collector/producer"))
         assert argv[argv.index("--base-url") + 1] == "https://gateway:8443"
-        assert argv[argv.index("--tls-profile") + 1] == "/tls/profile.json"
+        assert argv[argv.index("--tls-profile") + 1] == str(Path("/tls/profile.json"))
         assert helpers.os.environ["SIGNAL_COLLECTOR_API_KEY"] == "c" * 64
         assert "--once" not in argv
     else:
         assert "scripts.mtls_native" in argv and "api" in argv
-        assert argv[argv.index("--profile") + 1] == "/tls/server.json"
+        assert argv[argv.index("--profile") + 1] == str(Path("/tls/server.json"))
         assert helpers.os.environ["AUTH_MODE"] == "api_key"
 
 
