@@ -21,6 +21,7 @@ from app.models import SecurityEvent
 from app.scenarios import synthetic_events
 from app.security import Principal, Role, get_principal
 from app.services.continuous_signals import ContinuousSignalService
+from app.services.policy_journal import JournalLimits
 from app.services.signal_inbox import SignalInbox
 from app.services.trusted_signals import (
     SignalRegistryUnavailable,
@@ -429,6 +430,7 @@ def test_fanout_preflights_session_version_limit_before_any_write(lab):
 
 
 def test_journal_capacity_never_commits_partial_fanout_and_full_journal_is_readable(lab):
+    lab.service.journal_limits = JournalLimits(max_archive_records=0)
     lab.session()
     lab.session("session-two", device="device-b")
     with lab.service._transaction() as transaction:
