@@ -4,7 +4,6 @@ import hashlib
 import hmac
 import json
 import secrets
-import sqlite3
 from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -13,7 +12,9 @@ from app.analyzers.rule_based import RuleBasedAnalyzer
 from app.continuous_signal_models import ObservationApplication, SignedContinuousSignal
 from app.models import ResourceContext
 from app.security import Principal
+from app.services import policy_journal
 from app.services.ocsf import get_ocsf_normalizer
+from app.services.policy_journal import JournalLimits, JournalUnavailable
 from app.services.sigma import get_sigma_engine
 from app.services.trusted_signals import SignalVerifier, VerifiedSignal, canonical_observation
 from app.zero_trust_models import (
@@ -39,10 +40,6 @@ class SessionMissing(LookupError):
     pass
 
 
-class JournalUnavailable(RuntimeError):
-    pass
-
-
 def _canonical(value: dict) -> str:
     return json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
 
@@ -54,13 +51,16 @@ def _digest(value: str) -> str:
 class ZeroTrustOperations:
     """SQLite transactions serialize decisions, revocations and single-use resource access.
 
-    The journal is the sole source of state. Each operation verifies its bounded chain
-    before deriving sessions/grants, so there is no unverified mutable projection.
+    The complete archived prefix and active journal remain the source of state.
+    Each operation verifies their chain before deriving sessions/grants, so there
+    is no unverified mutable projection and no forgotten consumption or revocation.
     """
 
     def __init__(self, path: Path, policy_path: Path = POLICY_PATH,
-                 signal_verifier: SignalVerifier | None = None) -> None:
+                 signal_verifier: SignalVerifier | None = None,
+                 *, journal_limits: JournalLimits | None = None) -> None:
         self.path = path
+        self.journal_limits = journal_limits or JournalLimits()
         self.signal_verifier = signal_verifier or SignalVerifier()
         self.policy = ZeroTrustPolicyBundle.model_validate_json(policy_path.read_text("utf-8"))
         self.policy_digest = _digest(self.policy.model_dump_json())
@@ -68,59 +68,37 @@ class ZeroTrustOperations:
         if len(self.resources) != len(self.policy.resources):
             raise ValueError("duplicate resource policy")
         path.parent.mkdir(parents=True, exist_ok=True)
-        with sqlite3.connect(path) as connection:
-            connection.execute(
-                "CREATE TABLE IF NOT EXISTS journal ("
-                "seq INTEGER PRIMARY KEY, payload TEXT NOT NULL, "
-                "previous_hash TEXT NOT NULL, record_hash TEXT NOT NULL)"
-            )
+        policy_journal.initialize(path, self.journal_limits)
 
     @contextmanager
     def _transaction(self):
         try:
-            with sqlite3.connect(self.path, timeout=5) as connection:
-                connection.execute("PRAGMA synchronous=FULL")
-                connection.execute("BEGIN IMMEDIATE")
-                rows = connection.execute(
-                    "SELECT seq,payload,previous_hash,record_hash FROM journal ORDER BY seq"
-                ).fetchall()
-                if len(rows) > 10000:
-                    raise JournalUnavailable("local journal capacity reached")
-                previous = "0" * 64
-                entries = []
-                for index, (seq, payload, prior, digest) in enumerate(rows, 1):
-                    if seq != index or prior != previous or not hmac.compare_digest(
-                        digest, _digest(prior + "." + payload)
-                    ):
-                        raise JournalUnavailable("zero trust journal integrity failed")
-                    entry = json.loads(payload)
+            with policy_journal.transaction(self.path, self.journal_limits) as transaction:
+                for entry in transaction[1]:
                     if entry["kind"] == "decision":
                         SessionDecision.model_validate(entry["session"])
                     elif entry["kind"] == "observation":
                         ObservationApplication.model_validate(entry)
                     elif entry["kind"] != "access":
                         raise JournalUnavailable("unknown journal entry")
-                    entries.append(entry)
-                    previous = digest
-                yield [connection, entries, previous]
-        except (sqlite3.Error, OSError, ValueError, KeyError, TypeError) as exc:
+                yield transaction
+        except (OSError, ValueError, KeyError, TypeError) as exc:
             if isinstance(exc, SessionConflict):
                 raise
             raise JournalUnavailable("zero trust journal is unavailable") from exc
 
     @staticmethod
     def _append(transaction, entry):
-        connection, entries, previous = transaction
-        if len(entries) >= 10000:
-            raise JournalUnavailable("local journal capacity reached")
-        payload = _canonical(entry)
-        record_hash = _digest(previous + "." + payload)
-        connection.execute(
-            "INSERT INTO journal VALUES (?,?,?,?)",
-            (len(entries) + 1, payload, previous, record_hash),
-        )
-        entries.append(entry)
-        transaction[2] = record_hash
+        policy_journal.append(transaction, entry)
+
+    def journal_status(self) -> dict:
+        with self._transaction() as transaction:
+            return policy_journal.status(transaction)
+
+    def compact_journal(self, *, limit: int | None = None) -> dict:
+        """Move an immutable prefix without changing logical policy history."""
+        with self._transaction() as transaction:
+            return policy_journal.compact(transaction, limit=limit)
 
     @staticmethod
     def _latest(entries, tenant_id, session_id):
@@ -213,8 +191,7 @@ class ZeroTrustOperations:
                                              else previous.challenge_expires_at),
                 })
                 changes.append((session, previous.version, reason))
-            if len(entries) + len(changes) > 10000:
-                raise JournalUnavailable("local journal capacity reached")
+            policy_journal.ensure_capacity(transaction, len(changes))
             for session, previous_version, reason in changes:
                 self._append(transaction, {
                     "kind": "decision", "session": session.model_dump(mode="json"),
@@ -362,8 +339,7 @@ class ZeroTrustOperations:
                 changed.append(session)
             # Preflight every bound before the first write; SQLite also rolls back
             # the whole fanout if a later append or marker insertion fails.
-            if len(entries) + len(changed) + 1 > 10000:
-                raise JournalUnavailable("local journal capacity reached")
+            policy_journal.ensure_capacity(transaction, len(changed) + 1)
             for session in changed:
                 self._append(transaction, {"kind": "decision",
                     "session": session.model_dump(mode="json"), "grant_hash": None,

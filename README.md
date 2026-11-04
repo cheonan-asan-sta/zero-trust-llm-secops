@@ -1,5 +1,11 @@
 # zero-trust-llm-secops
 
+## 정책 저널 보관 이관
+
+활성 정책 저널의 오래된 행을 같은 SQLite DB의 압축 segment로 옮기고, 모든 읽기에서 전체 이력과 체인을 검증합니다.
+세션·회수·허용 소비·관측 중복 표식을 보존하며 서버 inbox·세션 버전과 전체 보관 한도는 유지합니다.
+[상태 조회·수동 이관·자동 이관과 복구 경계](docs/policy-journal-maintenance.md)를 확인합니다.
+
 ## 2026년 11월 4일 후속 부모 Docker 데몬 재시작 복구
 
 [부모 데몬 복구](docs/parent-docker-recovery.md)는 장애 전에 보관한 Engine ID/anchor를 대조하고,

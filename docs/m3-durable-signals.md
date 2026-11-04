@@ -67,6 +67,8 @@
 기존 자료와 분리한 로컬 DB로 시험하고, 기존 DB를 업그레이드하기 전에는 정책·키 등록·감사 기록을 포함한 일관된 스냅샷을 확보해야 한다.
 회수 기록이 생긴 뒤 단순히 옛 백업으로 되돌려 허용을 되살리면 안 된다. 최신 회수·폐기 상태를 보존하는 운영 복원·롤백 절차는 아직 구현하지 않았다.
 
+후속 [정책 저널 보관 이관](policy-journal-maintenance.md)은 같은 SQLite DB의 활성 journal prefix를 압축 segment에 보관하고 매 읽기에서 전체 체인을 검증·복원한다. 세션 이력·누적 관측 제한·중복 방지와 worker ACK 복구 표식은 archive 안에서도 유지한다. version 2 스키마의 필수 메타데이터 누락을 신규 DB로 재초기화하지 않으며 옛 코드 downgrade는 지원하지 않는다. 이 기능은 아래 inbox의 영수증 보관 상한이나 백업·복원 한계를 해소하지 않는다.
+
 ```text
 pending → processing → completed
                 └→ pending (재시도 시각 이후)
