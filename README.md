@@ -17,6 +17,12 @@ identity/device 권한을 나누어 기존 M3 수신 API로 전달하며, 재시
 수집기의 202 접수 확인과 서버 worker의 정책 완료는 구분합니다.
 [초기화·공개키 등록·실행·상태 조회와 제한](docs/continuous-signal-collector.md)을 따릅니다.
 
+## 주기적 세션 재검증
+
+별도 watchdog가 요청 없이도 서명 증명 만료를 보류하고, 출처·키 폐기와 등록 변경을 회수 상태로 기록합니다.
+새 허용이나 자동 정상화를 만들지 않으며, 같은 DB·공개 등록을 쓰는 local/test 프로세스로 실행합니다.
+[실행 명령·상태 전이·감사와 운영 한계](docs/periodic-session-revalidation.md)를 따릅니다.
+
 ## 2026년 11월 4일 후속 관리 호스트·전환 기록 이중화
 
 [관리 실행 호스트 이중화](docs/executor-host-high-availability.md)는 신뢰된 실행기 두 개와 별도

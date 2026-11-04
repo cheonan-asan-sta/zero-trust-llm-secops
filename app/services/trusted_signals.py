@@ -103,6 +103,22 @@ class SignalVerifier:
             return None
         return hashlib.sha256(source.model_dump_json().encode()).hexdigest()
 
+    def current_source_digests(self, now: datetime) -> dict[tuple[str, str, str], str]:
+        """Read one validated authority snapshot for a background session scan.
+
+        Use the same complete source digest and key validity boundary as access().
+        A malformed registry raises instead of looking like an empty/revoked one.
+        """
+        digests = {}
+        for (tenant_id, source_id), source in self._sources().items():
+            if not source.enabled:
+                continue
+            digest = hashlib.sha256(source.model_dump_json().encode()).hexdigest()
+            for key in source.keys:
+                if key.enabled and key.not_before <= now < key.not_after:
+                    digests[(tenant_id, source_id, key.key_id)] = digest
+        return digests
+
     def verify(self, signal: SignedSessionSignal, principal: Principal, now: datetime) -> VerifiedSignal:
         sources = self._sources()
         source = sources.get((principal.tenant_id, signal.source_id))
