@@ -27,7 +27,7 @@ from scripts.test_ca_host_recovery import RecoveryLab
 from scripts.test_control_plane_ha import ControlLab
 from scripts.test_control_transition import CrashLab
 
-SOURCES=['scripts/control_executor.py','scripts/executor_cluster.py','scripts/executor_disk.py',
+SOURCES=['scripts/control_executor.py','scripts/executor_cluster.py','scripts/executor_disk.py','scripts/executor_transition.py',
     'scripts/executor_fence.py','scripts/executor_store.py','scripts/test_executor_hosts.py',
     'scripts/test_control_transition.py']
 IMPORTED={p:sha256(ROOT/p) for p in SOURCES}
@@ -77,7 +77,7 @@ def fixture_call(cluster,record,cut=False):
     flow.require(result.returncode==(73 if cut else 0),'executor_fixture_exit')
 
 
-def spec_check(directory):
+def spec_check(directory,takeover=None):
     project='c02-'+uuid.uuid4().hex[:12];tags=[];cluster=None
     directory.mkdir(parents=True,exist_ok=True)
     report={'schema':'executor-host-spec-1','project':project,'started_at':flow.timestamp(),'checks':[]}
@@ -132,7 +132,7 @@ def spec_check(directory):
         check('real_process_exit_after_peer_fsync_refuses_divergent_local_prefix')
         anchor=cluster.anchor();survivor=copy.deepcopy(cluster.d['hosts']['b']);old=copy.deepcopy(cluster.d)
         cluster=Cluster.recover(anchor,'b',survivor['journal'],survivor['owner'])
-        receipt=cluster.takeover('b',discard=True)
+        receipt=cluster.takeover('b',discard=True) if takeover is None else takeover(cluster,'b')
         flow.require(cluster.rpc('journal')['result']==record,'executor_spec_lost_peer_prefix')
         check('whole_active_worker_and_its_two_volumes_removed_surviving_peer_recovers_latest_record',**receipt)
         flow.require(subprocess.run(['docker','inspect',job_id],capture_output=True,check=False).returncode!=0,

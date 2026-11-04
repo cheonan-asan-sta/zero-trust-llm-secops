@@ -1,5 +1,10 @@
 # C04: 로컬 인증서 발급·갱신 선정 기록
 
+11/4 후속 [관리 호스트 전환 실행기 재개](../executor-transition-recovery.md)는 기존 Docker의 동일
+PID-1 컨테이너와 생존 볼륨 flock을 선택한다. 운영자 프로세스 종료를 로컬에서 재현하면서 실행기 식별과
+직렬화를 유지하려는 선택이며 분산 선출 제품 대비 우열/채택 근거가 아니다. checksum은 손상 검출이고
+socket 관리자 신뢰·물리 PC/데몬·actor 컨테이너 유실 경계는 별도다.
+
 11/4 후속 [관리 실행 호스트·기록 이중화](../executor-host-high-availability.md)는 기존 Docker와
 고정 DinD 이미지의 CLI를 재사용한다. 독립 journal/owner와 명시적 봉쇄를 선택한 이유는 새 유료 서비스
 없이 실행기 손실·기록 보존을 재현하기 위해서다. 동일 부모 Docker/물리 PC와 socket 관리자 신뢰는 남긴다.
