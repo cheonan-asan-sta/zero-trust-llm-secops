@@ -32,7 +32,8 @@ CUTS={'after_hosts','after_leaf'}
 
 def spec(found):
     cfg=copy.deepcopy(found['Config']);cfg['Env']=op.digest(cfg.get('Env') or [])
-    networks={n:{'NetworkID':v.get('NetworkID'),'Aliases':sorted(v.get('Aliases') or []),'IPAMConfig':v.get('IPAMConfig')} for n,v in found['NetworkSettings']['Networks'].items()}
+    networks={n:{'NetworkID':None if n=='bridge' and found['HostConfig'].get('NetworkMode') in {'default','bridge'} else v.get('NetworkID'),
+        'Aliases':sorted(v.get('Aliases') or []),'IPAMConfig':v.get('IPAMConfig')} for n,v in found['NetworkSettings']['Networks'].items()}
     return op.digest({'id':found['Id'],'name':found['Name'],'image':found['Image'],'config':cfg,
         'host':found['HostConfig'],'mounts':found['Mounts'],'networks':networks})
 

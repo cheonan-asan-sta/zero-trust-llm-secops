@@ -68,6 +68,22 @@ def test_secret_environment_is_hashed_and_alias_order_is_not_identity():
     item['Config']['Env']=['SECRET=other'];assert recovery.spec(item)!=signature
 
 
+@pytest.mark.parametrize('mode',['default','bridge'])
+def test_builtin_bridge_runtime_network_id_can_change_on_same_daemon_restart(mode):
+    item=found();item['HostConfig']['NetworkMode']=mode
+    item['NetworkSettings']['Networks']={'bridge':item['NetworkSettings']['Networks']['n']}
+    expected=recovery.pin(item,'ca');item['NetworkSettings']['Networks']['bridge']['NetworkID']='new-builtin-id'
+    recovery.check_pin(item,expected)
+    item['HostConfig']['NetworkMode']='other'
+    with pytest.raises(LifecycleError):recovery.check_pin(item,expected)
+
+
+def test_custom_network_replacement_still_refuses_even_when_name_and_aliases_match():
+    item=found();item['HostConfig']['NetworkMode']='n';expected=recovery.pin(item,'gateway')
+    item['NetworkSettings']['Networks']['n']['NetworkID']='replacement-network'
+    with pytest.raises(LifecycleError):recovery.check_pin(item,expected)
+
+
 @pytest.mark.parametrize('fault',['phase','cycle','actor','history','frozen','receipt','extra'])
 def test_invalid_recovery_record_is_not_a_resume_authority(fault):
     value=record('intent')

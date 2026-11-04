@@ -42,7 +42,7 @@ def test_current_authenticated_checkpoint_is_read_only_and_public(tmp_path,monke
 
 @pytest.mark.parametrize('fault',['pending','error','sequence','missing_hash','incarnation','hash','lsn','authority','path','key','tag','replica','private_tree'])
 def test_uncertain_or_unauthenticated_state_cannot_open_admission(tmp_path,monkeypatch,fault):
-    state,envelope,proof=fixture(tmp_path,monkeypatch)
+    state,envelope,_=fixture(tmp_path,monkeypatch)
     if fault=='pending':state['pending']={'unacknowledged':{}}
     elif fault=='error':state['error']='unknown_write'
     elif fault=='sequence':state['checkpoint_sequence']=2
@@ -58,11 +58,7 @@ def test_uncertain_or_unauthenticated_state_cannot_open_admission(tmp_path,monke
         envelope['ciphertext']='invalid'
         for site in ['a','b']:(tmp_path/site/'witness/security.sealed').write_text(json.dumps(envelope),encoding='utf-8')
     elif fault=='private_tree':
-        def changed(roots,expected):
-            value=copy.deepcopy(proof)
-            if roots['ca'].parent.name=='b':value['tree_sha256']='other'
-            return value
-        monkeypatch.setattr(store,'validate',changed)
+        (tmp_path/'b/ca/unexpected-private-file').write_bytes(b'different private state')
     for site in ['a','b']:
         value=copy.deepcopy(state)
         if fault=='replica' and site=='b':value['sequence']=4
@@ -70,3 +66,36 @@ def test_uncertain_or_unauthenticated_state_cannot_open_admission(tmp_path,monke
     before=contents(tmp_path)
     with pytest.raises(LifecycleError):store.private_proof({'role':'current'})
     assert contents(tmp_path)==before
+
+
+def status_files(tmp_path,values):
+    for site,value in zip(['a','b'],values,strict=True):
+        root=tmp_path/site/'leaf';root.mkdir()
+        (root/'status.json').write_text(json.dumps(value),encoding='utf-8')
+
+
+def test_derived_status_clock_drift_does_not_invalidate_identical_authoritative_state(tmp_path,monkeypatch):
+    fixture(tmp_path,monkeypatch)
+    status_files(tmp_path,[{'at':1.0,'credentials':{'current':'same'}},{'at':2.0,'credentials':{'current':'same'}}])
+    before=contents(tmp_path);assert store.private_proof({})['tree_sha256']
+    assert contents(tmp_path)==before
+
+
+@pytest.mark.parametrize('fault',['credentials','phase','clock_type'])
+def test_only_status_clock_is_normalized_other_status_changes_still_refuse(tmp_path,monkeypatch,fault):
+    fixture(tmp_path,monkeypatch);left={'at':1.0,'credentials':{'current':'same'},'phase':None};right=copy.deepcopy(left)
+    if fault=='credentials':right['credentials']['current']='different'
+    elif fault=='phase':right['phase']='pending'
+    else:right['at']='invalid'
+    status_files(tmp_path,[left,right]);before=contents(tmp_path)
+    with pytest.raises(LifecycleError):store.private_proof({})
+    assert contents(tmp_path)==before
+
+
+def test_private_source_change_during_crypto_validation_cannot_be_accepted(tmp_path,monkeypatch):
+    _,_,proof=fixture(tmp_path,monkeypatch)
+    def changed(*args):
+        for site in ['a','b']:(tmp_path/site/'ca/new-file').write_bytes(b'changed during validation')
+        return copy.deepcopy(proof)
+    monkeypatch.setattr(store,'validate',changed)
+    with pytest.raises(LifecycleError,match='private_source_changed'):store.private_proof({})

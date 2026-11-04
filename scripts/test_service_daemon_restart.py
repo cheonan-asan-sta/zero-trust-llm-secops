@@ -64,6 +64,29 @@ class ServiceLab(ExecutorLab):
     def service_check(self,label,**fields):
         self.report['service_checks'].append({'label':label,'passed':True,**fields});self.save()
 
+    def replica_diagnostics(self):
+        program="""import hashlib,json
+from pathlib import Path
+from scripts.control_store import COMPONENTS,files
+values={};raw={}
+for site in ['a','b']:
+ values[site]={};raw[site]={}
+ for component in COMPONENTS:
+  for name,path in files(Path('/source')/site/component).items():
+   key=component+'/'+name;data=path.read_bytes();raw[site][key]=hashlib.sha256(data).hexdigest()
+   if key=='leaf/status.json':
+    body=json.loads(data);body.pop('at');data=json.dumps(body,sort_keys=True,separators=(',',':')).encode()
+   values[site][key]=hashlib.sha256(data).hexdigest()
+keys=set(values['a'])|set(values['b'])
+print(json.dumps({'differences':[{'path':k,'a_sha256':values['a'].get(k),'b_sha256':values['b'].get(k)} for k in sorted(keys) if values['a'].get(k)!=values['b'].get(k)],'derived_status_clock_diff':raw['a'].get('leaf/status.json')!=raw['b'].get('leaf/status.json')}))"""
+        args=['run','--rm','--network','none','--read-only','--user','10001:10001','--cap-drop=ALL']
+        for site in ['a','b']:
+            for component,volume in self.backend.volumes(site).items():args+=['--mount',f'type=volume,src={volume},dst=/source/{site}/{component},readonly']
+        result=json.loads(self.backend.raw([*args,'--entrypoint','python',self.backend.profile['image'],'-c',program]))
+        self.report['service_replica_preflight']=result;self.save()
+        flow.require(not result['differences'],'services_fixture_private_replicas_diverged')
+        self.service_check('private_replicas_match_with_only_derived_status_clock_normalized',clock_difference_observed=result['derived_status_clock_diff'])
+
     def recover_services(self,*,expected=None,cuts=True):
         result=subprocess.run([sys.executable,'-m','scripts.test_service_daemon_restart','recover',
             '--seal',str(self.directory/'services-seal.json'),*(['--no-cuts'] if not cuts else [])],capture_output=True,text=True,encoding='utf-8',errors='replace',timeout=940,check=False)
@@ -83,6 +106,7 @@ class ServiceLab(ExecutorLab):
         revoked_expiry=self.private_rpc("import json;from pathlib import Path;from scripts.certificate_controller import metadata;print(json.dumps(metadata(Path('/state/ha-revoked.pem').read_text())['not_after']))")
         self.service_check('real_consumed_token_and_revoked_certificate_established_before_parent_fault')
         self.service_csr=self.private_rpc("import json;from pathlib import Path;s=json.loads(Path('/state/state.json').read_bytes());print(json.dumps(next(c['csr'] for c in s['credentials'].values() if c['name']=='collector' and c['purpose']=='clientAuth')))")
+        self.replica_diagnostics()
         p=self.backend.profile;known={*p['gateways'],p['leaf']['name'],p['management']['standby']['name'],
             *(n['name'] for n in p['service_hosts'].values()),*(h['worker']['name'] for h in self.executors.d['hosts'].values())}
         extras=[]
