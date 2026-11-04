@@ -47,6 +47,8 @@ app·worker·watchdog는 같은 `/data/zero-trust.sqlite3`와 읽기 전용 `/si
 
 수집기는 접수 `202`를 보존하고 worker는 정책 완료를 별도로 기록합니다. watchdog는 만료를 보류하고 출처·키 무효화를 회수로 반영합니다. 어느 프로세스도 정상 관측·재시작·만료 뒤 새 허용이나 자동 정상화를 만들지 않습니다. 세부 계약은 [수집기](continuous-signal-collector.md), [주기적 재검증](periodic-session-revalidation.md), [접수·worker](m3-durable-signals.md)를 따릅니다.
 
+runtime의 관측 append helper도 collector와 공유하는 `input.lock` 안에서 활성 입력을 다시 엽니다. 기본 8MiB EOF 회전과 ACK 행의 tombstone 정리는 collector spool에 적용하며, pending 봉투·중복 방지 이력을 잊지 않습니다. named volume의 입력을 직접 append·truncate하는 writer는 회전과 협력하지 않으므로 사용하지 않습니다. 수동 `compact`·`rotate`는 sender 종료 후 같은 spool·대상 URL·TLS 프로필로 수행합니다. 이 기능이 서버 inbox 상한을 비우거나 인증서·관측 서명키를 갱신하지는 않습니다.
+
 ## 장애·재시작 검증
 
 ```bash
