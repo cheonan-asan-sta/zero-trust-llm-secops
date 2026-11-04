@@ -322,6 +322,16 @@ def dispatch(request, directory=DIRECTORY):
         s = state(directory)
         if operation == "checkpoint":
             return checkpoint(directory)
+        if operation == "management_reconcile":
+            if (not request.get("verified_writers_stopped") or not request.get("verified_gateways_stopped")):
+                raise LifecycleError("recovery_management_fence_required")
+            s.update(frozen=True, pending={})
+            save(directory / "state.json", s)
+            result = checkpoint(directory)
+            s = state(directory)
+            s["settled_sequence"] = s["sequence"]
+            save(directory / "state.json", s)
+            return result
         if operation == "settle":
             if not request.get("verified_writers_stopped") or not s["frozen"] or s["pending"]:
                 raise LifecycleError("recovery_writer_stop_required")

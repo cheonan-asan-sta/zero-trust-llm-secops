@@ -69,6 +69,8 @@ def ca_health(plan):
 
 
 def dispatch(request):
+    from scripts.control_mirror import guard
+    guard()
     operation = request["operation"]
     cfg = leaf.config(DIRECTORY / "config.json")
     state = json.loads((DIRECTORY / "state.json").read_bytes())
@@ -143,7 +145,7 @@ def dispatch(request):
                 raise leaf.LifecycleError("authority_probe_identity")
             return {"issued": True}
         finally:
-            payload_path.unlink(missing_ok=True)
+            leaf.remove_file(payload_path, missing_ok=True)
     if operation == "activate":
         if cfg.get("authority_epoch") == plan["epoch"]:
             return {"activated": True}
@@ -186,7 +188,7 @@ def dispatch(request):
                 raise leaf.LifecycleError("retired_jwk_still_authorized")
             return {"denied": len(statuses), "statuses": statuses}
         finally:
-            path.unlink(missing_ok=True)
+            leaf.remove_file(path, missing_ok=True)
     if operation == "finish":
         if cfg.get("authority_manifest_hash") == digest(plan):
             return {"finished": True}

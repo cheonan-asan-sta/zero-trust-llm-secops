@@ -220,7 +220,7 @@ def publish_rotation(cfg, state, state_dir):
                 raise lifecycle.LifecycleError("retired_asset_changed")
             if key.exists() and public_hash(serialization.load_pem_private_key(key.read_bytes(), password=None).public_key()) != old["public_key_sha256"]:
                 raise lifecycle.LifecycleError("retired_asset_changed")
-            key.unlink(missing_ok=True)
-            cert.unlink(missing_ok=True)
+            lifecycle.remove_file(key, missing_ok=True)
+            lifecycle.remove_file(cert, missing_ok=True)
         state["transaction"] = None
         lifecycle.save(state_dir / "state.json", state)

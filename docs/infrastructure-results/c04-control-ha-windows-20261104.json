@@ -1,0 +1,1479 @@
+{
+  "schema": "control-plane-ha-public-1",
+  "generated_at": "2026-11-04T06:34:51.130964+00:00",
+  "baseline_commit": "635638a3dd4972a71c4578b5b3d9ffcfc8d16804",
+  "source_provenance": "Baseline identifies starting checkout; raw input/in-image hashes identify tested feature sources. LF-normalized hashes identify Git blobs without changing Windows runner bytes.",
+  "scope": {
+    "management": "two independent 9-volume cells and active/passive processes on ONE parent Docker engine and PC",
+    "service_hosts": "two DinD CA/PG daemons reused; no combined service-host and management-loss recovery matrix",
+    "coordination": "trusted surviving host executor and local kernel/file lease; explicit pinned process fencing; no quorum/election",
+    "promotion_phases": [
+      "idle",
+      "prepared"
+    ],
+    "credential_scope": "offline root/JWK and backup-key jobs have network=none; online controllers have no vault/socket",
+    "baseline": "application/detection/policy/evaluation unchanged; no AWS or paid model calls"
+  },
+  "started_at": "2026-11-04T05:25:46.669053+00:00",
+  "finished_at": "2026-11-04T05:42:44.716387+00:00",
+  "summary": {
+    "successful_fresh_trials": 1,
+    "control_checks_passed": 20,
+    "new_unit_cases": 45,
+    "physical_pc_count": 1,
+    "management_takeovers": 2,
+    "source_role_and_ca_config_removed_before_first_takeover": true,
+    "retired_volumes_actually_removed": 18,
+    "authority_epochs": 1,
+    "active_identity_count": 3,
+    "registered_jwk_count": 66,
+    "old_jwk_fresh_requests_denied": 132,
+    "aws_or_paid_model_calls": 0
+  },
+  "unit_runs": {
+    "windows": {
+      "passed": 961,
+      "skipped": 1,
+      "seconds": 2841.55,
+      "duration_note": "Single observed pytest report, not an application latency or SLA benchmark."
+    },
+    "linux": {
+      "passed": 962,
+      "skipped": 0,
+      "seconds": 72.54,
+      "duration_note": "Single observed pytest report, not an application latency or SLA benchmark."
+    }
+  },
+  "source_input_sha256": {
+    "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+    "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+    "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+    "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+    "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+    "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+    "app/config.py": "27abe1679ef3147f9eb28920299c68dbf93932e05bda6035a64d7b0ac1d2fcb2",
+    "app/continuous_signal_models.py": "895b017d7c666923639088281f71ef64386977e381c5b8060c3123d174be34ae",
+    "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+    "app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+    "app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+    "app/data/control-register.json": "a8884d1269874e18a6b5261940d9e498c8509c51d0f134ea252e6b04a327c201",
+    "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+    "app/data/replay/manifest.json": "bc974726efe7f2b98119af04b9b624ba4b18a4588b2d5ff8a4c441d4beb232e9",
+    "app/data/replay/microsoft-sentinel-wiz-audit.json": "4bc25e2e6ae2cb4b80d2d135fb401d073e2c66e2d183dd5cabb574cde27ebc3b",
+    "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+    "app/data/sigma/credential_anomaly.yml": "27ee3ff5ce6eb25bdffeb5d25a59998b21c799fcff48768204be57f2974b4086",
+    "app/data/sigma/data_exfiltration.yml": "e378a7df56ac30a3c5568d42e86be53bfd43ce88489ae500c84d16e8ee8466e7",
+    "app/data/sigma/lateral_movement.yml": "cd13987a9a7ae36d57f718a2b9a87cb0fb224e5a78380311dec8edcd78dfe0c8",
+    "app/data/sigma/privilege_escalation.yml": "337b23a4ba5bed1081828f30d771f777628d8bdd88ee1298a776e7f3f21eb880",
+    "app/data/sigma/remote_desktop_logon.yml": "35a4a4fbe7ae16484a16a4287e6287239697648018be40dd4e9c33e04b0c61ee",
+    "app/data/sigma/unmanaged_device_access.yml": "b0c3ef8498458e9d687c32ca554147de44db7cdf84857eacf4224050b8122004",
+    "app/data/zero-trust-policies.json": "ab3acc5b14ba5a4af640240cc781d1ea63523a096d7e5c2dfd3d912dc468d0f9",
+    "app/main.py": "c04fb9ff8011a463994a95eed78d577512434500d2e89d0ce424161b9e2fce34",
+    "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+    "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+    "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+    "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+    "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+    "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+    "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+    "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+    "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+    "app/services/continuous_signals.py": "05115d837dc2c00b56aafbe8833b047c0cd9fb1854fff20ba7db03db261ca2a3",
+    "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+    "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+    "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+    "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+    "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+    "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+    "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+    "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+    "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+    "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+    "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+    "app/services/signal_inbox.py": "03b2d65ded032c5dd3c55434fa538afdc5604e72f54ddce2581e146cf05378b8",
+    "app/services/trusted_signals.py": "1c4908fed64712b1206bca5ae9b0f7175f315a1952e3703d764c9bb2477bb1e0",
+    "app/services/zero_trust.py": "88b40b4932138aa6832e9f6e5f7e5277baa5b1dcf44f0a737a2a6b2ec6ff64b8",
+    "app/zero_trust_api.py": "556fda2b67c9a20077b65c5f03c121e5deffd4a48d9f651ff1b7409f26b1b491",
+    "app/zero_trust_models.py": "1c466b491a923a23ce618e776660193c9bae4bef8a5026e39d8ac310a4ae7992",
+    "Dockerfile": "2278c841e2f77eda77f5ed282abd5f35ddf50f2e3dd2e890c36967804f4db219",
+    "pyproject.toml": "b8bd572be04ec1a6f8bf818645b6ac74458f98fc9561ea453210ab6c23e5475e",
+    "scripts/pep_lab.py": "b199f1fd9df18e75e564182036e8ef208872bc65f6efd489f058840541263fe8",
+    "scripts/compare_pep.py": "e2ef12beb7950a263d6384869fc3e33326c6901f9692e91f77ee16f6775fb9b4",
+    "infra/pep/contract.json": "c9aa86653aa173db206f446a09878e7facad3abf0905d85f25d013b70a59d0b5",
+    "infra/pep/envoy.yaml": "460fff298ab3e5554d8f2f7b102b8c315e57cb81fb1dd1ecb5f1ff3fec6e164a",
+    "infra/pep/nginx.conf": "654470eda569a812501345415dac2ba7da4128c480eaae71691cd50c47afdf65",
+    "infra/pep/tools.lock.json": "9076cc79d486366d5814014024df6f38ffef7862bbaf008261c39f7249b447e6",
+    "scripts/mtls_transport.py": "5e71999d5eb87354bd1beaf79b62fad5169d7584106deebf60ed3ee53c9b1a56",
+    "scripts/mtls_fixtures.py": "086155d77391fc36973dfb49442c0609ac0192760a1944774d68cbcbfad665b9",
+    "scripts/test_mtls_infrastructure.py": "3724f4c98f0baee127c58d4f961f048d8be97dde9d409ee7137f996845c6b72b",
+    "infra/mtls/contract.json": "d09f81a030ce30a4ab15e24097b5b78e95d3471f76fb7593afa39f13a9e8e55b",
+    "scripts/mtls_native.py": "e892293b44d86feca35b6e408b21ffc28c684893533632c7fc5c15a72c678e17",
+    "scripts/test_all_hops_mtls.py": "0e7c44dc5fb4ab1809e4a0a5e377338132991b719061fa4fe97cd47b4e61ce09",
+    "scripts/signal_metrics_exporter.py": "6a0cc98797b1fc53f2a40af019c608996fe734809ebd936e1985bd152ae5ba41",
+    "scripts/local_signal_collector.py": "a3ce655c10963a183f46413dc71bdaa3f56c7c85da91abe756a7e6e034cfbb39",
+    "scripts/observability_lab.py": "596bf05a9d8d2ffe268e0d61142d9d4d6f5b9fff64012497aa6b542f9eacfcc3",
+    "infra/mtls/all-hops-nginx.conf": "858533d28040a4d83c6bd58ede75e3efac0f8597f3e2992dfa79976527ad2e0e",
+    "infra/mtls/all-hops-contract.json": "e2c47e8a6594298dafbad183cdf9f75ab4814c5a405a3cf10ab996c7835631fe",
+    "infra/observability/alerts.yaml": "3b2e233f36d0338ecf572c384961729a951d51e8a2ab1f9264bb4e7cdff95172",
+    "infra/observability/tools.lock.json": "3d4b387c15a2dadd6bd7c4d3e84af436b9072b80ec32083346d40d27a4b8f014",
+    "scripts/certificate_authority.py": "1b3e0d501e74d9bc47442e15b1d2f4201bf4a6fd6d48644d93a70c6592c54f9c",
+    "scripts/certificate_controller.py": "fe5d5058b8edbf3632e6d060c4ad2074d6ea8fd72767524db18da1ea9d70ec32",
+    "scripts/certificate_reload_runner.py": "bbdafeaa210b747c007f666ec4f1beb12ee2b9afe49556fffc7c303751f0a6c9",
+    "scripts/test_certificate_automation.py": "37740d5b589cadbaedc3d530ea8318d5ff4f3a44a07f17f0cd320d1418e6b773",
+    "infra/mtls/ca-tools.lock.json": "dde8c06b2764b93b3767df4a38064586c27f78a62697084671cea62816028122",
+    "infra/mtls/certificate-lifecycle-contract.json": "df5c727f4a167dc3135636daf96a9f7fad1b24f3c7fa001257b5a1badd91e503",
+    "infra/mtls/nginx-renewal.sh": "07468723f53706ef477f19725dcdf2fed53f51ea41eb277c317f828fc5f9505c",
+    ".gitattributes": "e576cf8cd5811efcee1b36531868f155bef136dbe0e20f7d5b0039b3a36405a5",
+    "scripts/certificate_key_rotation.py": "e648f07caf6d2a7873fb14d91cfd5285f5aec67e1aa086e436e1e5ca9284d319",
+    "scripts/test_private_key_rotation.py": "b8fd85194759dff83f7991f2069ebefe1025b853a53ce48b8f846b4c194a788c",
+    "infra/mtls/nginx-rekey.sh": "a57af3bdd39b62a8961ead51392be8155d246dcc5878638920285f07c406c814",
+    "infra/mtls/private-key-rotation-contract.json": "2832f6dd92ef36aaa49af5e96cbb984b3969783cca37c3152d77f137bd5e5cff",
+    "scripts/authority_custodian.py": "b87fc7ef0be26ecb259510e8df07eae402dae9608b1a2e5bfa3e03b23c6f4693",
+    "scripts/authority_rotation_runtime.py": "e184e49c386ed46d4f3e9214cec95e97a7f56e4e0608711119f2c61b6b76ca26",
+    "scripts/authority_rotation_coordinator.py": "1ab99ef7f9a96c75393209c169d41f82db0a783c4f24bde7df622a7c9c84647b",
+    "scripts/test_authority_key_rotation.py": "2e7c4dbd442e02421ec8f61d7f2346d8e79fec549601f4e2741ab1721f2dad0c",
+    "infra/mtls/authority-rotation-contract.json": "e344b3be34aca530d47ec30b07c8df8fd5dacabb2febccb91fc7138c7fb489cb",
+    "scripts/ca_endpoints.py": "b5c546ce93d86ea90e99de46f78e80e60149f8146605e27160ceb24a9babd057",
+    "scripts/test_ca_high_availability.py": "284c3785291117d71ffa78dd0be6147e6e8e58fb16a63a697d8c519b6b91e4b2",
+    "infra/mtls/ca-ha-tools.lock.json": "30c9e3b2f850c4d8a8bc6d89d9c0d9e15717d62e980989073372c8b3a61345d2",
+    "infra/mtls/ca-ha-contract.json": "36f50c9666eaf1ace7dc976ebbd2da501154c55d5523e75646b55de132ac5ccc",
+    "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+    "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+    "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+    "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+    "infra/mtls/ca-recovery-tools.lock.json": "50a2419212074c7733f72046bc762ba8a97d88263e99d6cbf7f984787f73aa42",
+    "scripts/control_mirror.py": "baa85f9272dabed1b60b4ddbf9e4922a0341de952a8c2ad473ddbcdbeb625df6",
+    "scripts/control_store.py": "086b90813a97d6caa4693d66e760982194e4103bf9b003eec9624f71b58db0da",
+    "scripts/control_plane_ha.py": "0813fdcd48fe8c6fd2cfb22f209d9ca31e0f5fdbee2295599093412ba8a0dd43",
+    "scripts/test_control_plane_ha.py": "97ea79bfe0369dd8983c8c57d6d3e9128879c083dd81b83bda4c59e7586b8e8e"
+  },
+  "lf_normalized_source_sha256": {
+    "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+    "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+    "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+    "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+    "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+    "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+    "app/config.py": "0cce522f9991ae302a87f39cb727593d680392062a296958b80d563359053a01",
+    "app/continuous_signal_models.py": "9482577e2d7cb210a16cf3de6ef46517c32c32ee1ec1efb23e28f626fda25ee3",
+    "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+    "app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+    "app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+    "app/data/control-register.json": "a8884d1269874e18a6b5261940d9e498c8509c51d0f134ea252e6b04a327c201",
+    "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+    "app/data/replay/manifest.json": "bc974726efe7f2b98119af04b9b624ba4b18a4588b2d5ff8a4c441d4beb232e9",
+    "app/data/replay/microsoft-sentinel-wiz-audit.json": "4bc25e2e6ae2cb4b80d2d135fb401d073e2c66e2d183dd5cabb574cde27ebc3b",
+    "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+    "app/data/sigma/credential_anomaly.yml": "27ee3ff5ce6eb25bdffeb5d25a59998b21c799fcff48768204be57f2974b4086",
+    "app/data/sigma/data_exfiltration.yml": "e378a7df56ac30a3c5568d42e86be53bfd43ce88489ae500c84d16e8ee8466e7",
+    "app/data/sigma/lateral_movement.yml": "cd13987a9a7ae36d57f718a2b9a87cb0fb224e5a78380311dec8edcd78dfe0c8",
+    "app/data/sigma/privilege_escalation.yml": "337b23a4ba5bed1081828f30d771f777628d8bdd88ee1298a776e7f3f21eb880",
+    "app/data/sigma/remote_desktop_logon.yml": "35a4a4fbe7ae16484a16a4287e6287239697648018be40dd4e9c33e04b0c61ee",
+    "app/data/sigma/unmanaged_device_access.yml": "b0c3ef8498458e9d687c32ca554147de44db7cdf84857eacf4224050b8122004",
+    "app/data/zero-trust-policies.json": "ab3acc5b14ba5a4af640240cc781d1ea63523a096d7e5c2dfd3d912dc468d0f9",
+    "app/main.py": "22ccdd69e9bd30842ea4708a15101d51722876f28baeb8b0b1ca625aa0820997",
+    "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+    "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+    "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+    "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+    "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+    "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+    "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+    "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+    "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+    "app/services/continuous_signals.py": "870da40ee024067d6c35689b6daed7fd89215071918650a4a17cc7c5a1aa37d6",
+    "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+    "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+    "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+    "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+    "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+    "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+    "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+    "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+    "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+    "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+    "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+    "app/services/signal_inbox.py": "fd16fc2ca126600989cc6325900eabd3e6c5923464c6ccb504b4560fd9dfd638",
+    "app/services/trusted_signals.py": "d015e6e04730dee55b4a6bd37701415c721a17bf1f59a33351ea77c725c3ff09",
+    "app/services/zero_trust.py": "0a7e0c5333ea2fa3dbe7766b64d3f46c3bab25e80c63af2f21792aeef21b6884",
+    "app/zero_trust_api.py": "8df229ab6392b1330e40c90bd508961721b95413121388c4b14650fb54f34ec7",
+    "app/zero_trust_models.py": "74e3fc316b62881ee325d501735ed94fc62073de583c37ad5c527d4366b75718",
+    "Dockerfile": "f10f2d3b8af1fc31ea0bb5c9e7a40e05b9609943c62a7a9b0810dde7224eab2b",
+    "pyproject.toml": "a71998c113e8cea24811d46050c1ae0aa431e0f8e1f37751e46eeeb7a5f90ed9",
+    "scripts/pep_lab.py": "2d2491720dfb9982ca06862daeb9e1cd13bb21bfef08ad1d3aa4ca59e69abc1f",
+    "scripts/compare_pep.py": "f8b35ddf395d80886fda042b319457403e30b265e6de0e0d26298893aecdafb3",
+    "infra/pep/contract.json": "dafb14514c4b1ec07282fab1dca80f0f509b368936d6ab09b03601f9e4dc171c",
+    "infra/pep/envoy.yaml": "78a73d32d1551bede27a2cc0bcff77d1625324a61ed6f27526b532861baf057c",
+    "infra/pep/nginx.conf": "f5486bcbe05cd4c1dba2755a81c5d64984e414d74e693868cbbfb68e4a26fc56",
+    "infra/pep/tools.lock.json": "69b9ddd436c4aed7fd27b70afad40fe3740e5b4b0c5a50fbe503b1a93f654e66",
+    "scripts/mtls_transport.py": "43024fa67e17c558ffdedb458e65c6712a07468262278ce8fb5c90a2f81ddd65",
+    "scripts/mtls_fixtures.py": "c6414b317a456cd7eb97290c589bd2115bca57e898c9ca6bd4848a529c6802fe",
+    "scripts/test_mtls_infrastructure.py": "a24fef9f3e849877a8dc9f9c27503a04adc7b6c7057220ce1576bb5da500c207",
+    "infra/mtls/contract.json": "68bbb3fddc9dc0ef10ebe2e085e826d22b5889dd3098559d2f41bcf7e9f831ee",
+    "scripts/mtls_native.py": "bd5046f8136a93f723207c70cdcf0984b575108e764335f2cc6dd766fcc7f925",
+    "scripts/test_all_hops_mtls.py": "eb841f22ff531228aff62a496917c86ef4e6a7edbe9b3d5c47ca2dc02feddf46",
+    "scripts/signal_metrics_exporter.py": "76be66a9ff3e2194cf46ed72a53748342abe5e0c7a7b95345f6483c9cc4c83ed",
+    "scripts/local_signal_collector.py": "3bd27286e473283b10650a89863b349171285d0866104999f7ef42ec6a2cde9b",
+    "scripts/observability_lab.py": "eea01b2ad71226ebebc64e60cfc06b3a9c85a584891d690ab3a1ebb39655b14f",
+    "infra/mtls/all-hops-nginx.conf": "b9cf941bfbaab0c5c5b89f1fc02cd164542a48d46cac0d27855cef8ce60f1509",
+    "infra/mtls/all-hops-contract.json": "9c11c814dc57fccd607f3a9c13f6ba48938b83675f6bcfd0146483a80da98806",
+    "infra/observability/alerts.yaml": "442f9c0566db9d6088f6809907ecbf17f80ede1c2f62f20e76c6673fa2206779",
+    "infra/observability/tools.lock.json": "b65aadfdb1d637ca15c03a59c58c0ddeb04f778b5edd99f29e47b33cb5fae75f",
+    "scripts/certificate_authority.py": "adddc6bf0a629b8192c2a262e7aa7ec047114d4b826c0f3f040e0613b12d4ed3",
+    "scripts/certificate_controller.py": "9bb12b7f76f952316d3a736cd8a573fdfd780c2550402643c65390c82d964bee",
+    "scripts/certificate_reload_runner.py": "5e4f9aeeea931cefc77d77fe137d875666c96e204727e3f1b7661667aa65ee26",
+    "scripts/test_certificate_automation.py": "85893bf90e05568ba61bc74abf658817919ab2ec9d4e510188f51a34c74c0270",
+    "infra/mtls/ca-tools.lock.json": "182b2e5f0a2bdb91fe0b29a888a536044c08ca5b4177a610e870b0dcb45d4e96",
+    "infra/mtls/certificate-lifecycle-contract.json": "ba62e7c3fe863ef32da73ebb34d2b1242a7988d2e22e90721ebaaa624af68026",
+    "infra/mtls/nginx-renewal.sh": "07468723f53706ef477f19725dcdf2fed53f51ea41eb277c317f828fc5f9505c",
+    ".gitattributes": "df1b80380b6c8b3a079d8d45cc53dfc223aa383fbe8afcab6cfb77879b66fe6c",
+    "scripts/certificate_key_rotation.py": "0ad9647b6e72ce8a5a67196f9df3284c561e7894686bc4bb961a7d31e5fcf6d8",
+    "scripts/test_private_key_rotation.py": "b9c97aab996b75cd2824ce995e49b87c748b39f391a9770fb752e2f78649e12a",
+    "infra/mtls/nginx-rekey.sh": "a57af3bdd39b62a8961ead51392be8155d246dcc5878638920285f07c406c814",
+    "infra/mtls/private-key-rotation-contract.json": "6961570c7438566dac41b080428826fa0517e8310e9b207e0b673ddd824818ca",
+    "scripts/authority_custodian.py": "de343958405c33effa92a6471e3dea1edf3ad8adf3af681050a26ef7ad46c77a",
+    "scripts/authority_rotation_runtime.py": "11ec4e8cb92d808beb1b60755b8085bb59bd9478479ecaf03327f0a34af17c5b",
+    "scripts/authority_rotation_coordinator.py": "2c702808b299692069fb505260f39db0316c53daf44ad284665f5fc9e8612614",
+    "scripts/test_authority_key_rotation.py": "50d8b3ba8e1aeb01bf22eb6867c36e008ccaffc9a363837afce87accbc0433e3",
+    "infra/mtls/authority-rotation-contract.json": "3278508b932de119e93b6edf03c191a613bba65dc086489c968745ce2c6ef3ad",
+    "scripts/ca_endpoints.py": "77f41676e7a8a0c44449e32f6f271a7d4a8f5a48e17473593c42fa7074593cb6",
+    "scripts/test_ca_high_availability.py": "dfa2275d67129e4cfce44cd6c6eaa406e07313aa6f7121e9dd193401cc0ba40e",
+    "infra/mtls/ca-ha-tools.lock.json": "5f61296747d8db973e55893b0ea273706f1a1bbb19c3fa535ec7d2dad37ffbeb",
+    "infra/mtls/ca-ha-contract.json": "15d59148f2ea4c834f21583b30b062d6e94e739bda541fe9c10e8de8fa816738",
+    "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+    "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+    "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+    "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+    "infra/mtls/ca-recovery-tools.lock.json": "50a2419212074c7733f72046bc762ba8a97d88263e99d6cbf7f984787f73aa42",
+    "scripts/control_mirror.py": "baa85f9272dabed1b60b4ddbf9e4922a0341de952a8c2ad473ddbcdbeb625df6",
+    "scripts/control_store.py": "086b90813a97d6caa4693d66e760982194e4103bf9b003eec9624f71b58db0da",
+    "scripts/control_plane_ha.py": "0813fdcd48fe8c6fd2cfb22f209d9ca31e0f5fdbee2295599093412ba8a0dd43",
+    "scripts/test_control_plane_ha.py": "97ea79bfe0369dd8983c8c57d6d3e9128879c083dd81b83bda4c59e7586b8e8e"
+  },
+  "image_source_sha256": {
+    "ha_image_source_sha256": {
+      "scripts/authority_custodian.py": "b87fc7ef0be26ecb259510e8df07eae402dae9608b1a2e5bfa3e03b23c6f4693",
+      "scripts/authority_rotation_runtime.py": "e184e49c386ed46d4f3e9214cec95e97a7f56e4e0608711119f2c61b6b76ca26",
+      "scripts/authority_rotation_coordinator.py": "1ab99ef7f9a96c75393209c169d41f82db0a783c4f24bde7df622a7c9c84647b",
+      "scripts/test_authority_key_rotation.py": "2e7c4dbd442e02421ec8f61d7f2346d8e79fec549601f4e2741ab1721f2dad0c",
+      "scripts/certificate_controller.py": "fe5d5058b8edbf3632e6d060c4ad2074d6ea8fd72767524db18da1ea9d70ec32",
+      "scripts/certificate_key_rotation.py": "e648f07caf6d2a7873fb14d91cfd5285f5aec67e1aa086e436e1e5ca9284d319",
+      "scripts/test_private_key_rotation.py": "b8fd85194759dff83f7991f2069ebefe1025b853a53ce48b8f846b4c194a788c",
+      "scripts/test_certificate_automation.py": "37740d5b589cadbaedc3d530ea8318d5ff4f3a44a07f17f0cd320d1418e6b773",
+      "scripts/ca_endpoints.py": "b5c546ce93d86ea90e99de46f78e80e60149f8146605e27160ceb24a9babd057",
+      "scripts/test_ca_high_availability.py": "284c3785291117d71ffa78dd0be6147e6e8e58fb16a63a697d8c519b6b91e4b2",
+      "scripts/certificate_authority.py": "1b3e0d501e74d9bc47442e15b1d2f4201bf4a6fd6d48644d93a70c6592c54f9c"
+    },
+    "recovery_image_source_sha256": {
+      "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+      "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+      "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+      "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+      "scripts/authority_rotation_coordinator.py": "1ab99ef7f9a96c75393209c169d41f82db0a783c4f24bde7df622a7c9c84647b",
+      "scripts/authority_rotation_runtime.py": "e184e49c386ed46d4f3e9214cec95e97a7f56e4e0608711119f2c61b6b76ca26",
+      "scripts/authority_custodian.py": "b87fc7ef0be26ecb259510e8df07eae402dae9608b1a2e5bfa3e03b23c6f4693",
+      "scripts/certificate_controller.py": "fe5d5058b8edbf3632e6d060c4ad2074d6ea8fd72767524db18da1ea9d70ec32",
+      "scripts/certificate_authority.py": "1b3e0d501e74d9bc47442e15b1d2f4201bf4a6fd6d48644d93a70c6592c54f9c",
+      "scripts/certificate_key_rotation.py": "e648f07caf6d2a7873fb14d91cfd5285f5aec67e1aa086e436e1e5ca9284d319",
+      "scripts/test_authority_key_rotation.py": "2e7c4dbd442e02421ec8f61d7f2346d8e79fec549601f4e2741ab1721f2dad0c",
+      "scripts/test_ca_high_availability.py": "284c3785291117d71ffa78dd0be6147e6e8e58fb16a63a697d8c519b6b91e4b2",
+      "scripts/test_private_key_rotation.py": "b8fd85194759dff83f7991f2069ebefe1025b853a53ce48b8f846b4c194a788c",
+      "scripts/test_certificate_automation.py": "37740d5b589cadbaedc3d530ea8318d5ff4f3a44a07f17f0cd320d1418e6b773",
+      "scripts/ca_endpoints.py": "b5c546ce93d86ea90e99de46f78e80e60149f8146605e27160ceb24a9babd057"
+    },
+    "control_image_source_sha256": {
+      "scripts/control_mirror.py": "baa85f9272dabed1b60b4ddbf9e4922a0341de952a8c2ad473ddbcdbeb625df6",
+      "scripts/control_store.py": "086b90813a97d6caa4693d66e760982194e4103bf9b003eec9624f71b58db0da",
+      "scripts/control_plane_ha.py": "0813fdcd48fe8c6fd2cfb22f209d9ca31e0f5fdbee2295599093412ba8a0dd43",
+      "scripts/test_control_plane_ha.py": "97ea79bfe0369dd8983c8c57d6d3e9128879c083dd81b83bda4c59e7586b8e8e"
+    }
+  },
+  "images": {
+    "certificate_execution_image_id": "sha256:0ebfa520df4c4863c35acf5c2572aca79f7656061e761dccc06a1a4142bfd4cf",
+    "ha_postgres_image_id": "sha256:86bfd196795395ce7bfffa0a30135bfc699073e15bac5dd2238e75f766147f56"
+  },
+  "tools": {
+    "schema": "ca-recovery-tools-1",
+    "platform": "linux/amd64",
+    "docker_host": {
+      "image": "docker:29-dind@sha256:97545b7bab66319a476800a85b008b25c06681733d484909e2a776281e41574f",
+      "observed_version": "29.9.2-dind",
+      "source": "https://github.com/docker-library/docker/tree/29938079fb10e4c1a5e417cf74a84b6f845443e2/29/dind"
+    },
+    "wheels": [
+      {
+        "name": "psycopg-3.3.6-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/4e/de/748bd7609c71cae5d737f0ba9192f19329f70180ecda8fff3cac02c5abe3/psycopg-3.3.6-py3-none-any.whl",
+        "sha256": "a1db9f7148b06a28606767efaca51fa6f9398c5c0a3810519be69d7000bdb631"
+      },
+      {
+        "name": "psycopg_binary-3.3.6-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+        "url": "https://files.pythonhosted.org/packages/0a/42/948bb3d2617795093512613fd96ba380e922992c7908fbc073858147d196/psycopg_binary-3.3.6-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+        "sha256": "1679a1cb93fbe5a6d1fd58d82cbddcc6fcb8c61446ba7cae6eb2a7b19bc585de"
+      }
+    ]
+  },
+  "initial_service_hosts": {
+    "a": {
+      "name": "c02-568e31428ddc-smoke-host-a",
+      "id": "ed45986c565a14850c3d55105ab14834e361b812daa2ddf79dd0a4b25eb73d9d",
+      "image": "sha256:9a5d43f7d02971b15763b4b88d0e44cfaa858ec8a04b2fd84057b03c6f0e0f96",
+      "daemon_id": "15b11d81-cf2e-46e7-916a-b14f50603247",
+      "docker_volume": "c02-568e31428ddc-smoke-host-a-docker-0",
+      "address": "172.20.0.2"
+    },
+    "b": {
+      "name": "c02-568e31428ddc-smoke-host-b",
+      "id": "8af9b459404e706cdedfa8af464c74d2a9ed2cf09b1a3c6953fde0ddb25a1e07",
+      "image": "sha256:9a5d43f7d02971b15763b4b88d0e44cfaa858ec8a04b2fd84057b03c6f0e0f96",
+      "daemon_id": "0b6f422d-54a2-4835-855f-90838eb7208c",
+      "docker_volume": "c02-568e31428ddc-smoke-host-b-docker-0",
+      "address": "172.20.0.3"
+    }
+  },
+  "checks": [
+    {
+      "label": "independent_management_volume_sets",
+      "passed": true,
+      "cells": {
+        "a": {
+          "vault": "c02-568e31428ddc-smoke-authority-vault",
+          "ca": "c02-568e31428ddc-smoke-ca-state",
+          "leaf": "c02-568e31428ddc-smoke-controller-state",
+          "renewal": "c02-568e31428ddc-smoke-renewal-proof",
+          "witness": "c02-568e31428ddc-smoke-security-witness",
+          "backups": "c02-568e31428ddc-smoke-backups",
+          "backup_key": "c02-568e31428ddc-smoke-backup-key",
+          "reader": "c02-568e31428ddc-smoke-reader-tls",
+          "control": "c02-568e31428ddc-mgmt-a-g1-control"
+        },
+        "b": {
+          "ca": "c02-568e31428ddc-mgmt-b-g1-ca",
+          "vault": "c02-568e31428ddc-mgmt-b-g1-vault",
+          "leaf": "c02-568e31428ddc-mgmt-b-g1-leaf",
+          "renewal": "c02-568e31428ddc-mgmt-b-g1-renewal",
+          "witness": "c02-568e31428ddc-mgmt-b-g1-witness",
+          "backups": "c02-568e31428ddc-mgmt-b-g1-backups",
+          "backup_key": "c02-568e31428ddc-mgmt-b-g1-backup-key",
+          "reader": "c02-568e31428ddc-mgmt-b-g1-reader",
+          "control": "c02-568e31428ddc-mgmt-b-g1-control"
+        }
+      }
+    },
+    {
+      "label": "active_publisher_and_read_only_standby",
+      "passed": true,
+      "active": {
+        "name": "c02-568e31428ddc-mgmt-a-e1-leaf",
+        "id": "69c1107c9b8715a5e59d7ac34228a9e7eff5f3e1ffa30e815123e197b9616421"
+      },
+      "standby": {
+        "name": "c02-568e31428ddc-mgmt-b-e1-standby",
+        "id": "33439aca8579957f3c1f1cbdf9cd458b6f7c1453b3d2c2a2146ed0bc60f9e961"
+      }
+    },
+    {
+      "label": "mismatched_candidate_role_refuses_takeover",
+      "passed": true,
+      "reason": "authority_child_control_candidate_role_mismatch"
+    },
+    {
+      "label": "unfinished_management_operation_refuses_takeover",
+      "passed": true,
+      "reason": "authority_child_control_unfinished_operation"
+    },
+    {
+      "label": "authority_candidate_keys_and_plan_replicated_before_install",
+      "passed": true,
+      "root_public_key_sha256": "d72a0c6a6a68b65e24972648c260ad604243cd7e2660d38075a888e40d7eb250"
+    },
+    {
+      "label": "lost_active_management_role_and_publisher_taken_over",
+      "passed": true,
+      "elapsed_seconds": 66.5,
+      "active": "b",
+      "management_epoch": 2,
+      "coordinator_phase": "prepared",
+      "coordinator_epoch": 0,
+      "plan_hash": "f30cfdf72358f538118b7aae5e7a26aaaeeec9c39c6da87823625238eda3b064",
+      "fenced": [
+        {
+          "id": "69c1107c9b8715a5e59d7ac34228a9e7eff5f3e1ffa30e815123e197b9616421",
+          "name": "c02-568e31428ddc-mgmt-a-e1-leaf",
+          "stopped": true
+        },
+        {
+          "id": "33439aca8579957f3c1f1cbdf9cd458b6f7c1453b3d2c2a2146ed0bc60f9e961",
+          "name": "c02-568e31428ddc-mgmt-b-e1-standby",
+          "stopped": true
+        },
+        {
+          "id": "687b3523acfbb5287804dbeb4e326ef3e4fe414e7b3625956df0769c9ef63507",
+          "name": "c02-568e31428ddc-smoke-admission-a",
+          "stopped": true
+        },
+        {
+          "id": "e809906626c34c698863003a980f4095ee186ac10d62c4b2805903686c34d269",
+          "name": "c02-568e31428ddc-smoke-admission-b",
+          "stopped": true
+        }
+      ],
+      "retired_volumes": {
+        "vault": "c02-568e31428ddc-smoke-authority-vault",
+        "ca": "c02-568e31428ddc-smoke-ca-state",
+        "leaf": "c02-568e31428ddc-smoke-controller-state",
+        "renewal": "c02-568e31428ddc-smoke-renewal-proof",
+        "witness": "c02-568e31428ddc-smoke-security-witness",
+        "backups": "c02-568e31428ddc-smoke-backups",
+        "backup_key": "c02-568e31428ddc-smoke-backup-key",
+        "reader": "c02-568e31428ddc-smoke-reader-tls",
+        "control": "c02-568e31428ddc-mgmt-a-g1-control"
+      },
+      "candidate_sha256": "313452e641e6a50833783fcfa982b172e3b6abca930816debcd9c50dfd510680"
+    },
+    {
+      "label": "retired_management_storage_removed_after_fencing_b",
+      "passed": true,
+      "count": 9
+    },
+    {
+      "label": "coordinator_cache_loss_recovers_same_private_candidate_and_plan",
+      "passed": true
+    },
+    {
+      "label": "stale_original_controller_profile_cannot_mutate",
+      "passed": true,
+      "reason": "authority_docker_command_failed"
+    },
+    {
+      "label": "authority_rotation_completed_from_replicated_prepared_checkpoint",
+      "passed": true,
+      "old_jwk_denials": 132
+    },
+    {
+      "label": "mtls_renewal_after_first_management_takeover",
+      "passed": true
+    },
+    {
+      "label": "encrypted_backup_and_separate_backup_key_replicated",
+      "passed": true,
+      "name": "backup-control-current.sealed",
+      "manifest": {
+        "sequence": 208,
+        "authority": "96a71e3706592d93db304bf35ac9261c7c1accdbc1c1f4a5803132b714f525b3",
+        "incarnation": "7704184526829506575",
+        "database_sha256": "434276135b03c8bbbc92f1c9de38fbd65510a1f309c1cd55469c27f754ae6eaf",
+        "checkpoint_hash": "d93eac32282f161c0ec2f88b9740bede882c51549d1c81b8353be07492f819f2",
+        "created_at": 1793770817.2598884
+      },
+      "ciphertext_sha256": "f55eb90e2cfcacd13d051130acd8dfadb7614f0c75c3059a9a067f30daef400c"
+    },
+    {
+      "label": "post_backup_token_consumption_and_revocation_established",
+      "passed": true,
+      "serial": "146306191555910021293284818373536300193"
+    },
+    {
+      "label": "second_management_cell_loss_uses_independent_surviving_copy",
+      "passed": true,
+      "active": "a",
+      "management_epoch": 3,
+      "coordinator_phase": "idle",
+      "coordinator_epoch": 1,
+      "plan_hash": null,
+      "fenced": [
+        {
+          "id": "136d9041dae8d7515f89518816aa72bae19ca970c4ac191f7d1647e421aaedcb",
+          "name": "c02-568e31428ddc-mgmt-b-e2-leaf",
+          "stopped": true
+        },
+        {
+          "id": "788c7674f284e162f06db84700f521705d7994b97ffdd23ff6ebcc02185a2d9e",
+          "name": "c02-568e31428ddc-mgmt-a-e2-standby",
+          "stopped": true
+        },
+        {
+          "id": "3cbb7da1ee2c57603cdaf95927ffc3940476e2207c206fc2015aaa00066fe709",
+          "name": "c02-568e31428ddc-smoke-admission-a",
+          "stopped": true
+        },
+        {
+          "id": "d72e2036f05b70fe4bca3bd5ef7de6386fe086ada6362d43185d741e52d5e40f",
+          "name": "c02-568e31428ddc-smoke-admission-b",
+          "stopped": true
+        }
+      ],
+      "retired_volumes": {
+        "ca": "c02-568e31428ddc-mgmt-b-g1-ca",
+        "vault": "c02-568e31428ddc-mgmt-b-g1-vault",
+        "leaf": "c02-568e31428ddc-mgmt-b-g1-leaf",
+        "renewal": "c02-568e31428ddc-mgmt-b-g1-renewal",
+        "witness": "c02-568e31428ddc-mgmt-b-g1-witness",
+        "backups": "c02-568e31428ddc-mgmt-b-g1-backups",
+        "backup_key": "c02-568e31428ddc-mgmt-b-g1-backup-key",
+        "reader": "c02-568e31428ddc-mgmt-b-g1-reader",
+        "control": "c02-568e31428ddc-mgmt-b-g1-control"
+      },
+      "candidate_sha256": "3350d7a61655fe8f28ca8c0ca591b97ae6299ced6af2b889484cb55980a89945"
+    },
+    {
+      "label": "retired_management_storage_removed_after_fencing_a",
+      "passed": true,
+      "count": 9
+    },
+    {
+      "label": "committed_authority_epoch_survives_cache_and_cell_loss",
+      "passed": true
+    },
+    {
+      "label": "consumed_token_and_revoked_certificate_still_unexpired",
+      "passed": true,
+      "remaining_token_seconds": 817.74,
+      "remaining_certificate_seconds": 1118.74
+    },
+    {
+      "label": "consumed_token_and_revoked_certificate_remain_denied",
+      "passed": true
+    },
+    {
+      "label": "new_nonce_works_after_both_separate_management_losses",
+      "passed": true
+    },
+    {
+      "label": "surviving_backup_key_and_archive_authenticate_with_latest_security_state",
+      "passed": true,
+      "verified": true,
+      "backup_sequence": 208,
+      "latest_security_sha256": "54466596b90e33edb4d36af803d42f1046bf75021bf76ccdff19baa4737402fa",
+      "latest_lsn": "0/30DD270"
+    }
+  ],
+  "authority_rotation": {
+    "epoch": 1,
+    "changed": {
+      "issuer": true,
+      "jwk": true,
+      "root": true
+    },
+    "plan_hash": "f30cfdf72358f538118b7aae5e7a26aaaeeec9c39c6da87823625238eda3b064",
+    "root_public_key_sha256": "d72a0c6a6a68b65e24972648c260ad604243cd7e2660d38075a888e40d7eb250",
+    "issuer_public_key_sha256": "5fe2509e26d73c2972c2df5b3ed57a1cf6394fac136cbf66a9151fd389f5ce53",
+    "provider_public_keys": {
+      "alert-manager-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "SQ-SUcmAL8fslLJZ7UVPRJ3SulVTWya2gDCh1cX14Ak",
+        "kty": "EC",
+        "use": "sig",
+        "x": "nsZMOsWYQO-tAZL4v0riUpcuPmTipAmOpbQOh8aNgIg",
+        "y": "76bvRg7ORbp3-5QtE6a34CG6sPsy14_bpdMBQ1kE4w8"
+      },
+      "am-control-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "tIGmPuvtA_q0mD2wxAlmBRxEXTYzFPYMvGAgah1vPaY",
+        "kty": "EC",
+        "use": "sig",
+        "x": "uMh411OgXcqekkEwRUyuKGep9mTkQ61gPJ2jvPJLOiM",
+        "y": "0hii9ZQukcO7QTPn2MOPIutGy-AFoAZIgxCCCMuTLTg"
+      },
+      "am-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "mCZeEBOSptjsdcJCk0A7nk8gurigKMJDa3NQYCl6H3E",
+        "kty": "EC",
+        "use": "sig",
+        "x": "Cnbh5laeATAqLcxhIB7T80DJqbbdFFGWnlkfYYXV_KA",
+        "y": "4TPEOR9qv6DSv1qa6H-BFNS18Qx4s4Cq4EK8Zka-S3k"
+      },
+      "auto-canary-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "cXSKZn3zuvaBPrPBJQFJVOeYRARvcFLAihPZvFNBCVY",
+        "kty": "EC",
+        "use": "sig",
+        "x": "70wQ1KT7Nr6WlrYm7xA8QGkWPLcfCggXLYVxSQ--Al8",
+        "y": "GBh1d8PZ3srqO-HskiYpZMuPJx9Gi_-vkdKA-rAo2fc"
+      },
+      "bridge-auth-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "cgtav8FeniF5qMjhyInIdljg-m-F3zX63kO2SV08S8g",
+        "kty": "EC",
+        "use": "sig",
+        "x": "V8Aj6fhegdcG_0BK86cIPWoI8hpyjeIcL2J70pcBGJs",
+        "y": "vzxRItNlAzyf4my513Hg1SaghkCmg_z6qvEneoyg-7U"
+      },
+      "bridge-consume-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "Puh_E7XbMlS9lwgVU6Twi_1DrpdIw_X2ktg6dn45NTw",
+        "kty": "EC",
+        "use": "sig",
+        "x": "NmwC89JAuntuzFqzYx3SpwraeXvANXgr-Q7v6WEHD9E",
+        "y": "oMsKppolz5pmcdAQzAGXUtk8093tvnmmERJ0Pw9aAGE"
+      },
+      "bridge-probe-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "lfPT-6vXd0Go0rXYUVTGH-WjlWxojjJE9UXSXSVfWCM",
+        "kty": "EC",
+        "use": "sig",
+        "x": "yI6BJzzhCZHLsauZgo7lCgZbhRoe30T0ovkOqQpKIhY",
+        "y": "ltJHwLtfExiaVpkxPwFYPg9oWvBzlxFQTk3DBzEReMg"
+      },
+      "collector-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "TakrL2Cd-HlQ19-NG9IzrITxnaRThVgKkOHpmGpR_X0",
+        "kty": "EC",
+        "use": "sig",
+        "x": "j8f4aBY-RTCZevOxD5_UMc0rzyDFA_OfWao1KA0VAg4",
+        "y": "xZR52PNfSHovkjDpXehkF9VsvllBxVo_kmwfmnUXL3Y"
+      },
+      "core-a-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "ugePUePVC3MO9NqokcLGx7FwBP-6lhq_P_h3YCfHYf4",
+        "kty": "EC",
+        "use": "sig",
+        "x": "kt6UuGriQnGwDs2mSa6scMamyOVg9fqGxjKm5pX-IL4",
+        "y": "QV-Xrn2U2GZ6k6hUuYEITYDvx_0MXWutGFl9fEuIK-8"
+      },
+      "core-b-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "qJjvFSW7KmtIBEuOyHVs8SkmyMgbiKyxoYm3U-HaQu0",
+        "kty": "EC",
+        "use": "sig",
+        "x": "S9XLXV6KiCVxK80rqiKXzAnH5c_P6oOjPwzEvn6p99Y",
+        "y": "eVsmmSPL9lhgDL3JjjqANL-jIYD1z8IOawHXrwXx-cw"
+      },
+      "core-c-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "iTINldKtfD34KFlRrInDc97sG53Jw3hoYu3e7g0FuWI",
+        "kty": "EC",
+        "use": "sig",
+        "x": "OJ7jzIyiMUyUvViFogfklM1LsMpm8DxloM44BUxTApI",
+        "y": "Bu2n94ZP5ljQ6Rn7FxZIOLWu1A121MyQ4xmkpwurrEg"
+      },
+      "core-operator-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "QeNJAVMcMMTHela_ZeUdJtE7jINY3SibHN7IWY3wer4",
+        "kty": "EC",
+        "use": "sig",
+        "x": "v7OUUsQOR9eOAbqE18L14l9DHQZePd3XKMW71Hul8-Q",
+        "y": "CORRGeIE8vT2z36xGpdq-iaDmnQ6tgE96HdOtf01OgM"
+      },
+      "exporter-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "-d4L_j3LCPn67cyUPzOqjieXSacuEq5nWE20pZO9GlA",
+        "kty": "EC",
+        "use": "sig",
+        "x": "4uodTjXjZzUkMjTJLN497z54YdDOhXDvtpuSxvGeVk0",
+        "y": "5_dLBuv0Mr_0imViYGh5HjZcx2tvtNlp550oqPX8gmg"
+      },
+      "frontend-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "Z1tI4cTcorfO2pO-jafvrVoyBZlPYllsxgS5gHI87dw",
+        "kty": "EC",
+        "use": "sig",
+        "x": "kuy0i8axOjUwWByOJLsPdTaCRr5Q_RBnz6r5h9dzyJg",
+        "y": "TCOq4G1nToQUecQL9Rq-zowUuM8LdpP7SxggJJJm8Ds"
+      },
+      "frontend-next-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "0yH8QwC-mwT9psLQokCry8Eun-eiY2FODkd6qlTwdOE",
+        "kty": "EC",
+        "use": "sig",
+        "x": "Bo3s7rij0UUaV5sQYPgepl7hWqfwZsqnxFtTY7h5xYY",
+        "y": "yXH-OuxJ8_WcR3kfuLCfhFxuOlrdL1iKBTNojdguOuo"
+      },
+      "gateway-client-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "UyIy96BEpoZfTcCqhAHCkcUdCsA9Afausn-h8DqV5eg",
+        "kty": "EC",
+        "use": "sig",
+        "x": "VM7PirN04V3JPUiPIhd475Ju9_u85_Phc8DKzQtc1Os",
+        "y": "3f-suVTKhLtHVPbkfkuFKaZUUimise6Ibsj68DGO6kI"
+      },
+      "gateway-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "hv4O1kNcc2AtuewE5dJpmluSdUPKPQD1d_cgnQwrekQ",
+        "kty": "EC",
+        "use": "sig",
+        "x": "mlRJ4GeBhTijpOOSmixEPZkySPEc7AUHZ_VGWp8vseA",
+        "y": "fmB5pQHaZPRBZ1OMZAgRtXj7lg-lflfFNRHFXfv8iFQ"
+      },
+      "gateway-stats-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "EA9EHeeLrvP0C5Of0HjL6zEYiJFPphcTv_dkLcP-Je4",
+        "kty": "EC",
+        "use": "sig",
+        "x": "T4s9vMpQAOMyzIU_owlTTdNHL6z0wMOuIJ4hxJbDGtc",
+        "y": "OxuK345ei0hL3FaAOHmAIEjKM4mAFKhxBurOOcsPapk"
+      },
+      "metrics-reader-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "K0_PXpdqxavqV2YWdQ7R7Sv9bdNlvlCGpnW9eDduAxM",
+        "kty": "EC",
+        "use": "sig",
+        "x": "801PATixKn3XlyYr8_7kTVzNoJQ526JtrCEegn0O5TI",
+        "y": "Q7tC4l-VHB9mF53DvMSWjirJMLuh6zHCAhYycnd6lVo"
+      },
+      "monitor-alert-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "dRx6uY7ScpuyFU08rnUNdDwGhFtDP4SEEWAcTht74l8",
+        "kty": "EC",
+        "use": "sig",
+        "x": "NR6w4wG6T7ZVUO-ApDvPZIMBeHMlUvRHLgfTUo9d7Dw",
+        "y": "Km87JCLIJQsRwM0OGSpl_EazqSYSPPCIJjZjGYg5p4c"
+      },
+      "monitor-query-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "Nq5Wtr2_7mLYpmJrVgHMtf0yNG4Vs_-1_zApq-2VjNg",
+        "kty": "EC",
+        "use": "sig",
+        "x": "R_2xbDczdaMrDZ2tJLIqnbWEPHEV-vugOQ0iAjTjZ8k",
+        "y": "6Ta9F35UdQp8MP-7BmmxDgjikbnJT1ty4AUI2ru6Bjk"
+      },
+      "pep-bridge-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "lbJ7x92MH2sBzjBagSs1ScNQ2Zk8U1tfga4228gI-SU",
+        "kty": "EC",
+        "use": "sig",
+        "x": "2nb0XHsJN7nwVMD2ZYtG5f7MM9cJe8uq3s3FXovel9o",
+        "y": "7UNOHuJuzW-EvtwOu9z3Fy9VBg5orgTtOo_5fdFPLUI"
+      },
+      "prometheus-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "yLlOUfeEVBbT-EGLJo6OlJysVJqD40W-XHKIc1eLos4",
+        "kty": "EC",
+        "use": "sig",
+        "x": "fn5oNnbWCsffe3D6FSyTp3_LZwD9ekkeQ5hqCUnscBE",
+        "y": "DveYhy0OkeumHOjuv4CVr6-3DiRGOn4v8QKfo7rfJPo"
+      },
+      "proxy-auth-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "YKP6BU5-OeGb6sRVYY9byBFtxuIAAxw6nLyK8kCi8K0",
+        "kty": "EC",
+        "use": "sig",
+        "x": "GGfykgLZN4Z-Bh772E_5UobCEkeGDQqTpRqkMfp6pI8",
+        "y": "gQYsWjeTUDmZNqvzxJVX07vPsuQ_c2-FYugmK0P3zyM"
+      },
+      "proxy-resource-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "vGkSPo9sO5mWLLKOQvIWlg4M_DPUe4FQVqjlOIAoxCo",
+        "kty": "EC",
+        "use": "sig",
+        "x": "ARVny4qG9SjzWDsqdbDcLcQOPbusH4g-E6Ex7KuGbQ8",
+        "y": "gPWTZgNWbjxvIUYp2C7wzyYWnahMRMQVExdN2RHpJuI"
+      },
+      "proxy-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "te568-Ow92Ji7ZOPxiLheg2L5HuahTYhqm9Lp1bzCGE",
+        "kty": "EC",
+        "use": "sig",
+        "x": "LXZ0k9rvJnUEtVYNa2Euihmk4hH00-6DZR8FQQzV6Rc",
+        "y": "T6C9yJCCc7k1Avw-FVbc8NKNo__sXQSyoOe_wNVbMg4"
+      },
+      "reader-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "JF1ExBpmHDKVO5PhkupmfTAuDBLvMAYWuIddqYYBBmU",
+        "kty": "EC",
+        "use": "sig",
+        "x": "NtNq7C7KYCpFYmpdZ2Fgb5qzL9fQ966Iksyknd3yzYY",
+        "y": "trMx63jjyJYLqcOly87MZbTrBOe9IMDDc-443yldDNU"
+      },
+      "renew-am-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "7xo_t68pZ8eDMc2CNWrc-y6YBdonaDD9QJoecwAKg7s",
+        "kty": "EC",
+        "use": "sig",
+        "x": "0h3UnclQ06buKVzBpKjLSydKGe6R9djQ5H0G0d426hg",
+        "y": "JC-96prcqALa7-sq7GcUwIiytcPOeVjFxGdLD-_Iq2Q"
+      },
+      "renew-bridge-auth-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "Dv_0_jaF8_6FaDryii2a5_5rSsp6c_peYz0KhZgoSKE",
+        "kty": "EC",
+        "use": "sig",
+        "x": "0dpHXEXDbWgshD-U5FDO7t3nJAzJ7uvLhqK1HYzFLAw",
+        "y": "cOjIYQ10E_61xLHFDGP4WKTvqJdaFMOW8ApMi-gDIkg"
+      },
+      "renew-bridge-consume-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "OOuyjx6golu60f8yV_6LLpbDV0bRJfsUFQoYZA8hbF0",
+        "kty": "EC",
+        "use": "sig",
+        "x": "Z7DKWPBEXV0MuJhrXSusCBsxN6epfR2giJ7QLugCgto",
+        "y": "iupXXpX0acG_Sh8wl5nh4TSAjmnycC9FsCU8d45Nr9Y"
+      },
+      "renew-core-a-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "i1EWleRKBa1BiArpIQKNH_y5bRL4DIthPGFKusPR94A",
+        "kty": "EC",
+        "use": "sig",
+        "x": "2aS8iIjyuAIhqJeaULs2XCwDUC50GzSJnJiHt6iVU-Y",
+        "y": "qHvyX-iObn2Pma8XXxdOzf6-MMbfkK0K67rnmbQ0JcA"
+      },
+      "renew-core-b-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "15NXcF9RbJku4BHRzYsHt45M0lvbrFM8vjDyjOE__g4",
+        "kty": "EC",
+        "use": "sig",
+        "x": "-elDAvkVziV4knHrEfruqucq2T8t1Gfnb4ibyEfv-cc",
+        "y": "w8aEJk67w3lOZwpMmRCqnmJigCoQezZ23U2dXwsvH3A"
+      },
+      "renew-core-c-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "LYEdjto6-UuaowhLfQFgPa12UEvMUhxG0Pm1_6hdpzM",
+        "kty": "EC",
+        "use": "sig",
+        "x": "HPlYepuTSAO3o83e_BVcceIxFg5RwIIH7u0mjCe2enc",
+        "y": "zaWXQGiKEi7GCgENC_k6h1CEr7dwcPh28sAdg7IBP_s"
+      },
+      "renew-exporter-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "kASzdsdr1hwgaF0QXtB1Vc4HIixn1g3fm7ZsTUSx93Y",
+        "kty": "EC",
+        "use": "sig",
+        "x": "pfyU7UVHOqaG4IP15XnYdT1hb15ptJA08MzP1esVNRM",
+        "y": "fs2ukFhHjp5IgjxrsQSNK64sUxWYhaGucXvs_ZD5jps"
+      },
+      "renew-gateway-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "OCh7xDvUzQSA1NiLuSd2FyntCtE8pf0tQfVyHHghw9Q",
+        "kty": "EC",
+        "use": "sig",
+        "x": "A60pyA8KQkyCBhvXbX4OVNXAdJIJeJ3_ahpZPG37OP8",
+        "y": "n7tTJ7ruOHYqpOdzQnh5Mhtj9MCj6Uu_I_rSTE9RJcg"
+      },
+      "renew-gateway-stats-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "zUfD4Gd8LLtfA1DDSabOW9fPBmMwPLQ1owe56c9SliA",
+        "kty": "EC",
+        "use": "sig",
+        "x": "Kcxdv_qW6DM3pgAeOrykBagFUTkkqlr1ZZhVT-qoKN8",
+        "y": "iUuMprJyXMzSA50VhWNqe_0D4QK4s7XmSO2j12PH6jk"
+      },
+      "renew-prometheus-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "C8pDadT95CGbWhrLLMINTdFBs1e8FNgYeHXtr4UuqOU",
+        "kty": "EC",
+        "use": "sig",
+        "x": "8yQshsI_WUZNr_bVIvMefDV_fqnSuB84KBB4bpom0lo",
+        "y": "bCcIjtni0rin98BHcJgnBCBgGxgnxUWpV2ZXUMN6VEs"
+      },
+      "renew-proxy-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "PNxBsIwXm_s4Yw2ZQG8YbKArky7DUIPahAL_EETbXMo",
+        "kty": "EC",
+        "use": "sig",
+        "x": "i3Q4Iyhyst1VYCPpRYXx032Qtn7kBUp4U_R1X-4TSOY",
+        "y": "d3OmnsANvbUGb8wvfH8jqzCAi9qf-WJmqrMlmuDkvmM"
+      },
+      "renew-reader-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "7UDzPULlqntI-Hf0n0sh9jGWC-OsQPSAPQQq1ZJUiUo",
+        "kty": "EC",
+        "use": "sig",
+        "x": "EDjXTyx2Kz_yonqkZbH2IKunuDPRXQdUWcsv0R00d5E",
+        "y": "Xb-STcpfRkB4GqaIqpGfqNKtN2emWb5ZnnGCN4a9BAA"
+      },
+      "renew-resource-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "3lVlhvqMDuHrOI-hmZjZ4ippBM94BtgGmh9b01WVXBE",
+        "kty": "EC",
+        "use": "sig",
+        "x": "7-3t887BUlfsoYW42LFJLEbObY7jBeJDcm_Q6eF3AEg",
+        "y": "JSZg5mMCPwQGCOs9QDq3dofrgxz_MHK1tSBFRKkvuWc"
+      },
+      "renew-sink-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "rpoNiEFnOy5Q_3byZqYYEZV2eIKm_w68bb35F6L9kfM",
+        "kty": "EC",
+        "use": "sig",
+        "x": "xn80N2LLu83l51Wwddw8DjT_hXi-W5LZFVwtbXt0H5g",
+        "y": "x4jSjHLhv2T2le-Cd9kUV_FSuPGhkOZ-Pr-G0pdgkY4"
+      },
+      "resource-auditor-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "XRcTSG3MyxuUiVi4SSTCDRLDxk82nxzVTpfntOTLlBQ",
+        "kty": "EC",
+        "use": "sig",
+        "x": "Y1HQ8v_Nrx-mHLYm6q6diQdlQOPasg0ZSGT6F-o5EIg",
+        "y": "jxiMst0nHBDRKTpQ57MfoQTxK-YEgfhiN17XFXyAcDA"
+      },
+      "resource-consumer-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "BkPj8dubSHtlXOyuELtKj0bgmQLdJSAVJdNXXtRVXZ8",
+        "kty": "EC",
+        "use": "sig",
+        "x": "uCT06tRG94-zzodeeTqm1R1eb7wzpHjQOV6pALmCE8w",
+        "y": "HvBe45nI9cNTQKaNf7D6cnkI62JyMSqV8a9ly4yqV7U"
+      },
+      "resource-probe-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "Zwzugfz4-d7t3rjrzLK-bo1nC5_iEe4RL-q-dvaObp8",
+        "kty": "EC",
+        "use": "sig",
+        "x": "sNpO4n4NGRoE0zJwVzt2ISUdZeqI8Q4OAPOO8x7770Y",
+        "y": "MeHdhH7eUoH7WUVgr8OTkFjLAIpTOkSswbe_6iYnwG8"
+      },
+      "resource-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "0RPoPWT4nLaGfJrLLnvtcbZFfr-5DN9xt3YPhJEeFQg",
+        "kty": "EC",
+        "use": "sig",
+        "x": "S2WL8AgnF6BVVFCPIURsu-GRaTaY0tDZq6BLTvhUAl4",
+        "y": "8v4qRyhUIdchzWDmsp9MfRK5Xu13WUrAznPZOyUzqCw"
+      },
+      "revocable-canary-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "obXzMqBHpWjKjHBEWZHbh5g0C1ej65jo2a3NzTRJ1tU",
+        "kty": "EC",
+        "use": "sig",
+        "x": "YBgsvB8cqPQT0R6ft4XuyM2KEnHxuHh3Dp4F1HVKxpc",
+        "y": "njX1nui1KsxQIGSu9zbqePO35wW8R1c4h5bm7rVRozU"
+      },
+      "scrape-agent-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "431hEAdRwZDN6qWm8zMPL4LRjT-pkdnLmTjZ1KZcd0w",
+        "kty": "EC",
+        "use": "sig",
+        "x": "rHzuxsoLoRS8i-ECpKmA2_i_S-dGTxOLtDVK4KBsHYA",
+        "y": "UkutEF2XYIqvqwORmsCYzYPJm-xYX-MpTTzApKjyL7Y"
+      },
+      "scrape-control-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "ZndRYSZV_mdCo10pq_GR6p9tcpPurgB_i5u43jFUQtE",
+        "kty": "EC",
+        "use": "sig",
+        "x": "ZfinzM8hhWdAh9929XgHHAFsF1JVxHWx_p70b_KP9sM",
+        "y": "uMK51NLYxuU8rD6AlUS9ZID-PvAMOZZ1JAwpzu-ABVI"
+      },
+      "server-renewal-am": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "qLh6uLCxIYZJGoSxn0NYAJme4fwlfgvxV4-4zOn9KBE",
+        "kty": "EC",
+        "use": "sig",
+        "x": "4scvfck6D_uWkdk9-LI6AX5bpz7cRIwbgWV3G1Tb8mQ",
+        "y": "h5voOxgVhqjsjzT1TISDa_jzqQixUBidpfc7ZK4v2c0"
+      },
+      "server-renewal-bridge-auth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "mWx_R7D_t92t_t-Q1VkEWE_E1o6Xm-BrJvnV9RmO7CU",
+        "kty": "EC",
+        "use": "sig",
+        "x": "dW88WRAEuXEDmArTV5N98pyDzHDY70sS2-xKxLwHYpw",
+        "y": "VF7_NEqj_oHbb0OtX30naXEc49v_RxtW_5s3F1VOckE"
+      },
+      "server-renewal-bridge-consume": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "Fyty9b4_lOSfp0ztxe_JMLaDVpcwujM8506n-0cPgak",
+        "kty": "EC",
+        "use": "sig",
+        "x": "_CDgaF8B4zEtGMO1Xrij0fNdrdra0xy_kNUB8fysdbY",
+        "y": "C0EKvDpyPqLKYgHpaCchVqt2FInJ7xUJv2bwygTSfqo"
+      },
+      "server-renewal-core-a": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "fAsFMBNc3ntN6ei7nh7nCpsv4L_YfnqsTRWpJOG1L-s",
+        "kty": "EC",
+        "use": "sig",
+        "x": "s--qQCzyCbBp4GVY7Ba7Itym7mSOetidTHqNCDONeZw",
+        "y": "OjWP-Ny_hc1_0xx375Z4IXaXkXXXaawQXpq4e1s-6QQ"
+      },
+      "server-renewal-core-b": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "cLsaLWdntbCB9xeZheHPFyLAlYyHnyC-EqQ0zoqQRhQ",
+        "kty": "EC",
+        "use": "sig",
+        "x": "XQeICrF5Mnpx6GIaKcolE5ZDaESLOjHW6_Wh9DnA5k0",
+        "y": "0sPQPUofw9o4iAH5u8o0JXqNsxzzRHzq4JTjspVp8L0"
+      },
+      "server-renewal-core-c": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "OXQTWWWIU5TrNLt4uRZLqis5fgTad8lgeWDW5tevwzA",
+        "kty": "EC",
+        "use": "sig",
+        "x": "sc0irfWXdfcgxYV4-qJu7Nfq755erfLc3Z_cyOI8NRU",
+        "y": "2hAAczbGfDwRPNHnb0YSEGCqryg8CLWH9p3Cf7nmM-Y"
+      },
+      "server-renewal-exporter": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "lxzRBuHLuoOWvw0o8gQSSwrzy_qfAC3QJH3K3me7jls",
+        "kty": "EC",
+        "use": "sig",
+        "x": "-1SZ9u6eSfha1u5sMw7zu3svoqwqGJ9lEDvq8Al2GRs",
+        "y": "ddNcHlBI-8K60Iza-HjHQt_FBeNrGHnc29xubL4f0Ec"
+      },
+      "server-renewal-gateway": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "aBeK4HZ91bodqXrX_Edd3hI3we-I0tI_lrRzAR31v5w",
+        "kty": "EC",
+        "use": "sig",
+        "x": "QB4Aju9mrnYOOVhjEf1ljyvriqHS1iMFlmeld0e29f8",
+        "y": "YYCjktB26Y3M6h09waJSRaFPTqQv06kMi5vlglNMAso"
+      },
+      "server-renewal-gateway-stats": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "QVeQV30_FX3LnWHd1pW1-af4veUwBvhp1ew_nNmS6CA",
+        "kty": "EC",
+        "use": "sig",
+        "x": "KjMoDbEWR2ZvoE5VbpOJSrWWrRSPSz8mQaaxVbVxe-Q",
+        "y": "b-jTOef2PF95pyrrMPncAaKGyRY98vNqGd9Y4gEaQO8"
+      },
+      "server-renewal-prometheus": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "qw05ATxHEWpjVhpZLikAhfxVieM2NFFxgNkpN9lss98",
+        "kty": "EC",
+        "use": "sig",
+        "x": "ZnH9v84Ig71bgfzqrezHaBBR4CKqNdDYFzIEEW6eaDg",
+        "y": "LyaUPbHvJ5_mgosKONVEqTe3J08MNzrJQZGsShX1PuM"
+      },
+      "server-renewal-proxy": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "EOKZieyIR821yzzNHaOcabHkBQ4MXH_OsUsVpNx9EAY",
+        "kty": "EC",
+        "use": "sig",
+        "x": "Dey6r2oEr3s8RT0If7xHjQT4rsMmhre12GtXgm2iT8c",
+        "y": "HfdsGiAjxWlqQPb2fl3akxBbEJeUUuoOQabtjU0Dg7Q"
+      },
+      "server-renewal-reader": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "bjEnXlMqMhd5l6WBw7uZTEwB0MvtV4FZYDQrKdCLBxY",
+        "kty": "EC",
+        "use": "sig",
+        "x": "1txcFgprVHGZfHODfGq2NxVo_XqM12FP0SB2yBwC0iA",
+        "y": "5vef7PmzRZWFQ3lxdSDyRIwGvDgTUNtfVlkeZyUroaI"
+      },
+      "server-renewal-resource": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "a92LI5Dov91xM-uC_7Mt8N-TsN4zkA9KDkBpIjpyRFw",
+        "kty": "EC",
+        "use": "sig",
+        "x": "I1Pm5y1JFguhTpv6fKTvLvdWBkPoQ1j2LPMKD4-g51M",
+        "y": "vhTr0ClW41Gvvt3NlIBMudJr1GPN7qvh1DW2kt0NuYc"
+      },
+      "server-renewal-sink": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "LJEDYKRvoc6zPOVTZtz0v1to-WnBnKWFuT86-3i8nvc",
+        "kty": "EC",
+        "use": "sig",
+        "x": "cCzyH1ZSAGQjbz46R7YONOyUC75g_n0xDx7DVAcJOGA",
+        "y": "NbWf0xppVy4TZ9WWfUldkV9BWKoTY1R9RTznRXZNGL0"
+      },
+      "sink-auditor-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "zX0kHoh5FITQfHLuzrzVv4HJWar6pYHHHcd_taewejY",
+        "kty": "EC",
+        "use": "sig",
+        "x": "4bbuWuTGMCOmWGYlY80Nb6mGklL5X9T8BIaXci3zdlA",
+        "y": "9FdtiZtXp3MN0zZ3tdrqVtuzaKs-ZjXRB01gs2mwA_U"
+      },
+      "sink-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "GcNOEfP3wvVKwuaGMfjIIHph1FFNgiQzarGGflm9o1Q",
+        "kty": "EC",
+        "use": "sig",
+        "x": "u61iIgiftYG7C0koxwNljjLpbeqZrjPXaZde89mE1Uk",
+        "y": "NeHIg8_DvMOiV3sHnlEAnDIs2AdFIevBcsB-_usxk8M"
+      },
+      "static-canary-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "kVHbAwcmS6Hw36GEZysJcAyCW1xeYE9-8NOfpvNTyWQ",
+        "kty": "EC",
+        "use": "sig",
+        "x": "Aun1YYIE-2i7MV4i9xYRgvZEY5Rtj0JG9yf7PcHAQHk",
+        "y": "DKUMCRCiJa0TkNrrUjZ9Uj7h2qJn1lesWbYvOypJl4M"
+      },
+      "transport-auditor-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "6ZSeplLSI9zb5Qf1vv3dDPYQeTMOPfm5amcb4SB2lKs",
+        "kty": "EC",
+        "use": "sig",
+        "x": "UszmS0H55-MPp7_PIadHLaKDYP-AWFEuObe1GX9hIa4",
+        "y": "ZGpGik6xi-CV-KYGyclb522-TnDbZ0AjTJTaoPaqWeA"
+      }
+    },
+    "evidence": {
+      "custody": {
+        "docker_socket": false,
+        "interfaces": [
+          "lo"
+        ],
+        "uid": 10001,
+        "vault_mode": 384
+      },
+      "final_ca_tls": {
+        "replicas": {
+          "ca-a": {
+            "issuer": "7b0ca9808029d9d8877926c5d8bb1a97ecbbcb9754bc9698c4cecc7fb7a2000a",
+            "tls_version": "TLSv1.3"
+          },
+          "ca-b": {
+            "issuer": "7b0ca9808029d9d8877926c5d8bb1a97ecbbcb9754bc9698c4cecc7fb7a2000a",
+            "tls_version": "TLSv1.3"
+          }
+        }
+      },
+      "final_services": {
+        "identities": 3,
+        "servers": {
+          "gateway": {
+            "at": 1793770706.0941823,
+            "fingerprint": "73da835ffab3db6977cda3d5acdab09a0fcaeaba1cc1c765624a116845ab75d0",
+            "tls_version": "TLSv1.3"
+          }
+        }
+      },
+      "migrated_services": {
+        "identities": 3,
+        "servers": {
+          "gateway": {
+            "at": 1793770668.472328,
+            "fingerprint": "73da835ffab3db6977cda3d5acdab09a0fcaeaba1cc1c765624a116845ab75d0",
+            "tls_version": "TLSv1.3"
+          }
+        }
+      },
+      "new_ca_tls": {
+        "replicas": {
+          "ca-a": {
+            "issuer": "7b0ca9808029d9d8877926c5d8bb1a97ecbbcb9754bc9698c4cecc7fb7a2000a",
+            "tls_version": "TLSv1.3"
+          },
+          "ca-b": {
+            "issuer": "7b0ca9808029d9d8877926c5d8bb1a97ecbbcb9754bc9698c4cecc7fb7a2000a",
+            "tls_version": "TLSv1.3"
+          }
+        }
+      },
+      "new_jwk_issuance": {
+        "replicas": {
+          "ca-a": {
+            "issued": true
+          },
+          "ca-b": {
+            "issued": true
+          }
+        }
+      },
+      "old_jwks": {
+        "denied": 66,
+        "replicas": {
+          "ca-a": {
+            "denied": 66,
+            "statuses": [
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401
+            ]
+          },
+          "ca-b": {
+            "denied": 66,
+            "statuses": [
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401
+            ]
+          }
+        },
+        "total_denied": 132
+      },
+      "old_services_with_overlap": {
+        "servers": {
+          "gateway": {
+            "at": 1793770503.9661694,
+            "fingerprint": "227c44ecef8307551270829a3f7a2a0e7116e0476b0fe9d2b2df93a17b7511e3",
+            "tls_version": "TLSv1.3"
+          }
+        }
+      },
+      "retired_trust": {
+        "retired": true,
+        "trust_stores": 3
+      },
+      "trust_overlap": {
+        "identities": 3,
+        "staged": true,
+        "trust_stores": 3
+      }
+    }
+  },
+  "final_management_role": {
+    "schema": "control-role-1",
+    "project": "c02-568e31428ddc",
+    "image": "sha256:0ebfa520df4c4863c35acf5c2572aca79f7656061e761dccc06a1a4142bfd4cf",
+    "epoch": 3,
+    "active": "a",
+    "generations": {
+      "a": 2,
+      "b": 2
+    }
+  },
+  "cleanup": {
+    "containers_remaining": 0,
+    "volumes_remaining": 0,
+    "networks_remaining": 0
+  },
+  "independent_all_trials_post_cleanup_inventory": {
+    "c02-27910efb298e": {
+      "containers": [],
+      "volumes": [],
+      "networks": [],
+      "image_tags": []
+    },
+    "c02-5e61117d7994": {
+      "containers": [],
+      "volumes": [],
+      "networks": [],
+      "image_tags": []
+    },
+    "c02-d7f03e3fab6f": {
+      "containers": [],
+      "volumes": [],
+      "networks": [],
+      "image_tags": []
+    },
+    "c02-568e31428ddc": {
+      "containers": [],
+      "volumes": [],
+      "networks": [],
+      "image_tags": []
+    }
+  },
+  "preliminary_trials_excluded": [
+    {
+      "directory_label": "control-pilot1",
+      "completed": false,
+      "failure": "development_cancelled_after_source_revision",
+      "control_checks_not_counted": 0,
+      "cleanup": {
+        "containers_remaining": 0,
+        "volumes_remaining": 0,
+        "networks_remaining": 0
+      }
+    },
+    {
+      "directory_label": "control-pilot2",
+      "completed": false,
+      "failure": "recovery_pre_admission_tls_health",
+      "control_checks_not_counted": 5,
+      "cleanup": {
+        "containers_remaining": 0,
+        "volumes_remaining": 0,
+        "networks_remaining": 0
+      }
+    },
+    {
+      "directory_label": "control-final",
+      "completed": false,
+      "failure": "FileNotFoundError",
+      "control_checks_not_counted": 18,
+      "cleanup": {
+        "containers_remaining": 0,
+        "volumes_remaining": 0,
+        "networks_remaining": 0
+      }
+    }
+  ],
+  "limits": [
+    "No physical host/disk/management-daemon isolation, multi-site HA, automatic election, consensus or malicious-admin fencing.",
+    "Trusted host executor/file lease and workload certificate volumes remain shared. Application SQLite/session data HA is outside scope.",
+    "Only idle/prepared checkpoints; unfinished operations/publication refuse takeover. No automatic recovery of crashes during takeover itself.",
+    "No combined CA-host restoration plus management-loss failure matrix, independent teammate review, production SLA/RPO/RTO or global rollback protection."
+  ],
+  "unit_image_tags_remaining": [],
+  "verification_notes": {
+    "git_index_lf_normalized_source_hashes_verified": true,
+    "attested_source_input_files": 101,
+    "inventory_method": "Separate Docker CLI queries by the same executor, not independent teammate review.",
+    "untracked_user_archives_unchanged": true,
+    "existing_unrelated_container_same_id_and_running": true
+  }
+}

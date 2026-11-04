@@ -12,6 +12,7 @@ import json
 import re
 import subprocess
 import time
+from contextlib import nullcontext
 from pathlib import Path
 
 from scripts.authority_rotation_coordinator import DockerBackend, lease
@@ -27,6 +28,8 @@ def lsn(value):
 
 class Hosts(DockerBackend):
     def __init__(self, profile):
+        if type(self) is Hosts and profile.get('management'):
+            raise LifecycleError('control_management_backend_required')
         super().__init__(profile)
         self.hosts = profile["service_hosts"]
         if set(self.hosts) != {"a", "b"}:
@@ -192,7 +195,7 @@ print('{}')"""
             raise LifecycleError("recovery_gateway_network_unconfirmed")
 
     def failover(self, old, target):
-        with lease(self.directory()):
+        with lease(self.directory()), self.management_operation() if hasattr(self, 'management_operation') else nullcontext():
             self.quiesce()
             return self._failover(old, target)
 
@@ -241,12 +244,15 @@ print('{}')"""
         deadline = time.monotonic() + 30
         while True:
             try:
-                self.command(["exec", "-i", self.profile["gateways"][0], "python", "-c", program], request, timeout=5)
+                self.node_tls_probe(program, request)
                 return
             except LifecycleError:
                 if time.monotonic() > deadline:
                     raise LifecycleError("recovery_pre_admission_tls_health") from None
                 time.sleep(.3)
+
+    def node_tls_probe(self, program, request):
+        self.command(["exec", "-i", self.profile["gateways"][0], "python", "-c", program], request, timeout=5)
 
     def private_backup_job(self, payload):
         args = ["run", "--rm", "-i", "--network", "none", "--read-only", "--user", "10001:10001", "--cap-drop=ALL", "--security-opt=no-new-privileges:true",
@@ -265,7 +271,8 @@ print('{}')"""
             if time.monotonic() > deadline:
                 raise LifecycleError("recovery_leaf_not_quiescent")
             time.sleep(.2)
-        control = json.loads((self.directory() / "authority-coordinator.json").read_bytes())
+        control = (self.load_control() if hasattr(self, 'load_control') else
+            json.loads((self.directory() / "authority-coordinator.json").read_bytes()))
         if control["phase"] != "idle":
             raise LifecycleError("recovery_authority_transition_pending")
         self.wait_quiet()
@@ -308,7 +315,7 @@ print('{}')"""
             self.node_health(label)
 
     def backup(self, name, primary):
-        with lease(self.directory()):
+        with lease(self.directory()), self.management_operation() if hasattr(self, 'management_operation') else nullcontext():
             self.quiesce()
             self.settle(primary)
             database = self.inner_raw(primary, ["exec", self.hosts[primary]["database"], "pg_dump", "-h", "/tmp", "-U", "postgres", "-d", "stepca", "-Fc"], timeout=60)
@@ -318,7 +325,7 @@ print('{}')"""
             return result
 
     def restore_check(self, name, primary=None):
-        with lease(self.directory()):
+        with lease(self.directory()), self.management_operation() if hasattr(self, 'management_operation') else nullcontext():
             self.quiesce()
             if primary is not None:
                 self.settle(primary)
@@ -327,14 +334,14 @@ print('{}')"""
                 "latest_security_sha256": value["security"]["sha256"], "latest_lsn": value["security"]["lsn"]}
 
     def seal_recovery(self, primary):
-        with lease(self.directory()):
+        with lease(self.directory()), self.management_operation() if hasattr(self, 'management_operation') else nullcontext():
             self.quiesce()
             self.settle(primary)
             return self.witness("status")
 
     def rejoin(self, label, primary, backup_name):
         from scripts.ca_recovery_nodes import Rebuilder
-        with lease(self.directory()):
+        with lease(self.directory()), self.management_operation() if hasattr(self, 'management_operation') else nullcontext():
             return self._rejoin(label, primary, backup_name, Rebuilder(self))
 
     def _rejoin(self, label, primary, backup_name, factory):
@@ -360,7 +367,7 @@ print('{}')"""
 
     def restore(self, name):
         from scripts.ca_recovery_nodes import Rebuilder
-        with lease(self.directory()):
+        with lease(self.directory()), self.management_operation() if hasattr(self, 'management_operation') else nullcontext():
             self.quiesce()
             value = self.private_backup_job({"operation": "restore", "name": name})
             before = self.witness("status")
@@ -417,7 +424,12 @@ def main():
     parser.add_argument("--target", choices=["a", "b"], default="b")
     parser.add_argument("--backup-name")
     args = parser.parse_args()
-    backend = Hosts(json.loads(args.profile.read_bytes()))
+    profile = json.loads(args.profile.read_bytes())
+    if profile.get('management'):
+        from scripts.control_plane_ha import Management
+        backend = Management(profile)
+    else:
+        backend = Hosts(profile)
     if args.operation == "failover":
         result = backend.failover(args.old, args.target)
     elif args.operation == "status":
