@@ -1,5 +1,11 @@
 # zero-trust-llm-secops
 
+## 서버 inbox 영수증 보관 이관
+
+완료·실패 영수증을 같은 SQLite DB의 압축 archive로 옮겨 hot 공간을 확보하고, 원래 영수증과 중복·충돌 검사를 보존합니다.
+pending·processing은 이관하지 않으며 archive·byte 한도가 차면 새 접수를 거부합니다.
+[상태·수동 이관·코드 정렬과 권한 검증](docs/server-inbox-maintenance.md)을 확인합니다.
+
 ## 정책 저널 보관 이관
 
 활성 정책 저널의 오래된 행을 같은 SQLite DB의 압축 segment로 옮기고, 모든 읽기에서 전체 이력과 체인을 검증합니다.

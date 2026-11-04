@@ -62,6 +62,26 @@ def test_failed_poll_does_not_reuse_previous_good_values(summary):
     assert 'secret' not in result
 
 
+def test_archived_receipts_remain_visible_beyond_the_old_logical_record_ceiling(summary):
+    summary.update(completed=100000, total=100001, active_records=1, archived_records=100000)
+    text = exporter.render_summary(summary)
+    assert 'secops_signal_inbox_records{state="completed"} 100000' in text
+    assert "secops_signal_inbox_active_records 1" in text
+    assert "secops_signal_inbox_archived_records 100000" in text
+
+
+@pytest.mark.parametrize("storage", [
+    {"active_records": 3}, {"archived_records": 0},
+    {"active_records": True, "archived_records": 2},
+    {"active_records": 2, "archived_records": 2},
+    {"active_records": 0, "archived_records": 3},
+])
+def test_inconsistent_storage_counts_are_not_exported_as_healthy(summary, storage):
+    summary.update(storage)
+    with pytest.raises(ValueError):
+        exporter.render_summary(summary)
+
+
 @pytest.mark.parametrize("url", [
     "file:///zero-trust/signals/inbox", "http://user:password@example.com/zero-trust/signals/inbox",
     "https://example.com/analysis", "http://example.com/zero-trust/signals/inbox?token=secret",
