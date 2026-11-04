@@ -17,6 +17,8 @@ runtime/m3-validation/
 runtime/c03/
 runtime/c01/
 runtime/c02/
+runtime/continuous-collector/
+runtime/collector-validation/
 .idea/
 .vscode/
 
