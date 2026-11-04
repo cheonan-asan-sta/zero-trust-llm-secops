@@ -1,5 +1,10 @@
 # zero-trust-llm-secops
 
+## 일반 평가 상한 이후의 보안 전이
+
+일반 세션 평가는 최대 버전 200을 유지하고, 이후 위험 강화·만료 점검·회수만 최대 204까지 기록합니다.
+새 grant·자동 정상화 없이 반복·동시 처리를 제어하며 [전이·CAS·저장과 검증 범위](docs/session-security-transitions.md)를 따릅니다.
+
 ## 서버 inbox 영수증 보관 이관
 
 완료·실패 영수증을 같은 SQLite DB의 압축 archive로 옮겨 hot 공간을 확보하고, 원래 영수증과 중복·충돌 검사를 보존합니다.

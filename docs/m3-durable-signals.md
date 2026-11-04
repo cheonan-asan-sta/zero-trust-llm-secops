@@ -84,6 +84,8 @@ lease 토큰은 완료·실패 기록의 소유권을 검사하므로 이전 wor
 
 worker는 새 정책 적용 전에 현재 키와 수집기 권한을 다시 확인한다. 접수 후 정책 journal에 장애가 생기면 접수 영수증을 취소하지 않고 처리 오류·재시도 상태로 추적한다. 최초 신선도 검증 후 접수된 위험 관측이 대기 중 만료돼도 접근을 제한할 수 있다. 순서가 뒤집힌 과거 위험 관측도 제한을 강화할 수 있으며 `stale`로 표시한다. 정상 관측은 기록만 하고 제한을 낮추지 않는다. 기존 제한은 이후 동기 평가와 새 세션에도 적용된다. **안전한 제한 해제·복구 절차는 후속 작업**으로 남긴다.
 
+일반 평가 상한 200 이후에도 [보안 전용 전이](session-security-transitions.md)로 관련 세션의 제한 강화·회수를 최대 버전 204까지 기록한다. 새 ALLOW·grant·제한 하향은 없고 유효한 204는 DENY/REVOKED다. 이미 회수되거나 같은 조건을 처리한 세션은 버전을 늘리지 않는다. 관측의 다중 세션 변경과 journal 표식은 함께 commit하거나 롤백하며, ACK 복구는 기존 표식을 읽어 새 효과 없이 완료 상태만 복구한다. 손상·알 수 없는 전이·저장 한도의 실패 폐쇄는 유지한다.
+
 완료·실패 영수증은 자동 삭제하지 않는다. [서버 inbox 영수증 보관 이관](server-inbox-maintenance.md)은 전역·테넌트 hot 한도에서 terminal 행만 같은 DB의 압축 archive로 옮겨 원래 payload·결과·오류·내용 지문과 공개 영수증을 보존한다. pending·processing·lease·시도 횟수는 바꾸지 않는다. 기본 hot 10,000행과 별도로 archive 100,000행·1,000개 segment·byte 한도를 두고, 공간을 확보할 수 없으면 새 입력을 거부한다. 영수증 조회·중복·충돌과 상태 집계는 hot·archive 전체를 포함하며 현재 출처·키·권한 검증도 유지한다. 각 연산 비용은 전체 보관량에 비례한다. 이관은 영수증 삭제·무한 운영·보안 소거·앱 DB 백업 복원이나 원격 변조 방지 보증이 아니다. 독립 inbox format과 application ID를 사용하는 스키마 이행 전후에는 같은 DB를 쓰는 앱·worker·watchdog·CLI의 코드를 정렬하며 구형 코드를 섞지 않는다.
 
 ## 별도 worker 실행과 앱 지표
@@ -131,6 +133,7 @@ SIGNAL_REGISTRY_PATH=/absolute/sources.json docker compose -f compose.yaml -f co
 | 정책 효과 직후 완료 기록 실패·재시작·마지막 시도·후속 키 폐기 | 관련 세션 변경 보존, 버전·이력 증가 없이 완료 상태 대조 복구 | `test_continuous_signal_api.py`, `test_signal_worker_process.py` |
 | 관련 다중 세션·무관 세션 | 관련 세션의 다음 접근 403, 무관 세션은 200 | `test_continuous_signal_api.py` |
 | 순서 역전·정상 관측·기존 제한 | 위험 근거 보존, 새 허용·MFA 복구 없음 | `test_continuous_signal_policy.py` |
+| 일반 평가 200 이후 보안 전이 | 최대 204 내 제한 강화·회수, 새 grant 없음, 반복·동시 실행과 ACK 복구의 중복 효과 없음 | [보안 전이 검증 계약](session-security-transitions.md#검증-범위와-증거-구분) |
 | 재시도 소진·저장 손상 | failed 영수증 또는 실패 폐쇄 | `test_signal_inbox.py` |
 | production 경계 | 새 API 404, CLI 실행 거부 | `test_continuous_signal_api.py`, `test_signal_worker_process.py` |
 

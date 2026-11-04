@@ -18,6 +18,8 @@ from app.services.policy_journal import JournalLimits, JournalUnavailable
 from app.services.sigma import get_sigma_engine
 from app.services.trusted_signals import SignalVerifier, VerifiedSignal, canonical_observation
 from app.zero_trust_models import (
+    MAX_EVALUATION_VERSION,
+    MAX_SECURITY_VERSION,
     ProtectedAccessRequest,
     ProtectedAccessResult,
     SessionDecision,
@@ -48,6 +50,81 @@ def _digest(value: str) -> str:
     return hashlib.sha256(value.encode()).hexdigest()
 
 
+def _validate_security_transition(previous, current, entry):
+    if current.version <= MAX_EVALUATION_VERSION:
+        if previous is not None and previous.version > MAX_EVALUATION_VERSION:
+            raise ValueError("security-only session revision cannot reset to ordinary history")
+        return
+    if (previous is None or previous.version < MAX_EVALUATION_VERSION
+            or current.version != previous.version + 1 or "grant_hash" not in entry
+            or entry["grant_hash"] is not None or previous.status == "REVOKED"):
+        raise ValueError("invalid security-only decision predecessor")
+    mutable = {"version", "event_id", "evaluated_at", "decision", "status", "risk_score",
+               "reason_codes", "evidence", "input_digest_sha256", "grant_expires_at",
+               "challenge_id", "challenge_expires_at"}
+    before, after = previous.model_dump(), current.model_dump()
+    if any(before[field] != after[field] for field in before.keys() - mutable):
+        raise ValueError("security-only decision changes session binding")
+    if (current.event_id == previous.event_id or current.risk_score < previous.risk_score
+            or not set(previous.reason_codes).issubset(current.reason_codes)
+            or current.evidence[:len(previous.evidence)] != previous.evidence
+            or (current.challenge_id is not None and (
+                current.challenge_id != previous.challenge_id
+                or current.challenge_expires_at != previous.challenge_expires_at))):
+        raise ValueError("security-only decision changes prior security evidence")
+    old_rank = _RESTRICTION_RANK[previous.decision]
+    new_rank = _RESTRICTION_RANK[current.decision]
+    revalidation = entry.get("revalidation", {})
+    if entry.get("trigger") == "periodic_revalidation":
+        if (set(entry) != {"kind", "session", "grant_hash", "trigger", "revalidation"}
+                or not isinstance(revalidation, dict)
+                or set(revalidation) != {"previous_version", "reason_code", "checked_at"}
+                or type(revalidation["previous_version"]) is not int
+                or revalidation["previous_version"] != previous.version
+                or revalidation["reason_code"] not in {"SIGNAL_PROOF_EXPIRED", "SIGNAL_SOURCE_REVOKED"}
+                or revalidation["reason_code"] not in current.reason_codes
+                or current.decision != ("HOLD" if revalidation["reason_code"] == "SIGNAL_PROOF_EXPIRED" else "DENY")
+                or not isinstance(revalidation["checked_at"], str)
+                or datetime.fromisoformat(revalidation["checked_at"]) != current.evaluated_at
+                or current.input_digest_sha256 != previous.input_digest_sha256
+                or current.evidence != previous.evidence or current.risk_score != previous.risk_score
+                or (current.decision == "DENY" and (
+                    current.challenge_id is not None or current.challenge_expires_at is not None))
+                or (current.decision == "HOLD" and (
+                    current.challenge_id != previous.challenge_id
+                    or current.challenge_expires_at != previous.challenge_expires_at))):
+            raise ValueError("invalid security-only revalidation record")
+    elif "observation_event_id" in entry:
+        event_id = entry["observation_event_id"]
+        if (set(entry) != {"kind", "session", "grant_hash", "observation_event_id"}
+                or not isinstance(event_id, str) or not 1 <= len(event_id) <= 128
+                or current.event_id != "obs-" + _digest(current.tenant_id + "." + event_id + "." + current.session_id)
+                or not any(f"CONTINUOUS_{kind}_{current.decision}" in current.reason_codes for kind in ("IDENTITY", "DEVICE"))
+                or current.challenge_id is not None or current.challenge_expires_at is not None):
+            raise ValueError("invalid security-only observation record")
+    elif "revoked_by" in entry:
+        if (set(entry) != {"kind", "session", "grant_hash", "revoked_by", "note"}
+                or current.decision != "DENY" or "OPERATOR_REVOKED" not in current.reason_codes
+                or not isinstance(entry["revoked_by"], str) or not entry["revoked_by"].strip()
+                or not isinstance(entry["note"], str) or not 3 <= len(entry["note"]) <= 300
+                or current.input_digest_sha256 != previous.input_digest_sha256
+                or current.evidence != previous.evidence or current.risk_score != previous.risk_score
+                or current.challenge_id is not None or current.challenge_expires_at is not None):
+            raise ValueError("invalid security-only operator revocation record")
+    else:
+        raise ValueError("unknown security-only transition writer")
+    if new_rank > old_rank:
+        return
+    if (new_rank != old_rank or current.decision != "HOLD"
+            or "SIGNAL_PROOF_EXPIRED" in previous.reason_codes
+            or "SIGNAL_PROOF_EXPIRED" not in current.reason_codes
+            or entry.get("trigger") != "periodic_revalidation"
+            or not isinstance(revalidation, dict)
+            or revalidation.get("reason_code") != "SIGNAL_PROOF_EXPIRED"
+            or revalidation.get("previous_version") != previous.version):
+        raise ValueError("security-only decision does not strengthen restrictions")
+
+
 class ZeroTrustOperations:
     """SQLite transactions serialize decisions, revocations and single-use resource access.
 
@@ -74,9 +151,13 @@ class ZeroTrustOperations:
     def _transaction(self):
         try:
             with policy_journal.transaction(self.path, self.journal_limits) as transaction:
+                latest = {}
                 for entry in transaction[1]:
                     if entry["kind"] == "decision":
-                        SessionDecision.model_validate(entry["session"])
+                        current = SessionDecision.model_validate(entry["session"])
+                        key = (current.tenant_id, current.session_id)
+                        _validate_security_transition(latest.get(key), current, entry)
+                        latest[key] = current
                     elif entry["kind"] == "observation":
                         ObservationApplication.model_validate(entry)
                     elif entry["kind"] != "access":
@@ -89,6 +170,14 @@ class ZeroTrustOperations:
 
     @staticmethod
     def _append(transaction, entry):
+        raw = entry.get("session")
+        if entry.get("kind") == "decision" and isinstance(raw, dict):
+            previous = ZeroTrustOperations._latest(transaction[1], raw.get("tenant_id"), raw.get("session_id"))
+            predecessor = SessionDecision.model_validate(previous["session"]) if previous else None
+            overflow = isinstance(raw.get("version"), int) and raw["version"] > MAX_EVALUATION_VERSION
+            if overflow or (predecessor and predecessor.version > MAX_EVALUATION_VERSION):
+                current = SessionDecision.model_validate(raw)
+                _validate_security_transition(predecessor, current, entry)
         policy_journal.append(transaction, entry)
 
     def journal_status(self) -> dict:
@@ -176,8 +265,8 @@ class ZeroTrustOperations:
                 if (reason in previous.reason_codes
                         and _RESTRICTION_RANK[previous.decision] >= _RESTRICTION_RANK[decision]):
                     continue
-                if previous.version >= 200:
-                    raise JournalUnavailable("session history capacity reached")
+                if previous.version >= MAX_SECURITY_VERSION:
+                    raise JournalUnavailable("security-only session revision capacity reached")
                 session = SessionDecision.model_validate({
                     **previous.model_dump(), "version": previous.version + 1,
                     "event_id": "check-" + secrets.token_hex(16), "evaluated_at": now,
@@ -318,8 +407,8 @@ class ZeroTrustOperations:
             for previous in matched:
                 if restriction is None or _RESTRICTION_RANK[restriction] <= _RESTRICTION_RANK[previous.decision]:
                     continue
-                if previous.version >= 200:
-                    raise SessionConflict("session history capacity reached")
+                if previous.version >= MAX_SECURITY_VERSION:
+                    raise JournalUnavailable("security-only session revision capacity reached")
                 reason = f"CONTINUOUS_{signal.observation.kind.upper()}_{restriction}"
                 session = SessionDecision.model_validate({
                     **previous.model_dump(), "version": previous.version + 1,
@@ -380,7 +469,7 @@ class ZeroTrustOperations:
                     raise SessionConflict("event identifier reused with different input or session")
                 return SessionEvaluationResult(session=previous, duplicate=True)
             expected = previous.version if previous else 0
-            if request.expected_version != expected or expected >= 200:
+            if request.expected_version != expected or expected >= MAX_EVALUATION_VERSION:
                 raise SessionConflict("session version conflict or history capacity reached")
             if previous and (previous.user_id != event.user.user_id
                              or previous.device_id != event.device.device_id):
@@ -456,7 +545,7 @@ class ZeroTrustOperations:
                 hold = hold or observation_restriction == "HOLD"
                 step_up = step_up or observation_restriction == "STEP_UP"
                 reasons.append("CONTINUOUS_OBSERVATION_" + observation_restriction)
-            if expected == 199:
+            if expected == MAX_EVALUATION_VERSION - 1:
                 hold = True
                 reasons.append("SESSION_HISTORY_CAPACITY")
             challenge_verified = False
@@ -523,12 +612,18 @@ class ZeroTrustOperations:
             if entry is None:
                 raise SessionMissing(session_id)
             previous = SessionDecision.model_validate(entry["session"])
-            if request.expected_version != previous.version or previous.version >= 200:
+            if request.expected_version != previous.version:
                 raise SessionConflict("session version conflict or history capacity reached")
+            if previous.status == "REVOKED":
+                return previous
+            if previous.version >= MAX_SECURITY_VERSION:
+                raise JournalUnavailable("security-only session revision capacity reached")
+            reasons = ([*previous.reason_codes, "OPERATOR_REVOKED"]
+                       if previous.version >= MAX_EVALUATION_VERSION else ["OPERATOR_REVOKED"])
             session = SessionDecision.model_validate({**previous.model_dump(),
                 "version": previous.version + 1, "decision": "DENY", "status": "REVOKED",
                 "event_id": "revoke-" + secrets.token_hex(12), "evaluated_at": now,
-                "reason_codes": ["OPERATOR_REVOKED"], "grant_expires_at": None,
+                "reason_codes": list(dict.fromkeys(reasons)), "grant_expires_at": None,
                 "challenge_id": None, "challenge_expires_at": None})
             self._append(transaction, {"kind": "decision", "session": session.model_dump(mode="json"),
                                        "grant_hash": None, "revoked_by": principal.subject,

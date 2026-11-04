@@ -413,7 +413,7 @@ def test_invalid_observation_marker_fails_journal_closed(lab):
         lab.session()
 
 
-def test_fanout_preflights_session_version_limit_before_any_write(lab):
+def test_capped_session_does_not_block_atomic_restrictions_on_related_sessions(lab):
     first = lab.session()
     second = lab.session("session-two", device="device-b")
     capped = second.session.model_copy(update={
@@ -423,10 +423,14 @@ def test_fanout_preflights_session_version_limit_before_any_write(lab):
         lab.service._append(transaction, {
             "kind": "decision", "session": capped.model_dump(mode="json"), "grant_hash": None,
         })
-    with pytest.raises(SessionConflict):
-        lab.apply(lab.observation())
-    assert lab.service.history("session-a", lab.principal)[-1] == first.session
-    assert lab.service.integrity()["verified_entries"] == 3
+    result = lab.apply(lab.observation())
+    assert result["changed_sessions"] == 2
+    current = lab.service.history("session-a", lab.principal)[-1]
+    capped_current = lab.service.history("session-two", lab.principal)[-1]
+    assert current.version == first.session.version + 1 and current.status == "REVOKED"
+    assert capped_current.version == 201 and capped_current.status == "REVOKED"
+    assert capped_current.grant_expires_at is None
+    assert lab.service.integrity()["verified_entries"] == 6
 
 
 def test_journal_capacity_never_commits_partial_fanout_and_full_journal_is_readable(lab):

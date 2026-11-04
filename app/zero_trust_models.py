@@ -5,6 +5,9 @@ from pydantic import Field, field_validator, model_validator
 
 from app.models import EventAction, SecurityEvent, StrictModel
 
+MAX_EVALUATION_VERSION = 200
+MAX_SECURITY_VERSION = 204
+
 
 class ResourcePolicy(StrictModel):
     resource_id: str
@@ -25,7 +28,7 @@ class ZeroTrustPolicyBundle(StrictModel):
 
 class SessionEvaluationRequest(StrictModel):
     session_id: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,63}$")
-    expected_version: int = Field(ge=0, le=200)
+    expected_version: int = Field(ge=0, le=MAX_EVALUATION_VERSION)
     event: SecurityEvent
 
 
@@ -35,7 +38,7 @@ class SessionDecision(StrictModel):
     operator_id: str
     user_id: str
     device_id: str
-    version: int = Field(ge=1, le=200)
+    version: int = Field(ge=1, le=MAX_SECURITY_VERSION)
     event_id: str
     observed_at: datetime
     evaluated_at: datetime
@@ -61,6 +64,23 @@ class SessionDecision(StrictModel):
     challenge_expires_at: datetime | None = None
     enforcement_mode: Literal["local_simulation"] = "local_simulation"
 
+    @model_validator(mode="after")
+    def security_versions_never_authorize(self):
+        if self.version <= MAX_EVALUATION_VERSION:
+            return self  # Preserve existing legacy decisions and synthetic fixtures.
+        ranks = {"STEP_UP": 1, "HOLD": 2, "DENY": 3}
+        states = {"STEP_UP": "STEP_UP_REQUIRED", "HOLD": "HELD", "DENY": "REVOKED"}
+        if (self.decision not in ranks or self.status != states[self.decision]
+                or self.grant_expires_at is not None):
+            raise ValueError("security-only versions cannot authorize access")
+        if ((self.version == 202 and ranks[self.decision] < 2)
+                or (self.version == 203 and self.decision == "STEP_UP")
+                or (self.version == 203 and self.decision == "HOLD"
+                    and "SIGNAL_PROOF_EXPIRED" not in self.reason_codes)
+                or (self.version == MAX_SECURITY_VERSION and self.decision != "DENY")):
+            raise ValueError("security-only revision budget does not permit this state")
+        return self
+
 
 class SessionEvaluationResult(StrictModel):
     session: SessionDecision
@@ -69,7 +89,7 @@ class SessionEvaluationResult(StrictModel):
 
 
 class SessionRevocationRequest(StrictModel):
-    expected_version: int = Field(ge=1, le=199)
+    expected_version: int = Field(ge=1, le=MAX_SECURITY_VERSION)
     note: str = Field(min_length=3, max_length=300, pattern=r"\S.*")
 
 
