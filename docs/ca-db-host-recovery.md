@@ -1,5 +1,9 @@
 # CA 공유 DB·서비스 호스트 이중화와 안전한 복원
 
+후속 [관리 영역 이중화](control-plane-high-availability.md)는 이 문서의 단일 관리 영역을 별도
+로컬 관리 cell 두 개로 확장한다. 아래 33개 결과와 단일 관리 영역 한계는 당시 기본 프로필 기록이다.
+관리 이중화와 DB/호스트 복구를 동시에 조합한 전체 장애 행렬의 완료를 뜻하지 않는다.
+
 2026-11-04 · 기준 `aitest` `b6e35be` · `feature/chaeheeju-db-host-recovery`
 
 [CA 프로세스 HA](ca-high-availability.md)를 확장한 **별도 로컬 실행 프로필**이다.

@@ -34,7 +34,7 @@ class LifecycleError(ValueError):
     pass
 
 
-def atomic(path, body):
+def replace_file(path, body):
     path = Path(path)
     temporary = path.with_name(path.name + ".new")
     with os.fdopen(os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600), "wb") as stream:
@@ -42,6 +42,16 @@ def atomic(path, body):
         stream.flush()
         os.fsync(stream.fileno())
     os.replace(temporary, path)
+
+
+def atomic(path, body):
+    from scripts.control_mirror import write
+    write(path, body, replace_file)
+
+
+def remove_file(path, *, missing_ok=False):
+    from scripts.control_mirror import remove
+    remove(path, missing_ok=missing_ok)
 
 
 def save(path, value):
@@ -157,6 +167,8 @@ def cas(path, before, after):
 
 
 def ca_post(state_dir, target, payload, *, identity=None, endpoint=None):
+    from scripts.control_mirror import guard
+    guard()
     if target not in {"/1.0/sign", "/1.0/revoke", "/1.0/rekey", "/1.0/renew"}:
         raise LifecycleError("ca_route")
     if target in {"/1.0/rekey", "/1.0/renew"} and identity is None:
@@ -263,7 +275,7 @@ def renewal(c, state_dir):
             raise LifecycleError("renewal_denied")
         return output.read_text()
     finally:
-        output.unlink(missing_ok=True)
+        remove_file(output, missing_ok=True)
 
 
 def server_reissue(c, state, cfg, state_dir):
@@ -429,12 +441,14 @@ def status(state, state_dir):
 
 
 def tick(cfg, state, state_dir):
+    from scripts.control_mirror import guard
+    guard()
     bootstrap_path = state_dir / "bootstrap.json"
     bootstrap = json.loads(bootstrap_path.read_bytes()) if bootstrap_path.exists() else {}
     # Recovery/publication may return or fail before a new issuance round. An
     # exhausted bootstrap file must not depend on publication completing.
     if not bootstrap and bootstrap_path.exists():
-        bootstrap_path.unlink()
+        remove_file(bootstrap_path)
     if state["transaction"]:
         publish(cfg, state, state_dir)
         return
@@ -486,7 +500,7 @@ def tick(cfg, state, state_dir):
                     if bootstrap:
                         save(bootstrap_path, bootstrap)
                     else:
-                        bootstrap_path.unlink()
+                        remove_file(bootstrap_path)
             save(state_dir / "state.json", state)
     ready = [uid for uid in chosen if state["credentials"][uid]["candidate"]]
     if ready:
@@ -541,15 +555,22 @@ def main():
         state = json.loads((state_dir / "state.json").read_bytes())
         while True:
             cfg = config(args.config)
+            from scripts.control_mirror import activity, guard
+            guard()
+            successful = False
             try:
                 state["paused_ack"] = bool(cfg.get("paused") and not state["transaction"])
                 if not state["paused_ack"]:
+                    activity(state_dir, True)
                     tick(cfg, state, state_dir)
                 state["last_error"] = None
+                successful = True
             except (OSError, ValueError, TypeError, KeyError, http.client.HTTPException, subprocess.SubprocessError):
                 state["last_error"] = "publication_or_configuration_failed"
             save(state_dir / "state.json", state)
             status(state, state_dir)
+            if successful:
+                activity(state_dir, False)
             time.sleep(max(.2, min(10, cfg.get("interval_seconds", 2))))
 
 

@@ -25,7 +25,7 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.x509.oid import NameOID
 
 from scripts.certificate_authority import bootstrap_token, public_jwk
-from scripts.certificate_controller import LifecycleError, atomic, fingerprint, save
+from scripts.certificate_controller import LifecycleError, atomic, fingerprint, remove_file, save
 from scripts.certificate_key_rotation import public_hash
 
 
@@ -323,7 +323,7 @@ def finish(vault, ca, renewal, receipt):
         path = scoped(root, root / retired["name"])
         if path.exists() and hashlib.sha256(path.read_bytes()).hexdigest() != retired["sha256"]:
             raise LifecycleError("authority_retired_file_changed")
-        path.unlink(missing_ok=True)
+        remove_file(path, missing_ok=True)
     state.update(pending=None, cleanup=None)
     save(vault / "state.json", state)
     return {"committed": True, "epoch": state["generation"], "next_due_at": next_due(state)}

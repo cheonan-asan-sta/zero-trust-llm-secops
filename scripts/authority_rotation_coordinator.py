@@ -11,7 +11,7 @@ import os
 import re
 import subprocess
 import time
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from pathlib import Path
 
 from scripts.authority_custodian import digest, verify_plan
@@ -111,19 +111,29 @@ class DockerBackend:
 class Coordinator:
     def __init__(self, profile, directory, backend=None):
         self.profile, self.directory = profile, directory
-        if backend is None and profile.get("service_hosts"):
+        if backend is None and profile.get("management"):
+            from scripts.control_plane_ha import Management
+            backend = Management(profile)
+        elif backend is None and profile.get("service_hosts"):
             from scripts.ca_host_recovery import Hosts
             backend = Hosts(profile)
         self.backend = backend or DockerBackend(profile)
         self.path = directory / "authority-coordinator.json"
-        self.state = json.loads(self.path.read_bytes()) if self.path.exists() else {
+        self.state = (self.backend.load_control() if hasattr(self.backend, "load_control") else
+            json.loads(self.path.read_bytes()) if self.path.exists() else {
             "schema": "authority-coordinator-1", "phase": "idle", "epoch": 0, "root": profile["initial_root"],
-            "manifest_hash": None, "history": [], "plan": None, "last_error": None}
+            "manifest_hash": None, "history": [], "plan": None, "last_error": None})
 
     def persist(self):
+        if hasattr(self.backend, "save_control"):
+            self.backend.save_control(self.state)
         save(self.path, self.state)
 
     def tick(self):
+        with self.backend.control_tick() if hasattr(self.backend, "control_tick") else nullcontext():
+            self._tick()
+
+    def _tick(self):
         s, b = self.state, self.backend
         phase, plan = s["phase"], s["plan"]
         if phase == "idle":

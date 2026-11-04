@@ -1,5 +1,25 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 4일 후속 관리 영역 이중화
+
+- `aitest` `635638a`에서 `feature/chaeheeju-control-plane-ha`로 진행한다.
+  [관리 구성·전환·재현·한계](docs/control-plane-high-availability.md)를 먼저 읽는다.
+- `scripts.control_plane_ha.Management`가 management 프로필의 backend다. 기존 프로필은 기존 동작이다.
+  cell별 9개 볼륨, 대기 우선 동기 파일 쓰기/삭제, 두 RO 역할 기록·관리 epoch, 단일 활성 leaf와 RO
+  대기를 사용한다. 조정기 Linux 사본이 원본이며 Windows JSON은 복구 가능한 캐시다.
+- 승격은 host lease, 완료된 관리/leaf 작업, `idle`/`prepared`, CA/vault/계획 일치와 PG system ID를
+  요구한다. 기존 프로세스/관문과 CA writer를 정지한 뒤 새 세대 볼륨으로 이전한다. busy 삭제·과거
+  프로필 재사용·불확실한 POST 재전송으로 복구하지 않는다. 전환 도중 실패의 자동 복구는 후속이다.
+- `scripts.test_control_plane_ha`는 실제 준비된 root 계획 중 a→b, 완료 뒤 b→새 a와 옛 볼륨 삭제를
+  검증한다. root/backup 키는 network-none 작업만 읽고 온라인 제어기에 socket/vault를 주지 않는다.
+- 두 cell은 같은 부모 Docker/PC다. CA 서비스 호스트 두 DinD와 구분한다. 신뢰된 호스트 실행기/
+  파일 lease, workload 인증서 볼륨과 앱 SQLite는 공통/별도 경계다. 물리 HA·quorum·운영 SLA·독립
+  팀원 검토·전체 주간 계획 완료로 확대하지 않는다. 실제 결과는 위 문서와 공개 증거를 따른다.
+- 최종 새 클러스터 1회·20개, 신규 단위 45개, Windows 961+1 skip/Linux 962와 Ruff 통과.
+  역할/CA 설정 파일 유실 후 같은 키 계획 재개, cell 전환 2회·이전 볼륨 18개 삭제·미만료 소비/폐기
+  거부·캐시 삭제 후 백업 인증을 검증했다. 4개 프로젝트/전체 회귀 이미지 태그 잔여 0, 기존 Docker/ZIP 보존.
+  TLS health의 봉쇄 관문 의존과 quiesce의 Windows 캐시 의존 예비 실패를 최종 합계에서 제외한다.
+
 ## 2026년 11월 4일 CA DB·서비스 호스트 복구
 
 - `aitest` `b6e35be`에서 `feature/chaeheeju-db-host-recovery`로 진행한다.
