@@ -51,7 +51,8 @@ def write(path, record):
 
 
 def available(backend):
-    record = read(backend.directory() / 'management-transition.json')
+    path = backend.directory() / 'management-transition.json'
+    record = backend.transition_read(path) if hasattr(backend, 'transition_read') else read(path)
     if record is not None:
         if record['project'] != backend.project or record['image'] != backend.profile['image']:
             raise LifecycleError('control_transition_journal_scope')
@@ -68,7 +69,10 @@ class Transition:
     def save(self, phase=None):
         if phase is not None:
             self.record['phase'] = phase
-        write(self.path, self.record)
+        if hasattr(self.b, "transition_write"):
+            self.b.transition_write(self.path,self.record)
+        else:
+            write(self.path, self.record)
 
     def cut(self, point):
         hook = getattr(self.b, '_transition_hook', None)
@@ -121,7 +125,7 @@ class Transition:
             raise LifecycleError('control_transition_checkpoint_missing')
 
     def resume(self):
-        self.record = read(self.path)
+        self.record = self.b.transition_read(self.path) if hasattr(self.b, "transition_read") else read(self.path)
         if self.record is None:
             raise LifecycleError('control_transition_missing')
         self.validate()

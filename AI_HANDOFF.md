@@ -1,5 +1,28 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 4일 후속 관리 실행 호스트·기록 이중화
+
+- PR #14 병합 `aitest` `8569385`에서 `feature/chaeheeju-executor-host-redundancy`로 진행한다.
+  [구성·신뢰 경계·전환·재현](docs/executor-host-high-availability.md)을 먼저 읽는다.
+- `scripts.executor_cluster`의 두 유지보수 실행기는 별도 rootfs와 journal/owner 볼륨을 갖는다.
+  `ExecutorManagement`가 기존 관리 backend에 peer-first 전환 기록/프로필과 실행 epoch 검사를 더한다.
+  실행 host epoch와 관리 cell epoch를 구분한다. 양 owner 불일치·대기·기록 불일치는 거부한다.
+- operator lock 아래 고정 실행기 ID/전체 사양 확인·두 실행기 제거·옛 임시 작업 정리·서비스 ExecIDs 0
+  확인 후 새 세대 저장소를 생존 사본으로 채운다. 공개 anchor와 명시한 생존 볼륨이 복구 입력이다.
+  Windows JSON은 필요하지 않다. 임시 작업은 시작 전/관리 파일 변경 전에 양 owner를 확인한다.
+- 실행기는 부모 Docker socket을 가진 신뢰 관리자다. UID/RO rootfs/cap-drop이 socket의 관리자 권한을
+  줄이지 않는다. 온라인 CA/leaf에 socket/vault를 추가하지 않고 Root/백업 키는 network-none 작업만 읽는다.
+- 같은 부모 Docker/물리 PC, 두 노드 수동 전환이며 quorum·물리 HA·자동 선출이 아니다. operator 전환
+  자체 중단/부분 실패는 lock·봉쇄 상태에서 수동 조사한다. `opening` 이후 보안 상태를 초기화하지 않는다.
+- `.env.local`을 읽지 않고 기존 `docs.zip`, `docs/week03.zip`, `pod-forensics-20261025-control-plane`을
+  보존한다. AWS·유료 LLM 호출 없이 시험 프로젝트 자원만 정리한다. 역할/전체 주간 완료는 별도다.
+- 최종 `executor-final2`, project `c02-e6790d753406`: 새 CA 1회·실행기15+관리 저장소 제거2, 별도 사전8,
+  실제 본 종료2/사전1, Root/issuer/JWK epoch1·옛 JWK132거부. 관리/실행 epoch3, 양 세대2, 옛 실행 볼륨4/
+  관리 볼륨18 삭제. 준비된 동일 키 후보와 접속 재개 후 새 JWT 소비가 양 호스트 손실/재개 후 보존됐다.
+- 신규 단위68, Windows1087+1skip/Linux1088·Ruff 통과. 입력109개·양 이미지 안89개씩/외부20개·새 단위
+  지문을 공개 결과에 남겼다. 최종/예비/단위7개 범위 잔여0, 기존 컨테이너/ZIP 보존. BuildKit 빌드 참조
+  실패·unlabelled host drain 보완을 위한 준비 중단·이전 좁은 사전 실험은 최종 합계에서 제외했다.
+
 ## 2026년 11월 4일 후속 관리 전환 중단 복구
 
 - PR #13 병합 `aitest` `1531625`에서 `feature/chaeheeju-control-transition-recovery`로 진행한다.
