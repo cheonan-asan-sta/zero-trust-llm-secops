@@ -12,6 +12,13 @@
 - 실제 검증은 별도 privileged DinD의 자식 dockerd 프로세스를 재시작한다. 같은 supervisor와 데이터 볼륨,
   바뀐 daemon PID/유지된 Engine ID를 대조한다. 완료 후 보존 marker는 합성이며 이전 실제 CA 캠페인을
   새 데몬 검증으로 relabel하지 않는다. 물리 HA·전원 장애·독립 팀원 검토는 별도다.
+- 최종 `daemon-final2` project `c02-66f1bc36252c`: 실제 child dockerd 재시작12·검사16 통과.
+  같은 actor/op/예약 worker/epoch 유지, 완료 후 합성 profile 보존·부분 시작 재시도·실제 paused 선거부·
+  live-restored actor/worker 거부·명시적 정지 후 재개. 최종 epoch3/A활성/양세대2다.
+- 신규 단위27, Windows1381+2skip/Linux1383·Ruff 통과. 양 실험 이미지의 앱/스크립트94개 대조,
+  결합136입력/단위이미지135개(미포함.gitattributes1)와 Git raw/LF 지문 대조, 6소유범위잔여0을 확인했다.
+  구현 기준 `b9c50ad`, [공개 원자료](docs/infrastructure-results/c04-parent-daemon-windows-20261104.json)에
+  준비/진단 실패3회·이전버전통과1회 제외 근거와 기존 Docker/ZIP 보존을 기록했다. 앱 변경은 없다.
 
 ## 2026년 11월 4일 후속 전환 실행기 컨테이너 유실 복구
 

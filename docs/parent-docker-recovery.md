@@ -83,6 +83,17 @@ paused 보강 전 통과한 15검사/12재시작 1회는 각각 별도 원자료
 않으며 생산 코드의 생존 작업 거부 기준을 낮추어 통과시키지 않았다. 최종 회귀·전체 소유 범위 정리와
 Git raw/LF 지문 대조는 공개 원자료에 함께 기록한다.
 
+신규 단위 검사 27개를 포함한 전체 회귀는 **Windows 1,381 통과·2 건너뜀·3 경고(199.28초)**,
+**Linux Docker 1,383 통과·2 경고(123.64초)**와 Ruff 통과다. 건너뜀은 기존 Windows symlink 검사이며
+경고는 기존 라이브러리 사용 중단 알림이다. 잘못된 seal/다른 데몬의 조기 거부, 생존 프로세스·paused
+거부, 양 사본/owner/worker 선검증, 부분 시작 재시도와 기존 PID-1/유실 복구 회귀를 확인했다.
+
+실행 코드 기준은 `b9c50ad`다. 최종 단위 이미지의 입력 136개 중 포함된 135개 지문을 대조했으며,
+미포함 `.gitattributes` 1개를 구분했다. 현재 파일과 커밋의 Git blob을 raw/LF 두 지문으로 대조했고
+PR #20 기준 앱/탐지 정책 변경은 없다. 앞선 시도·최종 실험·단위 이미지의 6개 소유 범위에서 컨테이너·
+볼륨·네트워크·이미지 태그 잔여 0을 별도로 확인했다. 기존 `pod-forensics-20261025-control-plane`의
+같은 ID/실행 상태와 ZIP 두 개의 SHA256은 보존했다. private runtime/환경 파일은 커밋하지 않는다.
+
 시험기는 사용자 Docker Desktop을 재시작하지 않는다. 별도의 privileged DinD 안에서 PID 1 supervisor와
 `/var/lib/docker` 볼륨을 유지한 채 자식 dockerd에 SIGTERM을 보내고 새 프로세스로 시작한다. 동일 supervisor,
 달라진 dockerd PID, 유지된 Engine ID와 고정 actor/worker를 대조한다. 시험용 관리 API는 호스트
