@@ -357,14 +357,14 @@ def test_service_wrapper_executes_tls_daemon_and_keeps_credentials_out_of_argv(m
     assert helpers.os.environ["ANALYZER_MODE"] == "rule"
     if role == "collector":
         assert "scripts.continuous_signal_collector" in argv and "run" in argv
-        assert argv[argv.index("--directory") + 1] == "/collector/producer"
+        assert argv[argv.index("--directory") + 1] == str(Path("/collector/producer"))
         assert argv[argv.index("--base-url") + 1] == "https://gateway:8443"
-        assert argv[argv.index("--tls-profile") + 1] == "/tls/profile.json"
+        assert argv[argv.index("--tls-profile") + 1] == str(Path("/tls/profile.json"))
         assert helpers.os.environ["SIGNAL_COLLECTOR_API_KEY"] == "c" * 64
         assert "--once" not in argv
     else:
         assert "scripts.mtls_native" in argv and "api" in argv
-        assert argv[argv.index("--profile") + 1] == "/tls/server.json"
+        assert argv[argv.index("--profile") + 1] == str(Path("/tls/server.json"))
         assert helpers.os.environ["AUTH_MODE"] == "api_key"
 
 

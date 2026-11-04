@@ -57,7 +57,7 @@ def exercise(cluster,target,check,directory,after_complete=None):
             current=Cluster(record['planned'])
             if after_complete:after_complete(current)
             else:command(['docker','exec',current.d['hosts'][target]['worker']['id'],'python','-m','scripts.test_executor_transition','fixture-profile'])
-            check('new_state_after_commit_before_completed_actor_removal')
+            check('completed_state_callback_before_actor_removal')
         if index==0:
             cluster.raw(['rename',found['Id'],cluster.project+'-renamed-operator'])
             invoke(expected='executor_actor_predecessor_present')
