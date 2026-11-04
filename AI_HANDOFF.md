@@ -1,5 +1,18 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 4일 후속 부모 Docker 데몬 재시작 복구
+
+- 기준 `aitest` PR #20 `3a45b58`, 브랜치 `feature/chaeheeju-parent-daemon-recovery`.
+  [구성·seal·복구·검증·한계](docs/parent-docker-recovery.md)를 읽는다.
+- `scripts.executor_daemon_recovery`의 정상 상태 `seal-daemon`과 명시적 `recover-daemon`을 추가했다.
+  Docker Engine ID/이미지를 먼저 대조하고 양 기록/owner/고정 ID를 검증한다. 모호한 사본·살아 있는
+  미완료 actor/worker는 거부하며 Docker Desktop이나 운영 데몬을 재시작하는 명령은 제공하지 않는다.
+- 기존 actor의 workers/published/retired 재개는 양 owner와 고정 worker 사양/전환 표식을 먼저 검증해
+  멈춘 worker를 시작한다. 완료 복구는 복제/owner/epoch 변경 없이 같은 영수증을 반환한다.
+- 실제 검증은 별도 privileged DinD의 자식 dockerd 프로세스를 재시작한다. 같은 supervisor와 데이터 볼륨,
+  바뀐 daemon PID/유지된 Engine ID를 대조한다. 완료 후 보존 marker는 합성이며 이전 실제 CA 캠페인을
+  새 데몬 검증으로 relabel하지 않는다. 물리 HA·전원 장애·독립 팀원 검토는 별도다.
+
 ## 2026년 11월 4일 후속 전환 실행기 컨테이너 유실 복구
 
 - 기준 `aitest` `5d957aa`(PR #18), 작업 브랜치 `feature/chaeheeju-actor-container-recovery`.

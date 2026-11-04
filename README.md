@@ -1,5 +1,12 @@
 # zero-trust-llm-secops
 
+## 2026년 11월 4일 후속 부모 Docker 데몬 재시작 복구
+
+[부모 데몬 복구](docs/parent-docker-recovery.md)는 장애 전에 보관한 Engine ID/anchor를 대조하고,
+같은 데이터 영역의 정지한 전환을 `recover-daemon`으로 이어갑니다. 완료 단계는 양 기록·owner·고정
+worker를 먼저 확인해 정지한 worker만 시작하며 새 보안 상태를 되복제하지 않습니다. 살아 있는 미완료
+실행기나 사본 충돌은 거부합니다. 실제 격리 데몬 실험·회귀·한계는 연결 문서에 기록합니다.
+
 ## 2026년 11월 4일 후속 전환 실행기 컨테이너 유실 복구
 
 [컨테이너 유실 복구](docs/actor-container-recovery.md)는 기존 실행기 ID의 실제 부재, 남은 전환 기록과

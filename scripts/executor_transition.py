@@ -12,6 +12,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 import uuid
 from pathlib import Path
 
@@ -22,6 +23,7 @@ NAME='executor-transition.json'
 FAULTS='executor-transition-faults.json'
 ENV='SECOPS_EXECUTOR_TRANSITION'
 CUT_ENV='SECOPS_EXECUTOR_TRANSITION_CUTS'
+WAIT_ENV='SECOPS_EXECUTOR_TRANSITION_TEST_WAIT'
 RECOVERY_ENV='SECOPS_EXECUTOR_ACTOR_RECOVERY'
 RECOVERY_LABEL='secops.executor-recovery'
 LABEL='secops.executor-transition'
@@ -168,7 +170,7 @@ def request_cluster(request):
     except (ValueError,TypeError,KeyError):raise LifecycleError('executor_operator_request_invalid') from None
 
 
-def actor_args(request,cuts=(),recovery=None):
+def actor_args(request,cuts=(),recovery=None,*,wait=False):
     c=request_cluster(request);target=request['target'];volume=c.d['hosts'][target]['journal']
     args=['create','--name',c.project+'-executor-takeover-lock','--label','secops.c02='+c.project,
         '--label','secops.executor-cluster='+c.project,'--label','secops.executor-kind=operator','--label',LABEL+'='+request['id'],
@@ -180,6 +182,9 @@ def actor_args(request,cuts=(),recovery=None):
     if cuts:
         if len(set(cuts))!=len(cuts) or not set(cuts)<=set(CUTS):raise LifecycleError('executor_operator_test_cut_scope')
         args+=['--env',CUT_ENV+'='+json.dumps(list(cuts),separators=(',',':'))]
+    if wait:
+        if not cuts:raise LifecycleError('executor_operator_test_wait_scope')
+        args+=['--env',WAIT_ENV+'=1']
     mode='test-actor' if cuts else 'actor'
     if recovery is not None:
         recovery_proof(recovery,request)
@@ -196,6 +201,20 @@ def lookup(c,name):
     return json.loads(c.raw(['inspect',ids[0]]))[0]
 
 
+def require_stopped(found):
+    state=found['State']
+    if (state.get('Status') not in {'created','exited'} or any(state.get(k) for k in ['Running','Paused','Restarting','Dead','RemovalInProgress'])
+            or found.get('ExecIDs')):
+        raise LifecycleError('executor_daemon_process_not_quiescent')
+
+
+def require_worker_state(found):
+    state=found['State']
+    if not state['Running']:return require_stopped(found)
+    if state.get('Status')!='running' or any(state.get(k) for k in ['Paused','Restarting','Dead','RemovalInProgress']):
+        raise LifecycleError('executor_daemon_process_not_quiescent')
+
+
 def verify_actor(c,found,request):
     h=found['HostConfig'];cfg=found['Config'];labels=cfg.get('Labels') or {};env=cfg.get('Env') or []
     values=dict(v.split('=',1) for v in env);cuts=()
@@ -207,6 +226,9 @@ def verify_actor(c,found,request):
     expected=dict(v.split('=',1) for v in json.loads(c.raw(['image','inspect',c.d['executor_image']]))[0]['Config'].get('Env') or [])
     expected.update({'DOCKER_HOST':'unix:///var/run/docker.sock',ENV:json.dumps(request,sort_keys=True,separators=(',',':'))})
     if cuts:expected[CUT_ENV]=json.dumps(cuts,separators=(',',':'))
+    if WAIT_ENV in values:
+        if not cuts or values[WAIT_ENV]!='1':raise LifecycleError('executor_operator_replaced')
+        expected[WAIT_ENV]='1'
     mode='test-actor' if cuts else 'actor'
     if RECOVERY_ENV in values:
         try:proof=recovery_proof(json.loads(values[RECOVERY_ENV]),request)
@@ -310,7 +332,7 @@ def resume_operator(anchor,site,journal,owner):
     return complete_result(record) if value is not None else run_actor(original,found,request)
 
 
-def recovery_evidence(c,record,bound=None):
+def recovery_evidence(c,record,bound=None,present_actor=None):
     """Read-only cross-check before a replacement is allowed to bind intent.
 
     A peer-only identity write is accepted only for this exact pinned candidate.
@@ -319,7 +341,13 @@ def recovery_evidence(c,record,bound=None):
     from scripts.executor_cluster import Cluster
     validate(record);old=Cluster(record['original']);new=Cluster(copy.deepcopy(record['planned']));target=record['target'];source=old.d['active']
     if c.d!=old.d:raise LifecycleError('executor_actor_recovery_request_mismatch')
-    require_absent(c,[*record['actor'].get('predecessors',[]),record['actor']['id']])
+    ids=[*record['actor'].get('predecessors',[]),record['actor']['id']]
+    if present_actor is not None:
+        verify_actor(old,present_actor,record_request(record))
+        require_stopped(present_actor)
+        if present_actor['Id']!=record['actor']['id']:raise LifecycleError('executor_operator_identity_changed')
+        ids.remove(present_actor['Id'])
+    require_absent(c,ids)
     for kind in ['journal','owner']:old.verify_volume(target,kind)
     replica=new if PHASES.index(record['phase'])>=3 else old
     replica.verify_volume(source,'journal')
@@ -437,7 +465,10 @@ class Actor:
         if sys.argv[-1] not in {'test-actor','test-recover-actor'} or point not in json.loads(os.environ.get(CUT_ENV,'[]')):return
         path=self.root/FAULTS;used=json.loads(path.read_bytes()) if path.exists() else {}
         if point in used.get(self.r['id'],[]):return
-        used.setdefault(self.r['id'],[]).append(point);write_path(path,used);os._exit(73)
+        used.setdefault(self.r['id'],[]).append(point);write_path(path,used)
+        if os.environ.get(WAIT_ENV)=='1':
+            while True:time.sleep(1)
+        os._exit(73)
 
     def orphans(self):
         ids=self.old.raw(['ps','--all','--quiet','--filter','label='+LABEL+'='+self.r['id'],
@@ -474,6 +505,20 @@ class Actor:
         h['worker']={'name':name,'id':found['Id']};self.new.verify_worker(site,found);self.save()
         if not found['State']['Running']:self.new.raw(['start',found['Id']])
 
+    def resume_workers(self):
+        # A daemon restart can stop workers after their creation was acknowledged.
+        # Validate the whole owner pair and both pinned objects before any start.
+        workers=[]
+        for site in ['a','b']:
+            if self.new.disk(self.new.d['hosts'][site]['owner'],'read')!={'owner.json':self.new.role()}:
+                raise LifecycleError('executor_operator_owner_conflict')
+            found=self.new.inspect_worker(site)
+            if found['Config']['Labels'].get(LABEL)!=self.r['id']:raise LifecycleError('executor_operator_worker_replaced')
+            require_worker_state(found)
+            workers.append(found)
+        for found in workers:
+            if not found['State']['Running']:self.new.raw(['start',found['Id']])
+
     def run(self):
         if self.r['phase']=='complete':return complete_result(self.r)
         self.orphans();self.save();self.cut('after_intent')
@@ -502,6 +547,7 @@ class Actor:
         if self.r['phase']=='owners':
             for site in [self.r['target'],self.old.d['active']]:self.worker(site)
             self.save('workers')
+        if self.r['phase'] in {'workers','published','retired'}:self.resume_workers()
         if self.r['phase']=='workers':self.new.publish();self.save('published');self.cut('after_publish')
         if self.r['phase']=='published':
             if self.r['discard']:
