@@ -373,7 +373,7 @@ def test_journal_capacity_cannot_commit_a_partial_batch(lab):
     assert lab.service.integrity()["verified_entries"] == 9999
 
 
-@pytest.mark.parametrize("invalid", [datetime(2026, 11, 4), "2026-11-04", 0, float("nan")])
+@pytest.mark.parametrize("invalid", [datetime(2026, 11, 4, tzinfo=UTC).replace(tzinfo=None), "2026-11-04", 0, float("nan")])
 def test_invalid_now_is_rejected_before_registry_or_transaction(lab, monkeypatch, invalid):
     lab.create()
     rows = _rows(lab.service)
