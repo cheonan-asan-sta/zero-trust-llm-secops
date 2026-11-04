@@ -49,6 +49,8 @@ app·worker·watchdog는 같은 `/data/zero-trust.sqlite3`와 읽기 전용 `/si
 
 runtime의 관측 append helper도 collector와 공유하는 `input.lock` 안에서 활성 입력을 다시 엽니다. 기본 8MiB EOF 회전과 ACK 행의 tombstone 정리는 collector spool에 적용하며, pending 봉투·중복 방지 이력을 잊지 않습니다. named volume의 입력을 직접 append·truncate하는 writer는 회전과 협력하지 않으므로 사용하지 않습니다. 수동 `compact`·`rotate`는 sender 종료 후 같은 spool·대상 URL·TLS 프로필로 수행합니다. 이 기능이 서버 inbox 상한을 비우거나 인증서·관측 서명키를 갱신하지는 않습니다.
 
+후속 [서버 inbox 영수증 보관 이관](server-inbox-maintenance.md)은 서버 terminal 행의 hot 공간을 별도로 확보합니다. 같은 DB 안에 전체 영수증을 보존하고 pending·processing은 옮기지 않으며, 유한 archive·byte 한도와 현재 키·권한 검증을 유지합니다. 스키마 이행 전에는 같은 DB의 앱·worker·watchdog·관리 CLI를 중지하고 모두 지원 코드·이미지로 맞춰야 합니다. 같은 directory의 `up`만으로 기존 이미지를 재빌드하지는 않습니다. 이관은 C04 자동 갱신·서명키 handoff나 앱 DB 백업/복원을 추가하지 않습니다.
+
 ## 장애·재시작 검증
 
 ```bash
