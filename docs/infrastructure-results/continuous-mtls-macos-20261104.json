@@ -1,0 +1,331 @@
+{
+  "schema": "continuous-mtls-verification-1",
+  "completed": true,
+  "started_at": "2026-11-04T12:21:01.151249+00:00",
+  "checks": [
+    {
+      "label": "nine_hardened_services_and_six_internal_networks",
+      "passed": true,
+      "services": {
+        "app": {
+          "network_mode": "kmtls-80e42c51057b_core",
+          "restart": "unless-stopped",
+          "init": true,
+          "uid": "10001:10001",
+          "read_only": true,
+          "published_ports": false
+        },
+        "gateway": {
+          "network_mode": "kmtls-80e42c51057b_core",
+          "restart": "unless-stopped",
+          "init": true,
+          "uid": "10001:10001",
+          "read_only": true,
+          "published_ports": false
+        },
+        "bridge": {
+          "network_mode": "kmtls-80e42c51057b_auth",
+          "restart": "unless-stopped",
+          "init": true,
+          "uid": "10001:10001",
+          "read_only": true,
+          "published_ports": false
+        },
+        "resource": {
+          "network_mode": "kmtls-80e42c51057b_consume",
+          "restart": "unless-stopped",
+          "init": true,
+          "uid": "10001:10001",
+          "read_only": true,
+          "published_ports": false
+        },
+        "proxy": {
+          "network_mode": "kmtls-80e42c51057b_auth",
+          "restart": "unless-stopped",
+          "init": true,
+          "uid": "10001:10001",
+          "read_only": true,
+          "published_ports": false
+        },
+        "collector": {
+          "network_mode": "kmtls-80e42c51057b_intake",
+          "restart": "unless-stopped",
+          "init": true,
+          "uid": "10001:10001",
+          "read_only": true,
+          "published_ports": false
+        },
+        "worker": {
+          "network_mode": "none",
+          "restart": "unless-stopped",
+          "init": true,
+          "uid": "10001:10001",
+          "read_only": true,
+          "published_ports": false
+        },
+        "watchdog": {
+          "network_mode": "none",
+          "restart": "unless-stopped",
+          "init": true,
+          "uid": "10001:10001",
+          "read_only": true,
+          "published_ports": false
+        },
+        "operator": {
+          "network_mode": "kmtls-80e42c51057b_client",
+          "restart": "unless-stopped",
+          "init": true,
+          "uid": "10001:10001",
+          "read_only": true,
+          "published_ports": false
+        }
+      }
+    },
+    {
+      "label": "normal_mtls_document_delivery",
+      "passed": true,
+      "status": 200,
+      "resource_deliveries": 1,
+      "tls_version": "TLSv1.3"
+    },
+    {
+      "label": "automatic_restart_collector",
+      "passed": true,
+      "same_container": true,
+      "before": 0,
+      "after": 1,
+      "exit_signal": "SIGKILL to Python child, not Docker stop"
+    },
+    {
+      "label": "automatic_restart_worker",
+      "passed": true,
+      "same_container": true,
+      "before": 0,
+      "after": 1,
+      "exit_signal": "SIGKILL to Python child, not Docker stop"
+    },
+    {
+      "label": "outage_restart_recovers_persisted_envelope_once",
+      "passed": true,
+      "original_envelope_sha256": "10c3b91777cb6faeaa2928b4bdd16e854cb1bc771bf58caa8444f6d0c2844fcb",
+      "captured": 1,
+      "acknowledged": 1,
+      "policy_transitions": 1
+    },
+    {
+      "label": "recovered_observation_denies_unconsumed_grant",
+      "passed": true,
+      "status": 403,
+      "resource_deliveries": 0,
+      "tls_version": "TLSv1.3"
+    },
+    {
+      "label": "unrelated_subject_still_receives_document",
+      "passed": true,
+      "status": 200,
+      "resource_deliveries": 1,
+      "tls_version": "TLSv1.3"
+    },
+    {
+      "label": "duplicate_feed_preserves_one_receipt_and_policy_effect",
+      "passed": true
+    },
+    {
+      "label": "automatic_restart_watchdog",
+      "passed": true,
+      "same_container": true,
+      "before": 0,
+      "after": 1,
+      "exit_signal": "SIGKILL to Python child, not Docker stop"
+    },
+    {
+      "label": "expired_proof_denies_unconsumed_grant",
+      "passed": true,
+      "status": 403,
+      "resource_deliveries": 0,
+      "tls_version": "TLSv1.3"
+    },
+    {
+      "label": "watchdog_restart_records_expiry_without_new_input",
+      "passed": true,
+      "session_versions": 2
+    },
+    {
+      "label": "server_pin_failure_retains_event_and_same_path_profile_recovers",
+      "passed": true
+    },
+    {
+      "label": "revoked_signing_key_denies_unconsumed_grant",
+      "passed": true,
+      "status": 403,
+      "resource_deliveries": 0,
+      "tls_version": "TLSv1.3"
+    },
+    {
+      "label": "automatic_restart_app",
+      "passed": true,
+      "same_container": true,
+      "before": 0,
+      "after": 1,
+      "exit_signal": "SIGKILL to Python child, not Docker stop"
+    },
+    {
+      "label": "app_restart_preserves_revocation",
+      "passed": true,
+      "status": 403,
+      "resource_deliveries": 0,
+      "tls_version": "TLSv1.3"
+    },
+    {
+      "label": "source_key_revocation_visible_through_atomic_registry_replacement",
+      "passed": true
+    },
+    {
+      "label": "collector_worker_watchdog_app_continue_without_reviving_access",
+      "passed": true
+    }
+  ],
+  "project": "kmtls-80e42c51057b",
+  "image_id": "sha256:12f836634bdf91cc595d752a3bfdd18b0e7dc9409b3bfdbd14421a2bc2be95f1",
+  "source_commit": "2d01bee564c788d61cd5b5e449dbcaf61ab0e912",
+  "source_dirty": false,
+  "source_input_sha256": {
+    "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+    "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+    "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+    "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+    "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+    "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+    "app/config.py": "0cce522f9991ae302a87f39cb727593d680392062a296958b80d563359053a01",
+    "app/continuous_signal_models.py": "9482577e2d7cb210a16cf3de6ef46517c32c32ee1ec1efb23e28f626fda25ee3",
+    "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+    "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+    "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+    "app/main.py": "22ccdd69e9bd30842ea4708a15101d51722876f28baeb8b0b1ca625aa0820997",
+    "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+    "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+    "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+    "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+    "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+    "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+    "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+    "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+    "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+    "app/services/collector_spool.py": "ca992ea846edad01ae892d4ab9645a759f6f117775ecf9f3f0e4c525a6ff5851",
+    "app/services/continuous_signals.py": "870da40ee024067d6c35689b6daed7fd89215071918650a4a17cc7c5a1aa37d6",
+    "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+    "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+    "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+    "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+    "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+    "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+    "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+    "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+    "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+    "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+    "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+    "app/services/signal_inbox.py": "fd16fc2ca126600989cc6325900eabd3e6c5923464c6ccb504b4560fd9dfd638",
+    "app/services/trusted_signals.py": "d2fdbcbcf69953232288e3da196033105a5e4a954a4bc6c64fa48388c392e8cf",
+    "app/services/zero_trust.py": "9e27c840fd61fa5778855f8c793a0d15d5075b9df8113b3c956bbae937a7c530",
+    "app/zero_trust_api.py": "8df229ab6392b1330e40c90bd508961721b95413121388c4b14650fb54f34ec7",
+    "app/zero_trust_models.py": "74e3fc316b62881ee325d501735ed94fc62073de583c37ad5c527d4366b75718",
+    "scripts/authority_custodian.py": "de343958405c33effa92a6471e3dea1edf3ad8adf3af681050a26ef7ad46c77a",
+    "scripts/authority_rotation_coordinator.py": "2c702808b299692069fb505260f39db0316c53daf44ad284665f5fc9e8612614",
+    "scripts/authority_rotation_runtime.py": "11ec4e8cb92d808beb1b60755b8085bb59bd9478479ecaf03327f0a34af17c5b",
+    "scripts/build_detection_benchmark.py": "ed2513a7d2901360c55c22785e0f1eab6b2496c17c4c3660901ccd5da77445bf",
+    "scripts/ca_endpoints.py": "77f41676e7a8a0c44449e32f6f271a7d4a8f5a48e17473593c42fa7074593cb6",
+    "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+    "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+    "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+    "scripts/certificate_authority.py": "adddc6bf0a629b8192c2a262e7aa7ec047114d4b826c0f3f040e0613b12d4ed3",
+    "scripts/certificate_controller.py": "9bb12b7f76f952316d3a736cd8a573fdfd780c2550402643c65390c82d964bee",
+    "scripts/certificate_key_rotation.py": "0ad9647b6e72ce8a5a67196f9df3284c561e7894686bc4bb961a7d31e5fcf6d8",
+    "scripts/certificate_reload_runner.py": "5e4f9aeeea931cefc77d77fe137d875666c96e204727e3f1b7661667aa65ee26",
+    "scripts/compare_observability.py": "709e9ab3c9af1d3f9f8683762214b1ce4efc624fc8baef16d206e2809b4bd796",
+    "scripts/compare_pep.py": "f8b35ddf395d80886fda042b319457403e30b265e6de0e0d26298893aecdafb3",
+    "scripts/compare_supply_chain.py": "8c767c06b840de34cbd6536e382efc78929eb1c6d6330d1b3a891e098d9f979c",
+    "scripts/continuous_mtls_assets.py": "ec745537e886fcc98bd14861e85d621492a192e379800e2883befc694170eed5",
+    "scripts/continuous_mtls_runtime.py": "17ce98e1eec6fe2c9ebccdafe9f46c9cc72e0d65754ea7453acaf8b5f1eb87ff",
+    "scripts/continuous_signal_collector.py": "6083e95a4407dabc4c0e0b77667ff1413103ec3722343dc24b1a54363e6720b1",
+    "scripts/control_executor.py": "c51d60ffd947397c10124b1b88c52a9cbd210d760c2ebc6e75bc10e20d78388f",
+    "scripts/control_mirror.py": "257ff40d93aa632af4e34bc2306206836718432404ba66dfd98ed1b5e475d6aa",
+    "scripts/control_plane_ha.py": "c9db10231775eafd12a9c9708ee973993124bd48d9fec89800bad147a32b3be7",
+    "scripts/control_store.py": "81b9dd78f4be02723cdcbdf5cfbe42c861c56e754a154e9158b18b290cfc89cc",
+    "scripts/control_transition.py": "1c0f7f693c039ae48156d738b3bab08d2e9ff4b6478453d0a8197ce1db514ca2",
+    "scripts/evaluate_detection_benchmark.py": "270178af5fe498660a4d1fbb8b4d2f3c287199f4f777ee9e1ed0ca1c57d67d73",
+    "scripts/executor_cluster.py": "e3334a2bf5ec05c1ad99e0fb34791c3114a2f39e38c0229d7d4cd5a459dd859d",
+    "scripts/executor_disk.py": "a8070b44590f21da1e8e27b10371817b8f04b0ef05c99be91c7178383eb07acb",
+    "scripts/executor_fence.py": "f5c8067ab9130a8234b70f9a5e39c0a8c2fb751a9031318900db5226263d56cb",
+    "scripts/executor_store.py": "19e1f296ab4c8541d9431ed320a4caa8d858e8973ea285a5f1f01c0a1efb0a79",
+    "scripts/executor_transition.py": "b38897f3c685254b582161400d15187fdba278b30ea203f01800fe0a80af0407",
+    "scripts/local_signal_collector.py": "3bd27286e473283b10650a89863b349171285d0866104999f7ef42ec6a2cde9b",
+    "scripts/measure_signal_infrastructure.py": "c11e501b43463f435c24764d38bf9ed110c480c517b982af160f1527798ed8e8",
+    "scripts/mtls_fixtures.py": "c6414b317a456cd7eb97290c589bd2115bca57e898c9ca6bd4848a529c6802fe",
+    "scripts/mtls_native.py": "bd5046f8136a93f723207c70cdcf0984b575108e764335f2cc6dd766fcc7f925",
+    "scripts/mtls_transport.py": "43024fa67e17c558ffdedb458e65c6712a07468262278ce8fb5c90a2f81ddd65",
+    "scripts/observability_lab.py": "eea01b2ad71226ebebc64e60cfc06b3a9c85a584891d690ab3a1ebb39655b14f",
+    "scripts/pep_lab.py": "2d2491720dfb9982ca06862daeb9e1cd13bb21bfef08ad1d3aa4ca59e69abc1f",
+    "scripts/session_watchdog.py": "a912566a23d919b7369fae98f22a5003e10bb7b2a0c186744505211907bcf1ac",
+    "scripts/signal_metrics_exporter.py": "76be66a9ff3e2194cf46ed72a53748342abe5e0c7a7b95345f6483c9cc4c83ed",
+    "scripts/signal_worker.py": "b62316ed3e481501931572c134d50263052ae22cc92cb22dac163d5b7a271035",
+    "scripts/test_all_hops_mtls.py": "eb841f22ff531228aff62a496917c86ef4e6a7edbe9b3d5c47ca2dc02feddf46",
+    "scripts/test_authority_key_rotation.py": "50d8b3ba8e1aeb01bf22eb6867c36e008ccaffc9a363837afce87accbc0433e3",
+    "scripts/test_ca_high_availability.py": "dfa2275d67129e4cfce44cd6c6eaa406e07313aa6f7121e9dd193401cc0ba40e",
+    "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+    "scripts/test_certificate_automation.py": "85893bf90e05568ba61bc74abf658817919ab2ec9d4e510188f51a34c74c0270",
+    "scripts/test_continuous_mtls_runtime.py": "5f4c58c817a56480ae36c1418d2c4c2d9a606b8be8640402d3bd22f1c0329c42",
+    "scripts/test_control_plane_ha.py": "2d5eb84043a6c4e91d55c9e99f08e4edb491852d4ee925ec4a3bc5f326c6dd06",
+    "scripts/test_control_transition.py": "124cc452dbcdfbbff6ed064d2bfe301c86731e86e91397b139d4058433a6a198",
+    "scripts/test_executor_hosts.py": "0a9f791330279db729bddfea016c4484b1558bdbca683003d71f842ee7ac3c4f",
+    "scripts/test_executor_transition.py": "4dde1cb1bbd052616012d89a3d762ee070b4a68d0e3baca91ecebd359bf0b905",
+    "scripts/test_mtls_infrastructure.py": "a24fef9f3e849877a8dc9f9c27503a04adc7b6c7057220ce1576bb5da500c207",
+    "scripts/test_private_key_rotation.py": "b9c97aab996b75cd2824ce995e49b87c748b39f391a9770fb752e2f78649e12a",
+    "scripts/test_signal_compose.py": "37f96191e15d80cf2c86196c8572ea54a329e3c9762848dbe0a9a97242e20cab"
+  },
+  "configuration_sha256": {
+    "Dockerfile": "f10f2d3b8af1fc31ea0bb5c9e7a40e05b9609943c62a7a9b0810dde7224eab2b",
+    "pyproject.toml": "a71998c113e8cea24811d46050c1ae0aa431e0f8e1f37751e46eeeb7a5f90ed9",
+    "infra/pep/tools.lock.json": "69b9ddd436c4aed7fd27b70afad40fe3740e5b4b0c5a50fbe503b1a93f654e66",
+    "infra/mtls/all-hops-nginx.conf": "b9cf941bfbaab0c5c5b89f1fc02cd164542a48d46cac0d27855cef8ce60f1509"
+  },
+  "image_source_verified": true,
+  "cleanup": {
+    "containers": 0,
+    "volumes": 0,
+    "networks": 0
+  },
+  "finished_at": "2026-11-04T12:22:27.354225+00:00",
+  "validation_base": "5d957aa47bd4140072253975afd74af7d0fa0513",
+  "environment": {
+    "host": "macOS arm64",
+    "docker_engine": "29.5.2 aarch64",
+    "engine_profile": "Colima secops-m3",
+    "nginx_platform": "linux/amd64",
+    "network_hops": "mTLS; worker/watchdog use local SQLite IPC"
+  },
+  "local_regression": {
+    "python": "3.14.8",
+    "passed": 1322,
+    "warnings": 1,
+    "seconds": 60.01,
+    "ruff": "passed",
+    "diff_check": "passed"
+  },
+  "preparation_runs": [
+    {
+      "run": "a",
+      "result": "Docker CLI plugins unavailable before integration checks; task-local plugin configuration prepared and project cleaned"
+    },
+    {
+      "run": "b",
+      "result": "17 integration checks passed against earlier base 6765abd; excluded from final counts after latest aitest merge"
+    }
+  ],
+  "limitations": [
+    "Local/test synthetic observations and simulated protected document only; no real IdP/EDR or cloud/model calls",
+    "Static ephemeral TLS credentials; C04 automatic issuance/renewal and authority rotation are not integrated in this profile",
+    "No daemon/physical-host failure campaign or performance SLA; process restarts only",
+    "Independent teammate reproduction not performed",
+    "No changes to detection rules, thresholds, models or quality baseline"
+  ]
+}

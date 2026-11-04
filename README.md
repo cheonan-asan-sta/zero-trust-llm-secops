@@ -1,5 +1,12 @@
 # zero-trust-llm-secops
 
+## mTLS 기반 로컬 지속 실행
+
+app·수집기·worker·watchdog와 기존 보호 자원 경로를 별도 Docker 프로젝트의 9개 서비스로 실행합니다.
+공유 정책 DB와 전용 수집기 spool을 보존하고, 외부 공개 포트 없이 내부 mTLS 경로를 사용합니다.
+[실행·상태·종료·장애 검증과 정적 인증서 수명](docs/continuous-mtls-runtime.md)을 확인합니다.
+이 프로필의 임시 CA는 정적이며 C04 자동 갱신·교체 통합은 후속 범위입니다.
+
 ## 2026년 11월 4일 후속 관리 호스트 전환 실행기 재개
 
 [전환 실행기 중단 복구](docs/executor-transition-recovery.md)는 같은 고정 컨테이너의 PID 1을 다시 시작해
