@@ -1,0 +1,13 @@
+{
+  "schema": "ca-recovery-tools-1",
+  "platform": "linux/amd64",
+  "docker_host": {
+    "image": "docker:29-dind@sha256:97545b7bab66319a476800a85b008b25c06681733d484909e2a776281e41574f",
+    "observed_version": "29.9.2-dind",
+    "source": "https://github.com/docker-library/docker/tree/29938079fb10e4c1a5e417cf74a84b6f845443e2/29/dind"
+  },
+  "wheels": [
+    {"name": "psycopg-3.3.6-py3-none-any.whl", "url": "https://files.pythonhosted.org/packages/4e/de/748bd7609c71cae5d737f0ba9192f19329f70180ecda8fff3cac02c5abe3/psycopg-3.3.6-py3-none-any.whl", "sha256": "a1db9f7148b06a28606767efaca51fa6f9398c5c0a3810519be69d7000bdb631"},
+    {"name": "psycopg_binary-3.3.6-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", "url": "https://files.pythonhosted.org/packages/0a/42/948bb3d2617795093512613fd96ba380e922992c7908fbc073858147d196/psycopg_binary-3.3.6-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", "sha256": "1679a1cb93fbe5a6d1fd58d82cbddcc6fcb8c61446ba7cae6eb2a7b19bc585de"}
+  ]
+}

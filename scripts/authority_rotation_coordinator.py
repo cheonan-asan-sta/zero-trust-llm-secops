@@ -111,6 +111,9 @@ class DockerBackend:
 class Coordinator:
     def __init__(self, profile, directory, backend=None):
         self.profile, self.directory = profile, directory
+        if backend is None and profile.get("service_hosts"):
+            from scripts.ca_host_recovery import Hosts
+            backend = Hosts(profile)
         self.backend = backend or DockerBackend(profile)
         self.path = directory / "authority-coordinator.json"
         self.state = json.loads(self.path.read_bytes()) if self.path.exists() else {

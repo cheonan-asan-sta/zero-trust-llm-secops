@@ -1,5 +1,9 @@
 # 로컬 CA 프로세스 고가용성
 
+11/4 후속 [DB·서비스 호스트 이중화/복원 프로필](ca-db-host-recovery.md)은 독립 Docker 데몬 두 개,
+PostgreSQL 동기 복제·정지 확인 후 승격·새 저장소 재가입·보안 체크포인트 대조 복원을 추가한다.
+아래 단일 DB의 결과는 당시 범위로 보존하며 새 시험의 결과와 합산하지 않는다.
+
 2026-11-03 · 기준 `aitest` `0c32273` · `feature/chaeheeju-ca-high-availability`
 
 [CA·발급 JWK 키 교체](authority-key-rotation.md)의 후속 프로필이다. CA 두 프로세스가 같은 발급 정책과
