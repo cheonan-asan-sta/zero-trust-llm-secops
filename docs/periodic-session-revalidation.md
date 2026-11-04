@@ -1,5 +1,7 @@
 # 주기적 세션 재검증
 
+후속 [mTLS 기반 로컬 지속 실행](continuous-mtls-runtime.md)은 별도 Docker 프로필에서 앱·관측 수집기·worker·watchdog의 실행과 재시작을 연결한다. 아래는 watchdog 자체의 계약이며 Docker 운영 통합 미포함 표기는 그 최초 구현 범위다.
+
 `scripts.session_watchdog`는 새 관측이나 업무 접근 요청이 없어도 기존 서명 세션의 증명 만료와 출처·키 유효성을 주기적으로 확인하는 local/test 프로세스다. 앱의 `ZeroTrustOperations.revalidate_sessions()`를 사용하며 기존 접근 검사와 같은 출처 지문 계약을 따른다.
 
 [지속 수집기](continuous-signal-collector.md)는 JSONL 관측을 포착·전달하고, 서버 `signal_worker`는 접수한 관측을 처리한다. watchdog는 별도 프로세스로 기존 세션의 시간·등록 상태를 확인한다. API·수집기·worker를 실행하는 것만으로 watchdog가 자동 시작되지는 않는다.
