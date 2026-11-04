@@ -1,5 +1,9 @@
 # 개발 주차별 산출물
 
+11/5 후속: [CA·DB·leaf 서비스 데몬 복구](service-daemon-recovery.md).
+사전 고정 ID·최신 보안 checkpoint·DB 동기 복제 확인 뒤 접속을 열고, 재시도 시 새 소비·폐기를 보존한다.
+기존 worker 복구의 후속이며 같은 저장소/PC와 명시적 복구 조건, 실제 로컬 검증 범위를 설명한다.
+
 11/4 후속: [부모 Docker 데몬 재시작 복구](parent-docker-recovery.md).
 사전 Engine ID seal·같은 저장소 검증·정지 worker 복원·live-restore 거부와 실제 격리 데몬 검증을 설명한다.
 

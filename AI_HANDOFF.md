@@ -1,5 +1,30 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 5일 후속 CA·DB·leaf 서비스 복구
+
+- 최종 `c02-665896d5f3f5`: 실제 dockerd 재시작3·서비스10·기존 실행기15/관리 제거2, 옛 JWK132거부.
+  신규 단위65, Windows1749+2skip/Linux1751·Ruff 통과. 구현 기준 `c8cdf65`.
+  양 실험 이미지114개·전체206/단위 이미지205 대조, 11개 소유 범위 잔여0/기존 Docker·ZIP 보존.
+  [공개 원자료](docs/infrastructure-results/c04-service-daemon-windows-20261105.json)에 초기/검토 중단 제외와 지문을 기록했다.
+
+- 실제 서비스 캠페인은 `c8cdf65`/PR #24 앱으로 통과했다. 이후 동료 PR #25 `15366df`를 `7e014b5`로
+  보존 결합했다. 이 변경의 앱/상시 mTLS 입력 4개와 당시 실험 지문을 구분하고 최신 전체 회귀를 별도로 기록한다.
+  C04 복구 코드는 그대로이며 `15366df` 대비 이번 작업의 앱 변경은 없다. 최신 앱으로 CA 재시작을 다시
+  실행했다고 기록하지 않는다. CI의 최신 상시 mTLS 검증도 별도 범위다.
+
+- 기준 PR #23 `9088245`, 이름 브랜치 `feature/chaeheeju-service-daemon-recovery`.
+  [서비스 manifest·단계·실행·한계](docs/service-daemon-recovery.md)를 읽는다.
+- 동료 PR #24 `e9ae427`의 inbox 보관 이관을 `3d5acb2`로 보존 결합했다. README 양 안내를 유지했고,
+  실제 서비스 실험과 최종 회귀는 이 결합 코드로 실행한다. 동료 앱 변경을 이번 작업 기여로 기록하지 않는다.
+- `scripts.service_daemon_recovery`의 `seal/recover`: 같은 부모/내부 Engine·고정 서비스/볼륨·현재 관리/실행 역할을
+  검사하고 최신 인증 checkpoint·DB 역할/동기 복제 확인 뒤 접속을 연다. 모든 대상은 사전 고정 ID 또는 명시 extras다.
+- 기존 authority lease 아래 전용 공개 journal과 동일 actor로 재개한다. pending/busy/사본 충돌·생존 미완료 작업·
+  paused·부분 온라인 새 장애·미완료 actor 유실은 거부한다. 자동 kill/lease 삭제/DB 승격·복원·키 재생성은 없다.
+- `opening` 이후 새 토큰 소비·폐기를 과거 snapshot으로 되돌리지 않는다. 다음 전체 정지에는 새 service cycle을
+  사용하고 역할 epoch와 ID는 유지한다. Docker Desktop 대신 별도 격리 부모의 실제 CA/DB/leaf를 시험한다.
+- AWS/유료 LLM/실계정/OS 신뢰 설정·탐지 기준 변경 없이 진행한다. 기존 ZIP/컨테이너를 보존한다.
+  물리 HA·운영 SLA·팀원 독립 검토/전체 주간 완료는 별도이며 인프라 실행/측정은 채희주 담당이다.
+
 ## 2026년 11월 4일 후속 부모 Docker 데몬 재시작 복구
 
 - 기준 `aitest` PR #20 `3a45b58`, 브랜치 `feature/chaeheeju-parent-daemon-recovery`.

@@ -1,5 +1,9 @@
 # 기술 비교와 선정 실행 계획
 
+11/5 C04 후속 [서비스 데몬 복구](service-daemon-recovery.md)는 기존 Docker·PostgreSQL·step-ca와
+현재 보안 checkpoint/authority lease를 재사용한다. 같은 ID의 명시적 복구를 선택해 권한/키/DB 재생성을
+피하고 접속 재개 후 상태를 보존한다. 실제 격리 데몬 시험은 제품 간 우열이나 자동 선출/물리 HA 검증이 아니다.
+
 11/4 C04 후속 [부모 Docker 데몬 복구](parent-docker-recovery.md)는 기존 Engine ID·공개
 anchor·Linux flock·고정 객체를 재사용한다. 격리된 실제 dockerd 재시작으로 증거 기반 명시적 복구를
 검증하며 새 quorum/선출 제품의 채택이나 제품 간 우열을 주장하지 않는다. 운영 적용 검토는 별도다.

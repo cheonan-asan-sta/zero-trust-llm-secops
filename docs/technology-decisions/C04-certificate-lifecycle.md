@@ -1,5 +1,9 @@
 # C04: 로컬 인증서 발급·갱신 선정 기록
 
+11/5 후속 [서비스 데몬 복구](../service-daemon-recovery.md)는 같은 Docker/PostgreSQL/step-ca와
+현재 보안 checkpoint를 재사용한다. 고정 객체의 순차 시작과 접속 봉쇄를 선택해 재생성/승격/과거 복사를
+피한다. 같은 저장소 생존 조건의 로컬 실험이며 새 분산 선출 제품 도입이나 제품 간 우열 비교가 아니다.
+
 11/4 후속 [부모 Docker 데몬 재시작 복구](../parent-docker-recovery.md)는 정상 상태의 Engine ID
 seal과 기존 양 journal/owner·고정 worker 검증을 선택했다. 정지 worker를 복원하면서 완료 후 과거 상태
 복제를 피하려는 선택이며, live-restore된 미완료 작업·다른 데몬·충돌은 거부한다. 실제 daemon 재시작과
