@@ -49,6 +49,67 @@ class Checks:
         self.require(result["status"] == 200, "history_unavailable")
         return result["body"]
 
+    def journal(self):
+        return json.loads(self.runtime.execute("app", ["python", "-m", "scripts.policy_journal",
+            "status", "--database", "/data/zero-trust.sqlite3"]))
+
+    def journal_boundary(self):
+        # Generate audit rows inside the real shared SQLite transaction. This is
+        # a storage boundary test, not a throughput claim about 10,020 HTTP calls.
+        program = """from pathlib import Path
+from datetime import UTC,datetime
+from app.services.zero_trust import ZeroTrustOperations
+s=ZeroTrustOperations(Path('/data/zero-trust.sqlite3'))
+with s._transaction() as t:
+ for i in range(10020):
+  s._append(t,{'kind':'access','tenant_id':'local','operator_id':'journal-boundary',
+   'session_id':'boundary-no-session','resource_id':'zt-demo-documents','action':'READ',
+   'session_version':None,'allowed':False,'reason_code':'GRANT_INVALID',
+   'grant_hash':'0'*64,'recorded_at':datetime.now(UTC).isoformat()})
+"""
+        self.runtime.execute("app", ["python", "-c", program], timeout=90)
+        state = self.journal()
+        self.require(state["total_records"] >= 10020 and state["archived_records"] > 0
+                     and state["active_records"] <= 10000, "journal_boundary_not_archived")
+        self.add("policy_journal_continues_after_ten_thousand_records",
+                 total_records=state["total_records"], archived_records=state["archived_records"],
+                 active_records=state["active_records"], generated_audit_rows=10020)
+
+    def journal_security(self, spent):
+        revoked = self.mint("runtime-journal-revoked", user_id=OTHER, device_id=DEVICES[1])
+        result = self.runtime.probe({"profile": "core", "method": "POST",
+            "path": "/zero-trust/sessions/" + revoked[0] + "/revoke",
+            "body": {"expected_version": 1, "note": "Journal maintenance regression"}})
+        self.require(result["status"] == 200 and result["body"]["status"] == "REVOKED",
+                     "journal_revoke_failed")
+        before = self.journal()
+        self.runtime.execute("app", ["python", "-m", "scripts.policy_journal", "compact",
+            "--database", "/data/zero-trust.sqlite3", "--limit", "10000"], timeout=90)
+        after = self.journal()
+        self.require(after["active_records"] == 0 and after["total_records"] == before["total_records"]
+                     and after["archived_records"] == after["total_records"], "journal_compaction_lost_history")
+        self.access(spent, False, "archived_consumed_token_denies_document")
+        replay = self.runtime.probe({"profile": "core", "method": "POST",
+            "path": "/zero-trust/protected-access", "body": {
+                "session_id": spent[0], "resource_id": "zt-demo-documents",
+                "action": "READ", "grant_token": spent[1]}})
+        self.require(replay["status"] == 403 and replay["body"]["reason_code"] == "GRANT_ALREADY_USED",
+                     "archived_consumption_marker_missing")
+        self.access(revoked, False, "archived_revocation_denies_unconsumed_token")
+        self.require(len(self.history(spent[0])) == 1 and len(self.history(revoked[0])) == 2,
+                     "archive_changed_session_history")
+        # This explicit restart checks restored history; the later SIGKILL check
+        # separately exercises Docker's automatic restart manager.
+        command(["docker", "restart", self.runtime.container("app")])
+        self.wait(lambda: self.runtime.probe({"profile": "core", "path": "/health/live"})["status"] == 200,
+                  "journal_restart_not_ready")
+        self.access(revoked, False, "journal_restart_preserves_revoked_access_denial")
+        self.require(len(self.history(revoked[0])) == 2 and self.journal()["archived_records"] == after["archived_records"],
+                     "journal_restart_changed_archive")
+        self.add("journal_checkpoint_retains_sessions_consumption_and_revocation_after_restart",
+                 archived_records=after["archived_records"], consumed_reason="GRANT_ALREADY_USED",
+                 revoked_versions=2)
+
     def mint(self, label, **options):
         result = self.runtime.mint({"session_id": label, **options})
         self.require(result["status"] == 200 and result["body"]["grant_token"], "mint_failed")
@@ -170,7 +231,10 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
         for network in nets:
             self.require(json.loads(command(["docker", "network", "inspect", network["ID"]]))[0]["Internal"], "runtime_external_network")
         self.add("nine_hardened_services_and_six_internal_networks", services=hardening)
-        self.access(self.mint("runtime-normal"), True, "normal_mtls_document_delivery")
+        self.journal_boundary()
+        normal = self.mint("runtime-normal")
+        self.access(normal, True, "normal_mtls_document_delivery")
+        self.journal_security(normal)
 
         affected = self.mint("runtime-outage")
         unrelated = self.mint("runtime-unrelated", user_id=OTHER, device_id=DEVICES[1])
