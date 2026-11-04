@@ -116,6 +116,103 @@ with s._transaction() as t:
         self.require(result["body"]["session"]["status"] == "ACTIVE", "mint_not_active")
         return label, result["body"]["grant_token"]
 
+    def inbox_snapshot(self):
+        program = """import hashlib,json
+from pathlib import Path
+from app.services.signal_inbox import SignalInbox
+s=SignalInbox(Path('/data/zero-trust.sqlite3'))
+with s._transaction() as c:
+ rows=[r for r in s._rows(c) if r['event_id'].startswith('runtime-inbox-')]
+print(json.dumps({'storage':s.storage_status(),'live_sha256':hashlib.sha256(json.dumps(rows,sort_keys=True,separators=(',',':')).encode()).hexdigest(),'states':sorted(r['state'] for r in rows)}))
+"""
+        return json.loads(self.runtime.execute("app", ["python", "-c", program]))
+
+    def inbox_security(self, affected):
+        # Keep a live lease and a pending delivery while archiving a real receipt.
+        # Direct mTLS submissions here do not alter the collector's feed counters.
+        event_id = "runtime-outage-observation"
+        original_receipt = self.receipt(event_id)["body"]
+        original = json.loads(self.runtime.execute("app", ["python", "-c", """from pathlib import Path
+from app.services.signal_inbox import SignalInbox
+s=SignalInbox(Path('/data/zero-trust.sqlite3'))
+with s._transaction() as c:print(next(r['payload'] for r in s._rows(c) if r['event_id']=='runtime-outage-observation'))
+"""]))
+        program = """import base64,json,sys
+from pathlib import Path
+from datetime import UTC,datetime,timedelta
+from cryptography.hazmat.primitives import serialization
+from app.continuous_signal_models import SignedContinuousSignal
+from app.services.trusted_signals import canonical_observation
+d=Path('/collector/producer')
+key=serialization.load_pem_private_key((d/'private.pem').read_bytes(),password=None)
+cfg=json.loads((d/'config.json').read_text())
+old=json.load(sys.stdin)
+def sign(value):
+ value['signature']='A'*86
+ signal=SignedContinuousSignal.model_validate(value)
+ value['signature']=base64.urlsafe_b64encode(key.sign(canonical_observation(signal))).decode().rstrip('=')
+ return value
+now=datetime.now(UTC)
+items={}
+for label in ('processing','pending'):
+ value={'tenant_id':cfg['tenant_id'],'source_id':cfg['source_id'],'key_id':cfg['key_id'],
+ 'event_id':'runtime-inbox-'+label,'issued_at':now.isoformat(),'observed_at':now.isoformat(),
+ 'expires_at':(now+timedelta(seconds=90)).isoformat(),
+ 'observation':{'kind':'identity','subject_id':SUBJECT,'active':True,'authentication_result':'success'}}
+ items[label]=sign(value)
+old['observation'].update(active=True,authentication_result='success')
+items['conflict']=sign(old)
+print(json.dumps(items))
+""".replace("SUBJECT", repr(OTHER))
+        signed = json.loads(self.runtime.execute("collector", ["python", "-c", program], json.dumps(original)))
+        worker_id = self.runtime.container("worker")
+        command(["docker", "stop", "--time", "2", worker_id])
+        for label in ("processing", "pending"):
+            result = self.runtime.probe({"profile": "core", "method": "POST",
+                "path": "/zero-trust/signals/inbox", "body": signed[label]})
+            self.require(result["status"] == 202 and result["body"]["state"] == "pending",
+                         "inbox_live_delivery_not_accepted")
+        claimed = json.loads(self.runtime.execute("app", ["python", "-c", """import json
+from pathlib import Path
+from datetime import UTC,datetime
+from app.services.signal_inbox import SignalInbox
+s=SignalInbox(Path('/data/zero-trust.sqlite3'),lease_seconds=1)
+r=s.claim(now=datetime.now(UTC))
+print(json.dumps({'event_id':r['event_id'],'state':r['state']}))
+"""]))
+        self.require(claimed == {"event_id": "runtime-inbox-processing", "state": "processing"},
+                     "inbox_processing_lease_missing")
+        before = self.inbox_snapshot()
+        compact = json.loads(self.runtime.execute("app", ["python", "-m", "scripts.signal_inbox", "compact",
+            "--database", "/data/zero-trust.sqlite3", "--limit", "10000"]))
+        after = self.inbox_snapshot()
+        self.require(compact["compacted"] == 1 and after["storage"]["archived_records"] == 1
+                     and after["storage"]["active_records"] == 2
+                     and before["live_sha256"] == after["live_sha256"]
+                     and after["states"] == ["pending", "processing"], "inbox_compaction_changed_live_work")
+        self.add("server_inbox_archive_preserves_pending_processing_and_lease", archived_records=1, live_records=2)
+        duplicate = self.runtime.probe({"profile": "core", "method": "POST",
+            "path": "/zero-trust/signals/inbox", "body": original})
+        conflict = self.runtime.probe({"profile": "core", "method": "POST",
+            "path": "/zero-trust/signals/inbox", "body": signed["conflict"]})
+        self.require(duplicate["status"] == 202 and duplicate["body"]["duplicate"]
+                     and duplicate["body"]["state"] == "completed" and conflict["status"] == 409,
+                     "archived_inbox_identity_contract_changed")
+        self.add("archived_inbox_exact_duplicate_and_valid_conflict_over_mtls", duplicate_status=202, conflict_status=409)
+        command(["docker", "restart", self.runtime.container("app")])
+        self.wait(lambda: self.runtime.probe({"profile": "core", "path": "/health/live"})["status"] == 200,
+                  "inbox_restart_not_ready")
+        restarted = self.inbox_snapshot()
+        self.require(restarted == after and self.receipt(event_id)["body"] == original_receipt,
+                     "inbox_restart_lost_receipt_or_lease")
+        command(["docker", "start", worker_id])
+        self.wait(lambda: self.completed("runtime-inbox-processing") and self.completed("runtime-inbox-pending"),
+                  "inbox_live_deliveries_not_recovered")
+        self.require(len(self.history(affected[0])) == 2 and self.receipt(event_id)["body"] == original_receipt,
+                     "inbox_restart_reapplied_archived_effect")
+        self.add("inbox_restart_recovers_pending_and_expired_lease_without_reapplying_archive", recovered=2)
+        self.access(affected, False, "server_inbox_maintenance_restart_preserves_revoked_access_denial")
+
     def served(self):
         result = self.runtime.probe({"profile": "resource", "path": "/_stats"})
         self.require(result["status"] == 200, "resource_stats_unavailable")
@@ -267,6 +364,7 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
         self.wait(lambda: self.collector()["offset"] == 2 * first["offset"], "duplicate_input_captured")
         self.require(self.collector()["captured"] == 1 and len(self.history(affected[0])) == 2, "duplicate_policy_effect")
         self.add("duplicate_feed_preserves_one_receipt_and_policy_effect")
+        self.inbox_security(affected)
 
         # Compact a confirmed receipt while a second exact signed transmission
         # is pending during an API outage, then rotate its fully captured feed.

@@ -18,6 +18,8 @@ from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_ope
 
 STATES = ("pending", "processing", "completed", "failed")
 MAX_BODY = 65536
+# Matches the bounded active (100,000) plus cold (1,000,000) storage ceilings.
+MAX_RETAINED_RECORDS = 1_100_000
 
 
 def validate_upstream(url):
@@ -35,15 +37,27 @@ def render_summary(summary):
     counts = []
     for state in STATES:
         value = summary.get(state)
-        if type(value) is not int or not 0 <= value <= 100000:
+        limit = 100000 if state in {"pending", "processing"} else MAX_RETAINED_RECORDS
+        if type(value) is not int or not 0 <= value <= limit:
             raise ValueError("invalid_count")
         counts.append(value)
-    if (type(summary.get("total")) is not int or not 0 <= summary["total"] <= 100000
+    if (type(summary.get("total")) is not int or not 0 <= summary["total"] <= MAX_RETAINED_RECORDS
             or sum(counts) != summary["total"]):
         raise ValueError("inconsistent_total")
     rows = ["# TYPE secops_signal_inbox_records gauge"]
     rows += [f'secops_signal_inbox_records{{state="{state}"}} {value}'
              for state, value in zip(STATES, counts, strict=True)]
+    storage_fields = ("active_records", "archived_records")
+    if any(field in summary for field in storage_fields):
+        storage = [summary.get(field) for field in storage_fields]
+        if (any(type(value) is not int or not 0 <= value <= limit
+                for value, limit in zip(storage, (100000, 1000000), strict=True))
+                or sum(storage) != summary["total"]
+                or summary["pending"] + summary["processing"] > storage[0]):
+            raise ValueError("inconsistent_storage_counts")
+        for field, value in zip(storage_fields, storage, strict=True):
+            name = "secops_signal_inbox_" + field
+            rows += [f"# TYPE {name} gauge", f"{name} {value}"]
     for state in ("pending", "processing"):
         value = summary.get("oldest_" + state + "_age_seconds")
         if value is None and summary[state] == 0:

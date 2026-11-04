@@ -52,7 +52,7 @@
 | 출처·키·서명·종류/주체 권한·테넌트·최초 신선도 거부 | 401 | 저장·정책 적용 없음 |
 | 역할 부족 | 403 | viewer가 접수할 수 없음 |
 | 없는 ID 또는 다른 테넌트 ID 조회 | 404 | 타 테넌트의 접수 존재를 공개하지 않음 |
-| 대기 또는 전체 보관 상한 초과 | 429, `Retry-After: 1` | 저장하지 않은 새 접수, 재전송 필요 |
+| 대기 상한 또는 이관으로도 확보할 수 없는 hot·archive·byte 용량 | 429, `Retry-After: 1` | 저장하지 않은 새 접수, 재전송 필요 |
 | 수신함·키 등록 이용 불가 | 503 | 접수 성공으로 표시하지 않음 |
 | 형식·필드·시간대·유효기간 모델 오류 | 422 | 서명 처리 전 입력 거부 |
 | production 또는 미설정 수신기 | 404 | 로컬 기능 미노출 |
@@ -84,7 +84,7 @@ lease 토큰은 완료·실패 기록의 소유권을 검사하므로 이전 wor
 
 worker는 새 정책 적용 전에 현재 키와 수집기 권한을 다시 확인한다. 접수 후 정책 journal에 장애가 생기면 접수 영수증을 취소하지 않고 처리 오류·재시도 상태로 추적한다. 최초 신선도 검증 후 접수된 위험 관측이 대기 중 만료돼도 접근을 제한할 수 있다. 순서가 뒤집힌 과거 위험 관측도 제한을 강화할 수 있으며 `stale`로 표시한다. 정상 관측은 기록만 하고 제한을 낮추지 않는다. 기존 제한은 이후 동기 평가와 새 세션에도 적용된다. **안전한 제한 해제·복구 절차는 후속 작업**으로 남긴다.
 
-완료·실패 영수증은 자동 삭제하지 않는다. 전체 보관 상한에 도달하면 새 입력을 거부하여 중복 방지 이력을 임의로 잊지 않는다. 운영자의 후속 아카이브·교체 절차는 아직 구현하지 않았으며 과거 영수증을 제거하면 중복 보장의 범위도 달라진다. 각 연산은 보관 행 전체를 검증하므로 비용이 보관량에 비례한다. 기본 10,000행 상한은 로컬 안전 경계이며 처리량·운영 규모의 검증 결과가 아니다. 파일 해시는 우발 손상을 검사하며 저장소를 통제하는 공격자에 대한 원격 변조 방지 보증은 아니다.
+완료·실패 영수증은 자동 삭제하지 않는다. [서버 inbox 영수증 보관 이관](server-inbox-maintenance.md)은 전역·테넌트 hot 한도에서 terminal 행만 같은 DB의 압축 archive로 옮겨 원래 payload·결과·오류·내용 지문과 공개 영수증을 보존한다. pending·processing·lease·시도 횟수는 바꾸지 않는다. 기본 hot 10,000행과 별도로 archive 100,000행·1,000개 segment·byte 한도를 두고, 공간을 확보할 수 없으면 새 입력을 거부한다. 영수증 조회·중복·충돌과 상태 집계는 hot·archive 전체를 포함하며 현재 출처·키·권한 검증도 유지한다. 각 연산 비용은 전체 보관량에 비례한다. 이관은 영수증 삭제·무한 운영·보안 소거·앱 DB 백업 복원이나 원격 변조 방지 보증이 아니다. 독립 inbox format과 application ID를 사용하는 스키마 이행 전후에는 같은 DB를 쓰는 앱·worker·watchdog·CLI의 코드를 정렬하며 구형 코드를 섞지 않는다.
 
 ## 별도 worker 실행과 앱 지표
 
@@ -113,12 +113,12 @@ SIGNAL_REGISTRY_PATH=/absolute/sources.json docker compose -f compose.yaml -f co
 | `ZERO_TRUST_DB_PATH` | `runtime/zero-trust.sqlite3` | API·worker 공통 SQLite 경로 |
 | `TRUSTED_SIGNAL_SOURCES_PATH` | 미설정 | 등록 공개키·종류/주체 권한, 미설정이면 서명 관측 접수 불가 |
 | `SIGNAL_INBOX_MAX_PENDING` | 1000 | pending·processing 합계 상한 |
-| `SIGNAL_INBOX_MAX_RECORDS` | 10000 | 완료·실패를 포함한 보관 상한 |
+| `SIGNAL_INBOX_MAX_RECORDS` | 10000 | pending·processing·이관 전 완료/실패를 포함한 hot 행 상한 |
 | `SIGNAL_INBOX_MAX_ATTEMPTS` | 3 | lease 취득 기준 최대 시도 |
 | `SIGNAL_INBOX_LEASE_SECONDS` | 30 | 처리 소유권 유효기간 |
 | `SIGNAL_INBOX_RETRY_SECONDS` | 1 | 첫 재시도 지연, 이후 지수 증가 |
 
-요약 API의 `pending`, `processing`, `completed`, `failed`, `total`은 해당 테넌트 보관 자료 기준이다. `oldest_pending_age_seconds`, `oldest_processing_age_seconds`는 접수부터 조회까지의 나이다. `completion_latency_samples`, `mean_completion_latency_seconds`, `max_completion_latency_seconds`는 **접수→완료** 구간이며 대기·재시도를 포함한다. 완료 표본이 없으면 지연은 `null`이다. 이는 worker CPU 실행 시간·수집기 관측부터 거부까지의 전체 지연·P95와 다르다. 경보 수집기·운영 임계값·RTO/RPO 실측은 채희주의 후속 인프라 실행과 연결한다.
+요약 API의 `pending`, `processing`, `completed`, `failed`, `total`은 해당 테넌트의 hot·archive 전체 보관 자료 기준이다. `active_records`는 terminal을 포함한 hot 행 수, `archived_records`는 이관 행 수다. `oldest_pending_age_seconds`, `oldest_processing_age_seconds`는 접수부터 조회까지의 나이다. `completion_latency_samples`, `mean_completion_latency_seconds`, `max_completion_latency_seconds`는 **접수→완료** 구간이며 대기·재시도를 포함하고 archive의 완료 표본도 유지한다. 완료 표본이 없으면 지연은 `null`이다. 이는 worker CPU 실행 시간·수집기 관측부터 거부까지의 전체 지연·P95와 다르다. 경보 수집기·운영 임계값·RTO/RPO 실측은 채희주의 후속 인프라 실행과 연결한다.
 
 ## 검증 행렬
 

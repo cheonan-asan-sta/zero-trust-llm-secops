@@ -185,7 +185,7 @@ def test_per_tenant_pending_capacity_allows_other_tenant(tmp_path):
 @pytest.mark.parametrize("limit", ["global", "tenant"])
 def test_terminal_retention_never_silently_forgets_event_ids(tmp_path, limit):
     options = {"max_records": 1} if limit == "global" else {"max_records_per_tenant": 1}
-    inbox = SignalInbox(tmp_path / "inbox.sqlite3", **options)
+    inbox = SignalInbox(tmp_path / "inbox.sqlite3", max_archive_records=0, **options)
     accept(inbox)
     item = inbox.claim(now=NOW)
     inbox.complete("tenant-a", "event-1", item["lease_token"], {}, NOW)
