@@ -16,6 +16,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from app.continuous_signal_models import SignedContinuousSignal
 from app.scenarios import synthetic_events
 from app.security import Principal, Role
+from app.services.policy_journal import JournalLimits
 from app.services.trusted_signals import (
     SignalRegistryUnavailable,
     SignalVerifier,
@@ -360,6 +361,7 @@ def test_version_bound_aborts_entire_batch_without_changing_earlier_candidate(la
 
 
 def test_journal_capacity_cannot_commit_a_partial_batch(lab):
+    lab.service.journal_limits = JournalLimits(max_archive_records=0)
     lab.create()
     lab.create("session-b")
     with lab.service._transaction() as transaction:
