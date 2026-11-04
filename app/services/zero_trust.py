@@ -79,6 +79,7 @@ class ZeroTrustOperations:
     def _transaction(self):
         try:
             with sqlite3.connect(self.path, timeout=5) as connection:
+                connection.execute("PRAGMA synchronous=FULL")
                 connection.execute("BEGIN IMMEDIATE")
                 rows = connection.execute(
                     "SELECT seq,payload,previous_hash,record_hash FROM journal ORDER BY seq"
@@ -161,6 +162,69 @@ class ZeroTrustOperations:
             if not history:
                 raise SessionMissing(session_id)
             return history
+
+    def revalidate_sessions(self, *, now: datetime | None = None) -> dict[str, int]:
+        """Persist proof expiry and withdrawn authority even with an empty inbox.
+
+        This local maintenance operation never issues grants or lowers restrictions.
+        The latest journal decisions are also its durable progress: concurrent or
+        restarted scanners repeat no effects until the session or authority changes.
+        """
+        if now is None:
+            now = datetime.now(UTC)
+        if not isinstance(now, datetime) or now.tzinfo is None or now.utcoffset() is None:
+            raise ValueError("session revalidation requires timezone")
+        with self._transaction() as transaction:
+            _, entries, _ = transaction
+            latest = {}
+            for entry in entries:
+                if entry["kind"] == "decision":
+                    session = entry["session"]
+                    latest[(session["tenant_id"], session["session_id"])] = session
+            candidates = [SessionDecision.model_validate(value) for value in latest.values()
+                          if value.get("signal_trust", "demo") == "verified_source"
+                          and value["status"] != "REVOKED"]
+            authorities = self.signal_verifier.current_source_digests(now)
+            changes = []
+            for previous in candidates:
+                current = authorities.get((previous.tenant_id, previous.signal_source_id,
+                                           previous.signal_key_id))
+                if current is None or current != previous.signal_source_digest:
+                    decision, reason = "DENY", "SIGNAL_SOURCE_REVOKED"
+                elif previous.signal_expires_at is None or previous.signal_expires_at <= now:
+                    decision, reason = "HOLD", "SIGNAL_PROOF_EXPIRED"
+                else:
+                    continue
+                if (reason in previous.reason_codes
+                        and _RESTRICTION_RANK[previous.decision] >= _RESTRICTION_RANK[decision]):
+                    continue
+                if previous.version >= 200:
+                    raise JournalUnavailable("session history capacity reached")
+                session = SessionDecision.model_validate({
+                    **previous.model_dump(), "version": previous.version + 1,
+                    "event_id": "check-" + secrets.token_hex(16), "evaluated_at": now,
+                    "decision": decision, "status": "REVOKED" if decision == "DENY" else "HELD",
+                    "reason_codes": list(dict.fromkeys([*previous.reason_codes, reason])),
+                    "grant_expires_at": None,
+                    # Preserve an outstanding MFA challenge on HOLD, just as a
+                    # synchronous HOLD cannot erase that additional requirement.
+                    "challenge_id": None if decision == "DENY" else previous.challenge_id,
+                    "challenge_expires_at": (None if decision == "DENY"
+                                             else previous.challenge_expires_at),
+                })
+                changes.append((session, previous.version, reason))
+            if len(entries) + len(changes) > 10000:
+                raise JournalUnavailable("local journal capacity reached")
+            for session, previous_version, reason in changes:
+                self._append(transaction, {
+                    "kind": "decision", "session": session.model_dump(mode="json"),
+                    "grant_hash": None, "trigger": "periodic_revalidation",
+                    "revalidation": {"previous_version": previous_version, "reason_code": reason,
+                                     "checked_at": now.isoformat()},
+                })
+            return {"checked": len(candidates), "changed": len(changes),
+                    "held": sum(session.status == "HELD" for session, _, _ in changes),
+                    "revoked": sum(session.status == "REVOKED" for session, _, _ in changes)}
 
     def evaluate(
         self, request: SessionEvaluationRequest, principal: Principal,
