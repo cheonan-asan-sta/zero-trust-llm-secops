@@ -1,5 +1,25 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 4일 후속 관리 전환 중단 복구
+
+- PR #13 병합 `aitest` `1531625`에서 `feature/chaeheeju-control-transition-recovery`로 진행한다.
+  [전환 단계·재개·검증·한계](docs/control-transition-recovery.md)를 먼저 확인한다.
+- `scripts.control_transition`은 기존 호스트 lease 아래 공개 `management-transition.json`을 원본으로 쓴다.
+  `scripts.control_plane_ha resume`은 같은 전환을 이어간다. 미완료 기록은 일반 host control 작업을 막는다.
+- `idle`/`prepared` 후보 검증·busy 거부는 유지한다. 작업 전 의도/사양을 기록하고 부분 사본 일치와
+  Docker 표식·이미지·ID·명령·환경·권한·마운트·네트워크를 확인한다. ID 기록 후 바뀐 객체는 대체하지 않는다.
+- `opening` 이후에는 copy/initialize/reconcile/writer-stop을 반복하지 않는다. 접속을 이미 열었다면
+  최신 pending/토큰 소비를 남긴 채 완료 기록만 확정한다. 업무 POST의 일반 재전송 기능이 아니다.
+- `scripts.test_control_transition`은 별도 호스트 프로세스의 실제 강제 종료와 다음 프로세스의 lease 획득을
+  검사한다. 새 실행기 import 누락으로 중단한 준비는 최종 통과 합계에 넣지 않는다. 실제 결과는 위 문서를 따른다.
+- 로컬 journal/신뢰된 실행기·동일 부모 Docker가 남아야 한다. 전원/디스크/호스트 전체 손실·quorum·자동
+  선출·임의 authority 중간 단계·구 이미지 인플레이스 이전·팀원 독립 검토·전체 주간 완료로 확대하지 않는다.
+- 최종 새 클러스터 1회·35개(기존 관리20+추가15), 실제 process death9회, 신규 단위58개,
+  Windows1019+1skip/Linux1020·Ruff 통과. 동일 생성 컨테이너 ID 채택과 접속 재개 후 새 JWT 소비 보존을 확인했다.
+  5개 프로젝트/단위 이미지 태그 잔여0, 기존 Docker/ZIP 보존. 예비 import·60초 상한·정지한 발행기에서의
+  CSR 준비·CA 재기동 전 JWT의 올바른401 거부를 최종 합계에서 제외한다. CSR은 정지 전 준비하고 JWT는
+  접속 재개 후 network-none/RO vault 작업에서 만든다. 운영 전환 코드는 예비 실행기 수정 중 변경하지 않았다.
+
 ## 2026년 11월 4일 후속 관리 영역 이중화
 
 - `aitest` `635638a`에서 `feature/chaeheeju-control-plane-ha`로 진행한다.

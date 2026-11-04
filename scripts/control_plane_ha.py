@@ -78,11 +78,15 @@ class Management(Hosts):
         return json.loads(self.raw([*args,'--entrypoint','python',self.profile['image'],'-m','scripts.control_store'],req))
 
     def guard(self):
+        from scripts.control_transition import available
+        available(self)
         mounts=[*self.meta_mounts(),(self.volumes()['control'],'/control',True),
             (self.volumes(self.peer)['control'],'/replica/control',True)]
         return self.job({'operation':'guard'},mounts,env=self.mirror({'/control':'/replica/control'}))
 
     def control_job(self, req):
+        from scripts.control_transition import available
+        available(self)
         return self.job(req,[*self.meta_mounts(),(self.volumes()['control'],'/control',False),
             (self.volumes(self.peer)['control'],'/replica/control',False)],env=self.mirror({'/control':'/replica/control'}))
 
@@ -113,6 +117,8 @@ class Management(Hosts):
         return self.management_operation()
 
     def command(self, args, payload=None, timeout=30):
+        from scripts.control_transition import available
+        available(self)
         # Add peer writes only to known management-volume jobs. CA service-host
         # volumes and application workload volumes keep their existing behavior.
         if args and args[0]=='run':
@@ -195,11 +201,14 @@ class Management(Hosts):
     def start_process(self,name,argv,mounts, *, network, aliases=(), extra_network=None, env=None, start=True):
         self.ensure_volumes([v for v,_,_ in mounts])
         args=['create','--name',name,'--network',network,'--restart','no','--read-only','--user','10001:10001',
-            '--cap-drop=ALL','--security-opt=no-new-privileges:true','--memory','512m','--pids-limit','128','--tmpfs','/tmp:rw,size=32m']
+            '--cap-drop=ALL','--security-opt=no-new-privileges:true','--memory','512m','--pids-limit','128','--tmpfs','/tmp:rw,size=32m','--tmpfs','/data:rw,uid=10001,gid=10001,size=1m']
         for alias in aliases:args+=['--network-alias',alias]
         for v,d,r in mounts:args+=['--mount',f'type=volume,src={v},dst={d}'+(',readonly' if r else '')]
         if env:args+=['--env',ENV+'='+env]
-        ident=self.raw([*args,'--entrypoint',argv[0],self.profile['image'],*argv[1:]]).strip()
+        args=[*args,'--entrypoint',argv[0],self.profile['image'],*argv[1:]]
+        if getattr(self,'_transition',None) is not None:
+            return self._transition.create_process(name,args,extra_network,start)
+        ident=self.raw(args).strip()
         self.profile.setdefault('additional_containers',[]).append(name)
         if extra_network:self.raw(['network','connect',extra_network,name])
         if start:self.raw(['start',name])
@@ -253,8 +262,15 @@ class Management(Hosts):
             '--memory','256m','--pids-limit','64','--entrypoint','python',self.profile['image'],'-c',program],request,timeout=10)
 
     def promote(self, target, primary):
+        from scripts.control_transition import available
         with lease(self.directory()):
+            available(self)
             return self._promote(target,primary)
+
+    def resume(self):
+        from scripts.control_transition import Transition
+        with lease(self.directory()):
+            return Transition(self).resume()
 
     def _promote(self,target,primary):
         if target!=self.peer:raise LifecycleError('control_promotion_scope')
@@ -264,43 +280,9 @@ class Management(Hosts):
         if (self.sql(primary,'SELECT pg_is_in_recovery();')!='f'
                 or self.sql(primary,'SELECT system_identifier FROM pg_control_system();')!=proof['database_incarnation']):
             raise LifecycleError('control_primary_identity')
-        # Host lease excludes live dispatchers; unfinished durable operations and
-        # any unknown orphan job remain a refusal, never an election timeout.
         self.ensure_no_jobs()
-        receipts=[self.container(self.profile['leaf'],stop=True,remove=True)]
-        receipts.append(self.container(self.profile['management']['standby'],stop=True,remove=True))
-        for name,ident in zip(self.profile['gateways'],self.profile['gateway_ids'],strict=True):
-            receipts.append(self.container({'name':name,'id':ident},stop=True,remove=True))
-        proof=self.job(validation,[(v,'/source/'+k,True) for k,v in candidate.items()])
-        ca=[]
-        for label in self.hosts:
-            record=self.owned_ca(label);self.inner(label,['stop','--time','2',record['Id']]);ca.append((label,record['Id']))
-        deadline=time.monotonic()+15
-        while self.sql(primary,"SELECT count(*) FROM pg_stat_activity WHERE usename='secops_ca';")!='0':
-            if time.monotonic()>deadline:raise LifecycleError('control_writer_drain_timeout')
-            time.sleep(.2)
-        source=self.active;old=copy.deepcopy(self.profile['management']['cells'][source])
-        replacement=self.new_cell(source,old['generation']+1)
-        self.seed(candidate,replacement['volumes'])
-        m=self.profile['management'];m['active']=target;m['epoch']+=1;m['cells'][source]=replacement
-        self.select_active_storage()
-        # Coordinator state is public; loading it from the candidate never reads
-        # private key bytes through the host filesystem.
-        state=json.loads(self.raw(['run','--rm','--network','none','--read-only','--user','10001:10001','--mount',
-            f"type=volume,src={candidate['control']},dst=/data,readonly",'--entrypoint','python',self.profile['image'],'-c',
-            "from pathlib import Path;print(Path('/data/coordinator.json').read_text())"]))
-        self.initialize_control(state)
-        self.offline_witness('management_reconcile',verified_writers_stopped=True,verified_gateways_stopped=True)
-        # Keep publishers paused until the interrupted authority ceremony resumes.
-        a=self.volumes();b=self.volumes(self.peer)
-        self.job({'operation':'pause_leaf'},[(a['leaf'],'/state',False),(b['leaf'],'/replica/leaf',False),*self.meta_mounts()],
-            env=self.mirror({'/state':'/replica/leaf'}))
-        for label,ident in ca:self.inner(label,['start',ident]);self.node_health(label)
-        self.install_processes();self.initialize_control(state);self.persist_profile()
-        self.witness('unfreeze')
-        return {'active':target,'management_epoch':m['epoch'],'coordinator_phase':proof['phase'],
-            'coordinator_epoch':proof['epoch'],'plan_hash':proof['plan_hash'],'fenced':receipts,
-            'retired_volumes':old['volumes'],'candidate_sha256':proof['tree_sha256']}
+        from scripts.control_transition import Transition
+        return Transition(self).begin(target,primary,proof)
 
     def ensure_no_jobs(self):
         ids=self.raw(['ps','--quiet','--filter','ancestor='+self.profile['image']]).split()
@@ -338,10 +320,11 @@ class Management(Hosts):
 
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('operation',choices=['status','promote'])
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('operation',choices=['status','promote','resume'])
     parser.add_argument('--profile',type=Path,required=True);parser.add_argument('--target',choices=['a','b']);parser.add_argument('--primary',choices=['a','b'],default='a')
     args=parser.parse_args();b=Management(json.loads(args.profile.read_bytes()))
-    print(json.dumps(b.promote(args.target,args.primary) if args.operation=='promote' else b.load_control()))
+    result=b.resume() if args.operation=='resume' else b.promote(args.target,args.primary) if args.operation=='promote' else b.load_control()
+    print(json.dumps(result))
 
 
 if __name__=='__main__':main()
