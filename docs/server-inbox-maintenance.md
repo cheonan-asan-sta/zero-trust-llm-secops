@@ -62,7 +62,7 @@ inbox의 독립 format marker와 영구 `PRAGMA application_id=0x5A544932`를 �
 
 매 저장 연산은 보관한 hot·archive를 검증하므로 비용과 복원 메모리는 전체 보관량에 따라 증가한다. O(1) 조회·처리량 향상·무한 지속 운영을 보장하지 않는다. SQLite 빈 page를 재사용할 수 있으나 `VACUUM`, 파일 축소·보안 소거를 보장하지 않는다. 해시·메타데이터 검증은 전체 DB 교체·과거 DB 복원·특권 호스트 변조를 막는 원격 anti-rollback 증명이 아니다.
 
-[정책 journal 이관](policy-journal-maintenance.md), [수집기 tombstone·입력 회전](continuous-signal-collector.md)은 별도 저장 경계다. 세션 버전 200, 유한 journal·spool 한도, 정적 신뢰 재료의 수명과 C04 미통합, 승인된 위험 해제·앱 DB 백업/복원은 여전히 남는다. 옛 백업을 덮어써 이미 소비·회수한 허용을 되살리는 복구를 하지 않는다.
+[정책 journal 이관](policy-journal-maintenance.md), [수집기 tombstone·입력 회전](continuous-signal-collector.md)은 별도 저장 경계다. 일반 세션 평가 상한 200 이후에는 후속 [보안 전용 전이](session-security-transitions.md)만 최대 204까지 허용한다. 유한 journal·spool 한도, 정적 신뢰 재료의 수명과 C04 미통합, 승인된 위험 해제·앱 DB 백업/복원은 여전히 남는다. 옛 백업을 덮어써 이미 소비·회수한 허용을 되살리는 복구를 하지 않는다.
 
 ## 검증 범위
 

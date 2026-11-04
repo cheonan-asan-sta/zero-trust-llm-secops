@@ -346,18 +346,19 @@ def test_store_error_rolls_back_all_session_transitions(lab, monkeypatch, failur
     assert lab.service.revalidate_sessions(now=lab.now + timedelta(seconds=90))["changed"] == 2
 
 
-def test_version_bound_aborts_entire_batch_without_changing_earlier_candidate(lab):
+def test_capped_candidate_does_not_block_atomic_expiry_batch(lab):
     first = lab.create().session
     second = lab.create("session-b").session
     capped = second.model_copy(update={"version": 200})
     with lab.service._transaction() as transaction:
         lab.service._append(transaction, {"kind": "decision", "session": capped.model_dump(mode="json"),
                                           "grant_hash": None})
-    rows = _rows(lab.service)
-    with pytest.raises(JournalUnavailable):
-        lab.service.revalidate_sessions(now=lab.now + timedelta(seconds=90))
-    assert _rows(lab.service) == rows
-    assert lab.latest() == first and lab.latest("session-b") == capped
+    result = lab.service.revalidate_sessions(now=lab.now + timedelta(seconds=90))
+    assert result == {"checked": 2, "changed": 2, "held": 2, "revoked": 0}
+    assert lab.latest().version == first.version + 1 and lab.latest().status == "HELD"
+    assert lab.latest("session-b").version == 201 and lab.latest("session-b").status == "HELD"
+    assert lab.latest("session-b").grant_expires_at is None
+    assert "SIGNAL_PROOF_EXPIRED" in lab.latest("session-b").reason_codes
 
 
 def test_journal_capacity_cannot_commit_a_partial_batch(lab):

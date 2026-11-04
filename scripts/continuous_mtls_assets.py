@@ -197,10 +197,13 @@ def mint(data):
     event["resource"].update(resource_id="zt-demo-documents", required_role=None)
     signal = SignedSessionSignal(
         session_id=data["session_id"], expected_version=0, event=event, tenant_id=TENANT,
-        source_id="runtime-session", key_id="session-key", issued_at=now,
+        source_id=data.get("source_id", "runtime-session"), key_id="session-key", issued_at=now,
         expires_at=now + timedelta(seconds=lifetime), signature="A" * 86,
     )
-    path = AUTH / "session-private.pem"
+    key_file = data.get("signing_key_file", "session-private.pem")
+    if not isinstance(key_file, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}-private\.pem", key_file):
+        raise ValueError("runtime signing key filename")
+    path = AUTH / key_file
     if path.stat().st_size > 16384:
         raise ValueError("runtime signing key size")
     key = serialization.load_pem_private_key(path.read_bytes(), password=None)
