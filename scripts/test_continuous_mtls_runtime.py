@@ -83,6 +83,14 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
 """
         return json.loads(self.runtime.execute("collector", ["python", "-c", program]))
 
+    def maintenance(self, operation):
+        # The long-lived sender is stopped before these production CLI commands
+        # acquire its lock. The one-off shares only the collector's own mounts.
+        return json.loads(self.runtime.compose("run", "--rm", "--no-deps", "-T",
+            "--entrypoint", "python", "collector", "-m", "scripts.continuous_signal_collector",
+            operation, "--directory", "/collector/producer", "--base-url", "https://gateway:8443",
+            "--tls-profile", "/tls/profile.json"))
+
     def append(self, event_id, *, active=False, other=False):
         payload = {"event_id": event_id, "active": active,
                    "authentication_result": "success" if active else "failure"}
@@ -182,6 +190,41 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
         self.require(self.collector()["captured"] == 1 and len(self.history(affected[0])) == 2, "duplicate_policy_effect")
         self.add("duplicate_feed_preserves_one_receipt_and_policy_effect")
 
+        # Compact a confirmed receipt while a second exact signed transmission
+        # is pending during an API outage, then rotate its fully captured feed.
+        first_event = runtime.execute("collector", ["python", "-c",
+            "from pathlib import Path;print(Path('/collector/producer/input.jsonl').read_text().splitlines()[0])"])
+        command(["docker", "stop", "--time", "2", app_id])
+        self.append("runtime-maintenance-pending", active=True, other=True)
+        self.wait(lambda: (s := self.collector())["captured"] == 2 and s["pending"] == 1
+                  and bool(self.spool()["envelopes"][1]), "maintenance_pending_not_staged")
+        pending_digest = self.spool()["envelopes"][1][0]
+        command(["docker", "stop", "--time", "2", runtime.container("collector")])
+        compacted = self.maintenance("compact")
+        self.require(compacted["compacted"] == 1 and compacted["storage"]["retained"] == 1
+                     and compacted["pending"] == 1 and compacted["acknowledged"] == 1,
+                     "maintenance_changed_pending_or_counters")
+        rotated = self.maintenance("rotate")
+        self.require(rotated["rotated"] and rotated["input_generation"] == 1
+                     and rotated["offset"] == 0 and rotated["pending"] == 1
+                     and rotated["captured"] == 2, "maintenance_rotation_failed")
+        self.add("compaction_and_rotation_preserve_pending_and_duplicate_history",
+                 compacted=1, retained_pending=1, input_generation=1)
+        command(["docker", "start", runtime.container("collector")])
+        command(["docker", "start", app_id])
+        self.wait(lambda: self.completed("runtime-maintenance-pending")
+                  and self.collector()["acknowledged"] == 2, "maintenance_delivery_not_recovered")
+        self.require(self.spool()["envelopes"][0][0] == pending_digest,
+                     "maintenance_changed_persisted_envelope")
+        self.add("pending_exact_envelope_recovers_over_mtls_after_maintenance",
+                 original_envelope_sha256=pending_digest, acknowledged=2)
+        runtime.execute("collector", ["python", "-m", "scripts.continuous_mtls_assets", "append"], first_event)
+        self.wait(lambda: self.collector()["offset"] > 0, "compacted_duplicate_not_read")
+        self.require(self.collector()["captured"] == 2 and self.collector()["acknowledged"] == 2
+                     and len(self.history(affected[0])) == 2, "compacted_duplicate_reapplied")
+        self.add("compacted_duplicate_skipped_across_input_generation")
+        self.access(affected, False, "maintenance_restart_preserves_revoked_access_denial")
+
         short = self.mint("runtime-expiry", user_id=OTHER, device_id=DEVICES[1], expires_seconds=8)
         self.restart("watchdog")
         self.wait(lambda: self.history(short[0])[-1]["status"] == "HELD", "expiry_without_input")
@@ -194,11 +237,11 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
         tls_profile = json.loads(runtime.execute("collector", ["python", "-c", "from pathlib import Path;print(Path('/tls/profile.json').read_text())"]))
         runtime.write_volume("collector-tls", {"profile.json": json.dumps(tls_profile | {"server_pins": ["0" * 64]})})
         self.append("runtime-bad-server-pin", active=True, other=True)
-        self.wait(lambda: (s := self.collector())["captured"] == 2 and s["pending"] == 1
+        self.wait(lambda: (s := self.collector())["captured"] == 3 and s["pending"] == 1
                   and s["last_error"] == "TRANSPORT_OR_RECEIPT_INVALID", "tls_failure_pending")
         self.require(self.receipt("runtime-bad-server-pin")["status"] == 404, "bad_tls_reached_api")
         runtime.write_volume("collector-tls", {"profile.json": json.dumps(tls_profile)})
-        self.wait(lambda: self.completed("runtime-bad-server-pin") and self.collector()["acknowledged"] == 2, "tls_profile_recovered")
+        self.wait(lambda: self.completed("runtime-bad-server-pin") and self.collector()["acknowledged"] == 3, "tls_profile_recovered")
         self.add("server_pin_failure_retains_event_and_same_path_profile_recovers")
 
         revoked = self.mint("runtime-key-revoked", user_id=OTHER, device_id=DEVICES[1])
@@ -217,7 +260,7 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
 
         # New observation work continues after all four process restarts.
         self.append("runtime-followup", active=True, other=True)
-        self.wait(lambda: self.completed("runtime-followup") and self.collector()["acknowledged"] == 3,
+        self.wait(lambda: self.completed("runtime-followup") and self.collector()["acknowledged"] == 4,
                   "followup_after_restarts")
         self.require(len(self.history(revoked[0])) == 2, "positive_observation_restored_revoked_session")
         self.add("collector_worker_watchdog_app_continue_without_reviving_access")
