@@ -116,6 +116,141 @@ with s._transaction() as t:
         self.require(result["body"]["session"]["status"] == "ACTIVE", "mint_not_active")
         return label, result["body"]["grant_token"]
 
+    def security_checkpoint(self, session_id):
+        # Explicit synthetic legacy boundary, not 200 live evaluations. Keep the
+        # original decision and append a synthetic non-granting v200 checkpoint.
+        program = """import json,sys
+from pathlib import Path
+from app.services.zero_trust import ZeroTrustOperations
+from app.zero_trust_models import SessionDecision
+s=ZeroTrustOperations(Path('/data/zero-trust.sqlite3'))
+name=json.load(sys.stdin)
+with s._transaction() as t:
+ old=s._latest(t[1],'local',name)['session']
+ capped=SessionDecision.model_validate({**old,'version':200,'decision':'HOLD','status':'HELD',
+  'event_id':'boundary-'+name,'reason_codes':[*old['reason_codes'],'SESSION_HISTORY_CAPACITY'],
+  'grant_expires_at':None,'challenge_id':None,'challenge_expires_at':None})
+ s._append(t,{'kind':'decision','session':capped.model_dump(mode='json'),'grant_hash':None})
+print(json.dumps({'version':200,'synthetic_checkpoint':True}))
+"""
+        result = json.loads(self.runtime.execute("app", ["python", "-c", program], json.dumps(session_id)))
+        self.require(result == {"version": 200, "synthetic_checkpoint": True}, "security_checkpoint_failed")
+        return self.history(session_id)
+
+    def security_denial(self, pair, version):
+        result = self.runtime.probe({"profile": "core", "path": "/zero-trust/protected-access",
+            "method": "POST", "body": {"session_id": pair[0], "resource_id": "zt-demo-documents",
+                                        "action": "READ", "grant_token": pair[1]}})
+        self.require(result["status"] == 403 and result["body"]["reason_code"] == "SESSION_NOT_AUTHORIZED"
+                     and result["body"]["session_version"] == version, "security_tail_denial_reason")
+
+    def security_versions(self):
+        from cryptography.hazmat.primitives import serialization
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
+        # Dedicated subjects and registry entries keep these fault tests separate
+        # from the existing collector feed counters and the original campaign.
+        registry = json.loads(self.runtime.execute("app", ["python", "-c",
+            "from pathlib import Path;print(Path('/signals/sources.json').read_text())"]))
+        session_source = json.loads(json.dumps(next(s for s in registry["sources"]
+                                                    if s["source_id"] == "runtime-session")))
+        observation_source = next(s for s in registry["sources"] if s.get("observation_kinds") == ["identity"])
+        users = ["runtime-tail-risk", "runtime-tail-expiry"]
+        key = Ed25519PrivateKey.generate()
+        session_source.update(source_id="runtime-tail-session", user_ids=users, device_ids=["runtime-tail-device"])
+        session_source["keys"][0]["public_key_pem"] = key.public_key().public_bytes(
+            serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo).decode()
+        self.runtime.write_volume("operator-auth", {"tail-private.pem": key.private_bytes(
+            serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()).decode()})
+        observation_source["user_ids"] = list(dict.fromkeys([*observation_source["user_ids"], *users]))
+        observation_source["device_ids"] = list(dict.fromkeys([*observation_source["device_ids"], "runtime-tail-device"]))
+        registry["sources"].append(session_source)
+        self.runtime.write_volume("registry", {"sources.json": json.dumps(registry)})
+
+        options = {"source_id": "runtime-tail-session", "device_id": "runtime-tail-device",
+                   "signing_key_file": "tail-private.pem"}
+        capped = self.mint("runtime-tail-capped", user_id=users[0], **options)
+        related = self.mint("runtime-tail-related", user_id=users[0], **options)
+        original = self.security_checkpoint(capped[0])
+        program = """import base64,json
+from pathlib import Path
+from datetime import UTC,datetime,timedelta
+from cryptography.hazmat.primitives import serialization
+from app.continuous_signal_models import SignedContinuousSignal
+from app.services.trusted_signals import canonical_observation
+d=Path('/collector/producer');cfg=json.loads((d/'config.json').read_text())
+key=serialization.load_pem_private_key((d/'private.pem').read_bytes(),password=None)
+now=datetime.now(UTC)-timedelta(seconds=1)
+s=SignedContinuousSignal(tenant_id=cfg['tenant_id'],source_id=cfg['source_id'],
+ key_id=cfg['key_id'],event_id='runtime-tail-risk-observation',issued_at=now,observed_at=now,
+ expires_at=now+timedelta(seconds=90),signature='A'*86,
+ observation={'kind':'identity','subject_id':'runtime-tail-risk','active':False,'authentication_result':'failure'})
+payload=s.model_dump(mode='json')
+payload['signature']=base64.urlsafe_b64encode(key.sign(canonical_observation(s))).decode().rstrip('=')
+print(json.dumps(payload))
+"""
+        payload = json.loads(self.runtime.execute("collector", ["python", "-c", program]))
+        accepted = self.runtime.probe({"profile": "core", "path": "/zero-trust/signals/inbox",
+                                       "method": "POST", "body": payload})
+        self.require(accepted["status"] == 202, "security_tail_observation_not_accepted")
+        self.wait(lambda: self.completed(payload["event_id"]), "security_tail_fanout_not_completed")
+        history = self.history(capped[0])
+        self.require(history[:-1] == original and history[-1]["version"] == 201
+                     and history[-1]["status"] == "REVOKED"
+                     and self.history(related[0])[-1]["version"] == 2, "security_tail_fanout_lost_history")
+        replay = self.runtime.probe({"profile": "core", "path": "/zero-trust/signals/inbox",
+                                     "method": "POST", "body": payload})
+        self.require(replay["status"] == 202 and replay["body"]["duplicate"]
+                     and self.history(capped[0]) == history, "security_tail_duplicate_reapplied")
+        self.security_denial(capped, 201)
+        self.security_denial(related, 2)
+        self.access(related, False, "version200_fanout_denies_related_document")
+        control = self.mint("runtime-tail-control", user_id=OTHER, device_id=DEVICES[1])
+        self.access(control, True, "version200_fanout_preserves_unrelated_document")
+        self.add("version200_observation_fanout_and_duplicate_preserve_history",
+                 synthetic_checkpoint=True, capped_version=201, related_version=2)
+
+        self.runtime.execute("app", ["python", "-m", "scripts.policy_journal", "compact",
+                                      "--database", "/data/zero-trust.sqlite3", "--limit", "10000"])
+        command(["docker", "restart", *(self.runtime.container(s) for s in ("app", "worker", "watchdog"))])
+        self.wait(lambda: self.runtime.probe({"profile": "core", "path": "/health/live"})["status"] == 200,
+                  "security_tail_restart_not_ready")
+        self.require(self.history(capped[0]) == history and self.completed(payload["event_id"]),
+                     "security_tail_restart_lost_archive")
+        self.access(capped, False, "archived_security_tail_restart_denies_document")
+        self.add("archived_security_tail_and_receipt_survive_app_worker_watchdog_restart", version=201)
+
+        watchdog = self.runtime.container("watchdog")
+        command(["docker", "stop", "--time", "2", watchdog])
+        expiring = self.mint("runtime-tail-expiring", user_id=users[1], expires_seconds=12, **options)
+        original = self.security_checkpoint(expiring[0])
+        fresh = self.mint("runtime-tail-fresh", user_id=users[1], **options)
+        command(["docker", "start", watchdog])
+        self.wait(lambda: self.history(expiring[0])[-1]["version"] == 201, "version200_expiry_not_recorded")
+        held = self.history(expiring[0])
+        self.require(held[:-1] == original and held[-1]["status"] == "HELD"
+                     and "SIGNAL_PROOF_EXPIRED" in held[-1]["reason_codes"], "version200_expiry_lost_history")
+        self.add("version200_watchdog_records_expiry_without_input", synthetic_checkpoint=True, version=201)
+        control = self.mint("runtime-tail-key-control", user_id=OTHER, device_id=DEVICES[1])
+        registry = json.loads(self.runtime.execute("app", ["python", "-c",
+            "from pathlib import Path;print(Path('/signals/sources.json').read_text())"]))
+        next(s for s in registry["sources"] if s["source_id"] == "runtime-tail-session")["keys"][0]["enabled"] = False
+        self.runtime.write_volume("registry", {"sources.json": json.dumps(registry)})
+        self.wait(lambda: self.history(expiring[0])[-1]["status"] == "REVOKED"
+                  and self.history(fresh[0])[-1]["status"] == "REVOKED", "version200_key_revoke_not_recorded")
+        final = self.history(expiring[0])
+        self.require(final[:-1] == held and final[-1]["version"] == 202
+                     and self.history(fresh[0])[-1]["version"] == 2, "version200_key_revoke_changed_history")
+        repeated = json.loads(self.runtime.execute("watchdog", ["python", "-m", "scripts.session_watchdog", "--once"]))
+        self.require(repeated["watchdog"] == "revalidated" and self.history(expiring[0]) == final
+                     and self.history(fresh[0])[-1]["version"] == 2,
+                     "security_tail_watchdog_repeated_effect")
+        self.security_denial(expiring, 202)
+        self.security_denial(fresh, 2)
+        self.access(fresh, False, "version200_watchdog_key_revocation_denies_related_document")
+        self.access(control, True, "version200_watchdog_preserves_unrelated_document")
+        self.add("version200_watchdog_key_revocation_and_repeat_are_idempotent", version=202)
+
     def inbox_snapshot(self):
         program = """import hashlib,json
 from pathlib import Path
@@ -186,11 +321,14 @@ print(json.dumps({'event_id':r['event_id'],'state':r['state']}))
         compact = json.loads(self.runtime.execute("app", ["python", "-m", "scripts.signal_inbox", "compact",
             "--database", "/data/zero-trust.sqlite3", "--limit", "10000"]))
         after = self.inbox_snapshot()
-        self.require(compact["compacted"] == 1 and after["storage"]["archived_records"] == 1
+        terminal_count = before["storage"]["active_records"] - len(before["states"])
+        self.require(compact["compacted"] == terminal_count and terminal_count >= 1
+                     and after["storage"]["archived_records"] == before["storage"]["archived_records"] + terminal_count
                      and after["storage"]["active_records"] == 2
                      and before["live_sha256"] == after["live_sha256"]
                      and after["states"] == ["pending", "processing"], "inbox_compaction_changed_live_work")
-        self.add("server_inbox_archive_preserves_pending_processing_and_lease", archived_records=1, live_records=2)
+        self.add("server_inbox_archive_preserves_pending_processing_and_lease",
+                 archived_records=after["storage"]["archived_records"], live_records=2)
         duplicate = self.runtime.probe({"profile": "core", "method": "POST",
             "path": "/zero-trust/signals/inbox", "body": original})
         conflict = self.runtime.probe({"profile": "core", "method": "POST",
@@ -332,6 +470,7 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
         normal = self.mint("runtime-normal")
         self.access(normal, True, "normal_mtls_document_delivery")
         self.journal_security(normal)
+        self.security_versions()
 
         affected = self.mint("runtime-outage")
         unrelated = self.mint("runtime-unrelated", user_id=OTHER, device_id=DEVICES[1])
