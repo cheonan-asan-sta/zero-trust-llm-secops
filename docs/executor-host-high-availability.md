@@ -1,5 +1,9 @@
 # 관리 실행 호스트와 전환 기록 이중화
 
+11/4 후속: 관리 호스트 전환을 수행하던 actor 자체가 삭제된 경우는
+[전환 실행기 컨테이너 유실 복구](actor-container-recovery.md)의 명시적 `recover-takeover`로 다룬다.
+현재/이전 ID 부재와 양 기록·owner·고정 객체 검증 후 같은 전환/epoch를 이어간다. 생존 볼륨과 부모 Docker 조건이다.
+
 2026-11-04 · I4·I6/C04 후속 · 로컬 Docker 시험 프로필 전용
 
 후속 [전환 실행기 중단 복구](executor-transition-recovery.md)는 아래 운영자 전환 중단의 수동 조사 경계

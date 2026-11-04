@@ -1,5 +1,54 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 4일 후속 부모 Docker 데몬 재시작 복구
+
+- 기준 `aitest` PR #20 `3a45b58`, 브랜치 `feature/chaeheeju-parent-daemon-recovery`.
+  [구성·seal·복구·검증·한계](docs/parent-docker-recovery.md)를 읽는다.
+- `scripts.executor_daemon_recovery`의 정상 상태 `seal-daemon`과 명시적 `recover-daemon`을 추가했다.
+  Docker Engine ID/이미지를 먼저 대조하고 양 기록/owner/고정 ID를 검증한다. 모호한 사본·살아 있는
+  미완료 actor/worker는 거부하며 Docker Desktop이나 운영 데몬을 재시작하는 명령은 제공하지 않는다.
+- 기존 actor의 workers/published/retired 재개는 양 owner와 고정 worker 사양/전환 표식을 먼저 검증해
+  멈춘 worker를 시작한다. 완료 복구는 복제/owner/epoch 변경 없이 같은 영수증을 반환한다.
+- 실제 검증은 별도 privileged DinD의 자식 dockerd 프로세스를 재시작한다. 같은 supervisor와 데이터 볼륨,
+  바뀐 daemon PID/유지된 Engine ID를 대조한다. 완료 후 보존 marker는 합성이며 이전 실제 CA 캠페인을
+  새 데몬 검증으로 relabel하지 않는다. 물리 HA·전원 장애·독립 팀원 검토는 별도다.
+- 최종 `daemon-final2` project `c02-66f1bc36252c`: 실제 child dockerd 재시작12·검사16 통과.
+  같은 actor/op/예약 worker/epoch 유지, 완료 후 합성 profile 보존·부분 시작 재시도·실제 paused 선거부·
+  live-restored actor/worker 거부·명시적 정지 후 재개. 최종 epoch3/A활성/양세대2다.
+- 신규 단위27, Windows1381+2skip/Linux1383·Ruff 통과. 양 실험 이미지의 앱/스크립트94개 대조,
+  결합136입력/단위이미지135개(미포함.gitattributes1)와 Git raw/LF 지문 대조, 6소유범위잔여0을 확인했다.
+  구현 기준 `b9c50ad`, [공개 원자료](docs/infrastructure-results/c04-parent-daemon-windows-20261104.json)에
+  준비/진단 실패3회·이전버전통과1회 제외 근거와 기존 Docker/ZIP 보존을 기록했다. 앱 변경은 없다.
+- 동료 PR #21 `e240c59`를 `e46ec18`로 보존 결합했다. 최신 회귀 Windows1465+2skip/Linux1467·Ruff 통과,
+  입력140/단위이미지139·Git raw/LF 대조, 총7소유범위잔여0·기존 Docker/ZIP 보존을 확인했다.
+- 실제 데몬 캠페인의 94개 원본 지문은 유지한다. 수집기 앱/스크립트4개는 동료 변경으로 달라졌고 90개는
+  동일하다. 핵심 데몬 코드8개도 동일하다. 새 결과는 `integration_validation`의140맵을 쓰며 검증기는 이를
+  우선한다. 앱 변경은 e240c59 대비 없고 동료 기여를 이번 작업으로 바꾸어 기록하지 않는다.
+  최신 수집기로 실제 데몬/CA 캠페인을 다시 실행했다고 확대하지 않는다.
+
+## 2026년 11월 4일 후속 전환 실행기 컨테이너 유실 복구
+
+- 기준 `aitest` `5d957aa`(PR #18), 작업 브랜치 `feature/chaeheeju-actor-container-recovery`.
+  [명시적 복구·재현·한계](docs/actor-container-recovery.md)를 먼저 읽는다.
+- `recover-takeover`만 유실한 미완료 actor의 대체를 허용한다. 모든 이전 ID의 Docker 전체 부재,
+  양 공개 기록/owner/이미지/예약 객체/원본 지문을 생성 전과 생존 flock 안에서 다시 확인한다.
+- `executor-transition-2`의 `actor.predecessors`(최대16)와 checkpoint-bound 복구 표식으로 식별자만 이전한다.
+  같은 작업 ID/epoch/계획을 이어가며 완료 시 actor를 다시 만들거나 보안 상태를 되복제하지 않는다.
+- `resume-takeover`는 같은 고정 컨테이너 재개다. 일반 사본 불일치/불확실한 식별자 이전은 조사 대상으로
+  거부한다. Docker 관리자 신뢰·생존 볼륨/이미지·같은 물리 PC 조건, 팀원 독립 검토 미완료를 유지한다.
+- 새 단위/실제 삭제 실험과 기존 CA/DB/관리 상태 회귀 결과는 위 문서·공개 JSON에 기록한다.
+  AWS/유료 LLM 호출·탐지 기준 변경·개인 ZIP/기존 Docker 변경 없이 로컬에서 실행한다.
+- 동료 상시 mTLS PR #19 `72afde1`을 `9716a08`로 보존 결합했다. Windows 경로 기대값 3곳만
+  `Path` 표현으로 호환 수정했고 앱 변경은 없다. 최종 회귀 Windows1354+2skip/Linux1356·Ruff 통과다.
+  앞선 결합 실패(경로2·기존 HTTP1)와 변경 없는 HTTP 단독 재통과는 별도로 기록한다.
+- 최종 `actor-loss-final1` project `c02-9a91d2c2613e`: 유실26+실행기15+관리제거2=43 통과.
+  actor 실제 삭제16/미완료 대체14·관리 종료2·새 콘솔26, 같은 작업/epoch/예약 ID·Root1·이전JWK132거부·
+  완료 뒤 새 토큰 소비 보존. 옛 실행 볼륨4/관리18 제거, 최종 실행/관리 epoch3·A활성·양세대2다.
+- [공개 원자료](docs/infrastructure-results/c04-actor-container-loss-windows-20261104.json)에 113입력/양이미지93씩·
+  외부20, 결합126입력/단위이미지125, 사전/실패/최종 구분과 3소유범위 잔여0·기존 Docker/ZIP 보존을 남겼다.
+  tested source는 `97bc043`이며 이후 문서/결과 저장과 Git raw/LF 지문 검증을 구분한다.
+  C04 graph 실험을 동료 9서비스 상시 프로필의 자동 갱신 통합 완료로 확대하지 않는다.
+
 ## 2026년 11월 4일 후속 호스트 전환 실행기 중단 복구
 
 - PR #15는 `aitest` `ee8067b`에 병합됐고 병합 후 CI도 통과했다. 후속 브랜치는

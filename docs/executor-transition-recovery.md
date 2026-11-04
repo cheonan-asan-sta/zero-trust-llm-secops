@@ -1,5 +1,14 @@
 # 관리 호스트 전환 실행기의 중단과 명시적 재개
 
+11/4 후속 [부모 Docker 데몬 재시작 복구](parent-docker-recovery.md): 재시작으로 멈춘 고정
+actor와 이미 생성된 worker를 양 기록·owner·ID/사양 대조 후 복원한다. 사전 Engine ID seal과 명시적
+복구를 사용하며 live-restore된 미완료 작업·사본 충돌은 조사 대상으로 거부한다.
+
+후속 범위(11/4): 이 문서의 같은 컨테이너 PID-1 재시작에 더해
+[실행기 컨테이너 유실 복구](actor-container-recovery.md)의 `recover-takeover`를 추가했다.
+아래의 미완료 actor 유실 거부는 `resume-takeover` 동작/당시 검증 범위로 유지한다. 새 명령은
+명시적 대체 증거 검증과 이전 ID 이력으로 같은 작업을 이어가며 완료 후 재복제를 하지 않는다.
+
 2026-11-04 · I4·I6/C04 · 로컬 Docker 시험 프로필 전용
 
 [관리 호스트·전환 기록 이중화](executor-host-high-availability.md)는 실행 호스트를 바꿨지만, 전환을 수행하던
