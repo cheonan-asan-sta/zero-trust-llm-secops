@@ -1,6 +1,6 @@
 # 로컬 관측의 지속 수집
 
-[지속 관측 수집기](../scripts/continuous_signal_collector.py)는 append-only JSONL 파일의 새 줄을 읽어 SQLite에 보존하고, 서명한 관측을 기존 M3 수신 API로 계속 전달한다. 한 수집기는 하나의 관측 종류와 명시한 주체만 담당한다. 실제 IdP·EDR 센서가 아니며 데이터는 합성·허용된 로컬 시험 자료를 사용한다.
+[지속 관측 수집기](../scripts/continuous_signal_collector.py)는 JSONL의 새 줄을 읽어 SQLite에 보존하고, 서명한 관측을 기존 M3 수신 API로 계속 전달한다. 각 입력 세대는 append-only이며, 완전히 포착한 파일만 명시적 절차로 회전한다. 한 수집기는 하나의 관측 종류와 명시한 주체만 담당한다. 실제 IdP·EDR 센서가 아니며 데이터는 합성·허용된 로컬 시험 자료를 사용한다.
 
 ```text
 input.jsonl 새 줄 → 관측·입력 커서를 SQLite에 함께 저장
@@ -30,6 +30,8 @@ python -m scripts.continuous_signal_collector init \
 | `input.jsonl` | 새 관측을 끝에 추가할 입력 파일 |
 | `state.sqlite3` | 첫 run/status 때 생성하는 입력 커서·보관 관측·서명 봉투·접수 확인 상태 |
 | `collector.lock` | 실행 중 단일 수집기 프로세스의 OS 잠금 |
+| `input.lock` | append·포착·회전이 공유하는 짧은 OS 잠금 |
+| `input.rotation.json`·`input.rotation.next`·`input.sealed.*.jsonl` | 회전 도중의 복구용 파일. 보관 아카이브가 아님 |
 
 `--subject`를 반복하면 같은 종류의 여러 주체를 허용한다. 기기 수집기는 별도 디렉터리·별도 키로 `--kind device --subject demo-device`처럼 만든다. 처음 발급한 서명키의 등록 유효기간은 7일이며 이 수집기가 서명키를 자동 교체하지는 않는다.
 
@@ -44,11 +46,21 @@ python -m scripts.continuous_signal_collector init \
 
 ## 입력·실행·상태 확인
 
-`input.jsonl` 끝에 UTF-8 JSON 한 줄과 줄바꿈을 추가한다. 다음은 identity 입력 형식이며 `observed_at`은 실제 관측 시각으로 바꾼다. 시각에는 시간대가 있어야 하고 미래 시각은 거부한다.
+입력은 UTF-8 JSON 한 줄과 줄바꿈이다. 기본 자동 회전과 함께 쓰는 writer는 `append` CLI 또는 같은 `append_event` helper를 사용해 `input.lock` 안에서 활성 파일을 다시 열어야 한다. 다음은 identity 입력 형식이며 `observed_at`은 실제 관측 시각으로 바꾼다. 시각에는 시간대가 있어야 하고 미래 시각은 거부한다.
 
 ```json
 {"event_id":"identity-disabled-001","observed_at":"2026-11-04T00:00:00Z","observation":{"kind":"identity","subject_id":"demo-user","active":false,"authentication_result":"failure"}}
 ```
+
+위 입력을 비공개 `observation.json`에 준비했다면 다음처럼 추가한다. stdin은 최대 64KiB이며 입력 종류·주체·시각을 검사한 뒤 파일을 fsync한다. `appended: true`는 로컬 파일 기록이며 SQLite 포착이나 서버 접수 확인이 아니다.
+
+```sh
+python -m scripts.continuous_signal_collector append \
+  --directory runtime/continuous-collector \
+  --base-url http://127.0.0.1:18080 < observation.json
+```
+
+`append`는 실행 중인 수집기와 함께 사용할 수 있다. 입력 잠금·회전 복구 대기·파일 상한에 걸리면 같은 event ID로 재시도하며 파일을 잘라내지 않는다. `append`·`status`·`compact`·`rotate`에도 `run`과 같은 대상 URL과 TLS 프로필을 지정한다. HTTPS spool에서 기본 HTTP 주소로 바꾸면 거부한다.
 
 기기 수집기의 `observation` 형식은 다음과 같다.
 
@@ -78,7 +90,9 @@ python -m scripts.continuous_signal_collector run \
   --directory runtime/continuous-collector --base-url http://127.0.0.1:18080 --once
 ```
 
-`status`는 고유 관측 수 `captured`, `acknowledged`, `pending`, 입력 바이트 `offset`, 제한된 `last_error`를 출력한다. 서명·관측 본문·개인키·API 키는 출력하지 않는다. `--once`는 전체 입력이나 대기열을 배출하는 명령이 아니며 종료 코드 0도 서버 정책 완료를 뜻하지 않는다. 재시도·상한에 걸리면 1을 반환한다.
+`status`의 `captured`·`acknowledged`는 compact·회전을 지나서도 유지하는 누적 고유 관측 수이며 `pending`은 미확인 수다. `offset`은 **현재 입력 세대**의 바이트 커서다. `storage.retained`는 본문·봉투를 보관한 행, `storage.compacted`는 중복 방지 tombstone 수이며 각각의 상한도 출력한다. `input_generation`은 회전 세대, `input_rotation_pending`은 복구용 파일 존재 여부다. `last_error`는 제한된 코드이며 서명·본문·개인키·API 키는 출력하지 않는다. 사용자 지정 상한을 썼다면 조회에도 같은 상한을 지정한다.
+
+`--once`는 입력 한 줄 포착과 전달 한 번만 시도하며 전체 입력이나 대기열을 배출하지 않는다. 종료 코드 0도 서버 정책 완료를 뜻하지 않는다. 재시도·상한에 걸리면 1을 반환한다.
 
 ## 전달·재시작 계약
 
@@ -94,7 +108,37 @@ python -m scripts.continuous_signal_collector run \
 
 전달은 최소 한 번이며 서버의 이벤트 중복 방지와 함께 사용한다. 관측마다 서명 변형을 최대 16개 보존하고 소진하면 `ENVELOPE_LIMIT` 상태로 pending을 유지한다. 로컬 공개 등록과 서버 등록의 현재 권한을 모두 확인하며, 새 서명이 서버의 출처·키 거부를 우회하지 않는다.
 
-설정·입력의 절대 경로·대상 URL·TLS 프로필 경로·서명키는 spool에 연결한다. `run`과 `status`에는 같은 대상 URL과 TLS 프로필을 사용한다. 기존 spool을 다른 테넌트·키·입력·목적지로 바꾸거나 DB를 삭제해 미확인 관측을 잊는 자동 복구는 하지 않는다. 재시작 뒤 이미 읽은 앞부분이 바뀌거나 파일이 저장된 커서보다 짧아졌으면 오류로 중단하며 커서를 0으로 초기화하지 않는다.
+설정·입력의 절대 경로·대상 URL·TLS 프로필 경로·서명키는 spool에 연결한다. 기존 spool을 다른 테넌트·키·입력·목적지로 바꾸거나 DB를 삭제해 미확인 관측을 잊는 자동 복구는 하지 않는다. 지정된 회전 복구를 제외하고 이미 읽은 앞부분이 바뀌거나 파일이 저장된 커서보다 짧아졌으면 오류로 중단하며 커서를 0으로 초기화하지 않는다.
+
+## 접수 확인 기록의 보관 정리
+
+포착 공간이 부족하면 접수가 확인된 행을 최대 256개씩 단일 SQLite 트랜잭션에서 tombstone으로 바꾸고, **같은 입력·같은 커서**로 다시 포착한다. pending 관측·서명 봉투·재시도 상태는 정리하지 않는다. 수동 정리는 `run`을 종료한 뒤 실행한다. `compact`·`rotate`는 장기 `collector.lock`을 획득하므로 실행 중인 sender와 동시에 수행할 수 없다.
+
+```sh
+python -m scripts.continuous_signal_collector compact \
+  --directory runtime/continuous-collector \
+  --base-url http://127.0.0.1:18080 --limit 256
+```
+
+tombstone은 순번, event ID, canonical JSON 관측의 해시, 접수 확인 시각과 무결성 digest를 보존한다. 같은 ID·같은 입력은 다시 전송하지 않고 커서만 전진하며, 같은 ID·다른 입력은 계속 충돌로 거부한다. 본문·서명 변형을 hot 행에서 제거할 뿐 `VACUUM`, 디스크 공간 반환이나 보안 소거를 보장하지 않는다. checksum은 원격 anti-rollback 증명이 아니다.
+
+tombstone은 자동 삭제하지 않는다. `--max-history`에 닿으면 추가 정리가 불가능하고 hot 행 상한도 차면 backpressure를 유지한다. 오래된 tombstone 삭제·별도 spool 이전은 중복 보장 범위를 바꾸므로 이번 자동화에 포함하지 않는다. **서버 inbox의 영수증·정책·감사 보관 상한도 이 정리로 비워지지 않는다.**
+
+## 입력 파일 회전과 중단 복구
+
+기본 `--rotate-bytes 8388608`은 현재 파일이 8MiB 이상이고 다음 포착에서 EOF를 확인했을 때 회전한다. 아직 읽지 않은 줄이나 부분 줄이 있으면 회전하지 않는다. pending 관측은 SQLite에 이미 보존되어 있으므로 모두 ACK될 때까지 기다릴 필요는 없다. 수동 회전은 `run`을 종료한 뒤 실행한다.
+
+```sh
+python -m scripts.continuous_signal_collector rotate \
+  --directory runtime/continuous-collector \
+  --base-url http://127.0.0.1:18080
+```
+
+회전은 복구 manifest fsync → 이전 입력을 sealed 파일로 rename → 새 활성 파일 생성·fsync → SQLite에서 예상 커서를 대조하고 세대·빈 커서 반영 → sealed 파일 제거 → manifest 제거 순서다. 중간 종료 후 다음 포착 또는 `rotate`가 저장한 세대·해시를 대조해 이어가며, 이미 완료한 회전으로 새 세대의 커서를 되감지 않는다. `input_rotation_pending`이면 `run` 또는 `rotate`로 복구하고 임시 파일을 수동 삭제하지 않는다. 완료 후 원본 sealed 파일은 제거되므로 별도 원본 보관 아카이브가 아니다. Windows의 이 API에는 POSIX directory fsync가 없어 전원·호스트 손실까지 같은 내구성으로 일반화하지 않는다.
+
+기존의 직접 JSONL writer, `echo >>`, 열린 파일 descriptor를 유지하는 writer는 회전 중 안전을 보장하지 않는다. 협력 helper로 바꾸거나 `run --rotate-bytes 0`으로 자동 회전을 끄고 writer를 정지한 뒤 완전 포착·sender 종료·수동 `rotate` 순서로 수행한다. 읽지 않은 입력·부분 줄·prefix 변경·상한을 파일 truncate나 DB 초기화로 우회하지 않는다. 회전 이력도 자동 삭제하지 않으며 `--max-rotations` 상한 이후에는 새 회전을 거부한다.
+
+기존 v1 spool은 처음 열 때 트랜잭션으로 v2 보관·회전 스키마에 이행한다. 코드 업그레이드 전에 sender·writer를 정지하고 일관된 입력·spool·설정·키 사본을 보호한다. 이행한 DB에 옛 수집기 코드를 다시 연결하는 downgrade는 지원하지 않는다. 코드만 되돌려 회수·접수·중복 이력을 잊는 복구를 하지 않는다.
 
 ## 전송과 크기 제한
 
@@ -102,19 +146,23 @@ python -m scripts.continuous_signal_collector run \
 
 | 제한 | 값과 의미 |
 |---|---|
-| 입력 파일 | 최대 16MiB, 이미 읽은 내용도 포함 |
+| 입력 파일 | 세대별 최대 16MiB, 현재 세대에서 이미 읽은 내용도 포함 |
 | 한 줄 | 줄바꿈을 포함해 최대 64KiB |
 | `--max-pending` | 기본 1000, 미확인 관측의 포착 상한 |
-| `--max-records` | 기본 10000, 확인된 관측까지 포함한 전체 보관 상한 |
+| `--max-records` | 기본 10000, pending과 정리 전 ACK를 포함한 hot 행 상한 |
+| `--max-history` | 기본 100000, 정리한 중복 방지 tombstone 상한 |
+| `--max-rotations` | 기본 100000, 보존하는 입력 회전 이력 상한 |
+| `compact --limit` | 기본 256, 수동 정리 한 번의 최대 행 수 |
+| `--rotate-bytes` | 기본 8388608(8MiB), 0이면 자동 회전 해제. 허용 범위 0~16777216 |
 | `--poll-seconds` | 기본 0.5초, 허용 범위 0.01~60초 |
 | 포착·전달 실행자 | 같은 디렉터리에서 OS 잠금을 가진 프로세스 1개 |
 
-상한에 닿으면 새 줄의 커서를 전진시키지 않고 `backpressure`를 표시한다. 접수 확인된 관측도 자동 삭제하지 않으므로 전체 보관 상한은 ACK만으로 비워지지 않는다. 파일 회전·아카이브·spool 이전·키 교체는 별도 절차가 필요하다. 매 포착 때 읽은 입력 앞부분과 보관 레코드를 검사하는 로컬 구현이며 대용량 처리량이나 운영 보존 체계의 검증 결과가 아니다.
+상한에 닿아 안전하게 공간을 만들 수 없으면 새 줄의 커서를 전진시키지 않고 `backpressure`를 표시한다. ACK만으로 기록을 잊지 않으며 pending·중복 이력을 자동 삭제하지 않는다. spool 연산마다 보관 레코드·tombstone·회전 이력을 검사하고 포착 시 현재 입력 prefix도 읽는 로컬 구현이다. 기본 상한은 처리량·SLA·장기 보관 목표를 달성했다는 측정 결과가 아니다.
 
 ## 검증과 범위
 
 이 문서는 사용 계약과 재현 절차다. 실제 시험 결과·통과 수·팀장 환경의 재현 여부는 해당 PR의 실행 기록을 따른다. 시험 대상은 입력/커서 원자성, 실제 별도 프로세스 종료·재시작, POST 전후 응답 유실, 서명 변형 충돌, 권한·전송·상한 거부와 서버 정책 반영의 구분이다.
 
-수집기는 local/test 전용이다. 정상·heartbeat 관측으로 MFA·새 grant·권한 복구를 증명하지 않고 기존 위험 제한을 자동 해제하지 않는다. 수집기 자체에는 세션 만료 타이머가 없다. 후속 [주기적 세션 재검증](periodic-session-revalidation.md)은 별도 프로세스에서 서명 증명 만료·출처/키 유효성에 따라 보류·회수를 기록한다. 수집기를 실행하는 것만으로 watchdog가 자동 시작되지는 않는다. 실제 IdP/EDR 연동·자동 운영 장애 복구·독립 팀원 재현·탐지 품질 개선과 구분한다.
+수집기는 local/test 전용이다. 정상·heartbeat 관측으로 MFA·새 grant·권한 복구를 증명하지 않고 기존 위험 제한을 자동 해제하지 않는다. 수집기 자체에는 세션 만료 타이머가 없다. 후속 [주기적 세션 재검증](periodic-session-revalidation.md)은 별도 프로세스에서 서명 증명 만료·출처/키 유효성에 따라 보류·회수를 기록한다. 수집기를 실행하는 것만으로 watchdog가 자동 시작되지는 않는다. 실제 IdP/EDR 연동·독립 팀원 재현·탐지 품질 개선·서버 inbox 보관 정리·TLS/관측 서명키 교체는 이번 보관·회전 기능과 구분한다. 새 mTLS runtime의 C04 자동 갱신·CA/JWK 교체 미통합 한계도 유지한다.
 
 기본 `runtime/continuous-collector/`와 검증용 `runtime/collector-validation/`은 Git에서 제외하며 Docker build context에서도 `runtime`을 제외한다. 개인키·spool DB·비공개 입력을 통째로 공유하지 않고 공개 설정·비밀값을 제거한 결과와 실행 커밋만 인계한다.
