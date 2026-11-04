@@ -2,8 +2,8 @@
 
 The inbox and session journal may share a SQLite file, but never a transaction.
 Delivery is at least once: consumers must make policy updates idempotent. Terminal
-receipts are retained until an operator archives/replaces the local store; reaching
-the record limit refuses new signals instead of forgetting deduplication history.
+receipts may move to immutable compressed archives in the same database. Reaching
+archive limits refuses new signals instead of forgetting deduplication history.
 """
 
 import hashlib
@@ -15,6 +15,8 @@ import sqlite3
 from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+
+from app.services import inbox_archive
 
 
 class InboxConflict(ValueError):
@@ -94,6 +96,10 @@ class SignalInbox:
         *,
         max_pending_per_tenant: int | None = None,
         max_records_per_tenant: int | None = None,
+        archive_batch_size: int = 5000,
+        max_archive_records: int = 100000,
+        max_archive_segments: int = 1000,
+        max_archive_records_per_tenant: int | None = None,
     ):
         self.path = Path(path)
         self.max_pending = max_pending
@@ -107,6 +113,13 @@ class SignalInbox:
         self.max_records_per_tenant = (
             max_records if max_records_per_tenant is None else max_records_per_tenant
         )
+        self._archive_limits = inbox_archive.ArchiveLimits(
+            max_records=max_records, max_records_per_tenant=self.max_records_per_tenant,
+            archive_batch_size=archive_batch_size, max_archive_records=max_archive_records,
+            max_archive_segments=max_archive_segments,
+            max_archive_records_per_tenant=(max_archive_records if max_archive_records_per_tenant is None
+                                            else max_archive_records_per_tenant),
+        )
         for value in (
             max_pending, max_records, max_attempts,
             self.max_pending_per_tenant, self.max_records_per_tenant,
@@ -118,23 +131,7 @@ class SignalInbox:
         try:
             self.path.parent.mkdir(parents=True, exist_ok=True)
             with self._transaction() as connection:
-                connection.execute(
-                    "CREATE TABLE IF NOT EXISTS signal_inbox ("
-                    "tenant_id TEXT NOT NULL, event_id TEXT NOT NULL, payload TEXT NOT NULL, "
-                    "input_digest TEXT NOT NULL, payload_digest TEXT NOT NULL, "
-                    "submitted_by TEXT NOT NULL, received_at TEXT NOT NULL, "
-                    "state TEXT NOT NULL CHECK(state IN "
-                    "('pending','processing','completed','failed')), "
-                    "attempts INTEGER NOT NULL CHECK(attempts >= 0), "
-                    "next_attempt_at TEXT, lease_token TEXT, lease_expires_at TEXT, "
-                    "completed_at TEXT, result_json TEXT, last_error TEXT, "
-                    "PRIMARY KEY (tenant_id,event_id))"
-                )
-                connection.execute(
-                    "CREATE INDEX IF NOT EXISTS signal_inbox_delivery "
-                    "ON signal_inbox(state,next_attempt_at,received_at)"
-                )
-                self._rows(connection)
+                inbox_archive.initialize(connection, self._validate, self._archive_limits)
         except OSError as exc:
             raise InboxUnavailable("signal inbox unavailable") from exc
 
@@ -154,6 +151,10 @@ class SignalInbox:
             if isinstance(exc, InboxConflict):
                 raise
             raise InboxUnavailable("signal inbox unavailable") from exc
+        except inbox_archive.ArchiveFull as exc:
+            if connection is not None:
+                connection.rollback()
+            raise InboxFull("signal inbox archive capacity reached") from exc
         except BaseException:
             if connection is not None:
                 connection.rollback()
@@ -218,9 +219,7 @@ class SignalInbox:
     def _rows(self, connection) -> list[dict]:
         # Capacity is bounded; validating every row also detects corrupt rows that
         # otherwise would disappear from a state-filtered claim or metrics query.
-        return [self._validate(dict(row)) for row in connection.execute(
-            "SELECT * FROM signal_inbox ORDER BY received_at,tenant_id,event_id"
-        )]
+        return inbox_archive.read(connection, self._validate, self._archive_limits).rows
 
     @staticmethod
     def _receipt(row: dict, *, duplicate: bool = False) -> dict:
@@ -264,12 +263,17 @@ class SignalInbox:
                 tenant_rows = [row for row in rows if row["tenant_id"] == tenant_id]
                 active = lambda row: row["state"] in {"pending", "processing"}
                 if (
-                    len(rows) >= self.max_records
-                    or len(tenant_rows) >= self.max_records_per_tenant
-                    or sum(map(active, rows)) >= self.max_pending
+                    sum(map(active, rows)) >= self.max_pending
                     or sum(map(active, tenant_rows)) >= self.max_pending_per_tenant
                 ):
                     raise InboxFull("signal inbox capacity reached; retained receipts require archiving")
+                prospective = dict.fromkeys(inbox_archive.FIELDS)
+                prospective.update(tenant_id=tenant_id, event_id=event_id, payload=serialized,
+                                   input_digest=input_digest, payload_digest=payload_digest,
+                                   submitted_by=submitted_by, received_at=timestamp,
+                                   state="pending", attempts=0, next_attempt_at=timestamp)
+                incoming_bytes = len(inbox_archive.canonical(prospective).encode("utf-8"))
+                inbox_archive.ensure_capacity(connection, self._validate, self._archive_limits, tenant_id, incoming_bytes)
                 connection.execute(
                     "INSERT INTO signal_inbox (tenant_id,event_id,payload,input_digest,payload_digest,"
                     "submitted_by,received_at,state,attempts,next_attempt_at) "
@@ -277,6 +281,7 @@ class SignalInbox:
                     (tenant_id, event_id, serialized, input_digest, payload_digest,
                      submitted_by, timestamp, timestamp),
                 )
+                inbox_archive.refresh(connection, self._validate, self._archive_limits, added=1)
                 receipt = self._receipt(self._find(self._rows(connection), tenant_id, event_id))
         # This line is reached only after SQLite successfully committed.
         return receipt
@@ -296,6 +301,7 @@ class SignalInbox:
         timestamp = _time(now)
         claimed = None
         with self._transaction() as connection:
+            mutated = False
             for row in self._rows(connection):
                 if row["state"] == "processing":
                     if row["lease_expires_at"] > timestamp:
@@ -312,6 +318,7 @@ class SignalInbox:
                         "WHERE tenant_id=? AND event_id=?",
                         (timestamp, row["tenant_id"], row["event_id"]),
                     )
+                    mutated = True
                     continue
                 token = secrets.token_hex(32)
                 lease_until = _time(now + timedelta(seconds=self.lease_seconds))
@@ -320,6 +327,7 @@ class SignalInbox:
                     "lease_token=?,lease_expires_at=? WHERE tenant_id=? AND event_id=?",
                     (0 if exhausted else 1, token, lease_until, row["tenant_id"], row["event_id"]),
                 )
+                mutated = True
                 row.update(state="processing", attempts=row["attempts"] + (0 if exhausted else 1),
                            lease_token=token, lease_expires_at=lease_until)
                 claimed = self._receipt(row) | {
@@ -328,6 +336,8 @@ class SignalInbox:
                     "lease_expires_at": lease_until, "reconcile_only": exhausted,
                 }
                 break
+            if mutated:
+                inbox_archive.refresh(connection, self._validate, self._archive_limits)
         return claimed
 
     @staticmethod
@@ -352,6 +362,7 @@ class SignalInbox:
                 "WHERE tenant_id=? AND event_id=?",
                 (timestamp, serialized, tenant_id, event_id),
             )
+            inbox_archive.refresh(connection, self._validate, self._archive_limits)
             receipt = self._receipt(self._find(self._rows(connection), tenant_id, event_id))
         return receipt
 
@@ -372,16 +383,20 @@ class SignalInbox:
                 ("failed" if terminal else "pending", due, timestamp if terminal else None,
                  error_code, tenant_id, event_id),
             )
+            inbox_archive.refresh(connection, self._validate, self._archive_limits)
             receipt = self._receipt(self._find(self._rows(connection), tenant_id, event_id))
         return receipt
 
     def metrics(self, tenant_id: str, *, now: datetime | None = None) -> dict:
         observed = _read_time(_time(now if now is not None else datetime.now(UTC)))
         with self._transaction() as connection:
-            rows = [row for row in self._rows(connection) if row["tenant_id"] == tenant_id]
+            storage = inbox_archive.read(connection, self._validate, self._archive_limits)
+            rows = [row for row in storage.rows if row["tenant_id"] == tenant_id]
             result = {state: sum(row["state"] == state for row in rows) for state in sorted(_STATES)}
             result.update(total=len(rows), max_pending=self.max_pending_per_tenant,
-                          max_records=self.max_records_per_tenant)
+                          max_records=self.max_records_per_tenant,
+                          active_records=sum(row["tenant_id"] == tenant_id for row in storage.active),
+                          archived_records=sum(row["tenant_id"] == tenant_id for row in storage.archived))
             # Ages measure acceptance-to-observation, not worker CPU time. Completion
             # latency includes queueing and retries and is bounded to retained rows.
             for state in ("pending", "processing"):
@@ -399,6 +414,15 @@ class SignalInbox:
                 max_completion_latency_seconds=max(latencies) if latencies else None,
             )
         return result
+
+    def compact(self, *, limit: int | None = None) -> dict:
+        with self._transaction() as connection:
+            return inbox_archive.compact(connection, self._validate, self._archive_limits, limit=limit)
+
+    def storage_status(self) -> dict:
+        with self._transaction() as connection:
+            storage = inbox_archive.read(connection, self._validate, self._archive_limits)
+            return inbox_archive.status(storage, self._archive_limits)
 
     def integrity(self) -> dict:
         result = {"backend": "sqlite", "mode": "local"}
