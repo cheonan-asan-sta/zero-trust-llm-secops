@@ -2,6 +2,16 @@
 
 ## 2026년 11월 5일 후속 CA·DB·leaf 서비스 복구
 
+- 최종 `c02-665896d5f3f5`: 실제 dockerd 재시작3·서비스10·기존 실행기15/관리 제거2, 옛 JWK132거부.
+  신규 단위65, Windows1749+2skip/Linux1751·Ruff 통과. 구현 기준 `c8cdf65`.
+  양 실험 이미지114개·전체206/단위 이미지205 대조, 11개 소유 범위 잔여0/기존 Docker·ZIP 보존.
+  [공개 원자료](docs/infrastructure-results/c04-service-daemon-windows-20261105.json)에 초기/검토 중단 제외와 지문을 기록했다.
+
+- 실제 서비스 캠페인은 `c8cdf65`/PR #24 앱으로 통과했다. 이후 동료 PR #25 `15366df`를 `7e014b5`로
+  보존 결합했다. 이 변경의 앱/상시 mTLS 입력 4개와 당시 실험 지문을 구분하고 최신 전체 회귀를 별도로 기록한다.
+  C04 복구 코드는 그대로이며 `15366df` 대비 이번 작업의 앱 변경은 없다. 최신 앱으로 CA 재시작을 다시
+  실행했다고 기록하지 않는다. CI의 최신 상시 mTLS 검증도 별도 범위다.
+
 - 기준 PR #23 `9088245`, 이름 브랜치 `feature/chaeheeju-service-daemon-recovery`.
   [서비스 manifest·단계·실행·한계](docs/service-daemon-recovery.md)를 읽는다.
 - 동료 PR #24 `e9ae427`의 inbox 보관 이관을 `3d5acb2`로 보존 결합했다. README 양 안내를 유지했고,
