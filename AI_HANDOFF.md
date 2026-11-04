@@ -1,5 +1,21 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 4일 후속 호스트 전환 실행기 중단 복구
+
+- PR #15는 `aitest` `ee8067b`에 병합됐고 병합 후 CI도 통과했다. 후속 브랜치는
+  `feature/chaeheeju-executor-transition-recovery`. [구성·재개·경계](docs/executor-transition-recovery.md)를 읽는다.
+- `scripts.executor_transition`의 고정 PID-1 actor와 생존 볼륨 flock으로 전환을 직렬화한다. 같은 컨테이너
+  ID/전체 사양을 확인해 정지한 actor만 명시적으로 다시 시작한다. 실행 중/ID 변경/유실한 미완료 actor는 거부한다.
+- 공개 op journal의 peer-first fsync, 양 marker 완료 전 일반 작업 거부, OPID 볼륨/실행기 채택, 같은 부분
+  복제 재개와 old/new owner 대조를 사용한다. `complete`는 copy/fence/owner 재설치를 반복하지 않는다.
+- actor도 socket을 가진 신뢰 관리자다. physical HA/quorum/자동 선출·불확실한 업무 POST 재전송으로 확대하지
+  않는다. OS 신뢰/AWS/유료 LLM/탐지 기준을 바꾸지 않고 기존 컨테이너/ZIP은 보존한다. 실제 결과는 위 문서를 따른다.
+- `operator-final1` project `c02-62de02a2e5c6`: operator30+실행기15+관리제거2=47, 별도 사전8+14 통과.
+  같은 actor 실제 exit73 16회·관리 프로세스2회·새 콘솔20회, Root1·이전 JWK132거부·완료 뒤 새 토큰 소비 보존.
+  실행/관리 epoch3 A활성·양세대2·옛 실행볼륨4/관리18 삭제. 111입력/양이미지91씩·외부20과 정리 증거를 보존했다.
+- 신규 단위66, 캠페인 회귀 Windows1152+2skip/Linux1154·Ruff 통과. 초기에 더 좁은 사전2회는 최종 합계에서
+  제외했다. 동료의 수집기 PR #16 `a908270`이 별도로 병합돼 결합 후 회귀 결과를 추가하며 해당 기여는 보존한다.
+
 ## 2026년 11월 4일 후속 관리 실행 호스트·기록 이중화
 
 - PR #14 병합 `aitest` `8569385`에서 `feature/chaeheeju-executor-host-redundancy`로 진행한다.

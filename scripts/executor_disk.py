@@ -8,7 +8,8 @@ from scripts.certificate_controller import LifecycleError, replace_file
 from scripts.control_mirror import durable_parent
 from scripts.control_transition import read
 
-NAMES={'profile.json','cluster.json','management-transition.json','authority-coordinator.json','owner.json'}
+NAMES={'profile.json','cluster.json','management-transition.json','authority-coordinator.json','owner.json',
+    'executor-transition.json','executor-transition-faults.json'}
 
 
 def load(root):
@@ -19,8 +20,23 @@ def load(root):
         if not p.is_file() or p.name not in NAMES or p.stat().st_size>4*1024**2:
             raise LifecycleError('executor_disk_file_scope')
         if p.name=='management-transition.json':read(p)
+        if p.name=='executor-transition.json':
+            from scripts.executor_transition import read_record
+            read_record(json.loads(p.read_bytes()))
         result[p.name]=json.loads(p.read_bytes())
     return result
+
+
+def copy_resume(root,source_root,expected):
+    from scripts.executor_transition import core_files, tree_hashes
+    source=core_files(load(source_root));target=core_files(load(root))
+    if tree_hashes(source)!=expected:raise LifecycleError('executor_copy_source_changed')
+    if any(name not in source or value!=source[name] for name,value in target.items()):
+        raise LifecycleError('executor_copy_conflict')
+    for name,value in source.items():
+        if name not in target:replace_file(root/name,json.dumps(value,sort_keys=True));durable_parent(root/name)
+    if core_files(load(root))!=source:raise LifecycleError('executor_copy_mismatch')
+    return {'copied':True}
 
 
 def main():
@@ -31,6 +47,8 @@ def main():
             if name not in NAMES:raise LifecycleError('executor_disk_write_scope')
             replace_file(root/name,json.dumps(value,sort_keys=True));durable_parent(root/name)
         result={'written':True}
+    elif request['operation']=='copy_resume':
+        result=copy_resume(root,Path('/source'),request['expected'])
     elif request['operation']=='copy':
         source=load(Path('/source'))
         if any(root.iterdir()):raise LifecycleError('executor_disk_target_not_empty')

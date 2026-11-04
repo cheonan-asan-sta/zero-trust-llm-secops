@@ -48,7 +48,11 @@ class Cluster:
         if len(set(workers))!=len(workers):raise LifecycleError('executor_shared_worker')
         if len(set(volumes))!=4:raise LifecycleError('executor_shared_volumes')
 
-    def raw(self,args,payload=None,timeout=60):return DockerBackend.command(self,args,payload,timeout)
+    def raw(self,args,payload=None,timeout=60):
+        if getattr(self,'operator_id',None) and args and args[0]=='run':
+            args=['run','--label','secops.c02='+self.project,'--label','secops.executor-transition='+self.operator_id,
+                '--label','secops.executor-operator-job=1',*args[1:]]
+        return DockerBackend.command(self,args,payload,timeout)
 
     def volume_name(self,site,generation,kind):return self.project+f'-executor-{site}-g{generation}-'+kind
 
@@ -71,13 +75,13 @@ class Cluster:
             (self.d['hosts']['a']['owner'],'/executor-role-a',True),
             (self.d['hosts']['b']['owner'],'/executor-role-b',True)]
 
-    def disk(self,volume,operation,*,files=None,source=None):
+    def disk(self,volume,operation,*,files=None,source=None,expected=None):
         self.raw(['volume','inspect',volume,*([source] if source else [])])
         args=['run','--rm','-i','--network','none','--read-only','--user','10001:10001','--cap-drop=ALL',
             '--security-opt=no-new-privileges:true','--mount',f'type=volume,src={volume},dst=/data'+(',readonly' if operation=='read' else '')]
         if source:args+=['--mount',f'type=volume,src={source},dst=/source,readonly']
         return json.loads(self.raw([*args,'--entrypoint','python',self.d['graph_image'],'-m','scripts.executor_disk'],
-            {'operation':operation,**({'files':files} if files is not None else {})}))
+            {'operation':operation,**({'files':files} if files is not None else {}),**({'expected':expected} if expected is not None else {})}))
 
     def volume(self,site,generation,kind):
         name=self.volume_name(site,generation,kind)
@@ -126,7 +130,7 @@ class Cluster:
                 or context not in c.get('Env',[]) or 'DOCKER_HOST=unix:///var/run/docker.sock' not in c.get('Env',[])):
             raise LifecycleError('executor_worker_replaced')
 
-    def create_worker(self,site):
+    def worker_args(self,site,operation=None):
         name=self.project+f"-executor-{site}-e{self.d['epoch']}"
         args=['create','--name',name,'--label','secops.c02='+self.project,'--label',CLUSTER+'='+self.project,
             '--label',KIND+'=worker','--label',JOB_SITE+'='+site,'--label',JOB_EPOCH+'='+str(self.d['epoch']),
@@ -137,7 +141,12 @@ class Cluster:
             '--env','DOCKER_HOST=unix:///var/run/docker.sock',
             '--env',ENV+'='+json.dumps(self.context(site),sort_keys=True,separators=(',',':'))]
         for volume,dest,ro in self.mounts(site):args+=['--mount',f'type=volume,src={volume},dst={dest}'+(',readonly' if ro else '')]
-        ident=self.raw([*args,'--entrypoint','python',self.d['executor_image'],'-m','scripts.control_executor','daemon']).strip()
+        if operation:args+=['--label','secops.executor-transition='+operation]
+        return [*args,'--entrypoint','python',self.d['executor_image'],'-m','scripts.control_executor','daemon']
+
+    def create_worker(self,site):
+        name=self.project+f"-executor-{site}-e{self.d['epoch']}"
+        ident=self.raw(self.worker_args(site)).strip()
         self.d['hosts'][site]['worker']={'name':name,'id':ident};self.raw(['start',ident]);self.inspect_worker(site)
 
     def publish(self):
@@ -230,23 +239,8 @@ class Cluster:
 
     def takeover(self,target,*,discard=False):
         if target==self.d['active'] or target not in {'a','b'}:raise LifecycleError('executor_takeover_scope')
-        with self.operator_lock():
-            for kind in ['owner','journal']:self.verify_volume(target,kind)
-            peer=self.disk(self.d['hosts'][target]['journal'],'read');owner=self.disk(self.d['hosts'][target]['owner'],'read')
-            if peer.get('cluster.json')!=self.d or owner.get('owner.json')!=self.role():raise LifecycleError('executor_survivor_not_current')
-            old_site=self.d['active'];old=copy.deepcopy(self.d['hosts'][old_site])
-            receipts=[self.fence_worker(old_site),self.fence_worker(target)];settled=self.settle(peer['profile.json'])
-            if discard:
-                for kind in ['journal','owner']:self.raw(['volume','rm',old[kind]])
-            generation=old['generation']+1
-            replacement={'generation':generation,'journal':self.volume(old_site,generation,'journal'),
-                'owner':self.volume(old_site,generation,'owner'),'worker':None}
-            self.disk(replacement['journal'],'copy',source=self.d['hosts'][target]['journal'])
-            self.d['hosts'][old_site]=replacement;self.d['active']=target;self.d['epoch']+=1
-            for site in ['a','b']:self.disk(self.d['hosts'][site]['owner'],'write',files={'owner.json':self.role()})
-            self.create_worker(target);self.create_worker(old_site);self.publish()
-            return {'active':target,'executor_epoch':self.d['epoch'],'fenced':receipts,'settled':settled,
-                'retired_storage':{k:old[k] for k in ['journal','owner']},'discarded':discard}
+        from scripts.executor_transition import launch
+        result=launch(self,target,discard=discard);self.d=result['descriptor'];return result['receipt']
 
     @classmethod
     def bootstrap(cls,profile,executor_image,*,adopt=True):
@@ -305,10 +299,14 @@ class Remote:
 
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('operation',choices=['status','takeover','recover','journal','resume','tick'])
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('operation',choices=['status','takeover','recover','journal','resume','tick','resume-takeover'])
     p.add_argument('--descriptor',type=Path);p.add_argument('--anchor',type=Path);p.add_argument('--site',choices=['a','b'])
     p.add_argument('--journal');p.add_argument('--owner');args=p.parse_args()
-    if args.operation=='recover':
+    if args.operation=='resume-takeover':
+        from scripts.executor_transition import resume_operator
+        value=resume_operator(json.loads(args.anchor.read_bytes()),args.site,args.journal,args.owner)
+        cluster=Cluster(value['descriptor']);result=value['receipt']
+    elif args.operation=='recover':
         cluster=Cluster.recover(json.loads(args.anchor.read_bytes()),args.site,args.journal,args.owner)
         result=cluster.takeover(args.site)
     else:

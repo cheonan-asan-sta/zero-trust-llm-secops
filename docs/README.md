@@ -1,5 +1,9 @@
 # 개발 주차별 산출물
 
+11/4 후속 [관리 호스트 전환 실행기 재개](executor-transition-recovery.md)는 고정 actor의 중단을 같은
+ID/저장소에서 명시적으로 이어간다. pending 차단·부분 사본/owner 검증·완료 후 새 상태 보존을 추가하며
+물리 HA·유실한 미완료 actor 재생성·독립 검토 완료와 구분한다.
+
 11/4 후속 [관리 실행 호스트·기록 이중화](executor-host-high-availability.md)는 실행 호스트별 독립
 저장소·대기 우선 journal·양 owner/실행 epoch 검사와 명시적 봉쇄 전환을 추가한다. 콘솔 캐시 손실 후
 생존 사본으로 이어가며, 물리 HA·자동 선출·운영자 전환 자체의 중단 복구는 별도 범위다.
