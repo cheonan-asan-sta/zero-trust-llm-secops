@@ -29,5 +29,13 @@ jobs:
           docker run --rm zero-trust-llm-secops:ci-tests
       - name: Build application image
         run: docker build --platform linux/amd64 --provenance=false --file Dockerfile --tag zero-trust-llm-secops:ci .
+      - name: Verify collector maintenance over mTLS
+        run: python -m scripts.test_continuous_mtls_runtime --directory runtime/c02/collector-maintenance-ci
+      - name: Report mTLS verification
+        if: always()
+        run: |
+          if [ -f runtime/c02/collector-maintenance-ci/verification.json ]; then
+            cat runtime/c02/collector-maintenance-ci/verification.json
+          fi
       - name: Build Lambda image
         run: docker build --platform linux/amd64 --provenance=false --file Dockerfile.lambda --tag zero-trust-llm-secops:lambda-ci .
