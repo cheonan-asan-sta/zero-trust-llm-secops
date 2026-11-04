@@ -115,6 +115,6 @@ python -m scripts.continuous_signal_collector run \
 
 이 문서는 사용 계약과 재현 절차다. 실제 시험 결과·통과 수·팀장 환경의 재현 여부는 해당 PR의 실행 기록을 따른다. 시험 대상은 입력/커서 원자성, 실제 별도 프로세스 종료·재시작, POST 전후 응답 유실, 서명 변형 충돌, 권한·전송·상한 거부와 서버 정책 반영의 구분이다.
 
-수집기는 local/test 전용이다. 정상·heartbeat 관측으로 MFA·새 grant·권한 복구를 증명하지 않고 기존 위험 제한을 자동 해제하지 않는다. 신호가 새로 오지 않았다는 이유만으로 세션을 만료·회수하는 watchdog도 이번 범위에 포함하지 않는다. 실제 IdP/EDR 연동·자동 운영 장애 복구·독립 팀원 재현·탐지 품질 개선과 구분한다.
+수집기는 local/test 전용이다. 정상·heartbeat 관측으로 MFA·새 grant·권한 복구를 증명하지 않고 기존 위험 제한을 자동 해제하지 않는다. 수집기 자체에는 세션 만료 타이머가 없다. 후속 [주기적 세션 재검증](periodic-session-revalidation.md)은 별도 프로세스에서 서명 증명 만료·출처/키 유효성에 따라 보류·회수를 기록한다. 수집기를 실행하는 것만으로 watchdog가 자동 시작되지는 않는다. 실제 IdP/EDR 연동·자동 운영 장애 복구·독립 팀원 재현·탐지 품질 개선과 구분한다.
 
 기본 `runtime/continuous-collector/`와 검증용 `runtime/collector-validation/`은 Git에서 제외하며 Docker build context에서도 `runtime`을 제외한다. 개인키·spool DB·비공개 입력을 통째로 공유하지 않고 공개 설정·비밀값을 제거한 결과와 실행 커밋만 인계한다.
