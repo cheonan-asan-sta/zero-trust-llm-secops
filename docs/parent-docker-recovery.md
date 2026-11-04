@@ -2,6 +2,10 @@
 
 2026-11-04 · I4·I6/C04 · 기존 [컨테이너 유실 복구](actor-container-recovery.md)의 후속
 
+11/5 후속 [CA·DB·leaf 서비스 복구](service-daemon-recovery.md)는 아래 worker/전환 복구와 별도 명령이다.
+같은 서비스/저장소·최신 보안 checkpoint·기존 DB 역할/동기 복제를 확인하고 접속을 순서대로 연다.
+아래 11/4 실험은 당시 actor/worker·합성 marker 범위의 역사적 결과로 유지한다.
+
 부모 데몬이 재시작되면 전환 actor뿐 아니라 이미 만들어 둔 새 worker도 멈출 수 있다. 이번 변경은
 **같은 Docker 데이터 저장소·이미지·볼륨이 살아 있는 경우** `recover-daemon`으로 같은 전환을 재개한다.
 Docker Desktop이나 데몬 자체를 재시작하는 운영 명령은 추가하지 않는다. 복구는 명시적이며 증거가

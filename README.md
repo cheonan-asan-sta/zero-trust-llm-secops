@@ -1,5 +1,11 @@
 # zero-trust-llm-secops
 
+## 2026년 11월 5일 후속 CA·DB·leaf 데몬 복구
+
+[서비스 복구](docs/service-daemon-recovery.md)는 사전 식별 기록에 고정한 CA/DB 호스트·게이트웨이·leaf·worker를
+같은 Docker 저장소에서 명시적으로 재개합니다. 최신 보안 checkpoint·DB 역할/동기 복제를 확인한 뒤 접속을
+열고, 중단 후 재시도에서도 새 토큰 소비·폐기를 보존합니다. 실행 방법·로컬 검증 범위·한계는 연결 문서를 따릅니다.
+
 ## 정책 저널 보관 이관
 
 활성 정책 저널의 오래된 행을 같은 SQLite DB의 압축 segment로 옮기고, 모든 읽기에서 전체 이력과 체인을 검증합니다.

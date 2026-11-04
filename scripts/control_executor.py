@@ -75,6 +75,11 @@ def main():
     elif fault:raise LifecycleError('executor_fault_mode_denied')
     operation=request['operation'];args=request.get('args',[]);kwargs=request.get('kwargs',{})
     if operation=='view':result=b.profile
+    elif operation=='service-seal':
+        from scripts.executor_cluster import Cluster
+        from scripts.service_daemon_recovery import seal_services_local
+        with lease(b.directory()):
+            result=seal_services_local(Cluster(store.load_json('cluster.json')),*args,**kwargs)
     elif operation=='journal':result=store.record(b.directory()/'management-transition.json')
     elif operation=='tick':
         with lease(b.directory()):

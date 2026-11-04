@@ -1,5 +1,18 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 5일 후속 CA·DB·leaf 서비스 복구
+
+- 기준 PR #23 `9088245`, 이름 브랜치 `feature/chaeheeju-service-daemon-recovery`.
+  [서비스 manifest·단계·실행·한계](docs/service-daemon-recovery.md)를 읽는다.
+- `scripts.service_daemon_recovery`의 `seal/recover`: 같은 부모/내부 Engine·고정 서비스/볼륨·현재 관리/실행 역할을
+  검사하고 최신 인증 checkpoint·DB 역할/동기 복제 확인 뒤 접속을 연다. 모든 대상은 사전 고정 ID 또는 명시 extras다.
+- 기존 authority lease 아래 전용 공개 journal과 동일 actor로 재개한다. pending/busy/사본 충돌·생존 미완료 작업·
+  paused·부분 온라인 새 장애·미완료 actor 유실은 거부한다. 자동 kill/lease 삭제/DB 승격·복원·키 재생성은 없다.
+- `opening` 이후 새 토큰 소비·폐기를 과거 snapshot으로 되돌리지 않는다. 다음 전체 정지에는 새 service cycle을
+  사용하고 역할 epoch와 ID는 유지한다. Docker Desktop 대신 별도 격리 부모의 실제 CA/DB/leaf를 시험한다.
+- AWS/유료 LLM/실계정/OS 신뢰 설정·탐지 기준 변경 없이 진행한다. 기존 ZIP/컨테이너를 보존한다.
+  물리 HA·운영 SLA·팀원 독립 검토/전체 주간 완료는 별도이며 인프라 실행/측정은 채희주 담당이다.
+
 ## 2026년 11월 4일 후속 부모 Docker 데몬 재시작 복구
 
 - 기준 `aitest` PR #20 `3a45b58`, 브랜치 `feature/chaeheeju-parent-daemon-recovery`.
