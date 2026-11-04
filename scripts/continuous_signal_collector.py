@@ -7,7 +7,6 @@ signed transmission and receipt acknowledgement are separate durable boundaries.
 import argparse
 import base64
 import hashlib
-import hmac
 import json
 import os
 import signal
@@ -43,11 +42,21 @@ from app.services.trusted_signals import (
     SignalVerifier,
     canonical_observation,
 )
+from scripts.collector_input import (
+    JOURNAL,
+    MAX_FEED,
+    MAX_LINE,
+    PREPARATION,
+    InputBusy,
+    _prefix,
+    append_event,
+    feed_lock,
+    recover_rotation,
+    rotate_input,
+)
 from scripts.local_signal_collector import _NoRedirect, _target
 
 INBOX = "/zero-trust/signals/inbox"
-MAX_LINE = 65536
-MAX_FEED = 16 * 1024 * 1024
 
 
 class InputRecord(StrictModel):
@@ -177,7 +186,8 @@ def post_observation(base_url, payload, *, tls_profile=None):
 
 class ContinuousCollector:
     def __init__(self, directory, base_url, *, tls_profile=None, transport=None,
-                 clock=None, max_pending=1000, max_records=10000):
+                 clock=None, max_pending=1000, max_records=10000, max_history=100000,
+                 max_rotations=100000, rotate_bytes=MAX_FEED // 2):
         if get_settings().app_environment not in {"local", "test"}:
             raise ValueError("collector is local/test only")
         self.directory = Path(directory).resolve()
@@ -194,6 +204,9 @@ class ContinuousCollector:
         self.tls_profile = tls_profile
         self.clock = clock or (lambda: datetime.now(UTC))
         self.transport = transport or post_observation
+        if type(rotate_bytes) is not int or not 0 <= rotate_bytes <= MAX_FEED:
+            raise ValueError("collector rotation threshold invalid")
+        self.rotate_bytes = rotate_bytes
         self.verifier = SignalVerifier(self.directory / "sources.json")
         self.principal = Principal("continuous-collector", self.config.tenant_id,
                                    frozenset({Role.ANALYST}), "collector")
@@ -206,22 +219,26 @@ class ContinuousCollector:
             "public_key_sha256": hashlib.sha256(public).hexdigest(),
         }
         self.spool = CollectorSpool(self.directory / "state.sqlite3", binding,
-                                    max_pending=max_pending, max_records=max_records)
+                                    max_pending=max_pending, max_records=max_records,
+                                    max_history=max_history, max_rotations=max_rotations)
 
     def capture_one(self):
+        with feed_lock(self.directory):
+            recover_rotation(self.directory, self.spool)
+            return self._capture_locked()
+
+    def _capture_locked(self):
         checkpoint = self.spool.checkpoint()
+        prefix, size = _prefix(self.input_path, checkpoint)
         with self.input_path.open("rb") as file:
-            if os.fstat(file.fileno()).st_size > MAX_FEED:
-                raise ValueError("collector input size limit")
-            prefix = file.read(checkpoint["offset"])
-            if len(prefix) != checkpoint["offset"] or not hmac.compare_digest(
-                hashlib.sha256(prefix).hexdigest(), checkpoint["prefix_sha256"],
-            ):
-                raise ValueError("collector input prefix changed")
+            file.seek(checkpoint["offset"])
             line = file.readline(MAX_LINE + 1)
         if len(line) > MAX_LINE:
             raise ValueError("collector record size limit")
         if not line or not line.endswith(b"\n"):
+            if (not line and self.rotate_bytes and size >= self.rotate_bytes
+                    and size == checkpoint["offset"]):
+                rotate_input(self.directory, self.spool)
             return False  # Do not checkpoint a writer's partial final line.
         record = InputRecord.model_validate_json(line)
         if (record.observation.kind != self.config.kind
@@ -229,8 +246,36 @@ class ContinuousCollector:
                 or record.observed_at > self.clock()):
             raise ValueError("collector input scope or time")
         event = record.model_dump(mode="json")
-        return self.spool.enqueue(event, offset=checkpoint["offset"] + len(line),
-                                  prefix_sha256=hashlib.sha256(prefix + line).hexdigest())
+        arguments = {"offset": checkpoint["offset"] + len(line),
+                     "prefix_sha256": hashlib.sha256(prefix + line).hexdigest()}
+        try:
+            return self.spool.enqueue(event, **arguments)
+        except SpoolFull:
+            # Never prune pending or duplicate history. Compact only confirmed
+            # receipts, then retry the same event at the same input checkpoint.
+            if not self.spool.compact():
+                raise
+            return self.spool.enqueue(event, **arguments)
+
+    def rotate(self):
+        with feed_lock(self.directory):
+            return rotate_input(self.directory, self.spool)
+
+    def append(self, event):
+        record = InputRecord.model_validate(event)
+        if (record.observation.kind != self.config.kind
+                or record.observation.subject_id not in self.config.subjects
+                or record.observed_at > self.clock()):
+            raise ValueError("collector input scope or time")
+        return append_event(self.directory, record.model_dump(mode="json"))
+
+    def status(self):
+        return self.spool.summary() | {
+            "storage": self.spool.storage_summary(),
+            "input_generation": self.spool.rotation_checkpoint()["generation"],
+            "input_rotation_pending": any((self.directory / name).exists()
+                                          for name in (JOURNAL, PREPARATION)),
+        }
 
     def _envelope(self, event):
         now = self.clock()
@@ -311,7 +356,7 @@ class ContinuousCollector:
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("operation", choices=["init", "run", "status"])
+    parser.add_argument("operation", choices=["init", "run", "status", "compact", "rotate", "append"])
     parser.add_argument("--directory", type=Path, required=True)
     parser.add_argument("--tenant", default="local")
     parser.add_argument("--source-id", default="local-identity-observer")
@@ -323,10 +368,17 @@ def main(argv=None):
     parser.add_argument("--poll-seconds", type=float, default=0.5)
     parser.add_argument("--max-pending", type=int, default=1000)
     parser.add_argument("--max-records", type=int, default=10000)
+    parser.add_argument("--max-history", type=int, default=100000)
+    parser.add_argument("--max-rotations", type=int, default=100000)
+    parser.add_argument("--limit", type=int, default=256)
+    parser.add_argument("--rotate-bytes", type=int, default=MAX_FEED // 2)
     parser.add_argument("--once", action="store_true")
     args = parser.parse_args(argv)
     if (not 0.01 <= args.poll_seconds <= 60 or not 1 <= args.max_pending <= 10000
-            or not 1 <= args.max_records <= 100000):
+            or not 1 <= args.max_records <= 100000
+            or not 1 <= args.max_history <= 1000000 or not 1 <= args.limit <= 10000
+            or not 1 <= args.max_rotations <= 1000000
+            or not 0 <= args.rotate_bytes <= MAX_FEED):
         parser.error("invalid poll interval or capacity")
     stopped = Event()
     for sig in (signal.SIGINT, signal.SIGTERM):
@@ -338,28 +390,51 @@ def main(argv=None):
             print(json.dumps(initialize(args.directory, args.tenant, args.source_id,
                                         args.key_id, args.kind, args.subject)))
             return 0
-        if args.operation == "status":
-            collector = ContinuousCollector(args.directory, args.base_url,
-                tls_profile=args.tls_profile, max_pending=args.max_pending, max_records=args.max_records)
-            print(json.dumps(collector.spool.summary()))
+        def configured_collector():
+            return ContinuousCollector(args.directory, args.base_url,
+                tls_profile=args.tls_profile, max_pending=args.max_pending, max_records=args.max_records,
+                max_history=args.max_history, max_rotations=args.max_rotations,
+                rotate_bytes=args.rotate_bytes)
+
+        if args.operation in {"status", "append"}:
+            collector = configured_collector()
+            if args.operation == "append":
+                raw = sys.stdin.buffer.read(MAX_LINE + 1)
+                if len(raw) > MAX_LINE:
+                    raise ValueError("collector input record size limit")
+                print(json.dumps(collector.append(json.loads(raw))), flush=True)
+            else:
+                print(json.dumps(collector.status()))
             return 0
         with exclusive_collector(args.directory):
-            collector = ContinuousCollector(args.directory, args.base_url,
-                tls_profile=args.tls_profile, max_pending=args.max_pending, max_records=args.max_records)
+            collector = configured_collector()
+            if args.operation == "compact":
+                print(json.dumps({"compacted": collector.spool.compact(limit=args.limit),
+                                  **collector.status()}), flush=True)
+                return 0
+            if args.operation == "rotate":
+                print(json.dumps(collector.rotate() | collector.status()), flush=True)
+                return 0
             while not stopped.is_set():
-                full = False
+                full, busy = False, False
                 try:
                     captured = collector.capture_one()
                 except SpoolFull:
                     captured, full = False, True
+                except InputBusy:
+                    captured, busy = False, True
                 result = collector.deliver_one()
                 if captured or full or result != "idle" or args.once:
                     print(json.dumps({"collector": result, "captured": captured,
-                                      "backpressure": full}), flush=True)
+                                      "backpressure": full, "input_busy": busy}), flush=True)
                 if args.once:
-                    return 1 if result == "retry" or full else 0
+                    return 1 if result == "retry" or full or busy else 0
                 stopped.wait(args.poll_seconds)
         return 0
+    except SpoolFull:
+        print(json.dumps({"collector": "backpressure", "error": "STORAGE_CAPACITY_REACHED"}),
+              file=sys.stderr, flush=True)
+        return 1
     except (OSError, ValueError, TypeError, UnsupportedAlgorithm,
             SpoolUnavailable, SpoolConflict, SpoolBindingMismatch):
         print(json.dumps({"collector": "stopped", "error": "INPUT_CONFIG_OR_STORAGE_INVALID"}),

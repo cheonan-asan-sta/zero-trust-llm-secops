@@ -212,6 +212,7 @@ def mint(data):
 
 
 def append(data):
+    from scripts.collector_input import append_event
     from scripts.continuous_signal_collector import InputRecord
     record = InputRecord(
         event_id=data["event_id"], observed_at=data.get("observed_at", data.get(
@@ -224,13 +225,7 @@ def append(data):
     )
     if record.observation.kind != "identity":
         raise ValueError("runtime feed requires identity observation")
-    raw = record.model_dump_json().encode() + b"\n"
-    descriptor = os.open(COLLECTOR / "input.jsonl", os.O_WRONLY | os.O_APPEND)
-    with os.fdopen(descriptor, "ab") as file:
-        file.write(raw)
-        file.flush()
-        os.fsync(file.fileno())
-    return {"appended": True}
+    return append_event(COLLECTOR, record.model_dump(mode="json"))
 
 
 def main(argv=None):

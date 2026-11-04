@@ -47,6 +47,8 @@ app·worker·watchdog는 같은 `/data/zero-trust.sqlite3`와 읽기 전용 `/si
 
 수집기는 접수 `202`를 보존하고 worker는 정책 완료를 별도로 기록합니다. watchdog는 만료를 보류하고 출처·키 무효화를 회수로 반영합니다. 어느 프로세스도 정상 관측·재시작·만료 뒤 새 허용이나 자동 정상화를 만들지 않습니다. 세부 계약은 [수집기](continuous-signal-collector.md), [주기적 재검증](periodic-session-revalidation.md), [접수·worker](m3-durable-signals.md)를 따릅니다.
 
+runtime의 관측 append helper도 collector와 공유하는 `input.lock` 안에서 활성 입력을 다시 엽니다. 기본 8MiB EOF 회전과 ACK 행의 tombstone 정리는 collector spool에 적용하며, pending 봉투·중복 방지 이력을 잊지 않습니다. named volume의 입력을 직접 append·truncate하는 writer는 회전과 협력하지 않으므로 사용하지 않습니다. 수동 `compact`·`rotate`는 sender 종료 후 같은 spool·대상 URL·TLS 프로필로 수행합니다. 이 기능이 서버 inbox 상한을 비우거나 인증서·관측 서명키를 갱신하지는 않습니다.
+
 ## 장애·재시작 검증
 
 ```bash
@@ -66,7 +68,7 @@ python -m scripts.test_continuous_mtls_runtime --directory "runtime/c02/continuo
 
 자동 재시작 검사는 컨테이너 안의 Python 자식 프로세스를 `SIGKILL`하고 **같은 컨테이너 ID에서 Docker `RestartCount`가 증가**했는지를 확인하는 방식입니다. `docker stop`은 운영자가 정지한 상태여서 `unless-stopped`의 자동 복구 검사와 구분합니다. 프로세스 재시작 뒤에는 기존 DB·접수·spool과 이미 회수한 세션을 유지해야 합니다. 구체적인 통과 결과는 실제 검증 기록으로 확인하며, 실행 설정만으로 장애 복구가 입증되지는 않습니다.
 
-2026-11-04 최종 [공개 검증 기록](infrastructure-results/continuous-mtls-macos-20261104.json)은 최신 `aitest 5d957aa`를 합친 코드로 실제 Docker 통합 검사 **17개**를 통과한 결과입니다. app·collector·worker·watchdog의 프로세스 종료 후 자동 재시작, 전송 복구, 증명 만료·서명키 폐기 후 미사용 grant의 문서 접근 **403**, 무관 주체의 정상 **200**, 서버 pin 오류와 복구를 확인했습니다. 이미지 안의 앱·스크립트 지문을 원본과 대조했고 시험 컨테이너·볼륨·망 잔여는 각각 **0**입니다. macOS arm64의 전체 회귀는 **1,322건 통과·기존 의존성 경고 1건**, Ruff도 통과했습니다. 이전 기준의 예비 성공 17개는 최종 합계에 더하지 않습니다. 팀장 환경의 독립 재현은 후속 확인입니다.
+보관 정리·입력 회전 추가 전 프로필 기준선인 2026-11-04 [공개 검증 기록](infrastructure-results/continuous-mtls-macos-20261104.json)은 당시 `aitest 5d957aa`를 합친 코드로 실제 Docker 통합 검사 **17개**를 통과한 결과입니다. app·collector·worker·watchdog의 프로세스 종료 후 자동 재시작, 전송 복구, 증명 만료·서명키 폐기 후 미사용 grant의 문서 접근 **403**, 무관 주체의 정상 **200**, 서버 pin 오류와 복구를 확인했습니다. 이미지 안의 앱·스크립트 지문을 원본과 대조했고 시험 컨테이너·볼륨·망 잔여는 각각 **0**입니다. macOS arm64의 전체 회귀는 **1,322건 통과·기존 의존성 경고 1건**, Ruff도 통과했습니다. 이전 기준의 예비 성공 17개는 최종 합계에 더하지 않습니다. 팀장 환경의 독립 재현은 후속 확인입니다.
 
 ## 수명과 후속 통합
 

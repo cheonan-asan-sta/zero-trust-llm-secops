@@ -2,8 +2,8 @@
 
 Capture and its input byte checkpoint commit together. Acknowledgement is a
 separate transaction and means remote durable receipt, not policy completion.
-The caller holds the single-producer OS lock across network operations. Retained
-rows are bounded and never pruned automatically, preserving duplicate detection.
+The caller holds the single-producer OS lock across network operations. Confirmed
+rows may be compacted into bounded duplicate history; unconfirmed rows never move.
 """
 
 import hashlib
@@ -87,12 +87,14 @@ class CollectorSpool:
     """Bounded single-host SQLite spool; validation scans all retained records."""
 
     def __init__(self, path: Path, binding: dict, *, max_pending=1000,
-                 max_records=10000, max_variants=16):
+                 max_records=10000, max_variants=16, max_history=100000, max_rotations=100000):
         self.path = Path(path)
         self.max_pending = max_pending
         self.max_records = max_records
         self.max_variants = max_variants
-        for value in (max_pending, max_records, max_variants):
+        self.max_history = max_history
+        self.max_rotations = max_rotations
+        for value in (max_pending, max_records, max_variants, max_history, max_rotations):
             if type(value) is not int or value < 1:
                 raise ValueError("collector limits must be positive integers")
         if not isinstance(binding, dict) or any(
@@ -120,10 +122,12 @@ class CollectorSpool:
                 if not connection.execute("SELECT 1 FROM collector_spool_metadata").fetchone():
                     checkpoint = _canonical({"offset": 0, "prefix_sha256": _digest(""), "records": 0})
                     connection.execute(
-                        "INSERT INTO collector_spool_metadata VALUES (1,?,?,?,?)",
+                        "INSERT INTO collector_spool_metadata "
+                        "(id,binding,binding_digest,checkpoint,checkpoint_digest) VALUES (1,?,?,?,?)",
                         (self.binding_json, _digest(self.binding_json), checkpoint,
                          _digest(checkpoint)),
                     )
+                self._migrate(connection)
                 self._read(connection)
             # POSIX permissions supplement the protected runtime directory. Windows
             # ACLs remain the caller's responsibility; unsupported chmod is harmless.
@@ -133,6 +137,78 @@ class CollectorSpool:
                 pass
         except OSError as exc:
             raise SpoolUnavailable("collector spool unavailable") from exc
+
+    @staticmethod
+    def _migrate(connection):
+        columns = {row["name"] for row in connection.execute("PRAGMA table_info(collector_spool_metadata)")}
+        if "storage_version" in columns:
+            return  # Missing version-2 tables/rows are corruption, never reinitialized.
+        connection.execute("ALTER TABLE collector_spool_metadata "
+                           "ADD COLUMN storage_version INTEGER NOT NULL DEFAULT 1")
+        connection.execute(
+            "CREATE TABLE collector_spool_history (seq INTEGER PRIMARY KEY, "
+            "event_id TEXT NOT NULL UNIQUE,event_sha256 TEXT NOT NULL, "
+            "acknowledged_at TEXT NOT NULL,tombstone_digest TEXT NOT NULL)"
+        )
+        connection.execute(
+            "CREATE TABLE collector_spool_rotation (id INTEGER PRIMARY KEY CHECK(id=1), "
+            "rotation_json TEXT NOT NULL,rotation_digest TEXT NOT NULL)"
+        )
+        connection.execute(
+            "CREATE TABLE collector_spool_rotations (generation INTEGER PRIMARY KEY, "
+            "rotation_id TEXT NOT NULL UNIQUE,entry_json TEXT NOT NULL,entry_digest TEXT NOT NULL)"
+        )
+        serialized = _canonical({"generation": 0, "rotation_id": None})
+        connection.execute("INSERT INTO collector_spool_rotation VALUES (1,?,?)",
+                           (serialized, _digest(serialized)))
+        connection.execute("UPDATE collector_spool_metadata SET storage_version=2")
+
+    @staticmethod
+    def _input_checkpoint(value):
+        if (not isinstance(value, dict) or set(value) != {"offset", "prefix_sha256"}
+                or type(value["offset"]) is not int or value["offset"] < 0
+                or not isinstance(value["prefix_sha256"], str)
+                or not _HEX.fullmatch(value["prefix_sha256"])):
+            raise ValueError("collector input checkpoint invalid")
+        return value
+
+    def _rotation(self, connection):
+        rows = connection.execute("SELECT * FROM collector_spool_rotation").fetchall()
+        if len(rows) != 1 or rows[0]["id"] != 1:
+            raise ValueError("collector rotation metadata missing")
+        row = rows[0]
+        serialized = row["rotation_json"]
+        if (not isinstance(serialized, str)
+                or not hmac.compare_digest(_digest(serialized), row["rotation_digest"])
+                or _canonical(json.loads(serialized)) != serialized):
+            raise ValueError("collector rotation metadata integrity failed")
+        rotation = json.loads(serialized)
+        if (not isinstance(rotation, dict) or set(rotation) != {"generation", "rotation_id"}
+                or type(rotation["generation"]) is not int or rotation["generation"] < 0):
+            raise ValueError("collector rotation metadata invalid")
+        entries = connection.execute("SELECT * FROM collector_spool_rotations ORDER BY generation").fetchall()
+        if len(entries) != rotation["generation"]:
+            raise ValueError("collector rotation history changed")
+        last = None
+        for generation, entry in enumerate(entries, 1):
+            raw = entry["entry_json"]
+            if (entry["generation"] != generation or not isinstance(raw, str)
+                    or not hmac.compare_digest(_digest(raw), entry["entry_digest"])
+                    or _canonical(json.loads(raw)) != raw):
+                raise ValueError("collector rotation entry integrity failed")
+            value = json.loads(raw)
+            if (not isinstance(value, dict)
+                    or set(value) != {"generation", "rotation_id", "expected_checkpoint"}
+                    or type(value["generation"]) is not int or value["generation"] != generation
+                    or not isinstance(value["rotation_id"], str)
+                    or not _EVENT_ID.fullmatch(value["rotation_id"])
+                    or value["rotation_id"] != entry["rotation_id"]):
+                raise ValueError("collector rotation entry invalid")
+            self._input_checkpoint(value["expected_checkpoint"])
+            last = value["rotation_id"]
+        if rotation["rotation_id"] != last:
+            raise ValueError("collector rotation generation changed")
+        return rotation
 
     @contextmanager
     def _transaction(self):
@@ -169,11 +245,14 @@ class CollectorSpool:
             raise ValueError("signed envelope changes captured observation")
         return model.model_dump(mode="json")
 
-    def _read(self, connection) -> tuple[dict, list[dict]]:
+    def _read(self, connection) -> tuple[dict, list[dict], list[dict]]:
         metadata = connection.execute("SELECT * FROM collector_spool_metadata").fetchall()
         if len(metadata) != 1 or metadata[0]["id"] != 1:
             raise ValueError("collector metadata missing")
         meta = metadata[0]
+        if meta["storage_version"] != 2:
+            raise ValueError("collector storage version invalid")
+        self._rotation(connection)
         for field in ("binding", "checkpoint"):
             serialized = meta[field]
             if not isinstance(serialized, str) or not hmac.compare_digest(
@@ -193,12 +272,11 @@ class CollectorSpool:
         ):
             raise ValueError("collector checkpoint invalid")
         stored = connection.execute("SELECT * FROM collector_spool_records ORDER BY seq").fetchall()
-        if len(stored) != checkpoint["records"]:
-            raise ValueError("collector record count changed")
         records = []
-        for expected, row in enumerate(stored, 1):
+        sequences, identifiers = set(), set()
+        for row in stored:
             serialized = row["record_json"]
-            if row["seq"] != expected or not isinstance(serialized, str) or not hmac.compare_digest(
+            if type(row["seq"]) is not int or row["seq"] < 1 or not isinstance(serialized, str) or not hmac.compare_digest(
                 _digest(serialized), row["record_digest"]
             ) or _canonical(json.loads(serialized)) != serialized:
                 raise ValueError("collector record integrity failed")
@@ -233,7 +311,25 @@ class CollectorSpool:
             elif record["acknowledged_at"] is not None:
                 raise ValueError("pending collector acknowledgement invalid")
             records.append(record)
-        return checkpoint, records
+            sequences.add(row["seq"])
+            identifiers.add(row["event_id"])
+        history = []
+        for row in connection.execute("SELECT * FROM collector_spool_history ORDER BY seq"):
+            entry = {field: row[field] for field in ("seq", "event_id", "event_sha256", "acknowledged_at")}
+            if (type(entry["seq"]) is not int or entry["seq"] < 1 or entry["seq"] in sequences
+                    or not isinstance(entry["event_id"], str) or not _EVENT_ID.fullmatch(entry["event_id"])
+                    or entry["event_id"] in identifiers or not isinstance(entry["event_sha256"], str)
+                    or not _HEX.fullmatch(entry["event_sha256"])
+                    or not hmac.compare_digest(_digest(_canonical(entry)), row["tombstone_digest"])):
+                raise ValueError("collector duplicate history integrity failed")
+            _stored_time(entry["acknowledged_at"])
+            history.append(entry)
+            sequences.add(entry["seq"])
+            identifiers.add(entry["event_id"])
+        if (len(sequences) != checkpoint["records"] or len(identifiers) != len(sequences)
+                or any(seq != expected for expected, seq in enumerate(sorted(sequences), 1))):
+            raise ValueError("collector record history changed")
+        return checkpoint, records, history
 
     @staticmethod
     def _find(records, event_id):
@@ -252,7 +348,7 @@ class CollectorSpool:
 
     def checkpoint(self) -> dict:
         with self._transaction() as connection:
-            checkpoint, _ = self._read(connection)
+            checkpoint, _, _ = self._read(connection)
             result = {field: checkpoint[field] for field in ("offset", "prefix_sha256")}
         return result
 
@@ -266,18 +362,20 @@ class CollectorSpool:
         except (ValueError, TypeError) as exc:
             raise SpoolConflict("collector input rejected") from exc
         with self._transaction() as connection:
-            checkpoint, records = self._read(connection)
+            checkpoint, records, history = self._read(connection)
             previous = next((record for record in records
                              if record["event"]["event_id"] == event["event_id"]), None)
-            if previous is not None and previous["event"] != event:
+            compacted = next((entry for entry in history if entry["event_id"] == event["event_id"]), None)
+            if ((previous is not None and previous["event"] != event)
+                    or (compacted is not None and compacted["event_sha256"] != _digest(_canonical(event)))):
                 raise SpoolConflict("collector event identifier reused with different input")
             if offset < checkpoint["offset"] or (
                 offset == checkpoint["offset"] and (
-                    previous is None or prefix_sha256 != checkpoint["prefix_sha256"]
+                    (previous is None and compacted is None) or prefix_sha256 != checkpoint["prefix_sha256"]
                 )
             ):
                 raise SpoolConflict("collector input checkpoint moved backwards or changed")
-            created = previous is None
+            created = previous is None and compacted is None
             if created:
                 if len(records) >= self.max_records or sum(
                     record["state"] == "pending" for record in records
@@ -287,9 +385,9 @@ class CollectorSpool:
                           "next_retry_at": None, "last_error": None, "acknowledged_at": None}
                 serialized = _canonical(record)
                 connection.execute("INSERT INTO collector_spool_records VALUES (?,?,?,?)",
-                                   (len(records) + 1, event["event_id"], serialized, _digest(serialized)))
+                                   (checkpoint["records"] + 1, event["event_id"], serialized, _digest(serialized)))
             checkpoint = _canonical({"offset": offset, "prefix_sha256": prefix_sha256,
-                                     "records": len(records) + int(created)})
+                                     "records": checkpoint["records"] + int(created)})
             connection.execute(
                 "UPDATE collector_spool_metadata SET checkpoint=?,checkpoint_digest=? WHERE id=1",
                 (checkpoint, _digest(checkpoint)),
@@ -300,7 +398,7 @@ class CollectorSpool:
         timestamp = _time(now)
         result = None
         with self._transaction() as connection:
-            _, records = self._read(connection)
+            _, records, _ = self._read(connection)
             for record in records:
                 if record["state"] != "pending":
                     continue
@@ -313,7 +411,7 @@ class CollectorSpool:
 
     def stage(self, event_id: str, envelope: dict) -> None:
         with self._transaction() as connection:
-            _, records = self._read(connection)
+            _, records, _ = self._read(connection)
             record = self._find(records, event_id)
             try:
                 envelope = self._envelope(envelope, record["event"])
@@ -337,7 +435,7 @@ class CollectorSpool:
             raise SpoolConflict("collector retry delay invalid")
         due = _time(now + timedelta(seconds=delay_seconds))
         with self._transaction() as connection:
-            _, records = self._read(connection)
+            _, records, _ = self._read(connection)
             record = self._find(records, event_id)
             if record["state"] != "pending":
                 raise SpoolConflict("acknowledged collector event is immutable")
@@ -347,7 +445,9 @@ class CollectorSpool:
     def acknowledge(self, event_id: str, *, now: datetime) -> None:
         timestamp = _time(now)
         with self._transaction() as connection:
-            _, records = self._read(connection)
+            _, records, history = self._read(connection)
+            if any(entry["event_id"] == event_id for entry in history):
+                return
             record = self._find(records, event_id)
             if record["state"] == "acknowledged":
                 return
@@ -359,10 +459,85 @@ class CollectorSpool:
 
     def summary(self) -> dict:
         with self._transaction() as connection:
-            checkpoint, records = self._read(connection)
-            acknowledged = sum(record["state"] == "acknowledged" for record in records)
+            checkpoint, records, history = self._read(connection)
+            acknowledged = len(history) + sum(record["state"] == "acknowledged" for record in records)
             errors = [record["last_error"] for record in records if record["last_error"]]
-            result = {"captured": len(records), "acknowledged": acknowledged,
-                      "pending": len(records) - acknowledged, "offset": checkpoint["offset"],
+            result = {"captured": checkpoint["records"], "acknowledged": acknowledged,
+                      "pending": checkpoint["records"] - acknowledged, "offset": checkpoint["offset"],
                       "last_error": errors[-1] if errors else None}
         return result
+
+    def compact(self, *, limit=256) -> int:
+        """Atomically replace confirmed payloads with immutable duplicate history."""
+        if type(limit) is not int or limit < 1:
+            raise SpoolConflict("collector compaction limit invalid")
+        with self._transaction() as connection:
+            _, records, history = self._read(connection)
+            eligible = [record for record in records if record["state"] == "acknowledged"]
+            if not eligible:
+                return 0
+            available = self.max_history - len(history)
+            if available <= 0:
+                raise SpoolFull("collector duplicate history capacity reached")
+            selected = eligible[:min(limit, available)]
+            for record in selected:
+                event_id = record["event"]["event_id"]
+                seq = connection.execute("SELECT seq FROM collector_spool_records WHERE event_id=?",
+                                         (event_id,)).fetchone()[0]
+                entry = {"seq": seq, "event_id": event_id,
+                         "event_sha256": _digest(_canonical(record["event"])),
+                         "acknowledged_at": record["acknowledged_at"]}
+                connection.execute("INSERT INTO collector_spool_history VALUES (?,?,?,?,?)",
+                                   (seq, event_id, entry["event_sha256"], entry["acknowledged_at"],
+                                    _digest(_canonical(entry))))
+                connection.execute("DELETE FROM collector_spool_records WHERE event_id=?", (event_id,))
+            self._read(connection)
+            return len(selected)
+
+    def storage_summary(self) -> dict:
+        with self._transaction() as connection:
+            _, records, history = self._read(connection)
+            return {"retained": len(records), "compacted": len(history),
+                    "max_records": self.max_records, "max_history": self.max_history,
+                    "max_rotations": self.max_rotations}
+
+    def rotation_checkpoint(self) -> dict:
+        with self._transaction() as connection:
+            self._read(connection)
+            return self._rotation(connection)
+
+    def rotate_input(self, expected_checkpoint: dict, rotation_id: str) -> None:
+        try:
+            self._input_checkpoint(expected_checkpoint)
+            expected_checkpoint = json.loads(_canonical(expected_checkpoint))
+            if not isinstance(rotation_id, str) or not _EVENT_ID.fullmatch(rotation_id):
+                raise ValueError("collector rotation identifier invalid")
+        except (ValueError, TypeError) as exc:
+            raise SpoolConflict("collector input rotation rejected") from exc
+        with self._transaction() as connection:
+            checkpoint, _, _ = self._read(connection)
+            rotation = self._rotation(connection)
+            previous = connection.execute("SELECT entry_json FROM collector_spool_rotations WHERE rotation_id=?",
+                                          (rotation_id,)).fetchone()
+            if previous is not None:
+                entry = json.loads(previous[0])
+                if (rotation["rotation_id"] != rotation_id
+                        or entry["expected_checkpoint"] != expected_checkpoint):
+                    raise SpoolConflict("collector rotation identifier reused")
+                return  # A repeated completion must not rewind a newly captured feed.
+            if {field: checkpoint[field] for field in ("offset", "prefix_sha256")} != expected_checkpoint:
+                raise SpoolConflict("collector input changed before rotation")
+            if rotation["generation"] >= self.max_rotations:
+                raise SpoolFull("collector input rotation history capacity reached")
+            generation = rotation["generation"] + 1
+            entry = _canonical({"generation": generation, "rotation_id": rotation_id,
+                                "expected_checkpoint": expected_checkpoint})
+            connection.execute("INSERT INTO collector_spool_rotations VALUES (?,?,?,?)",
+                               (generation, rotation_id, entry, _digest(entry)))
+            serialized = _canonical({"generation": generation, "rotation_id": rotation_id})
+            connection.execute("UPDATE collector_spool_rotation SET rotation_json=?,rotation_digest=? WHERE id=1",
+                               (serialized, _digest(serialized)))
+            reset = _canonical(checkpoint | {"offset": 0, "prefix_sha256": _digest("")})
+            connection.execute("UPDATE collector_spool_metadata SET checkpoint=?,checkpoint_digest=? WHERE id=1",
+                               (reset, _digest(reset)))
+            self._read(connection)
