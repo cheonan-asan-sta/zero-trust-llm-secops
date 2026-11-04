@@ -1,5 +1,12 @@
 # zero-trust-llm-secops
 
+## 로컬 관측의 지속 수집
+
+로컬 JSONL의 새 관측을 별도 프로세스가 계속 읽고 SQLite 커서·서명 봉투·접수 확인 상태를 보존합니다.
+identity/device 권한을 나누어 기존 M3 수신 API로 전달하며, 재시작·응답 유실에는 저장한 입력을 재전송합니다.
+수집기의 202 접수 확인과 서버 worker의 정책 완료는 구분합니다.
+[초기화·공개키 등록·실행·상태 조회와 제한](docs/continuous-signal-collector.md)을 따릅니다.
+
 ## 2026년 11월 4일 후속 관리 호스트·전환 기록 이중화
 
 [관리 실행 호스트 이중화](docs/executor-host-high-availability.md)는 신뢰된 실행기 두 개와 별도
