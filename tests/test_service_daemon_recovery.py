@@ -2,6 +2,7 @@
 
 import copy
 import json
+from types import SimpleNamespace
 
 import pytest
 from test_executor_transition import original
@@ -11,6 +12,7 @@ from scripts import service_daemon_recovery as recovery
 from scripts.certificate_controller import LifecycleError
 from scripts.executor_cluster import Cluster
 from scripts.service_recovery_store import read_record, write_record
+from scripts.test_service_daemon_restart import ServiceLab
 
 
 def found(index=1,running=False):
@@ -82,6 +84,22 @@ def test_custom_network_replacement_still_refuses_even_when_name_and_aliases_mat
     item=found();item['HostConfig']['NetworkMode']='n';expected=recovery.pin(item,'gateway')
     item['NetworkSettings']['Networks']['n']['NetworkID']='replacement-network'
     with pytest.raises(LifecycleError):recovery.check_pin(item,expected)
+
+
+def test_inherited_dns_null_and_empty_survive_reload_but_explicit_resolver_change_refuses():
+    item=found();item['HostConfig']['Dns']=None;expected=recovery.pin(item,'worker')
+    item['HostConfig']['Dns']=[];recovery.check_pin(item,expected)
+    item['HostConfig']['Dns']=['192.0.2.53']
+    with pytest.raises(LifecycleError):recovery.check_pin(item,expected)
+
+
+def test_fixture_does_not_accept_expected_code_appearing_only_in_traceback_source(tmp_path,monkeypatch):
+    lab=ServiceLab.__new__(ServiceLab);lab.directory=tmp_path
+    result=SimpleNamespace(returncode=1,stderr="raise LifecycleError('services_recovery_result_unknown')\nLifecycleError: services_object_replaced\n")
+    from scripts import test_service_daemon_restart as fixture
+    monkeypatch.setattr(fixture.subprocess,'run',lambda *args,**kwargs:result)
+    with pytest.raises(fixture.flow.CheckFailed,match='wrong_cut'):
+        lab.recover_services(expected='services_recovery_result_unknown')
 
 
 @pytest.mark.parametrize('fault',['phase','cycle','actor','history','frozen','receipt','extra'])

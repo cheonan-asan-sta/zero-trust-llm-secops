@@ -6,6 +6,7 @@ import copy
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -90,9 +91,18 @@ print(json.dumps({'differences':[{'path':k,'a_sha256':values['a'].get(k),'b_sha2
     def recover_services(self,*,expected=None,cuts=True):
         result=subprocess.run([sys.executable,'-m','scripts.test_service_daemon_restart','recover',
             '--seal',str(self.directory/'services-seal.json'),*(['--no-cuts'] if not cuts else [])],capture_output=True,text=True,encoding='utf-8',errors='replace',timeout=940,check=False)
-        if result.returncode:(self.directory/'service-console-failure.private.log').write_text(result.stderr,encoding='utf-8')
+        if result.returncode:
+            (self.directory/'service-console-failure.private.log').write_text(result.stderr,encoding='utf-8')
+            if hasattr(self,'ident'):
+                log=subprocess.run(['docker','logs',self.ident+'-services-recovery'],capture_output=True,text=True,encoding='utf-8',errors='replace',timeout=20,check=False)
+                (self.directory/'service-actor-failure.private.log').write_text(log.stdout+log.stderr,encoding='utf-8')
         if expected:
-            flow.require(result.returncode!=0 and expected in result.stderr,'service_fixture_wrong_cut');return None
+            codes=re.findall(r'LifecycleError: ([a-z0-9_]+)\s*$',result.stderr,re.MULTILINE)
+            flow.require(result.returncode!=0 and codes and codes[-1]==expected,'service_fixture_wrong_cut')
+            if expected=='services_recovery_result_unknown':
+                found=recovery.inspect(self.executors,self.ident+'-services-recovery')
+                flow.require(found['State']['ExitCode']==73,'service_fixture_wrong_actor_exit')
+            return None
         if result.returncode:
             raise LifecycleError('service_fixture_recovery_failed')
         return json.loads(result.stdout)

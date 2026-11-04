@@ -32,10 +32,14 @@ CUTS={'after_hosts','after_leaf'}
 
 def spec(found):
     cfg=copy.deepcopy(found['Config']);cfg['Env']=op.digest(cfg.get('Env') or [])
+    host=copy.deepcopy(found['HostConfig'])
+    # Docker reloads an inherited DNS setting from null to []. Both mean no
+    # explicit resolver; configured resolver addresses must still match exactly.
+    if host.get('Dns') is None:host['Dns']=[]
     networks={n:{'NetworkID':None if n=='bridge' and found['HostConfig'].get('NetworkMode') in {'default','bridge'} else v.get('NetworkID'),
         'Aliases':sorted(v.get('Aliases') or []),'IPAMConfig':v.get('IPAMConfig')} for n,v in found['NetworkSettings']['Networks'].items()}
     return op.digest({'id':found['Id'],'name':found['Name'],'image':found['Image'],'config':cfg,
-        'host':found['HostConfig'],'mounts':found['Mounts'],'networks':networks})
+        'host':host,'mounts':found['Mounts'],'networks':networks})
 
 
 def pin(found,role):return {'id':found['Id'],'name':found['Name'][1:],'image':found['Image'],'spec':spec(found),'role':role}
