@@ -4,7 +4,7 @@ import argparse
 import json
 import subprocess
 import time
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from scripts.continuous_mtls_assets import DEVICES, OTHER
@@ -93,10 +93,23 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
 
     def append(self, event_id, *, active=False, other=False):
         payload = {"event_id": event_id, "active": active,
-                   "authentication_result": "success" if active else "failure"}
+                   "authentication_result": "success" if active else "failure",
+                   "observed_at": (datetime.now(UTC) - timedelta(seconds=1)).isoformat()}
         if other:
             payload["subject"] = OTHER
-        self.runtime.execute("collector", ["python", "-m", "scripts.continuous_mtls_assets", "append"], json.dumps(payload))
+        self.append_record(payload)
+
+    def append_record(self, payload):
+        # A busy input lock is expected backpressure. Preserve the entire source
+        # event even if the helper committed its append before losing its reply.
+        wire = json.dumps(payload)
+
+        def accepted():
+            result = json.loads(self.runtime.execute("collector",
+                ["python", "-m", "scripts.continuous_mtls_assets", "append"], wire))
+            return isinstance(result, dict) and result.get("appended") is True
+
+        self.wait(accepted, "managed_input_append_not_confirmed")
 
     def receipt(self, event_id):
         return self.runtime.probe({"profile": "core", "path": "/zero-trust/signals/inbox/" + event_id})
@@ -184,16 +197,15 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
         self.access(unrelated, True, "unrelated_subject_still_receives_document")
 
         # Repeat the exact input line: no new event ID and no second policy effect.
-        duplicate = "from pathlib import Path;import os;p=Path('/collector/producer/input.jsonl');line=p.read_bytes().splitlines(keepends=True)[0];f=p.open('ab');f.write(line);f.flush();os.fsync(f.fileno());f.close()"
-        runtime.execute("collector", ["python", "-c", duplicate])
+        first_event = runtime.execute("collector", ["python", "-c",
+            "from pathlib import Path;print(Path('/collector/producer/input.jsonl').read_text().splitlines()[0])"])
+        self.append_record(json.loads(first_event))
         self.wait(lambda: self.collector()["offset"] == 2 * first["offset"], "duplicate_input_captured")
         self.require(self.collector()["captured"] == 1 and len(self.history(affected[0])) == 2, "duplicate_policy_effect")
         self.add("duplicate_feed_preserves_one_receipt_and_policy_effect")
 
         # Compact a confirmed receipt while a second exact signed transmission
         # is pending during an API outage, then rotate its fully captured feed.
-        first_event = runtime.execute("collector", ["python", "-c",
-            "from pathlib import Path;print(Path('/collector/producer/input.jsonl').read_text().splitlines()[0])"])
         command(["docker", "stop", "--time", "2", app_id])
         self.append("runtime-maintenance-pending", active=True, other=True)
         self.wait(lambda: (s := self.collector())["captured"] == 2 and s["pending"] == 1
@@ -218,7 +230,7 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
                      "maintenance_changed_persisted_envelope")
         self.add("pending_exact_envelope_recovers_over_mtls_after_maintenance",
                  original_envelope_sha256=pending_digest, acknowledged=2)
-        runtime.execute("collector", ["python", "-m", "scripts.continuous_mtls_assets", "append"], first_event)
+        self.append_record(json.loads(first_event))
         self.wait(lambda: self.collector()["offset"] > 0, "compacted_duplicate_not_read")
         self.require(self.collector()["captured"] == 2 and self.collector()["acknowledged"] == 2
                      and len(self.history(affected[0])) == 2, "compacted_duplicate_reapplied")
