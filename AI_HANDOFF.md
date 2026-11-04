@@ -1,5 +1,28 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 4일 후속 전환 실행기 컨테이너 유실 복구
+
+- 기준 `aitest` `5d957aa`(PR #18), 작업 브랜치 `feature/chaeheeju-actor-container-recovery`.
+  [명시적 복구·재현·한계](docs/actor-container-recovery.md)를 먼저 읽는다.
+- `recover-takeover`만 유실한 미완료 actor의 대체를 허용한다. 모든 이전 ID의 Docker 전체 부재,
+  양 공개 기록/owner/이미지/예약 객체/원본 지문을 생성 전과 생존 flock 안에서 다시 확인한다.
+- `executor-transition-2`의 `actor.predecessors`(최대16)와 checkpoint-bound 복구 표식으로 식별자만 이전한다.
+  같은 작업 ID/epoch/계획을 이어가며 완료 시 actor를 다시 만들거나 보안 상태를 되복제하지 않는다.
+- `resume-takeover`는 같은 고정 컨테이너 재개다. 일반 사본 불일치/불확실한 식별자 이전은 조사 대상으로
+  거부한다. Docker 관리자 신뢰·생존 볼륨/이미지·같은 물리 PC 조건, 팀원 독립 검토 미완료를 유지한다.
+- 새 단위/실제 삭제 실험과 기존 CA/DB/관리 상태 회귀 결과는 위 문서·공개 JSON에 기록한다.
+  AWS/유료 LLM 호출·탐지 기준 변경·개인 ZIP/기존 Docker 변경 없이 로컬에서 실행한다.
+- 동료 상시 mTLS PR #19 `72afde1`을 `9716a08`로 보존 결합했다. Windows 경로 기대값 3곳만
+  `Path` 표현으로 호환 수정했고 앱 변경은 없다. 최종 회귀 Windows1354+2skip/Linux1356·Ruff 통과다.
+  앞선 결합 실패(경로2·기존 HTTP1)와 변경 없는 HTTP 단독 재통과는 별도로 기록한다.
+- 최종 `actor-loss-final1` project `c02-9a91d2c2613e`: 유실26+실행기15+관리제거2=43 통과.
+  actor 실제 삭제16/미완료 대체14·관리 종료2·새 콘솔26, 같은 작업/epoch/예약 ID·Root1·이전JWK132거부·
+  완료 뒤 새 토큰 소비 보존. 옛 실행 볼륨4/관리18 제거, 최종 실행/관리 epoch3·A활성·양세대2다.
+- [공개 원자료](docs/infrastructure-results/c04-actor-container-loss-windows-20261104.json)에 113입력/양이미지93씩·
+  외부20, 결합126입력/단위이미지125, 사전/실패/최종 구분과 3소유범위 잔여0·기존 Docker/ZIP 보존을 남겼다.
+  tested source는 `97bc043`이며 이후 문서/결과 저장과 Git raw/LF 지문 검증을 구분한다.
+  C04 graph 실험을 동료 9서비스 상시 프로필의 자동 갱신 통합 완료로 확대하지 않는다.
+
 ## 2026년 11월 4일 후속 호스트 전환 실행기 중단 복구
 
 - PR #15는 `aitest` `ee8067b`에 병합됐고 병합 후 CI도 통과했다. 후속 브랜치는

@@ -299,12 +299,13 @@ class Remote:
 
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('operation',choices=['status','takeover','recover','journal','resume','tick','resume-takeover'])
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('operation',choices=['status','takeover','recover','journal','resume','tick','resume-takeover','recover-takeover'])
     p.add_argument('--descriptor',type=Path);p.add_argument('--anchor',type=Path);p.add_argument('--site',choices=['a','b'])
     p.add_argument('--journal');p.add_argument('--owner');args=p.parse_args()
-    if args.operation=='resume-takeover':
-        from scripts.executor_transition import resume_operator
-        value=resume_operator(json.loads(args.anchor.read_bytes()),args.site,args.journal,args.owner)
+    if args.operation in {'resume-takeover','recover-takeover'}:
+        from scripts.executor_transition import recover_operator, resume_operator
+        method=recover_operator if args.operation=='recover-takeover' else resume_operator
+        value=method(json.loads(args.anchor.read_bytes()),args.site,args.journal,args.owner)
         cluster=Cluster(value['descriptor']);result=value['receipt']
     elif args.operation=='recover':
         cluster=Cluster.recover(json.loads(args.anchor.read_bytes()),args.site,args.journal,args.owner)

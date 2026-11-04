@@ -1,5 +1,9 @@
 # 기술 비교와 선정 실행 계획
 
+11/4 C04 후속: [실행기 컨테이너 유실 복구](actor-container-recovery.md)는 기존 Docker의
+고정 이름/ID와 생존 볼륨 flock·peer-first 기록을 재사용한다. 명시적 대체와 거부 증거를 비교/기록하며
+새 분산 선출 제품을 채택했다거나 제품 간 우열을 검증했다고 해석하지 않는다. 물리 분리는 별도 검증이다.
+
 11/4 후속 C04/I4·I6: [관리 호스트 전환 실행기 재개](executor-transition-recovery.md)는 고정 Docker
 actor·기존 Linux flock·공개 파일 journal을 재사용한다. 종료/새 콘솔 재개·부분 사본/owner·완료 후 보안
 상태를 검증하며 자동 선출/분산 저장 제품 비교나 물리 HA 채택 완료로 처리하지 않는다.

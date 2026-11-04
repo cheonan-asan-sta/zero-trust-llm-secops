@@ -1,0 +1,2776 @@
+{
+  "schema": "executor-actor-container-loss-public-1",
+  "generated_at": "2026-11-04T13:25:01.458424+00:00",
+  "starting_baseline_commit": "5d957aa47bd4140072253975afd74af7d0fa0513",
+  "starting_baseline_pr": 18,
+  "integration_base_commit": "72afde16e77d76fd28634d862b302f7b031396ff",
+  "teammate_pr_preserved": 19,
+  "feature_merge_commit": "9716a08",
+  "tested_source_commit": "97bc043daeeab8cc28a67d99c42651f49d58f3bf",
+  "source_provenance": "Raw SHA256 identify tested feature bytes; LF-normalized hashes identify Git blobs. New CA campaign ran after preserving teammate PR19. No own app changes relative to that baseline.",
+  "scope": {
+    "hosts": "two trusted Docker-admin maintenance containers; independent rootfs, journal and owner volumes on one PC",
+    "availability": "Explicit resume of the same stopped actor or checkpoint-bound replacement of a missing actor; survivor-volume flock; no automatic election, physical-host or power-loss guarantee.",
+    "online_services": "no Docker socket or offline root/backup-key mounts; executor socket is root-equivalent trusted maintenance access",
+    "actor_recovery": "Explicit recover-takeover; all current/predecessor IDs absent; paired checkpoints/current owners/pinned objects; identity transfer under survivor flock. No new epoch per replacement.",
+    "limits": "Same PC/kernel/parent Docker and surviving journal/images. No quorum/automatic election/power-loss or arbitrary replica-conflict recovery guarantee.",
+    "application": "No app/detection/policy/evaluation changes; no AWS, paid LLM, real accounts or OS trust changes.",
+    "management": "Existing two nine-volume management cells and independent CA/PG DinD replication reused. Completed recovery never restores old security snapshots."
+  },
+  "started_at": "2026-11-04T12:57:37.090024+00:00",
+  "finished_at": "2026-11-04T13:23:56.364458+00:00",
+  "summary": {
+    "successful_fresh_ca_trials": 1,
+    "actor_loss_checks": 26,
+    "executor_checks": 15,
+    "management_retirement_checks": 2,
+    "preflight_base_checks": 8,
+    "preflight_actor_loss_checks": 12,
+    "new_unit_cases": 34,
+    "actor_containers_actually_removed": 16,
+    "incomplete_actor_replacements": 14,
+    "management_process_exits_73": 2,
+    "preflight_actor_containers_removed": 8,
+    "fresh_console_invocations_full_run_including_expected_refusals": 26,
+    "executor_handovers": 2,
+    "management_handovers": 2,
+    "old_executor_volumes_removed": 4,
+    "old_management_volumes_removed": 18,
+    "old_jwk_denials": 132,
+    "source_input_files": 113
+  },
+  "unit_runs": {
+    "windows": {
+      "passed": 1354,
+      "skipped": 2,
+      "warnings": 3,
+      "seconds": 232.99,
+      "ruff": "passed"
+    },
+    "linux_docker": {
+      "passed": 1356,
+      "skipped": 0,
+      "warnings": 2,
+      "seconds": 139.68,
+      "ruff": "passed"
+    }
+  },
+  "earlier_windows_before_pr19": {
+    "passed": 1309,
+    "skipped": 2,
+    "warnings": 3,
+    "seconds": 228.82,
+    "scope": "Starting baseline plus actor recovery, before PR19 integration; not added to final totals."
+  },
+  "preliminary_combined_windows": {
+    "failed": 3,
+    "passed": 1351,
+    "skipped": 2,
+    "warnings": 3,
+    "seconds": 221.21,
+    "failures": [
+      "two new mTLS wrapper tests compared host Path strings to literal Linux separators on Windows",
+      "existing metrics HTTP test encountered WinError10053; unchanged isolated rerun passed (1 test,1.21s)"
+    ],
+    "resolution": "Test-only expected paths use str(Path(...)); Linux expected values unchanged. No exporter timeout or production behavior modified. Final full rerun recorded separately."
+  },
+  "source_input_sha256": {
+    "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+    "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+    "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+    "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+    "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+    "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+    "app/config.py": "27abe1679ef3147f9eb28920299c68dbf93932e05bda6035a64d7b0ac1d2fcb2",
+    "app/continuous_signal_models.py": "895b017d7c666923639088281f71ef64386977e381c5b8060c3123d174be34ae",
+    "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+    "app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+    "app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+    "app/data/control-register.json": "a8884d1269874e18a6b5261940d9e498c8509c51d0f134ea252e6b04a327c201",
+    "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+    "app/data/replay/manifest.json": "bc974726efe7f2b98119af04b9b624ba4b18a4588b2d5ff8a4c441d4beb232e9",
+    "app/data/replay/microsoft-sentinel-wiz-audit.json": "4bc25e2e6ae2cb4b80d2d135fb401d073e2c66e2d183dd5cabb574cde27ebc3b",
+    "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+    "app/data/sigma/credential_anomaly.yml": "27ee3ff5ce6eb25bdffeb5d25a59998b21c799fcff48768204be57f2974b4086",
+    "app/data/sigma/data_exfiltration.yml": "e378a7df56ac30a3c5568d42e86be53bfd43ce88489ae500c84d16e8ee8466e7",
+    "app/data/sigma/lateral_movement.yml": "cd13987a9a7ae36d57f718a2b9a87cb0fb224e5a78380311dec8edcd78dfe0c8",
+    "app/data/sigma/privilege_escalation.yml": "337b23a4ba5bed1081828f30d771f777628d8bdd88ee1298a776e7f3f21eb880",
+    "app/data/sigma/remote_desktop_logon.yml": "35a4a4fbe7ae16484a16a4287e6287239697648018be40dd4e9c33e04b0c61ee",
+    "app/data/sigma/unmanaged_device_access.yml": "b0c3ef8498458e9d687c32ca554147de44db7cdf84857eacf4224050b8122004",
+    "app/data/zero-trust-policies.json": "ab3acc5b14ba5a4af640240cc781d1ea63523a096d7e5c2dfd3d912dc468d0f9",
+    "app/main.py": "c04fb9ff8011a463994a95eed78d577512434500d2e89d0ce424161b9e2fce34",
+    "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+    "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+    "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+    "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+    "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+    "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+    "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+    "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+    "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+    "app/services/collector_spool.py": "347d80f8044fecc9e43ce48045d712237d49245a8fe47de15482db8574ab2a08",
+    "app/services/continuous_signals.py": "05115d837dc2c00b56aafbe8833b047c0cd9fb1854fff20ba7db03db261ca2a3",
+    "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+    "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+    "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+    "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+    "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+    "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+    "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+    "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+    "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+    "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+    "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+    "app/services/signal_inbox.py": "03b2d65ded032c5dd3c55434fa538afdc5604e72f54ddce2581e146cf05378b8",
+    "app/services/trusted_signals.py": "076ac930894e32522813ff39e1c6f317bcd2a6746605f670dde8f807d59492ff",
+    "app/services/zero_trust.py": "19270efe1dca2c273e41f8c35eaf22cf73dfa2b8022aea00a0189762d7a8003b",
+    "app/zero_trust_api.py": "556fda2b67c9a20077b65c5f03c121e5deffd4a48d9f651ff1b7409f26b1b491",
+    "app/zero_trust_models.py": "1c466b491a923a23ce618e776660193c9bae4bef8a5026e39d8ac310a4ae7992",
+    "Dockerfile": "2278c841e2f77eda77f5ed282abd5f35ddf50f2e3dd2e890c36967804f4db219",
+    "pyproject.toml": "b8bd572be04ec1a6f8bf818645b6ac74458f98fc9561ea453210ab6c23e5475e",
+    "scripts/pep_lab.py": "b199f1fd9df18e75e564182036e8ef208872bc65f6efd489f058840541263fe8",
+    "scripts/compare_pep.py": "e2ef12beb7950a263d6384869fc3e33326c6901f9692e91f77ee16f6775fb9b4",
+    "infra/pep/contract.json": "c9aa86653aa173db206f446a09878e7facad3abf0905d85f25d013b70a59d0b5",
+    "infra/pep/envoy.yaml": "460fff298ab3e5554d8f2f7b102b8c315e57cb81fb1dd1ecb5f1ff3fec6e164a",
+    "infra/pep/nginx.conf": "654470eda569a812501345415dac2ba7da4128c480eaae71691cd50c47afdf65",
+    "infra/pep/tools.lock.json": "9076cc79d486366d5814014024df6f38ffef7862bbaf008261c39f7249b447e6",
+    "scripts/mtls_transport.py": "5e71999d5eb87354bd1beaf79b62fad5169d7584106deebf60ed3ee53c9b1a56",
+    "scripts/mtls_fixtures.py": "086155d77391fc36973dfb49442c0609ac0192760a1944774d68cbcbfad665b9",
+    "scripts/test_mtls_infrastructure.py": "3724f4c98f0baee127c58d4f961f048d8be97dde9d409ee7137f996845c6b72b",
+    "infra/mtls/contract.json": "d09f81a030ce30a4ab15e24097b5b78e95d3471f76fb7593afa39f13a9e8e55b",
+    "scripts/mtls_native.py": "e892293b44d86feca35b6e408b21ffc28c684893533632c7fc5c15a72c678e17",
+    "scripts/test_all_hops_mtls.py": "0e7c44dc5fb4ab1809e4a0a5e377338132991b719061fa4fe97cd47b4e61ce09",
+    "scripts/signal_metrics_exporter.py": "6a0cc98797b1fc53f2a40af019c608996fe734809ebd936e1985bd152ae5ba41",
+    "scripts/local_signal_collector.py": "a3ce655c10963a183f46413dc71bdaa3f56c7c85da91abe756a7e6e034cfbb39",
+    "scripts/observability_lab.py": "596bf05a9d8d2ffe268e0d61142d9d4d6f5b9fff64012497aa6b542f9eacfcc3",
+    "infra/mtls/all-hops-nginx.conf": "858533d28040a4d83c6bd58ede75e3efac0f8597f3e2992dfa79976527ad2e0e",
+    "infra/mtls/all-hops-contract.json": "e2c47e8a6594298dafbad183cdf9f75ab4814c5a405a3cf10ab996c7835631fe",
+    "infra/observability/alerts.yaml": "3b2e233f36d0338ecf572c384961729a951d51e8a2ab1f9264bb4e7cdff95172",
+    "infra/observability/tools.lock.json": "3d4b387c15a2dadd6bd7c4d3e84af436b9072b80ec32083346d40d27a4b8f014",
+    "scripts/certificate_authority.py": "1b3e0d501e74d9bc47442e15b1d2f4201bf4a6fd6d48644d93a70c6592c54f9c",
+    "scripts/certificate_controller.py": "fe5d5058b8edbf3632e6d060c4ad2074d6ea8fd72767524db18da1ea9d70ec32",
+    "scripts/certificate_reload_runner.py": "bbdafeaa210b747c007f666ec4f1beb12ee2b9afe49556fffc7c303751f0a6c9",
+    "scripts/test_certificate_automation.py": "37740d5b589cadbaedc3d530ea8318d5ff4f3a44a07f17f0cd320d1418e6b773",
+    "infra/mtls/ca-tools.lock.json": "dde8c06b2764b93b3767df4a38064586c27f78a62697084671cea62816028122",
+    "infra/mtls/certificate-lifecycle-contract.json": "df5c727f4a167dc3135636daf96a9f7fad1b24f3c7fa001257b5a1badd91e503",
+    "infra/mtls/nginx-renewal.sh": "07468723f53706ef477f19725dcdf2fed53f51ea41eb277c317f828fc5f9505c",
+    ".gitattributes": "e576cf8cd5811efcee1b36531868f155bef136dbe0e20f7d5b0039b3a36405a5",
+    "scripts/certificate_key_rotation.py": "e648f07caf6d2a7873fb14d91cfd5285f5aec67e1aa086e436e1e5ca9284d319",
+    "scripts/test_private_key_rotation.py": "b8fd85194759dff83f7991f2069ebefe1025b853a53ce48b8f846b4c194a788c",
+    "infra/mtls/nginx-rekey.sh": "a57af3bdd39b62a8961ead51392be8155d246dcc5878638920285f07c406c814",
+    "infra/mtls/private-key-rotation-contract.json": "2832f6dd92ef36aaa49af5e96cbb984b3969783cca37c3152d77f137bd5e5cff",
+    "scripts/authority_custodian.py": "b87fc7ef0be26ecb259510e8df07eae402dae9608b1a2e5bfa3e03b23c6f4693",
+    "scripts/authority_rotation_runtime.py": "e184e49c386ed46d4f3e9214cec95e97a7f56e4e0608711119f2c61b6b76ca26",
+    "scripts/authority_rotation_coordinator.py": "1ab99ef7f9a96c75393209c169d41f82db0a783c4f24bde7df622a7c9c84647b",
+    "scripts/test_authority_key_rotation.py": "2e7c4dbd442e02421ec8f61d7f2346d8e79fec549601f4e2741ab1721f2dad0c",
+    "infra/mtls/authority-rotation-contract.json": "e344b3be34aca530d47ec30b07c8df8fd5dacabb2febccb91fc7138c7fb489cb",
+    "scripts/ca_endpoints.py": "b5c546ce93d86ea90e99de46f78e80e60149f8146605e27160ceb24a9babd057",
+    "scripts/test_ca_high_availability.py": "284c3785291117d71ffa78dd0be6147e6e8e58fb16a63a697d8c519b6b91e4b2",
+    "infra/mtls/ca-ha-tools.lock.json": "30c9e3b2f850c4d8a8bc6d89d9c0d9e15717d62e980989073372c8b3a61345d2",
+    "infra/mtls/ca-ha-contract.json": "36f50c9666eaf1ace7dc976ebbd2da501154c55d5523e75646b55de132ac5ccc",
+    "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+    "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+    "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+    "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+    "infra/mtls/ca-recovery-tools.lock.json": "50a2419212074c7733f72046bc762ba8a97d88263e99d6cbf7f984787f73aa42",
+    "scripts/control_transition.py": "008a42a90391793290d01fa9986b2488828528ca6e7e192ff5c4a0abdbd8c36b",
+    "scripts/control_mirror.py": "7755a1e838b5b2f92d37d7d05e3de6a2456191ca18ae2b76d9882c86f79f10f3",
+    "scripts/executor_fence.py": "62babd635b6c9001cb38ddf7bc4996b22b3976ad96bb67eb5a9623900d5a2152",
+    "scripts/control_store.py": "6fc5ae46bf568adb1202cff86430cabad1025ee555ad5bddecbf0a9a484c524a",
+    "scripts/control_plane_ha.py": "1c4c2e10e28fc8ea4a057f809e2ce6d8ea1e2cd09d33771fba817ee8b836ba3f",
+    "scripts/test_control_plane_ha.py": "47b1579dcc89bd1d2e0a041c53f2ca6cd6de2adaf0ac74ae029d9c02e56c744a",
+    "scripts/control_executor.py": "d5fca9f017f91ab7a65fa53b71df8bc583e4f052cba1a46e444e440f2a27fa15",
+    "scripts/executor_cluster.py": "784dc3b77ea1099f4f21d3d1ef8774c30f317680c47543489c44ba5eaa69dd20",
+    "scripts/executor_disk.py": "95d97888db2d21746698b0dee9656cbe91655f25d3725c63526a1187585be32d",
+    "scripts/executor_transition.py": "66f17a86e7ee75257db05325341e6e1903e43bb250ef1c8539b84025674caad4",
+    "scripts/executor_store.py": "a9919ae315ce055cd39da3731dd13a708a3eba585efe2ac5e35b8cdcce076738",
+    "scripts/test_executor_hosts.py": "0a9f791330279db729bddfea016c4484b1558bdbca683003d71f842ee7ac3c4f",
+    "scripts/test_control_transition.py": "5e0683ea48d454c57322adb1d45b7f3c1881a4ba4d956524d31a7e6529ed3e91",
+    "scripts/test_executor_transition.py": "4dde1cb1bbd052616012d89a3d762ee070b4a68d0e3baca91ecebd359bf0b905",
+    "scripts/test_executor_actor_loss.py": "6b097f646a42c827af3fa665e7647f5a8d92c49339797cfb534bb147a41816f9"
+  },
+  "lf_normalized_source_sha256": {
+    "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+    "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+    "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+    "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+    "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+    "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+    "app/config.py": "0cce522f9991ae302a87f39cb727593d680392062a296958b80d563359053a01",
+    "app/continuous_signal_models.py": "9482577e2d7cb210a16cf3de6ef46517c32c32ee1ec1efb23e28f626fda25ee3",
+    "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+    "app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+    "app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+    "app/data/control-register.json": "a8884d1269874e18a6b5261940d9e498c8509c51d0f134ea252e6b04a327c201",
+    "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+    "app/data/replay/manifest.json": "bc974726efe7f2b98119af04b9b624ba4b18a4588b2d5ff8a4c441d4beb232e9",
+    "app/data/replay/microsoft-sentinel-wiz-audit.json": "4bc25e2e6ae2cb4b80d2d135fb401d073e2c66e2d183dd5cabb574cde27ebc3b",
+    "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+    "app/data/sigma/credential_anomaly.yml": "27ee3ff5ce6eb25bdffeb5d25a59998b21c799fcff48768204be57f2974b4086",
+    "app/data/sigma/data_exfiltration.yml": "e378a7df56ac30a3c5568d42e86be53bfd43ce88489ae500c84d16e8ee8466e7",
+    "app/data/sigma/lateral_movement.yml": "cd13987a9a7ae36d57f718a2b9a87cb0fb224e5a78380311dec8edcd78dfe0c8",
+    "app/data/sigma/privilege_escalation.yml": "337b23a4ba5bed1081828f30d771f777628d8bdd88ee1298a776e7f3f21eb880",
+    "app/data/sigma/remote_desktop_logon.yml": "35a4a4fbe7ae16484a16a4287e6287239697648018be40dd4e9c33e04b0c61ee",
+    "app/data/sigma/unmanaged_device_access.yml": "b0c3ef8498458e9d687c32ca554147de44db7cdf84857eacf4224050b8122004",
+    "app/data/zero-trust-policies.json": "ab3acc5b14ba5a4af640240cc781d1ea63523a096d7e5c2dfd3d912dc468d0f9",
+    "app/main.py": "22ccdd69e9bd30842ea4708a15101d51722876f28baeb8b0b1ca625aa0820997",
+    "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+    "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+    "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+    "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+    "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+    "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+    "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+    "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+    "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+    "app/services/collector_spool.py": "ca992ea846edad01ae892d4ab9645a759f6f117775ecf9f3f0e4c525a6ff5851",
+    "app/services/continuous_signals.py": "870da40ee024067d6c35689b6daed7fd89215071918650a4a17cc7c5a1aa37d6",
+    "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+    "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+    "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+    "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+    "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+    "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+    "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+    "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+    "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+    "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+    "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+    "app/services/signal_inbox.py": "fd16fc2ca126600989cc6325900eabd3e6c5923464c6ccb504b4560fd9dfd638",
+    "app/services/trusted_signals.py": "d2fdbcbcf69953232288e3da196033105a5e4a954a4bc6c64fa48388c392e8cf",
+    "app/services/zero_trust.py": "9e27c840fd61fa5778855f8c793a0d15d5075b9df8113b3c956bbae937a7c530",
+    "app/zero_trust_api.py": "8df229ab6392b1330e40c90bd508961721b95413121388c4b14650fb54f34ec7",
+    "app/zero_trust_models.py": "74e3fc316b62881ee325d501735ed94fc62073de583c37ad5c527d4366b75718",
+    "Dockerfile": "f10f2d3b8af1fc31ea0bb5c9e7a40e05b9609943c62a7a9b0810dde7224eab2b",
+    "pyproject.toml": "a71998c113e8cea24811d46050c1ae0aa431e0f8e1f37751e46eeeb7a5f90ed9",
+    "scripts/pep_lab.py": "2d2491720dfb9982ca06862daeb9e1cd13bb21bfef08ad1d3aa4ca59e69abc1f",
+    "scripts/compare_pep.py": "f8b35ddf395d80886fda042b319457403e30b265e6de0e0d26298893aecdafb3",
+    "infra/pep/contract.json": "dafb14514c4b1ec07282fab1dca80f0f509b368936d6ab09b03601f9e4dc171c",
+    "infra/pep/envoy.yaml": "78a73d32d1551bede27a2cc0bcff77d1625324a61ed6f27526b532861baf057c",
+    "infra/pep/nginx.conf": "f5486bcbe05cd4c1dba2755a81c5d64984e414d74e693868cbbfb68e4a26fc56",
+    "infra/pep/tools.lock.json": "69b9ddd436c4aed7fd27b70afad40fe3740e5b4b0c5a50fbe503b1a93f654e66",
+    "scripts/mtls_transport.py": "43024fa67e17c558ffdedb458e65c6712a07468262278ce8fb5c90a2f81ddd65",
+    "scripts/mtls_fixtures.py": "c6414b317a456cd7eb97290c589bd2115bca57e898c9ca6bd4848a529c6802fe",
+    "scripts/test_mtls_infrastructure.py": "a24fef9f3e849877a8dc9f9c27503a04adc7b6c7057220ce1576bb5da500c207",
+    "infra/mtls/contract.json": "68bbb3fddc9dc0ef10ebe2e085e826d22b5889dd3098559d2f41bcf7e9f831ee",
+    "scripts/mtls_native.py": "bd5046f8136a93f723207c70cdcf0984b575108e764335f2cc6dd766fcc7f925",
+    "scripts/test_all_hops_mtls.py": "eb841f22ff531228aff62a496917c86ef4e6a7edbe9b3d5c47ca2dc02feddf46",
+    "scripts/signal_metrics_exporter.py": "76be66a9ff3e2194cf46ed72a53748342abe5e0c7a7b95345f6483c9cc4c83ed",
+    "scripts/local_signal_collector.py": "3bd27286e473283b10650a89863b349171285d0866104999f7ef42ec6a2cde9b",
+    "scripts/observability_lab.py": "eea01b2ad71226ebebc64e60cfc06b3a9c85a584891d690ab3a1ebb39655b14f",
+    "infra/mtls/all-hops-nginx.conf": "b9cf941bfbaab0c5c5b89f1fc02cd164542a48d46cac0d27855cef8ce60f1509",
+    "infra/mtls/all-hops-contract.json": "9c11c814dc57fccd607f3a9c13f6ba48938b83675f6bcfd0146483a80da98806",
+    "infra/observability/alerts.yaml": "442f9c0566db9d6088f6809907ecbf17f80ede1c2f62f20e76c6673fa2206779",
+    "infra/observability/tools.lock.json": "b65aadfdb1d637ca15c03a59c58c0ddeb04f778b5edd99f29e47b33cb5fae75f",
+    "scripts/certificate_authority.py": "adddc6bf0a629b8192c2a262e7aa7ec047114d4b826c0f3f040e0613b12d4ed3",
+    "scripts/certificate_controller.py": "9bb12b7f76f952316d3a736cd8a573fdfd780c2550402643c65390c82d964bee",
+    "scripts/certificate_reload_runner.py": "5e4f9aeeea931cefc77d77fe137d875666c96e204727e3f1b7661667aa65ee26",
+    "scripts/test_certificate_automation.py": "85893bf90e05568ba61bc74abf658817919ab2ec9d4e510188f51a34c74c0270",
+    "infra/mtls/ca-tools.lock.json": "182b2e5f0a2bdb91fe0b29a888a536044c08ca5b4177a610e870b0dcb45d4e96",
+    "infra/mtls/certificate-lifecycle-contract.json": "ba62e7c3fe863ef32da73ebb34d2b1242a7988d2e22e90721ebaaa624af68026",
+    "infra/mtls/nginx-renewal.sh": "07468723f53706ef477f19725dcdf2fed53f51ea41eb277c317f828fc5f9505c",
+    ".gitattributes": "df1b80380b6c8b3a079d8d45cc53dfc223aa383fbe8afcab6cfb77879b66fe6c",
+    "scripts/certificate_key_rotation.py": "0ad9647b6e72ce8a5a67196f9df3284c561e7894686bc4bb961a7d31e5fcf6d8",
+    "scripts/test_private_key_rotation.py": "b9c97aab996b75cd2824ce995e49b87c748b39f391a9770fb752e2f78649e12a",
+    "infra/mtls/nginx-rekey.sh": "a57af3bdd39b62a8961ead51392be8155d246dcc5878638920285f07c406c814",
+    "infra/mtls/private-key-rotation-contract.json": "6961570c7438566dac41b080428826fa0517e8310e9b207e0b673ddd824818ca",
+    "scripts/authority_custodian.py": "de343958405c33effa92a6471e3dea1edf3ad8adf3af681050a26ef7ad46c77a",
+    "scripts/authority_rotation_runtime.py": "11ec4e8cb92d808beb1b60755b8085bb59bd9478479ecaf03327f0a34af17c5b",
+    "scripts/authority_rotation_coordinator.py": "2c702808b299692069fb505260f39db0316c53daf44ad284665f5fc9e8612614",
+    "scripts/test_authority_key_rotation.py": "50d8b3ba8e1aeb01bf22eb6867c36e008ccaffc9a363837afce87accbc0433e3",
+    "infra/mtls/authority-rotation-contract.json": "3278508b932de119e93b6edf03c191a613bba65dc086489c968745ce2c6ef3ad",
+    "scripts/ca_endpoints.py": "77f41676e7a8a0c44449e32f6f271a7d4a8f5a48e17473593c42fa7074593cb6",
+    "scripts/test_ca_high_availability.py": "dfa2275d67129e4cfce44cd6c6eaa406e07313aa6f7121e9dd193401cc0ba40e",
+    "infra/mtls/ca-ha-tools.lock.json": "5f61296747d8db973e55893b0ea273706f1a1bbb19c3fa535ec7d2dad37ffbeb",
+    "infra/mtls/ca-ha-contract.json": "15d59148f2ea4c834f21583b30b062d6e94e739bda541fe9c10e8de8fa816738",
+    "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+    "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+    "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+    "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+    "infra/mtls/ca-recovery-tools.lock.json": "50a2419212074c7733f72046bc762ba8a97d88263e99d6cbf7f984787f73aa42",
+    "scripts/control_transition.py": "1c0f7f693c039ae48156d738b3bab08d2e9ff4b6478453d0a8197ce1db514ca2",
+    "scripts/control_mirror.py": "257ff40d93aa632af4e34bc2306206836718432404ba66dfd98ed1b5e475d6aa",
+    "scripts/executor_fence.py": "f5c8067ab9130a8234b70f9a5e39c0a8c2fb751a9031318900db5226263d56cb",
+    "scripts/control_store.py": "81b9dd78f4be02723cdcbdf5cfbe42c861c56e754a154e9158b18b290cfc89cc",
+    "scripts/control_plane_ha.py": "c9db10231775eafd12a9c9708ee973993124bd48d9fec89800bad147a32b3be7",
+    "scripts/test_control_plane_ha.py": "2d5eb84043a6c4e91d55c9e99f08e4edb491852d4ee925ec4a3bc5f326c6dd06",
+    "scripts/control_executor.py": "c51d60ffd947397c10124b1b88c52a9cbd210d760c2ebc6e75bc10e20d78388f",
+    "scripts/executor_cluster.py": "f011531f849497a5e0381c0cef7a1883cb249cd160dff3b797176988a3e62d59",
+    "scripts/executor_disk.py": "a8070b44590f21da1e8e27b10371817b8f04b0ef05c99be91c7178383eb07acb",
+    "scripts/executor_transition.py": "66f17a86e7ee75257db05325341e6e1903e43bb250ef1c8539b84025674caad4",
+    "scripts/executor_store.py": "19e1f296ab4c8541d9431ed320a4caa8d858e8973ea285a5f1f01c0a1efb0a79",
+    "scripts/test_executor_hosts.py": "0a9f791330279db729bddfea016c4484b1558bdbca683003d71f842ee7ac3c4f",
+    "scripts/test_control_transition.py": "124cc452dbcdfbbff6ed064d2bfe301c86731e86e91397b139d4058433a6a198",
+    "scripts/test_executor_transition.py": "4dde1cb1bbd052616012d89a3d762ee070b4a68d0e3baca91ecebd359bf0b905",
+    "scripts/test_executor_actor_loss.py": "6b097f646a42c827af3fa665e7647f5a8d92c49339797cfb534bb147a41816f9"
+  },
+  "new_unit_source_sha256": {
+    "tests/test_executor_actor_loss.py": "20a2532db357ee026a2d10e223cffc9fbd56ff90a5027d8618ae27b6d286d260"
+  },
+  "current_input_sha256": {
+    ".gitattributes": "e576cf8cd5811efcee1b36531868f155bef136dbe0e20f7d5b0039b3a36405a5",
+    "Dockerfile": "2278c841e2f77eda77f5ed282abd5f35ddf50f2e3dd2e890c36967804f4db219",
+    "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+    "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+    "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+    "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+    "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+    "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+    "app/config.py": "27abe1679ef3147f9eb28920299c68dbf93932e05bda6035a64d7b0ac1d2fcb2",
+    "app/continuous_signal_models.py": "895b017d7c666923639088281f71ef64386977e381c5b8060c3123d174be34ae",
+    "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+    "app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+    "app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+    "app/data/control-register.json": "a8884d1269874e18a6b5261940d9e498c8509c51d0f134ea252e6b04a327c201",
+    "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+    "app/data/replay/manifest.json": "bc974726efe7f2b98119af04b9b624ba4b18a4588b2d5ff8a4c441d4beb232e9",
+    "app/data/replay/microsoft-sentinel-wiz-audit.json": "4bc25e2e6ae2cb4b80d2d135fb401d073e2c66e2d183dd5cabb574cde27ebc3b",
+    "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+    "app/data/sigma/credential_anomaly.yml": "27ee3ff5ce6eb25bdffeb5d25a59998b21c799fcff48768204be57f2974b4086",
+    "app/data/sigma/data_exfiltration.yml": "e378a7df56ac30a3c5568d42e86be53bfd43ce88489ae500c84d16e8ee8466e7",
+    "app/data/sigma/lateral_movement.yml": "cd13987a9a7ae36d57f718a2b9a87cb0fb224e5a78380311dec8edcd78dfe0c8",
+    "app/data/sigma/privilege_escalation.yml": "337b23a4ba5bed1081828f30d771f777628d8bdd88ee1298a776e7f3f21eb880",
+    "app/data/sigma/remote_desktop_logon.yml": "35a4a4fbe7ae16484a16a4287e6287239697648018be40dd4e9c33e04b0c61ee",
+    "app/data/sigma/unmanaged_device_access.yml": "b0c3ef8498458e9d687c32ca554147de44db7cdf84857eacf4224050b8122004",
+    "app/data/zero-trust-policies.json": "ab3acc5b14ba5a4af640240cc781d1ea63523a096d7e5c2dfd3d912dc468d0f9",
+    "app/main.py": "c04fb9ff8011a463994a95eed78d577512434500d2e89d0ce424161b9e2fce34",
+    "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+    "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+    "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+    "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+    "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+    "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+    "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+    "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+    "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+    "app/services/collector_spool.py": "347d80f8044fecc9e43ce48045d712237d49245a8fe47de15482db8574ab2a08",
+    "app/services/continuous_signals.py": "05115d837dc2c00b56aafbe8833b047c0cd9fb1854fff20ba7db03db261ca2a3",
+    "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+    "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+    "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+    "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+    "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+    "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+    "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+    "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+    "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+    "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+    "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+    "app/services/signal_inbox.py": "03b2d65ded032c5dd3c55434fa538afdc5604e72f54ddce2581e146cf05378b8",
+    "app/services/trusted_signals.py": "076ac930894e32522813ff39e1c6f317bcd2a6746605f670dde8f807d59492ff",
+    "app/services/zero_trust.py": "19270efe1dca2c273e41f8c35eaf22cf73dfa2b8022aea00a0189762d7a8003b",
+    "app/zero_trust_api.py": "556fda2b67c9a20077b65c5f03c121e5deffd4a48d9f651ff1b7409f26b1b491",
+    "app/zero_trust_models.py": "1c466b491a923a23ce618e776660193c9bae4bef8a5026e39d8ac310a4ae7992",
+    "infra/mtls/all-hops-contract.json": "e2c47e8a6594298dafbad183cdf9f75ab4814c5a405a3cf10ab996c7835631fe",
+    "infra/mtls/all-hops-nginx.conf": "858533d28040a4d83c6bd58ede75e3efac0f8597f3e2992dfa79976527ad2e0e",
+    "infra/mtls/authority-rotation-contract.json": "e344b3be34aca530d47ec30b07c8df8fd5dacabb2febccb91fc7138c7fb489cb",
+    "infra/mtls/ca-ha-contract.json": "36f50c9666eaf1ace7dc976ebbd2da501154c55d5523e75646b55de132ac5ccc",
+    "infra/mtls/ca-ha-tools.lock.json": "30c9e3b2f850c4d8a8bc6d89d9c0d9e15717d62e980989073372c8b3a61345d2",
+    "infra/mtls/ca-recovery-tools.lock.json": "50a2419212074c7733f72046bc762ba8a97d88263e99d6cbf7f984787f73aa42",
+    "infra/mtls/ca-tools.lock.json": "dde8c06b2764b93b3767df4a38064586c27f78a62697084671cea62816028122",
+    "infra/mtls/certificate-lifecycle-contract.json": "df5c727f4a167dc3135636daf96a9f7fad1b24f3c7fa001257b5a1badd91e503",
+    "infra/mtls/contract.json": "d09f81a030ce30a4ab15e24097b5b78e95d3471f76fb7593afa39f13a9e8e55b",
+    "infra/mtls/nginx-rekey.sh": "a57af3bdd39b62a8961ead51392be8155d246dcc5878638920285f07c406c814",
+    "infra/mtls/nginx-renewal.sh": "07468723f53706ef477f19725dcdf2fed53f51ea41eb277c317f828fc5f9505c",
+    "infra/mtls/private-key-rotation-contract.json": "2832f6dd92ef36aaa49af5e96cbb984b3969783cca37c3152d77f137bd5e5cff",
+    "infra/observability/alerts.yaml": "3b2e233f36d0338ecf572c384961729a951d51e8a2ab1f9264bb4e7cdff95172",
+    "infra/observability/tools.lock.json": "3d4b387c15a2dadd6bd7c4d3e84af436b9072b80ec32083346d40d27a4b8f014",
+    "infra/pep/contract.json": "c9aa86653aa173db206f446a09878e7facad3abf0905d85f25d013b70a59d0b5",
+    "infra/pep/envoy.yaml": "460fff298ab3e5554d8f2f7b102b8c315e57cb81fb1dd1ecb5f1ff3fec6e164a",
+    "infra/pep/nginx.conf": "654470eda569a812501345415dac2ba7da4128c480eaae71691cd50c47afdf65",
+    "infra/pep/tools.lock.json": "9076cc79d486366d5814014024df6f38ffef7862bbaf008261c39f7249b447e6",
+    "pyproject.toml": "b8bd572be04ec1a6f8bf818645b6ac74458f98fc9561ea453210ab6c23e5475e",
+    "scripts/authority_custodian.py": "b87fc7ef0be26ecb259510e8df07eae402dae9608b1a2e5bfa3e03b23c6f4693",
+    "scripts/authority_rotation_coordinator.py": "1ab99ef7f9a96c75393209c169d41f82db0a783c4f24bde7df622a7c9c84647b",
+    "scripts/authority_rotation_runtime.py": "e184e49c386ed46d4f3e9214cec95e97a7f56e4e0608711119f2c61b6b76ca26",
+    "scripts/ca_endpoints.py": "b5c546ce93d86ea90e99de46f78e80e60149f8146605e27160ceb24a9babd057",
+    "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+    "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+    "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+    "scripts/certificate_authority.py": "1b3e0d501e74d9bc47442e15b1d2f4201bf4a6fd6d48644d93a70c6592c54f9c",
+    "scripts/certificate_controller.py": "fe5d5058b8edbf3632e6d060c4ad2074d6ea8fd72767524db18da1ea9d70ec32",
+    "scripts/certificate_key_rotation.py": "e648f07caf6d2a7873fb14d91cfd5285f5aec67e1aa086e436e1e5ca9284d319",
+    "scripts/certificate_reload_runner.py": "bbdafeaa210b747c007f666ec4f1beb12ee2b9afe49556fffc7c303751f0a6c9",
+    "scripts/compare_pep.py": "e2ef12beb7950a263d6384869fc3e33326c6901f9692e91f77ee16f6775fb9b4",
+    "scripts/continuous_mtls_assets.py": "0088c353bed65dbb7ff5949a0c6f8f0c73b4f72c8cfa51bd5b63eb83bd81d66e",
+    "scripts/continuous_mtls_runtime.py": "3275cbcee45c7e70fd135ff2d085785ea1460c92b68d546b56d3eaeb88d14755",
+    "scripts/continuous_signal_collector.py": "ed3a6dce1e4f4fa02fc173d2c511902e5db57e2b84e272148c78409e39c1e49a",
+    "scripts/control_executor.py": "d5fca9f017f91ab7a65fa53b71df8bc583e4f052cba1a46e444e440f2a27fa15",
+    "scripts/control_mirror.py": "7755a1e838b5b2f92d37d7d05e3de6a2456191ca18ae2b76d9882c86f79f10f3",
+    "scripts/control_plane_ha.py": "1c4c2e10e28fc8ea4a057f809e2ce6d8ea1e2cd09d33771fba817ee8b836ba3f",
+    "scripts/control_store.py": "6fc5ae46bf568adb1202cff86430cabad1025ee555ad5bddecbf0a9a484c524a",
+    "scripts/control_transition.py": "008a42a90391793290d01fa9986b2488828528ca6e7e192ff5c4a0abdbd8c36b",
+    "scripts/executor_cluster.py": "784dc3b77ea1099f4f21d3d1ef8774c30f317680c47543489c44ba5eaa69dd20",
+    "scripts/executor_disk.py": "95d97888db2d21746698b0dee9656cbe91655f25d3725c63526a1187585be32d",
+    "scripts/executor_fence.py": "62babd635b6c9001cb38ddf7bc4996b22b3976ad96bb67eb5a9623900d5a2152",
+    "scripts/executor_store.py": "a9919ae315ce055cd39da3731dd13a708a3eba585efe2ac5e35b8cdcce076738",
+    "scripts/executor_transition.py": "66f17a86e7ee75257db05325341e6e1903e43bb250ef1c8539b84025674caad4",
+    "scripts/local_signal_collector.py": "a3ce655c10963a183f46413dc71bdaa3f56c7c85da91abe756a7e6e034cfbb39",
+    "scripts/mtls_fixtures.py": "086155d77391fc36973dfb49442c0609ac0192760a1944774d68cbcbfad665b9",
+    "scripts/mtls_native.py": "e892293b44d86feca35b6e408b21ffc28c684893533632c7fc5c15a72c678e17",
+    "scripts/mtls_transport.py": "5e71999d5eb87354bd1beaf79b62fad5169d7584106deebf60ed3ee53c9b1a56",
+    "scripts/observability_lab.py": "596bf05a9d8d2ffe268e0d61142d9d4d6f5b9fff64012497aa6b542f9eacfcc3",
+    "scripts/pep_lab.py": "b199f1fd9df18e75e564182036e8ef208872bc65f6efd489f058840541263fe8",
+    "scripts/session_watchdog.py": "a70627cf113d1cf1e13adef8ef6f1b4ffc7bd99ca93c677ab6c099343eea322e",
+    "scripts/signal_metrics_exporter.py": "6a0cc98797b1fc53f2a40af019c608996fe734809ebd936e1985bd152ae5ba41",
+    "scripts/test_all_hops_mtls.py": "0e7c44dc5fb4ab1809e4a0a5e377338132991b719061fa4fe97cd47b4e61ce09",
+    "scripts/test_authority_key_rotation.py": "2e7c4dbd442e02421ec8f61d7f2346d8e79fec549601f4e2741ab1721f2dad0c",
+    "scripts/test_ca_high_availability.py": "284c3785291117d71ffa78dd0be6147e6e8e58fb16a63a697d8c519b6b91e4b2",
+    "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+    "scripts/test_certificate_automation.py": "37740d5b589cadbaedc3d530ea8318d5ff4f3a44a07f17f0cd320d1418e6b773",
+    "scripts/test_continuous_mtls_runtime.py": "39a870c1437b7e3c2c332827fc5b4ddc95c3b343a20512e1c4c010ebd86f7b7b",
+    "scripts/test_control_plane_ha.py": "47b1579dcc89bd1d2e0a041c53f2ca6cd6de2adaf0ac74ae029d9c02e56c744a",
+    "scripts/test_control_transition.py": "5e0683ea48d454c57322adb1d45b7f3c1881a4ba4d956524d31a7e6529ed3e91",
+    "scripts/test_executor_actor_loss.py": "6b097f646a42c827af3fa665e7647f5a8d92c49339797cfb534bb147a41816f9",
+    "scripts/test_executor_hosts.py": "0a9f791330279db729bddfea016c4484b1558bdbca683003d71f842ee7ac3c4f",
+    "scripts/test_executor_transition.py": "4dde1cb1bbd052616012d89a3d762ee070b4a68d0e3baca91ecebd359bf0b905",
+    "scripts/test_mtls_infrastructure.py": "3724f4c98f0baee127c58d4f961f048d8be97dde9d409ee7137f996845c6b72b",
+    "scripts/test_private_key_rotation.py": "b8fd85194759dff83f7991f2069ebefe1025b853a53ce48b8f846b4c194a788c",
+    "tests/test_collector_spool.py": "6456d259efc95ef4a0d624d4351ade2d7ecd2dc8ae67da7894f3a5c18f34cab4",
+    "tests/test_continuous_mtls_runtime.py": "c1626d4e015dc667f9ae51b682cadeefe68cb91a16062b16c470d0fc8d636a53",
+    "tests/test_continuous_signal_collector.py": "fdf91e9b83a5920b18d36fde730c9620da8e2abf37a12c946fadf10d76a3ef95",
+    "tests/test_executor_actor_loss.py": "20a2532db357ee026a2d10e223cffc9fbd56ff90a5027d8618ae27b6d286d260",
+    "tests/test_executor_transition.py": "e4c00ddda3bd88430063c4df3856801078b77cbf6035d6bc30daeca64dc00a8d",
+    "tests/test_observation_collector_process.py": "7d233cd87342d5360f9ba00db1a8cd795d553a7928dae819aee7495f1a1a2209",
+    "tests/test_session_revalidation.py": "7ab58fed04eaa218d9cb0a9c08cd23e8bf78d15b6eebcf5d517338739d5e46e7",
+    "tests/test_session_watchdog_process.py": "a621f608cd47244e25b6a7251521e2da404e236a5f63ce078657af704599b6f8"
+  },
+  "current_lf_normalized_sha256": {
+    ".gitattributes": "df1b80380b6c8b3a079d8d45cc53dfc223aa383fbe8afcab6cfb77879b66fe6c",
+    "Dockerfile": "f10f2d3b8af1fc31ea0bb5c9e7a40e05b9609943c62a7a9b0810dde7224eab2b",
+    "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+    "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+    "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+    "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+    "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+    "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+    "app/config.py": "0cce522f9991ae302a87f39cb727593d680392062a296958b80d563359053a01",
+    "app/continuous_signal_models.py": "9482577e2d7cb210a16cf3de6ef46517c32c32ee1ec1efb23e28f626fda25ee3",
+    "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+    "app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+    "app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+    "app/data/control-register.json": "a8884d1269874e18a6b5261940d9e498c8509c51d0f134ea252e6b04a327c201",
+    "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+    "app/data/replay/manifest.json": "bc974726efe7f2b98119af04b9b624ba4b18a4588b2d5ff8a4c441d4beb232e9",
+    "app/data/replay/microsoft-sentinel-wiz-audit.json": "4bc25e2e6ae2cb4b80d2d135fb401d073e2c66e2d183dd5cabb574cde27ebc3b",
+    "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+    "app/data/sigma/credential_anomaly.yml": "27ee3ff5ce6eb25bdffeb5d25a59998b21c799fcff48768204be57f2974b4086",
+    "app/data/sigma/data_exfiltration.yml": "e378a7df56ac30a3c5568d42e86be53bfd43ce88489ae500c84d16e8ee8466e7",
+    "app/data/sigma/lateral_movement.yml": "cd13987a9a7ae36d57f718a2b9a87cb0fb224e5a78380311dec8edcd78dfe0c8",
+    "app/data/sigma/privilege_escalation.yml": "337b23a4ba5bed1081828f30d771f777628d8bdd88ee1298a776e7f3f21eb880",
+    "app/data/sigma/remote_desktop_logon.yml": "35a4a4fbe7ae16484a16a4287e6287239697648018be40dd4e9c33e04b0c61ee",
+    "app/data/sigma/unmanaged_device_access.yml": "b0c3ef8498458e9d687c32ca554147de44db7cdf84857eacf4224050b8122004",
+    "app/data/zero-trust-policies.json": "ab3acc5b14ba5a4af640240cc781d1ea63523a096d7e5c2dfd3d912dc468d0f9",
+    "app/main.py": "22ccdd69e9bd30842ea4708a15101d51722876f28baeb8b0b1ca625aa0820997",
+    "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+    "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+    "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+    "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+    "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+    "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+    "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+    "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+    "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+    "app/services/collector_spool.py": "ca992ea846edad01ae892d4ab9645a759f6f117775ecf9f3f0e4c525a6ff5851",
+    "app/services/continuous_signals.py": "870da40ee024067d6c35689b6daed7fd89215071918650a4a17cc7c5a1aa37d6",
+    "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+    "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+    "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+    "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+    "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+    "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+    "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+    "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+    "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+    "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+    "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+    "app/services/signal_inbox.py": "fd16fc2ca126600989cc6325900eabd3e6c5923464c6ccb504b4560fd9dfd638",
+    "app/services/trusted_signals.py": "d2fdbcbcf69953232288e3da196033105a5e4a954a4bc6c64fa48388c392e8cf",
+    "app/services/zero_trust.py": "9e27c840fd61fa5778855f8c793a0d15d5075b9df8113b3c956bbae937a7c530",
+    "app/zero_trust_api.py": "8df229ab6392b1330e40c90bd508961721b95413121388c4b14650fb54f34ec7",
+    "app/zero_trust_models.py": "74e3fc316b62881ee325d501735ed94fc62073de583c37ad5c527d4366b75718",
+    "infra/mtls/all-hops-contract.json": "9c11c814dc57fccd607f3a9c13f6ba48938b83675f6bcfd0146483a80da98806",
+    "infra/mtls/all-hops-nginx.conf": "b9cf941bfbaab0c5c5b89f1fc02cd164542a48d46cac0d27855cef8ce60f1509",
+    "infra/mtls/authority-rotation-contract.json": "3278508b932de119e93b6edf03c191a613bba65dc086489c968745ce2c6ef3ad",
+    "infra/mtls/ca-ha-contract.json": "15d59148f2ea4c834f21583b30b062d6e94e739bda541fe9c10e8de8fa816738",
+    "infra/mtls/ca-ha-tools.lock.json": "5f61296747d8db973e55893b0ea273706f1a1bbb19c3fa535ec7d2dad37ffbeb",
+    "infra/mtls/ca-recovery-tools.lock.json": "50a2419212074c7733f72046bc762ba8a97d88263e99d6cbf7f984787f73aa42",
+    "infra/mtls/ca-tools.lock.json": "182b2e5f0a2bdb91fe0b29a888a536044c08ca5b4177a610e870b0dcb45d4e96",
+    "infra/mtls/certificate-lifecycle-contract.json": "ba62e7c3fe863ef32da73ebb34d2b1242a7988d2e22e90721ebaaa624af68026",
+    "infra/mtls/contract.json": "68bbb3fddc9dc0ef10ebe2e085e826d22b5889dd3098559d2f41bcf7e9f831ee",
+    "infra/mtls/nginx-rekey.sh": "a57af3bdd39b62a8961ead51392be8155d246dcc5878638920285f07c406c814",
+    "infra/mtls/nginx-renewal.sh": "07468723f53706ef477f19725dcdf2fed53f51ea41eb277c317f828fc5f9505c",
+    "infra/mtls/private-key-rotation-contract.json": "6961570c7438566dac41b080428826fa0517e8310e9b207e0b673ddd824818ca",
+    "infra/observability/alerts.yaml": "442f9c0566db9d6088f6809907ecbf17f80ede1c2f62f20e76c6673fa2206779",
+    "infra/observability/tools.lock.json": "b65aadfdb1d637ca15c03a59c58c0ddeb04f778b5edd99f29e47b33cb5fae75f",
+    "infra/pep/contract.json": "dafb14514c4b1ec07282fab1dca80f0f509b368936d6ab09b03601f9e4dc171c",
+    "infra/pep/envoy.yaml": "78a73d32d1551bede27a2cc0bcff77d1625324a61ed6f27526b532861baf057c",
+    "infra/pep/nginx.conf": "f5486bcbe05cd4c1dba2755a81c5d64984e414d74e693868cbbfb68e4a26fc56",
+    "infra/pep/tools.lock.json": "69b9ddd436c4aed7fd27b70afad40fe3740e5b4b0c5a50fbe503b1a93f654e66",
+    "pyproject.toml": "a71998c113e8cea24811d46050c1ae0aa431e0f8e1f37751e46eeeb7a5f90ed9",
+    "scripts/authority_custodian.py": "de343958405c33effa92a6471e3dea1edf3ad8adf3af681050a26ef7ad46c77a",
+    "scripts/authority_rotation_coordinator.py": "2c702808b299692069fb505260f39db0316c53daf44ad284665f5fc9e8612614",
+    "scripts/authority_rotation_runtime.py": "11ec4e8cb92d808beb1b60755b8085bb59bd9478479ecaf03327f0a34af17c5b",
+    "scripts/ca_endpoints.py": "77f41676e7a8a0c44449e32f6f271a7d4a8f5a48e17473593c42fa7074593cb6",
+    "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+    "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+    "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+    "scripts/certificate_authority.py": "adddc6bf0a629b8192c2a262e7aa7ec047114d4b826c0f3f040e0613b12d4ed3",
+    "scripts/certificate_controller.py": "9bb12b7f76f952316d3a736cd8a573fdfd780c2550402643c65390c82d964bee",
+    "scripts/certificate_key_rotation.py": "0ad9647b6e72ce8a5a67196f9df3284c561e7894686bc4bb961a7d31e5fcf6d8",
+    "scripts/certificate_reload_runner.py": "5e4f9aeeea931cefc77d77fe137d875666c96e204727e3f1b7661667aa65ee26",
+    "scripts/compare_pep.py": "f8b35ddf395d80886fda042b319457403e30b265e6de0e0d26298893aecdafb3",
+    "scripts/continuous_mtls_assets.py": "ec745537e886fcc98bd14861e85d621492a192e379800e2883befc694170eed5",
+    "scripts/continuous_mtls_runtime.py": "17ce98e1eec6fe2c9ebccdafe9f46c9cc72e0d65754ea7453acaf8b5f1eb87ff",
+    "scripts/continuous_signal_collector.py": "6083e95a4407dabc4c0e0b77667ff1413103ec3722343dc24b1a54363e6720b1",
+    "scripts/control_executor.py": "c51d60ffd947397c10124b1b88c52a9cbd210d760c2ebc6e75bc10e20d78388f",
+    "scripts/control_mirror.py": "257ff40d93aa632af4e34bc2306206836718432404ba66dfd98ed1b5e475d6aa",
+    "scripts/control_plane_ha.py": "c9db10231775eafd12a9c9708ee973993124bd48d9fec89800bad147a32b3be7",
+    "scripts/control_store.py": "81b9dd78f4be02723cdcbdf5cfbe42c861c56e754a154e9158b18b290cfc89cc",
+    "scripts/control_transition.py": "1c0f7f693c039ae48156d738b3bab08d2e9ff4b6478453d0a8197ce1db514ca2",
+    "scripts/executor_cluster.py": "f011531f849497a5e0381c0cef7a1883cb249cd160dff3b797176988a3e62d59",
+    "scripts/executor_disk.py": "a8070b44590f21da1e8e27b10371817b8f04b0ef05c99be91c7178383eb07acb",
+    "scripts/executor_fence.py": "f5c8067ab9130a8234b70f9a5e39c0a8c2fb751a9031318900db5226263d56cb",
+    "scripts/executor_store.py": "19e1f296ab4c8541d9431ed320a4caa8d858e8973ea285a5f1f01c0a1efb0a79",
+    "scripts/executor_transition.py": "66f17a86e7ee75257db05325341e6e1903e43bb250ef1c8539b84025674caad4",
+    "scripts/local_signal_collector.py": "3bd27286e473283b10650a89863b349171285d0866104999f7ef42ec6a2cde9b",
+    "scripts/mtls_fixtures.py": "c6414b317a456cd7eb97290c589bd2115bca57e898c9ca6bd4848a529c6802fe",
+    "scripts/mtls_native.py": "bd5046f8136a93f723207c70cdcf0984b575108e764335f2cc6dd766fcc7f925",
+    "scripts/mtls_transport.py": "43024fa67e17c558ffdedb458e65c6712a07468262278ce8fb5c90a2f81ddd65",
+    "scripts/observability_lab.py": "eea01b2ad71226ebebc64e60cfc06b3a9c85a584891d690ab3a1ebb39655b14f",
+    "scripts/pep_lab.py": "2d2491720dfb9982ca06862daeb9e1cd13bb21bfef08ad1d3aa4ca59e69abc1f",
+    "scripts/session_watchdog.py": "a912566a23d919b7369fae98f22a5003e10bb7b2a0c186744505211907bcf1ac",
+    "scripts/signal_metrics_exporter.py": "76be66a9ff3e2194cf46ed72a53748342abe5e0c7a7b95345f6483c9cc4c83ed",
+    "scripts/test_all_hops_mtls.py": "eb841f22ff531228aff62a496917c86ef4e6a7edbe9b3d5c47ca2dc02feddf46",
+    "scripts/test_authority_key_rotation.py": "50d8b3ba8e1aeb01bf22eb6867c36e008ccaffc9a363837afce87accbc0433e3",
+    "scripts/test_ca_high_availability.py": "dfa2275d67129e4cfce44cd6c6eaa406e07313aa6f7121e9dd193401cc0ba40e",
+    "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+    "scripts/test_certificate_automation.py": "85893bf90e05568ba61bc74abf658817919ab2ec9d4e510188f51a34c74c0270",
+    "scripts/test_continuous_mtls_runtime.py": "5f4c58c817a56480ae36c1418d2c4c2d9a606b8be8640402d3bd22f1c0329c42",
+    "scripts/test_control_plane_ha.py": "2d5eb84043a6c4e91d55c9e99f08e4edb491852d4ee925ec4a3bc5f326c6dd06",
+    "scripts/test_control_transition.py": "124cc452dbcdfbbff6ed064d2bfe301c86731e86e91397b139d4058433a6a198",
+    "scripts/test_executor_actor_loss.py": "6b097f646a42c827af3fa665e7647f5a8d92c49339797cfb534bb147a41816f9",
+    "scripts/test_executor_hosts.py": "0a9f791330279db729bddfea016c4484b1558bdbca683003d71f842ee7ac3c4f",
+    "scripts/test_executor_transition.py": "4dde1cb1bbd052616012d89a3d762ee070b4a68d0e3baca91ecebd359bf0b905",
+    "scripts/test_mtls_infrastructure.py": "a24fef9f3e849877a8dc9f9c27503a04adc7b6c7057220ce1576bb5da500c207",
+    "scripts/test_private_key_rotation.py": "b9c97aab996b75cd2824ce995e49b87c748b39f391a9770fb752e2f78649e12a",
+    "tests/test_collector_spool.py": "bb137905ff3b70d3614754dc766ad4a8dcc17232db1a2b9f4e911ef5330e0dd6",
+    "tests/test_continuous_mtls_runtime.py": "c44355ef52230a353e6b8a72596c2d6a98a91d2c19d05e03c1cc1a8bd3af8e0f",
+    "tests/test_continuous_signal_collector.py": "7be265a1e950d3192a9c0beff697aa5521896dced1c92b50f64818f834bb63f5",
+    "tests/test_executor_actor_loss.py": "20a2532db357ee026a2d10e223cffc9fbd56ff90a5027d8618ae27b6d286d260",
+    "tests/test_executor_transition.py": "e4c00ddda3bd88430063c4df3856801078b77cbf6035d6bc30daeca64dc00a8d",
+    "tests/test_observation_collector_process.py": "622316c1cb8f76e1ee2c91a75ec7578c65450a4abed252fce6311121bdaf8c9f",
+    "tests/test_session_revalidation.py": "d3a02c82b9a9a69f1ca8d14750becd405c886af4d9798174ee31cf1b78b9f938",
+    "tests/test_session_watchdog_process.py": "0b3c56d38a4f63a3209998087f6148c687c5fb16d53866fce717d9416f2fbb50"
+  },
+  "combined_unit_image_audit": {
+    "tag": "c02-b8d8f7914233-unit-tests",
+    "image": "sha256:4188c435f60de49c858a40bfd9e1f95023c2fa747d893a509d7182f7c78ca227",
+    "input_sha256": {
+      ".gitattributes": "e576cf8cd5811efcee1b36531868f155bef136dbe0e20f7d5b0039b3a36405a5",
+      "Dockerfile": "2278c841e2f77eda77f5ed282abd5f35ddf50f2e3dd2e890c36967804f4db219",
+      "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+      "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+      "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+      "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+      "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+      "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+      "app/config.py": "27abe1679ef3147f9eb28920299c68dbf93932e05bda6035a64d7b0ac1d2fcb2",
+      "app/continuous_signal_models.py": "895b017d7c666923639088281f71ef64386977e381c5b8060c3123d174be34ae",
+      "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+      "app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+      "app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+      "app/data/control-register.json": "a8884d1269874e18a6b5261940d9e498c8509c51d0f134ea252e6b04a327c201",
+      "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+      "app/data/replay/manifest.json": "bc974726efe7f2b98119af04b9b624ba4b18a4588b2d5ff8a4c441d4beb232e9",
+      "app/data/replay/microsoft-sentinel-wiz-audit.json": "4bc25e2e6ae2cb4b80d2d135fb401d073e2c66e2d183dd5cabb574cde27ebc3b",
+      "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+      "app/data/sigma/credential_anomaly.yml": "27ee3ff5ce6eb25bdffeb5d25a59998b21c799fcff48768204be57f2974b4086",
+      "app/data/sigma/data_exfiltration.yml": "e378a7df56ac30a3c5568d42e86be53bfd43ce88489ae500c84d16e8ee8466e7",
+      "app/data/sigma/lateral_movement.yml": "cd13987a9a7ae36d57f718a2b9a87cb0fb224e5a78380311dec8edcd78dfe0c8",
+      "app/data/sigma/privilege_escalation.yml": "337b23a4ba5bed1081828f30d771f777628d8bdd88ee1298a776e7f3f21eb880",
+      "app/data/sigma/remote_desktop_logon.yml": "35a4a4fbe7ae16484a16a4287e6287239697648018be40dd4e9c33e04b0c61ee",
+      "app/data/sigma/unmanaged_device_access.yml": "b0c3ef8498458e9d687c32ca554147de44db7cdf84857eacf4224050b8122004",
+      "app/data/zero-trust-policies.json": "ab3acc5b14ba5a4af640240cc781d1ea63523a096d7e5c2dfd3d912dc468d0f9",
+      "app/main.py": "c04fb9ff8011a463994a95eed78d577512434500d2e89d0ce424161b9e2fce34",
+      "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+      "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+      "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+      "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+      "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+      "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+      "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+      "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+      "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+      "app/services/collector_spool.py": "347d80f8044fecc9e43ce48045d712237d49245a8fe47de15482db8574ab2a08",
+      "app/services/continuous_signals.py": "05115d837dc2c00b56aafbe8833b047c0cd9fb1854fff20ba7db03db261ca2a3",
+      "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+      "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+      "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+      "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+      "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+      "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+      "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+      "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+      "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+      "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+      "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+      "app/services/signal_inbox.py": "03b2d65ded032c5dd3c55434fa538afdc5604e72f54ddce2581e146cf05378b8",
+      "app/services/trusted_signals.py": "076ac930894e32522813ff39e1c6f317bcd2a6746605f670dde8f807d59492ff",
+      "app/services/zero_trust.py": "19270efe1dca2c273e41f8c35eaf22cf73dfa2b8022aea00a0189762d7a8003b",
+      "app/zero_trust_api.py": "556fda2b67c9a20077b65c5f03c121e5deffd4a48d9f651ff1b7409f26b1b491",
+      "app/zero_trust_models.py": "1c466b491a923a23ce618e776660193c9bae4bef8a5026e39d8ac310a4ae7992",
+      "infra/mtls/all-hops-contract.json": "e2c47e8a6594298dafbad183cdf9f75ab4814c5a405a3cf10ab996c7835631fe",
+      "infra/mtls/all-hops-nginx.conf": "858533d28040a4d83c6bd58ede75e3efac0f8597f3e2992dfa79976527ad2e0e",
+      "infra/mtls/authority-rotation-contract.json": "e344b3be34aca530d47ec30b07c8df8fd5dacabb2febccb91fc7138c7fb489cb",
+      "infra/mtls/ca-ha-contract.json": "36f50c9666eaf1ace7dc976ebbd2da501154c55d5523e75646b55de132ac5ccc",
+      "infra/mtls/ca-ha-tools.lock.json": "30c9e3b2f850c4d8a8bc6d89d9c0d9e15717d62e980989073372c8b3a61345d2",
+      "infra/mtls/ca-recovery-tools.lock.json": "50a2419212074c7733f72046bc762ba8a97d88263e99d6cbf7f984787f73aa42",
+      "infra/mtls/ca-tools.lock.json": "dde8c06b2764b93b3767df4a38064586c27f78a62697084671cea62816028122",
+      "infra/mtls/certificate-lifecycle-contract.json": "df5c727f4a167dc3135636daf96a9f7fad1b24f3c7fa001257b5a1badd91e503",
+      "infra/mtls/contract.json": "d09f81a030ce30a4ab15e24097b5b78e95d3471f76fb7593afa39f13a9e8e55b",
+      "infra/mtls/nginx-rekey.sh": "a57af3bdd39b62a8961ead51392be8155d246dcc5878638920285f07c406c814",
+      "infra/mtls/nginx-renewal.sh": "07468723f53706ef477f19725dcdf2fed53f51ea41eb277c317f828fc5f9505c",
+      "infra/mtls/private-key-rotation-contract.json": "2832f6dd92ef36aaa49af5e96cbb984b3969783cca37c3152d77f137bd5e5cff",
+      "infra/observability/alerts.yaml": "3b2e233f36d0338ecf572c384961729a951d51e8a2ab1f9264bb4e7cdff95172",
+      "infra/observability/tools.lock.json": "3d4b387c15a2dadd6bd7c4d3e84af436b9072b80ec32083346d40d27a4b8f014",
+      "infra/pep/contract.json": "c9aa86653aa173db206f446a09878e7facad3abf0905d85f25d013b70a59d0b5",
+      "infra/pep/envoy.yaml": "460fff298ab3e5554d8f2f7b102b8c315e57cb81fb1dd1ecb5f1ff3fec6e164a",
+      "infra/pep/nginx.conf": "654470eda569a812501345415dac2ba7da4128c480eaae71691cd50c47afdf65",
+      "infra/pep/tools.lock.json": "9076cc79d486366d5814014024df6f38ffef7862bbaf008261c39f7249b447e6",
+      "pyproject.toml": "b8bd572be04ec1a6f8bf818645b6ac74458f98fc9561ea453210ab6c23e5475e",
+      "scripts/authority_custodian.py": "b87fc7ef0be26ecb259510e8df07eae402dae9608b1a2e5bfa3e03b23c6f4693",
+      "scripts/authority_rotation_coordinator.py": "1ab99ef7f9a96c75393209c169d41f82db0a783c4f24bde7df622a7c9c84647b",
+      "scripts/authority_rotation_runtime.py": "e184e49c386ed46d4f3e9214cec95e97a7f56e4e0608711119f2c61b6b76ca26",
+      "scripts/ca_endpoints.py": "b5c546ce93d86ea90e99de46f78e80e60149f8146605e27160ceb24a9babd057",
+      "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+      "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+      "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+      "scripts/certificate_authority.py": "1b3e0d501e74d9bc47442e15b1d2f4201bf4a6fd6d48644d93a70c6592c54f9c",
+      "scripts/certificate_controller.py": "fe5d5058b8edbf3632e6d060c4ad2074d6ea8fd72767524db18da1ea9d70ec32",
+      "scripts/certificate_key_rotation.py": "e648f07caf6d2a7873fb14d91cfd5285f5aec67e1aa086e436e1e5ca9284d319",
+      "scripts/certificate_reload_runner.py": "bbdafeaa210b747c007f666ec4f1beb12ee2b9afe49556fffc7c303751f0a6c9",
+      "scripts/compare_pep.py": "e2ef12beb7950a263d6384869fc3e33326c6901f9692e91f77ee16f6775fb9b4",
+      "scripts/continuous_mtls_assets.py": "0088c353bed65dbb7ff5949a0c6f8f0c73b4f72c8cfa51bd5b63eb83bd81d66e",
+      "scripts/continuous_mtls_runtime.py": "3275cbcee45c7e70fd135ff2d085785ea1460c92b68d546b56d3eaeb88d14755",
+      "scripts/continuous_signal_collector.py": "ed3a6dce1e4f4fa02fc173d2c511902e5db57e2b84e272148c78409e39c1e49a",
+      "scripts/control_executor.py": "d5fca9f017f91ab7a65fa53b71df8bc583e4f052cba1a46e444e440f2a27fa15",
+      "scripts/control_mirror.py": "7755a1e838b5b2f92d37d7d05e3de6a2456191ca18ae2b76d9882c86f79f10f3",
+      "scripts/control_plane_ha.py": "1c4c2e10e28fc8ea4a057f809e2ce6d8ea1e2cd09d33771fba817ee8b836ba3f",
+      "scripts/control_store.py": "6fc5ae46bf568adb1202cff86430cabad1025ee555ad5bddecbf0a9a484c524a",
+      "scripts/control_transition.py": "008a42a90391793290d01fa9986b2488828528ca6e7e192ff5c4a0abdbd8c36b",
+      "scripts/executor_cluster.py": "784dc3b77ea1099f4f21d3d1ef8774c30f317680c47543489c44ba5eaa69dd20",
+      "scripts/executor_disk.py": "95d97888db2d21746698b0dee9656cbe91655f25d3725c63526a1187585be32d",
+      "scripts/executor_fence.py": "62babd635b6c9001cb38ddf7bc4996b22b3976ad96bb67eb5a9623900d5a2152",
+      "scripts/executor_store.py": "a9919ae315ce055cd39da3731dd13a708a3eba585efe2ac5e35b8cdcce076738",
+      "scripts/executor_transition.py": "66f17a86e7ee75257db05325341e6e1903e43bb250ef1c8539b84025674caad4",
+      "scripts/local_signal_collector.py": "a3ce655c10963a183f46413dc71bdaa3f56c7c85da91abe756a7e6e034cfbb39",
+      "scripts/mtls_fixtures.py": "086155d77391fc36973dfb49442c0609ac0192760a1944774d68cbcbfad665b9",
+      "scripts/mtls_native.py": "e892293b44d86feca35b6e408b21ffc28c684893533632c7fc5c15a72c678e17",
+      "scripts/mtls_transport.py": "5e71999d5eb87354bd1beaf79b62fad5169d7584106deebf60ed3ee53c9b1a56",
+      "scripts/observability_lab.py": "596bf05a9d8d2ffe268e0d61142d9d4d6f5b9fff64012497aa6b542f9eacfcc3",
+      "scripts/pep_lab.py": "b199f1fd9df18e75e564182036e8ef208872bc65f6efd489f058840541263fe8",
+      "scripts/session_watchdog.py": "a70627cf113d1cf1e13adef8ef6f1b4ffc7bd99ca93c677ab6c099343eea322e",
+      "scripts/signal_metrics_exporter.py": "6a0cc98797b1fc53f2a40af019c608996fe734809ebd936e1985bd152ae5ba41",
+      "scripts/test_all_hops_mtls.py": "0e7c44dc5fb4ab1809e4a0a5e377338132991b719061fa4fe97cd47b4e61ce09",
+      "scripts/test_authority_key_rotation.py": "2e7c4dbd442e02421ec8f61d7f2346d8e79fec549601f4e2741ab1721f2dad0c",
+      "scripts/test_ca_high_availability.py": "284c3785291117d71ffa78dd0be6147e6e8e58fb16a63a697d8c519b6b91e4b2",
+      "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+      "scripts/test_certificate_automation.py": "37740d5b589cadbaedc3d530ea8318d5ff4f3a44a07f17f0cd320d1418e6b773",
+      "scripts/test_continuous_mtls_runtime.py": "39a870c1437b7e3c2c332827fc5b4ddc95c3b343a20512e1c4c010ebd86f7b7b",
+      "scripts/test_control_plane_ha.py": "47b1579dcc89bd1d2e0a041c53f2ca6cd6de2adaf0ac74ae029d9c02e56c744a",
+      "scripts/test_control_transition.py": "5e0683ea48d454c57322adb1d45b7f3c1881a4ba4d956524d31a7e6529ed3e91",
+      "scripts/test_executor_actor_loss.py": "6b097f646a42c827af3fa665e7647f5a8d92c49339797cfb534bb147a41816f9",
+      "scripts/test_executor_hosts.py": "0a9f791330279db729bddfea016c4484b1558bdbca683003d71f842ee7ac3c4f",
+      "scripts/test_executor_transition.py": "4dde1cb1bbd052616012d89a3d762ee070b4a68d0e3baca91ecebd359bf0b905",
+      "scripts/test_mtls_infrastructure.py": "3724f4c98f0baee127c58d4f961f048d8be97dde9d409ee7137f996845c6b72b",
+      "scripts/test_private_key_rotation.py": "b8fd85194759dff83f7991f2069ebefe1025b853a53ce48b8f846b4c194a788c",
+      "tests/test_collector_spool.py": "6456d259efc95ef4a0d624d4351ade2d7ecd2dc8ae67da7894f3a5c18f34cab4",
+      "tests/test_continuous_mtls_runtime.py": "c1626d4e015dc667f9ae51b682cadeefe68cb91a16062b16c470d0fc8d636a53",
+      "tests/test_continuous_signal_collector.py": "fdf91e9b83a5920b18d36fde730c9620da8e2abf37a12c946fadf10d76a3ef95",
+      "tests/test_executor_actor_loss.py": "20a2532db357ee026a2d10e223cffc9fbd56ff90a5027d8618ae27b6d286d260",
+      "tests/test_executor_transition.py": "e4c00ddda3bd88430063c4df3856801078b77cbf6035d6bc30daeca64dc00a8d",
+      "tests/test_observation_collector_process.py": "7d233cd87342d5360f9ba00db1a8cd795d553a7928dae819aee7495f1a1a2209",
+      "tests/test_session_revalidation.py": "7ab58fed04eaa218d9cb0a9c08cd23e8bf78d15b6eebcf5d517338739d5e46e7",
+      "tests/test_session_watchdog_process.py": "a621f608cd47244e25b6a7251521e2da404e236a5f63ce078657af704599b6f8"
+    },
+    "present": {
+      "Dockerfile": "2278c841e2f77eda77f5ed282abd5f35ddf50f2e3dd2e890c36967804f4db219",
+      "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+      "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+      "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+      "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+      "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+      "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+      "app/config.py": "27abe1679ef3147f9eb28920299c68dbf93932e05bda6035a64d7b0ac1d2fcb2",
+      "app/continuous_signal_models.py": "895b017d7c666923639088281f71ef64386977e381c5b8060c3123d174be34ae",
+      "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+      "app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+      "app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+      "app/data/control-register.json": "a8884d1269874e18a6b5261940d9e498c8509c51d0f134ea252e6b04a327c201",
+      "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+      "app/data/replay/manifest.json": "bc974726efe7f2b98119af04b9b624ba4b18a4588b2d5ff8a4c441d4beb232e9",
+      "app/data/replay/microsoft-sentinel-wiz-audit.json": "4bc25e2e6ae2cb4b80d2d135fb401d073e2c66e2d183dd5cabb574cde27ebc3b",
+      "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+      "app/data/sigma/credential_anomaly.yml": "27ee3ff5ce6eb25bdffeb5d25a59998b21c799fcff48768204be57f2974b4086",
+      "app/data/sigma/data_exfiltration.yml": "e378a7df56ac30a3c5568d42e86be53bfd43ce88489ae500c84d16e8ee8466e7",
+      "app/data/sigma/lateral_movement.yml": "cd13987a9a7ae36d57f718a2b9a87cb0fb224e5a78380311dec8edcd78dfe0c8",
+      "app/data/sigma/privilege_escalation.yml": "337b23a4ba5bed1081828f30d771f777628d8bdd88ee1298a776e7f3f21eb880",
+      "app/data/sigma/remote_desktop_logon.yml": "35a4a4fbe7ae16484a16a4287e6287239697648018be40dd4e9c33e04b0c61ee",
+      "app/data/sigma/unmanaged_device_access.yml": "b0c3ef8498458e9d687c32ca554147de44db7cdf84857eacf4224050b8122004",
+      "app/data/zero-trust-policies.json": "ab3acc5b14ba5a4af640240cc781d1ea63523a096d7e5c2dfd3d912dc468d0f9",
+      "app/main.py": "c04fb9ff8011a463994a95eed78d577512434500d2e89d0ce424161b9e2fce34",
+      "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+      "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+      "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+      "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+      "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+      "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+      "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+      "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+      "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+      "app/services/collector_spool.py": "347d80f8044fecc9e43ce48045d712237d49245a8fe47de15482db8574ab2a08",
+      "app/services/continuous_signals.py": "05115d837dc2c00b56aafbe8833b047c0cd9fb1854fff20ba7db03db261ca2a3",
+      "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+      "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+      "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+      "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+      "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+      "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+      "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+      "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+      "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+      "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+      "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+      "app/services/signal_inbox.py": "03b2d65ded032c5dd3c55434fa538afdc5604e72f54ddce2581e146cf05378b8",
+      "app/services/trusted_signals.py": "076ac930894e32522813ff39e1c6f317bcd2a6746605f670dde8f807d59492ff",
+      "app/services/zero_trust.py": "19270efe1dca2c273e41f8c35eaf22cf73dfa2b8022aea00a0189762d7a8003b",
+      "app/zero_trust_api.py": "556fda2b67c9a20077b65c5f03c121e5deffd4a48d9f651ff1b7409f26b1b491",
+      "app/zero_trust_models.py": "1c466b491a923a23ce618e776660193c9bae4bef8a5026e39d8ac310a4ae7992",
+      "infra/mtls/all-hops-contract.json": "e2c47e8a6594298dafbad183cdf9f75ab4814c5a405a3cf10ab996c7835631fe",
+      "infra/mtls/all-hops-nginx.conf": "858533d28040a4d83c6bd58ede75e3efac0f8597f3e2992dfa79976527ad2e0e",
+      "infra/mtls/authority-rotation-contract.json": "e344b3be34aca530d47ec30b07c8df8fd5dacabb2febccb91fc7138c7fb489cb",
+      "infra/mtls/ca-ha-contract.json": "36f50c9666eaf1ace7dc976ebbd2da501154c55d5523e75646b55de132ac5ccc",
+      "infra/mtls/ca-ha-tools.lock.json": "30c9e3b2f850c4d8a8bc6d89d9c0d9e15717d62e980989073372c8b3a61345d2",
+      "infra/mtls/ca-recovery-tools.lock.json": "50a2419212074c7733f72046bc762ba8a97d88263e99d6cbf7f984787f73aa42",
+      "infra/mtls/ca-tools.lock.json": "dde8c06b2764b93b3767df4a38064586c27f78a62697084671cea62816028122",
+      "infra/mtls/certificate-lifecycle-contract.json": "df5c727f4a167dc3135636daf96a9f7fad1b24f3c7fa001257b5a1badd91e503",
+      "infra/mtls/contract.json": "d09f81a030ce30a4ab15e24097b5b78e95d3471f76fb7593afa39f13a9e8e55b",
+      "infra/mtls/nginx-rekey.sh": "a57af3bdd39b62a8961ead51392be8155d246dcc5878638920285f07c406c814",
+      "infra/mtls/nginx-renewal.sh": "07468723f53706ef477f19725dcdf2fed53f51ea41eb277c317f828fc5f9505c",
+      "infra/mtls/private-key-rotation-contract.json": "2832f6dd92ef36aaa49af5e96cbb984b3969783cca37c3152d77f137bd5e5cff",
+      "infra/observability/alerts.yaml": "3b2e233f36d0338ecf572c384961729a951d51e8a2ab1f9264bb4e7cdff95172",
+      "infra/observability/tools.lock.json": "3d4b387c15a2dadd6bd7c4d3e84af436b9072b80ec32083346d40d27a4b8f014",
+      "infra/pep/contract.json": "c9aa86653aa173db206f446a09878e7facad3abf0905d85f25d013b70a59d0b5",
+      "infra/pep/envoy.yaml": "460fff298ab3e5554d8f2f7b102b8c315e57cb81fb1dd1ecb5f1ff3fec6e164a",
+      "infra/pep/nginx.conf": "654470eda569a812501345415dac2ba7da4128c480eaae71691cd50c47afdf65",
+      "infra/pep/tools.lock.json": "9076cc79d486366d5814014024df6f38ffef7862bbaf008261c39f7249b447e6",
+      "pyproject.toml": "b8bd572be04ec1a6f8bf818645b6ac74458f98fc9561ea453210ab6c23e5475e",
+      "scripts/authority_custodian.py": "b87fc7ef0be26ecb259510e8df07eae402dae9608b1a2e5bfa3e03b23c6f4693",
+      "scripts/authority_rotation_coordinator.py": "1ab99ef7f9a96c75393209c169d41f82db0a783c4f24bde7df622a7c9c84647b",
+      "scripts/authority_rotation_runtime.py": "e184e49c386ed46d4f3e9214cec95e97a7f56e4e0608711119f2c61b6b76ca26",
+      "scripts/ca_endpoints.py": "b5c546ce93d86ea90e99de46f78e80e60149f8146605e27160ceb24a9babd057",
+      "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+      "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+      "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+      "scripts/certificate_authority.py": "1b3e0d501e74d9bc47442e15b1d2f4201bf4a6fd6d48644d93a70c6592c54f9c",
+      "scripts/certificate_controller.py": "fe5d5058b8edbf3632e6d060c4ad2074d6ea8fd72767524db18da1ea9d70ec32",
+      "scripts/certificate_key_rotation.py": "e648f07caf6d2a7873fb14d91cfd5285f5aec67e1aa086e436e1e5ca9284d319",
+      "scripts/certificate_reload_runner.py": "bbdafeaa210b747c007f666ec4f1beb12ee2b9afe49556fffc7c303751f0a6c9",
+      "scripts/compare_pep.py": "e2ef12beb7950a263d6384869fc3e33326c6901f9692e91f77ee16f6775fb9b4",
+      "scripts/continuous_mtls_assets.py": "0088c353bed65dbb7ff5949a0c6f8f0c73b4f72c8cfa51bd5b63eb83bd81d66e",
+      "scripts/continuous_mtls_runtime.py": "3275cbcee45c7e70fd135ff2d085785ea1460c92b68d546b56d3eaeb88d14755",
+      "scripts/continuous_signal_collector.py": "ed3a6dce1e4f4fa02fc173d2c511902e5db57e2b84e272148c78409e39c1e49a",
+      "scripts/control_executor.py": "d5fca9f017f91ab7a65fa53b71df8bc583e4f052cba1a46e444e440f2a27fa15",
+      "scripts/control_mirror.py": "7755a1e838b5b2f92d37d7d05e3de6a2456191ca18ae2b76d9882c86f79f10f3",
+      "scripts/control_plane_ha.py": "1c4c2e10e28fc8ea4a057f809e2ce6d8ea1e2cd09d33771fba817ee8b836ba3f",
+      "scripts/control_store.py": "6fc5ae46bf568adb1202cff86430cabad1025ee555ad5bddecbf0a9a484c524a",
+      "scripts/control_transition.py": "008a42a90391793290d01fa9986b2488828528ca6e7e192ff5c4a0abdbd8c36b",
+      "scripts/executor_cluster.py": "784dc3b77ea1099f4f21d3d1ef8774c30f317680c47543489c44ba5eaa69dd20",
+      "scripts/executor_disk.py": "95d97888db2d21746698b0dee9656cbe91655f25d3725c63526a1187585be32d",
+      "scripts/executor_fence.py": "62babd635b6c9001cb38ddf7bc4996b22b3976ad96bb67eb5a9623900d5a2152",
+      "scripts/executor_store.py": "a9919ae315ce055cd39da3731dd13a708a3eba585efe2ac5e35b8cdcce076738",
+      "scripts/executor_transition.py": "66f17a86e7ee75257db05325341e6e1903e43bb250ef1c8539b84025674caad4",
+      "scripts/local_signal_collector.py": "a3ce655c10963a183f46413dc71bdaa3f56c7c85da91abe756a7e6e034cfbb39",
+      "scripts/mtls_fixtures.py": "086155d77391fc36973dfb49442c0609ac0192760a1944774d68cbcbfad665b9",
+      "scripts/mtls_native.py": "e892293b44d86feca35b6e408b21ffc28c684893533632c7fc5c15a72c678e17",
+      "scripts/mtls_transport.py": "5e71999d5eb87354bd1beaf79b62fad5169d7584106deebf60ed3ee53c9b1a56",
+      "scripts/observability_lab.py": "596bf05a9d8d2ffe268e0d61142d9d4d6f5b9fff64012497aa6b542f9eacfcc3",
+      "scripts/pep_lab.py": "b199f1fd9df18e75e564182036e8ef208872bc65f6efd489f058840541263fe8",
+      "scripts/session_watchdog.py": "a70627cf113d1cf1e13adef8ef6f1b4ffc7bd99ca93c677ab6c099343eea322e",
+      "scripts/signal_metrics_exporter.py": "6a0cc98797b1fc53f2a40af019c608996fe734809ebd936e1985bd152ae5ba41",
+      "scripts/test_all_hops_mtls.py": "0e7c44dc5fb4ab1809e4a0a5e377338132991b719061fa4fe97cd47b4e61ce09",
+      "scripts/test_authority_key_rotation.py": "2e7c4dbd442e02421ec8f61d7f2346d8e79fec549601f4e2741ab1721f2dad0c",
+      "scripts/test_ca_high_availability.py": "284c3785291117d71ffa78dd0be6147e6e8e58fb16a63a697d8c519b6b91e4b2",
+      "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+      "scripts/test_certificate_automation.py": "37740d5b589cadbaedc3d530ea8318d5ff4f3a44a07f17f0cd320d1418e6b773",
+      "scripts/test_continuous_mtls_runtime.py": "39a870c1437b7e3c2c332827fc5b4ddc95c3b343a20512e1c4c010ebd86f7b7b",
+      "scripts/test_control_plane_ha.py": "47b1579dcc89bd1d2e0a041c53f2ca6cd6de2adaf0ac74ae029d9c02e56c744a",
+      "scripts/test_control_transition.py": "5e0683ea48d454c57322adb1d45b7f3c1881a4ba4d956524d31a7e6529ed3e91",
+      "scripts/test_executor_actor_loss.py": "6b097f646a42c827af3fa665e7647f5a8d92c49339797cfb534bb147a41816f9",
+      "scripts/test_executor_hosts.py": "0a9f791330279db729bddfea016c4484b1558bdbca683003d71f842ee7ac3c4f",
+      "scripts/test_executor_transition.py": "4dde1cb1bbd052616012d89a3d762ee070b4a68d0e3baca91ecebd359bf0b905",
+      "scripts/test_mtls_infrastructure.py": "3724f4c98f0baee127c58d4f961f048d8be97dde9d409ee7137f996845c6b72b",
+      "scripts/test_private_key_rotation.py": "b8fd85194759dff83f7991f2069ebefe1025b853a53ce48b8f846b4c194a788c",
+      "tests/test_collector_spool.py": "6456d259efc95ef4a0d624d4351ade2d7ecd2dc8ae67da7894f3a5c18f34cab4",
+      "tests/test_continuous_mtls_runtime.py": "c1626d4e015dc667f9ae51b682cadeefe68cb91a16062b16c470d0fc8d636a53",
+      "tests/test_continuous_signal_collector.py": "fdf91e9b83a5920b18d36fde730c9620da8e2abf37a12c946fadf10d76a3ef95",
+      "tests/test_executor_actor_loss.py": "20a2532db357ee026a2d10e223cffc9fbd56ff90a5027d8618ae27b6d286d260",
+      "tests/test_executor_transition.py": "e4c00ddda3bd88430063c4df3856801078b77cbf6035d6bc30daeca64dc00a8d",
+      "tests/test_observation_collector_process.py": "7d233cd87342d5360f9ba00db1a8cd795d553a7928dae819aee7495f1a1a2209",
+      "tests/test_session_revalidation.py": "7ab58fed04eaa218d9cb0a9c08cd23e8bf78d15b6eebcf5d517338739d5e46e7",
+      "tests/test_session_watchdog_process.py": "a621f608cd47244e25b6a7251521e2da404e236a5f63ce078657af704599b6f8"
+    },
+    "external_not_copied": [
+      ".gitattributes"
+    ]
+  },
+  "image_source_sha256": {
+    "authority_image_source_sha256": {
+      "scripts/authority_custodian.py": "b87fc7ef0be26ecb259510e8df07eae402dae9608b1a2e5bfa3e03b23c6f4693",
+      "scripts/authority_rotation_runtime.py": "e184e49c386ed46d4f3e9214cec95e97a7f56e4e0608711119f2c61b6b76ca26",
+      "scripts/authority_rotation_coordinator.py": "1ab99ef7f9a96c75393209c169d41f82db0a783c4f24bde7df622a7c9c84647b",
+      "scripts/test_authority_key_rotation.py": "2e7c4dbd442e02421ec8f61d7f2346d8e79fec549601f4e2741ab1721f2dad0c",
+      "scripts/certificate_controller.py": "fe5d5058b8edbf3632e6d060c4ad2074d6ea8fd72767524db18da1ea9d70ec32",
+      "scripts/certificate_key_rotation.py": "e648f07caf6d2a7873fb14d91cfd5285f5aec67e1aa086e436e1e5ca9284d319",
+      "scripts/test_private_key_rotation.py": "b8fd85194759dff83f7991f2069ebefe1025b853a53ce48b8f846b4c194a788c",
+      "scripts/test_certificate_automation.py": "37740d5b589cadbaedc3d530ea8318d5ff4f3a44a07f17f0cd320d1418e6b773"
+    },
+    "ha_image_source_sha256": {
+      "scripts/authority_custodian.py": "b87fc7ef0be26ecb259510e8df07eae402dae9608b1a2e5bfa3e03b23c6f4693",
+      "scripts/authority_rotation_runtime.py": "e184e49c386ed46d4f3e9214cec95e97a7f56e4e0608711119f2c61b6b76ca26",
+      "scripts/authority_rotation_coordinator.py": "1ab99ef7f9a96c75393209c169d41f82db0a783c4f24bde7df622a7c9c84647b",
+      "scripts/test_authority_key_rotation.py": "2e7c4dbd442e02421ec8f61d7f2346d8e79fec549601f4e2741ab1721f2dad0c",
+      "scripts/certificate_controller.py": "fe5d5058b8edbf3632e6d060c4ad2074d6ea8fd72767524db18da1ea9d70ec32",
+      "scripts/certificate_key_rotation.py": "e648f07caf6d2a7873fb14d91cfd5285f5aec67e1aa086e436e1e5ca9284d319",
+      "scripts/test_private_key_rotation.py": "b8fd85194759dff83f7991f2069ebefe1025b853a53ce48b8f846b4c194a788c",
+      "scripts/test_certificate_automation.py": "37740d5b589cadbaedc3d530ea8318d5ff4f3a44a07f17f0cd320d1418e6b773",
+      "scripts/ca_endpoints.py": "b5c546ce93d86ea90e99de46f78e80e60149f8146605e27160ceb24a9babd057",
+      "scripts/test_ca_high_availability.py": "284c3785291117d71ffa78dd0be6147e6e8e58fb16a63a697d8c519b6b91e4b2",
+      "scripts/certificate_authority.py": "1b3e0d501e74d9bc47442e15b1d2f4201bf4a6fd6d48644d93a70c6592c54f9c"
+    },
+    "recovery_image_source_sha256": {
+      "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+      "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+      "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+      "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+      "scripts/authority_rotation_coordinator.py": "1ab99ef7f9a96c75393209c169d41f82db0a783c4f24bde7df622a7c9c84647b",
+      "scripts/authority_rotation_runtime.py": "e184e49c386ed46d4f3e9214cec95e97a7f56e4e0608711119f2c61b6b76ca26",
+      "scripts/authority_custodian.py": "b87fc7ef0be26ecb259510e8df07eae402dae9608b1a2e5bfa3e03b23c6f4693",
+      "scripts/certificate_controller.py": "fe5d5058b8edbf3632e6d060c4ad2074d6ea8fd72767524db18da1ea9d70ec32",
+      "scripts/certificate_authority.py": "1b3e0d501e74d9bc47442e15b1d2f4201bf4a6fd6d48644d93a70c6592c54f9c",
+      "scripts/certificate_key_rotation.py": "e648f07caf6d2a7873fb14d91cfd5285f5aec67e1aa086e436e1e5ca9284d319",
+      "scripts/test_authority_key_rotation.py": "2e7c4dbd442e02421ec8f61d7f2346d8e79fec549601f4e2741ab1721f2dad0c",
+      "scripts/test_ca_high_availability.py": "284c3785291117d71ffa78dd0be6147e6e8e58fb16a63a697d8c519b6b91e4b2",
+      "scripts/test_private_key_rotation.py": "b8fd85194759dff83f7991f2069ebefe1025b853a53ce48b8f846b4c194a788c",
+      "scripts/test_certificate_automation.py": "37740d5b589cadbaedc3d530ea8318d5ff4f3a44a07f17f0cd320d1418e6b773",
+      "scripts/ca_endpoints.py": "b5c546ce93d86ea90e99de46f78e80e60149f8146605e27160ceb24a9babd057"
+    },
+    "control_image_source_sha256": {
+      "scripts/control_transition.py": "008a42a90391793290d01fa9986b2488828528ca6e7e192ff5c4a0abdbd8c36b",
+      "scripts/control_mirror.py": "7755a1e838b5b2f92d37d7d05e3de6a2456191ca18ae2b76d9882c86f79f10f3",
+      "scripts/executor_fence.py": "62babd635b6c9001cb38ddf7bc4996b22b3976ad96bb67eb5a9623900d5a2152",
+      "scripts/control_store.py": "6fc5ae46bf568adb1202cff86430cabad1025ee555ad5bddecbf0a9a484c524a",
+      "scripts/control_plane_ha.py": "1c4c2e10e28fc8ea4a057f809e2ce6d8ea1e2cd09d33771fba817ee8b836ba3f",
+      "scripts/test_control_plane_ha.py": "47b1579dcc89bd1d2e0a041c53f2ca6cd6de2adaf0ac74ae029d9c02e56c744a"
+    },
+    "executor_image_source_sha256": {
+      "graph": {
+        "scripts/control_executor.py": "d5fca9f017f91ab7a65fa53b71df8bc583e4f052cba1a46e444e440f2a27fa15",
+        "scripts/executor_cluster.py": "784dc3b77ea1099f4f21d3d1ef8774c30f317680c47543489c44ba5eaa69dd20",
+        "scripts/executor_disk.py": "95d97888db2d21746698b0dee9656cbe91655f25d3725c63526a1187585be32d",
+        "scripts/executor_transition.py": "66f17a86e7ee75257db05325341e6e1903e43bb250ef1c8539b84025674caad4",
+        "scripts/executor_fence.py": "62babd635b6c9001cb38ddf7bc4996b22b3976ad96bb67eb5a9623900d5a2152",
+        "scripts/executor_store.py": "a9919ae315ce055cd39da3731dd13a708a3eba585efe2ac5e35b8cdcce076738",
+        "scripts/test_executor_hosts.py": "0a9f791330279db729bddfea016c4484b1558bdbca683003d71f842ee7ac3c4f",
+        "scripts/test_control_transition.py": "5e0683ea48d454c57322adb1d45b7f3c1881a4ba4d956524d31a7e6529ed3e91"
+      },
+      "executor": {
+        "scripts/control_executor.py": "d5fca9f017f91ab7a65fa53b71df8bc583e4f052cba1a46e444e440f2a27fa15",
+        "scripts/executor_cluster.py": "784dc3b77ea1099f4f21d3d1ef8774c30f317680c47543489c44ba5eaa69dd20",
+        "scripts/executor_disk.py": "95d97888db2d21746698b0dee9656cbe91655f25d3725c63526a1187585be32d",
+        "scripts/executor_transition.py": "66f17a86e7ee75257db05325341e6e1903e43bb250ef1c8539b84025674caad4",
+        "scripts/executor_fence.py": "62babd635b6c9001cb38ddf7bc4996b22b3976ad96bb67eb5a9623900d5a2152",
+        "scripts/executor_store.py": "a9919ae315ce055cd39da3731dd13a708a3eba585efe2ac5e35b8cdcce076738",
+        "scripts/test_executor_hosts.py": "0a9f791330279db729bddfea016c4484b1558bdbca683003d71f842ee7ac3c4f",
+        "scripts/test_control_transition.py": "5e0683ea48d454c57322adb1d45b7f3c1881a4ba4d956524d31a7e6529ed3e91"
+      }
+    },
+    "operator_image_source_sha256": {
+      "graph": {
+        "scripts/executor_transition.py": "66f17a86e7ee75257db05325341e6e1903e43bb250ef1c8539b84025674caad4",
+        "scripts/test_executor_transition.py": "4dde1cb1bbd052616012d89a3d762ee070b4a68d0e3baca91ecebd359bf0b905"
+      },
+      "executor": {
+        "scripts/executor_transition.py": "66f17a86e7ee75257db05325341e6e1903e43bb250ef1c8539b84025674caad4",
+        "scripts/test_executor_transition.py": "4dde1cb1bbd052616012d89a3d762ee070b4a68d0e3baca91ecebd359bf0b905"
+      }
+    },
+    "actor_loss_image_source_sha256": {
+      "graph": {
+        "scripts/test_executor_actor_loss.py": "6b097f646a42c827af3fa665e7647f5a8d92c49339797cfb534bb147a41816f9"
+      },
+      "executor": {
+        "scripts/test_executor_actor_loss.py": "6b097f646a42c827af3fa665e7647f5a8d92c49339797cfb534bb147a41816f9"
+      }
+    }
+  },
+  "all_present_code_image_audit": {
+    "graph": {
+      "present": {
+        "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+        "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+        "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+        "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+        "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+        "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+        "app/config.py": "27abe1679ef3147f9eb28920299c68dbf93932e05bda6035a64d7b0ac1d2fcb2",
+        "app/continuous_signal_models.py": "895b017d7c666923639088281f71ef64386977e381c5b8060c3123d174be34ae",
+        "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+        "app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+        "app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+        "app/data/control-register.json": "a8884d1269874e18a6b5261940d9e498c8509c51d0f134ea252e6b04a327c201",
+        "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+        "app/data/replay/manifest.json": "bc974726efe7f2b98119af04b9b624ba4b18a4588b2d5ff8a4c441d4beb232e9",
+        "app/data/replay/microsoft-sentinel-wiz-audit.json": "4bc25e2e6ae2cb4b80d2d135fb401d073e2c66e2d183dd5cabb574cde27ebc3b",
+        "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+        "app/data/sigma/credential_anomaly.yml": "27ee3ff5ce6eb25bdffeb5d25a59998b21c799fcff48768204be57f2974b4086",
+        "app/data/sigma/data_exfiltration.yml": "e378a7df56ac30a3c5568d42e86be53bfd43ce88489ae500c84d16e8ee8466e7",
+        "app/data/sigma/lateral_movement.yml": "cd13987a9a7ae36d57f718a2b9a87cb0fb224e5a78380311dec8edcd78dfe0c8",
+        "app/data/sigma/privilege_escalation.yml": "337b23a4ba5bed1081828f30d771f777628d8bdd88ee1298a776e7f3f21eb880",
+        "app/data/sigma/remote_desktop_logon.yml": "35a4a4fbe7ae16484a16a4287e6287239697648018be40dd4e9c33e04b0c61ee",
+        "app/data/sigma/unmanaged_device_access.yml": "b0c3ef8498458e9d687c32ca554147de44db7cdf84857eacf4224050b8122004",
+        "app/data/zero-trust-policies.json": "ab3acc5b14ba5a4af640240cc781d1ea63523a096d7e5c2dfd3d912dc468d0f9",
+        "app/main.py": "c04fb9ff8011a463994a95eed78d577512434500d2e89d0ce424161b9e2fce34",
+        "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+        "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+        "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+        "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+        "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+        "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+        "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+        "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+        "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+        "app/services/collector_spool.py": "347d80f8044fecc9e43ce48045d712237d49245a8fe47de15482db8574ab2a08",
+        "app/services/continuous_signals.py": "05115d837dc2c00b56aafbe8833b047c0cd9fb1854fff20ba7db03db261ca2a3",
+        "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+        "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+        "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+        "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+        "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+        "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+        "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+        "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+        "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+        "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+        "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+        "app/services/signal_inbox.py": "03b2d65ded032c5dd3c55434fa538afdc5604e72f54ddce2581e146cf05378b8",
+        "app/services/trusted_signals.py": "076ac930894e32522813ff39e1c6f317bcd2a6746605f670dde8f807d59492ff",
+        "app/services/zero_trust.py": "19270efe1dca2c273e41f8c35eaf22cf73dfa2b8022aea00a0189762d7a8003b",
+        "app/zero_trust_api.py": "556fda2b67c9a20077b65c5f03c121e5deffd4a48d9f651ff1b7409f26b1b491",
+        "app/zero_trust_models.py": "1c466b491a923a23ce618e776660193c9bae4bef8a5026e39d8ac310a4ae7992",
+        "pyproject.toml": "b8bd572be04ec1a6f8bf818645b6ac74458f98fc9561ea453210ab6c23e5475e",
+        "scripts/pep_lab.py": "b199f1fd9df18e75e564182036e8ef208872bc65f6efd489f058840541263fe8",
+        "scripts/compare_pep.py": "e2ef12beb7950a263d6384869fc3e33326c6901f9692e91f77ee16f6775fb9b4",
+        "scripts/mtls_transport.py": "5e71999d5eb87354bd1beaf79b62fad5169d7584106deebf60ed3ee53c9b1a56",
+        "scripts/mtls_fixtures.py": "086155d77391fc36973dfb49442c0609ac0192760a1944774d68cbcbfad665b9",
+        "scripts/test_mtls_infrastructure.py": "3724f4c98f0baee127c58d4f961f048d8be97dde9d409ee7137f996845c6b72b",
+        "scripts/mtls_native.py": "e892293b44d86feca35b6e408b21ffc28c684893533632c7fc5c15a72c678e17",
+        "scripts/test_all_hops_mtls.py": "0e7c44dc5fb4ab1809e4a0a5e377338132991b719061fa4fe97cd47b4e61ce09",
+        "scripts/signal_metrics_exporter.py": "6a0cc98797b1fc53f2a40af019c608996fe734809ebd936e1985bd152ae5ba41",
+        "scripts/local_signal_collector.py": "a3ce655c10963a183f46413dc71bdaa3f56c7c85da91abe756a7e6e034cfbb39",
+        "scripts/observability_lab.py": "596bf05a9d8d2ffe268e0d61142d9d4d6f5b9fff64012497aa6b542f9eacfcc3",
+        "scripts/certificate_authority.py": "1b3e0d501e74d9bc47442e15b1d2f4201bf4a6fd6d48644d93a70c6592c54f9c",
+        "scripts/certificate_controller.py": "fe5d5058b8edbf3632e6d060c4ad2074d6ea8fd72767524db18da1ea9d70ec32",
+        "scripts/certificate_reload_runner.py": "bbdafeaa210b747c007f666ec4f1beb12ee2b9afe49556fffc7c303751f0a6c9",
+        "scripts/test_certificate_automation.py": "37740d5b589cadbaedc3d530ea8318d5ff4f3a44a07f17f0cd320d1418e6b773",
+        "scripts/certificate_key_rotation.py": "e648f07caf6d2a7873fb14d91cfd5285f5aec67e1aa086e436e1e5ca9284d319",
+        "scripts/test_private_key_rotation.py": "b8fd85194759dff83f7991f2069ebefe1025b853a53ce48b8f846b4c194a788c",
+        "scripts/authority_custodian.py": "b87fc7ef0be26ecb259510e8df07eae402dae9608b1a2e5bfa3e03b23c6f4693",
+        "scripts/authority_rotation_runtime.py": "e184e49c386ed46d4f3e9214cec95e97a7f56e4e0608711119f2c61b6b76ca26",
+        "scripts/authority_rotation_coordinator.py": "1ab99ef7f9a96c75393209c169d41f82db0a783c4f24bde7df622a7c9c84647b",
+        "scripts/test_authority_key_rotation.py": "2e7c4dbd442e02421ec8f61d7f2346d8e79fec549601f4e2741ab1721f2dad0c",
+        "scripts/ca_endpoints.py": "b5c546ce93d86ea90e99de46f78e80e60149f8146605e27160ceb24a9babd057",
+        "scripts/test_ca_high_availability.py": "284c3785291117d71ffa78dd0be6147e6e8e58fb16a63a697d8c519b6b91e4b2",
+        "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+        "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+        "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+        "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+        "scripts/control_transition.py": "008a42a90391793290d01fa9986b2488828528ca6e7e192ff5c4a0abdbd8c36b",
+        "scripts/control_mirror.py": "7755a1e838b5b2f92d37d7d05e3de6a2456191ca18ae2b76d9882c86f79f10f3",
+        "scripts/executor_fence.py": "62babd635b6c9001cb38ddf7bc4996b22b3976ad96bb67eb5a9623900d5a2152",
+        "scripts/control_store.py": "6fc5ae46bf568adb1202cff86430cabad1025ee555ad5bddecbf0a9a484c524a",
+        "scripts/control_plane_ha.py": "1c4c2e10e28fc8ea4a057f809e2ce6d8ea1e2cd09d33771fba817ee8b836ba3f",
+        "scripts/test_control_plane_ha.py": "47b1579dcc89bd1d2e0a041c53f2ca6cd6de2adaf0ac74ae029d9c02e56c744a",
+        "scripts/control_executor.py": "d5fca9f017f91ab7a65fa53b71df8bc583e4f052cba1a46e444e440f2a27fa15",
+        "scripts/executor_cluster.py": "784dc3b77ea1099f4f21d3d1ef8774c30f317680c47543489c44ba5eaa69dd20",
+        "scripts/executor_disk.py": "95d97888db2d21746698b0dee9656cbe91655f25d3725c63526a1187585be32d",
+        "scripts/executor_transition.py": "66f17a86e7ee75257db05325341e6e1903e43bb250ef1c8539b84025674caad4",
+        "scripts/executor_store.py": "a9919ae315ce055cd39da3731dd13a708a3eba585efe2ac5e35b8cdcce076738",
+        "scripts/test_executor_hosts.py": "0a9f791330279db729bddfea016c4484b1558bdbca683003d71f842ee7ac3c4f",
+        "scripts/test_control_transition.py": "5e0683ea48d454c57322adb1d45b7f3c1881a4ba4d956524d31a7e6529ed3e91",
+        "scripts/test_executor_transition.py": "4dde1cb1bbd052616012d89a3d762ee070b4a68d0e3baca91ecebd359bf0b905",
+        "scripts/test_executor_actor_loss.py": "6b097f646a42c827af3fa665e7647f5a8d92c49339797cfb534bb147a41816f9"
+      },
+      "external_inputs_not_copied_into_image": [
+        "Dockerfile",
+        "infra/pep/contract.json",
+        "infra/pep/envoy.yaml",
+        "infra/pep/nginx.conf",
+        "infra/pep/tools.lock.json",
+        "infra/mtls/contract.json",
+        "infra/mtls/all-hops-nginx.conf",
+        "infra/mtls/all-hops-contract.json",
+        "infra/observability/alerts.yaml",
+        "infra/observability/tools.lock.json",
+        "infra/mtls/ca-tools.lock.json",
+        "infra/mtls/certificate-lifecycle-contract.json",
+        "infra/mtls/nginx-renewal.sh",
+        ".gitattributes",
+        "infra/mtls/nginx-rekey.sh",
+        "infra/mtls/private-key-rotation-contract.json",
+        "infra/mtls/authority-rotation-contract.json",
+        "infra/mtls/ca-ha-tools.lock.json",
+        "infra/mtls/ca-ha-contract.json",
+        "infra/mtls/ca-recovery-tools.lock.json"
+      ]
+    },
+    "executor": {
+      "present": {
+        "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+        "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+        "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+        "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+        "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+        "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+        "app/config.py": "27abe1679ef3147f9eb28920299c68dbf93932e05bda6035a64d7b0ac1d2fcb2",
+        "app/continuous_signal_models.py": "895b017d7c666923639088281f71ef64386977e381c5b8060c3123d174be34ae",
+        "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+        "app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+        "app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+        "app/data/control-register.json": "a8884d1269874e18a6b5261940d9e498c8509c51d0f134ea252e6b04a327c201",
+        "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+        "app/data/replay/manifest.json": "bc974726efe7f2b98119af04b9b624ba4b18a4588b2d5ff8a4c441d4beb232e9",
+        "app/data/replay/microsoft-sentinel-wiz-audit.json": "4bc25e2e6ae2cb4b80d2d135fb401d073e2c66e2d183dd5cabb574cde27ebc3b",
+        "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+        "app/data/sigma/credential_anomaly.yml": "27ee3ff5ce6eb25bdffeb5d25a59998b21c799fcff48768204be57f2974b4086",
+        "app/data/sigma/data_exfiltration.yml": "e378a7df56ac30a3c5568d42e86be53bfd43ce88489ae500c84d16e8ee8466e7",
+        "app/data/sigma/lateral_movement.yml": "cd13987a9a7ae36d57f718a2b9a87cb0fb224e5a78380311dec8edcd78dfe0c8",
+        "app/data/sigma/privilege_escalation.yml": "337b23a4ba5bed1081828f30d771f777628d8bdd88ee1298a776e7f3f21eb880",
+        "app/data/sigma/remote_desktop_logon.yml": "35a4a4fbe7ae16484a16a4287e6287239697648018be40dd4e9c33e04b0c61ee",
+        "app/data/sigma/unmanaged_device_access.yml": "b0c3ef8498458e9d687c32ca554147de44db7cdf84857eacf4224050b8122004",
+        "app/data/zero-trust-policies.json": "ab3acc5b14ba5a4af640240cc781d1ea63523a096d7e5c2dfd3d912dc468d0f9",
+        "app/main.py": "c04fb9ff8011a463994a95eed78d577512434500d2e89d0ce424161b9e2fce34",
+        "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+        "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+        "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+        "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+        "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+        "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+        "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+        "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+        "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+        "app/services/collector_spool.py": "347d80f8044fecc9e43ce48045d712237d49245a8fe47de15482db8574ab2a08",
+        "app/services/continuous_signals.py": "05115d837dc2c00b56aafbe8833b047c0cd9fb1854fff20ba7db03db261ca2a3",
+        "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+        "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+        "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+        "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+        "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+        "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+        "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+        "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+        "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+        "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+        "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+        "app/services/signal_inbox.py": "03b2d65ded032c5dd3c55434fa538afdc5604e72f54ddce2581e146cf05378b8",
+        "app/services/trusted_signals.py": "076ac930894e32522813ff39e1c6f317bcd2a6746605f670dde8f807d59492ff",
+        "app/services/zero_trust.py": "19270efe1dca2c273e41f8c35eaf22cf73dfa2b8022aea00a0189762d7a8003b",
+        "app/zero_trust_api.py": "556fda2b67c9a20077b65c5f03c121e5deffd4a48d9f651ff1b7409f26b1b491",
+        "app/zero_trust_models.py": "1c466b491a923a23ce618e776660193c9bae4bef8a5026e39d8ac310a4ae7992",
+        "pyproject.toml": "b8bd572be04ec1a6f8bf818645b6ac74458f98fc9561ea453210ab6c23e5475e",
+        "scripts/pep_lab.py": "b199f1fd9df18e75e564182036e8ef208872bc65f6efd489f058840541263fe8",
+        "scripts/compare_pep.py": "e2ef12beb7950a263d6384869fc3e33326c6901f9692e91f77ee16f6775fb9b4",
+        "scripts/mtls_transport.py": "5e71999d5eb87354bd1beaf79b62fad5169d7584106deebf60ed3ee53c9b1a56",
+        "scripts/mtls_fixtures.py": "086155d77391fc36973dfb49442c0609ac0192760a1944774d68cbcbfad665b9",
+        "scripts/test_mtls_infrastructure.py": "3724f4c98f0baee127c58d4f961f048d8be97dde9d409ee7137f996845c6b72b",
+        "scripts/mtls_native.py": "e892293b44d86feca35b6e408b21ffc28c684893533632c7fc5c15a72c678e17",
+        "scripts/test_all_hops_mtls.py": "0e7c44dc5fb4ab1809e4a0a5e377338132991b719061fa4fe97cd47b4e61ce09",
+        "scripts/signal_metrics_exporter.py": "6a0cc98797b1fc53f2a40af019c608996fe734809ebd936e1985bd152ae5ba41",
+        "scripts/local_signal_collector.py": "a3ce655c10963a183f46413dc71bdaa3f56c7c85da91abe756a7e6e034cfbb39",
+        "scripts/observability_lab.py": "596bf05a9d8d2ffe268e0d61142d9d4d6f5b9fff64012497aa6b542f9eacfcc3",
+        "scripts/certificate_authority.py": "1b3e0d501e74d9bc47442e15b1d2f4201bf4a6fd6d48644d93a70c6592c54f9c",
+        "scripts/certificate_controller.py": "fe5d5058b8edbf3632e6d060c4ad2074d6ea8fd72767524db18da1ea9d70ec32",
+        "scripts/certificate_reload_runner.py": "bbdafeaa210b747c007f666ec4f1beb12ee2b9afe49556fffc7c303751f0a6c9",
+        "scripts/test_certificate_automation.py": "37740d5b589cadbaedc3d530ea8318d5ff4f3a44a07f17f0cd320d1418e6b773",
+        "scripts/certificate_key_rotation.py": "e648f07caf6d2a7873fb14d91cfd5285f5aec67e1aa086e436e1e5ca9284d319",
+        "scripts/test_private_key_rotation.py": "b8fd85194759dff83f7991f2069ebefe1025b853a53ce48b8f846b4c194a788c",
+        "scripts/authority_custodian.py": "b87fc7ef0be26ecb259510e8df07eae402dae9608b1a2e5bfa3e03b23c6f4693",
+        "scripts/authority_rotation_runtime.py": "e184e49c386ed46d4f3e9214cec95e97a7f56e4e0608711119f2c61b6b76ca26",
+        "scripts/authority_rotation_coordinator.py": "1ab99ef7f9a96c75393209c169d41f82db0a783c4f24bde7df622a7c9c84647b",
+        "scripts/test_authority_key_rotation.py": "2e7c4dbd442e02421ec8f61d7f2346d8e79fec549601f4e2741ab1721f2dad0c",
+        "scripts/ca_endpoints.py": "b5c546ce93d86ea90e99de46f78e80e60149f8146605e27160ceb24a9babd057",
+        "scripts/test_ca_high_availability.py": "284c3785291117d71ffa78dd0be6147e6e8e58fb16a63a697d8c519b6b91e4b2",
+        "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+        "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+        "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+        "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+        "scripts/control_transition.py": "008a42a90391793290d01fa9986b2488828528ca6e7e192ff5c4a0abdbd8c36b",
+        "scripts/control_mirror.py": "7755a1e838b5b2f92d37d7d05e3de6a2456191ca18ae2b76d9882c86f79f10f3",
+        "scripts/executor_fence.py": "62babd635b6c9001cb38ddf7bc4996b22b3976ad96bb67eb5a9623900d5a2152",
+        "scripts/control_store.py": "6fc5ae46bf568adb1202cff86430cabad1025ee555ad5bddecbf0a9a484c524a",
+        "scripts/control_plane_ha.py": "1c4c2e10e28fc8ea4a057f809e2ce6d8ea1e2cd09d33771fba817ee8b836ba3f",
+        "scripts/test_control_plane_ha.py": "47b1579dcc89bd1d2e0a041c53f2ca6cd6de2adaf0ac74ae029d9c02e56c744a",
+        "scripts/control_executor.py": "d5fca9f017f91ab7a65fa53b71df8bc583e4f052cba1a46e444e440f2a27fa15",
+        "scripts/executor_cluster.py": "784dc3b77ea1099f4f21d3d1ef8774c30f317680c47543489c44ba5eaa69dd20",
+        "scripts/executor_disk.py": "95d97888db2d21746698b0dee9656cbe91655f25d3725c63526a1187585be32d",
+        "scripts/executor_transition.py": "66f17a86e7ee75257db05325341e6e1903e43bb250ef1c8539b84025674caad4",
+        "scripts/executor_store.py": "a9919ae315ce055cd39da3731dd13a708a3eba585efe2ac5e35b8cdcce076738",
+        "scripts/test_executor_hosts.py": "0a9f791330279db729bddfea016c4484b1558bdbca683003d71f842ee7ac3c4f",
+        "scripts/test_control_transition.py": "5e0683ea48d454c57322adb1d45b7f3c1881a4ba4d956524d31a7e6529ed3e91",
+        "scripts/test_executor_transition.py": "4dde1cb1bbd052616012d89a3d762ee070b4a68d0e3baca91ecebd359bf0b905",
+        "scripts/test_executor_actor_loss.py": "6b097f646a42c827af3fa665e7647f5a8d92c49339797cfb534bb147a41816f9"
+      },
+      "external_inputs_not_copied_into_image": [
+        "Dockerfile",
+        "infra/pep/contract.json",
+        "infra/pep/envoy.yaml",
+        "infra/pep/nginx.conf",
+        "infra/pep/tools.lock.json",
+        "infra/mtls/contract.json",
+        "infra/mtls/all-hops-nginx.conf",
+        "infra/mtls/all-hops-contract.json",
+        "infra/observability/alerts.yaml",
+        "infra/observability/tools.lock.json",
+        "infra/mtls/ca-tools.lock.json",
+        "infra/mtls/certificate-lifecycle-contract.json",
+        "infra/mtls/nginx-renewal.sh",
+        ".gitattributes",
+        "infra/mtls/nginx-rekey.sh",
+        "infra/mtls/private-key-rotation-contract.json",
+        "infra/mtls/authority-rotation-contract.json",
+        "infra/mtls/ca-ha-tools.lock.json",
+        "infra/mtls/ca-ha-contract.json",
+        "infra/mtls/ca-recovery-tools.lock.json"
+      ]
+    }
+  },
+  "images": {
+    "app_image_id": "sha256:ac83aec890f0f1bdba72204c45b3a16350ab89c73c8264802e6c6992cbe2be6c",
+    "execution_image_id": "sha256:befc1791245a2ed23f5d8c72f43f845f61ee1b09bbf7ef2cafb8f5d9d460bc42",
+    "certificate_execution_image_id": "sha256:b86c82bf43a5b736b35f448f85078a1b81984bfcc028b2d939f98484c0573890",
+    "ha_postgres_image_id": "sha256:86bfd196795395ce7bfffa0a30135bfc699073e15bac5dd2238e75f766147f56",
+    "executor_image_id": "sha256:b61e6c84b6fceefc388a6ec6a3fa8ed2f4bd6ab42825e0210e84915c5ac639d7"
+  },
+  "tools": {
+    "docker_host": {
+      "image": "docker:29-dind@sha256:97545b7bab66319a476800a85b008b25c06681733d484909e2a776281e41574f",
+      "observed_version": "29.9.2-dind",
+      "source": "https://github.com/docker-library/docker/tree/29938079fb10e4c1a5e417cf74a84b6f845443e2/29/dind"
+    },
+    "certificate_tools": {
+      "step-ca": "Smallstep CA/0.30.2 (linux/amd64)\nRelease Date: 2026-03-23T00:18:00Z",
+      "step": "Smallstep CLI/0.31.0 (linux/amd64)\nRelease Date: 2026-09-25T19:53:51Z"
+    },
+    "postgres": "postgres (PostgreSQL) 17.11 (Debian 17.11-1.pgdg12+2)"
+  },
+  "initial_service_hosts": {
+    "a": {
+      "name": "c02-9a91d2c2613e-smoke-host-a",
+      "id": "a0c1dbe00fc3c95436e65decff4e0f2982561bca8c343036144d7f83e36bb69e",
+      "image": "sha256:9a5d43f7d02971b15763b4b88d0e44cfaa858ec8a04b2fd84057b03c6f0e0f96",
+      "daemon_id": "20208bd4-44bd-4dda-972e-be0dfce47cd6",
+      "docker_volume": "c02-9a91d2c2613e-smoke-host-a-docker-0",
+      "address": "172.20.0.2"
+    },
+    "b": {
+      "name": "c02-9a91d2c2613e-smoke-host-b",
+      "id": "6b532050a84e5a040c9fd02b4e0b130e96d48ce8a54631dc43b55134d0405610",
+      "image": "sha256:9a5d43f7d02971b15763b4b88d0e44cfaa858ec8a04b2fd84057b03c6f0e0f96",
+      "daemon_id": "6c49bf6b-023f-4dfa-8e52-c0a326c98852",
+      "docker_volume": "c02-9a91d2c2613e-smoke-host-b-docker-0",
+      "address": "172.20.0.3"
+    }
+  },
+  "actor_loss_checks": [
+    {
+      "label": "renamed_old_actor_blocks_replacement_even_when_fixed_name_is_empty",
+      "passed": true,
+      "actor_id": "982ef9ca43751aa0e80c5e722788fe3d5e8d61822d03cad8ffba89aa8db810e5"
+    },
+    {
+      "label": "actual_actor_container_removed",
+      "passed": true,
+      "point": "after_intent",
+      "phase": "intent",
+      "actor_id": "982ef9ca43751aa0e80c5e722788fe3d5e8d61822d03cad8ffba89aa8db810e5",
+      "transition_id": "1ec1be3cc8c24e869f9e6ef02fd0fccc"
+    },
+    {
+      "label": "replacement_created_before_identity_ack_is_adopted_by_pinned_spec",
+      "passed": true,
+      "actor_id": "657ff2521e36cc3ee122bdb25f23e5c1af0f8aa94645d3737749672ab46e3f80"
+    },
+    {
+      "label": "actual_actor_container_removed",
+      "passed": true,
+      "point": "after_fence",
+      "phase": "fenced",
+      "actor_id": "657ff2521e36cc3ee122bdb25f23e5c1af0f8aa94645d3737749672ab46e3f80",
+      "transition_id": "1ec1be3cc8c24e869f9e6ef02fd0fccc"
+    },
+    {
+      "label": "actual_actor_container_removed",
+      "passed": true,
+      "point": "volume_created",
+      "phase": "fenced",
+      "actor_id": "46e12c288e3e6f6d81847b232cd4cfe83a62778c033ac7887687e732add325fb",
+      "transition_id": "1ec1be3cc8c24e869f9e6ef02fd0fccc"
+    },
+    {
+      "label": "actual_actor_container_removed",
+      "passed": true,
+      "point": "after_copy",
+      "phase": "copied",
+      "actor_id": "57226d769abca7bcf34c4415aa9ca59173b189e32a5aa7bb5444fe3df32e2c45",
+      "transition_id": "1ec1be3cc8c24e869f9e6ef02fd0fccc"
+    },
+    {
+      "label": "actual_actor_container_removed",
+      "passed": true,
+      "point": "owner_a_written",
+      "phase": "copied",
+      "actor_id": "9e7dc009cdca3ced1897544cfd45d0e11a1ff30ce3c7d25cffd7ce456fa428db",
+      "transition_id": "1ec1be3cc8c24e869f9e6ef02fd0fccc"
+    },
+    {
+      "label": "actual_actor_container_removed",
+      "passed": true,
+      "point": "worker_created",
+      "phase": "owners",
+      "actor_id": "cd1b79328abd711aba78c00dc58cda5ca699111033d8453d0d902e30621eb82c",
+      "transition_id": "1ec1be3cc8c24e869f9e6ef02fd0fccc"
+    },
+    {
+      "label": "actual_actor_container_removed",
+      "passed": true,
+      "point": "after_publish",
+      "phase": "published",
+      "actor_id": "23ee4ac59ff5f1def38555703aa4cc6973fa5e0306c20acffea6fd848e251662",
+      "transition_id": "1ec1be3cc8c24e869f9e6ef02fd0fccc"
+    },
+    {
+      "label": "completed_state_callback_before_actor_removal",
+      "passed": true
+    },
+    {
+      "label": "actual_actor_container_removed",
+      "passed": true,
+      "point": "after_complete",
+      "phase": "complete",
+      "actor_id": "6e58dda8e2df67784903b79254453e9e6fa6387b66715577dc2562b9f966cc1e",
+      "transition_id": "1ec1be3cc8c24e869f9e6ef02fd0fccc"
+    },
+    {
+      "label": "same_operation_and_epoch_complete_with_all_removed_ids_in_lineage",
+      "passed": true,
+      "transition_id": "1ec1be3cc8c24e869f9e6ef02fd0fccc",
+      "removed_actor_ids": [
+        "982ef9ca43751aa0e80c5e722788fe3d5e8d61822d03cad8ffba89aa8db810e5",
+        "657ff2521e36cc3ee122bdb25f23e5c1af0f8aa94645d3737749672ab46e3f80",
+        "46e12c288e3e6f6d81847b232cd4cfe83a62778c033ac7887687e732add325fb",
+        "57226d769abca7bcf34c4415aa9ca59173b189e32a5aa7bb5444fe3df32e2c45",
+        "9e7dc009cdca3ced1897544cfd45d0e11a1ff30ce3c7d25cffd7ce456fa428db",
+        "cd1b79328abd711aba78c00dc58cda5ca699111033d8453d0d902e30621eb82c",
+        "23ee4ac59ff5f1def38555703aa4cc6973fa5e0306c20acffea6fd848e251662",
+        "6e58dda8e2df67784903b79254453e9e6fa6387b66715577dc2562b9f966cc1e"
+      ],
+      "predecessors": [
+        "982ef9ca43751aa0e80c5e722788fe3d5e8d61822d03cad8ffba89aa8db810e5",
+        "657ff2521e36cc3ee122bdb25f23e5c1af0f8aa94645d3737749672ab46e3f80",
+        "46e12c288e3e6f6d81847b232cd4cfe83a62778c033ac7887687e732add325fb",
+        "57226d769abca7bcf34c4415aa9ca59173b189e32a5aa7bb5444fe3df32e2c45",
+        "9e7dc009cdca3ced1897544cfd45d0e11a1ff30ce3c7d25cffd7ce456fa428db",
+        "cd1b79328abd711aba78c00dc58cda5ca699111033d8453d0d902e30621eb82c",
+        "23ee4ac59ff5f1def38555703aa4cc6973fa5e0306c20acffea6fd848e251662"
+      ],
+      "worker_id": "ae2b39064fc0c5b72c4d1375ecc1176a7416f585181e73dc61d016a6a987fcba"
+    },
+    {
+      "label": "renamed_old_actor_blocks_replacement_even_when_fixed_name_is_empty",
+      "passed": true,
+      "actor_id": "28402f860b17098261c6f4893239875e225341614d819e67479424c53305f959"
+    },
+    {
+      "label": "actual_actor_container_removed",
+      "passed": true,
+      "point": "after_intent",
+      "phase": "intent",
+      "actor_id": "28402f860b17098261c6f4893239875e225341614d819e67479424c53305f959",
+      "transition_id": "30924ab21e7e4a6f87f0da27f812cf01"
+    },
+    {
+      "label": "replacement_created_before_identity_ack_is_adopted_by_pinned_spec",
+      "passed": true,
+      "actor_id": "e71c238ac8769c61df10bc71b4a423755b28e1f35dc1c14e31bec77f12d8b8ab"
+    },
+    {
+      "label": "actual_actor_container_removed",
+      "passed": true,
+      "point": "after_fence",
+      "phase": "fenced",
+      "actor_id": "e71c238ac8769c61df10bc71b4a423755b28e1f35dc1c14e31bec77f12d8b8ab",
+      "transition_id": "30924ab21e7e4a6f87f0da27f812cf01"
+    },
+    {
+      "label": "actual_actor_container_removed",
+      "passed": true,
+      "point": "volume_created",
+      "phase": "fenced",
+      "actor_id": "fd6e89fc9ec53bf43fa282ef2e63cb9ebe385802f5fd399d3e676bec2c87cf14",
+      "transition_id": "30924ab21e7e4a6f87f0da27f812cf01"
+    },
+    {
+      "label": "actual_actor_container_removed",
+      "passed": true,
+      "point": "after_copy",
+      "phase": "copied",
+      "actor_id": "3ba16984122fd12b3cd387cad6cabd174d05451d2c966886a5f0f76ef711f73a",
+      "transition_id": "30924ab21e7e4a6f87f0da27f812cf01"
+    },
+    {
+      "label": "actual_actor_container_removed",
+      "passed": true,
+      "point": "owner_a_written",
+      "phase": "copied",
+      "actor_id": "b6f999d1e7601074812e6fe757f0cd35d91b30ccdc6b049665cc25c9c70d2722",
+      "transition_id": "30924ab21e7e4a6f87f0da27f812cf01"
+    },
+    {
+      "label": "actual_actor_container_removed",
+      "passed": true,
+      "point": "worker_created",
+      "phase": "owners",
+      "actor_id": "4c4dd61738f8399473c42b6fa708350b8db1ec4a32fa6878331132b9d103cdb5",
+      "transition_id": "30924ab21e7e4a6f87f0da27f812cf01"
+    },
+    {
+      "label": "actual_actor_container_removed",
+      "passed": true,
+      "point": "after_publish",
+      "phase": "published",
+      "actor_id": "be5ea9305f93e0de834b7aa8f4a90b0bea15cd598048bb5fb83e51cf6a7af3c6",
+      "transition_id": "30924ab21e7e4a6f87f0da27f812cf01"
+    },
+    {
+      "label": "fresh_token_consumed_after_commit_before_actor_container_removal",
+      "passed": true
+    },
+    {
+      "label": "completed_state_callback_before_actor_removal",
+      "passed": true
+    },
+    {
+      "label": "actual_actor_container_removed",
+      "passed": true,
+      "point": "after_complete",
+      "phase": "complete",
+      "actor_id": "a3532a148fb7080633b09b45ccaddcde86003487113b6884b9e3e203af4a1d83",
+      "transition_id": "30924ab21e7e4a6f87f0da27f812cf01"
+    },
+    {
+      "label": "same_operation_and_epoch_complete_with_all_removed_ids_in_lineage",
+      "passed": true,
+      "transition_id": "30924ab21e7e4a6f87f0da27f812cf01",
+      "removed_actor_ids": [
+        "28402f860b17098261c6f4893239875e225341614d819e67479424c53305f959",
+        "e71c238ac8769c61df10bc71b4a423755b28e1f35dc1c14e31bec77f12d8b8ab",
+        "fd6e89fc9ec53bf43fa282ef2e63cb9ebe385802f5fd399d3e676bec2c87cf14",
+        "3ba16984122fd12b3cd387cad6cabd174d05451d2c966886a5f0f76ef711f73a",
+        "b6f999d1e7601074812e6fe757f0cd35d91b30ccdc6b049665cc25c9c70d2722",
+        "4c4dd61738f8399473c42b6fa708350b8db1ec4a32fa6878331132b9d103cdb5",
+        "be5ea9305f93e0de834b7aa8f4a90b0bea15cd598048bb5fb83e51cf6a7af3c6",
+        "a3532a148fb7080633b09b45ccaddcde86003487113b6884b9e3e203af4a1d83"
+      ],
+      "predecessors": [
+        "28402f860b17098261c6f4893239875e225341614d819e67479424c53305f959",
+        "e71c238ac8769c61df10bc71b4a423755b28e1f35dc1c14e31bec77f12d8b8ab",
+        "fd6e89fc9ec53bf43fa282ef2e63cb9ebe385802f5fd399d3e676bec2c87cf14",
+        "3ba16984122fd12b3cd387cad6cabd174d05451d2c966886a5f0f76ef711f73a",
+        "b6f999d1e7601074812e6fe757f0cd35d91b30ccdc6b049665cc25c9c70d2722",
+        "4c4dd61738f8399473c42b6fa708350b8db1ec4a32fa6878331132b9d103cdb5",
+        "be5ea9305f93e0de834b7aa8f4a90b0bea15cd598048bb5fb83e51cf6a7af3c6"
+      ],
+      "worker_id": "186b3ded595c245f46f6d4f375d4179215e1df093b396b98b01dfa5ca4436cb3"
+    },
+    {
+      "label": "completed_missing_actor_fast_path_preserves_fresh_token_consumption",
+      "passed": true
+    }
+  ],
+  "executor_checks": [
+    {
+      "label": "two_executor_hosts_with_independent_journal_and_owner_volumes",
+      "passed": true,
+      "hosts": {
+        "a": {
+          "generation": 1,
+          "journal": "c02-9a91d2c2613e-executor-a-g1-journal",
+          "owner": "c02-9a91d2c2613e-executor-a-g1-owner",
+          "worker": {
+            "name": "c02-9a91d2c2613e-executor-a-e1",
+            "id": "174ce9befc8ce5c8ca4b5c4b34f49a88e71aac558da3e90add1591945e5ad507"
+          }
+        },
+        "b": {
+          "generation": 1,
+          "journal": "c02-9a91d2c2613e-executor-b-g1-journal",
+          "owner": "c02-9a91d2c2613e-executor-b-g1-owner",
+          "worker": {
+            "name": "c02-9a91d2c2613e-executor-b-e1",
+            "id": "10afba6622556db0a343f4ed1d0ab065597499cfb81ab8e7622df38dfa17a1a9"
+          }
+        }
+      }
+    },
+    {
+      "label": "real_transition_peer_only_roles_checkpoint_blocks_old_executor_after_process_exit",
+      "passed": true
+    },
+    {
+      "label": "independent_executor_takeover_after_host_storage_and_console_cache_loss",
+      "passed": true,
+      "active": "b",
+      "discarded": true,
+      "executor_epoch": 2,
+      "fenced": [
+        {
+          "id": "174ce9befc8ce5c8ca4b5c4b34f49a88e71aac558da3e90add1591945e5ad507",
+          "name": "c02-9a91d2c2613e-executor-a-e1",
+          "removed": true
+        },
+        {
+          "id": "10afba6622556db0a343f4ed1d0ab065597499cfb81ab8e7622df38dfa17a1a9",
+          "name": "c02-9a91d2c2613e-executor-b-e1",
+          "removed": true
+        }
+      ],
+      "operator_actor_id": "6e58dda8e2df67784903b79254453e9e6fa6387b66715577dc2562b9f966cc1e",
+      "operator_actor_predecessors": [
+        "982ef9ca43751aa0e80c5e722788fe3d5e8d61822d03cad8ffba89aa8db810e5",
+        "657ff2521e36cc3ee122bdb25f23e5c1af0f8aa94645d3737749672ab46e3f80",
+        "46e12c288e3e6f6d81847b232cd4cfe83a62778c033ac7887687e732add325fb",
+        "57226d769abca7bcf34c4415aa9ca59173b189e32a5aa7bb5444fe3df32e2c45",
+        "9e7dc009cdca3ced1897544cfd45d0e11a1ff30ce3c7d25cffd7ce456fa428db",
+        "cd1b79328abd711aba78c00dc58cda5ca699111033d8453d0d902e30621eb82c",
+        "23ee4ac59ff5f1def38555703aa4cc6973fa5e0306c20acffea6fd848e251662"
+      ],
+      "operator_transition_id": "1ec1be3cc8c24e869f9e6ef02fd0fccc",
+      "retired_storage": {
+        "journal": "c02-9a91d2c2613e-executor-a-g1-journal",
+        "owner": "c02-9a91d2c2613e-executor-a-g1-owner"
+      },
+      "settled": {
+        "execs_remaining": 0,
+        "jobs_remaining": 0,
+        "pinned_services_inspected": 2
+      }
+    },
+    {
+      "label": "surviving_executor_resumes_exact_transition_once",
+      "passed": true,
+      "transition_id": "6900b95fdce2425cbbc77314be832bf4",
+      "management_epoch": 2,
+      "opening": false
+    },
+    {
+      "label": "same_prepared_root_candidate_survives_management_and_executor_loss",
+      "passed": true,
+      "root_public_key_sha256": "1f1246203a28b2d299b2ed21a68748a8b42ceb83f7e87895f70b31aa3e5a8c9a"
+    },
+    {
+      "label": "root_issuer_and_all_jwk_rotation_completed_on_surviving_executor",
+      "passed": true,
+      "old_jwk_denials": 132
+    },
+    {
+      "label": "current_mtls_renewal_after_executor_takeover",
+      "passed": true
+    },
+    {
+      "label": "encrypted_backup_and_separate_key_replicated",
+      "passed": true,
+      "name": "backup-executor-current.sealed",
+      "manifest": {
+        "sequence": 173,
+        "authority": "29b5eca8a72a214852767f5ef2db0db10e94ffac241e44b31f8b8328ed029c2b",
+        "incarnation": "7704301304912121870",
+        "database_sha256": "a701150cf7072d3caca29fa718f5d53b3d580c7729bb71c28acda9a31b661b15",
+        "checkpoint_hash": "c854f770ec02f8faf74cfdc42a1e70b7358f0333e041ecc2f225402fba6b40e4",
+        "created_at": 1793798149.457611
+      },
+      "ciphertext_sha256": "38dfa10a00b8f13d97c6fa37b46853181df235778239b9f65a6a08495036efe6"
+    },
+    {
+      "label": "independent_executor_takeover_after_host_storage_and_console_cache_loss",
+      "passed": true,
+      "active": "a",
+      "discarded": true,
+      "executor_epoch": 3,
+      "fenced": [
+        {
+          "id": "ae2b39064fc0c5b72c4d1375ecc1176a7416f585181e73dc61d016a6a987fcba",
+          "name": "c02-9a91d2c2613e-executor-b-e2",
+          "removed": true
+        },
+        {
+          "id": "f63a51214a55871b42b83f213f8dcb61548c5d653fa8b0b1761109a7d48040c7",
+          "name": "c02-9a91d2c2613e-executor-a-e2",
+          "removed": true
+        }
+      ],
+      "operator_actor_id": "a3532a148fb7080633b09b45ccaddcde86003487113b6884b9e3e203af4a1d83",
+      "operator_actor_predecessors": [
+        "28402f860b17098261c6f4893239875e225341614d819e67479424c53305f959",
+        "e71c238ac8769c61df10bc71b4a423755b28e1f35dc1c14e31bec77f12d8b8ab",
+        "fd6e89fc9ec53bf43fa282ef2e63cb9ebe385802f5fd399d3e676bec2c87cf14",
+        "3ba16984122fd12b3cd387cad6cabd174d05451d2c966886a5f0f76ef711f73a",
+        "b6f999d1e7601074812e6fe757f0cd35d91b30ccdc6b049665cc25c9c70d2722",
+        "4c4dd61738f8399473c42b6fa708350b8db1ec4a32fa6878331132b9d103cdb5",
+        "be5ea9305f93e0de834b7aa8f4a90b0bea15cd598048bb5fb83e51cf6a7af3c6"
+      ],
+      "operator_transition_id": "30924ab21e7e4a6f87f0da27f812cf01",
+      "retired_storage": {
+        "journal": "c02-9a91d2c2613e-executor-b-g1-journal",
+        "owner": "c02-9a91d2c2613e-executor-b-g1-owner"
+      },
+      "settled": {
+        "execs_remaining": 0,
+        "jobs_remaining": 0,
+        "pinned_services_inspected": 6
+      }
+    },
+    {
+      "label": "new_security_write_after_open_and_executor_loss_before_resume",
+      "passed": true
+    },
+    {
+      "label": "surviving_executor_resumes_exact_transition_once",
+      "passed": true,
+      "transition_id": "9c021b0a9b5e43b6954c49503e2ed93f",
+      "management_epoch": 3,
+      "opening": true
+    },
+    {
+      "label": "post_open_token_consumption_preserved_after_resume",
+      "passed": true
+    },
+    {
+      "label": "unexpired_consumed_token_and_revoked_certificate_still_denied",
+      "passed": true,
+      "remaining_token_seconds": 464.775,
+      "remaining_certificate_seconds": 765.775
+    },
+    {
+      "label": "fresh_nonce_works_after_both_management_and_executor_losses",
+      "passed": true
+    },
+    {
+      "label": "surviving_backup_and_key_authenticate_against_latest_security_checkpoint",
+      "passed": true,
+      "verified": true,
+      "backup_sequence": 173,
+      "latest_security_sha256": "9045824e80821ddf1a31a91a5ddba1a3caa12f6e14297a5d467444efba7522c9",
+      "latest_lsn": "0/30D69A8"
+    }
+  ],
+  "management_checks": [
+    {
+      "label": "retired_management_storage_removed_after_fencing_b",
+      "passed": true,
+      "count": 9
+    },
+    {
+      "label": "retired_management_storage_removed_after_fencing_a",
+      "passed": true,
+      "count": 9
+    }
+  ],
+  "preflight": {
+    "base": {
+      "schema": "executor-host-spec-1",
+      "project": "c02-4ed0e3e1dd6e",
+      "started_at": "2026-11-04T12:34:05.634652+00:00",
+      "checks": [
+        {
+          "label": "two_distinct_workers_and_four_independent_storage_volumes",
+          "passed": true,
+          "workers": {
+            "a": {
+              "name": "c02-4ed0e3e1dd6e-executor-a-e1",
+              "id": "4cfc1f19b392a9513a371c50f7f034f777af7f76eb3c77bbdd82fd7a5958ede0"
+            },
+            "b": {
+              "name": "c02-4ed0e3e1dd6e-executor-b-e1",
+              "id": "ccbf191edf81a781c1549c6dd7b32733ac59b9fe3b9c3db83579c30ed3d4191c"
+            }
+          }
+        },
+        {
+          "label": "pinned_docker_cli_works_from_nonroot_trusted_executor",
+          "passed": true,
+          "version": "29.9.2"
+        },
+        {
+          "label": "passive_host_refuses_dispatch",
+          "passed": true
+        },
+        {
+          "label": "unlabelled_pinned_service_exec_blocks_owner_takeover",
+          "passed": true
+        },
+        {
+          "label": "real_process_exit_after_peer_fsync_refuses_divergent_local_prefix",
+          "passed": true
+        },
+        {
+          "label": "whole_active_worker_and_its_two_volumes_removed_surviving_peer_recovers_latest_record",
+          "passed": true,
+          "active": "b",
+          "discarded": true,
+          "executor_epoch": 2,
+          "fenced": [
+            {
+              "id": "4cfc1f19b392a9513a371c50f7f034f777af7f76eb3c77bbdd82fd7a5958ede0",
+              "name": "c02-4ed0e3e1dd6e-executor-a-e1",
+              "removed": true
+            },
+            {
+              "id": "ccbf191edf81a781c1549c6dd7b32733ac59b9fe3b9c3db83579c30ed3d4191c",
+              "name": "c02-4ed0e3e1dd6e-executor-b-e1",
+              "removed": true
+            }
+          ],
+          "operator_actor_id": "241f4c6855ddb9e7eb3e834a6a28cae9eb28664e2f2da31e8162e60903c090ca",
+          "operator_actor_predecessors": [
+            "6caaf933756c2b6df3c8789a51b74849fc148eb19ab09421a0dd3ffe27112812",
+            "081414ce71ce3eb57a39406d627349111104b0d03d794bc5b55f731519c98f59",
+            "fe77ce801e0e1fffe525e7149638b162202a2634cd0a386d33b50be46abe316f",
+            "b830b08255f53c8ad2331f94111cd8efc56decf17accfaf3dba8d884d4d5a102",
+            "0843e3182c996cb681591cdebfd42d8fde0e6265f9cdc1294504ffd738ec8f5f",
+            "4e9c4b1c10532b3fb668552432c76dea05bb817f506c7f6e59e62011f60f6229",
+            "dbf3ec14317a1cfd031ac1ce6ae8128f03fbab2927960cfd9dbce985563d79df"
+          ],
+          "operator_transition_id": "3f9eb8392c5a4159ab64c9ab7026bff5",
+          "retired_storage": {
+            "journal": "c02-4ed0e3e1dd6e-executor-a-g1-journal",
+            "owner": "c02-4ed0e3e1dd6e-executor-a-g1-owner"
+          },
+          "settled": {
+            "execs_remaining": 0,
+            "jobs_remaining": 0,
+            "pinned_services_inspected": 0
+          }
+        },
+        {
+          "label": "old_epoch_inflight_job_removed_before_new_owner_is_published",
+          "passed": true
+        },
+        {
+          "label": "late_old_epoch_job_refused_before_business_command",
+          "passed": true
+        }
+      ],
+      "completed": true,
+      "cleanup": {
+        "containers_remaining": 0,
+        "volumes_remaining": 0,
+        "networks_remaining": 0
+      },
+      "finished_at": "2026-11-04T12:40:04.031986+00:00"
+    },
+    "actor_loss": {
+      "schema": "actor-loss-spec-1",
+      "checks": [
+        {
+          "label": "renamed_old_actor_blocks_replacement_even_when_fixed_name_is_empty",
+          "passed": true,
+          "actor_id": "6caaf933756c2b6df3c8789a51b74849fc148eb19ab09421a0dd3ffe27112812"
+        },
+        {
+          "label": "actual_actor_container_removed",
+          "passed": true,
+          "point": "after_intent",
+          "phase": "intent",
+          "actor_id": "6caaf933756c2b6df3c8789a51b74849fc148eb19ab09421a0dd3ffe27112812",
+          "transition_id": "3f9eb8392c5a4159ab64c9ab7026bff5"
+        },
+        {
+          "label": "replacement_created_before_identity_ack_is_adopted_by_pinned_spec",
+          "passed": true,
+          "actor_id": "081414ce71ce3eb57a39406d627349111104b0d03d794bc5b55f731519c98f59"
+        },
+        {
+          "label": "actual_actor_container_removed",
+          "passed": true,
+          "point": "after_fence",
+          "phase": "fenced",
+          "actor_id": "081414ce71ce3eb57a39406d627349111104b0d03d794bc5b55f731519c98f59",
+          "transition_id": "3f9eb8392c5a4159ab64c9ab7026bff5"
+        },
+        {
+          "label": "actual_actor_container_removed",
+          "passed": true,
+          "point": "volume_created",
+          "phase": "fenced",
+          "actor_id": "fe77ce801e0e1fffe525e7149638b162202a2634cd0a386d33b50be46abe316f",
+          "transition_id": "3f9eb8392c5a4159ab64c9ab7026bff5"
+        },
+        {
+          "label": "actual_actor_container_removed",
+          "passed": true,
+          "point": "after_copy",
+          "phase": "copied",
+          "actor_id": "b830b08255f53c8ad2331f94111cd8efc56decf17accfaf3dba8d884d4d5a102",
+          "transition_id": "3f9eb8392c5a4159ab64c9ab7026bff5"
+        },
+        {
+          "label": "actual_actor_container_removed",
+          "passed": true,
+          "point": "owner_a_written",
+          "phase": "copied",
+          "actor_id": "0843e3182c996cb681591cdebfd42d8fde0e6265f9cdc1294504ffd738ec8f5f",
+          "transition_id": "3f9eb8392c5a4159ab64c9ab7026bff5"
+        },
+        {
+          "label": "actual_actor_container_removed",
+          "passed": true,
+          "point": "worker_created",
+          "phase": "owners",
+          "actor_id": "4e9c4b1c10532b3fb668552432c76dea05bb817f506c7f6e59e62011f60f6229",
+          "transition_id": "3f9eb8392c5a4159ab64c9ab7026bff5"
+        },
+        {
+          "label": "actual_actor_container_removed",
+          "passed": true,
+          "point": "after_publish",
+          "phase": "published",
+          "actor_id": "dbf3ec14317a1cfd031ac1ce6ae8128f03fbab2927960cfd9dbce985563d79df",
+          "transition_id": "3f9eb8392c5a4159ab64c9ab7026bff5"
+        },
+        {
+          "label": "new_state_after_commit_before_completed_actor_removal",
+          "passed": true
+        },
+        {
+          "label": "actual_actor_container_removed",
+          "passed": true,
+          "point": "after_complete",
+          "phase": "complete",
+          "actor_id": "241f4c6855ddb9e7eb3e834a6a28cae9eb28664e2f2da31e8162e60903c090ca",
+          "transition_id": "3f9eb8392c5a4159ab64c9ab7026bff5"
+        },
+        {
+          "label": "same_operation_and_epoch_complete_with_all_removed_ids_in_lineage",
+          "passed": true,
+          "transition_id": "3f9eb8392c5a4159ab64c9ab7026bff5",
+          "removed_actor_ids": [
+            "6caaf933756c2b6df3c8789a51b74849fc148eb19ab09421a0dd3ffe27112812",
+            "081414ce71ce3eb57a39406d627349111104b0d03d794bc5b55f731519c98f59",
+            "fe77ce801e0e1fffe525e7149638b162202a2634cd0a386d33b50be46abe316f",
+            "b830b08255f53c8ad2331f94111cd8efc56decf17accfaf3dba8d884d4d5a102",
+            "0843e3182c996cb681591cdebfd42d8fde0e6265f9cdc1294504ffd738ec8f5f",
+            "4e9c4b1c10532b3fb668552432c76dea05bb817f506c7f6e59e62011f60f6229",
+            "dbf3ec14317a1cfd031ac1ce6ae8128f03fbab2927960cfd9dbce985563d79df",
+            "241f4c6855ddb9e7eb3e834a6a28cae9eb28664e2f2da31e8162e60903c090ca"
+          ],
+          "predecessors": [
+            "6caaf933756c2b6df3c8789a51b74849fc148eb19ab09421a0dd3ffe27112812",
+            "081414ce71ce3eb57a39406d627349111104b0d03d794bc5b55f731519c98f59",
+            "fe77ce801e0e1fffe525e7149638b162202a2634cd0a386d33b50be46abe316f",
+            "b830b08255f53c8ad2331f94111cd8efc56decf17accfaf3dba8d884d4d5a102",
+            "0843e3182c996cb681591cdebfd42d8fde0e6265f9cdc1294504ffd738ec8f5f",
+            "4e9c4b1c10532b3fb668552432c76dea05bb817f506c7f6e59e62011f60f6229",
+            "dbf3ec14317a1cfd031ac1ce6ae8128f03fbab2927960cfd9dbce985563d79df"
+          ],
+          "worker_id": "ab62fb32ffb0a2c716eecea3f70b01dbf17a97785d7ac22c009569a70bcb7cb2"
+        }
+      ]
+    },
+    "scope": "Before PR19/docs-only module header and check-label edit; full final-source CA campaign supersedes runtime proof. Never added to final totals."
+  },
+  "authority_rotation": {
+    "changed": {
+      "issuer": true,
+      "jwk": true,
+      "root": true
+    },
+    "epoch": 1,
+    "evidence": {
+      "custody": {
+        "docker_socket": false,
+        "interfaces": [
+          "lo"
+        ],
+        "uid": 10001,
+        "vault_mode": 384
+      },
+      "final_ca_tls": {
+        "replicas": {
+          "ca-a": {
+            "issuer": "78413701c1a5ba6547cafe099a32f73d6f649bb973a33a980278d3bf25befcba",
+            "tls_version": "TLSv1.3"
+          },
+          "ca-b": {
+            "issuer": "78413701c1a5ba6547cafe099a32f73d6f649bb973a33a980278d3bf25befcba",
+            "tls_version": "TLSv1.3"
+          }
+        }
+      },
+      "final_services": {
+        "identities": 3,
+        "servers": {
+          "gateway": {
+            "at": 1793798061.910637,
+            "fingerprint": "c172eac5fa454aeadc38d76df109326e5f77ba2ddcc431e4c7e272fec07f12f6",
+            "tls_version": "TLSv1.3"
+          }
+        }
+      },
+      "migrated_services": {
+        "identities": 3,
+        "servers": {
+          "gateway": {
+            "at": 1793798032.040898,
+            "fingerprint": "c172eac5fa454aeadc38d76df109326e5f77ba2ddcc431e4c7e272fec07f12f6",
+            "tls_version": "TLSv1.3"
+          }
+        }
+      },
+      "new_ca_tls": {
+        "replicas": {
+          "ca-a": {
+            "issuer": "78413701c1a5ba6547cafe099a32f73d6f649bb973a33a980278d3bf25befcba",
+            "tls_version": "TLSv1.3"
+          },
+          "ca-b": {
+            "issuer": "78413701c1a5ba6547cafe099a32f73d6f649bb973a33a980278d3bf25befcba",
+            "tls_version": "TLSv1.3"
+          }
+        }
+      },
+      "new_jwk_issuance": {
+        "replicas": {
+          "ca-a": {
+            "issued": true
+          },
+          "ca-b": {
+            "issued": true
+          }
+        }
+      },
+      "old_jwks": {
+        "denied": 66,
+        "replicas": {
+          "ca-a": {
+            "denied": 66,
+            "statuses": [
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401
+            ]
+          },
+          "ca-b": {
+            "denied": 66,
+            "statuses": [
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401,
+              401
+            ]
+          }
+        },
+        "total_denied": 132
+      },
+      "old_services_with_overlap": {
+        "servers": {
+          "gateway": {
+            "at": 1793797945.4228776,
+            "fingerprint": "3d5c2b5523210265e4b54cab3ace61647d286f8e4ad45e8bac2a138d4ae2812b",
+            "tls_version": "TLSv1.3"
+          }
+        }
+      },
+      "retired_trust": {
+        "retired": true,
+        "trust_stores": 3
+      },
+      "trust_overlap": {
+        "identities": 3,
+        "staged": true,
+        "trust_stores": 3
+      }
+    },
+    "finished_at": 1793798110.5530539,
+    "issuer_public_key_sha256": "66ae05fb96842ab1f9d5503643e352d75b70479de61eca454fa5543f4a9c0eaa",
+    "plan_hash": "af8cd0fed0081d70c48b8c8df961cb1965aac5ce631b2a0c34d15b578881db89",
+    "provider_public_keys": {
+      "alert-manager-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "daBf89EqF5-0tydlTHrqYrWvXbRWVglHeUrAjRy6bxA",
+        "kty": "EC",
+        "use": "sig",
+        "x": "N272k4P7AzOEK2uk4wYGB8Rx1mN_093qCLFTM5bttcg",
+        "y": "FGtkxoc4VhTOBxUYMEuWMAnFCKRLa2iFOt-eU4zcuAw"
+      },
+      "am-control-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "mdbMOHMSZ8F4R38ZnTFJVl3wENrDbxFgdOkomk8OkzQ",
+        "kty": "EC",
+        "use": "sig",
+        "x": "QzUZuDwIftUhljUuIIjEtSGwUYowYBFQ92fxlppSr1c",
+        "y": "bNFGGa68qmKFHn1Uo0pKwekVFotgPchDqpm3-o_cgDc"
+      },
+      "am-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "41v4dljt9gvBWTVhBMnpHvRTdYHWHhm1urbK0OAWvc4",
+        "kty": "EC",
+        "use": "sig",
+        "x": "vHRP12A7KiO3crvMRPszbWBB4XfjFdzqR0Fqoj_7zgo",
+        "y": "IBY8Rnb8R4BOoZULB19rvHLmPfaDIz2BRQ6DQ7tdKHk"
+      },
+      "auto-canary-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "_0ZfS7T2tpV1dYc1Bxv_tuotAfkv8UAPQ0AWLifO0Iw",
+        "kty": "EC",
+        "use": "sig",
+        "x": "IqKnARj-bbUYbDTzQFWvuPhzCML8LZ_Yzf-KHNZGveA",
+        "y": "u6VHu4-6_M83VYh9XHuxXsVxrfeHo140fQyaIFG64W8"
+      },
+      "bridge-auth-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "ohmhh0CVkWgKvJwGC1A0UMhDOSnLVzLn9gYkL_bqGic",
+        "kty": "EC",
+        "use": "sig",
+        "x": "rx9zZ8-36zXbz1SrjD17h9t1IMGs6Ua2omzG9_U5-HA",
+        "y": "TN8HNCQx2i28-bqoojKu-rrIH8fr_esjA8AdV84yD5o"
+      },
+      "bridge-consume-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "W5UXRZkjUvnwtF63-kcnU3lIcweWzkosrxbcx99XMJw",
+        "kty": "EC",
+        "use": "sig",
+        "x": "ws7ex7RedSohevp1CiAB0Nz2htsWqzFFfb5jB5TpF84",
+        "y": "5W0qLweK4CgK4-MyNfQQFTO2DV3D5bTPa--D8T7dSEk"
+      },
+      "bridge-probe-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "CoEsAOHn20TEYj2LiUVIYjdmXD_SJFYeSV5I7yYnREg",
+        "kty": "EC",
+        "use": "sig",
+        "x": "vhtZiEJ4MZe1S1FYn2zPSV0I-xYHjiOWmW7Lgh2r2tU",
+        "y": "t90j2yJmxbHU1BbXzplXpOUOklVVxBYki1uET6mp1rg"
+      },
+      "collector-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "CwosYOTykPAUiJwzprAYww9NXK8eJwerK6ZcPKMZvgY",
+        "kty": "EC",
+        "use": "sig",
+        "x": "wK6fuSn9FFg5qtWAVWM8NySHseOqlJzcjIXePTUGXg4",
+        "y": "BBcrGkiZFT13s6KfFt26_jaJvqpT1X67Ur0Qu1aVLvQ"
+      },
+      "core-a-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "RFwbuuk4rNAyjRMOewkZAA7Iu9XR749yXNm4QZXZolI",
+        "kty": "EC",
+        "use": "sig",
+        "x": "C-X54DB5BtWKnJaBO3_pwqZkt0XUstPW8eJAsCSc27I",
+        "y": "ww8t79WkUqRj_bNRNHFIa6OBI99Gj0LUOYYQfFj4RfQ"
+      },
+      "core-b-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "OltgBOlujGS_Dn6IH28q6SGZq5Th0mQfmOtIEnFSSy8",
+        "kty": "EC",
+        "use": "sig",
+        "x": "wNFVIog0j6NMJw0phU45dc_BtJnmtBbKrHJSdl0iJNA",
+        "y": "OAn7A4qwSjDWiSY9ifqolPOaUZg7O4toiWIrAuA5vio"
+      },
+      "core-c-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "y2fJd5mYdRYorWoiofKpsDlHe_znFu6x44YEWb7RvFU",
+        "kty": "EC",
+        "use": "sig",
+        "x": "ak0JmJ8_6Z476P0U4KOf79r-WYPoXx5SBCnw5KSEhAE",
+        "y": "MRt6jVPryt8ZlymkuC0P3bXwXyvnj2GrK6ujvAmGDlU"
+      },
+      "core-operator-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "_PCFkPzcAYQuM-GZYBQNKKwwjSkkOttQB4EywKgFJB4",
+        "kty": "EC",
+        "use": "sig",
+        "x": "kb9HQ8CvxRTZlkCmFg3_g4w74q4GPIMAKmVEvAZ8Sh0",
+        "y": "aBrL46P2BJoI7MrY7LSz-bfutECgw4-efu-N9MGRiJY"
+      },
+      "exporter-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "SAmgRbr5O65Lsf6f-i8R2NEyxBOc4pzEVtVZDvzguII",
+        "kty": "EC",
+        "use": "sig",
+        "x": "abywhKc7CE88XEIxQWXMFAatS2HmTld0gw71u9dgjHA",
+        "y": "oUXgsHqj91r7JUY2nCQ0FNITia0LtajnjlcethTv-SU"
+      },
+      "frontend-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "0IyCfbD2AP_0maAjk78p_ETRSoZfzQ0xQ9DYJGmsjyg",
+        "kty": "EC",
+        "use": "sig",
+        "x": "bz31kLr01z9p9FlJNIxoJugeXMvPeo253Uzbam_dWIQ",
+        "y": "gk-FCYG01KryG0qV0pZfIB3Ed52tlVnRc50DSJiIQN8"
+      },
+      "frontend-next-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "9dJO451eLxF35EVYcexnZtykYsHxkIJm6VJC0XLnNi0",
+        "kty": "EC",
+        "use": "sig",
+        "x": "LzHMMTfp9XsEN2j8-uMa_7o993QEjI3pvy8ovJjKjjY",
+        "y": "VR32RZTly1GoOd7BXvdS95g80A-QeV1WSa0U-Dq1sRM"
+      },
+      "gateway-client-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "x4Ivd9aW5hA1NHK6OWteOkO4BBSPoQRfe5Gl-6fF4Mo",
+        "kty": "EC",
+        "use": "sig",
+        "x": "y6RAq-Wjyt0JMQ4ZTlgsNEYri0KrRMw2kKN9R5CycvA",
+        "y": "m9aYfP8OPbVUwLtPW2vILXqPewndk2kGgBTROK-ycfI"
+      },
+      "gateway-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "DRTCi_NO9fKQrdVSTXm0Hfwyv6Z2KImqkHgb9amyxK4",
+        "kty": "EC",
+        "use": "sig",
+        "x": "1SYYZ8FN4q-V3ZrqkzN86Wzl92MwBTz58mFPYdEy2dM",
+        "y": "99jK1BBjH45BYnFULZLyy6AVCl98TUYjYkHFJBqky8c"
+      },
+      "gateway-stats-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "vVeIJ-HEWZkGPG7xgtdvlLejVWECx5tfk8ohoMPDIvA",
+        "kty": "EC",
+        "use": "sig",
+        "x": "gyHnZvIAmOMJ95vj5ixmOEz9-so3LgyYu210p389ISI",
+        "y": "6GH1evKAS65RLM6XdqMRWrHWb_2cMThsf_pHkI5TEVs"
+      },
+      "metrics-reader-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "Sdg2_QgQvMRI6hXNiHRYtqg8bkOW8bIGRmUYB7w91qY",
+        "kty": "EC",
+        "use": "sig",
+        "x": "olWcHRcUXaTJTVAXeBMlAl9tuNxwaQVxDBy3U9xUlqY",
+        "y": "wR_RA_Wb-OrYtvllndGRqxNlPso1cTVk5sWVcfu4qsM"
+      },
+      "monitor-alert-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "o1BYJtOryc9mmhCwIVyYNr1MyT9sCkS7e8i6H2bbnZY",
+        "kty": "EC",
+        "use": "sig",
+        "x": "53mdCQwymk18j37eaf3854S8n6z9PfTlUGs2ItfV1v0",
+        "y": "gJ-1j07PKuaiwkz6b_MlzZN0cSjfzOdnbhu-rzj7k50"
+      },
+      "monitor-query-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "Nvd_2a83-2w9HdBSUtZMJ7lzDUjuJPZx6zwFMq1eY8o",
+        "kty": "EC",
+        "use": "sig",
+        "x": "iPEtQK3MKdWnCKv6QXFDZxD5hrLOD8OOexkK4_XLkQY",
+        "y": "sX7tyd6HJT7k7vUUETAgZs0u7Cv13g3824WTvY_qjh0"
+      },
+      "pep-bridge-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "JSZrJwyy3leWRECAoDIi6C-CFzdc82HJfXeMS04A6UQ",
+        "kty": "EC",
+        "use": "sig",
+        "x": "u2XAaxWlApmOfivkmMerwyxgrPWlf4v0rfr5hdJGk98",
+        "y": "5e1sIIq73IOHkExieTyKaekztZBn3MdWVHlY9jbLSqw"
+      },
+      "prometheus-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "TWqkRn3twtQlSfjpWJ2RvKCR-P1jylZddQaH8G9oLEE",
+        "kty": "EC",
+        "use": "sig",
+        "x": "-RmXUMe-HIsB_ljp5EyglwuA5TtLd6sePFrLgQx92AM",
+        "y": "jQ5VjBePfpUk1olcU48HCocjJbA1BuuJIdJ3KykOUY8"
+      },
+      "proxy-auth-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "8_TwdmpG2VsC5YOkFrATT9FKvx1ZVhLGIn7VLzEZCSY",
+        "kty": "EC",
+        "use": "sig",
+        "x": "WVLdXmqdwoyagWaeS1wmIEsHIFyz2PVwJz5AK4eIeGw",
+        "y": "2D6tdCu9pBc-BuuMbieRt8gkGjeuJXuLQp6sFHIjYp0"
+      },
+      "proxy-resource-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "LKOh9BInEmgUuEDtbxNdhMv5gjeQ1Q6p7pqbl6C80WU",
+        "kty": "EC",
+        "use": "sig",
+        "x": "_s4ZyjEvzDoJwBOuXvRtr3TXS4zIRTJMLu3aHaMkZAQ",
+        "y": "Y8E-8eXAAy9MvC5x6Zludd-lj8dgQ7jetfS2PlVAMKI"
+      },
+      "proxy-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "syJFzsbyRWbDAZar0CALg22bR54Rb3mEs_amXqEycdY",
+        "kty": "EC",
+        "use": "sig",
+        "x": "mWea96f098NxtJsSw7agfhdmVK-3D8LF7sebJw5QkQo",
+        "y": "fzDuYC9skAfn_eqevjICwNcctY_2_dIexuC1AqZJfEU"
+      },
+      "reader-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "aQgdoOH0XD2oB-cPFSg40AWJECUMl0mw_MLztZF0jjU",
+        "kty": "EC",
+        "use": "sig",
+        "x": "2FK8SJsQaVGuO3zuZ8F4tdna8aVxCt-UwNcpVSxjwVI",
+        "y": "xHD0e_1StHg6BbaVSdnQyN4UGYGu5Id6kydvRbz4_p8"
+      },
+      "renew-am-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "l7hqRrDR3FWCrvobsQm1ZiDYInPp4ZtPO-9KdvcNRNY",
+        "kty": "EC",
+        "use": "sig",
+        "x": "5xSvt4G3Yri_FcoLwic8UX56VSjTrcsDx8mJtwcPuQ0",
+        "y": "JqEXd9_UvghfcIgx_JEqeO0NgBLWZZ9jghSHC9ZdKjo"
+      },
+      "renew-bridge-auth-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "Q-5dyGh2_BdRz10h-ZLA-W1QJCBbx5OejIiL77sioko",
+        "kty": "EC",
+        "use": "sig",
+        "x": "fhOAeSKwSGXF-KswEnLABtsmx9cQebiHOxCkgQbeULE",
+        "y": "a02jf8zdr6NDhdxBfTuCR4ZhbKZpdDmlJibK01aWzsA"
+      },
+      "renew-bridge-consume-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "tv-hB0SObJN1aVpsCXTKmpZe__rTlM5hcbbqOdu1lxM",
+        "kty": "EC",
+        "use": "sig",
+        "x": "dqUj4E0zExRYzU9JQsplRAyKzypRDfr_BUXx4fSMJI0",
+        "y": "3W4elDy0p4ioHUoaBdmCcX7TCEMiSP1Fq1b7MJuoUkA"
+      },
+      "renew-core-a-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "ETXMoOP8SMuLh7l_hcZmWgIpUJ-ybMnbMRc-fKgr-n0",
+        "kty": "EC",
+        "use": "sig",
+        "x": "f3HXqQvJYlyB9xWUUTqbNBAWF4qTUVRZDaIKsvHaTps",
+        "y": "0QiSzWMP8yLFROEm8_wfJaD78c4ub02Dg0dpVT3vvA0"
+      },
+      "renew-core-b-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "LVzoGoQQvtYUO3ZHS_OAQJCVnlG1YuFmfD2nHeQPlNk",
+        "kty": "EC",
+        "use": "sig",
+        "x": "BKTqjP8H1jqEmEIcG7XLBAXIJCCiI8uO_mpWVzG9lVw",
+        "y": "s4EonBTLRp4bmTnd0vrSWbUAUrXuqLhIjmCOTrZG29I"
+      },
+      "renew-core-c-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "0iYKCtD5GXqpOOpea6KR1hRCiRF34h2ZOcb2ARDDzB8",
+        "kty": "EC",
+        "use": "sig",
+        "x": "T87K4E3yV5C5A37R9dRzzmiynPNMIqY866wK2he5dR0",
+        "y": "wQNyo2vy3nmkVXrIrKh0QiJv3jCgqHC0c_c1glViea8"
+      },
+      "renew-exporter-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "Hsm76EhGLWXU4eNMNcJJMOIL2JleE7x2nqVjjy6Rotg",
+        "kty": "EC",
+        "use": "sig",
+        "x": "PO_GMKCSRpLQXGIggyrBYNG8cAqRPGB_NdAmRSvrE_0",
+        "y": "0c8jY9ETBkN38-Z-_qt_6o-8tJCrDSsFQep9bjwxyYU"
+      },
+      "renew-gateway-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "FfujCFxix1QCI67hSGM6HmDuhljhNsaMXJJH-vtmEsY",
+        "kty": "EC",
+        "use": "sig",
+        "x": "0JipoFwetSIs7BrHKWfJFsNYFkLwiqIgSIkaCOdHYzk",
+        "y": "CI7euyXgGyezYUWSgKuv6_bAJ2LCs9zKVzcEDevFxEM"
+      },
+      "renew-gateway-stats-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "xySlW4hbmU01byIjE0qG5Mj2Frk7NwbiY_yvyrNd0Js",
+        "kty": "EC",
+        "use": "sig",
+        "x": "oHQYsPqBmck1nBqLEfX6eXeg1t4vflHs83KiPYvflwA",
+        "y": "R5UcfFHS_3tJvgjqkQQdpc5kSH07H_2KWroyCRX4CG0"
+      },
+      "renew-prometheus-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "32vtznHcCCvkzZNbsfPEJAhu1TtvfrUtJP7-R0Vz32k",
+        "kty": "EC",
+        "use": "sig",
+        "x": "Iu-eZtdX-SeNCfyb4leesBiTC6oTwuBwI7WFovM9Tio",
+        "y": "Qzh0AoXSXVegR9NMJnVJkbmJqoiwvFTzpK0IubwB4nY"
+      },
+      "renew-proxy-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "FjLxWTR9KVqJYzpMhc4goHZPZay06zgB-NT_DQVAXp4",
+        "kty": "EC",
+        "use": "sig",
+        "x": "SJjYP7mluoBkJCUC9fCGzi0YJzLJW9zNdilhrYco6kY",
+        "y": "uBXNjQOi8ieJ-xo6naBiAUSTwzj5OrLX0zwWJHAvw0Q"
+      },
+      "renew-reader-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "Adt0MHOquxEtGe1JRK1QqEBY5Wx3JX6PlphLjCBw2No",
+        "kty": "EC",
+        "use": "sig",
+        "x": "Swik_izLYQA88L_FQvbWFa8VM7ENQLejA5d8z4s1h8k",
+        "y": "iy0hVLDbc6xzmJsu4c70ueD8humf_q1x92CMfB-HPoE"
+      },
+      "renew-resource-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "Qr7UmCOW-LMWcAxrtowm5o63f6Kk5khUInFhjlRqo-g",
+        "kty": "EC",
+        "use": "sig",
+        "x": "xXuEfWJ5NftTGccxL-J5k692_7EnF2zPbLq-sVkS570",
+        "y": "awRVaj5SHwVxpIjo0-mMg0Mv3-kIuH-TjIVrbx2TWI8"
+      },
+      "renew-sink-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "RNyPKccpZLrMDAQtVoEDp1wUq89kuPCtbBW1VuOwNlM",
+        "kty": "EC",
+        "use": "sig",
+        "x": "U677wTudUErHVgO6omPKa_YU_0hiOexa89IOmRSiW-0",
+        "y": "YwirUmFXzkHywaEWFbDF7Vj-jtmpzSkJnfGATHn7a60"
+      },
+      "resource-auditor-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "TcqNVMXz7bd6ZRg8NAn5LCT87KNY-BIxkfTfyxiAMNU",
+        "kty": "EC",
+        "use": "sig",
+        "x": "lAnTdNfIkvdXKzXeD0NZ6vY50E_xWPA8l5-pkevN_og",
+        "y": "XsP4etPPSMIy97YAYkUmYsVzmAm4HFePslwYhZAA-_I"
+      },
+      "resource-consumer-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "0VFBCfMc7sul7f8aKhkuRM-ba842IRPwz2yABujb1WU",
+        "kty": "EC",
+        "use": "sig",
+        "x": "KXptHmH8pfa2mEqvUd7cOSAP-2b0pCJAUUUnSjUDAio",
+        "y": "F12vBLW5okoYaDlgFITnrxefrxazXMLexRtI_CqZCyE"
+      },
+      "resource-probe-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "hDa6jZ5bpDHv0I7VmwgnIAlQxFBv7dyWOykfvLkKMZc",
+        "kty": "EC",
+        "use": "sig",
+        "x": "NNblLVF5E-wikMucj7d38fAjKqlJW00x8vUNyA_ha0w",
+        "y": "ZD3n96DOv_9XyCaIIXo6UBIek8bakIUMdqhhN0y-qEA"
+      },
+      "resource-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "idMszLRLWQ8XmA60b06pSntPnA1GEppOjnS6FcfLSlc",
+        "kty": "EC",
+        "use": "sig",
+        "x": "XD8nyfsZc2z2tTdCp5EV5_OKBb55jvOAurrbugCJdOo",
+        "y": "_im0UcLiJJi1TmhHhevl4IbrWEYA_YeZ3OYmhhb4_7k"
+      },
+      "revocable-canary-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "fJaOapN3VGN3Fiq4HExugBvU6iHlv1JnQ1H97NynDvw",
+        "kty": "EC",
+        "use": "sig",
+        "x": "BdI-YoTP5dhGrd4StGA_E7mffS-d6WaH3rnG8Rjjuk4",
+        "y": "eEEIP4AbOnj_dXJNu88xl3PVz9An_7VlZD52MS5lp-Y"
+      },
+      "scrape-agent-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "U4F8Q8MKsTYPLvlmIQiB5oq1_LTpXO5CLBJM2kIVYwk",
+        "kty": "EC",
+        "use": "sig",
+        "x": "du47JMjUx9ftqoSiypQ5k2jldbquFj-R3Mk0GJgI4E0",
+        "y": "bVkWO2ExeHkx44sArbuWMBiqAFvAPLDyGJR49Mw6x9g"
+      },
+      "scrape-control-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "l-kN13GhIt3iBWYGHonJrf4lu0EaD28QEo-0tB3nTK0",
+        "kty": "EC",
+        "use": "sig",
+        "x": "7lAJQoCGHF0jbPd0-csbDgTUSHsMmtPdA0Nl2I6JqoQ",
+        "y": "__uwAErGtbfMYjEE9uBpvqpF0mApouoevjtYf9ETSp4"
+      },
+      "server-renewal-am": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "Aj1Lii7Z7495hNdfgODFBD6rp8uQpOr9_UG0HakhPao",
+        "kty": "EC",
+        "use": "sig",
+        "x": "aiq1zel4ZcJ55SVP491I2myo1Z43UnAk3X_7w8qSbZc",
+        "y": "sUjWtzF_5IsWa0fdJv-5M_AuI25mp0IFVfnSlw2r0KU"
+      },
+      "server-renewal-bridge-auth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "9kLUnQtHGiCzqdsLVC9NgHhwmbE3t5Dw9qCO_DIjz8E",
+        "kty": "EC",
+        "use": "sig",
+        "x": "YtPS3vk05QuJYlxsJFuDJ18dnaUjlP_7zviP7MQ2Oyk",
+        "y": "jAHI6buRER_BxA14oITw7gtgAgB1-QSOWIrjUZSEnfc"
+      },
+      "server-renewal-bridge-consume": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "B-54uvPDRO4mZPzZaQX1A-v78u3rzPMLP0vwNnSD7Mw",
+        "kty": "EC",
+        "use": "sig",
+        "x": "ZGh_igD--A2K1N0MzG7OtBgDew-EDMAzz-PLkkyIuuo",
+        "y": "b43kOCLMxzYrCNvYRTxaj9rrsU6ktjuU2jJfBDWnWng"
+      },
+      "server-renewal-core-a": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "0Po9VlF8d-7-4UwRTgR5wjN5RTNbYnJlBZW-p1Qsflc",
+        "kty": "EC",
+        "use": "sig",
+        "x": "wdtZR2jEPlUMksbXfM-s7Ny5Cy0JJ3i80PfjCOF2LyU",
+        "y": "BRT1Gsl1Eph0X3TLjBOO9fSeemJD6KCDB3H3XlAzp4Q"
+      },
+      "server-renewal-core-b": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "8JpbKTbjHu6HuKHLoZa6lifLFq-adpLunoUVH7MLCCs",
+        "kty": "EC",
+        "use": "sig",
+        "x": "ebrXpt8DiYlxuJtmWKEXH7DDF6Sz2SJSaA9K4GXPuTw",
+        "y": "FzNoXe0aud0FRtz3n2DRIWC0bPpQjj2g1G8tovq6oXE"
+      },
+      "server-renewal-core-c": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "Pw2POW4lcbTvZY-HWWqhi_-2b1AwMOuYUKwwkdjZnbo",
+        "kty": "EC",
+        "use": "sig",
+        "x": "GKSOnhyEGGNacTBsfbqy0um0RFBySa5ftYnBJlqCprQ",
+        "y": "8fjvLH75O3frfR0BmAu7MzrUKeYJPPT0mwMhIoP1y0c"
+      },
+      "server-renewal-exporter": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "ADuEMpL5sHcgr52TvOr8EXeLEWk83bqAm7OPYhsx9xQ",
+        "kty": "EC",
+        "use": "sig",
+        "x": "zkQ9cSjwZkAxSy3wWE0e3dJZvL0Gv85WHVrtjwqUE-M",
+        "y": "ScnvPsGtlhgNo9MjM8_s5K3pglh_eiBUEOwoZ7bTR8M"
+      },
+      "server-renewal-gateway": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "LolNQ65Ct0UrsyEj3yanaEEPO3S3DfzFB_DpDWTXXlw",
+        "kty": "EC",
+        "use": "sig",
+        "x": "VS94vDtsmTzqKiOMNeW3p2hZkpRFGAHdApYMvUH24bg",
+        "y": "NQ0BfdIBnj9vkp2Cnba6Y2RZ6YWNvNSxhbOX7XxqqkU"
+      },
+      "server-renewal-gateway-stats": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "mj0lVO8_aK3InU2-WS0BdiwDq1iPvExsohnioCR5XmA",
+        "kty": "EC",
+        "use": "sig",
+        "x": "kHjjgRy6eY0UrNrJqJeDTUCqs7n3JhZzSZE3-M4ec54",
+        "y": "VUQ2baf5bGSepuS-ZLjtAs4deWAFFRWPdlO5uQCyPrI"
+      },
+      "server-renewal-prometheus": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "6me5vcQWHhstF7DAwthmaVvo_JJVbbDB-j1GKGEaCcE",
+        "kty": "EC",
+        "use": "sig",
+        "x": "XXGbcq44eIO-q7bPlxT4bEbJK1B2OXq-ws1qs6dXODY",
+        "y": "su96qsqFSSwWZkV9s_93yR99AMlKD1Uk_sEWGWkm6tw"
+      },
+      "server-renewal-proxy": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "lN-0O-yaMCPeRNNzai9XnPb36srTgrQjh738X4oE7GM",
+        "kty": "EC",
+        "use": "sig",
+        "x": "L0yqfc-tvUzlJr6sKwil3KdG1iEDckDcC-EWjbXGuo8",
+        "y": "h8NV2TIWhTul68HcAhSgx1sbGWnVJnA4tpVvW8jnf0w"
+      },
+      "server-renewal-reader": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "Ip8a4Hz0DANtc8jV4MP8f3X3EZQUYextxqpiI_0Ac9g",
+        "kty": "EC",
+        "use": "sig",
+        "x": "nVDrMgfgZzKC5GZB4OkbEY6sNQvMWQdfrLvrhITXSDw",
+        "y": "ipLTfrcXFu2IXyDpxOVl_6p3sK87Zjkhm5_Fi_P486g"
+      },
+      "server-renewal-resource": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "wI9i7wKSJLpxB0BVbRHjPYT2fivhd41kEw-XbSYeIKs",
+        "kty": "EC",
+        "use": "sig",
+        "x": "W0eiagVs5DkC1ihttYKCj22pZnpIm7iWDBpnQm3-SJw",
+        "y": "aYy7DCaNJJJIfpklIkezy922xrIdxydW7dGVrMVRkV4"
+      },
+      "server-renewal-sink": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "-o-SJdoMsjiQ4lWSFgxht0fFi_AtXd90BechL5ufNjE",
+        "kty": "EC",
+        "use": "sig",
+        "x": "KHpa9R14maCfCC3eaYoTjlkJTRd9rkZWI_cWu9iY8wY",
+        "y": "N6MKA6sTFDnU6UJUT8_s2e8t4fOwhohtKx9xsOO-2wg"
+      },
+      "sink-auditor-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "H7KWnurH4KiahPw5P0ErhEaBfrcXvWdYbqCZJGGDzTg",
+        "kty": "EC",
+        "use": "sig",
+        "x": "qMu-NW_PwY7eQ5V-ypltxjw6R3PnYieHHUEKSCDEClM",
+        "y": "cJb52snwjFr4FlluS6KkTjyUgqFvRKMmj5aSsEk75Rs"
+      },
+      "sink-serverAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "1ZKh2VsA97tZanzCJ1bgcLmSpgK9_9_dOaXnQVOQSe4",
+        "kty": "EC",
+        "use": "sig",
+        "x": "MrE2omu-LreAmu5t2Xl7solEJtMqYHPNHV62LtNzQH0",
+        "y": "JZLFuxHWuQr44tRhW3KWaAz2_NjN3yQSeIqBniiIpDw"
+      },
+      "static-canary-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "dR41dnv7O-mu8U2pkB5nHnQPbw4RChEdR4uMYIcl-Z0",
+        "kty": "EC",
+        "use": "sig",
+        "x": "T0FU8YbFTXaBp28pI8xyR814Q_4aRpjpr_oHA6HKpwM",
+        "y": "f1k6mcdITy_FKeZtX0f5OuJVMANoZ7TGT2m8b50D7KE"
+      },
+      "transport-auditor-clientAuth": {
+        "alg": "ES256",
+        "crv": "P-256",
+        "kid": "7aq6MMNTuZF2S2kbdUa8dzWSP-BC89JLUBe-_cDVzgc",
+        "kty": "EC",
+        "use": "sig",
+        "x": "qp0i2ikT8cpUn30u7erV-nTOAGANtiztJ0tvELLh81o",
+        "y": "e4uFGKVSuahXX6ix2VS8NekrIIn9VjzB8SyHglMaCno"
+      }
+    },
+    "root_public_key_sha256": "1f1246203a28b2d299b2ed21a68748a8b42ceb83f7e87895f70b31aa3e5a8c9a"
+  },
+  "authority_tick_deadline_seconds": 180,
+  "authority_tick_observations": [
+    {
+      "after": "quiescing",
+      "seconds": 8.828,
+      "error": null
+    },
+    {
+      "after": "prepared",
+      "seconds": 11.625,
+      "error": null
+    },
+    {
+      "after": "trust_staged",
+      "seconds": 10.235,
+      "error": null
+    },
+    {
+      "after": "ca_activated",
+      "seconds": 24.39,
+      "error": null
+    },
+    {
+      "after": "leaf_activating",
+      "seconds": 24.594,
+      "error": null
+    },
+    {
+      "after": "migrating",
+      "seconds": 10.078,
+      "error": null
+    },
+    {
+      "after": "quiescing_retirement",
+      "seconds": 13.641,
+      "error": null
+    },
+    {
+      "after": "trust_retired",
+      "seconds": 27.609,
+      "error": null
+    },
+    {
+      "after": "committing",
+      "seconds": 30.969,
+      "error": null
+    },
+    {
+      "after": "idle",
+      "seconds": 26.063,
+      "error": null
+    }
+  ],
+  "final_executor_role": {
+    "schema": "executor-owner-1",
+    "project": "c02-9a91d2c2613e",
+    "epoch": 3,
+    "active": "a",
+    "graph_image": "sha256:b86c82bf43a5b736b35f448f85078a1b81984bfcc028b2d939f98484c0573890",
+    "executor_image": "sha256:b61e6c84b6fceefc388a6ec6a3fa8ed2f4bd6ab42825e0210e84915c5ac639d7",
+    "generations": {
+      "a": 2,
+      "b": 2
+    }
+  },
+  "final_management_role": {
+    "schema": "control-role-1",
+    "project": "c02-9a91d2c2613e",
+    "image": "sha256:b86c82bf43a5b736b35f448f85078a1b81984bfcc028b2d939f98484c0573890",
+    "epoch": 3,
+    "active": "a",
+    "generations": {
+      "a": 2,
+      "b": 2
+    }
+  },
+  "cleanup": {
+    "main": {
+      "containers_remaining": 0,
+      "volumes_remaining": 0,
+      "networks_remaining": 0
+    },
+    "executor": {
+      "containers_remaining": 0,
+      "volumes_remaining": 0,
+      "networks_remaining": 0
+    },
+    "preflight": {
+      "containers_remaining": 0,
+      "volumes_remaining": 0,
+      "networks_remaining": 0
+    }
+  },
+  "independent_all_trials_post_cleanup_inventory": {
+    "containers": {
+      "c02-4ed0e3e1dd6e": [],
+      "c02-9a91d2c2613e": [],
+      "c02-b8d8f7914233": []
+    },
+    "volumes": {
+      "c02-4ed0e3e1dd6e": [],
+      "c02-9a91d2c2613e": [],
+      "c02-b8d8f7914233": []
+    },
+    "networks": {
+      "c02-4ed0e3e1dd6e": [],
+      "c02-9a91d2c2613e": [],
+      "c02-b8d8f7914233": []
+    },
+    "image_tags": {
+      "c02-4ed0e3e1dd6e": [],
+      "c02-9a91d2c2613e": [],
+      "c02-b8d8f7914233": []
+    }
+  },
+  "preserved": {
+    "unrelated_container": {
+      "name": "/pod-forensics-20261025-control-plane",
+      "id": "640d769d1c1b146fa0c9b7119ea24c0c0dc2b5dec60d8f49765338e6a3d8bd01",
+      "running": true
+    },
+    "zip_sha256": {
+      "docs.zip": "c64e347071f45725ccf84aa0a8973fa64cabe774b731a7f206a2ec9d05b33ec9",
+      "docs/week03.zip": "fb5890905406b45555d5fd3cc9722d23cd51439a5010ec2ff30bd8d83c1f4e95"
+    }
+  },
+  "limits": [
+    "Same physical PC/kernel/parent Docker and surviving journal/images; not physical-host/site HA.",
+    "Docker socket is root-equivalent despite nonroot/read-only/cap-drop.",
+    "Explicit replacement only with consistent evidence. General replica disagreement or lost candidate during partial identity write requires investigation.",
+    "No valid intent means no recovered request; max16 predecessors per operation.",
+    "Checksums detect accidental damage, not malicious Docker-admin rollback; no quorum/election or external monotonic anchor.",
+    "Faults are process/container/volume cases, not power-failure durability proof.",
+    "No arbitrary authority busy reset, uncertain business POST retries, workload SQLite HA, full CA cold restore, production SLA/RTO/RPO or teammate independent review.",
+    "Historical campaigns/preflight/earlier Windows results are not added to this run totals."
+  ]
+}
