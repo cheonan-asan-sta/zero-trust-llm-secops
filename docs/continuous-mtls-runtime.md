@@ -68,7 +68,7 @@ python -m scripts.test_continuous_mtls_runtime --directory "runtime/c02/continuo
 
 자동 재시작 검사는 컨테이너 안의 Python 자식 프로세스를 `SIGKILL`하고 **같은 컨테이너 ID에서 Docker `RestartCount`가 증가**했는지를 확인하는 방식입니다. `docker stop`은 운영자가 정지한 상태여서 `unless-stopped`의 자동 복구 검사와 구분합니다. 프로세스 재시작 뒤에는 기존 DB·접수·spool과 이미 회수한 세션을 유지해야 합니다. 구체적인 통과 결과는 실제 검증 기록으로 확인하며, 실행 설정만으로 장애 복구가 입증되지는 않습니다.
 
-2026-11-04 최종 [공개 검증 기록](infrastructure-results/continuous-mtls-macos-20261104.json)은 최신 `aitest 5d957aa`를 합친 코드로 실제 Docker 통합 검사 **17개**를 통과한 결과입니다. app·collector·worker·watchdog의 프로세스 종료 후 자동 재시작, 전송 복구, 증명 만료·서명키 폐기 후 미사용 grant의 문서 접근 **403**, 무관 주체의 정상 **200**, 서버 pin 오류와 복구를 확인했습니다. 이미지 안의 앱·스크립트 지문을 원본과 대조했고 시험 컨테이너·볼륨·망 잔여는 각각 **0**입니다. macOS arm64의 전체 회귀는 **1,322건 통과·기존 의존성 경고 1건**, Ruff도 통과했습니다. 이전 기준의 예비 성공 17개는 최종 합계에 더하지 않습니다. 팀장 환경의 독립 재현은 후속 확인입니다.
+보관 정리·입력 회전 추가 전 프로필 기준선인 2026-11-04 [공개 검증 기록](infrastructure-results/continuous-mtls-macos-20261104.json)은 당시 `aitest 5d957aa`를 합친 코드로 실제 Docker 통합 검사 **17개**를 통과한 결과입니다. app·collector·worker·watchdog의 프로세스 종료 후 자동 재시작, 전송 복구, 증명 만료·서명키 폐기 후 미사용 grant의 문서 접근 **403**, 무관 주체의 정상 **200**, 서버 pin 오류와 복구를 확인했습니다. 이미지 안의 앱·스크립트 지문을 원본과 대조했고 시험 컨테이너·볼륨·망 잔여는 각각 **0**입니다. macOS arm64의 전체 회귀는 **1,322건 통과·기존 의존성 경고 1건**, Ruff도 통과했습니다. 이전 기준의 예비 성공 17개는 최종 합계에 더하지 않습니다. 팀장 환경의 독립 재현은 후속 확인입니다.
 
 ## 수명과 후속 통합
 
