@@ -347,3 +347,34 @@ def test_fresh_empty_mounted_authority_directories_are_supported(tmp_path):
     assert store.initialize()["initialized"]
     with pytest.raises(recovery.RecoveryError, match="already_initialized"):
         store.initialize()
+
+
+@pytest.mark.parametrize("phase", ["snapshot", "checkpoint.json", "anchor.json"])
+def test_failed_checkpoint_cannot_fall_back_to_old_valid_authority(lab, monkeypatch, phase):
+    old_stage, _ = restore(lab)
+    service = recovery.operations(lab.root / "data")
+    service.revoke("pending", SessionRevocationRequest(expected_version=1, note="new revocation"), PRINCIPAL)
+    original = recovery.atomic
+
+    def fail_write(path, body):
+        if path.name == phase:
+            raise OSError("injected checkpoint write failure")
+        return original(path, body)
+
+    with monkeypatch.context() as fault:
+        if phase == "snapshot":
+            fault.setattr(recovery, "snapshot", lambda *a, **kw: (_ for _ in ()).throw(OSError("snapshot failed")))
+        else:
+            fault.setattr(recovery, "atomic", fail_write)
+        with pytest.raises(OSError):
+            lab.store.checkpoint()
+    for action in (lab.store.backup, lambda: lab.store.restore(lab.backup["backup_id"])):
+        with pytest.raises(recovery.RecoveryError, match="publication_incomplete"):
+            action()
+    with pytest.raises(recovery.RecoveryError, match="pin_mismatch"):
+        recovery.verify_admission(old_stage, lab.root / "public")
+    # A deliberate new checkpoint of the stopped, current source can resume.
+    lab.store.checkpoint()
+    with pytest.raises(recovery.RecoveryError, match="backup_stale"):
+        lab.store.restore(lab.backup["backup_id"])
+    assert lab.store.restore(lab.store.backup()["backup_id"])["inbox_preserved"]

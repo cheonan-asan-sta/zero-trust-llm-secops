@@ -174,6 +174,23 @@ class Lab:
             "f=json.loads(Path('/lab/data/fixture.json').read_bytes()); "
             "require(access(operations(Path('/lab/data')),'pending',f['tokens']['pending'],datetime.fromisoformat(f['now'])).allowed,'consume')")
         self.checks["changed_source_backup_refused"] = self.invoke("backup", denied="source_advanced_since_checkpoint") is None
+        fault = self.job("""import json
+from pathlib import Path
+from scripts import app_state_recovery as r
+original=r.atomic
+def fail(path,body):
+    if path.name=='checkpoint.json': raise OSError('synthetic publication failure')
+    original(path,body)
+r.atomic=fail
+try: r.Store(Path('/lab')).checkpoint()
+except OSError: print(json.dumps({'checkpoint_write_failed':True}))
+else: raise RuntimeError('fault_not_injected')
+""")
+        self.checks["checkpoint_write_failure_injected"] = json.loads(fault.stdout)["checkpoint_write_failed"]
+        self.checks["incomplete_checkpoint_refuses_old_restore"] = self.invoke("restore", backup["backup_id"],
+            denied="checkpoint_publication_incomplete") is None
+        self.checks["incomplete_checkpoint_refuses_backup"] = self.invoke("backup",
+            denied="checkpoint_publication_incomplete") is None
         self.invoke("checkpoint")
         self.checks["old_backup_refused"] = self.invoke("restore", backup["backup_id"], denied="backup_stale_or_foreign") is None
         backup = self.invoke("backup")

@@ -4,6 +4,28 @@
 대상 계획은 **11/16~11/22의 3주차**이며 해당 작업을 미리 진행했다.
 김택희의 앱 의미·독립 재현 검토와 3주차 전체 완료는 별도다.
 
+## 체크포인트 저장 실패 후 재사용 차단 보강
+
+초기 구현 [PR #30](https://github.com/cheonan-asan-sta/zero-trust-llm-secops/pull/30)의 최종 CI는
+전체 회귀·복구 15개·mTLS 41개·이미지 빌드를 통과했다. 추가 검토에서 새 checkpoint 파일 저장이
+실패하면 예전 checkpoint/anchor가 서로 일치해 과거 백업이 다시 사용될 수 있는 경로를 발견했다.
+새 세션의 일괄 회수만으로 최신 inbox/소비 이력의 유실까지 해결할 수 없어 후속으로 차단했다.
+
+이제 **복사/검증 전에 다음 세대의 차단 pin을 먼저 저장**하고, 백업/복원은 public 세대와
+완료된 anchor 세대가 같을 때만 허용한다. 스냅샷·checkpoint·anchor 쓰기가 중단되면 과거 사본을
+사용할 수 없다. 현재 정지 원본을 다시 검증해 새 checkpoint를 정상 발행한 뒤에만 재개한다.
+차단 기록 자체를 저장할 수 없는 경우도 운영자는 작업을 중단하고 노출을 재개하지 않아야 한다.
+신뢰 호스트와 정지 경계·전체 제어 저장소 rollback 제외 조건은 그대로다.
+
+[보강된 로컬 원자료](infrastructure-results/app-state-recovery-checkpoint-20261105.json):
+복구 단위 **51개/83.10초**, 실제 Docker **18/18** 통과, 소유 컨테이너/볼륨 **0/0**.
+49,152-byte DB/18 journal records에서 backup 2.9436초, restore job 2.5752초,
+DB 유실→HTTP 준비 11.7072초이며 정지 증거 경계의 journal 손실은 0이다.
+원본 DB/기동/권한 거부 등 초기 검사를 모두 반복하고 실제 checkpoint 저장 실패와 구 사본 거부를 추가했다.
+아래 초기 15개·전체 회귀 1,940개 기록은 그 당시 근거로 보존한다. 최신 전체 회귀 결과는 후속 PR의
+정확한 head 및 최종 병합 commit CI 기록을 따른다. PR #30의 병합 후 CI는 이 보강을 위한
+후속 검증으로 대체하려고 취소했으며, 취소를 성공으로 기록하지 않는다.
+
 ## 해결한 공백
 
 기존 CA DB/호스트 복구와 런타임 업그레이드 DB 호환 시험은 앱의 권한 상태를
@@ -74,7 +96,7 @@ docker build --file Dockerfile --tag week3-app-recovery:app .
 출력 경로는 존재하지 않는 새 `runtime/week3/...`를 사용한다. 상세 평문·합성 토큰·개인키는
 공개 문서/저장소에 넣지 않는다. `verification.json`은 비밀을 제외한 선택 지문·판정·시간만 담는다.
 실행기는 이미지 안의 앱/새 스크립트 지문을 현재 소스와 대조하고 다르면 거부한다.
-CI도 현재 소스에서 빌드한 앱 이미지로 동일 실험을 실행한다.
+CI도 현재 소스에서 빌드한 앱 이미지로 보강된 18개 실험을 실행한다.
 
 ## 측정 정의와 근거
 
@@ -86,7 +108,7 @@ CI도 현재 소스에서 빌드한 앱 이미지로 동일 실험을 실행한�
   실행 중 임의 시점이나 JSONL까지 RPO 0이라고 주장하지 않는다.
 - 각 컨테이너 제한은 CPU 1 / memory 256 MiB / pids 128이며 호스트·캐시·부하에 따라 시간이 달라진다.
 
-공개 측정은 [로컬 검증 JSON](infrastructure-results/app-state-recovery-20261105.json)을 따른다.
+초기 PR #30 측정은 [초기 로컬 검증 JSON](infrastructure-results/app-state-recovery-20261105.json)을 따른다.
 
 | 로컬 Docker 1회 측정 | 결과 |
 |---|---|
@@ -99,7 +121,7 @@ CI도 현재 소스에서 빌드한 앱 이미지로 동일 실험을 실행한�
 | 실험 후 남은 소유 컨테이너 / 볼륨 | 0 / 0 |
 
 Linux 전체 회귀는 **1,940개 통과 / 기존 경고 2개 / 467.84초**다. 복구 신규 단위 시험 48개를 포함한다.
-최종 PR/병합 후의 전체 회귀·기존 mTLS 41개·새 복구 15개 결과와 정확한 commit/run은 PR 기록에 남긴다.
+후속 PR/최종 병합 후의 전체 회귀·기존 mTLS 41개·보강 복구 18개 결과와 정확한 commit/run은 PR 기록에 남긴다.
 경고는 FastAPI/Starlette TestClient의 httpx 사용과 Mangum event loop deprecation이며 억제하지 않았다.
 
 로컬 기록의 `base_git_head=a1f6046...`, `source_dirty=true`는 구현 중 시험했다는 뜻이다.

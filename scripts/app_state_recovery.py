@@ -214,12 +214,16 @@ class Store:
         local_only()
         with locked(self.control), tempfile.TemporaryDirectory(prefix="secops-checkpoint-") as temp:
             anchor = read_json(self.control / "anchor.json")
+            # Persist invalidation before inspecting/copying the newer source.
+            # If snapshot/seal/anchor publication fails, the old checkpoint must
+            # not become usable again merely because its own files still match.
+            generation = anchor["generation"] + 1
+            atomic(self.public / "current.json", canonical({"source": anchor["source"],
+                "generation": generation, "restore_id": None, "release_sha256": None}))
             state = snapshot(self.root / "data", Path(temp) / "snapshot")
             manifest = {"purpose": "app-checkpoint-1", "source": anchor["source"],
-                        "generation": anchor["generation"] + 1, "created_at": datetime.now(UTC).isoformat()}
+                        "generation": generation, "created_at": datetime.now(UTC).isoformat()}
             envelope = sealed(state["state"], read_file(self.control / "checkpoint.key", 32), manifest)
-            atomic(self.public / "current.json", canonical({"source": anchor["source"],
-                "generation": manifest["generation"], "restore_id": None, "release_sha256": None}))
             atomic(self.control / "checkpoint.json", canonical(envelope))
             atomic(self.control / "anchor.json", canonical({"source": anchor["source"],
                 "generation": manifest["generation"], "checkpoint_sha256": sha(canonical(envelope))}))
@@ -228,6 +232,9 @@ class Store:
     def _checkpoint(self, max_age):
         require(type(max_age) is int and 1 <= max_age <= 3600, "checkpoint_age_limit")
         anchor = read_json(self.control / "anchor.json")
+        current = read_json(self.public / "current.json")
+        require(current["source"] == anchor["source"] and current["generation"] == anchor["generation"],
+                "checkpoint_publication_incomplete")
         envelope = read_json(self.control / "checkpoint.json")
         require(anchor["checkpoint_sha256"] == sha(canonical(envelope)), "checkpoint_replay_or_tamper")
         state = unseal(envelope, read_file(self.control / "checkpoint.key", 32), "app-checkpoint-1")
