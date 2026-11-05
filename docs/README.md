@@ -1,5 +1,9 @@
 # 개발 주차별 산출물
 
+11/6 3주차 [C01 선택형 관측 지속 실행](persistent-monitoring.md): 기존 mTLS 경로와
+Prometheus/Alertmanager·조회/exporter·시험 알림 수신기를 연결한다. 경보 episode·복구 해제·
+저장/설정 보존과 기존 보안 회귀를 함께 검증하며 운영 선정·독립 재현은 남긴다.
+
 11/6 3주차 [실행 환경 고정·재시작 인수](runtime-release-lock.md): 9개 mTLS 서비스의 소스·정책·
 설정·실행 구조와 앱/NGINX image ID를 고정하고 변경/누락·태그/설정 불일치 시작을 거부한다.
 기존 키·상태는 재사용하며 C01 통합·전체 저장 계약·최종 선정/독립 검토는 남긴다.

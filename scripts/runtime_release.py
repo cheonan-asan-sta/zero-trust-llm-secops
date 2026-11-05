@@ -28,9 +28,9 @@ def file_digest(path):
     return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 
 
-def capture(root, topology):
+def capture(root, topology, extra_files=()):
     root = Path(root).resolve()
-    files = set(FIXED)
+    files = set(FIXED) | set(extra_files)
     for folder in ("app", "scripts", "infra/runtime"):
         for path in (root / folder).rglob("*"):
             if "__pycache__" in path.parts:

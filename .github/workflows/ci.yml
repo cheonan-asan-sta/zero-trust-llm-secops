@@ -38,7 +38,7 @@ jobs:
             cat runtime/week3/app-recovery-ci/verification.json
           fi
       - name: Verify collector maintenance over mTLS
-        run: python -m scripts.test_continuous_mtls_runtime --directory runtime/c02/collector-maintenance-ci
+        run: python -m scripts.test_continuous_mtls_runtime --monitoring --directory runtime/c02/collector-maintenance-ci
       - name: Report mTLS verification
         if: always()
         run: |

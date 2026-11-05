@@ -39,13 +39,17 @@ COLLECTOR = Path("/collector/producer")
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def assets() -> dict[str, dict[str, str]]:
+def assets(*, monitoring=False) -> dict[str, dict[str, str]]:
     """Generate only in-memory private leaf/signing keys; retain no CA private key."""
     ca = authority("Continuous local runtime CA")
     ca_pem = ca[1].public_bytes(serialization.Encoding.PEM).decode()
     servers = ("core-a", "gateway", "bridge-auth", "bridge-consume", "resource", "proxy")
     clients = ("core-operator", "gateway-client", "pep-bridge", "collector", "proxy-auth",
                "bridge-probe", "resource-consumer", "proxy-resource", "resource-auditor", "frontend")
+    if monitoring:
+        from scripts.monitoring_runtime_assets import CLIENTS, SERVERS
+        servers += SERVERS
+        clients += CLIENTS
     leaves = {name: leaf(ca, name, server=name in servers) for name in (*servers, *clients)}
 
     def credentials(*names):
@@ -80,7 +84,7 @@ def assets() -> dict[str, dict[str, str]]:
                   ).decode(), "not_before": (now - timedelta(seconds=30)).isoformat(),
                   "not_after": (now + timedelta(days=1)).isoformat()}],
     }]}
-    return {
+    material = {
         "registry": {"sources.json": json.dumps(registry)},
         "core-tls": server("server.json", "core-a", {
             "gateway-client": "api-gateway", "core-operator": "core-operator",
@@ -113,6 +117,10 @@ def assets() -> dict[str, dict[str, str]]:
         "secret": {"secret": secrets.token_urlsafe(32)},
         "config": {"all-hops.conf": (ROOT / "infra/mtls/all-hops-nginx.conf").read_text("utf-8")},
     }
+    if monitoring:
+        from scripts.monitoring_runtime_assets import assets as monitor_assets
+        material.update(monitor_assets(server, client, credentials))
+    return material
 
 
 def _credential(name, *, digest=False):

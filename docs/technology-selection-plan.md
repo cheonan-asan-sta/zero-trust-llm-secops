@@ -1,5 +1,9 @@
 # 기술 비교와 선정 실행 계획
 
+11/6 3주차 [C01 지속 실행 통합](persistent-monitoring.md): 잠정 선택한 Prometheus/Alertmanager의
+기존 asset digest를 재사용해 mTLS 지속 실행·분리 저장소·실제 경보/복구·버전/설정 고정을 검증한다.
+기존 후보 비교 결과를 바꾸거나 운영 채택·C01~C03 최종 승인·독립 재현을 완료로 표시하지 않는다.
+
 11/6 3주차 [선정 실행 경로 고정](runtime-release-lock.md): 기존 NGINX digest와 Python/SQLite/
 wheel lock을 재사용해 앱·정책·빌드·실행 구조를 고정하고 실제 이미지/설정을 대조한다. 새 제품
 추가나 C01~C03 최종 선정은 아니며 관측 통합·조건부 판정·독립 검토는 남긴다.

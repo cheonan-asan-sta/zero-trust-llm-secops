@@ -1,5 +1,24 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 6일 C01 관측 지속 실행 통합
+
+- [선택형 관측 프로필](docs/persistent-monitoring.md): `scripts.monitored_mtls_runtime`을 사용한다.
+  기본 `continuous_mtls_runtime` 9서비스는 유지하며 관측 프로필은 14서비스·8개 내부망이다.
+- reader는 별도 viewer 신원/API 키, exporter는 보안 DB/응답·수집 키 없이 mTLS로 조회한다.
+  reader 자체는 기존 앱의 초기화/트랜잭션 구조상 공유 DB RW 마운트가 필요함을 명시한다.
+- Prometheus/Alertmanager는 기존 공식 asset digest를 재사용하고 전용 저장소를 쓴다. app ID·
+  기반 RootFS prefix·도구 ID/바이너리4·관측 lock/rules/설정 지문을 확인한다. 재시작 불일치는 거부한다.
+- `FROM sha256:<local-ID>`는 BuildKit이 외부 repo/tag로 해석해 준비2회가 실패했다. 기반 로컬
+  태그의 ID와 결과의 전체 기반 레이어 prefix 대조로 보완했으며 계정 인증이 필요한 문제가 아니다.
+- 기존 mTLS48에 실제 새 경보 episode·same fingerprint/startsAt resolved·고정 시각 TSDB·
+  AM silence 보존·관측 설정 drift·접수 후 폐기 키 재검증/failed 경보를 추가했다. CI도 --monitoring을 사용한다.
+- 최종 로컬 관측71·기본9 호환4·집중129·Linux 전체2021이 통과했다. 실제 시험 소유 자원은 모두 정리했다.
+  [원자료](docs/infrastructure-results/persistent-monitoring-20261106.json)에 입력151개와 실패/중간 시도도 남긴다.
+- 시험 수신기는 RAM/최대1000개이며 운영 알림 이력 저장소가 아니다. AM native TLS는 허용 SAN에
+  관리 API를 신뢰하며 경로별 세분화 RBAC/운영 host attestation은 미구현이다.
+- 앱/정책·탐지 기준은 바꾸지 않는다. CA 자동화 통합 인수·전체 JSONL 저장 계약·C01~C03 최종
+  조건부 선정·운영 부하/인증·김택희 독립 검토는 미완료다. 전체 3주차 완료로 확대하지 않는다.
+
 ## 2026년 11월 6일 3주차 실행 환경 고정
 
 - [release lock/재현/범위](docs/runtime-release-lock.md): `scripts.runtime_release`와 기존 지속 실행기의

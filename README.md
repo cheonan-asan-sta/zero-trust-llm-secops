@@ -1,5 +1,11 @@
 # zero-trust-llm-secops
 
+## 2026년 11월 6일 3주차 관측 지속 실행 통합
+
+[선택형 관측 프로필](docs/persistent-monitoring.md)에 Prometheus·Alertmanager·조회/exporter·로컬
+시험 수신기를 기존 mTLS 경로와 연결했다. 신원/관측망·저장소를 분리하고 같은 경보의 발생/해제,
+재시작 후 데이터와 설정 고정을 검증한다. 앱 정책·탐지 기준과 자체 대시보드 계획은 유지한다.
+
 ## 2026년 11월 6일 3주차 실행 환경 고정
 
 [지속 실행 환경 고정](docs/runtime-release-lock.md): 9개 서비스 mTLS 경로의 소스·정책·빌드 입력·
