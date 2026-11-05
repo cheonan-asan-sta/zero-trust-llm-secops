@@ -14,6 +14,9 @@
   AM silence 보존·관측 설정 drift·접수 후 폐기 키 재검증/failed 경보를 추가했다. CI도 --monitoring을 사용한다.
 - 최종 로컬 관측71·기본9 호환4·집중129·Linux 전체2021이 통과했다. 실제 시험 소유 자원은 모두 정리했다.
   [원자료](docs/infrastructure-results/persistent-monitoring-20261106.json)에 입력151개와 실패/중간 시도도 남긴다.
+- PR33 병합 전 CI 전체 통과 뒤 같은 tree의 병합 후 CI42088599100은 호스트 Ruff가 0.17.3→0.17.4로
+  바뀌어 기존 SIM102에서 중단됐다. 호스트 CI도 기존 Docker build/test wheel lock을 해시 검증 설치하고
+  프로젝트를 오프라인/no-deps/no-build-isolation 설치·pip check하도록 후속 수정한다. lock·검사 규칙·앱 판정은 유지한다.
 - 시험 수신기는 RAM/최대1000개이며 운영 알림 이력 저장소가 아니다. AM native TLS는 허용 SAN에
   관리 API를 신뢰하며 경로별 세분화 RBAC/운영 host attestation은 미구현이다.
 - 앱/정책·탐지 기준은 바꾸지 않는다. CA 자동화 통합 인수·전체 JSONL 저장 계약·C01~C03 최종

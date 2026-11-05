@@ -149,6 +149,17 @@ Windows 전체 2,016 통과/4 skip/기존 경고3은
 검사·정리와 실패/중간 시도를 구분해 기록했다. PR에는 정확한 head 및 병합 후 CI 근거를 남긴다.
 채희주의 실제 도구 실행과 김택희 독립 검토 미완료를 구분한다.
 
+[PR #33](https://github.com/cheonan-asan-sta/zero-trust-llm-secops/pull/33)의 병합 전 CI는
+호스트2,019 통과/2 skip·Docker2,021·관측71·복구18을 통과했다. 병합 후 동일 tree의
+[첫 CI](https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/42088599100)는
+호스트의 범위 지정 설치가 Ruff 0.17.3 대신 새 0.17.4를 받아 기존 공급망 스크립트의 SIM102에서
+중단됐다. 이를 관측 기능 회귀나 통합 검사 완료로 기록하지 않는다. 후속으로 호스트 CI도 기존
+Docker의 build/test wheel lock을 `--only-binary=:all: --require-hashes`로 설치하고 프로젝트는
+`--no-index --no-deps --no-build-isolation`로 설치한 뒤 `pip check`한다. 검사 규칙/기존 판정
+코드/lock은 바꾸지 않는다. 후속 PR에 정확한 head와 병합 후 전체 재실행 근거를 남긴다.
+로컬에서는 최종 Linux 시험 이미지 안의 새 venv에서 같은 설치 명령·오프라인 프로젝트 빌드·
+`pip check`·Ruff 0.17.3 검사를 통과했다. 해당 임시 컨테이너는 종료 시 삭제했다.
+
 이번은 선택형 관측 경로 통합이며 CA 자동화와 동적 키 변경의 통합 인수, JSONL 사건/감사/outbox를
 포함한 전체 저장 계약, C01~C03 조건부 최종 선정·운영 부하/인증·독립 재현은 남아 있다.
 기존 C03 앱 런타임 패치/검사 결과를 새 Go 도구 포함 이미지의 취약점 검토 완료로 확대하지 않는다.
