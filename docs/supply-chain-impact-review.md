@@ -1,5 +1,8 @@
 # C03 실제 구성에 따른 취약점 영향 검토
 
+후속 패치/현재 이미지 상태는 [런타임 패치 기록](supply-chain-priority-patches.md)을 따른다.
+아래 내용과 200항목 JSON은 과거 이미지의 패치 전 snapshot으로 보존한다.
+
 2026년 11월 5일 · 채희주 인프라·배포 이미지 담당 · Codex 도구 보조.
 
 기존의 [발견 차이 200항목](supply-chain-findings-review.md)을 설치 파일·실행 권한·실제 기능과

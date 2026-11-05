@@ -1,5 +1,21 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 5일 C03 우선 런타임 패치
+
+- 로컬 최종: Linux1,892 / Windows1,888+4skip, 실제 mTLS41·정리0. 빌드 cache 제외 후 집중106·앱/Lambda23씩 통과.
+  로컬 mTLS와 최종 포장은 소스/SQLite 바이너리가 같고 이미지 ID는 다르다. 최종 PR/병합 후 CI가 새 포장의 mTLS를 재검증한다.
+
+- [패치 근거/재현](docs/supply-chain-priority-patches.md): 세 Dockerfile에 digest 기반 Python3.12.16,
+  검증한 SQLite3.54.1·pip26.3·외부 wheel hash lock과 HTTP 문법 로컬 backport를 연결했다.
+- 3.12 PR160772는 확인 당시 open이다. 원본/patch/결과 지문 불일치는 빌드 중단한다.
+  Debian SQLite는 로컬 Deb3.54.1-0secops1이며 공식 DSA가 아니다. Lambda의 활성 /var/lang/lib와 OS RPM을 구분한다.
+- 실제 앱/Lambda23개씩, 같은 현재 앱의 구→신 런타임 DB/백업18개를 로컬 검증했다.
+  전체 회귀·mTLS·새 이미지 양 검사기/동일 DB 반복의 최종 수치는 공개 JSON과 PR 기록을 따른다.
+- 과거 C03 200항목 JSON은 그대로 보존한다. 스캐너 잔여·zipfile 기록 차이·disputed·앱 독립 검토는
+  [새 검사 결과](docs/infrastructure-results/c03-patched-scan-20261105.json)에 연결하고 일괄 억제하지 않는다.
+- 앱/정책/탐지 코드·평가 기준은 변경하지 않았다. 실행/측정은 채희주, 앱 의미/입력 경계 독립 대조는 김택희다.
+  AWS·유료 모델/OS 신뢰 변경 없이 로컬 시험하며 ZIP·기존 kind를 보존한다.
+
 ## 2026년 11월 5일 C03 인프라 영향 조건 검토
 
 - 기준 `2e52165`/PR #27, 이름 브랜치 `feature/chaeheeju-c03-impact-review`.

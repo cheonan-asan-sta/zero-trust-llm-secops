@@ -1,10 +1,12 @@
 """Real Docker mTLS continuous-runtime fault tests; only owned test resources are purged."""
 
 import argparse
+import hashlib
 import json
 import subprocess
 import time
 from datetime import UTC, datetime, timedelta
+from itertools import pairwise
 from pathlib import Path
 
 from scripts.continuous_mtls_assets import DEVICES, OTHER
@@ -93,8 +95,25 @@ with s._transaction() as t:
             "path": "/zero-trust/protected-access", "body": {
                 "session_id": spent[0], "resource_id": "zt-demo-documents",
                 "action": "READ", "grant_token": spent[1]}})
-        self.require(replay["status"] == 403 and replay["body"]["reason_code"] == "GRANT_ALREADY_USED",
-                     "archived_consumption_marker_missing")
+        # A slow fault campaign can outlive the 60s grant. Verify the actual
+        # archived consumption independently; expiry must never mask lost state.
+        program = """import json,sys
+from pathlib import Path
+from app.services.zero_trust import ZeroTrustOperations
+q=json.load(sys.stdin);s=ZeroTrustOperations(Path('/data/zero-trust.sqlite3'))
+with s._transaction() as t:
+ found=any(e['kind']=='access' and e.get('allowed') is True and
+  e.get('session_id')==q['session'] and e.get('grant_hash')==q['hash'] for e in t[1])
+print(json.dumps({'consumed':found}))
+"""
+        marker = json.loads(self.runtime.execute("app", ["python", "-c", program], json.dumps({
+            "session": spent[0], "hash": hashlib.sha256(spent[1].encode()).hexdigest()})))
+        self.require(marker == {"consumed": True}, "archived_consumption_marker_missing")
+        reason = replay.get("body", {}).get("reason_code")
+        expired = datetime.fromisoformat(self.history(spent[0])[0]["grant_expires_at"]) <= datetime.now(UTC)
+        self.require(replay["status"] == 403 and (reason == "GRANT_ALREADY_USED" or
+                     (expired and reason in {"GRANT_EXPIRED", "SIGNAL_PROOF_EXPIRED", "SESSION_NOT_AUTHORIZED"})),
+                     "archived_replay_not_denied")
         self.access(revoked, False, "archived_revocation_denies_unconsumed_token")
         self.require(len(self.history(spent[0])) == 1 and len(self.history(revoked[0])) == 2,
                      "archive_changed_session_history")
@@ -107,8 +126,49 @@ with s._transaction() as t:
         self.require(len(self.history(revoked[0])) == 2 and self.journal()["archived_records"] == after["archived_records"],
                      "journal_restart_changed_archive")
         self.add("journal_checkpoint_retains_sessions_consumption_and_revocation_after_restart",
-                 archived_records=after["archived_records"], consumed_reason="GRANT_ALREADY_USED",
-                 revoked_versions=2)
+                 archived_records=after["archived_records"], consumed_reason=reason, consumed_marker_verified=True,
+                 revoked_versions=2, expiry_watchdog_quiesced_for_snapshot=True)
+
+    def journal_phase(self):
+        # Keep this storage compatibility snapshot free of concurrent expiry
+        # decisions. The watchdog is restarted even on failure, then exercised
+        # live by security_versions and the subsequent process-fault campaign.
+        watchdog = self.runtime.container("watchdog")
+        command(["docker", "stop", "--time", "2", watchdog])
+        try:
+            normal = self.mint("runtime-normal")
+            self.access(normal, True, "normal_mtls_document_delivery")
+            self.journal_security(normal)
+        finally:
+            command(["docker", "start", watchdog])
+
+    def unrelated_after_outage(self, pair, label="unrelated_subject_still_receives_document", *,
+                               record_label="outage_control_policy_and_expiry_are_distinct"):
+        # Availability after an arbitrarily slow outage requires fresh proof.
+        # The old session may legitimately be HELD by the expiry watchdog, but
+        # an observation about a different subject must never revoke it.
+        history = self.history(pair[0])
+        self.require(history[0]["version"] == 1 and history[0]["decision"] == "ALLOW",
+                     "outage_control_initial_decision")
+        for previous, current in pairwise(history):
+            self.require(current["version"] == previous["version"] + 1 and current["decision"] == "HOLD"
+                         and current["status"] == "HELD" and "SIGNAL_PROOF_EXPIRED" in current["reason_codes"],
+                         "outage_changed_unrelated_policy")
+        expired = datetime.fromisoformat(history[0]["grant_expires_at"]) <= datetime.now(UTC)
+        reason = None
+        if expired:
+            result = self.runtime.probe({"profile": "core", "path": "/zero-trust/protected-access",
+                "method": "POST", "body": {"session_id": pair[0], "resource_id": "zt-demo-documents",
+                                            "action": "READ", "grant_token": pair[1]}})
+            reason = result.get("body", {}).get("reason_code")
+            permitted = {"GRANT_EXPIRED", "SIGNAL_PROOF_EXPIRED"}
+            if history[-1]["status"] == "HELD":
+                permitted.add("SESSION_NOT_AUTHORIZED")
+            self.require(result["status"] == 403 and reason in permitted, "outage_expired_control_revived")
+        fresh = self.mint(pair[0] + "-fresh", user_id=OTHER, device_id=DEVICES[1])
+        self.access(fresh, True, label)
+        self.add(record_label, original_versions=len(history),
+                 expired_original_denied=expired, expired_reason=reason, fresh_proof_used=True)
 
     def mint(self, label, **options):
         result = self.runtime.mint({"session_id": label, **options})
@@ -248,7 +308,8 @@ print(json.dumps(payload))
         self.security_denial(expiring, 202)
         self.security_denial(fresh, 2)
         self.access(fresh, False, "version200_watchdog_key_revocation_denies_related_document")
-        self.access(control, True, "version200_watchdog_preserves_unrelated_document")
+        self.unrelated_after_outage(control, "version200_watchdog_preserves_unrelated_document",
+                                    record_label="version200_control_policy_and_expiry_are_distinct")
         self.add("version200_watchdog_key_revocation_and_repeat_are_idempotent", version=202)
 
     def inbox_snapshot(self):
@@ -467,9 +528,7 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
             self.require(json.loads(command(["docker", "network", "inspect", network["ID"]]))[0]["Internal"], "runtime_external_network")
         self.add("nine_hardened_services_and_six_internal_networks", services=hardening)
         self.journal_boundary()
-        normal = self.mint("runtime-normal")
-        self.access(normal, True, "normal_mtls_document_delivery")
-        self.journal_security(normal)
+        self.journal_phase()
         self.security_versions()
 
         affected = self.mint("runtime-outage")
@@ -494,7 +553,7 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
         self.add("outage_restart_recovers_persisted_envelope_once", original_envelope_sha256=original,
                  captured=1, acknowledged=1, policy_transitions=1)
         self.access(affected, False, "recovered_observation_denies_unconsumed_grant")
-        self.access(unrelated, True, "unrelated_subject_still_receives_document")
+        self.unrelated_after_outage(unrelated)
 
         # Repeat the exact input line: no new event ID and no second policy effect.
         first_event = runtime.execute("collector", ["python", "-c",

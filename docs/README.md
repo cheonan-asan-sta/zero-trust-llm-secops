@@ -1,5 +1,10 @@
 # 개발 주차별 산출물
 
+11/5 I8/C03 후속: [우선 취약점 런타임 패치·재현](supply-chain-priority-patches.md),
+[검증 근거](infrastructure-results/c03-priority-patches-20261105.json),
+[새 이미지·동일 DB 재검사](infrastructure-results/c03-patched-scan-20261105.json).
+Python/SQLite/pip·HTTP 로컬 patch와 빌드 lock을 적용했고 앱/정책·탐지 기준은 유지한다. 과거 기록과 구분한다.
+
 11/5 I8/C03 후속: [실제 인프라 영향 조건 검토](supply-chain-impact-review.md),
 [200항목 대장](supply-chain-impact-register.md). 고정 이미지·공식 vendor·실물 probe를 대조했다.
 P1 조치/검증17과 특정 pip 전제 완화2를 구분하며 실제 악용/수정/억제는0이다. 새 이미지/앱 독립 검토는 남긴다.

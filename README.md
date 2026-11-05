@@ -1,5 +1,12 @@
 # zero-trust-llm-secops
 
+## 2026년 11월 5일 우선 취약점 패치
+
+[C03 런타임 패치](docs/supply-chain-priority-patches.md): 채희주 인프라 범위에서 앱·테스트·Lambda
+이미지의 Python 3.12.16·SQLite 3.54.1·pip 26.3과 HTTP 로컬 backport, wheel 해시 lock을 적용했다.
+로컬 런타임·권한 상태/백업 보존·회귀·동일 DB 검사 결과와 남은 위험은 연결 문서에 둔다.
+아래 영향 검토는 패치 이전의 과거 이미지 기록이며, 이번 변경을 전면 취약점 해결·운영 승인으로 해석하지 않는다.
+
 ## 2026년 11월 5일 공급망 실제 영향 조건 검토
 
 [인프라 영향 검토](docs/supply-chain-impact-review.md)는 과거 고정 앱 이미지의 200항목을 공식 공급자

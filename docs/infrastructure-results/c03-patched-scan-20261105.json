@@ -1,0 +1,5508 @@
+{
+  "additional_build_input_verification": {
+    ".dockerignore": "66b602d4f6b420101d3d8efe2f1574de4066e68c34a370933fe1728b007d7727"
+  },
+  "app_image_id": "sha256:cc32b77d0f4494a6fa3f14f76bf38132556e515c4879d8f8f5e85ae6b926318c",
+  "binary_sha256": {
+    "cosign": "424e2c97d0b45fd7a6b608a87f090f35633f4c23ece5f092d48bba11aaf4bbfa",
+    "grype": "497a3587a0a9fbce68888dffc7cb80670ddf92d827ca49939e430a02168e7c91",
+    "syft": "20572660f157af9f9bd4db5541e89f306ad108cdec0376eabd7d682ed98cbf2d",
+    "trivy": "d1dfca6ae10a1ad4540bb94e64f0510077c47008920a9b554986b39dca573d83"
+  },
+  "build_recipe_override": null,
+  "comparison": {
+    "grype": {
+      "candidate_native_package_advisories": 187,
+      "historical_native_package_advisories": 195
+    },
+    "trivy": {
+      "candidate_native_package_advisories": 188,
+      "historical_native_package_advisories": 191
+    }
+  },
+  "completed": true,
+  "conditions": {
+    "cpus": 2,
+    "db_storage": "Docker Linux named volume",
+    "memory_bytes": 2147483648,
+    "pids": 128,
+    "scan_network": "none",
+    "uid": 10001
+  },
+  "db_files": {
+    "grype/6/import.json": "7c5c874eb167626b4391b0d84b959dee07e67601284cec7f1c8e24ec4e015b55",
+    "grype/6/last_update_check": "132ebf063120831435d36e9bc6daf0655788118d44d0a385645e472c0721538e",
+    "grype/6/vulnerability.db": "f905098bfd379ef6e9572cb113ce94949d8363cae09f12f57a430a95866a47a4",
+    "trivy/db/metadata.json": "9f2e42db11b158349ce0b6947c5be76f44ba12ea4af41bf32ecf4d4086b756c1",
+    "trivy/db/trivy.db": "006f20ea99ebe785c4f6dafd5dfd0bc4eae464d222f3fc260ec05a9f7299e7e8"
+  },
+  "db_files_after": {
+    "grype/6/import.json": "7c5c874eb167626b4391b0d84b959dee07e67601284cec7f1c8e24ec4e015b55",
+    "grype/6/last_update_check": "132ebf063120831435d36e9bc6daf0655788118d44d0a385645e472c0721538e",
+    "grype/6/vulnerability.db": "f905098bfd379ef6e9572cb113ce94949d8363cae09f12f57a430a95866a47a4",
+    "trivy/db/metadata.json": "9f2e42db11b158349ce0b6947c5be76f44ba12ea4af41bf32ecf4d4086b756c1",
+    "trivy/db/trivy.db": "006f20ea99ebe785c4f6dafd5dfd0bc4eae464d222f3fc260ec05a9f7299e7e8"
+  },
+  "finished_at": "2026-11-05T09:39:06.078085+00:00",
+  "frozen_database_source": "c03-718a7db3f784-db",
+  "image_app_scripts_source_verified": true,
+  "image_archive_sha256": "52437162374fff86e78b3fc3f5b63ea8607ce5253a02ad7279671eb3c3f284dc",
+  "image_origin": "Already built candidate image; no source rebuild or historical base substitution.",
+  "limits": [
+    "Frozen 2026-11-03 DB, not a latest-advisory scan. No suppression or deployment gate approval.",
+    "Historical b466 app and patched current app/dependencies differ; finding count delta is not a controlled single-variable efficacy or accuracy metric.",
+    "Debian SQLite 14 and Python HTTP remain version/distro findings despite runtime source/backport checks.",
+    "Trivy setuptools 3 findings remain in pip26.3 vendored pkg_resources metadata; no top-level setuptools installed, no blanket false-positive waiver.",
+    "Squashed image/rootfs inventory; not eradication of old bytes from lower image layers."
+  ],
+  "previous_summary_sha256": "e0123483da081abb7dd0343e142bd545023867bd11e37b01c6a61e822324637f",
+  "repeats": 3,
+  "results": {
+    "advisory_comparison_limit": "Native IDs only; CVE/GHSA aliases may differ. Counts are not scanner accuracy.",
+    "controls": {
+      "grype": {
+        "2.31.0": {
+          "all_advisory_ids": [
+            "CVE-2024-35195",
+            "CVE-2024-47081",
+            "CVE-2026-25645",
+            "GHSA-9hjg-9r4m-mvj7",
+            "GHSA-9wx4-h78v-vm56",
+            "GHSA-gc5v-m9x4-r6x2"
+          ],
+          "expected_present": true,
+          "passed": true,
+          "target_advisory_present": true
+        },
+        "2.32.0": {
+          "all_advisory_ids": [
+            "CVE-2024-47081",
+            "CVE-2026-25645",
+            "GHSA-9hjg-9r4m-mvj7",
+            "GHSA-gc5v-m9x4-r6x2"
+          ],
+          "expected_present": false,
+          "passed": true,
+          "target_advisory_present": false
+        }
+      },
+      "trivy": {
+        "2.31.0": {
+          "all_advisory_ids": [
+            "CVE-2024-35195",
+            "CVE-2024-47081",
+            "CVE-2026-25645"
+          ],
+          "expected_present": true,
+          "passed": true,
+          "target_advisory_present": true
+        },
+        "2.32.0": {
+          "all_advisory_ids": [
+            "CVE-2024-47081",
+            "CVE-2026-25645"
+          ],
+          "expected_present": false,
+          "passed": true,
+          "target_advisory_present": false
+        }
+      }
+    },
+    "database_files_unchanged_during_offline_scans": true,
+    "findings": {
+      "grype": {
+        "rows": [
+          [
+            "binary",
+            "python",
+            "3.12.16",
+            "CVE-2025-12781"
+          ],
+          [
+            "binary",
+            "python",
+            "3.12.16",
+            "CVE-2025-15366"
+          ],
+          [
+            "binary",
+            "python",
+            "3.12.16",
+            "CVE-2025-15367"
+          ],
+          [
+            "binary",
+            "python",
+            "3.12.16",
+            "CVE-2026-103995"
+          ],
+          [
+            "binary",
+            "python",
+            "3.12.16",
+            "CVE-2026-3446"
+          ],
+          [
+            "binary",
+            "python",
+            "3.12.16",
+            "CVE-2026-3479"
+          ],
+          [
+            "binary",
+            "python",
+            "3.12.16",
+            "CVE-2026-6019"
+          ],
+          [
+            "deb",
+            "apt",
+            "3.0.3",
+            "CVE-2011-3374"
+          ],
+          [
+            "deb",
+            "bsdutils",
+            "1:2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "bsdutils",
+            "1:2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "bsdutils",
+            "1:2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "bsdutils",
+            "1:2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "bsdutils",
+            "1:2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "bsdutils",
+            "1:2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "coreutils",
+            "9.7-3",
+            "CVE-2017-18018"
+          ],
+          [
+            "deb",
+            "coreutils",
+            "9.7-3",
+            "CVE-2025-5278"
+          ],
+          [
+            "deb",
+            "coreutils",
+            "9.7-3",
+            "CVE-2026-56391"
+          ],
+          [
+            "deb",
+            "coreutils",
+            "9.7-3",
+            "CVE-2026-56392"
+          ],
+          [
+            "deb",
+            "dash",
+            "0.5.12-12",
+            "CVE-2026-102473"
+          ],
+          [
+            "deb",
+            "dash",
+            "0.5.12-12",
+            "CVE-2026-102474"
+          ],
+          [
+            "deb",
+            "diffutils",
+            "1:3.10-4",
+            "CVE-2026-53910"
+          ],
+          [
+            "deb",
+            "gcc-14-base",
+            "14.2.0-19",
+            "CVE-2026-102010"
+          ],
+          [
+            "deb",
+            "gcc-14-base",
+            "14.2.0-19",
+            "CVE-2026-114690"
+          ],
+          [
+            "deb",
+            "gcc-14-base",
+            "14.2.0-19",
+            "CVE-2026-114691"
+          ],
+          [
+            "deb",
+            "gcc-14-base",
+            "14.2.0-19",
+            "CVE-2026-115455"
+          ],
+          [
+            "deb",
+            "gcc-14-base",
+            "14.2.0-19",
+            "CVE-2026-95619"
+          ],
+          [
+            "deb",
+            "libacl1",
+            "2.3.2-2+b1",
+            "CVE-2026-54369"
+          ],
+          [
+            "deb",
+            "libacl1",
+            "2.3.2-2+b1",
+            "CVE-2026-54370"
+          ],
+          [
+            "deb",
+            "libapt-pkg7.0",
+            "3.0.3",
+            "CVE-2011-3374"
+          ],
+          [
+            "deb",
+            "libattr1",
+            "1:2.5.2-3",
+            "CVE-2026-54371"
+          ],
+          [
+            "deb",
+            "libblkid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "libblkid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "libblkid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "libblkid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "libblkid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "libblkid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "libbz2-1.0",
+            "1.0.8-6",
+            "CVE-2026-42250"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2010-4756"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2018-20796"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2019-1010022"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2019-1010023"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2019-1010024"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2019-1010025"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2019-9192"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-18374"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-19499"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-19542"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-5435"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-6238"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-6368"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-6791"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-77117"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-80489"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-84243"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-8674"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-86805"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-89092"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-95818"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-97399"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2010-4756"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2018-20796"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2019-1010022"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2019-1010023"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2019-1010024"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2019-1010025"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2019-9192"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-18374"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-19499"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-19542"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-5435"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-6238"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-6368"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-6791"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-77117"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-80489"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-84243"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-8674"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-86805"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-89092"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-95818"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-97399"
+          ],
+          [
+            "deb",
+            "libgcc-s1",
+            "14.2.0-19",
+            "CVE-2026-102010"
+          ],
+          [
+            "deb",
+            "libgcc-s1",
+            "14.2.0-19",
+            "CVE-2026-114690"
+          ],
+          [
+            "deb",
+            "libgcc-s1",
+            "14.2.0-19",
+            "CVE-2026-114691"
+          ],
+          [
+            "deb",
+            "libgcc-s1",
+            "14.2.0-19",
+            "CVE-2026-115455"
+          ],
+          [
+            "deb",
+            "libgcc-s1",
+            "14.2.0-19",
+            "CVE-2026-95619"
+          ],
+          [
+            "deb",
+            "liblastlog2-2",
+            "2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "liblastlog2-2",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "liblastlog2-2",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "liblastlog2-2",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "liblastlog2-2",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "liblastlog2-2",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "libmount1",
+            "2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "libmount1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "libmount1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "libmount1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "libmount1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "libmount1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "libncursesw6",
+            "6.5+20250216-2",
+            "CVE-2025-6141"
+          ],
+          [
+            "deb",
+            "libncursesw6",
+            "6.5+20250216-2",
+            "CVE-2025-69720"
+          ],
+          [
+            "deb",
+            "libpam-modules",
+            "1.7.0-5",
+            "CVE-2026-54411"
+          ],
+          [
+            "deb",
+            "libpam-modules-bin",
+            "1.7.0-5",
+            "CVE-2026-54411"
+          ],
+          [
+            "deb",
+            "libpam-runtime",
+            "1.7.0-5",
+            "CVE-2026-54411"
+          ],
+          [
+            "deb",
+            "libpam0g",
+            "1.7.0-5",
+            "CVE-2026-54411"
+          ],
+          [
+            "deb",
+            "libsmartcols1",
+            "2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "libsmartcols1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "libsmartcols1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "libsmartcols1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "libsmartcols1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "libsmartcols1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2021-45346"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2025-70873"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119371"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119372"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119373"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119374"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119375"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119376"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119377"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119378"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119379"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119591"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-50812"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-50813"
+          ],
+          [
+            "deb",
+            "libstdc++6",
+            "14.2.0-19",
+            "CVE-2026-102010"
+          ],
+          [
+            "deb",
+            "libstdc++6",
+            "14.2.0-19",
+            "CVE-2026-114690"
+          ],
+          [
+            "deb",
+            "libstdc++6",
+            "14.2.0-19",
+            "CVE-2026-114691"
+          ],
+          [
+            "deb",
+            "libstdc++6",
+            "14.2.0-19",
+            "CVE-2026-115455"
+          ],
+          [
+            "deb",
+            "libstdc++6",
+            "14.2.0-19",
+            "CVE-2026-95619"
+          ],
+          [
+            "deb",
+            "libsystemd0",
+            "257.13-1~deb13u1",
+            "CVE-2013-4392"
+          ],
+          [
+            "deb",
+            "libsystemd0",
+            "257.13-1~deb13u1",
+            "CVE-2023-31437"
+          ],
+          [
+            "deb",
+            "libsystemd0",
+            "257.13-1~deb13u1",
+            "CVE-2023-31438"
+          ],
+          [
+            "deb",
+            "libsystemd0",
+            "257.13-1~deb13u1",
+            "CVE-2023-31439"
+          ],
+          [
+            "deb",
+            "libsystemd0",
+            "257.13-1~deb13u1",
+            "CVE-2026-15059"
+          ],
+          [
+            "deb",
+            "libsystemd0",
+            "257.13-1~deb13u1",
+            "CVE-2026-16742"
+          ],
+          [
+            "deb",
+            "libsystemd0",
+            "257.13-1~deb13u1",
+            "CVE-2026-40228"
+          ],
+          [
+            "deb",
+            "libtinfo6",
+            "6.5+20250216-2",
+            "CVE-2025-6141"
+          ],
+          [
+            "deb",
+            "libtinfo6",
+            "6.5+20250216-2",
+            "CVE-2025-69720"
+          ],
+          [
+            "deb",
+            "libudev1",
+            "257.13-1~deb13u1",
+            "CVE-2013-4392"
+          ],
+          [
+            "deb",
+            "libudev1",
+            "257.13-1~deb13u1",
+            "CVE-2023-31437"
+          ],
+          [
+            "deb",
+            "libudev1",
+            "257.13-1~deb13u1",
+            "CVE-2023-31438"
+          ],
+          [
+            "deb",
+            "libudev1",
+            "257.13-1~deb13u1",
+            "CVE-2023-31439"
+          ],
+          [
+            "deb",
+            "libudev1",
+            "257.13-1~deb13u1",
+            "CVE-2026-15059"
+          ],
+          [
+            "deb",
+            "libudev1",
+            "257.13-1~deb13u1",
+            "CVE-2026-16742"
+          ],
+          [
+            "deb",
+            "libudev1",
+            "257.13-1~deb13u1",
+            "CVE-2026-40228"
+          ],
+          [
+            "deb",
+            "libuuid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "libuuid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "libuuid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "libuuid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "libuuid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "libuuid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "login",
+            "1:4.16.0-2+really2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "login",
+            "1:4.16.0-2+really2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "login",
+            "1:4.16.0-2+really2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "login",
+            "1:4.16.0-2+really2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "login",
+            "1:4.16.0-2+really2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "login",
+            "1:4.16.0-2+really2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "login.defs",
+            "1:4.17.4-2",
+            "CVE-2007-5686"
+          ],
+          [
+            "deb",
+            "login.defs",
+            "1:4.17.4-2",
+            "CVE-2024-56433"
+          ],
+          [
+            "deb",
+            "mount",
+            "2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "mount",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "mount",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "mount",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "mount",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "mount",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "ncurses-base",
+            "6.5+20250216-2",
+            "CVE-2025-6141"
+          ],
+          [
+            "deb",
+            "ncurses-base",
+            "6.5+20250216-2",
+            "CVE-2025-69720"
+          ],
+          [
+            "deb",
+            "ncurses-bin",
+            "6.5+20250216-2",
+            "CVE-2025-6141"
+          ],
+          [
+            "deb",
+            "ncurses-bin",
+            "6.5+20250216-2",
+            "CVE-2025-69720"
+          ],
+          [
+            "deb",
+            "passwd",
+            "1:4.17.4-2",
+            "CVE-2007-5686"
+          ],
+          [
+            "deb",
+            "passwd",
+            "1:4.17.4-2",
+            "CVE-2024-56433"
+          ],
+          [
+            "deb",
+            "perl-base",
+            "5.40.1-6+deb13u1",
+            "CVE-2011-4116"
+          ],
+          [
+            "deb",
+            "perl-base",
+            "5.40.1-6+deb13u1",
+            "CVE-2026-15534"
+          ],
+          [
+            "deb",
+            "perl-base",
+            "5.40.1-6+deb13u1",
+            "CVE-2026-82560"
+          ],
+          [
+            "deb",
+            "perl-base",
+            "5.40.1-6+deb13u1",
+            "CVE-2026-9538"
+          ],
+          [
+            "deb",
+            "tar",
+            "1.35+dfsg-3.1",
+            "CVE-2005-2541"
+          ],
+          [
+            "deb",
+            "tar",
+            "1.35+dfsg-3.1",
+            "CVE-2026-18477"
+          ],
+          [
+            "deb",
+            "tar",
+            "1.35+dfsg-3.1",
+            "CVE-2026-18508"
+          ],
+          [
+            "deb",
+            "tar",
+            "1.35+dfsg-3.1",
+            "CVE-2026-5704"
+          ],
+          [
+            "deb",
+            "util-linux",
+            "2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "util-linux",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "util-linux",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "util-linux",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "util-linux",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "util-linux",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "zlib1g",
+            "1:1.3.dfsg+really1.3.1-1+b1",
+            "CVE-2026-27171"
+          ],
+          [
+            "deb",
+            "zlib1g",
+            "1:1.3.dfsg+really1.3.1-1+b1",
+            "CVE-2026-85091"
+          ]
+        ],
+        "unique_package_native_advisories": 187
+      },
+      "trivy": {
+        "rows": [
+          [
+            "deb",
+            "apt",
+            "3.0.3",
+            "CVE-2011-3374"
+          ],
+          [
+            "deb",
+            "bash",
+            "5.2.37-2+b10",
+            "TEMP-0841856-B18BAF"
+          ],
+          [
+            "deb",
+            "bsdutils",
+            "1:2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "bsdutils",
+            "1:2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "bsdutils",
+            "1:2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "bsdutils",
+            "1:2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "bsdutils",
+            "1:2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "bsdutils",
+            "1:2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "coreutils",
+            "9.7-3",
+            "CVE-2017-18018"
+          ],
+          [
+            "deb",
+            "coreutils",
+            "9.7-3",
+            "CVE-2025-5278"
+          ],
+          [
+            "deb",
+            "coreutils",
+            "9.7-3",
+            "CVE-2026-56391"
+          ],
+          [
+            "deb",
+            "coreutils",
+            "9.7-3",
+            "CVE-2026-56392"
+          ],
+          [
+            "deb",
+            "dash",
+            "0.5.12-12",
+            "CVE-2026-102473"
+          ],
+          [
+            "deb",
+            "dash",
+            "0.5.12-12",
+            "CVE-2026-102474"
+          ],
+          [
+            "deb",
+            "diffutils",
+            "1:3.10-4",
+            "CVE-2026-53910"
+          ],
+          [
+            "deb",
+            "gcc-14-base",
+            "14.2.0-19",
+            "CVE-2026-102010"
+          ],
+          [
+            "deb",
+            "gcc-14-base",
+            "14.2.0-19",
+            "CVE-2026-114690"
+          ],
+          [
+            "deb",
+            "gcc-14-base",
+            "14.2.0-19",
+            "CVE-2026-114691"
+          ],
+          [
+            "deb",
+            "gcc-14-base",
+            "14.2.0-19",
+            "CVE-2026-115455"
+          ],
+          [
+            "deb",
+            "gcc-14-base",
+            "14.2.0-19",
+            "CVE-2026-95619"
+          ],
+          [
+            "deb",
+            "libacl1",
+            "2.3.2-2+b1",
+            "CVE-2026-54369"
+          ],
+          [
+            "deb",
+            "libacl1",
+            "2.3.2-2+b1",
+            "CVE-2026-54370"
+          ],
+          [
+            "deb",
+            "libapt-pkg7.0",
+            "3.0.3",
+            "CVE-2011-3374"
+          ],
+          [
+            "deb",
+            "libattr1",
+            "1:2.5.2-3",
+            "CVE-2026-54371"
+          ],
+          [
+            "deb",
+            "libblkid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "libblkid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "libblkid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "libblkid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "libblkid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "libblkid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "libbz2-1.0",
+            "1.0.8-6",
+            "CVE-2026-42250"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2010-4756"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2018-20796"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2019-1010022"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2019-1010023"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2019-1010024"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2019-1010025"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2019-9192"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-18374"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-19499"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-19542"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-5435"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-6238"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-6368"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-6791"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-77117"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-80489"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-84243"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-8674"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-86805"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-89092"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-95818"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4",
+            "CVE-2026-97399"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2010-4756"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2018-20796"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2019-1010022"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2019-1010023"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2019-1010024"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2019-1010025"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2019-9192"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-18374"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-19499"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-19542"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-5435"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-6238"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-6368"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-6791"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-77117"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-80489"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-84243"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-8674"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-86805"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-89092"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-95818"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4",
+            "CVE-2026-97399"
+          ],
+          [
+            "deb",
+            "libgcc-s1",
+            "14.2.0-19",
+            "CVE-2026-102010"
+          ],
+          [
+            "deb",
+            "libgcc-s1",
+            "14.2.0-19",
+            "CVE-2026-114690"
+          ],
+          [
+            "deb",
+            "libgcc-s1",
+            "14.2.0-19",
+            "CVE-2026-114691"
+          ],
+          [
+            "deb",
+            "libgcc-s1",
+            "14.2.0-19",
+            "CVE-2026-115455"
+          ],
+          [
+            "deb",
+            "libgcc-s1",
+            "14.2.0-19",
+            "CVE-2026-95619"
+          ],
+          [
+            "deb",
+            "liblastlog2-2",
+            "2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "liblastlog2-2",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "liblastlog2-2",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "liblastlog2-2",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "liblastlog2-2",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "liblastlog2-2",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "libmount1",
+            "2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "libmount1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "libmount1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "libmount1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "libmount1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "libmount1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "libncursesw6",
+            "6.5+20250216-2",
+            "CVE-2025-6141"
+          ],
+          [
+            "deb",
+            "libncursesw6",
+            "6.5+20250216-2",
+            "CVE-2025-69720"
+          ],
+          [
+            "deb",
+            "libpam-modules",
+            "1.7.0-5",
+            "CVE-2026-54411"
+          ],
+          [
+            "deb",
+            "libpam-modules-bin",
+            "1.7.0-5",
+            "CVE-2026-54411"
+          ],
+          [
+            "deb",
+            "libpam-runtime",
+            "1.7.0-5",
+            "CVE-2026-54411"
+          ],
+          [
+            "deb",
+            "libpam0g",
+            "1.7.0-5",
+            "CVE-2026-54411"
+          ],
+          [
+            "deb",
+            "libsmartcols1",
+            "2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "libsmartcols1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "libsmartcols1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "libsmartcols1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "libsmartcols1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "libsmartcols1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2021-45346"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2025-70873"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119371"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119372"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119373"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119374"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119375"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119376"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119377"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119378"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119379"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-119591"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-50812"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1",
+            "CVE-2026-50813"
+          ],
+          [
+            "deb",
+            "libstdc++6",
+            "14.2.0-19",
+            "CVE-2026-102010"
+          ],
+          [
+            "deb",
+            "libstdc++6",
+            "14.2.0-19",
+            "CVE-2026-114690"
+          ],
+          [
+            "deb",
+            "libstdc++6",
+            "14.2.0-19",
+            "CVE-2026-114691"
+          ],
+          [
+            "deb",
+            "libstdc++6",
+            "14.2.0-19",
+            "CVE-2026-115455"
+          ],
+          [
+            "deb",
+            "libstdc++6",
+            "14.2.0-19",
+            "CVE-2026-95619"
+          ],
+          [
+            "deb",
+            "libsystemd0",
+            "257.13-1~deb13u1",
+            "CVE-2013-4392"
+          ],
+          [
+            "deb",
+            "libsystemd0",
+            "257.13-1~deb13u1",
+            "CVE-2023-31437"
+          ],
+          [
+            "deb",
+            "libsystemd0",
+            "257.13-1~deb13u1",
+            "CVE-2023-31438"
+          ],
+          [
+            "deb",
+            "libsystemd0",
+            "257.13-1~deb13u1",
+            "CVE-2023-31439"
+          ],
+          [
+            "deb",
+            "libsystemd0",
+            "257.13-1~deb13u1",
+            "CVE-2026-15059"
+          ],
+          [
+            "deb",
+            "libsystemd0",
+            "257.13-1~deb13u1",
+            "CVE-2026-16742"
+          ],
+          [
+            "deb",
+            "libsystemd0",
+            "257.13-1~deb13u1",
+            "CVE-2026-40228"
+          ],
+          [
+            "deb",
+            "libtinfo6",
+            "6.5+20250216-2",
+            "CVE-2025-6141"
+          ],
+          [
+            "deb",
+            "libtinfo6",
+            "6.5+20250216-2",
+            "CVE-2025-69720"
+          ],
+          [
+            "deb",
+            "libudev1",
+            "257.13-1~deb13u1",
+            "CVE-2013-4392"
+          ],
+          [
+            "deb",
+            "libudev1",
+            "257.13-1~deb13u1",
+            "CVE-2023-31437"
+          ],
+          [
+            "deb",
+            "libudev1",
+            "257.13-1~deb13u1",
+            "CVE-2023-31438"
+          ],
+          [
+            "deb",
+            "libudev1",
+            "257.13-1~deb13u1",
+            "CVE-2023-31439"
+          ],
+          [
+            "deb",
+            "libudev1",
+            "257.13-1~deb13u1",
+            "CVE-2026-15059"
+          ],
+          [
+            "deb",
+            "libudev1",
+            "257.13-1~deb13u1",
+            "CVE-2026-16742"
+          ],
+          [
+            "deb",
+            "libudev1",
+            "257.13-1~deb13u1",
+            "CVE-2026-40228"
+          ],
+          [
+            "deb",
+            "libuuid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "libuuid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "libuuid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "libuuid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "libuuid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "libuuid1",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "login",
+            "1:4.16.0-2+really2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "login",
+            "1:4.16.0-2+really2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "login",
+            "1:4.16.0-2+really2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "login",
+            "1:4.16.0-2+really2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "login",
+            "1:4.16.0-2+really2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "login",
+            "1:4.16.0-2+really2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "login.defs",
+            "1:4.17.4-2",
+            "CVE-2007-5686"
+          ],
+          [
+            "deb",
+            "login.defs",
+            "1:4.17.4-2",
+            "CVE-2024-56433"
+          ],
+          [
+            "deb",
+            "login.defs",
+            "1:4.17.4-2",
+            "TEMP-0628843-DBAD28"
+          ],
+          [
+            "deb",
+            "mount",
+            "2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "mount",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "mount",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "mount",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "mount",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "mount",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "ncurses-base",
+            "6.5+20250216-2",
+            "CVE-2025-6141"
+          ],
+          [
+            "deb",
+            "ncurses-base",
+            "6.5+20250216-2",
+            "CVE-2025-69720"
+          ],
+          [
+            "deb",
+            "ncurses-bin",
+            "6.5+20250216-2",
+            "CVE-2025-6141"
+          ],
+          [
+            "deb",
+            "ncurses-bin",
+            "6.5+20250216-2",
+            "CVE-2025-69720"
+          ],
+          [
+            "deb",
+            "passwd",
+            "1:4.17.4-2",
+            "CVE-2007-5686"
+          ],
+          [
+            "deb",
+            "passwd",
+            "1:4.17.4-2",
+            "CVE-2024-56433"
+          ],
+          [
+            "deb",
+            "passwd",
+            "1:4.17.4-2",
+            "TEMP-0628843-DBAD28"
+          ],
+          [
+            "deb",
+            "perl-base",
+            "5.40.1-6+deb13u1",
+            "CVE-2011-4116"
+          ],
+          [
+            "deb",
+            "perl-base",
+            "5.40.1-6+deb13u1",
+            "CVE-2026-15534"
+          ],
+          [
+            "deb",
+            "perl-base",
+            "5.40.1-6+deb13u1",
+            "CVE-2026-82560"
+          ],
+          [
+            "deb",
+            "perl-base",
+            "5.40.1-6+deb13u1",
+            "CVE-2026-9538"
+          ],
+          [
+            "deb",
+            "sysvinit-utils",
+            "3.14-4",
+            "TEMP-0517018-A83CE6"
+          ],
+          [
+            "deb",
+            "tar",
+            "1.35+dfsg-3.1",
+            "CVE-2005-2541"
+          ],
+          [
+            "deb",
+            "tar",
+            "1.35+dfsg-3.1",
+            "CVE-2026-18477"
+          ],
+          [
+            "deb",
+            "tar",
+            "1.35+dfsg-3.1",
+            "CVE-2026-18508"
+          ],
+          [
+            "deb",
+            "tar",
+            "1.35+dfsg-3.1",
+            "CVE-2026-5704"
+          ],
+          [
+            "deb",
+            "tar",
+            "1.35+dfsg-3.1",
+            "TEMP-0290435-0B57B5"
+          ],
+          [
+            "deb",
+            "util-linux",
+            "2.41.5-0+deb13u1",
+            "CVE-2022-0563"
+          ],
+          [
+            "deb",
+            "util-linux",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-3184"
+          ],
+          [
+            "deb",
+            "util-linux",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-76642"
+          ],
+          [
+            "deb",
+            "util-linux",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78408"
+          ],
+          [
+            "deb",
+            "util-linux",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78409"
+          ],
+          [
+            "deb",
+            "util-linux",
+            "2.41.5-0+deb13u1",
+            "CVE-2026-78410"
+          ],
+          [
+            "deb",
+            "zlib1g",
+            "1:1.3.dfsg+really1.3.1-1+b1",
+            "CVE-2026-27171"
+          ],
+          [
+            "deb",
+            "zlib1g",
+            "1:1.3.dfsg+really1.3.1-1+b1",
+            "CVE-2026-85091"
+          ],
+          [
+            "pypi",
+            "setuptools",
+            "70.3.0",
+            "CVE-2025-47273"
+          ],
+          [
+            "pypi",
+            "setuptools",
+            "70.3.0",
+            "CVE-2026-59890"
+          ],
+          [
+            "pypi",
+            "setuptools",
+            "70.3.0",
+            "GHSA-xmj3-9gf7-h52w"
+          ]
+        ],
+        "unique_package_native_advisories": 188
+      }
+    },
+    "grype_database_status": {
+      "built": "2026-11-02T06:26:52Z",
+      "from": "https://grype.anchore.io/databases/v6/vulnerability-db_v6.1.10_2026-11-02T00:22:47Z_1793600812.tar.zst?checksum=sha256%3A68063965a3a023acd330a65a0740976c81f8e13902824134b447deee97a0d838",
+      "path": "/cache/grype/6/vulnerability.db",
+      "schemaVersion": "v6.1.10",
+      "valid": true
+    },
+    "inventory": {
+      "installed_metadata": [
+        [
+          "deb",
+          "adduser",
+          "3.152"
+        ],
+        [
+          "deb",
+          "apt",
+          "3.0.3"
+        ],
+        [
+          "deb",
+          "base-files",
+          "13.8+deb13u7"
+        ],
+        [
+          "deb",
+          "base-passwd",
+          "3.6.7"
+        ],
+        [
+          "deb",
+          "bash",
+          "5.2.37-2+b10"
+        ],
+        [
+          "deb",
+          "bsdutils",
+          "1:2.41.5-0+deb13u1"
+        ],
+        [
+          "deb",
+          "ca-certificates",
+          "20250419+deb13u1"
+        ],
+        [
+          "deb",
+          "coreutils",
+          "9.7-3"
+        ],
+        [
+          "deb",
+          "dash",
+          "0.5.12-12"
+        ],
+        [
+          "deb",
+          "debconf",
+          "1.5.91"
+        ],
+        [
+          "deb",
+          "debian-archive-keyring",
+          "2025.1"
+        ],
+        [
+          "deb",
+          "debianutils",
+          "5.23.2"
+        ],
+        [
+          "deb",
+          "diffutils",
+          "1:3.10-4"
+        ],
+        [
+          "deb",
+          "dpkg",
+          "1.22.22"
+        ],
+        [
+          "deb",
+          "findutils",
+          "4.10.0-3"
+        ],
+        [
+          "deb",
+          "gcc-14-base",
+          "14.2.0-19"
+        ],
+        [
+          "deb",
+          "grep",
+          "3.11-4"
+        ],
+        [
+          "deb",
+          "gzip",
+          "1.13-1+deb13u1"
+        ],
+        [
+          "deb",
+          "hostname",
+          "3.25"
+        ],
+        [
+          "deb",
+          "init-system-helpers",
+          "1.69~deb13u1"
+        ],
+        [
+          "deb",
+          "libacl1",
+          "2.3.2-2+b1"
+        ],
+        [
+          "deb",
+          "libapt-pkg7.0",
+          "3.0.3"
+        ],
+        [
+          "deb",
+          "libattr1",
+          "1:2.5.2-3"
+        ],
+        [
+          "deb",
+          "libaudit-common",
+          "1:4.0.2-2+deb13u1"
+        ],
+        [
+          "deb",
+          "libaudit1",
+          "1:4.0.2-2+deb13u1"
+        ],
+        [
+          "deb",
+          "libblkid1",
+          "2.41.5-0+deb13u1"
+        ],
+        [
+          "deb",
+          "libbsd0",
+          "0.12.2-2"
+        ],
+        [
+          "deb",
+          "libbz2-1.0",
+          "1.0.8-6"
+        ],
+        [
+          "deb",
+          "libc-bin",
+          "2.41-12+deb13u4"
+        ],
+        [
+          "deb",
+          "libc6",
+          "2.41-12+deb13u4"
+        ],
+        [
+          "deb",
+          "libcap-ng0",
+          "0.8.5-4+b1"
+        ],
+        [
+          "deb",
+          "libcap2",
+          "1:2.75-10+deb13u1+b3"
+        ],
+        [
+          "deb",
+          "libcrypt1",
+          "1:4.4.38-1"
+        ],
+        [
+          "deb",
+          "libdb5.3t64",
+          "5.3.28+dfsg2-9"
+        ],
+        [
+          "deb",
+          "libdebconfclient0",
+          "0.280"
+        ],
+        [
+          "deb",
+          "libffi8",
+          "3.4.8-2"
+        ],
+        [
+          "deb",
+          "libgcc-s1",
+          "14.2.0-19"
+        ],
+        [
+          "deb",
+          "libgdbm6t64",
+          "1.24-2"
+        ],
+        [
+          "deb",
+          "libgmp10",
+          "2:6.3.0+dfsg-3"
+        ],
+        [
+          "deb",
+          "libhogweed6t64",
+          "3.10.1-1"
+        ],
+        [
+          "deb",
+          "liblastlog2-2",
+          "2.41.5-0+deb13u1"
+        ],
+        [
+          "deb",
+          "liblz4-1",
+          "1.10.0-4"
+        ],
+        [
+          "deb",
+          "liblzma5",
+          "5.8.1-1+deb13u2"
+        ],
+        [
+          "deb",
+          "libmd0",
+          "1.1.0-2+b1"
+        ],
+        [
+          "deb",
+          "libmount1",
+          "2.41.5-0+deb13u1"
+        ],
+        [
+          "deb",
+          "libncursesw6",
+          "6.5+20250216-2"
+        ],
+        [
+          "deb",
+          "libnettle8t64",
+          "3.10.1-1"
+        ],
+        [
+          "deb",
+          "libpam-modules",
+          "1.7.0-5"
+        ],
+        [
+          "deb",
+          "libpam-modules-bin",
+          "1.7.0-5"
+        ],
+        [
+          "deb",
+          "libpam-runtime",
+          "1.7.0-5"
+        ],
+        [
+          "deb",
+          "libpam0g",
+          "1.7.0-5"
+        ],
+        [
+          "deb",
+          "libpcre2-8-0",
+          "10.46-1~deb13u3"
+        ],
+        [
+          "deb",
+          "libreadline8t64",
+          "8.2-6"
+        ],
+        [
+          "deb",
+          "libseccomp2",
+          "2.6.0-2"
+        ],
+        [
+          "deb",
+          "libselinux1",
+          "3.8.1-1"
+        ],
+        [
+          "deb",
+          "libsemanage-common",
+          "3.8.1-1"
+        ],
+        [
+          "deb",
+          "libsemanage2",
+          "3.8.1-1"
+        ],
+        [
+          "deb",
+          "libsepol2",
+          "3.8.1-1"
+        ],
+        [
+          "deb",
+          "libsmartcols1",
+          "2.41.5-0+deb13u1"
+        ],
+        [
+          "deb",
+          "libsqlite3-0",
+          "3.54.1-0secops1"
+        ],
+        [
+          "deb",
+          "libssl3t64",
+          "3.5.7-1~deb13u3"
+        ],
+        [
+          "deb",
+          "libstdc++6",
+          "14.2.0-19"
+        ],
+        [
+          "deb",
+          "libsystemd0",
+          "257.13-1~deb13u1"
+        ],
+        [
+          "deb",
+          "libtinfo6",
+          "6.5+20250216-2"
+        ],
+        [
+          "deb",
+          "libudev1",
+          "257.13-1~deb13u1"
+        ],
+        [
+          "deb",
+          "libuuid1",
+          "2.41.5-0+deb13u1"
+        ],
+        [
+          "deb",
+          "libxxhash0",
+          "0.8.3-2"
+        ],
+        [
+          "deb",
+          "libzstd1",
+          "1.5.7+dfsg-1"
+        ],
+        [
+          "deb",
+          "login",
+          "1:4.16.0-2+really2.41.5-0+deb13u1"
+        ],
+        [
+          "deb",
+          "login.defs",
+          "1:4.17.4-2"
+        ],
+        [
+          "deb",
+          "mawk",
+          "1.3.4.20250131-1"
+        ],
+        [
+          "deb",
+          "mount",
+          "2.41.5-0+deb13u1"
+        ],
+        [
+          "deb",
+          "ncurses-base",
+          "6.5+20250216-2"
+        ],
+        [
+          "deb",
+          "ncurses-bin",
+          "6.5+20250216-2"
+        ],
+        [
+          "deb",
+          "netbase",
+          "6.5"
+        ],
+        [
+          "deb",
+          "openssl",
+          "3.5.7-1~deb13u3"
+        ],
+        [
+          "deb",
+          "openssl-provider-legacy",
+          "3.5.7-1~deb13u3"
+        ],
+        [
+          "deb",
+          "passwd",
+          "1:4.17.4-2"
+        ],
+        [
+          "deb",
+          "perl-base",
+          "5.40.1-6+deb13u1"
+        ],
+        [
+          "deb",
+          "readline-common",
+          "8.2-6"
+        ],
+        [
+          "deb",
+          "sed",
+          "4.9-2+deb13u1"
+        ],
+        [
+          "deb",
+          "sqv",
+          "1.3.0-3+b2"
+        ],
+        [
+          "deb",
+          "sysvinit-utils",
+          "3.14-4"
+        ],
+        [
+          "deb",
+          "tar",
+          "1.35+dfsg-3.1"
+        ],
+        [
+          "deb",
+          "tzdata",
+          "2026e-0+deb13u1"
+        ],
+        [
+          "deb",
+          "util-linux",
+          "2.41.5-0+deb13u1"
+        ],
+        [
+          "deb",
+          "zlib1g",
+          "1:1.3.dfsg+really1.3.1-1+b1"
+        ],
+        [
+          "pypi",
+          "annotated-doc",
+          "0.0.5"
+        ],
+        [
+          "pypi",
+          "annotated-types",
+          "0.8.0"
+        ],
+        [
+          "pypi",
+          "anyio",
+          "4.16.0"
+        ],
+        [
+          "pypi",
+          "boto3",
+          "1.43.124"
+        ],
+        [
+          "pypi",
+          "botocore",
+          "1.43.124"
+        ],
+        [
+          "pypi",
+          "certifi",
+          "2026.10.23"
+        ],
+        [
+          "pypi",
+          "cffi",
+          "2.1.1"
+        ],
+        [
+          "pypi",
+          "click",
+          "8.5.0"
+        ],
+        [
+          "pypi",
+          "cryptography",
+          "50.0.2"
+        ],
+        [
+          "pypi",
+          "distro",
+          "1.9.0"
+        ],
+        [
+          "pypi",
+          "fastapi",
+          "0.162.0"
+        ],
+        [
+          "pypi",
+          "h11",
+          "0.16.0"
+        ],
+        [
+          "pypi",
+          "httpcore",
+          "1.0.9"
+        ],
+        [
+          "pypi",
+          "httptools",
+          "0.9.0"
+        ],
+        [
+          "pypi",
+          "httpx",
+          "0.28.1"
+        ],
+        [
+          "pypi",
+          "idna",
+          "3.20"
+        ],
+        [
+          "pypi",
+          "jiter",
+          "0.18.0"
+        ],
+        [
+          "pypi",
+          "jmespath",
+          "1.1.0"
+        ],
+        [
+          "pypi",
+          "mangum",
+          "0.22.0"
+        ],
+        [
+          "pypi",
+          "openai",
+          "2.54.0"
+        ],
+        [
+          "pypi",
+          "opentelemetry-api",
+          "1.45.2"
+        ],
+        [
+          "pypi",
+          "pip",
+          "26.3"
+        ],
+        [
+          "pypi",
+          "prometheus-client",
+          "0.26.0"
+        ],
+        [
+          "pypi",
+          "pycparser",
+          "3.12"
+        ],
+        [
+          "pypi",
+          "pydantic",
+          "2.14.2"
+        ],
+        [
+          "pypi",
+          "pydantic-core",
+          "2.50.2"
+        ],
+        [
+          "pypi",
+          "pydantic-settings",
+          "2.16.2"
+        ],
+        [
+          "pypi",
+          "pyjwt",
+          "2.15.1"
+        ],
+        [
+          "pypi",
+          "python-dateutil",
+          "2.9.0.post0"
+        ],
+        [
+          "pypi",
+          "python-dotenv",
+          "1.2.4"
+        ],
+        [
+          "pypi",
+          "pyyaml",
+          "6.0.3"
+        ],
+        [
+          "pypi",
+          "s3transfer",
+          "0.19.3"
+        ],
+        [
+          "pypi",
+          "six",
+          "1.17.0"
+        ],
+        [
+          "pypi",
+          "sniffio",
+          "1.3.1"
+        ],
+        [
+          "pypi",
+          "starlette",
+          "1.10.0"
+        ],
+        [
+          "pypi",
+          "tqdm",
+          "4.70.1"
+        ],
+        [
+          "pypi",
+          "typing-extensions",
+          "4.16.0"
+        ],
+        [
+          "pypi",
+          "typing-inspection",
+          "0.4.5"
+        ],
+        [
+          "pypi",
+          "urllib3",
+          "2.8.0"
+        ],
+        [
+          "pypi",
+          "uvicorn",
+          "0.54.0"
+        ],
+        [
+          "pypi",
+          "uvloop",
+          "0.23.0"
+        ],
+        [
+          "pypi",
+          "watchfiles",
+          "1.3.0"
+        ],
+        [
+          "pypi",
+          "websockets",
+          "17.4"
+        ],
+        [
+          "pypi",
+          "zero-trust-llm-secops",
+          "0.17.0"
+        ]
+      ],
+      "syft": {
+        "additional_to_installed_metadata": [],
+        "matched_count": 131,
+        "missing_installed_metadata": [],
+        "observed": [
+          [
+            "deb",
+            "adduser",
+            "3.152"
+          ],
+          [
+            "deb",
+            "apt",
+            "3.0.3"
+          ],
+          [
+            "deb",
+            "base-files",
+            "13.8+deb13u7"
+          ],
+          [
+            "deb",
+            "base-passwd",
+            "3.6.7"
+          ],
+          [
+            "deb",
+            "bash",
+            "5.2.37-2+b10"
+          ],
+          [
+            "deb",
+            "bsdutils",
+            "1:2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "ca-certificates",
+            "20250419+deb13u1"
+          ],
+          [
+            "deb",
+            "coreutils",
+            "9.7-3"
+          ],
+          [
+            "deb",
+            "dash",
+            "0.5.12-12"
+          ],
+          [
+            "deb",
+            "debconf",
+            "1.5.91"
+          ],
+          [
+            "deb",
+            "debian-archive-keyring",
+            "2025.1"
+          ],
+          [
+            "deb",
+            "debianutils",
+            "5.23.2"
+          ],
+          [
+            "deb",
+            "diffutils",
+            "1:3.10-4"
+          ],
+          [
+            "deb",
+            "dpkg",
+            "1.22.22"
+          ],
+          [
+            "deb",
+            "findutils",
+            "4.10.0-3"
+          ],
+          [
+            "deb",
+            "gcc-14-base",
+            "14.2.0-19"
+          ],
+          [
+            "deb",
+            "grep",
+            "3.11-4"
+          ],
+          [
+            "deb",
+            "gzip",
+            "1.13-1+deb13u1"
+          ],
+          [
+            "deb",
+            "hostname",
+            "3.25"
+          ],
+          [
+            "deb",
+            "init-system-helpers",
+            "1.69~deb13u1"
+          ],
+          [
+            "deb",
+            "libacl1",
+            "2.3.2-2+b1"
+          ],
+          [
+            "deb",
+            "libapt-pkg7.0",
+            "3.0.3"
+          ],
+          [
+            "deb",
+            "libattr1",
+            "1:2.5.2-3"
+          ],
+          [
+            "deb",
+            "libaudit-common",
+            "1:4.0.2-2+deb13u1"
+          ],
+          [
+            "deb",
+            "libaudit1",
+            "1:4.0.2-2+deb13u1"
+          ],
+          [
+            "deb",
+            "libblkid1",
+            "2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "libbsd0",
+            "0.12.2-2"
+          ],
+          [
+            "deb",
+            "libbz2-1.0",
+            "1.0.8-6"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4"
+          ],
+          [
+            "deb",
+            "libcap-ng0",
+            "0.8.5-4+b1"
+          ],
+          [
+            "deb",
+            "libcap2",
+            "1:2.75-10+deb13u1+b3"
+          ],
+          [
+            "deb",
+            "libcrypt1",
+            "1:4.4.38-1"
+          ],
+          [
+            "deb",
+            "libdb5.3t64",
+            "5.3.28+dfsg2-9"
+          ],
+          [
+            "deb",
+            "libdebconfclient0",
+            "0.280"
+          ],
+          [
+            "deb",
+            "libffi8",
+            "3.4.8-2"
+          ],
+          [
+            "deb",
+            "libgcc-s1",
+            "14.2.0-19"
+          ],
+          [
+            "deb",
+            "libgdbm6t64",
+            "1.24-2"
+          ],
+          [
+            "deb",
+            "libgmp10",
+            "2:6.3.0+dfsg-3"
+          ],
+          [
+            "deb",
+            "libhogweed6t64",
+            "3.10.1-1"
+          ],
+          [
+            "deb",
+            "liblastlog2-2",
+            "2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "liblz4-1",
+            "1.10.0-4"
+          ],
+          [
+            "deb",
+            "liblzma5",
+            "5.8.1-1+deb13u2"
+          ],
+          [
+            "deb",
+            "libmd0",
+            "1.1.0-2+b1"
+          ],
+          [
+            "deb",
+            "libmount1",
+            "2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "libncursesw6",
+            "6.5+20250216-2"
+          ],
+          [
+            "deb",
+            "libnettle8t64",
+            "3.10.1-1"
+          ],
+          [
+            "deb",
+            "libpam-modules",
+            "1.7.0-5"
+          ],
+          [
+            "deb",
+            "libpam-modules-bin",
+            "1.7.0-5"
+          ],
+          [
+            "deb",
+            "libpam-runtime",
+            "1.7.0-5"
+          ],
+          [
+            "deb",
+            "libpam0g",
+            "1.7.0-5"
+          ],
+          [
+            "deb",
+            "libpcre2-8-0",
+            "10.46-1~deb13u3"
+          ],
+          [
+            "deb",
+            "libreadline8t64",
+            "8.2-6"
+          ],
+          [
+            "deb",
+            "libseccomp2",
+            "2.6.0-2"
+          ],
+          [
+            "deb",
+            "libselinux1",
+            "3.8.1-1"
+          ],
+          [
+            "deb",
+            "libsemanage-common",
+            "3.8.1-1"
+          ],
+          [
+            "deb",
+            "libsemanage2",
+            "3.8.1-1"
+          ],
+          [
+            "deb",
+            "libsepol2",
+            "3.8.1-1"
+          ],
+          [
+            "deb",
+            "libsmartcols1",
+            "2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1"
+          ],
+          [
+            "deb",
+            "libssl3t64",
+            "3.5.7-1~deb13u3"
+          ],
+          [
+            "deb",
+            "libstdc++6",
+            "14.2.0-19"
+          ],
+          [
+            "deb",
+            "libsystemd0",
+            "257.13-1~deb13u1"
+          ],
+          [
+            "deb",
+            "libtinfo6",
+            "6.5+20250216-2"
+          ],
+          [
+            "deb",
+            "libudev1",
+            "257.13-1~deb13u1"
+          ],
+          [
+            "deb",
+            "libuuid1",
+            "2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "libxxhash0",
+            "0.8.3-2"
+          ],
+          [
+            "deb",
+            "libzstd1",
+            "1.5.7+dfsg-1"
+          ],
+          [
+            "deb",
+            "login",
+            "1:4.16.0-2+really2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "login.defs",
+            "1:4.17.4-2"
+          ],
+          [
+            "deb",
+            "mawk",
+            "1.3.4.20250131-1"
+          ],
+          [
+            "deb",
+            "mount",
+            "2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "ncurses-base",
+            "6.5+20250216-2"
+          ],
+          [
+            "deb",
+            "ncurses-bin",
+            "6.5+20250216-2"
+          ],
+          [
+            "deb",
+            "netbase",
+            "6.5"
+          ],
+          [
+            "deb",
+            "openssl",
+            "3.5.7-1~deb13u3"
+          ],
+          [
+            "deb",
+            "openssl-provider-legacy",
+            "3.5.7-1~deb13u3"
+          ],
+          [
+            "deb",
+            "passwd",
+            "1:4.17.4-2"
+          ],
+          [
+            "deb",
+            "perl-base",
+            "5.40.1-6+deb13u1"
+          ],
+          [
+            "deb",
+            "readline-common",
+            "8.2-6"
+          ],
+          [
+            "deb",
+            "sed",
+            "4.9-2+deb13u1"
+          ],
+          [
+            "deb",
+            "sqv",
+            "1.3.0-3+b2"
+          ],
+          [
+            "deb",
+            "sysvinit-utils",
+            "3.14-4"
+          ],
+          [
+            "deb",
+            "tar",
+            "1.35+dfsg-3.1"
+          ],
+          [
+            "deb",
+            "tzdata",
+            "2026e-0+deb13u1"
+          ],
+          [
+            "deb",
+            "util-linux",
+            "2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "zlib1g",
+            "1:1.3.dfsg+really1.3.1-1+b1"
+          ],
+          [
+            "pypi",
+            "annotated-doc",
+            "0.0.5"
+          ],
+          [
+            "pypi",
+            "annotated-types",
+            "0.8.0"
+          ],
+          [
+            "pypi",
+            "anyio",
+            "4.16.0"
+          ],
+          [
+            "pypi",
+            "boto3",
+            "1.43.124"
+          ],
+          [
+            "pypi",
+            "botocore",
+            "1.43.124"
+          ],
+          [
+            "pypi",
+            "certifi",
+            "2026.10.23"
+          ],
+          [
+            "pypi",
+            "cffi",
+            "2.1.1"
+          ],
+          [
+            "pypi",
+            "click",
+            "8.5.0"
+          ],
+          [
+            "pypi",
+            "cryptography",
+            "50.0.2"
+          ],
+          [
+            "pypi",
+            "distro",
+            "1.9.0"
+          ],
+          [
+            "pypi",
+            "fastapi",
+            "0.162.0"
+          ],
+          [
+            "pypi",
+            "h11",
+            "0.16.0"
+          ],
+          [
+            "pypi",
+            "httpcore",
+            "1.0.9"
+          ],
+          [
+            "pypi",
+            "httptools",
+            "0.9.0"
+          ],
+          [
+            "pypi",
+            "httpx",
+            "0.28.1"
+          ],
+          [
+            "pypi",
+            "idna",
+            "3.20"
+          ],
+          [
+            "pypi",
+            "jiter",
+            "0.18.0"
+          ],
+          [
+            "pypi",
+            "jmespath",
+            "1.1.0"
+          ],
+          [
+            "pypi",
+            "mangum",
+            "0.22.0"
+          ],
+          [
+            "pypi",
+            "openai",
+            "2.54.0"
+          ],
+          [
+            "pypi",
+            "opentelemetry-api",
+            "1.45.2"
+          ],
+          [
+            "pypi",
+            "pip",
+            "26.3"
+          ],
+          [
+            "pypi",
+            "prometheus-client",
+            "0.26.0"
+          ],
+          [
+            "pypi",
+            "pycparser",
+            "3.12"
+          ],
+          [
+            "pypi",
+            "pydantic",
+            "2.14.2"
+          ],
+          [
+            "pypi",
+            "pydantic-core",
+            "2.50.2"
+          ],
+          [
+            "pypi",
+            "pydantic-settings",
+            "2.16.2"
+          ],
+          [
+            "pypi",
+            "pyjwt",
+            "2.15.1"
+          ],
+          [
+            "pypi",
+            "python-dateutil",
+            "2.9.0.post0"
+          ],
+          [
+            "pypi",
+            "python-dotenv",
+            "1.2.4"
+          ],
+          [
+            "pypi",
+            "pyyaml",
+            "6.0.3"
+          ],
+          [
+            "pypi",
+            "s3transfer",
+            "0.19.3"
+          ],
+          [
+            "pypi",
+            "six",
+            "1.17.0"
+          ],
+          [
+            "pypi",
+            "sniffio",
+            "1.3.1"
+          ],
+          [
+            "pypi",
+            "starlette",
+            "1.10.0"
+          ],
+          [
+            "pypi",
+            "tqdm",
+            "4.70.1"
+          ],
+          [
+            "pypi",
+            "typing-extensions",
+            "4.16.0"
+          ],
+          [
+            "pypi",
+            "typing-inspection",
+            "0.4.5"
+          ],
+          [
+            "pypi",
+            "urllib3",
+            "2.8.0"
+          ],
+          [
+            "pypi",
+            "uvicorn",
+            "0.54.0"
+          ],
+          [
+            "pypi",
+            "uvloop",
+            "0.23.0"
+          ],
+          [
+            "pypi",
+            "watchfiles",
+            "1.3.0"
+          ],
+          [
+            "pypi",
+            "websockets",
+            "17.4"
+          ],
+          [
+            "pypi",
+            "zero-trust-llm-secops",
+            "0.17.0"
+          ]
+        ]
+      },
+      "trivy": {
+        "additional_to_installed_metadata": [
+          [
+            "pypi",
+            "cachecontrol",
+            "0.14.4"
+          ],
+          [
+            "pypi",
+            "distlib",
+            "0.4.4"
+          ],
+          [
+            "pypi",
+            "msgpack",
+            "1.2.4"
+          ],
+          [
+            "pypi",
+            "packaging",
+            "26.3"
+          ],
+          [
+            "pypi",
+            "platformdirs",
+            "4.12.4"
+          ],
+          [
+            "pypi",
+            "pygments",
+            "2.21.0"
+          ],
+          [
+            "pypi",
+            "pyproject-hooks",
+            "1.3.3"
+          ],
+          [
+            "pypi",
+            "requests",
+            "2.34.2"
+          ],
+          [
+            "pypi",
+            "resolvelib",
+            "1.2.1"
+          ],
+          [
+            "pypi",
+            "rich",
+            "15.0.0"
+          ],
+          [
+            "pypi",
+            "setuptools",
+            "70.3.0"
+          ],
+          [
+            "pypi",
+            "tomli",
+            "2.3.2"
+          ],
+          [
+            "pypi",
+            "tomli-w",
+            "1.2.0"
+          ],
+          [
+            "pypi",
+            "truststore",
+            "0.10.5"
+          ]
+        ],
+        "matched_count": 131,
+        "missing_installed_metadata": [],
+        "observed": [
+          [
+            "deb",
+            "adduser",
+            "3.152"
+          ],
+          [
+            "deb",
+            "apt",
+            "3.0.3"
+          ],
+          [
+            "deb",
+            "base-files",
+            "13.8+deb13u7"
+          ],
+          [
+            "deb",
+            "base-passwd",
+            "3.6.7"
+          ],
+          [
+            "deb",
+            "bash",
+            "5.2.37-2+b10"
+          ],
+          [
+            "deb",
+            "bsdutils",
+            "1:2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "ca-certificates",
+            "20250419+deb13u1"
+          ],
+          [
+            "deb",
+            "coreutils",
+            "9.7-3"
+          ],
+          [
+            "deb",
+            "dash",
+            "0.5.12-12"
+          ],
+          [
+            "deb",
+            "debconf",
+            "1.5.91"
+          ],
+          [
+            "deb",
+            "debian-archive-keyring",
+            "2025.1"
+          ],
+          [
+            "deb",
+            "debianutils",
+            "5.23.2"
+          ],
+          [
+            "deb",
+            "diffutils",
+            "1:3.10-4"
+          ],
+          [
+            "deb",
+            "dpkg",
+            "1.22.22"
+          ],
+          [
+            "deb",
+            "findutils",
+            "4.10.0-3"
+          ],
+          [
+            "deb",
+            "gcc-14-base",
+            "14.2.0-19"
+          ],
+          [
+            "deb",
+            "grep",
+            "3.11-4"
+          ],
+          [
+            "deb",
+            "gzip",
+            "1.13-1+deb13u1"
+          ],
+          [
+            "deb",
+            "hostname",
+            "3.25"
+          ],
+          [
+            "deb",
+            "init-system-helpers",
+            "1.69~deb13u1"
+          ],
+          [
+            "deb",
+            "libacl1",
+            "2.3.2-2+b1"
+          ],
+          [
+            "deb",
+            "libapt-pkg7.0",
+            "3.0.3"
+          ],
+          [
+            "deb",
+            "libattr1",
+            "1:2.5.2-3"
+          ],
+          [
+            "deb",
+            "libaudit-common",
+            "1:4.0.2-2+deb13u1"
+          ],
+          [
+            "deb",
+            "libaudit1",
+            "1:4.0.2-2+deb13u1"
+          ],
+          [
+            "deb",
+            "libblkid1",
+            "2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "libbsd0",
+            "0.12.2-2"
+          ],
+          [
+            "deb",
+            "libbz2-1.0",
+            "1.0.8-6"
+          ],
+          [
+            "deb",
+            "libc-bin",
+            "2.41-12+deb13u4"
+          ],
+          [
+            "deb",
+            "libc6",
+            "2.41-12+deb13u4"
+          ],
+          [
+            "deb",
+            "libcap-ng0",
+            "0.8.5-4+b1"
+          ],
+          [
+            "deb",
+            "libcap2",
+            "1:2.75-10+deb13u1+b3"
+          ],
+          [
+            "deb",
+            "libcrypt1",
+            "1:4.4.38-1"
+          ],
+          [
+            "deb",
+            "libdb5.3t64",
+            "5.3.28+dfsg2-9"
+          ],
+          [
+            "deb",
+            "libdebconfclient0",
+            "0.280"
+          ],
+          [
+            "deb",
+            "libffi8",
+            "3.4.8-2"
+          ],
+          [
+            "deb",
+            "libgcc-s1",
+            "14.2.0-19"
+          ],
+          [
+            "deb",
+            "libgdbm6t64",
+            "1.24-2"
+          ],
+          [
+            "deb",
+            "libgmp10",
+            "2:6.3.0+dfsg-3"
+          ],
+          [
+            "deb",
+            "libhogweed6t64",
+            "3.10.1-1"
+          ],
+          [
+            "deb",
+            "liblastlog2-2",
+            "2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "liblz4-1",
+            "1.10.0-4"
+          ],
+          [
+            "deb",
+            "liblzma5",
+            "5.8.1-1+deb13u2"
+          ],
+          [
+            "deb",
+            "libmd0",
+            "1.1.0-2+b1"
+          ],
+          [
+            "deb",
+            "libmount1",
+            "2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "libncursesw6",
+            "6.5+20250216-2"
+          ],
+          [
+            "deb",
+            "libnettle8t64",
+            "3.10.1-1"
+          ],
+          [
+            "deb",
+            "libpam-modules",
+            "1.7.0-5"
+          ],
+          [
+            "deb",
+            "libpam-modules-bin",
+            "1.7.0-5"
+          ],
+          [
+            "deb",
+            "libpam-runtime",
+            "1.7.0-5"
+          ],
+          [
+            "deb",
+            "libpam0g",
+            "1.7.0-5"
+          ],
+          [
+            "deb",
+            "libpcre2-8-0",
+            "10.46-1~deb13u3"
+          ],
+          [
+            "deb",
+            "libreadline8t64",
+            "8.2-6"
+          ],
+          [
+            "deb",
+            "libseccomp2",
+            "2.6.0-2"
+          ],
+          [
+            "deb",
+            "libselinux1",
+            "3.8.1-1"
+          ],
+          [
+            "deb",
+            "libsemanage-common",
+            "3.8.1-1"
+          ],
+          [
+            "deb",
+            "libsemanage2",
+            "3.8.1-1"
+          ],
+          [
+            "deb",
+            "libsepol2",
+            "3.8.1-1"
+          ],
+          [
+            "deb",
+            "libsmartcols1",
+            "2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "libsqlite3-0",
+            "3.54.1-0secops1"
+          ],
+          [
+            "deb",
+            "libssl3t64",
+            "3.5.7-1~deb13u3"
+          ],
+          [
+            "deb",
+            "libstdc++6",
+            "14.2.0-19"
+          ],
+          [
+            "deb",
+            "libsystemd0",
+            "257.13-1~deb13u1"
+          ],
+          [
+            "deb",
+            "libtinfo6",
+            "6.5+20250216-2"
+          ],
+          [
+            "deb",
+            "libudev1",
+            "257.13-1~deb13u1"
+          ],
+          [
+            "deb",
+            "libuuid1",
+            "2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "libxxhash0",
+            "0.8.3-2"
+          ],
+          [
+            "deb",
+            "libzstd1",
+            "1.5.7+dfsg-1"
+          ],
+          [
+            "deb",
+            "login",
+            "1:4.16.0-2+really2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "login.defs",
+            "1:4.17.4-2"
+          ],
+          [
+            "deb",
+            "mawk",
+            "1.3.4.20250131-1"
+          ],
+          [
+            "deb",
+            "mount",
+            "2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "ncurses-base",
+            "6.5+20250216-2"
+          ],
+          [
+            "deb",
+            "ncurses-bin",
+            "6.5+20250216-2"
+          ],
+          [
+            "deb",
+            "netbase",
+            "6.5"
+          ],
+          [
+            "deb",
+            "openssl",
+            "3.5.7-1~deb13u3"
+          ],
+          [
+            "deb",
+            "openssl-provider-legacy",
+            "3.5.7-1~deb13u3"
+          ],
+          [
+            "deb",
+            "passwd",
+            "1:4.17.4-2"
+          ],
+          [
+            "deb",
+            "perl-base",
+            "5.40.1-6+deb13u1"
+          ],
+          [
+            "deb",
+            "readline-common",
+            "8.2-6"
+          ],
+          [
+            "deb",
+            "sed",
+            "4.9-2+deb13u1"
+          ],
+          [
+            "deb",
+            "sqv",
+            "1.3.0-3+b2"
+          ],
+          [
+            "deb",
+            "sysvinit-utils",
+            "3.14-4"
+          ],
+          [
+            "deb",
+            "tar",
+            "1.35+dfsg-3.1"
+          ],
+          [
+            "deb",
+            "tzdata",
+            "2026e-0+deb13u1"
+          ],
+          [
+            "deb",
+            "util-linux",
+            "2.41.5-0+deb13u1"
+          ],
+          [
+            "deb",
+            "zlib1g",
+            "1:1.3.dfsg+really1.3.1-1+b1"
+          ],
+          [
+            "pypi",
+            "annotated-doc",
+            "0.0.5"
+          ],
+          [
+            "pypi",
+            "annotated-types",
+            "0.8.0"
+          ],
+          [
+            "pypi",
+            "anyio",
+            "4.16.0"
+          ],
+          [
+            "pypi",
+            "boto3",
+            "1.43.124"
+          ],
+          [
+            "pypi",
+            "botocore",
+            "1.43.124"
+          ],
+          [
+            "pypi",
+            "cachecontrol",
+            "0.14.4"
+          ],
+          [
+            "pypi",
+            "certifi",
+            "2026.10.23"
+          ],
+          [
+            "pypi",
+            "cffi",
+            "2.1.1"
+          ],
+          [
+            "pypi",
+            "click",
+            "8.5.0"
+          ],
+          [
+            "pypi",
+            "cryptography",
+            "50.0.2"
+          ],
+          [
+            "pypi",
+            "distlib",
+            "0.4.4"
+          ],
+          [
+            "pypi",
+            "distro",
+            "1.9.0"
+          ],
+          [
+            "pypi",
+            "fastapi",
+            "0.162.0"
+          ],
+          [
+            "pypi",
+            "h11",
+            "0.16.0"
+          ],
+          [
+            "pypi",
+            "httpcore",
+            "1.0.9"
+          ],
+          [
+            "pypi",
+            "httptools",
+            "0.9.0"
+          ],
+          [
+            "pypi",
+            "httpx",
+            "0.28.1"
+          ],
+          [
+            "pypi",
+            "idna",
+            "3.20"
+          ],
+          [
+            "pypi",
+            "jiter",
+            "0.18.0"
+          ],
+          [
+            "pypi",
+            "jmespath",
+            "1.1.0"
+          ],
+          [
+            "pypi",
+            "mangum",
+            "0.22.0"
+          ],
+          [
+            "pypi",
+            "msgpack",
+            "1.2.4"
+          ],
+          [
+            "pypi",
+            "openai",
+            "2.54.0"
+          ],
+          [
+            "pypi",
+            "opentelemetry-api",
+            "1.45.2"
+          ],
+          [
+            "pypi",
+            "packaging",
+            "26.3"
+          ],
+          [
+            "pypi",
+            "pip",
+            "26.3"
+          ],
+          [
+            "pypi",
+            "platformdirs",
+            "4.12.4"
+          ],
+          [
+            "pypi",
+            "prometheus-client",
+            "0.26.0"
+          ],
+          [
+            "pypi",
+            "pycparser",
+            "3.12"
+          ],
+          [
+            "pypi",
+            "pydantic",
+            "2.14.2"
+          ],
+          [
+            "pypi",
+            "pydantic-core",
+            "2.50.2"
+          ],
+          [
+            "pypi",
+            "pydantic-settings",
+            "2.16.2"
+          ],
+          [
+            "pypi",
+            "pygments",
+            "2.21.0"
+          ],
+          [
+            "pypi",
+            "pyjwt",
+            "2.15.1"
+          ],
+          [
+            "pypi",
+            "pyproject-hooks",
+            "1.3.3"
+          ],
+          [
+            "pypi",
+            "python-dateutil",
+            "2.9.0.post0"
+          ],
+          [
+            "pypi",
+            "python-dotenv",
+            "1.2.4"
+          ],
+          [
+            "pypi",
+            "pyyaml",
+            "6.0.3"
+          ],
+          [
+            "pypi",
+            "requests",
+            "2.34.2"
+          ],
+          [
+            "pypi",
+            "resolvelib",
+            "1.2.1"
+          ],
+          [
+            "pypi",
+            "rich",
+            "15.0.0"
+          ],
+          [
+            "pypi",
+            "s3transfer",
+            "0.19.3"
+          ],
+          [
+            "pypi",
+            "setuptools",
+            "70.3.0"
+          ],
+          [
+            "pypi",
+            "six",
+            "1.17.0"
+          ],
+          [
+            "pypi",
+            "sniffio",
+            "1.3.1"
+          ],
+          [
+            "pypi",
+            "starlette",
+            "1.10.0"
+          ],
+          [
+            "pypi",
+            "tomli",
+            "2.3.2"
+          ],
+          [
+            "pypi",
+            "tomli-w",
+            "1.2.0"
+          ],
+          [
+            "pypi",
+            "tqdm",
+            "4.70.1"
+          ],
+          [
+            "pypi",
+            "truststore",
+            "0.10.5"
+          ],
+          [
+            "pypi",
+            "typing-extensions",
+            "4.16.0"
+          ],
+          [
+            "pypi",
+            "typing-inspection",
+            "0.4.5"
+          ],
+          [
+            "pypi",
+            "urllib3",
+            "2.8.0"
+          ],
+          [
+            "pypi",
+            "uvicorn",
+            "0.54.0"
+          ],
+          [
+            "pypi",
+            "uvloop",
+            "0.23.0"
+          ],
+          [
+            "pypi",
+            "watchfiles",
+            "1.3.0"
+          ],
+          [
+            "pypi",
+            "websockets",
+            "17.4"
+          ],
+          [
+            "pypi",
+            "zero-trust-llm-secops",
+            "0.17.0"
+          ]
+        ]
+      }
+    },
+    "native_advisory_id_overlap": 180,
+    "raw_artifacts": {
+      "out\\control-2.31.0-grype.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\control-2.31.0-grype.json": {
+        "bytes": 16239,
+        "sha256": "c40109557f45d91b71ec004a72c76584dd0e8d5394d66da0fdb0f85c0307767c"
+      },
+      "out\\control-2.31.0-grype.metrics.json": {
+        "bytes": 198,
+        "sha256": "03dfe38b784dcb4ee538951e58a3d2289f32588ba5afeee6491bde93cc20ff68"
+      },
+      "out\\control-2.31.0-grype.stderr": {
+        "bytes": 233,
+        "sha256": "ac0a38e05eea602d4b6ecf9c6626946633d0612b53594f33771a69f96d05a163"
+      },
+      "out\\control-2.31.0-grype.stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\control-2.31.0-trivy.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\control-2.31.0-trivy.json": {
+        "bytes": 12379,
+        "sha256": "61f446fb92d84c94cc2cff42ccffaf7515bcb8efce6e060da7f2e240614a37da"
+      },
+      "out\\control-2.31.0-trivy.metrics.json": {
+        "bytes": 210,
+        "sha256": "4e3b19ce5ee3a723943197cd6cafbe1a27e4e4fceb0c1a1bc52ee00215a7d0d0"
+      },
+      "out\\control-2.31.0-trivy.stderr": {
+        "bytes": 428,
+        "sha256": "45966b71373285ae5fdf6affa3672b0232b36f6208a219703fd4ee9c3197c21f"
+      },
+      "out\\control-2.31.0-trivy.stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\control-2.32.0-grype.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\control-2.32.0-grype.json": {
+        "bytes": 12860,
+        "sha256": "49ae97eb7793527182cfb4928e9510c1e4ce53ea3b5938b6b7bc20ed70b4731f"
+      },
+      "out\\control-2.32.0-grype.metrics.json": {
+        "bytes": 208,
+        "sha256": "d9b839bb2ee750cc824905fd2beee5f479659d26982c0815fd576ba3ab3200aa"
+      },
+      "out\\control-2.32.0-grype.stderr": {
+        "bytes": 233,
+        "sha256": "ac0a38e05eea602d4b6ecf9c6626946633d0612b53594f33771a69f96d05a163"
+      },
+      "out\\control-2.32.0-grype.stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\control-2.32.0-trivy.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\control-2.32.0-trivy.json": {
+        "bytes": 8316,
+        "sha256": "9398854ce25a20ea8f72a39cce8b63df0ca38ee26fa588e1edcc568ebd19f3b6"
+      },
+      "out\\control-2.32.0-trivy.metrics.json": {
+        "bytes": 212,
+        "sha256": "7cb9a84eaf0998e95b8f1bdf172e04aaa44dc6eb87287554247a7aa536031e00"
+      },
+      "out\\control-2.32.0-trivy.stderr": {
+        "bytes": 428,
+        "sha256": "a02dde0454418ca6a7921982ab1e6d68ce068732a6884ee3f46774c9ea220581"
+      },
+      "out\\control-2.32.0-trivy.stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\db-hashes-after.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\db-hashes-after.metrics.json": {
+        "bytes": 197,
+        "sha256": "8941d9163f565828b82788ce0e4660a522849bf6c86a6cc249eacf14d1319e3d"
+      },
+      "out\\db-hashes-after.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\db-hashes-after.stdout": {
+        "bytes": 469,
+        "sha256": "ff896e805e370b30939bc9500cdea688ec6097a1dc2c608e0e8b512a7f94894d"
+      },
+      "out\\db-hashes-before.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\db-hashes-before.metrics.json": {
+        "bytes": 198,
+        "sha256": "4fa4d9f55047e69a489f500d5d1a32ce82b42dcb3156b01a8a8ca61ee0771e74"
+      },
+      "out\\db-hashes-before.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\db-hashes-before.stdout": {
+        "bytes": 469,
+        "sha256": "ff896e805e370b30939bc9500cdea688ec6097a1dc2c608e0e8b512a7f94894d"
+      },
+      "out\\db-hashes-copied.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\db-hashes-copied.metrics.json": {
+        "bytes": 207,
+        "sha256": "a6575acea53492e445c9fac9a921d6e57281dc7d34cc15f355eaf70958469911"
+      },
+      "out\\db-hashes-copied.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\db-hashes-copied.stdout": {
+        "bytes": 469,
+        "sha256": "ff896e805e370b30939bc9500cdea688ec6097a1dc2c608e0e8b512a7f94894d"
+      },
+      "out\\grype-db-status.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\grype-db-status.metrics.json": {
+        "bytes": 197,
+        "sha256": "53358338dab4dd5999a8abcfa2423f5d1c53e4b1d4d1da99de39473a14f5fbe6"
+      },
+      "out\\grype-db-status.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\grype-db-status.stdout": {
+        "bytes": 331,
+        "sha256": "b854296453428233887a2c4b5a3c5507acd686e789303870f68187cbfffd5905"
+      },
+      "out\\installed.json": {
+        "bytes": 4226,
+        "sha256": "4f2e53d31a1245a2c73e6df183233b9580cdc38ba5da85bfa29c20cdfe5c6ece"
+      },
+      "out\\run-1-grype.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\run-1-grype.json": {
+        "bytes": 871303,
+        "sha256": "c1e1b7fe91fea9ebc3d377fa448ae223e182906ce275474ceee8614b3964dee2"
+      },
+      "out\\run-1-grype.metrics.json": {
+        "bytes": 199,
+        "sha256": "03f5a58fb1fcf5bf39661276e4ae914eb48904e65629eded35406d21d0cfcb1c"
+      },
+      "out\\run-1-grype.stderr": {
+        "bytes": 233,
+        "sha256": "ac0a38e05eea602d4b6ecf9c6626946633d0612b53594f33771a69f96d05a163"
+      },
+      "out\\run-1-grype.stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\run-1-syft.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\run-1-syft.json": {
+        "bytes": 4059515,
+        "sha256": "85bd25d1793fb1f12141edfd0efe68369f6241f06ec8cffeaa23d91e0e51edb2"
+      },
+      "out\\run-1-syft.metrics.json": {
+        "bytes": 198,
+        "sha256": "55aff86c21d2a394dfb09812038f35e6dbf3b7eeb33538ffea40ff53ca03be20"
+      },
+      "out\\run-1-syft.stderr": {
+        "bytes": 232,
+        "sha256": "4dd86f9e6b98545d13e2f20199d07616f76b44c4d50dca7af51619c240435ac0"
+      },
+      "out\\run-1-syft.stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\run-1-trivy.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\run-1-trivy.json": {
+        "bytes": 938441,
+        "sha256": "c7b8c4d3ce5215db60f3ee8dd37639a7cb6c602a075231156ba6adb5cdf01837"
+      },
+      "out\\run-1-trivy.metrics.json": {
+        "bytes": 208,
+        "sha256": "07058e12492500ccf1a8a1aba30b7601863c11679faecfda4f653359427e9abc"
+      },
+      "out\\run-1-trivy.stderr": {
+        "bytes": 543,
+        "sha256": "a747d2778880141ba8418070e1e1a86c1c73375397c1f8fa8d3ed54d76bf2046"
+      },
+      "out\\run-1-trivy.stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\run-2-grype.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\run-2-grype.json": {
+        "bytes": 871303,
+        "sha256": "2632026c420c21d35f8ace6d1d5a6f5b897037a857b87ce7759dfd9b6013c620"
+      },
+      "out\\run-2-grype.metrics.json": {
+        "bytes": 197,
+        "sha256": "ba4449c2b6df1c3e05612f27181ba7c7fa8242301e4874e4cad3e0fbe98c5b43"
+      },
+      "out\\run-2-grype.stderr": {
+        "bytes": 233,
+        "sha256": "ac0a38e05eea602d4b6ecf9c6626946633d0612b53594f33771a69f96d05a163"
+      },
+      "out\\run-2-grype.stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\run-2-syft.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\run-2-syft.json": {
+        "bytes": 4059515,
+        "sha256": "85bd25d1793fb1f12141edfd0efe68369f6241f06ec8cffeaa23d91e0e51edb2"
+      },
+      "out\\run-2-syft.metrics.json": {
+        "bytes": 199,
+        "sha256": "0a89be1b90bbf8b442b3b2990a085ede0b5aa40e9e48eca1360b12fc241face6"
+      },
+      "out\\run-2-syft.stderr": {
+        "bytes": 232,
+        "sha256": "4dd86f9e6b98545d13e2f20199d07616f76b44c4d50dca7af51619c240435ac0"
+      },
+      "out\\run-2-syft.stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\run-2-trivy.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\run-2-trivy.json": {
+        "bytes": 938441,
+        "sha256": "2aedeae68a8693306b077ae8cab1b7143119161a99a2958f8c2efff1fc4f4660"
+      },
+      "out\\run-2-trivy.metrics.json": {
+        "bytes": 210,
+        "sha256": "ba999a721e1abbc081a0f8597e471a327682ef6b1043958c0c51bc53222d49be"
+      },
+      "out\\run-2-trivy.stderr": {
+        "bytes": 543,
+        "sha256": "65ab52a7cda42c30d90761eccfe3036c94bc995a42707cd1dd4ee92aed8cbee0"
+      },
+      "out\\run-2-trivy.stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\run-3-grype.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\run-3-grype.json": {
+        "bytes": 871303,
+        "sha256": "803e2ace58fb4401f3624607cd3eb14b03f7d65a49cf6f784a7f0b4a25e4840a"
+      },
+      "out\\run-3-grype.metrics.json": {
+        "bytes": 217,
+        "sha256": "9545c0e49cb03d654d0789969515b46ae7dad36f49ee94347e6d949cc47c46aa"
+      },
+      "out\\run-3-grype.stderr": {
+        "bytes": 233,
+        "sha256": "ac0a38e05eea602d4b6ecf9c6626946633d0612b53594f33771a69f96d05a163"
+      },
+      "out\\run-3-grype.stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\run-3-syft.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\run-3-syft.json": {
+        "bytes": 4059515,
+        "sha256": "85bd25d1793fb1f12141edfd0efe68369f6241f06ec8cffeaa23d91e0e51edb2"
+      },
+      "out\\run-3-syft.metrics.json": {
+        "bytes": 199,
+        "sha256": "d6774b1c9d08ef5beed16b945f984aa20d9b31fca9b1d39dcb2c0e09d6cdf382"
+      },
+      "out\\run-3-syft.stderr": {
+        "bytes": 232,
+        "sha256": "4dd86f9e6b98545d13e2f20199d07616f76b44c4d50dca7af51619c240435ac0"
+      },
+      "out\\run-3-syft.stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\run-3-trivy.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\run-3-trivy.json": {
+        "bytes": 938441,
+        "sha256": "e33eb77011f88559b40a0076a98efd69c3aaa65941577166266ea3af6688b616"
+      },
+      "out\\run-3-trivy.metrics.json": {
+        "bytes": 209,
+        "sha256": "29d51a49643afab27226e6807a03c2d58b7adac2f02bef40d0fc4b1b49551020"
+      },
+      "out\\run-3-trivy.stderr": {
+        "bytes": 543,
+        "sha256": "83a646aff6e54499fe2d62bd0cf00db28ed450c63f45d8ed04b93ff7dac0d013"
+      },
+      "out\\run-3-trivy.stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\trivy-db-status.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\trivy-db-status.metrics.json": {
+        "bytes": 207,
+        "sha256": "fc08828372a740bfd6711e04b98df2a9caf0d2c72d54c1bfcfb2b80933c5d046"
+      },
+      "out\\trivy-db-status.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\trivy-db-status.stdout": {
+        "bytes": 192,
+        "sha256": "6ac3802b0c23cc8359cd2a9610b60c2345d82073bc0a25b88f446c18e4bf5de2"
+      },
+      "out\\warmup-grype.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\warmup-grype.json": {
+        "bytes": 871304,
+        "sha256": "059f81eda9d0c874de9dc4ceb5e023207f1afed7321998a363a9cd398aa933f6"
+      },
+      "out\\warmup-grype.metrics.json": {
+        "bytes": 197,
+        "sha256": "c9edcb140e3842aba39084803186f60aa23c165a6453272c702f3df5e4f3c49b"
+      },
+      "out\\warmup-grype.stderr": {
+        "bytes": 233,
+        "sha256": "ac0a38e05eea602d4b6ecf9c6626946633d0612b53594f33771a69f96d05a163"
+      },
+      "out\\warmup-grype.stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\warmup-syft.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\warmup-syft.json": {
+        "bytes": 4059515,
+        "sha256": "85bd25d1793fb1f12141edfd0efe68369f6241f06ec8cffeaa23d91e0e51edb2"
+      },
+      "out\\warmup-syft.metrics.json": {
+        "bytes": 198,
+        "sha256": "9b2cd3c8fb335506233e52864c03ae1242cdb401f8ed51cc68b4d30596f1e4f3"
+      },
+      "out\\warmup-syft.stderr": {
+        "bytes": 232,
+        "sha256": "4dd86f9e6b98545d13e2f20199d07616f76b44c4d50dca7af51619c240435ac0"
+      },
+      "out\\warmup-syft.stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\warmup-trivy.docker.stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "out\\warmup-trivy.json": {
+        "bytes": 938441,
+        "sha256": "e078ea86e1017153ccf4495141ab34b87a5f84ceadb9ad224868baeddac8b794"
+      },
+      "out\\warmup-trivy.metrics.json": {
+        "bytes": 198,
+        "sha256": "d50fdec33d4bbcb0303fceff8f9b53dd6eb8d4dd2039e4505bd887db70ccc4cd"
+      },
+      "out\\warmup-trivy.stderr": {
+        "bytes": 869,
+        "sha256": "8cef23e681840f2c2cd04e9d178208715a7d6f605c6ac6949fb35f65aa8d32b7"
+      },
+      "out\\warmup-trivy.stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "repeat_consistency": {
+      "grype_findings": true,
+      "syft_inventory": true,
+      "trivy_findings": true,
+      "trivy_inventory": true
+    },
+    "trivy_database_status": {
+      "Version": "0.76.1",
+      "VulnerabilityDB": {
+        "DownloadedAt": "2026-11-02T18:00:15.259286164Z",
+        "NextUpdate": "2026-11-03T13:15:56.441126429Z",
+        "UpdatedAt": "2026-11-02T13:15:56.44112656Z",
+        "Version": 2
+      }
+    }
+  },
+  "runner_base": "python@sha256:a0f57064cbdcd6285fa45f51237ab0b35ea8ebaed06a1f5973e89e19dfb86704",
+  "runner_image_id": "sha256:3b9e8073c0838a25404a783943fac28e4fd6d584b5eec69568f152d2540d84d6",
+  "runs": [
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 6.650399899997865,
+      "label": "db-hashes-copied",
+      "metrics": {
+        "child_maxrss_kib": 21548,
+        "cpu.stat": null,
+        "elapsed_seconds": 5.644979533000878,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 1.6533129999999998,
+        "user_seconds": 2.598063
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 5.685649299997749,
+      "label": "grype-db-status",
+      "metrics": {
+        "child_maxrss_kib": 67452,
+        "cpu.stat": null,
+        "elapsed_seconds": 4.874725319998106,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 1.237029,
+        "user_seconds": 0.583314
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 1.51474109999981,
+      "label": "trivy-db-status",
+      "metrics": {
+        "child_maxrss_kib": 107524,
+        "cpu.stat": null,
+        "elapsed_seconds": 0.74110264599949,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 0.039587,
+        "user_seconds": 0.5443319999999999
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 6.237390700000105,
+      "label": "db-hashes-before",
+      "metrics": {
+        "child_maxrss_kib": 21708,
+        "cpu.stat": null,
+        "elapsed_seconds": 5.4630435229992145,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 1.103715,
+        "user_seconds": 2.893524
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 4.910932000002504,
+      "label": "warmup-syft",
+      "metrics": {
+        "child_maxrss_kib": 291872,
+        "cpu.stat": null,
+        "elapsed_seconds": 4.1376974470003915,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 1.201664,
+        "user_seconds": 2.50967
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 6.265862399999605,
+      "label": "warmup-grype",
+      "metrics": {
+        "child_maxrss_kib": 103424,
+        "cpu.stat": null,
+        "elapsed_seconds": 5.527747831998568,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 1.87194,
+        "user_seconds": 1.692711
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 42.3537608000006,
+      "label": "warmup-trivy",
+      "metrics": {
+        "child_maxrss_kib": 163544,
+        "cpu.stat": null,
+        "elapsed_seconds": 41.59823301299912,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 6.901931,
+        "user_seconds": 2.316817
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 4.159254900001542,
+      "label": "run-1-syft",
+      "metrics": {
+        "child_maxrss_kib": 277076,
+        "cpu.stat": null,
+        "elapsed_seconds": 3.4594858620002924,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 1.15232,
+        "user_seconds": 2.467801
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 3.9550100000014936,
+      "label": "run-1-grype",
+      "metrics": {
+        "child_maxrss_kib": 106116,
+        "cpu.stat": null,
+        "elapsed_seconds": 3.2118610109973815,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 1.331485,
+        "user_seconds": 1.534765
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 17.336614399999235,
+      "label": "run-1-trivy",
+      "metrics": {
+        "child_maxrss_kib": 133464,
+        "cpu.stat": null,
+        "elapsed_seconds": 16.61068511800113,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 0.9289569999999999,
+        "user_seconds": 0.425772
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 4.198465800000122,
+      "label": "run-2-syft",
+      "metrics": {
+        "child_maxrss_kib": 275092,
+        "cpu.stat": null,
+        "elapsed_seconds": 3.4655679010029417,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 1.189267,
+        "user_seconds": 2.410109
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 3.204034000002139,
+      "label": "run-2-grype",
+      "metrics": {
+        "child_maxrss_kib": 106016,
+        "cpu.stat": null,
+        "elapsed_seconds": 2.47288307800045,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 1.049275,
+        "user_seconds": 1.534317
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 14.293067800001154,
+      "label": "run-2-trivy",
+      "metrics": {
+        "child_maxrss_kib": 136364,
+        "cpu.stat": null,
+        "elapsed_seconds": 13.584728874997381,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 0.821476,
+        "user_seconds": 0.37098899999999996
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 3.8164058000002115,
+      "label": "run-3-syft",
+      "metrics": {
+        "child_maxrss_kib": 272104,
+        "cpu.stat": null,
+        "elapsed_seconds": 3.1149939589995483,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 0.873903,
+        "user_seconds": 2.174826
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 3.175532599998405,
+      "label": "run-3-grype",
+      "metrics": {
+        "child_maxrss_kib": 108372,
+        "cpu.stat": null,
+        "elapsed_seconds": 2.42325737200008,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 0.9825929999999999,
+        "user_seconds": 1.6142599999999998
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 15.350035700001172,
+      "label": "run-3-trivy",
+      "metrics": {
+        "child_maxrss_kib": 132044,
+        "cpu.stat": null,
+        "elapsed_seconds": 14.65897275899988,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 0.911783,
+        "user_seconds": 0.28962499999999997
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 2.2550455999989936,
+      "label": "control-2.31.0-grype",
+      "metrics": {
+        "child_maxrss_kib": 82224,
+        "cpu.stat": null,
+        "elapsed_seconds": 1.5301648550012033,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 0.996563,
+        "user_seconds": 0.553646
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 0.7973454000020865,
+      "label": "control-2.31.0-trivy",
+      "metrics": {
+        "child_maxrss_kib": 110036,
+        "cpu.stat": null,
+        "elapsed_seconds": 0.09337643399703666,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 0.01167,
+        "user_seconds": 0.07002499999999999
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 1.9718877999985125,
+      "label": "control-2.32.0-grype",
+      "metrics": {
+        "child_maxrss_kib": 82460,
+        "cpu.stat": null,
+        "elapsed_seconds": 1.2735700070006715,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 0.7807879999999999,
+        "user_seconds": 0.507512
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 0.7644614999990154,
+      "label": "control-2.32.0-trivy",
+      "metrics": {
+        "child_maxrss_kib": 109576,
+        "cpu.stat": null,
+        "elapsed_seconds": 0.08597736900264863,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 0.015002999999999999,
+        "user_seconds": 0.060015
+      },
+      "network": "none"
+    },
+    {
+      "container_exit": 0,
+      "docker_wall_seconds": 6.1793660000003,
+      "label": "db-hashes-after",
+      "metrics": {
+        "child_maxrss_kib": 21452,
+        "cpu.stat": null,
+        "elapsed_seconds": 5.440856293000252,
+        "exit_code": 0,
+        "memory.events": null,
+        "memory.peak": null,
+        "system_seconds": 2.464352,
+        "user_seconds": 2.711777
+      },
+      "network": "none"
+    }
+  ],
+  "schema": "c03-patched-image-scan-1",
+  "signature_reuse": "Prior signed-checksum verification; identical release asset hashes checked again, no new signature query.",
+  "signature_verification": {
+    "grype": {
+      "checksum_verified": true,
+      "identity": "https://github.com/anchore/grype/.github/workflows/release.yaml@refs/heads/main"
+    },
+    "syft": {
+      "checksum_verified": true,
+      "identity": "https://github.com/anchore/syft/.github/workflows/release.yaml@refs/heads/main"
+    },
+    "trivy": {
+      "checksum_verified": true,
+      "identity": "https://github.com/aquasecurity/trivy/.github/workflows/reusable-release.yaml@refs/tags/v0.76.1"
+    }
+  },
+  "source_commit": "08655e5810359f3b65cb4645a6c083b59b31ff7c",
+  "source_dirty": true,
+  "source_input_sha256": {
+    "Dockerfile": "896c79f30f531b67fcc0c9f9b0a44162fbe624ae355c273cd2b01c321c7e234e",
+    "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+    "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+    "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+    "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+    "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+    "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+    "app/config.py": "27abe1679ef3147f9eb28920299c68dbf93932e05bda6035a64d7b0ac1d2fcb2",
+    "app/continuous_signal_models.py": "895b017d7c666923639088281f71ef64386977e381c5b8060c3123d174be34ae",
+    "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+    "app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+    "app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+    "app/data/control-register.json": "a8884d1269874e18a6b5261940d9e498c8509c51d0f134ea252e6b04a327c201",
+    "app/data/replay/NOTICE.md": "500a22b9b16b4b76ff214872adfdcce862a1045818df96b645f41f0fac12a786",
+    "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+    "app/data/replay/manifest.json": "bc974726efe7f2b98119af04b9b624ba4b18a4588b2d5ff8a4c441d4beb232e9",
+    "app/data/replay/microsoft-sentinel-wiz-audit.json": "4bc25e2e6ae2cb4b80d2d135fb401d073e2c66e2d183dd5cabb574cde27ebc3b",
+    "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+    "app/data/zero-trust-policies.json": "ab3acc5b14ba5a4af640240cc781d1ea63523a096d7e5c2dfd3d912dc468d0f9",
+    "app/main.py": "c04fb9ff8011a463994a95eed78d577512434500d2e89d0ce424161b9e2fce34",
+    "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+    "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+    "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+    "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+    "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+    "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+    "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+    "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+    "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+    "app/services/collector_spool.py": "e39bb7d21c314251a51733483f00ff529c42f9eee32487431bfba606a5bf457b",
+    "app/services/continuous_signals.py": "05115d837dc2c00b56aafbe8833b047c0cd9fb1854fff20ba7db03db261ca2a3",
+    "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+    "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+    "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+    "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+    "app/services/inbox_archive.py": "39e29b7923df2df40230c031f6e015ffbf7b28400c5689172df9824ad6026522",
+    "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+    "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+    "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+    "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+    "app/services/policy_journal.py": "8299f7210567cb235156dcebed19a8c71b0e980cd52c7386c9cabf8867a5145e",
+    "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+    "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+    "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+    "app/services/signal_inbox.py": "481d3c511025deb2b8b46cdb8f9abeacf780673bd754ac040346f443787877d8",
+    "app/services/trusted_signals.py": "076ac930894e32522813ff39e1c6f317bcd2a6746605f670dde8f807d59492ff",
+    "app/services/zero_trust.py": "e71f5e925be41fe1e2515ad4554b883d029e11cf5a1599a5e84c51b7dc2a8d22",
+    "app/zero_trust_api.py": "556fda2b67c9a20077b65c5f03c121e5deffd4a48d9f651ff1b7409f26b1b491",
+    "app/zero_trust_models.py": "dec2759fcc568ee9e76e758f5a521481ae7d066e1e8bc82530e18945419f5eb1",
+    "infra/runtime/NOTICE.md": "98df8af2f6bb7b0232f1bc4666f644176ddfe88140774455f6f7b09b8fb7110d",
+    "infra/runtime/build_runtime.py": "f12b3ffaac1aa6445f53953f827e800485e15e3acc5fee572151d914ad843885",
+    "infra/runtime/http-client.patch": "73bb32ef9b713ad796751bb1e8df5104974255e71e03e3b69d339c53568de701",
+    "infra/runtime/requirements/build.lock": "0b2f96a35e79d90d94f57e7cb7af3f97d49f3cc7b8c09d47f63390b223fe32c7",
+    "infra/runtime/requirements/runtime.lock": "a6a277432de8500bdf1f0345334b085c66a7fa83813e3d85a622b87eba62130c",
+    "infra/runtime/requirements/test.lock": "61e7b1c2641db36202832a56ab0b0cd3728e07a7e77c4dab38448ba7161309f8",
+    "infra/runtime/sources.lock.json": "e5cd2b050b6a87a499ba8920a8d28469a7466aaaf85e6ac4d2e2ae7d5e390b2e",
+    "infra/runtime/verify_security.py": "bf45ca64aca30cabe4f49c37335d21d224bfc475a08a7ee8e95be31acbec58ca",
+    "pyproject.toml": "b8bd572be04ec1a6f8bf818645b6ac74458f98fc9561ea453210ab6c23e5475e",
+    "scripts/assess_supply_chain.py": "a7019aa6fdc7e9c6ef8f0615ee55bd1a9e42c18549b14e22e55f3199619cd37b",
+    "scripts/authority_custodian.py": "b87fc7ef0be26ecb259510e8df07eae402dae9608b1a2e5bfa3e03b23c6f4693",
+    "scripts/authority_rotation_coordinator.py": "1ab99ef7f9a96c75393209c169d41f82db0a783c4f24bde7df622a7c9c84647b",
+    "scripts/authority_rotation_runtime.py": "e184e49c386ed46d4f3e9214cec95e97a7f56e4e0608711119f2c61b6b76ca26",
+    "scripts/build_detection_benchmark.py": "ed2513a7d2901360c55c22785e0f1eab6b2496c17c4c3660901ccd5da77445bf",
+    "scripts/ca_endpoints.py": "b5c546ce93d86ea90e99de46f78e80e60149f8146605e27160ceb24a9babd057",
+    "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+    "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+    "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+    "scripts/certificate_authority.py": "1b3e0d501e74d9bc47442e15b1d2f4201bf4a6fd6d48644d93a70c6592c54f9c",
+    "scripts/certificate_controller.py": "fe5d5058b8edbf3632e6d060c4ad2074d6ea8fd72767524db18da1ea9d70ec32",
+    "scripts/certificate_key_rotation.py": "e648f07caf6d2a7873fb14d91cfd5285f5aec67e1aa086e436e1e5ca9284d319",
+    "scripts/certificate_reload_runner.py": "bbdafeaa210b747c007f666ec4f1beb12ee2b9afe49556fffc7c303751f0a6c9",
+    "scripts/collector_input.py": "129af08fa42d4aaf1cc5ac44475b7b26f66b43981d851da40470f0ab0184e562",
+    "scripts/compare_observability.py": "e7228243d654f4629486b3c8c51dede5594e07cbe52586765252de868bacc5b0",
+    "scripts/compare_pep.py": "42954e1790532378b17572b26f64282844b9c8c806c03d019afd87e2e9036477",
+    "scripts/compare_supply_chain.py": "c1d018310629b5e797b98f6179730b0b677f66b6e444ca75b928bf71c79b9adb",
+    "scripts/continuous_mtls_assets.py": "29c55780ed407201968b276727bafe9be980c5e10640b442be85c3e4876b3015",
+    "scripts/continuous_mtls_runtime.py": "eee3fa4726a8fb08fba10fbbbc80b3bd41a16ccce0051e234e76c4a352687602",
+    "scripts/continuous_signal_collector.py": "8ac1925b946c4fd1b1b56fe43d743793b4f5320de1628f787f533a72be7684a6",
+    "scripts/control_executor.py": "e139a3f73b644a9f9d59de3f5875293065fc41371e8e7ba88dc1bf1046850de8",
+    "scripts/control_mirror.py": "7755a1e838b5b2f92d37d7d05e3de6a2456191ca18ae2b76d9882c86f79f10f3",
+    "scripts/control_plane_ha.py": "1c4c2e10e28fc8ea4a057f809e2ce6d8ea1e2cd09d33771fba817ee8b836ba3f",
+    "scripts/control_store.py": "6fc5ae46bf568adb1202cff86430cabad1025ee555ad5bddecbf0a9a484c524a",
+    "scripts/control_transition.py": "008a42a90391793290d01fa9986b2488828528ca6e7e192ff5c4a0abdbd8c36b",
+    "scripts/evaluate_detection_benchmark.py": "270178af5fe498660a4d1fbb8b4d2f3c287199f4f777ee9e1ed0ca1c57d67d73",
+    "scripts/executor_cluster.py": "dccff8606a63a5d819ba3cf04668ba372c2a87fa2bb645eced2026e709852f4b",
+    "scripts/executor_daemon_recovery.py": "15a083c72ad77b38d1469b15410024855c46fb4cb753014f330cf247a1107904",
+    "scripts/executor_disk.py": "95d97888db2d21746698b0dee9656cbe91655f25d3725c63526a1187585be32d",
+    "scripts/executor_fence.py": "62babd635b6c9001cb38ddf7bc4996b22b3976ad96bb67eb5a9623900d5a2152",
+    "scripts/executor_store.py": "a9919ae315ce055cd39da3731dd13a708a3eba585efe2ac5e35b8cdcce076738",
+    "scripts/executor_transition.py": "79e243cc1242a7ada85932b275ca9710255f71275447307b824f891616ff89f9",
+    "scripts/local_signal_collector.py": "a3ce655c10963a183f46413dc71bdaa3f56c7c85da91abe756a7e6e034cfbb39",
+    "scripts/measure_signal_infrastructure.py": "e57da22be08f5360798dba42e1661ea271dea3907574a35cd4848ea237772d80",
+    "scripts/mtls_fixtures.py": "086155d77391fc36973dfb49442c0609ac0192760a1944774d68cbcbfad665b9",
+    "scripts/mtls_native.py": "e892293b44d86feca35b6e408b21ffc28c684893533632c7fc5c15a72c678e17",
+    "scripts/mtls_transport.py": "5e71999d5eb87354bd1beaf79b62fad5169d7584106deebf60ed3ee53c9b1a56",
+    "scripts/observability_lab.py": "596bf05a9d8d2ffe268e0d61142d9d4d6f5b9fff64012497aa6b542f9eacfcc3",
+    "scripts/pep_lab.py": "b199f1fd9df18e75e564182036e8ef208872bc65f6efd489f058840541263fe8",
+    "scripts/policy_journal.py": "a4527df2e3ecdb8311835c5acdcd93ee6eaeb7889b666861776e03aad0f936e5",
+    "scripts/recheck_supply_chain.py": "797651e936d8d21e7eabeb372d7a3c55dead5fa9975a6e57d33b2204d121e7c1",
+    "scripts/review_supply_chain.py": "9d5425ca6e27aed96e224d79f3ef40af4bb0e20f2eeb9847d7f6f0895fd4efa4",
+    "scripts/service_daemon_recovery.py": "101aa30d6bc7a37b159ed1e62ae0f00f3045ef14f6aada9ade8a94188ee35738",
+    "scripts/service_recovery_store.py": "01e2423150812f56f88cbc82b6f27da0cc2eee68bbe4f62d018068aaaba9c157",
+    "scripts/session_watchdog.py": "a70627cf113d1cf1e13adef8ef6f1b4ffc7bd99ca93c677ab6c099343eea322e",
+    "scripts/signal_inbox.py": "14bb418a0277d64d26238f0733384699019d48d5dcec548c931dcb5d6b5947d7",
+    "scripts/signal_metrics_exporter.py": "182c650db6796e973829afddd8ce239318505021058a5c891c46d074a6b0ff62",
+    "scripts/signal_worker.py": "043a97a59149ac6375a9c0945e7acef9a64f3da0e83b5815fab040cee5194438",
+    "scripts/supply_chain_runtime_probe.py": "be4b52555a5a349817806ee23d72907b2e762f7b46f4fb7d37bb434622c42645",
+    "scripts/test_all_hops_mtls.py": "0e7c44dc5fb4ab1809e4a0a5e377338132991b719061fa4fe97cd47b4e61ce09",
+    "scripts/test_authority_key_rotation.py": "2e7c4dbd442e02421ec8f61d7f2346d8e79fec549601f4e2741ab1721f2dad0c",
+    "scripts/test_ca_high_availability.py": "284c3785291117d71ffa78dd0be6147e6e8e58fb16a63a697d8c519b6b91e4b2",
+    "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+    "scripts/test_certificate_automation.py": "37740d5b589cadbaedc3d530ea8318d5ff4f3a44a07f17f0cd320d1418e6b773",
+    "scripts/test_continuous_mtls_runtime.py": "aa958cfd5a565971a7a47648485e15e8f4b20a926a688d3fb54ae13486fc8c66",
+    "scripts/test_control_plane_ha.py": "47b1579dcc89bd1d2e0a041c53f2ca6cd6de2adaf0ac74ae029d9c02e56c744a",
+    "scripts/test_control_transition.py": "5e0683ea48d454c57322adb1d45b7f3c1881a4ba4d956524d31a7e6529ed3e91",
+    "scripts/test_executor_actor_loss.py": "6b097f646a42c827af3fa665e7647f5a8d92c49339797cfb534bb147a41816f9",
+    "scripts/test_executor_daemon_restart.py": "ab653f1d75d349e66a326da3e02c35157a293d40e0f30da4fab40e30e8f6b94e",
+    "scripts/test_executor_hosts.py": "0a9f791330279db729bddfea016c4484b1558bdbca683003d71f842ee7ac3c4f",
+    "scripts/test_executor_transition.py": "4dde1cb1bbd052616012d89a3d762ee070b4a68d0e3baca91ecebd359bf0b905",
+    "scripts/test_mtls_infrastructure.py": "3724f4c98f0baee127c58d4f961f048d8be97dde9d409ee7137f996845c6b72b",
+    "scripts/test_private_key_rotation.py": "b8fd85194759dff83f7991f2069ebefe1025b853a53ce48b8f846b4c194a788c",
+    "scripts/test_service_daemon_restart.py": "a64a67ca256fd5a0aeb3bef1aa286612235f92e0b4705e0fdc2e5b4cfe6eb125",
+    "scripts/test_signal_compose.py": "5738653d37888e7729528576d2167a0d0e6534543007e83636c2ccc765d3dd5b",
+    "scripts/verify_runtime_upgrade.py": "3f66af29bb9cd3ac18b4a44891d12bd6b10f72eeff9073d9b3ee4f73ce7d220d"
+  },
+  "started_at": "2026-11-05T09:35:23.831071+00:00",
+  "tools": {
+    "as_of": "2026-11-03",
+    "platform": "linux/amd64",
+    "source": "Official GitHub Releases asset digests; verify signed checksum bundles before scanner execution",
+    "tools": [
+      {
+        "assets": [
+          {
+            "browser_download_url": "https://github.com/anchore/syft/releases/download/v1.56.0/syft_1.56.0_linux_amd64.tar.gz",
+            "digest": "sha256:1c2493cfcf52d3367d6cb25780d9190c111c2219c34c820574c43e8bae15c528",
+            "name": "syft_1.56.0_linux_amd64.tar.gz"
+          },
+          {
+            "browser_download_url": "https://github.com/anchore/syft/releases/download/v1.56.0/syft_1.56.0_checksums.txt",
+            "digest": "sha256:a2db61bc71f8f7ea8c67fc4a81b8e4e6474386e6a07d104bd2e78e964d5d7ec7",
+            "name": "syft_1.56.0_checksums.txt"
+          },
+          {
+            "browser_download_url": "https://github.com/anchore/syft/releases/download/v1.56.0/syft_1.56.0_checksums.txt.sigstore.json",
+            "digest": "sha256:c038aae4d95fe1d57c338f818cfa227e0b2e2a9dc171e35b7a234f9c9f5b0732",
+            "name": "syft_1.56.0_checksums.txt.sigstore.json"
+          }
+        ],
+        "name": "syft",
+        "repo": "anchore/syft",
+        "tag": "v1.56.0"
+      },
+      {
+        "assets": [
+          {
+            "browser_download_url": "https://github.com/anchore/grype/releases/download/v0.121.1/grype_0.121.1_linux_amd64.tar.gz",
+            "digest": "sha256:bc3ea3f9e6fd56ac781c08c6c5e614271b79f438200757f6932085c19b0a4657",
+            "name": "grype_0.121.1_linux_amd64.tar.gz"
+          },
+          {
+            "browser_download_url": "https://github.com/anchore/grype/releases/download/v0.121.1/grype_0.121.1_checksums.txt",
+            "digest": "sha256:da895035e48970f8d7559662ca4453d2440885cf295ad7517de12cadcccaf3c1",
+            "name": "grype_0.121.1_checksums.txt"
+          },
+          {
+            "browser_download_url": "https://github.com/anchore/grype/releases/download/v0.121.1/grype_0.121.1_checksums.txt.sigstore.json",
+            "digest": "sha256:042ef2b405baec9aeb3a4531a7bb7ce4ee05cdfafbe4755e22f9c11137bf80a6",
+            "name": "grype_0.121.1_checksums.txt.sigstore.json"
+          }
+        ],
+        "name": "grype",
+        "repo": "anchore/grype",
+        "tag": "v0.121.1"
+      },
+      {
+        "assets": [
+          {
+            "browser_download_url": "https://github.com/aquasecurity/trivy/releases/download/v0.76.1/trivy_0.76.1_Linux-64bit.tar.gz",
+            "digest": "sha256:c7cbe3137fb8a48a17574bede3dd6beb16742d1e9772929940fc90082c39d9c0",
+            "name": "trivy_0.76.1_Linux-64bit.tar.gz"
+          },
+          {
+            "browser_download_url": "https://github.com/aquasecurity/trivy/releases/download/v0.76.1/trivy_0.76.1_checksums.txt",
+            "digest": "sha256:885debc41b570179e81af560e5f393a66be29b9ff8c52915674f3eb2304c535d",
+            "name": "trivy_0.76.1_checksums.txt"
+          },
+          {
+            "browser_download_url": "https://github.com/aquasecurity/trivy/releases/download/v0.76.1/trivy_0.76.1_checksums.txt.sigstore.json",
+            "digest": "sha256:f5ed98b7affeff5ed5ab06eb6623e557d038bd1bc216e6125a87454d7e8d0450",
+            "name": "trivy_0.76.1_checksums.txt.sigstore.json"
+          },
+          {
+            "browser_download_url": "https://github.com/aquasecurity/trivy/releases/download/v0.76.1/trivy_0.76.1_Linux-64bit.tar.gz.sigstore.json",
+            "digest": "sha256:6955f0366357d5b44ebe8ab312b5c70c02b59e19203005c8239ae64350669ca1",
+            "name": "trivy_0.76.1_Linux-64bit.tar.gz.sigstore.json"
+          }
+        ],
+        "name": "trivy",
+        "repo": "aquasecurity/trivy",
+        "tag": "v0.76.1"
+      },
+      {
+        "assets": [
+          {
+            "browser_download_url": "https://github.com/sigstore/cosign/releases/download/v3.1.4/cosign-linux-amd64",
+            "digest": "sha256:424e2c97d0b45fd7a6b608a87f090f35633f4c23ece5f092d48bba11aaf4bbfa",
+            "name": "cosign-linux-amd64"
+          },
+          {
+            "browser_download_url": "https://github.com/sigstore/cosign/releases/download/v3.1.4/cosign-linux-amd64.sigstore.json",
+            "digest": "sha256:355244bb0186e950ced20f03106640ba3a4630e1223d0467ff34bcebe10bb18a",
+            "name": "cosign-linux-amd64.sigstore.json"
+          }
+        ],
+        "name": "cosign",
+        "repo": "sigstore/cosign",
+        "tag": "v3.1.4"
+      }
+    ]
+  }
+}

@@ -1,5 +1,9 @@
 # 채희주 개인 실행 계획
 
+11/5 I8/C03 [우선 런타임 패치](../supply-chain-priority-patches.md): 앱·테스트·Lambda 이미지의
+Python/SQLite/pip·HTTP 로컬 patch와 wheel hash lock을 구성하고 로컬 빌드·회귀·mTLS·동일 DB 재검사,
+기존 소비/회수/보관/백업 보존을 실행·측정한다. 앱 정책 변경과 김택희의 독립 검토 실적은 포함하지 않는다.
+
 11/5 C03 [인프라 실제 영향 조건](../supply-chain-impact-review.md): 고정 이미지의 설치/실행 파일·권한·
 native library·공식 vendor를 로컬3회 검토하고 우선 검증/완화 조건과 200항목 대장을 인계한다.
 패치 적용/새 이미지 재검사·독립 검토는 후속이며 앱·의존성·탐지 기준은 이번에 바꾸지 않는다.
