@@ -39,10 +39,10 @@ COLLECTOR = Path("/collector/producer")
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def assets(*, monitoring=False) -> dict[str, dict[str, str]]:
+def assets(*, monitoring=False, issuer=None, trust_bundle=None) -> dict[str, dict[str, str]]:
     """Generate only in-memory private leaf/signing keys; retain no CA private key."""
-    ca = authority("Continuous local runtime CA")
-    ca_pem = ca[1].public_bytes(serialization.Encoding.PEM).decode()
+    ca = issuer or authority("Continuous local runtime CA")
+    ca_pem = trust_bundle or ca[1].public_bytes(serialization.Encoding.PEM).decode()
     servers = ("core-a", "gateway", "bridge-auth", "bridge-consume", "resource", "proxy")
     clients = ("core-operator", "gateway-client", "pep-bridge", "collector", "proxy-auth",
                "bridge-probe", "resource-consumer", "proxy-resource", "resource-auditor", "frontend")

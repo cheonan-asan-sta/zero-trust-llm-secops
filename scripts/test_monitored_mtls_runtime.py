@@ -11,8 +11,8 @@ from scripts.test_continuous_mtls_runtime import Checks
 
 
 class MonitoredChecks(Checks):
-    def __init__(self, directory):
-        super().__init__(directory, runtime_class=MonitoredRuntime)
+    def __init__(self, directory, runtime_class=MonitoredRuntime):
+        super().__init__(directory, runtime_class=runtime_class)
         self.report["schema"] = "monitored-continuous-mtls-verification-1"
         self.scrape = self.notify = None
         self.episode_starts = {}

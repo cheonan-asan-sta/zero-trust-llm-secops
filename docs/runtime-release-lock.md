@@ -1,5 +1,9 @@
 # 3주차 실행 환경 고정과 재시작 전 검증
 
+11/6 [CA leaf 통합 인수](ca-runtime-acceptance.md)는 기존 고정 경로를 재사용하며
+CA tool lock·reload script·16서비스 구조와 제어기 고정 신뢰 설정을 추가 대조한다.
+기존9·관측14서비스 descriptor를 자동 승격하지 않는다.
+
 11/6 후속 [C01 선택형 관측 프로필](persistent-monitoring.md)은 같은 검증 경로를 확장해
 관측 tool/rules·14서비스 구조·도구 이미지/바이너리와 설치된 설정을 추가 고정한다. 아래 기본
 9서비스 측정/근거는 당시 기록으로 보존한다.

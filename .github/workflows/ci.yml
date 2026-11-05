@@ -49,5 +49,13 @@ jobs:
           if [ -f runtime/c02/collector-maintenance-ci/verification.json ]; then
             cat runtime/c02/collector-maintenance-ci/verification.json
           fi
+      - name: Verify CA integration acceptance
+        run: python -m scripts.test_authority_mtls_runtime --directory runtime/c02/authority-acceptance-ci
+      - name: Report CA integration verification
+        if: always()
+        run: |
+          if [ -f runtime/c02/authority-acceptance-ci/verification.json ]; then
+            cat runtime/c02/authority-acceptance-ci/verification.json
+          fi
       - name: Build Lambda image
         run: docker build --platform linux/amd64 --provenance=false --file Dockerfile.lambda --tag zero-trust-llm-secops:lambda-ci .

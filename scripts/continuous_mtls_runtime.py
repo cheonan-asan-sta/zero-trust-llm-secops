@@ -140,6 +140,9 @@ class Runtime:
     def prepare_extra_images(self):
         pass
 
+    def before_start(self):
+        pass
+
     def verify_extra_images(self):
         pass
 
@@ -268,6 +271,7 @@ print(json.dumps({p:hashlib.sha256(Path(p).read_bytes().replace(b'\\r\\n',b'\\n'
         self.verify_public_configuration()
         self.verify_extra_images()
         self.write_manifest()
+        self.before_start()
         self.compose("up", "--detach", timeout=300)
         self.wait(lambda: self.probe({"profile": "core", "path": "/health/live", "method": "GET"})["status"] == 200)
         self.wait(lambda: all(row["running"] for row in self.status()["services"].values()))

@@ -1,5 +1,9 @@
 # zero-trust-llm-secops
 
+11/6 3주차 [CA leaf 통합 인수](docs/ca-runtime-acceptance.md): 기존 지속 실행 관측 경로에
+선택형 CA/제어기를 연결한다. 기본9·관측14서비스를 유지하며 CA 프로필은16서비스다.
+실제 발급·갱신·재적용·CA 장애/재시작·폐기 보존을 인프라 범위에서 검증한다.
+
 ## 2026년 11월 6일 3주차 관측 지속 실행 통합
 
 [선택형 관측 프로필](docs/persistent-monitoring.md)에 Prometheus·Alertmanager·조회/exporter·로컬
