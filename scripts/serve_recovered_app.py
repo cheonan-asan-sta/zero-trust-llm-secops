@@ -1,0 +1,38 @@
+"""Local Docker lab admission gate, before exposing the existing application."""
+
+import argparse
+import os
+import sqlite3
+from pathlib import Path
+
+from app.config import get_settings
+from scripts.app_state_recovery import RecoveryError, local_only, require, verify_admission
+
+
+def admit(data, public):
+    local_only()
+    settings = get_settings()
+    require(settings.analyzer_mode == "rule" and settings.auth_mode == "api_key", "lab_authentication_required")
+    require(settings.zero_trust_db_path.resolve() == (data / "app.sqlite3").resolve(), "database_path_mismatch")
+    registry = data / "sources.json"
+    require((settings.trusted_signal_sources_path is not None and
+             settings.trusted_signal_sources_path.resolve() == registry.resolve()) if registry.exists()
+            else settings.trusted_signal_sources_path is None, "registry_path_mismatch")
+    return verify_admission(data, public)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--data", required=True, type=Path)
+    parser.add_argument("--public", required=True, type=Path)
+    args = parser.parse_args()
+    try:
+        admit(args.data, args.public)
+    except (RecoveryError, OSError, ValueError, TypeError, LookupError, RuntimeError, sqlite3.Error):
+        raise SystemExit("RECOVERY_ADMISSION_DENIED") from None
+    os.execvp("uvicorn", ["uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", "8000",
+                          "--no-access-log"])
+
+
+if __name__ == "__main__":
+    main()

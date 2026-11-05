@@ -1,5 +1,10 @@
 # 개발 주차별 산출물
 
+11/5 3주차 I4: [앱 보안 DB 백업·복구/잔여 표](app-state-recovery.md),
+[로컬 선택 검증 JSON](infrastructure-results/app-state-recovery-20261105.json).
+모든 기록자 정지·최신 checkpoint·암호화·기존 세션 회수·서명 기동과 원본 유실 복구를 검사한다.
+CA 복구와 구분하며 JSONL 전체 복구·선정 인프라 통합·독립 검토는 남긴다.
+
 11/5 I8/C03 후속: [우선 취약점 런타임 패치·재현](supply-chain-priority-patches.md),
 [검증 근거](infrastructure-results/c03-priority-patches-20261105.json),
 [새 이미지·동일 DB 재검사](infrastructure-results/c03-patched-scan-20261105.json).
