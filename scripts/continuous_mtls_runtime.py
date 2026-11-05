@@ -102,6 +102,9 @@ def compose_spec(project: str, image: str, nginx_image: str) -> dict:
 
 
 class Runtime:
+    services = SERVICES
+    volumes = VOLUMES
+
     def __init__(self, directory: Path):
         self.directory = Path(directory).resolve()
         if not self.directory.is_relative_to((ROOT / "runtime/c02").resolve()):
@@ -115,7 +118,7 @@ class Runtime:
         state = json.loads(self.descriptor.read_text())
         project = state.get("project", "")
         if (state.get("schema") != "continuous-mtls-runtime-1" or PROJECT.fullmatch(project) is None
-                or state.get("volumes") != {n: project + "-" + n for n in VOLUMES}
+                or state.get("volumes") != {n: project + "-" + n for n in self.volumes}
                 or state.get("image") != project + "-app"):
             raise ValueError("runtime_descriptor_scope")
         self.state = state
@@ -124,8 +127,24 @@ class Runtime:
         return state
 
     def release_inputs(self):
-        return release.capture(ROOT, compose_spec("kmtls-000000000000", "sha256:" + "0" * 64,
-                                                 "sha256:" + "1" * 64))
+        return release.capture(ROOT, self.definition("kmtls-000000000000", "sha256:" + "0" * 64,
+                                                    "sha256:" + "1" * 64))
+
+    def definition(self, project, image, nginx):
+        return compose_spec(project, image, nginx)
+
+    def make_assets(self):
+        from scripts.continuous_mtls_assets import assets
+        return assets()
+
+    def prepare_extra_images(self):
+        pass
+
+    def verify_extra_images(self):
+        pass
+
+    def expected_image(self, service):
+        return self.state["nginx_image_id"] if service == "proxy" else self.state["image_id"]
 
     def verify_release(self):
         return release.verify(self.state.get("release"), self.release_inputs())
@@ -141,8 +160,10 @@ class Runtime:
         nginx = self.state.get("nginx_image_id")
         if nginx is None:
             nginx = "nginx@sha256:" + "0" * 64
-        spec = compose_spec(self.state["project"], self.state.get("image_id", self.state["image"]), nginx)
-        for service in spec["services"].values():
+        spec = self.definition(self.state["project"], self.state.get("image_id", self.state["image"]), nginx)
+        for name, service in spec["services"].items():
+            if "image_id" in self.state and (name != "proxy" or self.state.get("nginx_image_id")):
+                service["image"] = self.expected_image(name)
             service.update(pull_policy="never", platform="linux/amd64")
         self.manifest.write_text(yaml.safe_dump(spec))
         self.empty_env.write_text("")
@@ -174,12 +195,11 @@ for name,body in json.load(sys.stdin).items():
                 raise RuntimeFailure("runtime_initialization_incomplete")
             self.verify_release()
         else:
-            from scripts.continuous_mtls_assets import assets
             captured = self.release_inputs()
             self.directory.mkdir(parents=True, exist_ok=True)
             project = "kmtls-" + uuid.uuid4().hex[:12]
             self.state = {"schema": "continuous-mtls-runtime-1", "project": project, "image": project + "-app",
-                          "volumes": {n: project + "-" + n for n in VOLUMES}, "initialized": False,
+                          "volumes": {n: project + "-" + n for n in self.volumes}, "initialized": False,
                           "release": captured}
             self.save()
             self.write_manifest()
@@ -216,12 +236,13 @@ print(json.dumps({p:hashlib.sha256(Path(p).read_bytes().replace(b'\\r\\n',b'\\n'
             if copied != payload_files:
                 raise RuntimeFailure("runtime_release_image_payload_mismatch")
             self.state["release_image_payload_verified"] = True
+            self.prepare_extra_images()
             self.state["configuration_sha256"] = {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
                 for name in ("Dockerfile", "pyproject.toml", "infra/pep/tools.lock.json", "infra/mtls/all-hops-nginx.conf")}
             self.state["configuration_sha256"].update({p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
                 for p in sorted((ROOT / "infra/runtime").rglob("*")) if p.is_file() and "__pycache__" not in p.parts})
             self.save()
-            material = assets()
+            material = self.make_assets()
             for label, volume in self.state["volumes"].items():
                 command(["docker", "volume", "create", "--label", "secops.runtime=" + project, volume])
                 detail = json.loads(command(["docker", "volume", "inspect", volume]))[0]
@@ -245,6 +266,7 @@ print(json.dumps({p:hashlib.sha256(Path(p).read_bytes().replace(b'\\r\\n',b'\\n'
                                     (self.state["nginx_image_id"], self.state["nginx_image_id"])):
             release.image_identity(json.loads(command(["docker", "image", "inspect", reference]))[0], expected)
         self.verify_public_configuration()
+        self.verify_extra_images()
         self.write_manifest()
         self.compose("up", "--detach", timeout=300)
         self.wait(lambda: self.probe({"profile": "core", "path": "/health/live", "method": "GET"})["status"] == 200)
@@ -261,7 +283,7 @@ print(json.dumps({p:hashlib.sha256(Path(p).read_bytes().replace(b'\\r\\n',b'\\n'
             raise RuntimeFailure("runtime_public_configuration_changed")
 
     def container(self, service):
-        if service not in SERVICES:
+        if service not in self.services:
             raise ValueError("runtime_service_scope")
         ident = self.compose("ps", "--all", "--quiet", service).strip()
         if not re.fullmatch(r"[a-f0-9]{12,64}", ident):
@@ -298,7 +320,7 @@ print(json.dumps({p:hashlib.sha256(Path(p).read_bytes().replace(b'\\r\\n',b'\\n'
 
     def status(self):
         rows = {}
-        for name in SERVICES:
+        for name in self.services:
             info = json.loads(command(["docker", "inspect", self.container(name)]))[0]
             rows[name] = {"running": info["State"]["Running"], "restart_count": info["RestartCount"],
                           "restart_policy": info["HostConfig"]["RestartPolicy"]["Name"]}
@@ -307,7 +329,7 @@ print(json.dumps({p:hashlib.sha256(Path(p).read_bytes().replace(b'\\r\\n',b'\\n'
     def down(self, *, purge=False):
         self.load()
         # Only this generated project; never prune the engine or other workloads.
-        for name in SERVICES:
+        for name in self.services:
             try:
                 self.container(name)
             except RuntimeFailure as exc:

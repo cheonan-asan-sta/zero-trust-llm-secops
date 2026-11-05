@@ -1,5 +1,9 @@
 # mTLS 기반 로컬 지속 실행
 
+11/6 [선택형 관측 통합](persistent-monitoring.md)은 `scripts.monitored_mtls_runtime`으로 별도
+실행한다. 이 문서의 기본 9개 서비스 경로는 유지하며 관측 프로필은 14개 서비스/8개 내부망과
+전용 TSDB·Alertmanager 저장소를 사용한다. 두 프로필의 descriptor를 혼용하지 않는다.
+
 11/6 [3주차 실행 환경 고정](runtime-release-lock.md)을 적용했다. 최초 생성 때 입력/실행 구조와
 앱/NGINX image ID를 기록하고 재시작에 대조한다. release 없는 과거 환경은 자동 승인하지 않으며,
 다른 소스/이미지/설정이면 시작을 거부한다. 상태 조회·범위 검증된 종료/정리는 가능하다.

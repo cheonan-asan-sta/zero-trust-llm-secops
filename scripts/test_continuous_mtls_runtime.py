@@ -11,14 +11,14 @@ from itertools import pairwise
 from pathlib import Path
 
 from scripts.continuous_mtls_assets import DEVICES, OTHER
-from scripts.continuous_mtls_runtime import ROOT, SERVICES, Runtime, RuntimeFailure, command
+from scripts.continuous_mtls_runtime import ROOT, Runtime, RuntimeFailure, command
 from scripts.pep_lab import DOCUMENT_HASH
 from scripts.runtime_release import digest
 
 
 class Checks:
-    def __init__(self, directory):
-        self.runtime = Runtime(directory)
+    def __init__(self, directory, runtime_class=Runtime):
+        self.runtime = runtime_class(directory)
         if self.runtime.descriptor.exists():
             raise ValueError("validation_requires_fresh_directory")
         self.path = Path(directory) / "verification.json"
@@ -87,12 +87,12 @@ class Checks:
         before = self.credential_fingerprints()
         runtime.up()
         spec = json.loads(runtime.compose("config", "--format", "json"))
-        self.require(set(spec["services"]) == set(SERVICES), "release_service_inventory")
+        self.require(set(spec["services"]) == set(runtime.services), "release_service_inventory")
         for name, service in spec["services"].items():
-            image_id = state["nginx_image_id"] if name == "proxy" else state["image_id"]
+            image_id = runtime.expected_image(name)
             self.require(service["image"] == image_id and service["pull_policy"] == "never"
                          and self.inspect(name)["Image"] == image_id, "release_running_image_drift")
-        self.add("compose_rebuilt_with_local_image_ids", service_count=len(SERVICES), automatic_pull=False)
+        self.add("compose_rebuilt_with_local_image_ids", service_count=len(runtime.services), automatic_pull=False)
         self.require(self.credential_fingerprints() == before, "release_resume_replaced_credentials")
         self.add("clean_resume_preserves_credential_volume_fingerprints", volumes=4)
 
@@ -605,7 +605,7 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
         self.report["image_source_verified"] = runtime.state["image_source_verified"]
         self.release_phase()
         hardening = {}
-        for service in SERVICES:
+        for service in runtime.services:
             data = self.inspect(service)
             host = data["HostConfig"]
             self.require(data["Config"]["User"] == "10001:10001" and host["ReadonlyRootfs"]
@@ -621,10 +621,13 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
                                   "init": True, "uid": "10001:10001", "read_only": True, "published_ports": False}
         nets = [json.loads(line) for line in command(["docker", "network", "ls", "--filter",
                 "label=secops.runtime=" + runtime.state["project"], "--format", "{{json .}}"]).splitlines()]
-        self.require(len(nets) == 6, "runtime_network_count")
+        network_count = len(runtime.definition(runtime.state["project"], "app", "nginx")["networks"])
+        self.require(len(nets) == network_count, "runtime_network_count")
         for network in nets:
             self.require(json.loads(command(["docker", "network", "inspect", network["ID"]]))[0]["Internal"], "runtime_external_network")
-        self.add("nine_hardened_services_and_six_internal_networks", services=hardening)
+        self.add("nine_hardened_services_and_six_internal_networks" if len(runtime.services) == 9
+                 else "monitored_hardened_services_and_internal_networks", services=hardening, networks=network_count)
+        self.integration_checks()
         self.journal_boundary()
         self.journal_phase()
         self.security_versions()
@@ -736,6 +739,9 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
         self.add("collector_worker_watchdog_app_continue_without_reviving_access")
         self.report["completed"] = True
 
+    def integration_checks(self):
+        pass
+
     def cleanup(self):
         if self.runtime.descriptor.exists():
             self.runtime.down(purge=True)
@@ -753,8 +759,13 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--directory", type=Path, default=ROOT / "runtime/c02/continuous-mtls-validation")
+    parser.add_argument("--monitoring", action="store_true", help="Include the optional C01 monitored profile")
     args = parser.parse_args()
-    checks = Checks(args.directory)
+    if args.monitoring:
+        from scripts.test_monitored_mtls_runtime import MonitoredChecks
+        checks = MonitoredChecks(args.directory)
+    else:
+        checks = Checks(args.directory)
     try:
         checks.run()
     except (RuntimeFailure, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as exc:
