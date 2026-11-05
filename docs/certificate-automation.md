@@ -1,5 +1,8 @@
 # 로컬 인증서 자동 발급·갱신
 
+11/6 후속 [지속 실행 CA leaf 통합 인수](ca-runtime-acceptance.md)는 아래 제어기를 실제
+지속 실행 관측 프로필에 연결한다. 아래 별도 캠페인/당시 수치와 새 통합 인수 근거를 구분한다.
+
 후속 [CA 프로세스 HA](ca-high-availability.md)는 공유 PostgreSQL·CA 2대·관리 클라이언트 연결 전환을
 별도 opt-in 프로필로 추가한다. 아래 단일 CA/CLI 갱신 시험은 당시 기준선이며 DB/호스트 HA와 구분한다.
 

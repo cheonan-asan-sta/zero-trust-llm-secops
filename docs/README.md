@@ -1,5 +1,8 @@
 # 개발 주차별 산출물
 
+11/6 [CA leaf 통합 인수](ca-runtime-acceptance.md): 기존 자동화 제어기와 관측 지속 실행
+경로를 연결한다. CA/제어기 전용 상태·망·발급 권한을 구분하고 실패/재개 원자료를 남긴다.
+
 11/6 3주차 [C01 선택형 관측 지속 실행](persistent-monitoring.md): 기존 mTLS 경로와
 Prometheus/Alertmanager·조회/exporter·시험 알림 수신기를 연결한다. 경보 episode·복구 해제·
 저장/설정 보존과 기존 보안 회귀를 함께 검증하며 운영 선정·독립 재현은 남긴다.

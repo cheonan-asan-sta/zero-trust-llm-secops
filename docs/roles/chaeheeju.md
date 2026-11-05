@@ -1,5 +1,11 @@
 # 채희주 개인 실행 계획
 
+11/6 3주차 [CA leaf 통합 인수](../ca-runtime-acceptance.md): 채희주가 CA/제어기·기존
+업무/관측 TLS의 연결, 발급/타이머 갱신·재적용·장애/재시작·폐기 보존·실행 환경 고정을
+구성·실행·측정했다. 집중237·Linux2050·실제CA29 통과/소유 자원0을
+[원자료](../infrastructure-results/ca-runtime-acceptance-20261106.json)에 기록했다.
+앱/탐지·정책은 재사용하며 CA 키/HA의 통합·전체 저장 계약은 별도다.
+
 11/6 3주차 [C01 관측 지속 실행 통합](../persistent-monitoring.md): 채희주가 mTLS 관측 신원·
 viewer 조회·별도 관측망·Prometheus/Alertmanager 저장/설정 고정·실제 경보/해제·재시작/실패를
 구성·실행·측정했다. 최종 관측71·기본9 호환4·집중129·Linux 전체2021 통과와 소유 시험 자원 정리를

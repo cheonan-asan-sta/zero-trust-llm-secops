@@ -1,5 +1,26 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 6일 CA leaf 지속 실행 통합 인수
+
+- [CA leaf 인수](docs/ca-runtime-acceptance.md): `scripts.authority_mtls_runtime` 선택형16서비스/9내부망.
+  기존9·관측14서비스는 유지하고 별도 CA/제어기·39개 신원/11서버의 발급·갱신을 연결한다.
+- root/최초 bootstrap 서명키는 드라이버 RAM, 암호화 issuer와 DB는 CA 전용 볼륨이다.
+  제어기는 중앙 신뢰 관리 영역이며 업무 DB/API 키·수집 서명키·CA 서명키/Docker socket은 없다.
+  관측 TLS 볼륨에 함께 있는 scrape/notify 토큰은 읽을 수 있으므로 이 한계는 숨기지 않는다.
+- 기존 CSR 결합 grant·pin 겹침/교체·NGINX/Go ack/실제 TLS 관측·구 pin 제거를 재사용한다.
+  사용한 grant 삭제, 초기화 중단의 무승인 재등록 거부, 고정 관리 설정/공개 CA 입력 불일치 선거부를 추가한다.
+- CA 최초 생성 승인 파일을 exec 전에 한 번 소비하고 이후 Badger metadata/marker를 요구한다.
+  호스트 up과 CA entrypoint가 각각 검사해 DB 전체 유실을 빈 DB 자동 생성으로 숨기지 않는다.
+  기존 DB를 보존 이동한 실패 주입·직접 CA 컨테이너 시작 차단·같은 DB 복원/폐기 보존을 별도 검증한다.
+  이 기동 보호를 임의 DB rollback·부분 손상·전원 손실의 백업/복원 승인으로 확대하지 않는다.
+- 실제 CA/제어기 재시작·DB 폐기 보존·유효 업무/관측 경로·disabled/pin 회수 보존·정상 재개를 검증한다.
+  CA serial 폐기와 즉시 업무 peer pin 회수를 구분한다. 만료 자동 재등록 금지는 unit 회귀 범위다.
+- 최종 집중237/신규29·Linux 전체2050/기존 경고2·실제 CA29가 통과했고 소유 컨테이너/볼륨/망은0이다.
+  [원자료](docs/infrastructure-results/ca-runtime-acceptance-20261106.json)에 실패9/7·중간26·최종29와
+  입력156/image payload·이전 Linux2043의 소스 차이를 구분했다. 정확한 head/병합 후 CI는 PR에 남긴다.
+- CA/JWK·개인키 교체 및 CA HA/공유 DB 호스트 복구의 이 프로필 통합, 전체 JSONL 저장 계약·
+  새 Go 도구 이미지 공급망 검토·운영 채택·김택희 독립 대조는 남긴다. 탐지/정책·기준선은 유지한다.
+
 ## 2026년 11월 6일 C01 관측 지속 실행 통합
 
 - [선택형 관측 프로필](docs/persistent-monitoring.md): `scripts.monitored_mtls_runtime`을 사용한다.
