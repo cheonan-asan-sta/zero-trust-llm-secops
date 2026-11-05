@@ -2,14 +2,16 @@
 
 ## 2026년 11월 5일 3주차 I4 앱 정비 복구
 
-- [새 관리 경로/남은 주차 표](docs/app-state-recovery.md), 공개 `app-state-recovery-20261105.json`을 먼저 읽는다.
+- [새 관리 경로/남은 주차 표](docs/app-state-recovery.md), 공개 `app-state-recovery-checkpoint-20261105.json`을 먼저 읽는다.
+- 후속 보강: snapshot 전에 다음 세대 차단 pin을 저장하고, anchor와 public 세대 불일치는 백업/복원을 거부한다.
+  초기 PR #30의 병합 후 CI는 후속 검증으로 대체하려고 취소했다. 취소를 통과로 기록하지 않는다.
 - `scripts.app_state_recovery`는 앱 SQLite journal/inbox와 registry를 백업한다. CA 복구나 구→신 런타임
   호환 시험과 별개다. 기존 앱/정책/탐지 기준은 수정하지 않았고 기존 회수 함수를 재사용한다.
 - **모든 쓰기 프로세스를 정지·봉쇄한 정비 경계만 지원**한다. 저수준 CLI는 외부 기록자를 발견하지 않는다.
   checkpoint·anchor·관리 키는 백업 밖에서 보호한다. 전체 제어 저장소 rollback/운영 HA 보장은 없다.
 - 복원 전 모든 테넌트/세션 회수, inbox·압축 이력 보존, 현재 public pin/서명·journal prefix 검증을 거쳐 기동한다.
   일반 앱에 관리 키/백업 볼륨을 연결하지 않는다. 사건/감사/outbox JSONL 전체 복구는 후속이다.
-- Docker 원본 DB 파괴·복구·실제 API 키 HTTP 403과 TTL 고정 대조·변조/구 백업 거부 15개 검사를 통과했다.
+- Docker 원본 DB 파괴·복구·실제 API 키 HTTP 403과 TTL 고정 대조·변조/구 백업 거부 18개 검사를 통과했다.
   source 지문·원자료·자원 정리를 남기고 CI에서 현재 이미지로 동일 검사를 실행한다.
 - 채희주 구성/도구 실행·측정이며 김택희 상태 의미/독립 검토는 미완료다. 통합 버전 lock·C01~C03
   최종 판정·전체 저장 계약은 남아 있다. 3주차 전체 완료, 탐지 품질 개선, 운영 RPO 0으로 표현하지 않는다.
