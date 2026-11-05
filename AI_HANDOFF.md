@@ -1,5 +1,23 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 6일 3주차 실행 환경 고정
+
+- [release lock/재현/범위](docs/runtime-release-lock.md): `scripts.runtime_release`와 기존 지속 실행기의
+  최초 입력 고정·재시작 대조를 확인한다. 앱/정책·탐지 코드는 변경하지 않았다.
+- app 전체·scripts Python·runtime build/lock·NGINX 설정·실행 구조가 release 입력이다. 파일 목록의
+  추가/삭제도 변경이다. 문서/bytecode는 제외하고 CRLF/LF는 정규화한다.
+- 앱 tag가 다른 ID로 바뀌거나 고정 이미지/플랫폼·설치된 공개 프록시 설정이 다르면 시작을 거부한다.
+  실제 Compose는 앱/NGINX의 로컬 image ID와 pull_policy=never로 생성한다.
+- release 없는 과거 descriptor는 자동 재봉인/승인하지 않는다. 조회/범위 검증된 종료·정리는 허용한다.
+  소스 변경은 새 환경 인수 검증 대상이며 기존 데이터의 자동 이관/초기화로 해결하지 않는다.
+- release는 신뢰 호스트의 공개 지문이다. 서명/외부 승인/악성 root 방어/바이트 재현 빌드가 아니다.
+  시작 전 gate이며 불일치를 발견해 이미 실행 중인 앱을 자동 강제 종료하지 않는다.
+- 키·동적 registry는 기존 검증을 따르며 정상 재개에서 새로 발급하지 않는다. C01 통합/CA 연결·
+  전체 JSONL 저장 계약·C01~C03 최종 판정과 김택희 독립 대조는 미완료다.
+- 로컬 최종 통합48/48·정리0, 입력145·집중91 통과. 공개 `runtime-release-lock-20261106.json`에
+  초기 실패21개와 최종 성공을 구분했다. 검증기 상태 snapshot 경쟁 경로를 재현/보완했으며
+  앱/정책/TTL은 바꾸지 않았다. 초기 전체 회귀 수치를 보완 후 최종 전체 회귀로 바꾸어 기록하지 않는다.
+
 ## 2026년 11월 5일 3주차 I4 앱 정비 복구
 
 - [새 관리 경로/남은 주차 표](docs/app-state-recovery.md), 공개 `app-state-recovery-checkpoint-20261105.json`을 먼저 읽는다.

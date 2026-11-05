@@ -1,5 +1,9 @@
 # mTLS 기반 로컬 지속 실행
 
+11/6 [3주차 실행 환경 고정](runtime-release-lock.md)을 적용했다. 최초 생성 때 입력/실행 구조와
+앱/NGINX image ID를 기록하고 재시작에 대조한다. release 없는 과거 환경은 자동 승인하지 않으며,
+다른 소스/이미지/설정이면 시작을 거부한다. 상태 조회·범위 검증된 종료/정리는 가능하다.
+
 기존 native TLS, `mtls_transport`, `pep_lab`, NGINX의 all-hops 경로에 app·수집기·worker·watchdog를 연결하는 local/test 전용 Docker 프로필입니다. 이전 시험 캠페인의 마지막 상태를 이어 쓰지 않고 새 프로젝트, 정적 임시 CA와 named volume을 만듭니다. 실제 IdP·EDR 연결, 탐지 모델·임계값 변경과 운영 배포는 포함하지 않습니다.
 
 ## 실행과 보존
