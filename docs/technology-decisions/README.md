@@ -1,5 +1,8 @@
 # 기술 비교와 선정 대장
 
+11/5 C03 [우선 런타임 패치·재검사](../supply-chain-priority-patches.md): 새 이미지에서 고정 DB로
+양 검사기 결과와 잔여를 기록했다. 로컬 backport·Deb 유지보수·범위 차이를 근거에 포함하며 최종 선정은 미완료다.
+
 11/5 C04 후속 [CA·DB·leaf 서비스 데몬 복구](../service-daemon-recovery.md): 기존 Docker/DB/CA와
 현재 보안 checkpoint를 재사용해 고정 서비스만 순서대로 재개한다. 실험 근거와 운영 한계를 연결 문서에
 기록하며, 신규 분산 제품 채택·물리 HA·독립 검토 완료로 해석하지 않는다.

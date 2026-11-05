@@ -1,5 +1,9 @@
 # 김택희 개인 실행 계획
 
+11/5 C03 [패치 후 독립 인계](../supply-chain-priority-patches.md): 실제 SQL/DB/WAL/changeset 입력,
+HTTP 간접 사용과 새 런타임의 소비·회수·복원 의미를 독립 확인한다. 잔여/disputed/공급자 기록 차이를
+검토하며 완료 상태는 아직 pending이다. 컨테이너 구성·실행·측정은 채희주 담당 기록으로 구분한다.
+
 11/5 C03 [영향 조건 인계](../supply-chain-impact-review.md): SQLite SQL/DB/WAL/changeset·base64
 canonicalization과 간접 기능의 실제 앱 도달성을 독립 대조한다. native library/기능 포함과 권한/빌드
 검토는 채희주 담당 실적으로 구분하며, 이 문서는 김택희의 검토 완료 증거가 아니다.

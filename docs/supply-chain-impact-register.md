@@ -1,5 +1,8 @@
 # C03 인프라 영향 조건 200항목 대장
 
+후속 패치/현재 이미지 상태는 [런타임 패치 기록](supply-chain-priority-patches.md)을 따른다.
+아래 내용과 200항목 JSON은 과거 이미지의 패치 전 snapshot으로 보존한다.
+
 2026년 11월 5일 · 채희주 인프라 검토 / Codex 도구 보조.
 
 대상·실제 probe·출처와 해석은 [영향 검토 본문](supply-chain-impact-review.md)을 따른다.

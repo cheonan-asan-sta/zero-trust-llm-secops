@@ -1,14 +1,43 @@
-FROM public.ecr.aws/lambda/python:3.12
+FROM public.ecr.aws/lambda/python@sha256:6e64b9e33e8dd79ba53dffe424b6c407fc7647b19aae2aa2e4fb5a97373467eb AS runtime-build
+ENV PYTHONDONTWRITEBYTECODE=1 PIP_DISABLE_PIP_VERSION_CHECK=1
+COPY infra/runtime /runtime-build
+RUN python /runtime-build/build_runtime.py patch-http
+RUN dnf install -y gcc glibc-devel && dnf clean all
+RUN python /runtime-build/build_runtime.py build-sqlite --profile lambda --assets /runtime-assets
+
+FROM public.ecr.aws/lambda/python@sha256:6e64b9e33e8dd79ba53dffe424b6c407fc7647b19aae2aa2e4fb5a97373467eb AS patched-runtime
+ENV PYTHONDONTWRITEBYTECODE=1 PIP_DISABLE_PIP_VERSION_CHECK=1
+RUN dnf upgrade -y && dnf clean all
+COPY --from=runtime-build /var/lang/lib/python3.12/http/client.py /var/lang/lib/python3.12/http/client.py
+COPY --from=runtime-build /runtime-assets /runtime-assets
+COPY infra/runtime /opt/secops-runtime/install
+RUN python /opt/secops-runtime/install/build_runtime.py install-library --assets /runtime-assets \
+    && python /opt/secops-runtime/install/build_runtime.py bootstrap-pip --assets /runtime-assets \
+    && cp /runtime-assets/runtime.json /opt/secops-runtime/runtime.json \
+    && rm -r /runtime-assets \
+    && python /opt/secops-runtime/install/build_runtime.py verify --assets /opt/secops-runtime
+
+FROM patched-runtime AS project-wheel
+WORKDIR /build/project
+COPY pyproject.toml README.md ./
+COPY app ./app
+RUN python -m pip install --only-binary=:all: --require-hashes -r /opt/secops-runtime/install/requirements/build.lock \
+    && python /opt/secops-runtime/install/build_runtime.py build-project --assets /project-wheel
+
+FROM patched-runtime AS application
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_DEFAULT_TIMEOUT=300 \
     PIP_RETRIES=5
 
-RUN dnf upgrade -y && dnf clean all
-
 COPY pyproject.toml README.md ./
 COPY app ./app
+COPY --from=project-wheel /project-wheel /project-wheel
 
-RUN --mount=type=cache,target=/root/.cache/pip pip install .
+RUN --mount=type=cache,target=/root/.cache/pip \
+    python -m pip install --only-binary=:all: --require-hashes -r /opt/secops-runtime/install/requirements/runtime.lock \
+    && python -m pip install --no-index --no-deps --require-hashes -r /project-wheel/project.lock \
+    && python -m pip check \
+    && rm -r /project-wheel
 
 CMD ["app.main.handler"]

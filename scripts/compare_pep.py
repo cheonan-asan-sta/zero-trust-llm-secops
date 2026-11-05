@@ -61,8 +61,10 @@ class Lab:
         flow.require("--with-http_auth_request_module" in version.stderr, "c02_nginx_auth_module")
         self.report["nginx_auth_request_module_verified"] = True
         paths = [*[p for p in sorted((ROOT / "app").rglob("*")) if p.suffix in {".py", ".json", ".yaml", ".yml"}], ROOT / "Dockerfile", ROOT / "pyproject.toml",
-                 ROOT / "scripts/pep_lab.py", ROOT / "scripts/compare_pep.py", *sorted((ROOT / "infra/pep").glob("*"))]
-        self.report["source_input_sha256"] = {p.relative_to(ROOT).as_posix(): sha256(p) for p in paths if p.is_file()}
+                 ROOT / "scripts/pep_lab.py", ROOT / "scripts/compare_pep.py", *sorted((ROOT / "infra/pep").glob("*")),
+                 *sorted((ROOT / "infra/runtime").rglob("*"))]
+        self.report["source_input_sha256"] = {p.relative_to(ROOT).as_posix(): sha256(p) for p in paths
+                                             if p.is_file() and "__pycache__" not in p.parts}
         self.save()
 
     def start(self, name, network, argv, *, image=None, mounts=(), env=None, alias=None, memory=128, cpus=.25, additional=()):

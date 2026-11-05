@@ -179,6 +179,8 @@ for name,body in json.load(sys.stdin).items():
             self.state["image_source_verified"] = True
             self.state["configuration_sha256"] = {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
                 for name in ("Dockerfile", "pyproject.toml", "infra/pep/tools.lock.json", "infra/mtls/all-hops-nginx.conf")}
+            self.state["configuration_sha256"].update({p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+                for p in sorted((ROOT / "infra/runtime").rglob("*")) if p.is_file() and "__pycache__" not in p.parts})
             self.save()
             material = assets()
             for label, volume in self.state["volumes"].items():

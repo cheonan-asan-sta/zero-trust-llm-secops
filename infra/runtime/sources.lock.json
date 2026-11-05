@@ -1,0 +1,60 @@
+{
+  "debian_base": "python@sha256:1148dbb014615300fa7e713b2f94f550c0d1c69780c0805f84f093ceee34dd0b",
+  "debian_base_tag_at_capture": "python:3.12.16-slim-trixie",
+  "ensurepip": {
+    "after_sha256": "5946b1d405e3650a310f4a85b1a48bdf4182f03397e069ff34f9fd7a1422217a",
+    "before_sha256": "90f6c76cd9ef7ed6daa198bb9ef771139683487f1b061211be7aa511831b2028",
+    "maintenance": "Local bundled pip version update; CPython ensurepip algorithm unchanged.",
+    "old_version": "25.0.1",
+    "old_wheel_sha256": "c46efd13b6aa8279f33f2864459c8ce587ea6a1a59ee20de055868d8f7688f7f"
+  },
+  "http_client": {
+    "after_sha256": "a713e5531a886739b3e2be7871c1bb239528f1025f5589f0a0e521c2a922f869",
+    "backport_commit": "1c8d928392cf0b4e84e392eb12f34557c9a0373f",
+    "backport_status_at_review": "open_PR_160772_not_an_upstream_3.12_release",
+    "base_url": "https://github.com/python/cpython/blob/v3.12.16/Lib/http/client.py",
+    "before_sha256": "c2c0694155837d72fc710a4138e5d1e53ae1a652b117a2e23a5b1b0db527a0f9",
+    "merged_main_commit": "2eb2af805c156ca52b316bb4ced5e0ab3971d0ae",
+    "ows_fix_commit": "9f52b443c002cccfb54bda0706a9276b6b4a109d",
+    "patch_sha256": "73bb32ef9b713ad796751bb1e8df5104974255e71e03e3b69d339c53568de701",
+    "upstream_backport_file_sha256": "2590d9284866458cc6d2b7c0b726338867ea6bb849581945562913f035835c67"
+  },
+  "lambda_base": "public.ecr.aws/lambda/python@sha256:6e64b9e33e8dd79ba53dffe424b6c407fc7647b19aae2aa2e4fb5a97373467eb",
+  "lambda_base_tag_at_capture": "public.ecr.aws/lambda/python:3.12",
+  "pip": {
+    "filename": "pip-26.3-py3-none-any.whl",
+    "sha256": "f3b60b20ffaadd4415ed7957212a38ac63fa4c5fa375bd0f4a797777940fad13",
+    "url": "https://files.pythonhosted.org/packages/07/25/ee8c38ae72d66b844ce8eb9711ba905dba21ca1a8a0c960057c41cd23337/pip-26.3-py3-none-any.whl",
+    "version": "26.3"
+  },
+  "platform": "linux/amd64",
+  "python_version": "3.12.16",
+  "schema": "secops-runtime-sources-1",
+  "sqlite": {
+    "sha256": "926ef8d3eab93fbf6e06011901273eec076b25594a4e1cdadd50c987f4f6d64e",
+    "sha3_256": "b6ced585c750916b1052667239a12c25a7ff34e7f06e1e6e01ecb0427657d9c4",
+    "source_id": "2026-10-16 14:45:20 555e07ef33f69a0957d24d8e555b702464a131d6f1607f4c3c1e4551e8e6ca76",
+    "url": "https://www.sqlite.org/2026/sqlite-autoconf-3540100.tar.gz",
+    "version": "3.54.1"
+  },
+  "sqlite_compile_defines": [
+    "SQLITE_THREADSAFE=1",
+    "SQLITE_ENABLE_COLUMN_METADATA",
+    "SQLITE_ENABLE_DBSTAT_VTAB",
+    "SQLITE_ENABLE_FTS3",
+    "SQLITE_ENABLE_FTS3_PARENTHESIS",
+    "SQLITE_ENABLE_FTS3_TOKENIZER",
+    "SQLITE_ENABLE_FTS4",
+    "SQLITE_ENABLE_FTS5",
+    "SQLITE_ENABLE_RTREE",
+    "SQLITE_ENABLE_SESSION",
+    "SQLITE_ENABLE_PREUPDATE_HOOK",
+    "SQLITE_ENABLE_UNLOCK_NOTIFY",
+    "SQLITE_ENABLE_MATH_FUNCTIONS",
+    "SQLITE_ENABLE_LOAD_EXTENSION",
+    "SQLITE_SECURE_DELETE",
+    "SQLITE_LIKE_DOESNT_MATCH_BLOBS",
+    "SQLITE_DEFAULT_RECURSIVE_TRIGGERS",
+    "SQLITE_MAX_EXPR_DEPTH=1000"
+  ]
+}
