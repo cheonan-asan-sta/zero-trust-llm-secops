@@ -1,5 +1,9 @@
 # 김택희 개인 실행 계획
 
+11/5 C03 [영향 조건 인계](../supply-chain-impact-review.md): SQLite SQL/DB/WAL/changeset·base64
+canonicalization과 간접 기능의 실제 앱 도달성을 독립 대조한다. native library/기능 포함과 권한/빌드
+검토는 채희주 담당 실적으로 구분하며, 이 문서는 김택희의 검토 완료 증거가 아니다.
+
 11/5 C03 후속 인계 [발견 차이 재분석](../supply-chain-findings-review.md): 공급자 alias와 실제 영향의
 구분, 변조/누락 거부·패키지 범위 혼동을 독립 대조하고 앱 영향 검토를 보탠다. 이 검토는 미완료다.
 재분석기 구현·실행·인프라 원자료는 채희주 담당이며 이 기록을 김택희의 수행 실적으로 취급하지 않는다.
