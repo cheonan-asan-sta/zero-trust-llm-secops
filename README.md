@@ -1,5 +1,11 @@
 # zero-trust-llm-secops
 
+## 2026년 11월 5일 공급망 검사 차이 재분석
+
+[C03 검토 도구](docs/supply-chain-findings-review.md)는 보관한 입력 27개의 지문과 반복/대조군을
+검증해 같은 ID 180건·직접 alias 6건·한쪽 전용 14건과 심각도 차이 78건을 재현합니다.
+200개 항목은 모두 실제 영향 미검토입니다. 과거 이미지의 오프라인 재분석이며 새 스캔·취약점 해결·도구 선정과 구분합니다.
+
 ## 2026년 11월 5일 후속 CA·DB·leaf 데몬 복구
 
 [서비스 복구](docs/service-daemon-recovery.md)는 사전 식별 기록에 고정한 CA/DB 호스트·게이트웨이·leaf·worker를
