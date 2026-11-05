@@ -4,6 +4,7 @@ import base64
 import hashlib
 import json
 import shlex
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -64,6 +65,54 @@ def test_runtime_writer_retries_the_same_complete_event_after_busy_or_lost_reply
     event = json.loads(sent[0])
     assert event["event_id"] == "same-source-event"
     assert event["observed_at"] and event["subject"] == helpers.OTHER
+
+
+def expiry_campaign(monkeypatch, *, status=403, transition="expiry"):
+    initial = {"version": 1, "decision": "ALLOW", "status": "ACTIVE",
+               "grant_expires_at": (datetime.now(UTC) - timedelta(seconds=1)).isoformat()}
+    held = initial | {"version": 2, "decision": "HOLD", "status": "HELD", "reason_codes": ["SIGNAL_PROOF_EXPIRED"]}
+    if transition == "revoked":
+        held.update(decision="DENY", status="REVOKED", reason_codes=["OPERATOR_REVOKED"])
+    elif transition == "wrong_reason":
+        held["reason_codes"] = ["OTHER_REASON"]
+    elif transition == "version_gap":
+        held["version"] = 3
+    after = [initial, held] if transition != "none" else [initial]
+    if transition == "rewritten_prefix":
+        after = [initial | {"grant_expires_at": "changed"}, held]
+    values = iter([[initial], after])
+    checks = object.__new__(runtime_checks.Checks)
+    checks.runtime = SimpleNamespace(probe=lambda request: {
+        "status": status, "body": {"reason_code": "SESSION_NOT_AUTHORIZED"}})
+    seen = []
+    monkeypatch.setattr(checks, "history", lambda name: next(values))
+    monkeypatch.setattr(checks, "mint", lambda *a, **kw: seen.append("mint-fresh") or ("fresh-session", "synthetic"))
+    monkeypatch.setattr(checks, "access", lambda *a: seen.append("fresh-access"))
+    monkeypatch.setattr(checks, "add", lambda *a, **kw: seen.append(kw))
+    return checks, seen
+
+
+def test_expiry_after_pre_request_snapshot_is_verified_before_accepting_denial(monkeypatch):
+    checks, seen = expiry_campaign(monkeypatch)
+    checks.unrelated_after_outage(("old-session", "synthetic"))
+    assert seen[:2] == ["mint-fresh", "fresh-access"]
+    assert seen[2]["original_versions"] == 2 and seen[2]["expired_original_denied"]
+    assert seen[2]["post_request_expiry_history_verified"]
+
+
+@pytest.mark.parametrize("transition", ["revoked", "wrong_reason", "version_gap", "rewritten_prefix", "none"])
+def test_expiry_race_never_masks_revocation_or_unexplained_history(monkeypatch, transition):
+    checks, seen = expiry_campaign(monkeypatch, transition=transition)
+    with pytest.raises(runtime.RuntimeFailure):
+        checks.unrelated_after_outage(("old-session", "synthetic"))
+    assert not seen
+
+
+def test_expiry_race_never_accepts_successful_old_access(monkeypatch):
+    checks, seen = expiry_campaign(monkeypatch, status=200)
+    with pytest.raises(runtime.RuntimeFailure, match="expired_control_revived"):
+        checks.unrelated_after_outage(("old-session", "synthetic"))
+    assert not seen
 
 
 def mounts(service):

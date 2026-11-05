@@ -1,5 +1,12 @@
 # 개발 주차별 산출물
 
+11/6 3주차 [실행 환경 고정·재시작 인수](runtime-release-lock.md): 9개 mTLS 서비스의 소스·정책·
+설정·실행 구조와 앱/NGINX image ID를 고정하고 변경/누락·태그/설정 불일치 시작을 거부한다.
+기존 키·상태는 재사용하며 C01 통합·전체 저장 계약·최종 선정/독립 검토는 남긴다.
+
+[로컬 검증 JSON](infrastructure-results/runtime-release-lock-20261106.json): 최종 통합48·정리0,
+입력145·집중91, 초기 실패/보완 이력을 구분한다.
+
 11/5 3주차 I4: [앱 보안 DB 백업·복구/잔여 표](app-state-recovery.md),
 [로컬 선택 검증 JSON](infrastructure-results/app-state-recovery-checkpoint-20261105.json).
 모든 기록자 정지·최신 checkpoint·암호화·기존 세션 회수·서명 기동과 원본 유실 복구를 검사한다.

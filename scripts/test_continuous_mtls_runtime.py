@@ -1,6 +1,7 @@
 """Real Docker mTLS continuous-runtime fault tests; only owned test resources are purged."""
 
 import argparse
+import copy
 import hashlib
 import json
 import subprocess
@@ -12,6 +13,7 @@ from pathlib import Path
 from scripts.continuous_mtls_assets import DEVICES, OTHER
 from scripts.continuous_mtls_runtime import ROOT, SERVICES, Runtime, RuntimeFailure, command
 from scripts.pep_lab import DOCUMENT_HASH
+from scripts.runtime_release import digest
 
 
 class Checks:
@@ -26,6 +28,86 @@ class Checks:
     def save(self):
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.path.write_text(json.dumps(self.report, indent=2) + "\n")
+
+    def release_phase(self):
+        runtime = self.runtime
+        self.report["release_lock"] = copy.deepcopy(runtime.state["release"])
+        self.report["nginx_image_id"] = runtime.state["nginx_image_id"]
+        self.report["release_image_payload_verified"] = runtime.state["release_image_payload_verified"]
+        self.require(runtime.verify_release() == runtime.state["release"]["sha256"]
+                     and runtime.state["release_image_payload_verified"], "release_not_verified")
+        self.add("runtime_release_inputs_and_image_payload_locked",
+                 inputs=len(runtime.state["release"]["payload"]["files"]))
+        original = runtime.descriptor.read_bytes()
+        state = copy.deepcopy(runtime.state)
+        runtime.compose("stop", "--timeout", "2")
+
+        def stopped():
+            self.require(all(not row["running"] for row in runtime.status()["services"].values()),
+                         "release_fault_started_workloads")
+
+        def rejected(label, expected):
+            try:
+                runtime.up()
+            except (RuntimeFailure, ValueError) as error:
+                self.require(str(error) == expected, "release_wrong_denial")
+            else:
+                raise RuntimeFailure("release_drift_accepted")
+            stopped()
+            self.add(label, workloads_stayed_stopped=True, denial=expected)
+
+        try:
+            changed = copy.deepcopy(state)
+            changed["release"]["payload"]["files"]["Dockerfile"] = "0" * 64
+            changed["release"]["sha256"] = digest(changed["release"]["payload"])
+            runtime.descriptor.write_text(json.dumps(changed))
+            rejected("modified_release_refused_before_start", "runtime_release_changed_or_missing")
+            legacy = copy.deepcopy(state)
+            legacy.pop("release")
+            runtime.descriptor.write_text(json.dumps(legacy))
+            rejected("legacy_runtime_not_silently_upgraded", "runtime_release_changed_or_missing")
+            runtime.descriptor.write_bytes(original)
+            runtime.load()
+            command(["docker", "image", "tag", state["nginx_image_id"], state["image"]])
+            try:
+                rejected("replaced_app_tag_refused", "runtime_image_identity_mismatch")
+            finally:
+                command(["docker", "image", "tag", state["image_id"], state["image"]])
+            configured = (ROOT / "infra/mtls/all-hops-nginx.conf").read_text(encoding="utf-8")
+            runtime.write_volume("config", {"all-hops.conf": configured + "\n# synthetic unapproved edit\n"})
+            try:
+                rejected("modified_proxy_volume_refused", "runtime_public_configuration_changed")
+            finally:
+                runtime.write_volume("config", {"all-hops.conf": configured})
+        finally:
+            runtime.descriptor.write_bytes(original)
+            runtime.load()
+        # Host YAML must not be a second mutable deployment authority.
+        runtime.manifest.write_text("services: {unexpected: {image: arbitrary:latest}}\n")
+        before = self.credential_fingerprints()
+        runtime.up()
+        spec = json.loads(runtime.compose("config", "--format", "json"))
+        self.require(set(spec["services"]) == set(SERVICES), "release_service_inventory")
+        for name, service in spec["services"].items():
+            image_id = state["nginx_image_id"] if name == "proxy" else state["image_id"]
+            self.require(service["image"] == image_id and service["pull_policy"] == "never"
+                         and self.inspect(name)["Image"] == image_id, "release_running_image_drift")
+        self.add("compose_rebuilt_with_local_image_ids", service_count=len(SERVICES), automatic_pull=False)
+        self.require(self.credential_fingerprints() == before, "release_resume_replaced_credentials")
+        self.add("clean_resume_preserves_credential_volume_fingerprints", volumes=4)
+
+    def credential_fingerprints(self):
+        result = {}
+        program = """import hashlib,json
+from pathlib import Path
+print(json.dumps({p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in Path('/data').iterdir() if p.is_file()}))
+"""
+        for label in ("core-tls", "operator-auth", "registry", "collector-tls"):
+            result[label] = json.loads(command(["docker", "run", "--rm", "--network", "none", "--read-only",
+                "--user", "10001:10001", "--cap-drop=ALL", "--security-opt=no-new-privileges:true",
+                "--mount", f"type=volume,src={self.runtime.state['volumes'][label]},dst=/data,readonly",
+                "--entrypoint", "python", self.runtime.state["image_id"], "-c", program]))
+        return result
 
     @staticmethod
     def require(condition, label):
@@ -148,27 +230,42 @@ print(json.dumps({'consumed':found}))
         # The old session may legitimately be HELD by the expiry watchdog, but
         # an observation about a different subject must never revoke it.
         history = self.history(pair[0])
-        self.require(history[0]["version"] == 1 and history[0]["decision"] == "ALLOW",
-                     "outage_control_initial_decision")
-        for previous, current in pairwise(history):
-            self.require(current["version"] == previous["version"] + 1 and current["decision"] == "HOLD"
-                         and current["status"] == "HELD" and "SIGNAL_PROOF_EXPIRED" in current["reason_codes"],
-                         "outage_changed_unrelated_policy")
+        self.unrelated_history(history)
         expired = datetime.fromisoformat(history[0]["grant_expires_at"]) <= datetime.now(UTC)
         reason = None
+        post_request_history_verified = False
         if expired:
             result = self.runtime.probe({"profile": "core", "path": "/zero-trust/protected-access",
                 "method": "POST", "body": {"session_id": pair[0], "resource_id": "zt-demo-documents",
                                             "action": "READ", "grant_token": pair[1]}})
             reason = result.get("body", {}).get("reason_code")
             permitted = {"GRANT_EXPIRED", "SIGNAL_PROOF_EXPIRED"}
-            if history[-1]["status"] == "HELD":
-                permitted.add("SESSION_NOT_AUTHORIZED")
+            if reason == "SESSION_NOT_AUTHORIZED":
+                # The watchdog can append HELD after the pre-request snapshot.
+                # Re-read verified history rather than interpreting that safe
+                # denial as revival. Never accept REVOKED/changed history or a
+                # successful access, and never retry the consumed request.
+                after = self.history(pair[0])
+                self.unrelated_history(after)
+                self.require(after[:len(history)] == history, "outage_control_history_changed")
+                if after[-1]["status"] == "HELD":
+                    permitted.add("SESSION_NOT_AUTHORIZED")
+                    post_request_history_verified = True
+                history = after
             self.require(result["status"] == 403 and reason in permitted, "outage_expired_control_revived")
         fresh = self.mint(pair[0] + "-fresh", user_id=OTHER, device_id=DEVICES[1])
         self.access(fresh, True, label)
         self.add(record_label, original_versions=len(history),
-                 expired_original_denied=expired, expired_reason=reason, fresh_proof_used=True)
+                 expired_original_denied=expired, expired_reason=reason, fresh_proof_used=True,
+                 post_request_expiry_history_verified=post_request_history_verified)
+
+    def unrelated_history(self, history):
+        self.require(bool(history) and history[0]["version"] == 1 and history[0]["decision"] == "ALLOW",
+                     "outage_control_initial_decision")
+        for previous, current in pairwise(history):
+            self.require(current["version"] == previous["version"] + 1 and current["decision"] == "HOLD"
+                         and current["status"] == "HELD" and "SIGNAL_PROOF_EXPIRED" in current["reason_codes"],
+                         "outage_changed_unrelated_policy")
 
     def mint(self, label, **options):
         result = self.runtime.mint({"session_id": label, **options})
@@ -506,6 +603,7 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
         self.report["source_input_sha256"] = runtime.state["source_sha256"]
         self.report["configuration_sha256"] = runtime.state["configuration_sha256"]
         self.report["image_source_verified"] = runtime.state["image_source_verified"]
+        self.release_phase()
         hardening = {}
         for service in SERVICES:
             data = self.inspect(service)
