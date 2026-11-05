@@ -1,5 +1,19 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 5일 C03 인프라 영향 조건 검토
+
+- 기준 `2e52165`/PR #27, 이름 브랜치 `feature/chaeheeju-c03-impact-review`.
+- [영향 검토/실행/담당](docs/supply-chain-impact-review.md), [200항목 대장](docs/supply-chain-impact-register.md),
+  공개 `c03-impact-inputs`/`c03-impact-review` JSON을 읽는다. 이전 비교 JSON의 미검토 상태는 당시 기록으로 보존했다.
+- 과거 b4660ad 이미지5a64의 Python3.12.15/pip25.0.1·패키지131을 실제 확인했다. 제한된 실물 probe3회는
+  바이트 동일하다. P1은 조치/검증 순서17항목(TLS/HTTP/tar3+SQLite14)이며 실제 악용17건이 아니다.
+- pip PEP706 fallback/self-check 전제2개를 관측 구성에서만 완화. Debian185의 source mapping/현재 vendor open과
+  source-match metadata5·부팅 전제 부재1을 구분한다. libsystemd/libgcc 등 공유 라이브러리는 자동 제외하지 않는다.
+- 현재 소스2e52165의 직접 AST 참조와 과거 이미지 참조를 구분한다. 앱의 입력 도달성/김택희 독립 검토,
+  새 고정 이미지 재검사·C03 최종 선정은 후속이다. 의존성/탐지/앱 정책과 과거 C03/C04 근거를 수정하지 않는다.
+- `scripts.assess_supply_chain`은 pinned 공개 입력의 오프라인 보고서만 만든다. security_gate_passed/production_approved는
+  false이며 새 테스트38·C03 집중107 통과. 인프라 검토를 취약점 해결이나 운영 승인으로 바꾸지 않는다.
+
 ## 2026년 11월 5일 C03 발견 차이 재분석
 
 - `feature/chaeheeju-c03-findings-review`, 기준 `aitest` PR #26 `01aebf9`.

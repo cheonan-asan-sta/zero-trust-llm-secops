@@ -1,5 +1,8 @@
 # C03 공급망 발견 차이의 재현 가능한 검토
 
+후속 [실제 구성별 영향 검토](supply-chain-impact-review.md)는 이 문서의 200항목을 별도 근거/결과로
+인프라 관점에서 검토했다. 아래 최초 비교와 원본 JSON은 당시 미검토 상태로 보존하며 실제 영향/수정 완료로 바꾸지 않는다.
+
 2026년 11월 5일 · I8/C03 · 채희주 인프라 구현·실행, Codex 도구 보조.
 
 [첫 스캐너 비교](technology-decisions/C03-supply-chain.md)는 Grype 195행·Trivy 191행과
