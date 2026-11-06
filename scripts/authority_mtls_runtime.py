@@ -103,8 +103,11 @@ class AuthorityRuntime(MonitoredRuntime):
                           authority_base_layers_sha256=release.digest(layers))
         self.save()
 
+    def build_material(self):
+        return assets.material()
+
     def make_assets(self):
-        material, self._bootstrap_provisioners = assets.material()
+        material, self._bootstrap_provisioners = self.build_material()
         cfg = json.loads(material['certificate-state']['config.json'])
         self.state['authority_configuration_sha256'] = release.digest(assets.fixed_configuration(cfg))
         self.state['authority_public_sha256'] = {volume: {name: release.file_digest(ROOT / assets.INPUTS[1])
@@ -118,7 +121,7 @@ class AuthorityRuntime(MonitoredRuntime):
         self.save()
         return material
 
-    def helper(self, program, payload=None, *, network='none', timeout=60):
+    def helper(self, program, payload=None, *, network='none', timeout=60, readonly=False):
         mounts = ['certificate-state:/state', *[f'{name}:/managed/{name}' for name in assets.MANAGED],
                   *[f'ack-{name}:/ack/{name}:ro' for name in assets.RELOADS]]
         argv = ['docker', 'run', '--rm', '--network', network, '--read-only', '--user', '10001:10001',
@@ -126,7 +129,7 @@ class AuthorityRuntime(MonitoredRuntime):
                 '--tmpfs', '/data:size=1m']
         for mount in mounts:
             volume, target, *options = mount.split(':')
-            argv += ['--mount', f"type=volume,src={self.state['volumes'][volume]},dst={target}" + (',readonly' if options else '')]
+            argv += ['--mount', f"type=volume,src={self.state['volumes'][volume]},dst={target}" + (',readonly' if options or readonly else '')]
         return command([*argv, '--entrypoint', 'python', '-i', self.state['authority_image_id'], *program],
                        payload=payload, timeout=timeout)
 

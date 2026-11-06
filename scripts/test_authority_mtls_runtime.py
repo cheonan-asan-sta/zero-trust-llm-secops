@@ -71,6 +71,7 @@ class AuthorityChecks(MonitoredChecks):
         try:
             self.runtime.wait(predicate, timeout=timeout)
         except RuntimeFailure:
+            self.record_monitoring_failure(label)
             raise RuntimeFailure(label) from None
 
     def rpc(self, operation, **data):

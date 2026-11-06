@@ -1,5 +1,13 @@
 # 채희주 개인 실행 계획
 
+11/6 후속 검증: 집중104/신규37·Linux2087, 실제 rekey22·관측72·CA29 통과/소유 자원0.
+[공개 원자료](../infrastructure-results/persistent-key-rotation-20261106.json)에 실행별 입력과 범위를 구분한다.
+
+11/6 3주차 후속 [지속 실행 개인키 교체·관측 진단](../persistent-key-rotation.md): 기존 controller와
+leaf 교체기를 재사용해 업무/관측16서비스의 키 경로·reload ack·실제 TLS 확인·구 키 정리를 연결한다.
+CA 중단/게시 중 controller 종료·disabled 보존·재시작 설정 검사·비밀값 제외 진단의 구성/실행/측정을 맡는다.
+CA/JWK 키 교체·HA 통합·전체 저장 계약·운영 선정과 김택희 독립 검토는 별도로 남긴다.
+
 11/6 3주차 [CA leaf 통합 인수](../ca-runtime-acceptance.md): 채희주가 CA/제어기·기존
 업무/관측 TLS의 연결, 발급/타이머 갱신·재적용·장애/재시작·폐기 보존·실행 환경 고정을
 구성·실행·측정했다. 집중237·Linux2050·실제CA29 통과/소유 자원0을

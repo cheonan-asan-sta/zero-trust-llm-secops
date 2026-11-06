@@ -1,5 +1,8 @@
 # zero-trust-llm-secops
 
+11/6 후속 [지속 실행 개인키 교체·관측 실패 진단](docs/persistent-key-rotation.md): 기존 leaf 교체를
+업무/관측16서비스에 연결한다. CA/JWK 키·HA 통합과 독립 검토는 후속으로 구분한다.
+
 11/6 3주차 [CA leaf 통합 인수](docs/ca-runtime-acceptance.md): 기존 지속 실행 관측 경로에
 선택형 CA/제어기를 연결한다. 기본9·관측14서비스를 유지하며 CA 프로필은16서비스다.
 실제 발급·갱신·재적용·CA 장애/재시작·폐기 보존을 인프라 범위에서 검증한다.

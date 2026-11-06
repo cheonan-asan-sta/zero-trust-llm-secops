@@ -57,5 +57,13 @@ jobs:
           if [ -f runtime/c02/authority-acceptance-ci/verification.json ]; then
             cat runtime/c02/authority-acceptance-ci/verification.json
           fi
+      - name: Verify persistent private-key rotation
+        run: python -m scripts.test_rekey_mtls_runtime --directory runtime/c02/rekey-acceptance-ci
+      - name: Report private-key rotation verification
+        if: always()
+        run: |
+          if [ -f runtime/c02/rekey-acceptance-ci/verification.json ]; then
+            cat runtime/c02/rekey-acceptance-ci/verification.json
+          fi
       - name: Build Lambda image
         run: docker build --platform linux/amd64 --provenance=false --file Dockerfile.lambda --tag zero-trust-llm-secops:lambda-ci .
