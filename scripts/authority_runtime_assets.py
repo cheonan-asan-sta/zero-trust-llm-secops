@@ -99,8 +99,8 @@ def configuration(material):
             'interval_seconds': 2, 'overlap_seconds': 1, 'disabled': [], 'paused': False}
 
 
-def material():
-    root, issuer = authority.hierarchy()
+def material(*, hierarchy=None):
+    root, issuer = authority.hierarchy() if hierarchy is None else hierarchy
     bundle = ''.join(pair[1].public_bytes(serialization.Encoding.PEM).decode() for pair in (root, issuer))
     result = base.assets(monitoring=True, issuer=issuer, trust_bundle=bundle)
     renewal = {'ca.pem': bundle}

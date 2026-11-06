@@ -331,10 +331,17 @@ def finish(vault, ca, renewal, receipt):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("operation", choices=["prepare", "install", "finish", "probe", "old-probes"])
+    parser.add_argument("operation", choices=["prepare", "install", "finish", "probe", "old-probes", "status"])
     args = parser.parse_args()
     vault, ca, renewal = Path("/vault"), Path("/ca"), Path("/renewal")
-    if args.operation == "prepare":
+    if args.operation == 'status':
+        state = json.loads((vault / 'state.json').read_bytes())
+        bundles = list(vault.glob('authority-g*.sealed'))
+        result = {'epoch': state['generation'], 'pending': state['pending'] is not None,
+                  'only_current_sealed_bundle': len(bundles) == 1 and bundles[0].name == state['bundle'],
+                  'ca_private_key_files': len(list(ca.glob('*.key'))),
+                  'server_signing_key_files': len(list(renewal.glob('sign-*.key')))}
+    elif args.operation == "prepare":
         result = prepare(vault, ca, renewal)
         result["custody"] = {"uid": os.getuid(), "interfaces": sorted(p.name for p in Path("/sys/class/net").iterdir()),
             "vault_mode": (vault / "password").stat().st_mode & 0o777,

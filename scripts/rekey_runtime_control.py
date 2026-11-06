@@ -64,7 +64,15 @@ def verify_pair(pair, identity, issuer, state, allowed):
     info = metadata(body)
     private = serialization.load_pem_private_key(key.read_bytes(), password=None)
     leaf = x509.load_pem_x509_certificate(body.encode())
-    leaf.verify_directly_issued_by(issuer)
+    issuers = issuer if isinstance(issuer, list) else [issuer]
+    for authority in issuers:
+        try:
+            leaf.verify_directly_issued_by(authority)
+            break
+        except (ValueError, TypeError, InvalidSignature):
+            pass
+    else:
+        raise ValueError('rekey_unapproved_issuer')
     if (info['name'] != identity or identity + '-' + info['purpose'] not in allowed
             or not leaf.not_valid_before_utc <= datetime.now(UTC) < leaf.not_valid_after_utc
             or public_hash(leaf.public_key()) != public_hash(private.public_key())
@@ -85,7 +93,13 @@ def verify(request):
     if request['initialized'] and state is None:
         raise ValueError('rekey_state_required')
     cfg = json.loads(Path('/state/config.json').read_bytes())
-    issuer = x509.load_pem_x509_certificate(Path('/state/issuer.pem').read_bytes())
+    issuer = (x509.load_pem_x509_certificates(request['issuers'].encode()) if 'issuers' in request else
+              x509.load_pem_x509_certificate(Path('/state/issuer.pem').read_bytes()))
+    def issuers_for(identity):
+        credential = next(((uid, c) for uid, c in (state or {}).get('credentials', {}).items() if c['name'] == identity), None)
+        if credential and (credential[0] in cfg.get('disabled', []) or credential[1].get('inhibited')) and request.get('retired_issuers'):
+            return x509.load_pem_x509_certificates(request['retired_issuers'].encode())
+        return issuer
     for volume, files in request['templates'].items():
         for name, template in files.items():
             actual = (Path('/managed') / volume / name).read_text()
@@ -94,7 +108,7 @@ def verify(request):
             for identity in set(re.findall(r'/service-tls/([A-Za-z0-9_-]+)\.key', template)):
                 for pair in allowed_pairs(state, identity, volume):
                     if all('/service-tls/' + Path(pair[field]).name in actual for field in ('cert', 'key')):
-                        verify_pair(pair, identity, issuer, state, cfg['allowed_provisioners'])
+                        verify_pair(pair, identity, issuers_for(identity), state, cfg['allowed_provisioners'])
                         break
     for relative, identity in request['profiles'].items():
         volume, filename = relative.split('/')
@@ -103,7 +117,7 @@ def verify(request):
         pair = {'cert': str(root / profile['cert']), 'key': str(root / profile['key'])}
         if pair not in allowed_pairs(state, identity, volume):
             raise ValueError('rekey_profile_identity_or_generation')
-        verify_pair(pair, identity, issuer, state, cfg['allowed_provisioners'])
+        verify_pair(pair, identity, issuers_for(identity), state, cfg['allowed_provisioners'])
     for name, expected in request['signers'].items():
         key = serialization.load_pem_private_key(Path(cfg['server_signers'][name]).read_bytes(), password=None)
         if public_hash(key.public_key()) != expected:

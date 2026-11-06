@@ -5,7 +5,7 @@ import ssl
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
@@ -29,6 +29,13 @@ def active(cfg, state):
 
 def trust_paths(cfg):
     return [DIRECTORY / "root.pem", *[Path(root) / "ca.pem" for root in cfg["roots"] if (Path(root) / "ca.pem").exists()]]
+
+
+def signer_paths(cfg, names):
+    root = PurePosixPath(cfg.get('authority_signer_root', '/managed/renewal'))
+    if str(root) not in cfg['roots'] or root.parent != PurePosixPath('/managed'):
+        raise leaf.LifecycleError('authority_signer_root_scope')
+    return {name: str(root / filename) for name, filename in names.items()}
 
 
 def migrated(plan, ledger, cfg, state):
@@ -150,11 +157,11 @@ def dispatch(request):
         if cfg.get("authority_epoch") == plan["epoch"]:
             return {"activated": True}
         paused(cfg, state)
-        if cfg["server_signers"] != {name: "/managed/renewal/" + filename for name, filename in plan["old_signers"].items()}:
+        if cfg["server_signers"] != signer_paths(cfg, plan["old_signers"]):
             raise leaf.LifecycleError("authority_signer_configuration_changed")
         leaf.atomic(DIRECTORY / "issuer.pem", plan["issuer"])
         document = {k: v for k, v in cfg.items() if k != "scoped"}
-        document.update(server_signers={name: "/managed/renewal/" + filename for name, filename in plan["signers"].items()},
+        document.update(server_signers=signer_paths(cfg, plan["signers"]),
                         authority_epoch=plan["epoch"], paused=False)
         leaf.save(DIRECTORY / "config.json", document)
         return {"activated": True}
