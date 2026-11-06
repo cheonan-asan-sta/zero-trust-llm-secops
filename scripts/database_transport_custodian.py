@@ -107,7 +107,10 @@ def checked(anchor, journal):
     if (anchor.get('schema') != 'transport-anchor-1' or anchor.get('policy') != POLICY
             or not hash_inventory(anchor.get('files')) or journal.get('schema') != 'transport-journal-1'
             or journal.get('phase') not in PHASES or not isinstance(journal.get('history'), list)
-            or len(journal['history']) > 64 or type(journal.get('epoch')) is not int):
+            or len(journal['history']) > 64 or type(journal.get('epoch')) is not int
+            or type(journal.get('restore_paused')) is not bool
+            or type(journal.get('next_due_at', 0)) not in {int, float}
+            or not math.isfinite(journal.get('next_due_at', 0)) or journal.get('next_due_at', 0) < 0):
         raise LifecycleError('transport_journal_shape')
     root, files, previous = anchor['root'], anchor['files'], None
     for epoch, plan in enumerate(journal['history'], 1):

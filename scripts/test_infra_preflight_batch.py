@@ -20,7 +20,7 @@ from scripts.continuous_mtls_runtime import ROOT
 
 STAGES = (('linux', None, 0),
           ('monitored', 'scripts.test_continuous_mtls_runtime', 75),
-          ('authority-ha', 'scripts.test_database_transport_runtime', 48))
+          ('authority-ha', 'scripts.test_database_transport_runtime', 54))
 
 
 def source_manifest():

@@ -2,8 +2,11 @@
 
 import argparse
 import copy
+import hashlib
 import json
+import secrets
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -14,6 +17,7 @@ from scripts.continuous_mtls_runtime import ROOT, RuntimeFailure, command
 from scripts.database_transport_runtime import VAULT, TransportCoordinator, TransportRuntime
 from scripts.test_persistent_authority_runtime import AcceptanceRuntime
 from scripts.test_persistent_authority_runtime import Checks as ParentChecks
+from scripts.test_transport_process_recovery import kill_worker, public_failure
 
 
 class AcceptanceTransport(AcceptanceRuntime, TransportRuntime):
@@ -73,30 +77,99 @@ print(json.dumps(result))
     def drive_transport(self, epoch, *, interrupt=False):
         r = self.runtime
         self.force_transport_due()
+        if interrupt:
+            self.process_recovery()
         worker = TransportCoordinator(r)
         deadline = time.monotonic() + 480
-        restarted = False
         with lease(r.directory):
             while time.monotonic() < deadline:
                 worker.tick()
                 s = worker.state
-                if interrupt and not restarted and s['phase'] == 'stopped':
-                    plan = custody.digest(s['plan'])
-                    try:
-                        r.up()
-                    except RuntimeFailure as error:
-                        self.require(str(error) == 'database_transport_requires_pinned_resume', 'transport_wrong_pending_denial')
-                    else:
-                        raise RuntimeFailure('transport_pending_up_admitted')
-                    worker = TransportCoordinator(r)
-                    self.require(custody.digest(worker.state['plan']) == plan, 'transport_candidate_replaced_on_resume')
-                    restarted = True
-                    self.add('pending_transport_blocks_ordinary_start_and_new_coordinator_resumes_same_plan')
                 if s['phase'] == 'idle' and s['epoch'] == epoch:
                     self.report.setdefault('transport_ceremonies', []).append(copy.deepcopy(s))
                     return s
                 time.sleep(.2)
         raise RuntimeFailure('transport_acceptance_timeout')
+
+    def process_recovery(self):
+        r, candidate = self.runtime, None
+        pinned = r.make_profile()
+        checkpoints = [('stopped', 'stopped'), ('installed', 'stopped'),
+                       ('resuming', 'committing'), ('idle', 'resuming')]
+        for target, recorded_phase in checkpoints:
+            token = secrets.token_hex(12)
+            marker = r.directory / ('transport-fault-' + token + '.json')
+            started = time.monotonic()
+            child = subprocess.Popen([sys.executable, '-m', 'scripts.test_transport_process_recovery',
+                '--directory', str(r.directory), '--checkpoint', target, '--token', token],
+                cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            try:
+                deadline = time.monotonic() + 420
+                while not marker.exists():
+                    if child.poll() is not None or time.monotonic() > deadline:
+                        raise RuntimeFailure('transport_fault_child_failed_before_checkpoint')
+                    time.sleep(.2)
+                expected = {'token': token, 'phase': target, 'boundary': 'after' if target == 'stopped' else 'before'}
+                self.require(json.loads(marker.read_bytes()) == expected and child.poll() is None,
+                             'transport_fault_checkpoint_mismatch')
+                if target == 'stopped':
+                    self.concurrent_management_denied()
+                kill_worker(child)
+                self.require(child.returncode != 0, 'transport_fault_worker_not_killed')
+            finally:
+                if child.poll() is None:
+                    kill_worker(child)
+            state = r.transport_journal()
+            self.require(state['phase'] == recorded_phase, 'transport_lost_response_was_acknowledged')
+            plan = custody.digest(state['plan'] or state['history'][-1])
+            candidate = candidate or plan
+            self.require(plan == candidate and r.make_profile() == pinned,
+                         'transport_process_resume_changed_candidate_or_objects')
+            # A new process must be able to acquire the kernel-released lock.
+            with lease(r.directory):
+                resumed = TransportCoordinator(r)
+                self.require(resumed.state == state, 'transport_process_resume_changed_journal')
+            if target == 'stopped':
+                try:
+                    r.up()
+                except RuntimeFailure as error:
+                    self.require(str(error) == 'database_transport_requires_pinned_resume', 'transport_wrong_pending_denial')
+                else:
+                    raise RuntimeFailure('transport_pending_up_admitted')
+                self.add('pending_transport_blocks_ordinary_start_and_new_coordinator_resumes_same_plan')
+            self.report.setdefault('process_interruptions', []).append({
+                'checkpoint': target, 'boundary': expected['boundary'], 'persisted_phase': recorded_phase,
+                'exit_nonzero': child.returncode != 0, 'same_candidate_sha256': candidate,
+                'same_pinned_objects': True, 'lock_reacquired': True,
+                'seconds': round(time.monotonic() - started, 3)})
+            self.save()
+            self.add('actual_host_process_kill_and_resume_at_' + target)
+
+    def concurrent_management_denied(self):
+        r = self.runtime
+        for operation in [r.up, r.down, lambda: r.down(purge=True)]:
+            try:
+                operation()
+            except RuntimeFailure as error:
+                self.require(str(error) == 'database_transport_management_busy', 'transport_wrong_busy_denial')
+            else:
+                raise RuntimeFailure('transport_concurrent_management_admitted')
+        for mode in ('tick', 'once', 'run', 'preflight'):
+            result = subprocess.run([sys.executable, '-m', 'scripts.database_transport_runtime', mode,
+                '--directory', str(r.directory)], cwd=ROOT, capture_output=True, text=True, timeout=15, check=False)
+            self.require(result.returncode == 1 and json.loads(result.stdout).get('verified') is False,
+                         'transport_concurrent_cli_admitted')
+        self.add('live_scheduler_lease_blocks_start_stop_purge_ticks_and_preflight')
+        paths = [p for p in r.directory.iterdir() if p.is_file() and p.suffix != '.lock']
+        before = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+        result = subprocess.run([sys.executable, '-m', 'scripts.database_transport_runtime', 'status',
+            '--directory', str(r.directory)], cwd=ROOT, capture_output=True, text=True, timeout=15, check=False)
+        status = json.loads(result.stdout)
+        self.require(result.returncode == 0 and status['observation_only'] and status['recovery_required']
+                     and status['phase'] == 'stopped' and status['pending_plan_sha256'], 'transport_readonly_status_failed')
+        self.require({p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in paths} == before,
+                     'transport_status_wrote_management_state')
+        self.add('status_during_live_scheduler_reads_signed_journal_without_writing_inputs')
 
     def run(self):
         super().run()
@@ -155,8 +228,8 @@ def main():
     checks = Checks(args.directory)
     try:
         checks.run()
-    except (RuntimeError, OSError, ValueError, TypeError, KeyError, subprocess.SubprocessError):
-        checks.report.update(completed=False, failure='database_transport_acceptance_failed')
+    except (RuntimeError, OSError, ValueError, TypeError, KeyError, subprocess.SubprocessError) as error:
+        checks.report.update(completed=False, failure='database_transport_acceptance_failed', failure_detail=public_failure(error))
         checks.record_authority_failure()
     finally:
         try:
