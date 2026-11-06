@@ -8,62 +8,116 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  unit:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-          cache: pip
-      - name: Install project
-        run: |
-          python -m pip install --only-binary=:all: --require-hashes -r infra/runtime/requirements/build.lock
-          python -m pip install --only-binary=:all: --require-hashes -r infra/runtime/requirements/test.lock
-          python -m pip install --no-index --no-deps --no-build-isolation .
-          python -m pip check
+          ref: ${{ github.sha }}
+      - uses: ./.github/actions/python-locked
       - name: Check code
         run: python -m ruff check .
       - name: Run tests
         run: python -m pytest -q
+
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
       - name: Run tests in Docker
         run: |
           docker build --file Dockerfile.test --tag zero-trust-llm-secops:ci-tests .
           docker run --rm zero-trust-llm-secops:ci-tests
+
+  runtime:
+    name: runtime (${{ matrix.kind }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - kind: application
+            directory: runtime/week3/app-recovery-ci
+            verification: Verify application maintenance recovery
+            report: Report application recovery verification
+            command: python -m scripts.test_app_recovery_runtime --full-state --image zero-trust-llm-secops:ci --directory runtime/week3/app-recovery-ci
+          - kind: monitored
+            directory: runtime/c02/collector-maintenance-ci
+            verification: Verify collector maintenance over mTLS
+            report: Report mTLS verification
+            command: python -m scripts.test_continuous_mtls_runtime --monitoring --directory runtime/c02/collector-maintenance-ci
+          - kind: authority
+            directory: runtime/c02/authority-acceptance-ci
+            verification: Verify CA integration acceptance
+            report: Report CA integration verification
+            command: python -m scripts.test_authority_mtls_runtime --directory runtime/c02/authority-acceptance-ci
+          - kind: rekey
+            directory: runtime/c02/rekey-acceptance-ci
+            verification: Verify persistent private-key rotation
+            report: Report private-key rotation verification
+            command: python -m scripts.test_rekey_mtls_runtime --directory runtime/c02/rekey-acceptance-ci
+          - kind: authority-ha
+            directory: runtime/c02/persistent-authority-ci
+            verification: Verify persistent authority rotation and CA failover
+            report: Report persistent authority verification
+            command: python -m scripts.test_persistent_authority_runtime --directory runtime/c02/persistent-authority-ci
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: ./.github/actions/python-locked
       - name: Build application image
+        if: matrix.kind == 'application'
         run: docker build --platform linux/amd64 --provenance=false --file Dockerfile --tag zero-trust-llm-secops:ci .
-      - name: Verify application maintenance recovery
-        run: python -m scripts.test_app_recovery_runtime --full-state --image zero-trust-llm-secops:ci --directory runtime/week3/app-recovery-ci
-      - name: Report application recovery verification
+      - name: ${{ matrix.verification }}
+        run: ${{ matrix.command }}
+      - name: ${{ matrix.report }}
         if: always()
+        env:
+          REPORT_DIRECTORY: ${{ matrix.directory }}
         run: |
-          if [ -f runtime/week3/app-recovery-ci/verification.json ]; then
-            cat runtime/week3/app-recovery-ci/verification.json
+          if [ -f "$REPORT_DIRECTORY/verification.json" ]; then
+            cat "$REPORT_DIRECTORY/verification.json"
           fi
-      - name: Verify collector maintenance over mTLS
-        run: python -m scripts.test_continuous_mtls_runtime --monitoring --directory runtime/c02/collector-maintenance-ci
-      - name: Report mTLS verification
-        if: always()
-        run: |
-          if [ -f runtime/c02/collector-maintenance-ci/verification.json ]; then
-            cat runtime/c02/collector-maintenance-ci/verification.json
-          fi
-      - name: Verify CA integration acceptance
-        run: python -m scripts.test_authority_mtls_runtime --directory runtime/c02/authority-acceptance-ci
-      - name: Report CA integration verification
-        if: always()
-        run: |
-          if [ -f runtime/c02/authority-acceptance-ci/verification.json ]; then
-            cat runtime/c02/authority-acceptance-ci/verification.json
-          fi
-      - name: Verify persistent private-key rotation
-        run: python -m scripts.test_rekey_mtls_runtime --directory runtime/c02/rekey-acceptance-ci
-      - name: Report private-key rotation verification
-        if: always()
-        run: |
-          if [ -f runtime/c02/rekey-acceptance-ci/verification.json ]; then
-            cat runtime/c02/rekey-acceptance-ci/verification.json
-          fi
+
+  lambda:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
       - name: Build Lambda image
         run: docker build --platform linux/amd64 --provenance=false --file Dockerfile.lambda --tag zero-trust-llm-secops:lambda-ci .
+
+  # Keep the existing required check name. Every dependency must succeed.
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    if: always()
+    needs: [unit, docker, runtime, lambda]
+    steps:
+      - name: Require every verification job
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          python - <<'PY'
+          import json, os
+          results = json.loads(os.environ['RESULTS'])
+          if set(results) != {'unit', 'docker', 'runtime', 'lambda'}:
+              raise SystemExit('required_verification_missing')
+          failed = [name for name, value in results.items() if value['result'] != 'success']
+          print(json.dumps({name: value['result'] for name, value in results.items()}, sort_keys=True))
+          if failed:
+              raise SystemExit('required_verification_incomplete')
+          PY

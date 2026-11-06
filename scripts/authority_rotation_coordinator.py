@@ -111,7 +111,10 @@ class DockerBackend:
 class Coordinator:
     def __init__(self, profile, directory, backend=None):
         self.profile, self.directory = profile, directory
-        if backend is None and profile.get("management"):
+        if backend is None and profile.get('schema') == 'persistent-authority-profile-1':
+            from scripts.persistent_authority_runtime import GraphBackend
+            backend = GraphBackend.from_profile(profile)
+        elif backend is None and profile.get("management"):
             from scripts.control_plane_ha import Management
             backend = Management(profile)
         elif backend is None and profile.get("service_hosts"):
@@ -131,6 +134,9 @@ class Coordinator:
 
     def tick(self):
         with self.backend.control_tick() if hasattr(self.backend, "control_tick") else nullcontext():
+            if (hasattr(self.backend, 'before_authority_tick') and
+                    (self.state['phase'] != 'idle' or self.state.get('next_due_at', 0) <= time.time())):
+                self.backend.before_authority_tick()
             self._tick()
 
     def _tick(self):

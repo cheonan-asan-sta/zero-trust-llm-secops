@@ -23,8 +23,8 @@ def templates():
     return result
 
 
-def material():
-    result, provisioners = authority.material()
+def material(*, hierarchy=None):
+    result, provisioners = authority.material() if hierarchy is None else authority.material(hierarchy=hierarchy)
     cfg = json.loads(result['certificate-state']['config.json'])
     online = json.loads(result['ca-state']['ca.json'])
     delegated = {}

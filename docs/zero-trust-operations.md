@@ -1,5 +1,7 @@
 # 제로 트러스트 운영 구현 명세
 
+11/6 기능 묶음: [CA/JWK 교체·CA 프로세스 이중화·병렬 CI](persistent-authority-rotation.md). 채희주가 인프라18서비스·공유 mTLS DB와 서명된 교체/복구 검증을 연결한다. 로컬 집중190/신규91·고정 Ruff·Docker2281·통합35/35·소유 자원0이며 정확한 head/병합 후 CI는 PR을 따른다. DB·물리 호스트 HA와 팀원 독립 인수는 후속이다.
+
 11/6 [CA 준비 상태·발급시각·replay 검증](ca-bootstrap-readiness.md): 신뢰하는 CA의 TLS health와
 UTC Date를 확인한 뒤 최초 grant를 만든다. 준비 불명은 발급 중단이며 CA 발급시각 검사를 끄지 않는다.
 CA 재시작 뒤 현재 유효한 claim의 새 jti 허용/소비한 jti 거부를 대조해 과거 발급시각 차단이

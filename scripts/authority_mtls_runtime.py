@@ -121,9 +121,12 @@ class AuthorityRuntime(MonitoredRuntime):
         self.save()
         return material
 
+    def helper_mounts(self):
+        return ['certificate-state:/state', *[f'{name}:/managed/{name}' for name in assets.MANAGED],
+                *[f'ack-{name}:/ack/{name}:ro' for name in assets.RELOADS]]
+
     def helper(self, program, payload=None, *, network='none', timeout=60, readonly=False):
-        mounts = ['certificate-state:/state', *[f'{name}:/managed/{name}' for name in assets.MANAGED],
-                  *[f'ack-{name}:/ack/{name}:ro' for name in assets.RELOADS]]
+        mounts = self.helper_mounts()
         argv = ['docker', 'run', '--rm', '--network', network, '--read-only', '--user', '10001:10001',
                 '--cap-drop=ALL', '--security-opt=no-new-privileges:true', '--memory', '256m', '--cpus', '1',
                 '--tmpfs', '/data:size=1m']
@@ -153,10 +156,17 @@ class AuthorityRuntime(MonitoredRuntime):
             '--entrypoint', 'python', '-i', self.state['authority_image_id'], '-c', program], payload=json.dumps(list(self.state['authority_binary_sha256']))))
         if actual != self.state['authority_binary_sha256']:
             raise RuntimeFailure('authority_binary_drift')
+        self.verify_authority_configuration()
+        self.verify_authority_public_assets()
+        self.verify_authority_database()
+
+    def verify_authority_configuration(self):
         cfg = self.controller_configuration()
         if (not assets.configuration_valid(cfg)
                 or release.digest(assets.fixed_configuration(cfg)) != self.state['authority_configuration_sha256']):
             raise RuntimeFailure('authority_configuration_drift')
+
+    def verify_authority_public_assets(self):
         for volume, expected in self.state['authority_public_sha256'].items():
             program = "import hashlib,json,sys;from pathlib import Path;print(json.dumps({n:hashlib.sha256((Path('/data')/n).read_bytes().replace(b'\\r\\n',b'\\n')).hexdigest() for n in json.load(sys.stdin)}))"
             actual = json.loads(command(['docker', 'run', '--rm', '--network', 'none', '--read-only', '--tmpfs', '/tmp:size=1m',
@@ -165,6 +175,8 @@ class AuthorityRuntime(MonitoredRuntime):
                 self.state['image_id'], '-c', program], payload=json.dumps(list(expected))))
             if actual != expected:
                 raise RuntimeFailure('authority_public_configuration_drift')
+
+    def verify_authority_database(self):
         if self.state.get('authority_initialized'):
             program = "from pathlib import Path;from scripts.authority_runtime_assets import require_existing_database;require_existing_database(Path('/ca'))"
             try:
@@ -214,8 +226,12 @@ class AuthorityRuntime(MonitoredRuntime):
         self.compose('up', '--detach', 'certificate-controller')
         self.wait(lambda: (s := self.controller_status())['phase'] is None
                   and all(c['generation'] >= 1 for c in s['credentials'].values()), timeout=180)
+        self.after_enrollment()
         self.state['authority_initialized'] = True
         self.save()
+
+    def after_enrollment(self):
+        pass
 
     def down(self, *, purge=False):
         result = super().down(purge=purge)

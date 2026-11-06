@@ -1,5 +1,7 @@
 # 로컬 CA·발급 JWK 서명키 자동 교체
 
+11/6 기능 묶음: [CA/JWK 교체·CA 프로세스 이중화·병렬 CI](persistent-authority-rotation.md). 채희주가 인프라18서비스·공유 mTLS DB와 서명된 교체/복구 검증을 연결한다. 로컬 집중190/신규91·고정 Ruff·Docker2281·통합35/35·소유 자원0이며 정확한 head/병합 후 CI는 PR을 따른다. DB·물리 호스트 HA와 팀원 독립 인수는 후속이다.
+
 후속 [CA 프로세스 고가용성](ca-high-availability.md)은 공유 PostgreSQL·CA 2대·관리 클라이언트 전환을
 추가한다. 키 교체는 모든 노드의 새 issuer/JWK와 구 JWK 거부를 확인하며, 아래 단일 CA 결과는 당시
 기준선으로 보존한다. DB/호스트 이중화·무중단 키 교체는 후속 범위와도 구분한다.
