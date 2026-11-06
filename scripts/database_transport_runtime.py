@@ -4,6 +4,7 @@ import argparse
 import json
 import subprocess
 import time
+from contextlib import ExitStack, contextmanager
 from pathlib import Path
 
 from scripts import authority_custodian as custody
@@ -23,6 +24,18 @@ from scripts.persistent_authority_runtime import definition as parent_definition
 VAULT = 'database-transport-vault'
 
 
+@contextmanager
+def management_lease(directory):
+    """All supported management writers share the scheduler's OS lock."""
+    directory.mkdir(parents=True, exist_ok=True)
+    with ExitStack() as stack:
+        try:
+            stack.enter_context(lease(directory))
+        except OSError:
+            raise RuntimeFailure('database_transport_management_busy') from None
+        yield
+
+
 def definition(project, image, nginx):
     spec = parent_definition(project, image, nginx)
     spec['volumes'][VAULT] = {'external': True, 'name': project + '-' + VAULT}
@@ -31,6 +44,30 @@ def definition(project, image, nginx):
 
 class TransportRuntime(PersistentAuthorityRuntime):
     volumes = PersistentAuthorityRuntime.volumes + (VAULT,)
+
+    def write_manifest(self):
+        if not getattr(self, '_transport_observing', False):
+            super().write_manifest()
+
+    def observation(self):
+        # load normally regenerates Compose inputs. A public observation must
+        # not race the scheduler or rewrite files while its lease is held.
+        self._transport_observing = True
+        try:
+            self.load()
+            s = self.transport_journal()
+            return {'phase': s['phase'], 'epoch': s['epoch'],
+                'last_error': 'pinned_resume_required' if s.get('last_error') else None,
+                'recovery_required': s['phase'] != 'idle',
+                'pending_plan_sha256': custody.digest(s['plan']) if s['plan'] else None,
+                'remaining_history_slots': 64 - len(s['history']),
+                'observation_only': True}
+        finally:
+            self._transport_observing = False
+
+    def up(self):
+        with management_lease(self.directory):
+            return super().up()
 
     def definition(self, project, image, nginx):
         return definition(project, image, nginx)
@@ -126,11 +163,12 @@ class TransportRuntime(PersistentAuthorityRuntime):
         return result
 
     def down(self, *, purge=False):
-        if self.descriptor.exists():
-            self.load()
-            if not purge:
-                self.transport_idle()
-        return super().down(purge=purge)
+        with management_lease(self.directory):
+            if self.descriptor.exists():
+                self.load()
+                if not purge:
+                    self.transport_idle()
+            return super().down(purge=purge)
 
 
 class TransportCoordinator:
@@ -261,15 +299,14 @@ def main():
         r = TransportRuntime(args.directory)
         if args.mode in {'up', 'down'}:
             result = r.up() if args.mode == 'up' else r.down(purge=args.purge)
+        elif args.mode == 'status':
+            result = r.observation()
         else:
-            r.load()
-            if args.mode == 'preflight':
-                result = r.preflight()
-            elif args.mode == 'status':
-                s = r.transport_journal()
-                result = {k: s[k] for k in ('phase', 'epoch', 'last_error')}
-            else:
-                with lease(r.directory):
+            with management_lease(r.directory):
+                r.load()
+                if args.mode == 'preflight':
+                    result = r.preflight()
+                else:
                     worker = TransportCoordinator(r)
                     authority = Coordinator(worker.profile, r.directory, worker.backend)
                     deadline = time.monotonic() + 600
