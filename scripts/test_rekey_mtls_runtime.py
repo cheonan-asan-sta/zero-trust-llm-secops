@@ -259,6 +259,7 @@ def main():
         checks.run()
     except (RuntimeFailure, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as error:
         checks.report.update(completed=False, failure=str(error) if isinstance(error, RuntimeFailure) else type(error).__name__)
+        checks.record_authority_failure()
     finally:
         try:
             checks.cleanup()

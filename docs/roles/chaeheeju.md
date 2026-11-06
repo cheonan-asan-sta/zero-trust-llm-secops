@@ -1,6 +1,10 @@
 # 채희주 개인 실행 계획
 
-11/6 후속 검증: 집중104/신규37·Linux2087, 실제 rekey22·관측72·CA29 통과/소유 자원0.
+11/6 기동 진단 후속: CI 첫 CA 초기 대기 실패와 별도 Ubuntu 재현의 만료 대조 실패를 구분해 기록한다.
+원문을 제외한 controller 이유와 첫 assertion 이전 RO snapshot을 추가했고 집중205/신규22·Linux2109/경고2를 통과했다.
+최신 전체 회귀·정확한 head 인수/병합은 [진단 보강 기록](../persistent-key-rotation.md)을 따른다.
+
+11/6 초기 구현 검증: 집중104/신규37·Linux2087, 실제 rekey22·관측72·CA29 통과/소유 자원0.
 [공개 원자료](../infrastructure-results/persistent-key-rotation-20261106.json)에 실행별 입력과 범위를 구분한다.
 
 11/6 3주차 후속 [지속 실행 개인키 교체·관측 진단](../persistent-key-rotation.md): 기존 controller와

@@ -67,6 +67,18 @@ class AuthorityChecks(MonitoredChecks):
         super().__init__(directory, runtime_class=AcceptanceRuntime)
         self.report['schema'] = 'authority-continuous-mtls-verification-1'
 
+    def record_authority_failure(self):
+        # Diagnostics must preserve the original failure, including startup errors
+        # raised inside Runtime.up before the first acceptance assertion.
+        try:
+            from scripts.authority_diagnostics import collect
+            if 'authority_failure_diagnostics' not in self.report:
+                self.report['authority_failure_diagnostics'] = collect(self.runtime)
+            self.record_monitoring_failure('authority_runtime_failure')
+            self.save()
+        except (RuntimeError, OSError, ValueError, KeyError, TypeError, AttributeError, ImportError, subprocess.SubprocessError):
+            self.report.setdefault('authority_failure_diagnostics', {'snapshot': {'available': False}})
+
     def wait(self, predicate, label, timeout=90):
         try:
             self.runtime.wait(predicate, timeout=timeout)
@@ -387,6 +399,7 @@ def main():
         checks.run()
     except (RuntimeFailure, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as error:
         checks.report.update(completed=False, failure=str(error) if isinstance(error, RuntimeFailure) else type(error).__name__)
+        checks.record_authority_failure()
     finally:
         try:
             checks.cleanup()

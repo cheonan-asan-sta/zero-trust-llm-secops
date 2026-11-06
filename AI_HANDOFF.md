@@ -2,7 +2,12 @@
 
 ## 2026년 11월 6일 지속 실행 leaf rekey 및 관측 실패 진단
 
-- 최종 집중104/신규37, Linux2087·경고2, Windows2083/skip4·경고3, 실제 rekey22/관측72/CA29 통과·소유 자원0.
+- 후속: PR37 첫 head985cd4c의 CI42168186247/attempt1은 CA `Runtime.up`에서0검사 timeout·정리0이다.
+  원인 미확정이며 새 rekey는 skipped다. 같은 head의 Ubuntu 재현은 초기39/서버11 통과 뒤19검사에서
+  이미 만료된 collector 양성 대조로 중단·정리0. 이를 CI 초기 실패 재현/전체 CA29로 기록하지 않는다.
+  후속은 원문을 제외한 controller 실패 종류와 RO/8초 초기 snapshot을 CA/rekey 인수 main에서 수집한다.
+  집중205/신규22·최종 Linux2109/경고2 통과. 정확한 새 head의 전체 회귀·인수·병합 결과는 PR37 후속 기록을 확인한다.
+- 초기 구현: 집중104/신규37, Linux2087·경고2, Windows2083/skip4·경고3, 실제 rekey22/관측72/CA29 통과·소유 자원0.
   [공개 원자료](docs/infrastructure-results/persistent-key-rotation-20261106.json)의 로컬 커밋 전 입력과 PR의 정확한 head CI를 구분한다.
 
 - [새 선택형 프로필](docs/persistent-key-rotation.md): 기존 교체기를 업무/관측16서비스·9내부망·31볼륨에 연결한다.
