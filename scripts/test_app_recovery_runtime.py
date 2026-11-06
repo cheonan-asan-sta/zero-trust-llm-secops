@@ -12,7 +12,8 @@ from pathlib import Path
 from scripts.app_state_recovery import ROOT, app_digest, canonical, require, sha
 
 SOURCE_FILES = ("scripts/app_state_recovery.py", "scripts/app_recovery_fixture.py",
-                "scripts/serve_recovered_app.py", "scripts/test_app_recovery_runtime.py")
+                "scripts/serve_recovered_app.py", "scripts/test_app_recovery_runtime.py",
+                "scripts/app_storage_contract.py", "scripts/app_storage_fixture.py")
 
 
 def fingerprint():
@@ -21,7 +22,8 @@ def fingerprint():
 
 
 class Lab:
-    def __init__(self, image):
+    def __init__(self, image, *, full_state=False):
+        self.full_state = full_state
         self.image = self.command("image", "inspect", image)[0]["Id"]
         self.owner = "app-recovery-" + secrets.token_hex(6)
         self.volumes = {name: self.owner + "-" + name for name in ("data", "control", "public", "backups", "restores")}
@@ -67,7 +69,8 @@ class Lab:
     def invoke(self, operation, backup=None, denied=None):
         code = ("import json; from scripts.app_state_recovery import Store; from pathlib import Path; "
                 "s=Store(Path('/lab')); print(json.dumps(s." + operation +
-                ("(" + repr(backup) + ")" if backup else "()") + "))")
+                ("(" + repr(backup) + ")" if backup else
+                 "(full_state=True)" if operation == "initialize" and self.full_state else "()") + "))")
         if denied:
             code = ("import sys,json; from scripts.app_state_recovery import RecoveryError\ntry:\n    " + code +
                     "\nexcept RecoveryError as error:\n    print(json.dumps({'denied':str(error)})); sys.exit(3)")
@@ -88,7 +91,7 @@ class Lab:
             actual = {row["Name"] for row in item["Mounts"] if row["Type"] == "volume"}
             require(actual == expected_mounts and not item["State"]["Running"], "writer_not_fenced")
 
-    def start(self, *, restore_id=None):
+    def start(self, *, restore_id=None, wrong_storage=False):
         name = self.owner + ("-restored-" + secrets.token_hex(3) if restore_id else "-source")
         data = "/recovered/" + restore_id if restore_id else "/lab/data"
         mounts = [("restores", "/recovered", False), ("public", "/public", True)] if restore_id else [("data", data, False)]
@@ -97,6 +100,11 @@ class Lab:
                "API_KEY_SUBJECT": "recovery-test", "API_KEY_TENANT_ID": "recovery-tenant", "API_KEY_ROLES": "admin",
                "ZERO_TRUST_DB_PATH": data + "/app.sqlite3", "TRUSTED_SIGNAL_SOURCES_PATH": data + "/sources.json",
                "AUDIT_LOG_PATH": "/tmp/audit.jsonl", "CASE_LOG_PATH": "/tmp/cases.jsonl", "OUTBOX_LOG_PATH": "/tmp/outbox.jsonl"}
+        if self.full_state:
+            env.update(AUDIT_BACKEND="jsonl", AUDIT_LOG_PATH=data + "/audit.jsonl",
+                       CASE_LOG_PATH=data + "/cases.jsonl", OUTBOX_LOG_PATH=data + "/integration-outbox.jsonl")
+        if wrong_storage:
+            env["OUTBOX_LOG_PATH"] = "/tmp/outbox.jsonl"
         for key, value in env.items():
             args += ["-e", key + "=" + value]
         args += ["--tmpfs", "/data:rw,nosuid,nodev,size=1m", "--user", "10001:10001"]
@@ -148,6 +156,10 @@ class Lab:
         require(actual == fingerprint(), "image_source_mismatch")
         self.checks["image_source_matches"] = True
         self.job("from pathlib import Path; from scripts.app_recovery_fixture import prepare; prepare(Path('/lab/data'))")
+        if self.full_state:
+            self.job("from pathlib import Path; import json; from scripts.app_storage_fixture import seed_logs; "
+                "p=Path('/lab/data'); expected=seed_logs(p); f=json.loads((p/'fixture.json').read_bytes()); "
+                "f['jsonl']=expected; (p/'fixture.json').write_text(json.dumps(f))")
         self.invoke("initialize")
         source = self.start()
         self.ready(source)
@@ -204,12 +216,37 @@ else: raise RuntimeError('fault_not_injected')
         self.run("rm", source)
         self.writers = []
         self.job("from pathlib import Path; p=Path('/lab/data'); "
-            "[(p/name).unlink(missing_ok=True) for name in ('app.sqlite3','app.sqlite3-wal','app.sqlite3-shm','sources.json')]; "
+            "[(p/name).unlink(missing_ok=True) for name in ('app.sqlite3','app.sqlite3-wal','app.sqlite3-shm','sources.json')" +
+            ("+('storage.json','audit.jsonl','cases.jsonl','integration-outbox.jsonl')" if self.full_state else "") + "]; "
             "assert not (p/'app.sqlite3').exists()")
         self.checks["original_database_destroyed"] = True
         outage = time.perf_counter()
         restored = self.invoke("restore", backup["backup_id"])
         stage = "/lab/restores/" + restored["restore_id"]
+        if self.full_state:
+            fault = self.job("""import os
+from pathlib import Path
+from scripts import app_state_recovery as r
+original=r.atomic
+def fail(path,raw):
+    if path.name=='integration-outbox.jsonl': os._exit(73)
+    original(path,raw)
+r.atomic=fail
+r.Store(Path('/lab')).restore(""" + repr(backup["backup_id"]) + ")", ok=False)
+            self.checks["full_storage_mid_restore_process_exit"] = fault.returncode == 73
+            denied = self.job("from pathlib import Path; from scripts.app_state_recovery import verify_admission; "
+                "verify_admission(Path('" + stage + "'),Path('/lab/public'))", ok=False)
+            self.checks["full_storage_interrupted_restore_fences_previous_copy"] = denied.returncode != 0
+            restored = self.invoke("restore", backup["backup_id"])
+            stage = "/lab/restores/" + restored["restore_id"]
+            result = self.job("import json; from pathlib import Path; from scripts.app_storage_contract import inspect; "
+                "from scripts.app_state_recovery import require; p=Path('" + stage + "'); "
+                "f=json.loads(Path('/lab/data/fixture.json').read_bytes()); "
+                "require(inspect(p)==f['jsonl'],'full_storage_state_changed'); print(json.dumps({'preserved':True}))")
+            self.checks["full_storage_bytes_heads_and_delivery_state_preserved"] = json.loads(result.stdout)["preserved"]
+            wrong = self.start(restore_id=restored["restore_id"], wrong_storage=True)
+            self.run("wait", wrong)
+            self.checks["full_storage_wrong_path_denied_before_http"] = self.command("inspect", wrong)[0]["State"]["ExitCode"] != 0
         result = self.job("import json; from pathlib import Path; from scripts.app_recovery_fixture import verify; "
             "print(json.dumps(verify(Path('" + stage + "'),Path('/lab/data'))))")
         self.checks["fixed_clock_old_grants_denied"] = json.loads(result.stdout)["old_grants_denied"] == 3
@@ -236,7 +273,41 @@ print(json.dumps({'denied':3}))
         response = self.run("exec", "-i", ident, "python", "-c", probe,
                             input=json.dumps({"tokens": payload["tokens"], "key": self.api_key}))
         self.checks["real_authenticated_http_denies_old_grants"] = json.loads(response.stdout)["denied"] == 3
+        if self.full_state:
+            probe = """import sys,json,urllib.request
+key=json.load(sys.stdin)['key']
+def get(path):
+    r=urllib.request.Request('http://127.0.0.1:8000'+path,headers={'X-API-Key':key})
+    return json.load(urllib.request.urlopen(r,timeout=3))
+cases=get('/cases?limit=100'); rows=get('/integrations/outbox?limit=100')
+assert len(cases)==1 and len(rows)==4
+assert {row['status'] for row in rows}=={'PENDING','DELIVERED','RETRY_SCHEDULED','DEAD_LETTER'}
+assert all(row['event']['tenant_id']=='recovery-tenant' for row in rows)
+print(json.dumps({'tenant_state_preserved':True}))
+"""
+            response = self.run("exec", "-i", ident, "python", "-c", probe,
+                                input=json.dumps({"key": self.api_key}))
+            self.checks["full_storage_real_http_cases_and_outbox_isolate_tenant"] = json.loads(response.stdout)["tenant_state_preserved"]
         self.run("stop", ident)
+        if self.full_state:
+            result = self.job("""import asyncio,json
+from pathlib import Path
+from scripts.app_storage_contract import FILES,inspect
+from scripts.app_state_recovery import verify_admission,require
+from app.services.cases import CaseStore
+from app.services.integration_outbox import IntegrationOutboxStore,IntegrationOutboxService
+p=Path(""" + repr(stage) + """)
+before=inspect(p)
+for _ in range(2):
+    cases=CaseStore(p/FILES['cases'])
+    service=IntegrationOutboxService(IntegrationOutboxStore(p/FILES['outbox']))
+    for tenant in ('recovery-tenant','unrelated-tenant'):
+        require(asyncio.run(service.reconcile_cases(cases.recent(100,tenant)))==(0,4),'duplicate_after_restore')
+require(inspect(p)==before,'reconcile_changed_delivery_state')
+verify_admission(p,Path('/lab/public'))
+print(json.dumps({'reconciled':True}))
+""")
+            self.checks["full_storage_reconcile_twice_after_reopen_preserves_ids_and_attempts"] = json.loads(result.stdout)["reconciled"]
         self.job("from pathlib import Path; from scripts.app_state_recovery import verify_admission; "
                  "verify_admission(Path('" + stage + "'),Path('/lab/public'))")
         self.checks["audit_descendant_restart_admitted"] = True
@@ -249,7 +320,8 @@ print(json.dumps({'denied':3}))
         self.checks["tampered_admission_exits_before_serving"] = not state["Running"] and state["ExitCode"] != 0
         logs = self.run("logs", denied)
         self.checks["tampered_admission_reports_expected_denial"] = "RECOVERY_ADMISSION_DENIED" in logs.stderr
-        return {"backup_bytes_plaintext": backup["plaintext_bytes"], "source_records": restored["source_records"],
+        return {"backup_bytes_plaintext": backup["plaintext_bytes"], "jsonl_bytes": backup["jsonl_bytes"],
+                "source_records": restored["source_records"],
                 "fenced_sessions": restored["fenced_sessions"], "rpo_at_stopped_checkpoint_records": 0,
                 "rpo_scope": "Only the fully stopped, witnessed lab writer boundary; no online RPO promise."}
 
@@ -258,6 +330,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--image", required=True)
     parser.add_argument("--directory", type=Path, required=True)
+    parser.add_argument("--full-state", action="store_true", help="Include audit, cases and outbox recovery")
     args = parser.parse_args()
     directory = args.directory.resolve()
     require(directory.is_relative_to((ROOT / "runtime/week3").resolve()) and not directory.exists(), "fresh_local_lab_required")
@@ -266,7 +339,10 @@ def main():
               "source": fingerprint(), "base_git_head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
               "source_dirty": bool(subprocess.check_output(["git", "status", "--porcelain", "--untracked-files=no"], cwd=ROOT, text=True).strip()),
               "execution": "Chaeheeju / Codex tools; local Docker; rule analyzer; synthetic data", "passed": False}
-    lab = Lab(args.image)
+    report["full_state"] = args.full_state
+    if args.full_state:
+        report["execution"] = "Local Docker; rule analyzer; synthetic data"
+    lab = Lab(args.image, full_state=args.full_state)
     report["image_id"] = lab.image
     failure = None
     try:
