@@ -156,12 +156,12 @@ class PersistentAuthorityRuntime(RekeyRuntime):
 
     def verify_authority_public_assets(self):
         self.verify_owned_volumes()
-        expected = self.state['authority_public_sha256']
-        if set(expected) != set(assets.PUBLIC_FILES) or any(set(expected[v]) != set(names) for v, names in assets.PUBLIC_FILES.items()):
+        inventory, expected = self.authority_public_inventory(), self.authority_public_expected()
+        if set(expected) != set(inventory) or any(set(expected[v]) != set(names) for v, names in inventory.items()):
             raise RuntimeFailure('authority_public_inventory_changed')
         argv = ['docker', 'run', '--rm', '--network', 'none', '--read-only', '--user', '10001:10001',
                 '--cap-drop=ALL', '--security-opt=no-new-privileges:true', '--memory', '256m', '--cpus', '1']
-        for volume in assets.PUBLIC_FILES:
+        for volume in inventory:
             argv += ['--mount', f"type=volume,src={self.state['volumes'][volume]},dst=/fixed/{volume},readonly"]
         program = '''import hashlib,json,sys
 from pathlib import Path
@@ -176,9 +176,18 @@ for volume,names in json.load(sys.stdin).items():
   result[volume][name]=hashlib.sha256(body.replace(b'\\r\\n',b'\\n')).hexdigest()
 print(json.dumps(result))'''
         actual = json.loads(command([*argv, '--entrypoint', 'python', '-i', self.state['authority_image_id'], '-c', program],
-                                    payload=json.dumps(assets.PUBLIC_FILES), timeout=15))
+                                    payload=json.dumps(inventory), timeout=15))
         if actual != expected:
             raise RuntimeFailure('authority_public_configuration_drift')
+
+    def authority_public_inventory(self):
+        return assets.PUBLIC_FILES
+
+    def authority_public_expected(self):
+        return self.state['authority_public_sha256']
+
+    def database_transport_root_hash(self):
+        return self.state['authority_public_sha256']['authority-db-tls']['root.pem']
 
     def verify_authority_database(self):
         self._database_transport = self.verify_database_transport()
@@ -201,7 +210,7 @@ print(json.dumps(result))'''
         try:
             result = json.loads(command([*argv, '--entrypoint', 'python', '-i', self.state['authority_image_id'],
                 '-m', 'scripts.database_transport_preflight'], payload=json.dumps({'expected_root_sha256':
-                    self.state['authority_public_sha256']['authority-db-tls']['root.pem']}), timeout=15))
+                    self.database_transport_root_hash()}), timeout=15))
         except (RuntimeFailure, ValueError, OSError, subprocess.SubprocessError):
             raise RuntimeFailure('database_transport_preflight_failed') from None
         if result.get('verified') is not True:
@@ -321,16 +330,23 @@ class GraphBackend(DockerBackend):
         path = Path(profile['directory'])
         if path.is_absolute():
             raise LifecycleError('persistent_authority_directory_scope')
-        runtime = PersistentAuthorityRuntime(ROOT / path)
+        runtime_class = PersistentAuthorityRuntime
+        if profile.get('transport_lifecycle') is True:
+            from scripts.database_transport_runtime import TransportRuntime
+            runtime_class = TransportRuntime
+        runtime = runtime_class(ROOT / path)
         runtime.load()
         return cls(runtime, profile)
 
     def owned_container(self, expected):
         records = [self.profile['ca'], self.profile['leaf'], *self.profile['ca_replicas']]
+        if self.profile.get('transport_lifecycle') is True:
+            records.append(self.profile['transport_database'])
         if expected not in records:
             raise LifecycleError('persistent_authority_container_scope')
         found = json.loads(self.command(['inspect', expected['id']]))[0]
-        service = ('certificate-controller' if expected == self.profile['leaf'] else
+        service = ('ca-db' if expected == self.profile.get('transport_database') else
+                   'certificate-controller' if expected == self.profile['leaf'] else
                    'ca' if expected['name'] == self.profile['ca']['name'] else 'ca-secondary')
         spec = self.runtime.definition(self.project, 'app', 'nginx')['services'][service]
         wanted = {}
@@ -338,7 +354,8 @@ class GraphBackend(DockerBackend):
             volume, target, *flags = entry.split(':')
             wanted[target] = (self.runtime.state['volumes'][volume], not flags)
         actual = {m['Destination']: (m.get('Name'), m['RW']) for m in found['Mounts'] if m['Type'] == 'volume'}
-        if (found['Id'] != expected['id'] or found['Name'] != '/' + expected['name'] or found['Image'] != self.profile['image']
+        if (found['Id'] != expected['id'] or found['Name'] != '/' + expected['name']
+                or found['Image'] != (self.runtime.expected_image(service) if service == 'ca-db' else self.profile['image'])
                 or found['Config']['Labels'].get('secops.runtime') != self.project
                 or found['Config']['Labels'].get('com.docker.compose.service') != service
                 or actual != wanted or any(m['Type'] == 'bind' for m in found['Mounts'])

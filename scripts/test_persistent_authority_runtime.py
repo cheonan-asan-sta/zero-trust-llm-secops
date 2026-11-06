@@ -38,8 +38,10 @@ class AcceptanceRuntime(PersistentAuthorityRuntime):
 
 
 class Checks(AuthorityChecks):
-    def __init__(self, directory):
-        MonitoredChecks.__init__(self, directory, runtime_class=AcceptanceRuntime)
+    expected_volumes = 36
+
+    def __init__(self, directory, *, runtime_class=AcceptanceRuntime):
+        MonitoredChecks.__init__(self, directory, runtime_class=runtime_class)
         self.report['schema'] = 'persistent-authority-ha-verification-1'
         self._ca_floor = 0
 
@@ -245,9 +247,9 @@ print(json.dumps({'status':code,'unexpired':alive}))
         self.report['authority'] = {key: copy.deepcopy(r.state[key]) for key in ('authority_image_id', 'authority_tools', 'authority_binary_sha256',
             'authority_database_image_id', 'authority_database_reference', 'authority_database_tools')}
         spec = r.definition(r.state['project'], 'app', 'nginx')
-        self.require(len(spec['services']) == 18 and len(spec['networks']) == 10 and len(spec['volumes']) == 36,
+        self.require(len(spec['services']) == 18 and len(spec['networks']) == 10 and len(spec['volumes']) == self.expected_volumes,
                      'persistent_authority_topology')
-        self.add('eighteen_services_ten_internal_networks_thirty_six_owned_volumes')
+        self.add('eighteen_services_ten_internal_networks_' + str(self.expected_volumes) + '_owned_volumes')
         for name in r.services:
             info = self.inspect(name)
             self.require(info['Config']['User'] == '10001:10001' and info['HostConfig']['ReadonlyRootfs']
