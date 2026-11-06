@@ -1,0 +1,1787 @@
+{
+  "schema": "ca-bootstrap-readiness-evidence-1",
+  "date": "2026-11-06",
+  "owner": "chaeheeju infrastructure execution and measurement; Codex tool assistance",
+  "base": "99bf0cab50057c8f1801d4026a8beb4c66318322",
+  "branch": "feature/chaeheeju-ca-bootstrap-order",
+  "cloud_or_paid_llm_calls": 0,
+  "pr37_premerge": {
+    "run_id": "42181443167",
+    "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/42181443167/attempts/1",
+    "head": "df368d4825e02db4a0fbf8b2be7602f8a5ed6b02",
+    "source_commit": "dd9a8c90eea4097af8067186c9c4fa6ca448cccd",
+    "status": "success",
+    "pytest": [
+      "2170 passed, 2 skipped, 2 warnings in 260.86s (0:04:20)",
+      "2172 passed, 2 warnings in 352.46s (0:05:52)"
+    ],
+    "monitored_mtls_checks": 72,
+    "app_recovery_checks": 24,
+    "git_source_config_files_verified": 139,
+    "release_files_verified": 162,
+    "release_sha256": "6e406d91ffb193d94e5bddd91cbdcbcd9a81991774204b4f2ad62e5d300dea78",
+    "monitoring_image_id": "sha256:8f122fe7940e024ad704f06c039af5c32896a34636c3ecf39d6a77158ee795b0",
+    "monitoring_tools_and_binary_inventory_verified": true,
+    "release_image_payload_verified": true,
+    "source_dirty": false,
+    "cleanup": {
+      "monitored_mtls": {
+        "containers": 0,
+        "volumes": 0,
+        "networks": 0
+      },
+      "app_recovery": {
+        "containers": 0,
+        "volumes": 0
+      }
+    },
+    "all_jobs_success": true,
+    "log_sha256": "83b7e453e422c2e8d0ca92e12a4f6903bec45386b4cc36a8876277bee2fa2b8a",
+    "authority_checks": 29,
+    "authority_release_files_verified": 164,
+    "authority_release_sha256": "46839944778fd5f4e0ea0004b8dd5234fb6b8b81159e83f766923c081153d864",
+    "authority_tools_verified": true,
+    "authority_image_id": "sha256:2513018bc3f631e226842efed8574f259b531f9dd9b96c011c29fec65db178cb",
+    "authority_cleanup": {
+      "containers": 0,
+      "volumes": 0,
+      "networks": 0
+    },
+    "authority_source_verified": true,
+    "host_locked_install_verified": true,
+    "rekey_checks": 22,
+    "rekey_release_files_verified": 165,
+    "rekey_release_sha256": "c01061a876c3f4442b03aedd18ea75ba218d594b29360861838b9793e1cf7d8d",
+    "rekey_source_verified": true,
+    "rekey_cleanup": {
+      "containers": 0,
+      "volumes": 0,
+      "networks": 0
+    },
+    "monitoring_actual_outage_diagnostics_verified": true,
+    "attempt": 1
+  },
+  "pr37_postmerge_failure": {
+    "run_id": "42185498165",
+    "attempt": 1,
+    "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/42185498165/attempts/1",
+    "head": "99bf0cab50057c8f1801d4026a8beb4c66318322",
+    "premerge_and_postmerge_git_trees_equal": true,
+    "ca_checks": 0,
+    "rekey_step": "skipped",
+    "report": {
+      "schema": "authority-continuous-mtls-verification-1",
+      "completed": false,
+      "started_at": "2026-11-06T08:31:31.471897+00:00",
+      "checks": [],
+      "failure": "runtime_wait_timeout",
+      "authority_failure_diagnostics": {
+        "schema": "public-authority-failure-1",
+        "captured_at": "2026-11-06T08:35:15.709285+00:00",
+        "authority_initialized": false,
+        "storage_initialized": true,
+        "snapshot": {
+          "available": true,
+          "credential_count": 39,
+          "generations": {
+            "0": 39
+          },
+          "controller_at": 1793954115.1866932,
+          "phase": null,
+          "paused": false,
+          "publication_failed": false,
+          "reason": null,
+          "native_servers_observed": [],
+          "reloads": [
+            {
+              "service": "proxy",
+              "available": true,
+              "expected_sha256": "ab9f0d92b76322285b038e8e3bffe43cc2e6435b07e8500651b61b2bdb26e608",
+              "observed_sha256": "ab9f0d92b76322285b038e8e3bffe43cc2e6435b07e8500651b61b2bdb26e608",
+              "matches": true
+            },
+            {
+              "service": "prometheus",
+              "available": true,
+              "expected_sha256": "d5799ecaf099050820560a2eddf06fd49a2663c446bba43ad89313adeabcfa4c",
+              "observed_sha256": "d5799ecaf099050820560a2eddf06fd49a2663c446bba43ad89313adeabcfa4c",
+              "matches": true
+            },
+            {
+              "service": "alertmanager",
+              "available": true,
+              "expected_sha256": "94c2ffa13a55df3c00f9b62e672b4ff4b62c1298e2518bde5519e47b2e8dd05c",
+              "observed_sha256": "94c2ffa13a55df3c00f9b62e672b4ff4b62c1298e2518bde5519e47b2e8dd05c",
+              "matches": true
+            }
+          ]
+        }
+      },
+      "monitoring_failure_diagnostics": {
+        "schema": "public-c01-diagnostics-1",
+        "captured_at": "2026-11-06T08:35:16.933279+00:00",
+        "reason": "authority_runtime_failure",
+        "budget_seconds": 20,
+        "prometheus": {
+          "up": {
+            "available": true,
+            "samples": [
+              {
+                "labels": {
+                  "instance": "exporter:9101",
+                  "job": "zt-signals"
+                },
+                "timestamp": 1793954118.852,
+                "value": 1.0
+              }
+            ],
+            "truncated": false
+          },
+          "alerts": {
+            "available": true,
+            "samples": [],
+            "truncated": false
+          },
+          "rules": {
+            "available": true,
+            "rules": [
+              {
+                "name": "C01SignalQueueBacklog",
+                "state": "inactive",
+                "health": "ok",
+                "evaluation_error": false,
+                "evaluation_seconds": 0.000187235
+              },
+              {
+                "name": "C01SignalCollectionUnavailable",
+                "state": "inactive",
+                "health": "ok",
+                "evaluation_error": false,
+                "evaluation_seconds": 5.1843e-05
+              },
+              {
+                "name": "C01ExporterDown",
+                "state": "inactive",
+                "health": "ok",
+                "evaluation_error": false,
+                "evaluation_seconds": 8.3942e-05
+              },
+              {
+                "name": "C01SignalProcessingFailed",
+                "state": "inactive",
+                "health": "ok",
+                "evaluation_error": false,
+                "evaluation_seconds": 4.5022e-05
+              }
+            ],
+            "truncated": false
+          }
+        },
+        "services": [
+          {
+            "service": "certificate-controller",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "ca",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "operator",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "alertmanager",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "bridge",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "app",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "prometheus",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "gateway",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "resource",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "sink",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "reader",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "worker",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "watchdog",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "collector",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "exporter",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "proxy",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          }
+        ],
+        "budget_exhausted": false
+      },
+      "cleanup": {
+        "containers": 0,
+        "volumes": 0,
+        "networks": 0
+      },
+      "finished_at": "2026-11-06T08:35:27.212437+00:00"
+    },
+    "inference": "generation0 and no publication; missing pre-grant readiness boundary matches reproduced iat rejection; failed-CI raw HTTP reason not captured"
+  },
+  "controlled_policy_probe": {
+    "completed": true,
+    "initial_credentials": 39,
+    "native_servers": 11,
+    "generations": [
+      1
+    ],
+    "old_token_signature_valid": true,
+    "old_token_unexpired": true,
+    "old_token_predates_ca_container": true,
+    "old_status": 401,
+    "old_rejection_reason_in_ca_log": true,
+    "fresh_consumed_grant_replay_status": 401,
+    "replay_rejection_in_ca_log": true,
+    "source_commit": "99bf0cab50057c8f1801d4026a8beb4c66318322",
+    "source_dirty": true,
+    "release_lock": {
+      "payload": {
+        "schema": "local-runtime-release-1",
+        "platform": "linux/amd64",
+        "nginx_reference": "nginx@sha256:b565a9579cdabe43de09a5a278dc95ceee721dae1cacf85247effc4f6630d511",
+        "files": {
+          ".dockerignore": "fcae495a3f4cceefd962edca376d682ce94dff3115e7c32a1eb690c390a93d51",
+          "Dockerfile": "1dde008271fcd5da9a4dc35044f76b75976ee152d22adb5fa332e3d97f0e8bff",
+          "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+          "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+          "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+          "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+          "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+          "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+          "app/config.py": "0cce522f9991ae302a87f39cb727593d680392062a296958b80d563359053a01",
+          "app/continuous_signal_models.py": "9482577e2d7cb210a16cf3de6ef46517c32c32ee1ec1efb23e28f626fda25ee3",
+          "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+          "app/data/benchmark/cases.jsonl": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f",
+          "app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+          "app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+          "app/data/control-register.json": "a8884d1269874e18a6b5261940d9e498c8509c51d0f134ea252e6b04a327c201",
+          "app/data/replay/NOTICE.md": "500a22b9b16b4b76ff214872adfdcce862a1045818df96b645f41f0fac12a786",
+          "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+          "app/data/replay/manifest.json": "bc974726efe7f2b98119af04b9b624ba4b18a4588b2d5ff8a4c441d4beb232e9",
+          "app/data/replay/microsoft-sentinel-wiz-audit.json": "4bc25e2e6ae2cb4b80d2d135fb401d073e2c66e2d183dd5cabb574cde27ebc3b",
+          "app/data/replay/splunk-aws-console-login-failures.jsonl": "7bc7fc2237bdbab84c8d70f3243dac849c181196892beaadf75ebfa5f2e9d02b",
+          "app/data/replay/splunk-rdp-session-established.xml": "801e46d2c0e771e9a9b28d0579ba740f511358949b835367f80271b4392ed486",
+          "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+          "app/data/sigma/credential_anomaly.yml": "27ee3ff5ce6eb25bdffeb5d25a59998b21c799fcff48768204be57f2974b4086",
+          "app/data/sigma/data_exfiltration.yml": "e378a7df56ac30a3c5568d42e86be53bfd43ce88489ae500c84d16e8ee8466e7",
+          "app/data/sigma/lateral_movement.yml": "cd13987a9a7ae36d57f718a2b9a87cb0fb224e5a78380311dec8edcd78dfe0c8",
+          "app/data/sigma/privilege_escalation.yml": "337b23a4ba5bed1081828f30d771f777628d8bdd88ee1298a776e7f3f21eb880",
+          "app/data/sigma/remote_desktop_logon.yml": "35a4a4fbe7ae16484a16a4287e6287239697648018be40dd4e9c33e04b0c61ee",
+          "app/data/sigma/unmanaged_device_access.yml": "b0c3ef8498458e9d687c32ca554147de44db7cdf84857eacf4224050b8122004",
+          "app/data/zero-trust-policies.json": "ab3acc5b14ba5a4af640240cc781d1ea63523a096d7e5c2dfd3d912dc468d0f9",
+          "app/main.py": "22ccdd69e9bd30842ea4708a15101d51722876f28baeb8b0b1ca625aa0820997",
+          "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+          "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+          "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+          "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+          "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+          "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+          "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+          "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+          "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+          "app/services/collector_spool.py": "c211e41b80c8de5007e73e70ddaa2ebd039bfae8c665edcc0c6d9cfe114cde01",
+          "app/services/continuous_signals.py": "870da40ee024067d6c35689b6daed7fd89215071918650a4a17cc7c5a1aa37d6",
+          "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+          "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+          "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+          "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+          "app/services/inbox_archive.py": "d2ea9abdc4f5e4aa735a72915266a2a3c96e61a6c32e464df704685374c258c1",
+          "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+          "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+          "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+          "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+          "app/services/policy_journal.py": "3afe04d54355f4bbfedc0c8e18ae85efeaaa340f82cb9f737760061987fae29a",
+          "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+          "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+          "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+          "app/services/signal_inbox.py": "7d16a6b1f2f3abb0746a29a856a5312cab52d00820e41ebf7f05716b9289982a",
+          "app/services/trusted_signals.py": "d2fdbcbcf69953232288e3da196033105a5e4a954a4bc6c64fa48388c392e8cf",
+          "app/services/zero_trust.py": "c3658b1204aecc9e12053d3643c213380196b8781fce46f5efa7f33d99edd511",
+          "app/static/app.js": "81c36a450b626215d1d477ce80274879d2e34c7f2b25a8e081d720a1aa2422ee",
+          "app/static/favicon.svg": "bec88bbc90b4997af05738501c6d2e4067c568ceac4f0a99dbb776238d0903ab",
+          "app/static/index.html": "f02561df26b9be46729327de76bee6096707620ab4d5db4362fec332d3ee35ec",
+          "app/static/styles.css": "230330aa277d662169610a2be084511720a011ade1351ee8c925b5a441a54c48",
+          "app/zero_trust_api.py": "8df229ab6392b1330e40c90bd508961721b95413121388c4b14650fb54f34ec7",
+          "app/zero_trust_models.py": "0c4506d0cc3adeba57fa40297f68112b599d1acab607c93db4ab674e6c40a538",
+          "infra/mtls/all-hops-nginx.conf": "b9cf941bfbaab0c5c5b89f1fc02cd164542a48d46cac0d27855cef8ce60f1509",
+          "infra/mtls/ca-tools.lock.json": "182b2e5f0a2bdb91fe0b29a888a536044c08ca5b4177a610e870b0dcb45d4e96",
+          "infra/mtls/nginx-renewal.sh": "07468723f53706ef477f19725dcdf2fed53f51ea41eb277c317f828fc5f9505c",
+          "infra/observability/alerts.yaml": "442f9c0566db9d6088f6809907ecbf17f80ede1c2f62f20e76c6673fa2206779",
+          "infra/observability/tools.lock.json": "b65aadfdb1d637ca15c03a59c58c0ddeb04f778b5edd99f29e47b33cb5fae75f",
+          "infra/pep/tools.lock.json": "69b9ddd436c4aed7fd27b70afad40fe3740e5b4b0c5a50fbe503b1a93f654e66",
+          "infra/runtime/NOTICE.md": "98df8af2f6bb7b0232f1bc4666f644176ddfe88140774455f6f7b09b8fb7110d",
+          "infra/runtime/build_runtime.py": "f12b3ffaac1aa6445f53953f827e800485e15e3acc5fee572151d914ad843885",
+          "infra/runtime/http-client.patch": "73bb32ef9b713ad796751bb1e8df5104974255e71e03e3b69d339c53568de701",
+          "infra/runtime/requirements/build.lock": "013559140df5e368e32008c14145bf79e0b032d7ce06345989d2e222875b9e88",
+          "infra/runtime/requirements/runtime.lock": "f1ea4b9984f15394db8c2f300934ef173245c9addf8bc89e7114d760cdbf8d07",
+          "infra/runtime/requirements/test.lock": "9824d5fb26b94cc0fb9b36a52a70ca98eabc1801d93c11c77b2621cd2930c7ba",
+          "infra/runtime/sources.lock.json": "e5cd2b050b6a87a499ba8920a8d28469a7466aaaf85e6ac4d2e2ae7d5e390b2e",
+          "infra/runtime/verify_security.py": "bf45ca64aca30cabe4f49c37335d21d224bfc475a08a7ee8e95be31acbec58ca",
+          "pyproject.toml": "a71998c113e8cea24811d46050c1ae0aa431e0f8e1f37751e46eeeb7a5f90ed9",
+          "scripts/app_recovery_fixture.py": "edf14f711c974a7cb33457b716ea48dbe9299833b38fdc15706863874ec10274",
+          "scripts/app_state_recovery.py": "6a1c1150a706a1643f5556c43718736d9422b78e049d7a33a31ad4b148f5e532",
+          "scripts/app_storage_contract.py": "55cd4bcee4753b1535260a44f3c6d19c0d1deb90042001c43c5ec8f8c30ebe0f",
+          "scripts/app_storage_fixture.py": "d26f19a947aa4d4c106829b2da2adb2e223d8a35b6b1fca54983f166796c9ed2",
+          "scripts/assess_supply_chain.py": "a7019aa6fdc7e9c6ef8f0615ee55bd1a9e42c18549b14e22e55f3199619cd37b",
+          "scripts/authority_custodian.py": "de343958405c33effa92a6471e3dea1edf3ad8adf3af681050a26ef7ad46c77a",
+          "scripts/authority_diagnostics.py": "5923da8d4b2734fbdee1b1b52e6f9a31aff20ef99e216dcf21c278e3fcaa61da",
+          "scripts/authority_mtls_runtime.py": "344778153c21237e5a675a4d710ac00ad684b21778b7b5faebdc0bb798a4db6e",
+          "scripts/authority_rotation_coordinator.py": "2c702808b299692069fb505260f39db0316c53daf44ad284665f5fc9e8612614",
+          "scripts/authority_rotation_runtime.py": "11ec4e8cb92d808beb1b60755b8085bb59bd9478479ecaf03327f0a34af17c5b",
+          "scripts/authority_runtime_assets.py": "a0903013f96b25bd4986ad6faea2caeb8d3526e9e2dbc9548c53ad3453a81ec6",
+          "scripts/build_detection_benchmark.py": "ed2513a7d2901360c55c22785e0f1eab6b2496c17c4c3660901ccd5da77445bf",
+          "scripts/ca_endpoints.py": "77f41676e7a8a0c44449e32f6f271a7d4a8f5a48e17473593c42fa7074593cb6",
+          "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+          "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+          "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+          "scripts/certificate_authority.py": "adddc6bf0a629b8192c2a262e7aa7ec047114d4b826c0f3f040e0613b12d4ed3",
+          "scripts/certificate_controller.py": "14dae36a5af682ad5040cc27a5830160232851068d7e75944068130d95a62d30",
+          "scripts/certificate_key_rotation.py": "0ad9647b6e72ce8a5a67196f9df3284c561e7894686bc4bb961a7d31e5fcf6d8",
+          "scripts/certificate_reload_runner.py": "5e4f9aeeea931cefc77d77fe137d875666c96e204727e3f1b7661667aa65ee26",
+          "scripts/collector_input.py": "dd63ba19f5c5c82d2d535b5baccc14c457966385e9bb8eeed050dd9266071b9e",
+          "scripts/compare_observability.py": "709e9ab3c9af1d3f9f8683762214b1ce4efc624fc8baef16d206e2809b4bd796",
+          "scripts/compare_pep.py": "ccc998b829466c325f94b61d6443aeb9a6ce4f593ce8bd4d5679ee58855b622d",
+          "scripts/compare_supply_chain.py": "8c767c06b840de34cbd6536e382efc78929eb1c6d6330d1b3a891e098d9f979c",
+          "scripts/continuous_mtls_assets.py": "0409acda39f8a5dce3606b65a83226375bd4087f59e2938507042ab9be40abc2",
+          "scripts/continuous_mtls_runtime.py": "8ab6f4b789bd28988a1f9633ddfeec4206d84de9929b8bef778abbd2218c34b7",
+          "scripts/continuous_signal_collector.py": "00cfe3d80a4a41d95ea32dc4136bdc30ab794c36e6febf0d2a26801fdc816244",
+          "scripts/control_executor.py": "9b3fa0d00a90964c60860bb7c5c1df2678d050ba1ec0b32fb5fda341abab1c64",
+          "scripts/control_mirror.py": "257ff40d93aa632af4e34bc2306206836718432404ba66dfd98ed1b5e475d6aa",
+          "scripts/control_plane_ha.py": "c9db10231775eafd12a9c9708ee973993124bd48d9fec89800bad147a32b3be7",
+          "scripts/control_store.py": "81b9dd78f4be02723cdcbdf5cfbe42c861c56e754a154e9158b18b290cfc89cc",
+          "scripts/control_transition.py": "1c0f7f693c039ae48156d738b3bab08d2e9ff4b6478453d0a8197ce1db514ca2",
+          "scripts/evaluate_detection_benchmark.py": "270178af5fe498660a4d1fbb8b4d2f3c287199f4f777ee9e1ed0ca1c57d67d73",
+          "scripts/executor_cluster.py": "b9a0a0f9d12f0b80ffb481afffab6dd2f919ea415f8be0d18092104fe02635f5",
+          "scripts/executor_daemon_recovery.py": "15a083c72ad77b38d1469b15410024855c46fb4cb753014f330cf247a1107904",
+          "scripts/executor_disk.py": "a8070b44590f21da1e8e27b10371817b8f04b0ef05c99be91c7178383eb07acb",
+          "scripts/executor_fence.py": "f5c8067ab9130a8234b70f9a5e39c0a8c2fb751a9031318900db5226263d56cb",
+          "scripts/executor_store.py": "19e1f296ab4c8541d9431ed320a4caa8d858e8973ea285a5f1f01c0a1efb0a79",
+          "scripts/executor_transition.py": "79e243cc1242a7ada85932b275ca9710255f71275447307b824f891616ff89f9",
+          "scripts/local_signal_collector.py": "3bd27286e473283b10650a89863b349171285d0866104999f7ef42ec6a2cde9b",
+          "scripts/measure_signal_infrastructure.py": "c11e501b43463f435c24764d38bf9ed110c480c517b982af160f1527798ed8e8",
+          "scripts/monitored_mtls_runtime.py": "75ef6c64e45c1844194a65545e3f2e8810ef5ea862dd87183c59e8031f2d3c18",
+          "scripts/monitoring_diagnostics.py": "30d785995030beafa6a3b664a95f4095dd8cdb9c14240f225ce187b556290b7a",
+          "scripts/monitoring_runtime_assets.py": "7b8feb5aba444ca7720b5e26b0c97b3760088a654c41fc5eab8149d83d5c4150",
+          "scripts/monitoring_runtime_control.py": "b66aff1144b0dabdd3d15e99748f59784f00437613e250ac6064588db6288cec",
+          "scripts/mtls_fixtures.py": "c6414b317a456cd7eb97290c589bd2115bca57e898c9ca6bd4848a529c6802fe",
+          "scripts/mtls_native.py": "bd5046f8136a93f723207c70cdcf0984b575108e764335f2cc6dd766fcc7f925",
+          "scripts/mtls_transport.py": "43024fa67e17c558ffdedb458e65c6712a07468262278ce8fb5c90a2f81ddd65",
+          "scripts/observability_lab.py": "eea01b2ad71226ebebc64e60cfc06b3a9c85a584891d690ab3a1ebb39655b14f",
+          "scripts/pep_lab.py": "2d2491720dfb9982ca06862daeb9e1cd13bb21bfef08ad1d3aa4ca59e69abc1f",
+          "scripts/policy_journal.py": "67443d3370bbd32b40239ba99fad0c11dd9a520df45130a6167a416e8547ffce",
+          "scripts/recheck_supply_chain.py": "797651e936d8d21e7eabeb372d7a3c55dead5fa9975a6e57d33b2204d121e7c1",
+          "scripts/rekey_mtls_runtime.py": "6cb80eef36396adb4561051c65ebdceaea3f1834812d3ca830fbcf97c4e669be",
+          "scripts/rekey_runtime_assets.py": "12df79cbb753ebab8586a91268dccb0d30ab64963436f5b8f4178699067edf9d",
+          "scripts/rekey_runtime_control.py": "cde78cebe82448cd6137dd01246761bbf5fc4d845d15711073ee3a353762d255",
+          "scripts/review_supply_chain.py": "9d5425ca6e27aed96e224d79f3ef40af4bb0e20f2eeb9847d7f6f0895fd4efa4",
+          "scripts/runtime_release.py": "cd8f2dc0224c2859d27cc9c53d66fa85c52aa58500d0974ca67e366e1ab5dece",
+          "scripts/serve_recovered_app.py": "2fc84c975928c3f5459c8c1a0144c1960336abce37123bd99e768e318f237e72",
+          "scripts/service_daemon_recovery.py": "101aa30d6bc7a37b159ed1e62ae0f00f3045ef14f6aada9ade8a94188ee35738",
+          "scripts/service_recovery_store.py": "01e2423150812f56f88cbc82b6f27da0cc2eee68bbe4f62d018068aaaba9c157",
+          "scripts/session_watchdog.py": "a912566a23d919b7369fae98f22a5003e10bb7b2a0c186744505211907bcf1ac",
+          "scripts/signal_inbox.py": "2a72361e9f43a3dadbc1b0ef2fd46e5a822f83f27cc01be48f0fbac32f2b4d01",
+          "scripts/signal_metrics_exporter.py": "d74d736e8a7423aaf3a6940195e2853ad915d268e42ab0f4779f056bdfe19119",
+          "scripts/signal_worker.py": "b62316ed3e481501931572c134d50263052ae22cc92cb22dac163d5b7a271035",
+          "scripts/supply_chain_runtime_probe.py": "be4b52555a5a349817806ee23d72907b2e762f7b46f4fb7d37bb434622c42645",
+          "scripts/test_all_hops_mtls.py": "eb841f22ff531228aff62a496917c86ef4e6a7edbe9b3d5c47ca2dc02feddf46",
+          "scripts/test_app_recovery_runtime.py": "6e3bce3d33097b8edec2de7b81ce40b1fdd058687aca0a7e3362502f4e73e82a",
+          "scripts/test_authority_key_rotation.py": "50d8b3ba8e1aeb01bf22eb6867c36e008ccaffc9a363837afce87accbc0433e3",
+          "scripts/test_authority_mtls_runtime.py": "5c13652a5469b061671df298c7d8ffcf9746b2fcc4487fbdcb4212670882fe48",
+          "scripts/test_ca_high_availability.py": "dfa2275d67129e4cfce44cd6c6eaa406e07313aa6f7121e9dd193401cc0ba40e",
+          "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+          "scripts/test_certificate_automation.py": "85893bf90e05568ba61bc74abf658817919ab2ec9d4e510188f51a34c74c0270",
+          "scripts/test_continuous_mtls_runtime.py": "40b2b027dd606fe53e6a0a08bbd1ebb2e377db8b3afee23b7577000fbebd3b89",
+          "scripts/test_control_plane_ha.py": "2d5eb84043a6c4e91d55c9e99f08e4edb491852d4ee925ec4a3bc5f326c6dd06",
+          "scripts/test_control_transition.py": "124cc452dbcdfbbff6ed064d2bfe301c86731e86e91397b139d4058433a6a198",
+          "scripts/test_executor_actor_loss.py": "6b097f646a42c827af3fa665e7647f5a8d92c49339797cfb534bb147a41816f9",
+          "scripts/test_executor_daemon_restart.py": "ab653f1d75d349e66a326da3e02c35157a293d40e0f30da4fab40e30e8f6b94e",
+          "scripts/test_executor_hosts.py": "0a9f791330279db729bddfea016c4484b1558bdbca683003d71f842ee7ac3c4f",
+          "scripts/test_executor_transition.py": "4dde1cb1bbd052616012d89a3d762ee070b4a68d0e3baca91ecebd359bf0b905",
+          "scripts/test_monitored_mtls_runtime.py": "4e5cb4cae0ac2b6ca249fccfa14837f9517b88050ab4c8b353cc2988201810a1",
+          "scripts/test_mtls_infrastructure.py": "a24fef9f3e849877a8dc9f9c27503a04adc7b6c7057220ce1576bb5da500c207",
+          "scripts/test_private_key_rotation.py": "b9c97aab996b75cd2824ce995e49b87c748b39f391a9770fb752e2f78649e12a",
+          "scripts/test_rekey_mtls_runtime.py": "839d5c40cb285d2b115d4621b913605957ff32efbfa956d204050b37987c4b14",
+          "scripts/test_service_daemon_restart.py": "a64a67ca256fd5a0aeb3bef1aa286612235f92e0b4705e0fdc2e5b4cfe6eb125",
+          "scripts/test_signal_compose.py": "37f96191e15d80cf2c86196c8572ea54a329e3c9762848dbe0a9a97242e20cab",
+          "scripts/verify_runtime_upgrade.py": "3f66af29bb9cd3ac18b4a44891d12bd6b10f72eeff9073d9b3ee4f73ce7d220d"
+        },
+        "topology_sha256": "a831bc5bbcf5d7376bd680a07dc9b110f4e870875188f7fa08c54f38ec5bb1c0"
+      },
+      "sha256": "46839944778fd5f4e0ea0004b8dd5234fb6b8b81159e83f766923c081153d864"
+    },
+    "cleanup": {
+      "containers": 0,
+      "volumes": 0,
+      "networks": 0
+    }
+  },
+  "changes": {
+    "readiness_seconds": 30,
+    "connection_seconds": 2,
+    "exec_seconds": 5,
+    "response_max_bytes": 1024,
+    "utc_date_clock_skew_seconds": 5,
+    "grant_seconds": 300,
+    "issuance_wait_seconds": 180,
+    "issued_at_check_disabled": false,
+    "tls_verification_disabled": false,
+    "replay_control": "same CSR/current claims; new jti accepted and consumed jti denied before and after actual CA restart",
+    "acceptance_signer": "one limited collector signer only in test-driver RAM; production clears provisioners"
+  },
+  "local_focused": {
+    "passed": 69,
+    "new_tests": 18,
+    "locked_ruff": "0.17.3 passed"
+  },
+  "local_execution_scope": "pre-commit working tree on base99bf; source_dirty true, not exact clean CI source",
+  "source_sha256": {
+    "scripts/authority_runtime_assets.py": "b0cf774bec59a597831c6630faf198cbccc98e58389d0efc4bf2de878d735823",
+    "scripts/authority_mtls_runtime.py": "af33ff5dcf69eaa7d332f066716e99c0df54bf692dcdf5f2e8158c2c208ed7de",
+    "scripts/test_authority_mtls_runtime.py": "dc684575457a81f397021e7b34bfeef9f82beae71968c5829b2dcf818c1495b5",
+    "tests/test_ca_bootstrap_readiness.py": "6da2d7028bc46e5bdc2791688977b96daabef84c4731a7c59fb2854aa3ce32ca"
+  },
+  "remaining": [
+    "CA/JWK signing-key rotation and HA/shared DB recovery integration",
+    "selected-runtime real JSONL writer/path boundary",
+    "native immediate revocation enforcement",
+    "operating supply-chain adoption and independent acceptance"
+  ],
+  "local_linux": {
+    "passed": 2190,
+    "existing_warnings": 2,
+    "image_id": "sha256:8502370763e35c94a5f597fa0a4401ff87464b5dbbca9d9d7e9b5bb2fbbcf0ed",
+    "source_files_verified": 211,
+    "image_source_verified": true,
+    "log_sha256": "051f8069ec6fe7409ed5f7f02b8e837b1f41072e878a74ac205b6308ebd62de5"
+  },
+  "local_authority": {
+    "schema": "authority-continuous-mtls-verification-1",
+    "completed": true,
+    "started_at": "2026-11-06T08:56:57.531973+00:00",
+    "checks": [
+      {
+        "label": "all_39_registered_identities_enrolled_by_real_ca",
+        "passed": true,
+        "generations": {
+          "06a8ee4819952349f70a7841585d4343e0b70effcaac85095c31aceb04a78bf8": 1,
+          "070ac70110058c2ef1e09da236aec63d6e97ecf8b3f7d56c784ddab4917b83bd": 1,
+          "100ce834d2b63c87906398116c9eb980344ca0bff53540c87039513b9e85bbbd": 1,
+          "12a45e6b85ee078a3ae7701a2f7d59ccc56ded95eb31d323d57210d28987b99f": 1,
+          "1cb171b90137dfe81131e083da0704cc6105fa0814bb590eb524da38756ed52d": 1,
+          "2ad45d29f43e91add8e1e076e2a25bbf56c86b017d087ba9fd1bf28baf1a8dfa": 1,
+          "31ceff80f502e3d71255fc182be1a201e8bb89ef47272a2028583ae30a20a76e": 1,
+          "335568b1edd64f4cfc32a1a8d1cda86010771c434a16b4b089c17e1c7fbc2490": 1,
+          "3fc949064d59a2d018168bb092cd85bde54cd728bb35ac6d3c12b20bf32085d6": 1,
+          "45fda77b75340ba972e39d4834ca6617a9496c85c73909c1dcdbc3411ec2d1ba": 1,
+          "4671f7091ee2854f63202c0591e3ff2faf14a228729503e80ce049a8d99b31e1": 1,
+          "46e66ecbcead99f8339bc13fed193081830784b5b94225b8a37614667efc6f17": 1,
+          "4947b8d7973e3f45d595e29abb00955df3551b695ab78b616a4a9f6b020b7e24": 1,
+          "4deb7504940a6a6883358efb932bef34b17fd16c159a2c613f043995e8a81b3c": 1,
+          "5305f2ba059e27a8ce510d43cd1ba2c796b1feaa7af84047773486d1141e4bd6": 1,
+          "5493722374711d79144b4a5877bd0a8fd83836c882882767080f7eddb5be5815": 1,
+          "558a0322cc21765f2f996d2a63b05a705e9d80e5cf72b23bacba60c33f37b270": 1,
+          "57c8f7172e709c92bff6f24d9461b024d7856dcbb39c6554aae7b6e4ae044ea6": 1,
+          "5a61e6e30f50ed28c36da24f4efe2e4291a275c22f3287b8c52983885b6ff00e": 1,
+          "5b523b81b5df2fbe905d355177f7c1d4ba87c6bcdc2c7e122d7dd1c38cea404f": 1,
+          "5d6f3c04f3a813315ba723cc2245f879507a3faec7abae1129eee9fed1807a7c": 1,
+          "6f2e0ec03e4095449645636bf52cb1a8c872ef9d330bd2684b115e4d2da2a0f5": 1,
+          "73b6ac72a0fdf1d21db6b8d06355481b37b5f8915016a2b41c96281304c593f8": 1,
+          "79279a5595010edd300d93f7d3b8f4e6427c98c2457972f01ee614bcf17cf16e": 1,
+          "7f7753dc0cbe96ddf9b695624889386b1d773f1df989500b3342a3fd9d1672ac": 1,
+          "81237f57e48b82be77b6d06e6e3ca0094e39c485cf6075f4d5a87e9b35352338": 1,
+          "8306460c962538881c0a067be521ad91e5c279935673c0a25f6c4d0f8fc84134": 1,
+          "86df3b4dc39f931d84edc0cb3e862dbd9b641341b1698c5b589f4b0973ee85a8": 1,
+          "8fffb0c71df45135b258d6138bc681dd72ba8373536e399152518c068774bb9c": 1,
+          "98678ed329f80bb4a928cb902cfef111543b69264b59355d41a132dee3c9fa07": 1,
+          "a7a521ec4b95dd5b5d7551c40044a88b2eb109c41b9a54718f12d4abd8fa7842": 1,
+          "a7fcf1ee828c726166f02e35a0113a2782c2774e6b8768562f3b88ce5fbacaf9": 1,
+          "b7fa8ac20f0e1e6e8c553c30498a24e5d84fc381bc36c6c38fb5877ed93ad732": 1,
+          "bcffacee0c6c3516b0f72d507cfb3d790a402c6af615f7973c2f289f5a9984e0": 1,
+          "d4cda07f5bca1f92b823121cb028a0c51130b237f9280406443641b30bb19652": 1,
+          "d6e10b90a202b04f4b6ff62bbd159689753cef3eb018c4ec9dc3ef9ee05c5d83": 1,
+          "dbdc7f53db39b379db87c96103ff8d2b9fe1c331a2a15a3e3b147ca803cacca7": 1,
+          "e382e0331893297d57576d458813c3af1ae6f9aa5e8fceaefdd2bc2770ef39db": 1,
+          "ed1f811ede9868d30c78bec6d35aaa596fa43efe78756d942cc1d89e496c6c4f": 1
+        }
+      },
+      {
+        "label": "used_bootstrap_grants_erased_and_no_ca_signing_key_on_controller",
+        "passed": true
+      },
+      {
+        "label": "used_exact_csr_bootstrap_replay_denied",
+        "passed": true,
+        "status": 401
+      },
+      {
+        "label": "unexpired_pre_ca_iat_denied_same_nonce_and_csr_current_iat_accepted",
+        "passed": true
+      },
+      {
+        "label": "sixteen_hardened_services_with_isolated_ca_and_no_business_db_or_api_keys_on_controller",
+        "passed": true
+      },
+      {
+        "label": "all_39_identities_renew_by_timer_without_private_key_replacement",
+        "passed": true
+      },
+      {
+        "label": "all_eleven_native_nginx_go_servers_present_current_renewed_leaf",
+        "passed": true,
+        "observations": {
+          "alertmanager": {
+            "at": 1793955676.8476186,
+            "fingerprint": "a1362160380a4fdf1298a29d031b26a2aafc7140540817ae7d98c28bbf363c17",
+            "tls_version": "TLSv1.3"
+          },
+          "bridge-auth": {
+            "at": 1793955676.8152237,
+            "fingerprint": "1c6149fe122e87d3bed5b3274b890faf187adce8b1a8ca837d1514eff8bdf135",
+            "tls_version": "TLSv1.3"
+          },
+          "bridge-consume": {
+            "at": 1793955676.8618999,
+            "fingerprint": "713dc7bf05513b7ba7ec38022ecf4b3aa84d591388242274acb40624e2fd03ca",
+            "tls_version": "TLSv1.3"
+          },
+          "core-a": {
+            "at": 1793955676.8322926,
+            "fingerprint": "835dbf323f192c4e0c5b3198baa698401396fe791fc7eafb4c3621498310d925",
+            "tls_version": "TLSv1.3"
+          },
+          "exporter": {
+            "at": 1793955676.8674803,
+            "fingerprint": "f23507dda7463d6e99b6c021e5763acbf67ab0773735de4ce9f2e25facd59907",
+            "tls_version": "TLSv1.3"
+          },
+          "gateway": {
+            "at": 1793955676.8238666,
+            "fingerprint": "ecff75c783efa12f07a58649dedca3c7b95a1b3fafc87941ac3c917a16b989bd",
+            "tls_version": "TLSv1.3"
+          },
+          "prometheus": {
+            "at": 1793955676.8433042,
+            "fingerprint": "6b43452c484d0319258a1f903b28bd02f9a7dfb6e4cad937a4264563ff837693",
+            "tls_version": "TLSv1.3"
+          },
+          "proxy": {
+            "at": 1793955676.8733194,
+            "fingerprint": "34c9009450d5fe15422630a7fa258a9aa382c2a9f9731aa1a582e5283db67f5b",
+            "tls_version": "TLSv1.3"
+          },
+          "reader": {
+            "at": 1793955676.8556843,
+            "fingerprint": "5c1ddefa9769dd6a092f4ebd6ebef2446815441c4581dae48120bcf7b88a3b7e",
+            "tls_version": "TLSv1.3"
+          },
+          "resource": {
+            "at": 1793955676.8094904,
+            "fingerprint": "c9f829618eccb9f080ef1181d065ee9ceb7e8a56f68db8c4c669bf1a061532a6",
+            "tls_version": "TLSv1.3"
+          },
+          "sink": {
+            "at": 1793955676.8382914,
+            "fingerprint": "1c75634865ba3c61e8bfb05762387a8a1a5d8058d7dc6f9b2a4f163753d243ef",
+            "tls_version": "TLSv1.3"
+          }
+        }
+      },
+      {
+        "label": "old_leaf_pins_retired_after_reload_ack_and_native_tls_probes",
+        "passed": true
+      },
+      {
+        "label": "still_valid_prior_leaf_rejected_with_current_leaf_positive_transport_control",
+        "passed": true
+      },
+      {
+        "label": "valid_ca_renewal_identity_has_no_business_role_with_authorized_control",
+        "passed": true
+      },
+      {
+        "label": "document_enforcement_succeeds_after_ca_renewal",
+        "passed": true,
+        "status": 200,
+        "resource_deliveries": 1,
+        "tls_version": "TLSv1.3"
+      },
+      {
+        "label": "authenticated_metrics_work_after_ca_renewal",
+        "passed": true
+      },
+      {
+        "label": "ca_issued_viewer_still_requires_api_auth_and_cannot_write",
+        "passed": true
+      },
+      {
+        "label": "ca_issued_wrong_role_denied_by_native_and_go_monitoring_services",
+        "passed": true
+      },
+      {
+        "label": "fresh_backlog_notification_delivered_with_renewed_credentials",
+        "passed": true
+      },
+      {
+        "label": "same_post_renewal_alert_episode_resolves_after_worker_recovery",
+        "passed": true
+      },
+      {
+        "label": "valid_workload_mtls_continues_during_ca_outage",
+        "passed": true,
+        "status": 200,
+        "resource_deliveries": 1,
+        "tls_version": "TLSv1.3"
+      },
+      {
+        "label": "ca_outage_records_renewal_failure_without_self_signed_or_plaintext_fallback",
+        "passed": true
+      },
+      {
+        "label": "ca_and_controller_restart_resume_renewal_from_persisted_state_without_bootstrap",
+        "passed": true
+      },
+      {
+        "label": "bootstrap_replay_remains_denied_after_ca_db_restart",
+        "passed": true,
+        "status": 401
+      },
+      {
+        "label": "same_collector_transport_admits_signed_observation_before_retirement",
+        "passed": true
+      },
+      {
+        "label": "ca_revocation_denies_client_renewal_with_positive_control",
+        "passed": true
+      },
+      {
+        "label": "ca_database_restart_preserves_revoked_client_renewal_denial",
+        "passed": true
+      },
+      {
+        "label": "disabled_identity_and_removed_peer_pin_not_restored_by_controller_restart",
+        "passed": true
+      },
+      {
+        "label": "retired_collector_mtls_denied_before_new_observation_reaches_inbox",
+        "passed": true
+      },
+      {
+        "label": "clean_resume_preserves_ca_db_certificates_disabled_identity_and_pause",
+        "passed": true
+      },
+      {
+        "label": "modified_controller_trust_configuration_refuses_all_services_before_start",
+        "passed": true
+      },
+      {
+        "label": "missing_ca_database_refuses_host_start_before_any_service",
+        "passed": true
+      },
+      {
+        "label": "ca_container_entrypoint_refuses_db_recreation_even_without_host_preflight",
+        "passed": true
+      },
+      {
+        "label": "same_preserved_ca_db_resumes_with_positive_control_and_revocation_still_enforced",
+        "passed": true
+      }
+    ],
+    "project": "kmtls-92afb1e02931",
+    "image_id": "sha256:ad37517263ee973b434e7801a18c2c67aca2ce13994900c652a0ff71ac4e0097",
+    "source_commit": "99bf0cab50057c8f1801d4026a8beb4c66318322",
+    "source_dirty": true,
+    "source_input_sha256": {
+      "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+      "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+      "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+      "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+      "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+      "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+      "app/config.py": "27abe1679ef3147f9eb28920299c68dbf93932e05bda6035a64d7b0ac1d2fcb2",
+      "app/continuous_signal_models.py": "895b017d7c666923639088281f71ef64386977e381c5b8060c3123d174be34ae",
+      "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+      "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+      "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+      "app/main.py": "c04fb9ff8011a463994a95eed78d577512434500d2e89d0ce424161b9e2fce34",
+      "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+      "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+      "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+      "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+      "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+      "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+      "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+      "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+      "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+      "app/services/collector_spool.py": "e39bb7d21c314251a51733483f00ff529c42f9eee32487431bfba606a5bf457b",
+      "app/services/continuous_signals.py": "05115d837dc2c00b56aafbe8833b047c0cd9fb1854fff20ba7db03db261ca2a3",
+      "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+      "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+      "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+      "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+      "app/services/inbox_archive.py": "39e29b7923df2df40230c031f6e015ffbf7b28400c5689172df9824ad6026522",
+      "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+      "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+      "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+      "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+      "app/services/policy_journal.py": "8299f7210567cb235156dcebed19a8c71b0e980cd52c7386c9cabf8867a5145e",
+      "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+      "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+      "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+      "app/services/signal_inbox.py": "481d3c511025deb2b8b46cdb8f9abeacf780673bd754ac040346f443787877d8",
+      "app/services/trusted_signals.py": "076ac930894e32522813ff39e1c6f317bcd2a6746605f670dde8f807d59492ff",
+      "app/services/zero_trust.py": "e71f5e925be41fe1e2515ad4554b883d029e11cf5a1599a5e84c51b7dc2a8d22",
+      "app/zero_trust_api.py": "556fda2b67c9a20077b65c5f03c121e5deffd4a48d9f651ff1b7409f26b1b491",
+      "app/zero_trust_models.py": "dec2759fcc568ee9e76e758f5a521481ae7d066e1e8bc82530e18945419f5eb1",
+      "scripts/app_recovery_fixture.py": "edf14f711c974a7cb33457b716ea48dbe9299833b38fdc15706863874ec10274",
+      "scripts/app_state_recovery.py": "669d3fd8eac763574c9d6e0f43c3b20a02c65d0abf1fe74643d14e7615360065",
+      "scripts/app_storage_contract.py": "251e7ae2f9f92de19b856bb9c67c97520bda95c4a009f3e6ebb206eedd368933",
+      "scripts/app_storage_fixture.py": "08d2ec9d515511be0877dba09d7176caa5b3e5773ba38038a40e57b2c61d00fc",
+      "scripts/assess_supply_chain.py": "a7019aa6fdc7e9c6ef8f0615ee55bd1a9e42c18549b14e22e55f3199619cd37b",
+      "scripts/authority_custodian.py": "b87fc7ef0be26ecb259510e8df07eae402dae9608b1a2e5bfa3e03b23c6f4693",
+      "scripts/authority_diagnostics.py": "4d30deb638222d64fe5077ab75a27fd9b3bea251d94d1a649811a48319b0c69a",
+      "scripts/authority_mtls_runtime.py": "af33ff5dcf69eaa7d332f066716e99c0df54bf692dcdf5f2e8158c2c208ed7de",
+      "scripts/authority_rotation_coordinator.py": "1ab99ef7f9a96c75393209c169d41f82db0a783c4f24bde7df622a7c9c84647b",
+      "scripts/authority_rotation_runtime.py": "e184e49c386ed46d4f3e9214cec95e97a7f56e4e0608711119f2c61b6b76ca26",
+      "scripts/authority_runtime_assets.py": "b0cf774bec59a597831c6630faf198cbccc98e58389d0efc4bf2de878d735823",
+      "scripts/build_detection_benchmark.py": "ed2513a7d2901360c55c22785e0f1eab6b2496c17c4c3660901ccd5da77445bf",
+      "scripts/ca_endpoints.py": "b5c546ce93d86ea90e99de46f78e80e60149f8146605e27160ceb24a9babd057",
+      "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+      "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+      "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+      "scripts/certificate_authority.py": "1b3e0d501e74d9bc47442e15b1d2f4201bf4a6fd6d48644d93a70c6592c54f9c",
+      "scripts/certificate_controller.py": "7369d5ea09e2a1e2a3a6efdf35e148197d5480f96fcc601309ba98fd574f6e45",
+      "scripts/certificate_key_rotation.py": "e648f07caf6d2a7873fb14d91cfd5285f5aec67e1aa086e436e1e5ca9284d319",
+      "scripts/certificate_reload_runner.py": "bbdafeaa210b747c007f666ec4f1beb12ee2b9afe49556fffc7c303751f0a6c9",
+      "scripts/collector_input.py": "129af08fa42d4aaf1cc5ac44475b7b26f66b43981d851da40470f0ab0184e562",
+      "scripts/compare_observability.py": "e7228243d654f4629486b3c8c51dede5594e07cbe52586765252de868bacc5b0",
+      "scripts/compare_pep.py": "42954e1790532378b17572b26f64282844b9c8c806c03d019afd87e2e9036477",
+      "scripts/compare_supply_chain.py": "c1d018310629b5e797b98f6179730b0b677f66b6e444ca75b928bf71c79b9adb",
+      "scripts/continuous_mtls_assets.py": "4b348b8af3c5c7394fbb6a61e0b8393a70148bea3582323b5eace9a647f833d2",
+      "scripts/continuous_mtls_runtime.py": "a0f2cea6e8c69d66f07aa1fb99bcb6d8a082db6f737f207514002df4f9ed8c89",
+      "scripts/continuous_signal_collector.py": "8ac1925b946c4fd1b1b56fe43d743793b4f5320de1628f787f533a72be7684a6",
+      "scripts/control_executor.py": "e139a3f73b644a9f9d59de3f5875293065fc41371e8e7ba88dc1bf1046850de8",
+      "scripts/control_mirror.py": "7755a1e838b5b2f92d37d7d05e3de6a2456191ca18ae2b76d9882c86f79f10f3",
+      "scripts/control_plane_ha.py": "1c4c2e10e28fc8ea4a057f809e2ce6d8ea1e2cd09d33771fba817ee8b836ba3f",
+      "scripts/control_store.py": "6fc5ae46bf568adb1202cff86430cabad1025ee555ad5bddecbf0a9a484c524a",
+      "scripts/control_transition.py": "008a42a90391793290d01fa9986b2488828528ca6e7e192ff5c4a0abdbd8c36b",
+      "scripts/evaluate_detection_benchmark.py": "270178af5fe498660a4d1fbb8b4d2f3c287199f4f777ee9e1ed0ca1c57d67d73",
+      "scripts/executor_cluster.py": "dccff8606a63a5d819ba3cf04668ba372c2a87fa2bb645eced2026e709852f4b",
+      "scripts/executor_daemon_recovery.py": "15a083c72ad77b38d1469b15410024855c46fb4cb753014f330cf247a1107904",
+      "scripts/executor_disk.py": "95d97888db2d21746698b0dee9656cbe91655f25d3725c63526a1187585be32d",
+      "scripts/executor_fence.py": "62babd635b6c9001cb38ddf7bc4996b22b3976ad96bb67eb5a9623900d5a2152",
+      "scripts/executor_store.py": "a9919ae315ce055cd39da3731dd13a708a3eba585efe2ac5e35b8cdcce076738",
+      "scripts/executor_transition.py": "79e243cc1242a7ada85932b275ca9710255f71275447307b824f891616ff89f9",
+      "scripts/local_signal_collector.py": "a3ce655c10963a183f46413dc71bdaa3f56c7c85da91abe756a7e6e034cfbb39",
+      "scripts/measure_signal_infrastructure.py": "e57da22be08f5360798dba42e1661ea271dea3907574a35cd4848ea237772d80",
+      "scripts/monitored_mtls_runtime.py": "75ef6c64e45c1844194a65545e3f2e8810ef5ea862dd87183c59e8031f2d3c18",
+      "scripts/monitoring_diagnostics.py": "30d785995030beafa6a3b664a95f4095dd8cdb9c14240f225ce187b556290b7a",
+      "scripts/monitoring_runtime_assets.py": "7b8feb5aba444ca7720b5e26b0c97b3760088a654c41fc5eab8149d83d5c4150",
+      "scripts/monitoring_runtime_control.py": "b66aff1144b0dabdd3d15e99748f59784f00437613e250ac6064588db6288cec",
+      "scripts/mtls_fixtures.py": "086155d77391fc36973dfb49442c0609ac0192760a1944774d68cbcbfad665b9",
+      "scripts/mtls_native.py": "e892293b44d86feca35b6e408b21ffc28c684893533632c7fc5c15a72c678e17",
+      "scripts/mtls_transport.py": "5e71999d5eb87354bd1beaf79b62fad5169d7584106deebf60ed3ee53c9b1a56",
+      "scripts/observability_lab.py": "596bf05a9d8d2ffe268e0d61142d9d4d6f5b9fff64012497aa6b542f9eacfcc3",
+      "scripts/pep_lab.py": "b199f1fd9df18e75e564182036e8ef208872bc65f6efd489f058840541263fe8",
+      "scripts/policy_journal.py": "a4527df2e3ecdb8311835c5acdcd93ee6eaeb7889b666861776e03aad0f936e5",
+      "scripts/recheck_supply_chain.py": "797651e936d8d21e7eabeb372d7a3c55dead5fa9975a6e57d33b2204d121e7c1",
+      "scripts/rekey_mtls_runtime.py": "6cb80eef36396adb4561051c65ebdceaea3f1834812d3ca830fbcf97c4e669be",
+      "scripts/rekey_runtime_assets.py": "12df79cbb753ebab8586a91268dccb0d30ab64963436f5b8f4178699067edf9d",
+      "scripts/rekey_runtime_control.py": "cde78cebe82448cd6137dd01246761bbf5fc4d845d15711073ee3a353762d255",
+      "scripts/review_supply_chain.py": "9d5425ca6e27aed96e224d79f3ef40af4bb0e20f2eeb9847d7f6f0895fd4efa4",
+      "scripts/runtime_release.py": "cd8f2dc0224c2859d27cc9c53d66fa85c52aa58500d0974ca67e366e1ab5dece",
+      "scripts/serve_recovered_app.py": "c74bf725097ef3d9ec6a2368e60a885e15985d524dbb55f6d966288c8bb908c1",
+      "scripts/service_daemon_recovery.py": "101aa30d6bc7a37b159ed1e62ae0f00f3045ef14f6aada9ade8a94188ee35738",
+      "scripts/service_recovery_store.py": "01e2423150812f56f88cbc82b6f27da0cc2eee68bbe4f62d018068aaaba9c157",
+      "scripts/session_watchdog.py": "a70627cf113d1cf1e13adef8ef6f1b4ffc7bd99ca93c677ab6c099343eea322e",
+      "scripts/signal_inbox.py": "14bb418a0277d64d26238f0733384699019d48d5dcec548c931dcb5d6b5947d7",
+      "scripts/signal_metrics_exporter.py": "182c650db6796e973829afddd8ce239318505021058a5c891c46d074a6b0ff62",
+      "scripts/signal_worker.py": "043a97a59149ac6375a9c0945e7acef9a64f3da0e83b5815fab040cee5194438",
+      "scripts/supply_chain_runtime_probe.py": "be4b52555a5a349817806ee23d72907b2e762f7b46f4fb7d37bb434622c42645",
+      "scripts/test_all_hops_mtls.py": "0e7c44dc5fb4ab1809e4a0a5e377338132991b719061fa4fe97cd47b4e61ce09",
+      "scripts/test_app_recovery_runtime.py": "12235853892fe182bb367f2120a7145ea7dbded46c5ae61f57013fdf7544ea26",
+      "scripts/test_authority_key_rotation.py": "2e7c4dbd442e02421ec8f61d7f2346d8e79fec549601f4e2741ab1721f2dad0c",
+      "scripts/test_authority_mtls_runtime.py": "c711e174ce2ea6570a2a61b3c6bd60a6d4cd404253714f25eb1757ff68e2fb77",
+      "scripts/test_ca_high_availability.py": "284c3785291117d71ffa78dd0be6147e6e8e58fb16a63a697d8c519b6b91e4b2",
+      "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+      "scripts/test_certificate_automation.py": "37740d5b589cadbaedc3d530ea8318d5ff4f3a44a07f17f0cd320d1418e6b773",
+      "scripts/test_continuous_mtls_runtime.py": "cc14f0a4f4fde14ced03709ecf898210994cafd7aa1559c4c1209ec2b6dddb7c",
+      "scripts/test_control_plane_ha.py": "47b1579dcc89bd1d2e0a041c53f2ca6cd6de2adaf0ac74ae029d9c02e56c744a",
+      "scripts/test_control_transition.py": "5e0683ea48d454c57322adb1d45b7f3c1881a4ba4d956524d31a7e6529ed3e91",
+      "scripts/test_executor_actor_loss.py": "6b097f646a42c827af3fa665e7647f5a8d92c49339797cfb534bb147a41816f9",
+      "scripts/test_executor_daemon_restart.py": "ab653f1d75d349e66a326da3e02c35157a293d40e0f30da4fab40e30e8f6b94e",
+      "scripts/test_executor_hosts.py": "0a9f791330279db729bddfea016c4484b1558bdbca683003d71f842ee7ac3c4f",
+      "scripts/test_executor_transition.py": "4dde1cb1bbd052616012d89a3d762ee070b4a68d0e3baca91ecebd359bf0b905",
+      "scripts/test_monitored_mtls_runtime.py": "4e5cb4cae0ac2b6ca249fccfa14837f9517b88050ab4c8b353cc2988201810a1",
+      "scripts/test_mtls_infrastructure.py": "3724f4c98f0baee127c58d4f961f048d8be97dde9d409ee7137f996845c6b72b",
+      "scripts/test_private_key_rotation.py": "b8fd85194759dff83f7991f2069ebefe1025b853a53ce48b8f846b4c194a788c",
+      "scripts/test_rekey_mtls_runtime.py": "1a1881dbd606d42baa5cbcc8a4211c4d3a28e747a764b1d856385de118a0fbd0",
+      "scripts/test_service_daemon_restart.py": "a64a67ca256fd5a0aeb3bef1aa286612235f92e0b4705e0fdc2e5b4cfe6eb125",
+      "scripts/test_signal_compose.py": "5738653d37888e7729528576d2167a0d0e6534543007e83636c2ccc765d3dd5b",
+      "scripts/verify_runtime_upgrade.py": "3f66af29bb9cd3ac18b4a44891d12bd6b10f72eeff9073d9b3ee4f73ce7d220d"
+    },
+    "configuration_sha256": {
+      "Dockerfile": "896c79f30f531b67fcc0c9f9b0a44162fbe624ae355c273cd2b01c321c7e234e",
+      "pyproject.toml": "b8bd572be04ec1a6f8bf818645b6ac74458f98fc9561ea453210ab6c23e5475e",
+      "infra/pep/tools.lock.json": "9076cc79d486366d5814014024df6f38ffef7862bbaf008261c39f7249b447e6",
+      "infra/mtls/all-hops-nginx.conf": "858533d28040a4d83c6bd58ede75e3efac0f8597f3e2992dfa79976527ad2e0e",
+      "infra/runtime/build_runtime.py": "f12b3ffaac1aa6445f53953f827e800485e15e3acc5fee572151d914ad843885",
+      "infra/runtime/http-client.patch": "73bb32ef9b713ad796751bb1e8df5104974255e71e03e3b69d339c53568de701",
+      "infra/runtime/NOTICE.md": "98df8af2f6bb7b0232f1bc4666f644176ddfe88140774455f6f7b09b8fb7110d",
+      "infra/runtime/requirements/build.lock": "0b2f96a35e79d90d94f57e7cb7af3f97d49f3cc7b8c09d47f63390b223fe32c7",
+      "infra/runtime/requirements/runtime.lock": "a6a277432de8500bdf1f0345334b085c66a7fa83813e3d85a622b87eba62130c",
+      "infra/runtime/requirements/test.lock": "61e7b1c2641db36202832a56ab0b0cd3728e07a7e77c4dab38448ba7161309f8",
+      "infra/runtime/sources.lock.json": "e5cd2b050b6a87a499ba8920a8d28469a7466aaaf85e6ac4d2e2ae7d5e390b2e",
+      "infra/runtime/verify_security.py": "bf45ca64aca30cabe4f49c37335d21d224bfc475a08a7ee8e95be31acbec58ca"
+    },
+    "image_source_verified": true,
+    "release_lock": {
+      "payload": {
+        "schema": "local-runtime-release-1",
+        "platform": "linux/amd64",
+        "nginx_reference": "nginx@sha256:b565a9579cdabe43de09a5a278dc95ceee721dae1cacf85247effc4f6630d511",
+        "files": {
+          ".dockerignore": "fcae495a3f4cceefd962edca376d682ce94dff3115e7c32a1eb690c390a93d51",
+          "Dockerfile": "1dde008271fcd5da9a4dc35044f76b75976ee152d22adb5fa332e3d97f0e8bff",
+          "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+          "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+          "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+          "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+          "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+          "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+          "app/config.py": "0cce522f9991ae302a87f39cb727593d680392062a296958b80d563359053a01",
+          "app/continuous_signal_models.py": "9482577e2d7cb210a16cf3de6ef46517c32c32ee1ec1efb23e28f626fda25ee3",
+          "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+          "app/data/benchmark/cases.jsonl": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f",
+          "app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+          "app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+          "app/data/control-register.json": "a8884d1269874e18a6b5261940d9e498c8509c51d0f134ea252e6b04a327c201",
+          "app/data/replay/NOTICE.md": "500a22b9b16b4b76ff214872adfdcce862a1045818df96b645f41f0fac12a786",
+          "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+          "app/data/replay/manifest.json": "bc974726efe7f2b98119af04b9b624ba4b18a4588b2d5ff8a4c441d4beb232e9",
+          "app/data/replay/microsoft-sentinel-wiz-audit.json": "4bc25e2e6ae2cb4b80d2d135fb401d073e2c66e2d183dd5cabb574cde27ebc3b",
+          "app/data/replay/splunk-aws-console-login-failures.jsonl": "7bc7fc2237bdbab84c8d70f3243dac849c181196892beaadf75ebfa5f2e9d02b",
+          "app/data/replay/splunk-rdp-session-established.xml": "801e46d2c0e771e9a9b28d0579ba740f511358949b835367f80271b4392ed486",
+          "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+          "app/data/sigma/credential_anomaly.yml": "27ee3ff5ce6eb25bdffeb5d25a59998b21c799fcff48768204be57f2974b4086",
+          "app/data/sigma/data_exfiltration.yml": "e378a7df56ac30a3c5568d42e86be53bfd43ce88489ae500c84d16e8ee8466e7",
+          "app/data/sigma/lateral_movement.yml": "cd13987a9a7ae36d57f718a2b9a87cb0fb224e5a78380311dec8edcd78dfe0c8",
+          "app/data/sigma/privilege_escalation.yml": "337b23a4ba5bed1081828f30d771f777628d8bdd88ee1298a776e7f3f21eb880",
+          "app/data/sigma/remote_desktop_logon.yml": "35a4a4fbe7ae16484a16a4287e6287239697648018be40dd4e9c33e04b0c61ee",
+          "app/data/sigma/unmanaged_device_access.yml": "b0c3ef8498458e9d687c32ca554147de44db7cdf84857eacf4224050b8122004",
+          "app/data/zero-trust-policies.json": "ab3acc5b14ba5a4af640240cc781d1ea63523a096d7e5c2dfd3d912dc468d0f9",
+          "app/main.py": "22ccdd69e9bd30842ea4708a15101d51722876f28baeb8b0b1ca625aa0820997",
+          "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+          "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+          "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+          "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+          "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+          "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+          "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+          "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+          "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+          "app/services/collector_spool.py": "c211e41b80c8de5007e73e70ddaa2ebd039bfae8c665edcc0c6d9cfe114cde01",
+          "app/services/continuous_signals.py": "870da40ee024067d6c35689b6daed7fd89215071918650a4a17cc7c5a1aa37d6",
+          "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+          "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+          "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+          "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+          "app/services/inbox_archive.py": "d2ea9abdc4f5e4aa735a72915266a2a3c96e61a6c32e464df704685374c258c1",
+          "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+          "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+          "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+          "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+          "app/services/policy_journal.py": "3afe04d54355f4bbfedc0c8e18ae85efeaaa340f82cb9f737760061987fae29a",
+          "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+          "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+          "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+          "app/services/signal_inbox.py": "7d16a6b1f2f3abb0746a29a856a5312cab52d00820e41ebf7f05716b9289982a",
+          "app/services/trusted_signals.py": "d2fdbcbcf69953232288e3da196033105a5e4a954a4bc6c64fa48388c392e8cf",
+          "app/services/zero_trust.py": "c3658b1204aecc9e12053d3643c213380196b8781fce46f5efa7f33d99edd511",
+          "app/static/app.js": "81c36a450b626215d1d477ce80274879d2e34c7f2b25a8e081d720a1aa2422ee",
+          "app/static/favicon.svg": "bec88bbc90b4997af05738501c6d2e4067c568ceac4f0a99dbb776238d0903ab",
+          "app/static/index.html": "f02561df26b9be46729327de76bee6096707620ab4d5db4362fec332d3ee35ec",
+          "app/static/styles.css": "230330aa277d662169610a2be084511720a011ade1351ee8c925b5a441a54c48",
+          "app/zero_trust_api.py": "8df229ab6392b1330e40c90bd508961721b95413121388c4b14650fb54f34ec7",
+          "app/zero_trust_models.py": "0c4506d0cc3adeba57fa40297f68112b599d1acab607c93db4ab674e6c40a538",
+          "infra/mtls/all-hops-nginx.conf": "b9cf941bfbaab0c5c5b89f1fc02cd164542a48d46cac0d27855cef8ce60f1509",
+          "infra/mtls/ca-tools.lock.json": "182b2e5f0a2bdb91fe0b29a888a536044c08ca5b4177a610e870b0dcb45d4e96",
+          "infra/mtls/nginx-renewal.sh": "07468723f53706ef477f19725dcdf2fed53f51ea41eb277c317f828fc5f9505c",
+          "infra/observability/alerts.yaml": "442f9c0566db9d6088f6809907ecbf17f80ede1c2f62f20e76c6673fa2206779",
+          "infra/observability/tools.lock.json": "b65aadfdb1d637ca15c03a59c58c0ddeb04f778b5edd99f29e47b33cb5fae75f",
+          "infra/pep/tools.lock.json": "69b9ddd436c4aed7fd27b70afad40fe3740e5b4b0c5a50fbe503b1a93f654e66",
+          "infra/runtime/NOTICE.md": "98df8af2f6bb7b0232f1bc4666f644176ddfe88140774455f6f7b09b8fb7110d",
+          "infra/runtime/build_runtime.py": "f12b3ffaac1aa6445f53953f827e800485e15e3acc5fee572151d914ad843885",
+          "infra/runtime/http-client.patch": "73bb32ef9b713ad796751bb1e8df5104974255e71e03e3b69d339c53568de701",
+          "infra/runtime/requirements/build.lock": "013559140df5e368e32008c14145bf79e0b032d7ce06345989d2e222875b9e88",
+          "infra/runtime/requirements/runtime.lock": "f1ea4b9984f15394db8c2f300934ef173245c9addf8bc89e7114d760cdbf8d07",
+          "infra/runtime/requirements/test.lock": "9824d5fb26b94cc0fb9b36a52a70ca98eabc1801d93c11c77b2621cd2930c7ba",
+          "infra/runtime/sources.lock.json": "e5cd2b050b6a87a499ba8920a8d28469a7466aaaf85e6ac4d2e2ae7d5e390b2e",
+          "infra/runtime/verify_security.py": "bf45ca64aca30cabe4f49c37335d21d224bfc475a08a7ee8e95be31acbec58ca",
+          "pyproject.toml": "a71998c113e8cea24811d46050c1ae0aa431e0f8e1f37751e46eeeb7a5f90ed9",
+          "scripts/app_recovery_fixture.py": "edf14f711c974a7cb33457b716ea48dbe9299833b38fdc15706863874ec10274",
+          "scripts/app_state_recovery.py": "6a1c1150a706a1643f5556c43718736d9422b78e049d7a33a31ad4b148f5e532",
+          "scripts/app_storage_contract.py": "55cd4bcee4753b1535260a44f3c6d19c0d1deb90042001c43c5ec8f8c30ebe0f",
+          "scripts/app_storage_fixture.py": "d26f19a947aa4d4c106829b2da2adb2e223d8a35b6b1fca54983f166796c9ed2",
+          "scripts/assess_supply_chain.py": "a7019aa6fdc7e9c6ef8f0615ee55bd1a9e42c18549b14e22e55f3199619cd37b",
+          "scripts/authority_custodian.py": "de343958405c33effa92a6471e3dea1edf3ad8adf3af681050a26ef7ad46c77a",
+          "scripts/authority_diagnostics.py": "5923da8d4b2734fbdee1b1b52e6f9a31aff20ef99e216dcf21c278e3fcaa61da",
+          "scripts/authority_mtls_runtime.py": "af33ff5dcf69eaa7d332f066716e99c0df54bf692dcdf5f2e8158c2c208ed7de",
+          "scripts/authority_rotation_coordinator.py": "2c702808b299692069fb505260f39db0316c53daf44ad284665f5fc9e8612614",
+          "scripts/authority_rotation_runtime.py": "11ec4e8cb92d808beb1b60755b8085bb59bd9478479ecaf03327f0a34af17c5b",
+          "scripts/authority_runtime_assets.py": "b0cf774bec59a597831c6630faf198cbccc98e58389d0efc4bf2de878d735823",
+          "scripts/build_detection_benchmark.py": "ed2513a7d2901360c55c22785e0f1eab6b2496c17c4c3660901ccd5da77445bf",
+          "scripts/ca_endpoints.py": "77f41676e7a8a0c44449e32f6f271a7d4a8f5a48e17473593c42fa7074593cb6",
+          "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+          "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+          "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+          "scripts/certificate_authority.py": "adddc6bf0a629b8192c2a262e7aa7ec047114d4b826c0f3f040e0613b12d4ed3",
+          "scripts/certificate_controller.py": "14dae36a5af682ad5040cc27a5830160232851068d7e75944068130d95a62d30",
+          "scripts/certificate_key_rotation.py": "0ad9647b6e72ce8a5a67196f9df3284c561e7894686bc4bb961a7d31e5fcf6d8",
+          "scripts/certificate_reload_runner.py": "5e4f9aeeea931cefc77d77fe137d875666c96e204727e3f1b7661667aa65ee26",
+          "scripts/collector_input.py": "dd63ba19f5c5c82d2d535b5baccc14c457966385e9bb8eeed050dd9266071b9e",
+          "scripts/compare_observability.py": "709e9ab3c9af1d3f9f8683762214b1ce4efc624fc8baef16d206e2809b4bd796",
+          "scripts/compare_pep.py": "ccc998b829466c325f94b61d6443aeb9a6ce4f593ce8bd4d5679ee58855b622d",
+          "scripts/compare_supply_chain.py": "8c767c06b840de34cbd6536e382efc78929eb1c6d6330d1b3a891e098d9f979c",
+          "scripts/continuous_mtls_assets.py": "0409acda39f8a5dce3606b65a83226375bd4087f59e2938507042ab9be40abc2",
+          "scripts/continuous_mtls_runtime.py": "8ab6f4b789bd28988a1f9633ddfeec4206d84de9929b8bef778abbd2218c34b7",
+          "scripts/continuous_signal_collector.py": "00cfe3d80a4a41d95ea32dc4136bdc30ab794c36e6febf0d2a26801fdc816244",
+          "scripts/control_executor.py": "9b3fa0d00a90964c60860bb7c5c1df2678d050ba1ec0b32fb5fda341abab1c64",
+          "scripts/control_mirror.py": "257ff40d93aa632af4e34bc2306206836718432404ba66dfd98ed1b5e475d6aa",
+          "scripts/control_plane_ha.py": "c9db10231775eafd12a9c9708ee973993124bd48d9fec89800bad147a32b3be7",
+          "scripts/control_store.py": "81b9dd78f4be02723cdcbdf5cfbe42c861c56e754a154e9158b18b290cfc89cc",
+          "scripts/control_transition.py": "1c0f7f693c039ae48156d738b3bab08d2e9ff4b6478453d0a8197ce1db514ca2",
+          "scripts/evaluate_detection_benchmark.py": "270178af5fe498660a4d1fbb8b4d2f3c287199f4f777ee9e1ed0ca1c57d67d73",
+          "scripts/executor_cluster.py": "b9a0a0f9d12f0b80ffb481afffab6dd2f919ea415f8be0d18092104fe02635f5",
+          "scripts/executor_daemon_recovery.py": "15a083c72ad77b38d1469b15410024855c46fb4cb753014f330cf247a1107904",
+          "scripts/executor_disk.py": "a8070b44590f21da1e8e27b10371817b8f04b0ef05c99be91c7178383eb07acb",
+          "scripts/executor_fence.py": "f5c8067ab9130a8234b70f9a5e39c0a8c2fb751a9031318900db5226263d56cb",
+          "scripts/executor_store.py": "19e1f296ab4c8541d9431ed320a4caa8d858e8973ea285a5f1f01c0a1efb0a79",
+          "scripts/executor_transition.py": "79e243cc1242a7ada85932b275ca9710255f71275447307b824f891616ff89f9",
+          "scripts/local_signal_collector.py": "3bd27286e473283b10650a89863b349171285d0866104999f7ef42ec6a2cde9b",
+          "scripts/measure_signal_infrastructure.py": "c11e501b43463f435c24764d38bf9ed110c480c517b982af160f1527798ed8e8",
+          "scripts/monitored_mtls_runtime.py": "75ef6c64e45c1844194a65545e3f2e8810ef5ea862dd87183c59e8031f2d3c18",
+          "scripts/monitoring_diagnostics.py": "30d785995030beafa6a3b664a95f4095dd8cdb9c14240f225ce187b556290b7a",
+          "scripts/monitoring_runtime_assets.py": "7b8feb5aba444ca7720b5e26b0c97b3760088a654c41fc5eab8149d83d5c4150",
+          "scripts/monitoring_runtime_control.py": "b66aff1144b0dabdd3d15e99748f59784f00437613e250ac6064588db6288cec",
+          "scripts/mtls_fixtures.py": "c6414b317a456cd7eb97290c589bd2115bca57e898c9ca6bd4848a529c6802fe",
+          "scripts/mtls_native.py": "bd5046f8136a93f723207c70cdcf0984b575108e764335f2cc6dd766fcc7f925",
+          "scripts/mtls_transport.py": "43024fa67e17c558ffdedb458e65c6712a07468262278ce8fb5c90a2f81ddd65",
+          "scripts/observability_lab.py": "eea01b2ad71226ebebc64e60cfc06b3a9c85a584891d690ab3a1ebb39655b14f",
+          "scripts/pep_lab.py": "2d2491720dfb9982ca06862daeb9e1cd13bb21bfef08ad1d3aa4ca59e69abc1f",
+          "scripts/policy_journal.py": "67443d3370bbd32b40239ba99fad0c11dd9a520df45130a6167a416e8547ffce",
+          "scripts/recheck_supply_chain.py": "797651e936d8d21e7eabeb372d7a3c55dead5fa9975a6e57d33b2204d121e7c1",
+          "scripts/rekey_mtls_runtime.py": "6cb80eef36396adb4561051c65ebdceaea3f1834812d3ca830fbcf97c4e669be",
+          "scripts/rekey_runtime_assets.py": "12df79cbb753ebab8586a91268dccb0d30ab64963436f5b8f4178699067edf9d",
+          "scripts/rekey_runtime_control.py": "cde78cebe82448cd6137dd01246761bbf5fc4d845d15711073ee3a353762d255",
+          "scripts/review_supply_chain.py": "9d5425ca6e27aed96e224d79f3ef40af4bb0e20f2eeb9847d7f6f0895fd4efa4",
+          "scripts/runtime_release.py": "cd8f2dc0224c2859d27cc9c53d66fa85c52aa58500d0974ca67e366e1ab5dece",
+          "scripts/serve_recovered_app.py": "2fc84c975928c3f5459c8c1a0144c1960336abce37123bd99e768e318f237e72",
+          "scripts/service_daemon_recovery.py": "101aa30d6bc7a37b159ed1e62ae0f00f3045ef14f6aada9ade8a94188ee35738",
+          "scripts/service_recovery_store.py": "01e2423150812f56f88cbc82b6f27da0cc2eee68bbe4f62d018068aaaba9c157",
+          "scripts/session_watchdog.py": "a912566a23d919b7369fae98f22a5003e10bb7b2a0c186744505211907bcf1ac",
+          "scripts/signal_inbox.py": "2a72361e9f43a3dadbc1b0ef2fd46e5a822f83f27cc01be48f0fbac32f2b4d01",
+          "scripts/signal_metrics_exporter.py": "d74d736e8a7423aaf3a6940195e2853ad915d268e42ab0f4779f056bdfe19119",
+          "scripts/signal_worker.py": "b62316ed3e481501931572c134d50263052ae22cc92cb22dac163d5b7a271035",
+          "scripts/supply_chain_runtime_probe.py": "be4b52555a5a349817806ee23d72907b2e762f7b46f4fb7d37bb434622c42645",
+          "scripts/test_all_hops_mtls.py": "eb841f22ff531228aff62a496917c86ef4e6a7edbe9b3d5c47ca2dc02feddf46",
+          "scripts/test_app_recovery_runtime.py": "6e3bce3d33097b8edec2de7b81ce40b1fdd058687aca0a7e3362502f4e73e82a",
+          "scripts/test_authority_key_rotation.py": "50d8b3ba8e1aeb01bf22eb6867c36e008ccaffc9a363837afce87accbc0433e3",
+          "scripts/test_authority_mtls_runtime.py": "dc684575457a81f397021e7b34bfeef9f82beae71968c5829b2dcf818c1495b5",
+          "scripts/test_ca_high_availability.py": "dfa2275d67129e4cfce44cd6c6eaa406e07313aa6f7121e9dd193401cc0ba40e",
+          "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+          "scripts/test_certificate_automation.py": "85893bf90e05568ba61bc74abf658817919ab2ec9d4e510188f51a34c74c0270",
+          "scripts/test_continuous_mtls_runtime.py": "40b2b027dd606fe53e6a0a08bbd1ebb2e377db8b3afee23b7577000fbebd3b89",
+          "scripts/test_control_plane_ha.py": "2d5eb84043a6c4e91d55c9e99f08e4edb491852d4ee925ec4a3bc5f326c6dd06",
+          "scripts/test_control_transition.py": "124cc452dbcdfbbff6ed064d2bfe301c86731e86e91397b139d4058433a6a198",
+          "scripts/test_executor_actor_loss.py": "6b097f646a42c827af3fa665e7647f5a8d92c49339797cfb534bb147a41816f9",
+          "scripts/test_executor_daemon_restart.py": "ab653f1d75d349e66a326da3e02c35157a293d40e0f30da4fab40e30e8f6b94e",
+          "scripts/test_executor_hosts.py": "0a9f791330279db729bddfea016c4484b1558bdbca683003d71f842ee7ac3c4f",
+          "scripts/test_executor_transition.py": "4dde1cb1bbd052616012d89a3d762ee070b4a68d0e3baca91ecebd359bf0b905",
+          "scripts/test_monitored_mtls_runtime.py": "4e5cb4cae0ac2b6ca249fccfa14837f9517b88050ab4c8b353cc2988201810a1",
+          "scripts/test_mtls_infrastructure.py": "a24fef9f3e849877a8dc9f9c27503a04adc7b6c7057220ce1576bb5da500c207",
+          "scripts/test_private_key_rotation.py": "b9c97aab996b75cd2824ce995e49b87c748b39f391a9770fb752e2f78649e12a",
+          "scripts/test_rekey_mtls_runtime.py": "839d5c40cb285d2b115d4621b913605957ff32efbfa956d204050b37987c4b14",
+          "scripts/test_service_daemon_restart.py": "a64a67ca256fd5a0aeb3bef1aa286612235f92e0b4705e0fdc2e5b4cfe6eb125",
+          "scripts/test_signal_compose.py": "37f96191e15d80cf2c86196c8572ea54a329e3c9762848dbe0a9a97242e20cab",
+          "scripts/verify_runtime_upgrade.py": "3f66af29bb9cd3ac18b4a44891d12bd6b10f72eeff9073d9b3ee4f73ce7d220d"
+        },
+        "topology_sha256": "a831bc5bbcf5d7376bd680a07dc9b110f4e870875188f7fa08c54f38ec5bb1c0"
+      },
+      "sha256": "d4f17632b4a43cc613fcf0c34cdf3f47db4b7ea38d3fe1a80319259d2d0763a2"
+    },
+    "release_image_payload_verified": true,
+    "authority": {
+      "authority_image_id": "sha256:383730139c1b45412545b26459652ec0828f2c8eda15a49cf73985fa27fed51e",
+      "authority_tools": {
+        "schema": "c04-tools-1",
+        "platform": "linux/amd64",
+        "tools": [
+          {
+            "name": "step-ca",
+            "repo": "smallstep/certificates",
+            "tag": "v0.30.2",
+            "asset": {
+              "name": "step-ca_linux_amd64.tar.gz",
+              "browser_download_url": "https://github.com/smallstep/certificates/releases/download/v0.30.2/step-ca_linux_amd64.tar.gz",
+              "digest": "sha256:1726ee7b6a24c67abb8c9e96ad671623b29b3d34f6a712f7087495f31331e54b"
+            },
+            "binary": "step-ca"
+          },
+          {
+            "name": "step",
+            "repo": "smallstep/cli",
+            "tag": "v0.31.0",
+            "asset": {
+              "name": "step_linux_amd64.tar.gz",
+              "browser_download_url": "https://github.com/smallstep/cli/releases/download/v0.31.0/step_linux_amd64.tar.gz",
+              "digest": "sha256:2bc654b26ca467848edb764620d6f17febea9d7d3629368b76dd20ce40c6ef32"
+            },
+            "binary": "step"
+          }
+        ]
+      },
+      "authority_binary_sha256": {
+        "step-ca": "53597e5f169ce8251daee828727d140e09e29c839eefc2823fcb662ed644b6da",
+        "step": "68d61b52d83d5bfaed0f82635952d521f3a4e98c158704b6b8233ef326fbbae3"
+      },
+      "authority_base_layers_sha256": "b604bc9842805abe2333f3f37114563a8e42da164fb8898e57fc85c0c00b7866",
+      "authority_configuration_sha256": "a02860d465e995a74513a99f1d551370fc7cfc0652c9c0473049ff5ea8592bff",
+      "authority_public_sha256": {
+        "ca-state": {
+          "ca.json": "e00b0ea5f688be83013d15c57f0be651afb4e166081306cc573a9fd5ac33d107",
+          "root.pem": "b60263cda1fa9071c750357fd4fcf34f2af12f191d34598356e7c543e3b59f20",
+          "issuer.pem": "7b0c2acd20a2c0681d1d30b5a9aba3bb3f2ee4f084a3903df94aea37bafa8847"
+        },
+        "certificate-state": {
+          "root.pem": "b60263cda1fa9071c750357fd4fcf34f2af12f191d34598356e7c543e3b59f20",
+          "issuer.pem": "7b0c2acd20a2c0681d1d30b5a9aba3bb3f2ee4f084a3903df94aea37bafa8847"
+        },
+        "config": {
+          "nginx-renewal.sh": "07468723f53706ef477f19725dcdf2fed53f51ea41eb277c317f828fc5f9505c"
+        }
+      }
+    },
+    "monitoring": {
+      "tools": [
+        {
+          "name": "prometheus",
+          "repo": "prometheus/prometheus",
+          "tag": "v3.15.1",
+          "assets": [
+            {
+              "name": "prometheus-3.15.1.linux-amd64.tar.gz",
+              "digest": "sha256:6a726885328ad9efebbf36e876ce2fb6225468a71fd1e7ce3ba666d5f4d97a84",
+              "browser_download_url": "https://github.com/prometheus/prometheus/releases/download/v3.15.1/prometheus-3.15.1.linux-amd64.tar.gz"
+            }
+          ],
+          "binaries": {
+            "prometheus": "prometheus-3.15.1.linux-amd64/prometheus",
+            "promtool": "prometheus-3.15.1.linux-amd64/promtool"
+          }
+        },
+        {
+          "name": "alertmanager",
+          "repo": "prometheus/alertmanager",
+          "tag": "v0.34.2",
+          "assets": [
+            {
+              "name": "alertmanager-0.34.2.linux-amd64.tar.gz",
+              "digest": "sha256:17ee14acd0f6ba6e25a436ff223d9c17ddd5cf484f543ad12f0932eaa89ba186",
+              "browser_download_url": "https://github.com/prometheus/alertmanager/releases/download/v0.34.2/alertmanager-0.34.2.linux-amd64.tar.gz"
+            }
+          ],
+          "binaries": {
+            "alertmanager": "alertmanager-0.34.2.linux-amd64/alertmanager",
+            "amtool": "alertmanager-0.34.2.linux-amd64/amtool"
+          }
+        }
+      ],
+      "image_id": "sha256:dab3869c75de9e015793be2530ecea57c4d5d26b522901c304020dd7052119c2",
+      "binary_sha256": {
+        "prometheus": "bbd11cb0084f0ed962ec32163ee22622ff920990af29b5de802e44c570187989",
+        "promtool": "d0d2e0b6de44079416d2e5ea3c3fa8c9eed83bed1ad2cdd549a1bb644d8b4456",
+        "alertmanager": "65b77b431acf07fe0df45158a0a6f3060e53e0b592f641d971fb3a745c34f432",
+        "amtool": "7b6147bf0af2258af655ae0599004960390d88d9d5e14692dfc6cf006aec1633"
+      }
+    },
+    "final_certificates": {
+      "at": 1793956116.4821992,
+      "credentials": {
+        "06a8ee4819952349f70a7841585d4343e0b70effcaac85095c31aceb04a78bf8": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "9e139786c8d1e3da4c0729413f87a1a71dcc9d00eb1d0ececf96d6335b78083f",
+          "generation": 3,
+          "key_generation": null,
+          "name": "collector",
+          "not_after": 1793957005.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "52178537104049572323929585601663573262",
+          "status": "disabled"
+        },
+        "070ac70110058c2ef1e09da236aec63d6e97ecf8b3f7d56c784ddab4917b83bd": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "9786bbb2ec89ae7cedddd1c25b0d212a91b3f887de86dcfa6bca0464ff2e4acc",
+          "generation": 4,
+          "key_generation": null,
+          "name": "resource",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "serverAuth",
+          "serial": "101526940723476277350401512571674648123",
+          "status": "active"
+        },
+        "100ce834d2b63c87906398116c9eb980344ca0bff53540c87039513b9e85bbbd": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "abc9d9f73cb73060762033ff114f47d59875d1113951064ecc26e312322ac366",
+          "generation": 4,
+          "key_generation": null,
+          "name": "proxy-auth",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "27403293799645246668395037343540628334",
+          "status": "active"
+        },
+        "12a45e6b85ee078a3ae7701a2f7d59ccc56ded95eb31d323d57210d28987b99f": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "10b372df405513b0d6c6dc69fa1f277f2d3a22130cd63ec56619764e9b34cfca",
+          "generation": 4,
+          "key_generation": null,
+          "name": "bridge-auth",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "serverAuth",
+          "serial": "10403813166148077899148026665573601468",
+          "status": "active"
+        },
+        "1cb171b90137dfe81131e083da0704cc6105fa0814bb590eb524da38756ed52d": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "edd62ec6b7f9223eeba61d9e8d1e89e0bf13d850395bd8273dd7056d9a722277",
+          "generation": 4,
+          "key_generation": null,
+          "name": "renew-reader",
+          "not_after": 1793959456.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "244032595684598679504061093797805393468",
+          "status": "active"
+        },
+        "2ad45d29f43e91add8e1e076e2a25bbf56c86b017d087ba9fd1bf28baf1a8dfa": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "6cc552b27a3e8a727465df7366dc7cc813f8229b548c26b8607ccab071fe7b80",
+          "generation": 4,
+          "key_generation": null,
+          "name": "am-control",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "263218952769755759681004190744218818352",
+          "status": "active"
+        },
+        "31ceff80f502e3d71255fc182be1a201e8bb89ef47272a2028583ae30a20a76e": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "5ad88f2979ce29f6bd7c7482413c2f0b867eb0c083a5bf14804bd4fb3e28aab2",
+          "generation": 4,
+          "key_generation": null,
+          "name": "renew-resource",
+          "not_after": 1793959456.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "190466311251717678537505947266409444342",
+          "status": "active"
+        },
+        "335568b1edd64f4cfc32a1a8d1cda86010771c434a16b4b089c17e1c7fbc2490": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "18026b626b7ac239eaf702de127404c2027b0019d5fe6d4a9866a8548152a349",
+          "generation": 4,
+          "key_generation": null,
+          "name": "frontend",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "149939804888383568141721499615142183649",
+          "status": "active"
+        },
+        "3fc949064d59a2d018168bb092cd85bde54cd728bb35ac6d3c12b20bf32085d6": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "79ce8214be270689014e7a12f31f1213bbdc60ab4dde29ac9eb0ef18872d2874",
+          "generation": 4,
+          "key_generation": null,
+          "name": "gateway",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "serverAuth",
+          "serial": "188475003508004677169834928452895125709",
+          "status": "active"
+        },
+        "45fda77b75340ba972e39d4834ca6617a9496c85c73909c1dcdbc3411ec2d1ba": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "a7f243cc8a17deaed67ff8844ace608192a1ca96778940a898e6c2d4c1d7834b",
+          "generation": 4,
+          "key_generation": null,
+          "name": "core-a",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "serverAuth",
+          "serial": "304071252406871718270945107576880210364",
+          "status": "active"
+        },
+        "4671f7091ee2854f63202c0591e3ff2faf14a228729503e80ce049a8d99b31e1": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "f631282cb2ca17951731de9690a3933e06380bb080d7e7ce82083af512840302",
+          "generation": 4,
+          "key_generation": null,
+          "name": "renew-prometheus",
+          "not_after": 1793959456.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "249512342971349836932730575841183259192",
+          "status": "active"
+        },
+        "46e66ecbcead99f8339bc13fed193081830784b5b94225b8a37614667efc6f17": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "6522f25e0eebb7a2c74a52e18c5aa05a9cad93318223e268b5753ddbca0fbab6",
+          "generation": 4,
+          "key_generation": null,
+          "name": "gateway-client",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "218349094786398292089173993900763747338",
+          "status": "active"
+        },
+        "4947b8d7973e3f45d595e29abb00955df3551b695ab78b616a4a9f6b020b7e24": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "ab7a61d83aaccbe2fc683acbac4886693d83d534b4eaa46f8a9724d048cfed96",
+          "generation": 4,
+          "key_generation": null,
+          "name": "renew-gateway",
+          "not_after": 1793959456.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "299149501995244267497634018381878969428",
+          "status": "active"
+        },
+        "4deb7504940a6a6883358efb932bef34b17fd16c159a2c613f043995e8a81b3c": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "dadfacdfee71d4554964a132a9db5032ee01d43c63bf07c9f7681de79914f3a6",
+          "generation": 4,
+          "key_generation": null,
+          "name": "sink",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "serverAuth",
+          "serial": "123989468639518832351441188841043931365",
+          "status": "active"
+        },
+        "5305f2ba059e27a8ce510d43cd1ba2c796b1feaa7af84047773486d1141e4bd6": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "d3f1d39a17103f595df93d89be60a6fd3dabfe099d85f03190167bfbbde72f4e",
+          "generation": 4,
+          "key_generation": null,
+          "name": "monitor-alert",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "291057681127626786149665229529738991449",
+          "status": "active"
+        },
+        "5493722374711d79144b4a5877bd0a8fd83836c882882767080f7eddb5be5815": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "cb76ffc2561626bc432171f2e4b83c3a7888958c3a71a6a6f546c100644fcb1b",
+          "generation": 4,
+          "key_generation": null,
+          "name": "core-operator",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "130779220904680062450724534618453259262",
+          "status": "active"
+        },
+        "558a0322cc21765f2f996d2a63b05a705e9d80e5cf72b23bacba60c33f37b270": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "c82410aee7be453a756f31cfdadfcfab67f1cf35bd8c9de7c02b6696fcc3064d",
+          "generation": 4,
+          "key_generation": null,
+          "name": "prometheus",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "serverAuth",
+          "serial": "184688063097939024096090884091140711368",
+          "status": "active"
+        },
+        "57c8f7172e709c92bff6f24d9461b024d7856dcbb39c6554aae7b6e4ae044ea6": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "3a9a42ac44ad844b792048cb18214073531a873eb0775224cfc7b3ac4f1cad74",
+          "generation": 4,
+          "key_generation": null,
+          "name": "metrics-reader",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "83340862897426014629478288605058966847",
+          "status": "active"
+        },
+        "5a61e6e30f50ed28c36da24f4efe2e4291a275c22f3287b8c52983885b6ff00e": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "4965cbc04403828bf272aa00339dd29dd61fef92905070f0a9052a9e6793444e",
+          "generation": 4,
+          "key_generation": null,
+          "name": "alert-manager",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "306488168235051186870724017242846894616",
+          "status": "active"
+        },
+        "5b523b81b5df2fbe905d355177f7c1d4ba87c6bcdc2c7e122d7dd1c38cea404f": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "a6679e3fed7afd518e9b864d190a48e45703f6326f7a1a000afe02711f3da2e3",
+          "generation": 4,
+          "key_generation": null,
+          "name": "alertmanager",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "serverAuth",
+          "serial": "130989332705883450505614249692577096271",
+          "status": "active"
+        },
+        "5d6f3c04f3a813315ba723cc2245f879507a3faec7abae1129eee9fed1807a7c": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "1d96926972800b29959fff9b5e67cd3a1adea018623ef4c0866e7ffd2e18f40c",
+          "generation": 4,
+          "key_generation": null,
+          "name": "renew-bridge-auth",
+          "not_after": 1793959456.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "286558505658554004088140512812309404573",
+          "status": "active"
+        },
+        "6f2e0ec03e4095449645636bf52cb1a8c872ef9d330bd2684b115e4d2da2a0f5": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "17f05a8c13baded6ed9a047cb1579db6aa7f39d3a8e80552678455860dba8963",
+          "generation": 4,
+          "key_generation": null,
+          "name": "renew-sink",
+          "not_after": 1793959456.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "155018396626258948129036181847654557879",
+          "status": "active"
+        },
+        "73b6ac72a0fdf1d21db6b8d06355481b37b5f8915016a2b41c96281304c593f8": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "740c04738daec31726c105683387ce3202730f4c2a0e05b2bb00f4fedd1b9085",
+          "generation": 4,
+          "key_generation": null,
+          "name": "resource-consumer",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "230296355585408286273161879455745549810",
+          "status": "active"
+        },
+        "79279a5595010edd300d93f7d3b8f4e6427c98c2457972f01ee614bcf17cf16e": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "d130780bffd763098225e8bc453223eb1595b59fcd0ac7c130e83e83f8b24c9a",
+          "generation": 4,
+          "key_generation": null,
+          "name": "renew-proxy",
+          "not_after": 1793959457.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "157877186154894162913684393519949975285",
+          "status": "active"
+        },
+        "7f7753dc0cbe96ddf9b695624889386b1d773f1df989500b3342a3fd9d1672ac": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "ffea6098767c5c2f8954f7fae2b4208085f80307ca83d8e77828eed9fbfdfd58",
+          "generation": 4,
+          "key_generation": null,
+          "name": "reader",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "serverAuth",
+          "serial": "339221149651378181641449930744881269398",
+          "status": "active"
+        },
+        "81237f57e48b82be77b6d06e6e3ca0094e39c485cf6075f4d5a87e9b35352338": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "286e063a139e73d54bbd42541bb5e59c67c6738f5d664a32be70e4ab782ec09d",
+          "generation": 4,
+          "key_generation": null,
+          "name": "proxy-resource",
+          "not_after": 1793957056.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "295091697454957528574958569629362651980",
+          "status": "active"
+        },
+        "8306460c962538881c0a067be521ad91e5c279935673c0a25f6c4d0f8fc84134": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "52805bf6e5bce92c14e7badfe6b973136b6446c3d31bcd34424215f82caf9d96",
+          "generation": 4,
+          "key_generation": null,
+          "name": "sink-auditor",
+          "not_after": 1793957057.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "39147210502898877595696322377828671231",
+          "status": "active"
+        },
+        "86df3b4dc39f931d84edc0cb3e862dbd9b641341b1698c5b589f4b0973ee85a8": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "c0810ded4e0b7e3e20bc136629716a615009990c0446f03e594d1948e481fe23",
+          "generation": 4,
+          "key_generation": null,
+          "name": "renew-exporter",
+          "not_after": 1793959457.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "110660678956885748766002099832232740955",
+          "status": "active"
+        },
+        "8fffb0c71df45135b258d6138bc681dd72ba8373536e399152518c068774bb9c": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "39cb42cf0cd77a7429f10ac521528b9eca6f48ffe1da9a34e41c58b6381abe41",
+          "generation": 4,
+          "key_generation": null,
+          "name": "renew-alertmanager",
+          "not_after": 1793959457.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "216339272468879024418000638519319378518",
+          "status": "active"
+        },
+        "98678ed329f80bb4a928cb902cfef111543b69264b59355d41a132dee3c9fa07": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "033234b9dd81c25769c20663c47e1f7fb6e7eb1f4332f427cdf4a331f4146c86",
+          "generation": 4,
+          "key_generation": null,
+          "name": "resource-auditor",
+          "not_after": 1793957057.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "130458044370845345387617872794778914455",
+          "status": "active"
+        },
+        "a7a521ec4b95dd5b5d7551c40044a88b2eb109c41b9a54718f12d4abd8fa7842": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "0a12fa5eca891aadf02773fe991a0fb5afc0b86d413c7086f15abee2bf02aa98",
+          "generation": 4,
+          "key_generation": null,
+          "name": "renew-core-a",
+          "not_after": 1793959457.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "131925042680949128569561119711140661471",
+          "status": "active"
+        },
+        "a7fcf1ee828c726166f02e35a0113a2782c2774e6b8768562f3b88ce5fbacaf9": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "8715bb98d65dac82df4a4f6dc947246c6ff5164e4f3c269738b617923d4e7ab5",
+          "generation": 4,
+          "key_generation": null,
+          "name": "bridge-consume",
+          "not_after": 1793957057.0,
+          "public_key_sha256": null,
+          "purpose": "serverAuth",
+          "serial": "213887528042771974646497282852018479336",
+          "status": "active"
+        },
+        "b7fa8ac20f0e1e6e8c553c30498a24e5d84fc381bc36c6c38fb5877ed93ad732": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "abce35188b7e8c9465f9e8731d935f594c45d1d07d877bbf2cc4170247bdf4b5",
+          "generation": 4,
+          "key_generation": null,
+          "name": "scrape-agent",
+          "not_after": 1793957057.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "4221661775484872522226677050602142668",
+          "status": "active"
+        },
+        "bcffacee0c6c3516b0f72d507cfb3d790a402c6af615f7973c2f289f5a9984e0": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "a695774890cfe4e0f89d2669d577ee3c83709bcb15da9cacecd8bc022476d32f",
+          "generation": 4,
+          "key_generation": null,
+          "name": "monitor-query",
+          "not_after": 1793957057.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "246396898110724051545515814066258342933",
+          "status": "active"
+        },
+        "d4cda07f5bca1f92b823121cb028a0c51130b237f9280406443641b30bb19652": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "e1f8f5c84eb21cf305b9eb7d7a6fa80c96e8b7729d356f5a15011a0ababb6fc2",
+          "generation": 4,
+          "key_generation": null,
+          "name": "exporter",
+          "not_after": 1793957057.0,
+          "public_key_sha256": null,
+          "purpose": "serverAuth",
+          "serial": "236828595380568296301120288919350113263",
+          "status": "active"
+        },
+        "d6e10b90a202b04f4b6ff62bbd159689753cef3eb018c4ec9dc3ef9ee05c5d83": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "5f2ff0c1c0ca3920252dbf6f5c00f1bef0edfb01fd1c8c61172d7d94fb80d39d",
+          "generation": 4,
+          "key_generation": null,
+          "name": "pep-bridge",
+          "not_after": 1793957057.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "265789733935230488125761776152840296289",
+          "status": "active"
+        },
+        "dbdc7f53db39b379db87c96103ff8d2b9fe1c331a2a15a3e3b147ca803cacca7": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "8e1e917ff657f76d32331f7a1a57531a9d1ebbae2fd2e5ebdf193c1eafb3e7ae",
+          "generation": 4,
+          "key_generation": null,
+          "name": "proxy",
+          "not_after": 1793957057.0,
+          "public_key_sha256": null,
+          "purpose": "serverAuth",
+          "serial": "8260553110621736470294913889984678083",
+          "status": "active"
+        },
+        "e382e0331893297d57576d458813c3af1ae6f9aa5e8fceaefdd2bc2770ef39db": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "6e276a1e2027af7a224c32665ff0bae00fa6b6676f9fae2d981be80e96a1deb4",
+          "generation": 4,
+          "key_generation": null,
+          "name": "renew-bridge-consume",
+          "not_after": 1793959457.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "246469940565495067940595303271889689294",
+          "status": "active"
+        },
+        "ed1f811ede9868d30c78bec6d35aaa596fa43efe78756d942cc1d89e496c6c4f": {
+          "authority_epoch": null,
+          "failures": 0,
+          "fingerprint": "16f1173737965e298db9d7b29318f43b8da9e9987a843eea5f066467a26cd15f",
+          "generation": 4,
+          "key_generation": null,
+          "name": "scrape-control",
+          "not_after": 1793957057.0,
+          "public_key_sha256": null,
+          "purpose": "clientAuth",
+          "serial": "200895088377550240924611046944743382741",
+          "status": "active"
+        }
+      },
+      "last_error": null,
+      "last_error_reason": null,
+      "paused": true,
+      "phase": null,
+      "server_observations": {
+        "alertmanager": {
+          "at": 1793955860.5054107,
+          "fingerprint": "a6679e3fed7afd518e9b864d190a48e45703f6326f7a1a000afe02711f3da2e3",
+          "tls_version": "TLSv1.3"
+        },
+        "bridge-auth": {
+          "at": 1793955860.4850311,
+          "fingerprint": "10b372df405513b0d6c6dc69fa1f277f2d3a22130cd63ec56619764e9b34cfca",
+          "tls_version": "TLSv1.3"
+        },
+        "bridge-consume": {
+          "at": 1793955860.5168948,
+          "fingerprint": "8715bb98d65dac82df4a4f6dc947246c6ff5164e4f3c269738b617923d4e7ab5",
+          "tls_version": "TLSv1.3"
+        },
+        "core-a": {
+          "at": 1793955860.4945772,
+          "fingerprint": "a7f243cc8a17deaed67ff8844ace608192a1ca96778940a898e6c2d4c1d7834b",
+          "tls_version": "TLSv1.3"
+        },
+        "exporter": {
+          "at": 1793955860.5219278,
+          "fingerprint": "e1f8f5c84eb21cf305b9eb7d7a6fa80c96e8b7729d356f5a15011a0ababb6fc2",
+          "tls_version": "TLSv1.3"
+        },
+        "gateway": {
+          "at": 1793955860.489534,
+          "fingerprint": "79ce8214be270689014e7a12f31f1213bbdc60ab4dde29ac9eb0ef18872d2874",
+          "tls_version": "TLSv1.3"
+        },
+        "prometheus": {
+          "at": 1793955860.5016012,
+          "fingerprint": "c82410aee7be453a756f31cfdadfcfab67f1cf35bd8c9de7c02b6696fcc3064d",
+          "tls_version": "TLSv1.3"
+        },
+        "proxy": {
+          "at": 1793955860.5259826,
+          "fingerprint": "8e1e917ff657f76d32331f7a1a57531a9d1ebbae2fd2e5ebdf193c1eafb3e7ae",
+          "tls_version": "TLSv1.3"
+        },
+        "reader": {
+          "at": 1793955860.5117943,
+          "fingerprint": "ffea6098767c5c2f8954f7fae2b4208085f80307ca83d8e77828eed9fbfdfd58",
+          "tls_version": "TLSv1.3"
+        },
+        "resource": {
+          "at": 1793955860.4801612,
+          "fingerprint": "9786bbb2ec89ae7cedddd1c25b0d212a91b3f887de86dcfa6bca0464ff2e4acc",
+          "tls_version": "TLSv1.3"
+        },
+        "sink": {
+          "at": 1793955860.4984024,
+          "fingerprint": "dadfacdfee71d4554964a132a9db5032ee01d43c63bf07c9f7681de79914f3a6",
+          "tls_version": "TLSv1.3"
+        }
+      }
+    },
+    "cleanup": {
+      "containers": 0,
+      "volumes": 0,
+      "networks": 0
+    },
+    "finished_at": "2026-11-06T09:09:19.447952+00:00"
+  }
+}

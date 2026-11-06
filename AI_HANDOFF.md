@@ -1,5 +1,16 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+11/6 최신 후속은 [CA 최초 발급 준비 경계](docs/ca-bootstrap-readiness.md)다.
+PR37 병합 전 CI 성공 뒤 병합99bf0ca의 CI42185498165/attempt1은 CA0검사 기동 timeout으로 실패했다.
+소유 자원은0이며 아래 이전 성공 기록과 구분한다. 고정 CA의 기동 전 iat 거부를 로컬 대조했고,
+TLS health/UTC Date 뒤 grant를 생성하는 순서와 현재 iat·소비한 jti의 replay 검사를 보강한다.
+집중69/신규18·고정 Ruff 통과. 전체 Linux·실제 CA30·후속 PR head/병합 후 결과는
+[새 원자료](docs/infrastructure-results/ca-bootstrap-readiness-20261106.json)와 후속 PR을 따른다.
+CA/JWK·HA 통합·실제 JSONL 경로·native 즉시 폐기·독립 인수는 미완료다. AWS·유료 LLM 호출 없음.
+
+위 수정 소스의 최종 로컬은 Linux2190/기존 경고2·실제 CA30/30/소유 자원0이다.
+test image 소스211개 대조 완료. 정확한 PR head/병합 후 결과는 후속 PR에서 별도 확인한다.
+
 11/6 최신 통합 기준: PR36 전체 저장 계약 코드를 보존했다. 통합 집중319·Linux2172/경고2,
 실제 전체 상태 복구24/24·컨테이너/볼륨0 통과. 정확한 head의 관측72/CA29/rekey22와
 앱 전체 복구24·병합 후 CI는 PR37 최종 기록을 확인한다. 독립 인수는 미완료다.

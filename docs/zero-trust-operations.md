@@ -1,5 +1,10 @@
 # 제로 트러스트 운영 구현 명세
 
+11/6 [CA 준비 상태·발급시각·replay 검증](ca-bootstrap-readiness.md): 신뢰하는 CA의 TLS health와
+UTC Date를 확인한 뒤 최초 grant를 만든다. 준비 불명은 발급 중단이며 CA 발급시각 검사를 끄지 않는다.
+CA 재시작 뒤 현재 유효한 claim의 새 jti 허용/소비한 jti 거부를 대조해 과거 발급시각 차단이
+DB replay 상태 유실을 가리지 않게 한다. 실제 결과와 이전 병합 후 실패는 원자료/후속 PR을 따른다.
+
 11/6 [CA leaf 통합 인수](ca-runtime-acceptance.md): 실제 CA 발급·동일 키 갱신·pin 겹침과
 구 pin 회수·재적용 확인을 지속 실행 업무/관측 경로에 연결한다. CA 신뢰가 앱 역할을 대체하지
 않으며 폐기 시 CA 갱신 권한과 업무 peer pin을 구분해 차단한다. 탐지 기준선은 유지한다.

@@ -7,6 +7,7 @@ import secrets
 import subprocess
 import tempfile
 import time
+from datetime import datetime
 from pathlib import Path
 
 import jwt
@@ -41,7 +42,7 @@ def certificate_probe(profile, certificate, key, payload, *, target='/zero-trust
 
 
 class AcceptanceRuntime(AuthorityRuntime):
-    """Keep one already-consumed grant in driver RAM solely for replay denial."""
+    """Keep one limited signer in test-driver RAM for paired issuance controls."""
     def helper(self, program, payload=None, **options):
         result = super().helper(program, payload, **options)
         if program == ['-m', 'scripts.certificate_controller', 'init']:
@@ -54,10 +55,11 @@ class AcceptanceRuntime(AuthorityRuntime):
             uid = next(uid for uid, c in self._acceptance_inventory.items() if c['name'] == 'collector')
             credential = self._acceptance_inventory[uid]
             entry, key = self._bootstrap_provisioners['collector-clientAuth']
-            # Test-only: the consumed grant must still be unexpired after the
-            # fault campaign, otherwise expiry could mask a lost CA replay DB.
-            grants[uid]['token'] = bootstrap_token(entry, key, credential['csr'], seconds=3600)
-            files = files | {'bootstrap.json': json.dumps(grants)}
+            self._acceptance_signer = (entry, key)  # Test-only RAM; never a runtime/volume field.
+            started = command(['docker', 'inspect', '--format', '{{.State.StartedAt}}', self.container('ca')]).strip()
+            self._ca_container_started = int(datetime.fromisoformat(started).timestamp())
+            self._pre_start_grant = {'csr': credential['csr'], 'ott': bootstrap_token(entry, key,
+                credential['csr'], seconds=3600, now=self._ca_container_started - 1)}
             self._consumed_grant = {'csr': self._acceptance_inventory[uid]['csr'], 'ott': grants[uid]['token']}
         return super().write_volume(label, files)
 
@@ -122,11 +124,38 @@ print(json.dumps({str(p):hashlib.sha256(s.load_pem_private_key(p.read_bytes(),pa
         return after
 
     def replay_denied(self):
-        claims = jwt.decode(self.runtime._consumed_grant['ott'], options={'verify_signature': False})
-        self.require(claims['exp'] > time.time() + 5, 'authority_expired_grant_cannot_prove_replay_db')
-        result = self.rpc('ca_post', path='/1.0/sign', payload=self.runtime._consumed_grant)
+        r = self.runtime
+        claims = jwt.decode(r._consumed_grant['ott'], options={'verify_signature': False})
+        health = r.authority_health()
+        self.require(health['healthy'], 'authority_replay_control_ca_not_healthy')
+        now = health['server_time']
+        claims.update(iat=now, nbf=now - 2, exp=now + 60)
+        entry, key = r._acceptance_signer
+        def signed(values):
+            return jwt.encode(values, key, algorithm='ES256', headers={'kid': entry['key']['kid']})
+        # Fresh iat avoids CA-start rejection masking a missing replay DB. The
+        # positive and negative requests differ only in their one-time jti.
+        positive = self.rpc('ca_post', path='/1.0/sign', payload={
+            'csr': r._consumed_grant['csr'], 'ott': signed(claims | {'jti': secrets.token_hex(24)})})
+        self.require(positive['status'] == 201, 'authority_replay_fresh_nonce_control_failed')
+        result = self.rpc('ca_post', path='/1.0/sign', payload={'csr': r._consumed_grant['csr'], 'ott': signed(claims)})
         self.require(result['status'] in {400, 401, 403}, 'authority_bootstrap_replay_accepted')
         return result['status']
+
+    def pre_start_denied(self):
+        r = self.runtime
+        claims = jwt.decode(r._pre_start_grant['ott'], options={'verify_signature': False})
+        self.require(claims['exp'] > time.time() + 5 and claims['iat'] < r._ca_container_started,
+                     'authority_pre_start_control_not_unexpired_or_old')
+        denied = self.rpc('ca_post', path='/1.0/sign', payload=r._pre_start_grant)
+        health = r.authority_health()
+        self.require(health['healthy'], 'authority_pre_start_control_ca_not_healthy')
+        entry, key = r._acceptance_signer
+        current = jwt.encode(claims | {'iat': health['server_time']}, key, algorithm='ES256', headers={'kid': entry['key']['kid']})
+        control = self.rpc('ca_post', path='/1.0/sign', payload={'csr': r._pre_start_grant['csr'], 'ott': current})
+        self.require(denied['status'] in {400, 401, 403} and control['status'] == 201,
+                     'authority_pre_start_iat_boundary_not_proven')
+        self.add('unexpired_pre_ca_iat_denied_same_nonce_and_csr_current_iat_accepted')
 
     def collector_request(self, event_id):
         signed = self.signed_observation(event_id)
@@ -242,6 +271,7 @@ print(json.dumps({'restored':True}))
                      'authority_controller_bootstrap_or_ca_private_key_retained')
         self.add('used_bootstrap_grants_erased_and_no_ca_signing_key_on_controller')
         self.add('used_exact_csr_bootstrap_replay_denied', status=self.replay_denied())
+        self.pre_start_denied()
 
         spec = r.definition(r.state['project'], 'app', 'nginx')
         for name in r.services:
