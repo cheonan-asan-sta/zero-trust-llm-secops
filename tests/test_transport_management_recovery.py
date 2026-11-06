@@ -113,7 +113,7 @@ def test_fault_worker_stops_at_exact_side_effect_persistence_boundary(tmp_path, 
         worker.persist()
 
     worker.tick = tick
-    monkeypatch.setattr(faults, 'TransportRuntime', lambda *a: SimpleNamespace(directory=tmp_path, load=lambda: None))
+    monkeypatch.setattr(faults, 'runtime_type', lambda path: lambda *a: SimpleNamespace(directory=tmp_path, load=lambda: None))
     monkeypatch.setattr(faults, 'TransportCoordinator', lambda *a: worker)
     monkeypatch.setattr(faults, 'save', lambda p, s: markers.append(s))
 

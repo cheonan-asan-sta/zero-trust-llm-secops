@@ -12,7 +12,7 @@ from cryptography import x509
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
 
-from scripts.certificate_controller import metadata
+from scripts.certificate_controller import bindings, metadata
 from scripts.certificate_key_rotation import public_hash
 
 
@@ -55,7 +55,27 @@ def configuration_matches(actual, template, volume, state):
     return expected == actual
 
 
-def verify_pair(pair, identity, issuer, state, allowed):
+def retired_without_bindings(state, identity, disabled):
+    """An explicitly disabled client is an archive only after every pin is gone."""
+    if state is None:
+        return False
+    found = [(uid, c) for uid, c in state['credentials'].items() if c['name'] == identity]
+    if len(found) != 1:
+        return False
+    uid, c = found[0]
+    if (uid not in disabled or c.get('status') != 'disabled' or c.get('purpose') != 'clientAuth'
+            or c.get('candidate') or c.get('pending_key') or not c.get('bindings')):
+        return False
+    for binding in c['bindings']:
+        path = Path(binding['path'])
+        if path.is_symlink() or not path.is_file() or not 0 < path.stat().st_size <= 65536:
+            return False
+        if bindings(json.loads(path.read_bytes()), c['fingerprint']):
+            return False
+    return True
+
+
+def verify_pair(pair, identity, issuer, state, allowed, *, disabled=()):
     certificate, key = Path(pair['cert']), Path(pair['key'])
     for path in (certificate, key):
         if path.is_symlink() or not path.is_file() or path.stat().st_size > 65536:
@@ -73,8 +93,10 @@ def verify_pair(pair, identity, issuer, state, allowed):
             pass
     else:
         raise ValueError('rekey_unapproved_issuer')
+    now = datetime.now(UTC)
     if (info['name'] != identity or identity + '-' + info['purpose'] not in allowed
-            or not leaf.not_valid_before_utc <= datetime.now(UTC) < leaf.not_valid_after_utc
+            or now < leaf.not_valid_before_utc
+            or now >= leaf.not_valid_after_utc and not retired_without_bindings(state, identity, disabled)
             or public_hash(leaf.public_key()) != public_hash(private.public_key())
             or stat.S_IMODE(key.stat().st_mode) != 0o600):
         raise ValueError('rekey_asset_identity')
@@ -108,7 +130,7 @@ def verify(request):
             for identity in set(re.findall(r'/service-tls/([A-Za-z0-9_-]+)\.key', template)):
                 for pair in allowed_pairs(state, identity, volume):
                     if all('/service-tls/' + Path(pair[field]).name in actual for field in ('cert', 'key')):
-                        verify_pair(pair, identity, issuers_for(identity), state, cfg['allowed_provisioners'])
+                        verify_pair(pair, identity, issuers_for(identity), state, cfg['allowed_provisioners'], disabled=cfg.get('disabled', []))
                         break
     for relative, identity in request['profiles'].items():
         volume, filename = relative.split('/')
@@ -117,7 +139,7 @@ def verify(request):
         pair = {'cert': str(root / profile['cert']), 'key': str(root / profile['key'])}
         if pair not in allowed_pairs(state, identity, volume):
             raise ValueError('rekey_profile_identity_or_generation')
-        verify_pair(pair, identity, issuers_for(identity), state, cfg['allowed_provisioners'])
+        verify_pair(pair, identity, issuers_for(identity), state, cfg['allowed_provisioners'], disabled=cfg.get('disabled', []))
     for name, expected in request['signers'].items():
         key = serialization.load_pem_private_key(Path(cfg['server_signers'][name]).read_bytes(), password=None)
         if public_hash(key.public_key()) != expected:

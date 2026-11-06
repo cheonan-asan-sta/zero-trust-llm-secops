@@ -334,6 +334,9 @@ class GraphBackend(DockerBackend):
         if profile.get('transport_lifecycle') is True:
             from scripts.database_transport_runtime import TransportRuntime
             runtime_class = TransportRuntime
+        if profile.get('database_backup') is True:
+            from scripts.database_backup_runtime import BackupRuntime
+            runtime_class = BackupRuntime
         runtime = runtime_class(ROOT / path)
         runtime.load()
         return cls(runtime, profile)
