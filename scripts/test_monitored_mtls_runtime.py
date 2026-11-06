@@ -3,6 +3,7 @@
 import copy
 import json
 import secrets
+import subprocess
 from datetime import UTC, datetime, timedelta
 
 from scripts.continuous_mtls_runtime import RuntimeFailure, command
@@ -16,6 +17,22 @@ class MonitoredChecks(Checks):
         self.report["schema"] = "monitored-continuous-mtls-verification-1"
         self.scrape = self.notify = None
         self.episode_starts = {}
+
+    def record_monitoring_failure(self, label):
+        if 'monitoring_failure_diagnostics' not in self.report:
+            from scripts.monitoring_diagnostics import collect
+            try:
+                self.report['monitoring_failure_diagnostics'] = collect(self.runtime, label)
+                self.save()
+            except (RuntimeFailure, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError):
+                self.report['monitoring_failure_diagnostics'] = {'available': False}
+
+    def wait(self, predicate, label):
+        try:
+            super().wait(predicate, label)
+        except RuntimeFailure:
+            self.record_monitoring_failure(label)
+            raise
 
     def monitor(self, profile, path=None, **data):
         request = {"profile": profile, **data}
@@ -179,6 +196,16 @@ print(json.dumps({'status':status,'denied':status in (0,403)}))
                     self.require("secops_signal_collection_success 0" in body and "secops_signal_inbox_records" not in body,
                                  "monitoring_stale_metrics_reused")
                 self.add("monitoring_" + service + "_failure_fires_without_stale_success")
+                if service == 'exporter':
+                    from scripts.monitoring_diagnostics import collect
+                    snapshot = collect(runtime, 'synthetic_exporter_outage')
+                    self.require(any(row['value'] == 0 for row in snapshot['prometheus']['up'].get('samples', []))
+                                 and any(row.get('labels', {}).get('alertname') == alert and row['value'] == 1
+                                         for row in snapshot['prometheus']['alerts'].get('samples', []))
+                                 and any(row['service'] == 'exporter' and row.get('running') is False
+                                         for row in snapshot['services']), 'monitoring_diagnostics_missing_live_fault')
+                    self.report['monitoring_diagnostic_validation'] = snapshot
+                    self.add('monitoring_diagnostics_capture_actual_outage_before_cleanup')
             finally:
                 command(["docker", "start", runtime.container(service)])
             self.await_episode(alert, "resolved", floor, firing)

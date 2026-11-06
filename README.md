@@ -1,5 +1,8 @@
 # zero-trust-llm-secops
 
+11/6 후속 [지속 실행 개인키 교체·관측 실패 진단](docs/persistent-key-rotation.md): 기존 leaf 교체를
+업무/관측16서비스에 연결한다. CA/JWK 키·HA 통합과 독립 검토는 후속으로 구분한다.
+
 ## 앱 전체 저장 계약과 정비 복원
 
 [선택형 전체 저장 복원](docs/app-storage-recovery.md)은 SQLite·등록과 사건·감사·outbox JSONL을

@@ -63,8 +63,8 @@ def configuration(material):
             'extra_certificates': pairs, 'allowed_provisioners': sorted(name + '-' + purpose for name, purpose in identities.items()),
             'probes': [{'server_name': name, 'host': host, 'port': port, 'profile': '/managed/' + path}
                        for name, host, port, path in profiles],
-            'reload_groups': [{'root': '/managed/' + name,
-                               'files': [f'/managed/{name}/{identity}.pem' for identity in names],
+            'reload_groups': [{'root': '/managed/' + name + '-tls',
+                               'files': [f'/managed/{name}-tls/{identity}.pem' for identity in names],
                                'ack': '/ack/' + name + '/ack'} for name, names in RELOADS.items()],
             'server_renewal': {name: 'renew-' + name for name in SERVERS},
             'renew_before': {name: 1200 if name.startswith('renew-') else 400 for name in identities},

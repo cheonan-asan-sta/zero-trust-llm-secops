@@ -1,5 +1,9 @@
 # 3주차 CA 통합 인수: 지속 실행 경로의 인증서 발급·갱신
 
+11/6 후속 [지속 실행 개인키 교체·관측 진단](persistent-key-rotation.md)을 별도 선택형으로 연결한다.
+아래 동일 키 갱신 기준선은 보존한다. reload group의 실제 볼륨 경로 보완과 현재 소스의 회귀 결과는
+후속 기록을 따른다. 이전 native TLS 관측을 올바른 ack 경로 검사 결과로 소급하지 않는다.
+
 2026-11-06 · 채희주 인프라 구성·실행·측정, Codex 도구 보조.
 
 기존 [인증서 자동화](certificate-automation.md)는 별도 전체-hop 캠페인에서 검증했다.
@@ -143,8 +147,8 @@ CA/제어기 재시작·DB의 폐기 보존, 제어기 재시작 후 disabled/pi
 
 운영 인수의 잔여 항목:
 
-- [개인키 교체](private-key-rotation.md)·[CA/JWK 교체](authority-key-rotation.md)·
-  [CA HA](ca-high-availability.md)/공유 DB 호스트 복구를 이 지속 실행 경로에 연결한 별도 계약/인수.
+- [개인키 교체 연결](persistent-key-rotation.md)은 후속 인수로 진행했다. [CA/JWK 교체](authority-key-rotation.md)·
+  [CA HA](ca-high-availability.md)/공유 DB 호스트 복구를 이 지속 실행 경로에 연결한 별도 계약/인수는 남긴다.
 - active CRL/OCSP·native Go 연결의 즉시 폐기, CA 관리 API 세분화 RBAC·HSM/외부 secret manager,
   인증서 전용 운영 경보/조직 IdP 연계. CA serial 폐기만으로 업무 접근이 즉시 끊긴다고 주장하지 않는다.
 - [전체 JSONL 저장 계약](app-state-recovery.md)·C01~C03 운영 선정·새 Go 도구 포함 이미지의

@@ -34,6 +34,35 @@ class LifecycleError(ValueError):
     pass
 
 
+PUBLIC_FAILURE_REASONS = frozenset({
+    "reload_ack_missing", "server_not_reloaded", "server_probe_missing",
+    "candidate_expired_during_publication", "identity_disabled_during_publication",
+    "candidate_changed", "old_client_revocation_unconfirmed",
+    "configuration_publication_conflict", "policy_publication_conflict",
+    "tls_failure", "network_timeout", "dns_failure", "connection_failure",
+    "io_failure", "authority_transport_failure", "operation_failure", "validation_failure"})
+
+
+def failure_reason(error):
+    if isinstance(error, LifecycleError) and str(error) in PUBLIC_FAILURE_REASONS:
+        return str(error)
+    if isinstance(error, ssl.SSLError):
+        return "tls_failure"
+    if isinstance(error, TimeoutError):
+        return "network_timeout"
+    if isinstance(error, socket.gaierror):
+        return "dns_failure"
+    if isinstance(error, ConnectionError):
+        return "connection_failure"
+    if isinstance(error, OSError):
+        return "io_failure"
+    if isinstance(error, http.client.HTTPException):
+        return "authority_transport_failure"
+    if isinstance(error, subprocess.SubprocessError):
+        return "operation_failure"
+    return "validation_failure"
+
+
 def replace_file(path, body):
     path = Path(path)
     temporary = path.with_name(path.name + ".new")
@@ -435,6 +464,8 @@ def status(state, state_dir):
     save(state_dir / "status.json", {"at": time.time(), "phase": (state.get("transaction") or {}).get("phase"),
         "paused": state.get("paused_ack", False),
         "server_observations": state.get("server_observations", {}),
+        "last_error_reason": state.get("last_error_reason") if isinstance(state.get("last_error_reason"), str)
+            and state["last_error_reason"] in PUBLIC_FAILURE_REASONS else None,
         "last_error": state.get("last_error"), "credentials": {uid: {k: c.get(k) for k in
             ["name", "purpose", "fingerprint", "serial", "not_after", "generation", "status", "failures", "key_generation", "public_key_sha256", "authority_epoch"]}
             for uid, c in state["credentials"].items()}})
@@ -564,9 +595,11 @@ def main():
                     activity(state_dir, True)
                     tick(cfg, state, state_dir)
                 state["last_error"] = None
+                state["last_error_reason"] = None
                 successful = True
-            except (OSError, ValueError, TypeError, KeyError, http.client.HTTPException, subprocess.SubprocessError):
+            except (OSError, ValueError, TypeError, KeyError, http.client.HTTPException, subprocess.SubprocessError) as error:
                 state["last_error"] = "publication_or_configuration_failed"
+                state["last_error_reason"] = failure_reason(error)
             save(state_dir / "state.json", state)
             status(state, state_dir)
             if successful:

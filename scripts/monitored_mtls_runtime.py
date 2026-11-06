@@ -153,6 +153,9 @@ class MonitoredRuntime(Runtime):
             payload=json.dumps(list(self.state["monitoring_binary_sha256"]))))
         if actual != self.state["monitoring_binary_sha256"]:
             raise RuntimeFailure("monitoring_binary_drift")
+        self.verify_monitoring_configuration()
+
+    def verify_monitoring_configuration(self):
         for volume, expected in self.state["monitoring_config_sha256"].items():
             program = "import hashlib,json,sys;from pathlib import Path;print(json.dumps({n:hashlib.sha256((Path('/data')/n).read_bytes().replace(b'\\r\\n',b'\\n')).hexdigest() for n in json.load(sys.stdin)}))"
             actual = json.loads(command(["docker", "run", "--rm", "--network", "none", "--read-only", "--user", "10001:10001",
