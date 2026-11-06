@@ -20,7 +20,7 @@ from scripts.continuous_mtls_runtime import ROOT
 
 STAGES = (('linux', None, 0),
           ('monitored', 'scripts.test_continuous_mtls_runtime', 75),
-          ('authority-ha', 'scripts.test_persistent_authority_runtime', 38))
+          ('authority-ha', 'scripts.test_database_transport_runtime', 48))
 
 
 def source_manifest():
@@ -134,8 +134,8 @@ class Batch:
                 if name == 'monitored':
                     from scripts.monitored_mtls_runtime import MonitoredRuntime as Runtime
                 else:
-                    from scripts.persistent_authority_runtime import (
-                        PersistentAuthorityRuntime as Runtime,
+                    from scripts.database_transport_runtime import (
+                        TransportRuntime as Runtime,
                     )
                 runtime = Runtime(directory)
                 runtime.load()
@@ -151,7 +151,7 @@ class Batch:
             raise ValueError('batch_child_descriptor_missing')
         report = json.loads(path.read_text(encoding='utf-8'))
         schema = ('monitored-continuous-mtls-verification-1' if name == 'monitored'
-                  else 'persistent-authority-ha-verification-1')
+                  else 'database-transport-rotation-verification-1')
         if report.get('schema') != schema:
             raise ValueError('batch_child_schema_mismatch')
         release.verify(report.get('release_lock'), runtime.release_inputs())

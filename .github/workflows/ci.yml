@@ -71,6 +71,11 @@ jobs:
             verification: Verify persistent authority rotation and CA failover
             report: Report persistent authority verification
             command: python -m scripts.test_persistent_authority_runtime --directory runtime/c02/persistent-authority-ci
+          - kind: database-transport
+            directory: runtime/c02/database-transport-ci
+            verification: Verify database transport rotation and resume
+            report: Report database transport verification
+            command: python -m scripts.test_database_transport_runtime --directory runtime/c02/database-transport-ci
     steps:
       - uses: actions/checkout@v4
         with:
