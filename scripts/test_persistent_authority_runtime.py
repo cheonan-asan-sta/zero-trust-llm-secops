@@ -119,6 +119,40 @@ except (OSError,ValueError,KeyError,http.client.HTTPException):print(json.dumps(
             self.require((result.returncode == 0) == (name == 'valid'), 'persistent_authority_database_tls_control')
             self.add('database_tls_' + name + '_positive_or_negative_control')
 
+    def transport_admission(self):
+        r = self.runtime
+        result = r.preflight()
+        transport = result['database_transport']
+        self.require(result['verified'] and result['offline'] and transport['verified']
+                     and len(transport['credentials']) == 3 and transport['minimum_remaining_seconds'] > 0,
+                     'database_transport_offline_admission_missing')
+        self.report['database_transport_preflight'] = result
+        self.add('offline_preflight_verifies_db_transport_identity_key_permissions_and_expiry')
+
+        def fault(mode):
+            r.verify_owned_volumes()
+            command(['docker', 'run', '--rm', '--network', 'none', '--read-only', '--user', '10001:10001',
+                '--cap-drop=ALL', '--security-opt=no-new-privileges:true', '--mount',
+                'type=volume,src=' + r.state['volumes']['authority-ca-a-db'] + ',dst=/a,readonly', '--mount',
+                'type=volume,src=' + r.state['volumes']['authority-ca-b-db'] + ',dst=/b',
+                '--entrypoint', 'python', '-i', r.state['authority_image_id'], '-c', '''import json,os,sys
+from pathlib import Path
+mode=json.load(sys.stdin);key=Path('/b/client.key');held=Path('/b/held.key')
+if mode=='permissions':key.chmod(0o644)
+elif mode=='mismatch':
+ os.replace(key,held);key.write_bytes(Path('/a/client.key').read_bytes());key.chmod(0o600)
+elif mode=='restore':
+ if held.exists():os.replace(held,key)
+ key.chmod(0o600)
+else:raise ValueError('fixed_test_fault')
+'''], payload=json.dumps(mode))
+
+        for mode in ('permissions', 'mismatch'):
+            self.stopped_gate('database_private_key_' + mode + '_refuses_all_services_before_start',
+                              lambda mode=mode: fault(mode), lambda: fault('restore'),
+                              expected='database_transport_preflight_failed')
+        self.ready()
+
     def force_due(self, part):
         backend = self.backend
         backend.runtime.verify_owned_volumes()
@@ -180,15 +214,16 @@ except (OSError,ValueError):code=0
 print(json.dumps({'status':code,'unexpired':alive}))
 '''], json.dumps(save)))
 
-    def stopped_gate(self, label, mutate, restore):
+    def stopped_gate(self, label, mutate, restore, *, expected=None):
         r = self.runtime
         r.compose('stop', '--timeout', '2')
         mutate()
         try:
             try:
                 r.up()
-            except (ValueError, RuntimeFailure):
-                pass
+            except (ValueError, RuntimeFailure) as error:
+                if expected:
+                    self.require(str(error) == expected, 'persistent_authority_wrong_admission_denial')
             else:
                 raise RuntimeFailure('persistent_authority_drift_started_services')
             self.require(not any(row['running'] for row in r.status()['services'].values()), 'persistent_authority_drift_started_service')
@@ -222,6 +257,7 @@ print(json.dumps({'status':code,'unexpired':alive}))
         initial = r.controller_status()
         self.require(len(initial['credentials']) == 39 and len(initial['server_observations']) == 11, 'persistent_authority_initial_inventory')
         self.add('all_39_identities_enrolled_and_eleven_native_servers_observed')
+        self.transport_admission()
         current = json.loads(r.execute('certificate-controller', ['python', '-c', "import json;from pathlib import Path;s=json.loads(Path('/state/state.json').read_bytes());print(json.dumps(next({'id':u,'csr':c['csr']} for u,c in s['credentials'].items() if c['name']=='collector'))) "]))
         self.csr, self.collector = current['csr'], current['id']
         self.database_controls()

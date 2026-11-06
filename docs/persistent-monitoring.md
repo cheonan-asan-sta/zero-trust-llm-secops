@@ -1,5 +1,7 @@
 # 3주차 C01: mTLS 지속 실행 환경의 관측·경보 통합
 
+11/6 착수·11/7 검증 묶음: [DB 전송 PKI 사전 점검·관측 준비·로컬 일괄 검증](infrastructure-preflight-batch.md). 채희주가 만료/신원/키 권한 선검사와 현재 rule 평가 경계·소스/엔진 고정 실행을 구성한다. 집중236/신규59·고정 Ruff·로컬 Docker2340·관측75/75·authority38/38·소유 자원0을 확인했다. 정확한 clean head/병합 후 CI는 PR 기록을 따른다. DB 전송 인증서 자동 교체·DB/물리 HA·팀원 독립 인수는 후속이다.
+
 11/6 후속 [CA leaf 통합 인수](ca-runtime-acceptance.md)는 이 관측 경로에 선택형 CA/제어기를
 연결한다. 아래14서비스/수동 leaf 경로는 그대로 보존하며 CA 키 교체/HA 통합 인수와 구분한다.
 
