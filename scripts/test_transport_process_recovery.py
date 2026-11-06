@@ -16,8 +16,8 @@ from scripts.certificate_controller import PUBLIC_FAILURE_REASONS, failure_reaso
 from scripts.continuous_mtls_runtime import ROOT, RuntimeFailure
 from scripts.database_transport_runtime import (
     TransportCoordinator,
-    TransportRuntime,
     management_lease,
+    runtime_type,
 )
 
 CHECKPOINTS = {'stopped': 'after', 'installed': 'before', 'resuming': 'before', 'idle': 'before'}
@@ -54,7 +54,7 @@ def kill_worker(child):
 def checkpoint_worker(directory, target, token):
     if target not in CHECKPOINTS or re.fullmatch('[a-f0-9]{24}', token) is None:
         raise RuntimeFailure('transport_test_checkpoint_scope')
-    r = TransportRuntime(directory)
+    r = runtime_type(directory)(directory)
     with management_lease(r.directory):
         r.load()
         worker = TransportCoordinator(r)

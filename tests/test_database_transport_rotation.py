@@ -237,7 +237,7 @@ def test_acceptance_runtime_reuses_bootstrap_capture_and_new_transport_graph():
 def test_foreign_container_or_mount_blocks_every_transition_before_mutation(tmp_path, monkeypatch, phase):
     worker = object.__new__(runtime.TransportCoordinator)
     worker.state = {'phase': phase}
-    worker.runtime = SimpleNamespace(_transport_active=False)
+    worker.runtime = SimpleNamespace(_transport_active=False, transport_idle=lambda: None)
     worker.persist = lambda: pytest.fail('persisted after scope failure')
 
     def deny():
@@ -260,7 +260,7 @@ def test_failure_after_candidate_publish_does_not_advance_or_unpause(monkeypatch
         assert operation == 'install'
         raise runtime.RuntimeFailure('synthetic_publish_failure')
 
-    worker.runtime = SimpleNamespace(transport_job=failed)
+    worker.runtime = SimpleNamespace(transport_job=failed, transport_idle=lambda: None)
     worker.leaf = lambda *a, **kw: pytest.fail('unpaused after unsuccessful publication')
     with pytest.raises(runtime.RuntimeFailure):
         worker.tick()
@@ -270,7 +270,7 @@ def test_failure_after_candidate_publish_does_not_advance_or_unpause(monkeypatch
 def test_failed_live_database_validation_never_commits_or_resumes(monkeypatch):
     worker = object.__new__(runtime.TransportCoordinator)
     worker.state = {'phase': 'committing'}
-    worker.runtime = SimpleNamespace(transport_job=lambda *a: pytest.fail('committed without live validation'))
+    worker.runtime = SimpleNamespace(transport_idle=lambda: None, transport_job=lambda *a: pytest.fail('committed without live validation'))
     worker.admit = lambda: None
     worker.persist = lambda: pytest.fail('persisted after failed live barrier')
     worker.live = lambda: (_ for _ in ()).throw(LifecycleError('transport_live_database_identity_failed'))
@@ -282,7 +282,7 @@ def test_failed_live_database_validation_never_commits_or_resumes(monkeypatch):
 def test_idle_timer_does_not_spawn_helpers_before_next_due():
     worker = object.__new__(runtime.TransportCoordinator)
     worker.state = {'phase': 'idle', 'next_due_at': time.time() + 300}
-    worker.runtime = SimpleNamespace()
+    worker.runtime = SimpleNamespace(transport_idle=lambda: None)
     worker.admit = lambda: pytest.fail('idle timer launched Docker helper')
     worker.tick()
 

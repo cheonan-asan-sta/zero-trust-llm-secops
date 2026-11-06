@@ -76,6 +76,11 @@ jobs:
             verification: Verify database transport rotation and resume
             report: Report database transport verification
             command: python -m scripts.test_database_transport_runtime --directory runtime/c02/database-transport-ci
+          - kind: database-backup
+            directory: runtime/c02/database-backup-ci
+            verification: Verify encrypted database backup and isolated restore
+            report: Report database backup verification
+            command: python -m scripts.test_database_backup_runtime --directory runtime/c02/database-backup-ci
     steps:
       - uses: actions/checkout@v4
         with:

@@ -27,8 +27,8 @@ class AcceptanceTransport(AcceptanceRuntime, TransportRuntime):
 class Checks(ParentChecks):
     expected_volumes = 37
 
-    def __init__(self, directory):
-        super().__init__(directory, runtime_class=AcceptanceTransport)
+    def __init__(self, directory, *, runtime_class=AcceptanceTransport):
+        super().__init__(directory, runtime_class=runtime_class)
         self.report['schema'] = 'database-transport-rotation-verification-1'
 
     def force_transport_due(self):

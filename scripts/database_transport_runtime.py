@@ -168,7 +168,19 @@ class TransportRuntime(PersistentAuthorityRuntime):
                 self.load()
                 if not purge:
                     self.transport_idle()
+                self.before_transport_down(purge)
             return super().down(purge=purge)
+
+    def before_transport_down(self, purge):
+        pass
+
+
+def runtime_type(directory):
+    path = Path(directory) / 'authority-profile.json'
+    if path.exists() and json.loads(control.read(path, 65536)).get('database_backup') is True:
+        from scripts.database_backup_runtime import BackupRuntime
+        return BackupRuntime
+    return TransportRuntime
 
 
 class TransportCoordinator:
@@ -229,10 +241,11 @@ class TransportCoordinator:
 
     def tick(self):
         r, s = self.runtime, self.state
-        if s['phase'] == 'idle' and s.get('next_due_at', 0) > time.time():
-            return
         r._transport_active = True
         try:
+            r.transport_idle()
+            if s['phase'] == 'idle' and s.get('next_due_at', 0) > time.time():
+                return
             self.admit()
             phase = s['phase']
             if phase == 'idle':
@@ -296,7 +309,7 @@ def main():
     parser.add_argument('--purge', action='store_true')
     args = parser.parse_args()
     try:
-        r = TransportRuntime(args.directory)
+        r = runtime_type(args.directory)(args.directory)
         if args.mode in {'up', 'down'}:
             result = r.up() if args.mode == 'up' else r.down(purge=args.purge)
         elif args.mode == 'status':
