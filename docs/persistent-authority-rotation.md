@@ -1,5 +1,7 @@
 # 3주차 지속 실행 CA/JWK 교체·CA 프로세스 이중화
 
+11/6 착수·11/7 검증 묶음: [DB 전송 PKI 사전 점검·관측 준비·로컬 일괄 검증](infrastructure-preflight-batch.md). 채희주가 만료/신원/키 권한 선검사와 현재 rule 평가 경계·소스/엔진 고정 실행을 구성한다. 집중236/신규59·고정 Ruff·로컬 Docker2340·관측75/75·authority38/38·소유 자원0을 확인했다. 정확한 clean head/병합 후 CI는 PR 기록을 따른다. DB 전송 인증서 자동 교체·DB/물리 HA·팀원 독립 인수는 후속이다.
+
 2026-11-06 · 채희주 인프라 구성·실행·측정, Codex 도구 보조.
 
 [지속 실행 leaf 개인키 교체](persistent-key-rotation.md) 다음 묶음이다. 기존 서명 계획 조정기·

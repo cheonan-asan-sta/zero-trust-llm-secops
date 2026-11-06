@@ -10,7 +10,8 @@ from datetime import UTC, datetime
 from scripts.continuous_mtls_runtime import RuntimeFailure, command
 
 ALERTS = {'C01SignalQueueBacklog', 'C01SignalCollectionUnavailable', 'C01ExporterDown', 'C01SignalProcessingFailed'}
-QUERIES = {'up': 'up{job="zt-signals"}', 'alerts': 'ALERTS{alertname=~"C01.*"}'}
+QUERIES = {'up': 'up{job="zt-signals"}', 'alerts': 'ALERTS{alertname=~"C01.*"}',
+           'alert_sample_timestamps': 'timestamp(ALERTS{alertname=~"C01.*"})'}
 
 
 def number(value):

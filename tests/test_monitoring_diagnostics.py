@@ -77,7 +77,8 @@ def test_scoped_inspection_and_queries_do_not_export_docker_or_api_secrets(monke
             'data': {'resultType': 'vector', 'result': [], 'groups': []}, 'token': 'secret-sentinel'}})
     monkeypatch.setattr(diag, 'command', command)
     result = diag.collect(SimpleNamespace(state={'project': 'kmtls-012345abcdef'}, services=('operator',)), 'query_failed')
-    assert len(calls) == 5 and result['prometheus']['up']['available']
+    assert len(calls) == 6 and result['prometheus']['up']['available']
+    assert result['prometheus']['alert_sample_timestamps']['available']
     assert 'secret-sentinel' not in json.dumps(result) and ident not in json.dumps(result)
 
 

@@ -8,6 +8,7 @@ from datetime import UTC, datetime, timedelta
 
 from scripts.continuous_mtls_runtime import RuntimeFailure, command
 from scripts.monitored_mtls_runtime import MonitoredRuntime
+from scripts.monitoring_readiness import FRESH_UP, inactive_rule
 from scripts.test_continuous_mtls_runtime import Checks
 
 
@@ -72,6 +73,27 @@ class MonitoredChecks(Checks):
         clock = self.runtime.execute("sink", ["python", "-c", "from datetime import UTC,datetime;print(datetime.now(UTC).isoformat())"])
         self.episode_starts[floor] = datetime.fromisoformat(clock.strip())
         return floor
+
+    def clear_baseline(self, alert):
+        floor = datetime.now(UTC)
+        evidence = {}
+
+        def fresh():
+            result = self.monitor('prometheus', '/api/v1/rules?type=alert')
+            value = inactive_rule(result.get('body'), alert, floor) if result.get('status') == 200 else None
+            if not value:
+                return False
+            samples = self.query(FRESH_UP)
+            if (len(samples) != 1 or samples[0].get('metric', {}).get('job') != 'zt-signals'
+                    or samples[0].get('metric', {}).get('instance') != 'exporter:9101'
+                    or samples[0].get('value', [None, None])[1] != '1'):
+                return False
+            evidence.update(value)
+            return True
+
+        self.wait(fresh, 'monitoring_fresh_inactive_rule_not_ready')
+        self.report.setdefault('monitoring_baselines', []).append(evidence)
+        self.add('fresh_healthy_inactive_' + alert + '_evaluation_and_live_scrape_before_fault')
 
     def await_episode(self, name, status, floor, original=None):
         found = {}
@@ -186,7 +208,7 @@ print(json.dumps({'status':status,'denied':status in (0,403)}))
         self.add("monitoring_worker_drain_resolves_same_backlog_episode")
 
         for service, alert in (("reader", "C01SignalCollectionUnavailable"), ("exporter", "C01ExporterDown")):
-            self.wait(lambda alert=alert: not self.query('ALERTS{alertname="' + alert + '"}'), "monitoring_previous_alert_not_cleared")
+            self.clear_baseline(alert)
             floor = self.begin_episode()
             command(["docker", "stop", "--time", "2", runtime.container(service)])
             try:
@@ -259,8 +281,7 @@ print(json.dumps({'status':status,'denied':status in (0,403)}))
     def run(self):
         super().run()
         self.report["completed"] = False
-        self.wait(lambda: not self.query('ALERTS{alertname="C01SignalProcessingFailed"}'),
-                  "monitoring_failed_baseline_not_clear")
+        self.clear_baseline('C01SignalProcessingFailed')
         floor = self.begin_episode()
         worker = self.runtime.container("worker")
         command(["docker", "stop", "--time", "2", worker])

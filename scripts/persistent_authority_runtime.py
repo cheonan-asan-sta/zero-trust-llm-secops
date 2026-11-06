@@ -181,6 +181,7 @@ print(json.dumps(result))'''
             raise RuntimeFailure('authority_public_configuration_drift')
 
     def verify_authority_database(self):
+        self._database_transport = self.verify_database_transport()
         self.verify_owned_volumes()
         if self.state.get('authority_initialized'):
             command(['docker', 'run', '--rm', '--network', 'none', '--read-only', '--user', '10001:10001',
@@ -188,6 +189,33 @@ print(json.dumps(result))'''
                 f"type=volume,src={self.state['volumes']['authority-db-data']},dst=/pgdata,readonly",
                 '--entrypoint', 'sh', self.state['authority_database_image_id'], '-c',
                 'test -s /pgdata/db/PG_VERSION && test -f /pgdata/initialized && test ! -e /pgdata/initialize.once'])
+
+    def verify_database_transport(self):
+        from scripts.database_transport_preflight import VOLUMES
+        self.verify_owned_volumes()
+        argv = ['docker', 'run', '--rm', '--network', 'none', '--read-only', '--user', '10001:10001',
+                '--cap-drop=ALL', '--security-opt=no-new-privileges:true', '--memory', '128m', '--cpus', '1',
+                '--label', 'secops.runtime=' + self.state['project']]
+        for volume in VOLUMES:
+            argv += ['--mount', f"type=volume,src={self.state['volumes'][volume]},dst=/transport/{volume},readonly"]
+        try:
+            result = json.loads(command([*argv, '--entrypoint', 'python', '-i', self.state['authority_image_id'],
+                '-m', 'scripts.database_transport_preflight'], payload=json.dumps({'expected_root_sha256':
+                    self.state['authority_public_sha256']['authority-db-tls']['root.pem']}), timeout=15))
+        except (RuntimeFailure, ValueError, OSError, subprocess.SubprocessError):
+            raise RuntimeFailure('database_transport_preflight_failed') from None
+        if result.get('verified') is not True:
+            raise RuntimeFailure('database_transport_preflight_failed')
+        return result
+
+    def preflight(self):
+        self.verify_release()
+        self.verify_owned_volumes()
+        self.verify_public_configuration()
+        self.verify_extra_images()
+        return {'schema': 'persistent-authority-preflight-1', 'verified': True, 'offline': True,
+                'release_sha256': self.state['release']['sha256'], 'epoch': self.journal()['epoch'],
+                'database_transport': self._database_transport}
 
     def verify_extra_images(self):
         # Fail before readonly helpers can accidentally create an absent volume.
@@ -331,11 +359,12 @@ class GraphBackend(DockerBackend):
     def before_authority_tick(self):
         self.runtime.verify_monitoring_configuration()
         self.runtime.verify_authority_public_assets()
+        self.runtime.verify_database_transport()
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('up', 'down', 'status', 'tick', 'once', 'run'))
+    parser.add_argument('mode', choices=('up', 'down', 'status', 'preflight', 'tick', 'once', 'run'))
     parser.add_argument('--directory', type=Path, default=ROOT / 'runtime/c02/persistent-authority')
     parser.add_argument('--purge', action='store_true')
     args = parser.parse_args()
@@ -347,7 +376,9 @@ def main():
             result = runtime.down(purge=args.purge)
         else:
             runtime.load()
-            if args.mode == 'status':
+            if args.mode == 'preflight':
+                result = runtime.preflight()
+            elif args.mode == 'status':
                 state = runtime.journal()
                 result = {'phase': state['phase'], 'epoch': state['epoch'], 'services': runtime.status()['services']}
             else:
