@@ -7,6 +7,7 @@ from pathlib import Path
 
 from app.config import get_settings
 from scripts.app_state_recovery import RecoveryError, local_only, require, verify_admission
+from scripts.app_storage_contract import FILES
 
 
 def admit(data, public):
@@ -18,7 +19,14 @@ def admit(data, public):
     require((settings.trusted_signal_sources_path is not None and
              settings.trusted_signal_sources_path.resolve() == registry.resolve()) if registry.exists()
             else settings.trusted_signal_sources_path is None, "registry_path_mismatch")
-    return verify_admission(data, public)
+    result = verify_admission(data, public)
+    if (data / "storage.json").exists():
+        require(settings.audit_backend == "jsonl", "jsonl_backend_required")
+        for setting, kind in (("audit_log_path", "audit"), ("case_log_path", "cases"),
+                              ("outbox_log_path", "outbox")):
+            require(getattr(settings, setting).resolve() == (data / FILES[kind]).resolve(),
+                    "storage_path_mismatch")
+    return result
 
 
 def main():

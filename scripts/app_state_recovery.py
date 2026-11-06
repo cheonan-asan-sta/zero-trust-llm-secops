@@ -32,6 +32,7 @@ from app.services.signal_inbox import InboxUnavailable, SignalInbox
 from app.services.trusted_signals import SignalVerifier
 from app.services.zero_trust import JournalUnavailable, ZeroTrustOperations
 from app.zero_trust_models import SessionRevocationRequest
+from scripts import app_storage_contract as storage
 from scripts.ca_recovery_state import atomic, canonical, locked, opened, sealed
 from scripts.certificate_controller import LifecycleError
 
@@ -81,6 +82,15 @@ def app_digest():
 
 def schema(connection):
     return connection.execute("SELECT type,name,tbl_name,sql FROM sqlite_schema ORDER BY type,name").fetchall()
+
+
+def recovery_digest(full_state):
+    if not full_state:
+        return app_digest()
+    # Prevent a SQLite-only gate from accepting a release while ignoring JSONL.
+    paths = ("app_state_recovery.py", "app_storage_contract.py", "serve_recovered_app.py")
+    return sha(canonical({"application": app_digest(), "full_storage": {
+        name: sha((ROOT / "scripts" / name).read_bytes().replace(b"\r\n", b"\n")) for name in paths}}))
 
 
 def expected_schema(inbox):
@@ -144,6 +154,10 @@ def inspect_state(directory):
     state = {"schema_sha256": sha(canonical(actual)), "tables": tables, "head": head,
              "registry_sha256": sha(read_file(registry, 1024**2)) if registry.exists() else None,
              "application_sha256": app_digest(), "policy_sha256": service.policy_digest}
+    jsonl = storage.inspect(directory)
+    if jsonl is not None:
+        state["jsonl"] = jsonl
+        state["application_sha256"] = recovery_digest(True)
     return {"state": state, "state_sha256": sha(canonical(state)), "records": records,
             "sessions": latest, "has_inbox": has_inbox}
 
@@ -156,6 +170,7 @@ def snapshot(source, target, *, timeout=15):
     read_file(database, MAX_DATABASE)
     registry = source / "sources.json"
     before = read_file(registry, 1024**2) if registry.exists() else None
+    logs = storage.capture(source)
     started = time.monotonic()
 
     def progress(_status, _remaining, _total):
@@ -167,8 +182,11 @@ def snapshot(source, target, *, timeout=15):
         db.backup(destination, pages=256, progress=progress, sleep=.05)
     after = read_file(registry, 1024**2) if registry.exists() else None
     require(before == after, "registry_changed_during_snapshot")
+    require(storage.capture(source) == logs, "storage_changed_during_snapshot")
     if before is not None:
         (target / "sources.json").write_bytes(before)
+    for name, raw in logs.items():
+        atomic(target / name, raw)
     return inspect_state(target)
 
 
@@ -190,8 +208,11 @@ class Store:
             require(not path.is_symlink() and path.resolve().is_relative_to(self.root), "directory_scope")
         self.control, self.public = self.root / "control", self.root / "public"
 
-    def initialize(self):
+    def initialize(self, *, full_state=False):
         local_only()
+        logs = storage.inspect(self.root / "data")
+        require(type(full_state) is bool and (logs is not None) == full_state,
+                "explicit_full_storage_required")
         require(all(not path.exists() or (path.is_dir() and not any(path.iterdir()))
                     for path in (self.control, self.public)), "authority_already_initialized")
         self.control.mkdir(parents=True, mode=0o700, exist_ok=True)
@@ -206,7 +227,8 @@ class Store:
         public = signing.public_key().public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
         source = secrets.token_hex(16)
         atomic(self.public / "trust.json", canonical({"source": source, "public_key": base64.b64encode(public).decode()}))
-        atomic(self.control / "anchor.json", canonical({"source": source, "generation": 0, "checkpoint_sha256": None}))
+        atomic(self.control / "anchor.json", canonical({"source": source, "generation": 0,
+            "checkpoint_sha256": None, "storage_mode": "full-jsonl" if full_state else "sqlite"}))
         return {"initialized": True, "source": source}
 
     def checkpoint(self):
@@ -221,12 +243,16 @@ class Store:
             atomic(self.public / "current.json", canonical({"source": anchor["source"],
                 "generation": generation, "restore_id": None, "release_sha256": None}))
             state = snapshot(self.root / "data", Path(temp) / "snapshot")
+            mode = anchor.get("storage_mode", "sqlite")
+            require(mode in {"sqlite", "full-jsonl"} and ("jsonl" in state["state"]) == (mode == "full-jsonl"),
+                    "checkpoint_storage_mode")
             manifest = {"purpose": "app-checkpoint-1", "source": anchor["source"],
                         "generation": generation, "created_at": datetime.now(UTC).isoformat()}
             envelope = sealed(state["state"], read_file(self.control / "checkpoint.key", 32), manifest)
             atomic(self.control / "checkpoint.json", canonical(envelope))
             atomic(self.control / "anchor.json", canonical({"source": anchor["source"],
-                "generation": manifest["generation"], "checkpoint_sha256": sha(canonical(envelope))}))
+                "generation": manifest["generation"], "checkpoint_sha256": sha(canonical(envelope)),
+                "storage_mode": mode}))
             return {"checkpointed": True, "generation": manifest["generation"], "records": state["records"]}
 
     def _checkpoint(self, max_age):
@@ -238,11 +264,14 @@ class Store:
         envelope = read_json(self.control / "checkpoint.json")
         require(anchor["checkpoint_sha256"] == sha(canonical(envelope)), "checkpoint_replay_or_tamper")
         state = unseal(envelope, read_file(self.control / "checkpoint.key", 32), "app-checkpoint-1")
+        mode = anchor.get("storage_mode", "sqlite")
+        require(mode in {"sqlite", "full-jsonl"} and ("jsonl" in state) == (mode == "full-jsonl"),
+                "checkpoint_storage_mode")
         m = envelope["manifest"]
         require(m["source"] == anchor["source"] and m["generation"] == anchor["generation"], "checkpoint_generation")
         age = (datetime.now(UTC) - datetime.fromisoformat(m["created_at"])).total_seconds()
         require(0 <= age <= max_age, "checkpoint_expired_or_future")
-        require(state["application_sha256"] == app_digest(), "application_version_mismatch")
+        require(state["application_sha256"] == recovery_digest("jsonl" in state), "application_version_mismatch")
         return anchor, state
 
     def backup(self, *, max_age=300):
@@ -260,10 +289,16 @@ class Store:
                         "created_at": datetime.now(UTC).isoformat()}
             payload = {"state": expected, "database": base64.b64encode(database).decode(),
                        "registry": base64.b64encode(read_file(registry, 1024**2)).decode() if registry.exists() else None}
+            if "jsonl" in expected:
+                payload["jsonl"] = {name: base64.b64encode(raw).decode()
+                                    for name, raw in storage.capture(path).items()}
             envelope = sealed(payload, read_file(self.control / "backup.key", 32), manifest)
-            atomic(self.root / "backups" / (ident + ".sealed"), canonical(envelope))
+            encoded = canonical(envelope)
+            require(len(encoded) <= MAX_ENVELOPE, "backup_envelope_size_limit")
+            atomic(self.root / "backups" / (ident + ".sealed"), encoded)
             return {"backed_up": True, "backup_id": ident, "records": result["records"],
-                    "generation": anchor["generation"], "plaintext_bytes": len(database)}
+                    "generation": anchor["generation"], "plaintext_bytes": len(database),
+                    "jsonl_bytes": sum(row["bytes"] for row in expected.get("jsonl", {}).get("files", {}).values())}
 
     def restore(self, backup_id, *, max_age=300):
         local_only()
@@ -277,6 +312,7 @@ class Store:
                     and manifest["backup_id"] == backup_id, "backup_stale_or_foreign")
             require(payload["state"] == expected and sha(canonical(expected)) == manifest["state_sha256"],
                     "backup_checkpoint_mismatch")
+            require(("jsonl" in payload) == ("jsonl" in expected), "backup_storage_mode")
             raw = base64.b64decode(payload["database"], validate=True)
             require(len(raw) <= MAX_DATABASE and sha(raw) == manifest["database_sha256"], "database_digest")
             # Invalidate the previous restore before doing any fallible staging.
@@ -291,6 +327,14 @@ class Store:
                 registry = base64.b64decode(payload["registry"], validate=True)
                 require(len(registry) <= 1024**2, "registry_size")
                 atomic(stage / "sources.json", registry)
+            if "jsonl" in expected:
+                require(isinstance(payload["jsonl"], dict) and set(payload["jsonl"]) ==
+                        {"storage.json", *storage.FILES.values()}, "backup_storage_files")
+                for name, encoded in payload["jsonl"].items():
+                    raw = base64.b64decode(encoded, validate=True)
+                    require(len(raw) <= (4096 if name == "storage.json" else storage.MAX_LOG),
+                            "backup_storage_size")
+                    atomic(stage / name, raw)
             restored = inspect_state(stage)
             require(restored["state"] == expected, "restored_state_mismatch")
             service = operations(stage)
@@ -306,11 +350,14 @@ class Store:
                 if table.startswith("signal_inbox"):
                     require(after["state"]["tables"][table] == digest, "inbox_changed_during_fence")
             require(after["state"]["registry_sha256"] == expected["registry_sha256"], "registry_changed_during_fence")
+            require(after["state"].get("jsonl") == expected.get("jsonl"), "storage_changed_during_fence")
             release = {"purpose": "app-admission-1", "source": anchor["source"], "generation": anchor["generation"],
                        "restore_id": ident, "application_sha256": after["state"]["application_sha256"],
                        "policy_sha256": after["state"]["policy_sha256"],
                        "registry_sha256": after["state"]["registry_sha256"], "head": after["state"]["head"],
                        "fenced_sessions": fenced}
+            if "jsonl" in after["state"]:
+                release["jsonl"] = after["state"]["jsonl"]
             key = Ed25519PrivateKey.from_private_bytes(read_file(self.control / "signing.key", 32))
             signed = {"release": release, "signature": base64.b64encode(key.sign(canonical(release))).decode()}
             atomic(stage / "release.json", canonical(signed))
@@ -341,6 +388,9 @@ def verify_admission(directory, trust_directory):
     except (ValueError, InvalidSignature):
         raise RecoveryError("admission_signature") from None
     state = inspect_state(directory)
+    require(("jsonl" in release) == ("jsonl" in state["state"]), "admission_storage_mode")
+    if "jsonl" in release:
+        storage.verify_prefix(directory, release["jsonl"])
     require(state["state"]["application_sha256"] == release["application_sha256"] and
             state["state"]["policy_sha256"] == release["policy_sha256"] and
             state["state"]["registry_sha256"] == release["registry_sha256"], "admission_configuration_changed")
@@ -367,6 +417,7 @@ def main(argv=None):
     parser.add_argument("--backup-id")
     parser.add_argument("--restore-id")
     parser.add_argument("--max-age", type=int, default=300)
+    parser.add_argument("--full-state", action="store_true", help="Pin full JSONL storage at initialization")
     args = parser.parse_args(argv)
     try:
         local_only()
@@ -375,8 +426,9 @@ def main(argv=None):
         allowed |= sys.platform == "linux" and Path("/.dockerenv").exists() and path.is_relative_to(Path("/lab"))
         require(allowed, "local_lab_directory_required")
         store = Store(args.directory)
+        require(not args.full_state or args.operation == "init", "full_state_init_only")
         if args.operation == "init":
-            result = store.initialize()
+            result = store.initialize(full_state=args.full_state)
         elif args.operation == "checkpoint":
             result = store.checkpoint()
         elif args.operation == "backup":

@@ -34,7 +34,7 @@ jobs:
       - name: Build application image
         run: docker build --platform linux/amd64 --provenance=false --file Dockerfile --tag zero-trust-llm-secops:ci .
       - name: Verify application maintenance recovery
-        run: python -m scripts.test_app_recovery_runtime --image zero-trust-llm-secops:ci --directory runtime/week3/app-recovery-ci
+        run: python -m scripts.test_app_recovery_runtime --full-state --image zero-trust-llm-secops:ci --directory runtime/week3/app-recovery-ci
       - name: Report application recovery verification
         if: always()
         run: |
