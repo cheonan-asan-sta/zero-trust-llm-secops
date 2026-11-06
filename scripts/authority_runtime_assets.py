@@ -1,7 +1,11 @@
 """CA and controller material for the optional persistent, monitored local graph."""
 
+import http.client
 import json
 import os
+import ssl
+import time
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 
 from cryptography.hazmat.primitives import serialization
@@ -22,6 +26,30 @@ INPUTS = ('infra/mtls/ca-tools.lock.json', 'infra/mtls/nginx-renewal.sh')
 # These are the only mutable local management controls. All other configuration
 # is sealed before startup; this does not authenticate a malicious Docker host.
 CONTROLS = {'paused', 'disabled', 'renew_before'}
+
+
+def ca_health():
+    """Local CA-only TLS barrier; no grants before authenticated readiness."""
+    connection = None
+    try:
+        context = ssl.create_default_context(cafile='/ca/root.pem')
+        context.minimum_version = ssl.TLSVersion.TLSv1_2
+        connection = http.client.HTTPSConnection('ca', 9000, context=context, timeout=2)
+        connection.request('GET', '/health')
+        response = connection.getresponse()
+        body = response.read(1025)
+        date = parsedate_to_datetime(response.getheader('Date') or '')
+        stamp = int(date.timestamp())
+        if (response.status != 200 or len(body) > 1024 or json.loads(body) != {'status': 'ok'}
+                or date.utcoffset() is None or date.utcoffset().total_seconds() != 0
+                or abs(stamp - time.time()) > 5):
+            return {'healthy': False}
+        return {'healthy': True, 'server_time': stamp}
+    except (OSError, ValueError, TypeError, http.client.HTTPException):
+        return {'healthy': False}
+    finally:
+        if connection is not None:
+            connection.close()
 
 
 def fixed_configuration(value):

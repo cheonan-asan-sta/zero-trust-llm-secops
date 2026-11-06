@@ -140,6 +140,10 @@ class AuthorityRuntime(MonitoredRuntime):
     def controller_configuration(self):
         return json.loads(self.helper(['-c', "from pathlib import Path;print(Path('/state/config.json').read_text())"]))
 
+    def authority_health(self):
+        return json.loads(self.execute('ca', ['python', '-c',
+            'import json;from scripts.authority_runtime_assets import ca_health;print(json.dumps(ca_health()))'], timeout=5))
+
     def verify_extra_images(self):
         super().verify_extra_images()
         release.image_identity(json.loads(command(['docker', 'image', 'inspect', self.state['authority_image']]))[0],
@@ -178,10 +182,32 @@ class AuthorityRuntime(MonitoredRuntime):
             raise RuntimeFailure('authority_initialization_requires_new_approved_bootstrap')
         self.compose('up', '--detach', *[name for name in self.services if name != 'certificate-controller'], timeout=300)
         inventory = json.loads(self.helper(['-m', 'scripts.certificate_controller', 'init']))
+        ready = {}
+
+        def healthy():
+            try:
+                result = self.authority_health()
+            except (RuntimeFailure, ValueError):
+                return False
+            if result.get('healthy') is True and type(result.get('server_time')) is int:
+                ready.update(result)
+                return True
+            return False
+
+        try:
+            self.wait(healthy, timeout=30)
+        except RuntimeFailure:
+            raise RuntimeFailure('authority_health_unavailable') from None
+        # step-ca rejects JWTs whose iat precedes its initialized authority.
+        # Date comes from the authenticated CA, rather than a fixed sleep or a
+        # disabled issued-at check. No grant exists before this barrier.
+        self.state['authority_bootstrap_time'] = ready['server_time']
+        self.save()
         grants = {}
         for uid, credential in inventory.items():
             entry, key = self._bootstrap_provisioners[credential['name'] + '-' + credential['purpose']]
-            grants[uid] = {'token': authority.bootstrap_token(entry, key, credential['csr'], seconds=300),
+            grants[uid] = {'token': authority.bootstrap_token(entry, key, credential['csr'], seconds=300,
+                                                           now=ready['server_time']),
                            'duration': '1h' if credential['name'].startswith('renew-') else '20m'}
         self.write_volume('certificate-state', {'bootstrap.json': json.dumps(grants)})
         self._bootstrap_provisioners.clear()
