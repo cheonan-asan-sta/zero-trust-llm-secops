@@ -1,5 +1,21 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 2026년 11월 6일 앱 전체 저장 정비 계약
+
+- [전체 저장 계약](docs/app-storage-recovery.md): 기존 SQLite 정비 복원에 audit/cases/outbox
+  JSONL을 선택형 `init --full-state`로 연결한다. 관리 anchor에 모드를 고정하며 누락을 빈 로그로
+  바꾸거나 기존 SQLite 전용 관리 영역을 자동 승격하지 않는다.
+- 정확한 바이트·hash chain·모델·사건 버전/테넌트와 CloudEvent를 대조한다. 합법적인 case/outbox
+  commit 간극은 집계해 보존하고 기존 reconciler가 같은 ID로 누락분만 채운다.
+- 모든 기존 세션을 회수하고 JSONL·Inbox의 변경 없음을 확인한 뒤 서명된 기동 승인을 발행한다.
+  전체 모드는 앱/복원 검사 코드 identity와 JSONL prefix, 실제 세 로그의 설정 경로를 검사한다.
+- 중간 종료 뒤 옛 승인 사본은 거부하며 새 격리 사본으로 재시도한다. 기존 단위 51개를 유지하고
+  추가 63개·집중 114개, 최종 Mac 전체 2111/기존 skip2를 확인했다. 실제 Docker 전체 복원 24개와
+  소유 컨테이너/볼륨 0도 확인했다. Linux 집중114/Ruff도 통과했다. 추가 Linux 전체는 맥 공간
+  보호를 위해 중단했으며 성공으로 세지 않는다. 전체 Linux/최종 PR 상태는 별도 확인한다.
+- 정지된 기록자 경계의 로컬 정비다. 온라인 백업·외부 exactly-once·전체 관리 저장소 rollback
+  방어·운영 RTO/RPO·팀원 독립 인수의 완료로 확대하지 않는다. 기존 인프라 인계의 실제 실행자는 유지한다.
+
 ## 2026년 11월 6일 CA leaf 지속 실행 통합 인수
 
 - [CA leaf 인수](docs/ca-runtime-acceptance.md): `scripts.authority_mtls_runtime` 선택형16서비스/9내부망.

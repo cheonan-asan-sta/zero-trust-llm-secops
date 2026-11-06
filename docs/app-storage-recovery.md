@@ -76,3 +76,14 @@ python -m scripts.test_app_recovery_runtime --full-state --image app-full-recove
 실험은 새 소유 프로젝트만 만들고 정리한다. 보고서에서 `full_state: true`, `passed: true`, 모든 검사 true, 정리 컨테이너/볼륨 0을 함께 확인한다. 소스/실행 이미지 지문도 대조한다. 재현 시마다 새 directory를 사용한다.
 
 CI는 기존 앱 정비 복원 단계를 `--full-state`로 실행한다. SQLite 전용 호환 단위 시험도 유지한다. 팀장 보유 케이스의 독립 재현과 실제 운영 승인은 별도이며, 정확한 최종 실행 커밋·시험 수·결과는 PR 검증 기록에 남긴다.
+
+## 2026년 11월 6일 로컬 검증 기록
+
+- 구현 커밋 `b92042053dbb19ae2b1f371803bfd6cb6ba863a1`에서 집중 114개(기존 정비 복원 51개 + 신규 63개)와 Ruff를 통과했다.
+- 최종 Mac Python 3.14 전체 회귀는 **2,111 passed / 기존 skip 2 / 기존 경고 1**, 123.58초다. 첫 sandbox 실행은 loopback 바인딩 제한과 macOS 임시 경로 별칭 때문에 실패했고, 허용된 실제 HTTP 실행과 정규 임시 경로로 전체를 다시 검증했다.
+- 고정 Linux amd64 시험 이미지의 Ruff와 집중 **114개**도 통과했다(117.76초). Apple Silicon/QEMU 환경이다. 추가 Linux 전체 회귀는 맥 여유 공간 감소 때문에 소유 컨테이너를 명시적으로 중단했으며 종료 137을 성공으로 처리하지 않는다. 전체 Linux/CI 결과는 원격 업로드 후 별도로 확인한다.
+- 원본 Dockerfile·고정 Linux amd64 런타임으로 실제 전체 복원 **24/24**를 통과했다. 원본 DB와 세 로그 유실, 복원 중 실제 종료 73, 새 격리 사본 재시도, 잘못된 outbox 경로의 기동 거부, 인증된 HTTP 403과 사건/outbox 테넌트 경계, 두 번 재개한 reconciler의 중복 방지를 확인했다.
+- 실행 소스는 위 커밋의 tracked-clean 상태이며 앱 digest와 복원 관련 스크립트 6개의 실행 이미지/로컬 지문을 대조했다. SQLite 49,152 bytes와 JSONL 76,953 bytes·정책 journal 18개를 보존하고 기존 세션 3개를 회수했다. 시험 컨테이너/볼륨 잔여는 **0/0**이다.
+- 실제 복원 보고서 SHA-256은 `feaf623dacafde0cc34929dabb0d997c930f4c1f687e72bf1babafda7c15cd53`다. 실행 환경과 합성 fixture를 포함하는 private runtime 전체를 공개 저장소에 올리지 않는다.
+- 초기 legacy Docker 빌드는 BuildKit cache mount 미지원으로 중단됐다. 기존 설치된 Buildx를 시험 전용 설정으로 연결한 뒤 원본 Dockerfile을 그대로 빌드했다. 기존 Colima는 이미지 저장소 I/O 오류가 있어 변경하지 않았고, 별도 시험 프로필에서 실행했다.
+- 이 기록의 시간은 로컬 시험·가속/실패 주입·정리 비용을 포함하며 운영 성능이나 RTO/RPO 보장이 아니다. 뒤에 추가하는 검증 문서 변경은 구현/실행 소스의 변경과 구분한다.
