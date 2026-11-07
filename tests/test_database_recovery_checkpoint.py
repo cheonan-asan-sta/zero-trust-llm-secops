@@ -4,6 +4,7 @@ import json
 import pytest
 
 from scripts import database_recovery_checkpoint as checkpoint
+from scripts import database_recovery_runtime as runtime
 from scripts.certificate_controller import LifecycleError
 from scripts.database_backup_runtime import TABLES
 from scripts.database_recovery_runtime import VOLUMES, RecoveryRuntime, definition
@@ -97,3 +98,39 @@ def test_missing_host_anchor_refuses_helper_before_docker(monkeypatch):
     r.verify_owned_volumes = lambda: None
     with pytest.raises(LifecycleError, match='anchor_invalid'):
         r.checkpoint_job('assess', {})
+
+
+def test_checkpoint_failure_does_not_save_new_host_anchor():
+    r = object.__new__(RecoveryRuntime)
+    r.state = {'checkpoint_head': copy.deepcopy(checkpoint.ZERO)}
+    def fail(*args):
+        raise LifecycleError('untrusted_checkpoint')
+    r.checkpoint_job = fail
+    r.save = lambda: pytest.fail('saved after failed publication')
+    with pytest.raises(LifecycleError, match='untrusted_checkpoint'):
+        r.checkpoint_security({})
+    assert r.state['checkpoint_head'] == checkpoint.ZERO
+
+
+def test_incompatible_checkpoint_denies_before_restore_even_with_readable_archive(checkpoint_request, monkeypatch):
+    data, _ = checkpoint_request
+    r = object.__new__(RecoveryRuntime)
+    r.state = {'project': data['manifest']['project']}
+    r.verify_release = lambda: None
+    r.transport_idle = lambda: None
+    r.backup_store = lambda *a: {'exists': True, 'dump': 'unused-until-admitted'}
+    def deny(*args):
+        raise LifecycleError('checkpoint_security_rollback')
+    r.checkpoint_job = deny
+    monkeypatch.setattr(runtime, 'RestoreDrill', lambda *a: pytest.fail('restore started before checkpoint admission'))
+    with pytest.raises(LifecycleError, match='security_rollback'):
+        r.assess(data['manifest'])
+
+
+def test_foreign_project_refused_before_archive_decryption(checkpoint_request):
+    data, _ = checkpoint_request
+    r = object.__new__(RecoveryRuntime)
+    r.state = {'project': 'kmtls-' + 'f' * 12}
+    r.backup_store = lambda *a: pytest.fail('decrypted foreign archive')
+    with pytest.raises(LifecycleError, match='project_changed'):
+        r.assess(data['manifest'])
