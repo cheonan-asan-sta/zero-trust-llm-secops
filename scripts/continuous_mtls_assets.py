@@ -133,7 +133,7 @@ def _credential(name, *, digest=False):
     return value
 
 
-def service(role):
+def service(role, *, before_exec=None):
     if os.environ.get("APP_ENVIRONMENT", "local") not in {"local", "test"}:
         raise ValueError("continuous runtime is local/test only")
     os.environ["ANALYZER_MODE"] = "rule"
@@ -150,6 +150,8 @@ def service(role):
                    "--poll-seconds", "0.05"]
     else:
         raise ValueError("unknown runtime role")
+    if before_exec is not None:
+        before_exec()
     os.execv(sys.executable, [sys.executable, *command])
 
 

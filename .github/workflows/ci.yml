@@ -51,6 +51,11 @@ jobs:
             verification: Verify application maintenance recovery
             report: Report application recovery verification
             command: python -m scripts.test_app_recovery_runtime --full-state --image zero-trust-llm-secops:ci --directory runtime/week3/app-recovery-ci
+          - kind: application-mtls
+            directory: runtime/c02/application-mtls-recovery-ci
+            verification: Verify application recovery and token fencing over mTLS
+            report: Report mTLS application recovery verification
+            command: python -m scripts.test_recoverable_mtls_runtime --directory runtime/c02/application-mtls-recovery-ci
           - kind: monitored
             directory: runtime/c02/collector-maintenance-ci
             verification: Verify collector maintenance over mTLS

@@ -6,18 +6,29 @@ import sqlite3
 from pathlib import Path
 
 from app.config import get_settings
-from scripts.app_state_recovery import RecoveryError, local_only, require, verify_admission
+from scripts.app_state_recovery import (
+    RecoveryError,
+    local_only,
+    read_file,
+    require,
+    verify_admission,
+)
 from scripts.app_storage_contract import FILES
 
 
-def admit(data, public):
+def admit(data, public, *, registry_path=None, require_api_key=True):
     local_only()
     settings = get_settings()
-    require(settings.analyzer_mode == "rule" and settings.auth_mode == "api_key", "lab_authentication_required")
+    require(settings.analyzer_mode == "rule"
+            and (not require_api_key or settings.auth_mode == "api_key"), "lab_authentication_required")
     require(settings.zero_trust_db_path.resolve() == (data / "app.sqlite3").resolve(), "database_path_mismatch")
     registry = data / "sources.json"
+    configured_registry = Path(registry_path) if registry_path is not None else registry
+    if registry_path is not None:
+        require(read_file(configured_registry, 1024**2) == read_file(registry, 1024**2),
+                "registry_witness_mismatch")
     require((settings.trusted_signal_sources_path is not None and
-             settings.trusted_signal_sources_path.resolve() == registry.resolve()) if registry.exists()
+             settings.trusted_signal_sources_path.resolve() == configured_registry.resolve()) if registry.exists()
             else settings.trusted_signal_sources_path is None, "registry_path_mismatch")
     result = verify_admission(data, public)
     if (data / "storage.json").exists():
