@@ -162,14 +162,14 @@ def inspect_state(directory):
             "sessions": latest, "has_inbox": has_inbox}
 
 
-def snapshot(source, target, *, timeout=15):
+def snapshot(source, target, *, timeout=15, registry_path=None):
     source, target = Path(source), Path(target)
     require(not target.exists(), "fresh_snapshot_required")
     target.mkdir(parents=True)
     database = source / "app.sqlite3"
     read_file(database, MAX_DATABASE)
-    registry = source / "sources.json"
-    before = read_file(registry, 1024**2) if registry.exists() else None
+    registry = Path(registry_path) if registry_path is not None else source / "sources.json"
+    before = read_file(registry, 1024**2) if registry_path is not None or registry.exists() else None
     logs = storage.capture(source)
     started = time.monotonic()
 
@@ -199,7 +199,7 @@ def unseal(envelope, key, purpose):
 
 
 class Store:
-    def __init__(self, directory):
+    def __init__(self, directory, *, source=None, registry_path=None):
         local_only()
         self.root = Path(directory).resolve()
         require(not Path(directory).is_symlink(), "directory_symlink")
@@ -207,10 +207,12 @@ class Store:
             path = self.root / name
             require(not path.is_symlink() and path.resolve().is_relative_to(self.root), "directory_scope")
         self.control, self.public = self.root / "control", self.root / "public"
+        self.data = self.root / "data" if source is None else Path(source)
+        self.registry_path = registry_path
 
     def initialize(self, *, full_state=False):
         local_only()
-        logs = storage.inspect(self.root / "data")
+        logs = storage.inspect(self.data)
         require(type(full_state) is bool and (logs is not None) == full_state,
                 "explicit_full_storage_required")
         require(all(not path.exists() or (path.is_dir() and not any(path.iterdir()))
@@ -242,7 +244,7 @@ class Store:
             generation = anchor["generation"] + 1
             atomic(self.public / "current.json", canonical({"source": anchor["source"],
                 "generation": generation, "restore_id": None, "release_sha256": None}))
-            state = snapshot(self.root / "data", Path(temp) / "snapshot")
+            state = snapshot(self.data, Path(temp) / "snapshot", registry_path=self.registry_path)
             mode = anchor.get("storage_mode", "sqlite")
             require(mode in {"sqlite", "full-jsonl"} and ("jsonl" in state["state"]) == (mode == "full-jsonl"),
                     "checkpoint_storage_mode")
@@ -279,7 +281,7 @@ class Store:
         with locked(self.control), tempfile.TemporaryDirectory(prefix="secops-backup-") as temp:
             anchor, expected = self._checkpoint(max_age)
             path = Path(temp) / "snapshot"
-            result = snapshot(self.root / "data", path)
+            result = snapshot(self.data, path, registry_path=self.registry_path)
             require(result["state"] == expected, "source_advanced_since_checkpoint")
             database = read_file(path / "app.sqlite3", MAX_DATABASE)
             registry = path / "sources.json"
@@ -300,7 +302,7 @@ class Store:
                     "generation": anchor["generation"], "plaintext_bytes": len(database),
                     "jsonl_bytes": sum(row["bytes"] for row in expected.get("jsonl", {}).get("files", {}).values())}
 
-    def restore(self, backup_id, *, max_age=300):
+    def restore(self, backup_id, *, max_age=300, stage_root=None):
         local_only()
         require(isinstance(backup_id, str) and IDENT.fullmatch(backup_id), "backup_id")
         with locked(self.control):
@@ -320,7 +322,9 @@ class Store:
             atomic(self.public / "current.json", canonical({"source": anchor["source"],
                 "generation": anchor["generation"], "restore_id": None, "release_sha256": None}))
             ident = secrets.token_hex(16)
-            stage = self.root / "restores" / ident
+            root = self.root / "restores" if stage_root is None else Path(stage_root)
+            require(root.is_dir() and not root.is_symlink(), "restore_stage_scope")
+            stage = root / ident
             stage.mkdir(mode=0o700)
             atomic(stage / "app.sqlite3", raw)
             if payload["registry"] is not None:

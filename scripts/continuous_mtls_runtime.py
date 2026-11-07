@@ -133,6 +133,9 @@ class Runtime:
     def definition(self, project, image, nginx):
         return compose_spec(project, image, nginx)
 
+    def active_definition(self, project, image, nginx):
+        return self.definition(project, image, nginx)
+
     def make_assets(self):
         from scripts.continuous_mtls_assets import assets
         return assets()
@@ -163,7 +166,7 @@ class Runtime:
         nginx = self.state.get("nginx_image_id")
         if nginx is None:
             nginx = "nginx@sha256:" + "0" * 64
-        spec = self.definition(self.state["project"], self.state.get("image_id", self.state["image"]), nginx)
+        spec = self.active_definition(self.state["project"], self.state.get("image_id", self.state["image"]), nginx)
         for name, service in spec["services"].items():
             if "image_id" in self.state and (name != "proxy" or self.state.get("nginx_image_id")):
                 service["image"] = self.expected_image(name)
