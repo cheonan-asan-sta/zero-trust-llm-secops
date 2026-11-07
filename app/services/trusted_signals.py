@@ -11,7 +11,7 @@ from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
-from app.continuous_signal_models import SignedContinuousSignal
+from app.continuous_signal_models import GUARDDUTY_MAX_AGE_SECONDS, SignedContinuousSignal
 from app.security import Principal
 from app.zero_trust_models import SignedSessionSignal, TrustedSignalRegistry
 
@@ -172,11 +172,15 @@ class SignalVerifier:
         key = next((item for item in source.keys if item.key_id == signal.key_id), None)
         if key is None or not key.enabled or not key.not_before <= now < key.not_after:
             raise SignalRejected("observation key rejected")
-        if (signal.observation.kind not in source.observation_kinds
-                or signal.observation.subject_id not in (
-                    source.user_ids if signal.observation.kind == "identity" else source.device_ids
-                )):
+        observation = signal.observation
+        subjects = source.device_ids if observation.kind == "device" else source.user_ids
+        if observation.kind not in source.observation_kinds or observation.subject_id not in subjects:
             raise SignalRejected("observation kind or subject scope rejected")
+        if observation.kind == "guardduty":
+            if observation.resource_id not in source.guardduty_resource_ids:
+                raise SignalRejected("observation resource scope rejected")
+            if enforce_freshness and (now - signal.observed_at).total_seconds() > GUARDDUTY_MAX_AGE_SECONDS:
+                raise SignalRejected("GuardDuty finding is too old for first intake")
         if (signal.issued_at > now or signal.issued_at < key.not_before
                 or signal.expires_at > key.not_after
                 or (enforce_freshness and (

@@ -99,7 +99,8 @@ def _validate_security_transition(previous, current, entry):
         if (set(entry) != {"kind", "session", "grant_hash", "observation_event_id"}
                 or not isinstance(event_id, str) or not 1 <= len(event_id) <= 128
                 or current.event_id != "obs-" + _digest(current.tenant_id + "." + event_id + "." + current.session_id)
-                or not any(f"CONTINUOUS_{kind}_{current.decision}" in current.reason_codes for kind in ("IDENTITY", "DEVICE"))
+                or not any(f"CONTINUOUS_{kind}_{current.decision}" in current.reason_codes
+                           for kind in ("IDENTITY", "DEVICE", "GUARDDUTY"))
                 or current.challenge_id is not None or current.challenge_expires_at is not None):
             raise ValueError("invalid security-only observation record")
     elif "revoked_by" in entry:
@@ -309,6 +310,8 @@ class ZeroTrustOperations:
 
     @staticmethod
     def _restriction_for(observation):
+        if observation.kind == "guardduty":
+            return "DENY"
         if observation.kind == "identity":
             if not observation.active or observation.authentication_result == "failure":
                 return "DENY"
@@ -324,7 +327,14 @@ class ZeroTrustOperations:
         return None
 
     @staticmethod
-    def _observation_restriction(entries, tenant_id, user_id, device_id):
+    def _observation_matches(observation, user_id, device_id, resource_id):
+        if observation["kind"] == "device":
+            return observation["subject_id"] == device_id
+        return (observation["subject_id"] == user_id
+                and (observation["kind"] != "guardduty" or observation["resource_id"] == resource_id))
+
+    @staticmethod
+    def _observation_restriction(entries, tenant_id, user_id, device_id, resource_id):
         """Restrictions are sticky until a future explicit, reviewed recovery protocol.
 
         A positive or out-of-order observation cannot erase earlier adverse evidence,
@@ -334,9 +344,7 @@ class ZeroTrustOperations:
             entry["restriction"] for entry in entries
             if entry["kind"] == "observation" and entry["tenant_id"] == tenant_id
             and entry["restriction"] is not None
-            and entry["observation"]["subject_id"] == (
-                user_id if entry["observation"]["kind"] == "identity" else device_id
-            )
+            and ZeroTrustOperations._observation_matches(entry["observation"], user_id, device_id, resource_id)
         ]
         return max(restrictions, key=_RESTRICTION_RANK.__getitem__, default=None)
 
@@ -386,12 +394,14 @@ class ZeroTrustOperations:
             )
             if duplicate:
                 return duplicate
+            observation = signal.observation.model_dump(mode="json")
             matching_observations = [entry for entry in entries
                                      if entry["kind"] == "observation"
                                      and entry["tenant_id"] == signal.tenant_id
                                      and entry["observation"]["kind"] == signal.observation.kind
                                      and entry["observation"]["subject_id"]
-                                     == signal.observation.subject_id]
+                                     == signal.observation.subject_id
+                                     and entry["observation"].get("resource_id") == observation.get("resource_id")]
             stale = any(signal.observed_at <= datetime.fromisoformat(entry["observed_at"])
                         for entry in matching_observations)
             restriction = self._restriction_for(signal.observation)
@@ -401,8 +411,9 @@ class ZeroTrustOperations:
                     session = entry["session"]
                     latest[session["session_id"]] = session
             matched = [SessionDecision.model_validate(session) for session in latest.values()
-                       if (session["user_id"] if signal.observation.kind == "identity"
-                           else session["device_id"]) == signal.observation.subject_id]
+                       if self._observation_matches(
+                           observation, session["user_id"], session["device_id"], session["resource_id"],
+                       )]
             changed = []
             for previous in matched:
                 if restriction is None or _RESTRICTION_RANK[restriction] <= _RESTRICTION_RANK[previous.decision]:
@@ -538,7 +549,7 @@ class ZeroTrustOperations:
                 step_up = True
                 reasons.append("ELEVATED_RISK")
             observation_restriction = self._observation_restriction(
-                entries, principal.tenant_id, event.user.user_id, event.device.device_id,
+                entries, principal.tenant_id, event.user.user_id, event.device.device_id, event.resource.resource_id,
             )
             if observation_restriction:
                 deny = deny or observation_restriction == "DENY"

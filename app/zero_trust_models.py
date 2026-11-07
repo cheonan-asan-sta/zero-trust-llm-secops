@@ -1,8 +1,9 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_serializer, model_validator
 
+from app.continuous_signal_models import ObservationKind, ResourceIdentifier
 from app.models import EventAction, SecurityEvent, StrictModel
 
 MAX_EVALUATION_VERSION = 200
@@ -138,8 +139,25 @@ class TrustedSignalSource(StrictModel):
     roles: list[str] = Field(min_length=1, max_length=20)
     # Empty preserves legacy full-session-only authority. Nonempty sources are
     # observation-only and cannot use the old full-session proof endpoint.
-    observation_kinds: list[Literal["identity", "device"]] = Field(default_factory=list, max_length=2)
+    observation_kinds: list[ObservationKind] = Field(default_factory=list, max_length=2)
     keys: list[SignalKey] = Field(min_length=1, max_length=10)
+    guardduty_resource_ids: list[ResourceIdentifier] = Field(default_factory=list, max_length=100)
+
+    @model_serializer(mode="wrap")
+    def serialize_source(self, handler):
+        value = handler(self)
+        # Existing session proofs bind the serialized source record.
+        if not self.guardduty_resource_ids:
+            value.pop("guardduty_resource_ids", None)
+        return value
+
+    @model_validator(mode="after")
+    def guardduty_scope(self):
+        if ("guardduty" in self.observation_kinds or self.guardduty_resource_ids) and (
+            self.observation_kinds != ["guardduty"] or not self.guardduty_resource_ids
+        ):
+            raise ValueError("GuardDuty requires a dedicated source and resource scope")
+        return self
 
 
 class TrustedSignalRegistry(StrictModel):

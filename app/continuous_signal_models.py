@@ -7,6 +7,10 @@ from pydantic import Field, field_validator, model_validator
 
 from app.models import StrictModel
 
+GUARDDUTY_MAX_AGE_SECONDS = 300
+ObservationKind = Literal["identity", "device", "guardduty"]
+ResourceIdentifier = Annotated[str, Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")]
+
 
 class IdentityObservation(StrictModel):
     kind: Literal["identity"] = "identity"
@@ -22,7 +26,16 @@ class DeviceObservation(StrictModel):
     security_posture: Literal["healthy", "at_risk", "compromised", "unknown"]
 
 
-Observation = Annotated[IdentityObservation | DeviceObservation, Field(discriminator="kind")]
+class GuardDutyObservation(StrictModel):
+    kind: Literal["guardduty"] = "guardduty"
+    subject_id: str = Field(min_length=1, max_length=128)
+    resource_id: ResourceIdentifier
+    finding_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+
+Observation = Annotated[
+    IdentityObservation | DeviceObservation | GuardDutyObservation, Field(discriminator="kind"),
+]
 
 
 class SignedContinuousSignal(StrictModel):
