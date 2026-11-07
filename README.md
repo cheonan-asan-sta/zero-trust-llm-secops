@@ -132,6 +132,8 @@ app·수집기·worker·watchdog와 기존 보호 자원 경로를 별도 Docker
 
 ## 로컬 관측의 지속 수집
 
+[GuardDuty EventBridge 로컬 입력](docs/guardduty-eventbridge-local.md)은 서명된 경보의 계정·주체·자원을 검증한 뒤 기존 Inbox와 worker에 연결합니다.
+
 로컬 JSONL의 새 관측을 별도 프로세스가 계속 읽고 SQLite 커서·서명 봉투·접수 확인 상태를 보존합니다.
 identity/device 권한을 나누어 기존 M3 수신 API로 전달하며, 재시작·응답 유실에는 저장한 입력을 재전송합니다.
 수집기의 202 접수 확인과 서버 worker의 정책 완료는 구분합니다.

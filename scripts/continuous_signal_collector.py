@@ -22,10 +22,15 @@ from urllib.request import ProxyHandler, Request, build_opener
 from cryptography.exceptions import UnsupportedAlgorithm
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_serializer, model_validator
 
 from app.config import get_settings
-from app.continuous_signal_models import Observation, SignedContinuousSignal
+from app.continuous_signal_models import (
+    Observation,
+    ObservationKind,
+    ResourceIdentifier,
+    SignedContinuousSignal,
+)
 from app.models import StrictModel
 from app.security import Principal, Role
 from app.services.collector_spool import (
@@ -54,6 +59,7 @@ from scripts.collector_input import (
     recover_rotation,
     rotate_input,
 )
+from scripts.guardduty_eventbridge import GuardDutyMapping, normalize_finding, read_local_file
 from scripts.local_signal_collector import _NoRedirect, _target
 
 INBOX = "/zero-trust/signals/inbox"
@@ -77,8 +83,23 @@ class CollectorConfig(StrictModel):
     tenant_id: str = Field(pattern=r"^[A-Za-z0-9._-]{1,64}$")
     source_id: str = Field(pattern=r"^[A-Za-z0-9._-]{1,64}$")
     key_id: str = Field(pattern=r"^[A-Za-z0-9._-]{1,64}$")
-    kind: str = Field(pattern=r"^(identity|device)$")
+    kind: ObservationKind
     subjects: list[str] = Field(min_length=1, max_length=100)
+    resource_ids: list[ResourceIdentifier] = Field(default_factory=list, max_length=100)
+
+    @model_serializer(mode="wrap")
+    def serialize_config(self, handler):
+        value = handler(self)
+        # The spool binds the serialized collector configuration.
+        if not self.resource_ids:
+            value.pop("resource_ids", None)
+        return value
+
+    @model_validator(mode="after")
+    def resource_scope(self):
+        if bool(self.resource_ids) != (self.kind == "guardduty"):
+            raise ValueError("only a GuardDuty collector requires resource scope")
+        return self
 
     @field_validator("subjects")
     @classmethod
@@ -95,9 +116,9 @@ def _private_file(path, content):
         os.fsync(file.fileno())
 
 
-def initialize(directory, tenant, source_id, key_id, kind, subjects):
+def initialize(directory, tenant, source_id, key_id, kind, subjects, *, resource_ids=()):
     config = CollectorConfig(tenant_id=tenant, source_id=source_id, key_id=key_id,
-                             kind=kind, subjects=subjects)
+                             kind=kind, subjects=subjects, resource_ids=list(resource_ids))
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True, mode=0o700)
     names = ["config.json", "private.pem", "sources.json", "input.jsonl", "state.sqlite3"]
@@ -110,13 +131,15 @@ def initialize(directory, tenant, source_id, key_id, kind, subjects):
     now = datetime.now(UTC)
     registry = {"sources": [{
         "tenant_id": tenant, "source_id": source_id, "enabled": True,
-        "user_ids": subjects if kind == "identity" else ["unused-device-source-user"],
+        "user_ids": subjects if kind != "device" else ["unused-device-source-user"],
         "device_ids": subjects if kind == "device" else ["unused-identity-source-device"],
         "roles": ["employee"], "observation_kinds": [kind],
         "keys": [{"key_id": key_id, "enabled": True, "public_key_pem": public,
                   "not_before": (now - timedelta(seconds=1)).isoformat(),
                   "not_after": (now + timedelta(days=7)).isoformat()}],
     }]}
+    if kind == "guardduty":
+        registry["sources"][0]["guardduty_resource_ids"] = config.resource_ids
     _private_file(directory / "private.pem", key.private_bytes(
         serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8,
         serialization.NoEncryption(),
@@ -241,10 +264,7 @@ class ContinuousCollector:
                 rotate_input(self.directory, self.spool)
             return False  # Do not checkpoint a writer's partial final line.
         record = InputRecord.model_validate_json(line)
-        if (record.observation.kind != self.config.kind
-                or record.observation.subject_id not in self.config.subjects
-                or record.observed_at > self.clock()):
-            raise ValueError("collector input scope or time")
+        self._check_record(record)
         event = record.model_dump(mode="json")
         arguments = {"offset": checkpoint["offset"] + len(line),
                      "prefix_sha256": hashlib.sha256(prefix + line).hexdigest()}
@@ -261,12 +281,17 @@ class ContinuousCollector:
         with feed_lock(self.directory):
             return rotate_input(self.directory, self.spool)
 
-    def append(self, event):
-        record = InputRecord.model_validate(event)
+    def _check_record(self, record):
         if (record.observation.kind != self.config.kind
                 or record.observation.subject_id not in self.config.subjects
+                or (record.observation.kind == "guardduty"
+                    and record.observation.resource_id not in self.config.resource_ids)
                 or record.observed_at > self.clock()):
             raise ValueError("collector input scope or time")
+
+    def append(self, event):
+        record = InputRecord.model_validate(event)
+        self._check_record(record)
         return append_event(self.directory, record.model_dump(mode="json"))
 
     def status(self):
@@ -356,13 +381,15 @@ class ContinuousCollector:
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("operation", choices=["init", "run", "status", "compact", "rotate", "append"])
+    parser.add_argument("operation", choices=["init", "run", "status", "compact", "rotate", "append", "append-guardduty"])
     parser.add_argument("--directory", type=Path, required=True)
     parser.add_argument("--tenant", default="local")
     parser.add_argument("--source-id", default="local-identity-observer")
     parser.add_argument("--key-id", default="key-1")
-    parser.add_argument("--kind", choices=["identity", "device"], default="identity")
+    parser.add_argument("--kind", choices=["identity", "device", "guardduty"], default="identity")
     parser.add_argument("--subject", action="append", default=[])
+    parser.add_argument("--resource", action="append", default=[])
+    parser.add_argument("--event-signature", type=Path)
     parser.add_argument("--base-url", default="http://127.0.0.1:18080")
     parser.add_argument("--tls-profile", type=Path)
     parser.add_argument("--poll-seconds", type=float, default=0.5)
@@ -374,6 +401,8 @@ def main(argv=None):
     parser.add_argument("--rotate-bytes", type=int, default=MAX_FEED // 2)
     parser.add_argument("--once", action="store_true")
     args = parser.parse_args(argv)
+    if (args.operation == "append-guardduty") != (args.event_signature is not None):
+        parser.error("append-guardduty requires --event-signature")
     if (not 0.01 <= args.poll_seconds <= 60 or not 1 <= args.max_pending <= 10000
             or not 1 <= args.max_records <= 100000
             or not 1 <= args.max_history <= 1000000 or not 1 <= args.limit <= 10000
@@ -388,7 +417,7 @@ def main(argv=None):
             raise ValueError("collector is local/test only")
         if args.operation == "init":
             print(json.dumps(initialize(args.directory, args.tenant, args.source_id,
-                                        args.key_id, args.kind, args.subject)))
+                                        args.key_id, args.kind, args.subject, resource_ids=args.resource)))
             return 0
         def configured_collector():
             return ContinuousCollector(args.directory, args.base_url,
@@ -396,13 +425,25 @@ def main(argv=None):
                 max_history=args.max_history, max_rotations=args.max_rotations,
                 rotate_bytes=args.rotate_bytes)
 
-        if args.operation in {"status", "append"}:
+        if args.operation in {"status", "append", "append-guardduty"}:
             collector = configured_collector()
-            if args.operation == "append":
+            if args.operation != "status":
                 raw = sys.stdin.buffer.read(MAX_LINE + 1)
                 if len(raw) > MAX_LINE:
                     raise ValueError("collector input record size limit")
-                print(json.dumps(collector.append(json.loads(raw))), flush=True)
+                if args.operation == "append-guardduty":
+                    mapping = GuardDutyMapping.model_validate_json(
+                        read_local_file(collector.directory / "guardduty-map.json", 32768),
+                    )
+                    event = normalize_finding(
+                        raw, read_local_file(args.event_signature, 64), mapping,
+                        tenant_id=collector.config.tenant_id, now=collector.clock(),
+                    )
+                else:
+                    if collector.config.kind == "guardduty":
+                        raise ValueError("GuardDuty input requires a signed EventBridge finding")
+                    event = json.loads(raw)
+                print(json.dumps(collector.append(event)), flush=True)
             else:
                 print(json.dumps(collector.status()))
             return 0
