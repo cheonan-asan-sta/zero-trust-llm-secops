@@ -7,7 +7,8 @@ from pathlib import Path
 
 from scripts.ca_recovery_state import save
 from scripts.certificate_controller import LifecycleError
-from scripts.database_backup_runtime import BackupCoordinator, BackupRuntime, management_lease
+from scripts.database_backup_runtime import BackupCoordinator, management_lease
+from scripts.database_transport_runtime import runtime_type
 
 
 def main():
@@ -17,7 +18,7 @@ def main():
     args = parser.parse_args()
     if re.fullmatch('[a-f0-9]{24}', args.token) is None:
         raise LifecycleError('backup_test_token_invalid')
-    r = BackupRuntime(args.directory)
+    r = runtime_type(args.directory)(args.directory)
     with management_lease(r.directory):
         r.load()
         worker = BackupCoordinator(r)

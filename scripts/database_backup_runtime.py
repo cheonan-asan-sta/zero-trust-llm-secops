@@ -142,6 +142,9 @@ class BackupRuntime(TransportRuntime):
             request['dump'] = base64.b64encode(dump).decode()
         return json.loads(command(argv, payload=json.dumps(request), timeout=60))
 
+    def checkpoint_security(self, manifest):
+        """Optional independent recovery checkpoint, while both CA writers stop."""
+
 
 class RestoreDrill:
     """Disposable tmpfs PostgreSQL: no network, secrets, host bind or live data."""
@@ -285,6 +288,7 @@ class BackupCoordinator:
                 self.stopped()
                 if snapshot(r.sql) != s['manifest']['security']:
                     raise LifecycleError('backup_live_security_changed')
+                r.checkpoint_security(s['manifest'])
                 result = r.backup_store('inspect', s['manifest'])
                 if not result['exists']:
                     output = subprocess.run(['docker', 'exec', self.profile['transport_database']['id'], 'pg_dump',

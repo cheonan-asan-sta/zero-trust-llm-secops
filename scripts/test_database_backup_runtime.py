@@ -33,8 +33,8 @@ class AcceptanceBackup(AcceptanceRuntime, BackupRuntime):
 class Checks(ParentChecks):
     expected_volumes = 39
 
-    def __init__(self, directory):
-        super().__init__(directory, runtime_class=AcceptanceBackup)
+    def __init__(self, directory, *, runtime_class=AcceptanceBackup):
+        super().__init__(directory, runtime_class=runtime_class)
         self.report['schema'] = 'database-backup-verification-1'
 
     def interrupt_backup(self):

@@ -1,0 +1,47 @@
+{
+  "date_kst": "2026-11-08",
+  "status": "DRAFT_NOT_INTEGRATION_VERIFIED",
+  "branch": "feature/chaeheeju-recovery-checkpoint",
+  "base": "370ebb364f2173599bbb288277b0e63b9bfb685c",
+  "deadline_kst": "2026-11-08T07:00:00+09:00",
+  "pytest": "........................................................................ [ 72%]\n............................                                             [100%]\n100 passed in 3.20s",
+  "new_tests": 23,
+  "source_sha256": {
+    "scripts/database_backup_runtime.py": "a3be1c2fb9b60338a8297217bf908fb77e9e0e8d1a19952f4110a0b8be6099b0",
+    "scripts/database_transport_runtime.py": "e8221026bf966037b95b6c907802760b9710ca5c635257d76cbd8bc6002c55de",
+    "scripts/persistent_authority_runtime.py": "52a33c936e4d65df6104261ced3f0c8392b9ccab3661dc0e9882eb771e9bea9d",
+    "scripts/test_database_backup_process.py": "d581b7a6dc89c8183719cc03e8eca5874f4e1475047491e35a4d6dc6e0ec5326",
+    "scripts/test_database_backup_runtime.py": "9533256fded9409fb13ee8f245ee51de98cff04c76451381d9860fb1027b7445",
+    "scripts/database_recovery_checkpoint.py": "ac9b68622727a9fe9fdd7faedec0ad4cc4d39c7a1fc50b592a2dd4b548731ef8",
+    "scripts/database_recovery_runtime.py": "de3a4dbb9de7852bdff3ea95c1d01031ab6587aa5de3a23ea8979c66357b9360",
+    "scripts/test_database_recovery_runtime.py": "e88d8d5031c8cf05ca7309e7c2e96d6a3ce3b660cac0481bc4483a3e70e5f65c",
+    "tests/test_database_recovery_checkpoint.py": "bfe361ce31a634428d9cdbec031b654374c23a541c2fe94334144517f8cbd263"
+  },
+  "ruff": "local 0.16.6 passed; not pinned CI verification",
+  "first_attempt": {
+    "passed": 99,
+    "failed": 1,
+    "seconds": 15482.89,
+    "failure": "existing management lock process kill: taskkill timeout; prolonged tool return delay; cause not confirmed"
+  },
+  "not_run": [
+    "Docker checkpoint acceptance",
+    "full Linux regression on final source",
+    "exact PR head CI",
+    "postmerge CI"
+  ],
+  "aws_calls": 0,
+  "paid_llm_calls": 0,
+  "new_docker_resources_created": 0,
+  "pending": "Run focused Docker acceptance, fix failures, wire required CI, full source verification before PR merge",
+  "additional_regression": {
+    "passed": 62,
+    "skipped": 1,
+    "seconds": 4.42,
+    "files": [
+      "tests/test_runtime_release.py",
+      "tests/test_parallel_ci.py",
+      "tests/test_database_transport_preflight.py"
+    ]
+  }
+}

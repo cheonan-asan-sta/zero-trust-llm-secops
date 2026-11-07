@@ -177,6 +177,9 @@ class TransportRuntime(PersistentAuthorityRuntime):
 
 def runtime_type(directory):
     path = Path(directory) / 'authority-profile.json'
+    if path.exists() and json.loads(control.read(path, 65536)).get('database_recovery_checkpoint') is True:
+        from scripts.database_recovery_runtime import RecoveryRuntime
+        return RecoveryRuntime
     if path.exists() and json.loads(control.read(path, 65536)).get('database_backup') is True:
         from scripts.database_backup_runtime import BackupRuntime
         return BackupRuntime
