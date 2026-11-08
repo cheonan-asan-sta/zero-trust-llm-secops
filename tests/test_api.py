@@ -1,4 +1,5 @@
 from hashlib import sha256
+from uuid import uuid4
 
 from fastapi.testclient import TestClient
 
@@ -194,6 +195,9 @@ def test_high_risk_result_can_be_reviewed_and_resolved() -> None:
         "/events/simulate",
         json={"scenario_id": "ZT-S05", "count": 1},
     ).json()[0]
+    # This case tests review transitions, independently of earlier analyses of
+    # the same synthetic event and their timestamp-based latest selection.
+    event['event_id'] = 'review-' + uuid4().hex
     analysis = client.post("/analysis", json=event).json()
 
     started = client.patch(
@@ -213,6 +217,7 @@ def test_high_risk_result_can_be_reviewed_and_resolved() -> None:
         },
     )
     assert resolved.status_code == 200
+    assert resolved.json()['analysis_id'] == analysis['analysis_id']
     assert resolved.json()["review_status"] == "RESOLVED"
     assert resolved.json()["review_updated_at"] is not None
 

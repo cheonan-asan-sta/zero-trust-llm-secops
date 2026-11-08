@@ -337,6 +337,9 @@ class GraphBackend(DockerBackend):
         if profile.get('database_backup') is True:
             from scripts.database_backup_runtime import BackupRuntime
             runtime_class = BackupRuntime
+        if profile.get('database_recovery_checkpoint') is True:
+            from scripts.database_recovery_runtime import RecoveryRuntime
+            runtime_class = RecoveryRuntime
         runtime = runtime_class(ROOT / path)
         runtime.load()
         return cls(runtime, profile)

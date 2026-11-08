@@ -16,7 +16,7 @@ from scripts.app_recovery_fixture import PRINCIPAL, accept, access, evaluate, pr
 
 
 @pytest.fixture
-def lab(tmp_path):
+def lab(tmp_path, recovery_clock):
     prepare(tmp_path / "data")
     store = recovery.Store(tmp_path)
     store.initialize()
@@ -165,7 +165,7 @@ def test_checkpoint_expired_or_future_denied(lab, seconds):
     envelope = recovery.read_json(path)
     key = recovery.read_file(lab.root / "control/checkpoint.key")
     state = recovery.opened(envelope, key)
-    envelope["manifest"]["created_at"] = (datetime.now(UTC) + timedelta(seconds=seconds)).isoformat()
+    envelope["manifest"]["created_at"] = (recovery.datetime.now(UTC) + timedelta(seconds=seconds)).isoformat()
     envelope = recovery.sealed(state, key, envelope["manifest"])
     write(path, envelope)
     anchor = recovery.read_json(lab.root / "control/anchor.json")
