@@ -79,6 +79,7 @@ def prepare(pilot, previous_path):
     copier = pilot.ident + "-copy"
     pilot.containers.append(copier)
     run(["docker", "run", "--name", copier, "--network", "none", "--read-only", "--user", "0:0",
+         "--label", "secops.c03=" + pilot.ident,
          "--cap-drop=ALL", "--cap-add=CHOWN", "--cap-add=DAC_READ_SEARCH", "--security-opt=no-new-privileges:true",
          "--mount", f"type=volume,src={original},dst=/original,readonly",
          "--mount", f"type=volume,src={pilot.cache_volume},dst=/cache", "--entrypoint", "sh", BASE,
