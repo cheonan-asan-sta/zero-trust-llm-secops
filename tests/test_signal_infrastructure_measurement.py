@@ -43,6 +43,23 @@ def test_resource_rows_keep_counter_direction_and_only_accept_owned_containers()
             measure.parse_stats({**stats_row(), "ID": bad}, {"a" * 64: "app"})
 
 
+@pytest.mark.parametrize('invalid', ['--', 'PRIVATE_KEY_SENTINEL'])
+def test_sampler_preserves_missing_field_reason_without_fabricating_zero_or_leaking_raw_values(tmp_path, monkeypatch, invalid):
+    sampler = measure.Sampler({'a' * 64: 'app'}, tmp_path / 'samples.jsonl', 1)
+
+    def snapshot(*args, **kwargs):
+        sampler.stopped.set()
+        return json.dumps(stats_row() | {'PIDs': invalid})
+
+    monkeypatch.setattr(measure, 'docker', snapshot)
+    sampler.collect()
+    assert sampler.rows == [] and len(sampler.errors) == 1
+    error = sampler.errors[0]
+    assert error['error_type'] == 'ValueError' and error['reason'] == 'invalid_pids'
+    assert error['unavailable_fields'] == (['PIDs'] if invalid == '--' else [])
+    assert 'SENTINEL' not in json.dumps(error)
+
+
 def test_small_samples_show_empirical_rank_and_empty_samples_remain_unknown():
     assert measure.distribution([]) == {"n": 0, "p50_ms": None, "p95_ms": None, "max_ms": None}
     assert measure.distribution([3, 1, 2]) == {"n": 3, "p50_ms": 2, "p95_ms": 3, "max_ms": 3}

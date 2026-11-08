@@ -23,8 +23,10 @@ class SelectionChecks(MonitoredChecks):
         if directory == allowed or not directory.is_relative_to(allowed) or directory.exists():
             raise ValueError('selection_fresh_scoped_directory_required')
         super().__init__(directory)
-        self.report.update(schema='infrastructure-selection-verification-1', workloads=[], recoveries=[],
+        self.report.update(schema='infrastructure-selection-verification-2', workloads=[], recoveries=[],
+            resource_samples=[], resource_errors=[], resource_windows=[], resource_warmup=[],
             conditions={'repeats': 3, 'concurrency': [1, 4, 8], 'requests_per_wave': 16,
+                'resource_scope': 'steady workloads after three valid snapshots; sampler joined before gateway stop',
                 'order': 'alternate ascending/descending concurrency each repetition',
                 'timing': 'HTTP inside operator includes mTLS handshake; excludes mint and Docker exec startup',
                 'capacity_claim': False, 'production_approval': False, 'independent_review': False})
@@ -97,6 +99,47 @@ print(json.dumps({'status':status}))
         result = json.loads(self.runtime.execute('collector', ['python', '-c', program]))
         return result.get('status') == 422
 
+    def prepare_resources(self, repeat, containers):
+        sampler = Sampler(containers, self.path.parent / 'warmup-resources.jsonl', 1)
+
+        def counts():
+            floor = sampler.errors[-1]['at'] if sampler.errors else None
+            return {name: sum(row['service'] == name and (floor is None or row['at'] > floor)
+                              for row in sampler.rows) for name in self.runtime.services}
+
+        def ready():
+            return all(n >= 3 for n in counts().values())
+
+        sampler.thread.start()
+        try:
+            self.runtime.wait(ready, timeout=30)
+        finally:
+            sampler.stop()
+            self.report['resource_warmup'].append({'repeat': repeat, 'ready': ready(),
+                'service_counts': counts(), 'samples': len(sampler.rows), 'errors': sampler.errors})
+            self.save()
+        self.require(ready(), 'selection_resource_baseline_not_ready')
+
+    def measure_workloads(self):
+        for repeat in range(1, 4):
+            containers = {self.runtime.container(s): s for s in self.runtime.services}
+            self.prepare_resources(repeat, containers)
+            sampler = Sampler(containers, self.path.parent / 'resources.jsonl', 1)
+            sampler.thread.start()
+            try:
+                for concurrency in ([1, 4, 8] if repeat % 2 else [8, 4, 1]):
+                    for kind in ('valid', 'shared', 'missing'):
+                        self.workload(repeat, concurrency, kind)
+            finally:
+                sampler.stop()  # Never leave a Docker stats request crossing an intentional stop/start.
+                self.report['resource_samples'].extend(row | {'window': repeat} for row in sampler.rows)
+                self.report['resource_errors'].extend(sampler.errors)
+                self.report['resource_windows'].append({'repeat': repeat, 'samples': len(sampler.rows)})
+                self.save()
+            self.require(not sampler.errors and {r['service'] for r in sampler.rows} == set(self.runtime.services),
+                         'selection_resource_measurement_incomplete')
+            self.recovery(repeat)
+
     def run(self):
         runtime = self.runtime
         runtime.up()
@@ -110,7 +153,7 @@ print(json.dumps({'status':status}))
         for service in runtime.services:
             detail = self.inspect(service)
             host = detail['HostConfig']
-            self.require(detail['Config']['User'] == '10001:10001' and host['ReadonlyRootfs']
+            self.require(detail['State']['Running'] and detail['Config']['User'] == '10001:10001' and host['ReadonlyRootfs']
                          and 'ALL' in host['CapDrop'] and 'no-new-privileges:true' in host['SecurityOpt']
                          and not host.get('PortBindings') and not any(m['Type'] == 'bind' for m in detail['Mounts']),
                          'selection_service_boundary')
@@ -122,20 +165,7 @@ print(json.dumps({'status':status}))
         self.scrape = runtime.execute('exporter', ['python', '-c',
             "from pathlib import Path;print(Path('/auth/scrape.token').read_text())"]).strip()
         self.wait(self.healthy, 'selection_monitoring_not_ready')
-        sampler = Sampler({runtime.container(s): s for s in runtime.services}, self.path.parent / 'resources.jsonl', 1)
-        sampler.thread.start()
-        try:
-            for repeat in range(1, 4):
-                for concurrency in ([1, 4, 8] if repeat % 2 else [8, 4, 1]):
-                    for kind in ('valid', 'shared', 'missing'):
-                        self.workload(repeat, concurrency, kind)
-                self.recovery(repeat)
-        finally:
-            sampler.stop()
-            self.report.update(resource_samples=sampler.rows, resource_errors=sampler.errors)
-            self.save()
-        self.require(not sampler.errors and {r['service'] for r in sampler.rows} == set(runtime.services),
-                     'selection_resource_measurement_incomplete')
+        self.measure_workloads()
         self.report.update(completed=True, measured_at=datetime.now(UTC).isoformat())
 
 

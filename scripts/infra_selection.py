@@ -61,11 +61,12 @@ def historical(root):
 
 
 def measurement(value):
-    require(value.get('schema') == 'infrastructure-selection-verification-1' and value.get('completed') is True
+    require(value.get('schema') == 'infrastructure-selection-verification-2' and value.get('completed') is True
             and value.get('cleanup') == {'containers': 0, 'volumes': 0, 'networks': 0}
             and value.get('image_source_verified') is True and value.get('release_image_payload_verified') is True
             and value.get('conditions') == {
                 'repeats': 3, 'concurrency': [1, 4, 8], 'requests_per_wave': 16,
+                'resource_scope': 'steady workloads after three valid snapshots; sampler joined before gateway stop',
                 'order': 'alternate ascending/descending concurrency each repetition',
                 'timing': 'HTTP inside operator includes mTLS handshake; excludes mint and Docker exec startup',
                 'capacity_claim': False, 'production_approval': False, 'independent_review': False},
@@ -105,11 +106,25 @@ def measurement(value):
             and {r['service'] for r in value['resource_samples']} == set(services)
             and all(r['published_ports'] is False and r['host_binds'] is False for r in services.values()),
             'selection_resource_evidence')
+    require(len(value['resource_warmup']) == 3 and {r['repeat'] for r in value['resource_warmup']} == {1, 2, 3}
+            and all(r['ready'] is True and set(r['service_counts']) == set(services)
+                    and all(type(n) is int and n >= 3 for n in r['service_counts'].values())
+                    and isinstance(r['errors'], list) for r in value['resource_warmup']), 'selection_resource_baseline')
+    require(len(value['resource_windows']) == 3 and {r['repeat'] for r in value['resource_windows']} == {1, 2, 3},
+            'selection_resource_windows')
+    for window in value['resource_windows']:
+        window_rows = [r for r in value['resource_samples'] if r.get('window') == window['repeat']]
+        require(type(window['samples']) is int and window['samples'] == len(window_rows)
+                and {r['service'] for r in window_rows} == set(services), 'selection_resource_window_coverage')
+    require(sum(r['samples'] for r in value['resource_windows']) == len(value['resource_samples']),
+            'selection_resource_window_coverage')
     return {'requests': requests, 'allowed': allowed, 'denied': requests - allowed,
             'valid_http_ms_by_concurrency': {str(c): distribution(rows) for c, rows in samples.items()},
             'gateway_start_to_new_grant_delivery_ms': distribution([
                 r['start_to_new_grant_delivery_seconds'] * 1000 for r in value['recoveries']]),
-            'resource_samples': len(value['resource_samples']), 'resource_errors': 0}
+            'resource_samples': len(value['resource_samples']), 'resource_errors': 0,
+            'resource_scope': value['conditions']['resource_scope'],
+            'resource_warmup_errors': sum(len(r['errors']) for r in value['resource_warmup'])}
 
 
 def assess(value, root=ROOT):

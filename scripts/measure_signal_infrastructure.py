@@ -94,17 +94,27 @@ class Sampler:
 
     def collect(self):
         while not self.stopped.is_set():
+            current_row = {}
             try:
                 raw = docker("stats", "--no-stream", "--no-trunc", "--format", "{{json .}}",
                              *self.containers, timeout=12)
-                rows = [parse_stats(json.loads(line), self.containers)
-                        for line in raw.splitlines() if line.strip()]
+                rows = []
+                for line in raw.splitlines():
+                    if line.strip():
+                        current_row = json.loads(line)
+                        rows.append(parse_stats(current_row, self.containers))
                 with self.destination.open("a", encoding="utf-8") as handle:
                     for row in rows:
                         handle.write(json.dumps(row) + "\n")
                 self.rows.extend(rows)
             except (OSError, ValueError, KeyError, subprocess.TimeoutExpired, flow.CheckFailed) as exc:
-                self.errors.append({"at": flow.timestamp(), "error_type": type(exc).__name__})
+                reasons = {'invalid_container_id', 'unowned_container', 'invalid_counter_pair', 'invalid_pids',
+                           'unsupported_percentage', 'nonfinite_percentage', 'unsupported_size', 'nonfinite_size'}
+                missing = [name for name in ('ID', 'CPUPerc', 'MemUsage', 'NetIO', 'BlockIO', 'PIDs')
+                           if isinstance(current_row, dict) and current_row.get(name) in (None, '', '--')]
+                self.errors.append({"at": flow.timestamp(), "error_type": type(exc).__name__,
+                    "reason": str(exc) if str(exc) in reasons else 'resource_collection_failed',
+                    "unavailable_fields": missing})
             self.stopped.wait(self.interval)
 
     def stop(self):

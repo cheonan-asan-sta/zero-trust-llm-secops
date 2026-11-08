@@ -1,3 +1,4 @@
+import copy
 import json
 from pathlib import Path
 
@@ -9,6 +10,61 @@ from scripts import rekey_runtime_assets as assets
 from scripts.certificate_key_rotation import public_hash
 from scripts.rekey_mtls_runtime import definition
 from scripts.rekey_runtime_control import allowed_pairs, configuration_matches
+from scripts.test_rekey_mtls_runtime import RekeyChecks, arm_test_round
+
+
+@pytest.mark.parametrize('increment', [1, 2])
+def test_round_requires_exactly_one_key_generation_per_identity(increment):
+    checks = object.__new__(RekeyChecks)
+    checks.disabled = set()
+    checks.files_exist = lambda paths: []
+    checks.add = lambda *a, **kw: None
+    before = {'credentials': {'id': {'key_generation': 2, 'public_key_sha256': 'a', 'assets': []}}}
+    after = {'credentials': {'id': {'key_generation': 2 + increment, 'public_key_sha256': 'b',
+        'copies_match': True, 'pairs_match': True, 'private_modes': [384], 'pending': None}}}
+    if increment == 1:
+        checks.validate_round(before, after, 'exact-round')
+    else:
+        from scripts.continuous_mtls_runtime import RuntimeFailure
+        with pytest.raises(RuntimeFailure, match='generation_not_proven'):
+            checks.validate_round(before, after, 'extra-round')
+
+
+def test_disposable_round_ages_only_active_scheduling_clocks_and_preserves_pending_keys():
+    state = {'paused_ack': True, 'transaction': None, 'credentials': {
+        'active': {'generation': 3, 'key_generation': 2, 'last_key_rotation': 950,
+                   'not_after': 2000, 'pending_key': {'key': '/private/pending.key', 'csr': 'unchanged'}},
+        'disabled': {'generation': 2, 'last_key_rotation': 900},
+        'inhibited': {'generation': 2, 'last_key_rotation': 900, 'inhibited': True}}}
+    original = copy.deepcopy(state)
+    result = arm_test_round(state, {'paused': True, 'key_rotation': {'interval_seconds': 600},
+                                   'disabled': ['disabled']}, 1000)
+    expected = copy.deepcopy(original)
+    expected['credentials']['active']['last_key_rotation'] = 399
+    assert result == expected and state == original
+
+
+@pytest.mark.parametrize('fault', ['unpaused', 'missing_ack', 'transaction', 'short_timer', 'unregistered', 'nan', 'bool'])
+def test_fixture_round_refuses_live_or_incomplete_state(fault):
+    state = {'paused_ack': True, 'transaction': None, 'credentials': {'active': {'generation': 1}}}
+    cfg = {'paused': True, 'key_rotation': {'interval_seconds': 600}}
+    now = 1000
+    if fault == 'unpaused':
+        cfg['paused'] = False
+    elif fault == 'missing_ack':
+        state['paused_ack'] = False
+    elif fault == 'transaction':
+        state['transaction'] = {'phase': 'activated'}
+    elif fault == 'short_timer':
+        cfg['key_rotation']['interval_seconds'] = 15
+    elif fault == 'unregistered':
+        state['credentials']['active']['generation'] = 0
+    else:
+        now = float('nan') if fault == 'nan' else True
+    original = copy.deepcopy(state)
+    with pytest.raises(ValueError, match='rekey_fixture_'):
+        arm_test_round(state, cfg, now)
+    assert state == original
 
 
 def pair(stem, volume='prometheus-tls'):
