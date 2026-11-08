@@ -1,0 +1,39 @@
+{
+  "schema": "m7-auth-pilot-1",
+  "source_sha256": "445f69377a2e12b4203a68f15cd9a4013fbc7e0ef21c19843969f671b1334a30",
+  "source_contract_sha256": "0ace3370fb73551cf6b64c21aa004f447616bf75172b3023efbe7eff4f0efe5c",
+  "files": {
+    "development.jsonl": "888c43d05de050d7832e847be8a9a45867045405ab57482a3447a028acdf55c6",
+    "evaluation.jsonl": "47fb3890b1ea38c641be1dfa7abf4595718b516035e78e5ffe3daa4d89dc07b2",
+    "labels.jsonl": "6b1892f3ffd3c4b3c1022b2d097ea972b55aa3ec807a6c4b2ee44511249905c0"
+  },
+  "cohort": {
+    "development": {
+      "sessions": 24,
+      "events": 146,
+      "labels": {
+        "threat": 12,
+        "normal": 12
+      },
+      "families": 13
+    },
+    "evaluation": {
+      "sessions": 24,
+      "events": 138,
+      "labels": {
+        "normal": 12,
+        "threat": 12
+      },
+      "families": 11
+    }
+  },
+  "cross_split_overlap": {
+    "subjects": 0,
+    "clients": 0,
+    "families": 0,
+    "sessions": 0,
+    "records": 0,
+    "signal_patterns": 0
+  },
+  "label_review": "publisher_labels_pending_independent_team_review"
+}
