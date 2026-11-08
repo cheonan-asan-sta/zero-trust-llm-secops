@@ -1,0 +1,363 @@
+{
+  "schema": "docker-resource-display-local-evidence-1",
+  "status": "LOCAL_VERIFIED",
+  "source_commit_before_commit": "146f36958944f47f8688d5cd9f506a63a3349394",
+  "source_dirty": true,
+  "source_manifest_sha256": "2d2b03e7988d4003541683319440e1e29a1ea03642385780e7a04d2831692d12",
+  "source_files": 293,
+  "changed_files_from_previous_local": {
+    "scripts/measure_signal_infrastructure.py": "3b3ed748c44aa9476f3029c7526955e0240d91949c792474655f5a2c79e3bf18",
+    "tests/test_signal_infrastructure_measurement.py": "51695d65ee3edea23ae14060644976a48c0d29d7b2c13629f5c9e7b8fa8548fd"
+  },
+  "previous_local_evidence": "rekey-resource-isolation-20261108.json",
+  "original_failed_ci": {
+    "run": "42455950944",
+    "head": "146f36958944f47f8688d5cd9f506a63a3349394",
+    "failure": "selection_resource_measurement_incomplete",
+    "checks": 26,
+    "resource_samples": 742,
+    "resource_errors": [
+      {
+        "at": "2026-11-08T06:48:56.982213+00:00",
+        "error_type": "ValueError",
+        "reason": "unsupported_size",
+        "unavailable_fields": []
+      }
+    ],
+    "cleanup": {
+      "containers": 0,
+      "volumes": 0,
+      "networks": 0
+    },
+    "exact_invalid_size_was_not_recorded": true
+  },
+  "official_formatter_boundary": {
+    "input_bytes": 999999,
+    "general_precision": 3,
+    "scaled_display": "1e+03kB",
+    "original_parser": "unsupported_size",
+    "fixed_bytes_estimate": 1000000,
+    "source": "https://github.com/docker/go-units/blob/main/size.go",
+    "not_proof_of_original_ci_raw_value": true
+  },
+  "focused_tests": 112,
+  "additional_tests": 19,
+  "linux": {
+    "passed": 2596,
+    "skipped": 0,
+    "seconds": 490.24
+  },
+  "selection_checks": 37,
+  "selection": {
+    "schema": "infra-selection-advice-1",
+    "advisory_only": true,
+    "source_commit": "146f36958944f47f8688d5cd9f506a63a3349394",
+    "source_dirty": true,
+    "release_sha256": "0d986e027a824aabcbe92d3502278432cb8726ac7a9c69b2002edb43c3636758",
+    "historical_evidence": {
+      "C01": {
+        "path": "docs/infrastructure-results/c01-windows-20261103.json",
+        "sha256": "aec43eb1e113e24099549da92ac37207e1d03920218f437760b1a4ad6dc48aed",
+        "source_commit": "719f069d8dc48a62710dbbcce2d970adc4742f5e",
+        "historical_only": true
+      },
+      "C02": {
+        "path": "docs/infrastructure-results/c02-windows-20261103.json",
+        "sha256": "a0a7c68a7635a115a3d46b21e67f2141a9633051a8fd9c97b3b5493d399760ae",
+        "source_commit": "9f61f35696ec9c79e94608a3ac4550a33bd6eaa7",
+        "historical_only": true
+      },
+      "C03": {
+        "path": "docs/infrastructure-results/c03-patched-scan-20261105.json",
+        "sha256": "461e4f9b6c7c5b6ef820e9868d96a0a71b689b5ea72c8f4c6f4aae9be72d4f4b",
+        "source_commit": "08655e5810359f3b65cb4645a6c083b59b31ff7c",
+        "historical_only": true
+      }
+    },
+    "measurement": {
+      "requests": 576,
+      "allowed": 153,
+      "denied": 423,
+      "valid_http_ms_by_concurrency": {
+        "1": {
+          "n": 48,
+          "p50_ms": 51.07393099751789,
+          "p95_ms": 61.376017998554744,
+          "max_ms": 108.80514199379832
+        },
+        "4": {
+          "n": 48,
+          "p50_ms": 73.60369799425825,
+          "p95_ms": 632.740361004835,
+          "max_ms": 735.0145920063369
+        },
+        "8": {
+          "n": 48,
+          "p50_ms": 117.90537800698075,
+          "p95_ms": 879.6119850012474,
+          "max_ms": 1171.7333999986295
+        }
+      },
+      "gateway_start_to_new_grant_delivery_ms": {
+        "n": 3,
+        "p50_ms": 14093.99999998277,
+        "p95_ms": 14532.00000000652,
+        "max_ms": 14532.00000000652
+      },
+      "resource_samples": 1862,
+      "resource_errors": 0,
+      "resource_scope": "steady workloads after three valid snapshots; sampler joined before gateway stop",
+      "resource_warmup_errors": 0
+    },
+    "decisions": {
+      "C01": {
+        "candidate": "Prometheus + Alertmanager",
+        "status": "local_conditional",
+        "reason": "Historical paired safety trial; two-component local stack; current locked mTLS load evidence"
+      },
+      "C02": {
+        "candidate": "NGINX auth_request",
+        "status": "local_conditional",
+        "reason": "Fixed GET resource; historical paired safety trial and current one-use load/fault evidence"
+      },
+      "C03": {
+        "candidate": "Syft/Grype and Trivy comparison retained",
+        "status": "deferred",
+        "reason": "Historical frozen DB evidence only; current image scan and independent app reachability review pending"
+      }
+    },
+    "production_approved": false,
+    "week3_complete": false,
+    "independent_review_complete": false,
+    "remaining": [
+      "Independent teammate reproduction and app-state contract review",
+      "Current-image supply-chain rescan and residual finding disposition",
+      "Production thresholds, sustained load and RTO/RPO targets not established"
+    ],
+    "limits": [
+      "Selected current stack measured; alternative stacks have historical measurements only",
+      "Three short bounded repetitions on one shared Docker host; not a capacity/SLA proof",
+      "No policy change, no cloud/model API, no production rollout authorized"
+    ]
+  },
+  "conditions": {
+    "repeats": 3,
+    "concurrency": [
+      1,
+      4,
+      8
+    ],
+    "requests_per_wave": 16,
+    "resource_scope": "steady workloads after three valid snapshots; sampler joined before gateway stop",
+    "order": "alternate ascending/descending concurrency each repetition",
+    "timing": "HTTP inside operator includes mTLS handshake; excludes mint and Docker exec startup",
+    "capacity_claim": false,
+    "production_approval": false,
+    "independent_review": false
+  },
+  "resource_rows": 1862,
+  "resource_errors": [],
+  "resource_warmup": [
+    {
+      "repeat": 1,
+      "ready": true,
+      "service_counts": {
+        "app": 3,
+        "gateway": 3,
+        "bridge": 3,
+        "resource": 3,
+        "proxy": 3,
+        "collector": 3,
+        "worker": 3,
+        "watchdog": 3,
+        "operator": 3,
+        "reader": 3,
+        "exporter": 3,
+        "prometheus": 3,
+        "alertmanager": 3,
+        "sink": 3
+      },
+      "samples": 42,
+      "errors": []
+    },
+    {
+      "repeat": 2,
+      "ready": true,
+      "service_counts": {
+        "app": 3,
+        "gateway": 3,
+        "bridge": 3,
+        "resource": 3,
+        "proxy": 3,
+        "collector": 3,
+        "worker": 3,
+        "watchdog": 3,
+        "operator": 3,
+        "reader": 3,
+        "exporter": 3,
+        "prometheus": 3,
+        "alertmanager": 3,
+        "sink": 3
+      },
+      "samples": 42,
+      "errors": []
+    },
+    {
+      "repeat": 3,
+      "ready": true,
+      "service_counts": {
+        "app": 3,
+        "gateway": 3,
+        "bridge": 3,
+        "resource": 3,
+        "proxy": 3,
+        "collector": 3,
+        "worker": 3,
+        "watchdog": 3,
+        "operator": 3,
+        "reader": 3,
+        "exporter": 3,
+        "prometheus": 3,
+        "alertmanager": 3,
+        "sink": 3
+      },
+      "samples": 42,
+      "errors": []
+    }
+  ],
+  "resource_windows": [
+    {
+      "repeat": 1,
+      "samples": 616
+    },
+    {
+      "repeat": 2,
+      "samples": 616
+    },
+    {
+      "repeat": 3,
+      "samples": 630
+    }
+  ],
+  "resource_summary": {
+    "app": {
+      "n": 133,
+      "max_cpu_percent": 55.18,
+      "max_memory_bytes_estimate": 116706509
+    },
+    "gateway": {
+      "n": 133,
+      "max_cpu_percent": 20.43,
+      "max_memory_bytes_estimate": 19807601
+    },
+    "bridge": {
+      "n": 133,
+      "max_cpu_percent": 21.9,
+      "max_memory_bytes_estimate": 27137147
+    },
+    "resource": {
+      "n": 133,
+      "max_cpu_percent": 7.51,
+      "max_memory_bytes_estimate": 22523412
+    },
+    "proxy": {
+      "n": 133,
+      "max_cpu_percent": 7.75,
+      "max_memory_bytes_estimate": 4423942
+    },
+    "collector": {
+      "n": 133,
+      "max_cpu_percent": 2.81,
+      "max_memory_bytes_estimate": 44595937
+    },
+    "worker": {
+      "n": 133,
+      "max_cpu_percent": 0.68,
+      "max_memory_bytes_estimate": 75675730
+    },
+    "watchdog": {
+      "n": 133,
+      "max_cpu_percent": 12.38,
+      "max_memory_bytes_estimate": 79880520
+    },
+    "operator": {
+      "n": 133,
+      "max_cpu_percent": 52.56,
+      "max_memory_bytes_estimate": 54641295
+    },
+    "reader": {
+      "n": 133,
+      "max_cpu_percent": 1.23,
+      "max_memory_bytes_estimate": 93920952
+    },
+    "exporter": {
+      "n": 133,
+      "max_cpu_percent": 1.25,
+      "max_memory_bytes_estimate": 22072525
+    },
+    "prometheus": {
+      "n": 133,
+      "max_cpu_percent": 1.47,
+      "max_memory_bytes_estimate": 52669972
+    },
+    "alertmanager": {
+      "n": 133,
+      "max_cpu_percent": 0.33,
+      "max_memory_bytes_estimate": 13411287
+    },
+    "sink": {
+      "n": 133,
+      "max_cpu_percent": 0.03,
+      "max_memory_bytes_estimate": 21223178
+    }
+  },
+  "recoveries": [
+    {
+      "repeat": 1,
+      "denied_status": 500,
+      "gateway_ready_status": 422,
+      "outage_deliveries": 0,
+      "post_recovery_deliveries": 1,
+      "stop_seconds": 0.8439999999827705,
+      "start_to_new_grant_delivery_seconds": 14.09399999998277,
+      "start_to_monitoring_healthy_seconds": 20.48499999998603
+    },
+    {
+      "repeat": 2,
+      "denied_status": 500,
+      "gateway_ready_status": 422,
+      "outage_deliveries": 0,
+      "post_recovery_deliveries": 1,
+      "stop_seconds": 1.0160000000032596,
+      "start_to_new_grant_delivery_seconds": 13.59399999998277,
+      "start_to_monitoring_healthy_seconds": 19.25
+    },
+    {
+      "repeat": 3,
+      "denied_status": 500,
+      "gateway_ready_status": 422,
+      "outage_deliveries": 0,
+      "post_recovery_deliveries": 1,
+      "stop_seconds": 0.8600000000442378,
+      "start_to_new_grant_delivery_seconds": 14.53200000000652,
+      "start_to_monitoring_healthy_seconds": 20.26600000000326
+    }
+  ],
+  "release_sha256": "0d986e027a824aabcbe92d3502278432cb8726ac7a9c69b2002edb43c3636758",
+  "native_report_sha256": "802b5728dfbee5136bcf01d52443af5362bc4d1598f882be4d59ee5ce983980c",
+  "cleanup": {
+    "containers": 0,
+    "volumes": 0,
+    "networks": 0
+  },
+  "rekey_22_reuse": {
+    "operating_ca_and_runtime_and_rekey_driver_unchanged": true,
+    "whole_release_fingerprint_identical": false,
+    "current_head_ci_reruns_22": true
+  },
+  "aws_calls": 0,
+  "paid_llm_calls": 0,
+  "production_approved": false,
+  "week3_complete": false,
+  "independent_review_complete": false
+}

@@ -26,10 +26,11 @@ def report():
                 if kind == 'shared':
                     value['replay'] = {'rows': rows(0)}
                 workloads.append(value)
-    return {'schema': 'infrastructure-selection-verification-1', 'completed': True,
+    return {'schema': 'infrastructure-selection-verification-2', 'completed': True,
             'cleanup': {'containers': 0, 'volumes': 0, 'networks': 0},
             'image_source_verified': True, 'release_image_payload_verified': True,
             'conditions': {'repeats': 3, 'concurrency': [1, 4, 8], 'requests_per_wave': 16,
+                'resource_scope': 'steady workloads after three valid snapshots; sampler joined before gateway stop',
                 'order': 'alternate ascending/descending concurrency each repetition',
                 'timing': 'HTTP inside operator includes mTLS handshake; excludes mint and Docker exec startup',
                 'capacity_claim': False, 'production_approval': False, 'independent_review': False},
@@ -40,7 +41,11 @@ def report():
                             'stop_seconds': 1, 'start_to_new_grant_delivery_seconds': 2,
                             'start_to_monitoring_healthy_seconds': 3} for i in range(1, 4)],
             'services': {str(i): {'published_ports': False, 'host_binds': False} for i in range(14)},
-            'resource_samples': [{'service': str(i)} for i in range(14)], 'resource_errors': []}
+            'resource_samples': [{'service': str(i), 'window': r} for r in range(1, 4) for i in range(14)],
+            'resource_errors': [],
+            'resource_warmup': [{'repeat': r, 'ready': True, 'service_counts': {str(i): 3 for i in range(14)},
+                                 'samples': 42, 'errors': []} for r in range(1, 4)],
+            'resource_windows': [{'repeat': r, 'samples': 14} for r in range(1, 4)]}
 
 
 def test_counts_keep_load_and_fault_probes_separate(report):
@@ -53,7 +58,8 @@ def test_counts_keep_load_and_fault_probes_separate(report):
 @pytest.mark.parametrize('fault', ['partial', 'cleanup', 'image', 'checks', 'duplicate_check', 'missing_wave',
     'duplicate_wave', 'false_allow', 'wrong_content', 'plaintext', 'transport_error', 'unexpected_delivery',
     'replay', 'missing_fault', 'fault_allow', 'fault_delivery', 'fault_recovery', 'nan', 'bool',
-    'resource_error', 'missing_service', 'port', 'bind', 'production_claim', 'failed_wave', 'gateway_readiness'])
+    'resource_error', 'missing_service', 'port', 'bind', 'production_claim', 'failed_wave', 'gateway_readiness',
+    'legacy_schema', 'missing_window', 'short_warmup', 'wrong_window'])
 def test_partial_unsafe_or_malformed_evidence_never_becomes_selection_advice(report, fault):
     if fault == 'partial':
         report['completed'] = False
@@ -105,6 +111,14 @@ def test_partial_unsafe_or_malformed_evidence_never_becomes_selection_advice(rep
         report['workloads'][0]['passed'] = False
     elif fault == 'gateway_readiness':
         report['recoveries'][0]['gateway_ready_status'] = 403
+    elif fault == 'legacy_schema':
+        report['schema'] = 'infrastructure-selection-verification-1'
+    elif fault == 'missing_window':
+        report['resource_windows'].pop()
+    elif fault == 'short_warmup':
+        report['resource_warmup'][0]['service_counts']['0'] = 2
+    elif fault == 'wrong_window':
+        report['resource_samples'][0]['window'] = 2
     else:
         report['conditions']['production_approval'] = True
     with pytest.raises(ValueError):
@@ -148,6 +162,38 @@ def test_failed_wave_is_saved_before_assertion_with_actual_responses_and_resourc
     assert saved['passed'] is False and saved['expected_delivered'] == 16
     assert saved['resource_before'] == 0 and saved['resource_after'] == saved['delivered'] == 15
     assert len(saved['rows']) == 16 and saved['rows'][-1]['status'] == 403
+
+
+def test_resource_sampler_joins_before_fault_and_each_new_window_has_a_fresh_valid_baseline(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    from scripts import test_infra_selection_runtime as driver
+    active = []
+
+    class Sampler:
+        def __init__(self, containers, destination, interval):
+            self.rows = [{'service': s, 'at': '2026-11-08T00:00:00+00:00'} for s in containers.values() for _ in range(3)]
+            self.errors = []
+            self.thread = SimpleNamespace(start=lambda: active.append(self))
+
+        def stop(self):
+            active.remove(self)
+
+    monkeypatch.setattr(driver, 'Sampler', Sampler)
+    obj = object.__new__(SelectionChecks)
+    obj.report = {'resource_samples': [], 'resource_errors': [], 'resource_windows': [], 'resource_warmup': []}
+    obj.path = tmp_path / 'verification.json'
+    obj.runtime = SimpleNamespace(services=tuple(str(i) for i in range(14)), container=lambda s: s,
+                                  wait=lambda predicate, **kw: predicate() or pytest.fail('baseline missing'))
+    calls = []
+    obj.workload = lambda *args: calls.append(args) if len(active) == 1 else pytest.fail('workload not sampled')
+    def recover(repeat):
+        assert not active, 'stats query must be joined before stopping a service'
+        assert obj.report['resource_warmup'][-1]['ready'] is True
+    obj.recovery = recover
+    obj.measure_workloads()
+    assert len(calls) == 27 and not active and len(obj.report['resource_windows']) == 3
+    assert len(obj.report['resource_samples']) == 126 and obj.report['resource_errors'] == []
 
 
 def history_root(tmp_path):

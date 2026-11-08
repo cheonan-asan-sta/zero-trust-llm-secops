@@ -21,17 +21,30 @@ import yaml
 from scripts import test_signal_compose as flow
 
 UNITS = {"B": 1, "kB": 1000, "KB": 1000, "MB": 1000**2, "GB": 1000**3,
-         "TB": 1000**4, "KiB": 1024, "MiB": 1024**2, "GiB": 1024**3, "TiB": 1024**4}
+         "TB": 1000**4, "PB": 1000**5, "EB": 1000**6, "ZB": 1000**7, "YB": 1000**8,
+         "KiB": 1024, "MiB": 1024**2, "GiB": 1024**3, "TiB": 1024**4,
+         "PiB": 1024**5, "EiB": 1024**6, "ZiB": 1024**7, "YiB": 1024**8}
+SIZE_DISPLAY = re.compile(r"(\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)\s*([A-Za-z]+)")
 
 
-def size_estimate(value):
+class ResourceValueError(ValueError):
+    def __init__(self, reason, field, value):
+        super().__init__(reason)
+        self.field = field
+        match = SIZE_DISPLAY.fullmatch(value.strip()) if isinstance(value, str) and len(value) <= 64 else None
+        # Only bounded numeric displays with known units may enter public diagnostics.
+        self.display = value.strip() if match and match[2] in UNITS else None
+
+
+def size_estimate(value, field=None):
     """Docker CLI values are rounded display values, not precise byte counters."""
-    match = re.fullmatch(r"(\d+(?:\.\d+)?)\s*([A-Za-z]+)", value.strip())
+    # Docker go-units uses Go %g: rounding 999.9 kB to three digits can yield 1e+03kB.
+    match = SIZE_DISPLAY.fullmatch(value.strip())
     if not match or match[2] not in UNITS:
-        raise ValueError("unsupported_size")
+        raise ResourceValueError("unsupported_size", field, value)
     size = float(match[1]) * UNITS[match[2]]
     if not math.isfinite(size):
-        raise ValueError("nonfinite_size")
+        raise ResourceValueError("nonfinite_size", field, value)
     return round(size)
 
 
@@ -76,12 +89,12 @@ def parse_stats(row, containers):
     if not str(row["PIDs"]).isdigit():
         raise ValueError("invalid_pids")
     return {"at": flow.timestamp(), "service": matches[0], "cpu_percent": percent(row["CPUPerc"]),
-            "memory_bytes_estimate": size_estimate(memory[0]),
-            "memory_limit_bytes_estimate": size_estimate(memory[1]),
-            "network_rx_bytes_estimate": size_estimate(network[0]),
-            "network_tx_bytes_estimate": size_estimate(network[1]),
-            "block_read_bytes_estimate": size_estimate(block[0]),
-            "block_written_bytes_estimate": size_estimate(block[1]),
+            "memory_bytes_estimate": size_estimate(memory[0], "MemUsage.used"),
+            "memory_limit_bytes_estimate": size_estimate(memory[1], "MemUsage.limit"),
+            "network_rx_bytes_estimate": size_estimate(network[0], "NetIO.rx"),
+            "network_tx_bytes_estimate": size_estimate(network[1], "NetIO.tx"),
+            "block_read_bytes_estimate": size_estimate(block[0], "BlockIO.read"),
+            "block_written_bytes_estimate": size_estimate(block[1], "BlockIO.write"),
             "pids": int(row["PIDs"])}
 
 
@@ -94,17 +107,29 @@ class Sampler:
 
     def collect(self):
         while not self.stopped.is_set():
+            current_row = {}
             try:
                 raw = docker("stats", "--no-stream", "--no-trunc", "--format", "{{json .}}",
                              *self.containers, timeout=12)
-                rows = [parse_stats(json.loads(line), self.containers)
-                        for line in raw.splitlines() if line.strip()]
+                rows = []
+                for line in raw.splitlines():
+                    if line.strip():
+                        current_row = json.loads(line)
+                        rows.append(parse_stats(current_row, self.containers))
                 with self.destination.open("a", encoding="utf-8") as handle:
                     for row in rows:
                         handle.write(json.dumps(row) + "\n")
                 self.rows.extend(rows)
             except (OSError, ValueError, KeyError, subprocess.TimeoutExpired, flow.CheckFailed) as exc:
-                self.errors.append({"at": flow.timestamp(), "error_type": type(exc).__name__})
+                reasons = {'invalid_container_id', 'unowned_container', 'invalid_counter_pair', 'invalid_pids',
+                           'unsupported_percentage', 'nonfinite_percentage', 'unsupported_size', 'nonfinite_size'}
+                missing = [name for name in ('ID', 'CPUPerc', 'MemUsage', 'NetIO', 'BlockIO', 'PIDs')
+                           if isinstance(current_row, dict) and current_row.get(name) in (None, '', '--')]
+                self.errors.append({"at": flow.timestamp(), "error_type": type(exc).__name__,
+                    "reason": str(exc) if str(exc) in reasons else 'resource_collection_failed',
+                    "unavailable_fields": missing,
+                    "invalid_size_field": exc.field if isinstance(exc, ResourceValueError) else None,
+                    "numeric_size_display": exc.display if isinstance(exc, ResourceValueError) else None})
             self.stopped.wait(self.interval)
 
     def stop(self):

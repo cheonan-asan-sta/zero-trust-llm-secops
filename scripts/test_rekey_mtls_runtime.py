@@ -3,6 +3,7 @@
 import argparse
 import copy
 import json
+import math
 import secrets
 import subprocess
 from pathlib import Path
@@ -13,6 +14,24 @@ from scripts.continuous_mtls_runtime import ROOT, RuntimeFailure, command
 from scripts.rekey_mtls_runtime import RekeyRuntime
 from scripts.test_authority_mtls_runtime import AuthorityChecks
 from scripts.test_monitored_mtls_runtime import MonitoredChecks
+
+ROUND_SECONDS = 600
+
+
+def arm_test_round(state, cfg, now):
+    """Age only a disposable fixture's scheduling clocks while its writer is stopped."""
+    if (state.get('paused_ack') is not True or cfg.get('paused') is not True
+            or state.get('transaction') is not None or type(now) not in {int, float} or not math.isfinite(now)
+            or cfg.get('key_rotation', {}).get('interval_seconds') != ROUND_SECONDS):
+        raise ValueError('rekey_fixture_quiescent_round_required')
+    result = copy.deepcopy(state)
+    for uid, credential in result['credentials'].items():
+        if uid in cfg.get('disabled', []) or credential.get('inhibited'):
+            continue
+        if not credential.get('generation'):
+            raise ValueError('rekey_fixture_enrollment_incomplete')
+        credential['last_key_rotation'] = now - ROUND_SECONDS - 1
+    return result
 
 
 class RekeyChecks(AuthorityChecks):
@@ -25,9 +44,30 @@ class RekeyChecks(AuthorityChecks):
             ['python', '-m', 'scripts.rekey_runtime_control', 'audit']))
 
     def start_round(self):
-        cfg = self.runtime.controller_configuration()
-        self.configure(paused=False, renew_before={name: 0 for name in cfg['renew_before']},
-                       key_rotation=cfg['key_rotation'] | {'interval_seconds': 15})
+        # One eligible round, with enough scheduling separation to observe its
+        # exact keys. No certificate validity, key bytes or auth policy is aged.
+        self.pause()
+        controller = self.runtime.container('certificate-controller')
+        command(['docker', 'stop', '--time', '2', controller])
+        try:
+            cfg = self.runtime.controller_configuration()
+            self.configure(paused=True, renew_before={name: 0 for name in cfg['renew_before']},
+                           key_rotation=cfg['key_rotation'] | {'interval_seconds': ROUND_SECONDS})
+            self.runtime.helper(['-c', """import fcntl,json,time
+from pathlib import Path
+from scripts.certificate_controller import save
+from scripts.test_rekey_mtls_runtime import arm_test_round
+root=Path('/state')
+with (root/'controller.lock').open('a') as lease:
+ fcntl.flock(lease,fcntl.LOCK_EX|fcntl.LOCK_NB)
+ state=json.loads((root/'state.json').read_bytes())
+ cfg=json.loads((root/'config.json').read_bytes())
+ save(root/'state.json',arm_test_round(state,cfg,time.time()))
+print(json.dumps({'fixture_round_armed':True}))
+"""])
+            self.configure(paused=False)
+        finally:
+            command(['docker', 'start', controller])
 
     def finish_round(self, before):
         self.wait(lambda: (s := self.runtime.controller_status())['phase'] is None
@@ -52,7 +92,7 @@ class RekeyChecks(AuthorityChecks):
                 self.require(c['public_key_sha256'] == before['credentials'][uid]['public_key_sha256'],
                              'rekey_disabled_key_changed')
                 continue
-            self.require(c['key_generation'] > before['credentials'][uid]['key_generation']
+            self.require(c['key_generation'] == before['credentials'][uid]['key_generation'] + 1
                          and c['public_key_sha256'] != before['credentials'][uid]['public_key_sha256']
                          and c['copies_match'] and c['pairs_match'] and c['private_modes'] == [384]
                          and c['pending'] is None, 'rekey_pair_or_generation_not_proven')

@@ -8,12 +8,17 @@ from scripts import measure_signal_infrastructure as measure
 
 
 @pytest.mark.parametrize(("value", "expected"), [("1.5MiB", 1572864), ("1.5MB", 1500000),
-                                                ("0B", 0), ("1.25GiB", 1342177280)])
+                                                ("0B", 0), ("1.25GiB", 1342177280),
+                                                ("1e+03kB", 1000000), ("1e+03KiB", 1024000),
+                                                ("1E3MB", 1000000000), ("1e-03B", 0),
+                                                *[("1" + unit, scale) for unit, scale in measure.UNITS.items()
+                                                  if unit in {"PB", "EB", "ZB", "YB", "PiB", "EiB", "ZiB", "YiB"}]])
 def test_display_units_distinguish_decimal_and_binary_scales(value, expected):
-    assert measure.size_estimate(value) == expected
+    assert measure.size_estimate(value) == pytest.approx(expected, rel=1e-15, abs=0)
 
 
-@pytest.mark.parametrize("value", ["", "--", "NaNMiB", "-3B", "1XB", "1e3MB", "9" * 400 + "B"])
+@pytest.mark.parametrize("value", ["", "--", "NaNMiB", "-3B", "1XB", "1e999MB", "9" * 400 + "B",
+                                 "1e+MB", "1e3PRIVATE_KEY", "-1e3B", "infB"])
 def test_invalid_or_nonfinite_resource_values_are_not_silently_zero(value):
     with pytest.raises(ValueError):
         measure.size_estimate(value)
@@ -43,12 +48,58 @@ def test_resource_rows_keep_counter_direction_and_only_accept_owned_containers()
             measure.parse_stats({**stats_row(), "ID": bad}, {"a" * 64: "app"})
 
 
+@pytest.mark.parametrize('invalid', ['--', 'PRIVATE_KEY_SENTINEL'])
+def test_sampler_preserves_missing_field_reason_without_fabricating_zero_or_leaking_raw_values(tmp_path, monkeypatch, invalid):
+    sampler = measure.Sampler({'a' * 64: 'app'}, tmp_path / 'samples.jsonl', 1)
+
+    def snapshot(*args, **kwargs):
+        sampler.stopped.set()
+        return json.dumps(stats_row() | {'PIDs': invalid})
+
+    monkeypatch.setattr(measure, 'docker', snapshot)
+    sampler.collect()
+    assert sampler.rows == [] and len(sampler.errors) == 1
+    error = sampler.errors[0]
+    assert error['error_type'] == 'ValueError' and error['reason'] == 'invalid_pids'
+    assert error['unavailable_fields'] == (['PIDs'] if invalid == '--' else [])
+    assert 'SENTINEL' not in json.dumps(error)
+
+
 def test_small_samples_show_empirical_rank_and_empty_samples_remain_unknown():
     assert measure.distribution([]) == {"n": 0, "p50_ms": None, "p95_ms": None, "max_ms": None}
     assert measure.distribution([3, 1, 2]) == {"n": 3, "p50_ms": 2, "p95_ms": 3, "max_ms": 3}
     for values in ([float("nan")], [float("inf")], [-1]):
         with pytest.raises(ValueError):
             measure.distribution(values)
+
+
+def test_docker_general_format_rounding_boundary_keeps_valid_resource_snapshot():
+    # go-units HumanSizeWithPrecision uses %.*g after scaling; BytesSize uses %.4g.
+    network = format(999999 / 1000, '.3g') + 'kB'
+    memory = format(1024 * 1023.99 / 1024, '.4g') + 'KiB'
+    assert network == '1e+03kB' and memory == '1024KiB'
+    row = measure.parse_stats(stats_row() | {'NetIO': network + ' / 0B',
+        'MemUsage': memory + ' / 256MiB'}, {'a' * 64: 'app'})
+    assert row['network_rx_bytes_estimate'] == 1000000
+    assert row['memory_bytes_estimate'] == 1048576
+
+
+@pytest.mark.parametrize('invalid, display', [('PRIVATE_KEY_SENTINEL', None), ('1e999B', '1e999B')])
+def test_bad_size_diagnostic_names_direction_and_only_records_bounded_numeric_display(tmp_path, monkeypatch, invalid, display):
+    sampler = measure.Sampler({'a' * 64: 'app'}, tmp_path / 'samples.jsonl', 1)
+
+    def snapshot(*args, **kwargs):
+        sampler.stopped.set()
+        return json.dumps(stats_row() | {'NetIO': '0B / ' + invalid})
+
+    monkeypatch.setattr(measure, 'docker', snapshot)
+    sampler.collect()
+    assert not sampler.rows and len(sampler.errors) == 1
+    error = sampler.errors[0]
+    assert error['invalid_size_field'] == 'NetIO.tx'
+    assert error['numeric_size_display'] == display
+    assert error['reason'] == ('unsupported_size' if display is None else 'nonfinite_size')
+    assert 'SENTINEL' not in json.dumps(error)
 
 
 def test_summarize_never_pools_planned_outage_or_counts_restored_receipt_twice():
