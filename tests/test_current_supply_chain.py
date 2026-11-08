@@ -1,10 +1,12 @@
 import copy
 import hashlib
 import json
+from types import SimpleNamespace
 
 import pytest
 
 from scripts import current_supply_chain as current
+from scripts import test_current_supply_chain_runtime as runtime
 
 IMAGE = 'sha256:' + 'a' * 64
 COMMIT = 'b' * 40
@@ -154,3 +156,34 @@ def test_pair_scope_stays_explicit(evidence):
     result = current.pair_reviews(a, b)
     assert result['same_database_snapshot'] and not result['all_runtime_images_covered']
     assert result['status'] == 'local_scan_verified_independent_review_pending'
+
+
+@pytest.mark.parametrize('fault', [None, 'source', 'runtime'])
+def test_image_probe_has_bounded_scratch_space_without_writable_root_or_network(monkeypatch, fault):
+    calls = []
+    expected = {'scripts/candidate.py': 'c' * 64}
+
+    def command(argv):
+        if argv[1:3] == ['image', 'inspect']:
+            return json.dumps([{'Id': IMAGE, 'Os': 'linux', 'Architecture': 'amd64'}])
+        calls.append(argv)
+        return json.dumps({'passed': fault != 'runtime', 'checks': {str(i): True for i in range(23)}})
+
+    def process(argv, **kwargs):
+        calls.append(argv)
+        assert json.loads(kwargs['input']) == list(expected)
+        return SimpleNamespace(stdout=json.dumps(expected if fault != 'source' else {}))
+
+    monkeypatch.setattr(runtime.scan, 'run', command)
+    monkeypatch.setattr(runtime.subprocess, 'run', process)
+    if fault:
+        with pytest.raises(ValueError): runtime.image_proof(IMAGE, expected, COMMIT, 'c03-owned')
+    else:
+        proof = runtime.image_proof(IMAGE, expected, COMMIT, 'c03-owned')
+        assert proof['runtime_security_checks'] == 23 and len(calls) == 2
+    for argv in calls:
+        assert '--read-only' in argv and '--cap-drop=ALL' in argv and '--security-opt=no-new-privileges:true' in argv
+        assert argv[argv.index('--network') + 1] == 'none'
+        mounts = [argv[i+1] for i, a in enumerate(argv[:-1]) if a == '--tmpfs']
+        assert any(m.startswith('/tmp:rw,nosuid,nodev,size=64m,') for m in mounts)
+        assert any(m.startswith('/data:rw,nosuid,nodev,size=1m,') for m in mounts)

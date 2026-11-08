@@ -37,6 +37,7 @@ print(json.dumps({n:hashlib.sha256(path(n).read_bytes().replace(b'\\r\\n',b'\\n'
 """
     args = ['docker', 'run', '--rm', '--label', 'secops.c03=' + label, '--network', 'none',
             '--read-only', '--user', '10001:10001', '--cap-drop=ALL', '--security-opt=no-new-privileges:true',
+            '--tmpfs', '/tmp:rw,nosuid,nodev,size=64m,uid=10001,gid=10001',
             '--tmpfs', '/data:rw,nosuid,nodev,size=1m,uid=10001,gid=10001', '--entrypoint', 'python', '-i', image]
     result = subprocess.run([*args, '-c', program], input=json.dumps(list(payload)), text=True,
                             capture_output=True, timeout=60, check=True)
