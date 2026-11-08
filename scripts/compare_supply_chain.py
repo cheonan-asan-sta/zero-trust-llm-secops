@@ -317,6 +317,7 @@ class Pilot:
         name = self.ident + "-" + label
         self.containers.append(name)
         args = ["docker", "run", "--name", name, "--read-only", "--cap-drop=ALL",
+                "--label", "secops.c03=" + self.ident,
                 "--security-opt=no-new-privileges:true", "--cpus=2", "--memory=2g",
                 "--memory-swap=2g", "--pids-limit=128", "--tmpfs", "/tmp:rw,nosuid,nodev,size=512m",
                 "--network", "bridge" if network else "none"]

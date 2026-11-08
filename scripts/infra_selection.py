@@ -151,7 +151,7 @@ def assess(value, root=ROOT):
                 'C02': {'candidate': 'NGINX auth_request', 'status': 'local_conditional',
                         'reason': 'Fixed GET resource; historical paired safety trial and current one-use load/fault evidence'},
                 'C03': {'candidate': 'Syft/Grype and Trivy comparison retained', 'status': 'deferred',
-                        'reason': 'Historical frozen DB evidence only; current image scan and independent app reachability review pending'}},
+                        'reason': 'Full current-image coverage, refreshed database evidence and independent app reachability review required'}},
             'production_approved': False, 'week3_complete': False, 'independent_review_complete': False,
             'remaining': ['Independent teammate reproduction and app-state contract review',
                           'Current-image supply-chain rescan and residual finding disposition',
