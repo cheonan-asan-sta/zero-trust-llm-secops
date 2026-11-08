@@ -9,8 +9,10 @@ import copy
 import json
 import subprocess
 from pathlib import Path
+from unittest.mock import patch
 
 from scripts.continuous_mtls_runtime import ROOT, RuntimeFailure
+from scripts.database_backup_runtime import RestoreDrill
 from scripts.database_recovery_runtime import RecoveryRuntime
 from scripts.database_transport_runtime import management_lease
 from scripts.test_database_backup_runtime import Checks as BackupChecks
@@ -24,6 +26,10 @@ class AcceptanceRecovery(AcceptanceRuntime, RecoveryRuntime):
 
 class Checks(BackupChecks):
     expected_volumes = 41
+    # Test driver only: extra checkpoint admission on each tick adds local Docker
+    # overhead. Production backup/resume CLI still stops after its 300s budget.
+    backup_resume_timeout = 600
+    backup_interrupt_timeout = 600
 
     def __init__(self, directory):
         super().__init__(directory, runtime_class=AcceptanceRecovery)
@@ -43,22 +49,36 @@ class Checks(BackupChecks):
             ("import json;from pathlib import Path;s=json.loads(Path('/state/state.json').read_bytes());"
              "print(json.dumps(next(c['csr'] for c in s['credentials'].values() if c['name']=='collector'))) ")]))
         self.ready()
+        before_revocations = int(r.sql('SELECT count(*) FROM revoked_x509_certs;'))
         issued = self.ca(self.fresh(), endpoint='ca-a', store=True)
         self.require(issued['status'] == 201, 'checkpoint_probe_issue_failed')
-        self.require(self.ca({'serial': issued['serial']}, endpoint='ca-b', mode='revoke')['status'] == 200,
+        revocation = self.ca({'serial': issued['serial'], 'passive': True}, endpoint='ca-b', mode='revoke')
+        self.report['checkpoint_revocation_status'] = revocation['status']
+        self.save()
+        self.require(revocation['status'] == 200,
                      'checkpoint_probe_revoke_failed')
+        after_revocations = int(r.sql('SELECT count(*) FROM revoked_x509_certs;'))
+        self.require(after_revocations > before_revocations, 'checkpoint_probe_revocation_not_persisted')
+        self.report.update(checkpoint_revocation_rows_before=before_revocations,
+                           checkpoint_revocation_rows_after=after_revocations)
+        self.refresh_active_leaves()
         latest = self.drive_backup(new=True)
         self.require(latest['manifest']['security']['public.revoked_x509_certs']['rows'] >
                      previous['security']['public.revoked_x509_certs']['rows'], 'checkpoint_revocation_not_captured')
         self.require(r.state['checkpoint_head']['sequence'] > initial['sequence'], 'checkpoint_did_not_advance')
         self.add('actual_post_backup_revocation_advances_independent_checkpoint')
         with management_lease(r.directory):
-            try:
-                r.assess(previous)
-            except (ValueError, RuntimeFailure):
-                pass
-            else:
-                raise RuntimeFailure('checkpoint_accepted_security_rollback')
+            # The old archive is still authentic; rejection must precede SQL restore.
+            old = r.backup_store('inspect', previous)
+            self.require(old == self.report['backups'][0]['archive'], 'checkpoint_old_archive_changed')
+            with patch.object(RestoreDrill, 'verify', side_effect=RuntimeError('checkpoint_restore_started_before_denial')) as restore:
+                try:
+                    r.assess(previous)
+                except (ValueError, RuntimeFailure):
+                    pass
+                else:
+                    raise RuntimeFailure('checkpoint_accepted_security_rollback')
+                self.require(not restore.called, 'checkpoint_denial_started_restore')
             self.require(r.assess(latest['manifest'])['checkpoint_compatible'], 'checkpoint_latest_restore_rejected')
         self.add('old_archive_denied_after_new_revocation_while_latest_restore_passes')
         before = copy.deepcopy(r.state['checkpoint_head'])
@@ -69,6 +89,7 @@ class Checks(BackupChecks):
             self.require(r.assess(latest['manifest'])['checkpoint_compatible'], 'checkpoint_restart_assessment_failed')
         self.add('normal_restart_preserves_checkpoint_anchor_and_compatible_restore')
         self.report.update(completed=True, checkpoint_head=before,
+                           checkpoint_latest_backup=latest, stale_restore_started=False,
                            freshness='last_explicit_quiesced_checkpoint', live_restore_supported=False)
 
 

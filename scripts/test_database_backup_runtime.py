@@ -21,6 +21,7 @@ from scripts.database_backup_runtime import (
     snapshot,
 )
 from scripts.database_transport_runtime import TransportCoordinator, management_lease
+from scripts.persistent_authority_control import read
 from scripts.test_database_transport_runtime import Checks as ParentChecks
 from scripts.test_persistent_authority_runtime import AcceptanceRuntime
 from scripts.test_transport_process_recovery import kill_worker, public_failure
@@ -32,6 +33,8 @@ class AcceptanceBackup(AcceptanceRuntime, BackupRuntime):
 
 class Checks(ParentChecks):
     expected_volumes = 39
+    backup_resume_timeout = 300
+    backup_interrupt_timeout = 240
 
     def __init__(self, directory, *, runtime_class=AcceptanceBackup):
         super().__init__(directory, runtime_class=runtime_class)
@@ -41,12 +44,23 @@ class Checks(ParentChecks):
         r, token = self.runtime, secrets.token_hex(12)
         marker = r.directory / ('backup-fault-' + token + '.json')
         child = subprocess.Popen([sys.executable, '-m', 'scripts.test_database_backup_process',
-            '--directory', str(r.directory), '--token', token], cwd=ROOT,
+            '--directory', str(r.directory), '--token', token, '--timeout', str(self.backup_interrupt_timeout)], cwd=ROOT,
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         try:
-            deadline = time.monotonic() + 240
+            started = time.monotonic()
+            deadline = started + self.backup_interrupt_timeout
             while not marker.exists():
                 if child.poll() is not None or time.monotonic() > deadline:
+                    detail = {'child_exited': child.poll() is not None, 'exit_code': child.poll(),
+                              'elapsed_seconds': time.monotonic() - started,
+                              'budget_seconds': self.backup_interrupt_timeout}
+                    failure = r.directory / ('backup-fault-failure-' + token + '.json')
+                    if failure.exists():
+                        value = json.loads(read(failure, 65536))
+                        if value.get('token') == token:
+                            detail['child_failure'] = value['failure']
+                    self.report['backup_interruption_failure'] = detail
+                    self.save()
                     raise RuntimeFailure('backup_child_failed_before_checkpoint')
                 time.sleep(.2)
             self.require(json.loads(marker.read_bytes()) == {'token': token, 'phase': 'sealed', 'boundary': 'before'},
@@ -93,7 +107,7 @@ else:
         with management_lease(r.directory):
             worker = BackupCoordinator(r)
             worker.tick(new=new)
-            deadline = time.monotonic() + 300
+            deadline = time.monotonic() + self.backup_resume_timeout
             while worker.state['phase'] != 'complete':
                 if time.monotonic() > deadline:
                     raise RuntimeFailure('backup_test_resume_timeout')
@@ -104,7 +118,7 @@ else:
         super().run()
         self.backup_checks()
 
-    def refresh_before_backup(self):
+    def refresh_active_leaves(self):
         r = self.runtime
         before = self.pause()
         original = r.controller_configuration()['renew_before']
@@ -119,6 +133,11 @@ else:
             self.configure(renew_before=original)
         self.require(current['credentials'][self.collector]['fingerprint'] == before['credentials'][self.collector]['fingerprint'],
                      'backup_preparation_reissued_retired_identity')
+        return current
+
+    def refresh_before_backup(self):
+        r = self.runtime
+        current = self.refresh_active_leaves()
         self.add('active_leaves_renew_before_backup_without_reissuing_retired_collector')
         retired_at = current['credentials'][self.collector]['not_after']
         active_at = min(c['not_after'] for uid, c in current['credentials'].items() if uid != self.collector)

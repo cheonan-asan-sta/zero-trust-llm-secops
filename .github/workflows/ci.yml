@@ -86,6 +86,11 @@ jobs:
             verification: Verify encrypted database backup and isolated restore
             report: Report database backup verification
             command: python -m scripts.test_database_backup_runtime --directory runtime/c02/database-backup-ci
+          - kind: database-recovery
+            directory: runtime/c02/database-recovery-ci
+            verification: Verify database recovery checkpoint and rollback denial
+            report: Report database recovery checkpoint verification
+            command: python -m scripts.test_database_recovery_runtime --directory runtime/c02/database-recovery-ci
     steps:
       - uses: actions/checkout@v4
         with:

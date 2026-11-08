@@ -19,7 +19,7 @@ from scripts.app_storage_fixture import seed_logs
 
 
 @pytest.fixture
-def full(tmp_path):
+def full(tmp_path, recovery_clock):
     data = tmp_path / "data"
     prepare(data)
     expected = seed_logs(data)
