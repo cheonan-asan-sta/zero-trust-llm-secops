@@ -67,7 +67,8 @@ def current_review(summary_path, raw_directory, pin, proof, expected_source):
     require(value['tools'] == json.loads((scan.ROOT / 'infra/supply-chain/tools.lock.json').read_text('utf-8')),
             'scanner_lock_drift')
     require(value['conditions'] == {'cpus': 2, 'memory_bytes': 2147483648, 'pids': 128,
-            'uid': 10001, 'scan_network': 'none', 'db_storage': 'Docker Linux named volume'},
+            'uid': 10001, 'scan_network': 'none', 'db_storage': 'Docker Linux named volume',
+            'scratch_tmpfs_bytes': 1536 * 1024**2},
             'current_scan_conditions')
     require(type(value['repeats']) is int and value['repeats'] == 3, 'current_scan_repeats')
     require(value.get('trivy_scan_timeout') == '15m', 'current_scan_timeout_budget')

@@ -95,6 +95,31 @@ def owned_cleanup(pilot):
     pilot.cleanup()
 
 
+def cleanup_pilots(pilots, label):
+    errors = []
+    # A later copier still mounts the earlier DB. Remove every container before
+    # attempting any DB volume removal; never force-remove a mounted volume.
+    for pilot in pilots:
+        try:
+            owned_cleanup(pilot)
+        except (ValueError, RuntimeError, OSError, subprocess.TimeoutExpired) as exc:
+            errors.append(type(exc).__name__)
+    for pilot in pilots:
+        try:
+            info = subprocess.run(['docker', 'volume', 'inspect', pilot.cache_volume], text=True,
+                                  encoding='utf-8', capture_output=True, check=False)
+            if info.returncode == 0:
+                require(json.loads(info.stdout)[0]['Labels'].get('secops.c03') == pilot.ident, 'current_db_cleanup_ownership')
+                scan.run(['docker', 'volume', 'rm', pilot.cache_volume])
+        except (ValueError, RuntimeError, OSError, subprocess.TimeoutExpired) as exc:
+            errors.append(type(exc).__name__)
+    leftovers = []
+    for ident in [label, *(p.ident for p in pilots)]:
+        for argv in (['ps', '-aq'], ['volume', 'ls', '-q'], ['network', 'ls', '-q']):
+            leftovers.extend(scan.run(['docker', *argv, '--filter', 'label=secops.c03=' + ident]).split())
+    return {'owned_resources_remaining': len(leftovers)}, errors
+
+
 def execute(directory):
     directory = Path(directory).resolve()
     allowed = (scan.ROOT / 'runtime/c03').resolve()
@@ -127,7 +152,7 @@ def execute(directory):
             require(source_manifest() == manifest and scan.run(['git', 'rev-parse', 'HEAD']).strip() == commit,
                     'current_source_changed')
             proof = image_proof(image, manifest, commit, label)
-            pilot = scan.Pilot(directory / name, commit, 3)
+            pilot = scan.Pilot(directory / name, commit, 3, scratch_mib=1536)
             pilot.directory.mkdir()
             pilot.app_image = pilot.ident + '-unused-input'
             pilots.append(pilot)
@@ -161,23 +186,8 @@ def execute(directory):
         report.update(completed=False, failure=str(exc) if isinstance(exc, ReviewError) else type(exc).__name__)
         raise
     finally:
-        cleanup_errors = []
-        for pilot in pilots:
-            try:
-                owned_cleanup(pilot)
-                info = subprocess.run(['docker', 'volume', 'inspect', pilot.cache_volume], text=True,
-                                      encoding='utf-8', capture_output=True, check=False)
-                if info.returncode == 0:
-                    require(json.loads(info.stdout)[0]['Labels'].get('secops.c03') == pilot.ident, 'current_db_cleanup_ownership')
-                    scan.run(['docker', 'volume', 'rm', pilot.cache_volume])
-            except (ValueError, RuntimeError, OSError, subprocess.TimeoutExpired) as exc:
-                cleanup_errors.append(type(exc).__name__)
-        leftovers = []
-        for ident in [label, *(p.ident for p in pilots)]:
-            for argv in (['ps', '-aq'], ['volume', 'ls', '-q'], ['network', 'ls', '-q']):
-                leftovers.extend(scan.run(['docker', *argv, '--filter', 'label=secops.c03=' + ident]).split())
-        report['cleanup'] = {'owned_resources_remaining': len(leftovers)}
-        if leftovers or cleanup_errors:
+        report['cleanup'], cleanup_errors = cleanup_pilots(pilots, label)
+        if report['cleanup']['owned_resources_remaining'] or cleanup_errors:
             report.update(completed=False, cleanup_errors=cleanup_errors)
             report.setdefault('failure', 'current_cleanup_incomplete')
         report['finished_at'] = datetime.now(UTC).isoformat()

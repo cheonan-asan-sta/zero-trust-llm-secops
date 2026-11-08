@@ -22,7 +22,8 @@ def evidence(tmp_path):
     versions = {t['name']: t['tag'].removeprefix('v') for t in lock['tools']}
     s = {'schema': 'c03-pilot-1', 'completed': True, 'source_commit': COMMIT, 'app_image_id': IMAGE,
         'repeats': 3, 'trivy_scan_timeout': '15m', 'conditions': {'cpus': 2, 'memory_bytes': 2147483648, 'pids': 128,
-            'uid': 10001, 'scan_network': 'none', 'db_storage': 'Docker Linux named volume'},
+            'uid': 10001, 'scan_network': 'none', 'db_storage': 'Docker Linux named volume',
+            'scratch_tmpfs_bytes': 1536 * 1024**2},
         'scan_started_at': NOW, 'tools': lock, 'db_files': {'db': 'c' * 64},
         'db_files_after': {'db': 'c' * 64}, 'runs': [],
         'results': {'raw_artifacts': {}, 'findings': {}, 'inventory': {}}}
@@ -201,3 +202,43 @@ def test_cleanup_reads_docker_inspect_as_utf8_and_refuses_foreign_owner(monkeypa
     with pytest.raises(ValueError, match='current_cleanup_ownership'):
         runtime.owned_cleanup(pilot)
     assert not cleaned
+
+
+def test_cleanup_releases_all_cross_copy_mounts_before_removing_any_database(monkeypatch):
+    pilots = [SimpleNamespace(ident=n, cache_volume=n+'-db') for n in ('c03-a', 'c03-b')]
+    cleaned = []
+    monkeypatch.setattr(runtime, 'owned_cleanup', lambda p: cleaned.append(p.ident))
+    def process(argv, **kwargs):
+        assert kwargs['encoding'] == 'utf-8' and len(cleaned) == 2
+        owner = argv[-1].removesuffix('-db')
+        return SimpleNamespace(returncode=0, stdout=json.dumps([{'Labels': {'secops.c03': owner}}]))
+    removed = []
+    def command(argv):
+        if argv[1:3] == ['volume', 'rm']:
+            assert len(cleaned) == 2
+            removed.append(argv[-1])
+        return ''
+    monkeypatch.setattr(runtime.subprocess, 'run', process)
+    monkeypatch.setattr(runtime.scan, 'run', command)
+    cleanup, errors = runtime.cleanup_pilots(pilots, 'c03-build')
+    assert removed == ['c03-a-db', 'c03-b-db']
+    assert cleanup == {'owned_resources_remaining': 0} and not errors
+
+
+@pytest.mark.parametrize('scratch', [512, 1536])
+def test_scanner_scratch_budget_preserves_memory_cpu_and_network_boundaries(tmp_path, monkeypatch, scratch):
+    pilot = object.__new__(current.scan.Pilot)
+    pilot.directory, pilot.ident = tmp_path, 'c03-owned'
+    pilot.cache_volume, pilot.runner_image = 'c03-owned-db', 'c03-owned-runner'
+    pilot.scratch_mib, pilot.containers, pilot.report = scratch, [], {'runs': []}
+    (tmp_path/'out').mkdir()
+    def process(argv, **kwargs):
+        assert f'/tmp:rw,nosuid,nodev,size={scratch}m' in argv
+        assert '--memory=2g' in argv and '--memory-swap=2g' in argv and '--cpus=2' in argv
+        assert argv[argv.index('--network')+1] == 'none'
+        assert '--read-only' in argv and '--cap-drop=ALL' in argv
+        (tmp_path/'out/probe.metrics.json').write_text('{"exit_code":0}')
+        return SimpleNamespace(returncode=0, stdout='', stderr='')
+    monkeypatch.setattr(current.scan.subprocess, 'run', process)
+    pilot.container('probe', ['/tools/syft','version'])
+    assert pilot.report['runs'][0]['metrics']['exit_code'] == 0

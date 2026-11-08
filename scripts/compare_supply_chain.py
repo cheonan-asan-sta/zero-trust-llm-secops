@@ -241,7 +241,10 @@ sys.exit(result.returncode)
 
 
 class Pilot:
-    def __init__(self, directory, source_ref, repeats):
+    def __init__(self, directory, source_ref, repeats, *, scratch_mib=512):
+        if scratch_mib not in (512, 1536):
+            raise ValueError("unsupported_scanner_scratch_budget")
+        self.scratch_mib = scratch_mib
         self.directory = directory.resolve()
         if not self.directory.is_relative_to((ROOT / "runtime/c03").resolve()):
             raise ValueError("work_directory_must_be_within_runtime_c03")
@@ -261,6 +264,8 @@ class Pilot:
                                       "uid": 10001, "scan_network": "none",
                                       "db_storage": "Docker Linux named volume"},
                        "cache_volume": self.cache_volume, "runs": []}
+        if scratch_mib != 512:
+            self.report["conditions"]["scratch_tmpfs_bytes"] = scratch_mib * 1024**2
 
     def save(self):
         (self.directory / "summary.json").write_text(
@@ -319,7 +324,7 @@ class Pilot:
         args = ["docker", "run", "--name", name, "--read-only", "--cap-drop=ALL",
                 "--label", "secops.c03=" + self.ident,
                 "--security-opt=no-new-privileges:true", "--cpus=2", "--memory=2g",
-                "--memory-swap=2g", "--pids-limit=128", "--tmpfs", "/tmp:rw,nosuid,nodev,size=512m",
+                "--memory-swap=2g", "--pids-limit=128", "--tmpfs", f"/tmp:rw,nosuid,nodev,size={self.scratch_mib}m",
                 "--network", "bridge" if network else "none"]
         args += ["--mount", f"type=volume,src={self.cache_volume},dst=/cache"]
         mounts = [("out", "/out", False), ("input", "/input", True)]
