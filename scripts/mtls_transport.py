@@ -146,6 +146,10 @@ class Quiet(BaseHTTPRequestHandler):
 
 class Gateway(ThreadingHTTPServer):
     daemon_threads = True
+    # A TLS handshake occupies accept() briefly. Keep a bounded pending queue
+    # above the eight-client local workload instead of TCPServer's default 5.
+    # NativeServer inherits this value; authentication and timeouts are unchanged.
+    request_queue_size = 32
 
     def __init__(self, address, path, backend="core", backend_port=8000, backend_profile=None, secure_stats=False):
         self.path, self.backend, self.backend_port = path, backend, backend_port

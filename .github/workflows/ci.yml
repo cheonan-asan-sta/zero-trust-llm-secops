@@ -91,6 +91,11 @@ jobs:
             verification: Verify database recovery checkpoint and rollback denial
             report: Report database recovery checkpoint verification
             command: python -m scripts.test_database_recovery_runtime --directory runtime/c02/database-recovery-ci
+          - kind: selection
+            directory: runtime/c02/selection-ci
+            verification: Measure selected mTLS infrastructure load and recovery
+            report: Report infrastructure selection verification
+            command: python -m scripts.test_infra_selection_runtime --directory runtime/c02/selection-ci && python -m scripts.infra_selection --report runtime/c02/selection-ci/verification.json
     steps:
       - uses: actions/checkout@v4
         with:
