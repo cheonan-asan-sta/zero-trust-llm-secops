@@ -5,8 +5,10 @@ These unit sockets stub the TLS peer only. No private key files are written here
 
 import hashlib
 import json
+import socket
 import threading
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 from http.server import ThreadingHTTPServer
 
@@ -17,6 +19,36 @@ from scripts import pep_lab as pep
 
 PEER = b"unit-peer-der-stub"
 PIN = hashlib.sha256(PEER).hexdigest()
+
+
+@pytest.mark.parametrize('native', [False, True])
+def test_bounded_connection_burst_fits_listener_queue_before_accept(native, monkeypatch):
+    # Only the initial certificate configuration is stubbed. Real loopback TCP
+    # connections exercise the OS listen queue without HTTP/TLS requests.
+    # Pausing accepts models the listener doing a handshake during a burst.
+    monkeypatch.setattr(tls, 'server_context', lambda path: object())
+    if native:
+        from scripts.mtls_native import NativeServer
+        server = NativeServer(('127.0.0.1', 0), 'unit-queue-profile', pep.QuietHandler)
+    else:
+        server = tls.Gateway(('127.0.0.1', 0), 'unit-queue-profile')
+
+    def connect(_):
+        try:
+            return socket.create_connection(server.server_address, timeout=.5)
+        except OSError:
+            return None
+
+    clients = []
+    try:
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            clients = list(pool.map(connect, range(8)))
+        assert all(client is not None for client in clients)
+    finally:
+        for client in clients:
+            if client:
+                client.close()
+        server.server_close()
 
 
 class PeerSocket:
