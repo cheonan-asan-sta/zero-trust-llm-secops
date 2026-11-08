@@ -320,6 +320,15 @@ def write_report(output, report):
         temporary.unlink(missing_ok=True)
 
 
+def source_commit():
+    try:
+        git = subprocess.run(["git", "rev-parse", "HEAD"], cwd=CONTRACT.parents[1],
+                             check=False, capture_output=True, text=True, timeout=5)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return (git.stdout.strip() or None) if git.returncode == 0 else None
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=Path("runtime/m6/pilot.json"))
@@ -327,12 +336,10 @@ def main():
     args = parser.parse_args()
     try:
         contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
-        git = subprocess.run(["git", "rev-parse", "HEAD"], cwd=CONTRACT.parents[1],
-                             check=False, capture_output=True, text=True, timeout=5)
         report = asyncio.run(run_pilot(DetectionBenchmark(), contract, max_requests=args.max_requests,
-                                       source_commit=git.stdout.strip() if git.returncode == 0 else None))
+                                       source_commit=source_commit()))
         write_report(args.output, report)
-    except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError):
+    except (OSError, ValueError, KeyError, TypeError):
         parser.exit(1, "m6 pilot unavailable\n")
     print(json.dumps({"mode": report["mode"], "cases": len(report["cases"]),
                       "requests_used": report["budget"]["requests_used"], "report": str(args.output)}))

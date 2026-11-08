@@ -236,8 +236,9 @@ def test_cost_cap_retains_the_reservation_of_an_unreconciled_timeout(benchmark, 
 
 
 @pytest.mark.parametrize("limit", [0, 2])
-def test_cli_writes_an_offline_report_with_a_lower_request_limit(tmp_path, monkeypatch, limit):
+def test_cli_writes_an_offline_report_without_git(tmp_path, monkeypatch, limit):
     output = tmp_path / "m6" / "pilot.json"
+    monkeypatch.setenv("PATH", "")
     monkeypatch.setattr(
         sys, "argv", ["evaluate_m6", "--output", str(output), "--max-requests", str(limit)]
     )
@@ -245,6 +246,7 @@ def test_cli_writes_an_offline_report_with_a_lower_request_limit(tmp_path, monke
     assert main() == 0
     report = json.loads(output.read_text(encoding="utf-8"))
     assert report["mode"] == "offline_mock_pilot"
+    assert report["source_commit"] is None
     assert report["split"] == "development"
     assert len(report["cases"]) == 24
     assert report["budget"]["request_limit"] == report["budget"]["requests_used"] == limit
