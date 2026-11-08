@@ -1,7 +1,7 @@
 {
   "schema": "m6-evaluation-contract-1",
   "as_of": "2026-11-03",
-  "status": "design_only_no_provider_calls",
+  "status": "mock_pilot_available_no_provider_calls",
   "execution_owner": "김택희: 평가 실행기·집계; 채희주: 후보·안전·예산·인프라 조건",
   "safety": {
     "mode": "shadow_only",
