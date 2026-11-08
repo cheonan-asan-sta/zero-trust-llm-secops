@@ -21,7 +21,7 @@ def evidence(tmp_path):
     lock = json.loads((current.scan.ROOT / 'infra/supply-chain/tools.lock.json').read_text('utf-8'))
     versions = {t['name']: t['tag'].removeprefix('v') for t in lock['tools']}
     s = {'schema': 'c03-pilot-1', 'completed': True, 'source_commit': COMMIT, 'app_image_id': IMAGE,
-        'repeats': 3, 'conditions': {'cpus': 2, 'memory_bytes': 2147483648, 'pids': 128,
+        'repeats': 3, 'trivy_scan_timeout': '15m', 'conditions': {'cpus': 2, 'memory_bytes': 2147483648, 'pids': 128,
             'uid': 10001, 'scan_network': 'none', 'db_storage': 'Docker Linux named volume'},
         'scan_started_at': NOW, 'tools': lock, 'db_files': {'db': 'c' * 64},
         'db_files_after': {'db': 'c' * 64}, 'runs': [],
@@ -114,7 +114,7 @@ def test_old_future_naive_and_non_utc_database_times_are_rejected(tool, date):
 
 
 @pytest.mark.parametrize('fault', ['complete','db','source','image','network','exit','duration','duplicate',
-                                 'missing','inventory','findings','proof','patch','version','control','raw'])
+                                 'missing','inventory','findings','proof','patch','version','control','raw','timeout'])
 def test_corruption_and_incomplete_inputs_fail_closed(evidence, fault):
     s, proof, _source, raw, write, review = evidence
     if fault == 'complete': s['completed'] = False
@@ -123,6 +123,7 @@ def test_corruption_and_incomplete_inputs_fail_closed(evidence, fault):
     elif fault == 'image': s['app_image_id'] = 'sha256:' + 'e' * 64
     elif fault == 'network': s['runs'][0]['network'] = 'bridge'
     elif fault == 'exit': s['runs'][0]['metrics']['exit_code'] = 1
+    elif fault == 'timeout': s.pop('trivy_scan_timeout')
     elif fault == 'duration': s['runs'][0]['docker_wall_seconds'] = -1
     elif fault == 'duplicate': s['runs'].append(copy.deepcopy(s['runs'][0]))
     elif fault == 'missing': s['runs'] = s['runs'][1:]
@@ -187,3 +188,16 @@ def test_image_probe_has_bounded_scratch_space_without_writable_root_or_network(
         mounts = [argv[i+1] for i, a in enumerate(argv[:-1]) if a == '--tmpfs']
         assert any(m.startswith('/tmp:rw,nosuid,nodev,size=64m,') for m in mounts)
         assert any(m.startswith('/data:rw,nosuid,nodev,size=1m,') for m in mounts)
+
+
+def test_cleanup_reads_docker_inspect_as_utf8_and_refuses_foreign_owner(monkeypatch):
+    cleaned = []
+    pilot = SimpleNamespace(containers=['c03-owned'], ident='c03-owned', cleanup=lambda: cleaned.append(True))
+    def inspect(argv, **kwargs):
+        assert kwargs['encoding'] == 'utf-8'
+        return SimpleNamespace(returncode=0, stdout=json.dumps([{'Name': '/c03-owned',
+            'Config': {'Labels': {'secops.c03': 'foreign'}, 'WorkingDir': '/한글'}}], ensure_ascii=False))
+    monkeypatch.setattr(runtime.subprocess, 'run', inspect)
+    with pytest.raises(ValueError, match='current_cleanup_ownership'):
+        runtime.owned_cleanup(pilot)
+    assert not cleaned

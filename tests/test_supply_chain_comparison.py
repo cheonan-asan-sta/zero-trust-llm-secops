@@ -184,3 +184,26 @@ def test_summary_detects_database_drift_and_repeat_disagreement(summary_files):
     results = c03.summarize(directory)["results"]
     assert not results["database_files_unchanged_during_offline_scans"]
     assert not results["repeat_consistency"]["syft_inventory"]
+
+
+@pytest.mark.parametrize('budget', [None, '15m', 'unbounded'])
+def test_scan_budget_is_bounded_explicit_and_preserves_all_offline_stages(tmp_path, monkeypatch, budget):
+    pilot = object.__new__(c03.Pilot)
+    pilot.directory, pilot.repeats, pilot.report = tmp_path, 3, {'runs': []}
+    calls = []
+    monkeypatch.setattr(pilot, 'container', lambda label, command: calls.append((label, command)))
+    monkeypatch.setattr(pilot, 'database_hashes', lambda phase: {'db': 'c' * 64})
+    if budget == 'unbounded':
+        with pytest.raises(ValueError, match='unsupported_trivy_timeout'):
+            pilot.scan(initialize_db=False, trivy_timeout=budget)
+        assert not calls
+        return
+    pilot.scan(initialize_db=False, trivy_timeout=budget)
+    scans = [(label, command) for label, command in calls if label.endswith('-trivy')]
+    assert len(scans) == 6  # warm-up, three repeats and both controls
+    for _, command in scans:
+        assert '--offline-scan' in command and '--skip-db-update' in command
+        assert ('--timeout' in command) == (budget is not None)
+        if budget:
+            assert command[command.index('--timeout') + 1] == '15m'
+    assert pilot.report.get('trivy_scan_timeout') == budget

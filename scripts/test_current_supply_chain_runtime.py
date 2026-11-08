@@ -39,7 +39,7 @@ print(json.dumps({n:hashlib.sha256(path(n).read_bytes().replace(b'\\r\\n',b'\\n'
             '--read-only', '--user', '10001:10001', '--cap-drop=ALL', '--security-opt=no-new-privileges:true',
             '--tmpfs', '/tmp:rw,nosuid,nodev,size=64m,uid=10001,gid=10001',
             '--tmpfs', '/data:rw,nosuid,nodev,size=1m,uid=10001,gid=10001', '--entrypoint', 'python', '-i', image]
-    result = subprocess.run([*args, '-c', program], input=json.dumps(list(payload)), text=True,
+    result = subprocess.run([*args, '-c', program], input=json.dumps(list(payload)), text=True, encoding='utf-8',
                             capture_output=True, timeout=60, check=True)
     require(json.loads(result.stdout) == payload, 'current_image_payload_mismatch')
     runtime = json.loads(scan.run([*args[:-1], image, '/opt/secops-runtime/install/verify_security.py', '--require-patched']))
@@ -87,7 +87,7 @@ def build_images(directory, label):
 
 def owned_cleanup(pilot):
     for name in pilot.containers:
-        result = subprocess.run(['docker', 'inspect', name], text=True, capture_output=True, check=False)
+        result = subprocess.run(['docker', 'inspect', name], text=True, encoding='utf-8', capture_output=True, check=False)
         if result.returncode == 0:
             detail = json.loads(result.stdout)[0]
             require(detail['Config']['Labels'].get('secops.c03') == pilot.ident
@@ -139,7 +139,7 @@ def execute(directory):
                 pilot.container('grype-db-update', ['/tools/grype', 'db', 'update'], network=True)
                 pilot.container('trivy-db-update', ['/tools/trivy', 'image', '--download-db-only', '--no-progress'], network=True)
             pilot.report['scan_started_at'] = datetime.now(UTC).isoformat()
-            pilot.scan(initialize_db=False)
+            pilot.scan(initialize_db=False, trivy_timeout='15m')
             pilot.report.update(completed=True, finished_at=datetime.now(UTC).isoformat())
             pilot.save()
             pilot.report = scan.summarize(pilot.directory)
@@ -161,19 +161,25 @@ def execute(directory):
         report.update(completed=False, failure=str(exc) if isinstance(exc, ReviewError) else type(exc).__name__)
         raise
     finally:
+        cleanup_errors = []
         for pilot in pilots:
-            owned_cleanup(pilot)
-            info = subprocess.run(['docker', 'volume', 'inspect', pilot.cache_volume], text=True, capture_output=True, check=False)
-            if info.returncode == 0:
-                require(json.loads(info.stdout)[0]['Labels'].get('secops.c03') == pilot.ident, 'current_db_cleanup_ownership')
-                scan.run(['docker', 'volume', 'rm', pilot.cache_volume])
+            try:
+                owned_cleanup(pilot)
+                info = subprocess.run(['docker', 'volume', 'inspect', pilot.cache_volume], text=True,
+                                      encoding='utf-8', capture_output=True, check=False)
+                if info.returncode == 0:
+                    require(json.loads(info.stdout)[0]['Labels'].get('secops.c03') == pilot.ident, 'current_db_cleanup_ownership')
+                    scan.run(['docker', 'volume', 'rm', pilot.cache_volume])
+            except (ValueError, RuntimeError, OSError, subprocess.TimeoutExpired) as exc:
+                cleanup_errors.append(type(exc).__name__)
         leftovers = []
         for ident in [label, *(p.ident for p in pilots)]:
             for argv in (['ps', '-aq'], ['volume', 'ls', '-q'], ['network', 'ls', '-q']):
                 leftovers.extend(scan.run(['docker', *argv, '--filter', 'label=secops.c03=' + ident]).split())
         report['cleanup'] = {'owned_resources_remaining': len(leftovers)}
-        if leftovers:
-            report.update(completed=False, failure='current_cleanup_incomplete')
+        if leftovers or cleanup_errors:
+            report.update(completed=False, cleanup_errors=cleanup_errors)
+            report.setdefault('failure', 'current_cleanup_incomplete')
         report['finished_at'] = datetime.now(UTC).isoformat()
         save()
     return report

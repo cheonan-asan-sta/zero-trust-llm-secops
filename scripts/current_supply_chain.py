@@ -70,6 +70,7 @@ def current_review(summary_path, raw_directory, pin, proof, expected_source):
             'uid': 10001, 'scan_network': 'none', 'db_storage': 'Docker Linux named volume'},
             'current_scan_conditions')
     require(type(value['repeats']) is int and value['repeats'] == 3, 'current_scan_repeats')
+    require(value.get('trivy_scan_timeout') == '15m', 'current_scan_timeout_budget')
     require(bool(value['db_files']) and value['db_files'] == value['db_files_after'], 'database_drift')
     versions = {t['name']: t['tag'].removeprefix('v') for t in value['tools']['tools']}
     required = {f'{prefix}-{tool}' for prefix in ['warmup', 'run-1', 'run-2', 'run-3']
@@ -140,7 +141,7 @@ def current_review(summary_path, raw_directory, pin, proof, expected_source):
     return {'schema': 'c03-current-review-1', 'image_id': proof['image_id'], 'source_commit': proof['source_commit'],
         'trusted_summary_sha256': pin, 'verified_raw_inputs': campaign.used,
         'source_lf_sha256': expected_source, 'database_files': value['db_files'], 'database_freshness': freshness,
-        'scan_started_at': value['scan_started_at'], 'repeats': 3,
+        'scan_started_at': value['scan_started_at'], 'repeats': 3, 'trivy_scan_timeout': value['trivy_scan_timeout'],
         'counts': {s: len(observed[s][0]) for s in ('grype', 'trivy')},
         'inventory_comparison': value['results']['inventory'],
         'ecosystems': dict(sorted(Counter(r['ecosystem'] for r in rows).items())),

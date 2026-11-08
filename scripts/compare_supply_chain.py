@@ -388,7 +388,14 @@ class Pilot:
                 json.dumps(control(version)), encoding="utf-8")
         self.save()
 
-    def scan(self, initialize_db=True):
+    def scan(self, initialize_db=True, trivy_timeout=None):
+        # Historical campaigns keep their original CLI defaults. A new campaign
+        # may explicitly budget more analysis time without skipping any checks.
+        if trivy_timeout not in (None, "15m"):
+            raise ValueError("unsupported_trivy_timeout")
+        trivy_budget = ["--timeout", trivy_timeout] if trivy_timeout else []
+        if trivy_timeout:
+            self.report["trivy_scan_timeout"] = trivy_timeout
         if initialize_db:
             self.container("grype-db-update", ["/tools/grype", "db", "update"], network=True)
             self.container("trivy-db-update", ["/tools/trivy", "image", "--download-db-only", "--no-progress"], network=True)
@@ -404,13 +411,13 @@ class Pilot:
                 "-o", "json", "--file", "/out/" + prefix + "-grype.json"])
             self.container(prefix + "-trivy", ["/tools/trivy", "image", "--input", "/input/app.tar",
                 "--scanners", "vuln", "--list-all-pkgs", "--skip-db-update", "--skip-java-db-update",
-                "--offline-scan", "--no-progress", "--format", "json", "--output", "/out/" + prefix + "-trivy.json"])
+                "--offline-scan", "--no-progress", "--format", "json", "--output", "/out/" + prefix + "-trivy.json", *trivy_budget])
         for version in ["2.31.0", "2.32.0"]:
             self.container("control-" + version + "-grype", ["/tools/grype", "sbom:/input/requests-" + version + ".json",
                 "-o", "json", "--file", "/out/control-" + version + "-grype.json"])
             self.container("control-" + version + "-trivy", ["/tools/trivy", "sbom", "/input/requests-" + version + ".json",
                 "--skip-db-update", "--skip-java-db-update", "--offline-scan", "--no-progress", "--format", "json",
-                "--output", "/out/control-" + version + "-trivy.json"])
+                "--output", "/out/control-" + version + "-trivy.json", *trivy_budget])
         self.report["db_files_after"] = self.database_hashes("after")
         self.save()
 

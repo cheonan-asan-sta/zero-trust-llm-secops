@@ -21,8 +21,14 @@ Grype의 age validation을 끄지 않는다. 두 공급자의 DB 시각은 UTC�
 미래 편차 최대10분으로 검사한다.120시간은 Grype 기본 경계를 공통 비교 조건으로 선택한 것이며
 Trivy의 기본 정책이라고 주장하지 않는다.
 
+Trivy 이미지/대조군 분석은 명시적으로15분의 제한시간을 둔다. 현재 이미지의 최초 warm-up이
+기본 제한시간에 도달해 실패한 기록을 보존한 뒤 적용한 실행 예산이며, 검사 생략이나 발견 억제가 아니다.
+과거 기본 설정으로 수집한 실행시간과 직접 성능 비교하지 않는다. Windows의 Docker inspect 출력은
+시스템 cp949 대신 UTF-8로 읽어 한글 호스트 경로가 포함되어도 소유권 검사·정리 근거를 보존한다.
+
 [Grype DB 설정](https://oss.anchore.com/docs/reference/grype/configuration/)과
 [Trivy DB 관리](https://trivy.dev/docs/latest/configuration/db/)를 참고한다.
+[Trivy 제한시간 안내](https://trivy.dev/docs/v0.76/guide/references/troubleshooting/#timeout)도 따른다.
 
 ## 근거 검증과 해석
 
