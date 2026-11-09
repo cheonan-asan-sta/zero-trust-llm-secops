@@ -211,7 +211,7 @@ def summarize(directory, *, installed_reader=installed_packages, inventory_reade
         results[scanner + "_database_status"] = read(scanner + "-db-status.stdout")
     before = {name: value for name, value in report["db_files"].items()
               if "grype" in name.replace("\\", "/").split("/")
-              or name.replace("\\", "/").split("/")[-1] in {"trivy.db", "metadata.json"}}
+              or name.replace("\\", "/").split("/")[-1] in {"trivy.db", "trivy-java.db", "metadata.json"}}
     results["database_files_unchanged_during_offline_scans"] = before == report["db_files_after"]
     report["results"] = results
     (directory / "summary.json").write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -434,7 +434,7 @@ class Pilot:
     def database_hashes(self, phase):
         code = ("import hashlib,json,pathlib; root=pathlib.Path('/cache'); result={}; "
                 "files=[p for p in root.rglob('*') if p.is_file() and "
-                "('grype' in p.parts or p.name in {'trivy.db','metadata.json'})]; "
+                "('grype' in p.parts or p.name in {'trivy.db','trivy-java.db','metadata.json'})]; "
                 "exec(\"for p in files:\\n h=hashlib.sha256()\\n "
                 "with p.open('rb') as f:\\n  while chunk:=f.read(1048576): h.update(chunk)\\n "
                 "result[str(p.relative_to(root))]=h.hexdigest()\"); print(json.dumps(result))")

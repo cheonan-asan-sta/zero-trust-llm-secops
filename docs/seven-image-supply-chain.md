@@ -23,6 +23,10 @@ PostgreSQL 데이터·클라우드 리소스를 만들지 않는다. 검사 도�
 과거 DB는 읽기 전용으로 확인하고 소유 복사본 하나만 갱신한다. 일곱 이미지가 같은 복사본과
 runner를 순차 사용해 반복 다운로드·DB 복사를 줄인다. 검사 전후 및 전체 마지막 DB 파일 지문이
 동일해야 한다. Grype/Trivy DB 모두 UTC·120시간 이내·미래 편차10분 이하 조건을 유지한다.
+NGINX의 libintl JAR 분석에 필요한 Trivy Java index도 준비 단계에서 별도로 내려받는다.
+`trivy-java.db`와 Java metadata까지 같은 스냅샷의 지문에 포함하고, 각 이미지의 오프라인 상태·나이를
+검증한다. Java 분석을 끄거나 누락한 채 성공으로 처리하지 않는다.
+[Trivy DB 준비 옵션](https://trivy.dev/docs/latest/configuration/db/)을 따른다.
 
 모든 이미지의 소스·런타임·OS metadata 사전 확인을 먼저 수행한 후 DB 갱신과 반복 검사를 시작한다.
 DB 갱신만 bridge 네트워크를 허용하며 실제 검사·버전·metadata·양/음성 대조군은 network none,

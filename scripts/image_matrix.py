@@ -3,12 +3,13 @@
 import json
 import re
 import subprocess
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from scripts import compare_supply_chain as scan
 from scripts import current_supply_chain as current
 from scripts import runtime_release as release
-from scripts.review_supply_chain import require
+from scripts.review_supply_chain import Campaign, require
 
 PROFILES = ('application', 'monitoring', 'authority', 'database', 'nginx', 'lambda', 'tests')
 PYTHON_PROFILES = frozenset(PROFILES) - {'database', 'nginx'}
@@ -107,6 +108,16 @@ def trivy_inventory(value):
 
 READERS = {'syft': syft_inventory, 'trivy': trivy_inventory}
 CONDITIONS = {**current.CURRENT_CONDITIONS, 'memory_bytes': 3*1024**3, 'scratch_tmpfs_bytes': 2*1024**3}
+JAVA_FILES = {'trivy/java-db/trivy-java.db', 'trivy/java-db/metadata.json'}
+
+
+def java_database_age(metadata, observed_at):
+    require(metadata.get('Version') == 1, 'matrix_java_db_schema')
+    now, built = datetime.fromisoformat(observed_at), datetime.fromisoformat(metadata['UpdatedAt'])
+    require(now.utcoffset() == built.utcoffset() == timedelta(0), 'matrix_java_db_not_utc')
+    age = now-built
+    require(-timedelta(minutes=10) <= age <= current.MAX_DB_AGE, 'matrix_java_db_outside_age_bound')
+    return {'built': metadata['UpdatedAt'], 'age_seconds': age.total_seconds(), 'version': metadata['Version']}
 
 
 def verify_proof(proof, source):
@@ -148,6 +159,13 @@ def review(summary_path, raw_directory, pin, proof, source):
         verify_proof=verify_proof, expected_conditions=CONDITIONS,
         installed_packages=installed_inventory, inventory_readers=READERS,
         inventory_scope='Installed DEB/RPM/APK and Python metadata; binary module findings retained separately')
+    require(JAVA_FILES <= set(result['database_files']), 'matrix_java_db_files_missing')
+    campaign = Campaign(summary_path, pin, raw_directory)
+    metrics = campaign.read('trivy-java-db-status.metrics.json')
+    require(type(metrics.get('exit_code')) is int and metrics['exit_code'] == 0, 'matrix_java_db_status_failed')
+    result['database_freshness']['trivy_java'] = java_database_age(
+        campaign.read('trivy-java-db-status.stdout'), result['scan_started_at'])
+    result['verified_raw_inputs'].update(campaign.used)
     installed = json.loads((Path(raw_directory)/'installed.json').read_text('utf-8'))
     for scanner in READERS:
         inventory = result['inventory_comparison'][scanner]['observed']

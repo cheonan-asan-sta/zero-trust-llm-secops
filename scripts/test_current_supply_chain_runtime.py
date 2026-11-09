@@ -56,7 +56,7 @@ def original_database_hashes(volume, label):
     code = """import hashlib,json
 from pathlib import Path
 root=Path('/original')
-files=[p for p in root.rglob('*') if p.is_file() and ('grype' in p.parts or p.name in {'trivy.db','metadata.json'})]
+files=[p for p in root.rglob('*') if p.is_file() and ('grype' in p.parts or p.name in {'trivy.db','trivy-java.db','metadata.json'})]
 result={}
 for p in files:
  h=hashlib.sha256()

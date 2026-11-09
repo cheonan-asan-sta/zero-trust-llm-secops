@@ -114,6 +114,12 @@ def matrix_evidence(evidence, source):
     installed = {'schema':'c03-installed-packages-1','manager':'deb','packages':[{'name':'bash','version':'1:5-2'}],
                  'pypi':[['requests','2.31.0']]}
     write('installed.json', installed)
+    java_files={n:'e'*64 for n in matrix.JAVA_FILES}
+    summary['db_files'].update(java_files);summary['db_files_after'].update(java_files)
+    write('trivy-java-db-status.stdout',{'Version':1,'UpdatedAt':'2026-11-08T12:00:00Z'})
+    write('trivy-java-db-status.metrics.json',{'exit_code':0})
+    summary['runs'].append({'label':'trivy-java-db-status','container_exit':0,'metrics':{'exit_code':0},
+                            'network':'none','docker_wall_seconds':1.0})
     for prefix in ('warmup','run-1','run-2','run-3'):
         for scanner in ('syft','trivy'):
             name=prefix+'-'+scanner+'.json';doc=json.loads((raw/name).read_text('utf-8'))
@@ -259,3 +265,18 @@ def test_source_text_line_endings_are_normalized_but_binary_bytes_are_exact(tmp_
     monkeypatch.setattr(matrix.subprocess,'check_output',lambda *args,**kwargs:name.encode()+b'\0')
     expected=hashlib.sha256(data.replace(b'\r\n',b'\n') if normalized else data).hexdigest()
     assert matrix.manifest()=={name:expected}
+
+
+@pytest.mark.parametrize('fault',['missing_file','missing_status','stale','future','schema','nonzero','raw_corruption'])
+def test_java_index_is_required_fresh_hash_bound_and_offline(matrix_evidence,fault):
+    summary,raw,write,review=matrix_evidence
+    if fault=='missing_file':
+        for key in ('db_files','db_files_after'):summary[key].pop('trivy/java-db/trivy-java.db')
+    elif fault=='missing_status':
+        summary['results']['raw_artifacts'].pop('out/trivy-java-db-status.stdout')
+    elif fault in {'stale','future','schema'}:
+        write('trivy-java-db-status.stdout',{'Version':2 if fault=='schema' else 1,
+            'UpdatedAt':'2026-11-01T12:00:00Z' if fault=='stale' else '2026-11-09T12:00:00Z'})
+    elif fault=='nonzero':write('trivy-java-db-status.metrics.json',{'exit_code':1})
+    else:(raw/'trivy-java-db-status.stdout').write_text('{}')
+    with pytest.raises(ValueError):review()

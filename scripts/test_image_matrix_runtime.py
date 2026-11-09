@@ -261,7 +261,9 @@ print(json.dumps(result))
             prepare(self.scanner, history_path)
             self.scanner.container('grype-db-update', ['/tools/grype', 'db', 'update'], network=True)
             self.scanner.container('trivy-db-update', ['/tools/trivy', 'image', '--download-db-only', '--no-progress'], network=True)
+            self.scanner.container('trivy-java-db-update', ['/tools/trivy', 'image', '--download-java-db-only', '--no-progress'], network=True)
             frozen = self.scanner.database_hashes('frozen')
+            require(matrix.JAVA_FILES <= set(frozen), 'matrix_java_db_files_missing')
             self.report['database_files'] = frozen
             reviews = {}
             for profile in matrix.PROFILES:
@@ -277,6 +279,8 @@ print(json.dumps(result))
                 scan.run(['docker', 'save', '-o', str(archive), proof['image_id']])
                 pilot.report['image_archive_sha256'] = scan.sha256(archive)
                 pilot.report['scan_started_at'] = datetime.now(UTC).isoformat()
+                pilot.container('trivy-java-db-status', ['python', '-c',
+                    "from pathlib import Path;print(Path('/cache/trivy/java-db/metadata.json').read_text())"])
                 pilot.scan(initialize_db=False, trivy_timeout='15m')
                 require(pilot.report['db_files'] == pilot.report['db_files_after'] == frozen, 'matrix_shared_db_changed')
                 pilot.report.update(completed=True, finished_at=datetime.now(UTC).isoformat())
@@ -295,7 +299,7 @@ print(json.dumps(result))
             self.report['cohort'] = matrix.cohort(reviews)
             require(self.scanner.database_hashes('finished') == frozen, 'matrix_final_db_drift')
             require(all(r['container_exit'] == r['metrics'].get('exit_code') == 0
-                        and r['network'] == ('bridge' if r['label'] in {'grype-db-update','trivy-db-update'} else 'none')
+                        and r['network'] == ('bridge' if r['label'] in {'grype-db-update','trivy-db-update','trivy-java-db-update'} else 'none')
                         for r in self.scanner.report['runs']), 'matrix_bootstrap_failed')
             self.scanner.report['results'] = {'raw_artifacts': {
                 str(p.relative_to(self.scanner.directory)): {'sha256': scan.sha256(p), 'bytes': p.stat().st_size}
