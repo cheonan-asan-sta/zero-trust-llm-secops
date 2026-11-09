@@ -79,7 +79,7 @@ class Batch:
         require(not scan.run(['git', 'status', '--porcelain', '--untracked-files=no']).strip(), 'matrix_dirty_source')
         self.source = matrix.manifest()
         self.directory.mkdir(parents=True)
-        self.scanner = scan.Pilot(self.directory/'_scanner', self.commit, 3, scratch_mib=1536)
+        self.scanner = scan.Pilot(self.directory/'_scanner', self.commit, 3, scratch_mib=2048, memory_mib=3072)
         self.scanner.directory.mkdir()
         self.label = self.scanner.ident
         self.probes, self.pilots = [], []
@@ -193,7 +193,7 @@ print(json.dumps(result))
     def image_input(self, pilot, profile, image, proof):
         detail = json.loads(scan.run(['docker', 'image', 'inspect', image]))[0]
         require(release.image_identity(detail) == proof['image_id'], 'matrix_export_image_changed')
-        require(detail['Size'] < 1400*1024**2, 'matrix_image_exceeds_scratch_budget')
+        require(detail['Size'] < 1900*1024**2, 'matrix_image_exceeds_scratch_budget')
         require(shutil.disk_usage(self.directory).free > detail['Size']+512*1024**2, 'matrix_export_disk_budget')
         os_metadata = self.probe(proof['image_id'], ['-c', OS_PROBE], entrypoint='sh').stdout
         pypi = []
@@ -247,7 +247,7 @@ print(json.dumps(result))
                 self.unchanged()
                 print(json.dumps({'image': profile, 'stage': 'preflight'}), flush=True)
                 proof = self.image_proof(profile, images[profile])
-                pilot = scan.Pilot(self.directory/profile, self.commit, 3, scratch_mib=1536)
+                pilot = scan.Pilot(self.directory/profile, self.commit, 3, scratch_mib=2048, memory_mib=3072)
                 self.pilots.append(pilot)
                 for name in ('input', 'out'):
                     (pilot.directory/name).mkdir(parents=True)

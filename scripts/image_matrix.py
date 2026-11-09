@@ -14,7 +14,8 @@ PROFILES = ('application', 'monitoring', 'authority', 'database', 'nginx', 'lamb
 PYTHON_PROFILES = frozenset(PROFILES) - {'database', 'nginx'}
 ROOT_FILES = {'README.md', 'pyproject.toml', 'Dockerfile', 'Dockerfile.lambda', 'Dockerfile.test',
               '.dockerignore', 'compose.yaml', 'compose.signals.yaml'}
-TEXT = {'.py', '.md', '.toml', '.json', '.jsonl', '.txt', '.yaml', '.yml', '.sh', '.conf', '.lock', '.csv', '.xml'}
+TEXT = {'.py', '.md', '.toml', '.json', '.jsonl', '.txt', '.yaml', '.yml', '.sh', '.conf', '.lock', '.csv', '.xml',
+        '.js', '.css', '.html', '.svg', '.patch', '.c', '.h', '.sql', '.cfg', '.ini', '.pem'}
 OS_TYPES = {'debian': 'deb', 'alpine': 'apk', 'amazon': 'rpm', 'redhat': 'rpm',
             'centos': 'rpm', 'rocky': 'rpm', 'oracle': 'rpm', 'alma': 'rpm', 'suse': 'rpm'}
 
@@ -105,6 +106,7 @@ def trivy_inventory(value):
 
 
 READERS = {'syft': syft_inventory, 'trivy': trivy_inventory}
+CONDITIONS = {**current.CURRENT_CONDITIONS, 'memory_bytes': 3*1024**3, 'scratch_tmpfs_bytes': 2*1024**3}
 
 
 def verify_proof(proof, source):
@@ -143,7 +145,7 @@ def verify_proof(proof, source):
 
 def review(summary_path, raw_directory, pin, proof, source):
     result = current.review_evidence(summary_path, raw_directory, pin, proof, source,
-        verify_proof=verify_proof, expected_conditions=current.CURRENT_CONDITIONS,
+        verify_proof=verify_proof, expected_conditions=CONDITIONS,
         installed_packages=installed_inventory, inventory_readers=READERS,
         inventory_scope='Installed DEB/RPM/APK and Python metadata; binary module findings retained separately')
     installed = json.loads((Path(raw_directory)/'installed.json').read_text('utf-8'))

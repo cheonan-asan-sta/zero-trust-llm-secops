@@ -246,10 +246,10 @@ sys.exit(result.returncode)
 
 
 class Pilot:
-    def __init__(self, directory, source_ref, repeats, *, scratch_mib=512):
-        if scratch_mib not in (512, 1536):
+    def __init__(self, directory, source_ref, repeats, *, scratch_mib=512, memory_mib=2048):
+        if (scratch_mib, memory_mib) not in {(512, 2048), (1536, 2048), (2048, 3072)}:
             raise ValueError("unsupported_scanner_scratch_budget")
-        self.scratch_mib = scratch_mib
+        self.scratch_mib, self.memory_mib = scratch_mib, memory_mib
         self.directory = directory.resolve()
         if not self.directory.is_relative_to((ROOT / "runtime/c03").resolve()):
             raise ValueError("work_directory_must_be_within_runtime_c03")
@@ -265,7 +265,7 @@ class Pilot:
                        "source_commit": run(["git", "rev-parse", "--verify", "--end-of-options",
                                              source_ref + "^{commit}"]).strip(),
                        "runner_base": BASE, "tools": self.lock, "repeats": repeats,
-                       "conditions": {"cpus": 2, "memory_bytes": 2147483648, "pids": 128,
+                       "conditions": {"cpus": 2, "memory_bytes": memory_mib * 1024**2, "pids": 128,
                                       "uid": 10001, "scan_network": "none",
                                       "db_storage": "Docker Linux named volume"},
                        "cache_volume": self.cache_volume, "runs": []}
@@ -328,8 +328,8 @@ class Pilot:
         self.containers.append(name)
         args = ["docker", "run", "--name", name, "--read-only", "--cap-drop=ALL",
                 "--label", "secops.c03=" + self.ident,
-                "--security-opt=no-new-privileges:true", "--cpus=2", "--memory=2g",
-                "--memory-swap=2g", "--pids-limit=128", "--tmpfs", f"/tmp:rw,nosuid,nodev,size={self.scratch_mib}m",
+                "--security-opt=no-new-privileges:true", "--cpus=2", f"--memory={self.memory_mib//1024}g",
+                f"--memory-swap={self.memory_mib//1024}g", "--pids-limit=128", "--tmpfs", f"/tmp:rw,nosuid,nodev,size={self.scratch_mib}m",
                 "--network", "bridge" if network else "none"]
         args += ["--mount", f"type=volume,src={self.cache_volume},dst=/cache"]
         mounts = [("out", "/out", False), ("input", "/input", True)]

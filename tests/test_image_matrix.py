@@ -110,6 +110,7 @@ def test_rpm_epoch_release_and_raw_finding_identity_are_both_preserved():
 @pytest.fixture
 def matrix_evidence(evidence, source):
     summary, _old_proof, _old_source, raw, write, _review = evidence
+    summary['conditions']=dict(matrix.CONDITIONS)
     installed = {'schema':'c03-installed-packages-1','manager':'deb','packages':[{'name':'bash','version':'1:5-2'}],
                  'pypi':[['requests','2.31.0']]}
     write('installed.json', installed)
@@ -225,3 +226,36 @@ def test_late_preflight_failure_never_starts_db_downloads_or_scans(monkeypatch,t
     with pytest.raises(ValueError,match='lambda_metadata_unavailable'):batch.run()
     assert visited==list(matrix.PROFILES[:6]) and cleaned==[True]
     assert not batch.report['completed'] and batch.report['failure']=='lambda_metadata_unavailable'
+
+
+def test_large_image_scanner_budget_is_hard_bounded_without_changing_legacy_defaults(tmp_path,monkeypatch):
+    pilot=object.__new__(runtime.scan.Pilot)
+    pilot.directory,pilot.ident=tmp_path,'c03-big'
+    pilot.scratch_mib,pilot.memory_mib=2048,3072
+    pilot.cache_volume,pilot.runner_image='c03-big-db','c03-big-runner'
+    pilot.containers,pilot.report=[],{'runs':[]};(tmp_path/'out').mkdir()
+    def process(argv,**kwargs):
+        assert '--memory=3g' in argv and '--memory-swap=3g' in argv and '--cpus=2' in argv
+        assert '/tmp:rw,nosuid,nodev,size=2048m' in argv and argv[argv.index('--network')+1]=='none'
+        (tmp_path/'out/capacity.metrics.json').write_text('{"exit_code":0}')
+        return SimpleNamespace(returncode=0,stdout='',stderr='')
+    monkeypatch.setattr(runtime.scan.subprocess,'run',process)
+    pilot.container('capacity',['/tools/syft','version'])
+    assert matrix.current.CURRENT_CONDITIONS['memory_bytes']==2*1024**3
+    assert matrix.CONDITIONS['memory_bytes']==3*1024**3
+
+
+@pytest.mark.parametrize(('scratch','memory'),[(2048,2048),(512,3072),(99999,99999)])
+def test_unapproved_or_incompatible_resource_budgets_are_rejected_before_docker(tmp_path,scratch,memory):
+    with pytest.raises(ValueError,match='unsupported_scanner_scratch_budget'):
+        runtime.scan.Pilot(tmp_path,'b'*40,3,scratch_mib=scratch,memory_mib=memory)
+
+
+@pytest.mark.parametrize(('name','normalized'),[('app/native.patch',True),('app/fixture.bin',False)])
+def test_source_text_line_endings_are_normalized_but_binary_bytes_are_exact(tmp_path,monkeypatch,name,normalized):
+    data=b'a\r\nb\x00c' if not normalized else b'a\r\nb\r\n'
+    path=tmp_path/name;path.parent.mkdir();path.write_bytes(data)
+    monkeypatch.setattr(matrix.scan,'ROOT',tmp_path)
+    monkeypatch.setattr(matrix.subprocess,'check_output',lambda *args,**kwargs:name.encode()+b'\0')
+    expected=hashlib.sha256(data.replace(b'\r\n',b'\n') if normalized else data).hexdigest()
+    assert matrix.manifest()=={name:expected}
