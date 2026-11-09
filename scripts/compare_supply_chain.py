@@ -156,7 +156,16 @@ def control(version):
                             "purl": f"pkg:pypi/requests@{version}"}]}
 
 
-def summarize(directory):
+def installed_packages(installed):
+    expected = {canonical_package("pypi", name, version) for name, version in installed["pypi"]}
+    for line in installed["deb"].splitlines():
+        name, version, status = line.split("\t")
+        if status == 'installed':
+            expected.add(canonical_package('deb', name, version))
+    return expected
+
+
+def summarize(directory, *, installed_reader=installed_packages, inventory_readers=None):
     """Compare inventory with installed metadata; finding totals are not accuracy."""
     directory = Path(directory)
     out = directory / "out"
@@ -166,15 +175,11 @@ def summarize(directory):
 
     report = json.loads((directory / "summary.json").read_text(encoding="utf-8"))
     installed = read("installed.json")
-    expected = {canonical_package("pypi", name, version) for name, version in installed["pypi"]}
-    for line in installed["deb"].splitlines():
-        name, version, status = line.split("\t")
-        if status == "installed":
-            expected.add(canonical_package("deb", name, version))
+    expected = installed_reader(installed)
     inventories = {"installed_metadata": sorted(expected)}
     detections = {}
     results = {"inventory": inventories, "findings": detections, "controls": {}, "repeat_consistency": {}}
-    for scanner, extractor in [("syft", syft_packages), ("trivy", trivy_packages)]:
+    for scanner, extractor in (inventory_readers or {"syft": syft_packages, "trivy": trivy_packages}).items():
         observed = [extractor(read(f"run-{i}-{scanner}.json")) for i in range(1, report["repeats"] + 1)]
         inventories[scanner] = {"observed": sorted(observed[0]),
                                 "missing_installed_metadata": sorted(expected - observed[0]),
@@ -206,7 +211,7 @@ def summarize(directory):
         results[scanner + "_database_status"] = read(scanner + "-db-status.stdout")
     before = {name: value for name, value in report["db_files"].items()
               if "grype" in name.replace("\\", "/").split("/")
-              or name.replace("\\", "/").split("/")[-1] in {"trivy.db", "metadata.json"}}
+              or name.replace("\\", "/").split("/")[-1] in {"trivy.db", "trivy-java.db", "metadata.json"}}
     results["database_files_unchanged_during_offline_scans"] = before == report["db_files_after"]
     report["results"] = results
     (directory / "summary.json").write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -241,10 +246,10 @@ sys.exit(result.returncode)
 
 
 class Pilot:
-    def __init__(self, directory, source_ref, repeats, *, scratch_mib=512):
-        if scratch_mib not in (512, 1536):
+    def __init__(self, directory, source_ref, repeats, *, scratch_mib=512, memory_mib=2048):
+        if (scratch_mib, memory_mib) not in {(512, 2048), (1536, 2048), (2048, 3072)}:
             raise ValueError("unsupported_scanner_scratch_budget")
-        self.scratch_mib = scratch_mib
+        self.scratch_mib, self.memory_mib = scratch_mib, memory_mib
         self.directory = directory.resolve()
         if not self.directory.is_relative_to((ROOT / "runtime/c03").resolve()):
             raise ValueError("work_directory_must_be_within_runtime_c03")
@@ -260,7 +265,7 @@ class Pilot:
                        "source_commit": run(["git", "rev-parse", "--verify", "--end-of-options",
                                              source_ref + "^{commit}"]).strip(),
                        "runner_base": BASE, "tools": self.lock, "repeats": repeats,
-                       "conditions": {"cpus": 2, "memory_bytes": 2147483648, "pids": 128,
+                       "conditions": {"cpus": 2, "memory_bytes": memory_mib * 1024**2, "pids": 128,
                                       "uid": 10001, "scan_network": "none",
                                       "db_storage": "Docker Linux named volume"},
                        "cache_volume": self.cache_volume, "runs": []}
@@ -323,8 +328,8 @@ class Pilot:
         self.containers.append(name)
         args = ["docker", "run", "--name", name, "--read-only", "--cap-drop=ALL",
                 "--label", "secops.c03=" + self.ident,
-                "--security-opt=no-new-privileges:true", "--cpus=2", "--memory=2g",
-                "--memory-swap=2g", "--pids-limit=128", "--tmpfs", f"/tmp:rw,nosuid,nodev,size={self.scratch_mib}m",
+                "--security-opt=no-new-privileges:true", "--cpus=2", f"--memory={self.memory_mib//1024}g",
+                f"--memory-swap={self.memory_mib//1024}g", "--pids-limit=128", "--tmpfs", f"/tmp:rw,nosuid,nodev,size={self.scratch_mib}m",
                 "--network", "bridge" if network else "none"]
         args += ["--mount", f"type=volume,src={self.cache_volume},dst=/cache"]
         mounts = [("out", "/out", False), ("input", "/input", True)]
@@ -429,7 +434,7 @@ class Pilot:
     def database_hashes(self, phase):
         code = ("import hashlib,json,pathlib; root=pathlib.Path('/cache'); result={}; "
                 "files=[p for p in root.rglob('*') if p.is_file() and "
-                "('grype' in p.parts or p.name in {'trivy.db','metadata.json'})]; "
+                "('grype' in p.parts or p.name in {'trivy.db','trivy-java.db','metadata.json'})]; "
                 "exec(\"for p in files:\\n h=hashlib.sha256()\\n "
                 "with p.open('rb') as f:\\n  while chunk:=f.read(1048576): h.update(chunk)\\n "
                 "result[str(p.relative_to(root))]=h.hexdigest()\"); print(json.dumps(result))")

@@ -8,3 +8,7 @@ infra/mtls/nginx-rekey.sh text eol=lf
 infra/runtime/** text eol=lf
 # Unified diff uses a single space for empty context lines.
 infra/runtime/http-client.patch whitespace=-blank-at-eol
+
+# M7 pilot integrity checks require the committed LF bytes.
+infra/m7/pilot/*.jsonl text eol=lf
+infra/m7/pilot/manifest.json text eol=lf

@@ -230,7 +230,7 @@ def test_scanner_scratch_budget_preserves_memory_cpu_and_network_boundaries(tmp_
     pilot = object.__new__(current.scan.Pilot)
     pilot.directory, pilot.ident = tmp_path, 'c03-owned'
     pilot.cache_volume, pilot.runner_image = 'c03-owned-db', 'c03-owned-runner'
-    pilot.scratch_mib, pilot.containers, pilot.report = scratch, [], {'runs': []}
+    pilot.scratch_mib, pilot.memory_mib, pilot.containers, pilot.report = scratch, 2048, [], {'runs': []}
     (tmp_path/'out').mkdir()
     def process(argv, **kwargs):
         assert f'/tmp:rw,nosuid,nodev,size={scratch}m' in argv
