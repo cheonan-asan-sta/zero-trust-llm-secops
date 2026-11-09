@@ -56,20 +56,41 @@ def verify_source(proof, expected):
             'image_source_commit')
 
 
+def debian_python_inventory(installed):
+    expected = {scan.canonical_package('pypi', n, v) for n, v in installed['pypi']}
+    for line in installed['deb'].splitlines():
+        name, version, state = line.split('\t')
+        if state == 'installed':
+            expected.add(scan.canonical_package('deb', name, version))
+    return expected
+
+
+CURRENT_CONDITIONS = {'cpus': 2, 'memory_bytes': 2147483648, 'pids': 128,
+    'uid': 10001, 'scan_network': 'none', 'db_storage': 'Docker Linux named volume',
+    'scratch_tmpfs_bytes': 1536 * 1024**2}
+
+
 def current_review(summary_path, raw_directory, pin, proof, expected_source):
+    return review_evidence(summary_path, raw_directory, pin, proof, expected_source,
+        verify_proof=verify_source, expected_conditions=CURRENT_CONDITIONS,
+        installed_packages=debian_python_inventory,
+        inventory_readers={'syft': scan.syft_packages, 'trivy': scan.trivy_packages},
+        inventory_scope='Debian/Python installed metadata comparison; embedded binary findings retained separately')
+
+
+def review_evidence(summary_path, raw_directory, pin, proof, expected_source, *, verify_proof,
+                    expected_conditions, installed_packages, inventory_readers, inventory_scope):
+    """Shared raw/image/DB checks. Callers supply explicit image and inventory contracts."""
     campaign = Campaign(summary_path, pin, raw_directory)
     value = campaign.summary
-    verify_source(proof, expected_source)
+    verify_proof(proof, expected_source)
     require(value.get('schema') == 'c03-pilot-1' and value.get('completed') is True,
             'current_scan_incomplete')
     require(value['app_image_id'] == proof['image_id'] and value['source_commit'] == proof['source_commit'],
             'current_scan_source_binding')
     require(value['tools'] == json.loads((scan.ROOT / 'infra/supply-chain/tools.lock.json').read_text('utf-8')),
             'scanner_lock_drift')
-    require(value['conditions'] == {'cpus': 2, 'memory_bytes': 2147483648, 'pids': 128,
-            'uid': 10001, 'scan_network': 'none', 'db_storage': 'Docker Linux named volume',
-            'scratch_tmpfs_bytes': 1536 * 1024**2},
-            'current_scan_conditions')
+    require(value['conditions'] == expected_conditions, 'current_scan_conditions')
     require(type(value['repeats']) is int and value['repeats'] == 3, 'current_scan_repeats')
     require(value.get('trivy_scan_timeout') == '15m', 'current_scan_timeout_budget')
     require(bool(value['db_files']) and value['db_files'] == value['db_files_after'], 'database_drift')
@@ -106,15 +127,11 @@ def current_review(summary_path, raw_directory, pin, proof, expected_source):
             if tool != 'syft':
                 observed[tool].append(scan.findings(doc, tool))
             if tool != 'grype':
-                inventories[tool].append((scan.syft_packages if tool == 'syft' else scan.trivy_packages)(doc))
+                inventories[tool].append(inventory_readers[tool](doc))
     require(all(all(r == rows[0] for r in rows) for rows in [*observed.values(), *inventories.values()]),
             'current_repeat_drift')
     installed = campaign.read('installed.json')
-    expected_inventory = {scan.canonical_package('pypi', n, v) for n, v in installed['pypi']}
-    for line in installed['deb'].splitlines():
-        name, version, state = line.split('\t')
-        if state == 'installed':
-            expected_inventory.add(scan.canonical_package('deb', name, version))
+    expected_inventory = installed_packages(installed)
     require(value['results']['inventory']['installed_metadata'] == sorted(map(list, expected_inventory)),
             'installed_metadata_summary_drift')
     for tool in ('syft', 'trivy'):
@@ -146,7 +163,7 @@ def current_review(summary_path, raw_directory, pin, proof, expected_source):
         'counts': {s: len(observed[s][0]) for s in ('grype', 'trivy')},
         'inventory_comparison': value['results']['inventory'],
         'ecosystems': dict(sorted(Counter(r['ecosystem'] for r in rows).items())),
-        'inventory_scope': 'Debian/Python installed metadata comparison; embedded binary findings retained separately',
+        'inventory_scope': inventory_scope,
         'finding_rows': rows, 'security_gate_passed': False, 'production_approved': False,
         'independent_review_complete': False}
 

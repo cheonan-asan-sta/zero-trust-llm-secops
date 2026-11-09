@@ -156,7 +156,16 @@ def control(version):
                             "purl": f"pkg:pypi/requests@{version}"}]}
 
 
-def summarize(directory):
+def installed_packages(installed):
+    expected = {canonical_package("pypi", name, version) for name, version in installed["pypi"]}
+    for line in installed["deb"].splitlines():
+        name, version, status = line.split("\t")
+        if status == 'installed':
+            expected.add(canonical_package('deb', name, version))
+    return expected
+
+
+def summarize(directory, *, installed_reader=installed_packages, inventory_readers=None):
     """Compare inventory with installed metadata; finding totals are not accuracy."""
     directory = Path(directory)
     out = directory / "out"
@@ -166,15 +175,11 @@ def summarize(directory):
 
     report = json.loads((directory / "summary.json").read_text(encoding="utf-8"))
     installed = read("installed.json")
-    expected = {canonical_package("pypi", name, version) for name, version in installed["pypi"]}
-    for line in installed["deb"].splitlines():
-        name, version, status = line.split("\t")
-        if status == "installed":
-            expected.add(canonical_package("deb", name, version))
+    expected = installed_reader(installed)
     inventories = {"installed_metadata": sorted(expected)}
     detections = {}
     results = {"inventory": inventories, "findings": detections, "controls": {}, "repeat_consistency": {}}
-    for scanner, extractor in [("syft", syft_packages), ("trivy", trivy_packages)]:
+    for scanner, extractor in (inventory_readers or {"syft": syft_packages, "trivy": trivy_packages}).items():
         observed = [extractor(read(f"run-{i}-{scanner}.json")) for i in range(1, report["repeats"] + 1)]
         inventories[scanner] = {"observed": sorted(observed[0]),
                                 "missing_installed_metadata": sorted(expected - observed[0]),
