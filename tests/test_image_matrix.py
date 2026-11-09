@@ -107,6 +107,27 @@ def test_rpm_epoch_release_and_raw_finding_identity_are_both_preserved():
     assert matrix.scan.findings(trivy, 'trivy') == {('amazon','pkg','3:1-2','CVE-2026-1234')}
 
 
+@pytest.mark.parametrize('version', ['1.19-2.amzn2023.0.2', '2:1.19-2.amzn2023.0.2'])
+def test_rpm_elf_note_uses_complete_package_version_and_keeps_db_entry(version):
+    note = {'type':'rpm','name':'gdbm','version':version,
+            'metadataType':'elf-binary-package-note-json-payload',
+            'metadata':{'type':'rpm','architecture':'x86_64','osCPE':'cpe:2.3:o:amazon:amazon_linux:2023'}}
+    database = {'type':'rpm','name':'other','version':'1-2',
+                'metadata':{'version':'1','release':'2','epoch':3}}
+    assert matrix.syft_inventory({'artifacts':[note,database]}) == {
+        ('rpm','gdbm',version), ('rpm','other','3:1-2')}
+
+
+@pytest.mark.parametrize('fault', ['wrong_note_type', 'missing_db_version'])
+def test_unknown_or_inconsistent_rpm_metadata_remains_rejected(fault):
+    row = {'type':'rpm','name':'gdbm','version':'1.19-2',
+           'metadata':{'architecture':'x86_64'}}
+    if fault == 'wrong_note_type':
+        row.update(metadataType='elf-binary-package-note-json-payload',metadata={'type':'deb'})
+    with pytest.raises(ValueError, match='matrix_rpm_'):
+        matrix.syft_inventory({'artifacts':[row]})
+
+
 @pytest.fixture
 def matrix_evidence(evidence, source):
     summary, _old_proof, _old_source, raw, write, _review = evidence

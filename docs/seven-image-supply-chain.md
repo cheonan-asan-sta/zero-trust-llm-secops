@@ -47,6 +47,11 @@ Debian epoch/revision을 유지하고, Trivy의 OS별 명칭은 **설치 목록 
 성공으로 처리하지 않는다. 부분 누락/추가는 그대로 보여 주며 정확도나 악용 가능성으로 해석하지 않는다.
 형식 근거는 [Syft RPM metadata](https://github.com/anchore/syft/blob/v1.56.0/syft/pkg/rpm.go)와
 [Grype/Trivy DB 조건을 정리한 선행 검사](current-image-supply-chain.md)를 따른다.
+Syft의 RPM DB metadata와 ELF package note metadata는 구분한다. ELF note의 버전은
+[공식 변환 코드](https://github.com/anchore/syft/blob/v1.56.0/syft/pkg/cataloger/binary/elf_package.go)처럼
+최상위 Package.Version을 그대로 읽어 epoch/release를 보존한다. 알 수 없거나 모순된 형식은 거부한다.
+앞선 묶음은 다섯 이미지 검증 후 Lambda 원자료 정리에서 이 차이를 처리하지 못해 중단됐다.
+Lambda의 실제 검사 종료0과 전체 묶음 검증 실패를 구분해 보존하며, 해당 원자료 재검증은 진단으로 표시한다.
 
 ## 소스 경계와 정리
 

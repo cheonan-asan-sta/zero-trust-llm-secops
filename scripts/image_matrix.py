@@ -89,7 +89,14 @@ def syft_inventory(value):
         version = row['version']
         if kind == 'rpm':
             metadata = row['metadata']
-            version = epoch_version(metadata['version'], metadata['release'], metadata.get('epoch'))
+            if row.get('metadataType') == 'elf-binary-package-note-json-payload':
+                require(metadata.get('type') == 'rpm', 'matrix_rpm_note_type')
+                # ELF notes put the complete version in Package.Version, not
+                # in RpmDBEntry metadata. Preserve its epoch/release verbatim.
+                version = epoch_version(version)
+            else:
+                require({'version', 'release'} <= metadata.keys(), 'matrix_rpm_metadata')
+                version = epoch_version(metadata['version'], metadata['release'], metadata.get('epoch'))
         result.add(scan.canonical_package(kind, row['name'], version))
     return result
 
