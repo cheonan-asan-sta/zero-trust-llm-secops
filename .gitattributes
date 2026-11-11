@@ -12,3 +12,6 @@ infra/runtime/http-client.patch whitespace=-blank-at-eol
 # M7 pilot integrity checks require the committed LF bytes.
 infra/m7/pilot/*.jsonl text eol=lf
 infra/m7/pilot/manifest.json text eol=lf
+
+# F1 experiment contracts have external byte-exact anchors.
+infra/f1-lab/** text eol=lf

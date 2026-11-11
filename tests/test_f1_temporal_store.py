@@ -28,6 +28,7 @@ from scripts.f1_lab.approvals import (
     sign,
 )
 from scripts.f1_lab.detector import RULE_IDS, ShadowDetector
+from scripts.f1_lab.resource_policy import PinnedResourcePolicies
 from scripts.f1_lab.source_registry import FrozenSignalVerifier
 from scripts.f1_lab.temporal import TemporalStore, TemporalUnavailable
 
@@ -116,6 +117,112 @@ def test_frozen_source_snapshot_change_and_new_pin_cannot_rewrite_a_witnessed_st
         FrozenSignalVerifier(lab.registry_path, hashlib.sha256(lab.registry_path.read_bytes()).hexdigest()), lab.sources)
     with pytest.raises(TemporalUnavailable, match='witness_head'):
         changed.summary('session-a', lab.principal, now=lab.now)
+
+
+def with_resource_policy(lab, *, permissions=None, sensitivity='critical'):
+    body = {'schema_version': 'f1-resource-policies-1', 'version': 1,
+        'issued_at': at(lab, -60).isoformat(), 'expires_at': at(lab, 3600).isoformat(),
+        'resources': [{'tenant_id': 'tenant-a', 'resource_id': 'resource-a', 'sensitivity': sensitivity,
+            'permissions': permissions or [{'action': 'READ', 'roles': ['employee']},
+                {'action': 'DOWNLOAD', 'roles': ['employee']}, {'action': 'ADMIN', 'roles': ['administrator']}]}]}
+    path = lab.root/'resource-policy.json'
+    raw = json.dumps(body).encode()
+    path.write_bytes(raw)
+    policy = PinnedResourcePolicies(path, hashlib.sha256(raw).hexdigest(), minimum_version=1)
+    store = TemporalStore(lab.root/'policy-events.db', lab.root/'policy-control', SignalVerifier(lab.registry_path),
+                          lab.sources, resource_policies=policy)
+    store.initialize()
+    return store, policy
+
+
+def test_trusted_policy_denies_missing_role_admin_even_with_a_valid_business_context(lab):
+    store, _policy = with_resource_policy(lab)
+    message = lab.signal(action='ADMIN', **{'resource.required_role': None})
+    event = message.event
+    key = Ed25519PrivateKey.generate()
+    authority = Authority('tenant-a', 'business', 'key', key.public_key(), frozenset({'role_mismatch'}),
+        frozenset({event.user.user_id}), frozenset({event.device.device_id}), frozenset({event.resource.resource_id}),
+        frozenset({event.action}), at(lab, -60), at(lab, 3600))
+    context = ApprovalContext(approval_id='approval-'+'c'*32, tenant_id='tenant-a', issuer_id='business', key_id='key',
+        event_sha256=event_digest(event), user_id=event.user.user_id, device_id=event.device.device_id,
+        resource_id=event.resource.resource_id, action=event.action, permitted_deviations=['role_mismatch'],
+        maximum_download_mb=0, issued_at=lab.now, expires_at=at(lab, 60))
+    result = ShadowDetector(temporal_store=store, approval_verifier=ApprovalVerifier((authority,))).evaluate_signed(
+        message, lab.principal, approval=sign(context, key), now=lab.now)
+    assert result['signed_context_status'] == 'verified' and result['resource_policy_status'] == 'verified'
+    assert 'AUTHORITATIVE_RESOURCE_POLICY_DENIED' in result['reason_codes']
+    assert 'RECENT_RESOURCE_POLICY_DENIED' in result['reason_codes']
+    assert result['access_grants'] == result['session_changes'] == 0
+
+
+def test_cumulative_download_uses_pinned_sensitivity_when_event_claims_public_data(lab):
+    store, _policy = with_resource_policy(lab)
+    detector = ShadowDetector(temporal_store=store)
+    for index in range(3):
+        message = lab.signal('transfer-'+str(index), index*20, action='DOWNLOAD',
+            **{'resource.sensitivity': 'public', 'behavior.download_volume_mb': 200,
+               'auth_context.authentication_result': 'success', 'auth_context.failed_attempts': 0})
+        result = detector.evaluate_signed(message, lab.principal, now=at(lab, index*20))
+    assert result['temporal_evidence']['sensitive_download_mb'] == 600
+    assert result['effective_resource_sensitivity'] == 'critical'
+    assert 'CUMULATIVE_SIGNED_SENSITIVE_DOWNLOAD' in result['reason_codes']
+
+
+def test_policy_loss_preserves_received_volume_and_marks_window_incomplete(lab):
+    store, policy = with_resource_policy(lab)
+    store.observe(lab.signal(action='DOWNLOAD', **{'behavior.download_volume_mb': 200}), lab.principal, now=lab.now)
+    policy.path.write_bytes(b'invalid policy')
+    result = store.summary('session-a', lab.principal, now=at(lab, 1))
+    assert not result['complete'] and result['resource_policy_unavailable_events'] == 1
+    assert result['sensitive_download_mb'] == 200
+
+
+def test_registered_policy_can_resolve_a_legitimate_role_claim_disagreement(lab):
+    store, _policy = with_resource_policy(lab)
+    message = lab.signal(action='READ', **{'resource.required_role': 'administrator',
+        'auth_context.authentication_result': 'success', 'auth_context.failed_attempts': 0,
+        'auth_context.mfa': 'success'})
+    result = ShadowDetector(temporal_store=store).evaluate_signed(message, lab.principal, now=lab.now)
+    assert result['resource_policy_status'] == 'verified'
+    assert RULE_IDS['privilege'] not in result['predicted_rule_ids']
+
+
+def test_later_allowed_action_does_not_erase_received_resource_policy_denial(lab):
+    store, _policy = with_resource_policy(lab)
+    store.observe(lab.signal('denied', action='ADMIN'), lab.principal, now=lab.now)
+    result = ShadowDetector(temporal_store=store).evaluate_signed(
+        lab.signal('allowed', 20, action='READ'), lab.principal, now=at(lab, 20))
+    assert 'AUTHORITATIVE_RESOURCE_POLICY_DENIED' not in result['reason_codes']
+    assert 'RECENT_RESOURCE_POLICY_DENIED' in result['reason_codes']
+
+
+def test_policy_binding_cannot_disagree_between_current_and_temporal_judgment(lab):
+    _store, policy = with_resource_policy(lab)
+    with pytest.raises(ValueError, match='must_agree'):
+        ShadowDetector(temporal_store=lab.store, resource_policies=policy)
+
+
+def test_prior_at_risk_posture_is_not_erased_by_a_following_healthy_event(lab):
+    lab.store.observe(lab.signal('at-risk', **{'device.security_posture': 'at_risk'}), lab.principal, now=lab.now)
+    result = ShadowDetector(temporal_store=lab.store).evaluate_signed(
+        lab.signal('healthy', 20), lab.principal, now=at(lab, 20))
+    assert result['temporal_evidence']['saw_at_risk']
+    assert 'RECENT_AT_RISK_DEVICE' in result['reason_codes']
+
+
+def test_one_temporal_summary_uses_one_current_resource_policy_snapshot(lab, monkeypatch):
+    store, policy = with_resource_policy(lab)
+    for index in range(3):
+        store.observe(lab.signal('e-'+str(index), index, action='READ'), lab.principal, now=at(lab, index))
+    calls, original = [], policy.snapshot
+
+    def counted(**kwargs):
+        calls.append(1)
+        return original(**kwargs)
+
+    monkeypatch.setattr(policy, 'snapshot', counted)
+    assert store.summary('session-a', lab.principal, now=at(lab, 3))['event_count'] == 3
+    assert len(calls) == 1
 
 
 def test_window_expiry_is_missing_evidence_not_a_positive_safety_claim(lab):

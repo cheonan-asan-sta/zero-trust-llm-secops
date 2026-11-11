@@ -11,6 +11,7 @@ from app.config import get_settings
 from app.models import SecurityEvent, StrictModel
 from scripts.f1_lab.approvals import ApprovalRejected, ApprovalVerifier, SignedApproval
 from scripts.f1_lab.registry import PinnedApprovalVerifier
+from scripts.f1_lab.resource_policy import PinnedResourcePolicies, ResourcePolicyUnavailable
 from scripts.f1_lab.temporal import TemporalStore
 
 RULE_IDS = {
@@ -30,7 +31,7 @@ class DraftThresholds(StrictModel):
 
 
 class ShadowDetector:
-    def __init__(self, *, thresholds=None, approval_verifier=None, temporal_store=None):
+    def __init__(self, *, thresholds=None, approval_verifier=None, temporal_store=None, resource_policies=None):
         self.thresholds = thresholds if thresholds is not None else DraftThresholds()
         if not isinstance(self.thresholds, DraftThresholds):
             raise TypeError('draft_threshold_contract_required')
@@ -40,13 +41,23 @@ class ShadowDetector:
             raise TypeError('shadow_approval_verifier_contract_required')
         if self.temporal is not None and not isinstance(self.temporal, TemporalStore):
             raise TypeError('shadow_temporal_store_contract_required')
+        if resource_policies is not None and not isinstance(resource_policies, PinnedResourcePolicies):
+            raise TypeError('shadow_resource_policy_contract_required')
+        if self.temporal is not None:
+            inherited = self.temporal.resource_policies
+            if resource_policies is not None and (inherited is None or
+                    inherited.configuration_binding != resource_policies.configuration_binding):
+                raise ValueError('shadow_resource_policy_and_window_must_agree')
+            resource_policies = inherited
+        self.resource_policies = resource_policies
 
     @property
     def config_sha256(self):
-        contract = {'engine': 'f1-shadow-4', 'thresholds': self.thresholds.model_dump(),
+        contract = {'engine': 'f1-shadow-5', 'thresholds': self.thresholds.model_dump(),
                     'context_policy': 'pinned_exact_event_scoped_ed25519',
                     'status': 'draft_no_production_integration',
                     'missing_evidence_policy': 'report_inconclusive_without_inventing_labels',
+                    'resource_policy_binding': self.resource_policies.configuration_binding if self.resource_policies is not None else None,
                     'temporal_configuration': self.temporal.config_sha256 if self.temporal is not None else None}
         return hashlib.sha256(json.dumps(contract, sort_keys=True).encode()).hexdigest()
 
@@ -119,6 +130,20 @@ class ShadowDetector:
         auth, behavior = event.auth_context, event.behavior
         device, network = event.device, event.network
         resource = event.resource
+        sensitivity = resource.sensitivity
+        resource_policy, resource_policy_status = None, 'not_configured'
+        if self.resource_policies is not None:
+            try:
+                resource_policy = self.resource_policies.resolve(event, tenant_id, now=now)
+                resource_policy_status = 'verified'
+                sensitivity = resource_policy.effective_sensitivity
+            except ResourcePolicyUnavailable:
+                resource_policy_status = 'unavailable'
+                signal('privilege', 'AUTHORITATIVE_RESOURCE_POLICY_UNAVAILABLE')
+        if resource_policy is not None and not resource_policy.role_and_action_allowed:
+            # Context signed by a business operator cannot override an explicit
+            # resource-owner deny. There is no access-grant endpoint here.
+            signal('privilege', 'AUTHORITATIVE_RESOURCE_POLICY_DENIED')
         # Signed business exceptions never suppress inactive identities, rejected
         # MFA or explicit compromised/at-risk posture evidence.
         if not event.user.active:
@@ -135,7 +160,7 @@ class ShadowDetector:
             signal('device', 'ADVERSE_DEVICE_POSTURE')
         elif not device.managed and device.security_posture == 'unknown' and behavior.new_device:
             signal('device', 'NEW_UNMANAGED_UNKNOWN_DEVICE', deviation='new_unmanaged_device')
-        if resource.required_role is not None and event.user.role != resource.required_role:
+        if self.resource_policies is None and resource.required_role is not None and event.user.role != resource.required_role:
             signal('privilege', 'RESOURCE_ROLE_MISMATCH', deviation='role_mismatch')
         if action == 'REMOTE_ACCESS':
             signal('remote', 'REMOTE_ACCESS_REQUIRES_BUSINESS_CONTEXT', deviation='remote_access')
@@ -144,7 +169,7 @@ class ShadowDetector:
         if (action != 'LOGIN' and behavior.distinct_resources_10m >= self.thresholds.resource_fanout
                 and (behavior.request_rate == 'high' or action == 'REMOTE_ACCESS')):
             signal('lateral', 'MULTI_RESOURCE_ACTIVITY', deviation='resource_fanout')
-        if (action == 'DOWNLOAD' and resource.sensitivity in {'high', 'critical'}
+        if (action == 'DOWNLOAD' and sensitivity in {'high', 'critical'}
                 and behavior.download_volume_mb >= self.thresholds.bulk_download_mb):
             signal('exfiltration', 'SENSITIVE_BULK_DOWNLOAD', deviation='bulk_export')
         if window is not None:
@@ -152,6 +177,8 @@ class ShadowDetector:
             # events. Current-event approvals never suppress these findings.
             if not window['complete']:
                 signal('credential', 'TEMPORAL_AUTHORITY_OR_EVIDENCE_INCOMPLETE')
+            if window['resource_policy_denied_events']:
+                signal('privilege', 'RECENT_RESOURCE_POLICY_DENIED')
             if window['failed_login_events'] >= self.thresholds.credential_failures:
                 signal('credential', 'REPEATED_SIGNED_FAILED_LOGIN_EVENTS', deviation='authentication_failure', temporal=True)
             if window['sensitive_download_mb'] >= self.thresholds.bulk_download_mb:
@@ -160,22 +187,28 @@ class ShadowDetector:
                 signal('lateral', 'CUMULATIVE_SIGNED_RESOURCE_FANOUT', deviation='resource_fanout', temporal=True)
             if window['saw_compromised']:
                 signal('device', 'RECENT_COMPROMISED_DEVICE')
+            if window['saw_at_risk']:
+                signal('device', 'RECENT_AT_RISK_DEVICE')
             if window['saw_inactive']:
                 signal('credential', 'RECENT_INACTIVE_IDENTITY')
             if window['saw_rejected_mfa']:
                 signal('credential', 'RECENT_REJECTED_MFA')
         gaps = []
-        if action == 'ADMIN' and resource.required_role is None:
+        if self.resource_policies is None and action == 'ADMIN' and resource.required_role is None:
             gaps.append('RESOURCE_REQUIRED_ROLE_NOT_SUPPLIED')
-        if (window is None and action == 'DOWNLOAD' and resource.sensitivity in {'high', 'critical'}
+        if (window is None and action == 'DOWNLOAD' and sensitivity in {'high', 'critical'}
                 and behavior.download_volume_mb < self.thresholds.bulk_download_mb):
             gaps.append('AUTHENTICATED_CUMULATIVE_VOLUME_NOT_ASSESSED')
         if window is not None and not window['complete']:
             gaps.append('RECEIVED_WINDOW_AUTHORITY_INCOMPLETE')
-        return {'engine': 'f1-shadow-4', 'status': 'draft_shadow_only',
+        if resource_policy_status == 'unavailable':
+            gaps.append('AUTHORITATIVE_RESOURCE_POLICY_UNAVAILABLE')
+        return {'engine': 'f1-shadow-5', 'status': 'draft_shadow_only',
                 'config_sha256': self.config_sha256, 'detected': bool(matches),
                 'assessment_status': 'alert' if matches else 'inconclusive' if gaps else 'no_alert',
                 'evidence_gaps': gaps, 'no_alert_is_access_authorization': False,
+                'resource_policy_status': resource_policy_status,
+                'effective_resource_sensitivity': sensitivity,
                 'predicted_rule_ids': sorted(matches), 'reason_codes': reasons,
                 'signed_context_status': status, 'context_error': context_error,
                 'signed_window_context_status': window_context_status,

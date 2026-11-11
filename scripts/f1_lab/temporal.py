@@ -26,6 +26,7 @@ from app.services.trusted_signals import (
 )
 from app.zero_trust_models import SignedSessionSignal
 from scripts.ca_recovery_state import atomic, locked
+from scripts.f1_lab.resource_policy import PinnedResourcePolicies, ResourcePolicyUnavailable
 
 ZERO = '0' * 64
 APPLICATION_ID = 1515475537
@@ -81,9 +82,12 @@ def read(path, limit):
 
 class TemporalStore:
     def __init__(self, database: Path, control: Path, verifier: SignalVerifier, event_sources, *,
-                 window_seconds=600, capacity=1000):
+                 window_seconds=600, capacity=1000, resource_policies=None):
         self.database, self.control = Path(database), Path(control)
         self.verifier = verifier
+        require(resource_policies is None or isinstance(resource_policies, PinnedResourcePolicies),
+                'temporal_resource_policy_contract')
+        self.resource_policies = resource_policies
         self.event_sources = frozenset(event_sources)
         require(0 < len(self.event_sources) <= 100 and all(isinstance(v, tuple) and len(v) == 3
                 and all(isinstance(s, str) and s for s in v) for v in self.event_sources),
@@ -94,6 +98,7 @@ class TemporalStore:
         self.config_sha256 = digest(canonical({'event_producers': sorted(self.event_sources),
             'window_seconds': window_seconds, 'capacity': capacity, 'measurement': 'distinct_events_and_byte_deltas',
             'maximum_download_delta_mb': MAX_DOWNLOAD_DELTA_MB,
+            'resource_policy_binding': resource_policies.configuration_binding if resource_policies is not None else None,
             'source_registry_binding': getattr(verifier, 'configuration_binding', None)}))
 
     def _local(self):
@@ -339,6 +344,28 @@ class TemporalStore:
                 continue
             selected.append((record, signal.event))
         events = [event for _, event in selected]
+        sensitivities, policy_unavailable, policy_denied = [], 0, 0
+        policy_snapshot = None
+        if self.resource_policies is not None:
+            try:
+                policy_snapshot = self.resource_policies.snapshot(now=now)
+            except ResourcePolicyUnavailable:
+                pass
+        for event in events:
+            if self.resource_policies is None:
+                sensitivities.append(event.resource.sensitivity)
+            else:
+                try:
+                    if policy_snapshot is None:
+                        raise ResourcePolicyUnavailable('resource_policy_unavailable')
+                    policy = policy_snapshot.resolve(event, principal.tenant_id)
+                    sensitivities.append(policy.effective_sensitivity)
+                    policy_denied += not policy.role_and_action_allowed
+                except ResourcePolicyUnavailable:
+                    # Keep received download deltas, never a healthy zero from
+                    # an unknown resource. Incomplete authority cannot be approved.
+                    sensitivities.append('critical')
+                    policy_unavailable += 1
         first = SignedSessionSignal.model_validate(owned[0]['signal']).event
         facts = sorted((event.timestamp.isoformat(), event.event_id, record['input_sha256'], record['source_digest'])
                        for record, event in selected)
@@ -346,23 +373,27 @@ class TemporalStore:
             'operator': principal.subject, 'session_id': session_id, 'user_id': first.user.user_id,
             'device_id': first.device.device_id, 'as_of': now.isoformat(), 'window_seconds': self.window_seconds,
             'duplicate': duplicate, 'event_count': len(events), 'authority_excluded_events': excluded,
-            'complete': excluded == 0 and bool(events),
+            'complete': excluded == 0 and policy_unavailable == 0 and bool(events),
+            'resource_policy_unavailable_events': policy_unavailable,
+            'resource_policy_denied_events': policy_denied,
+            'resource_policy_binding': self.resource_policies.configuration_binding if self.resource_policies is not None else None,
             'collection_completeness_proven': False,
             'coverage_scope': 'authenticated_received_events_only',
             'failed_login_events': sum(e.action == 'LOGIN' and
                 e.auth_context.authentication_result == 'failure' for e in events),
-            'sensitive_download_mb': sum(e.behavior.download_volume_mb for e in events
-                if e.action == 'DOWNLOAD' and e.resource.sensitivity in {'high', 'critical'}),
+            'sensitive_download_mb': sum(e.behavior.download_volume_mb for e, sensitivity in zip(events, sensitivities)
+                if e.action == 'DOWNLOAD' and sensitivity in {'high', 'critical'}),
             'distinct_resources': len({e.resource.resource_id for e in events}),
             'resource_ids': sorted({e.resource.resource_id for e in events}),
             'actions': sorted({e.action.value for e in events}),
             'event_ids': sorted({e.event_id for e in events}),
             'saw_compromised': any(e.device.security_posture == 'compromised' for e in events),
+            'saw_at_risk': any(e.device.security_posture == 'at_risk' for e in events),
             'saw_inactive': any(not e.user.active for e in events),
             'saw_rejected_mfa': any(e.auth_context.mfa == 'failed' for e in events),
             'journal_head_sha256': head['hash'],
             'evidence_sha256': digest(canonical({'schema': 'f1-authenticated-window-facts-1',
                 'configuration': self.config_sha256,
                 'session': [principal.tenant_id, principal.subject, session_id, first.user.user_id, first.device.device_id],
-                'events': facts, 'excluded': excluded}))}
+                'events': facts, 'excluded': excluded, 'resource_policy_unavailable': policy_unavailable}))}
         return result
