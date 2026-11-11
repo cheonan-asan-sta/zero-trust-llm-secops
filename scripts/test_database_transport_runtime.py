@@ -15,6 +15,7 @@ from scripts.authority_rotation_coordinator import lease
 from scripts.certificate_controller import save
 from scripts.continuous_mtls_runtime import ROOT, RuntimeFailure, command
 from scripts.database_transport_runtime import VAULT, TransportCoordinator, TransportRuntime
+from scripts.persistent_authority_control import read
 from scripts.test_persistent_authority_runtime import AcceptanceRuntime
 from scripts.test_persistent_authority_runtime import Checks as ParentChecks
 from scripts.test_transport_process_recovery import kill_worker, public_failure
@@ -24,12 +25,56 @@ class AcceptanceTransport(AcceptanceRuntime, TransportRuntime):
     pass
 
 
+SECURITY_TABLES = ('used_ott', 'revoked_x509_certs')
+
+
+def security_rows(runtime):
+    return {name: set(runtime.sql('SELECT md5(row_to_json(t)::text) FROM ' + name +
+                                 ' t ORDER BY 1;').splitlines()) for name in SECURITY_TABLES}
+
+
+def renewal_rows_preserved(before, after):
+    """Controlled credential maintenance cannot lose any old security rows.
+
+    Real rekey preparation may append consumed attempts and revoked old client
+    certificates. DB rotations themselves must still preserve the entire
+    post-preparation snapshot exactly; additions are allowed only in preparation.
+    """
+    return (set(before) == set(after) == set(SECURITY_TABLES)
+            and before['used_ott'] <= after['used_ott']
+            and before['revoked_x509_certs'] <= after['revoked_x509_certs'])
+
+
 class Checks(ParentChecks):
     expected_volumes = 37
 
     def __init__(self, directory, *, runtime_class=AcceptanceTransport):
         super().__init__(directory, runtime_class=runtime_class)
         self.report['schema'] = 'database-transport-rotation-verification-1'
+
+    def refresh_active_leaves(self, *, label='backup'):
+        """Renew through the real controller before a long paused test ceremony.
+
+        This changes test scheduling only, never certificate validity or the
+        runtime's expired-active-identity rejection. Disabled clients stay retired.
+        """
+        r = self.runtime
+        before = self.pause()
+        original = r.controller_configuration()['renew_before']
+        self.configure(paused=False, renew_before={
+            c['name']: 3599 if c['name'].startswith('renew-') else 1199
+            for c in before['credentials'].values()})
+        try:
+            self.wait(lambda: all(c['generation'] > before['credentials'][uid]['generation']
+                for uid, c in r.controller_status()['credentials'].items() if uid != self.collector),
+                label + '_active_renewal_not_completed', timeout=120)
+        finally:
+            current = self.pause()
+            self.configure(renew_before=original)
+        self.require(current['credentials'][self.collector]['fingerprint'] ==
+                     before['credentials'][self.collector]['fingerprint'],
+                     label + '_preparation_reissued_retired_identity')
+        return current
 
     def force_transport_due(self):
         r = self.runtime
@@ -107,6 +152,15 @@ print(json.dumps(result))
                 deadline = time.monotonic() + 420
                 while not marker.exists():
                     if child.poll() is not None or time.monotonic() > deadline:
+                        detail = {'child_exited': child.poll() is not None, 'exit_code': child.poll(),
+                                  'checkpoint': target, 'elapsed_seconds': time.monotonic() - started}
+                        failure = r.directory / ('transport-fault-failure-' + token + '.json')
+                        if failure.exists():
+                            value = json.loads(read(failure, 65536))
+                            if value.get('token') == token:
+                                detail['child_failure'] = value['failure']
+                        self.report['transport_interruption_failure'] = detail
+                        self.save()
                         raise RuntimeFailure('transport_fault_child_failed_before_checkpoint')
                     time.sleep(.2)
                 expected = {'token': token, 'phase': target, 'boundary': 'after' if target == 'stopped' else 'before'}
@@ -173,18 +227,21 @@ print(json.dumps(result))
 
     def run(self):
         super().run()
+        self.transport_checks()
+
+    def transport_checks(self, *, authority_epoch=3, interrupt=True):
         self.report['completed'] = False
         r = self.runtime
-        self.pause()
-        before = r.controller_status()
+        before = self.refresh_active_leaves(label='transport')
+        self.add('active_leaves_renew_before_paused_transport_ceremony', cycle=1)
         initial = self.retired_db_identity(save=True)
         self.require(initial['accepted'] and initial['unexpired'], 'transport_old_client_positive_control')
         self.add('old_database_client_authenticates_before_transport_rotation')
         # Snapshot DB rows without depending on private SQL column names.
         snapshot_query = "SELECT md5(coalesce(string_agg(row_to_json(t)::text,E'\\n' ORDER BY row_to_json(t)::text),'')) FROM {} t;"
-        tables = ('used_ott', 'revoked_x509_certs')
+        tables = SECURITY_TABLES
         security = {name: r.sql(snapshot_query.format(name)) for name in tables}
-        first = self.drive_transport(1, interrupt=True)
+        first = self.drive_transport(1, interrupt=interrupt)
         self.require(first['live_evidence'] == {'verified': True, 'ca_nodes': 2, 'database_anchor': True,
                      'enrollment_and_security_tables': True}, 'transport_live_barrier_missing')
         self.add('timer_rotates_db_root_server_and_both_client_private_keys_with_live_mtls_barrier')
@@ -194,15 +251,41 @@ print(json.dumps(result))
         self.require(all(r.sql(snapshot_query.format(name)) == digest for name, digest in security.items()),
                      'transport_rotation_changed_nonce_or_revocation_rows')
         self.add('transport_rotation_preserves_exact_consumed_nonce_and_revocation_table_rows')
-        self.require(r.controller_status()['paused'] and r.journal()['epoch'] == 3,
+        self.require(r.controller_status()['paused'] and r.journal()['epoch'] == authority_epoch,
                      'transport_rotation_changed_workload_authority_or_pause')
         self.require({u: c['fingerprint'] for u, c in r.controller_status()['credentials'].items()} ==
                      {u: c['fingerprint'] for u, c in before['credentials'].items()}, 'transport_rotation_reissued_workload')
         self.add('workload_ca_epoch_leaf_identities_and_retired_collector_unchanged_by_db_rotation')
+        prior_rows = security_rows(r)
+        prior_credentials = r.controller_status()['credentials']
+        second_before = self.refresh_active_leaves(label='transport')
+        self.add('active_leaves_renew_before_paused_transport_ceremony', cycle=2)
+        renewed_rows = security_rows(r)
+        server_generations = sum(c['generation'] - prior_credentials[uid]['generation']
+            for uid, c in second_before['credentials'].items() if c['purpose'] == 'serverAuth')
+        self.report['fixture_renewal_security'] = {
+            'original_consumed_nonces_retained': prior_rows['used_ott'] <= renewed_rows['used_ott'],
+            'original_revocation_rows_retained': prior_rows['revoked_x509_certs'] <= renewed_rows['revoked_x509_certs'],
+            'observed_server_generation_increments': server_generations,
+            'observed_new_consumed_nonces': len(renewed_rows['used_ott'] - prior_rows['used_ott']),
+            'removed_consumed_nonce_rows': len(prior_rows['used_ott'] - renewed_rows['used_ott']),
+            'observed_new_revocation_rows': len(renewed_rows['revoked_x509_certs'] - prior_rows['revoked_x509_certs']),
+            'removed_revocation_rows': len(prior_rows['revoked_x509_certs'] - renewed_rows['revoked_x509_certs']),
+            'maintenance_additions_are_measurement_only': True}
+        self.save()
+        self.require(renewal_rows_preserved(prior_rows, renewed_rows),
+                     'transport_fixture_renewal_changed_existing_security_rows')
+        self.add('preparation_retains_every_prior_consumed_nonce_and_revocation_row')
+        security = {name: r.sql(snapshot_query.format(name)) for name in tables}
         second = self.drive_transport(2)
         self.require(len(second['history']) == 2 and second['history'][1]['previous'] == custody.digest(second['history'][0]),
                      'transport_second_chain_missing')
         self.add('second_timed_transport_rotation_chains_to_first_without_resealing_anchor')
+        self.require({u: c['fingerprint'] for u, c in r.controller_status()['credentials'].items()} ==
+                     {u: c['fingerprint'] for u, c in second_before['credentials'].items()},
+                     'second_transport_rotation_reissued_workload')
+        self.require(all(r.sql(snapshot_query.format(name)) == digest for name, digest in security.items()),
+                     'second_transport_rotation_changed_security_rows')
         r.down()
         r.up()
         self.require(r.transport_journal()['epoch'] == 2 and r.preflight()['database_transport']['verified'],

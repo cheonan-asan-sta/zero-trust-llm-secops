@@ -58,6 +58,7 @@ from app.models import (
     SigmaRuleSummary,
     SimulationRequest,
 )
+from app.response_workflow import response_router
 from app.scenarios import SCENARIOS, generate_events, get_scenario
 from app.security import Principal, Role, require_roles
 from app.services.assurance import get_assurance_registry
@@ -109,6 +110,7 @@ app.add_middleware(RequestBodyLimitMiddleware, max_bytes=settings.api_max_body_b
 app.add_middleware(RequestContextMiddleware)
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 audit_store = create_audit_store(settings)
+app.include_router(response_router(settings, audit_store))
 case_store = create_case_store(settings)
 integration_outbox_store = create_integration_outbox_store(settings)
 integration_outbox_service = IntegrationOutboxService(integration_outbox_store)
