@@ -96,6 +96,7 @@ class TemporalStore:
                 and type(capacity) is int and 1 <= capacity <= 2000, 'temporal_configuration_bounds')
         self.window_seconds, self.capacity = window_seconds, capacity
         self.config_sha256 = digest(canonical({'event_producers': sorted(self.event_sources),
+            'aggregation_contract': 'f1-temporal-session-activity-with-tenant-adverse-scopes-2',
             'window_seconds': window_seconds, 'capacity': capacity, 'measurement': 'distinct_events_and_byte_deltas',
             'maximum_download_delta_mb': MAX_DOWNLOAD_DELTA_MB,
             'resource_policy_binding': resource_policies.configuration_binding if resource_policies is not None else None,
@@ -367,13 +368,37 @@ class TemporalStore:
                     sensitivities.append('critical')
                     policy_unavailable += 1
         first = SignedSessionSignal.model_validate(owned[0]['signal']).event
+        adverse_facts, adverse_excluded, related_adverse = [], 0, set()
+        for record in entries:
+            if record['tenant'] != principal.tenant_id:
+                continue
+            signal = SignedSessionSignal.model_validate(record['signal'])
+            observed = signal.event
+            if not start < observed.timestamp <= now:
+                continue
+            markers = set()
+            if observed.device.device_id == first.device.device_id and observed.device.security_posture in {'at_risk', 'compromised'}:
+                markers.add(observed.device.security_posture)
+            if observed.user.user_id == first.user.user_id and not observed.user.active:
+                markers.add('inactive')
+            if not markers:
+                continue
+            identity = signal.tenant_id, signal.source_id, signal.key_id
+            trusted = current_sources.get(identity) == record['source_digest']
+            adverse_facts.append((record['input_sha256'], record['source_digest'], sorted(markers), trusted))
+            if trusted:
+                related_adverse.update(markers)
+            else:
+                adverse_excluded += 1
         facts = sorted((event.timestamp.isoformat(), event.event_id, record['input_sha256'], record['source_digest'])
                        for record, event in selected)
         result = {'schema': 'f1-temporal-summary-1', 'store_id': head['store_id'], 'tenant_id': principal.tenant_id,
             'operator': principal.subject, 'session_id': session_id, 'user_id': first.user.user_id,
             'device_id': first.device.device_id, 'as_of': now.isoformat(), 'window_seconds': self.window_seconds,
             'duplicate': duplicate, 'event_count': len(events), 'authority_excluded_events': excluded,
-            'complete': excluded == 0 and policy_unavailable == 0 and bool(events),
+            'complete': excluded == 0 and adverse_excluded == 0 and policy_unavailable == 0 and bool(events),
+            'related_adverse_authority_excluded_events': adverse_excluded,
+            'adverse_evidence_scope': 'tenant_shared_device_posture_and_user_inactive; received_window_only',
             'resource_policy_unavailable_events': policy_unavailable,
             'resource_policy_denied_events': policy_denied,
             'resource_policy_binding': self.resource_policies.configuration_binding if self.resource_policies is not None else None,
@@ -387,13 +412,14 @@ class TemporalStore:
             'resource_ids': sorted({e.resource.resource_id for e in events}),
             'actions': sorted({e.action.value for e in events}),
             'event_ids': sorted({e.event_id for e in events}),
-            'saw_compromised': any(e.device.security_posture == 'compromised' for e in events),
-            'saw_at_risk': any(e.device.security_posture == 'at_risk' for e in events),
-            'saw_inactive': any(not e.user.active for e in events),
+            'saw_compromised': 'compromised' in related_adverse,
+            'saw_at_risk': 'at_risk' in related_adverse,
+            'saw_inactive': 'inactive' in related_adverse,
             'saw_rejected_mfa': any(e.auth_context.mfa == 'failed' for e in events),
             'journal_head_sha256': head['hash'],
             'evidence_sha256': digest(canonical({'schema': 'f1-authenticated-window-facts-1',
                 'configuration': self.config_sha256,
                 'session': [principal.tenant_id, principal.subject, session_id, first.user.user_id, first.device.device_id],
-                'events': facts, 'excluded': excluded, 'resource_policy_unavailable': policy_unavailable}))}
+                'events': facts, 'excluded': excluded, 'resource_policy_unavailable': policy_unavailable,
+                'related_adverse_facts': sorted(adverse_facts)}))}
         return result

@@ -2,6 +2,10 @@
 
 진행 중 목표(11/12 02:26 KST): 사용자가 목표 달성 또는 오늘9시까지 지속 작업을 지시했다.
 오전/오후 확인 전 종료 기준은 11/12 09:00 KST다. [extra 지속 실험](docs/extra-f1-experiments.md)을 이어간다.
+**진행 중 장시간 시험:** `runtime/f1/extra-soak-20261112-03/run.json`의 소유 컨테이너/파생 이미지를 확인한다.
+종료 예정08:50 KST이며 helper 세션70567이 공개 stdout 증거를 수집한 뒤 소유 자원을 정리한다.
+`extra_start_frozen_soak_03.py`를 사용했고 다른 기존 컨테이너/데몬은 중지하지 않는다.
+중간 checkpoint는 완료가 아니다. 종료 상태·공개 파일 SHA·private runtime0·컨테이너/이미지 제거를 확인해야 한다.
 기존 app/규칙/라벨은 보존하고 shadow v1은 관찰 holdout F1 80%·FPR33.33%로 **목표 미달**이다.
 서명 없는 승인 정보를 제외한 개발 투영에는 충돌30그룹이 있다. 서명 업무 맥락·초안/원본 비교를
 실험했고 v8 최종 Windows307·Linux307개가 각각 통과했다. 시계 high-water·비교기별 오류 분모,
@@ -19,6 +23,8 @@ holdout 판단 근거 부족30건을 기록하며 분모에서 빼지 않는다.
 [v8 원본 점검](docs/infrastructure-results/extra-streamed-v8-20261112.json)은 공개 원본91.6MB/130,767행을
 점검해 M7 4파일을 Windows/Linux에서 바이트 동일하게 재현했다. 선언 투영69충돌·파일럿11해당세션은
 F1 실측이 아닌 관측 모호성이다. [데이터 적합성](docs/f1-data-readiness.md)을 참고하며 사람 검토를 대체하지 않는다.
+[v9 시작 근거](docs/infrastructure-results/extra-soak-start-v9-20261112.json)는 tenant 내 기기/비활성 이력을
+새 세션에서도 유지하는 경계와 Linux323개·실제 시계 시험 시작을 기록한다. 세션 간 인증/유출 누적은 아직 후속이다.
 사람 독립 검토·새 평가·운영 통합/최종 채택은 완료가 아니며 목표도 미달 상태를 유지한다.
 
 11/12 `extra`: 사용자 요청으로 `9c67889`에서 브랜치를 만들고 [F0/F1 기준선·오류 검토 도구](docs/extra-f1-baseline-review.md)를 구현한다.

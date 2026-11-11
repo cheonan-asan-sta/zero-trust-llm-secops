@@ -75,7 +75,7 @@ def lab(tmp_path):
         return message.model_copy(update={'signature': signature})
 
     return SimpleNamespace(root=tmp_path, now=now, store=store, principal=principal, signal=signal,
-                           registry=registry, publish=publish, registry_path=path, sources=sources)
+                           registry=registry, publish=publish, registry_path=path, sources=sources, producer_key=key)
 
 
 def at(lab, seconds):
@@ -223,6 +223,73 @@ def test_one_temporal_summary_uses_one_current_resource_policy_snapshot(lab, mon
     monkeypatch.setattr(policy, 'snapshot', counted)
     assert store.summary('session-a', lab.principal, now=at(lab, 3))['event_count'] == 3
     assert len(calls) == 1
+
+
+@pytest.mark.parametrize('posture', ['at_risk', 'compromised'])
+def test_new_session_cannot_escape_received_adverse_device_evidence(lab, posture):
+    lab.store.observe(lab.signal('risk', session='old', **{'device.security_posture': posture}), lab.principal, now=lab.now)
+    result = ShadowDetector(temporal_store=lab.store).evaluate_signed(
+        lab.signal('fresh', 10, session='new'), lab.principal, now=at(lab, 10))
+    assert result['temporal_evidence']['event_count'] == 1
+    assert result['temporal_evidence']['saw_'+posture]
+    assert ('RECENT_AT_RISK_DEVICE' if posture == 'at_risk' else 'RECENT_COMPROMISED_DEVICE') in result['reason_codes']
+
+
+def test_new_session_cannot_reset_received_inactive_identity_evidence(lab):
+    lab.store.observe(lab.signal('inactive', session='old', **{'user.active': False}), lab.principal, now=lab.now)
+    result = ShadowDetector(temporal_store=lab.store).evaluate_signed(
+        lab.signal('fresh', 10, session='new'), lab.principal, now=at(lab, 10))
+    assert result['temporal_evidence']['saw_inactive'] and 'RECENT_INACTIVE_IDENTITY' in result['reason_codes']
+
+
+def test_other_user_and_other_device_adverse_history_does_not_contaminate_the_target(lab):
+    lab.store.observe(lab.signal('other', session='other', **{'user.user_id': 'user-b',
+        'device.device_id': 'device-b', 'device.security_posture': 'compromised', 'user.active': False}),
+        lab.principal, now=lab.now)
+    result = lab.store.observe(lab.signal('target', 10), lab.principal, now=at(lab, 10))
+    assert not result['saw_compromised'] and not result['saw_inactive']
+
+
+def test_shared_adverse_evidence_expires_on_the_real_declared_window_boundary(lab):
+    lab.store.observe(lab.signal('old', session='old', **{'device.security_posture': 'at_risk'}), lab.principal, now=lab.now)
+    lab.store.observe(lab.signal('new', 599, session='new'), lab.principal, now=at(lab, 599))
+    assert lab.store.summary('new', lab.principal, now=at(lab, 599))['saw_at_risk']
+    assert not lab.store.summary('new', lab.principal, now=at(lab, 600))['saw_at_risk']
+
+
+def test_new_related_risk_invalidates_an_earlier_window_context_without_suppressing_danger(window_lab):
+    state = window_lab
+    state.lab.store.observe(state.lab.signal('risk-elsewhere', 41, session='other',
+        **{'device.security_posture': 'compromised'}), state.lab.principal, now=at(state.lab, 41))
+    result = window_detector(state).evaluate_signed(state.messages[-1], state.lab.principal,
+        approval=sign(state.context, state.key), now=at(state.lab, 42))
+    assert result['signed_window_context_status'] == 'rejected'
+    assert 'RECENT_COMPROMISED_DEVICE' in result['reason_codes']
+
+
+def test_same_identifier_in_another_tenant_does_not_contribute_adverse_evidence(lab):
+    lab.registry['sources'].append({**lab.registry['sources'][0], 'tenant_id': 'tenant-b'})
+    lab.publish()
+    sources = lab.sources | {('tenant-b', 'events', 'key-a')}
+    store = TemporalStore(lab.root/'multi.db', lab.root/'multi-control', SignalVerifier(lab.registry_path), sources)
+    store.initialize()
+    foreign = lab.signal('foreign', session='foreign', **{'user.active': False, 'device.security_posture': 'compromised'})
+    foreign = foreign.model_copy(update={'tenant_id': 'tenant-b'})
+    signature = base64.urlsafe_b64encode(lab.producer_key.sign(canonical_signal(foreign))).decode().rstrip('=')
+    foreign = foreign.model_copy(update={'signature': signature})
+    store.observe(foreign, Principal('other', 'tenant-b', frozenset({Role.ANALYST}), 'api_key'), now=lab.now)
+    current = store.observe(lab.signal('current', 1), lab.principal, now=at(lab, 1))
+    assert not current['saw_compromised'] and not current['saw_inactive']
+
+
+def test_related_device_risk_shares_no_other_operators_raw_session_details(lab):
+    other = Principal('other-operator', 'tenant-a', frozenset({Role.ANALYST}), 'api_key')
+    lab.store.observe(lab.signal('secret-event', session='secret-session',
+        **{'resource.resource_id': 'secret-resource', 'device.security_posture': 'compromised'}), other, now=lab.now)
+    result = lab.store.observe(lab.signal('current', 1), lab.principal, now=at(lab, 1))
+    assert result['saw_compromised'] and result['event_ids'] == ['current']
+    body = json.dumps(result)
+    assert all(value not in body for value in ('other-operator', 'secret-resource', 'secret-session', 'secret-event'))
 
 
 def test_window_expiry_is_missing_evidence_not_a_positive_safety_claim(lab):

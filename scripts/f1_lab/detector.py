@@ -53,7 +53,7 @@ class ShadowDetector:
 
     @property
     def config_sha256(self):
-        contract = {'engine': 'f1-shadow-5', 'thresholds': self.thresholds.model_dump(),
+        contract = {'engine': 'f1-shadow-6', 'thresholds': self.thresholds.model_dump(),
                     'context_policy': 'pinned_exact_event_scoped_ed25519',
                     'status': 'draft_no_production_integration',
                     'missing_evidence_policy': 'report_inconclusive_without_inventing_labels',
@@ -203,7 +203,7 @@ class ShadowDetector:
             gaps.append('RECEIVED_WINDOW_AUTHORITY_INCOMPLETE')
         if resource_policy_status == 'unavailable':
             gaps.append('AUTHORITATIVE_RESOURCE_POLICY_UNAVAILABLE')
-        return {'engine': 'f1-shadow-5', 'status': 'draft_shadow_only',
+        return {'engine': 'f1-shadow-6', 'status': 'draft_shadow_only',
                 'config_sha256': self.config_sha256, 'detected': bool(matches),
                 'assessment_status': 'alert' if matches else 'inconclusive' if gaps else 'no_alert',
                 'evidence_gaps': gaps, 'no_alert_is_access_authorization': False,
