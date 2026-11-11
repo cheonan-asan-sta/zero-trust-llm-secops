@@ -6,7 +6,7 @@ This ledger never calls an external responder or changes a Zero Trust session.
 import hashlib
 import json
 import sqlite3
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated
@@ -41,7 +41,7 @@ class ResponseWorkflow:
     @contextmanager
     def transaction(self):
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with sqlite3.connect(self.path, timeout=10) as db:
+        with closing(sqlite3.connect(self.path, timeout=10)) as db, db:
             db.execute('PRAGMA synchronous=FULL')
             db.execute('BEGIN IMMEDIATE')
             application = db.execute('PRAGMA application_id').fetchone()[0]

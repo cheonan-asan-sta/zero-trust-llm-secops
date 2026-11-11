@@ -1,5 +1,8 @@
 # 앱 전체 JSONL 저장 계약과 정비 복원
 
+11/12 후속: 새 로컬 승인 원장은 [선택형 승인 원장 복원](response-workflow-recovery.md)의
+`--full-state --response-state` 계약으로 추가한다. 아래 기존 전체 모드의 Docker 실행 기록과 구분한다.
+
 기존 [SQLite 정비 복원](app-state-recovery.md)에 사건·분석 감사·연동 outbox를 함께 묶는 선택형 저장 계약이다. 모든 기록자를 정지·봉쇄한 로컬 정비 경계에서 사용한다. 온라인 백업, 외부 전송의 exactly-once, 임의 시점의 전원 손실이나 전체 관리 저장소 rollback 방어를 보장하지 않는다.
 
 ## 저장 모드와 명시적 초기화

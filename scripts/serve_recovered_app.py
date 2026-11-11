@@ -31,6 +31,9 @@ def admit(data, public, *, registry_path=None, require_api_key=True):
              settings.trusted_signal_sources_path.resolve() == configured_registry.resolve()) if registry.exists()
             else settings.trusted_signal_sources_path is None, "registry_path_mismatch")
     result = verify_admission(data, public)
+    if (data / "response-workflow.sqlite3").exists():
+        require(settings.response_workflow_db_path.resolve() ==
+                (data / "response-workflow.sqlite3").resolve(), "response_path_mismatch")
     if (data / "storage.json").exists():
         require(settings.audit_backend == "jsonl", "jsonl_backend_required")
         for setting, kind in (("audit_log_path", "audit"), ("case_log_path", "cases"),

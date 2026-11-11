@@ -1,5 +1,10 @@
 # 개발 주차별 산출물
 
+11/12 후속: [4주차 잔여·직접 할 일](week4-remaining-and-handoff.md),
+[승인 원장 복원](response-workflow-recovery.md), [M7 검토지](m7-independent-review.md),
+[M8 네트워크 범위](m8-network-scope.md), [조건부 후보 제안](technology-decisions/conditional-scope-20261112.md).
+[탐지 기준선 오류 분해](detection-baseline-error-review.md)는 규칙 변경 없이 기존 미탐·오탐 계열을 정리한다.
+
 개발 로드맵 후속 [CA·DB·NGINX·Lambda·테스트 이미지 확장 검사](seven-image-supply-chain.md): 동일 소스·갱신 DB의 일곱 이미지 검증과 Git 원본 LF 자료를 읽기 전용으로 제공한 Linux2728 통과. 첫 M7 CRLF 회귀4실패와 후속 LF 체크아웃 정책을 구분해 기록한다. 실제 실행 커밋에 범위를 고정하고 테스트 이미지의 후속 문서 입력 차이·미검사 builder/helper·독립 영향 검토/운영 승인 대기를 구분한다. 아래 과거 기록의 나머지 이미지 검사 대기는 이 후속 결과로 대체하며, 독립 영향 검토·운영 승인은 남는다. 아래 날짜·주차는 개발 로드맵 분류이며 실제 수행 주차나 기간 전체 완료가 아니다.
 
 개발 로드맵 후속 [현재 앱·관측 이미지 공급망 재검사](current-image-supply-chain.md): 앱 Grype191/Trivy194, 관측 Grype196/Trivy197 native 항목. 동일한 갱신 DB·3반복·원본 보존·소유 자원0, Linux2637. 앱 영향 독립 검토·나머지 이미지·C03 운영 선정은 남긴다. 아래 날짜·주차는 원계획의 분류이며 실제 수행 주차나 해당 기간 전체 완료를 뜻하지 않는다.

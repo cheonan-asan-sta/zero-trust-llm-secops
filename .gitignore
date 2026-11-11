@@ -22,6 +22,7 @@ runtime/c02/
 runtime/continuous-collector/
 runtime/collector-validation/
 runtime/week3/
+runtime/week4-followup-*/
 .idea/
 .vscode/
 

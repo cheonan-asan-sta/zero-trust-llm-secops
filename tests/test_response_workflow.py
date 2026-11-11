@@ -59,6 +59,15 @@ def test_restart_and_exactly_once_simulation(lab):
     assert receipts[0]['result']['external_calls'] == 0
 
 
+def test_completed_transaction_releases_file_handle(lab):
+    service, _, _, plan = lab
+    assert service.get(plan['id'], person()) == plan
+    moved = service.path.with_name('moved.sqlite3')
+    service.path.rename(moved)
+    # Windows refuses the rename when a transaction leaves its connection open.
+    moved.unlink()
+
+
 @pytest.mark.parametrize('operation', ['approve', 'reject', 'execute'])
 def test_self_action_refused(lab, operation):
     service, _, _, plan = lab

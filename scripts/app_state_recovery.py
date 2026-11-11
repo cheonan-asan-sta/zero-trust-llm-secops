@@ -33,6 +33,7 @@ from app.services.trusted_signals import SignalVerifier
 from app.services.zero_trust import JournalUnavailable, ZeroTrustOperations
 from app.zero_trust_models import SessionRevocationRequest
 from scripts import app_storage_contract as storage
+from scripts import response_storage_contract as response_storage
 from scripts.ca_recovery_state import atomic, canonical, locked, opened, sealed
 from scripts.certificate_controller import LifecycleError
 
@@ -84,11 +85,13 @@ def schema(connection):
     return connection.execute("SELECT type,name,tbl_name,sql FROM sqlite_schema ORDER BY type,name").fetchall()
 
 
-def recovery_digest(full_state):
+def recovery_digest(full_state, response_state=False):
     if not full_state:
         return app_digest()
     # Prevent a SQLite-only gate from accepting a release while ignoring JSONL.
     paths = ("app_state_recovery.py", "app_storage_contract.py", "serve_recovered_app.py")
+    if response_state:
+        paths += ("response_storage_contract.py",)
     return sha(canonical({"application": app_digest(), "full_storage": {
         name: sha((ROOT / "scripts" / name).read_bytes().replace(b"\r\n", b"\n")) for name in paths}}))
 
@@ -158,6 +161,11 @@ def inspect_state(directory):
     if jsonl is not None:
         state["jsonl"] = jsonl
         state["application_sha256"] = recovery_digest(True)
+    response = response_storage.inspect(directory)
+    if response is not None:
+        require(jsonl is not None, "response_requires_full_storage")
+        state["response"] = response
+        state["application_sha256"] = recovery_digest(True, True)
     return {"state": state, "state_sha256": sha(canonical(state)), "records": records,
             "sessions": latest, "has_inbox": has_inbox}
 
@@ -171,6 +179,7 @@ def snapshot(source, target, *, timeout=15, registry_path=None):
     registry = Path(registry_path) if registry_path is not None else source / "sources.json"
     before = read_file(registry, 1024**2) if registry_path is not None or registry.exists() else None
     logs = storage.capture(source)
+    response_storage.snapshot(source, target)
     started = time.monotonic()
 
     def progress(_status, _remaining, _total):
@@ -210,11 +219,14 @@ class Store:
         self.data = self.root / "data" if source is None else Path(source)
         self.registry_path = registry_path
 
-    def initialize(self, *, full_state=False):
+    def initialize(self, *, full_state=False, response_state=False):
         local_only()
         logs = storage.inspect(self.data)
         require(type(full_state) is bool and (logs is not None) == full_state,
                 "explicit_full_storage_required")
+        response = response_storage.inspect(self.data)
+        require(type(response_state) is bool and (response is not None) == response_state
+                and (not response_state or full_state), "explicit_response_storage_required")
         require(all(not path.exists() or (path.is_dir() and not any(path.iterdir()))
                     for path in (self.control, self.public)), "authority_already_initialized")
         self.control.mkdir(parents=True, mode=0o700, exist_ok=True)
@@ -230,7 +242,8 @@ class Store:
         source = secrets.token_hex(16)
         atomic(self.public / "trust.json", canonical({"source": source, "public_key": base64.b64encode(public).decode()}))
         atomic(self.control / "anchor.json", canonical({"source": source, "generation": 0,
-            "checkpoint_sha256": None, "storage_mode": "full-jsonl" if full_state else "sqlite"}))
+            "checkpoint_sha256": None, "storage_mode": "full-jsonl" if full_state else "sqlite",
+            "response_storage": response_state}))
         return {"initialized": True, "source": source}
 
     def checkpoint(self):
@@ -248,13 +261,15 @@ class Store:
             mode = anchor.get("storage_mode", "sqlite")
             require(mode in {"sqlite", "full-jsonl"} and ("jsonl" in state["state"]) == (mode == "full-jsonl"),
                     "checkpoint_storage_mode")
+            require(("response" in state["state"]) == anchor.get("response_storage", False),
+                    "checkpoint_response_mode")
             manifest = {"purpose": "app-checkpoint-1", "source": anchor["source"],
                         "generation": generation, "created_at": datetime.now(UTC).isoformat()}
             envelope = sealed(state["state"], read_file(self.control / "checkpoint.key", 32), manifest)
             atomic(self.control / "checkpoint.json", canonical(envelope))
             atomic(self.control / "anchor.json", canonical({"source": anchor["source"],
                 "generation": manifest["generation"], "checkpoint_sha256": sha(canonical(envelope)),
-                "storage_mode": mode}))
+                "storage_mode": mode, "response_storage": anchor.get("response_storage", False)}))
             return {"checkpointed": True, "generation": manifest["generation"], "records": state["records"]}
 
     def _checkpoint(self, max_age):
@@ -269,11 +284,13 @@ class Store:
         mode = anchor.get("storage_mode", "sqlite")
         require(mode in {"sqlite", "full-jsonl"} and ("jsonl" in state) == (mode == "full-jsonl"),
                 "checkpoint_storage_mode")
+        require(("response" in state) == anchor.get("response_storage", False), "checkpoint_response_mode")
         m = envelope["manifest"]
         require(m["source"] == anchor["source"] and m["generation"] == anchor["generation"], "checkpoint_generation")
         age = (datetime.now(UTC) - datetime.fromisoformat(m["created_at"])).total_seconds()
         require(0 <= age <= max_age, "checkpoint_expired_or_future")
-        require(state["application_sha256"] == recovery_digest("jsonl" in state), "application_version_mismatch")
+        require(state["application_sha256"] == recovery_digest("jsonl" in state, "response" in state),
+                "application_version_mismatch")
         return anchor, state
 
     def backup(self, *, max_age=300):
@@ -294,6 +311,9 @@ class Store:
             if "jsonl" in expected:
                 payload["jsonl"] = {name: base64.b64encode(raw).decode()
                                     for name, raw in storage.capture(path).items()}
+            if "response" in expected:
+                payload["response_database"] = base64.b64encode(
+                    read_file(path / response_storage.FILE, response_storage.MAX_BYTES)).decode()
             envelope = sealed(payload, read_file(self.control / "backup.key", 32), manifest)
             encoded = canonical(envelope)
             require(len(encoded) <= MAX_ENVELOPE, "backup_envelope_size_limit")
@@ -315,6 +335,7 @@ class Store:
             require(payload["state"] == expected and sha(canonical(expected)) == manifest["state_sha256"],
                     "backup_checkpoint_mismatch")
             require(("jsonl" in payload) == ("jsonl" in expected), "backup_storage_mode")
+            require(("response_database" in payload) == ("response" in expected), "backup_response_mode")
             raw = base64.b64decode(payload["database"], validate=True)
             require(len(raw) <= MAX_DATABASE and sha(raw) == manifest["database_sha256"], "database_digest")
             # Invalidate the previous restore before doing any fallible staging.
@@ -339,6 +360,10 @@ class Store:
                     require(len(raw) <= (4096 if name == "storage.json" else storage.MAX_LOG),
                             "backup_storage_size")
                     atomic(stage / name, raw)
+            if "response" in expected:
+                response_raw = base64.b64decode(payload["response_database"], validate=True)
+                require(len(response_raw) <= response_storage.MAX_BYTES, "response_database_size")
+                atomic(stage / response_storage.FILE, response_raw)
             restored = inspect_state(stage)
             require(restored["state"] == expected, "restored_state_mismatch")
             service = operations(stage)
@@ -355,6 +380,10 @@ class Store:
                     require(after["state"]["tables"][table] == digest, "inbox_changed_during_fence")
             require(after["state"]["registry_sha256"] == expected["registry_sha256"], "registry_changed_during_fence")
             require(after["state"].get("jsonl") == expected.get("jsonl"), "storage_changed_during_fence")
+            response_fenced = 0
+            if "response" in expected:
+                response_fenced = response_storage.fence(stage)
+                after = inspect_state(stage)
             release = {"purpose": "app-admission-1", "source": anchor["source"], "generation": anchor["generation"],
                        "restore_id": ident, "application_sha256": after["state"]["application_sha256"],
                        "policy_sha256": after["state"]["policy_sha256"],
@@ -362,6 +391,8 @@ class Store:
                        "fenced_sessions": fenced}
             if "jsonl" in after["state"]:
                 release["jsonl"] = after["state"]["jsonl"]
+            if "response" in after["state"]:
+                release["response"] = after["state"]["response"]
             key = Ed25519PrivateKey.from_private_bytes(read_file(self.control / "signing.key", 32))
             signed = {"release": release, "signature": base64.b64encode(key.sign(canonical(release))).decode()}
             atomic(stage / "release.json", canonical(signed))
@@ -372,7 +403,8 @@ class Store:
             verify_admission(stage, self.public)
             return {"restored": True, "restore_id": ident, "fenced_sessions": len(fenced),
                     "source_records": restored["records"], "restored_records": after["records"],
-                    "inbox_preserved": True, "generation": anchor["generation"]}
+                    "inbox_preserved": True, "generation": anchor["generation"],
+                    "response_plans_fenced": response_fenced}
 
 
 def verify_admission(directory, trust_directory):
@@ -395,6 +427,9 @@ def verify_admission(directory, trust_directory):
     require(("jsonl" in release) == ("jsonl" in state["state"]), "admission_storage_mode")
     if "jsonl" in release:
         storage.verify_prefix(directory, release["jsonl"])
+    require(("response" in release) == ("response" in state["state"]), "admission_response_mode")
+    if "response" in release:
+        response_storage.verify_baseline(directory, release["response"])
     require(state["state"]["application_sha256"] == release["application_sha256"] and
             state["state"]["policy_sha256"] == release["policy_sha256"] and
             state["state"]["registry_sha256"] == release["registry_sha256"], "admission_configuration_changed")
@@ -422,6 +457,7 @@ def main(argv=None):
     parser.add_argument("--restore-id")
     parser.add_argument("--max-age", type=int, default=300)
     parser.add_argument("--full-state", action="store_true", help="Pin full JSONL storage at initialization")
+    parser.add_argument("--response-state", action="store_true", help="Also pin the local response approval ledger")
     args = parser.parse_args(argv)
     try:
         local_only()
@@ -431,8 +467,9 @@ def main(argv=None):
         require(allowed, "local_lab_directory_required")
         store = Store(args.directory)
         require(not args.full_state or args.operation == "init", "full_state_init_only")
+        require(not args.response_state or args.operation == "init", "response_state_init_only")
         if args.operation == "init":
-            result = store.initialize(full_state=args.full_state)
+            result = store.initialize(full_state=args.full_state, response_state=args.response_state)
         elif args.operation == "checkpoint":
             result = store.checkpoint()
         elif args.operation == "backup":
