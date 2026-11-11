@@ -3,7 +3,6 @@
 import argparse
 import hashlib
 import json
-import subprocess
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
@@ -15,6 +14,7 @@ from app.services.detection_benchmark import (
     metrics,
 )
 from scripts.f1_lab.detector import DraftThresholds, ShadowDetector
+from scripts.f1_lab.provenance import git_context
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -91,7 +91,7 @@ def run(destination, thresholds):
     reports = evaluate(benchmark, detector)
     summary = {'schema': 'f1-shadow-comparison-1', 'started_at_utc': started,
         'finished_at_utc': datetime.now(UTC).isoformat(),
-        'source_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+        **git_context(ROOT, captured),
         'source_files_lf_sha256': captured,
         'thresholds': thresholds.model_dump(), 'config_sha256': detector.config_sha256,
         'manifest_sha256': benchmark.manifest_digest,

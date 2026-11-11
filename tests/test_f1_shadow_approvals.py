@@ -31,7 +31,7 @@ def lab():
     authority = Authority('tenant-a', 'business-owner', 'key-1', key.public_key(),
                           frozenset({'authentication_failure'}), frozenset({event.user.user_id}),
                           frozenset({event.device.device_id}), frozenset({event.resource.resource_id}),
-                          frozenset({event.action}))
+                          frozenset({event.action}), now-timedelta(minutes=1), now+timedelta(hours=1))
     return event, now, key, context, authority
 
 
@@ -127,3 +127,18 @@ def test_same_signing_key_cannot_alias_another_issuer(lab):
     alias = replace(authority, issuer_id='another-issuer', key_id='key-2')
     with pytest.raises(ApprovalRejected, match='key_alias'):
         ApprovalVerifier((authority, alias))
+
+
+@pytest.mark.parametrize('boundary', ['before_activation', 'expired_key', 'backdated_issue', 'expiry_after_key'])
+def test_current_key_window_cannot_be_bypassed_by_valid_signature(lab, boundary):
+    event, now, key, context, authority = lab
+    if boundary == 'before_activation':
+        authority = replace(authority, key_not_before=now+timedelta(seconds=1))
+    elif boundary == 'expired_key':
+        authority = replace(authority, key_not_after=now)
+    elif boundary == 'backdated_issue':
+        context = context.model_copy(update={'issued_at': now-timedelta(minutes=2)})
+    else:
+        authority = replace(authority, key_not_after=now+timedelta(seconds=30))
+    with pytest.raises(ApprovalRejected, match='key_window'):
+        ApprovalVerifier((authority,)).verify(sign(context, key), event, 'tenant-a', now=now)

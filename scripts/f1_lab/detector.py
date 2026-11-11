@@ -4,11 +4,14 @@ import hashlib
 import json
 import math
 
+from cryptography.hazmat.primitives import serialization
 from pydantic import Field
 
 from app.config import get_settings
 from app.models import SecurityEvent, StrictModel
 from scripts.f1_lab.approvals import ApprovalRejected, ApprovalVerifier, SignedApproval
+from scripts.f1_lab.registry import PinnedApprovalVerifier
+from scripts.f1_lab.temporal import TemporalStore
 
 RULE_IDS = {
     'credential': '8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d',
@@ -27,20 +30,55 @@ class DraftThresholds(StrictModel):
 
 
 class ShadowDetector:
-    def __init__(self, *, thresholds=None, approval_verifier: ApprovalVerifier | None = None):
+    def __init__(self, *, thresholds=None, approval_verifier=None, temporal_store=None):
         self.thresholds = thresholds if thresholds is not None else DraftThresholds()
         if not isinstance(self.thresholds, DraftThresholds):
             raise TypeError('draft_threshold_contract_required')
         self.approvals = approval_verifier
+        self.temporal = temporal_store
+        if self.approvals is not None and not isinstance(self.approvals, (ApprovalVerifier, PinnedApprovalVerifier)):
+            raise TypeError('shadow_approval_verifier_contract_required')
+        if self.temporal is not None and not isinstance(self.temporal, TemporalStore):
+            raise TypeError('shadow_temporal_store_contract_required')
 
     @property
     def config_sha256(self):
-        contract = {'engine': 'f1-shadow-1', 'thresholds': self.thresholds.model_dump(),
+        contract = {'engine': 'f1-shadow-2', 'thresholds': self.thresholds.model_dump(),
                     'context_policy': 'pinned_exact_event_scoped_ed25519',
-                    'status': 'draft_no_production_integration'}
+                    'status': 'draft_no_production_integration',
+                    'temporal_configuration': self.temporal.config_sha256 if self.temporal is not None else None}
         return hashlib.sha256(json.dumps(contract, sort_keys=True).encode()).hexdigest()
 
     def evaluate(self, event: SecurityEvent, tenant_id: str, *, approval: SignedApproval | None = None, now=None):
+        return self._evaluate(event, tenant_id, approval=approval, now=now)
+
+    def _separate_authorities(self):
+        if self.approvals is None:
+            return
+        approvals = self.approvals.current()[0] if isinstance(self.approvals, PinnedApprovalVerifier) else self.approvals
+        source_keys = set()
+        for source in self.temporal.verifier._sources().values():
+            for key in source.keys:
+                if (source.tenant_id, source.source_id, key.key_id) in self.temporal.event_sources:
+                    public = serialization.load_pem_public_key(key.public_key_pem.encode())
+                    source_keys.add((source.tenant_id, public.public_bytes(
+                        serialization.Encoding.Raw, serialization.PublicFormat.Raw)))
+        for authority in approvals.authorities.values():
+            identity = (authority.tenant_id, authority.public_key.public_bytes(
+                serialization.Encoding.Raw, serialization.PublicFormat.Raw))
+            if identity in source_keys:
+                raise ValueError('shadow_observation_and_approval_keys_must_be_distinct')
+
+    def evaluate_signed(self, signal, principal, *, approval=None, now=None):
+        if self.temporal is None:
+            raise ValueError('shadow_signed_event_store_required')
+        self._separate_authorities()
+        window = self.temporal.observe(signal, principal, now=now)
+        result = self._evaluate(signal.event, principal.tenant_id, approval=approval, now=now, window=window)
+        result['temporal_evidence'] = window
+        return result
+
+    def _evaluate(self, event, tenant_id, *, approval=None, now=None, window=None):
         if get_settings().app_environment not in {'local', 'test'}:
             raise ValueError('shadow_detector_local_test_only')
         if not isinstance(event, SecurityEvent) or not isinstance(tenant_id, str) or not tenant_id:
@@ -99,7 +137,24 @@ class ShadowDetector:
         if (action == 'DOWNLOAD' and resource.sensitivity in {'high', 'critical'}
                 and behavior.download_volume_mb >= self.thresholds.bulk_download_mb):
             signal('exfiltration', 'SENSITIVE_BULK_DOWNLOAD', deviation='bulk_export')
-        return {'engine': 'f1-shadow-1', 'status': 'draft_shadow_only',
+        if window is not None:
+            # An exact-event approval does not approve preceding events. No
+            # temporal finding is suppressed by a current-event-only exception.
+            if not window['complete']:
+                signal('credential', 'TEMPORAL_AUTHORITY_OR_EVIDENCE_INCOMPLETE')
+            if window['failed_login_events'] >= self.thresholds.credential_failures:
+                signal('credential', 'REPEATED_SIGNED_FAILED_LOGIN_EVENTS')
+            if window['sensitive_download_mb'] >= self.thresholds.bulk_download_mb:
+                signal('exfiltration', 'CUMULATIVE_SIGNED_SENSITIVE_DOWNLOAD')
+            if window['distinct_resources'] >= self.thresholds.resource_fanout:
+                signal('lateral', 'CUMULATIVE_SIGNED_RESOURCE_FANOUT')
+            if window['saw_compromised']:
+                signal('device', 'RECENT_COMPROMISED_DEVICE')
+            if window['saw_inactive']:
+                signal('credential', 'RECENT_INACTIVE_IDENTITY')
+            if window['saw_rejected_mfa']:
+                signal('credential', 'RECENT_REJECTED_MFA')
+        return {'engine': 'f1-shadow-2', 'status': 'draft_shadow_only',
                 'config_sha256': self.config_sha256, 'detected': bool(matches),
                 'predicted_rule_ids': sorted(matches), 'reason_codes': reasons,
                 'signed_context_status': status, 'context_error': context_error,

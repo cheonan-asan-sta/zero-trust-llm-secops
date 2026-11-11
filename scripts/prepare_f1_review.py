@@ -4,7 +4,6 @@ import argparse
 import hashlib
 import json
 import platform
-import subprocess
 import tempfile
 from collections import defaultdict
 from importlib.metadata import version
@@ -21,6 +20,7 @@ from app.services.sigma import (
     _match_field,
     _match_selector,
 )
+from scripts.f1_lab.provenance import git_context
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXED_SOURCES = (
@@ -28,6 +28,7 @@ FIXED_SOURCES = (
     'app/services/sigma.py', 'scripts/build_detection_benchmark.py',
     'scripts/prepare_f1_review.py', 'app/data/benchmark/manifest.json',
     'app/data/benchmark/families.json', 'app/data/benchmark/cases.jsonl',
+    'scripts/f1_lab/provenance.py',
 )
 CAUSES = {'input_mapping', 'missing_observation', 'temporal_context', 'scope_exception',
           'rule_condition', 'label_dispute', 'other'}
@@ -167,9 +168,7 @@ def create(destination, *, author):
             json.dumps(row, ensure_ascii=False).encode() + b'\n' for row in worksheet))
         manifest = {'schema': 'f1-baseline-review-1', 'independent_review': 'pending',
             'implementation_author': author, 'detector_changed': False,
-            'source_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
-            'source_dirty': bool(subprocess.check_output(
-                ['git', 'status', '--porcelain', '--untracked-files=all', '--', *captured], cwd=ROOT).strip()),
+            **git_context(ROOT, captured),
             'environment': {'python': platform.python_version(),
                             'pydantic': version('pydantic'), 'pyyaml': version('pyyaml')},
             'metric_unit': 'authored_synthetic_event', 'new_blind_evaluation': False,

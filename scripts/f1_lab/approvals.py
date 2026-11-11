@@ -90,6 +90,8 @@ class Authority:
     device_ids: frozenset[str]
     resource_ids: frozenset[str]
     actions: frozenset[EventAction]
+    key_not_before: datetime
+    key_not_after: datetime
     active: bool = True
 
 
@@ -115,6 +117,9 @@ class ApprovalVerifier:
                     and authority.allowed_deviations <= DEVIATIONS, 'approval_registry_identity')
             require(all(0 < len(scope) <= 100 for scope in (authority.user_ids, authority.device_ids,
                     authority.resource_ids, authority.actions)), 'approval_registry_scope_required')
+            require(all(isinstance(value, datetime) and value.tzinfo is not None and value.utcoffset() is not None
+                        for value in (authority.key_not_before, authority.key_not_after))
+                    and authority.key_not_before < authority.key_not_after, 'approval_registry_key_window')
             fingerprint = (authority.tenant_id, authority.public_key.public_bytes(
                 serialization.Encoding.Raw, serialization.PublicFormat.Raw))
             require(fingerprint not in fingerprints, 'approval_key_alias')
@@ -129,6 +134,9 @@ class ApprovalVerifier:
         require(context.tenant_id == tenant_id, 'approval_tenant_mismatch')
         authority = self.authorities.get((tenant_id, context.issuer_id, context.key_id))
         require(authority is not None and authority.active, 'approval_authority_unavailable')
+        require(authority.key_not_before <= now < authority.key_not_after
+                and authority.key_not_before <= context.issued_at
+                and context.expires_at <= authority.key_not_after, 'approval_key_window')
         require(context.approval_id not in self.revoked, 'approval_revoked')
         require(set(context.permitted_deviations) <= authority.allowed_deviations, 'approval_authority_scope')
         require(context.user_id in authority.user_ids and context.device_id in authority.device_ids

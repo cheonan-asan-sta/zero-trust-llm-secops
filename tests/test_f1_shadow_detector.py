@@ -35,7 +35,8 @@ def with_context(event, deviations):
         issued_at=now, expires_at=now+timedelta(minutes=1))
     authority = Authority('a', 'owner', 'key', key.public_key(), frozenset(deviations),
         frozenset({event.user.user_id}), frozenset({event.device.device_id}),
-        frozenset({event.resource.resource_id}), frozenset({event.action}))
+        frozenset({event.resource.resource_id}), frozenset({event.action}),
+        now-timedelta(minutes=1), now+timedelta(hours=1))
     return ShadowDetector(approval_verifier=ApprovalVerifier((authority,))), sign(context, key), now
 
 
