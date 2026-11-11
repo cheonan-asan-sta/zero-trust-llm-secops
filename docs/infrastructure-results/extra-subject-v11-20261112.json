@@ -5,7 +5,7 @@
   "aggregation_profile": "f1-tenant-analyst-user-activity-1",
   "activity_scope": "same store/tenant/authenticated analyst/observed user; sessions and devices may differ",
   "adverse_scope": "related device posture and user inactive in same tenant; derived markers only",
-  "approval_contract": "exact current event plus exact received fact set; authority covers all devices/resources/actions and volume",
+  "approval_contract": "exact current event plus exact received fact set; authority covers all devices/resources/actions; signed context limits cumulative volume",
   "legacy_summary_complete": false,
   "actual_collection_completeness_proven": false,
   "focused": {
@@ -108,6 +108,7 @@
     "Observed user identity is a configured event-producer assertion; actual IdP binding pending.",
     "Activity is not aggregated across analysts, stores or hosts.",
     "No new independent labels or deployment acceptance.",
-    "Bounded journal does not silently discard old rows."
+    "Bounded journal does not silently discard old rows.",
+    "Authority registry has no separate issuer cumulative budget; volume ceiling is the business issuer's signed context value."
   ]
 }

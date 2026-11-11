@@ -6,6 +6,17 @@
 종료 예정08:50 KST이며 helper 세션70567이 공개 stdout 증거를 수집한 뒤 소유 자원을 정리한다.
 `extra_start_frozen_soak_03.py`를 사용했고 다른 기존 컨테이너/데몬은 중지하지 않는다.
 중간 checkpoint는 완료가 아니다. 종료 상태·공개 파일 SHA·private runtime0·컨테이너/이미지 제거를 확인해야 한다.
+**추가 진행 중:** 사용자 프로필 `runtime/f1/extra-subject-soak-20261112-02`는 전체 Linux pytest 뒤
+08:45 KST까지 실행한다. helper 세션55094, `extra_start_frozen_subject_soak_02.py`, 고정460파일이다.
+최초01은 통제 증거 문서2파일이 빠져3152통과/1실패·soak 시작0이며 소유 컨테이너/파생 이미지0으로 정리했다.
+앱 수정 없이 증거 문서를 source snapshot에 추가해02를 실행한다. 실패 회차는 보존한다.
+읽기 전용 Docker 자원 관측02 세션88019는 두 소유 컨테이너만60초 간격으로 측정하며08:51까지다.
+기존 관측 세션33253은01실패/기존 v9 관측 이력으로 별도 보존하며 회차 수를 합치지 않는다.
+두 시험은 서로 다른 소스/profile이다. 각 완료/해시/정리를 별도로 확인한다. 현재 Windows 최종418개 통과다.
+02 재실행 **전체 Linux3153개 통과·실패/오류/skip0** 뒤05:46 KST 첫20고유 이벤트/원장20행으로 soak를 시작했다.
+`start-checkpoint`는 공개 파일/전체 XML과 source460 지문이며 완료가 아니다.
+[v13 시작 근거](docs/infrastructure-results/extra-subject-soak-start-v13-20261112.json)를 따른다.
+최종에는 `extra_validate_public_soaks.py`로 공개 증거의 일정/원장/해시/실행 간격과 각 정리를 대조한다.
 기존 app/규칙/라벨은 보존하고 shadow v1은 관찰 holdout F1 80%·FPR33.33%로 **목표 미달**이다.
 서명 없는 승인 정보를 제외한 개발 투영에는 충돌30그룹이 있다. 서명 업무 맥락·초안/원본 비교를
 실험했고 v8 최종 Windows307·Linux307개가 각각 통과했다. 시계 high-water·비교기별 오류 분모,
