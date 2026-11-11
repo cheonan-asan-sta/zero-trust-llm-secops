@@ -8,6 +8,7 @@ Authority configuration is trusted operator input, not an event-supplied key.
 import base64
 import hashlib
 import json
+import math
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Annotated, Literal
@@ -58,6 +59,7 @@ class ApprovalContext(StrictModel):
     maximum_download_mb: float = Field(ge=0, allow_inf_nan=False)
     issued_at: datetime
     expires_at: datetime
+    window_evidence_sha256: Annotated[str | None, Field(pattern=r'^[a-f0-9]{64}$')] = None
 
     @field_validator('issued_at', 'expires_at')
     @classmethod
@@ -96,7 +98,7 @@ class Authority:
 
 
 def canonical(context: ApprovalContext):
-    return json.dumps(context.model_dump(mode='json'), ensure_ascii=False, sort_keys=True,
+    return json.dumps(context.model_dump(mode='json', exclude_none=True), ensure_ascii=False, sort_keys=True,
                       separators=(',', ':')).encode()
 
 
@@ -157,3 +159,22 @@ class ApprovalVerifier:
         except (ValueError, InvalidSignature):
             raise ApprovalRejected('approval_signature_rejected') from None
         return frozenset(context.permitted_deviations)
+
+    def verify_window(self, signed, event, tenant_id, window, *, now=None):
+        """Only call with the live server-derived window, never a client-supplied summary."""
+        scopes = self.verify(signed, event, tenant_id, now=now)
+        context = signed.context
+        require(window.get('complete') is True and context.window_evidence_sha256 is not None
+                and context.window_evidence_sha256 == window.get('evidence_sha256'), 'approval_window_binding')
+        require(window.get('tenant_id') == tenant_id and window.get('user_id') == context.user_id
+                and window.get('device_id') == context.device_id and event.event_id in window.get('event_ids', []),
+                'approval_window_identity')
+        authority = self.authorities[(tenant_id, context.issuer_id, context.key_id)]
+        require(window.get('resource_ids') and set(window['resource_ids']) <= authority.resource_ids
+                and window.get('actions') and set(window['actions']) <= authority.actions,
+                'approval_window_authority_scope')
+        volume = window.get('sensitive_download_mb')
+        require(isinstance(volume, (int, float)) and not isinstance(volume, bool) and math.isfinite(volume)
+                and 0 <= volume <= context.maximum_download_mb,
+                'approval_window_volume_scope')
+        return scopes

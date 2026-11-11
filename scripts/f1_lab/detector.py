@@ -43,7 +43,7 @@ class ShadowDetector:
 
     @property
     def config_sha256(self):
-        contract = {'engine': 'f1-shadow-2', 'thresholds': self.thresholds.model_dump(),
+        contract = {'engine': 'f1-shadow-3', 'thresholds': self.thresholds.model_dump(),
                     'context_policy': 'pinned_exact_event_scoped_ed25519',
                     'status': 'draft_no_production_integration',
                     'temporal_configuration': self.temporal.config_sha256 if self.temporal is not None else None}
@@ -85,7 +85,8 @@ class ShadowDetector:
             raise ValueError('shadow_input_contract_required')
         if not math.isfinite(event.behavior.download_volume_mb):
             raise ValueError('shadow_nonfinite_observation')
-        scopes, status, context_error = frozenset(), 'absent', None
+        scopes, window_scopes, status, context_error = frozenset(), frozenset(), 'absent', None
+        window_context_status = 'absent'
         if approval is not None:
             status = 'rejected'
             if self.approvals is None:
@@ -96,10 +97,18 @@ class ShadowDetector:
                     status = 'verified'
                 except ApprovalRejected as error:
                     context_error = str(error)
+        if status == 'verified' and window is not None and approval.context.window_evidence_sha256 is not None:
+            try:
+                window_scopes = self.approvals.verify_window(approval, event, tenant_id, window, now=now)
+                window_context_status = 'verified'
+            except ApprovalRejected as error:
+                window_context_status = 'rejected'
+                context_error = str(error)
         matches, reasons, suppressed = set(), [], []
 
-        def signal(domain, code, *, deviation=None):
-            if deviation is not None and deviation in scopes:
+        def signal(domain, code, *, deviation=None, temporal=False):
+            allowed = window_scopes if temporal else scopes
+            if deviation is not None and deviation in allowed:
                 suppressed.append(code)
             else:
                 matches.add(RULE_IDS[domain])
@@ -138,26 +147,27 @@ class ShadowDetector:
                 and behavior.download_volume_mb >= self.thresholds.bulk_download_mb):
             signal('exfiltration', 'SENSITIVE_BULK_DOWNLOAD', deviation='bulk_export')
         if window is not None:
-            # An exact-event approval does not approve preceding events. No
-            # temporal finding is suppressed by a current-event-only exception.
+            # Only an exact authenticated fact-set approval can cover preceding
+            # events. Current-event approvals never suppress these findings.
             if not window['complete']:
                 signal('credential', 'TEMPORAL_AUTHORITY_OR_EVIDENCE_INCOMPLETE')
             if window['failed_login_events'] >= self.thresholds.credential_failures:
-                signal('credential', 'REPEATED_SIGNED_FAILED_LOGIN_EVENTS')
+                signal('credential', 'REPEATED_SIGNED_FAILED_LOGIN_EVENTS', deviation='authentication_failure', temporal=True)
             if window['sensitive_download_mb'] >= self.thresholds.bulk_download_mb:
-                signal('exfiltration', 'CUMULATIVE_SIGNED_SENSITIVE_DOWNLOAD')
+                signal('exfiltration', 'CUMULATIVE_SIGNED_SENSITIVE_DOWNLOAD', deviation='bulk_export', temporal=True)
             if window['distinct_resources'] >= self.thresholds.resource_fanout:
-                signal('lateral', 'CUMULATIVE_SIGNED_RESOURCE_FANOUT')
+                signal('lateral', 'CUMULATIVE_SIGNED_RESOURCE_FANOUT', deviation='resource_fanout', temporal=True)
             if window['saw_compromised']:
                 signal('device', 'RECENT_COMPROMISED_DEVICE')
             if window['saw_inactive']:
                 signal('credential', 'RECENT_INACTIVE_IDENTITY')
             if window['saw_rejected_mfa']:
                 signal('credential', 'RECENT_REJECTED_MFA')
-        return {'engine': 'f1-shadow-2', 'status': 'draft_shadow_only',
+        return {'engine': 'f1-shadow-3', 'status': 'draft_shadow_only',
                 'config_sha256': self.config_sha256, 'detected': bool(matches),
                 'predicted_rule_ids': sorted(matches), 'reason_codes': reasons,
                 'signed_context_status': status, 'context_error': context_error,
+                'signed_window_context_status': window_context_status,
                 'context_only_suppressed_signals': suppressed,
                 'unsigned_exception_claim_used': False, 'external_calls': 0,
                 'access_grants': 0, 'session_changes': 0}

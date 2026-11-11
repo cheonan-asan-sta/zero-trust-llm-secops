@@ -20,6 +20,7 @@ from app.services.trusted_signals import SignalVerifier, canonical_signal
 from app.zero_trust_models import SignedSessionSignal
 from scripts.evaluate_f1_shadow import score
 from scripts.f1_lab.approvals import ApprovalContext, event_digest, sign
+from scripts.f1_lab.confidence import independent_trial_reference
 from scripts.f1_lab.detector import RULE_IDS, ShadowDetector
 from scripts.f1_lab.provenance import git_context
 from scripts.f1_lab.registry import PinnedApprovalVerifier
@@ -79,7 +80,9 @@ def trust_fixture(inputs, operator_plans):
     return {'sources': sources}, registry, producer_keys, approval_keys, bindings, assignments
 
 
-def run(dataset, anchor, destination, *, fixture_approvals=False):
+def run(dataset, anchor, destination, *, fixture_approvals=False, fixture_window_approvals=False):
+    if fixture_window_approvals and not fixture_approvals:
+        raise ValueError('controlled_window_mode_requires_explicit_fixture_approval_mode')
     if destination.exists() or destination.is_symlink():
         raise ValueError('controlled_fresh_result_directory_required')
     manifest = verify(dataset, anchor)
@@ -115,6 +118,7 @@ def run(dataset, anchor, destination, *, fixture_approvals=False):
             prediction, any_matches, raw_matches = None, set(), set()
             error = None
             for raw in case['events']:
+                started = time.perf_counter()
                 event = SecurityEvent.model_validate(raw)
                 now = event.timestamp
                 group = assignments[case['case_id']]
@@ -124,6 +128,15 @@ def run(dataset, anchor, destination, *, fixture_approvals=False):
                 signature = base64.urlsafe_b64encode(producer_keys[group].sign(canonical_signal(signal))).decode().rstrip('=')
                 signal = signal.model_copy(update={'signature': signature})
                 approval = None
+                window = None
+                if fixture_window_approvals:
+                    try:
+                        window = store.observe(signal, principal, now=now)
+                    except (ValueError, TypeError, RuntimeError):
+                        error = 'controlled_inference_failed'
+                        latencies.append((time.perf_counter()-started)*1000)
+                        event_count += 1
+                        continue
                 if fixture_approvals and case['case_id'] in plans:
                     plan = plans[case['case_id']]
                     context = ApprovalContext(approval_id='approval-'+hashlib.sha256((case['case_id']+event.event_id).encode()).hexdigest()[:32],
@@ -131,9 +144,10 @@ def run(dataset, anchor, destination, *, fixture_approvals=False):
                         key_id='business-key', event_sha256=event_digest(event), user_id=event.user.user_id,
                         device_id=event.device.device_id, resource_id=event.resource.resource_id, action=event.action,
                         permitted_deviations=plan['permitted_deviations'],
-                        maximum_download_mb=plan['maximum_window_download_mb'], issued_at=now, expires_at=now+timedelta(seconds=60))
+                        maximum_download_mb=plan['maximum_window_download_mb'], issued_at=now,
+                        expires_at=now+timedelta(seconds=60),
+                        window_evidence_sha256=window['evidence_sha256'] if window is not None else None)
                     approval = sign(context, approval_keys[plan['issuer_group']])
-                started = time.perf_counter()
                 try:
                     raw_prediction = single.evaluate(event, 'controlled-lab', approval=approval, now=now)
                     prediction = detector.evaluate_signed(signal, principal, approval=approval, now=now)
@@ -158,12 +172,18 @@ def run(dataset, anchor, destination, *, fixture_approvals=False):
                  'outcome': 'TP' if r['threat'] and r['single_event_any_alert'] else 'FN' if r['threat']
                  else 'FP' if r['single_event_any_alert'] else 'TN'} for r in result_rows]
     raw_score = score(raw_rows, RULE_IDS.values())
+    for result in (temporal_score, raw_score):
+        result['within_authored_family_bootstrap_target_supported'] = result['statistical_target_supported']
+        result['statistical_target_supported'] = False
+        result['statistical_support_scope'] = 'Controlled, author-labeled variants do not establish independent population support.'
+        result['hypothetical_independent_trial_reference'] = independent_trial_reference(result['confusion'])
     ordered = sorted(latencies)
     summary = {'schema': 'f1-controlled-session-result-1', **git_context(ROOT, captured),
         'source_files_lf_sha256': captured, 'dataset_manifest_sha256': anchor,
         'metric_unit': 'session_any_alert', 'scenario_families': manifest['family_count'],
         'sessions': len(result_rows), 'signed_events': event_count,
         'time_mode': manifest['time_mode'], 'fixture_approvals_enabled': fixture_approvals,
+        'fixture_window_approvals_enabled': fixture_window_approvals,
         'simulated_service_principal': True,
         'public_source_registry_sha256': hashlib.sha256(canonical(source_registry)).hexdigest(),
         'public_approval_registry_sha256': approval_anchor,
@@ -171,7 +191,9 @@ def run(dataset, anchor, destination, *, fixture_approvals=False):
         'single_event_any_alert': raw_score, 'signed_temporal_any_alert': temporal_score,
         'per_event_end_to_end_latency_ms': {'p50': statistics.median(ordered),
             'p95': ordered[math.ceil(len(ordered)*.95)-1], 'p95_method': 'nearest-rank',
-            'samples': len(ordered)},
+            'samples': len(ordered),
+            'scope': 'local producer encoding/signing, optional fixture issuance, both comparator evaluations',
+            'key_generation_and_setup_excluded': True, 'network_latency_included': False},
         'goals': {'original_event_benchmark_replaced': False, 'goal_qualified': False},
         'effects': {'cloud_calls': 0, 'paid_api_calls': 0, 'access_grants': 0, 'session_changes': 0},
         'ephemeral_stores_remaining': 0,
@@ -195,8 +217,11 @@ def main():
     parser.add_argument('--expected-sha256', required=True)
     parser.add_argument('--directory', required=True, type=Path)
     parser.add_argument('--fixture-approvals', action='store_true', help='Explicitly simulate operator plans; never real approval evidence')
+    parser.add_argument('--fixture-window-approvals', action='store_true',
+                        help='Also bind simulated approvals to live authenticated window facts')
     args = parser.parse_args()
-    result = run(args.dataset, args.expected_sha256, args.directory, fixture_approvals=args.fixture_approvals)
+    result = run(args.dataset, args.expected_sha256, args.directory, fixture_approvals=args.fixture_approvals,
+                 fixture_window_approvals=args.fixture_window_approvals)
     print(json.dumps({key: result[key] for key in ('sessions', 'signed_events', 'fixture_approvals_enabled',
         'single_event_any_alert', 'signed_temporal_any_alert', 'goals')}))
 

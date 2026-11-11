@@ -13,6 +13,7 @@ import secrets
 import sqlite3
 from contextlib import closing, contextmanager
 from datetime import UTC, datetime, timedelta
+from functools import wraps
 from pathlib import Path
 
 from app.config import get_settings
@@ -31,10 +32,23 @@ APPLICATION_ID = 1515475537
 TABLE = 'CREATE TABLE signed_events (seq INTEGER PRIMARY KEY, body TEXT NOT NULL, previous_hash TEXT NOT NULL, record_hash TEXT NOT NULL)'
 MAX_BODY = 32768
 MAX_DATABASE = 64 * 1024**2
+MAX_DOWNLOAD_DELTA_MB = 1_000_000_000
 
 
 class TemporalUnavailable(ValueError):
     pass
+
+
+def bounded(operation):
+    @wraps(operation)
+    def call(*args, **kwargs):
+        try:
+            return operation(*args, **kwargs)
+        except TemporalUnavailable:
+            raise
+        except (sqlite3.Error, OSError, ValueError, TypeError, KeyError, OverflowError):
+            raise TemporalUnavailable('temporal_store_unavailable') from None
+    return call
 
 
 def require(condition, code):
@@ -78,12 +92,14 @@ class TemporalStore:
                 and type(capacity) is int and 1 <= capacity <= 2000, 'temporal_configuration_bounds')
         self.window_seconds, self.capacity = window_seconds, capacity
         self.config_sha256 = digest(canonical({'event_producers': sorted(self.event_sources),
-            'window_seconds': window_seconds, 'capacity': capacity, 'measurement': 'distinct_events_and_byte_deltas'}))
+            'window_seconds': window_seconds, 'capacity': capacity, 'measurement': 'distinct_events_and_byte_deltas',
+            'maximum_download_delta_mb': MAX_DOWNLOAD_DELTA_MB}))
 
     def _local(self):
         require(get_settings().app_environment in {'local', 'test'}, 'temporal_local_test_only')
         require(not self.database.is_symlink() and not self.control.is_symlink(), 'temporal_path_scope')
 
+    @bounded
     def initialize(self):
         self._local()
         require(not self.database.exists() and not self.control.exists(), 'temporal_fresh_storage_required')
@@ -213,6 +229,7 @@ class TemporalStore:
                 and principal.auth_method != 'disabled' and bool(principal.subject.strip()),
                 'temporal_authenticated_analyst_required')
 
+    @bounded
     def observe(self, signal: SignedSessionSignal, principal: Principal, *, now=None):
         self._local()
         self._authorize(principal)
@@ -229,7 +246,8 @@ class TemporalStore:
             raise TemporalUnavailable('temporal_source_rejected') from None
         event = signal.event
         require(timedelta(0) <= now-instant(event.timestamp) <= timedelta(seconds=60)
-                and math.isfinite(event.behavior.download_volume_mb), 'temporal_observation_freshness')
+                and math.isfinite(event.behavior.download_volume_mb)
+                and event.behavior.download_volume_mb <= MAX_DOWNLOAD_DELTA_MB, 'temporal_observation_freshness')
         input_sha256 = digest(canonical_signal(signal))
         with self._locked(), closing(self._connect()) as db:
             db.execute('PRAGMA synchronous=FULL')
@@ -273,6 +291,7 @@ class TemporalStore:
             self._phase('after_publish')
             return self._summary([*entries, record], next_head, signal.session_id, principal, now)
 
+    @bounded
     def summary(self, session_id, principal: Principal, *, now=None):
         self._local()
         self._authorize(principal)
@@ -304,6 +323,8 @@ class TemporalStore:
             selected.append((record, signal.event))
         events = [event for _, event in selected]
         first = SignedSessionSignal.model_validate(owned[0]['signal']).event
+        facts = sorted((event.timestamp.isoformat(), event.event_id, record['input_sha256'], record['source_digest'])
+                       for record, event in selected)
         result = {'schema': 'f1-temporal-summary-1', 'store_id': head['store_id'], 'tenant_id': principal.tenant_id,
             'operator': principal.subject, 'session_id': session_id, 'user_id': first.user.user_id,
             'device_id': first.device.device_id, 'as_of': now.isoformat(), 'window_seconds': self.window_seconds,
@@ -316,10 +337,15 @@ class TemporalStore:
             'sensitive_download_mb': sum(e.behavior.download_volume_mb for e in events
                 if e.action == 'DOWNLOAD' and e.resource.sensitivity in {'high', 'critical'}),
             'distinct_resources': len({e.resource.resource_id for e in events}),
+            'resource_ids': sorted({e.resource.resource_id for e in events}),
+            'actions': sorted({e.action.value for e in events}),
+            'event_ids': sorted({e.event_id for e in events}),
             'saw_compromised': any(e.device.security_posture == 'compromised' for e in events),
             'saw_inactive': any(not e.user.active for e in events),
             'saw_rejected_mfa': any(e.auth_context.mfa == 'failed' for e in events),
-            'evidence_sha256': digest(canonical({'head': head, 'as_of': now.isoformat(),
-                'session': [principal.tenant_id, principal.subject, session_id],
-                'events': [r['input_sha256'] for r, _ in selected], 'excluded': excluded}))}
+            'journal_head_sha256': head['hash'],
+            'evidence_sha256': digest(canonical({'schema': 'f1-authenticated-window-facts-1',
+                'configuration': self.config_sha256,
+                'session': [principal.tenant_id, principal.subject, session_id, first.user.user_id, first.device.device_id],
+                'events': facts, 'excluded': excluded}))}
         return result

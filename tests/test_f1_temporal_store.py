@@ -6,6 +6,7 @@ import sqlite3
 import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 
@@ -194,6 +195,115 @@ def test_observation_key_cannot_also_be_the_business_approval_authority(lab):
     detector = ShadowDetector(temporal_store=lab.store, approval_verifier=ApprovalVerifier((authority,)))
     with pytest.raises(ValueError, match='keys_must_be_distinct'):
         detector.evaluate_signed(message, lab.principal, now=lab.now)
+    with pytest.raises(TemporalUnavailable, match='session_unavailable'):
+        lab.store.summary('session-a', lab.principal, now=lab.now)
+
+
+@pytest.fixture
+def window_lab(lab):
+    messages = []
+    for index in range(3):
+        message = lab.signal('window-'+str(index), index*20, action='DOWNLOAD',
+            **{'resource.resource_id': 'resource-'+str(index), 'resource.sensitivity': 'critical',
+               'behavior.download_volume_mb': 180, 'auth_context.authentication_result': 'success',
+               'auth_context.failed_attempts': 0})
+        window = lab.store.observe(message, lab.principal, now=at(lab, index*20))
+        messages.append(message)
+    now, event = at(lab, 40), messages[-1].event
+    key = Ed25519PrivateKey.generate()
+    authority = Authority('tenant-a', 'business', 'business-key', key.public_key(), frozenset({'bulk_export'}),
+        frozenset({event.user.user_id}), frozenset({event.device.device_id}), frozenset(window['resource_ids']),
+        frozenset({event.action}), now-timedelta(minutes=1), now+timedelta(hours=1))
+    context = ApprovalContext(approval_id='approval-'+'b'*32, tenant_id='tenant-a', issuer_id='business',
+        key_id='business-key', event_sha256=event_digest(event), user_id=event.user.user_id,
+        device_id=event.device.device_id, resource_id=event.resource.resource_id, action=event.action,
+        permitted_deviations=['bulk_export'], maximum_download_mb=540, issued_at=now,
+        expires_at=now+timedelta(seconds=60), window_evidence_sha256=window['evidence_sha256'])
+    return SimpleNamespace(lab=lab, now=now, messages=messages, event=event, window=window,
+                           key=key, authority=authority, context=context)
+
+
+def window_detector(state, *, authority=None, revoked=()):
+    verifier = ApprovalVerifier((state.authority if authority is None else authority,), revoked_approval_ids=revoked)
+    return ShadowDetector(temporal_store=state.lab.store, approval_verifier=verifier)
+
+
+def test_exact_signed_window_context_can_cover_its_registered_job_scope(window_lab):
+    state = window_lab
+    result = window_detector(state).evaluate_signed(state.messages[-1], state.lab.principal,
+        approval=sign(state.context, state.key), now=state.now)
+    assert result['signed_window_context_status'] == 'verified' and not result['detected']
+    assert 'CUMULATIVE_SIGNED_SENSITIVE_DOWNLOAD' in result['context_only_suppressed_signals']
+    assert result['access_grants'] == result['session_changes'] == 0
+
+
+@pytest.mark.parametrize('fault', ['event_only', 'different_window', 'last_resource_only', 'volume', 'revoked', 'bad_signature'])
+def test_window_context_cannot_expand_or_transplant_authority(window_lab, fault):
+    state = window_lab
+    context, authority, revoked = state.context, state.authority, ()
+    if fault == 'event_only':
+        context = context.model_copy(update={'window_evidence_sha256': None})
+    elif fault == 'different_window':
+        context = context.model_copy(update={'window_evidence_sha256': '0'*64})
+    elif fault == 'last_resource_only':
+        authority = replace(authority, resource_ids=frozenset({state.event.resource.resource_id}))
+    elif fault == 'volume':
+        context = context.model_copy(update={'maximum_download_mb': 180})
+    elif fault == 'revoked':
+        revoked = (context.approval_id,)
+    proof = sign(context, state.key)
+    if fault == 'bad_signature':
+        proof.context.window_evidence_sha256 = '1'*64
+    result = window_detector(state, authority=authority, revoked=revoked).evaluate_signed(
+        state.messages[-1], state.lab.principal, approval=proof, now=state.now)
+    assert result['detected']
+    assert 'CUMULATIVE_SIGNED_SENSITIVE_DOWNLOAD' in result['reason_codes']
+    assert result['signed_window_context_status'] != 'verified'
+
+
+def test_unrelated_session_and_small_clock_shift_do_not_change_the_fact_set(window_lab):
+    state = window_lab
+    other = state.lab.signal('other-session', 41, session='session-b')
+    state.lab.store.observe(other, state.lab.principal, now=at(state.lab, 41))
+    result = window_detector(state).evaluate_signed(state.messages[-1], state.lab.principal,
+        approval=sign(state.context, state.key), now=at(state.lab, 41))
+    assert result['temporal_evidence']['evidence_sha256'] == state.window['evidence_sha256']
+    assert result['signed_window_context_status'] == 'verified' and not result['detected']
+
+
+def test_new_event_in_same_window_invalidates_the_old_job_context(window_lab):
+    state = window_lab
+    new = state.lab.signal('extra-download', 41, action='DOWNLOAD',
+        **{'resource.sensitivity': 'critical', 'behavior.download_volume_mb': 180,
+           'auth_context.authentication_result': 'success', 'auth_context.failed_attempts': 0})
+    state.lab.store.observe(new, state.lab.principal, now=at(state.lab, 41))
+    result = window_detector(state).evaluate_signed(state.messages[-1], state.lab.principal,
+        approval=sign(state.context, state.key), now=at(state.lab, 41))
+    assert result['temporal_evidence']['evidence_sha256'] != state.window['evidence_sha256']
+    assert result['signed_window_context_status'] == 'rejected' and result['detected']
+
+
+def test_identical_signed_fact_reconstruction_has_same_context_binding(window_lab):
+    state = window_lab
+    clone = TemporalStore(state.lab.root / 'clone.db', state.lab.root / 'clone-control',
+                          SignalVerifier(state.lab.registry_path), state.lab.sources)
+    clone.initialize()
+    for index, message in enumerate(state.messages):
+        result = clone.observe(message, state.lab.principal, now=at(state.lab, index*20))
+    assert result['evidence_sha256'] == state.window['evidence_sha256']
+    assert result['journal_head_sha256'] != state.window['journal_head_sha256']
+
+
+def test_corrupt_sqlite_and_missing_witness_have_bounded_failure(lab):
+    lab.store.database.write_bytes(b'broken sqlite')
+    with pytest.raises(TemporalUnavailable):
+        lab.store.observe(lab.signal(), lab.principal, now=lab.now)
+
+
+def test_impossible_download_delta_is_rejected_before_journal_commit(lab):
+    message = lab.signal('huge', action='DOWNLOAD', **{'behavior.download_volume_mb': 1e308})
+    with pytest.raises(TemporalUnavailable, match='freshness'):
+        lab.store.observe(message, lab.principal, now=lab.now)
     with pytest.raises(TemporalUnavailable, match='session_unavailable'):
         lab.store.summary('session-a', lab.principal, now=lab.now)
 

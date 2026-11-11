@@ -82,3 +82,7 @@ class PinnedApprovalVerifier:
         # Replacing an old mtime or swapping a public registry cannot retain trust.
         verifier, _ = self.current()
         return verifier.verify(signed, event, tenant_id, now=now)
+
+    def verify_window(self, signed, event, tenant_id, window, *, now=None):
+        verifier, _ = self.current()
+        return verifier.verify_window(signed, event, tenant_id, window, now=now)
