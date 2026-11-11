@@ -122,7 +122,7 @@ class TemporalStore:
             db.execute(TABLE)
         head = {'store_id': secrets.token_hex(16), 'configuration': self.config_sha256,
                 'seq': 0, 'hash': ZERO, 'last_now': None}
-        self._save({'current': head, 'pending': None}, key)
+        self._save({'current': head, 'pending': None, 'observed_until': None}, key)
         return {'initialized': True, 'store_id': head['store_id'], 'config_sha256': self.config_sha256}
 
     def _key(self):
@@ -151,13 +151,13 @@ class TemporalStore:
                 msvcrt.locking(stream.fileno(), msvcrt.LK_UNLCK, 1)
 
     def _save(self, value, key):
-        body = {'schema': 'f1-temporal-witness-1', 'state': value}
+        body = {'schema': 'f1-temporal-witness-2', 'state': value}
         tag = hmac.new(key, canonical(body), hashlib.sha256).hexdigest()
         atomic(self.control / 'witness.json', canonical({**body, 'hmac_sha256': tag}))
 
     def _witness(self, key):
         raw = json.loads(read(self.control / 'witness.json', 4096))
-        require(set(raw) == {'schema', 'state', 'hmac_sha256'} and raw['schema'] == 'f1-temporal-witness-1',
+        require(set(raw) == {'schema', 'state', 'hmac_sha256'} and raw['schema'] == 'f1-temporal-witness-2',
                 'temporal_witness_contract')
         require(isinstance(raw['hmac_sha256'], str) and len(raw['hmac_sha256']) == 64,
                 'temporal_witness_tag_shape')
@@ -165,7 +165,7 @@ class TemporalStore:
         require(hmac.compare_digest(hmac.new(key, canonical(body), hashlib.sha256).hexdigest(),
                                     raw['hmac_sha256']), 'temporal_witness_authentication')
         value = raw['state']
-        require(set(value) == {'current', 'pending'}, 'temporal_witness_state')
+        require(set(value) == {'current', 'pending', 'observed_until'}, 'temporal_witness_state')
         for head in (value['current'], value['pending']):
             if head is None:
                 continue
@@ -173,6 +173,14 @@ class TemporalStore:
                     head['configuration'] == self.config_sha256 and type(head['seq']) is int
                     and 0 <= head['seq'] <= self.capacity and isinstance(head['hash'], str)
                     and len(head['hash']) == 64, 'temporal_witness_head')
+        high_water = value['observed_until']
+        require(high_water is None or isinstance(high_water, str), 'temporal_clock_high_water')
+        parsed_high_water = instant(datetime.fromisoformat(high_water)) if high_water is not None else None
+        for head in (value['current'], value['pending']):
+            if head is not None and head['last_now'] is not None:
+                require(parsed_high_water is not None
+                        and parsed_high_water >= instant(datetime.fromisoformat(head['last_now'])),
+                        'temporal_clock_high_water')
         return value
 
     def _rows(self, db):
@@ -212,10 +220,13 @@ class TemporalStore:
                 current = pending
             else:
                 require(same(current), 'temporal_pending_database_conflict')
-            self._save({'current': current, 'pending': None}, key)
+            self._save({'current': current, 'pending': None, 'observed_until': witness['observed_until']}, key)
         else:
             require(same(current), 'temporal_database_rollback_or_witness_mismatch')
-        return entries, current
+        return entries, current, witness['observed_until']
+
+    def _clock(self, high_water, now):
+        require(high_water is None or now >= datetime.fromisoformat(high_water), 'temporal_clock_rollback')
 
     def _connect(self):
         read(self.database, MAX_DATABASE)
@@ -253,13 +264,13 @@ class TemporalStore:
             db.execute('PRAGMA synchronous=FULL')
             db.execute('BEGIN IMMEDIATE')
             key = self._key()
-            entries, head = self._recover(db, key)
+            entries, head, high_water = self._recover(db, key)
             try:
                 current_digest = self.verifier.source_digest(principal.tenant_id, signal.source_id, signal.key_id, now)
             except SignalRegistryUnavailable:
                 raise TemporalUnavailable('temporal_current_authority_unavailable') from None
             require(current_digest == proof.source_digest, 'temporal_authority_changed_during_intake')
-            require(head['last_now'] is None or now >= datetime.fromisoformat(head['last_now']), 'temporal_clock_rollback')
+            self._clock(high_water, now)
             owned = [r for r in entries if r['tenant'] == principal.tenant_id and r['session'] == signal.session_id]
             if owned:
                 first = SignedSessionSignal.model_validate(owned[0]['signal'])
@@ -270,8 +281,10 @@ class TemporalStore:
             if duplicate is not None:
                 require(duplicate['operator'] == principal.subject and duplicate['input_sha256'] == input_sha256,
                         'temporal_event_identity_conflict')
+                result = self._summary(entries, head, signal.session_id, principal, now, duplicate=True)
                 db.commit()
-                return self._summary(entries, head, signal.session_id, principal, now, duplicate=True)
+                self._save({'current': head, 'pending': None, 'observed_until': now.isoformat()}, key)
+                return result
             require(len(entries) < self.capacity, 'temporal_capacity')
             record = {'store_id': head['store_id'], 'operator': principal.subject, 'tenant': principal.tenant_id,
                 'session': signal.session_id, 'input_sha256': input_sha256, 'source_digest': proof.source_digest,
@@ -280,14 +293,14 @@ class TemporalStore:
             require(len(raw) <= MAX_BODY, 'temporal_record_size')
             next_head = {**head, 'seq': head['seq']+1, 'hash': digest(head['hash'].encode()+b'.'+raw),
                          'last_now': now.isoformat()}
-            self._save({'current': head, 'pending': next_head}, key)
+            self._save({'current': head, 'pending': next_head, 'observed_until': now.isoformat()}, key)
             self._phase('after_prepare')
             db.execute('INSERT INTO signed_events VALUES (?,?,?,?)',
                        (next_head['seq'], raw.decode(), head['hash'], next_head['hash']))
             self._phase('before_db_commit')
             db.commit()
             self._phase('after_db_commit')
-            self._save({'current': next_head, 'pending': None}, key)
+            self._save({'current': next_head, 'pending': None, 'observed_until': now.isoformat()}, key)
             self._phase('after_publish')
             return self._summary([*entries, record], next_head, signal.session_id, principal, now)
 
@@ -298,10 +311,13 @@ class TemporalStore:
         now = instant(datetime.now(UTC) if now is None else now)
         with self._locked(), closing(self._connect()) as db:
             db.execute('BEGIN IMMEDIATE')
-            entries, head = self._recover(db, self._key())
-            require(head['last_now'] is None or now >= datetime.fromisoformat(head['last_now']), 'temporal_clock_rollback')
+            key = self._key()
+            entries, head, high_water = self._recover(db, key)
+            self._clock(high_water, now)
+            result = self._summary(entries, head, session_id, principal, now)
             db.commit()
-            return self._summary(entries, head, session_id, principal, now)
+            self._save({'current': head, 'pending': None, 'observed_until': now.isoformat()}, key)
+            return result
 
     def _summary(self, entries, head, session_id, principal, now, *, duplicate=False):
         owned = [r for r in entries if r['tenant'] == principal.tenant_id and r['session'] == session_id]

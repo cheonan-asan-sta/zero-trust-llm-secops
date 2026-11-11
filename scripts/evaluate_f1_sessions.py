@@ -1,30 +1,26 @@
 """Exercise controlled signed sessions, with explicitly optional simulated operator approvals."""
 
 import argparse
-import base64
 import hashlib
 import json
 import math
 import statistics
 import tempfile
-import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
-from app.models import SecurityEvent
 from app.security import Principal, Role
-from app.services.trusted_signals import SignalVerifier, canonical_signal
-from app.zero_trust_models import SignedSessionSignal
+from app.services.trusted_signals import SignalVerifier
 from scripts.evaluate_f1_shadow import score
-from scripts.f1_lab.approvals import ApprovalContext, event_digest, sign
 from scripts.f1_lab.confidence import independent_trial_reference
 from scripts.f1_lab.detector import RULE_IDS, ShadowDetector
 from scripts.f1_lab.provenance import git_context
 from scripts.f1_lab.registry import PinnedApprovalVerifier
 from scripts.f1_lab.session_controls import verify
+from scripts.f1_lab.session_inference import infer_session
 from scripts.f1_lab.temporal import TemporalStore
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -94,7 +90,11 @@ def run(dataset, anchor, destination, *, fixture_approvals=False, fixture_window
     source_registry, approval_registry, producer_keys, approval_keys, bindings, assignments = trust_fixture(inputs, list(plans.values()))
     destination.parent.mkdir(parents=True, exist_ok=True)
     result_rows, latencies, event_count = [], [], 0
-    source_paths = [Path(__file__), *sorted((ROOT / 'scripts/f1_lab').glob('*.py'))]
+    source_paths = [Path(__file__), ROOT / 'scripts/evaluate_f1_shadow.py',
+        ROOT / 'scripts/ca_recovery_state.py', *sorted((ROOT / 'scripts/f1_lab').glob('*.py')),
+        ROOT / 'app/models.py', ROOT / 'app/security.py', ROOT / 'app/config.py',
+        ROOT / 'app/zero_trust_models.py', ROOT / 'app/continuous_signal_models.py',
+        ROOT / 'app/services/trusted_signals.py', ROOT / 'app/services/detection_benchmark.py']
     captured = {p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes().replace(b'\r\n', b'\n')).hexdigest()
                 for p in source_paths}
     with tempfile.TemporaryDirectory(dir=destination.parent, prefix='.controlled-run-') as temporary:
@@ -115,60 +115,26 @@ def run(dataset, anchor, destination, *, fixture_approvals=False, fixture_window
             store.initialize()
             detector = ShadowDetector(temporal_store=store, approval_verifier=approval_verifier if fixture_approvals else None)
             single = ShadowDetector(approval_verifier=approval_verifier if fixture_approvals else None)
-            prediction, any_matches, raw_matches = None, set(), set()
-            error = None
-            for raw in case['events']:
-                started = time.perf_counter()
-                event = SecurityEvent.model_validate(raw)
-                now = event.timestamp
-                group = assignments[case['case_id']]
-                signal = SignedSessionSignal(tenant_id='controlled-lab', source_id=group, key_id='event-key',
-                    session_id=case['session_id'], expected_version=0, event=event,
-                    issued_at=now, expires_at=now+timedelta(seconds=90), signature='A'*86)
-                signature = base64.urlsafe_b64encode(producer_keys[group].sign(canonical_signal(signal))).decode().rstrip('=')
-                signal = signal.model_copy(update={'signature': signature})
-                approval = None
-                window = None
-                if fixture_window_approvals:
-                    try:
-                        window = store.observe(signal, principal, now=now)
-                    except (ValueError, TypeError, RuntimeError):
-                        error = 'controlled_inference_failed'
-                        latencies.append((time.perf_counter()-started)*1000)
-                        event_count += 1
-                        continue
-                if fixture_approvals and case['case_id'] in plans:
-                    plan = plans[case['case_id']]
-                    context = ApprovalContext(approval_id='approval-'+hashlib.sha256((case['case_id']+event.event_id).encode()).hexdigest()[:32],
-                        tenant_id='controlled-lab', issuer_id='owner-'+hashlib.sha256(plan['issuer_group'].encode()).hexdigest()[:16],
-                        key_id='business-key', event_sha256=event_digest(event), user_id=event.user.user_id,
-                        device_id=event.device.device_id, resource_id=event.resource.resource_id, action=event.action,
-                        permitted_deviations=plan['permitted_deviations'],
-                        maximum_download_mb=plan['maximum_window_download_mb'], issued_at=now,
-                        expires_at=now+timedelta(seconds=60),
-                        window_evidence_sha256=window['evidence_sha256'] if window is not None else None)
-                    approval = sign(context, approval_keys[plan['issuer_group']])
-                try:
-                    raw_prediction = single.evaluate(event, 'controlled-lab', approval=approval, now=now)
-                    prediction = detector.evaluate_signed(signal, principal, approval=approval, now=now)
-                    raw_matches.update(raw_prediction['predicted_rule_ids'])
-                    any_matches.update(prediction['predicted_rule_ids'])
-                except (ValueError, TypeError, RuntimeError):
-                    error = 'controlled_inference_failed'
-                latencies.append((time.perf_counter()-started)*1000)
-                event_count += 1
+            group = assignments[case['case_id']]
+            plan = plans.get(case['case_id']) if fixture_approvals else None
+            result = infer_session(case, source_id=group, producer_key=producer_keys[group],
+                principal=principal, store=store, detector=detector, single_detector=single,
+                operator_plan=plan, approval_key=approval_keys[plan['issuer_group']] if plan is not None else None,
+                fixture_window_approvals=fixture_window_approvals)
+            latencies.extend(result.pop('latencies_ms'))
+            event_count += result['signed_events_attempted']
             truth = labels[case['case_id']]
-            detected = bool(any_matches)
-            result_rows.append({'case_id': case['case_id'], 'family_id': truth['family_id'],
+            detected = result['detected']
+            result_rows.append({**result, 'family_id': truth['family_id'],
                 'threat': truth['threat'], 'detected': detected, 'expected_rule_ids': truth['expected_rule_ids'],
-                'predicted_rule_ids': sorted(any_matches), 'single_event_any_matches': sorted(raw_matches),
-                'single_event_any_alert': bool(raw_matches), 'last_prediction': prediction, 'error': error,
+                'error': result['temporal_error'],
                 'outcome': 'TP' if truth['threat'] and detected else 'FN' if truth['threat'] else 'FP' if detected else 'TN'})
         if captured != {p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes().replace(b'\r\n', b'\n')).hexdigest()
                         for p in source_paths}:
             raise ValueError('controlled_source_changed_during_run')
     temporal_score = score(result_rows, RULE_IDS.values())
     raw_rows = [{**r, 'detected': r['single_event_any_alert'], 'predicted_rule_ids': r['single_event_any_matches'],
+                 'error': r['single_event_error'],
                  'outcome': 'TP' if r['threat'] and r['single_event_any_alert'] else 'FN' if r['threat']
                  else 'FP' if r['single_event_any_alert'] else 'TN'} for r in result_rows]
     raw_score = score(raw_rows, RULE_IDS.values())
@@ -176,13 +142,18 @@ def run(dataset, anchor, destination, *, fixture_approvals=False, fixture_window
         result['within_authored_family_bootstrap_target_supported'] = result['statistical_target_supported']
         result['statistical_target_supported'] = False
         result['statistical_support_scope'] = 'Controlled, author-labeled variants do not establish independent population support.'
+        result['complete_inference_run'] = result['evaluation_errors'] == 0
         result['hypothetical_independent_trial_reference'] = independent_trial_reference(result['confusion'])
     ordered = sorted(latencies)
-    summary = {'schema': 'f1-controlled-session-result-1', **git_context(ROOT, captured),
+    summary = {'schema': 'f1-controlled-session-result-2', **git_context(ROOT, captured),
         'source_files_lf_sha256': captured, 'dataset_manifest_sha256': anchor,
         'metric_unit': 'session_any_alert', 'scenario_families': manifest['family_count'],
         'sessions': len(result_rows), 'signed_events': event_count,
+        'failed_event_attempts': {key: sum(r[key] for r in result_rows) for key in
+            ('single_event_failed_events', 'temporal_failed_events', 'context_issuance_failed_events')},
         'time_mode': manifest['time_mode'], 'fixture_approvals_enabled': fixture_approvals,
+        'producer_failure_policy': 'Input or producer signing failure aborts publication; no passing summary is written.',
+        'inference_failure_policy': 'Each comparator continues independently; every session stays in its denominator and any error fails its gate.',
         'fixture_window_approvals_enabled': fixture_window_approvals,
         'simulated_service_principal': True,
         'public_source_registry_sha256': hashlib.sha256(canonical(source_registry)).hexdigest(),

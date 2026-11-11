@@ -4,9 +4,11 @@
 오전/오후 확인 전 종료 기준은 11/12 09:00 KST다. [extra 지속 실험](docs/extra-f1-experiments.md)을 이어간다.
 기존 app/규칙/라벨은 보존하고 shadow v1은 관찰 holdout F1 80%·FPR33.33%로 **목표 미달**이다.
 서명 없는 승인 정보를 제외한 개발 투영에는 충돌30그룹이 있다. 서명 업무 맥락·초안/원본 비교를
-실험했고 v3 최종 Windows204·Linux204개가 각각 통과했다. 서명된 누적 작업 맥락을 넣은
+실험했고 v4 최종 Windows216·Linux216개가 각각 통과했다. 시계 high-water·비교기별 오류 분모를 보완했다.
+서명된 누적 작업 맥락을 넣은
 별도 제어군96세션은 TP54/FP0/FN0/TN42였으나 모의 조직 승인·작성된 시나리오다.
 [v3 근거](docs/infrastructure-results/extra-window-v3-20261112.json)와 실험 기록을 따른다.
+[v4 근거](docs/infrastructure-results/extra-inference-v4-20261112.json)는 최초 시계 회귀 실패와 수정 후 결과를 구분한다.
 사람 독립 검토·새 평가·운영 통합/최종 채택은 완료가 아니며 목표도 미달 상태를 유지한다.
 
 11/12 `extra`: 사용자 요청으로 `9c67889`에서 브랜치를 만들고 [F0/F1 기준선·오류 검토 도구](docs/extra-f1-baseline-review.md)를 구현한다.

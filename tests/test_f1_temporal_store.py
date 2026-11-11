@@ -327,6 +327,27 @@ def test_fresh_out_of_order_observation_is_kept_but_future_and_clock_rollback_ar
         lab.store.observe(lab.signal('future', 20), lab.principal, now=at(lab, 12))
 
 
+@pytest.mark.parametrize('advance', ['summary', 'duplicate'])
+def test_read_and_duplicate_clock_high_water_survives_restart(lab, advance):
+    message = lab.signal()
+    lab.store.observe(message, lab.principal, now=lab.now)
+    if advance == 'summary':
+        lab.store.summary('session-a', lab.principal, now=at(lab, 10))
+    else:
+        lab.store.observe(message, lab.principal, now=at(lab, 10))
+    restarted = TemporalStore(lab.store.database, lab.store.control, SignalVerifier(lab.registry_path), lab.sources)
+    with pytest.raises(TemporalUnavailable, match='clock_rollback'):
+        restarted.summary('session-a', lab.principal, now=at(lab, 9))
+
+
+def test_unauthorized_read_cannot_advance_another_operators_clock(lab):
+    lab.store.observe(lab.signal(), lab.principal, now=lab.now)
+    other = Principal('other-operator', 'tenant-a', frozenset({Role.ANALYST}), 'api_key')
+    with pytest.raises(TemporalUnavailable, match='session_unavailable'):
+        lab.store.summary('session-a', other, now=at(lab, 100))
+    assert lab.store.summary('session-a', lab.principal, now=at(lab, 1))['event_count'] == 1
+
+
 @pytest.mark.parametrize('change', ['event', 'user', 'device', 'owner', 'tenant', 'signature'])
 def test_changed_identity_cross_subject_or_bad_signature_cannot_extend_a_session(lab, change):
     lab.store.observe(lab.signal(), lab.principal, now=lab.now)
