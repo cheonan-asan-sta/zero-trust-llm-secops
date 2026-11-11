@@ -93,7 +93,8 @@ class TemporalStore:
         self.window_seconds, self.capacity = window_seconds, capacity
         self.config_sha256 = digest(canonical({'event_producers': sorted(self.event_sources),
             'window_seconds': window_seconds, 'capacity': capacity, 'measurement': 'distinct_events_and_byte_deltas',
-            'maximum_download_delta_mb': MAX_DOWNLOAD_DELTA_MB}))
+            'maximum_download_delta_mb': MAX_DOWNLOAD_DELTA_MB,
+            'source_registry_binding': getattr(verifier, 'configuration_binding', None)}))
 
     def _local(self):
         require(get_settings().app_environment in {'local', 'test'}, 'temporal_local_test_only')

@@ -135,3 +135,39 @@ def test_configuration_changes_are_fingerprinted():
 def test_untyped_threshold_payload_cannot_replace_validated_configuration():
     with pytest.raises(TypeError, match='threshold_contract'):
         ShadowDetector(thresholds={'resource_fanout': 0})
+
+
+def test_missing_resource_role_is_inconclusive_without_inventing_a_threat_label(event):
+    event.action = 'ADMIN'
+    event.user.active = True
+    event.user.role = 'employee'
+    event.resource.required_role = None
+    event.device.managed = True
+    event.device.security_posture = 'healthy'
+    event.auth_context.authentication_result = 'success'
+    event.auth_context.failed_attempts = 0
+    event.auth_context.mfa = 'passed'
+    event.network.access_method = 'internal'
+    event.behavior.distinct_resources_10m = 1
+    result = ShadowDetector().evaluate(event, 'a')
+    assert result['evidence_gaps'] == ['RESOURCE_REQUIRED_ROLE_NOT_SUPPLIED']
+    assert result['assessment_status'] == 'inconclusive' and not result['detected']
+    assert result['no_alert_is_access_authorization'] is False
+
+
+def test_small_sensitive_transfer_cannot_prove_the_absence_of_slow_cumulative_exfiltration(event):
+    event.action = 'DOWNLOAD'
+    event.resource.sensitivity = 'critical'
+    event.behavior.download_volume_mb = 10
+    result = ShadowDetector().evaluate(event, 'a')
+    assert 'AUTHENTICATED_CUMULATIVE_VOLUME_NOT_ASSESSED' in result['evidence_gaps']
+    assert result['access_grants'] == 0
+
+
+def test_inconclusive_rows_remain_in_metric_denominators():
+    rows = [{'case_id': 'one', 'family_id': 'f', 'threat': True, 'detected': False,
+             'expected_rule_ids': ['rule'], 'predicted_rule_ids': [], 'error': None,
+             'assessment_status': 'inconclusive'}]
+    result = evaluation.score(rows, ['rule'])
+    assert result['inconclusive_cases'] == result['case_count'] == result['confusion']['fn'] == 1
+    assert result['inconclusive_kept_in_denominator'] and not result['gate_passed']

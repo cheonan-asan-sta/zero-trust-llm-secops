@@ -43,9 +43,10 @@ class ShadowDetector:
 
     @property
     def config_sha256(self):
-        contract = {'engine': 'f1-shadow-3', 'thresholds': self.thresholds.model_dump(),
+        contract = {'engine': 'f1-shadow-4', 'thresholds': self.thresholds.model_dump(),
                     'context_policy': 'pinned_exact_event_scoped_ed25519',
                     'status': 'draft_no_production_integration',
+                    'missing_evidence_policy': 'report_inconclusive_without_inventing_labels',
                     'temporal_configuration': self.temporal.config_sha256 if self.temporal is not None else None}
         return hashlib.sha256(json.dumps(contract, sort_keys=True).encode()).hexdigest()
 
@@ -163,8 +164,18 @@ class ShadowDetector:
                 signal('credential', 'RECENT_INACTIVE_IDENTITY')
             if window['saw_rejected_mfa']:
                 signal('credential', 'RECENT_REJECTED_MFA')
-        return {'engine': 'f1-shadow-3', 'status': 'draft_shadow_only',
+        gaps = []
+        if action == 'ADMIN' and resource.required_role is None:
+            gaps.append('RESOURCE_REQUIRED_ROLE_NOT_SUPPLIED')
+        if (window is None and action == 'DOWNLOAD' and resource.sensitivity in {'high', 'critical'}
+                and behavior.download_volume_mb < self.thresholds.bulk_download_mb):
+            gaps.append('AUTHENTICATED_CUMULATIVE_VOLUME_NOT_ASSESSED')
+        if window is not None and not window['complete']:
+            gaps.append('RECEIVED_WINDOW_AUTHORITY_INCOMPLETE')
+        return {'engine': 'f1-shadow-4', 'status': 'draft_shadow_only',
                 'config_sha256': self.config_sha256, 'detected': bool(matches),
+                'assessment_status': 'alert' if matches else 'inconclusive' if gaps else 'no_alert',
+                'evidence_gaps': gaps, 'no_alert_is_access_authorization': False,
                 'predicted_rule_ids': sorted(matches), 'reason_codes': reasons,
                 'signed_context_status': status, 'context_error': context_error,
                 'signed_window_context_status': window_context_status,

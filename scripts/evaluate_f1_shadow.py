@@ -37,13 +37,16 @@ def score(rows, rule_ids):
                       'positive_families': support, 'point_targets_met': targets_met(rule_values)})
     negatives = len({r['family_id'] for r in rows if not r['threat']})
     errors = sum(r['error'] is not None for r in rows)
-    gate = targets_met(values) and errors == 0 and negatives >= 12 and all(
+    inconclusive = sum(r.get('assessment_status') == 'inconclusive' for r in rows)
+    gate = targets_met(values) and errors == 0 and inconclusive == 0 and negatives >= 12 and all(
         r['point_targets_met'] and r['positive_families'] >= 2 for r in rules)
     confidence = family_intervals(rows)
     statistical = gate and all((interval['upper'] is not None and interval['upper'] <= .05)
         if name == 'false_positive_rate' else (interval['lower'] is not None and interval['lower'] >= .95)
         for name, interval in confidence['intervals'].items())
     return {'confusion': counts, 'metrics': values, 'case_count': len(rows),
+            'inconclusive_cases': inconclusive,
+            'inconclusive_kept_in_denominator': True,
             'point_targets_met': targets_met(values), 'gate_passed': gate,
             'statistical_target_supported': statistical, 'family_confidence': confidence,
             'evaluation_errors': errors, 'rules': rules}
@@ -69,6 +72,7 @@ def evaluate(benchmark, detector):
                 'family_id': case.family_id, 'domain': case.domain, 'threat': case.threat,
                 'detected': detected, 'expected_rule_ids': case.expected_rule_ids,
                 'predicted_rule_ids': predicted, 'error': error, 'prediction': prediction,
+                'assessment_status': prediction.get('assessment_status') if prediction else 'failed',
                 'outcome': 'TP' if case.threat and detected else 'FN' if case.threat else 'FP' if detected else 'TN'})
         results[split] = {**score(rows, (r.rule_id for r in benchmark.engine.summaries())), 'cases': rows}
     return results

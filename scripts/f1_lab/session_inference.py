@@ -20,6 +20,7 @@ def infer_session(case, *, source_id, producer_key, principal, store, detector, 
         if operator_plan.case_id != case.case_id or approval_key is None:
             raise ValueError('controlled_plan_identity_or_key')
     raw_matches, temporal_matches, latencies = set(), set(), []
+    raw_gaps, temporal_gaps = set(), set()
     raw_errors = temporal_errors = issuance_errors = 0
     last_prediction = None
     for event in case.events:
@@ -51,11 +52,13 @@ def infer_session(case, *, source_id, producer_key, principal, store, detector, 
         try:
             raw_prediction = single_detector.evaluate(event, case.tenant_id, approval=approval, now=now)
             raw_matches.update(raw_prediction['predicted_rule_ids'])
+            raw_gaps.update(raw_prediction.get('evidence_gaps', []))
         except (ValueError, TypeError, RuntimeError):
             raw_errors += 1
         try:
             prediction = detector.evaluate_signed(signal, principal, approval=approval, now=now)
             temporal_matches.update(prediction['predicted_rule_ids'])
+            temporal_gaps.update(prediction.get('evidence_gaps', []))
             last_prediction = prediction
         except (ValueError, TypeError, RuntimeError):
             temporal_errors += 1
@@ -63,6 +66,11 @@ def infer_session(case, *, source_id, producer_key, principal, store, detector, 
     return {'case_id': case.case_id, 'signed_events_attempted': len(case.events),
         'single_event_any_alert': bool(raw_matches), 'single_event_any_matches': sorted(raw_matches),
         'detected': bool(temporal_matches), 'predicted_rule_ids': sorted(temporal_matches),
+        'single_event_assessment_status': 'alert' if raw_matches else 'failed' if raw_errors or issuance_errors
+            else 'inconclusive' if raw_gaps else 'no_alert',
+        'assessment_status': 'alert' if temporal_matches else 'failed' if temporal_errors or issuance_errors
+            else 'inconclusive' if temporal_gaps else 'no_alert',
+        'single_event_evidence_gaps': sorted(raw_gaps), 'evidence_gaps': sorted(temporal_gaps),
         'last_successful_prediction': last_prediction,
         'single_event_error': 'controlled_inference_failed' if raw_errors or issuance_errors else None,
         'temporal_error': 'controlled_inference_failed' if temporal_errors or issuance_errors else None,

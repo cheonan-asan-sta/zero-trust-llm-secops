@@ -1,4 +1,5 @@
 import base64
+import hashlib
 import json
 import os
 import shutil
@@ -27,6 +28,7 @@ from scripts.f1_lab.approvals import (
     sign,
 )
 from scripts.f1_lab.detector import RULE_IDS, ShadowDetector
+from scripts.f1_lab.source_registry import FrozenSignalVerifier
 from scripts.f1_lab.temporal import TemporalStore, TemporalUnavailable
 
 
@@ -98,6 +100,22 @@ def test_restart_preserves_window_and_session_scope(lab):
     other = lab.signal('other', 1, session='session-b')
     assert restarted.observe(other, lab.principal, now=at(lab, 1))['event_count'] == 1
     assert restarted.summary('session-a', lab.principal, now=at(lab, 1))['event_count'] == 1
+
+
+def test_frozen_source_snapshot_change_and_new_pin_cannot_rewrite_a_witnessed_store(lab):
+    anchor = hashlib.sha256(lab.registry_path.read_bytes()).hexdigest()
+    store = TemporalStore(lab.root / 'pinned.db', lab.root / 'pinned-control',
+                          FrozenSignalVerifier(lab.registry_path, anchor), lab.sources)
+    store.initialize()
+    assert store.observe(lab.signal(), lab.principal, now=lab.now)['event_count'] == 1
+    lab.registry['sources'][0]['keys'][0]['enabled'] = False
+    lab.publish()
+    with pytest.raises(TemporalUnavailable, match='authority_unavailable'):
+        store.summary('session-a', lab.principal, now=lab.now)
+    changed = TemporalStore(store.database, store.control,
+        FrozenSignalVerifier(lab.registry_path, hashlib.sha256(lab.registry_path.read_bytes()).hexdigest()), lab.sources)
+    with pytest.raises(TemporalUnavailable, match='witness_head'):
+        changed.summary('session-a', lab.principal, now=lab.now)
 
 
 def test_window_expiry_is_missing_evidence_not_a_positive_safety_claim(lab):

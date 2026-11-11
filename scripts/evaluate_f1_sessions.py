@@ -13,7 +13,6 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from app.security import Principal, Role
-from app.services.trusted_signals import SignalVerifier
 from scripts.evaluate_f1_shadow import score
 from scripts.f1_lab.confidence import independent_trial_reference
 from scripts.f1_lab.detector import RULE_IDS, ShadowDetector
@@ -21,6 +20,7 @@ from scripts.f1_lab.provenance import git_context
 from scripts.f1_lab.registry import PinnedApprovalVerifier
 from scripts.f1_lab.session_controls import verify
 from scripts.f1_lab.session_inference import infer_session
+from scripts.f1_lab.source_registry import FrozenSignalVerifier
 from scripts.f1_lab.temporal import TemporalStore
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -102,11 +102,12 @@ def run(dataset, anchor, destination, *, fixture_approvals=False, fixture_window
         if not lab.resolve().is_relative_to(destination.parent.resolve()):
             raise ValueError('controlled_runtime_scope')
         source_path, approval_path = lab / 'sources.json', lab / 'approvals.json'
-        source_path.write_bytes(canonical(source_registry))
+        source_raw = canonical(source_registry)
+        source_path.write_bytes(source_raw)
         approval_raw = canonical(approval_registry)
         approval_path.write_bytes(approval_raw)
         approval_anchor = hashlib.sha256(approval_raw).hexdigest()
-        verifier = SignalVerifier(source_path)
+        verifier = FrozenSignalVerifier(source_path, hashlib.sha256(source_raw).hexdigest())
         approval_verifier = PinnedApprovalVerifier(approval_path, approval_anchor, minimum_version=1)
         principal = Principal('controlled-evaluator', 'controlled-lab', frozenset({Role.ANALYST}), 'api_key')
         for ordinal, case in enumerate(inputs):
@@ -135,6 +136,7 @@ def run(dataset, anchor, destination, *, fixture_approvals=False, fixture_window
     temporal_score = score(result_rows, RULE_IDS.values())
     raw_rows = [{**r, 'detected': r['single_event_any_alert'], 'predicted_rule_ids': r['single_event_any_matches'],
                  'error': r['single_event_error'],
+                 'assessment_status': r['single_event_assessment_status'],
                  'outcome': 'TP' if r['threat'] and r['single_event_any_alert'] else 'FN' if r['threat']
                  else 'FP' if r['single_event_any_alert'] else 'TN'} for r in result_rows]
     raw_score = score(raw_rows, RULE_IDS.values())
@@ -157,6 +159,7 @@ def run(dataset, anchor, destination, *, fixture_approvals=False, fixture_window
         'fixture_window_approvals_enabled': fixture_window_approvals,
         'simulated_service_principal': True,
         'public_source_registry_sha256': hashlib.sha256(canonical(source_registry)).hexdigest(),
+        'source_registry_mode': 'frozen_external_pin; changed or unavailable bytes abort trust, not live authority rotation',
         'public_approval_registry_sha256': approval_anchor,
         'real_business_approvals': 0, 'independent_review': 'pending', 'new_independent_evaluation': False,
         'single_event_any_alert': raw_score, 'signed_temporal_any_alert': temporal_score,
