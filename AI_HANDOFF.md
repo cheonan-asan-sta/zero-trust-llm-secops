@@ -4,7 +4,7 @@
 오전/오후 확인 전 종료 기준은 11/12 09:00 KST다. [extra 지속 실험](docs/extra-f1-experiments.md)을 이어간다.
 기존 app/규칙/라벨은 보존하고 shadow v1은 관찰 holdout F1 80%·FPR33.33%로 **목표 미달**이다.
 서명 없는 승인 정보를 제외한 개발 투영에는 충돌30그룹이 있다. 서명 업무 맥락·초안/원본 비교를
-실험했고 v7 최종 Windows278·Linux278개가 각각 통과했다. 시계 high-water·비교기별 오류 분모,
+실험했고 v8 최종 Windows307·Linux307개가 각각 통과했다. 시계 high-water·비교기별 오류 분모,
 관측 출처 snapshot pin과 판단 근거 부족 표시를 보완했다.
 서명된 누적 작업 맥락을 넣은
 별도 제어군96세션은 TP54/FP0/FN0/TN42였으나 모의 조직 승인·작성된 시나리오다.
@@ -16,6 +16,9 @@ holdout 판단 근거 부족30건을 기록하며 분모에서 빼지 않는다.
 그룹 교차 검증에서 F1 83.78%/FPR33.33%로 미달이다. 선택된 auth-5를 채택하지 않고 기본3/8/500을 유지한다.
 [v7 자원 정책](docs/infrastructure-results/extra-resource-v7-20261112.json)은 공개 정책 pin·행위/복수 역할·
 등록 민감도·이전 거부/at-risk 이력 보존을 검증한다. 실제 기업 정책/IdP 인수나 운영 연결은 아니다.
+[v8 원본 점검](docs/infrastructure-results/extra-streamed-v8-20261112.json)은 공개 원본91.6MB/130,767행을
+점검해 M7 4파일을 Windows/Linux에서 바이트 동일하게 재현했다. 선언 투영69충돌·파일럿11해당세션은
+F1 실측이 아닌 관측 모호성이다. [데이터 적합성](docs/f1-data-readiness.md)을 참고하며 사람 검토를 대체하지 않는다.
 사람 독립 검토·새 평가·운영 통합/최종 채택은 완료가 아니며 목표도 미달 상태를 유지한다.
 
 11/12 `extra`: 사용자 요청으로 `9c67889`에서 브랜치를 만들고 [F0/F1 기준선·오류 검토 도구](docs/extra-f1-baseline-review.md)를 구현한다.
