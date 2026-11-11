@@ -1,5 +1,8 @@
 # 개발 주차별 산출물
 
+11/12 품질 후속 예정: [F1 목표 달성 실험 계획](f1-improvement-plan.md).
+기존 잔여 인수 이후 개발/보정 개선과 새 독립 평가를 진행하고 최종 동결에 연결한다. 아직 규칙/라벨 변경 없음.
+
 11/12 후속: [4주차 잔여·직접 할 일](week4-remaining-and-handoff.md),
 [승인 원장 복원](response-workflow-recovery.md), [M7 검토지](m7-independent-review.md),
 [M8 네트워크 범위](m8-network-scope.md), [조건부 후보 제안](technology-decisions/conditional-scope-20261112.md).
