@@ -1,0 +1,113 @@
+{
+  "schema": "extra-f1-subject-v11-1",
+  "date_kst": "2026-11-12",
+  "scope": "opt-in local shadow subject activity; no production integration or access effects",
+  "aggregation_profile": "f1-tenant-analyst-user-activity-1",
+  "activity_scope": "same store/tenant/authenticated analyst/observed user; sessions and devices may differ",
+  "adverse_scope": "related device posture and user inactive in same tenant; derived markers only",
+  "approval_contract": "exact current event plus exact received fact set; authority covers all devices/resources/actions and volume",
+  "legacy_summary_complete": false,
+  "actual_collection_completeness_proven": false,
+  "focused": {
+    "path": "runtime/f1/extra-subject-fourth-20261112.xml",
+    "tests": 39,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "windows_final": {
+    "path": "runtime/f1/extra-subject-final-windows-20261112.xml",
+    "tests": 387,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "linux_final": {
+    "schema": "extra-f1-linux-snapshot-1",
+    "completed": true,
+    "owner": "extra-f1-88e7bdd29712",
+    "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "tests": [
+      "tests/test_f1_subject_temporal.py",
+      "tests/test_f1_intake.py",
+      "tests/test_f1_soak.py",
+      "tests/test_m7_streaming_audit.py",
+      "tests/test_m7_auth_dataset.py",
+      "tests/test_f1_resource_policy.py",
+      "tests/test_f1_calibration.py",
+      "tests/test_f1_source_registry.py",
+      "tests/test_f1_session_inference.py",
+      "tests/test_f1_confidence.py",
+      "tests/test_f1_temporal_store.py",
+      "tests/test_f1_approval_registry.py",
+      "tests/test_f1_shadow_approvals.py",
+      "tests/test_f1_shadow_detector.py",
+      "tests/test_f1_feature_audit.py",
+      "tests/test_f1_review.py",
+      "tests/test_detection_benchmark.py",
+      "tests/test_f1_provenance.py",
+      "tests/test_f1_session_controls.py"
+    ],
+    "host_mounts": 0,
+    "network": "none",
+    "cloud_calls": 0,
+    "paid_api_calls": 0,
+    "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+    "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+    "source_manifest_sha256": "23834ddb18afabe690bc3fd25a5a2622e0361e16ffdd04a6477f7c9deec16208",
+    "source_files": 382,
+    "container_exit_code": 0,
+    "source_verified_before_and_after": true,
+    "remaining_containers": 0,
+    "junit": {
+      "path": "runtime/f1/extra-linux-subject-20261112-01/checks.xml",
+      "tests": 387,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "actual_worker_exit_phases": [
+    "after_prepare",
+    "before_db_commit",
+    "after_db_commit",
+    "after_publish"
+  ],
+  "prior_failures": [
+    {
+      "path": "runtime/f1/extra-subject-first-20261112.xml",
+      "reason": "invalid network literal and incorrectly constructed test fixture registry"
+    },
+    {
+      "path": "runtime/f1/extra-subject-second-20261112.xml",
+      "reason": "test expected wrong clock reason code; implementation rejected rollback"
+    },
+    {
+      "path": "runtime/f1/extra-subject-third-20261112.xml",
+      "reason": "failed MFA fixture omitted required failed-attempt evidence"
+    }
+  ],
+  "source_files_lf_sha256": {
+    "scripts/f1_lab/subject_temporal.py": "b8e543d4d31164ab4a02da8f7f7fbb8b8fbe65a332f2ce537356a616c19978e0",
+    "tests/test_f1_subject_temporal.py": "b73de315fb3397a01248761842e708145261387088a1132942162fccf372c2f5",
+    "scripts/f1_lab/temporal.py": "faa74c2dbba1b38264619a8233e7916f6164e7a200eb2080f148233af3f59b52",
+    "scripts/f1_lab/approvals.py": "165b6340a0b195703c038419fcee8ad7e2c48dbe90039da5844305c60a6a72a1",
+    "scripts/f1_lab/detector.py": "86e3ab96e1238340834743dba50c9c942f5d351ea2304c6d537de58cd6ce505b"
+  },
+  "new_metric_evaluation_runs": 0,
+  "new_independent_evaluation": false,
+  "goal_qualified": false,
+  "original_app_baseline_changed": false,
+  "labels_changed": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "access_grants": 0,
+  "session_changes": 0,
+  "long_soak": "Separate frozen v9 session profile still running; no claim of v11 subject-profile long soak.",
+  "limits": [
+    "Observed user identity is a configured event-producer assertion; actual IdP binding pending.",
+    "Activity is not aggregated across analysts, stores or hosts.",
+    "No new independent labels or deployment acceptance.",
+    "Bounded journal does not silently discard old rows."
+  ]
+}

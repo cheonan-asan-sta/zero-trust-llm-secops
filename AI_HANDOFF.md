@@ -33,6 +33,13 @@ F1 실측이 아닌 관측 모호성이다. [데이터 적합성](docs/f1-data-r
 실제 출처/독립 검토/목표 달성은 false이며 새 검출기 성능을 측정하지 않았다.
 [v10 공개 결과](docs/infrastructure-results/extra-intake-v10-20261112.json)를 따른다. 장시간 시험은 고정 v9 소스만 포함한다.
 
+[v11 사용자 활동](docs/f1-subject-activity.md)은 tenant/analyst/user 범위에서 여러 세션·기기의
+실제 실패 로그인/다운로드 증분/fanout을 모으는 **별도 선택형**이다. 모든 기기/자원/행위/총량 승인과
+기존 verifier 혼합 거부·일회 집계/시계/네 지점 worker 종료를 확인했다.
+최종 Windows387·Linux387개 각각 통과·Linux382파일 전후 동일·소유 컨테이너0이다.
+[v11 공개 결과](docs/infrastructure-results/extra-subject-v11-20261112.json)를 따른다. 독립 F1 평가·운영 통합은 아니다.
+v9 고정 장시간 시험은 v11 사용자 프로필의 장시간 시험으로 대체하지 않는다.
+
 11/12 `extra`: 사용자 요청으로 `9c67889`에서 브랜치를 만들고 [F0/F1 기준선·오류 검토 도구](docs/extra-f1-baseline-review.md)를 구현한다.
 기존 탐지 규칙·임계값·라벨은 유지하며 새로운 품질 달성이나 사람의 원인 검토 완료로 기록하지 않는다.
 
