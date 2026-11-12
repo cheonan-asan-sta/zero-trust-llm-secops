@@ -4,7 +4,12 @@ import json
 import pytest
 
 from scripts.audit_cloud_training import audit
-from scripts.f1_lab.cloud_observations import label, observation, partition
+from scripts.f1_lab.cloud_observations import (
+    label,
+    observation,
+    partition,
+    partition_with_request_facts,
+)
 
 
 def record(mfa='false'):
@@ -74,3 +79,29 @@ def test_cloud_audit_keeps_known_label_observation_errors_and_unknown_rows(tmp_p
         assert asset['counts']['truth_normal'] == asset['counts']['truth_unknown'] == asset['counts']['truth_attack'] == 1
     labels = [json.loads(row) for row in (tmp_path/'out/asset-0-truth.jsonl').read_bytes().splitlines()]
     assert len(labels) == 3 and labels[-1]['truth'] is True
+
+
+def test_request_facts_keep_absence_unknown_and_do_not_copy_keys_or_credentials():
+    item = {'eventName': 'PutObject', 'eventSource': 's3.amazonaws.com',
+            'requestParameters': {'bucketName': 'secret-bucket', 'key': 'secret-path',
+                                  'x-amz-acl': 'public-read', 'x-amz-server-side-encryption': 'AES256',
+                                  'credentials': {'sessionToken': 'secret-token'}}}
+    view, _ = partition_with_request_facts(item)
+    assert view['features']['requested_s3_acl_scope'] == 'broad'
+    assert view['features']['requested_s3_encryption_kind'] == 'AES256'
+    assert 'secret-' not in str(view) and all(v is None for v in view['unavailable_claims'].values())
+    absent, _ = partition_with_request_facts({**item, 'requestParameters': {}})
+    assert absent['features']['requested_s3_acl_scope'] == absent['features']['requested_s3_encryption_kind'] == 'unknown'
+
+
+def test_request_profile_is_label_independent_and_original_profile_stays_unchanged():
+    first = {'eventName': 'PutObject', 'eventSource': 's3.amazonaws.com', 'should_sample': False,
+             'requestParameters': {'x-amz-acl': 'private'}}
+    second = {**first, 'should_sample': True, 'attack_name': 'scenario'}
+    a, _ = partition_with_request_facts(first)
+    b, _ = partition_with_request_facts(second)
+    assert a == b and a['features']['requested_s3_acl_scope'] == 'limited'
+    original, _ = partition(first)
+    assert 'requested_s3_acl_scope' not in original['features']
+    other, _ = partition_with_request_facts({**first, 'eventSource': 'other.amazonaws.com'})
+    assert other['features']['requested_s3_acl_scope'] == 'unknown'

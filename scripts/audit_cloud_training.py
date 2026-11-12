@@ -6,7 +6,7 @@ import json
 from collections import Counter
 from pathlib import Path
 
-from scripts.f1_lab.cloud_observations import case_id, partition
+from scripts.f1_lab.cloud_observations import case_id, partition, partition_with_request_facts
 from scripts.f1_lab.line_truth import anchor
 from scripts.f1_lab.native_jsonl import decode, require
 
@@ -15,7 +15,8 @@ def canonical(value):
     return json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()
 
 
-def audit(directory, expected_receipt_sha256, output):
+def audit(directory, expected_receipt_sha256, output, *, include_request_facts=False):
+    require(type(include_request_facts) is bool, 'cloud_request_profile_flag')
     directory, output = Path(directory), Path(output)
     anchor(expected_receipt_sha256)
     receipt = directory/'acquisition.json'
@@ -30,6 +31,7 @@ def audit(directory, expected_receipt_sha256, output):
     report = {'schema': 'f1-cloud-training-audit-1', 'completed': False, 'acquisition_sha256': expected_receipt_sha256,
               'assets': [], 'test_records_read': 0, 'classifier_fitted': False, 'goal_qualified': False,
               'original_six_domain_goal_replaced': False, 'aws_sdk_calls': 0, 'paid_api_calls': 0}
+    report['feature_profile'] = 'cloud-request-facts-2' if include_request_facts else 'cloud-partial-facts-1'
     try:
         for index, asset in enumerate(acquisition['assets']):
             path = directory/f'asset-{index}.json.source'
@@ -47,7 +49,7 @@ def audit(directory, expected_receipt_sha256, output):
                     counters['records'] += 1
                     view, gold, problem = None, None, None
                     try:
-                        view, gold = partition(item)
+                        view, gold = (partition_with_request_facts if include_request_facts else partition)(item)
                     except (ValueError, TypeError, KeyError, OverflowError, RecursionError):
                         problem = 'unsupported_cloud_observation'
                         # A label can still be known when unrelated observation
@@ -89,8 +91,9 @@ def main():
     parser.add_argument('--directory', required=True, type=Path)
     parser.add_argument('--expected-receipt-sha256', required=True)
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--include-request-facts', action='store_true')
     args = parser.parse_args()
-    result = audit(args.directory, args.expected_receipt_sha256, args.output)
+    result = audit(args.directory, args.expected_receipt_sha256, args.output, include_request_facts=args.include_request_facts)
     print(json.dumps({'completed': result['completed'], 'assets': result['assets'], 'goal_qualified': False}))
 
 

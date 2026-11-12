@@ -108,6 +108,30 @@ def partition(raw):
     return observation(view), gold
 
 
+def request_facts(raw):
+    """Caller-requested S3 settings, not verified resource posture or permission.
+
+    Inspect exactly two named scalar fields. Never copy object names, request
+    bodies, tokens, policies or free-form values into the inference view.
+    """
+    request = raw.get('requestParameters')
+    request = request if isinstance(request, dict) else {}
+    supported = raw.get('eventSource') == 's3.amazonaws.com' and raw.get('eventName') in {'PutObject', 'PutBucketAcl', 'CreateBucket'}
+    acl = request.get('x-amz-acl') if supported else None
+    public = {'public-read', 'public-read-write', 'authenticated-read'}
+    private = {'private', 'bucket-owner-read', 'bucket-owner-full-control', 'log-delivery-write'}
+    scope = 'broad' if isinstance(acl, str) and acl in public else 'limited' if isinstance(acl, str) and acl in private else 'unknown'
+    encryption = request.get('x-amz-server-side-encryption') if supported else None
+    encryption = encryption if isinstance(encryption, str) and encryption in {'AES256', 'aws:kms', 'aws:kms:dsse'} else 'unknown'
+    return {'requested_s3_acl_scope': scope, 'requested_s3_encryption_kind': encryption}
+
+
+def partition_with_request_facts(raw):
+    view, gold = partition(raw)
+    view['features'].update(request_facts(raw))
+    return view, gold
+
+
 def case_id(raw, ordinal):
     payload = {'event': raw.get('eventID'), 'ordinal': ordinal}
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()

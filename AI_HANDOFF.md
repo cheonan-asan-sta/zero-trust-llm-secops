@@ -18,7 +18,7 @@ AIT 공개 원시 로그/경보의 고정 버전·라이선스·크기·체크�
 [수집·평가 계약](docs/extra-native-evaluation.md)과 `infra/f1-lab/native-data-protocol.json`을 따른다.
 개발 시나리오만 본문을 읽고 최종 예약 시나리오의 본문/라벨은 후보 동결 전 읽지 않는다.
 새 독립 성능 수치는 아직 없다. 결측 IdP/EDR/업무 승인 정보를 정상으로 채우지 않는다.
-개발 경보45,544행 변환·파싱/관측 오류0, 현재 관련 집중 시험 Windows193·Linux193개 통과다.
+개발 경보45,544행 변환·파싱/관측 오류0, 현재 관련 집중 시험 Windows204·Linux204개 통과다.
 원시 ZIP522,084,364바이트 전체 MD5/SHA 검증 완료. 실제 최상위 gather/labels 경로·dataset.yaml을 지원했다.
 개발 원시8쌍295,243행(공격61,862/정상233,381)을 색인했다. 후속 시간 전수 감사에서 실패/범위 밖0,
 특징 오류0·웹 시간 역순3곳을 확인했다. [원시 후보 개발 진단](docs/extra-native-candidate.md)을 따른다.
@@ -54,12 +54,21 @@ S는 이미 관찰한 자료다. `785862dedbb8d2627204e99b08400639d7b80f88a43e25
 `mfaAuthenticated=false`는 MFA 미사용이며 실패가 아니다. 정상 AssumedRole에도 존재한다.
 라이선스 파일/API 명시가 없어 읽기 전용 구조 연구만 진행하고 제품 채택·재배포는 미선정이다.
 CloudTrail 모델 학습0·테스트 ZIP 다운로드0이다. 다음은 원래 여섯 영역의 데이터/권한 맥락과 새 자료의 주체·시나리오 경계를 보완하는 것이다.
+[v24 정보/라벨 검토](docs/extra-cloud-information-and-labels.md)에서 현재 CloudTrail 특징으로 같은 학습 자료에
+도달 가능한 이상적 최대F1은93.7622%·최소 오분류64였다. 정답을 쓰는 진단이며 모델 성능이 아니다.
+S3의 요청된 ACL/암호화만 추가한 별도 프로필도 상한 개선0·정답 지문 동일이다. 원본 관측을 덮어쓰지 않았다.
+학습 파일 공통principal7개/관련7190행·발급역할4개/5487행으로 무작위 행 분리의 독립성을 추정하지 않는다.
+ZTA-RAD 전문가 CSV 첫128개·노트북 코드2개만 조사했다. 전문가 CSV 생성 경로에 집계 위험 규칙이 있어
+독립 공격 사건 정답으로 채택하지 않았다. 기기 계열103/128·HTTP77/128 결측은 전체 비율이 아니다.
+이후 CSV 행 사례 분석/노트북 실행0·SMOTE/LLM 라벨 자료 미수집이다.
+다음은 미래/정답을 쓰지 않는 과거 이력·검증 가능한 주체/권한 맥락을 보완하는 것이다. 여섯 영역의 최종 평가 부족은 남는다.
 [v18 실제 자료 근거](docs/infrastructure-results/extra-native-actual-pairs-v18-20261112.json)를 따른다.
 [v19 원시 후보 근거](docs/infrastructure-results/extra-native-raw-candidate-v19-20261112.json)는 개발 재대입과 미채택 사유다.
 [v20 맥락/트리 근거](docs/infrastructure-results/extra-native-context-tree-v20-20261112.json)도 독립 성능이나 원본 대비 개선 폭이 아니다.
 [v21 고정 전이·맥락 수집](docs/infrastructure-results/extra-native-transfer-v21-20261112.json)의 모델 상태 전후 일치와 잔여 문제를 보존한다.
 [v22 감사/후보 근거](docs/infrastructure-results/extra-metadata-heads-v22-20261112.json)는 여전히 goal_qualified=false다.
 [v23 단일 이진/학습 감사 근거](docs/infrastructure-results/extra-flat-cloud-v23-20261112.json)도 goal_qualified=false다.
+[v24 정보 부족/라벨 근거](docs/infrastructure-results/extra-cloud-information-v24-20261112.json)도 goal_qualified=false다.
 로컬 구현·검증·문서만 수행하며 GitHub 업로드/병합·AWS·유료 API를 실행하지 않는다.
 
 아래의 **진행 중** 표기는 관측 중단 이전의 당시 기록이다.
