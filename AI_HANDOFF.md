@@ -18,7 +18,7 @@ AIT 공개 원시 로그/경보의 고정 버전·라이선스·크기·체크�
 [수집·평가 계약](docs/extra-native-evaluation.md)과 `infra/f1-lab/native-data-protocol.json`을 따른다.
 개발 시나리오만 본문을 읽고 최종 예약 시나리오의 본문/라벨은 후보 동결 전 읽지 않는다.
 새 독립 성능 수치는 아직 없다. 결측 IdP/EDR/업무 승인 정보를 정상으로 채우지 않는다.
-개발 경보45,544행 변환·파싱/관측 오류0, 수집/변환/행별 연결/원시/맥락/트리 후보 집중 시험 Windows151·Linux151개 통과다.
+개발 경보45,544행 변환·파싱/관측 오류0, 수집/변환/행별 연결/원시/맥락/고정 전이 후보 집중 시험 Windows161·Linux161개 통과다.
 원시 ZIP522,084,364바이트 전체 MD5/SHA 검증 완료. 실제 최상위 gather/labels 경로·dataset.yaml을 지원했다.
 개발 원시8쌍295,243행(공격61,862/정상233,381)을 색인했다. 후속 시간 전수 감사에서 실패/범위 밖0,
 특징 오류0·웹 시간 역순3곳을 확인했다. [원시 후보 개발 진단](docs/extra-native-candidate.md)을 따른다.
@@ -31,12 +31,18 @@ AIT 공개 원시 로그/경보의 고정 버전·라이선스·크기·체크�
 파일별 평균 재현율44.55%·VPN/CPU/공유감사 R0으로 최종 후보 미채택이다. 단독 특징의 기여도 실험은 아니다.
 다음은 관측 종류별 학습 불균형/판단 근거 부족과 다른 개발 시나리오에서의 일반화 검토다.
 AIT만으로 여섯 영역 전체를 입증할 수 없으므로 [추가 맥락 출처 검토](docs/extra-contextual-source-review.md)를 함께 진행한다.
-GRAAI 고정 커밋의 카탈로그/README/LICENSE만 수집했다. 데이터 본문은 미수집/미열람이며 사전 사용/분할 계약부터 정한다.
-santos 공개 수집 세션69533을 확인한다. `runtime/f1/public-ait-lds21-santos-20261112`의 고정 범위 다운로드이며
-관측 만료만으로 재시작하지 않는다. 최종 예약 harrison/wilson의 본문·행별 정답은 읽지 않는다.
+GRAAI 사전 계약 뒤 고정7z25,241,476바이트·단일 CSV838,136,631바이트 전체 해시를 검증했다.
+최초128개 개발 기록만 구조를 봤고102개 명시 JSON 라벨·26개 비JSON/미해석 메시지가 있었다.
+`runtime/f1/contextual-schema-probe-20261112`의 나머지 기록은 격리 상태이며 독립 최종 평가로 인증하지 않았다.
+지문은 기기 건강 상태가 아니고 DB 연결 정보는 자원 소유자의 역할 정책이 아니다. 없는 라벨/신뢰 주장을 정상으로 채우지 않는다.
+santos 수집 세션69533과 준비/전이 세션36198은 완료exit0이다. 재시작하지 않는다.
+고정 v20 모델을 재학습 없이295,976행에 적용해 P99.73/R97.56/F1 98.63/FPR0.0499%였다.
+그러나 웹 FPR6.95%·파일별 평균 재현율41.92%·VPN/CPU R0이며 개발 시나리오 간 진단일 뿐 최종 인수가 아니다.
+[전이·새 맥락 자료 기록](docs/extra-native-transfer.md)을 따른다. 최종 예약 harrison/wilson 본문·행별 정답은 읽지 않는다.
 [v18 실제 자료 근거](docs/infrastructure-results/extra-native-actual-pairs-v18-20261112.json)를 따른다.
 [v19 원시 후보 근거](docs/infrastructure-results/extra-native-raw-candidate-v19-20261112.json)는 개발 재대입과 미채택 사유다.
 [v20 맥락/트리 근거](docs/infrastructure-results/extra-native-context-tree-v20-20261112.json)도 독립 성능이나 원본 대비 개선 폭이 아니다.
+[v21 고정 전이·맥락 수집](docs/infrastructure-results/extra-native-transfer-v21-20261112.json)의 모델 상태 전후 일치와 잔여 문제를 보존한다.
 로컬 구현·검증·문서만 수행하며 GitHub 업로드/병합·AWS·유료 API를 실행하지 않는다.
 
 아래의 **진행 중** 표기는 관측 중단 이전의 당시 기록이다.
