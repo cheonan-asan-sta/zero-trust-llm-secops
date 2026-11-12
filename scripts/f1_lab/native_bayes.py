@@ -5,6 +5,7 @@ import json
 import math
 
 from scripts.f1_lab.native_jsonl import require
+from scripts.f1_lab.raw_context import PROFILE, RICH_DOMAINS
 from scripts.f1_lab.raw_observations import raw_features
 
 DOMAINS = {key: (False, True) for key, value in raw_features('').items() if type(value) is bool}
@@ -21,9 +22,15 @@ DOMAINS.update({
 FEATURE_CONTRACT_SHA256 = hashlib.sha256(json.dumps(DOMAINS, sort_keys=True).encode()).hexdigest()
 
 
-def validate(features):
-    require(isinstance(features, dict) and features.keys() == DOMAINS.keys(), 'native_feature_population')
-    for name, values in DOMAINS.items():
+def feature_domains(profile):
+    require(profile in {'base', PROFILE}, 'native_feature_profile')
+    return DOMAINS if profile == 'base' else {**DOMAINS, **RICH_DOMAINS}
+
+
+def validate(features, *, profile='base'):
+    domains = feature_domains(profile)
+    require(isinstance(features, dict) and features.keys() == domains.keys(), 'native_feature_population')
+    for name, values in domains.items():
         require(type(features[name]) is type(values[0]) and features[name] in values, 'native_feature_value')
 
 
@@ -32,12 +39,14 @@ def state(value):
 
 
 class NativeBayes:
-    def __init__(self):
+    def __init__(self, *, profile='base'):
+        self.profile = profile
+        self.domains = feature_domains(profile)
         self.classes = [0, 0]
-        self.counts = [{name: {state(value): 0 for value in values} for name, values in DOMAINS.items()} for _ in range(2)]
+        self.counts = [{name: {state(value): 0 for value in values} for name, values in self.domains.items()} for _ in range(2)]
 
     def observe_training(self, features, malicious):
-        validate(features)
+        validate(features, profile=self.profile)
         require(type(malicious) is bool, 'native_training_label')
         index = int(malicious)
         self.classes[index] += 1
@@ -45,28 +54,30 @@ class NativeBayes:
             self.counts[index][name][state(value)] += 1
 
     def probability(self, features):
-        validate(features)
+        validate(features, profile=self.profile)
         require(min(self.classes) > 0, 'native_model_both_classes_required')
         scores = []
         for index, total in enumerate(self.classes):
             score = math.log((total+1)/(sum(self.classes)+2))
             for name, value in features.items():
-                score += math.log((self.counts[index][name][state(value)]+1)/(total+len(DOMAINS[name])))
+                score += math.log((self.counts[index][name][state(value)]+1)/(total+len(self.domains[name])))
             scores.append(score)
         delta = max(-700.0, min(700.0, scores[0]-scores[1]))
         return 1/(1+math.exp(delta))
 
     def export(self):
         require(min(self.classes) > 0, 'native_model_both_classes_required')
-        return {'schema': 'f1-native-categorical-bayes-1', 'feature_contract_sha256': FEATURE_CONTRACT_SHA256,
+        return {'schema': 'f1-native-categorical-bayes-1',
+                'feature_contract_sha256': hashlib.sha256(json.dumps(self.domains, sort_keys=True).encode()).hexdigest(),
+                'feature_profile': self.profile,
                 'class_counts': self.classes, 'categorical_counts': self.counts,
                 'laplace_alpha': 1, 'class_order': ['normal', 'attack'],
                 'operational_scope': 'offline raw-observation advisory candidate; no access effects'}
 
 
-def shape_reference(features):
+def shape_reference(features, *, profile='base'):
     """A new native heuristic reference, not the preserved original app baseline."""
-    validate(features)
+    validate(features, profile=profile)
     return any(features[name] for name in ('auth_failure', 'sensitive_file', 'sql_injection', 'path_traversal',
                                            'shell_payload', 'command_parameter', 'uploaded_script', 'scanner_agent')) or (
         features['dns_name_size'] >= 3 and features['dns_label_entropy'] >= 4)

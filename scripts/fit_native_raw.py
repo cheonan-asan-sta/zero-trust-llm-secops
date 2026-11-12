@@ -15,6 +15,7 @@ from scripts.f1_lab.native_bayes import (
     validate,
 )
 from scripts.f1_lab.native_jsonl import MAX_ROW, MAX_ROWS, decode, require
+from scripts.f1_lab.native_tree import NativeTree
 
 THRESHOLDS = (.1, .25, .5, .75, .9, .95, .99)
 
@@ -64,7 +65,8 @@ def rows(directory, preparation):
             and count == sum(row['rows'] for row in preparation['pairs']), 'raw_prepared_hash_or_rows')
 
 
-def fit(directory, expected_sha256, output):
+def fit(directory, expected_sha256, output, *, include_tree=False):
+    require(type(include_tree) is bool, 'tree_inclusion_flag')
     preparation = receipt(directory, expected_sha256)
     output = Path(output)
     require(not output.exists() and not output.is_symlink(), 'fresh_raw_fit_output')
@@ -76,33 +78,45 @@ def fit(directory, expected_sha256, output):
               'original_app_native_measurement': 'not performed; required context must not be manufactured',
               'goal_qualified': False, 'paid_api_calls': 0, 'aws_sdk_calls': 0}
     try:
-        model, fit_errors, all_training_counts = NativeBayes(), 0, [0, 0]
+        profile = preparation.get('feature_profile', 'base')
+        model, fit_errors, all_training_counts = NativeBayes(profile=profile), 0, [0, 0]
+        tree = NativeTree(profile=profile) if include_tree else None
+        report['feature_profile'] = profile
         for features, truth in rows(directory, preparation):
             all_training_counts[int(truth)] += 1
             try:
                 model.observe_training(features, truth)
             except ValueError:
                 fit_errors += 1
+                continue
+            if tree is not None:
+                tree.observe_training(features, truth)
         artifact = model.export()
+        tree_artifact = tree.fit().export() if tree is not None else None
         report['training'] = {'known_class_counts': all_training_counts, 'fitted_class_counts': model.classes,
                               'rows_unusable_for_fit': fit_errors}
         names = ['native_shape_reference', *('native_bayes_'+str(value) for value in THRESHOLDS)]
+        if tree is not None:
+            names.append('native_tree_0.5')
         totals = {name: counts() for name in names}
         per_pair = [{name: counts() for name in names} for _pair in preparation['pairs']]
         cache, pair_index, within_pair = {}, 0, 0
         for features, truth in rows(directory, preparation):
-            probability, reference = None, None
+            probability, reference, tree_probability = None, None, None
             try:
-                validate(features)
+                validate(features, profile=profile)
                 cache_key = tuple(sorted(features.items()))
                 if cache_key not in cache:
                     if len(cache) >= 100_000:
                         cache.clear()
-                    cache[cache_key] = (model.probability(features), shape_reference(features))
-                probability, reference = cache[cache_key]
+                    cache[cache_key] = (model.probability(features), shape_reference(features, profile=profile),
+                                        tree.probability(features) if tree is not None else None)
+                probability, reference, tree_probability = cache[cache_key]
             except ValueError:
                 pass
             predictions = [reference, *(None if probability is None else probability >= value for value in THRESHOLDS)]
+            if tree is not None:
+                predictions.append(None if probability is None else tree_probability >= .5)
             for name, prediction in zip(names, predictions, strict=True):
                 record(totals[name], truth, prediction)
                 record(per_pair[pair_index][name], truth, prediction)
@@ -118,6 +132,10 @@ def fit(directory, expected_sha256, output):
         model_body = canonical(artifact)+b'\n'
         (output/'model.json').write_bytes(model_body)
         report['model_sha256'] = hashlib.sha256(model_body).hexdigest()
+        if tree_artifact is not None:
+            tree_body = canonical(tree_artifact)+b'\n'
+            (output/'tree-model.json').write_bytes(tree_body)
+            report['tree_model_sha256'] = hashlib.sha256(tree_body).hexdigest()
         report['completed'] = True
     except (OSError, ValueError, KeyError, TypeError) as error:
         report['failure_type'] = type(error).__name__
@@ -132,8 +150,9 @@ def main():
     parser.add_argument('--directory', required=True, type=Path)
     parser.add_argument('--expected-preparation-sha256', required=True)
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--include-tree', action='store_true')
     args = parser.parse_args()
-    report = fit(args.directory, args.expected_preparation_sha256, args.output)
+    report = fit(args.directory, args.expected_preparation_sha256, args.output, include_tree=args.include_tree)
     print(json.dumps({key: report[key] for key in ('completed', 'evaluation', 'training', 'metrics', 'goal_qualified')}))
 
 
