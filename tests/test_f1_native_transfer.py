@@ -1,7 +1,10 @@
 import hashlib
 import json
 
+import pytest
+
 from scripts.evaluate_native_tree import evaluate
+from scripts.f1_lab.native_binary_tree import NativeBinaryTree
 from scripts.f1_lab.native_tree import NativeTree
 from scripts.f1_lab.raw_observations import raw_features
 
@@ -29,8 +32,9 @@ def prepared(tmp_path, *, reverse_truth=False, broken_observation=False):
     return directory, digest(directory/'preparation.json')
 
 
-def model(tmp_path):
-    tree = NativeTree(min_leaf=1, class_balanced=False)
+def model(tmp_path, model_kind='tree'):
+    kind = NativeTree if model_kind == 'tree' else NativeBinaryTree
+    tree = kind(min_leaf=1, class_balanced=False)
     for _i in range(5):
         tree.observe_training(raw_features('session opened'), False)
         tree.observe_training(raw_features('failed password'), True)
@@ -40,16 +44,17 @@ def model(tmp_path):
     return path, digest(path)
 
 
-def test_transfer_never_refits_or_uses_evaluation_truth_for_predictions(tmp_path, monkeypatch):
-    path, sha = model(tmp_path)
+@pytest.mark.parametrize('model_kind', ['tree', 'ordered_tree'])
+def test_transfer_never_refits_or_uses_evaluation_truth_for_predictions(tmp_path, monkeypatch, model_kind):
+    path, sha = model(tmp_path, model_kind)
     def forbidden(*_args):
         raise AssertionError('evaluation attempted to retrain')
     monkeypatch.setattr(NativeTree, 'observe_training', forbidden)
     monkeypatch.setattr(NativeTree, 'fit', forbidden)
     directory, anchor = prepared(tmp_path/'first')
-    first = evaluate(directory, anchor, path, sha, tmp_path/'result1')
+    first = evaluate(directory, anchor, path, sha, tmp_path/'result1', model_kind=model_kind)
     directory, anchor = prepared(tmp_path/'opposite', reverse_truth=True)
-    second = evaluate(directory, anchor, path, sha, tmp_path/'result2')
+    second = evaluate(directory, anchor, path, sha, tmp_path/'result2', model_kind=model_kind)
     assert first['metrics']['tp'] == first['metrics']['tn'] == 1
     assert second['metrics']['fp'] == second['metrics']['fn'] == 1
     assert first['model_state_before_after_sha256'] == second['model_state_before_after_sha256']

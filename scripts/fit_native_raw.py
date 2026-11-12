@@ -14,6 +14,7 @@ from scripts.f1_lab.native_bayes import (
     shape_reference,
     validate,
 )
+from scripts.f1_lab.native_binary_tree import NativeBinaryTree
 from scripts.f1_lab.native_jsonl import MAX_ROW, MAX_ROWS, decode, require
 from scripts.f1_lab.native_tree import NativeTree
 
@@ -65,8 +66,10 @@ def rows(directory, preparation):
             and count == sum(row['rows'] for row in preparation['pairs']), 'raw_prepared_hash_or_rows')
 
 
-def fit(directory, expected_sha256, output, *, include_tree=False):
+def fit(directory, expected_sha256, output, *, include_tree=False, tree_variant='categorical'):
     require(type(include_tree) is bool, 'tree_inclusion_flag')
+    require(tree_variant in {'categorical', 'ordered_binary'}
+            and (include_tree or tree_variant == 'categorical'), 'raw_tree_variant')
     preparation = receipt(directory, expected_sha256)
     output = Path(output)
     require(not output.exists() and not output.is_symlink(), 'fresh_raw_fit_output')
@@ -80,7 +83,9 @@ def fit(directory, expected_sha256, output, *, include_tree=False):
     try:
         profile = preparation.get('feature_profile', 'base')
         model, fit_errors, all_training_counts = NativeBayes(profile=profile), 0, [0, 0]
-        tree = NativeTree(profile=profile) if include_tree else None
+        tree_class = NativeTree if tree_variant == 'categorical' else NativeBinaryTree
+        tree = tree_class(profile=profile) if include_tree else None
+        report['tree_variant'] = tree_variant if include_tree else None
         report['feature_profile'] = profile
         for features, truth in rows(directory, preparation):
             all_training_counts[int(truth)] += 1
@@ -151,8 +156,10 @@ def main():
     parser.add_argument('--expected-preparation-sha256', required=True)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--include-tree', action='store_true')
+    parser.add_argument('--tree-variant', choices=('categorical', 'ordered_binary'), default='categorical')
     args = parser.parse_args()
-    report = fit(args.directory, args.expected_preparation_sha256, args.output, include_tree=args.include_tree)
+    report = fit(args.directory, args.expected_preparation_sha256, args.output, include_tree=args.include_tree,
+                 tree_variant=args.tree_variant)
     print(json.dumps({key: report[key] for key in ('completed', 'evaluation', 'training', 'metrics', 'goal_qualified')}))
 
 

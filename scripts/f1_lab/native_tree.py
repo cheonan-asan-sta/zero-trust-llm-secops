@@ -153,7 +153,8 @@ class NativeTree:
         return tree
 
 
-def load_frozen(path, expected_sha256):
+def load_frozen(path, expected_sha256, *, ordered_binary=False):
+    require(type(ordered_binary) is bool, 'tree_artifact_kind')
     path = Path(path)
     require(isinstance(expected_sha256, str) and len(expected_sha256) == 64
             and all(c in '0123456789abcdef' for c in expected_sha256), 'tree_external_anchor')
@@ -161,4 +162,7 @@ def load_frozen(path, expected_sha256):
     with path.open('rb') as stream:
         body = stream.read(16*1024**2+1)
     require(len(body) <= 16*1024**2 and hashlib.sha256(body).hexdigest() == expected_sha256, 'tree_artifact_hash')
+    if ordered_binary:
+        from scripts.f1_lab.native_binary_tree import NativeBinaryTree
+        return NativeBinaryTree.restore(decode(body))
     return NativeTree.restore(decode(body))

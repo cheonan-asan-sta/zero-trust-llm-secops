@@ -18,8 +18,9 @@ def canonical(value):
 
 def evaluate(directory, expected_preparation_sha256, model_path, expected_model_sha256, output, *, model_kind='tree'):
     preparation = receipt(directory, expected_preparation_sha256)
-    require(model_kind in {'tree', 'heads'}, 'transfer_model_kind')
-    tree = (load_frozen if model_kind == 'tree' else load_frozen_heads)(model_path, expected_model_sha256)
+    require(model_kind in {'tree', 'heads', 'ordered_tree'}, 'transfer_model_kind')
+    tree = load_frozen_heads(model_path, expected_model_sha256) if model_kind == 'heads' else load_frozen(
+        model_path, expected_model_sha256, ordered_binary=model_kind == 'ordered_tree')
     require(tree.profile == preparation.get('feature_profile', 'base'), 'transfer_feature_profile')
     output = Path(output)
     require(not output.exists() and not output.is_symlink(), 'fresh_transfer_output')
@@ -72,7 +73,7 @@ def main():
     parser.add_argument('--model', required=True, type=Path)
     parser.add_argument('--expected-model-sha256', required=True)
     parser.add_argument('--output', required=True, type=Path)
-    parser.add_argument('--model-kind', choices=('tree', 'heads'), default='tree')
+    parser.add_argument('--model-kind', choices=('tree', 'heads', 'ordered_tree'), default='tree')
     args = parser.parse_args()
     report = evaluate(args.directory, args.expected_preparation_sha256, args.model, args.expected_model_sha256, args.output,
                       model_kind=args.model_kind)

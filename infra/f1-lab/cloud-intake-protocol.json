@@ -1,0 +1,22 @@
+{
+  "schema": "f1-cloud-intake-protocol-1",
+  "stage": "public_training_schema_research_only",
+  "repo": "ArielCyber/cloud_log_sampling",
+  "commit": "18d3f248f4def592f4e86152c3fcb54506fbcbf6",
+  "development_assets": [
+    {"path": "TrainOn/base_a.zip", "bytes": 3778832, "git_blob_sha1": "67c427ffe6946643b9d2d20e316b1733fc5b5368"},
+    {"path": "TrainOn/train_labeled_a.zip", "bytes": 889015, "git_blob_sha1": "6c86e59cbcc26c6c07ddb61c3110c98037491f72"}
+  ],
+  "reserved_asset": {"path": "TestOn/labeled_cloudtrail_a.zip", "bytes": 4587424, "git_blob_sha1": "74c112f876706ad7019be5bfbc5422bb1114bfa1"},
+  "reads": "Only development assets for schema/claim presence and label audit. Do not download or inspect reserved test records before candidate/adaptation freeze.",
+  "integrity": "Fixed HTTPS commit URL, exact sizes and Git blob SHA1; record local SHA256 follow-up anchors. These hashes are not publisher signatures.",
+  "label_contract": "Publisher defines boolean should_sample=true as attack and false as benign. Validate attack_name coherence. Missing/nonboolean/conflicting labels stay unknown; do not insert labels into source records.",
+  "input_exclusions": ["should_sample", "attack_name", "source path/split", "raw account/principal/role/resource/IP identifiers as memorization features", "absolute timestamps as class shortcuts"],
+  "claims": "mfaAuthenticated=false is not failed MFA. Session issuer role is not resource-owner authorization policy. Missing identity-active/device-managed/device-health/business-approval fields stay unknown.",
+  "scope": "Publisher-controlled AWS workload/attack executions captured as CloudTrail logs. Not our AWS deployment or live trusted enterprise signals.",
+  "license_status": "No explicit LICENSE/COPYING/TERMS path and repository API license=null at pinned commit. Read-only public research inspection only; product adoption/redistribution not selected.",
+  "original_six_domain_goal_replaced": false,
+  "test_records_read": 0,
+  "new_independent_metrics": null,
+  "goal_qualified": false
+}
