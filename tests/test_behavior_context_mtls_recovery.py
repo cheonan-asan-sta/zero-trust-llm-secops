@@ -84,4 +84,3 @@ def test_mtls_job_retries_same_backup_and_preserves_context_after_publication_fa
     assert BehaviorContextStore(source / context.NAME).read("recovery-tenant") == rows
     assert recovery.verify_admission(active, public)["admission_verified"]
     assert verify(active, source)["old_grants_denied"] == 3
-

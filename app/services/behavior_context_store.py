@@ -293,4 +293,3 @@ class BehaviorContextStore:
     def read(self, tenant_id):
         with self.transaction() as transaction:
             return [entry for entry in transaction.entries if entry["tenant_id"] == tenant_id]
-
