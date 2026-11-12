@@ -61,6 +61,11 @@ jobs:
             verification: Verify isolated response approvals and full mTLS restore
             report: Report response approval and restoration verification
             command: python -m scripts.test_response_mtls_runtime --directory runtime/c02/response-mtls-ci
+          - kind: execution-mtls
+            directory: runtime/c02/execution-mtls-ci
+            verification: Verify continuous execution evidence and full mTLS restore
+            report: Report execution evidence and restoration verification
+            command: python -m scripts.test_execution_mtls_runtime --directory runtime/c02/execution-mtls-ci
           - kind: monitored
             directory: runtime/c02/collector-maintenance-ci
             verification: Verify collector maintenance over mTLS
