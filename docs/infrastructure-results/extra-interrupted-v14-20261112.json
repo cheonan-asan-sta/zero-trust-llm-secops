@@ -1,0 +1,86 @@
+{
+  "observed_at": "2026-11-12T02:13:26.309912+00:00",
+  "goal_cleared_by_user": true,
+  "development_and_new_tests_stopped": true,
+  "docker_engine_reachable": false,
+  "container_absence_verified": false,
+  "container_cleanup_verified": false,
+  "previous_inspect_results_are_inconclusive_when_engine_unreachable": true,
+  "prior_read_only_diagnostic": "before.json",
+  "profiles": {
+    "session": {
+      "directory": "extra-soak-20261112-03",
+      "host_wrapper_verification_present": false,
+      "last_observed_heartbeat": {
+        "cycle": 277,
+        "accepted_unique_events": 409,
+        "journal_seq": 409,
+        "negative_probes_rejected": 84,
+        "worker_exits_recovered": 4,
+        "exact_retries": 28,
+        "approved_fixture_jobs": 14,
+        "unapproved_export_episodes": 7,
+        "failed_login_episodes": 5,
+        "resource_denial_episodes": 4,
+        "journal_sha256": "2d6cd500a20bf6e516fa1c7d27b23f2d5d3bd241a5784e828c564cb45ca08fbf",
+        "at_utc": "2026-11-11T21:44:12.383864+00:00"
+      },
+      "observed_heartbeats": 278,
+      "long_run_completion_verified": false
+    },
+    "subject": {
+      "directory": "extra-subject-soak-20261112-02",
+      "host_wrapper_verification_present": false,
+      "last_observed_heartbeat": {
+        "cycle": 115,
+        "accepted_unique_events": 182,
+        "worker_exits_recovered": 2,
+        "exact_retries": 24,
+        "negative_probes_rejected": 12,
+        "approved_fixture_jobs": 6,
+        "partial_device_approvals_rejected": 6,
+        "unapproved_export_episodes": 3,
+        "failed_login_episodes": 2,
+        "fanout_episodes": 2,
+        "risk_episodes": 3,
+        "expired_risk_observations": 56,
+        "isolation_probes": 12,
+        "journal_seq": 182,
+        "journal_sha256": "cd979292d84949d5346e8bba6b17c66b1fa629d04522c75c349bcbad8f703a15",
+        "at_utc": "2026-11-11T21:43:41.897957+00:00"
+      },
+      "observed_heartbeats": 116,
+      "long_run_completion_verified": false
+    }
+  },
+  "resource_observers": {
+    "extra-owned-resource-samples-20261112": {
+      "completed": false,
+      "sample_count": 70,
+      "failure_type": null,
+      "ended_at": null,
+      "observed_maximum_memory_bytes_by_container": {
+        "v9_session": 125829120,
+        "v13_subject": 516318822
+      },
+      "continuous_memory_peak_measured": false
+    },
+    "extra-owned-resource-samples-20261112-02": {
+      "completed": false,
+      "sample_count": 61,
+      "failure_type": null,
+      "ended_at": null,
+      "observed_maximum_memory_bytes_by_container": {
+        "v9_session": 125829120,
+        "v13_subject": 558786150
+      },
+      "continuous_memory_peak_measured": false
+    }
+  },
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "docker_mutations_after_resume": 0,
+  "goal_qualified": false,
+  "docker_backend_tasklist_query_succeeded": true,
+  "docker_backend_process_observed": false
+}

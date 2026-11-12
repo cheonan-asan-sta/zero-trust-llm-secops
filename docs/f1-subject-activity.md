@@ -71,3 +71,7 @@ raw shadow 진단80%·FPR33.33%를 이39개 기능 시험으로 교체하지 않
 v13에서 이 사용자 프로필을 실제 시계로08:45까지 별도 실행하기 시작했다.
 [시작 근거](infrastructure-results/extra-subject-soak-start-v13-20261112.json)는 전체 Linux3153개·Windows418개와
 초기 공개 checkpoint이며 아직 장시간 시험 완료가 아니다. 08:50 종료 예정 기존 v9 세션 시험과 구분한다.
+
+후속 관측이06:43~06:44 KST에 끊겼다. 11:11 재확인 시 Docker 엔진 연결 불가로 최종 종료/정리도
+미확인이며, 사용자가 목표를 해제해 추가 작업을 멈췄다.
+[v14 중단 기록](infrastructure-results/extra-interrupted-v14-20261112.json)을 최종 상태로 따른다.
