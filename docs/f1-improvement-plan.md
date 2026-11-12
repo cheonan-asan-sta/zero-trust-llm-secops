@@ -3,6 +3,7 @@
 2026-11-12 · 상태: **extra에서 F0/F1 도구 실행, F3 shadow 초안 실험 진행·최종 인수 미완료**.
 [extra 기준선/오류 검토](extra-f1-baseline-review.md)에 실제 후속 실행과 한계를 기록한다.
 [지속 실험 기록](extra-f1-experiments.md)은 이후 사용자 지시에 따른 shadow 후보 구현/시험이다.
+[새 공개 원시 로그 수집·평가 계약](extra-native-evaluation.md)은 F2 후속이며 아직 새 독립 성능 수치는 없다.
 독립 검토가 대기 중인 실험 후보를 운영 인수나 F3 최종 완료로 표시하지 않는다.
 [4주차 잔여 인수](week4-remaining-and-handoff.md)의 후속 품질 작업으로 연결한다.
 현재 규칙·임계값·라벨·평가 파일을 바꾸지 않는다. 목표에 맞춰 정답을 고치지 않는다.
