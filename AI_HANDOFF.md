@@ -18,8 +18,12 @@ S 단일 후보는 TP46400/FP16/FN967/TN248593·P99.966/R97.958/F1 98.952/FPR0.0
 새 네트워크 요청은08:03 UTC에 중단하는 deadline wrapper를 쓴다. 관측 timeout으로 재시작하지 않는다.
 완료되면 두 모델 동결/수집 완료를 확인한 뒤 `../tmp/extra_evaluate_frozen_fox_v34.py`를08:00 UTC 이전에 시작할 수 있다.
 이 helper는08:08 UTC부터 새 단계를 시작하지 않는다. 불완전 단계는 완료로 보고하지 않는다.
-현재 성분 비교는 `../tmp/extra_semantic_component_ablation_v35.py`, **도구 세션87457 실행 중**이다.
-`runtime/f1/semantic-component-ablation-v35-20261112`에 기록한다. 같은 핸들을 확인하며 관측 timeout으로 재시작하지 않는다.
+성분 비교87457·인증 하위 성분38250은 terminal exit0이다. 다시 poll/재시작하지 않는다.
+`runtime/f1/semantic-component-ablation-v35-20261112`·`semantic-auth-ablation-v35b-20261112`에 있다.
+[v35 성분 결과](docs/extra-semantic-component-results.md): 모든 새 필드를 끄면 v23 root/혼동행렬 정확히 재현,
+HTTP만 FP111감소/TP15증가, 계정 이력만 TP7증가, 정적 인증·감사만 개선0이었다. 모두 기존 개발 자료다.
+`runtime/f1/semantic-lzx-storage-20261112.json`에서 완료/실패 데이터의 논리 SHA 보존과 파일 압축을 추가 확인했다.
+새 독립 목표 달성이나 운영 채택은 아니다. 새 pytest는 실행하지 않았다.
 이전 데이터 준비49865는 ENOSPC로 terminal exit1, 재개51090·Windows98919·Linux98823·완료기록90272는 terminal exit0이다.
 정확한 실패/복구·저장 원자료는 [v34 근거](docs/infrastructure-results/extra-http-auth-semantics-v34-20261112.json)를 따른다.
 기존 실패 RBA prefix 파일은 완성 ZIP과 동일 prefix SHA를 대조해 중복만 제거했다. 원래 실패 기록은 남고 바이트는 완성본에서 복원 가능하다.
