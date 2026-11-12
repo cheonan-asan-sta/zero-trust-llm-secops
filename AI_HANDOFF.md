@@ -26,7 +26,7 @@ AIT 공개 원시 로그/경보의 고정 버전·라이선스·크기·체크�
 [수집·평가 계약](docs/extra-native-evaluation.md)과 `infra/f1-lab/native-data-protocol.json`을 따른다.
 개발 시나리오만 본문을 읽고 최종 예약 시나리오의 본문/라벨은 후보 동결 전 읽지 않는다.
 새 독립 성능 수치는 아직 없다. 결측 IdP/EDR/업무 승인 정보를 정상으로 채우지 않는다.
-개발 경보45,544행 변환·파싱/관측 오류0, 현재 관련 집중 시험 Windows227·Linux227개 통과다.
+개발 경보45,544행 변환·파싱/관측 오류0, 현재 관련 집중 시험 Windows236·Linux236개 통과다.
 원시 ZIP522,084,364바이트 전체 MD5/SHA 검증 완료. 실제 최상위 gather/labels 경로·dataset.yaml을 지원했다.
 개발 원시8쌍295,243행(공격61,862/정상233,381)을 색인했다. 후속 시간 전수 감사에서 실패/범위 밖0,
 특징 오류0·웹 시간 역순3곳을 확인했다. [원시 후보 개발 진단](docs/extra-native-candidate.md)을 따른다.
@@ -84,7 +84,13 @@ AWSService3107건(공격48)은 principal/ARN/세션/위임 연결 근거가 없�
 `runtime/f1/public-rba-20261112/progress.json`을 확인한다. helper는 `../tmp/extra_acquire_rba.py`다.
 자산1093700330바이트·MD5고정이며1h/범위/재시도 제한이 있다. 세션이 살아 있으면 같은 핸들을 확인하고 중복 다운로드하지 않는다.
 메타데이터/시작·중간 기록은 완료가 아니다. 최종 acquisition receipt의 전체 MD5/SHA 확인 뒤 인덱스와 첫128개 개발 probe만 검토한다.
-CSV의 이후 행은 격리하며 아직 리더/분할 계약·최종 인증이 없다. 합성 RBA는 생산 IDS용이 아니고 여섯 영역을 대체하지 않는다.
+CSV의 이후 행은 격리하며 분할 계약·최종 인증이 없다. 제한 리더 구현은 아래 v27 후속을 따른다. 합성 RBA는 생산 IDS용이 아니고 여섯 영역을 대체하지 않는다.
+후속 v27에서 `scripts/probe_rba_schema.py` 제한 리더를 구현·통제 입력에서 검사했다.
+ZIP 전체 SHA/인덱스 확인 후 첫128개·파서1MiB·물리행64KiB만 허용하고 이후 기록은 파싱하지 않는다.
+ZIP 내부 선읽기와 전체 CSV CRC 미검증을 명시한다. 원본 RBA에는 아직 적용하지 않았고 분할/최종 인증도 없다.
+수집 세션34025를 먼저 확인한다. 전체 acquisition 완료/MD5/SHA 뒤 멤버 인덱스를 본 다음 정확한 CSV 이름으로
+`python -m scripts.probe_rba_schema --archive ... --expected-sha256 ... --member ... --output ...`를 새 디렉터리에 실행한다.
+외부 앵커는 완료 acquisition receipt의 실제 SHA를 사용한다. 본문 probe/지표와 fixture 검사236개를 구분한다.
 [v18 실제 자료 근거](docs/infrastructure-results/extra-native-actual-pairs-v18-20261112.json)를 따른다.
 [v19 원시 후보 근거](docs/infrastructure-results/extra-native-raw-candidate-v19-20261112.json)는 개발 재대입과 미채택 사유다.
 [v20 맥락/트리 근거](docs/infrastructure-results/extra-native-context-tree-v20-20261112.json)도 독립 성능이나 원본 대비 개선 폭이 아니다.
@@ -94,6 +100,7 @@ CSV의 이후 행은 격리하며 아직 리더/분할 계약·최종 인증이 
 [v24 정보 부족/라벨 근거](docs/infrastructure-results/extra-cloud-information-v24-20261112.json)도 goal_qualified=false다.
 [v25 과거 관측/동시 목표 근거](docs/infrastructure-results/extra-cloud-context-v25-20261112.json)도 goal_qualified=false다.
 [v26 신원 감사/수집 중간 근거](docs/infrastructure-results/extra-cloud-identity-rba-v26-20261112.json)도 goal_qualified=false다.
+[v27 제한 리더/수집 중간 근거](docs/infrastructure-results/extra-rba-probe-reader-v27-20261112.json)도 goal_qualified=false다.
 로컬 구현·검증·문서만 수행하며 GitHub 업로드/병합·AWS·유료 API를 실행하지 않는다.
 
 아래의 **진행 중** 표기는 관측 중단 이전의 당시 기록이다.
