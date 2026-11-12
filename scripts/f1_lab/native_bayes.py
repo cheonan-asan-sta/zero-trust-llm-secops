@@ -7,6 +7,8 @@ import math
 from scripts.f1_lab.native_jsonl import require
 from scripts.f1_lab.raw_context import PROFILE, RICH_DOMAINS
 from scripts.f1_lab.raw_observations import raw_features
+from scripts.f1_lab.vpn_context import PROFILE as VPN_PROFILE
+from scripts.f1_lab.vpn_context import VPN_DOMAINS
 
 DOMAINS = {key: (False, True) for key, value in raw_features('').items() if type(value) is bool}
 DOMAINS.update({
@@ -23,8 +25,10 @@ FEATURE_CONTRACT_SHA256 = hashlib.sha256(json.dumps(DOMAINS, sort_keys=True).enc
 
 
 def feature_domains(profile):
-    require(profile in {'base', PROFILE}, 'native_feature_profile')
-    return DOMAINS if profile == 'base' else {**DOMAINS, **RICH_DOMAINS}
+    require(profile in {'base', PROFILE, VPN_PROFILE}, 'native_feature_profile')
+    if profile == 'base':
+        return DOMAINS
+    return {**DOMAINS, **RICH_DOMAINS, **(VPN_DOMAINS if profile == VPN_PROFILE else {})}
 
 
 def validate(features, *, profile='base'):

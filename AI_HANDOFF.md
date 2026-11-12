@@ -26,7 +26,7 @@ AIT 공개 원시 로그/경보의 고정 버전·라이선스·크기·체크�
 [수집·평가 계약](docs/extra-native-evaluation.md)과 `infra/f1-lab/native-data-protocol.json`을 따른다.
 개발 시나리오만 본문을 읽고 최종 예약 시나리오의 본문/라벨은 후보 동결 전 읽지 않는다.
 새 독립 성능 수치는 아직 없다. 결측 IdP/EDR/업무 승인 정보를 정상으로 채우지 않는다.
-개발 경보45,544행 변환·파싱/관측 오류0, 현재 관련 집중 시험 Windows244·Linux244개 통과다.
+개발 경보45,544행 변환·파싱/관측 오류0, 현재 관련 집중 시험 Windows261·Linux261개 통과다.
 원시 ZIP522,084,364바이트 전체 MD5/SHA 검증 완료. 실제 최상위 gather/labels 경로·dataset.yaml을 지원했다.
 개발 원시8쌍295,243행(공격61,862/정상233,381)을 색인했다. 후속 시간 전수 감사에서 실패/범위 밖0,
 특징 오류0·웹 시간 역순3곳을 확인했다. [원시 후보 개발 진단](docs/extra-native-candidate.md)을 따른다.
@@ -109,6 +109,21 @@ v28은 문헌/진행 근거만 갱신하며 코드는 그대로다. 새 시험�
 다음은 여섯 영역의 출처별 정답 범위와 관측/분할 근거에 맞는 후보 개선이다. 예약 ATO26건은 예측 성능이 아니며
 ATO=false를 다른 영역까지 정상으로 바꾸지 않는다. 소스 변경·새 실패 없이 검사/문서 버전을 반복 생성하지 않는다.
 원본 앱·기존 라벨·예약 AIT/CloudTrail 최종 자료와 전체 여섯 영역 목표를 보존한다. 새 분류 모델은 학습하지 않았다.
+[v32 VPN 이력 후보](docs/extra-vpn-history-candidate.md)는 그 뒤 별도 프로필로 실제 학습/개발 전이했다.
+`raw-rich-vpn-history-3`은 동일 VPN 소스의 이전24시간만 보며 같은 시각 전체를 이력 반영 전 질의한다.
+IP/포트는 연결 키만 사용하고 이름은 존재 여부만 관측한다. 절대/시나리오 상대 시각·정답은 학습 값이 아니다.
+기존 두 프로필과 준비 기본값·원본 앱·sidecar는 보존한다. 모델 SHA는
+`06f8df701f82a72a55e78a8c54c3320a4d3c6ac8fa332b49aa3bc05d300360c2`다.
+고정 단일 후보의 S 전체 P99.718/R97.914/F1 98.808/FPR0.0527%는 개발 결과이며 VPN TP1/28·FP4다.
+VPN 전용 동조건 비교는 기존 TP9/FP1152에서 새 이력 TP28/FP80으로 개선했으나 P25.926%로 미채택이다.
+새 VPN 특징의 S 정답 이용 상한 진단도 R95%에서 최대P30.682%다. 모델 성능/전체 여섯 영역의 가능 상한이 아니다.
+Windows261/LINUX261의 실패·오류·건너뜀0·Linux453파일 전후/현재 지문·소유 컨테이너0을 대조했다.
+Windows 도우미는 시험 후 콘솔 출력 cp949 오류exit1이며 pytest 종료 코드 미기록이다. XML/로그 직접 대조로 시험 완료를 확인했다.
+실제 후보 세션9814·추가 비교90785·Linux12741은 terminal exit0, Windows69070은 위 출력 오류로 terminal exit1이다.
+재시작/poll하지 않는다. `runtime/f1/vpn-candidate-v32-20261112/run.json`과
+`runtime/f1/vpn-feature-ablation-v32-20261112/ablation.json`, [v32 근거](docs/infrastructure-results/extra-vpn-history-v32-20261112.json)를 따른다.
+다음은 개발 자료에 이전 보안 관측과 명시 세션/주체 연결이 실제 존재하는지 확인하는 것이다.
+이름/IP/가까운 시각만으로 사용자의 권한·기기 건강·승인을 만들어 넣지 않는다. 전체 목표/예약 자료 경계를 유지한다.
 [v18 실제 자료 근거](docs/infrastructure-results/extra-native-actual-pairs-v18-20261112.json)를 따른다.
 [v19 원시 후보 근거](docs/infrastructure-results/extra-native-raw-candidate-v19-20261112.json)는 개발 재대입과 미채택 사유다.
 [v20 맥락/트리 근거](docs/infrastructure-results/extra-native-context-tree-v20-20261112.json)도 독립 성능이나 원본 대비 개선 폭이 아니다.

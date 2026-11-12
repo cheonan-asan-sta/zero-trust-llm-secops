@@ -3,6 +3,9 @@
 2026-11-12 · **개발 시나리오 간 전이 진단이며 독립 최종 평가/전체 목표 달성이 아니다.**
 [v21 실행 근거](infrastructure-results/extra-native-transfer-v21-20261112.json)에 원자료·모델·결과·시험 지문을 보존했다.
 
+후속 [v32 VPN 과거 이력 비교](extra-vpn-history-candidate.md)에서 기존 특징과 새 이력을 같은 VPN 전용 조건으로 비교했다.
+아래 v21 결과는 역사적 기록으로 유지하며 최신 결과도 독립 최종 평가로 표현하지 않는다.
+
 ## 모델을 바꾸지 않고 확인한 것
 
 russellmitchell에서 적합한 v20 트리와 임계값0.5를 고정하고 santos에 적용했다.
