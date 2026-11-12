@@ -349,7 +349,7 @@ class BehaviorContextService:
                     "session_version", "capture_source_digest",
                 )},
                 "context_entries": [digest(item) for item in tx.entries
-                                    if item["kind"] != "evaluation"
+                                    if item["kind"] in {"capture", "baseline", "approval", "revocation", "execution"}
                                     and item["tenant_id"] == principal.tenant_id],
                 "decision": result,
             })

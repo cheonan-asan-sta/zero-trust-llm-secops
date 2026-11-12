@@ -346,7 +346,7 @@ payload=s.model_dump(mode='json')
 payload['signature']=base64.urlsafe_b64encode(key.sign(canonical_observation(s))).decode().rstrip('=')
 print(json.dumps(payload))
 """
-        payload = json.loads(self.runtime.execute("collector", ["python", "-c", program]))
+        payload = json.loads(self.collector_job(["-c", program]))
         accepted = self.runtime.probe({"profile": "core", "path": "/zero-trust/signals/inbox",
                                        "method": "POST", "body": payload})
         self.require(accepted["status"] == 202, "security_tail_observation_not_accepted")
@@ -398,7 +398,9 @@ print(json.dumps(payload))
         final = self.history(expiring[0])
         self.require(final[:-1] == held and final[-1]["version"] == 202
                      and self.history(fresh[0])[-1]["version"] == 2, "version200_key_revoke_changed_history")
-        repeated = json.loads(self.runtime.execute("watchdog", ["python", "-m", "scripts.session_watchdog", "--once"]))
+        repeated = json.loads(self.runtime.compose(
+            "run", "--rm", "--no-deps", "-T", "--entrypoint", "python",
+            "watchdog", "-m", "scripts.session_watchdog", "--once"))
         self.require(repeated["watchdog"] == "revalidated" and self.history(expiring[0]) == final
                      and self.history(fresh[0])[-1]["version"] == 2,
                      "security_tail_watchdog_repeated_effect")

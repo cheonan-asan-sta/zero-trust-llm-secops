@@ -18,7 +18,8 @@ ZERO_HASH = "0" * 64
 MAX_ENTRY_BYTES = 1024 * 1024
 MAX_RECORDS = 10_000
 MAX_TOTAL_BYTES = 128 * 1024 * 1024
-KINDS = frozenset({"capture", "baseline", "approval", "revocation", "evaluation", "execution"})
+KINDS = frozenset({"capture", "baseline", "approval", "revocation", "evaluation", "execution",
+                   "response_request", "response_approval", "response_cancel", "response_result"})
 TABLES = {"behavior_context_entries", "behavior_context_head"}
 FIELDS = {"kind", "tenant_id", "record_id", "created_at", "actor", "payload"}
 IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}\Z")

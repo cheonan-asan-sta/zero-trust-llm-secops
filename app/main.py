@@ -59,6 +59,7 @@ from app.models import (
     SigmaRuleSummary,
     SimulationRequest,
 )
+from app.response_api import response_router
 from app.scenarios import SCENARIOS, generate_events, get_scenario
 from app.security import Principal, Role, require_roles
 from app.services.assurance import get_assurance_registry
@@ -91,6 +92,7 @@ from app.services.ocsf import get_ocsf_normalizer
 from app.services.policy import enforce_assessment_safety, response_preview
 from app.services.public_detection import PublicSession, evaluate_public_session
 from app.services.public_replay import get_public_replay_service
+from app.services.response_actions import ResponseService
 from app.services.scenario_evaluator import evaluate_scenarios
 from app.services.sigma import get_sigma_engine
 from app.services.signal_inbox import SignalInbox
@@ -151,6 +153,11 @@ behavior_context_service = (
     if zero_trust_operations else None
 )
 app.include_router(behavior_context_router(behavior_context_service))
+response_service = (
+    ResponseService(behavior_context_service.store, zero_trust_operations)
+    if behavior_context_service else None
+)
+app.include_router(response_router(response_service))
 
 ViewerPrincipal = Annotated[Principal, Depends(require_roles(Role.VIEWER))]
 AnalystPrincipal = Annotated[Principal, Depends(require_roles(Role.ANALYST))]
