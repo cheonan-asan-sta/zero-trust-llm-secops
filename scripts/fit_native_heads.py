@@ -23,7 +23,7 @@ def fit(directory, expected_sha256, output, *, tree_variant='categorical'):
     output.mkdir(parents=True, mode=0o700)
     report = {'schema': 'f1-native-heads-fit-1', 'completed': False, 'scope': preparation['scope'],
               'evaluation_kind': 'development resubstitution only', 'training_preparation_sha256': expected_sha256,
-              'threshold': .5, 'head_gate': 'observed-format-1', 'final_candidate_selected': False,
+              'threshold': .5, 'head_gate': model.gate_version, 'final_candidate_selected': False,
               'tree_variant': tree_variant,
               'goal_qualified': False, 'original_six_domain_goal_replaced': False, 'paid_api_calls': 0, 'aws_sdk_calls': 0}
     try:
@@ -43,7 +43,7 @@ def fit(directory, expected_sha256, output, *, tree_variant='categorical'):
             prediction = None
             try:
                 validate(features, profile=model.profile)
-                name = gate(features)
+                name = gate(features, profile=model.profile)
                 selected_heads[name] = selected_heads.get(name, 0)+1
                 key = tuple(sorted(features.items()))
                 if key not in cache:

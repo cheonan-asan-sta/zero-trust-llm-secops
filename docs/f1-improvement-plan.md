@@ -1,5 +1,9 @@
 # 탐지 F1 목표 달성 실험 계획
 
+최신 후속은 [v34 HTTP/인증 의미 관측](extra-http-auth-semantics.md)이다. 같은 개발 자료에서 웹 접근 오탐과 인증 미탐을
+줄였고 관련 Windows/Linux287개를 확인했다. 원본 앱·라벨은 보존하며, 원래 여섯 영역의 F5 독립 최종 평가는 미완료다.
+사용자 지정 작업 창은2026-11-12 17:11 KST까지이며 현재 코드/모델/수집 상태는 `AI_HANDOFF.md`가 기준이다.
+
 2026-11-12 · 상태: **extra에서 F0/F1 도구 실행, F3 shadow 초안 실험 진행·최종 인수 미완료**.
 [extra 기준선/오류 검토](extra-f1-baseline-review.md)에 실제 후속 실행과 한계를 기록한다.
 [지속 실험 기록](extra-f1-experiments.md)은 이후 사용자 지시에 따른 shadow 후보 구현/시험이다.

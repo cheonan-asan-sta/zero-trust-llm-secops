@@ -9,6 +9,8 @@ from pathlib import Path
 from scripts.f1_lab.native_jsonl import MAX_FILE, MAX_ROW, decode, require
 from scripts.f1_lab.raw_context import PROFILE, extra_observations, ordered_http_context
 from scripts.f1_lab.raw_observations import REQUEST, raw_features, raw_time
+from scripts.f1_lab.raw_semantics import PROFILE as SEMANTIC_PROFILE
+from scripts.f1_lab.raw_semantics import ordered_auth_context, semantic_observations
 from scripts.f1_lab.vpn_context import PROFILE as VPN_PROFILE
 from scripts.f1_lab.vpn_context import empty as empty_vpn
 from scripts.f1_lab.vpn_context import ordered_vpn_context
@@ -20,7 +22,7 @@ def canonical(value):
 
 
 def prepare(base, expected_base_sha256, pairs_directory, output, *, profile=PROFILE):
-    require(profile in {PROFILE, VPN_PROFILE}, 'context_feature_profile')
+    require(profile in {PROFILE, VPN_PROFILE, SEMANTIC_PROFILE}, 'context_feature_profile')
     base, pairs_directory, output = Path(base), Path(pairs_directory), Path(output)
     original = receipt(base, expected_base_sha256)
     require(original.get('feature_profile', 'base') == 'base', 'context_requires_base_profile')
@@ -40,6 +42,8 @@ def prepare(base, expected_base_sha256, pairs_directory, output, *, profile=PROF
               'truth_copied_unchanged': False, 'http_context': [], 'goal_qualified': False}
     if profile == VPN_PROFILE:
         report['vpn_context'] = 'one source/host endpoint history; strictly earlier timestamps; equal-time batch withheld; 24-hour lookback; no authority claims'
+    if profile == SEMANTIC_PROFILE:
+        report['semantic_context'] = 'bounded HTTP semantic shapes; explicit local log account 60-second history within one source; equal timestamps follow original source ordinal; no authority claims'
     try:
         base_input = base/'inputs.jsonl'
         require(base_input.is_file() and not base_input.is_symlink()
@@ -51,7 +55,8 @@ def prepare(base, expected_base_sha256, pairs_directory, output, *, profile=PROF
                 require(pair['raw_sha256'] == provenance['raw_sha256'], 'context_pair_anchor')
                 source = pairs_directory/f'pair-{i}-raw.source'
                 require(source.is_file() and not source.is_symlink() and source.stat().st_size <= MAX_FILE, 'context_raw_file')
-                sha, count, total, requests, vpn_records = hashlib.sha256(), 0, 0, [], []
+                sha, count, total, requests, vpn_records, auth_records = hashlib.sha256(), 0, 0, [], [], []
+                auth_bytes = 0
                 with source.open('rb') as stream:
                     while body := stream.readline(MAX_ROW+1):
                         count += 1
@@ -73,9 +78,18 @@ def prepare(base, expected_base_sha256, pairs_directory, output, *, profile=PROF
                                 moment = None
                             require(len(vpn_records) < 100000, 'context_vpn_population_bound')
                             vpn_records.append((count, moment, line))
+                        if profile == SEMANTIC_PROFILE and provenance['raw_member'].endswith('/auth.log'):
+                            try:
+                                moment = raw_time(line, provenance['simulation_start'], provenance['simulation_end'], source_timezone='UTC')
+                            except ValueError:
+                                moment = None
+                            auth_bytes += len(body)
+                            require(len(auth_records) < 100000 and auth_bytes <= 64*1024**2, 'context_auth_bound')
+                            auth_records.append((count, moment, line))
                 require(sha.hexdigest() == pair['raw_sha256'] and count == pair['rows'], 'context_raw_hash_or_rows')
                 windows = ordered_http_context(requests)
                 vpn_windows = ordered_vpn_context(vpn_records) if profile == VPN_PROFILE else {}
+                auth_windows = ordered_auth_context(auth_records) if profile == SEMANTIC_PROFILE else {}
                 histogram, sha = Counter(), hashlib.sha256()
                 with source.open('rb') as stream:
                     for ordinal in range(1, pair['rows']+1):
@@ -98,6 +112,9 @@ def prepare(base, expected_base_sha256, pairs_directory, output, *, profile=PROF
                                 extra.update(windows[ordinal])
                             if profile == VPN_PROFILE:
                                 extra.update(vpn_windows.get(ordinal, empty_vpn()))
+                            if profile == SEMANTIC_PROFILE:
+                                extra.update(semantic_observations(line))
+                                extra.update(auth_windows.get(ordinal, {}))
                             histogram.update(name for name, value in extra.items() if value is True)
                             features = {**features, **extra}
                         target.write(canonical({**item, 'features': features})+b'\n')
@@ -141,7 +158,7 @@ def main():
     parser.add_argument('--expected-base-sha256', required=True)
     parser.add_argument('--pairs-directory', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
-    parser.add_argument('--feature-profile', choices=(PROFILE, VPN_PROFILE), default=PROFILE)
+    parser.add_argument('--feature-profile', choices=(PROFILE, VPN_PROFILE, SEMANTIC_PROFILE), default=PROFILE)
     args = parser.parse_args()
     report = prepare(args.base_directory, args.expected_base_sha256, args.pairs_directory, args.output,
                      profile=args.feature_profile)

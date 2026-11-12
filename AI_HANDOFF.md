@@ -8,6 +8,23 @@
 이 시간에는 HTTP 오탐·인증/감사 희소 관측 등 개선과 개발 비교/묶음 시험/문서 업데이트를 계속한다.
 지정 시각에는 실행 상태와 산출물을 정리하고 더 진행하지 않는다. 실제 시각은 clock 도구로 확인한다.
 
+**현재 v34:** [HTTP/인증 의미 관측](docs/extra-http-auth-semantics.md)을 구현해 전체 개발 비교했다.
+Windows/Linux287개 통과·Linux458파일 일치·소유 컨테이너0. 최초 Windows281/6실패는 실제 디스크 여유 검사였고 보존한다.
+S 단일 후보는 TP46400/FP16/FN967/TN248593·P99.966/R97.958/F1 98.952/FPR0.00644%다.
+웹 접근 FP112→1·인증 TP2/12→9/12지만 VPN0/28·공유감사0/2·감사14/19는 남는다. S는 관찰된 개발 자료다.
+관측별 트리 전체 FP1544는 미채택이다. 원본 앱·정답 변경0이며 독립 전체 목표 달성은 아니다.
+모델 둘은 `runtime/f1/semantic-models-frozen-v34-20261112.json`에 동결했다. Fox는 원래 보정용 시나리오다.
+**다운로드 실행 중 세션11206**, `runtime/f1/public-ait-lds21-fox-20261112/progress.json`. 본문은 아직 읽지 않았다.
+새 네트워크 요청은08:03 UTC에 중단하는 deadline wrapper를 쓴다. 관측 timeout으로 재시작하지 않는다.
+완료되면 두 모델 동결/수집 완료를 확인한 뒤 `../tmp/extra_evaluate_frozen_fox_v34.py`를08:00 UTC 이전에 시작할 수 있다.
+이 helper는08:08 UTC부터 새 단계를 시작하지 않는다. 불완전 단계는 완료로 보고하지 않는다.
+현재 성분 비교는 `../tmp/extra_semantic_component_ablation_v35.py`, **도구 세션87457 실행 중**이다.
+`runtime/f1/semantic-component-ablation-v35-20261112`에 기록한다. 같은 핸들을 확인하며 관측 timeout으로 재시작하지 않는다.
+이전 데이터 준비49865는 ENOSPC로 terminal exit1, 재개51090·Windows98919·Linux98823·완료기록90272는 terminal exit0이다.
+정확한 실패/복구·저장 원자료는 [v34 근거](docs/infrastructure-results/extra-http-auth-semantics-v34-20261112.json)를 따른다.
+기존 실패 RBA prefix 파일은 완성 ZIP과 동일 prefix SHA를 대조해 중복만 제거했다. 원래 실패 기록은 남고 바이트는 완성본에서 복원 가능하다.
+`runtime/f1/exact-prefix-storage-deduplication-20261112.json`이 정확한 경로/길이/해시/복원 방법이다. 실패 S 부분 파일과 사용자 ZIP은 보존한다.
+
 [v33 실제 연결/센서 감사](docs/extra-causal-linkage-and-evaluation-blocker.md)와
 [감사 근거](docs/infrastructure-results/extra-native-causal-linkage-v33-20261112.json)를 가장 먼저 확인한다.
 현재 목표는 달성되지 않았다. v31/v32/v33에서 같은 독립 관측/정답/분할 부족을 재확인했고,

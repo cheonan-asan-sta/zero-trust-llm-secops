@@ -24,6 +24,10 @@ SHA256은 ZIP 인덱스/실제 probe 실행 전후에도 대조했다. 체크섬
 부분 파일만 발행자 검증 완료로 승격하지 않았다. 재개한 **전체** 파일의 체크섬이 최종 근거다.
 원래 실패 기록은 `runtime/f1/public-rba-20261112`, 완료본은 `runtime/f1/public-rba-20261112-02`다.
 
+v34 저장 공간 복구 때 실패 prefix의 원래 바이트가 완성본의 같은 prefix와 SHA까지 동일함을 검증해 중복 파일만 제거했다.
+실패 receipt/범위 로그는 보존하며 prefix 바이트는 완성 ZIP의 처음1,069,547,520바이트로 정확히 복원할 수 있다.
+`runtime/f1/exact-prefix-storage-deduplication-20261112.json`과 [v34 저장 복구 설명](extra-http-auth-semantics.md)을 따른다.
+
 ZIP 인덱스에는12개 멤버가 있고 CSV는 `rba-dataset.csv` 하나다.
 CSV 선언 크기는9,052,907,531바이트·압축 크기1,091,167,086바이트다. 큰 CSV를 디스크에 통째로 풀지 않았다.
 범용512MiB 멤버 복사 제한도 유지한다. `runtime/f1/rba-zip-inspection-20261112`에 인덱스와 검증 receipt를 보존했다.

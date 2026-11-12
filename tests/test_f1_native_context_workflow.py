@@ -4,6 +4,7 @@ import json
 import pytest
 
 from scripts.f1_lab.raw_context import PROFILE
+from scripts.f1_lab.raw_semantics import PROFILE as SEMANTIC_PROFILE
 from scripts.f1_lab.vpn_context import PROFILE as VPN_PROFILE
 from scripts.prepare_native_context import prepare as enrich
 from scripts.prepare_native_raw import prepare
@@ -13,17 +14,19 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def fixture(tmp_path, *, vpn=False, labels_text='{"line":1,"labels":["attack"]}\n'):
+def fixture(tmp_path, *, vpn=False, auth=False, labels_text='{"line":1,"labels":["attack"]}\n'):
     source = tmp_path/'source'
     source.mkdir()
     raw = source/'pair-0-raw.source'
-    raw.write_text('2022-01-21 00:00:02 alice/192.0.2.1:1194 VERIFY OK\n'
+    raw.write_text('Jan 21 00:00:02 host systemd-logind[12]: New session c1 of user alice.\n'
+                   'Jan 21 00:00:01 host su[11]: Successful su for alice by daemon\n' if auth else
+                   '2022-01-21 00:00:02 alice/192.0.2.1:1194 VERIFY OK\n'
                    '2022-01-21 00:00:01 192.0.2.1:1194 TLS: Initial packet\n' if vpn else
                    '192.0.2.1 - - [21/Jan/2022:00:00:02 +0000] "GET /two HTTP/1.1" 404 10\n'
                    '192.0.2.1 - - [21/Jan/2022:00:00:01 +0000] "GET /one HTTP/1.1" 200 10\n')
     labels = source/'pair-0-labels.source'
     labels.write_text(labels_text)
-    name = 'openvpn.log' if vpn else 'access.log'
+    name = 'auth.log' if auth else 'openvpn.log' if vpn else 'access.log'
     manifest = {'completed': True, 'scope': 'authored functional fixture only',
                 'timestamp_basis': 'naive dataset bounds interpreted as UTC only after explicit per-host timezone UTC check',
                 'pairs': [{'pair_id': 'f'*64, 'raw_rows': 2,
@@ -103,3 +106,29 @@ def test_vpn_profile_does_not_create_endpoint_context_in_http_rows(tmp_path):
     output = tmp_path/'rich'
     enrich(base, digest(base/'preparation.json'), source, output, profile=VPN_PROFILE)
     assert all(not json.loads(body)['features']['vpn_endpoint_available'] for body in (output/'inputs.jsonl').read_bytes().splitlines())
+
+
+def test_semantic_auth_history_is_causal_and_unchanged_when_only_truth_changes(tmp_path):
+    inputs = []
+    for index in (1, 2):
+        directory = tmp_path/str(index)
+        directory.mkdir()
+        source, base = fixture(directory, auth=True, labels_text=json.dumps({'line': index, 'labels': ['attack']})+'\n')
+        output = directory/'rich'
+        result = enrich(base, digest(base/'preparation.json'), source, output, profile=SEMANTIC_PROFILE)
+        assert result['completed'] and result['truth_copied_unchanged']
+        inputs.append((output/'inputs.jsonl').read_bytes())
+        rows = [json.loads(body) for body in inputs[-1].splitlines()]
+        assert rows[0]['features']['auth_subject_prior_privilege_tool']
+        assert not rows[1]['features']['auth_subject_prior_privilege_tool']
+    assert inputs[0] == inputs[1]
+
+
+def test_semantic_http_profile_keeps_existing_http_history(tmp_path):
+    source, base = fixture(tmp_path)
+    output = tmp_path/'rich'
+    result = enrich(base, digest(base/'preparation.json'), source, output, profile=SEMANTIC_PROFILE)
+    rows = [json.loads(body) for body in (output/'inputs.jsonl').read_bytes().splitlines()]
+    assert result['completed'] and rows[0]['features']['http_semantic_available']
+    assert rows[0]['features']['http_requests_1s'] == 1 and rows[1]['features']['http_requests_1s'] == 0
+    assert not any(row['features']['auth_subject_context_available'] for row in rows)
