@@ -91,6 +91,14 @@ ZIP 내부 선읽기와 전체 CSV CRC 미검증을 명시한다. 원본 RBA에�
 수집 세션34025를 먼저 확인한다. 전체 acquisition 완료/MD5/SHA 뒤 멤버 인덱스를 본 다음 정확한 CSV 이름으로
 `python -m scripts.probe_rba_schema --archive ... --expected-sha256 ... --member ... --output ...`를 새 디렉터리에 실행한다.
 외부 앵커는 완료 acquisition receipt의 실제 SHA를 사용한다. 본문 probe/지표와 fixture 검사236개를 구분한다.
+v28 문헌 검토에서 `das-group/rba-dataset`의 고정 문서와 저자 논문을 확보했다.
+논문 원 연구31.3M/성공12.5M/실패18.8M/확인 탈취87은 공개 합성 CSV의 실제 클래스 수가 아니다.
+ATO/공격IP/로그인실패 정답과 입력 가능 시점·성공 이력 오염·합성 RTT 조건을 구분한다.
+최종 정상 행을 줄여 정밀도를 맞추지 않는다. 상세 경계는 `docs/extra-cloud-identity-and-rba.md`를 따른다.
+v28은 문헌/진행 근거만 갱신하며 코드는 그대로다. 새 시험을 돌린 것으로 쓰지 않는다.
+수집/검토 준비는 완료됐다. 다음 필수 단계는 같은 수집 세션34025의 종료 결과 확인이다.
+새 코드 변경·실패 근거 없이 검사/문서 버전을 반복 생성하지 말고 살아 있는 세션을 관측한다.
+관측 timeout은 종료가 아니다. 종료 receipt와 전체 MD5/SHA가 확인되기 전에는 부분 ZIP에서 CSV를 읽지 않는다.
 [v18 실제 자료 근거](docs/infrastructure-results/extra-native-actual-pairs-v18-20261112.json)를 따른다.
 [v19 원시 후보 근거](docs/infrastructure-results/extra-native-raw-candidate-v19-20261112.json)는 개발 재대입과 미채택 사유다.
 [v20 맥락/트리 근거](docs/infrastructure-results/extra-native-context-tree-v20-20261112.json)도 독립 성능이나 원본 대비 개선 폭이 아니다.
@@ -101,6 +109,7 @@ ZIP 내부 선읽기와 전체 CSV CRC 미검증을 명시한다. 원본 RBA에�
 [v25 과거 관측/동시 목표 근거](docs/infrastructure-results/extra-cloud-context-v25-20261112.json)도 goal_qualified=false다.
 [v26 신원 감사/수집 중간 근거](docs/infrastructure-results/extra-cloud-identity-rba-v26-20261112.json)도 goal_qualified=false다.
 [v27 제한 리더/수집 중간 근거](docs/infrastructure-results/extra-rba-probe-reader-v27-20261112.json)도 goal_qualified=false다.
+[v28 문헌/수집 중간 근거](docs/infrastructure-results/extra-rba-source-review-v28-20261112.json)도 goal_qualified=false다.
 로컬 구현·검증·문서만 수행하며 GitHub 업로드/병합·AWS·유료 API를 실행하지 않는다.
 
 아래의 **진행 중** 표기는 관측 중단 이전의 당시 기록이다.
