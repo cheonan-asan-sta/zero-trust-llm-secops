@@ -26,7 +26,7 @@ AIT 공개 원시 로그/경보의 고정 버전·라이선스·크기·체크�
 [수집·평가 계약](docs/extra-native-evaluation.md)과 `infra/f1-lab/native-data-protocol.json`을 따른다.
 개발 시나리오만 본문을 읽고 최종 예약 시나리오의 본문/라벨은 후보 동결 전 읽지 않는다.
 새 독립 성능 수치는 아직 없다. 결측 IdP/EDR/업무 승인 정보를 정상으로 채우지 않는다.
-개발 경보45,544행 변환·파싱/관측 오류0, 현재 관련 집중 시험 Windows236·Linux236개 통과다.
+개발 경보45,544행 변환·파싱/관측 오류0, 현재 관련 집중 시험 Windows244·Linux244개 통과다.
 원시 ZIP522,084,364바이트 전체 MD5/SHA 검증 완료. 실제 최상위 gather/labels 경로·dataset.yaml을 지원했다.
 개발 원시8쌍295,243행(공격61,862/정상233,381)을 색인했다. 후속 시간 전수 감사에서 실패/범위 밖0,
 특징 오류0·웹 시간 역순3곳을 확인했다. [원시 후보 개발 진단](docs/extra-native-candidate.md)을 따른다.
@@ -87,16 +87,24 @@ AWSService3107건(공격48)은 principal/ARN/세션/위임 연결 근거가 없�
 ZIP12멤버·CSV9052907531바이트를 통째로 풀지 않았다. v27 리더로 처음128개·파서37393바이트만 실제 조사했다.
 ATOfalse128/true0·공격IPtrue9·성공65/실패63·RTT결측122·시간대없는시각128, 관찰 사용자81개다.
 이를 전체 클래스 수/결측 비율이나 탐지 성능으로 쓰지 않는다. prefix/사용자 해시는 `runtime/f1/rba-schema-probe-20261112/probe.json`에 있다.
-나머지 CSV 기록은 아직 파싱하지 않았다. 개발 관찰 사용자를 미관찰 최종으로 재사용하지 않는다.
+v29까지 나머지 CSV 기록은 파싱하지 않았다. 후속 v30의 메타데이터 기계적 파싱 진행은 아래를 따른다. 개발 관찰 사용자를 미관찰 최종으로 재사용하지 않는다.
 ZIP 내부 선읽기·CSV 전체 CRC 미검증을 명시한다. 합성 RBA는 생산 IDS용이 아니고 여섯 영역을 대체하지 않는다.
 v28 문헌 검토에서 `das-group/rba-dataset`의 고정 문서와 저자 논문을 확보했다.
 논문 원 연구31.3M/성공12.5M/실패18.8M/확인 탈취87은 공개 합성 CSV의 실제 클래스 수가 아니다.
 ATO/공격IP/로그인실패 정답과 입력 가능 시점·성공 이력 오염·합성 RTT 조건을 구분한다.
 최종 정상 행을 줄여 정밀도를 맞추지 않는다. 상세 경계는 `docs/extra-cloud-identity-and-rba.md`를 따른다.
 v28은 문헌/진행 근거만 갱신하며 코드는 그대로다. 새 시험을 돌린 것으로 쓰지 않는다.
-다음 필수 단계는 별도 메타데이터 감사·분할·정답 계약을 정한 뒤 클래스 지지·주체/시간/중복을 기계적으로 확인하는 것이다.
-그 전에 CSV의 이후 사례를 보거나 모델에 넣지 않는다. v29는 실제 자료 검사이며 새 pytest를 돌리지 않았다.
-기존 Windows/Linux236개는 v27 소스의 근거로 유지한다. 원본 앱·기존 라벨·예약 최종 자료와 전체 여섯 영역 목표를 보존한다.
+[v30 메타데이터 감사](docs/extra-rba-metadata-audit.md)를 사전 계약 뒤 시작했다.
+**실행 중:** 도구 세션94763·PID8660, `runtime/f1/rba-metadata-run-20261112.json`,
+`runtime/f1/rba-full-metadata-20261112/progress.json`. helper는 `../tmp/extra_start_rba_metadata_actual.py`다.
+최대4천만행/3600초·SQLite1GiB·25,000행 배치다. 전체 EOF/CRC·바이트 수·소스 지문·DB 완료를 실제 결과로 확인해야 한다.
+분할은 사용자 해시70/15/15로 고정하고 기존81명은 전체 개발 배정한다. 클래스 지지 때문에 재분할하지 않는다.
+세션 출력에 조건부 교차표가 포함될 수 있으므로 `text(write_stdin(...))`로 원문을 펼치지 않는다.
+함수 내에서 출력은 길이/종료 상태만 표시하고 `../tmp/extra_show_rba_metadata_status.py`로 지지 집계만 확인한다.
+예약 후보의 조건부 교차표·개별 사례/라벨을 모델 선택에 사용하지 않는다. 실제 기기/템플릿·미래시점 독립성은 미인증이다.
+최종 Windows/Linux244개 통과·Linux450파일 전후 지문/소유 컨테이너0. 실제 전체 감사는 아직 미완료다.
+다음은 같은94763 세션의 종료/감사 receipt 확인이다. 소스 변경·새 실패 없이 검사/문서 버전을 반복 생성하지 않는다.
+원본 앱·기존 라벨·예약 AIT/CloudTrail 최종 자료와 전체 여섯 영역 목표를 보존한다. 새 분류 모델은 학습하지 않았다.
 [v18 실제 자료 근거](docs/infrastructure-results/extra-native-actual-pairs-v18-20261112.json)를 따른다.
 [v19 원시 후보 근거](docs/infrastructure-results/extra-native-raw-candidate-v19-20261112.json)는 개발 재대입과 미채택 사유다.
 [v20 맥락/트리 근거](docs/infrastructure-results/extra-native-context-tree-v20-20261112.json)도 독립 성능이나 원본 대비 개선 폭이 아니다.
@@ -109,6 +117,7 @@ v28은 문헌/진행 근거만 갱신하며 코드는 그대로다. 새 시험�
 [v27 제한 리더/수집 중간 근거](docs/infrastructure-results/extra-rba-probe-reader-v27-20261112.json)도 goal_qualified=false다.
 [v28 문헌/수집 중간 근거](docs/infrastructure-results/extra-rba-source-review-v28-20261112.json)도 goal_qualified=false다.
 [v29 실제 수집/probe 근거](docs/infrastructure-results/extra-rba-actual-probe-v29-20261112.json)도 goal_qualified=false다.
+[v30 메타데이터 구현/진행 근거](docs/infrastructure-results/extra-rba-metadata-v30-20261112.json)도 goal_qualified=false다.
 로컬 구현·검증·문서만 수행하며 GitHub 업로드/병합·AWS·유료 API를 실행하지 않는다.
 
 아래의 **진행 중** 표기는 관측 중단 이전의 당시 기록이다.
