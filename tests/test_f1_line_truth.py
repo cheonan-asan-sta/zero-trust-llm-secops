@@ -81,6 +81,14 @@ def test_other_host_label_file_cannot_match_by_basename(index, tmp_path):
         index.add_pair(**args)
 
 
+def test_actual_archive_root_pair_supported_without_losing_host_binding(index, tmp_path):
+    args = arguments(tmp_path)
+    args['raw_member'] = 'gather/host-a/logs/auth.log'
+    args['label_member'] = 'labels/host-a/logs/auth.log'
+    assert index.add_pair(**args)['raw_rows'] == 2
+    assert lookup(index, 'attack')['truth'] is True
+
+
 @pytest.mark.parametrize('number', [0, -1, True, '2', 3])
 def test_bad_or_out_of_range_label_never_commits_partial_truth(index, tmp_path, number):
     args = arguments(tmp_path, gold=(json.dumps({'line': number, 'labels': ['attack']})+'\n').encode())

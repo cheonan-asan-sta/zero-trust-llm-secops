@@ -40,8 +40,12 @@ def pair_members(raw_member, label_member):
                 and not any(ord(char) < 32 for char in name), 'pair_member')
         path = PurePosixPath(name)
         require(not path.is_absolute() and '..' not in path.parts and path.as_posix() == name, 'pair_member')
-    require(raw_member.count('/gather/') == 1 and label_member == raw_member.replace('/gather/', '/labels/'),
-            'exact_pair_member')
+    raw_parts = PurePosixPath(raw_member).parts
+    require(raw_parts.count('gather') == 1, 'exact_pair_member')
+    position = raw_parts.index('gather')
+    require(len(raw_parts) > position+3 and raw_parts[position+2] == 'logs', 'exact_pair_member')
+    expected = (*raw_parts[:position], 'labels', *raw_parts[position+1:])
+    require(PurePosixPath(label_member).parts == expected, 'exact_pair_member')
 
 
 class LineTruthIndex:
