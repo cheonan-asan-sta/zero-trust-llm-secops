@@ -168,7 +168,17 @@ class ResponseService:
             "version": 1 + len(reviews) + int(bool(cancelled or executed)),
             "status": status,
             "requester": base["requester"],
+            "reason": base["request"]["reason"],
             "approved_by": approvers,
+            "reviews": [
+                {
+                    "subject": row["actor"],
+                    "reason": row["payload"]["command"]["reason"],
+                    "approved_at": row["created_at"],
+                    "receipt_version": row["payload"]["version"],
+                }
+                for row in reviews
+            ],
             "required_approvals": 2,
             "action": kind,
             "target": target,

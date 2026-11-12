@@ -409,7 +409,9 @@ def test_mtls_roles_preserve_collector_and_native_core_boundaries(material):
     core = json.loads(material["core-tls"]["server.json"])
     gateway_pin = _fingerprint(material["gateway-tls"]["gateway-client.pem"])
     operator_pin = _fingerprint(material["operator-tls"]["core-operator.pem"])
-    assert core["peers"] == {gateway_pin: "api-gateway", operator_pin: "core-operator"}
+    reviewers = {_fingerprint(material['reviewer-' + name + '-tls']['response-reviewer-' + name + '.pem']):
+                 'response-reviewer' for name in ('a', 'b')}
+    assert core["peers"] == {gateway_pin: "api-gateway", operator_pin: "core-operator", **reviewers}
 
 
 def test_client_profiles_authenticate_each_expected_peer_and_use_existing_tls_pep(material):

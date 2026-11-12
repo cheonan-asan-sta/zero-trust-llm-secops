@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     aws_region: str = "ap-northeast-2"
     auth_mode: Literal["disabled", "api_key", "oidc"] = "disabled"
     api_key_sha256: SecretStr | None = None
+    api_key_accounts_path: Path | None = None
     api_key_subject: str = Field(default="service-client", min_length=1, max_length=128)
     api_key_tenant_id: str = Field(default="local", pattern=r"^[a-zA-Z0-9._-]{1,64}$")
     api_key_roles: str = "analyst,responder,viewer"

@@ -17,6 +17,7 @@ from scripts import persistent_authority_runtime as runtime
 from scripts.authority_rotation_coordinator import Coordinator
 from scripts.certificate_controller import LifecycleError
 from scripts.rekey_mtls_runtime import RekeyRuntime
+from tests.reviewer_credentials import assert_reviewer_isolation
 
 
 def require(value):
@@ -31,7 +32,8 @@ class Hidden(SimpleNamespace):
 
 def test_optional_graph_is_isolated_and_online_services_never_mount_vault():
     spec = runtime.definition('kmtls-012345abcdef', 'app', 'nginx')
-    assert len(spec['services']) == 18 and len(spec['volumes']) == 36 and len(spec['networks']) == 10
+    assert_reviewer_isolation(spec)
+    assert len(spec['services']) == 18 and len(spec['volumes']) == 40 and len(spec['networks']) == 10
     assert all(n['internal'] for n in spec['networks'].values())
     for service in spec['services'].values():
         assert service['user'] == '10001:10001' and service['read_only'] and not service.get('ports')

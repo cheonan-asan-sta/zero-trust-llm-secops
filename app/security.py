@@ -12,6 +12,7 @@ from fastapi import Depends, Header, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import InvalidTokenError, PyJWKClient, PyJWKClientConnectionError, PyJWKClientError
 
+from app.api_key_accounts import load_accounts
 from app.config import Settings, get_settings
 
 
@@ -69,17 +70,40 @@ def _parse_roles(value: object) -> frozenset[Role]:
         candidates = [item for item in value if isinstance(item, str)]
     else:
         candidates = []
-    roles = {Role(candidate.lower()) for candidate in candidates if candidate.lower() in Role._value2member_map_}
+    roles = {
+        Role(candidate.lower())
+        for candidate in candidates
+        if candidate.lower() in Role._value2member_map_
+    }
     if not roles:
         raise _unauthorized("Token does not contain an allowed role")
     return frozenset(roles)
 
 
 def _api_key_principal(api_key: str | None, settings: Settings) -> Principal:
-    if not api_key or settings.api_key_sha256 is None:
+    if not api_key or len(api_key) > 4096 or settings.api_key_sha256 is None:
         raise _unauthorized()
     actual_digest = hashlib.sha256(api_key.encode("utf-8")).hexdigest()
     expected_digest = settings.api_key_sha256.get_secret_value().lower()
+    accounts = []
+    if settings.api_key_accounts_path is not None:
+        try:
+            accounts = load_accounts(settings.api_key_accounts_path, expected_digest)
+        except (OSError, ValueError, TypeError, RecursionError) as exc:
+            raise HTTPException(
+                status_code=503, detail="Authentication configuration is unavailable"
+            ) from exc
+    matched = None
+    for account in accounts:
+        if hmac.compare_digest(actual_digest, account.sha256) and account.enabled:
+            matched = account
+    if matched is not None:
+        return Principal(
+            subject=matched.subject,
+            tenant_id=matched.tenant_id,
+            roles=_parse_roles(matched.roles),
+            auth_method="api_key",
+        )
     if not hmac.compare_digest(actual_digest, expected_digest):
         raise _unauthorized("Invalid API credential")
     return Principal(
@@ -126,8 +150,12 @@ async def _oidc_principal(
     except (InvalidTokenError, PyJWKClientError, KeyError, TypeError, ValueError) as exc:
         raise _unauthorized("Invalid identity token") from exc
     # Preserve claim types: coercing null, numbers or booleans creates unintended tenant IDs.
-    if (not isinstance(subject, str) or not subject
-            or not isinstance(tenant_id, str) or not _TENANT_PATTERN.fullmatch(tenant_id)):
+    if (
+        not isinstance(subject, str)
+        or not subject
+        or not isinstance(tenant_id, str)
+        or not _TENANT_PATTERN.fullmatch(tenant_id)
+    ):
         raise _unauthorized("Token identity claims are invalid")
     return Principal(
         subject=subject[:128],

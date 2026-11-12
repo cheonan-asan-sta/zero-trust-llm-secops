@@ -11,6 +11,7 @@ from scripts import database_transport_runtime as runtime
 from scripts import persistent_authority_assets as assets
 from scripts import persistent_authority_runtime as parent
 from scripts.certificate_controller import LifecycleError
+from tests.reviewer_credentials import assert_reviewer_isolation
 
 
 class Hidden(SimpleNamespace):
@@ -168,7 +169,8 @@ def test_expired_current_authority_is_not_automatically_resurrected(lab, monkeyp
 
 def test_opt_in_profile_adds_only_isolated_vault_no_online_mount():
     spec = runtime.definition('kmtls-012345abcdef', 'app', 'nginx')
-    assert len(spec['services']) == 18 and len(spec['networks']) == 10 and len(spec['volumes']) == 37
+    assert_reviewer_isolation(spec)
+    assert len(spec['services']) == 18 and len(spec['networks']) == 10 and len(spec['volumes']) == 41
     assert all(runtime.VAULT not in m for s in spec['services'].values() for m in s['volumes'])
     assert parent.PersistentAuthorityRuntime.volumes == runtime.TransportRuntime.volumes[:-1]
 

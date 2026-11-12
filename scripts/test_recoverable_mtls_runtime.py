@@ -48,6 +48,7 @@ print(json.dumps({'logs': state['jsonl'], 'consumed': consumed, 'registry': sha(
 
 
 class RecoveryChecks(Checks):
+    expected_context_records = 4
     def __init__(self, directory):
         super().__init__(directory, runtime_class=RecoverableRuntime)
         self.report["schema"] = "recoverable-mtls-verification-1"
@@ -119,7 +120,7 @@ class RecoveryChecks(Checks):
         receipt = self.receipt("app-restore-inbox-history")["body"]
         before = self.read_state("/data")
         self.require(before["consumed"] == 1 and before["inbox"] and before["logs"]
-                     and before["behavior_context"]["records"] == 4, "source_history_missing")
+                     and before["behavior_context"]["records"] == self.expected_context_records, "source_history_missing")
         old = self.mint("restore-old")
         history = self.history(old[0])
         self.require(history[-1]["status"] == "ACTIVE", "source_session_inactive")
@@ -166,10 +167,10 @@ class RecoveryChecks(Checks):
         self.report["completed"] = True
 
 
-def main():
+def main(checks_type=RecoveryChecks):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--directory", required=True, type=Path)
-    checks = RecoveryChecks(parser.parse_args().directory)
+    checks = checks_type(parser.parse_args().directory)
     try:
         checks.run()
     except (RuntimeFailure, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as exc:

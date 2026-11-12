@@ -8,6 +8,7 @@ from scripts import database_recovery_runtime as runtime
 from scripts.certificate_controller import LifecycleError
 from scripts.database_backup_runtime import TABLES
 from scripts.database_recovery_runtime import VOLUMES, RecoveryRuntime, definition
+from tests.reviewer_credentials import assert_reviewer_isolation
 
 
 @pytest.fixture
@@ -87,7 +88,8 @@ def test_anchor_shape_is_strict(value):
 
 def test_checkpoint_volumes_absent_from_online_graph():
     spec = definition('kmtls-' + 'a' * 12, 'image', 'nginx')
-    assert len(spec['volumes']) == 41
+    assert_reviewer_isolation(spec)
+    assert len(spec['volumes']) == 45
     for service in spec['services'].values():
         assert not any(m.split(':')[0] in VOLUMES for m in service['volumes'])
 

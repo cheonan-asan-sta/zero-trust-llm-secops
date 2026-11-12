@@ -99,6 +99,7 @@ def test_two_independent_reviews_produce_only_one_simulated_result(
     before = e.lab.operations.history(e.target.session.session.session_id, e.lab.operator)
     assert view["target"]["kind"] == target_kind and view["required_approvals"] == 2
     assert view["session_binding"]["operator_id"] == e.requester.subject
+    assert view["reason"] == request.reason and view["reviews"] == []
     with pytest.raises(ResponseDenied):
         e.service.approve(request.request_id, review(view), e.requester)
     with pytest.raises(ResponseConflict):
@@ -110,6 +111,9 @@ def test_two_independent_reviews_produce_only_one_simulated_result(
         e.service.execute(request.request_id, command(view), e.requester)
     view = e.service.approve(request.request_id, review(view), e.reviewers[1])
     assert view["status"] == "APPROVED"
+    assert [item["subject"] for item in view["reviews"]] == ["reviewer-a", "reviewer-b"]
+    assert all(item["reason"] == first.reason for item in view["reviews"])
+    assert [item["receipt_version"] for item in view["reviews"]] == [2, 3]
     duplicate = e.service.approve(request.request_id, first, e.reviewers[0])
     assert duplicate["duplicate"] and duplicate["receipt_version"] == 2
     with pytest.raises(ResponseConflict):
