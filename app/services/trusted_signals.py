@@ -10,9 +10,16 @@ from pathlib import Path
 from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+from pydantic import ValidationError
 
-from app.continuous_signal_models import GUARDDUTY_MAX_AGE_SECONDS, SignedContinuousSignal
-from app.security import Principal
+from app.behavior_context_models import SignedBehaviorCapture
+from app.behavior_execution_models import SignedExecutionEvidence
+from app.continuous_signal_models import (
+    GUARDDUTY_MAX_AGE_SECONDS,
+    SESSION_PROOF_MAX_AGE_SECONDS,
+    SignedContinuousSignal,
+)
+from app.security import Principal, Role
 from app.zero_trust_models import SignedSessionSignal, TrustedSignalRegistry
 
 
@@ -34,6 +41,18 @@ def canonical_signal(signal: SignedSessionSignal) -> bytes:
 def canonical_observation(signal: SignedContinuousSignal) -> bytes:
     """Domain-separated by the signed zt-observation-1 schema, not a session proof."""
     payload = signal.model_dump(mode="json", exclude={"signature"})
+    return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()
+
+
+def canonical_behavior_capture(capture: SignedBehaviorCapture) -> bytes:
+    """Sign the entire telemetry and binding under the zt-behavior-1 domain."""
+    payload = capture.model_dump(mode="json", exclude={"signature"})
+    return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()
+
+
+def canonical_execution_evidence(evidence: SignedExecutionEvidence) -> bytes:
+    """Sign observations and exact capture binding under the separate execution domain."""
+    payload = evidence.model_dump(mode="json", exclude={"signature"})
     return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()
 
 
@@ -126,12 +145,13 @@ class SignalVerifier:
             raise SignalRejected("source or tenant rejected")
         # Observation collectors have deliberately narrower claim authority. They
         # cannot switch schemas to assert device health, MFA and a complete session.
-        if source.observation_kinds:
+        if source.observation_kinds or source.behavior_scopes or source.execution_scopes:
             raise SignalRejected("observation-only source cannot assert a full session")
         key = next((item for item in source.keys if item.key_id == signal.key_id), None)
         if key is None or not key.enabled or not key.not_before <= now < key.not_after:
             raise SignalRejected("source key rejected")
-        if (signal.issued_at > now or (now - signal.issued_at).total_seconds() > 60
+        if (signal.issued_at > now or signal.issued_at < key.not_before
+                or (now - signal.issued_at).total_seconds() > 60
                 or signal.expires_at <= now or signal.expires_at > key.not_after
                 or signal.event.timestamp > signal.issued_at):
             raise SignalRejected("signal freshness rejected")
@@ -153,6 +173,103 @@ class SignalVerifier:
             source_digest=hashlib.sha256(source.model_dump_json().encode()).hexdigest(),
             expires_at=signal.expires_at, issued_at=signal.issued_at,
             challenge_id=signal.challenge_id, input_digest=hashlib.sha256(payload).hexdigest(),
+        )
+
+    def verify_behavior_capture(
+        self, capture: SignedBehaviorCapture, principal: Principal, now: datetime,
+        *, enforce_freshness: bool = True,
+    ) -> VerifiedSignal:
+        """Only dedicated collectors can assert bounded observed behavior.
+
+        Historical context reads may skip intake freshness but still verify the exact
+        signature and current source/key/scope. Their caller must not treat an expired
+        capture as a current normal-operation attestation.
+        """
+        if Role.ANALYST not in principal.effective_roles:
+            raise SignalRejected("behavior capture requires analyst authority")
+        try:
+            # Revalidate non-HTTP callers and model_copy(update=...) objects as well.
+            capture = SignedBehaviorCapture.model_validate(capture.model_dump(mode="json"))
+        except (ValidationError, ValueError, TypeError, AttributeError) as exc:
+            raise SignalRejected("behavior capture shape rejected") from exc
+        source = self._sources().get((principal.tenant_id, capture.source_id))
+        if (source is None or not source.enabled or capture.tenant_id != principal.tenant_id
+                or not source.behavior_scopes or capture.scope not in source.behavior_scopes):
+            raise SignalRejected("behavior source or scope rejected")
+        key = next((item for item in source.keys if item.key_id == capture.key_id), None)
+        if key is None or not key.enabled or not key.not_before <= now < key.not_after:
+            raise SignalRejected("behavior key rejected")
+        if (capture.issued_at > now or capture.issued_at < key.not_before
+                or capture.expires_at > key.not_after
+                or (enforce_freshness and (
+                    (now - capture.issued_at).total_seconds() > 60 or capture.expires_at <= now
+                ))):
+            raise SignalRejected("behavior freshness rejected")
+        payload = canonical_behavior_capture(capture)
+        if len(payload) > 1_048_576:
+            raise SignalRejected("behavior capture too large")
+        try:
+            signature = base64.urlsafe_b64decode(capture.signature + "==")
+            if base64.urlsafe_b64encode(signature).decode().rstrip("=") != capture.signature:
+                raise ValueError("noncanonical signature")
+            public = serialization.load_pem_public_key(key.public_key_pem.encode())
+            public.verify(signature, payload)
+        except (InvalidSignature, ValueError, TypeError) as exc:
+            raise SignalRejected("behavior signature rejected") from exc
+        return VerifiedSignal(
+            source_id=capture.source_id, key_id=capture.key_id,
+            source_digest=hashlib.sha256(source.model_dump_json().encode()).hexdigest(),
+            expires_at=capture.expires_at, issued_at=capture.issued_at,
+            challenge_id=None, input_digest=hashlib.sha256(payload).hexdigest(),
+        )
+
+    def verify_execution_evidence(
+        self, evidence: SignedExecutionEvidence, principal: Principal, now: datetime,
+        *, enforce_freshness: bool = True,
+    ) -> VerifiedSignal:
+        """Dedicated collectors attest bounded observations, never an approval or verdict.
+
+        Replay reads may skip first-delivery age, but still verify current authority and
+        the exact signed payload. Normal classification must separately require unexpired
+        evidence and bind every referenced event and connection to the accepted capture.
+        """
+        if Role.ANALYST not in principal.effective_roles:
+            raise SignalRejected("execution evidence requires analyst authority")
+        if not isinstance(now, datetime) or now.utcoffset() is None:
+            raise SignalRejected("execution verification clock requires timezone")
+        try:
+            evidence = SignedExecutionEvidence.model_validate(evidence.model_dump(mode="json"))
+        except (ValidationError, ValueError, TypeError, AttributeError) as exc:
+            raise SignalRejected("execution evidence shape rejected") from exc
+        source = self._sources().get((principal.tenant_id, evidence.source_id))
+        if (source is None or not source.enabled or evidence.tenant_id != principal.tenant_id
+                or not source.execution_scopes or evidence.scope not in source.execution_scopes):
+            raise SignalRejected("execution source or scope rejected")
+        key = next((item for item in source.keys if item.key_id == evidence.key_id), None)
+        if key is None or not key.enabled or not key.not_before <= now < key.not_after:
+            raise SignalRejected("execution key rejected")
+        if (evidence.issued_at > now or evidence.issued_at < key.not_before
+                or evidence.expires_at > key.not_after
+                or (enforce_freshness and (
+                    (now - evidence.issued_at).total_seconds() > 60 or evidence.expires_at <= now
+                ))):
+            raise SignalRejected("execution freshness rejected")
+        payload = canonical_execution_evidence(evidence)
+        if len(payload) > 1_048_576:
+            raise SignalRejected("execution evidence too large")
+        try:
+            signature = base64.urlsafe_b64decode(evidence.signature + "==")
+            if base64.urlsafe_b64encode(signature).decode().rstrip("=") != evidence.signature:
+                raise ValueError("noncanonical signature")
+            public = serialization.load_pem_public_key(key.public_key_pem.encode())
+            public.verify(signature, payload)
+        except (InvalidSignature, ValueError, TypeError) as exc:
+            raise SignalRejected("execution signature rejected") from exc
+        return VerifiedSignal(
+            source_id=evidence.source_id, key_id=evidence.key_id,
+            source_digest=hashlib.sha256(source.model_dump_json().encode()).hexdigest(),
+            expires_at=evidence.expires_at, issued_at=evidence.issued_at,
+            challenge_id=None, input_digest=hashlib.sha256(payload).hexdigest(),
         )
 
     def verify_observation(
@@ -181,6 +298,13 @@ class SignalVerifier:
                 raise SignalRejected("observation resource scope rejected")
             if enforce_freshness and (now - signal.observed_at).total_seconds() > GUARDDUTY_MAX_AGE_SECONDS:
                 raise SignalRejected("GuardDuty finding is too old for first intake")
+        if observation.kind == "session_proof":
+            if (observation.device_id not in source.device_ids
+                    or observation.resource_id not in source.session_proof_resource_ids):
+                raise SignalRejected("session proof device or resource scope rejected")
+            if (enforce_freshness
+                    and (now - signal.observed_at).total_seconds() > SESSION_PROOF_MAX_AGE_SECONDS):
+                raise SignalRejected("session proof finding is too old for first intake")
         if (signal.issued_at > now or signal.issued_at < key.not_before
                 or signal.expires_at > key.not_after
                 or (enforce_freshness and (

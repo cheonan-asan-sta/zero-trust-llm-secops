@@ -10,6 +10,7 @@ import hashlib
 import json
 import os
 import signal
+import stat
 import sys
 from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
@@ -86,6 +87,7 @@ class CollectorConfig(StrictModel):
     kind: ObservationKind
     subjects: list[str] = Field(min_length=1, max_length=100)
     resource_ids: list[ResourceIdentifier] = Field(default_factory=list, max_length=100)
+    device_ids: list[str] = Field(default_factory=list, max_length=100)
 
     @model_serializer(mode="wrap")
     def serialize_config(self, handler):
@@ -93,15 +95,19 @@ class CollectorConfig(StrictModel):
         # The spool binds the serialized collector configuration.
         if not self.resource_ids:
             value.pop("resource_ids", None)
+        if not self.device_ids:
+            value.pop("device_ids", None)
         return value
 
     @model_validator(mode="after")
-    def resource_scope(self):
-        if bool(self.resource_ids) != (self.kind == "guardduty"):
-            raise ValueError("only a GuardDuty collector requires resource scope")
+    def observation_scope(self):
+        if bool(self.resource_ids) != (self.kind in {"guardduty", "session_proof"}):
+            raise ValueError("GuardDuty and session proof collectors require resource scope")
+        if bool(self.device_ids) != (self.kind == "session_proof"):
+            raise ValueError("only a session proof collector requires separate device scope")
         return self
 
-    @field_validator("subjects")
+    @field_validator("subjects", "device_ids")
     @classmethod
     def subject_scope(cls, values):
         if len(set(values)) != len(values) or any(not v.strip() or len(v) > 128 for v in values):
@@ -116,11 +122,19 @@ def _private_file(path, content):
         os.fsync(file.fileno())
 
 
-def initialize(directory, tenant, source_id, key_id, kind, subjects, *, resource_ids=()):
+def _check_proof_feed_permissions(metadata):
+    if os.name == "posix" and (metadata.st_uid != os.geteuid() or stat.S_IMODE(metadata.st_mode) & 0o077):
+        raise ValueError("session proof feed must be owner-only")
+
+
+def initialize(directory, tenant, source_id, key_id, kind, subjects, *, resource_ids=(), device_ids=()):
     config = CollectorConfig(tenant_id=tenant, source_id=source_id, key_id=key_id,
-                             kind=kind, subjects=subjects, resource_ids=list(resource_ids))
+                             kind=kind, subjects=subjects, resource_ids=list(resource_ids),
+                             device_ids=list(device_ids))
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True, mode=0o700)
+    if kind == "session_proof":
+        _check_proof_feed_permissions(directory.stat())
     names = ["config.json", "private.pem", "sources.json", "input.jsonl", "state.sqlite3"]
     if any((directory / name).exists() for name in names):
         raise FileExistsError("collector files already exist")
@@ -140,6 +154,9 @@ def initialize(directory, tenant, source_id, key_id, kind, subjects, *, resource
     }]}
     if kind == "guardduty":
         registry["sources"][0]["guardduty_resource_ids"] = config.resource_ids
+    if kind == "session_proof":
+        registry["sources"][0]["device_ids"] = config.device_ids
+        registry["sources"][0]["session_proof_resource_ids"] = config.resource_ids
     _private_file(directory / "private.pem", key.private_bytes(
         serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8,
         serialization.NoEncryption(),
@@ -220,6 +237,8 @@ class ContinuousCollector:
         if config_path.stat().st_size > 32768 or private_path.stat().st_size > 16384:
             raise ValueError("collector configuration too large")
         self.config = CollectorConfig.model_validate_json(config_path.read_bytes())
+        if self.config.kind == "session_proof":
+            _check_proof_feed_permissions(self.directory.stat())
         self.key = serialization.load_pem_private_key(private_path.read_bytes(), password=None)
         if not isinstance(self.key, Ed25519PrivateKey):
             raise TypeError("collector requires Ed25519")
@@ -251,6 +270,9 @@ class ContinuousCollector:
             return self._capture_locked()
 
     def _capture_locked(self):
+        if self.config.kind == "session_proof":
+            _check_proof_feed_permissions(self.directory.stat())
+            _check_proof_feed_permissions(self.input_path.lstat())
         checkpoint = self.spool.checkpoint()
         prefix, size = _prefix(self.input_path, checkpoint)
         with self.input_path.open("rb") as file:
@@ -284,12 +306,18 @@ class ContinuousCollector:
     def _check_record(self, record):
         if (record.observation.kind != self.config.kind
                 or record.observation.subject_id not in self.config.subjects
-                or (record.observation.kind == "guardduty"
+                or (record.observation.kind in {"guardduty", "session_proof"}
                     and record.observation.resource_id not in self.config.resource_ids)
+                or (record.observation.kind == "session_proof"
+                    and record.observation.device_id not in self.config.device_ids)
                 or record.observed_at > self.clock()):
             raise ValueError("collector input scope or time")
 
     def append(self, event):
+        if self.config.kind == "session_proof":
+            # The independent verifier owns the protected JSONL writer. The
+            # generic user-input command is not a proof verification interface.
+            raise ValueError("session proof input requires the protected verifier feed")
         record = InputRecord.model_validate(event)
         self._check_record(record)
         return append_event(self.directory, record.model_dump(mode="json"))
@@ -386,9 +414,10 @@ def main(argv=None):
     parser.add_argument("--tenant", default="local")
     parser.add_argument("--source-id", default="local-identity-observer")
     parser.add_argument("--key-id", default="key-1")
-    parser.add_argument("--kind", choices=["identity", "device", "guardduty"], default="identity")
+    parser.add_argument("--kind", choices=["identity", "device", "guardduty", "session_proof"], default="identity")
     parser.add_argument("--subject", action="append", default=[])
     parser.add_argument("--resource", action="append", default=[])
+    parser.add_argument("--device", action="append", default=[], help="Session proof collector device scope")
     parser.add_argument("--event-signature", type=Path)
     parser.add_argument("--base-url", default="http://127.0.0.1:18080")
     parser.add_argument("--tls-profile", type=Path)
@@ -417,7 +446,8 @@ def main(argv=None):
             raise ValueError("collector is local/test only")
         if args.operation == "init":
             print(json.dumps(initialize(args.directory, args.tenant, args.source_id,
-                                        args.key_id, args.kind, args.subject, resource_ids=args.resource)))
+                                        args.key_id, args.kind, args.subject, resource_ids=args.resource,
+                                        device_ids=args.device)))
             return 0
         def configured_collector():
             return ContinuousCollector(args.directory, args.base_url,

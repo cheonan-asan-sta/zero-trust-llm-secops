@@ -13,7 +13,8 @@ from scripts.app_state_recovery import ROOT, app_digest, canonical, require, sha
 
 SOURCE_FILES = ("scripts/app_state_recovery.py", "scripts/app_recovery_fixture.py",
                 "scripts/serve_recovered_app.py", "scripts/test_app_recovery_runtime.py",
-                "scripts/app_storage_contract.py", "scripts/app_storage_fixture.py")
+                "scripts/app_storage_contract.py", "scripts/app_storage_fixture.py",
+                "scripts/behavior_context_recovery.py")
 
 
 def fingerprint():
@@ -117,7 +118,8 @@ class Lab:
 
     def ready(self, ident):
         started = time.monotonic()
-        while time.monotonic() - started < 30:
+        # The restored admission gate also runs under amd64 emulation on ARM hosts.
+        while time.monotonic() - started < 90:
             result = self.run("exec", ident, "python", "-c",
                 "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/live',timeout=1)", ok=False)
             if result.returncode == 0:
@@ -156,6 +158,8 @@ class Lab:
         require(actual == fingerprint(), "image_source_mismatch")
         self.checks["image_source_matches"] = True
         self.job("from pathlib import Path; from scripts.app_recovery_fixture import prepare; prepare(Path('/lab/data'))")
+        self.job("from pathlib import Path; from scripts.app_storage_fixture import seed_behavior_context; "
+            "seed_behavior_context(Path('/lab/data'))")
         if self.full_state:
             self.job("from pathlib import Path; import json; from scripts.app_storage_fixture import seed_logs; "
                 "p=Path('/lab/data'); expected=seed_logs(p); f=json.loads((p/'fixture.json').read_bytes()); "
@@ -171,6 +175,9 @@ class Lab:
         else:
             raise RuntimeError("live_writer_not_rejected")
         self.run("stop", source)
+        self.job("from pathlib import Path; import json; from scripts.behavior_context_recovery import inspect; "
+            "p=Path('/lab/data'); f=json.loads((p/'fixture.json').read_bytes()); "
+            "f['behavior_context']=inspect(p); (p/'fixture.json').write_text(json.dumps(f))")
         self.invoke("checkpoint")
         backup = self.invoke("backup")
         # A private, temporary unfenced control proves that TTL alone cannot pass the test.
@@ -216,7 +223,9 @@ else: raise RuntimeError('fault_not_injected')
         self.run("rm", source)
         self.writers = []
         self.job("from pathlib import Path; p=Path('/lab/data'); "
-            "[(p/name).unlink(missing_ok=True) for name in ('app.sqlite3','app.sqlite3-wal','app.sqlite3-shm','sources.json')" +
+            "[(p/name).unlink(missing_ok=True) for name in ('app.sqlite3','app.sqlite3-wal','app.sqlite3-shm','sources.json',"
+            "'app-behavior-context.sqlite3','app-behavior-context.sqlite3-journal',"
+            "'app-behavior-context.sqlite3-wal','app-behavior-context.sqlite3-shm')" +
             ("+('storage.json','audit.jsonl','cases.jsonl','integration-outbox.jsonl')" if self.full_state else "") + "]; "
             "assert not (p/'app.sqlite3').exists()")
         self.checks["original_database_destroyed"] = True
@@ -247,6 +256,15 @@ r.Store(Path('/lab')).restore(""" + repr(backup["backup_id"]) + ")", ok=False)
             wrong = self.start(restore_id=restored["restore_id"], wrong_storage=True)
             self.run("wait", wrong)
             self.checks["full_storage_wrong_path_denied_before_http"] = self.command("inspect", wrong)[0]["State"]["ExitCode"] != 0
+        result = self.job("import json; from pathlib import Path; from scripts.behavior_context_recovery import inspect; "
+            "from scripts.app_state_recovery import require; "
+            "f=json.loads(Path('/lab/data/fixture.json').read_bytes()); "
+            "require(inspect(Path('" + stage + "'))==f['behavior_context'],'context_state_changed'); "
+            "print(json.dumps({'preserved':True,'records':f['behavior_context']['records']}))")
+        context_result = json.loads(result.stdout)
+        self.checks["context_schema_head_count_and_bytes_preserved"] = (
+            context_result["preserved"] and context_result["records"] == 4
+        )
         result = self.job("import json; from pathlib import Path; from scripts.app_recovery_fixture import verify; "
             "print(json.dumps(verify(Path('" + stage + "'),Path('/lab/data'))))")
         self.checks["fixed_clock_old_grants_denied"] = json.loads(result.stdout)["old_grants_denied"] == 3
@@ -321,6 +339,7 @@ print(json.dumps({'reconciled':True}))
         logs = self.run("logs", denied)
         self.checks["tampered_admission_reports_expected_denial"] = "RECOVERY_ADMISSION_DENIED" in logs.stderr
         return {"backup_bytes_plaintext": backup["plaintext_bytes"], "jsonl_bytes": backup["jsonl_bytes"],
+                "context_records": context_result["records"],
                 "source_records": restored["source_records"],
                 "fenced_sessions": restored["fenced_sessions"], "rpo_at_stopped_checkpoint_records": 0,
                 "rpo_scope": "Only the fully stopped, witnessed lab writer boundary; no online RPO promise."}
@@ -350,6 +369,10 @@ def main():
         report["passed"] = bool(lab.checks) and all(lab.checks.values())
     except (RuntimeError, OSError, ValueError, TypeError, LookupError, subprocess.SubprocessError) as error:
         report["error_type"] = type(error).__name__
+        if isinstance(error, RuntimeError) and str(error) in {
+            "workload_start_failed", "workload_start_deadline", "docker_operation_failed",
+        }:
+            report["error_code"] = str(error)
         failure = error
     finally:
         report["cleanup"] = lab.cleanup()

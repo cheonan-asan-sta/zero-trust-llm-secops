@@ -28,17 +28,21 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey,
 from app.config import get_settings
 from app.security import Principal, Role
 from app.services import policy_journal
+from app.services.behavior_context_store import ContextStoreUnavailable
 from app.services.signal_inbox import InboxUnavailable, SignalInbox
 from app.services.trusted_signals import SignalVerifier
 from app.services.zero_trust import JournalUnavailable, ZeroTrustOperations
 from app.zero_trust_models import SessionRevocationRequest
 from scripts import app_storage_contract as storage
+from scripts import behavior_context_recovery as context_storage
 from scripts.ca_recovery_state import atomic, canonical, locked, opened, sealed
 from scripts.certificate_controller import LifecycleError
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_DATABASE = 32 * 1024**2
 MAX_ENVELOPE = 64 * 1024**2
+# Bound aggregate raw data before base64 and authenticated-envelope expansion.
+MAX_BACKUP_COMPONENT_BYTES = 32 * 1024**2
 IDENT = re.compile(r"[a-f0-9]{32}\Z")
 
 
@@ -85,11 +89,10 @@ def schema(connection):
 
 
 def recovery_digest(full_state):
-    if not full_state:
-        return app_digest()
-    # Prevent a SQLite-only gate from accepting a release while ignoring JSONL.
-    paths = ("app_state_recovery.py", "app_storage_contract.py", "serve_recovered_app.py")
-    return sha(canonical({"application": app_digest(), "full_storage": {
+    # Pin the admission implementation for every mode, including context history.
+    paths = ("app_state_recovery.py", "app_storage_contract.py", "serve_recovered_app.py",
+             "behavior_context_recovery.py")
+    return sha(canonical({"application": app_digest(), "full_state": full_state, "storage": {
         name: sha((ROOT / "scripts" / name).read_bytes().replace(b"\r\n", b"\n")) for name in paths}}))
 
 
@@ -118,9 +121,21 @@ def operations(directory):
     return ZeroTrustOperations(directory / "app.sqlite3", signal_verifier=verifier)
 
 
+def guard_behavior_context(directory, *, configured_path=None):
+    """Validate the stopped canonical source without creating or migrating it."""
+    expected = Path(directory) / context_storage.NAME
+    require(configured_path is None or Path(configured_path).resolve() == expected.resolve(),
+            "behavior_context_path_mismatch")
+    try:
+        return context_storage.inspect(directory, allow_missing=True)
+    except ContextStoreUnavailable:
+        raise RecoveryError("behavior_context_unavailable") from None
+
+
 def inspect_state(directory):
     """Validate a private copy; never initialize/migrate the original live DB."""
     directory = Path(directory)
+    context = guard_behavior_context(directory)
     database = directory / "app.sqlite3"
     read_file(database, MAX_DATABASE)
     with closing(sqlite3.connect(database)) as db:
@@ -153,7 +168,8 @@ def inspect_state(directory):
     registry = directory / "sources.json"
     state = {"schema_sha256": sha(canonical(actual)), "tables": tables, "head": head,
              "registry_sha256": sha(read_file(registry, 1024**2)) if registry.exists() else None,
-             "application_sha256": app_digest(), "policy_sha256": service.policy_digest}
+             "application_sha256": recovery_digest(False), "policy_sha256": service.policy_digest,
+             "behavior_context": context}
     jsonl = storage.inspect(directory)
     if jsonl is not None:
         state["jsonl"] = jsonl
@@ -165,6 +181,8 @@ def inspect_state(directory):
 def snapshot(source, target, *, timeout=15, registry_path=None):
     source, target = Path(source), Path(target)
     require(not target.exists(), "fresh_snapshot_required")
+    context_path = getattr(get_settings(), "behavior_context_db_path", None)
+    context_before = guard_behavior_context(source, configured_path=context_path)
     target.mkdir(parents=True)
     database = source / "app.sqlite3"
     read_file(database, MAX_DATABASE)
@@ -180,9 +198,15 @@ def snapshot(source, target, *, timeout=15, registry_path=None):
     with (closing(sqlite3.connect(uri, uri=True, timeout=1)) as db,
           closing(sqlite3.connect(target / "app.sqlite3")) as destination):
         db.backup(destination, pages=256, progress=progress, sleep=.05)
+    try:
+        context_copy = context_storage.capture(source, target, timeout=timeout)
+    except ContextStoreUnavailable:
+        raise RecoveryError("behavior_context_unavailable") from None
     after = read_file(registry, 1024**2) if registry.exists() else None
     require(before == after, "registry_changed_during_snapshot")
     require(storage.capture(source) == logs, "storage_changed_during_snapshot")
+    require(context_before == context_copy == guard_behavior_context(source, configured_path=context_path),
+            "behavior_context_changed_during_snapshot")
     if before is not None:
         (target / "sources.json").write_bytes(before)
     for name, raw in logs.items():
@@ -212,6 +236,7 @@ class Store:
 
     def initialize(self, *, full_state=False):
         local_only()
+        guard_behavior_context(self.data, configured_path=getattr(get_settings(), "behavior_context_db_path", None))
         logs = storage.inspect(self.data)
         require(type(full_state) is bool and (logs is not None) == full_state,
                 "explicit_full_storage_required")
@@ -255,7 +280,8 @@ class Store:
             atomic(self.control / "anchor.json", canonical({"source": anchor["source"],
                 "generation": manifest["generation"], "checkpoint_sha256": sha(canonical(envelope)),
                 "storage_mode": mode}))
-            return {"checkpointed": True, "generation": manifest["generation"], "records": state["records"]}
+            return {"checkpointed": True, "generation": manifest["generation"], "records": state["records"],
+                    "context_records": state["state"]["behavior_context"]["records"]}
 
     def _checkpoint(self, max_age):
         require(type(max_age) is int and 1 <= max_age <= 3600, "checkpoint_age_limit")
@@ -266,6 +292,7 @@ class Store:
         envelope = read_json(self.control / "checkpoint.json")
         require(anchor["checkpoint_sha256"] == sha(canonical(envelope)), "checkpoint_replay_or_tamper")
         state = unseal(envelope, read_file(self.control / "checkpoint.key", 32), "app-checkpoint-1")
+        require("behavior_context" in state, "checkpoint_context_missing")
         mode = anchor.get("storage_mode", "sqlite")
         require(mode in {"sqlite", "full-jsonl"} and ("jsonl" in state) == (mode == "full-jsonl"),
                 "checkpoint_storage_mode")
@@ -283,13 +310,23 @@ class Store:
             path = Path(temp) / "snapshot"
             result = snapshot(self.data, path, registry_path=self.registry_path)
             require(result["state"] == expected, "source_advanced_since_checkpoint")
+            components = [path / "app.sqlite3", path / context_storage.NAME]
+            if (path / "sources.json").exists():
+                components.append(path / "sources.json")
+            if "jsonl" in expected:
+                components.extend(path / name for name in ("storage.json", *storage.FILES.values()))
+            component_bytes = sum(item.stat().st_size for item in components)
+            require(component_bytes <= MAX_BACKUP_COMPONENT_BYTES, "backup_components_size_limit")
             database = read_file(path / "app.sqlite3", MAX_DATABASE)
+            context_database = read_file(path / context_storage.NAME, context_storage.MAX_DATABASE)
             registry = path / "sources.json"
             ident = secrets.token_hex(16)
             manifest = {"purpose": "app-backup-1", "source": anchor["source"], "generation": anchor["generation"],
                         "backup_id": ident, "state_sha256": result["state_sha256"], "database_sha256": sha(database),
+                        "behavior_context_database_sha256": sha(context_database),
                         "created_at": datetime.now(UTC).isoformat()}
             payload = {"state": expected, "database": base64.b64encode(database).decode(),
+                       "behavior_context_database": base64.b64encode(context_database).decode(),
                        "registry": base64.b64encode(read_file(registry, 1024**2)).decode() if registry.exists() else None}
             if "jsonl" in expected:
                 payload["jsonl"] = {name: base64.b64encode(raw).decode()
@@ -300,6 +337,8 @@ class Store:
             atomic(self.root / "backups" / (ident + ".sealed"), encoded)
             return {"backed_up": True, "backup_id": ident, "records": result["records"],
                     "generation": anchor["generation"], "plaintext_bytes": len(database),
+                    "context_bytes": len(context_database), "component_bytes": component_bytes,
+                    "context_records": expected["behavior_context"]["records"],
                     "jsonl_bytes": sum(row["bytes"] for row in expected.get("jsonl", {}).get("files", {}).values())}
 
     def restore(self, backup_id, *, max_age=300, stage_root=None):
@@ -317,6 +356,12 @@ class Store:
             require(("jsonl" in payload) == ("jsonl" in expected), "backup_storage_mode")
             raw = base64.b64decode(payload["database"], validate=True)
             require(len(raw) <= MAX_DATABASE and sha(raw) == manifest["database_sha256"], "database_digest")
+            require("behavior_context_database" in payload and "behavior_context_database_sha256" in manifest,
+                    "backup_context_missing")
+            context_raw = base64.b64decode(payload["behavior_context_database"], validate=True)
+            require(len(context_raw) <= context_storage.MAX_DATABASE
+                    and sha(context_raw) == manifest["behavior_context_database_sha256"], "behavior_context_digest")
+            component_bytes = len(raw) + len(context_raw)
             # Invalidate the previous restore before doing any fallible staging.
             # A partial retry must never re-admit an older published copy.
             atomic(self.public / "current.json", canonical({"source": anchor["source"],
@@ -327,9 +372,11 @@ class Store:
             stage = root / ident
             stage.mkdir(mode=0o700)
             atomic(stage / "app.sqlite3", raw)
+            atomic(stage / context_storage.NAME, context_raw)
             if payload["registry"] is not None:
                 registry = base64.b64decode(payload["registry"], validate=True)
                 require(len(registry) <= 1024**2, "registry_size")
+                component_bytes += len(registry)
                 atomic(stage / "sources.json", registry)
             if "jsonl" in expected:
                 require(isinstance(payload["jsonl"], dict) and set(payload["jsonl"]) ==
@@ -338,7 +385,9 @@ class Store:
                     raw = base64.b64decode(encoded, validate=True)
                     require(len(raw) <= (4096 if name == "storage.json" else storage.MAX_LOG),
                             "backup_storage_size")
+                    component_bytes += len(raw)
                     atomic(stage / name, raw)
+            require(component_bytes <= MAX_BACKUP_COMPONENT_BYTES, "backup_components_size_limit")
             restored = inspect_state(stage)
             require(restored["state"] == expected, "restored_state_mismatch")
             service = operations(stage)
@@ -355,10 +404,13 @@ class Store:
                     require(after["state"]["tables"][table] == digest, "inbox_changed_during_fence")
             require(after["state"]["registry_sha256"] == expected["registry_sha256"], "registry_changed_during_fence")
             require(after["state"].get("jsonl") == expected.get("jsonl"), "storage_changed_during_fence")
+            require(after["state"]["behavior_context"] == expected["behavior_context"],
+                    "behavior_context_changed_during_fence")
             release = {"purpose": "app-admission-1", "source": anchor["source"], "generation": anchor["generation"],
                        "restore_id": ident, "application_sha256": after["state"]["application_sha256"],
                        "policy_sha256": after["state"]["policy_sha256"],
                        "registry_sha256": after["state"]["registry_sha256"], "head": after["state"]["head"],
+                       "behavior_context": after["state"]["behavior_context"],
                        "fenced_sessions": fenced}
             if "jsonl" in after["state"]:
                 release["jsonl"] = after["state"]["jsonl"]
@@ -372,6 +424,8 @@ class Store:
             verify_admission(stage, self.public)
             return {"restored": True, "restore_id": ident, "fenced_sessions": len(fenced),
                     "source_records": restored["records"], "restored_records": after["records"],
+                    "context_records": after["state"]["behavior_context"]["records"],
+                    "context_preserved": True,
                     "inbox_preserved": True, "generation": anchor["generation"]}
 
 
@@ -392,6 +446,11 @@ def verify_admission(directory, trust_directory):
     except (ValueError, InvalidSignature):
         raise RecoveryError("admission_signature") from None
     state = inspect_state(directory)
+    require("behavior_context" in release, "admission_context_missing")
+    try:
+        context_storage.verify_prefix(directory, release["behavior_context"])
+    except ContextStoreUnavailable:
+        raise RecoveryError("admission_context_changed") from None
     require(("jsonl" in release) == ("jsonl" in state["state"]), "admission_storage_mode")
     if "jsonl" in release:
         storage.verify_prefix(directory, release["jsonl"])
@@ -411,6 +470,7 @@ def verify_admission(directory, trust_directory):
         require(session is not None and session["status"] == "REVOKED" and session["version"] >= item["version"],
                 "restored_session_revived")
     return {"admission_verified": True, "fenced_sessions": len(release["fenced_sessions"]),
+            "context_records": state["state"]["behavior_context"]["records"],
             "generation": release["generation"]}
 
 

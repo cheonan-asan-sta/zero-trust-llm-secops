@@ -9,7 +9,11 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from app.analyzers.rule_based import RuleBasedAnalyzer
-from app.continuous_signal_models import ObservationApplication, SignedContinuousSignal
+from app.continuous_signal_models import (
+    ObservationApplication,
+    SessionProofObservation,
+    SignedContinuousSignal,
+)
 from app.models import ResourceContext
 from app.security import Principal
 from app.services import policy_journal
@@ -100,7 +104,7 @@ def _validate_security_transition(previous, current, entry):
                 or not isinstance(event_id, str) or not 1 <= len(event_id) <= 128
                 or current.event_id != "obs-" + _digest(current.tenant_id + "." + event_id + "." + current.session_id)
                 or not any(f"CONTINUOUS_{kind}_{current.decision}" in current.reason_codes
-                           for kind in ("IDENTITY", "DEVICE", "GUARDDUTY"))
+                           for kind in ("IDENTITY", "DEVICE", "GUARDDUTY", "SESSION_PROOF"))
                 or current.challenge_id is not None or current.challenge_expires_at is not None):
             raise ValueError("invalid security-only observation record")
     elif "revoked_by" in entry:
@@ -310,7 +314,7 @@ class ZeroTrustOperations:
 
     @staticmethod
     def _restriction_for(observation):
-        if observation.kind == "guardduty":
+        if observation.kind in {"guardduty", "session_proof"}:
             return "DENY"
         if observation.kind == "identity":
             if not observation.active or observation.authentication_result == "failure":
@@ -328,6 +332,9 @@ class ZeroTrustOperations:
 
     @staticmethod
     def _observation_matches(observation, user_id, device_id, resource_id):
+        if observation["kind"] == "session_proof":
+            # A proof finding is about one existing grant context, not the user or device at large.
+            return False
         if observation["kind"] == "device":
             return observation["subject_id"] == device_id
         return (observation["subject_id"] == user_id
@@ -395,25 +402,42 @@ class ZeroTrustOperations:
             if duplicate:
                 return duplicate
             observation = signal.observation.model_dump(mode="json")
-            matching_observations = [entry for entry in entries
-                                     if entry["kind"] == "observation"
-                                     and entry["tenant_id"] == signal.tenant_id
-                                     and entry["observation"]["kind"] == signal.observation.kind
-                                     and entry["observation"]["subject_id"]
-                                     == signal.observation.subject_id
-                                     and entry["observation"].get("resource_id") == observation.get("resource_id")]
-            stale = any(signal.observed_at <= datetime.fromisoformat(entry["observed_at"])
-                        for entry in matching_observations)
             restriction = self._restriction_for(signal.observation)
             latest = {}
             for entry in entries:
                 if entry["kind"] == "decision" and entry["session"]["tenant_id"] == signal.tenant_id:
                     session = entry["session"]
                     latest[session["session_id"]] = session
-            matched = [SessionDecision.model_validate(session) for session in latest.values()
-                       if self._observation_matches(
-                           observation, session["user_id"], session["device_id"], session["resource_id"],
-                       )]
+            if isinstance(signal.observation, SessionProofObservation):
+                matched = []
+                stale = False
+                raw = latest.get(signal.observation.session_id)
+                if raw is not None:
+                    previous = SessionDecision.model_validate(raw)
+                    finding = signal.observation
+                    stale = (finding.session_version < previous.version
+                             or signal.observed_at < previous.evaluated_at)
+                    if (not stale and previous.signal_trust == "verified_source"
+                            and finding.session_version == previous.version
+                            and finding.subject_id == previous.user_id
+                            and finding.device_id == previous.device_id
+                            and finding.resource_id == previous.resource_id
+                            and finding.action == previous.action
+                            and hmac.compare_digest(finding.session_input_sha256, previous.input_digest_sha256)):
+                        matched.append(previous)
+            else:
+                stale = any(
+                    signal.observed_at <= datetime.fromisoformat(entry["observed_at"])
+                    for entry in entries
+                    if entry["kind"] == "observation" and entry["tenant_id"] == signal.tenant_id
+                    and entry["observation"]["kind"] == signal.observation.kind
+                    and entry["observation"]["subject_id"] == signal.observation.subject_id
+                    and entry["observation"].get("resource_id") == observation.get("resource_id")
+                )
+                matched = [SessionDecision.model_validate(session) for session in latest.values()
+                           if self._observation_matches(
+                               observation, session["user_id"], session["device_id"], session["resource_id"],
+                           )]
             changed = []
             for previous in matched:
                 if restriction is None or _RESTRICTION_RANK[restriction] <= _RESTRICTION_RANK[previous.decision]:

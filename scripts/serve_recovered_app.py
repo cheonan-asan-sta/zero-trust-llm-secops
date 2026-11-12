@@ -8,6 +8,7 @@ from pathlib import Path
 from app.config import get_settings
 from scripts.app_state_recovery import (
     RecoveryError,
+    guard_behavior_context,
     local_only,
     read_file,
     require,
@@ -22,6 +23,11 @@ def admit(data, public, *, registry_path=None, require_api_key=True):
     require(settings.analyzer_mode == "rule"
             and (not require_api_key or settings.auth_mode == "api_key"), "lab_authentication_required")
     require(settings.zero_trust_db_path.resolve() == (data / "app.sqlite3").resolve(), "database_path_mismatch")
+    context = getattr(settings, "behavior_context_db_path", None)
+    expected_context = data / "app-behavior-context.sqlite3"
+    require(context is None or Path(context).resolve() == expected_context.resolve(),
+            "behavior_context_path_mismatch")
+    guard_behavior_context(data, configured_path=context)
     registry = data / "sources.json"
     configured_registry = Path(registry_path) if registry_path is not None else registry
     if registry_path is not None:

@@ -172,7 +172,7 @@ def test_probe_keeps_strict_sibling_asset_loader_and_removes_temporary_private_k
         cfg = json.loads(path.read_bytes())
         for name in ('ca', 'cert', 'key'):
             asset = Path(tls.asset(path, cfg[name]))
-            assert asset.parent == path.parent and asset.exists()
+            assert asset.parent == path.parent.resolve() and asset.exists()
             if os.name == 'posix':
                 assert asset.stat().st_mode & 0o777 == 0o600
         seen.append(path)

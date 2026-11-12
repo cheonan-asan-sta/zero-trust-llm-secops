@@ -24,4 +24,7 @@ runtime/collector-validation/
 runtime/week3/
 .idea/
 .vscode/
+.DS_Store
+# Generated local evidence, private evaluation plans and temporary runtime state.
+runtime/
 

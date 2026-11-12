@@ -5,10 +5,12 @@ from typing import Annotated, Literal
 
 from pydantic import Field, field_validator, model_validator
 
-from app.models import StrictModel
+from app.models import EventAction, StrictModel
 
 GUARDDUTY_MAX_AGE_SECONDS = 300
-ObservationKind = Literal["identity", "device", "guardduty"]
+SESSION_PROOF_MAX_AGE_SECONDS = 60
+MAX_SECURITY_VERSION = 204
+ObservationKind = Literal["identity", "device", "guardduty", "session_proof"]
 ResourceIdentifier = Annotated[str, Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")]
 
 
@@ -33,8 +35,24 @@ class GuardDutyObservation(StrictModel):
     finding_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
 
 
+class SessionProofObservation(StrictModel):
+    """A trusted verifier's adverse finding for one exact session revision."""
+
+    kind: Literal["session_proof"] = "session_proof"
+    subject_id: str = Field(min_length=1, max_length=128)
+    device_id: str = Field(min_length=1, max_length=128)
+    resource_id: ResourceIdentifier
+    session_id: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{2,63}$")
+    session_version: int = Field(strict=True, ge=1, le=MAX_SECURITY_VERSION)
+    action: EventAction
+    session_input_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    proof_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    violation: Literal["scope_mismatch", "nonce_reuse", "unauthorized_key_rotation"]
+
+
 Observation = Annotated[
-    IdentityObservation | DeviceObservation | GuardDutyObservation, Field(discriminator="kind"),
+    IdentityObservation | DeviceObservation | GuardDutyObservation | SessionProofObservation,
+    Field(discriminator="kind"),
 ]
 
 

@@ -70,6 +70,21 @@ python -m scripts.continuous_signal_collector append \
 
 identity는 `active`와 `authentication_result`(`success/failure/unknown`), device는 `managed`와 `security_posture`(`healthy/at_risk/compromised/unknown`)를 받는다. 입력에는 `event_id`, `observed_at`, `observation`만 넣으며 tenant·출처·서명·발급 시각은 수집기가 설정으로 결합한다.
 
+### 세션 증명 검증기 입력
+
+독립 검증기의 확인 결과를 전달하려면 `init --kind session_proof`에 `--subject`, `--device`, `--resource`를 명시하고 생성된 공개키 항목을 서버 등록에 추가한다. 검증기는 서명과 요청 범위를 직접 확인한 뒤 다음 형식의 관측을 보호된 수집기 디렉터리에 `scripts.collector_input.append_event`로 기록한다. 이후 `run` 명령으로 기존 Inbox에 전달한다.
+
+| 관측 필드 | 값 |
+|---|---|
+| `kind` | `session_proof` |
+| `subject_id`, `device_id` | 현재 세션의 사용자와 기기 |
+| `session_id`, `session_version`, `session_input_sha256` | 관측 대상이 된 현재 세션의 ID, 버전, 입력 해시 |
+| `resource_id`, `action` | 현재 세션에서 허용한 자원과 동작 |
+| `proof_sha256` | 검증기가 검사한 증명 자료의 SHA-256 |
+| `violation` | `scope_mismatch`, `nonce_reuse`, `unauthorized_key_rotation` 중 하나 |
+
+최초 접수는 관측 후 60초 이내에 해야 한다. 이미 접수한 관측은 worker가 현재 서명 출처와 대상 세션을 다시 대조해 처리한다. HTTP 202는 접수를 뜻한다. 회수 완료는 `completed` 영수증의 `changed_sessions`와 세션 이력에서 확인한다.
+
 서버 주소에 맞춰 실행한다. 아래 주소는 예시이며 기본값도 `http://127.0.0.1:18080`이다.
 
 ```sh

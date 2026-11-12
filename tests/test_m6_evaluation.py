@@ -1,6 +1,7 @@
 import asyncio
 import hashlib
 import json
+import shutil
 import sys
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
@@ -9,11 +10,13 @@ from decimal import Decimal
 import pytest
 
 from app.services.detection_benchmark import DetectionBenchmark
-from scripts.evaluate_m6 import CONTRACT, main, run_pilot, write_report
+from scripts.evaluate_m6 import CONTRACT, main, run_m7_development, run_pilot, write_report
+from scripts.prepare_m7 import SOURCE as M7_SOURCE
 
 SOL = "gpt-6.1-sol"
 SONNET = "claude-sonnet-5-5"
 RULE = "rule-frozen-v0.17.0"
+M7_PILOT = M7_SOURCE.parent / "pilot"
 
 
 @pytest.fixture(scope="module")
@@ -300,3 +303,141 @@ def test_concurrent_report_writes_publish_one_complete_report(tmp_path):
 
     assert json.loads(output.read_text(encoding="utf-8")) in reports
     assert list(tmp_path.iterdir()) == [output]
+
+
+def test_m7_candidates_receive_identical_ordered_development_observations(contract):
+    observations = [
+        json.loads(line) for line in (M7_PILOT / "development.jsonl").read_bytes().splitlines()
+    ]
+    source = {row["session_id"]: row for row in observations}
+    development_truth = {
+        row["session_id"]: row["expected_label"]
+        for row in map(json.loads, (M7_PILOT / "labels.jsonl").read_bytes().splitlines())
+        if row["split"] == "development"
+    }
+    calls = defaultdict(dict)
+
+    async def dispatch(model_id, payload, timeout):
+        request = json.loads(payload)
+        assert set(request) == {"case_id", "events", "evidence_ids", "question", "labels"}
+        session = source[request["case_id"]]
+        assert request["events"] == session["events"]
+        assert request["evidence_ids"] == [event["evidence_id"] for event in session["events"]]
+        assert request["labels"] == ["normal", "threat", "unknown"]
+        case_id = request["case_id"]
+        calls[model_id][case_id] = payload
+        return response(
+            request, "normal" if model_id == SOL else "threat", evidence_ids=request["evidence_ids"]
+        )
+
+    result = asyncio.run(run_m7_development(M7_PILOT, contract, dispatch=dispatch))
+
+    assert result["split"] == "development"
+    assert set(result["models"]) == set(calls) == {SOL, SONNET}
+    assert calls[SOL] == calls[SONNET] and len(calls[SOL]) == 24
+    assert sum(len(json.loads(payload)["events"]) for payload in calls[SOL].values()) == 146
+    assert {case["case_id"]: case["expected_label"] for case in result["cases"]} == development_truth
+    assert {case["case_id"]: case["event_count"] for case in result["cases"]} == {
+        session_id: len(session["events"]) for session_id, session in source.items()
+    }
+    hashes = {case_id: hashlib.sha256(payload).hexdigest() for case_id, payload in calls[SOL].items()}
+    assert {case["case_id"]: case["input_sha256"] for case in result["cases"]} == hashes
+    for model in result["models"].values():
+        assert {row["case_id"]: row["input_sha256"] for row in model["results"]} == hashes
+        assert model["summary"]["case_count"] == 24
+    assert result["models"][SOL]["summary"]["confusion"] == {"tp": 0, "fp": 0, "fn": 12, "tn": 12}
+    assert result["models"][SONNET]["summary"]["confusion"] == {"tp": 12, "fp": 12, "fn": 0, "tn": 0}
+    assert result["budget"]["requests_used"] == 48
+    assert result["budget"]["actual_provider_requests"] == 0
+
+
+def test_m7_failure_and_request_budget_accounting_keeps_all_sessions(contract):
+    calls = []
+
+    async def dispatch(model_id, payload, timeout):
+        request = json.loads(payload)
+        calls.append((model_id, request["case_id"]))
+        if len(calls) <= 2:
+            raise TimeoutError
+        if len(calls) == 3:
+            return response(request, "normal", evidence_ids=["unlisted-evidence"])
+        return response(request, "unknown" if len(calls) == 4 else "normal")
+
+    result = asyncio.run(run_m7_development(M7_PILOT, contract, dispatch=dispatch, max_requests=5))
+
+    assert len(calls) == result["budget"]["requests_used"] == 5
+    assert calls[0] == calls[1] and {model for model, _ in calls} == {SOL}
+    sol = result["models"][SOL]
+    sonnet = result["models"][SONNET]
+    assert sol["summary"]["status_counts"] == {
+        "timeout": 1, "response_error": 1, "abstained": 1, "ok": 1, "request_limit": 20,
+    }
+    assert sonnet["summary"]["status_counts"] == {"request_limit": 24}
+    for model in (sol, sonnet):
+        assert len(model["results"]) == 24
+        assert all(
+            row["predicted_label"] == "unknown"
+            for row in model["results"] if row["status"] != "ok"
+        )
+
+
+def test_m7_rejects_substituted_evaluation_split_even_if_file_hash_matches(tmp_path, contract):
+    pilot = shutil.copytree(M7_PILOT, tmp_path / "pilot")
+    development = (pilot / "evaluation.jsonl").read_bytes()
+    (pilot / "development.jsonl").write_bytes(development)
+    manifest_path = pilot / "manifest.json"
+    manifest = json.loads(manifest_path.read_bytes())
+    manifest["files"]["development.jsonl"] = hashlib.sha256(development).hexdigest()
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    with pytest.raises(ValueError):
+        asyncio.run(run_m7_development(pilot, contract))
+
+
+def test_m7_cli_writes_the_development_report(tmp_path, monkeypatch):
+    pilot = tmp_path / "pilot"
+    pilot.mkdir()
+    for filename in ("development.jsonl", "labels.jsonl", "manifest.json"):
+        shutil.copyfile(M7_PILOT / filename, pilot / filename)
+    output = tmp_path / "m7" / "pilot.json"
+    monkeypatch.setattr(sys, "argv", [
+        "evaluate_m6", "--m7-development", str(pilot),
+        "--output", str(output), "--max-requests", "0",
+    ])
+
+    assert main() == 0
+    report = json.loads(output.read_text(encoding="utf-8"))
+    assert report["mode"] == "offline_mock_pilot"
+    assert report["schema"] == "m6-m7-development-pilot-1"
+    assert report["split"] == "development"
+    for key, filename in {
+        "dataset_sha256": "development.jsonl",
+        "labels_sha256": "labels.jsonl",
+        "split_manifest_sha256": "manifest.json",
+    }.items():
+        assert report[key] == hashlib.sha256((pilot / filename).read_bytes()).hexdigest()
+    assert len(report["cases"]) == 24
+    assert set(report["models"]) == {SOL, SONNET}
+    assert report["budget"]["actual_provider_requests"] == 0
+
+
+@pytest.mark.parametrize("filename", [
+    "development.jsonl", "evaluation.jsonl", "labels.jsonl", "manifest.json",
+])
+def test_m7_cli_cannot_overwrite_pilot_artifacts(tmp_path, monkeypatch, filename):
+    pilot = shutil.copytree(M7_PILOT, tmp_path / "pilot")
+    output = pilot / filename
+    original = output.read_bytes()
+    monkeypatch.setattr(sys, "argv", [
+        "evaluate_m6", "--m7-development", str(pilot), "--output", str(output),
+    ])
+
+    async def unexpected_run(*args, **kwargs):
+        pytest.fail("pilot artifacts must be protected before running the mock evaluation")
+
+    monkeypatch.setattr("scripts.evaluate_m6.run_m7_development", unexpected_run)
+    with pytest.raises(SystemExit) as error:
+        main()
+
+    assert error.value.code == 1
+    assert output.read_bytes() == original

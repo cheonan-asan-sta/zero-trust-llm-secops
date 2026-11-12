@@ -48,8 +48,9 @@ def test_runtime_mint_never_reads_a_key_outside_its_operator_volume(key_file):
 def test_runtime_writer_retries_the_same_complete_event_after_busy_or_lost_reply():
     sent = []
 
-    def execute(service, argv, payload):
-        assert service == "collector" and argv[-1] == "append"
+    def compose(*argv, payload):
+        assert argv == ('run', '--rm', '--no-deps', '-T', '--entrypoint', 'python', 'collector',
+                        '-m', 'scripts.continuous_mtls_assets', 'append')
         sent.append(payload)
         if len(sent) < 3:
             # First a busy input lock, then an append committed before its reply
@@ -58,7 +59,7 @@ def test_runtime_writer_retries_the_same_complete_event_after_busy_or_lost_reply
         return '{"appended":true}'
 
     checks = object.__new__(runtime_checks.Checks)
-    checks.runtime = SimpleNamespace(execute=execute,
+    checks.runtime = SimpleNamespace(compose=compose,
                                     wait=lambda predicate: runtime.Runtime.wait(predicate, timeout=3))
     checks.append("same-source-event", active=True, other=True)
     assert len(sent) == 3 and len(set(sent)) == 1

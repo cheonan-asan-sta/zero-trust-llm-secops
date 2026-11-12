@@ -14,6 +14,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from app.analyzers import HybridAnalyzer, OpenAIAnalyzer, RuleBasedAnalyzer
 from app.analyzers.base import Analyzer
+from app.behavior_context_api import behavior_context_router
 from app.config import get_settings
 from app.middleware import RequestBodyLimitMiddleware, RequestContextMiddleware
 from app.models import (
@@ -62,6 +63,8 @@ from app.scenarios import SCENARIOS, generate_events, get_scenario
 from app.security import Principal, Role, require_roles
 from app.services.assurance import get_assurance_registry
 from app.services.audit import create_audit_store
+from app.services.behavior_context import BehaviorContextService
+from app.services.behavior_context_store import BehaviorContextStore
 from app.services.cases import (
     ALLOWED_TRANSITIONS,
     CaseConflictError,
@@ -86,6 +89,7 @@ from app.services.integration_outbox import (
 )
 from app.services.ocsf import get_ocsf_normalizer
 from app.services.policy import enforce_assessment_safety, response_preview
+from app.services.public_detection import PublicSession, evaluate_public_session
 from app.services.public_replay import get_public_replay_service
 from app.services.scenario_evaluator import evaluate_scenarios
 from app.services.sigma import get_sigma_engine
@@ -138,6 +142,15 @@ continuous_signal_service = (
 )
 app.include_router(zero_trust_router(zero_trust_operations, continuous_signal_service))
 install_zero_trust_error_handlers(app)
+behavior_context_service = (
+    BehaviorContextService(BehaviorContextStore(
+        settings.behavior_context_db_path or settings.zero_trust_db_path.with_name(
+            settings.zero_trust_db_path.stem + "-behavior-context.sqlite3",
+        ),
+    ), zero_trust_operations)
+    if zero_trust_operations else None
+)
+app.include_router(behavior_context_router(behavior_context_service))
 
 ViewerPrincipal = Annotated[Principal, Depends(require_roles(Role.VIEWER))]
 AnalystPrincipal = Annotated[Principal, Depends(require_roles(Role.ANALYST))]
@@ -191,6 +204,8 @@ def readiness() -> Response:
         continuous_signal_service.inbox.integrity()
         if continuous_signal_service else {"ok": True, "enabled": False}
     )
+    context_integrity = (behavior_context_service.readiness() if behavior_context_service
+                         else {"ok": True, "enabled": False})
     integrity = audit_store.integrity()
     case_integrity = case_store.integrity()
     outbox_integrity = integration_outbox_store.integrity()
@@ -209,6 +224,7 @@ def readiness() -> Response:
         integrity["ok"]
         and zero_trust_integrity["ok"]
         and inbox_integrity["ok"]
+        and context_integrity["ok"]
         and case_integrity["ok"]
         and outbox_integrity["ok"]
         and assurance.valid
@@ -222,6 +238,7 @@ def readiness() -> Response:
     payload = {
         "status": "ready" if ready else "degraded",
         "signal_inbox": inbox_integrity,
+        "behavior_context": context_integrity,
         "audit": integrity,
         "case_management": {
             **case_integrity,
@@ -367,6 +384,12 @@ def evaluate_detections(event: SecurityEvent, _: AnalystPrincipal) -> DetectionP
 @app.get("/detections/rules", response_model=list[SigmaRuleSummary])
 def detection_rules(_: ViewerPrincipal) -> list[SigmaRuleSummary]:
     return sigma_engine.summaries()
+
+
+@app.post("/detections/public/evaluate")
+def evaluate_public_behavior(session: PublicSession, _: AnalystPrincipal) -> dict:
+    """Return reference detections; public observations cannot authorize access changes."""
+    return evaluate_public_session(session)
 
 
 @app.post("/incidents/correlate", response_model=CorrelationResult)

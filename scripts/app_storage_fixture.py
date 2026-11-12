@@ -13,6 +13,7 @@ from app.models import (
 )
 from app.scenarios import synthetic_events
 from app.services.audit import AuditStore
+from app.services.behavior_context_store import BehaviorContextStore
 from app.services.cases import CaseStore, IncidentCaseService
 from app.services.correlation import get_correlation_engine
 from app.services.integration_outbox import IntegrationOutboxService, IntegrationOutboxStore
@@ -21,6 +22,30 @@ from app.services.policy import response_preview
 from app.services.sigma import get_sigma_engine
 from scripts.app_state_recovery import atomic, canonical, local_only
 from scripts.app_storage_contract import CONTRACT, FILES, inspect
+from scripts.behavior_context_recovery import NAME as CONTEXT_NAME
+
+
+def seed_behavior_context(directory):
+    """Seed storage-only history, not authenticated captures or decision evidence.
+
+    These four synthetic records exercise lossless transport of baseline, approval,
+    use and cancellation entries. Signature and adjudication semantics are tested
+    separately through the actual context API and services.
+    """
+    local_only()
+    store = BehaviorContextStore(directory / CONTEXT_NAME)
+    with store.transaction() as transaction:
+        for kind, identifier, payload in (
+            ("baseline", "reviewed-work", {"reviewed_capture_ids": ["a", "b", "c"]}),
+            ("approval", "approved-work", {"baseline_id": "reviewed-work", "max_uses": 1}),
+            ("evaluation", "used-once", {"verdict": "normal", "capture_id": "work-1",
+                                        "approval_id": "approved-work"}),
+            ("revocation", "cancelled", {"target_kind": "approval", "target_id": "approved-work",
+                                         "reason": "Maintenance cancellation"}),
+        ):
+            transaction.put(kind, "recovery-tenant", identifier, payload,
+                            actor="local-recovery-fixture", now=datetime.now(UTC))
+    return store.read("recovery-tenant")
 
 
 def seed_logs(directory):

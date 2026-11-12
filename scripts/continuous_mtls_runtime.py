@@ -174,9 +174,10 @@ class Runtime:
         self.manifest.write_text(yaml.safe_dump(spec))
         self.empty_env.write_text("")
 
-    def compose(self, *args, timeout=120):
+    def compose(self, *args, timeout=120, payload=None):
         return command(["docker", "compose", "--env-file", str(self.empty_env), "--project-name", self.state["project"],
-                        "--project-directory", str(ROOT), "--file", str(self.manifest), *args], timeout=timeout)
+                        "--project-directory", str(ROOT), "--file", str(self.manifest), *args],
+                       timeout=timeout, payload=payload)
 
     def write_volume(self, label, files):
         program = """import json,os,sys
