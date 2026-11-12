@@ -4,6 +4,9 @@
 원래 여섯 영역의 새 독립 평가 목표는 그대로 미완료다. 아래 결과는 이미 관찰한 AIT 개발 자료의 진단이다.
 [실행·모델·시험 근거](infrastructure-results/extra-vpn-history-v32-20261112.json)를 함께 본다.
 
+후속 [v33 실제 이전 관측·보조 센서 연결 감사](extra-causal-linkage-and-evaluation-blocker.md)에서 아래 다음 판단을 수행했다.
+필요한 시점의 공격 연결 근거가 없어 원래 전체 평가의 공백은 남았다. 아래 v32 결과는 보존한다.
+
 ## 해결하려고 한 문제
 
 v23 단일 트리는 santos 전체에서 높은 micro F1을 보였지만 VPN 공격28건을 모두 놓쳤다.

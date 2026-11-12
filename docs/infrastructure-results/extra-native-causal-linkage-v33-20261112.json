@@ -1,0 +1,806 @@
+{
+  "schema": "extra-native-causal-linkage-v33-1",
+  "recorded_at": "2026-11-12T07:09:36.862894+00:00",
+  "branch": "extra",
+  "prior_commit": "a01c884177a28e5b8b8737462875a5b7a9cc46f6",
+  "direct_address_audit": {
+    "artifact": {
+      "path": "runtime/f1/native-address-linkage-v33-20261112/audit.json",
+      "bytes": 7419,
+      "sha256": "5644b9e128e048586df291d2adad243e88e4e4f3a085a9a0984565f436a48d21"
+    },
+    "schema": "extra-native-address-linkage-1",
+    "completed": true,
+    "protocol_sha256": "d0ef5ffe72b394d46d97b4f8780057be471bfcc568877651bbe5bbce9dfd3cca",
+    "scenarios": {
+      "ait-lds-dev-pairs-20261112": {
+        "manifest_sha256": "1fd4067e4254246833deca7f65df8a13a1eada20c7d6d76d5ed8c6589baab762",
+        "pairs": [
+          {
+            "raw_member": "gather/internal_share/logs/audit/audit.log",
+            "rows": 732,
+            "raw_sha256": "3b91178b6874141755e8461779aa9fa3f079de85867855e47a75e1fbde7bb940",
+            "counts": {}
+          },
+          {
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+            "rows": 275900,
+            "raw_sha256": "3b26c8774eab02ea72c46e7c3eead9e7a3601c6f169ce83b3bd4cafd7674888b",
+            "counts": {
+              "dns_explicit_query_client": 81277,
+              "rows_with_generic_semantic_signal": 17453
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/auth.log",
+            "rows": 272,
+            "raw_sha256": "091920347866802f42b869575c9b1139fa4fa783b83630a9ca1e0ce68a184e39",
+            "counts": {
+              "auth_or_audit_explicit_remote": 2,
+              "rows_with_generic_semantic_signal": 0
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2",
+            "rows": 36,
+            "raw_sha256": "ff3d6815b660b87bc0576bbb7fee011d48a08c2a81d12ab83c052e98a58b281b",
+            "counts": {}
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2",
+            "rows": 8530,
+            "raw_sha256": "4d3d700f50c6dde5295ebc57a00701b7c3049812c6f6709b3f809e36be362153",
+            "counts": {
+              "http_explicit_client": 8486,
+              "rows_with_generic_semantic_signal": 3226
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/audit/audit.log",
+            "rows": 2316,
+            "raw_sha256": "8dbee7a1f2d998c4bee99748b3be2cc16479f1e81fe30a71b1f9197f53f2601c",
+            "counts": {
+              "auth_or_audit_explicit_remote": 21,
+              "rows_with_generic_semantic_signal": 0
+            }
+          },
+          {
+            "raw_member": "gather/vpn/logs/openvpn.log",
+            "rows": 5537,
+            "raw_sha256": "08042e1ad03874326960ef3eef91a50305009cb2e7afe88827750dd839701bb1",
+            "counts": {
+              "vpn_prefix_endpoint": 5537
+            }
+          },
+          {
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.cpu.log",
+            "rows": 1920,
+            "raw_sha256": "4bd9d49a8c78bcc5ece4f8c38c93720735e919658b5e408b3620335dc251767b",
+            "counts": {}
+          }
+        ],
+        "vpn_message_forms": {
+          "vpn_primary_virtual_ip": 66,
+          "vpn_learned_route": 66,
+          "vpn_push_reply": 66,
+          "vpn_common_name": 470,
+          "vpn_initial_packet": 66
+        },
+        "mapping_shaped_rows": 66,
+        "distinct_external_observed_address_references": 15,
+        "vpn_support": {
+          "publisher_normal": {
+            "vpn_rows_with_prefix_endpoint": 5509,
+            "same_address_any_time": 0,
+            "strict_past_same_address_rows_available": 0,
+            "strict_past_same_address_security_signal_available": 0
+          },
+          "publisher_attack": {
+            "vpn_rows_with_prefix_endpoint": 28,
+            "same_address_any_time": 0,
+            "strict_past_same_address_rows_available": 0,
+            "strict_past_same_address_security_signal_available": 0
+          }
+        },
+        "temporal_policy": "past 24h, strictly earlier; mappings not applied retroactively",
+        "network_link_is_authenticated_identity_or_approval": false
+      },
+      "ait-lds-santos-pairs-20261112": {
+        "manifest_sha256": "f51c2482356856848704cc0b47209fb0100db3b4b0982381ff1ab444ed201e01",
+        "pairs": [
+          {
+            "raw_member": "gather/internal_share/logs/audit/audit.log",
+            "rows": 728,
+            "raw_sha256": "33b535b96f81473c60c6df10d9f2ac3753c9b2bfe3b9d749a3af5f9d89c1f3bd",
+            "counts": {}
+          },
+          {
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+            "rows": 275667,
+            "raw_sha256": "2cee0cab1e1e4cd2b2ed43b93ec2044e9f8c7343ab1fe6d832d0372d5a1654b9",
+            "counts": {
+              "dns_explicit_query_client": 71918,
+              "rows_with_generic_semantic_signal": 12803
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/auth.log",
+            "rows": 270,
+            "raw_sha256": "e58e17ce592a3cbddf0a2280276642ffd19802b3e8265ff3d3fed961aebf52c7",
+            "counts": {
+              "auth_or_audit_explicit_remote": 1,
+              "rows_with_generic_semantic_signal": 0
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log",
+            "rows": 9462,
+            "raw_sha256": "92d8fae4669a1fc10fbb23832c18b1429e894d9033f135c7e77fc4d0d90287ba",
+            "counts": {
+              "http_explicit_client": 9361,
+              "rows_with_generic_semantic_signal": 3327
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+            "rows": 44,
+            "raw_sha256": "7ee7ca5fa22ff8d83c022bbaf050ec9a827c3e85f9d233442090ddd7103701f0",
+            "counts": {}
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/audit/audit.log",
+            "rows": 2263,
+            "raw_sha256": "c0b288f21fe2d39e888f124b77a1162aafcc7329ba18f3e47c25398d8a15f54e",
+            "counts": {}
+          },
+          {
+            "raw_member": "gather/vpn/logs/openvpn.log",
+            "rows": 5622,
+            "raw_sha256": "f39a169c2ab4165b9848635c6e729a004bddb315f1f2f277f0341baf662e9ba7",
+            "counts": {
+              "vpn_prefix_endpoint": 5622
+            }
+          },
+          {
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log",
+            "rows": 1920,
+            "raw_sha256": "1fe7e7e06d79e8e786e5fcebb2560aa2350b42439ab9a7c090c7faa89ca6f8d7",
+            "counts": {}
+          }
+        ],
+        "vpn_message_forms": {
+          "vpn_primary_virtual_ip": 77,
+          "vpn_learned_route": 77,
+          "vpn_push_reply": 77,
+          "vpn_common_name": 468,
+          "vpn_initial_packet": 77
+        },
+        "mapping_shaped_rows": 77,
+        "distinct_external_observed_address_references": 20,
+        "vpn_support": {
+          "publisher_normal": {
+            "vpn_rows_with_prefix_endpoint": 5594,
+            "same_address_any_time": 0,
+            "strict_past_same_address_rows_available": 0,
+            "strict_past_same_address_security_signal_available": 0
+          },
+          "publisher_attack": {
+            "vpn_rows_with_prefix_endpoint": 28,
+            "same_address_any_time": 0,
+            "strict_past_same_address_rows_available": 0,
+            "strict_past_same_address_security_signal_available": 0
+          }
+        },
+        "temporal_policy": "past 24h, strictly earlier; mappings not applied retroactively",
+        "network_link_is_authenticated_identity_or_approval": false
+      }
+    },
+    "classifier_fitted": false,
+    "goal_qualified": false
+  },
+  "explicit_route_timing_audit": {
+    "artifact": {
+      "path": "runtime/f1/native-route-timing-v33-20261112/audit.json",
+      "bytes": 6266,
+      "sha256": "719228775aaf0cb0496140bf34ec794276d6fbb916bfba9e634cef072b211cb8"
+    },
+    "schema": "extra-native-route-timing-1",
+    "completed": true,
+    "scenarios": {
+      "ait-lds-dev-pairs-20261112": {
+        "raw_pair_rows_and_hashes_verified": [
+          {
+            "raw_sha256": "3b91178b6874141755e8461779aa9fa3f079de85867855e47a75e1fbde7bb940",
+            "label_sha256": "1c7bcf8b4c2c8c520eeb2e7a9bdeec95b65c60f7615b6119c23a707e3c45c7ca",
+            "rows": 732
+          },
+          {
+            "raw_sha256": "3b26c8774eab02ea72c46e7c3eead9e7a3601c6f169ce83b3bd4cafd7674888b",
+            "label_sha256": "3712f7e48ee1121a23f37d7dd14a4e729b3a86ad58ba9f365f7209dfc58cb5fe",
+            "rows": 275900
+          },
+          {
+            "raw_sha256": "091920347866802f42b869575c9b1139fa4fa783b83630a9ca1e0ce68a184e39",
+            "label_sha256": "a5c8c79f03471928f2e2cc2eadd6282ccf836f2ab4b5770c34ddf52e317d2bd2",
+            "rows": 272
+          },
+          {
+            "raw_sha256": "ff3d6815b660b87bc0576bbb7fee011d48a08c2a81d12ab83c052e98a58b281b",
+            "label_sha256": "14b014f6e3cfeb33c2ea6aa6fe9fc2938587f5c7cfdfd267cc9e00de8e66fe10",
+            "rows": 36
+          },
+          {
+            "raw_sha256": "4d3d700f50c6dde5295ebc57a00701b7c3049812c6f6709b3f809e36be362153",
+            "label_sha256": "ab6a834e2f9b8321cb7045cd78e0d88eea851a0f4b5231827f16e87ca7286154",
+            "rows": 8530
+          },
+          {
+            "raw_sha256": "8dbee7a1f2d998c4bee99748b3be2cc16479f1e81fe30a71b1f9197f53f2601c",
+            "label_sha256": "4ae8b5dcb024f9ffd9c5249cc6af4a2fb93e20620f5c0876af9c216b05b23c23",
+            "rows": 2316
+          },
+          {
+            "raw_sha256": "08042e1ad03874326960ef3eef91a50305009cb2e7afe88827750dd839701bb1",
+            "label_sha256": "24a46d40bf7e6ca91ee9f25f499ab1f709e881271d6944173e157f607c0d8e0d",
+            "rows": 5537
+          },
+          {
+            "raw_sha256": "4bd9d49a8c78bcc5ece4f8c38c93720735e919658b5e408b3620335dc251767b",
+            "label_sha256": "bbbb78d92e606b0bb1ed54e4cf468a9f3374054f8dd60a70778749c976a88f09",
+            "rows": 1920
+          }
+        ],
+        "route_parsing": {
+          "route_shaped_rows": 66,
+          "prefix_and_explicit_route_endpoint_match": 66
+        },
+        "support": {
+          "publisher_normal": {
+            "vpn_rows": 5509,
+            "has_same_connection_mapping_at_any_time": 5318,
+            "has_same_timestamp_mapping": 1688,
+            "has_strict_prior_mapping": 2759,
+            "possible_strict_prior_cross_source_rows": 0,
+            "possible_strict_prior_cross_source_security_signal": 0
+          },
+          "publisher_attack": {
+            "vpn_rows": 28,
+            "has_same_connection_mapping_at_any_time": 28,
+            "has_same_timestamp_mapping": 26,
+            "has_strict_prior_mapping": 2,
+            "possible_strict_prior_cross_source_rows": 0,
+            "possible_strict_prior_cross_source_security_signal": 0
+          }
+        },
+        "distinct_vpn_timestamps": {
+          "publisher_normal": 373,
+          "publisher_attack": 2
+        },
+        "route_lifetime_identity_authority_certified": false
+      },
+      "ait-lds-santos-pairs-20261112": {
+        "raw_pair_rows_and_hashes_verified": [
+          {
+            "raw_sha256": "33b535b96f81473c60c6df10d9f2ac3753c9b2bfe3b9d749a3af5f9d89c1f3bd",
+            "label_sha256": "33e817d0662687e5e636f8173e2763d7a3ef0ee4ed8b0b1a2521be42550d4449",
+            "rows": 728
+          },
+          {
+            "raw_sha256": "2cee0cab1e1e4cd2b2ed43b93ec2044e9f8c7343ab1fe6d832d0372d5a1654b9",
+            "label_sha256": "48af8fbb41bd45be90eeea44cbd632d98bce900f433ba106252bdc4f0409b9ef",
+            "rows": 275667
+          },
+          {
+            "raw_sha256": "e58e17ce592a3cbddf0a2280276642ffd19802b3e8265ff3d3fed961aebf52c7",
+            "label_sha256": "8dd9c6ae0e3dce0fbbc593374229e8feb630007e8385d8c1493b22dbf152ef7c",
+            "rows": 270
+          },
+          {
+            "raw_sha256": "92d8fae4669a1fc10fbb23832c18b1429e894d9033f135c7e77fc4d0d90287ba",
+            "label_sha256": "22a6c67df7525f3c45555c0056dc38bfb84f64b650ff585cceaae363633141c2",
+            "rows": 9462
+          },
+          {
+            "raw_sha256": "7ee7ca5fa22ff8d83c022bbaf050ec9a827c3e85f9d233442090ddd7103701f0",
+            "label_sha256": "25b727363b998ff7f450c1f366f02dfcca272db9d02504248d9ab95caf7b53a0",
+            "rows": 44
+          },
+          {
+            "raw_sha256": "c0b288f21fe2d39e888f124b77a1162aafcc7329ba18f3e47c25398d8a15f54e",
+            "label_sha256": "c52e271b7ae91a78269448bff45e438117f0e19d1a5d8f970861c07179a807bd",
+            "rows": 2263
+          },
+          {
+            "raw_sha256": "f39a169c2ab4165b9848635c6e729a004bddb315f1f2f277f0341baf662e9ba7",
+            "label_sha256": "7b00e3ce62fa975aa5a86af11fd2a74378b0142979f1bd6c16d0091b60d40a20",
+            "rows": 5622
+          },
+          {
+            "raw_sha256": "1fe7e7e06d79e8e786e5fcebb2560aa2350b42439ab9a7c090c7faa89ca6f8d7",
+            "label_sha256": "eeb51573e76733a7f1a16d2b1affdf15b466ae3fa30e3b447fc52cede83230f3",
+            "rows": 1920
+          }
+        ],
+        "route_parsing": {
+          "route_shaped_rows": 77,
+          "prefix_and_explicit_route_endpoint_match": 77
+        },
+        "support": {
+          "publisher_normal": {
+            "vpn_rows": 5594,
+            "has_same_connection_mapping_at_any_time": 4536,
+            "has_same_timestamp_mapping": 1974,
+            "has_strict_prior_mapping": 2203,
+            "possible_strict_prior_cross_source_rows": 0,
+            "possible_strict_prior_cross_source_security_signal": 0
+          },
+          "publisher_attack": {
+            "vpn_rows": 28,
+            "has_same_connection_mapping_at_any_time": 28,
+            "has_same_timestamp_mapping": 26,
+            "has_strict_prior_mapping": 2,
+            "possible_strict_prior_cross_source_rows": 0,
+            "possible_strict_prior_cross_source_security_signal": 0
+          }
+        },
+        "distinct_vpn_timestamps": {
+          "publisher_normal": 401,
+          "publisher_attack": 2
+        },
+        "route_lifetime_identity_authority_certified": false
+      }
+    },
+    "protocol_sha256": "69e1269e6e381d69eb0d2d8dd59b4e2a22886d597f5766f75329f2bfcb4ec752",
+    "classifier_fitted": false,
+    "independent_final_metrics": null,
+    "goal_qualified": false
+  },
+  "supplementary_sensor_acquisition": {
+    "protocol": {
+      "path": "runtime/f1/native-sensor-context-v33-20261112/protocol.json",
+      "bytes": 2003,
+      "sha256": "da350abd02b1ec83e204f97dabf7244bd1ff98c08df2e7f3199d4df3089db30e"
+    },
+    "artifact": {
+      "path": "runtime/f1/native-sensor-context-v33-20261112/acquisition.json",
+      "bytes": 3079,
+      "sha256": "952991a66997057e2cb3ecfe1703f807d9a30f070c96b422c93c6f7179687bd0"
+    },
+    "schema": "extra-native-sensor-context-acquisition-1",
+    "completed": true,
+    "assets": [
+      {
+        "scenario": "russellmitchell",
+        "archive_folder": "public-ait-lds21-russellmitchell-20261112-02",
+        "archive_sha256": "51a03f51daea0fbbdcfe9b8abe0dbbe10633716f4f98074f861204a162ee1978",
+        "member": "gather/inet-firewall/logs/suricata/fast.log",
+        "bytes": 1157577,
+        "crc32": "f434aa45",
+        "source_sha256": "51a03f51daea0fbbdcfe9b8abe0dbbe10633716f4f98074f861204a162ee1978",
+        "archive_member": "gather/inet-firewall/logs/suricata/fast.log",
+        "sha256": "d8cfe0e9c9073c6406a4a0378a188423ad4def10c126d43a45e627d0470f2acc",
+        "zip_crc_verified_at_eof": true,
+        "code_executed": false,
+        "path": "runtime/f1/native-sensor-context-v33-20261112/sensor-0.source"
+      },
+      {
+        "scenario": "russellmitchell",
+        "archive_folder": "public-ait-lds21-russellmitchell-20261112-02",
+        "archive_sha256": "51a03f51daea0fbbdcfe9b8abe0dbbe10633716f4f98074f861204a162ee1978",
+        "member": "gather/vpn/logs/suricata/fast.log",
+        "bytes": 422315,
+        "crc32": "c318fc83",
+        "source_sha256": "51a03f51daea0fbbdcfe9b8abe0dbbe10633716f4f98074f861204a162ee1978",
+        "archive_member": "gather/vpn/logs/suricata/fast.log",
+        "sha256": "fd79dae6b2e5ac1b34a1cee693226d81b5868867a2206c49092705506b79df7b",
+        "zip_crc_verified_at_eof": true,
+        "code_executed": false,
+        "path": "runtime/f1/native-sensor-context-v33-20261112/sensor-1.source"
+      },
+      {
+        "scenario": "santos",
+        "archive_folder": "public-ait-lds21-santos-20261112",
+        "archive_sha256": "af69973fbf4edeb6a26f1e4ebeae97b577f0263cec15bda0d987cc470425be5d",
+        "member": "gather/inet-firewall/logs/suricata/fast.log",
+        "bytes": 5532506,
+        "crc32": "4d7a9e72",
+        "source_sha256": "af69973fbf4edeb6a26f1e4ebeae97b577f0263cec15bda0d987cc470425be5d",
+        "archive_member": "gather/inet-firewall/logs/suricata/fast.log",
+        "sha256": "7e00a9dce50a8b60367654838dd48c5890d40b37b484232686b5eed95865cf91",
+        "zip_crc_verified_at_eof": true,
+        "code_executed": false,
+        "path": "runtime/f1/native-sensor-context-v33-20261112/sensor-2.source"
+      },
+      {
+        "scenario": "santos",
+        "archive_folder": "public-ait-lds21-santos-20261112",
+        "archive_sha256": "af69973fbf4edeb6a26f1e4ebeae97b577f0263cec15bda0d987cc470425be5d",
+        "member": "gather/vpn/logs/suricata/fast.log",
+        "bytes": 439484,
+        "crc32": "b1f27092",
+        "source_sha256": "af69973fbf4edeb6a26f1e4ebeae97b577f0263cec15bda0d987cc470425be5d",
+        "archive_member": "gather/vpn/logs/suricata/fast.log",
+        "sha256": "a997b379653ca39390078699455dce2587b2a5be54810ad8b390f8e52e5d9981",
+        "zip_crc_verified_at_eof": true,
+        "code_executed": false,
+        "path": "runtime/f1/native-sensor-context-v33-20261112/sensor-3.source"
+      }
+    ],
+    "protocol_sha256": "da350abd02b1ec83e204f97dabf7244bd1ff98c08df2e7f3199d4df3089db30e",
+    "goal_qualified": false
+  },
+  "supplementary_sensor_probe": {
+    "artifact": {
+      "path": "runtime/f1/native-sensor-context-v33-20261112/probe.json",
+      "bytes": 4189,
+      "sha256": "3485dae46f21719e382ed06cfe9f0d32242314969b238e111a23466748149778"
+    },
+    "schema": "extra-native-sensor-context-probe-1",
+    "completed": true,
+    "assets": [
+      {
+        "path": "runtime/f1/native-sensor-context-v33-20261112/sensor-0.source",
+        "sha256": "d8cfe0e9c9073c6406a4a0378a188423ad4def10c126d43a45e627d0470f2acc",
+        "counts": {
+          "rows": 5724,
+          "priority_2": 52,
+          "priority_3": 5669,
+          "priority_1": 3
+        },
+        "errors": {}
+      },
+      {
+        "path": "runtime/f1/native-sensor-context-v33-20261112/sensor-1.source",
+        "sha256": "fd79dae6b2e5ac1b34a1cee693226d81b5868867a2206c49092705506b79df7b",
+        "counts": {
+          "rows": 2089,
+          "priority_3": 2071,
+          "priority_2": 6,
+          "priority_1": 12
+        },
+        "errors": {}
+      },
+      {
+        "path": "runtime/f1/native-sensor-context-v33-20261112/sensor-2.source",
+        "sha256": "7e00a9dce50a8b60367654838dd48c5890d40b37b484232686b5eed95865cf91",
+        "counts": {
+          "rows": 28470,
+          "priority_2": 15208,
+          "priority_3": 13262
+        },
+        "errors": {}
+      },
+      {
+        "path": "runtime/f1/native-sensor-context-v33-20261112/sensor-3.source",
+        "sha256": "a997b379653ca39390078699455dce2587b2a5be54810ad8b390f8e52e5d9981",
+        "counts": {
+          "rows": 2174,
+          "priority_2": 11,
+          "priority_3": 2154,
+          "priority_1": 9
+        },
+        "errors": {}
+      }
+    ],
+    "scenarios": {
+      "russellmitchell": {
+        "metadata_sha256": "992bb3533597cb597023697c6172a92f267605ff1a6c55321934a162c8a808e2",
+        "metadata_top_level_keys": [
+          "remote_employee_1",
+          "attacker_0",
+          "remote_employee_2",
+          "remote_employee_0",
+          "cloud_share",
+          "webserver",
+          "morris_mail",
+          "davey_mail",
+          "vpn",
+          "intranet_server",
+          "internal_employee_1",
+          "internal_employee_3",
+          "ext_user_1",
+          "ext_user_0",
+          "ext_user_2",
+          "internal_share",
+          "monitoring",
+          "internal_employee_2",
+          "mail",
+          "internal_employee_0",
+          "inet-dns",
+          "inet-firewall"
+        ],
+        "vpn_support": {
+          "publisher_normal": {
+            "vpn_rows": 5509,
+            "same_address_sensor_at_any_time": 23,
+            "strict_prior_sensor_observation": 23,
+            "strict_prior_priority_1_or_2_sensor_observation": 23
+          },
+          "publisher_attack": {
+            "vpn_rows": 28,
+            "same_address_sensor_at_any_time": 28,
+            "strict_prior_sensor_observation": 0,
+            "strict_prior_priority_1_or_2_sensor_observation": 0
+          }
+        }
+      },
+      "santos": {
+        "metadata_sha256": "ff3034bb7d43514dd8b7fc74dcf1a97eae84d8d7d71c0c42f61a4cf20db56402",
+        "metadata_top_level_keys": [
+          "ext_user_4",
+          "ext_user_3",
+          "remote_employee_1",
+          "ext_user_2",
+          "remote_employee_2",
+          "remote_employee_0",
+          "ext_user_1",
+          "ext_user_5",
+          "webserver",
+          "ext_user_0",
+          "internal_employee_5",
+          "internal_employee_7",
+          "internal_employee_3",
+          "monitoring",
+          "rogersturnbull_mail",
+          "internal_employee_4",
+          "internal_employee_6",
+          "internal_employee_2",
+          "internal_employee_0",
+          "internal_share",
+          "hayes_mail",
+          "mail",
+          "cloud_share",
+          "vpn",
+          "internal_employee_8",
+          "intranet_server",
+          "attacker_0",
+          "internal_employee_1",
+          "inet-dns",
+          "inet-firewall"
+        ],
+        "vpn_support": {
+          "publisher_normal": {
+            "vpn_rows": 5594,
+            "same_address_sensor_at_any_time": 2,
+            "strict_prior_sensor_observation": 2,
+            "strict_prior_priority_1_or_2_sensor_observation": 0
+          },
+          "publisher_attack": {
+            "vpn_rows": 28,
+            "same_address_sensor_at_any_time": 28,
+            "strict_prior_sensor_observation": 0,
+            "strict_prior_priority_1_or_2_sensor_observation": 0
+          }
+        }
+      }
+    },
+    "classifier_fitted": false,
+    "goal_qualified": false
+  },
+  "supplementary_sensor_timing": {
+    "protocol": {
+      "path": "runtime/f1/native-sensor-context-v33-20261112/lag-protocol.json",
+      "bytes": 410,
+      "sha256": "6214076e3740d84e44a0148d4dedde1f16992694ebba6108841f9c112f1e7fe5"
+    },
+    "artifact": {
+      "path": "runtime/f1/native-sensor-context-v33-20261112/lag.json",
+      "bytes": 4644,
+      "sha256": "afa640bb645ef0c2d57ec481c21fd57b4e4cad83b8551d7aee9780eb8b9ee5aa"
+    },
+    "schema": "extra-native-sensor-lag-1",
+    "completed": true,
+    "scenarios": {
+      "russellmitchell": {
+        "verified_host_timezones": {
+          "inet-firewall": "UTC",
+          "vpn": "UTC"
+        },
+        "metadata_sha256": "992bb3533597cb597023697c6172a92f267605ff1a6c55321934a162c8a808e2",
+        "support": {
+          "publisher_normal": {
+            "1": {
+              "vpn_rows": 5509,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            },
+            "10": {
+              "vpn_rows": 5509,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            },
+            "60": {
+              "vpn_rows": 5509,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            },
+            "300": {
+              "vpn_rows": 5509,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            },
+            "3600": {
+              "vpn_rows": 5509,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            }
+          },
+          "publisher_attack": {
+            "1": {
+              "vpn_rows": 28,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            },
+            "10": {
+              "vpn_rows": 28,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            },
+            "60": {
+              "vpn_rows": 28,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            },
+            "300": {
+              "vpn_rows": 28,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            },
+            "3600": {
+              "vpn_rows": 28,
+              "has_sensor_record_between_event_and_deadline": 28,
+              "has_priority_1_or_2_between_event_and_deadline": 28
+            }
+          }
+        }
+      },
+      "santos": {
+        "verified_host_timezones": {
+          "inet-firewall": "UTC",
+          "vpn": "UTC"
+        },
+        "metadata_sha256": "ff3034bb7d43514dd8b7fc74dcf1a97eae84d8d7d71c0c42f61a4cf20db56402",
+        "support": {
+          "publisher_normal": {
+            "1": {
+              "vpn_rows": 5594,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            },
+            "10": {
+              "vpn_rows": 5594,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            },
+            "60": {
+              "vpn_rows": 5594,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            },
+            "300": {
+              "vpn_rows": 5594,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            },
+            "3600": {
+              "vpn_rows": 5594,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            }
+          },
+          "publisher_attack": {
+            "1": {
+              "vpn_rows": 28,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            },
+            "10": {
+              "vpn_rows": 28,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            },
+            "60": {
+              "vpn_rows": 28,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            },
+            "300": {
+              "vpn_rows": 28,
+              "has_sensor_record_between_event_and_deadline": 0,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            },
+            "3600": {
+              "vpn_rows": 28,
+              "has_sensor_record_between_event_and_deadline": 28,
+              "has_priority_1_or_2_between_event_and_deadline": 0
+            }
+          }
+        }
+      }
+    },
+    "goal_qualified": false
+  },
+  "read_only_driver_fingerprints": [
+    {
+      "workspace_relative_path": "tmp/extra_audit_native_address_links_v33.py",
+      "sha256": "f0605d2e11430e74ba97ff6acf32feedcd08d0ac95b060c419cbf0a48a548727"
+    },
+    {
+      "workspace_relative_path": "tmp/extra_audit_native_route_timing_v33.py",
+      "sha256": "ea19d58a8987e2e8876e64b0a2ad61f788e089ce1383978820486da594efd6b5"
+    },
+    {
+      "workspace_relative_path": "tmp/extra_acquire_sensor_context_v33.py",
+      "sha256": "c75ec62709d9634a0e6612607e0f339226db83391475af1a8dd6862dd76f1d99"
+    },
+    {
+      "workspace_relative_path": "tmp/extra_probe_sensor_context_v33.py",
+      "sha256": "b782d1b66d3b9087807ba4e0ee176247f75e91c4b801c507063f6101f267f01a"
+    },
+    {
+      "workspace_relative_path": "tmp/extra_verify_sensor_time_and_lag_v33.py",
+      "sha256": "b203efce6550ca71dcd7e5b208fdfb14d077a3465550940a1e1941d11911dc05"
+    }
+  ],
+  "completion_audit": {
+    "baseline_app_and_original_benchmark_results_preserved": true,
+    "source_code_unchanged_since_last_261_windows_261_linux_tests": true,
+    "independent_final_metrics": null,
+    "current_available_sources_prove_six_domain_target": false,
+    "missing_evaluation_contract": "All six original domains need supported normal/threat meaning, observed context and an independently separated final population; existing ATO/raw intrusion/task-risk labels are not automatically interchangeable.",
+    "no_later_sensor_records_backfilled_into_initial_decisions": true,
+    "no_point_target_or_domain_gate_relaxed": true,
+    "person_review_alone_is_not_the_blocker": true,
+    "no_more_aligned_local_implementation_can_supply_missing_external_observations_or_independent_labels": true,
+    "scope_of_impasse": "Current acquired/reviewed sources and original task contract; not a claim about all possible public datasets or models.",
+    "recurrence": [
+      {
+        "goal_turn": "v31",
+        "commit": "49b87a4",
+        "evidence": "docs/infrastructure-results/extra-rba-metadata-completed-v31-20261112.json",
+        "same_blocker": "No qualified independent final evaluation for all six original domains."
+      },
+      {
+        "goal_turn": "v32",
+        "commit": "a01c884",
+        "evidence": "docs/infrastructure-results/extra-vpn-history-v32-20261112.json",
+        "same_blocker": "No qualified independent final evaluation for all six original domains."
+      },
+      {
+        "goal_turn": "v33",
+        "evidence": "this record",
+        "same_blocker": "No qualified independent final evaluation for all six original domains; new causal linkage lead did not provide timely missing evidence."
+      }
+    ],
+    "completion_proven": false,
+    "blocked_audit_threshold_met": false,
+    "resume_condition": "New independently adjudicated/evaluable normal and threat observations covering the original six-domain task, or a verified new public source providing that evidence; preserve original scope and reserved evaluation separation.",
+    "goal_status": "active",
+    "local_candidate_improvements_remain_possible": true,
+    "reason_goal_not_marked_blocked": "Independent final evaluation evidence is missing, but aligned local development remains possible and the user explicitly requested one more hour of work. Missing final evidence alone is not a true all-work impasse.",
+    "user_work_window": {
+      "schema": "extra-user-work-window-1",
+      "started_at_utc": "2026-11-12T07:11:10+00:00",
+      "work_until_utc": "2026-11-12T08:11:10+00:00",
+      "work_until_kst": "2026-11-12T17:11:10+09:00",
+      "user_instruction": "\ud55c\uc2dc\uac04\ub4a4\uc5d0 \ub098\uac00\uc57c\ud558\ub294\ub370 \uadf8\ub54c\uae4c\uc9c0 \uc791\uc5c5\ud574\uc918",
+      "scope": "continue aligned local candidate implementation, comparison, tests and docs; independent final goal remains unproven",
+      "paid_calls_allowed": false,
+      "github_push_allowed": false,
+      "baseline_and_labels_preserved": true
+    }
+  },
+  "new_classifier_fitted": false,
+  "tests_rerun": false,
+  "labels_changed": false,
+  "reserved_ait_final_bodies_read": 0,
+  "cloud_test_archive_downloaded": false,
+  "independent_final_metrics": null,
+  "original_six_domain_goal_replaced": false,
+  "current_owned_f1_containers": 0,
+  "interrupted_soak_completion_claimed": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "github_pushes": 0,
+  "goal_qualified": false
+}
