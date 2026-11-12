@@ -54,4 +54,4 @@ DOCKER_DEFAULT_PLATFORM=linux/amd64 .venv/bin/python -m scripts.test_continuous_
 3. 현재 이미지와 실제 선정 인프라의 최종 검사, 성능 측정 원자료를 맞춘다. 과거 이미지 검사와 이번 소스 검토를 현재 이미지의 취약점 해소 증거로 대체하지 않는다.
 4. 로컬 자동 검증과 접근 집행, 모의 고위험 조치, 실제 클라우드 미연동 범위를 발표와 보고서에 동일하게 표시한다.
 
-API 계약과 자격증명 설정은 [고위험 대응 승인과 모의 실행](response-approval.md)에 정리했다. 이번 로컬 작업에서 GitHub push, PR 생성과 병합은 수행하지 않았다.
+API 계약과 자격증명 설정은 [고위험 대응 승인과 모의 실행](response-approval.md)에 정리했다. 위 결과는 PR 등록 전의 로컬 검증 기록이다. PR CI에는 `response-mtls` 검증을 추가해 실제 승인과 전체 복원을 반복한다. 원격 CI의 최종 결과와 병합 여부는 해당 PR 기록을 따른다.
