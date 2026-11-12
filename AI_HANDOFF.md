@@ -94,16 +94,20 @@ v28 문헌 검토에서 `das-group/rba-dataset`의 고정 문서와 저자 논�
 ATO/공격IP/로그인실패 정답과 입력 가능 시점·성공 이력 오염·합성 RTT 조건을 구분한다.
 최종 정상 행을 줄여 정밀도를 맞추지 않는다. 상세 경계는 `docs/extra-cloud-identity-and-rba.md`를 따른다.
 v28은 문헌/진행 근거만 갱신하며 코드는 그대로다. 새 시험을 돌린 것으로 쓰지 않는다.
-[v30 메타데이터 감사](docs/extra-rba-metadata-audit.md)를 사전 계약 뒤 시작했다.
-**실행 중:** 도구 세션94763·PID8660, `runtime/f1/rba-metadata-run-20261112.json`,
-`runtime/f1/rba-full-metadata-20261112/progress.json`. helper는 `../tmp/extra_start_rba_metadata_actual.py`다.
-최대4천만행/3600초·SQLite1GiB·25,000행 배치다. 전체 EOF/CRC·바이트 수·소스 지문·DB 완료를 실제 결과로 확인해야 한다.
+[v31 메타데이터 완료](docs/extra-rba-metadata-audit.md): 도구 세션94763·PID8660은 terminal exit0이다.
+재시작/poll하지 않는다. `runtime/f1/rba-metadata-run-20261112.json`과
+`runtime/f1/rba-full-metadata-20261112/{audit.json,metadata.sqlite3,verification.json}`을 따른다.
+31,269,264행·CSV9,052,907,531바이트 전체 EOF/CRC·ZIP 전후 SHA를 검증했다. 실행1553.562초다.
+별도 읽기 전용 DB 감사에서 무결성ok·4,304,857개 사용자 참조의 분할/라벨 수/행 수 보존을 전수 대조했다.
+개발/보정/예약 후보 행은26,122,183/2,572,078/2,575,003이고 ATO true는97/18/26, 미확정0이다.
+원 논문87건을 공개 CSV141건으로 소급 수정하지 않는다. 출처와 자료 버전이 다른 수치다.
 분할은 사용자 해시70/15/15로 고정하고 기존81명은 전체 개발 배정한다. 클래스 지지 때문에 재분할하지 않는다.
 세션 출력에 조건부 교차표가 포함될 수 있으므로 `text(write_stdin(...))`로 원문을 펼치지 않는다.
 함수 내에서 출력은 길이/종료 상태만 표시하고 `../tmp/extra_show_rba_metadata_status.py`로 지지 집계만 확인한다.
 예약 후보의 조건부 교차표·개별 사례/라벨을 모델 선택에 사용하지 않는다. 실제 기기/템플릿·미래시점 독립성은 미인증이다.
-최종 Windows/Linux244개 통과·Linux450파일 전후 지문/소유 컨테이너0. 실제 전체 감사는 아직 미완료다.
-다음은 같은94763 세션의 종료/감사 receipt 확인이다. 소스 변경·새 실패 없이 검사/문서 버전을 반복 생성하지 않는다.
+최종 Windows/Linux244개 통과·Linux450파일 전후 지문/소유 컨테이너0. 완료 대조 시 코드 변경/새 pytest 실행0이다.
+다음은 여섯 영역의 출처별 정답 범위와 관측/분할 근거에 맞는 후보 개선이다. 예약 ATO26건은 예측 성능이 아니며
+ATO=false를 다른 영역까지 정상으로 바꾸지 않는다. 소스 변경·새 실패 없이 검사/문서 버전을 반복 생성하지 않는다.
 원본 앱·기존 라벨·예약 AIT/CloudTrail 최종 자료와 전체 여섯 영역 목표를 보존한다. 새 분류 모델은 학습하지 않았다.
 [v18 실제 자료 근거](docs/infrastructure-results/extra-native-actual-pairs-v18-20261112.json)를 따른다.
 [v19 원시 후보 근거](docs/infrastructure-results/extra-native-raw-candidate-v19-20261112.json)는 개발 재대입과 미채택 사유다.
