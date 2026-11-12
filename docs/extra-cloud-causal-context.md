@@ -4,6 +4,9 @@
 이미 관찰한 CloudTrail 학습 자료만 사용했고 **분류 모델 학습·독립 최종 평가를 수행하지 않았다.**
 F1만95%를 넘기는 것으로 정밀도·재현율 각각95% 목표를 대체하지 않는다.
 
+후속 [v26 원본 신원 근거 감사](extra-cloud-identity-and-rba.md)에서 AWSService3,107건의 원래 principal 연결 후보0을 확인했다.
+누락을 임의 이력으로 채우지 않았고 RBA 보조 자료는 별도 계약 뒤 수집을 시작했다. 전체 검증·CSV 분석은 당시 미완료다.
+
 ## 무엇을 추가했나
 
 [사전 계약](../infra/f1-lab/cloud-context-protocol.json)에 따라 동일 principal 참조의 엄격한 과거10/60초를 집계했다.

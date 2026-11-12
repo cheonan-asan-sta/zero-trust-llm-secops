@@ -1,0 +1,285 @@
+{
+  "schema": "extra-cloud-identity-rba-v26-1",
+  "recorded_at": "2026-11-12T05:00:01.077615+00:00",
+  "branch": "extra",
+  "prior_commit": "155f360eafd1a6d8d6976fd00c419b3a27e1b171",
+  "cloud_identity_audit": {
+    "path": "runtime/f1/cloud-training-identity-audit-20261112/audit.json",
+    "bytes": 4610,
+    "sha256": "534c11075079b89c7d7e6614581353d6926457d5a4a37ae03beefd2731c98e91",
+    "acquisition_sha256": "78ddde247483a416712a110698287d56152716dd295ed781c14a1113f420bb0e",
+    "aws_sdk_calls": 0,
+    "candidate_join_verified": false,
+    "classifier_fitted": false,
+    "completed": true,
+    "fields_present_by_kind": {
+      "AWSAccount": {
+        "recipientAccountId": 391,
+        "requestID": 391,
+        "sharedEventID": 391,
+        "userIdentity.accessKeyId": 0,
+        "userIdentity.accountId": 391,
+        "userIdentity.arn": 0,
+        "userIdentity.credentialId": 0,
+        "userIdentity.inScopeOf.credentialsIssuedTo": 0,
+        "userIdentity.inScopeOf.sourceArn": 0,
+        "userIdentity.invokedBy": 0,
+        "userIdentity.onBehalfOf.identityStoreArn": 0,
+        "userIdentity.onBehalfOf.userId": 0,
+        "userIdentity.principalId": 379,
+        "userIdentity.sessionContext.sessionIssuer.arn": 0,
+        "userIdentity.sessionContext.signInSessionArn": 0,
+        "userIdentity.sessionContext.sourceIdentity": 0
+      },
+      "AWSService": {
+        "recipientAccountId": 3107,
+        "requestID": 3107,
+        "sharedEventID": 3107,
+        "userIdentity.accessKeyId": 0,
+        "userIdentity.accountId": 0,
+        "userIdentity.arn": 0,
+        "userIdentity.credentialId": 0,
+        "userIdentity.inScopeOf.credentialsIssuedTo": 0,
+        "userIdentity.inScopeOf.sourceArn": 0,
+        "userIdentity.invokedBy": 3107,
+        "userIdentity.onBehalfOf.identityStoreArn": 0,
+        "userIdentity.onBehalfOf.userId": 0,
+        "userIdentity.principalId": 0,
+        "userIdentity.sessionContext.sessionIssuer.arn": 0,
+        "userIdentity.sessionContext.signInSessionArn": 0,
+        "userIdentity.sessionContext.sourceIdentity": 0
+      },
+      "AssumedRole": {
+        "recipientAccountId": 15241,
+        "requestID": 15241,
+        "sharedEventID": 3939,
+        "userIdentity.accessKeyId": 15241,
+        "userIdentity.accountId": 15241,
+        "userIdentity.arn": 15241,
+        "userIdentity.credentialId": 0,
+        "userIdentity.inScopeOf.credentialsIssuedTo": 1427,
+        "userIdentity.inScopeOf.sourceArn": 0,
+        "userIdentity.invokedBy": 4534,
+        "userIdentity.onBehalfOf.identityStoreArn": 0,
+        "userIdentity.onBehalfOf.userId": 0,
+        "userIdentity.principalId": 15241,
+        "userIdentity.sessionContext.sessionIssuer.arn": 15241,
+        "userIdentity.sessionContext.signInSessionArn": 0,
+        "userIdentity.sessionContext.sourceIdentity": 0
+      },
+      "IAMUser": {
+        "recipientAccountId": 1957,
+        "requestID": 1949,
+        "sharedEventID": 0,
+        "userIdentity.accessKeyId": 1949,
+        "userIdentity.accountId": 1957,
+        "userIdentity.arn": 1952,
+        "userIdentity.credentialId": 0,
+        "userIdentity.inScopeOf.credentialsIssuedTo": 0,
+        "userIdentity.inScopeOf.sourceArn": 0,
+        "userIdentity.invokedBy": 24,
+        "userIdentity.onBehalfOf.identityStoreArn": 0,
+        "userIdentity.onBehalfOf.userId": 0,
+        "userIdentity.principalId": 1957,
+        "userIdentity.sessionContext.sessionIssuer.arn": 0,
+        "userIdentity.sessionContext.signInSessionArn": 0,
+        "userIdentity.sessionContext.sourceIdentity": 0
+      },
+      "Unknown": {
+        "recipientAccountId": 15,
+        "requestID": 0,
+        "sharedEventID": 0,
+        "userIdentity.accessKeyId": 0,
+        "userIdentity.accountId": 15,
+        "userIdentity.arn": 0,
+        "userIdentity.credentialId": 0,
+        "userIdentity.inScopeOf.credentialsIssuedTo": 0,
+        "userIdentity.inScopeOf.sourceArn": 0,
+        "userIdentity.invokedBy": 15,
+        "userIdentity.onBehalfOf.identityStoreArn": 0,
+        "userIdentity.onBehalfOf.userId": 0,
+        "userIdentity.principalId": 0,
+        "userIdentity.sessionContext.sessionIssuer.arn": 0,
+        "userIdentity.sessionContext.signInSessionArn": 0,
+        "userIdentity.sessionContext.sourceIdentity": 0
+      }
+    },
+    "goal_qualified": false,
+    "inference_features_changed": false,
+    "original_six_domain_goal_replaced": false,
+    "paid_api_calls": 0,
+    "population": {
+      "AWSAccount": 391,
+      "AWSService": 3107,
+      "AssumedRole": 15241,
+      "IAMUser": 1957,
+      "Unknown": 15
+    },
+    "raw_identifiers_displayed_or_exported": 0,
+    "rows": 20711,
+    "schema": "f1-cloud-training-identity-audit-1",
+    "service_exact_join_candidates": {
+      "no_candidate": 3107
+    },
+    "service_label_counts": {
+      "attack": 48,
+      "normal": 3059
+    },
+    "source_sha256": {
+      "asset-0.json.source": "035dc35e282bdc5bd9624391e8248dc0817bb399ba8d6787c0148dfc0ea1c4ab",
+      "asset-1.json.source": "4b1124205051b09fdb38b4350cd912a94f60d8e38f9ca68f13604fcb17516f26"
+    },
+    "test_records_read": 0
+  },
+  "identity_audit_protocol": {
+    "path": "infra/f1-lab/cloud-identity-audit-protocol.json",
+    "bytes": 1829,
+    "sha256": "963fd49094d0fcf424ad0fc9ae5d5b0e00c6bff49d6df7a200eaa9b0da6b5cae"
+  },
+  "rba_catalog": {
+    "path": "runtime/f1/rba-catalog-20261112/catalog.json",
+    "bytes": 638,
+    "sha256": "1771ae72e28e0b4fc2cc0a74ca6dbd73e63fd391cd90365b40a2c91f501bbbf8",
+    "schema": "rba-catalog-1",
+    "record_id": 6782156,
+    "metadata_sha256": "dad2a651462246cdcb89ff13aa7b4190f3a24064eb39741e2cf16c4948a9a813",
+    "doi": "10.5281/zenodo.6782156",
+    "version": "v1.0.0",
+    "license": {
+      "id": "cc-by-4.0"
+    },
+    "files": [
+      {
+        "id": "d291c4c0-1c8a-47f0-b824-0615480c39a7",
+        "key": "rba-dataset.zip",
+        "size": 1093700330,
+        "checksum": "md5:cc1b1078b3929650e6c08678caffcc57",
+        "links": {
+          "self": "https://zenodo.org/api/records/6782156/files/rba-dataset.zip/content"
+        }
+      }
+    ],
+    "data_body_downloaded": false,
+    "goal_qualified": false
+  },
+  "rba_asset_contract": {
+    "path": "infra/f1-lab/public-assets-rba.json",
+    "bytes": 473,
+    "sha256": "66ded784335c8df62c01c36ec95a9b230356565ddd6d9ab66e27d52cc7e7ac2a"
+  },
+  "rba_intake_protocol": {
+    "path": "infra/f1-lab/rba-intake-protocol.json",
+    "bytes": 2021,
+    "sha256": "247550c61f1fd7e7ba64f7d9dda9cdf01ec92e4f9d33bc617ec5b50d104558fc"
+  },
+  "rba_running_acquisition_snapshot": {
+    "schema": "rba-acquisition-run-1",
+    "started_at": "2026-11-12T04:56:43.521882+00:00",
+    "pid": 314588,
+    "contract_sha256": "66ded784335c8df62c01c36ec95a9b230356565ddd6d9ab66e27d52cc7e7ac2a",
+    "directory": "runtime\\f1\\public-rba-20261112",
+    "asset": {
+      "asset_id": "rba-login-v1",
+      "record_id": 6782156,
+      "record_version": "v1.0.0",
+      "filename": "rba-dataset.zip",
+      "bytes": 1093700330,
+      "publisher_md5": "cc1b1078b3929650e6c08678caffcc57",
+      "license_id": "cc-by-4.0",
+      "data_role": "publisher_synthesized_login_research_with_external_incident_labels",
+      "reference": "https://zenodo.org/records/6782156"
+    },
+    "acquisition_terminal": false,
+    "goal_qualified": false,
+    "csv_records_read": 0,
+    "progress_at_snapshot": {
+      "bytes_received": 61865984,
+      "elapsed_seconds": 195.22,
+      "expected_bytes": 1093700330,
+      "retry_count": 0
+    },
+    "tool_session_id": 34025,
+    "process_observed_live": true,
+    "process_creation_matches_owned_start": true,
+    "archive_integrity_complete": false,
+    "note": "Live-process and partial-progress snapshot only; not acquisition completion. Re-poll the same tool session before any retry."
+  },
+  "collector_source": {
+    "path": "scripts/f1_lab/public_sources.py",
+    "bytes": 13624,
+    "sha256": "a5b141ab12f9f5daf320fc68f278ba6d28b9f5f56d8537240bfe87f23b55c4f8"
+  },
+  "asset_range_maximum_bytes": 2147483648,
+  "generic_zip_member_copy_maximum_bytes": 536870912,
+  "labels_changed": false,
+  "reserved_ait_final_bodies_read": 0,
+  "cloud_test_archive_downloaded": false,
+  "original_six_domain_goal_replaced": false,
+  "independent_final_metrics": null,
+  "goal_qualified": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "tests": {
+    "windows": {
+      "path": "runtime/f1/extra-cloud-identity-rba-final-20261112.xml",
+      "bytes": 31647,
+      "sha256": "ef88594d2edf1fcf51fd29b64caabddb9de94292f5ce970203bdc471f3147b30",
+      "passed": 227
+    },
+    "linux": {
+      "path": "runtime/f1/extra-linux-public-native-20261112-14/checks.xml",
+      "bytes": 31653,
+      "sha256": "ff9bfc6df4fa40acf7d3088bb3b6f1c7b52238bd581780ffa0fc3f41cc66b366",
+      "passed": 227
+    }
+  },
+  "linux": {
+    "path": "runtime/f1/extra-linux-public-native-20261112-14/verification.json",
+    "bytes": 1474,
+    "sha256": "0a319fd98563c816db6155688bbd2bee18a968002f1673d5e453a7c4c420fa46",
+    "schema": "extra-f1-linux-snapshot-1",
+    "completed": true,
+    "owner": "extra-f1-64e3eac3f081",
+    "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "tests": [
+      "tests/test_f1_public_sources.py",
+      "tests/test_f1_bounded_zip.py",
+      "tests/test_f1_native_jsonl.py",
+      "tests/test_f1_native_preparation.py",
+      "tests/test_f1_line_truth.py",
+      "tests/test_f1_raw_observations.py",
+      "tests/test_f1_native_bayes.py",
+      "tests/test_f1_native_raw_workflow.py",
+      "tests/test_f1_raw_context.py",
+      "tests/test_f1_native_context_workflow.py",
+      "tests/test_f1_native_tree.py",
+      "tests/test_f1_frozen_native_tree.py",
+      "tests/test_f1_native_transfer.py",
+      "tests/test_f1_contextual_links.py",
+      "tests/test_f1_native_heads.py",
+      "tests/test_f1_native_binary_tree.py",
+      "tests/test_f1_cloud_observations.py",
+      "tests/test_f1_cloud_diagnostics.py",
+      "tests/test_f1_cloud_context.py",
+      "tests/test_f1_cloud_identity.py"
+    ],
+    "host_mounts": 0,
+    "network": "none",
+    "cloud_calls": 0,
+    "paid_api_calls": 0,
+    "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+    "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+    "source_manifest_sha256": "b54c26343c300969e28c4297694ba8528cb693f64010d3f8840af28a098cd252",
+    "source_files": 443,
+    "container_exit_code": 0,
+    "source_verified_before_and_after": true,
+    "remaining_containers": 0
+  },
+  "baseline_app_diff_empty": true,
+  "currently_owned_f1_containers": 0,
+  "interrupted_soak_cleanup": {
+    "path": "docs/infrastructure-results/extra-interrupted-cleanup-v15-20261112.json",
+    "bytes": 3897,
+    "sha256": "956dc5c53ff011b57145be7cae9868743864adbc8674113f37a9e7dff5197b73"
+  }
+}

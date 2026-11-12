@@ -249,3 +249,31 @@ def test_resume_cannot_accidentally_use_an_unranged_full_body_transfer(lab, tmp_
     with pytest.raises(ValueError, match='resume_requires_ranges'):
         source.acquire(lab.asset, tmp_path/'result', purpose='research', resume_from=tmp_path/'prior')
     assert not (tmp_path/'result').exists() and not lab.calls
+
+
+def test_larger_research_asset_remains_bounded_to_two_gib_before_io(lab):
+    value={**lab.asset.model_dump(),'bytes':1093700330}
+    assert source.Asset.model_validate(value).bytes==1093700330
+    with pytest.raises(ValueError):
+        source.Asset.model_validate({**value,'bytes':source.MAX_ASSET+1})
+    assert not lab.calls
+
+
+def test_range_above_one_gib_keeps_exact_offset_length_and_total_validation(monkeypatch):
+    url='https://zenodo.org/api/records/6782156/files/rba-dataset.zip/content'
+    total=source.MAX_ASSET
+    def respond(request, **kwargs):
+        assert request.get_header('Range')==f'bytes={total-4}-{total-1}'
+        return Response(b'last',url,status=206,headers={'Content-Range':f'bytes {total-4}-{total-1}/{total}',
+                                                      'Content-Length':'4'})
+    monkeypatch.setattr(source.urllib.request,'urlopen',respond)
+    with TRANSPORT(url,byte_range=(total-4,total-1,total)) as stream:
+        assert stream.read()==b'last'
+
+
+def test_range_above_two_gib_never_reaches_network(monkeypatch):
+    def forbidden(*args, **kwargs):
+        raise AssertionError('oversized request reached network')
+    monkeypatch.setattr(source.urllib.request,'urlopen',forbidden)
+    with pytest.raises(ValueError,match='range_request'):
+        TRANSPORT('https://zenodo.org/api/records/123',byte_range=(0,1,source.MAX_ASSET+1))

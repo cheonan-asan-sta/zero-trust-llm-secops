@@ -23,6 +23,7 @@ CONTRACT = ROOT/'infra/f1-lab/public-assets.json'
 CHUNK = 1024**2
 RANGE_BYTES = 4*CHUNK
 MAX_RETRIES = 8
+MAX_ASSET = 2*1024**3
 
 
 def require(condition, code):
@@ -53,7 +54,7 @@ class Asset(StrictModel):
     record_id: int = Field(strict=True, ge=1)
     record_version: str = Field(min_length=1, max_length=64)
     filename: str = Field(pattern=r'^[A-Za-z0-9_.-]{1,100}$')
-    bytes: int = Field(strict=True, ge=1, le=1024**3)
+    bytes: int = Field(strict=True, ge=1, le=MAX_ASSET)
     publisher_md5: str = Field(pattern=r'^[a-f0-9]{32}$')
     license_id: Literal['cc-by-4.0', 'cc-by-nc-sa-4.0']
     data_role: str = Field(min_length=1, max_length=128)
@@ -105,7 +106,7 @@ def response(url, *, byte_range=None):
     headers = {'User-Agent': 'ZeroTrustSecOps-public-evaluation/1.0', 'Accept-Encoding': 'identity'}
     if byte_range is not None:
         start, end, total = byte_range
-        require(all(type(value) is int for value in byte_range) and 0 <= start <= end < total <= 1024**3, 'range_request')
+        require(all(type(value) is int for value in byte_range) and 0 <= start <= end < total <= MAX_ASSET, 'range_request')
         headers['Range'] = f'bytes={start}-{end}'
     request = urllib.request.Request(url, headers=headers)
     result = urllib.request.urlopen(request, timeout=45)
