@@ -10,6 +10,7 @@ import tempfile
 from pathlib import Path
 
 from scripts import app_state_recovery as recovery
+from scripts import behavior_context_recovery as context
 from scripts.ca_recovery_state import atomic, canonical
 from scripts.continuous_mtls_assets import service
 from scripts.serve_recovered_app import admit
@@ -62,6 +63,20 @@ def _store(authority, source, registry):
     return recovery.Store(directory, source=source, registry_path=registry)
 
 
+def frozen_source(source, frozen):
+    """Copy the stopped writer boundary without dropping the context journal."""
+    # Context SQLite uses rollback journaling. Its clean, closed source is read
+    # without opening a writable connection or silently ignoring a crash journal.
+    context.capture(source, frozen)
+    # The policy SQLite database uses WAL and may need a writable scratch index.
+    for name in ("app.sqlite3", "app.sqlite3-wal"):
+        path = source / name
+        if name == "app.sqlite3" or path.exists():
+            atomic(frozen / name, recovery.read_file(path, recovery.MAX_DATABASE))
+    for name, body in recovery.storage.capture(source).items():
+        atomic(frozen / name, body)
+
+
 def restore(*, authority=Path("/authority"), source=Path("/source"), registry=REGISTRY,
             public=PUBLIC, destination=Path("/restored")):
     recovery.local_only()
@@ -73,12 +88,7 @@ def restore(*, authority=Path("/authority"), source=Path("/source"), registry=RE
         # Give it writable scratch files and leave the stopped source untouched.
         with tempfile.TemporaryDirectory(prefix="frozen-source-") as temp:
             frozen = Path(temp)
-            for name in ("app.sqlite3", "app.sqlite3-wal"):
-                path = source / name
-                if name == "app.sqlite3" or path.exists():
-                    atomic(frozen / name, recovery.read_file(path, recovery.MAX_DATABASE))
-            for name, body in recovery.storage.capture(source).items():
-                atomic(frozen / name, body)
+            frozen_source(source, frozen)
             backup_store = recovery.Store(store.root, source=frozen, registry_path=registry)
             backup_store.checkpoint()
             backup = backup_store.backup(max_age=3600)

@@ -42,11 +42,13 @@ state = inspect_state(path)['state']
 with operations(path)._transaction() as transaction:
     consumed = sum(entry['kind'] == 'access' and entry.get('allowed') is True for entry in transaction[1])
 print(json.dumps({'logs': state['jsonl'], 'consumed': consumed, 'registry': sha(read_file('/signals/sources.json', 1024**2)),
+                  'behavior_context': state['behavior_context'],
                   'inbox': {key: value for key, value in state['tables'].items() if key.startswith('signal_inbox')}}))
 """
 
 
 class RecoveryChecks(Checks):
+    expected_context_records = 4
     def __init__(self, directory):
         super().__init__(directory, runtime_class=RecoverableRuntime)
         self.report["schema"] = "recoverable-mtls-verification-1"
@@ -105,8 +107,9 @@ class RecoveryChecks(Checks):
         self.require(runtime.state["release_image_payload_verified"], "image_payload_unverified")
         runtime.compose("stop", "app", "worker", "watchdog")
         runtime._container_job(
-            ["-c", ("import json; from pathlib import Path; from scripts.app_storage_fixture import seed_logs; "
-                    "print(json.dumps(seed_logs(Path('/source'))))")],
+            ["-c", ("import json; from pathlib import Path; "
+                    "from scripts.app_storage_fixture import seed_logs,seed_behavior_context; "
+                    "p=Path('/source'); seed_behavior_context(p); print(json.dumps(seed_logs(p)))")],
             [("data", "/source", False)],
         )
         runtime.up()
@@ -116,7 +119,8 @@ class RecoveryChecks(Checks):
         self.wait(lambda: self.completed("app-restore-inbox-history"), "source_inbox_not_completed")
         receipt = self.receipt("app-restore-inbox-history")["body"]
         before = self.read_state("/data")
-        self.require(before["consumed"] == 1 and before["inbox"] and before["logs"], "source_history_missing")
+        self.require(before["consumed"] == 1 and before["inbox"] and before["logs"]
+                     and before["behavior_context"]["records"] == self.expected_context_records, "source_history_missing")
         old = self.mint("restore-old")
         history = self.history(old[0])
         self.require(history[-1]["status"] == "ACTIVE", "source_session_inactive")
@@ -141,9 +145,10 @@ class RecoveryChecks(Checks):
                      and after[-1]["version"] == history[-1]["version"] + 1, "session_history_not_preserved")
         self.require(self.receipt("app-restore-inbox-history")["body"] == receipt
                      and self.read_state("/data/active") == before, "application_history_not_preserved")
-        self.add("session_inbox_registry_and_three_jsonl_histories_preserved",
+        self.add("session_inbox_registry_context_and_three_jsonl_histories_preserved",
                  session_versions=len(after), consumed_grants=before["consumed"],
-                 jsonl_files=len(before["logs"]["files"]), inbox_tables=len(before["inbox"]))
+                 jsonl_files=len(before["logs"]["files"]), inbox_tables=len(before["inbox"]),
+                 context_records=before["behavior_context"]["records"])
         self.access(old, False, "pre_restore_unconsumed_token_returns_403")
         self.access(consumed, False, "pre_restore_consumed_token_returns_403")
 
@@ -162,14 +167,25 @@ class RecoveryChecks(Checks):
         self.report["completed"] = True
 
 
-def main():
+def main(checks_type=RecoveryChecks):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--directory", required=True, type=Path)
-    checks = RecoveryChecks(parser.parse_args().directory)
+    checks = checks_type(parser.parse_args().directory)
     try:
         checks.run()
     except (RuntimeFailure, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as exc:
         checks.report["failure"] = str(exc) if isinstance(exc, RuntimeFailure) else type(exc).__name__
+        if isinstance(exc, subprocess.TimeoutExpired):
+            # Arguments and captured output may contain credentials or telemetry.
+            argv = exc.cmd if isinstance(exc.cmd, (list, tuple)) else []
+            checks.report["timeout"] = {
+                "seconds": exc.timeout,
+                "operation": next((name for name in ("build", "pull", "compose", "exec", "run")
+                                   if name in argv[:6]), "unknown"),
+                "helper_mode": next((name for name in ("probe", "mint", "append")
+                                     if name in argv[-3:]), None),
+                "after_check": checks.report["checks"][-1]["label"] if checks.report["checks"] else None,
+            }
     finally:
         try:
             checks.cleanup()

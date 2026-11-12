@@ -110,6 +110,16 @@ python -m ruff check .
 
 재현 가능한 전체 사례·예측·실패·지문은 [개발 결과 JSON](../benchmark-results/development.json)과 [평가 결과 JSON](../benchmark-results/holdout.json)에 있다. API와 명령행은 로컬 정규화·Sigma 규칙만 사용하며 유료 모델·AWS·실계정에 연결하지 않는다.
 
+## 로컬 접근 집행 검증
+
+사전에 예상 허용 여부를 기록한 로컬 사례 200건에서 접근 API의 HTTP 응답과 보호 콘텐츠 반환을 확인한다. 허용과 거절은 각각 100건이며, 시나리오 계열 10개를 각각 20회 실행한다. 실제 API 키 검사, 서명된 인증 신호, 격리된 SQLite 저널을 사용해 인프로세스 FastAPI 경로를 검증한다.
+
+```sh
+python -m scripts.evaluate_local_access --output-dir runtime/m7/local-access
+```
+
+새 출력 디렉터리를 지정한다. `plan.json`에 시나리오와 기대 결과를 먼저 기록하고 `report.json`에 응답, 요청 주체 및 대상의 저널 대조 결과와 계열별 집계를 저장한다. 접근 집행의 분모는 시나리오 실행 건수다. 탐지 성능은 위 Sigma 기준선과 M7 평가에서 별도로 집계한다.
+
 로컬 전체 자동 테스트는 기존 381건에 평가기 검증 40건을 더한 **421건 통과**, Ruff와 JavaScript 문법 검사도 통과했다. 품질 기준 미달을 올바르게 계산·보고하는지 검증하는 시험이므로 자동 테스트 통과를 탐지 성능 합격으로 해석하지 않는다. Docker 엔진이 꺼져 있어 이번 컨테이너 시험은 수행하지 않았다. 데이터·지문 파일은 운영체제가 달라도 같은 바이트를 사용하도록 LF로 고정한다.
 
 방법 참고는 [그룹이 분할 사이에 겹치지 않는 scikit-learn의 GroupKFold](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GroupKFold.html)와 [백분위 부트스트랩 절차를 설명한 SciPy 문서](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html)다. 이 프로젝트는 해당 라이브러리를 추가 설치하지 않고 표준 라이브러리로 계열 분할 검증과 재표집을 구현했다.

@@ -5,7 +5,7 @@ import hashlib
 import json
 import tempfile
 from collections import Counter, defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -19,6 +19,45 @@ FILES = ("development.jsonl", "evaluation.jsonl", "labels.jsonl")
 LABELS = {"benign": "normal", "attack": "threat"}
 SIGNALS = ("module", "http_method", "http_status", "level")
 FEATURES = (*SIGNALS, "duration_ms")
+AUTH_STAGES = {
+    "admin_oidc_op_create": "configuration",
+    "admin_oidc_op_delete": "configuration",
+    "admin_saml_idp_create": "configuration",
+    "auth_access_log_failed": "access",
+    "auth_access_log_success": "access",
+    "auth_login_attempt": "login",
+    "auth_login_failed_rejected": "login",
+    "auth_login_failed_user_not_found": "login",
+    "auth_login_success": "login",
+    "auth_registration_attempt": "registration",
+    "auth_registration_failed_captcha": "registration",
+    "auth_registration_failed_duplicate": "registration",
+    "idp_samlresponse_created": "assertion",
+    "idp_slo_all": "logout",
+    "idp_slo_all_sent": "logout",
+    "idp_slo_invalid_request": "logout",
+    "idp_sso_request": "authorize",
+    "op_authorize_request": "authorize",
+    "op_session_clear_prompt": "logout",
+    "op_session_created": "session",
+    "op_token_request": "token",
+    "request_create": "request",
+    "request_response": "request",
+    "request_update": "request",
+    "rp_oidc_finalize_success": "session",
+    "rp_oidc_login": "login",
+    "rp_unregistration": "account_management",
+    "rp_unregistration_failed": "account_management",
+    "sp_federation_fetch": "federation",
+    "sp_login_by_idp": "login",
+    "sp_saml_login": "login",
+}
+FAILURE_REASONS = {
+    "auth_login_failed_user_not_found": "user_not_found",
+    "auth_registration_failed_captcha": "captcha_failed",
+    "auth_registration_failed_duplicate": "duplicate_registration",
+    "idp_slo_invalid_request": "request_validation_failed",
+}
 Digest = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
 SessionID = Annotated[str, Field(pattern=r"^m7-session-[0-9a-f]{64}$")]
 EvidenceID = Annotated[str, Field(pattern=r"^m7-event-[0-9a-f]{64}$")]
@@ -36,6 +75,16 @@ class Event(StrictModel):
 class Session(StrictModel):
     session_id: SessionID
     events: Annotated[list[Event], Field(min_length=1)]
+
+
+class EnrichedEvent(Event):
+    auth_stage: str
+    failure_reason: str | None
+    since_previous_ms: Annotated[int, Field(strict=True, ge=0)] | None
+
+
+class EnrichedSession(Session):
+    events: Annotated[list[EnrichedEvent], Field(min_length=1)]
 
 
 class Record(StrictModel):
@@ -137,12 +186,26 @@ def read_source(source, contract):
     return sessions
 
 
+def session_pair(trace, rows, split):
+    source_label, category, subcategory = rows[0][3]
+    session_id = session_id_for(trace)
+    data = Session(session_id=session_id, events=[row[1] for row in rows])
+    subjects = {sha(canonical(["subject", actor])) for row in rows for actor in row[4]}
+    clients = {sha(canonical(["client", row[5]])) for row in rows}
+    truth = Label(
+        session_id=session_id, split=split, expected_label=LABELS[source_label],
+        source_label=source_label, category=category, subcategory=subcategory,
+        subjects=sorted(subjects), clients=sorted(clients), records=[row[2] for row in rows],
+    )
+    return data, truth
+
+
 def select_sessions(sessions, pilot):
     cutoff = timestamp(pilot["evaluation_start"])
     limit = pilot["sessions_per_label_per_split"]
     candidates = defaultdict(list)
     for trace, rows in sessions.items():
-        source_label, category, subcategory = rows[0][3]
+        source_label = rows[0][3][0]
         if source_label not in LABELS:
             continue
         split = split_for(rows[0][3], pilot)
@@ -150,16 +213,7 @@ def select_sessions(sessions, pilot):
         order = [(row[0], row[2].line) for row in rows]
         if not in_time_range(split, order, cutoff):
             continue
-        session_id = session_id_for(trace)
-        data = Session(session_id=session_id, events=[row[1] for row in rows])
-        subjects = {sha(canonical(["subject", actor])) for row in rows for actor in row[4]}
-        clients = {sha(canonical(["client", row[5]])) for row in rows}
-        truth = Label(
-            session_id=session_id, split=split, expected_label=LABELS[source_label],
-            source_label=source_label, category=category, subcategory=subcategory,
-            subjects=sorted(subjects), clients=sorted(clients), records=[row[2] for row in rows],
-        )
-        candidates[split, source_label].append((data, truth))
+        candidates[split, source_label].append(session_pair(trace, rows, split))
 
     patterns, dev_subjects, dev_clients = set(), set(), set()
     selected = {split: [] for split in SPLITS}
@@ -238,6 +292,9 @@ def summarize(inputs, labels, contract):
         cohort[split] = {"sessions": len(rows), "events": events, "labels": dict(counts),
                          "families": len(families[split])}
 
+    if set(inputs) == {"development"}:
+        return cohort, {}
+
     overlap = {name: len(groups["development"] & groups["evaluation"])
                for name, groups in (("subjects", subjects), ("clients", clients),
                                     ("families", families))}
@@ -272,12 +329,105 @@ def verify(directory, contract):
     return manifest
 
 
+def enrich_sessions(source, sessions, scoring_labels, contract):
+    """Project allowlisted observations from the pinned records of selected sessions."""
+    if source.stat().st_size != contract["bytes"]:
+        raise ValueError("m7_source_size")
+    selected = {record.line for label in scoring_labels for record in label.records}
+    rows = {}
+    digest = hashlib.sha256()
+    with source.open("rb") as stream:
+        for line, raw in enumerate(stream, 1):
+            digest.update(raw)
+            if line in selected:
+                rows[line] = raw
+    if digest.hexdigest() != contract["sha256"]:
+        raise ValueError("m7_source_digest")
+    if rows.keys() != selected:
+        raise ValueError("m7_development_source_record_missing")
+
+    labels = {label.session_id: label for label in scoring_labels}
+    enriched = []
+    for session in sessions:
+        label = labels[session.session_id]
+        previous = None
+        events = []
+        for event, record in zip(session.events, label.records, strict=True):
+            raw = rows[record.line]
+            if sha(raw.rstrip(b"\r\n")) != record.sha256:
+                raise ValueError("m7_development_source_record_digest")
+            row = json.loads(raw)
+            if (session_id_for(row["trace_id"]) != session.session_id
+                    or row["timestamp"] != record.timestamp
+                    or Event(evidence_id=record.evidence_id,
+                             **{field: row[field] for field in FEATURES}) != event):
+                raise ValueError("m7_development_source_record_mismatch")
+            if (row["label"], row["category"], row["subcategory"]) != (
+                label.source_label, label.category, label.subcategory,
+            ):
+                raise ValueError("m7_development_source_label_mismatch")
+            event_type = row.get("event_type")
+            if not isinstance(event_type, str):
+                event_type = ""
+            reason = FAILURE_REASONS.get(event_type)
+            payload = row.get("payload")
+            if (event_type == "rp_unregistration_failed" and isinstance(payload, dict)
+                    and payload.get("error") == "protected_client"):
+                reason = "protected_client"
+            current = timestamp(row["timestamp"])
+            events.append(EnrichedEvent(
+                **event.model_dump(),
+                auth_stage=AUTH_STAGES.get(event_type, "unknown"),
+                failure_reason=reason,
+                since_previous_ms=(None if previous is None else
+                                   (current - previous) // timedelta(milliseconds=1)),
+            ))
+            previous = current
+        enriched.append(EnrichedSession(session_id=session.session_id, events=events))
+    return enriched
+
+
+def load_development(directory, *, source=None):
+    """Verify the development input and its labels without opening evaluation observations."""
+    contract = json.loads(SOURCE.read_bytes())
+    manifest_data = (directory / "manifest.json").read_bytes()
+    manifest = json.loads(manifest_data)
+    observations = (directory / "development.jsonl").read_bytes()
+    label_data = (directory / "labels.jsonl").read_bytes()
+    file_hashes = {"development.jsonl": sha(observations), "labels.jsonl": sha(label_data)}
+    if (manifest["schema"] != "m7-auth-pilot-1" or manifest["source_sha256"] != contract["sha256"]
+            or manifest["source_contract_sha256"] != sha(canonical(contract))
+            or any(manifest["files"][name] != value for name, value in file_hashes.items())):
+        raise ValueError("m7_manifest_mismatch")
+
+    sessions = read_rows(observations, Session)
+    labels = read_rows(label_data, Label)
+    if len({row.session_id for row in labels}) != len(labels):
+        raise ValueError("m7_label_session_mismatch")
+    development_labels = [row for row in labels if row.split == "development"]
+    cohort, _ = summarize({"development": sessions}, development_labels, contract)
+    if cohort["development"] != manifest["cohort"]["development"]:
+        raise ValueError("m7_manifest_mismatch")
+    fingerprints = {
+        "dataset_sha256": file_hashes["development.jsonl"],
+        "labels_sha256": file_hashes["labels.jsonl"],
+        "split_manifest_sha256": sha(manifest_data),
+    }
+    if source is not None:
+        sessions = enrich_sessions(source, sessions, development_labels, contract)
+        fingerprints.update(
+            base_dataset_sha256=file_hashes["development.jsonl"],
+            dataset_sha256=sha(jsonl(sessions)),
+            source_sha256=contract["sha256"],
+        )
+    return sessions, {row.session_id: row.expected_label for row in development_labels}, fingerprints
+
+
 def jsonl(rows):
     return b"".join(canonical(row.model_dump(mode="json")) + b"\n" for row in rows)
 
 
-def build(source, contract):
-    selected = select_sessions(read_source(source, contract), contract["pilot"])
+def pilot_bundle(selected, contract):
     files = {}
     labels = []
     for split, rows in selected.items():
@@ -288,6 +438,10 @@ def build(source, contract):
     manifest = describe(files, contract)
     files["manifest.json"] = (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode()
     return files, manifest
+
+
+def build(source, contract):
+    return pilot_bundle(select_sessions(read_source(source, contract), contract["pilot"]), contract)
 
 
 def prepare(source, output, contract):

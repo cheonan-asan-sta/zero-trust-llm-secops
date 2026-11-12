@@ -56,6 +56,11 @@ jobs:
             verification: Verify application recovery and token fencing over mTLS
             report: Report mTLS application recovery verification
             command: python -m scripts.test_recoverable_mtls_runtime --directory runtime/c02/application-mtls-recovery-ci
+          - kind: response-mtls
+            directory: runtime/c02/response-mtls-ci
+            verification: Verify isolated response approvals and full mTLS restore
+            report: Report response approval and restoration verification
+            command: python -m scripts.test_response_mtls_runtime --directory runtime/c02/response-mtls-ci
           - kind: monitored
             directory: runtime/c02/collector-maintenance-ci
             verification: Verify collector maintenance over mTLS

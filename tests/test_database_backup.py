@@ -9,6 +9,7 @@ from scripts import database_backup_runtime as runtime
 from scripts import database_backup_store as store
 from scripts.ca_recovery_state import save
 from scripts.certificate_controller import LifecycleError
+from tests.reviewer_credentials import assert_reviewer_isolation
 
 
 @pytest.fixture
@@ -134,7 +135,8 @@ def test_dump_requires_bounded_custom_archive(body, monkeypatch):
 
 def test_online_graph_never_mounts_backup_or_key():
     spec = runtime.definition('kmtls-' + 'a' * 12, 'app', 'nginx')
-    assert len(spec['volumes']) == 39 and len(spec['services']) == 18
+    assert_reviewer_isolation(spec)
+    assert len(spec['volumes']) == 43 and len(spec['services']) == 18
     for service in spec['services'].values():
         assert not any(m.split(':')[0] in runtime.VOLUMES for m in service['volumes'])
 

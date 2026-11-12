@@ -1,4 +1,4 @@
-"""Run the M6 development pilot with frozen rules and offline model simulations."""
+"""Run M6 simulations or prepare a paired live comparison on local M7 sessions."""
 
 import argparse
 import asyncio
@@ -19,12 +19,23 @@ from pydantic import Field
 
 from app.models import StrictModel
 from app.services.detection_benchmark import DetectionBenchmark, confusion, metrics
+from scripts.prepare_m7 import FILES as M7_PILOT_FILES
+from scripts.prepare_m7 import load_development
 
 CONTRACT = Path(__file__).resolve().parents[1] / "infra/model-evaluation-contract.json"
 BASELINE = "rule-frozen-v0.17.0"
 MOCK_MODELS = ("gpt-6.1-sol", "claude-sonnet-5-5")
 LABELS = ("normal", "threat", "unknown")
 QUESTION = "Classify the observed event as normal, threat, or unknown using the supplied evidence."
+M7_QUESTION = (
+    "Classify the observed authentication session as normal, threat, or unknown "
+    "using the supplied events in order."
+)
+M7_ENRICHED_QUESTION = (
+    M7_QUESTION + " Use auth_stage and any recorded failure_reason as operational evidence. "
+    "since_previous_ms is the interval between records, and duration_ms is request duration. "
+    "A null value means that a field is unknown or does not apply."
+)
 MAX_RESPONSE_BYTES = 65_536
 
 Label = Literal["normal", "threat", "unknown"]
@@ -258,9 +269,7 @@ def worst_case_price(candidate, limits):
             + output_price * limits.max_billed_output_tokens) / 1_000_000
 
 
-async def run_pilot(benchmark, contract, *, dispatch=mock_reply, max_requests=None,
-                    clock=time.monotonic, source_commit=None):
-    """Evaluate only with an offline mock dispatch function."""
+def mock_budget(contract, max_requests, clock):
     safety = contract["safety"]
     disabled = ("allow_external_tools", "allow_policy_write", "allow_permission_grant_or_restore",
                 "allow_real_identity_data", "change_detection_baseline")
@@ -269,34 +278,87 @@ async def run_pilot(benchmark, contract, *, dispatch=mock_reply, max_requests=No
         raise ValueError("unsupported_m6_contract")
     if tuple(contract["tasks"]["classification"]["labels"]) != LABELS:
         raise ValueError("unsupported_m6_labels")
-    limits = Limits.model_validate(contract["budget_proposal"])
-    budget = Budget(limits, max_requests, clock)
+    return Budget(Limits.model_validate(contract["budget_proposal"]), max_requests, clock)
+
+
+async def run_pilot(benchmark, contract, *, dispatch=mock_reply, max_requests=None,
+                    clock=time.monotonic, source_commit=None):
+    """Evaluate the original benchmark with the frozen rule baseline and model mocks."""
+    budget = mock_budget(contract, max_requests, clock)
     inputs = select_cases(benchmark, contract["pilot"])
     cases = [evidence for _, _, _, evidence in inputs]
-    candidates = {candidate["id"]: candidate for candidate in contract["candidates"]}
-    prices = {model: worst_case_price(candidates[model], limits) for model in MOCK_MODELS}
-    models = {}
     baseline = []
     for case, _, _, evidence in inputs:
         detected = benchmark.engine.evaluate(benchmark.normalizer.normalize(case.event)).matches
         baseline.append(result(evidence["case_id"], evidence["input_sha256"], status="ok",
                                label="threat" if detected else "normal", output_schema_valid=True))
-    models[BASELINE] = {"mode": "frozen_rule", "results": baseline,
-                        "summary": summarize(baseline, cases)}
+    models = {BASELINE: {"mode": "frozen_rule", "results": baseline,
+                         "summary": summarize(baseline, cases)}}
+    dataset = {
+        "schema": "m6-development-pilot-1",
+        "dataset_sha256": benchmark.manifest["cases_sha256"],
+        "split_manifest_sha256": benchmark.manifest_digest,
+    }
+    return await mock_report(
+        [entry[1:] for entry in inputs], cases, contract, budget, dispatch, models,
+        question=QUESTION, dataset=dataset, source_commit=source_commit,
+    )
 
+
+def m7_request(session, question):
+    return {
+        "case_id": session.session_id,
+        "events": [event.model_dump(mode="json") for event in session.events],
+        "evidence_ids": [event.evidence_id for event in session.events],
+        "question": question,
+        "labels": LABELS,
+    }
+
+
+async def run_m7_development(pilot_directory, contract, *, source=None, dispatch=mock_reply,
+                             max_requests=None, clock=time.monotonic, source_commit=None):
+    """Evaluate ordered M7 development observations with offline model mocks."""
+    budget = mock_budget(contract, max_requests, clock)
+    sessions, labels, fingerprints = load_development(pilot_directory, source=source)
+    question = M7_QUESTION if source is None else M7_ENRICHED_QUESTION
+    schema = ("m6-m7-development-pilot-1" if source is None else
+              "m6-m7-enriched-development-pilot-1")
+    inputs = []
+    cases = []
+    for session in sessions:
+        request = m7_request(session, question)
+        payload = canonical(request)
+        case = {
+            "case_id": session.session_id,
+            "input_sha256": digest(payload),
+            "event_count": len(session.events),
+            "expected_label": labels[session.session_id],
+        }
+        cases.append(case)
+        inputs.append((request, payload, case))
+    return await mock_report(
+        inputs, cases, contract, budget, dispatch, {},
+        question=question, dataset={"schema": schema, **fingerprints},
+        source_commit=source_commit,
+    )
+
+
+async def mock_report(inputs, cases, contract, budget, dispatch, models, *,
+                      question, dataset, source_commit):
+    limits = budget.limits
+    candidates = {candidate["id"]: candidate for candidate in contract["candidates"]}
+    prices = {model: worst_case_price(candidates[model], limits) for model in MOCK_MODELS}
     for model in MOCK_MODELS:
         rows = []
-        for _, request, payload, evidence in inputs:
+        for request, payload, evidence in inputs:
             rows.append(await evaluate_mock(model, request, payload, evidence["input_sha256"],
                                             prices[model], budget, dispatch))
         models[model] = {"mode": "mock", "results": rows, "summary": summarize(rows, cases)}
 
     return {
-        "schema": "m6-development-pilot-1", "mode": "offline_mock_pilot",
+        **dataset, "mode": "offline_mock_pilot",
         "run_id": uuid.uuid4().hex, "source_commit": source_commit, "split": "development",
-        "dataset_sha256": benchmark.manifest["cases_sha256"],
-        "split_manifest_sha256": benchmark.manifest_digest,
-        "prompt_contract_sha256": digest(canonical({"question": QUESTION, "tasks": contract["tasks"]})),
+        "prompt_contract_sha256": digest(canonical({"question": question, "tasks": contract["tasks"]})),
         "contract_sha256": digest(canonical(contract)), "cases": cases, "models": models,
         "budget": {"requests_used": budget.requests_used, "request_limit": budget.max_requests,
                    "simulated_reserved_usd": str(budget.reserved),
@@ -331,18 +393,103 @@ def source_commit():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=Path("runtime/m6/pilot.json"))
-    parser.add_argument("--max-requests", type=int, help="Lower the aggregate mock request limit")
+    parser.add_argument("--output", type=Path, help="Report path (default depends on the input)")
+    parser.add_argument("--m7-development", type=Path, metavar="DIRECTORY",
+                        help="Use the prepared M7 development sessions in this pilot directory")
+    parser.add_argument("--m7-source", type=Path, metavar="FILE",
+                        help="Enrich M7 development observations using the pinned publisher file")
+    parser.add_argument("--max-requests", type=int, help="Aggregate mock or live generation limit")
+    parser.add_argument("--m7-local", type=Path, metavar="DIRECTORY",
+                        help="Verify the local 200-session M7 bundle and prepare a paired comparison")
+    parser.add_argument("--m7-public", type=Path, metavar="DIRECTORY",
+                        help="Verify the public 12-session evidence bundle and compare three models")
+    parser.add_argument("--m7-paired", type=Path, metavar="DIRECTORY",
+                        help="Compare three models on the paired 200-session M7 bundle")
+    parser.add_argument("--output-dir", type=Path, help="New directory for the M7 run")
+    parser.add_argument("--live", action="store_true", help="Enable provider API requests")
+    parser.add_argument("--live-max-usd", help="Approved generation budget in USD")
+    parser.add_argument("--wall-seconds", type=int, help="Live run deadline (default: 3600)")
     args = parser.parse_args()
+    if args.m7_paired is not None:
+        if any(option is not None for option in (
+            args.m7_public, args.m7_local, args.m7_development, args.m7_source, args.output,
+        )):
+            parser.error("--m7-paired is separate from the other evaluation modes")
+        if args.output_dir is None:
+            parser.error("--m7-paired requires --output-dir")
+        if args.live and (args.max_requests != 600 or args.live_max_usd is None):
+            parser.error("paired live mode requires --max-requests 600 and --live-max-usd")
+        if not args.live and (args.live_max_usd is not None or args.wall_seconds is not None):
+            parser.error("paired cost and time limits require --live")
+        from scripts.evaluate_m6_paired import run_cli
+
+        try:
+            return run_cli(args)
+        except (OSError, ValueError, KeyError, TypeError):
+            parser.exit(1, "m6 paired evaluation unavailable: check bundle, output, and limits\n")
+    if args.m7_public is not None:
+        if args.m7_local is not None or args.m7_development is not None or args.output is not None:
+            parser.error("--m7-public is separate from the local and development comparisons")
+        if args.m7_source is None or args.output_dir is None:
+            parser.error("--m7-public requires --m7-source and --output-dir")
+        if args.live and (args.live_max_usd is None or args.max_requests is None):
+            parser.error("--live requires --max-requests and --live-max-usd")
+        if not args.live and any(option is not None for option in (
+            args.live_max_usd, args.max_requests, args.wall_seconds,
+        )):
+            parser.error("public M7 request, cost, and time limits require --live")
+        from scripts.evaluate_m6_public import run_cli
+
+        try:
+            return run_cli(args)
+        except (OSError, ValueError, KeyError, TypeError):
+            parser.exit(1, "m6 public evaluation unavailable: check bundle, credentials, and limits\n")
+    if args.m7_local is not None:
+        if args.m7_development is not None or args.m7_source is not None or args.output is not None:
+            parser.error("--m7-local is separate from the offline pilot options")
+        if args.output_dir is None:
+            parser.error("--m7-local requires --output-dir")
+        if args.live and (args.live_max_usd is None or args.max_requests is None):
+            parser.error("--live requires --max-requests and --live-max-usd")
+        if not args.live and any(option is not None for option in (
+            args.live_max_usd, args.max_requests, args.wall_seconds,
+        )):
+            parser.error("local M7 request, cost, and time limits require --live")
+        from scripts.evaluate_m6_live import run_cli
+
+        try:
+            return run_cli(args)
+        except (OSError, ValueError, KeyError, TypeError):
+            parser.exit(1, "m6 local evaluation unavailable: check bundle, credentials, and limits\n")
+    if args.live or any(option is not None for option in (
+        args.output_dir, args.live_max_usd, args.wall_seconds,
+    )):
+        parser.error("live comparison options require --m7-local or --m7-public")
+    if args.m7_source is not None and args.m7_development is None:
+        parser.error("--m7-source requires --m7-development or --m7-public")
     try:
         contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
-        report = asyncio.run(run_pilot(DetectionBenchmark(), contract, max_requests=args.max_requests,
-                                       source_commit=source_commit()))
-        write_report(args.output, report)
+        options = {"max_requests": args.max_requests, "source_commit": source_commit()}
+        if args.m7_development is None:
+            output = args.output or Path("runtime/m6/pilot.json")
+            report = asyncio.run(run_pilot(DetectionBenchmark(), contract, **options))
+        else:
+            default_name = ("m7-development.json" if args.m7_source is None else
+                            "m7-enriched-development.json")
+            output = args.output or Path("runtime/m6") / default_name
+            protected = {args.m7_development / name for name in (*M7_PILOT_FILES, "manifest.json")}
+            if args.m7_source is not None:
+                protected.add(args.m7_source)
+            if output.resolve() in {path.resolve() for path in protected}:
+                raise ValueError("m7_report_would_replace_pilot_file")
+            report = asyncio.run(run_m7_development(
+                args.m7_development, contract, source=args.m7_source, **options,
+            ))
+        write_report(output, report)
     except (OSError, ValueError, KeyError, TypeError):
         parser.exit(1, "m6 pilot unavailable\n")
     print(json.dumps({"mode": report["mode"], "cases": len(report["cases"]),
-                      "requests_used": report["budget"]["requests_used"], "report": str(args.output)}))
+                      "requests_used": report["budget"]["requests_used"], "report": str(output)}))
     return 0
 
 

@@ -123,7 +123,7 @@ observation={'kind':'identity','subject_id':'runtime-other','active':True,'authe
 s.signature=base64.urlsafe_b64encode(k.sign(canonical_observation(s))).decode().rstrip('=')
 print(s.model_dump_json())
 """
-        return json.loads(self.runtime.execute("collector", ["python", "-c", program], json.dumps({"event": event_id})))
+        return json.loads(self.collector_job(["-c", program], json.dumps({"event": event_id})))
 
     def submit(self, event_id):
         payload = self.signed_observation(event_id)

@@ -19,7 +19,7 @@ def test_independent_jobs_preserve_every_prior_acceptance_and_new_combined_graph
     assert set(value['jobs']) == {'unit', 'docker', 'runtime', 'lambda', 'test'}
     rows = value['jobs']['runtime']['strategy']['matrix']['include']
     assert {r['kind'] for r in rows} == {
-        'application', 'application-mtls', 'monitored', 'authority', 'rekey', 'authority-ha',
+        'application', 'application-mtls', 'response-mtls', 'monitored', 'authority', 'rekey', 'authority-ha',
         'database-transport', 'database-backup', 'database-recovery', 'selection',
     }
     assert len({r['directory'] for r in rows}) == len(rows) == len({r['report'] for r in rows})

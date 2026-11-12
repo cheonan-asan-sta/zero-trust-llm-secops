@@ -346,7 +346,7 @@ payload=s.model_dump(mode='json')
 payload['signature']=base64.urlsafe_b64encode(key.sign(canonical_observation(s))).decode().rstrip('=')
 print(json.dumps(payload))
 """
-        payload = json.loads(self.runtime.execute("collector", ["python", "-c", program]))
+        payload = json.loads(self.collector_job(["-c", program]))
         accepted = self.runtime.probe({"profile": "core", "path": "/zero-trust/signals/inbox",
                                        "method": "POST", "body": payload})
         self.require(accepted["status"] == 202, "security_tail_observation_not_accepted")
@@ -398,7 +398,9 @@ print(json.dumps(payload))
         final = self.history(expiring[0])
         self.require(final[:-1] == held and final[-1]["version"] == 202
                      and self.history(fresh[0])[-1]["version"] == 2, "version200_key_revoke_changed_history")
-        repeated = json.loads(self.runtime.execute("watchdog", ["python", "-m", "scripts.session_watchdog", "--once"]))
+        repeated = json.loads(self.runtime.compose(
+            "run", "--rm", "--no-deps", "-T", "--entrypoint", "python",
+            "watchdog", "-m", "scripts.session_watchdog", "--once"))
         self.require(repeated["watchdog"] == "revalidated" and self.history(expiring[0]) == final
                      and self.history(fresh[0])[-1]["version"] == 2,
                      "security_tail_watchdog_repeated_effect")
@@ -457,7 +459,7 @@ old['observation'].update(active=True,authentication_result='success')
 items['conflict']=sign(old)
 print(json.dumps(items))
 """.replace("SUBJECT", repr(OTHER))
-        signed = json.loads(self.runtime.execute("collector", ["python", "-c", program], json.dumps(original)))
+        signed = json.loads(self.collector_job(["-c", program], json.dumps(original)))
         worker_id = self.runtime.container("worker")
         command(["docker", "stop", "--time", "2", worker_id])
         for label in ("processing", "pending"):
@@ -524,8 +526,14 @@ print(json.dumps({'event_id':r['event_id'],'state':r['state']}))
         self.require(result["tls_version"] in {"TLSv1.2", "TLSv1.3"}, label + "_tls")
         self.add(label, status=result["status"], resource_deliveries=int(allowed), tls_version=result["tls_version"])
 
+    def collector_job(self, argv, payload=None):
+        # Python diagnostics and input producers have their own resource budget;
+        # never charge their imports to the continuously running sender.
+        return self.runtime.compose("run", "--rm", "--no-deps", "-T", "--entrypoint", "python",
+                                    "collector", *argv, payload=payload)
+
     def collector(self):
-        return json.loads(self.runtime.execute("collector", ["python", "-m", "scripts.continuous_signal_collector",
+        return json.loads(self.collector_job(["-m", "scripts.continuous_signal_collector",
             "status", "--directory", "/collector/producer", "--base-url", "https://gateway:8443",
             "--tls-profile", "/tls/profile.json"]))
 
@@ -559,8 +567,12 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
         wire = json.dumps(payload)
 
         def accepted():
-            result = json.loads(self.runtime.execute("collector",
-                ["python", "-m", "scripts.continuous_mtls_assets", "append"], wire))
+            # The input writer is a separate producer. Running its Python
+            # interpreter inside the live collector shares that collector's
+            # memory limit and can kill the sender during a test append.
+            result = json.loads(self.collector_job(
+                ["-m", "scripts.continuous_mtls_assets", "append"], wire,
+            ))
             return isinstance(result, dict) and result.get("appended") is True
 
         self.wait(accepted, "managed_input_append_not_confirmed")

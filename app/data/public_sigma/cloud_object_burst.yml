@@ -1,0 +1,34 @@
+title: Cloud Object API Burst
+id: 87588a99-4be9-4c37-97a7-c7d1feb57ffd
+status: test
+description: Same actor completes at least 100 identical object API operations over
+  at least 20 observed target tuples within 60 seconds. This is an investigation candidate
+  without verified attack context.
+author: Cheonan-Asan Team
+date: '2026-11-09'
+taxonomy: ocsf
+logsource:
+  category: application
+  product: cloudtrail
+detection:
+  selection:
+    unmapped.public.source: cloudtrail
+    unmapped.public.cloud_object_burst: true
+  condition: selection
+falsepositives:
+- Approved data migrations, backups, or object lifecycle cleanup.
+level: medium
+x_secops:
+  lifecycle: approved
+  version: 1.1.0
+  approved_by: reference-rule-test-harness
+  approved_on: '2026-11-09'
+  test_case_ids:
+  - PUBLIC-AWS-02
+  authority: reference_only
+  approval_scope: Offline detector execution acceptance only; grants no enforcement
+    authority.
+  public_detection:
+    feature: cloud_object_burst
+    disposition: investigate
+modified: '2026-11-10'

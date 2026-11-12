@@ -213,6 +213,8 @@ def test_signed_import_restarts_worker_and_scopes_real_http_access(tmp_path, for
     grants = [_session(operations, "related"), _session(operations, "unrelated", user="different-user"),
               _session(operations, "different-resource", resource=OTHER_RESOURCE)]
     assert other.grant_token and all(grant.grant_token for grant in grants)
+    unaffected = {grant.session.session_id: operations.history(grant.session.session_id, PRINCIPAL)
+                  for grant in grants[1:]}
     now = datetime.now(UTC)
     event = finding(now - timedelta(seconds=70))
     record = normalize(forwarder, event, now)
@@ -279,7 +281,15 @@ worker.process_one()
         assert receipt["state"] == "completed" and receipt["attempts"] == 2
         assert receipt["result"]["duplicate"] is True and receipt["result"]["changed_sessions"] == 0
 
-        for grant, expected in zip(grants, (403, 200, 200), strict=True):
+        assert all(operations.history(identifier, PRINCIPAL) == history
+                   for identifier, history in unaffected.items())
+        # Cold CLI processes under emulation can outlive the60s grant. Keep the
+        # original controls' histories intact and obtain current authorization
+        # for the same unaffected scopes before asserting successful delivery.
+        access_grants = [grants[0],
+                         _session(operations, "current-unrelated", user="different-user"),
+                         _session(operations, "current-other-resource", resource=OTHER_RESOURCE)]
+        for grant, expected in zip(access_grants, (403, 200, 200), strict=True):
             decision = grant.session
             status, response = _http(port, "/zero-trust/protected-access", {
                 "session_id": decision.session_id, "resource_id": decision.resource_id,

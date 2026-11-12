@@ -25,7 +25,7 @@ class AcceptanceTransport(AcceptanceRuntime, TransportRuntime):
 
 
 class Checks(ParentChecks):
-    expected_volumes = 37
+    expected_volumes = 41
 
     def __init__(self, directory, *, runtime_class=AcceptanceTransport):
         super().__init__(directory, runtime_class=runtime_class)

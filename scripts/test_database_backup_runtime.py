@@ -32,7 +32,7 @@ class AcceptanceBackup(AcceptanceRuntime, BackupRuntime):
 
 
 class Checks(ParentChecks):
-    expected_volumes = 39
+    expected_volumes = 43
     backup_resume_timeout = 300
     backup_interrupt_timeout = 240
 

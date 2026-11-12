@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SERVICES = ("app", "gateway", "bridge", "resource", "proxy", "collector", "worker", "watchdog", "operator")
 VOLUMES = ("data", "registry", "core-tls", "gateway-tls", "bridge-tls", "resource-tls", "proxy-tls",
            "collector-tls", "operator-tls", "core-auth", "collector-auth", "operator-auth", "secret",
-           "config", "collector-state")
+           "config", "collector-state", "reviewer-a-tls", "reviewer-a-auth", "reviewer-b-tls", "reviewer-b-auth")
 PROJECT = re.compile(r"kmtls-[a-f0-9]{12}")
 
 
@@ -174,9 +174,10 @@ class Runtime:
         self.manifest.write_text(yaml.safe_dump(spec))
         self.empty_env.write_text("")
 
-    def compose(self, *args, timeout=120):
+    def compose(self, *args, timeout=120, payload=None):
         return command(["docker", "compose", "--env-file", str(self.empty_env), "--project-name", self.state["project"],
-                        "--project-directory", str(ROOT), "--file", str(self.manifest), *args], timeout=timeout)
+                        "--project-directory", str(ROOT), "--file", str(self.manifest), *args],
+                       timeout=timeout, payload=payload)
 
     def write_volume(self, label, files):
         program = """import json,os,sys
@@ -312,6 +313,26 @@ print(json.dumps({p:hashlib.sha256(Path(p).read_bytes().replace(b'\\r\\n',b'\\n'
     def mint(self, request):
         return json.loads(self.execute("operator", ["python", "-m", "scripts.continuous_mtls_assets", "mint"],
                                        json.dumps(request)))
+
+    def reviewer_probe(self, reviewer, request):
+        if reviewer not in {'a', 'b'}:
+            raise ValueError('runtime_reviewer_scope')
+        self.verify_release()
+        # No long-lived service, collector or ordinary operator receives these
+        # credentials. Each one-off client mounts one reviewer's key and cert.
+        network = self.state['project'] + '_core'
+        detail = json.loads(command(['docker', 'network', 'inspect', network]))[0]
+        if detail.get('Labels', {}).get('secops.runtime') != self.state['project']:
+            raise RuntimeFailure('runtime_reviewer_network_scope')
+        argv = ['docker', 'run', '--rm', '--network', network,
+                '--read-only', '--user', '10001:10001', '--cap-drop=ALL',
+                '--security-opt=no-new-privileges:true', '--pids-limit', '128',
+                '--memory', '192m', '--cpus', '.5', '--tmpfs', '/data:uid=10001,gid=10001,mode=0700',
+                '--mount', f"type=volume,src={self.state['volumes']['reviewer-' + reviewer + '-tls']},dst=/tls,readonly",
+                '--mount', f"type=volume,src={self.state['volumes']['reviewer-' + reviewer + '-auth']},dst=/auth,readonly",
+                '--entrypoint', 'python', '-i', self.state['image_id'],
+                '-m', 'scripts.continuous_mtls_assets', 'probe']
+        return json.loads(command(argv, payload=json.dumps(request)))
 
     @staticmethod
     def wait(predicate, timeout=90):

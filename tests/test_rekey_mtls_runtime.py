@@ -11,6 +11,7 @@ from scripts.certificate_key_rotation import public_hash
 from scripts.rekey_mtls_runtime import definition
 from scripts.rekey_runtime_control import allowed_pairs, configuration_matches
 from scripts.test_rekey_mtls_runtime import RekeyChecks, arm_test_round
+from tests.reviewer_credentials import assert_reviewer_isolation
 
 
 @pytest.mark.parametrize('increment', [1, 2])
@@ -164,7 +165,8 @@ def test_bridge_probe_and_profiles_preserve_role_and_same_volume_assets(private)
 
 def test_native_services_watch_dynamic_config_and_have_read_only_tls():
     spec = definition('kmtls-012345abcdef', 'app', 'nginx')
-    assert len(spec['services']) == 16 and len(spec['networks']) == 9 and len(spec['volumes']) == 31
+    assert_reviewer_isolation(spec)
+    assert len(spec['services']) == 16 and len(spec['networks']) == 9 and len(spec['volumes']) == 35
     assert spec['services']['proxy']['entrypoint'][-1] == '/config/nginx-rekey.sh'
     for name in ('prometheus', 'alertmanager'):
         service = spec['services'][name]

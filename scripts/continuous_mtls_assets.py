@@ -45,7 +45,8 @@ def assets(*, monitoring=False, issuer=None, trust_bundle=None) -> dict[str, dic
     ca_pem = trust_bundle or ca[1].public_bytes(serialization.Encoding.PEM).decode()
     servers = ("core-a", "gateway", "bridge-auth", "bridge-consume", "resource", "proxy")
     clients = ("core-operator", "gateway-client", "pep-bridge", "collector", "proxy-auth",
-               "bridge-probe", "resource-consumer", "proxy-resource", "resource-auditor", "frontend")
+               "bridge-probe", "resource-consumer", "proxy-resource", "resource-auditor", "frontend",
+               "response-reviewer-a", "response-reviewer-b")
     if monitoring:
         from scripts.monitoring_runtime_assets import CLIENTS, SERVERS
         servers += SERVERS
@@ -73,6 +74,7 @@ def assets(*, monitoring=False, issuer=None, trust_bundle=None) -> dict[str, dic
         })}
 
     api_key = secrets.token_urlsafe(32)
+    reviewer_keys = {name: secrets.token_urlsafe(32) for name in ('a', 'b')}
     signing_key = Ed25519PrivateKey.generate()
     now = datetime.now(UTC)
     registry = {"sources": [{
@@ -88,6 +90,7 @@ def assets(*, monitoring=False, issuer=None, trust_bundle=None) -> dict[str, dic
         "registry": {"sources.json": json.dumps(registry)},
         "core-tls": server("server.json", "core-a", {
             "gateway-client": "api-gateway", "core-operator": "core-operator",
+            "response-reviewer-a": "response-reviewer", "response-reviewer-b": "response-reviewer",
         }),
         "gateway-tls": server("profile.json", "gateway", {
             "collector": "collector", "pep-bridge": "pep-bridge",
@@ -108,7 +111,12 @@ def assets(*, monitoring=False, issuer=None, trust_bundle=None) -> dict[str, dic
         "operator-tls": client("core.json", "core-operator", "core-a", "core", 8000)
         | client("frontend.json", "frontend", "proxy", "proxy", 8080)
         | client("resource.json", "resource-auditor", "resource", "resource", 8083),
-        "core-auth": {"api-key.sha256": hashlib.sha256(api_key.encode()).hexdigest()},
+        "core-auth": {"api-key.sha256": hashlib.sha256(api_key.encode()).hexdigest(),
+                      "accounts.json": json.dumps({"schema": "api-key-accounts-1", "accounts": [
+                          {"sha256": hashlib.sha256(key.encode()).hexdigest(),
+                           "subject": "runtime-reviewer-" + name, "tenant_id": TENANT,
+                           "roles": ["responder"], "enabled": True}
+                          for name, key in reviewer_keys.items()]})},
         "collector-auth": {"api-key.txt": api_key},
         "operator-auth": {"api-key.txt": api_key, "session-private.pem": signing_key.private_bytes(
             serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8,
@@ -117,6 +125,10 @@ def assets(*, monitoring=False, issuer=None, trust_bundle=None) -> dict[str, dic
         "secret": {"secret": secrets.token_urlsafe(32)},
         "config": {"all-hops.conf": (ROOT / "infra/mtls/all-hops-nginx.conf").read_text("utf-8")},
     }
+    for name, key in reviewer_keys.items():
+        material['reviewer-' + name + '-tls'] = client('core.json', 'response-reviewer-' + name,
+                                                      'core-a', 'core', 8000)
+        material['reviewer-' + name + '-auth'] = {'api-key.txt': key}
     if monitoring:
         from scripts.monitoring_runtime_assets import assets as monitor_assets
         material.update(monitor_assets(server, client, credentials))
@@ -140,7 +152,7 @@ def service(role, *, before_exec=None):
     if role == "app":
         os.environ.update(AUTH_MODE="api_key", API_KEY_SHA256=_credential("api-key.sha256", digest=True),
                           API_KEY_SUBJECT=OPERATOR, API_KEY_TENANT_ID=TENANT,
-                          API_KEY_ROLES="responder")
+                          API_KEY_ROLES="responder", API_KEY_ACCOUNTS_PATH=str(AUTH / 'accounts.json'))
         command = ["-m", "scripts.mtls_native", "api", "--profile", str(TLS / "server.json")]
     elif role == "collector":
         os.environ["AUTH_MODE"] = "disabled"

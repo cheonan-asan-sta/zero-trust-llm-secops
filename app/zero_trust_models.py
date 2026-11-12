@@ -3,11 +3,11 @@ from typing import Literal
 
 from pydantic import Field, field_validator, model_serializer, model_validator
 
-from app.continuous_signal_models import ObservationKind, ResourceIdentifier
+from app.behavior_context_models import BehaviorScope
+from app.continuous_signal_models import MAX_SECURITY_VERSION, ObservationKind, ResourceIdentifier
 from app.models import EventAction, SecurityEvent, StrictModel
 
 MAX_EVALUATION_VERSION = 200
-MAX_SECURITY_VERSION = 204
 
 
 class ResourcePolicy(StrictModel):
@@ -142,6 +142,9 @@ class TrustedSignalSource(StrictModel):
     observation_kinds: list[ObservationKind] = Field(default_factory=list, max_length=2)
     keys: list[SignalKey] = Field(min_length=1, max_length=10)
     guardduty_resource_ids: list[ResourceIdentifier] = Field(default_factory=list, max_length=100)
+    session_proof_resource_ids: list[ResourceIdentifier] = Field(default_factory=list, max_length=100)
+    behavior_scopes: list[BehaviorScope] = Field(default_factory=list, max_length=100)
+    execution_scopes: list[BehaviorScope] = Field(default_factory=list, max_length=100)
 
     @model_serializer(mode="wrap")
     def serialize_source(self, handler):
@@ -149,7 +152,41 @@ class TrustedSignalSource(StrictModel):
         # Existing session proofs bind the serialized source record.
         if not self.guardduty_resource_ids:
             value.pop("guardduty_resource_ids", None)
+        if not self.session_proof_resource_ids:
+            value.pop("session_proof_resource_ids", None)
+        if not self.behavior_scopes:
+            value.pop("behavior_scopes", None)
+        if not self.execution_scopes:
+            value.pop("execution_scopes", None)
         return value
+
+    @model_validator(mode="after")
+    def behavior_scope(self):
+        if self.behavior_scopes:
+            if (self.observation_kinds or self.guardduty_resource_ids
+                    or self.session_proof_resource_ids or self.execution_scopes):
+                raise ValueError("Behavior captures require a dedicated source")
+            scopes = [scope.model_dump_json() for scope in self.behavior_scopes]
+            if len(set(scopes)) != len(scopes):
+                raise ValueError("Behavior scopes must be distinct")
+            if any(scope.user_id not in self.user_ids or scope.device_id not in self.device_ids
+                   for scope in self.behavior_scopes):
+                raise ValueError("Behavior scope exceeds registered subjects")
+        return self
+
+    @model_validator(mode="after")
+    def execution_scope(self):
+        if self.execution_scopes:
+            if (self.behavior_scopes or self.observation_kinds or self.guardduty_resource_ids
+                    or self.session_proof_resource_ids):
+                raise ValueError("Execution evidence requires a dedicated source")
+            scopes = [scope.model_dump_json() for scope in self.execution_scopes]
+            if len(set(scopes)) != len(scopes):
+                raise ValueError("Execution scopes must be distinct")
+            if any(scope.user_id not in self.user_ids or scope.device_id not in self.device_ids
+                   for scope in self.execution_scopes):
+                raise ValueError("Execution scope exceeds registered subjects")
+        return self
 
     @model_validator(mode="after")
     def guardduty_scope(self):
@@ -157,6 +194,14 @@ class TrustedSignalSource(StrictModel):
             self.observation_kinds != ["guardduty"] or not self.guardduty_resource_ids
         ):
             raise ValueError("GuardDuty requires a dedicated source and resource scope")
+        return self
+
+    @model_validator(mode="after")
+    def session_proof_scope(self):
+        if ("session_proof" in self.observation_kinds or self.session_proof_resource_ids) and (
+            self.observation_kinds != ["session_proof"] or not self.session_proof_resource_ids
+        ):
+            raise ValueError("Session proof observations require a dedicated source and resource scope")
         return self
 
 
