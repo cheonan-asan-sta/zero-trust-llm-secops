@@ -38,7 +38,7 @@ class AcceptanceRuntime(PersistentAuthorityRuntime):
 
 
 class Checks(AuthorityChecks):
-    expected_volumes = 36
+    expected_volumes = 40
 
     def __init__(self, directory, *, runtime_class=AcceptanceRuntime):
         MonitoredChecks.__init__(self, directory, runtime_class=runtime_class)

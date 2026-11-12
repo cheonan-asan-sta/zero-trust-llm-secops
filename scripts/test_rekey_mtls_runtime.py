@@ -35,6 +35,7 @@ def arm_test_round(state, cfg, now):
 
 
 class RekeyChecks(AuthorityChecks):
+    expected_volumes = 35
     def __init__(self, directory):
         MonitoredChecks.__init__(self, directory, runtime_class=RekeyRuntime)
         self.report['schema'] = 'persistent-leaf-rekey-verification-1'
@@ -119,9 +120,9 @@ print(json.dumps({'fixture_round_armed':True}))
         self.require(len(before['credentials']) == 39, 'rekey_inventory_missing')
         spec = r.definition(r.state['project'], 'app', 'nginx')
         self.require(len(spec['services']) == 16 and len(spec['networks']) == 9
-                     and len(spec['volumes']) == 31 and all(n['internal'] for n in spec['networks'].values()),
+                     and len(spec['volumes']) == self.expected_volumes and all(n['internal'] for n in spec['networks'].values()),
                      'rekey_topology_changed')
-        self.add('same_sixteen_service_nine_internal_network_thirty_one_volume_graph')
+        self.add('same_sixteen_service_nine_internal_network_thirty_five_volume_graph')
         self.add('all_39_identities_enrolled_in_real_ca_before_rekey')
         for name in r.services:
             info = self.inspect(name)

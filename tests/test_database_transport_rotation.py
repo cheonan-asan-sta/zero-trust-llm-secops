@@ -232,7 +232,7 @@ def test_acceptance_runtime_reuses_bootstrap_capture_and_new_transport_graph():
     from scripts.test_persistent_authority_runtime import AcceptanceRuntime
     assert issubclass(AcceptanceTransport, runtime.TransportRuntime)
     assert AcceptanceTransport.helper is AcceptanceRuntime.helper
-    assert AcceptanceTransport.seed_last_at == 0 and Checks.expected_volumes == 37
+    assert AcceptanceTransport.seed_last_at == 0 and Checks.expected_volumes == 41
 
 
 @pytest.mark.parametrize('phase', ['prepared', 'stopped', 'installed', 'started', 'committing'])

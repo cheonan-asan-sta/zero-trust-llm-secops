@@ -25,7 +25,7 @@ class AcceptanceRecovery(AcceptanceRuntime, RecoveryRuntime):
 
 
 class Checks(BackupChecks):
-    expected_volumes = 41
+    expected_volumes = 45
     # Test driver only: extra checkpoint admission on each tick adds local Docker
     # overhead. Production backup/resume CLI still stops after its 300s budget.
     backup_resume_timeout = 600
