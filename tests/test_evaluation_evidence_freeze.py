@@ -1,7 +1,6 @@
 """Artifact freeze never turns old metrics into current or independent evaluation."""
 
 import json
-import subprocess
 
 import pytest
 
@@ -10,11 +9,11 @@ from tests import test_runtime_release
 
 
 @pytest.fixture
-def archive(tmp_path):
+def archive(tmp_path, monkeypatch):
     root = test_runtime_release.tree.__wrapped__(tmp_path)
-    subprocess.run(['git', 'init', '-q', str(root)], check=True)
-    subprocess.run(['git', '-C', str(root), '-c', 'user.name=Test', '-c', 'user.email=test@example.test',
-                    'commit', '--allow-empty', '-qm', 'Fixture'], check=True)
+    # Git is a host metadata dependency of the CLI, not part of the application
+    # image. Integrity checks below use actual artifact and source file bytes.
+    monkeypatch.setattr(module.subprocess, 'check_output', lambda *args, **kwargs: 'f' * 40 + '\n')
     directory = root / 'runtime/m6/old'
     directory.mkdir(parents=True)
     report = {'mode': 'live', 'models': {'model': {'summary': {
