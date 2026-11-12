@@ -3,6 +3,10 @@
 2026-11-12 · [v25 과거 이력 진단](extra-cloud-causal-context.md)의 후속이다.
 **새 분류 성능·독립 평가·목표 달성 기록이 아니다.** 원래 여섯 영역, 원본 앱과 정답, 최종 자료 격리를 유지한다.
 
+최신 [v29 실제 수집·probe 결과](extra-rba-acquisition-and-probe.md): 첫 수집의 시간 상한 종료 후 같은 고정 자산을
+검증하며 재개해 전체 ZIP MD5/SHA를 확인했다. 첫128개만 조사했고 이후 행/모델/독립 최종 평가는 미완료다.
+아래 v26~v28의 진행 중/미적용 표기는 각 당시 기록으로 보존한다.
+
 ## AWSService의 실제 원래 주체를 확인할 수 있나
 
 고정 CloudTrail 학습 원본20,711건을 [사전 감사 계약](../infra/f1-lab/cloud-identity-audit-protocol.json)에 따라 조사했다.
