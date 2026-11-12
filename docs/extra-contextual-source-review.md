@@ -52,5 +52,8 @@ README/LICENSE 지문을 보존했다. `infra/f1-lab/contextual-intake-protocol.
 `Suspicious`와 파생 위험/결정 플래그, 출처/호스트 이름·시간대 암기를 추론 특징으로 쓰지 않는다.
 
 이 자료의 도입·전체 영역 커버리지·독립 라벨 타당성·목표 달성은 모두 미판정이다.
+[v22 전수 연결 메타데이터 검사](extra-metadata-and-heads.md)에서347,768건의 명시 라벨/연결 가정을
+기계적으로 확인했다. 이후 본문을 사례별로 표시하거나 모델에 적합하지 않았다. 미확정65,978건과
+개발 probe 연결을 보존했으며 새 최종 분할은 인증하지 않았다.
 [v21 실제 검증 근거](infrastructure-results/extra-native-transfer-v21-20261112.json)와
 [다른 개발 시나리오 전이 결과](extra-native-transfer.md)에 이번 조사와 한계를 함께 기록했다.
