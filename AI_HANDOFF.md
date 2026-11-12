@@ -14,10 +14,17 @@ S 단일 후보는 TP46400/FP16/FN967/TN248593·P99.966/R97.958/F1 98.952/FPR0.0
 웹 접근 FP112→1·인증 TP2/12→9/12지만 VPN0/28·공유감사0/2·감사14/19는 남는다. S는 관찰된 개발 자료다.
 관측별 트리 전체 FP1544는 미채택이다. 원본 앱·정답 변경0이며 독립 전체 목표 달성은 아니다.
 모델 둘은 `runtime/f1/semantic-models-frozen-v34-20261112.json`에 동결했다. Fox는 원래 보정용 시나리오다.
-**다운로드 실행 중 세션11206**, `runtime/f1/public-ait-lds21-fox-20261112/progress.json`. 본문은 아직 읽지 않았다.
-새 네트워크 요청은08:03 UTC에 중단하는 deadline wrapper를 쓴다. 관측 timeout으로 재시작하지 않는다.
-완료되면 두 모델 동결/수집 완료를 확인한 뒤 `../tmp/extra_evaluate_frozen_fox_v34.py`를08:00 UTC 이전에 시작할 수 있다.
-이 helper는08:08 UTC부터 새 단계를 시작하지 않는다. 불완전 단계는 완료로 보고하지 않는다.
+**Fox 다운로드11206은 terminal exit0**이다. 688,586,900바이트·발행자MD5검증·SHA
+`8d71d31a31df469d836c80bdbfdc35da566e90322cf9ae490233e176a0c88d49`,2264.297초다. 다시 poll/재시작하지 않는다.
+보정 도구60958은 **ENOSPC terminal exit1**이다. 다시 poll/재시작하지 않는다.
+원시/정답8쌍668,418행(정상211,534/공격456,884)·기본 변환은 완료했으나 의미 입력 준비에서 디스크가 부족했다.
+추론 실행/보정 지표는 없다. 별도 검사는 HTTP412,904요청이 기존100,000상한도 넘는 것을 확인했다. 두 원인을 혼동하지 않는다.
+[v36 상태](docs/extra-fox-calibration-status.md)와 [한 시간 정리](docs/extra-one-hour-summary-20261112.md)를 먼저 읽는다.
+원시/라벨/실패 부분 파일을 남겼고 완료된 base/inputs.jsonl 캐시 하나는 SHA 대조 후 정리했다.
+기대 SHA/재생성 방법은 `runtime/f1/fox-calibration-v34-20261112/storage-recovery.json`에 있다. base receipt만 보고 캐시 완비로 오인하지 않는다.
+모델/기존 라벨은 그대로다. 저장 복구54022는 terminal exit0, 소유 실험/수집 작업은 종료했고 F1 컨테이너0이다.
+다음은 한 번의 관측 추출·제한된 외부 정렬·증분 HTTP 창, R/S 특징/예측 동일성 검증을 갖춘 스트리밍 준비기다.
+전체668,418행을 유지하며 일부만 잘라 목표를 통과시키지 않는다. 원래 여섯 영역의 최종 목표도 미완료다.
 성분 비교87457·인증 하위 성분38250은 terminal exit0이다. 다시 poll/재시작하지 않는다.
 `runtime/f1/semantic-component-ablation-v35-20261112`·`semantic-auth-ablation-v35b-20261112`에 있다.
 [v35 성분 결과](docs/extra-semantic-component-results.md): 모든 새 필드를 끄면 v23 root/혼동행렬 정확히 재현,
