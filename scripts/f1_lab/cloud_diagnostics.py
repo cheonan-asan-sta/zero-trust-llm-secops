@@ -27,6 +27,39 @@ def feature_key(features, profile):
     return hashlib.sha256(canonical(value)).hexdigest()
 
 
+def target_feasibility(groups):
+    """Gold-only exact attainable frontier, with an explicit computation bound."""
+    normal, attack = (sum(c[i] for c in groups) for i in (0, 1))
+    mixed = [c for c in groups if min(c) > 0]
+    if not normal or not attack:
+        return {'computed': False, 'reason': 'both_classes_required', 'all_targets_feasible': None}
+    if len(mixed)*attack > 5000000:
+        return {'computed': False, 'reason': 'frontier_computation_bound', 'all_targets_feasible': None}
+    # Pure-attack vectors can always be positive and pure-normal vectors
+    # negative without hurting any target. For every attainable TP retain the
+    # smallest FP; any other assignment at that TP is dominated.
+    states = {sum(a for n, a in groups if n == 0): 0}
+    for n, a in mixed:
+        updated = dict(states)
+        for tp, fp in states.items():
+            key = tp+a
+            updated[key] = min(updated.get(key, normal+1), fp+n)
+        states = updated
+    target = Fraction(95, 100)
+    recall_states = [(tp, fp) for tp, fp in states.items() if Fraction(tp, attack) >= target]
+    precision_states = [(tp, fp) for tp, fp in states.items() if tp+fp and Fraction(tp, tp+fp) >= target]
+    def all_targets(tp, fp):
+        return (tp+fp > 0 and Fraction(tp, tp+fp) >= target and Fraction(tp, attack) >= target
+                and Fraction(2*tp, attack+tp+fp) >= target and Fraction(fp, normal) <= Fraction(5, 100))
+    best_precision = max((Fraction(tp, tp+fp) for tp, fp in recall_states), default=None)
+    best_recall = max((Fraction(tp, attack) for tp, fp in precision_states), default=None)
+    return {'computed': True, 'target_precision_recall_f1': 0.95, 'target_max_false_positive_rate': 0.05,
+            'all_targets_feasible': any(all_targets(tp, fp) for tp, fp in states.items()),
+            'best_precision_at_recall_target': float(best_precision) if best_precision is not None else None,
+            'best_recall_at_precision_target': float(best_recall) if best_recall is not None else None,
+            'frontier_states': len(states), 'is_model_performance': False, 'is_independent_evaluation': False}
+
+
 def collision_summary(groups):
     """Exact empirical upper bound for deterministic decisions on these vectors.
 
@@ -50,6 +83,7 @@ def collision_summary(groups):
             'minimum_in_sample_classification_errors': sum(min(c) for c in groups),
             'gold_oracle_best_in_sample_f1': float(best) if attack else None,
             'oracle_tp': best_tp, 'oracle_fp': best_fp, 'oracle_fn': attack-best_tp,
+            'simultaneous_targets': target_feasibility(groups),
             'is_model_performance': False, 'is_independent_evaluation': False}
 
 

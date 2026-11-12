@@ -1,0 +1,439 @@
+{
+  "schema": "extra-cloud-context-v25-1",
+  "recorded_at": "2026-11-12T04:52:54.039601+00:00",
+  "branch": "extra",
+  "prior_commit": "46a396b1708495ef58b47e03a98cbbaaab15982f",
+  "context_protocol_recorded_before_enrichment": {
+    "path": "infra/f1-lab/cloud-context-protocol.json",
+    "bytes": 1635,
+    "sha256": "0acb9943269fd5fce3391c1e735c0c3f335006dafbedf5579a778c21b89f2f58"
+  },
+  "context_preparation": {
+    "path": "runtime/f1/cloud-training-context-observations-20261112/preparation.json",
+    "bytes": 1415,
+    "sha256": "b3bea8f888856e03a15e18caef480c2bddae9bfb01b312b828c4f6f886096f9a",
+    "aws_sdk_calls": 0,
+    "classifier_fitted": false,
+    "completed": true,
+    "context": {
+      "classifier_fitted": false,
+      "complete_history_verified": false,
+      "duplicate_reference_rows_retained": 9,
+      "goal_qualified": false,
+      "missing_time_or_principal": 3134,
+      "rows": 20711,
+      "time_policy": "strictly earlier; ties withheld; inclusive lower window edge"
+    },
+    "feature_profile": "cloud-causal-context-3",
+    "files": {
+      "asset-0-observations.jsonl": {
+        "bytes": 27082867,
+        "sha256": "7ba070792b40d8c991eec17e470d85767c89c1eb4390fde78cd148fb706c49ee"
+      },
+      "asset-0-truth.jsonl": {
+        "bytes": 2523735,
+        "sha256": "b21f93b7a22aa51b5b46f4250e0a6c61190cc65045d0be394dd6d85e5f4bef67"
+      },
+      "asset-1-observations.jsonl": {
+        "bytes": 6913639,
+        "sha256": "832ad2b6a5d4cfb8d1aa72fb69ad0df370a80c1029c103866fb1dd5348c1989a"
+      },
+      "asset-1-truth.jsonl": {
+        "bytes": 655207,
+        "sha256": "d834b591b1ff487a936d34cb25a093d2d0868fea914bde0a3d1ac1d079d34f1d"
+      }
+    },
+    "goal_qualified": false,
+    "input_sha256": {
+      "asset-0-observations.jsonl": "da46681f1a3f678ba8be93849caa261a9984b860a425480e72e55060f4e74bb3",
+      "asset-0-truth.jsonl": "b21f93b7a22aa51b5b46f4250e0a6c61190cc65045d0be394dd6d85e5f4bef67",
+      "asset-1-observations.jsonl": "461cbb8b9e4dc1bb6e57323f9c0cd1d5ee827eca91cb7d0338364c35e54790b8",
+      "asset-1-truth.jsonl": "d834b591b1ff487a936d34cb25a093d2d0868fea914bde0a3d1ac1d079d34f1d"
+    },
+    "original_six_domain_goal_replaced": false,
+    "paid_api_calls": 0,
+    "schema": "f1-cloud-context-preparation-3",
+    "test_records_read": 0,
+    "truth_copied_unchanged": true
+  },
+  "training_information_diagnostics": {
+    "request": {
+      "path": "runtime/f1/cloud-training-request-diagnostics-20261112-02/diagnostics.json",
+      "bytes": 3679,
+      "sha256": "86fce61e3ceceaa75942803d6ed258028366967a5bc0be91b03bc47e929ed7d3",
+      "aws_sdk_calls": 0,
+      "classifier_fitted": false,
+      "completed": true,
+      "conflicting_event_reference_labels": 0,
+      "counts": {
+        "known_attack": 541,
+        "known_normal": 20170,
+        "rows": 20711,
+        "usable_observations": 20711
+      },
+      "final_partition_certified": false,
+      "goal_qualified": false,
+      "input_sha256": {
+        "asset-0-observations.jsonl": "da46681f1a3f678ba8be93849caa261a9984b860a425480e72e55060f4e74bb3",
+        "asset-0-truth.jsonl": "b21f93b7a22aa51b5b46f4250e0a6c61190cc65045d0be394dd6d85e5f4bef67",
+        "asset-1-observations.jsonl": "461cbb8b9e4dc1bb6e57323f9c0cd1d5ee827eca91cb7d0338364c35e54790b8",
+        "asset-1-truth.jsonl": "d834b591b1ff487a936d34cb25a093d2d0868fea914bde0a3d1ac1d079d34f1d"
+      },
+      "labels_rewritten": false,
+      "linkage": {
+        "event_reference": {
+          "distinct_references": 20702,
+          "largest_reference_rows": 2,
+          "rows_in_shared_references": 0,
+          "shared_across_training_assets": 0
+        },
+        "issuer_reference": {
+          "distinct_references": 12,
+          "largest_reference_rows": 8157,
+          "rows_in_shared_references": 5487,
+          "shared_across_training_assets": 4
+        },
+        "principal_reference": {
+          "distinct_references": 364,
+          "largest_reference_rows": 4116,
+          "rows_in_shared_references": 7190,
+          "shared_across_training_assets": 7
+        },
+        "source_ip_reference": {
+          "distinct_references": 352,
+          "largest_reference_rows": 1982,
+          "rows_in_shared_references": 4138,
+          "shared_across_training_assets": 7
+        }
+      },
+      "linkage_scope": "principal/issuer/IP equality is not proof of session, physical device, current trust or safe final separation",
+      "original_six_domain_goal_replaced": false,
+      "paid_api_calls": 0,
+      "profile_scope": "same training rows only; exact age may encode near-unique history; bucket/no-age variants diagnose dependence",
+      "profiles": {
+        "bucketed_session_age": {
+          "gold_oracle_best_in_sample_f1": 0.9372549019607843,
+          "is_independent_evaluation": false,
+          "is_model_performance": false,
+          "known_attack": 541,
+          "known_normal": 20170,
+          "minimum_in_sample_classification_errors": 64,
+          "mixed_label_vectors": 12,
+          "oracle_fn": 63,
+          "oracle_fp": 1,
+          "oracle_tp": 478,
+          "rows_in_mixed_label_vectors": 1438,
+          "simultaneous_targets": {
+            "all_targets_feasible": false,
+            "best_precision_at_recall_target": 0.40408805031446543,
+            "best_recall_at_precision_target": 0.9020332717190388,
+            "computed": true,
+            "frontier_states": 66,
+            "is_independent_evaluation": false,
+            "is_model_performance": false,
+            "target_max_false_positive_rate": 0.05,
+            "target_precision_recall_f1": 0.95
+          },
+          "unique_vectors": 320
+        },
+        "exact": {
+          "gold_oracle_best_in_sample_f1": 0.9376218323586745,
+          "is_independent_evaluation": false,
+          "is_model_performance": false,
+          "known_attack": 541,
+          "known_normal": 20170,
+          "minimum_in_sample_classification_errors": 64,
+          "mixed_label_vectors": 12,
+          "oracle_fn": 60,
+          "oracle_fp": 4,
+          "oracle_tp": 481,
+          "rows_in_mixed_label_vectors": 1429,
+          "simultaneous_targets": {
+            "all_targets_feasible": false,
+            "best_precision_at_recall_target": 0.4044059795436664,
+            "best_recall_at_precision_target": 0.9057301293900185,
+            "computed": true,
+            "frontier_states": 66,
+            "is_independent_evaluation": false,
+            "is_model_performance": false,
+            "target_max_false_positive_rate": 0.05,
+            "target_precision_recall_f1": 0.95
+          },
+          "unique_vectors": 9471
+        },
+        "without_session_age": {
+          "gold_oracle_best_in_sample_f1": 0.9372549019607843,
+          "is_independent_evaluation": false,
+          "is_model_performance": false,
+          "known_attack": 541,
+          "known_normal": 20170,
+          "minimum_in_sample_classification_errors": 64,
+          "mixed_label_vectors": 10,
+          "oracle_fn": 63,
+          "oracle_fp": 1,
+          "oracle_tp": 478,
+          "rows_in_mixed_label_vectors": 1439,
+          "simultaneous_targets": {
+            "all_targets_feasible": false,
+            "best_precision_at_recall_target": 0.40408805031446543,
+            "best_recall_at_precision_target": 0.9020332717190388,
+            "computed": true,
+            "frontier_states": 66,
+            "is_independent_evaluation": false,
+            "is_model_performance": false,
+            "target_max_false_positive_rate": 0.05,
+            "target_precision_recall_f1": 0.95
+          },
+          "unique_vectors": 238
+        }
+      },
+      "schema": "f1-cloud-training-diagnostics-1",
+      "test_records_read": 0
+    },
+    "context": {
+      "path": "runtime/f1/cloud-training-context-diagnostics-20261112-02/diagnostics.json",
+      "bytes": 3671,
+      "sha256": "052dd1a8357b0f98423b365eb7ad843129ea7aab024cf12860a3b8deefa6fd15",
+      "aws_sdk_calls": 0,
+      "classifier_fitted": false,
+      "completed": true,
+      "conflicting_event_reference_labels": 0,
+      "counts": {
+        "known_attack": 541,
+        "known_normal": 20170,
+        "rows": 20711,
+        "usable_observations": 20711
+      },
+      "final_partition_certified": false,
+      "goal_qualified": false,
+      "input_sha256": {
+        "asset-0-observations.jsonl": "7ba070792b40d8c991eec17e470d85767c89c1eb4390fde78cd148fb706c49ee",
+        "asset-0-truth.jsonl": "b21f93b7a22aa51b5b46f4250e0a6c61190cc65045d0be394dd6d85e5f4bef67",
+        "asset-1-observations.jsonl": "832ad2b6a5d4cfb8d1aa72fb69ad0df370a80c1029c103866fb1dd5348c1989a",
+        "asset-1-truth.jsonl": "d834b591b1ff487a936d34cb25a093d2d0868fea914bde0a3d1ac1d079d34f1d"
+      },
+      "labels_rewritten": false,
+      "linkage": {
+        "event_reference": {
+          "distinct_references": 20702,
+          "largest_reference_rows": 2,
+          "rows_in_shared_references": 0,
+          "shared_across_training_assets": 0
+        },
+        "issuer_reference": {
+          "distinct_references": 12,
+          "largest_reference_rows": 8157,
+          "rows_in_shared_references": 5487,
+          "shared_across_training_assets": 4
+        },
+        "principal_reference": {
+          "distinct_references": 364,
+          "largest_reference_rows": 4116,
+          "rows_in_shared_references": 7190,
+          "shared_across_training_assets": 7
+        },
+        "source_ip_reference": {
+          "distinct_references": 352,
+          "largest_reference_rows": 1982,
+          "rows_in_shared_references": 4138,
+          "shared_across_training_assets": 7
+        }
+      },
+      "linkage_scope": "principal/issuer/IP equality is not proof of session, physical device, current trust or safe final separation",
+      "original_six_domain_goal_replaced": false,
+      "paid_api_calls": 0,
+      "profile_scope": "same training rows only; exact age may encode near-unique history; bucket/no-age variants diagnose dependence",
+      "profiles": {
+        "bucketed_session_age": {
+          "gold_oracle_best_in_sample_f1": 0.9515503875968992,
+          "is_independent_evaluation": false,
+          "is_model_performance": false,
+          "known_attack": 541,
+          "known_normal": 20170,
+          "minimum_in_sample_classification_errors": 50,
+          "mixed_label_vectors": 6,
+          "oracle_fn": 50,
+          "oracle_fp": 0,
+          "oracle_tp": 491,
+          "rows_in_mixed_label_vectors": 1377,
+          "simultaneous_targets": {
+            "all_targets_feasible": false,
+            "best_precision_at_recall_target": 0.410840534171249,
+            "best_recall_at_precision_target": 0.911275415896488,
+            "computed": true,
+            "frontier_states": 30,
+            "is_independent_evaluation": false,
+            "is_model_performance": false,
+            "target_max_false_positive_rate": 0.05,
+            "target_precision_recall_f1": 0.95
+          },
+          "unique_vectors": 4311
+        },
+        "exact": {
+          "gold_oracle_best_in_sample_f1": 0.9515503875968992,
+          "is_independent_evaluation": false,
+          "is_model_performance": false,
+          "known_attack": 541,
+          "known_normal": 20170,
+          "minimum_in_sample_classification_errors": 50,
+          "mixed_label_vectors": 6,
+          "oracle_fn": 50,
+          "oracle_fp": 0,
+          "oracle_tp": 491,
+          "rows_in_mixed_label_vectors": 1377,
+          "simultaneous_targets": {
+            "all_targets_feasible": false,
+            "best_precision_at_recall_target": 0.410840534171249,
+            "best_recall_at_precision_target": 0.911275415896488,
+            "computed": true,
+            "frontier_states": 30,
+            "is_independent_evaluation": false,
+            "is_model_performance": false,
+            "target_max_false_positive_rate": 0.05,
+            "target_precision_recall_f1": 0.95
+          },
+          "unique_vectors": 10294
+        },
+        "without_session_age": {
+          "gold_oracle_best_in_sample_f1": 0.9515503875968992,
+          "is_independent_evaluation": false,
+          "is_model_performance": false,
+          "known_attack": 541,
+          "known_normal": 20170,
+          "minimum_in_sample_classification_errors": 50,
+          "mixed_label_vectors": 6,
+          "oracle_fn": 50,
+          "oracle_fp": 0,
+          "oracle_tp": 491,
+          "rows_in_mixed_label_vectors": 1377,
+          "simultaneous_targets": {
+            "all_targets_feasible": false,
+            "best_precision_at_recall_target": 0.410840534171249,
+            "best_recall_at_precision_target": 0.911275415896488,
+            "computed": true,
+            "frontier_states": 30,
+            "is_independent_evaluation": false,
+            "is_model_performance": false,
+            "target_max_false_positive_rate": 0.05,
+            "target_precision_recall_f1": 0.95
+          },
+          "unique_vectors": 3801
+        }
+      },
+      "schema": "f1-cloud-training-diagnostics-1",
+      "test_records_read": 0
+    }
+  },
+  "remaining_collision_audit": {
+    "path": "runtime/f1/cloud-context-remaining-collisions-20261112/audit.json",
+    "bytes": 898,
+    "sha256": "b2e8328f23f2e46409ff34b382af6c85926612fbdc49b2a3adb460f8afd61b3f",
+    "schema": "remaining-context-collision-audit-1",
+    "profiles": "cloud-causal-context-3 exact",
+    "rows_in_mixed_vectors": 1377,
+    "summary": [
+      {
+        "api_name": "GetBucketEncryption",
+        "principal_kind": "AssumedRole",
+        "history_link_available": true,
+        "normal": 3,
+        "attack": 1
+      },
+      {
+        "api_name": "GetBucketLogging",
+        "principal_kind": "AssumedRole",
+        "history_link_available": true,
+        "normal": 4,
+        "attack": 1
+      },
+      {
+        "api_name": "HeadBucket",
+        "principal_kind": "AWSService",
+        "history_link_available": false,
+        "normal": 281,
+        "attack": 8
+      },
+      {
+        "api_name": "PutObject",
+        "principal_kind": "AWSService",
+        "history_link_available": false,
+        "normal": 1039,
+        "attack": 40
+      }
+    ],
+    "test_records_read": 0,
+    "goal_qualified": false
+  },
+  "original_labels_changed": false,
+  "truth_sidecars_unchanged": true,
+  "reserved_ait_final_bodies_read": 0,
+  "cloud_test_archive_downloaded": false,
+  "original_six_domain_goal_replaced": false,
+  "independent_final_metrics": null,
+  "goal_qualified": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "classifier_fitted": false,
+  "tests": {
+    "windows": {
+      "path": "runtime/f1/extra-cloud-context-final-20261112.xml",
+      "bytes": 30298,
+      "sha256": "36462fff79cf239ccefb4e21cf68273bf75c12304a47f6844423c33b221f0dbd",
+      "passed": 217
+    },
+    "linux": {
+      "path": "runtime/f1/extra-linux-public-native-20261112-13/checks.xml",
+      "bytes": 30304,
+      "sha256": "4d9910d3823d6174bc8938bbeb7101377819de8d3bbb2f47f808f72a85d2c6fd",
+      "passed": 217
+    }
+  },
+  "linux": {
+    "path": "runtime/f1/extra-linux-public-native-20261112-13/verification.json",
+    "bytes": 1434,
+    "sha256": "ab870e7ac8ec12fe41ded81e7087832ecefd3c3644bfa8251b39dab3859929d3",
+    "schema": "extra-f1-linux-snapshot-1",
+    "completed": true,
+    "owner": "extra-f1-a08fa7220fb7",
+    "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "tests": [
+      "tests/test_f1_public_sources.py",
+      "tests/test_f1_bounded_zip.py",
+      "tests/test_f1_native_jsonl.py",
+      "tests/test_f1_native_preparation.py",
+      "tests/test_f1_line_truth.py",
+      "tests/test_f1_raw_observations.py",
+      "tests/test_f1_native_bayes.py",
+      "tests/test_f1_native_raw_workflow.py",
+      "tests/test_f1_raw_context.py",
+      "tests/test_f1_native_context_workflow.py",
+      "tests/test_f1_native_tree.py",
+      "tests/test_f1_frozen_native_tree.py",
+      "tests/test_f1_native_transfer.py",
+      "tests/test_f1_contextual_links.py",
+      "tests/test_f1_native_heads.py",
+      "tests/test_f1_native_binary_tree.py",
+      "tests/test_f1_cloud_observations.py",
+      "tests/test_f1_cloud_diagnostics.py",
+      "tests/test_f1_cloud_context.py"
+    ],
+    "host_mounts": 0,
+    "network": "none",
+    "cloud_calls": 0,
+    "paid_api_calls": 0,
+    "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+    "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+    "source_manifest_sha256": "ec984119ef65aef5560cb9a6335dc5f02500c9bb1357de0d74741fc534da1fa5",
+    "source_files": 438,
+    "container_exit_code": 0,
+    "source_verified_before_and_after": true,
+    "remaining_containers": 0
+  },
+  "baseline_app_diff_empty": true,
+  "currently_owned_f1_containers": 0,
+  "interrupted_soak_cleanup": {
+    "path": "docs/infrastructure-results/extra-interrupted-cleanup-v15-20261112.json",
+    "bytes": 3897,
+    "sha256": "956dc5c53ff011b57145be7cae9868743864adbc8674113f37a9e7dff5197b73"
+  }
+}

@@ -5,7 +5,12 @@ import json
 import pytest
 
 from scripts.audit_cloud_separation import audit
-from scripts.f1_lab.cloud_diagnostics import CloudDiagnostics, collision_summary, feature_key
+from scripts.f1_lab.cloud_diagnostics import (
+    CloudDiagnostics,
+    collision_summary,
+    feature_key,
+    target_feasibility,
+)
 from scripts.f1_lab.cloud_observations import partition
 
 
@@ -32,6 +37,31 @@ def test_collision_population_counts_both_classes_instead_of_dropping_conflicts(
 
 def test_training_oracle_without_attack_has_no_f1_score():
     assert collision_summary([[3, 0]])['gold_oracle_best_in_sample_f1'] is None
+
+
+def test_simultaneous_metric_frontier_matches_exhaustive_assignments():
+    for groups in ([[50, 0], [0, 20]], [[100, 2], [0, 98]], [[1000, 10], [0, 90], [500, 0]], [[8, 1], [2, 5], [0, 3]]):
+        total_attack = sum(a for n, a in groups)
+        total_normal = sum(n for n, a in groups)
+        values = []
+        for decisions in itertools.product((False, True), repeat=len(groups)):
+            tp = sum(a for (n, a), yes in zip(groups, decisions, strict=True) if yes)
+            fp = sum(n for (n, a), yes in zip(groups, decisions, strict=True) if yes)
+            precision = tp/(tp+fp) if tp+fp else 0
+            recall = tp/total_attack
+            f1 = 2*tp/(total_attack+tp+fp)
+            values.append((precision, recall, f1, fp/total_normal))
+        result = target_feasibility(groups)
+        assert result['computed']
+        assert result['all_targets_feasible'] == any(p >= .95 and r >= .95 and f >= .95 and rate <= .05 for p, r, f, rate in values)
+        assert result['best_precision_at_recall_target'] == max(p for p, r, f, rate in values if r >= .95)
+        best_recall = max((r for p, r, f, rate in values if p >= .95), default=None)
+        assert result['best_recall_at_precision_target'] == best_recall
+
+
+def test_large_frontier_does_not_silently_certify_a_target_it_did_not_compute():
+    result = target_feasibility([[1, 1000]]*100)
+    assert not result['computed'] and result['all_targets_feasible'] is None
 
 
 def test_age_variants_remove_continuous_history_without_using_gold():

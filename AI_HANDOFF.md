@@ -18,7 +18,7 @@ AIT 공개 원시 로그/경보의 고정 버전·라이선스·크기·체크�
 [수집·평가 계약](docs/extra-native-evaluation.md)과 `infra/f1-lab/native-data-protocol.json`을 따른다.
 개발 시나리오만 본문을 읽고 최종 예약 시나리오의 본문/라벨은 후보 동결 전 읽지 않는다.
 새 독립 성능 수치는 아직 없다. 결측 IdP/EDR/업무 승인 정보를 정상으로 채우지 않는다.
-개발 경보45,544행 변환·파싱/관측 오류0, 현재 관련 집중 시험 Windows204·Linux204개 통과다.
+개발 경보45,544행 변환·파싱/관측 오류0, 현재 관련 집중 시험 Windows217·Linux217개 통과다.
 원시 ZIP522,084,364바이트 전체 MD5/SHA 검증 완료. 실제 최상위 gather/labels 경로·dataset.yaml을 지원했다.
 개발 원시8쌍295,243행(공격61,862/정상233,381)을 색인했다. 후속 시간 전수 감사에서 실패/범위 밖0,
 특징 오류0·웹 시간 역순3곳을 확인했다. [원시 후보 개발 진단](docs/extra-native-candidate.md)을 따른다.
@@ -62,6 +62,13 @@ ZTA-RAD 전문가 CSV 첫128개·노트북 코드2개만 조사했다. 전문가
 독립 공격 사건 정답으로 채택하지 않았다. 기기 계열103/128·HTTP77/128 결측은 전체 비율이 아니다.
 이후 CSV 행 사례 분석/노트북 실행0·SMOTE/LLM 라벨 자료 미수집이다.
 다음은 미래/정답을 쓰지 않는 과거 이력·검증 가능한 주체/권한 맥락을 보완하는 것이다. 여섯 영역의 최종 평가 부족은 남는다.
+[v25 엄격한 과거 관측](docs/extra-cloud-causal-context.md)에서 동일 principal의10/60초·쓰기/오류/종류를
+추가했다. 같은 시각끼리 서로의 과거를 보지 않고 중복9행은 이력1회/정답 전부 보존, 결측연결3134행을 임의로 묶지 않았다.
+학습20,711행의 최소 오분류는64→50·이상적 최대F1은93.7622→95.1550%지만 **모델 성능이 아니다**.
+동시 목표의 정확한 가능 상태를 검사했다. P≥95%에서 최대R91.1275%, R≥95%에서 최대P41.0841%로 동시 목표 불가능이다.
+혼합 공격50건 중48건은 현재 principal 연결이 없는 AWSService HeadBucket/PutObject 기록이다.
+다음은 원본에 서비스 호출의 원래 주체/역할·세션으로 연결할 근거가 있는지 검토하는 것이다.
+원본 관측/정답 지문과 최종 자료 격리를 유지한다. 새 CloudTrail 분류 모델 학습/독립 평가0이다.
 [v18 실제 자료 근거](docs/infrastructure-results/extra-native-actual-pairs-v18-20261112.json)를 따른다.
 [v19 원시 후보 근거](docs/infrastructure-results/extra-native-raw-candidate-v19-20261112.json)는 개발 재대입과 미채택 사유다.
 [v20 맥락/트리 근거](docs/infrastructure-results/extra-native-context-tree-v20-20261112.json)도 독립 성능이나 원본 대비 개선 폭이 아니다.
@@ -69,6 +76,7 @@ ZTA-RAD 전문가 CSV 첫128개·노트북 코드2개만 조사했다. 전문가
 [v22 감사/후보 근거](docs/infrastructure-results/extra-metadata-heads-v22-20261112.json)는 여전히 goal_qualified=false다.
 [v23 단일 이진/학습 감사 근거](docs/infrastructure-results/extra-flat-cloud-v23-20261112.json)도 goal_qualified=false다.
 [v24 정보 부족/라벨 근거](docs/infrastructure-results/extra-cloud-information-v24-20261112.json)도 goal_qualified=false다.
+[v25 과거 관측/동시 목표 근거](docs/infrastructure-results/extra-cloud-context-v25-20261112.json)도 goal_qualified=false다.
 로컬 구현·검증·문서만 수행하며 GitHub 업로드/병합·AWS·유료 API를 실행하지 않는다.
 
 아래의 **진행 중** 표기는 관측 중단 이전의 당시 기록이다.
