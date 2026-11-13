@@ -9,18 +9,24 @@ import hmac
 import json
 import re
 import sqlite3
+import zlib
 from contextlib import contextmanager
 from copy import deepcopy
 from datetime import datetime
+from itertools import chain
 from pathlib import Path
+
+from app.services import context_archive as archive
 
 ZERO_HASH = "0" * 64
 MAX_ENTRY_BYTES = 1024 * 1024
-MAX_RECORDS = 10_000
+MAX_ACTIVE_RECORDS = 10_000
+MAX_RECORDS = 100_000
 MAX_TOTAL_BYTES = 128 * 1024 * 1024
 KINDS = frozenset({"capture", "baseline", "approval", "revocation", "evaluation", "execution",
                    "response_request", "response_approval", "response_cancel", "response_result"})
-TABLES = {"behavior_context_entries", "behavior_context_head"}
+LEGACY_TABLES = {"behavior_context_entries", "behavior_context_head"}
+TABLES = LEGACY_TABLES | {archive.TABLE}
 FIELDS = {"kind", "tenant_id", "record_id", "created_at", "actor", "payload"}
 IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}\Z")
 TENANT = re.compile(r"[A-Za-z0-9._-]{1,64}\Z")
@@ -128,6 +134,12 @@ class ContextTransaction:
         if (len(self._entries) >= self._store.max_records
                 or self._total_bytes + byte_count > self._store.max_bytes):
             raise ContextStoreUnavailable("context history capacity reached")
+        active_count = self._connection.execute("SELECT COUNT(*) FROM behavior_context_entries").fetchone()[0]
+        if active_count >= self._store.max_active_records:
+            try:
+                archive.compact(self._connection, max(1, self._store.max_active_records // 2))
+            except (ValueError, zlib.error) as exc:
+                raise ContextStoreUnavailable("context archive unavailable") from exc
         sequence = len(self._entries) + 1
         current_hash = digest(self._last_hash + "." + encoded)
         self._connection.execute(
@@ -153,12 +165,15 @@ class ContextTransaction:
 
 
 class BehaviorContextStore:
-    def __init__(self, path: Path, *, max_records=MAX_RECORDS, max_bytes=MAX_TOTAL_BYTES):
+    def __init__(self, path: Path, *, max_records=MAX_RECORDS, max_bytes=MAX_TOTAL_BYTES,
+                 max_active_records=MAX_ACTIVE_RECORDS):
         if (type(max_records) is not int or not 1 <= max_records <= MAX_RECORDS
-                or type(max_bytes) is not int or not 1 <= max_bytes <= MAX_TOTAL_BYTES):
+                or type(max_bytes) is not int or not 1 <= max_bytes <= MAX_TOTAL_BYTES
+                or type(max_active_records) is not int or not 1 <= max_active_records <= MAX_ACTIVE_RECORDS):
             raise ValueError("context limits must be bounded positive integers")
         self.path = Path(path)
         self.max_records, self.max_bytes = max_records, max_bytes
+        self.max_active_records = max_active_records
         self._initialize()
 
     def _connect(self):
@@ -197,8 +212,12 @@ class BehaviorContextStore:
                     (ZERO_HASH, _head_digest(0, 0, ZERO_HASH)),
                 )
                 connection.execute("PRAGMA user_version=1")
-            elif tables != TABLES or version != 1:
+            elif not ((tables == LEGACY_TABLES and version == 1) or (tables == TABLES and version == 2)):
                 raise ValueError("incompatible context database")
+            self._load(connection)
+            if connection.execute("PRAGMA user_version").fetchone()[0] == 1:
+                archive.create(connection)
+                connection.execute("PRAGMA user_version=2")
             self._load(connection)
             # A process can die before SQLite writes a hot-journal header. A
             # read-only transaction leaves that cold rollback journal behind.
@@ -211,7 +230,7 @@ class BehaviorContextStore:
                 connection.execute("UPDATE behavior_context_head SET record_count=record_count+1 WHERE id=1")
                 connection.execute("UPDATE behavior_context_head SET record_count=record_count-1 WHERE id=1")
             connection.commit()
-        except (sqlite3.Error, OSError, ValueError, TypeError, KeyError) as exc:
+        except (sqlite3.Error, OSError, ValueError, TypeError, KeyError, zlib.error) as exc:
             if connection is not None:
                 connection.rollback()
             raise ContextStoreUnavailable("context database unavailable") from exc
@@ -220,7 +239,9 @@ class BehaviorContextStore:
                 connection.close()
 
     def _load(self, connection):
-        if self._tables(connection) != TABLES or connection.execute("PRAGMA user_version").fetchone()[0] != 1:
+        version = connection.execute("PRAGMA user_version").fetchone()[0]
+        tables = self._tables(connection)
+        if not ((version == 1 and tables == LEGACY_TABLES) or (version == 2 and tables == TABLES)):
             raise ValueError("incompatible context database")
         if connection.execute("SELECT COUNT(*) FROM sqlite_master WHERE type IN ('trigger','view')").fetchone()[0]:
             raise ValueError("unexpected context database executable schema")
@@ -234,15 +255,13 @@ class BehaviorContextStore:
                 or not isinstance(head_hash, str)
                 or not hmac.compare_digest(head_hash, _head_digest(count, total_bytes, last_hash))):
             raise ValueError("context checkpoint invalid")
-        actual_count, actual_bytes = connection.execute(
-            "SELECT COUNT(*),COALESCE(SUM(length(CAST(payload AS BLOB))),0) "
-            "FROM behavior_context_entries",
-        ).fetchone()
-        if actual_count != count or actual_bytes != total_bytes:
-            raise ValueError("context checkpoint does not match entries")
+        active_count = connection.execute("SELECT COUNT(*) FROM behavior_context_entries").fetchone()[0]
+        if active_count > (MAX_ACTIVE_RECORDS if version == 1 else self.max_active_records):
+            raise ValueError("context active tail exceeds limit")
         entries, prior, size = [], ZERO_HASH, 0
         identities = set()
-        for row in connection.execute("SELECT * FROM behavior_context_entries ORDER BY seq"):
+        archived = archive.read(connection) if version == 2 else ()
+        for row in chain(archived, connection.execute("SELECT * FROM behavior_context_entries ORDER BY seq")):
             if len(row) != 7:
                 raise ValueError("context row shape invalid")
             seq, kind, tenant, identifier, encoded, previous, row_hash = row
@@ -260,7 +279,7 @@ class BehaviorContextStore:
             size += len(encoded.encode())
             prior = row_hash
             entries.append(entry)
-        if prior != last_hash or size != total_bytes:
+        if prior != last_hash or size != total_bytes or len(entries) != count:
             raise ValueError("context terminal checkpoint invalid")
         return entries, last_hash, total_bytes
 
@@ -272,7 +291,7 @@ class BehaviorContextStore:
                 connection = self._connect()
                 connection.execute("BEGIN IMMEDIATE")
                 entries, last_hash, size = self._load(connection)
-            except (sqlite3.Error, OSError, ValueError, TypeError, KeyError) as exc:
+            except (sqlite3.Error, OSError, ValueError, TypeError, KeyError, zlib.error) as exc:
                 raise ContextStoreUnavailable("context database unavailable") from exc
             transaction = ContextTransaction(connection, entries, last_hash, size, self)
             yield transaction
@@ -294,3 +313,22 @@ class BehaviorContextStore:
     def read(self, tenant_id):
         with self.transaction() as transaction:
             return [entry for entry in transaction.entries if entry["tenant_id"] == tenant_id]
+
+    def storage_status(self):
+        with self.transaction() as transaction:
+            active = transaction._connection.execute("SELECT COUNT(*) FROM behavior_context_entries").fetchone()[0]
+            segments = transaction._connection.execute(f"SELECT COUNT(*) FROM {archive.TABLE}").fetchone()[0]
+            return {"active_records": active, "archived_records": len(transaction._entries) - active,
+                    "total_records": len(transaction._entries), "archive_segments": segments,
+                    "logical_bytes": transaction._total_bytes, "max_active_records": self.max_active_records,
+                    "max_records": self.max_records, "max_bytes": self.max_bytes}
+
+    def compact(self, *, limit=1000):
+        if type(limit) is not int or not 1 <= limit <= MAX_ACTIVE_RECORDS:
+            raise ValueError("context archive batch invalid")
+        with self.transaction() as transaction:
+            try:
+                moved = archive.compact(transaction._connection, limit)
+            except (ValueError, zlib.error) as exc:
+                raise ContextStoreUnavailable("context archive unavailable") from exc
+        return {"compacted": moved}

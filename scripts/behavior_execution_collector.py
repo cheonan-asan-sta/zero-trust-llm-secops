@@ -35,6 +35,7 @@ from app.services.trusted_signals import (
     canonical_behavior_capture,
     canonical_execution_evidence,
 )
+from scripts import execution_archive as archive
 from scripts.continuous_signal_collector import exclusive_collector
 from scripts.local_signal_collector import _NoRedirect, _target
 
@@ -71,6 +72,14 @@ def _private(path, data):
         os.fsync(stream.fileno())
 
 
+def _sync_directory(path):
+    descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+
+
 def _owned(metadata, *, directory=False):
     valid_type = stat.S_ISDIR(metadata.st_mode) if directory else stat.S_ISREG(metadata.st_mode)
     if not valid_type or (os.name == "posix" and (
@@ -79,7 +88,7 @@ def _owned(metadata, *, directory=False):
         raise ValueError("execution_collector_requires_owner_only_files")
 
 
-def read_private(path, maximum=MAX_RECORD_BYTES):
+def read_private(path, maximum=MAX_RECORD_BYTES, *, durable=False):
     """Reject symlinks and non-regular input; check permissions on the opened object."""
     descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0))
     with os.fdopen(descriptor, "rb") as stream:
@@ -90,6 +99,8 @@ def read_private(path, maximum=MAX_RECORD_BYTES):
         raw = stream.read(maximum + 1)
         if len(raw) > maximum:
             raise ValueError("execution_collector_file_too_large")
+        if durable:
+            os.fsync(stream.fileno())
         return raw
 
 
@@ -245,6 +256,7 @@ class ExecutionCollector:
                 connection.execute("CREATE TABLE IF NOT EXISTS evaluations("
                                    "evidence_id TEXT PRIMARY KEY,attempts INTEGER NOT NULL,"
                                    "next_attempt TEXT NOT NULL,status TEXT NOT NULL,result TEXT)")
+                archive.initialize(connection)
                 self._validate(connection)
 
     @contextmanager
@@ -271,9 +283,17 @@ class ExecutionCollector:
         rows = connection.execute("SELECT * FROM records ORDER BY seq").fetchall()
         if len(rows) > MAX_RECORDS:
             raise ValueError("execution_collector_spool_capacity")
+        archived = archive.load(connection)
+        active_ids = {row["evidence_id"] for row in rows}
+        if active_ids & set(archived) or len(rows) + len(archived) > archive.MAX_RECORDS:
+            raise ValueError("execution_collector_history_capacity_or_overlap")
+        logical_rows = rows + [item["record"] for item in archived.values()]
+        sequences = [row["seq"] for row in logical_rows]
+        if len(set(sequences)) != len(sequences) or any(type(n) is not int or n < 1 for n in sequences):
+            raise ValueError("execution_collector_sequence_corrupt")
         size = 0
-        records = {row["evidence_id"]: row for row in rows}
-        for row in rows:
+        records = {row["evidence_id"]: row for row in logical_rows}
+        for row in logical_rows:
             raw = row["envelope"].encode()
             if len(raw) > MAX_RECORD_BYTES or _sha(raw) != row["envelope_sha256"]:
                 raise ValueError("execution_collector_spool_corrupt")
@@ -284,8 +304,12 @@ class ExecutionCollector:
                     or row["status"] not in STATUSES or type(row["attempts"]) is not int or row["attempts"] < 0
                     or datetime.fromisoformat(row["next_attempt"]).utcoffset() is None):
                 raise ValueError("execution_collector_spool_corrupt")
-            size += len(raw)
+            if row["evidence_id"] in active_ids:
+                size += len(raw)
         bundles = {row["evidence_id"]: row for row in connection.execute("SELECT * FROM bundles")}
+        if not set(bundles) <= active_ids:
+            raise ValueError("execution_collector_orphan_active_bundle")
+        bundles.update({key: item["bundle"] for key, item in archived.items() if item["bundle"] is not None})
         for row in bundles.values():
             raw = row["capture"].encode()
             if (row["evidence_id"] not in records
@@ -293,9 +317,10 @@ class ExecutionCollector:
                     or row["state"] not in {"capture_pending", "captured"}):
                 raise ValueError("execution_collector_bundle_corrupt")
             SignedBehaviorCapture.model_validate_json(raw)
-            size += len(raw)
+            if row["evidence_id"] in active_ids:
+                size += len(raw)
         marks = connection.execute("SELECT * FROM input_files").fetchall()
-        if len(marks) > MAX_RECORDS:
+        if len(marks) > archive.MAX_RECORDS:
             raise ValueError("execution_collector_input_capacity")
         for mark in marks:
             if (Path(mark["name"]).name != mark["name"] or not mark["name"].endswith(".json")
@@ -303,6 +328,9 @@ class ExecutionCollector:
                     or mark["evidence_id"] not in records):
                 raise ValueError("execution_collector_input_corrupt")
         evaluations = connection.execute("SELECT * FROM evaluations").fetchall()
+        if any(row["evidence_id"] not in active_ids for row in evaluations):
+            raise ValueError("execution_collector_orphan_active_evaluation")
+        evaluations += [item["evaluation"] for item in archived.values() if item["evaluation"] is not None]
         if {row["evidence_id"] for row in evaluations} != set(bundles):
             raise ValueError("execution_collector_evaluation_corrupt")
         for row in evaluations:
@@ -317,7 +345,7 @@ class ExecutionCollector:
                         or receipt.get("capture_id") != capture["capture_id"]
                         or receipt.get("enforcement_eligible") is not False):
                     raise ValueError("execution_collector_evaluation_corrupt")
-            if row["result"] is not None:
+            if row["result"] is not None and row["evidence_id"] in active_ids:
                 size += len(row["result"].encode())
         if size > MAX_TOTAL_BYTES:
             raise ValueError("execution_collector_spool_capacity")
@@ -331,8 +359,16 @@ class ExecutionCollector:
         now = self.clock()
         with exclusive_collector(self.directory), self._connection() as connection:
             rows, size = self._validate(connection)
+            archived = archive.load(connection)
             identifier = record.get("evidence_id") if isinstance(record, dict) else None
             existing = next((row for row in rows if row["evidence_id"] == identifier), None)
+            archived_item = archived.get(identifier)
+            if archived_item is not None:
+                existing = archived_item["record"]
+            if existing is None and (len(rows) >= MAX_RECORDS or size >= MAX_TOTAL_BYTES // 2):
+                archive.compact(connection, min(MAX_RECORDS, 1000))
+                rows, size = self._validate(connection)
+                archived = archive.load(connection)
             # An exact replay remains identifiable after the original observation expires.
             # Only a new record is signed at the current time.
             validation_time = (SignedExecutionEvidence.model_validate_json(existing["envelope"]).issued_at
@@ -357,15 +393,19 @@ class ExecutionCollector:
                     raise ValueError("execution_collector_file_too_large")
                 previous = connection.execute("SELECT capture_sha256 FROM bundles WHERE evidence_id=?",
                                               (parsed.evidence_id,)).fetchone()
+                if archived_item is not None:
+                    previous = archived_item["bundle"]
                 if previous is not None and previous["capture_sha256"] != _sha(capture_raw):
                     raise ValueError("execution_collector_capture_conflict")
                 if existing is not None and previous is None:
                     raise ValueError("execution_collector_bundle_changed")
                 if previous is None and size + len(capture_raw) > MAX_TOTAL_BYTES:
                     raise ValueError("execution_collector_spool_capacity")
-                connection.execute("INSERT OR IGNORE INTO bundles VALUES(?,?,?,?,NULL)",
+                if archived_item is None:
+                    connection.execute("INSERT OR IGNORE INTO bundles VALUES(?,?,?,?,NULL)",
                                    (parsed.evidence_id, capture_raw.decode(), _sha(capture_raw), "capture_pending"))
-                connection.execute("INSERT OR IGNORE INTO evaluations VALUES(?,?,?,'pending',NULL)",
+                if archived_item is None:
+                    connection.execute("INSERT OR IGNORE INTO evaluations VALUES(?,?,?,'pending',NULL)",
                                    (parsed.evidence_id, 0, now.isoformat()))
                 if previous is None:
                     size += len(capture_raw)
@@ -375,7 +415,7 @@ class ExecutionCollector:
                 if mark is not None and mark["digest"] != digest:
                     raise ValueError("execution_collector_input_replaced")
                 count = connection.execute("SELECT COUNT(*) FROM input_files").fetchone()[0]
-                if mark is None and count >= MAX_RECORDS:
+                if mark is None and count >= archive.MAX_RECORDS:
                     raise ValueError("execution_collector_input_capacity")
                 connection.execute("INSERT OR IGNORE INTO input_files VALUES(?,?,?)",
                                    (name, digest, parsed.evidence_id))
@@ -384,6 +424,8 @@ class ExecutionCollector:
                     raise ValueError("execution_collector_identifier_conflict")
                 return {"evidence_id": parsed.evidence_id, "duplicate": True,
                         "state": existing["status"], "input_digest": existing["input_digest"]}
+            if len(rows) + len(archived) >= archive.MAX_RECORDS:
+                raise ValueError("execution_collector_history_capacity")
             envelope = sign_record(record, self.key, self.config, self.verifier, now,
                                    lifetime_seconds=self.lifetime_seconds)
             raw = _canonical(envelope.model_dump(mode="json"))
@@ -391,7 +433,7 @@ class ExecutionCollector:
                 raise ValueError("execution_collector_spool_capacity")
             input_digest = _sha(canonical_execution_evidence(envelope))
             connection.execute("INSERT INTO records VALUES(?,?,?,?,?,?,?,?,?,?)", (
-                len(rows) + 1, envelope.evidence_id, record_hash, raw.decode(), _sha(raw), input_digest,
+                max([row["seq"] for row in rows] + [item["record"]["seq"] for item in archived.values()] + [0]) + 1, envelope.evidence_id, record_hash, raw.decode(), _sha(raw), input_digest,
                 "pending", 0, now.isoformat(), None,
             ))
             return {"evidence_id": envelope.evidence_id, "duplicate": False,
@@ -444,11 +486,17 @@ class ExecutionCollector:
 
     def tick(self, directory):
         """A broken upstream input must not stop already durable delivery."""
+        retention = {"state": "idle"}
+        try:
+            retention = self.maintain(directory)
+        except (OSError, ValueError, TypeError, sqlite3.Error):
+            retention = {"state": "maintenance_error"}
         try:
             captured = self.capture_one(directory)
         except (OSError, ValueError, TypeError, SignalRejected, SignalRegistryUnavailable):
             captured = {"state": "input_error", "error_code": "INPUT_UNAVAILABLE_OR_INVALID"}
-        return {"input": captured, "delivery": self.send_once(), "evaluation": self.evaluate_once()}
+        return {"input": captured, "delivery": self.send_once(), "evaluation": self.evaluate_once(),
+                "retention": retention}
 
     def evaluate_once(self):
         """Persist advisory results only after both receiver receipts are verified."""
@@ -560,19 +608,98 @@ class ExecutionCollector:
             return {"state": state, "evidence_id": pending["evidence_id"], "attempts": attempts,
                     "error_code": code}
 
+    def compact(self, *, limit=1000):
+        if type(limit) is not int or not 1 <= limit <= MAX_RECORDS:
+            raise ValueError("execution_collector_archive_batch")
+        with exclusive_collector(self.directory), self._connection() as connection:
+            self._validate(connection)
+            moved = archive.compact(connection, limit)
+            self._validate(connection)
+        return {"compacted": moved}
+
+    def retire_inputs(self, directory, *, limit=1000):
+        """Move only archived, unchanged feed files; their durable marks remain forever.
+
+        A hard link is published without overwrite before unlinking the input. Both
+        directories are synced. A crash between the two leaves two identical copies
+        and the next attempt finishes; no cross-filesystem copy or data loss.
+        """
+        if type(limit) is not int or not 1 <= limit <= 1000:
+            raise ValueError("execution_collector_retirement_batch")
+        directory = Path(directory)
+        _owned(directory.lstat(), directory=True)
+        retired = directory / ".retired"
+        retired_bytes = 0
+        if retired.exists() or retired.is_symlink():
+            _owned(retired.lstat(), directory=True)
+            with os.scandir(retired) as files:
+                for entry in files:
+                    metadata = entry.stat(follow_symlinks=False)
+                    _owned(metadata)
+                    retired_bytes += metadata.st_size
+                    if retired_bytes > archive.MAX_BYTES:
+                        raise ValueError("execution_collector_retired_input_capacity")
+        with exclusive_collector(self.directory), self._connection() as connection:
+            self._validate(connection)
+            marks = connection.execute(
+                "SELECT f.* FROM input_files f JOIN execution_archive a USING(evidence_id) ORDER BY f.name",
+            ).fetchall()
+            moved = 0
+            for mark in marks:
+                source = directory / mark["name"]
+                if not source.exists() and not source.is_symlink():
+                    continue
+                if _sha(read_private(source)) != mark["digest"]:
+                    raise ValueError("execution_collector_input_replaced")
+                retired.mkdir(mode=0o700, exist_ok=True)
+                _owned(retired.lstat(), directory=True)
+                target = retired / mark["name"]
+                source_size = source.lstat().st_size
+                if not target.exists() and retired_bytes + source_size > archive.MAX_BYTES:
+                    raise ValueError("execution_collector_retired_input_capacity")
+                try:
+                    os.link(source, target, follow_symlinks=False)
+                    retired_bytes += source_size
+                except FileExistsError:
+                    pass
+                if _sha(read_private(target, durable=True)) != mark["digest"]:
+                    raise ValueError("execution_collector_retired_input_conflict")
+                _sync_directory(retired)
+                if _sha(read_private(source)) != mark["digest"]:
+                    raise ValueError("execution_collector_input_replaced")
+                source.unlink()
+                _sync_directory(directory)
+                moved += 1
+                if moved >= limit:
+                    break
+        return moved
+
+    def maintain(self, directory):
+        with exclusive_collector(self.directory), self._connection() as connection:
+            rows, size = self._validate(connection)
+            moved = 0
+            if len(rows) >= min(1000, MAX_RECORDS) or size >= MAX_TOTAL_BYTES // 2:
+                moved = archive.compact(connection, min(1000, MAX_RECORDS))
+        retired = self.retire_inputs(directory)
+        return {"state": "maintained" if moved or retired else "idle", "compacted": moved,
+                "retired_inputs": retired}
+
     def status(self):
         with exclusive_collector(self.directory), self._connection() as connection:
             rows, size = self._validate(connection)
-            return {"records": len(rows), "bytes": size,
-                    **{name: sum(row["status"] == name for row in rows) for name in sorted(STATUSES)},
+            archived = archive.load(connection)
+            history = list(rows) + [item["record"] for item in archived.values()]
+            return {"records": len(history), "active_records": len(rows), "archived_records": len(archived), "bytes": size,
+                    **{name: sum(row["status"] == name for row in history) for name in sorted(STATUSES)},
                     "evaluations": {name: connection.execute(
                         "SELECT COUNT(*) FROM evaluations WHERE status=?", (name,),
-                    ).fetchone()[0] for name in sorted(STATUSES)}}
+                    ).fetchone()[0] + sum(item["evaluation"] is not None and item["evaluation"]["status"] == name
+                                             for item in archived.values()) for name in sorted(STATUSES)}}
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("init", "enqueue", "send-once", "status", "run"))
+    parser.add_argument("command", choices=("init", "enqueue", "send-once", "status", "compact", "run"))
     parser.add_argument("--directory", required=True, type=Path)
     parser.add_argument("--base-url", default="http://127.0.0.1:18080")
     parser.add_argument("--tls-profile", type=Path)
@@ -598,6 +725,10 @@ def main(argv=None):
                 result = collector.enqueue_file(args.input)
             elif args.command == "send-once":
                 result = collector.send_once()
+            elif args.command == "compact":
+                result = collector.compact()
+                if args.input_directory is not None:
+                    result["retired_inputs"] = collector.retire_inputs(args.input_directory)
             elif args.command == "run":
                 if args.input_directory is None or not 0.05 <= args.poll_seconds <= 60:
                     raise ValueError("execution_collector_run_arguments")

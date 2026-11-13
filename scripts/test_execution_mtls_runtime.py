@@ -40,7 +40,8 @@ class Checks(BaseChecks):
 c=sqlite3.connect('/observer/state/execution-spool.sqlite3');c.row_factory=sqlite3.Row
 print(json.dumps({'records':[dict(r) for r in c.execute('SELECT evidence_id,status,attempts,envelope_sha256 FROM records')],
  'evaluations':[dict(r) for r in c.execute('SELECT evidence_id,status,result FROM evaluations')],
- 'files':c.execute('SELECT COUNT(*) FROM input_files').fetchone()[0]}))
+ 'files':c.execute('SELECT COUNT(*) FROM input_files').fetchone()[0],
+ 'archive':[dict(r) for r in c.execute('SELECT ordinal,evidence_id,raw_bytes,digest FROM execution_archive ORDER BY ordinal')]}))
 """
         return json.loads(self.runtime.execute('execution-observer', ['python', '-c', program]))
 
@@ -187,6 +188,33 @@ print(json.dumps({'records':[dict(r) for r in c.execute('SELECT evidence_id,stat
         self.access(unrelated, True, 'trusted_adverse_unrelated_200')
         self.add('trusted_signal_enforcement_timing', event_id='execution-adverse',
                  sent_at=sent.isoformat(), observed_at=datetime.now(UTC).isoformat())
+        # Archive within the live mTLS graph before exercising the restore fence.
+        retained = json.loads(runtime.execute('execution-observer', [
+            'python', '-m', 'scripts.behavior_execution_collector', 'compact',
+            '--directory', '/observer/state', '--base-url', 'https://core:8000',
+            '--tls-profile', '/tls/core.json', '--input-directory', '/observer/input',
+        ]))
+        self.require(retained['compacted'] >= 5 and retained['retired_inputs'] >= 5,
+                     'execution_terminal_history_not_archived')
+        server = json.loads(runtime.execute('app', [
+            'python', '-m', 'scripts.context_maintenance', 'compact',
+            '--database', '/data/app-behavior-context.sqlite3',
+        ]))
+        self.require(server['archived_records'] > 0, 'execution_server_history_not_archived')
+        history = self.spool()['archive']
+        self.publish(normal, filename='duplicate-normal')
+        self.wait(lambda: runtime.execute('execution-observer', ['python', '-c',
+                  "from pathlib import Path;print(Path('/observer/input/duplicate-normal.json').exists())"]).strip() == 'False',
+                  'execution_archived_duplicate_not_retired')
+        self.require(self.spool()['archive'] == history and not any(
+            row['evidence_id'] == 'execution-approved-normal' for row in self.spool()['records']),
+                     'execution_archived_duplicate_requeued')
+        self.access(related, False, 'after_archive_related_403')
+        unaffected = self.mint('after-archive-unrelated', user_id='runtime-other', device_id='other-device')
+        self.access(unaffected, True, 'after_archive_unrelated_200')
+        self.add('terminal_spool_and_input_rotation_preserve_original_history',
+                 compacted=retained['compacted'], retired_inputs=retained['retired_inputs'],
+                 server_archived=server['archived_records'])
         # Use an unaffected subject to prove restore fencing independently of revocation.
         old = self.mint('restore-old-unrelated', user_id='runtime-other', device_id='other-device')
         before_spool = self.spool()
