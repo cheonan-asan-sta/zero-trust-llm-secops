@@ -2,7 +2,7 @@
 
 2026-11-14. [v62 스캐너 읽기 요청 후보](extra-scanner-read-review.md)를 별도 Wardbeck 출처에
 적용하는 동결·원시 준비·예측·채점 경로를 준비했다. **이 문서 시점의 실제 출처 평가는 아직 미완료다.**
-아래6행 제어 시험과170개 Linux 테스트는 실제 Wardbeck 성능 수치가 아니다.
+아래6행 제어 시험과174개 Linux 테스트는 실제 Wardbeck 성능 수치가 아니다.
 
 ## 원래 자료 역할 보존
 
@@ -39,8 +39,12 @@ python -m scripts.run_scanner_transfer predict --freeze <freeze.json> --freeze-s
 python -m scripts.run_scanner_transfer score --freeze <freeze.json> --freeze-sha256 <SHA> --archive <archive.zip> --raw-directory <raw> --prediction-directory <predictions> --prediction-manifest-sha256 <SHA> --output <새_score>
 ```
 
-- Windows 관련48개, network none Linux 관련170개와 전체 Ruff+RUF100 통과.
+- Windows 관련52개, network none Linux 관련174개와 전체 Ruff+RUF100 통과.
 - 실제 모델·파서·네 단계·정답 채점으로6행 합성 제어를 실행했다. v62 새 TP1·새 FP/TP 손실0, 봉인 전 라벨 멤버 읽기0.
 - 기존 v53 회귀·후보/자료 역할 변조·순서 결속·라벨 격리·기존 점수 재현을 함께 검사했다.
-- Linux 소스956파일 불변·소유 컨테이너 제거, 유료 API/AWS 호출0.
-- [준비 실행 근거](infrastructure-results/extra-scanner-transfer-ready-v63-20261114.json)를 실제 평가 완료 증거로 대신하지 않는다.
+- Linux 소스958파일 불변·소유 컨테이너 제거, 유료 API/AWS 호출0.
+- [준비 실행 근거](infrastructure-results/extra-scanner-transfer-ready-v63-20261114-02.json)를 실제 평가 완료 증거로 대신하지 않는다.
+
+자료 본문을 열기 전 추가 대조로 원래 `native-data-protocol.json`도 직접 확인한다.
+Wardbeck을 개발/최종 용도로 옮기거나 보정 목록에서 삭제·중복한 계약은 동결 전에 거부한다.
+첫 준비 지문/시험 기록은 별도 파일로 유지했고, 위52/174개는 이 네 반례를 포함한 최종 준비 검증이다.

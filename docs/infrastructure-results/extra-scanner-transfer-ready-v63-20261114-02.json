@@ -1,0 +1,59 @@
+{
+  "schema": "extra-scanner-calibration-transfer-ready-1",
+  "completed": true,
+  "readiness_only": true,
+  "actual_source_evaluation_completed": false,
+  "original_planned_role": "calibration",
+  "redesignated_as_final_holdout": false,
+  "goal_qualified": false,
+  "original_six_domain_goal_replaced": false,
+  "source_id": "ait-wardbeck",
+  "publisher_record": 19483937,
+  "filename": "wardbeck_no-pcaps.zip",
+  "publisher_md5": "14eeacd83571a83615c2cce1f6a6eacf",
+  "source_body_access_before_freeze": 0,
+  "publisher_schedule_metadata_visible": true,
+  "comparison": "v52 versus v62; v49/v51 intermediate stages retained",
+  "validation": {
+    "windows_related_passed": 52,
+    "linux": {
+      "exit_code": 0,
+      "seconds": 13.312,
+      "counts": {
+        "passed": 174
+      },
+      "log": "runtime/f1/scanner-transfer-tests-v63-20261114-02/linux.log",
+      "executed": true,
+      "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+      "source_files": 958,
+      "source_archive_sha256": "8d127708c71e82e4ca102323a980070a9310d3d9d26ba7fa0b70dfaabbe6e1e7",
+      "container_exit": 0,
+      "oom_killed": false,
+      "network_mode": "none",
+      "owned_container": "d3aab1be5e6fcc070346cbb3e625d8ce646edd9fd5936c6cd2673a0d8d1ba2f3",
+      "snapshot_sources_unchanged_after": true,
+      "owned_container_removed": true
+    },
+    "synthetic_control_rows": 6,
+    "synthetic_new_tp": 1,
+    "synthetic_new_fp": 0,
+    "synthetic_lost_tp": 0,
+    "label_members_read_before_prediction_seal": 0
+  },
+  "source_files": {
+    "scripts/f1_lab/rotation_transfer.py": "a6e46d1a415a76be1cf88644cb91735b739c832e81b36b9ea453b8672418fb43",
+    "scripts/f1_lab/scanner_transfer.py": "cd8e30af29563253d971915655e56d886c5afe90937b00ece20bdde1c6cb3d73",
+    "scripts/run_rotated_transfer.py": "a65f286900df65875bb875bd55996f1d91468f2ac4017bcbf79e116f4f956731",
+    "scripts/run_scanner_transfer.py": "a5362944602061401dd141a22cc8fdc1ca31c2220b22e8d6c1bd7e0daa9bfd6a",
+    "scripts/audit_transfer_overlap.py": "aa1e236aa24e87a2aba090e78b91467c94e24985007edacb826c72f2fcedc8cb",
+    "scripts/run_web_scanner_review.py": "1280d9703f28d037df3952e1ec4d05ff0a1ffbf24c2c20fb8a6319833bc8668f",
+    "tests/test_web_scanner_replay.py": "3680611600ea8217e505a36fb21695dd1caa529e2855a7da106446779314c93a",
+    "tests/test_scanner_transfer.py": "f3240c831612e7089ddbda3b0c40eb4ec403ccc7e65e25e642513410913dca98"
+  },
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "previous_readiness_sha256": "7fe5a5842786569755cf80558346f30a418553278d852754af433f2a609474b2",
+  "original_split_file_verified_before_freeze": true,
+  "original_split_reassignment_rejection_cases": 4,
+  "original_split_path": "infra/f1-lab/native-data-protocol.json"
+}
