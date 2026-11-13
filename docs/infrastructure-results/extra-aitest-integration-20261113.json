@@ -152,5 +152,20 @@
     },
     "local_snapshot_note": "First lint snapshot lost Git executable mode for a 100755 script and stopped at EXE001. The successful snapshot preserves Git modes; no repository mode was changed.",
     "full_local_suite_scope": "4714 tests passed before this test-fixture-expression-only change; require fresh full CI on the final PR head."
+  },
+  "runtime_evidence_label_followup": {
+    "recorded_at": "2026-11-13T15:14:18.336243+00:00",
+    "previous_head": "aa29329bf7c37f3ec42995e00f551afd0aed4396",
+    "file": "scripts\\test_database_transport_runtime.py",
+    "sha256": "89b69defb9a7d5ffc88bbb2518540118bce61f9e0f72fef7012d2315dbce7deb",
+    "reason": "The canonical evidence reviewer rejects duplicate check labels; extra repeated the same renewal label for cycles 1 and 2.",
+    "new_labels": [
+      "active_leaves_renew_before_first_paused_transport_ceremony",
+      "active_leaves_renew_before_second_paused_transport_ceremony"
+    ],
+    "runtime_security_behavior_changed": false,
+    "windows_related_tests_passed": 38,
+    "ruff_RUF100": "passed",
+    "full_local_suite_scope": "4714 passed before the reporting-label-only change; fresh full CI and report validation are required on the new head."
   }
 }

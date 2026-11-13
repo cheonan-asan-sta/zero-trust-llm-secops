@@ -233,7 +233,7 @@ print(json.dumps(result))
         self.report['completed'] = False
         r = self.runtime
         before = self.refresh_active_leaves(label='transport')
-        self.add('active_leaves_renew_before_paused_transport_ceremony', cycle=1)
+        self.add('active_leaves_renew_before_first_paused_transport_ceremony', cycle=1)
         initial = self.retired_db_identity(save=True)
         self.require(initial['accepted'] and initial['unexpired'], 'transport_old_client_positive_control')
         self.add('old_database_client_authenticates_before_transport_rotation')
@@ -259,7 +259,7 @@ print(json.dumps(result))
         prior_rows = security_rows(r)
         prior_credentials = r.controller_status()['credentials']
         second_before = self.refresh_active_leaves(label='transport')
-        self.add('active_leaves_renew_before_paused_transport_ceremony', cycle=2)
+        self.add('active_leaves_renew_before_second_paused_transport_ceremony', cycle=2)
         renewed_rows = security_rows(r)
         server_generations = sum(c['generation'] - prior_credentials[uid]['generation']
             for uid, c in second_before['credentials'].items() if c['purpose'] == 'serverAuth')
