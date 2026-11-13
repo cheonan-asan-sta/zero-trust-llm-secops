@@ -16,6 +16,7 @@ from app.analyzers import HybridAnalyzer, OpenAIAnalyzer, RuleBasedAnalyzer
 from app.analyzers.base import Analyzer
 from app.behavior_context_api import behavior_context_router
 from app.config import get_settings
+from app.dashboard_api import router as dashboard_router
 from app.middleware import RequestBodyLimitMiddleware, RequestContextMiddleware
 from app.models import (
     AnalysisResult,
@@ -114,6 +115,7 @@ app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.allowed_host_li
 app.add_middleware(RequestBodyLimitMiddleware, max_bytes=settings.api_max_body_bytes)
 app.add_middleware(RequestContextMiddleware)
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
+app.include_router(dashboard_router)
 audit_store = create_audit_store(settings)
 case_store = create_case_store(settings)
 integration_outbox_store = create_integration_outbox_store(settings)
