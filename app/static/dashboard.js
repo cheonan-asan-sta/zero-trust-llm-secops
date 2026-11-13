@@ -91,6 +91,7 @@
     const stamp = new Date(value);
     if (!value || Number.isNaN(stamp.getTime())) return "—";
     return stamp.toLocaleString("ko-KR", full ? {
+      year: "numeric",
       month: "2-digit",
       day: "2-digit",
       hour: "2-digit",
@@ -316,7 +317,7 @@
       action.append(node("span", actions[record.policy_decision.action] || record.policy_decision.action), node("span", reviews[record.review_status] || record.review_status, "event-id"));
       const detail = node("td");
       detail.append(rowButton(record, "log"));
-      row.append(risk, event, node("td", record.analyzer, "mono"), action, node("td", date(record.analyzed_at), "mono"), detail);
+      row.append(risk, event, node("td", record.analyzer, "mono"), action, node("td", date(record.analyzed_at, true), "mono"), detail);
       target.append(row);
     });
   }
@@ -555,7 +556,7 @@
       openai: "OpenAI 분석",
       hybrid: "규칙 + OpenAI"
     } [health.analyzer_mode] || health.analyzer_mode : "—");
-    text("footerVersion", health ? `v${health.version} / ${health.environment.toUpperCase()}` : "LOCAL FRAMEWORK");
+    text("footerVersion", health ? `v${health.version} / ${health.environment.toUpperCase()} / ${Intl.DateTimeFormat().resolvedOptions().timeZone}` : "LOCAL FRAMEWORK");
     const errors = Object.entries(state.errors);
     const coreOkay = ["health", "identity", "metrics", "logs", "sessions"].every((key) => state.data[key]);
     text("connectionStatus", coreOkay ? (errors.length ? "일부 조회 기능 확인 필요" : "조회 API 연결됨") : "데이터 조회 확인 필요");

@@ -152,6 +152,7 @@ def run(args, directory, report):
             record["assessment"]["rationale"] = '<img src=x onerror="window.uiInjected=true">'
             record["grant_token"] = "SYNTHETIC_SECRET_MUST_NOT_EXPORT"
             record["event_id"] = "hostile-fixture"
+            record["analyzed_at"] = "2025-01-02T12:34:56+00:00"
             logs_pattern = "**/results?limit=100"
             page.route(logs_pattern, lambda route: route.fulfill(json=[record]))
             page.route("**/results/hostile-fixture", lambda route: route.fulfill(json=record))
@@ -159,6 +160,8 @@ def run(args, directory, report):
             expect(page.locator("#refresh")).to_be_enabled()
             page.get_by_role("link", name="로그 탐색").click()
             expect(page.locator("#logRows")).to_contain_text("hostile-fixture")
+            expect(page.locator("#logRows")).to_contain_text("2025")
+            check("historical_logs_show_calendar_year")
             page.locator("#logRows button").click()
             expect(page.locator("#detailBody")).to_contain_text("<img src=x")
             check("stored_markup_is_text", page.locator("#detailBody img").count() == 0
