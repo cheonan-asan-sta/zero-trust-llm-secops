@@ -1,6 +1,25 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
-## 현재 상태: v46 웹 위험/검토 영속화·중복/중단 복구
+## 현재 상태: v47 암호화 백업·복원과 외부 checkpoint
+
+[최신 백업/복원 설명](docs/extra-web-ledger-backup.md)과
+[실행·시험 근거](docs/infrastructure-results/extra-web-backup-v47-20261113.json)을 먼저 읽는다.
+새 `web_ledger_backup.py`는 잠금+SQLite backup 스냅샷과 witness/HMAC키를 AES-256-GCM으로 묶는다.
+별도 caller-held 복구 키32bytes·정확한 유지보수 주체+ADMIN·외부 manifest/checkpoint SHA를 요구한다.
+새 경로만 허용하고 검증 뒤 manifest/restore marker를 게시하며 자동 서비스 활성화는 없다.
+`CheckpointedWebLedger`는 매 접근마다 외부 pin/최소 prefix/시각을 검사해 로컬 전체 이력 rollback도 고정 지점까지 거부한다.
+기존 base ledger 경로에 자동 적용되지는 않는다. 마지막 pin 이후 미고정 기록은 이 보호 밖이다.
+
+예제10개·신규30포함 Windows/Linux 관련387개씩·Ruff 통과. 새 process-exit5경계(기존8도 회귀 포함).
+Linux network none·748소스 전후 동일·exit0/OOM false·컨테이너 제거.
+실제 실행 `runtime/f1/web-backup-controls-v47-20261113`, 시험 `runtime/f1/web-backup-tests-v47-20261113`.
+예제 복구 키는 메모리에만 있어 실행 후 재복호화할 운영 키를 제공하지 않는다. 테스트 key 파일/witness비밀은 공개/Git 금지다.
+remote WORM/KMS/물리 독립 보관·HA·writer fencing/절체·실제 센서/사건 인수는 미완료다.
+checkpoint와 기대SHA까지 함께 rollback하는 공격을 막으려면 별도 보호가 필요하다. 로컬 논리분리만 검증했다.
+실제 서버 수집/새 독립 평가/F1측정0, 앱·기존 모델/라벨/v44~46코드 보존.
+유료API/AWS/다운로드/push/병합0·사용자ZIP 보존. 다음은 실제 수집·키/pin 운영 보관·writer 절체/사건 인수다.
+
+## v46 보존 기록: 웹 위험/검토 영속화·중복/중단 복구
 
 [최신 기록부/복구 설명](docs/extra-web-evidence-ledger.md)과
 [실행·시험 근거](docs/infrastructure-results/extra-web-durable-v46-20261113.json)을 먼저 읽는다.

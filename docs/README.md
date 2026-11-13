@@ -1,6 +1,11 @@
 # 개발 주차별 산출물
 
-2026-11-13 최신 후속: [웹 위험·검토 영속화 v46](extra-web-evidence-ledger.md).
+2026-11-13 최신 후속: [웹 기록부 암호화 백업·복원 v47](extra-web-ledger-backup.md).
+일관된 스냅샷·암호화 묶음·외부 checkpoint 지문·복원본 접근 시 재검사를 추가했다.
+예제10개·새 process-exit5경계 포함 Windows/Linux 관련387개씩 통과했다.
+운영 키/원격 보관·실제 수집/F1 측정은 미완료이며 무료 로컬·앱 변경/병합/push0이다.
+
+2026-11-13 이전 후속: [웹 위험·검토 영속화 v46](extra-web-evidence-ledger.md).
 검증 시작/완료 기록·중복·재시작 위험 유지·중단 복구·DB/witness 무결성 검사를 추가했다.
 기능 예제10개·실제 process exit8경계 포함 Windows/Linux 관련357개씩 통과했다.
 기존 경보 자동 해제/앱 연결·실제 수집/새F1 측정은 없고 무료 로컬·병합/push0이다.
