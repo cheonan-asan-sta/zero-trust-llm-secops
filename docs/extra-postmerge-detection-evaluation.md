@@ -1,5 +1,8 @@
 # 병합 후 잔여 오류 개선과 출처 분리 평가 v49
 
+후속 개발 결과는 [v50 회전 웹 로그](extra-rotation-development.md)와
+[v51 선행 위험 문맥](extra-command-history-development.md)에 있다. 아래 동결된 v49 결과는 보존한다.
+
 2026-11-14 · PR #58 병합본 `aitest`의 `cea8303ad40350e07d088767d570fb340e89156e`에서 시작했다.
 작업 브랜치는 `feature/chaeheeju-postmerge-detection-evaluation`이다.
 기존 v43 준비 패킷·모델·원본 라벨·v44 결과는 보존한다.
