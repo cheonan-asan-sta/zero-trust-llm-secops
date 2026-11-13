@@ -22,6 +22,10 @@ def wardbeck_fixture(tmp_path):
     root, archive, acquisition = freezer_fixture(tmp_path)
     for asset, policy in [('asset_id', 'asset_id'), ('filename', 'filename'), ('publisher_md5', 'publisher_md5')]:
         acquisition['asset'][asset] = POLICY[policy]
+    (root/'infra/f1-lab/native-data-protocol.json').write_bytes(canonical({
+        'schema_version': 'f1-native-data-protocol-1', 'source_records': {'raw_logs': POLICY['metadata_source']},
+        'scenario_split_proposal': {'development': ['russellmitchell'], 'calibration': ['wardbeck'], 'reserved_final': ['wilson']},
+        'original_six_domain_goal_replaced': False, 'full_six_domain_goal_eligible': False}))
     return root, archive, acquisition
 
 
@@ -59,6 +63,24 @@ def test_wrong_publisher_or_exposed_source_cannot_be_frozen(tmp_path):
     (archive.parent/'evaluation-access.json').write_bytes(b'{}')
     with pytest.raises(ValueError, match='unsealed_source'):
         freeze(root, original, archive, tmp_path/'exposed.json')
+
+
+@pytest.mark.parametrize('role', ['development', 'reserved_final', 'duplicate', 'missing'])
+def test_original_data_plan_cannot_be_reassigned_before_freezing(tmp_path, role):
+    root, archive, acquisition = wardbeck_fixture(tmp_path)
+    path = root/'infra/f1-lab/native-data-protocol.json'
+    plan = decode(path.read_bytes())
+    roles = plan['scenario_split_proposal']
+    if role == 'duplicate':
+        roles['calibration'].append('wardbeck')
+    else:
+        roles['calibration'].remove('wardbeck')
+        if role != 'missing':
+            roles[role].append('wardbeck')
+    path.write_bytes(canonical(plan))
+    with pytest.raises(ValueError, match='original_role_changed'):
+        freeze(root, acquisition, archive, tmp_path/'freeze.json')
+    assert not (tmp_path/'freeze.json').exists()
 
 
 @pytest.mark.parametrize('stage,policy', [(False, POLICY), (True, WILSON_POLICY), ('yes', POLICY)])
