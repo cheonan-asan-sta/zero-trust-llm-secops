@@ -80,6 +80,32 @@ def test_ipv6_peer_and_reverse_query_are_observations_not_authority():
     assert not any('trust' in key or 'identity' in key for key in empty())
 
 
+@pytest.mark.parametrize('message', ['reply a.example is NXDOMAIN',
+    'forwarded a.example to 192.0.2.53', 'started, version 2.90 cachesize 150',
+    'query[A] bad..example from 192.0.2.1'])
+@pytest.mark.parametrize('moment', [None, 100, 102])
+@pytest.mark.parametrize('boundary', [{'pid': 456}, {'host': 'other'}])
+def test_non_query_process_boundary_clears_committed_and_pending_history(message, moment, boundary):
+    window = DNSWindow()
+    query = line('query[A] private.example from 192.0.2.1')
+    for _ in range(10):
+        window.observe(query, 100)
+    assert window.observe(query, 101)['dns_peer_queries_60s'] == 1
+    window.observe(line(message, **boundary), moment)
+    # Returning to the original PID must not resurrect its earlier counters.
+    assert not window.groups and not window.pending
+    assert window.observe(query, 103)['dns_peer_queries_60s'] == 0
+
+
+def test_same_process_non_query_does_not_clear_usable_history():
+    window = DNSWindow()
+    query = line('query[A] private.example from 192.0.2.1')
+    for _ in range(10):
+        window.observe(query, 100)
+    window.observe(line('reply private.example is NXDOMAIN'), None)
+    assert window.observe(query, 101)['dns_peer_queries_60s'] == 1
+
+
 @pytest.mark.parametrize('moment', [True, '1', float('nan'), float('inf')])
 def test_invalid_time_rejected(moment):
     with pytest.raises(ValueError, match='dns_time'):

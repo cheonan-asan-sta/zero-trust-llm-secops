@@ -95,14 +95,17 @@ class DNSWindow:
     def observe(self, line, moment):
         features, keys = observe_syntax(line)
         require(moment is None or type(moment) in {int, float} and math.isfinite(moment), 'dns_time')
+        # A reply, startup message, or malformed query can still show a process
+        # boundary. Observe that boundary even without a usable query or time.
+        prefix = PREFIX.fullmatch(line)
+        scope = hashlib.sha256(((prefix['host'] or '<physical-source>')+':'+prefix['pid']).encode()).digest() if prefix else None
+        if (moment is not None and self.moment is not None and moment < self.moment
+                or scope is not None and self.scope is not None and scope != self.scope):
+            self.groups, self.pending, self.moment, self.scope = {}, [], None, None
+        if scope is not None:
+            self.scope = scope
         if moment is None:
             return features
-        if self.moment is not None and moment < self.moment:
-            self.groups, self.pending, self.scope = {}, [], None
-        if keys is not None and self.scope is not None and keys[0] != self.scope:
-            self.groups, self.pending = {}, []
-        if keys is not None:
-            self.scope = keys[0]
         if self.moment is None or moment > self.moment:
             for previous, peer, name, kind, reverse in self.pending:
                 require(peer in self.groups or len(self.groups) < 10000, 'dns_peer_bound')
