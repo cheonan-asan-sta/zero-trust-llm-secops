@@ -3,6 +3,9 @@
 import base64
 import zipfile
 
+import pytest
+
+from scripts import audit_transfer_overlap as overlap
 from scripts import prepare_transfer_source as intake
 from scripts import run_rotated_transfer as driver
 from scripts.f1_lab.native_binary_tree import NativeBinaryTree
@@ -103,6 +106,14 @@ def test_real_three_stage_replay_never_opens_labels_until_sealed(tmp_path, monke
     assert packet['population'] == 5 and packet['inference_errors'] == 0
     assert state['label_members_read'] == 0 and not (prepared/'truth.jsonl').exists()
     assert packet['stages']['v51']['population'] == 5 and packet['stages']['v52']['population'] == 5
+    audited = overlap.audit(tmp_path, tmp_path/'freeze.json', anchor, output/'prediction-manifest.json',
+        packet['manifest_sha256'], prepared, [prepared], tmp_path/'overlap', freeze_checker=lambda *_: value)
+    assert audited['heldout_rows'] == audited['rows_matching_development_feature_vector'] == 5
+    assert audited['rows_removed_from_evaluation'] == 0 and audited['exact_raw_source_overlap']
+    assert state['label_members_read'] == 0 and not (tmp_path/'overlap/overlap.sqlite3').exists()
+    with pytest.raises(ValueError, match='overlap_prediction_seal'):
+        overlap.audit(tmp_path, tmp_path/'freeze.json', anchor, output/'prediction-manifest.json',
+            'b'*64, prepared, [prepared], tmp_path/'bad-overlap', freeze_checker=lambda *_: value)
     state['may_open_labels'] = True
     result = driver.score_packet(tmp_path, source, tmp_path/'freeze.json', anchor, raw, output,
                                  packet['manifest_sha256'], tmp_path/'score')

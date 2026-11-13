@@ -37,6 +37,9 @@
    예측 컨테이너를 정리한 뒤 별도 채점 프로세스에서 정답을 읽는다. 아직 실제 Wilson 실행을 완료한 상태는 아니다.
 5. **채점:** 예측/원문 manifest·중간 단계 지문을 다시 확인한 뒤 정답을 읽는다.
    전체 및 물리 파일별 수치, 각 단계의 새 TP/FP·기존 TP 손실을 함께 남긴다.
+6. **중복 감사:** 고정된 예측을 확인한 뒤 기존 R/S/F와 이미 관측한 Harrison 웹·VPN의
+   원시 파일 SHA 및 특징 벡터 일치를 센다. 일치 행을 삭제하거나 정답을 후보에 되돌리지 않는다.
+   `audit_transfer_overlap --protocol rotated`는 해당 동결 계약을 처음과 끝에 검증한다.
 
 [rotation_transfer.py](../scripts/f1_lab/rotation_transfer.py)에 고정 계약·선택·최종 예측 결합을,
 [run_rotated_transfer.py](../scripts/run_rotated_transfer.py)에 단계별 CLI를 구현했다.
@@ -65,6 +68,10 @@ python -m scripts.run_rotated_transfer score --freeze <freeze.json> --freeze-sha
   테스트에 작은 명시적 예산을 지정해 재검증했다. 실제 평가의 디스크·모집단 보호 조건은 낮추지 않았다.
 - Linux는 캐시 이미지·network none·비root·읽기 전용 root로 실행했다. 소스922파일 불변과 소유 컨테이너 제거를 확인했다.
   유료 LLM/AWS 호출0. 다운로드는 게시자의 비상업 연구 사용 조건을 따르는 공개 자료 수집이다.
+- 중복 감사 연결 보완 후 Windows 관련25개와 Linux 관련149개를 다시 통과했다.
+  마지막 Linux 스냅샷은924파일이며 전체 Ruff+RUF100, 소스 불변, 컨테이너 제거를 확인했다.
+  합성5행을 자기 자신과 대조하면5행이 겹치고 제거 행0, 정답 본문 읽기0이며
+  변조된 예측 manifest 지문은 거부된다. 앞선149개와 합산하지 않는다.
 
 ## 원래 목표와의 관계
 
