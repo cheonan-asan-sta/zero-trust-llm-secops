@@ -6,6 +6,7 @@ All observations here are explicitly synthetic fixtures, not a detection benchma
 import argparse
 import hashlib
 import json
+import re
 import subprocess
 import time
 from datetime import UTC, datetime, timedelta
@@ -20,19 +21,66 @@ from scripts.test_recoverable_mtls_runtime import READ_STATE, RESTORE_EXITS
 ACTOR = {'principal_id': 'runtime-user', 'workload_id': 'runtime-backup', 'executable_sha256': '4' * 64}
 DESTINATIONS = [{'kind': 'https', 'host': 'archive.example.test', 'port': 443, 'path': '/backup'}]
 
+# Only server-owned, fixed messages may become diagnostic categories. Arbitrary
+# response text, credentials, grants and request bodies never enter the report.
+FAILURE_DETAILS = {
+    'Signal source, signature, scope or freshness rejected': 'signal_rejected',
+    'Trusted signal registry unavailable; access denied': 'registry_unavailable',
+    'Session version, identity, order or event conflict': 'session_conflict',
+    'Zero Trust journal unavailable; access denied': 'journal_unavailable',
+    'Signal inbox unavailable; delivery not acknowledged': 'inbox_unavailable',
+    'Signal inbox capacity reached; delivery not accepted': 'inbox_full',
+    'Session not found': 'session_missing',
+    'Authentication required': 'authentication_required',
+    'Authentication configuration is unavailable': 'authentication_unavailable',
+    'Verified context state is unavailable': 'context_unavailable',
+    'Verified response state is unavailable': 'response_unavailable',
+}
+
+
+def safe_failure(result, *, stage, expected):
+    """Bounded diagnostics, including malformed replies, without response content."""
+    result = result if isinstance(result, dict) else {}
+    body = result.get('body')
+    detail = body.get('detail') if isinstance(body, dict) else None
+    code = FAILURE_DETAILS.get(detail, 'unclassified_response') if isinstance(detail, str) else (
+        'validation_rejected' if isinstance(detail, list) else 'missing_or_invalid_response')
+    status = result.get('status')
+    sha = result.get('body_sha256')
+    tls = result.get('tls_version')
+    return {
+        'stage': stage, 'expected_status': expected,
+        'observed_status': status if type(status) is int and 100 <= status <= 599 else None,
+        'category': code,
+        'tls': tls if isinstance(tls, str) and tls in {'TLSv1.2', 'TLSv1.3'} else None,
+        'response_sha256': sha if isinstance(sha, str) and re.fullmatch(r'[a-f0-9]{64}', sha) else None,
+        'observed_at': datetime.now(UTC).isoformat(),
+    }
+
 
 class Checks(BaseChecks):
     def __init__(self, directory):
         super().__init__(directory, runtime_class=ExecutionRuntime)
         self.report['schema'] = 'execution-mtls-verification-1'
 
+    def expect_reply(self, result, expected, label):
+        if (not isinstance(result, dict) or type(result.get('status')) is not int
+                or result.get('status') != expected):
+            self.report['failure_diagnostics'] = safe_failure(result, stage=label, expected=expected)
+            self.save()
+            raise RuntimeFailure(label)
+        if result.get('tls_version') != 'TLSv1.3':
+            self.report['failure_diagnostics'] = safe_failure(result, stage='execution_tls13_required',
+                                                             expected=expected)
+            self.save()
+            raise RuntimeFailure('execution_tls13_required')
+
     def api(self, path, body=None, *, observer=False, expected=200):
         request = {'path': path, 'method': 'POST' if body is not None else 'GET'}
         if body is not None:
             request['body'] = body
         result = (self.runtime.observer_probe(request) if observer else self.runtime.context_probe(request))
-        self.require(result['status'] == expected, 'execution_http_' + str(result['status']))
-        self.require(result['tls_version'] == 'TLSv1.3', 'execution_tls13_required')
+        self.expect_reply(result, expected, 'execution_api_reply')
         return result['body']
 
     def spool(self):
@@ -47,8 +95,16 @@ print(json.dumps({'records':[dict(r) for r in c.execute('SELECT evidence_id,stat
 
     def fixture(self, name, *, actor=ACTOR, destinations=DESTINATIONS):
         issued = self.runtime.mint({'session_id': 'session-' + name})
-        self.require(issued['status'] == 200, 'execution_fixture_session')
-        session = issued['body']['session']
+        self.expect_reply(issued, 200, 'execution_fixture_session')
+        body = issued.get('body')
+        session = body.get('session') if isinstance(body, dict) else None
+        if (not isinstance(session, dict) or session.get('session_id') != 'session-' + name
+                or type(session.get('version')) is not int or session.get('version') != 1
+                or not isinstance(session.get('input_digest_sha256'), str)
+                or re.fullmatch(r'[a-f0-9]{64}', session['input_digest_sha256']) is None):
+            self.report['failure_diagnostics'] = safe_failure(issued, stage='execution_fixture_payload', expected=200)
+            self.save()
+            raise RuntimeFailure('execution_fixture_payload')
         data = {'session': session, 'capture_id': name, 'actor': actor, 'destinations': destinations}
         bundle = json.loads(self.runtime.execute('operator', ['python', '-m', 'scripts.execution_runtime_fixture'],
                                                 json.dumps(data)))
@@ -81,8 +137,7 @@ print(json.dumps({'records':[dict(r) for r in c.execute('SELECT evidence_id,stat
             request = {'path': '/response/requests' + path, 'method': 'POST', 'body': body}
             reply = (self.runtime.probe(request) if reviewer is None
                      else self.runtime.reviewer_probe(reviewer, request))
-            self.require(reply['status'] == expected and reply['tls_version'] == 'TLSv1.3',
-                         'execution_response_quorum_http')
+            self.expect_reply(reply, expected, 'execution_response_quorum_http')
             return reply['body']
 
         view = post('', {'request_id': 'execution-response', 'session_id': target[0],
@@ -108,7 +163,8 @@ print(json.dumps({'records':[dict(r) for r in c.execute('SELECT evidence_id,stat
         runtime = self.runtime
         runtime.up()
         self.report.update(release=runtime.state['release'], image_id=runtime.state['image_id'],
-                           nginx_image_id=runtime.state['nginx_image_id'])
+                           nginx_image_id=runtime.state['nginx_image_id'],
+                           source_commit=runtime.state['source_commit'], source_dirty=runtime.state['source_dirty'])
         self.require(len(runtime.services) == 10 and len(runtime.volumes) == 28, 'execution_inventory')
         self.add('locked_mtls_runtime_started', services=10, volumes=28)
         for path in ('/detections/context/baselines', '/detections/context/approvals',
@@ -252,20 +308,29 @@ def main(argv=None):
     parser.add_argument('--directory', type=Path, default=ROOT / 'runtime/c02/execution-check')
     args = parser.parse_args(argv)
     checks = Checks(args.directory)
+    exit_code = 0
     try:
         checks.run()
-        return 0
     except (RuntimeFailure, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as error:
         checks.report.update(completed=False, error=type(error).__name__)
         if isinstance(error, RuntimeFailure):
             checks.report['error_code'] = str(error)
         checks.save()
         print(json.dumps({'completed': False, 'error': type(error).__name__}))
-        return 1
+        exit_code = 1
     finally:
         if checks.runtime.descriptor.exists():
-            checks.report['cleanup'] = checks.runtime.down(purge=True)
+            try:
+                checks.report['cleanup'] = checks.runtime.down(purge=True)
+                if checks.report['cleanup'].get('purged') is not True:
+                    checks.report['completed'] = False
+                    exit_code = 1
+            except (RuntimeFailure, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as error:
+                checks.report['cleanup'] = {'purged': False, 'error': type(error).__name__}
+                checks.report['completed'] = False
+                exit_code = 1
             checks.save()
+    return exit_code
 
 
 if __name__ == '__main__':
