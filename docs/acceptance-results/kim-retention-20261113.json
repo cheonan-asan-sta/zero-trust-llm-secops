@@ -465,11 +465,12 @@
         "topology_sha256": "db2a4edf88a9baab4098fece0e66acdf1a5f3535887415462a1c92c262ed38c0"
       },
       "sha256": "ec827671d53c52553e6a47ae18182b89661141ea54712a616834d4c0e1774309"
-    }
+    },
+    "local_source_commit": "5d3807fbbadb6d3dfcaef2c57cc96801eba61bc5"
   },
   "evaluation": {
-    "report_sha256": "0a63e6bc683adba5671ff307ec6b36fc72155624c8fd0e07ebd6e0dcd01cdb5c",
-    "manifest_sha256": "c15d75e5b971f06728ffdf27961b3b32b7c0a0647ca13b06795b94682f6cc6a4",
+    "report_sha256": "11af8b6cd315ef1a367bc16099ad19433e85bbf357d95f7500ab2129f9f14042",
+    "manifest_sha256": "3e6d7020fe5b1114cec93635ad3a6e3227b326d48a1e4483e30943895e6fc437",
     "origin_manifest_sha256": "6b145584b21b5850d25b59a041049fe38513cd47c7af6da754de7c2de187bf41",
     "input_and_label_sha256": {
       "fresh/inputs.jsonl": "8e69afd36ca95bb46884082179a93c8c9bf03c81dd794a649ceb8c1993adbe1c",
@@ -673,7 +674,7 @@
       "scripts/rekey_mtls_runtime.py": "6cb80eef36396adb4561051c65ebdceaea3f1834812d3ca830fbcf97c4e669be",
       "scripts/rekey_runtime_assets.py": "cb6f3a3175a3850f74a55732334e47a01d0d1d653c366a6f64a0b5f09c996b2e",
       "scripts/rekey_runtime_control.py": "594969b61b3d71a134dd060b2773e71a4cf1c3ecdafc5aa0da9f104ab7a58f3e",
-      "scripts/replay_evaluation_evidence.py": "532110d8961802167b93b85b0367f5e308858b2f2f03e0a617afa66e7ce56e83",
+      "scripts/replay_evaluation_evidence.py": "96ad71968b5c51671dc800b68ab023f11bbdebbad45b63a59176c52db3c46bdb",
       "scripts/review_supply_chain.py": "9d5425ca6e27aed96e224d79f3ef40af4bb0e20f2eeb9847d7f6f0895fd4efa4",
       "scripts/runtime_release.py": "cd8f2dc0224c2859d27cc9c53d66fa85c52aa58500d0974ca67e366e1ab5dece",
       "scripts/serve_recovered_app.py": "5b3767e4784811d15411609d4613e10c7b9e0ebeef55673adef29f77e6c2e0b3",
@@ -1018,9 +1019,37 @@
     "production_approved": false
   },
   "local_tests": {
-    "passed": 3482,
+    "source_commit": "812e46ff2fd9cd807315050bf9b8e478eec27125",
+    "passed": 3483,
     "skipped": 2,
     "ruff": "success",
-    "log_sha256": "c3b453b8cab07dbf17d55bba14a25b4ce7e14ef367399bab4c77a581fb7ae232"
+    "log_sha256": "296153222ba9cbb00e72609693b17d9beea7fc61932fde0edcc9a82c97e6d15d"
+  },
+  "portability": {
+    "source_commit": "812e46ff2fd9cd807315050bf9b8e478eec27125",
+    "source_dirty": false,
+    "different_checkout_reproduced": true,
+    "previous_directory_relocated": true,
+    "original_previous_directory": "/Users/modori/Documents/(파란학기제연구)LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 프레임워크 구축/zero-trust-llm-secops/runtime/m7/behavior-context-evaluation",
+    "prior_artifact_sha256": {
+      "inputs.jsonl": "5a6e4f118cad88322692cb080584fe0926a8da9cd3f5f6ee60b387c267f33b52",
+      "manifest.json": "5bd41f47903b9b9ba35d3afae71f1c257bfe07498e8528e49710a1745c322a83",
+      "predictions.jsonl": "5bd4a51dd0782e8a894656fc5b7eefac706b89847b8edd6639e30dc20f1a31bf",
+      "private/scoring.jsonl": "05679d75716e750c4a53666fdaebdfa70ab748bdaab58f98775c85e1af8837d4",
+      "report.json": "ceb0cd3de597efd6b45f0d719302679e06218e230414477386f0b8c3e736f9fe"
+    },
+    "overlap_prior_files": 40,
+    "same_input_and_label_bytes": true,
+    "evaluated_sessions": 410,
+    "original_manifests_unchanged": true
+  },
+  "resource_cleanup": {
+    "profile": "secops-m3",
+    "cpu": 2,
+    "memory_gib": 3,
+    "rosetta": false,
+    "original_configuration_restored": true,
+    "docker_context": "colima-secops-m3",
+    "running_containers": []
   }
 }
