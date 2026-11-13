@@ -100,12 +100,16 @@ PR #54를 `aitest`의 `596dae2913f10dd535421cd54ff70f3cb16f09de`로 병합한 �
 ```bash
 .venv/bin/python -m scripts.replay_evaluation_evidence \
   --source runtime/m7/behavior-execution-evaluation \
+  --previous-directory runtime/m7/behavior-context-evaluation \
   --directory runtime/m7/execution-regression-new-run
 .venv/bin/python -m scripts.evaluate_m7_execution_context evaluate \
   --directory runtime/m7/execution-regression-new-run
 ```
 
-이 명령에는 기존 로컬 평가 자료가 필요하다. 저장소만 받은 새 환경의 기능 검증은 위 mTLS
+이 명령에는 기존 로컬 평가 자료가 필요하다. 다른 경로에 복사한 프로젝트에서도
+`--previous-directory`로 실제 위치를 지정할 수 있다. 이전 입력, 라벨, 예측과 보고서의 모든
+원본 해시가 일치할 때만 경로를 바꾸며, 원래 manifest는 수정하지 않는다.
+기존 자료와 중복 여부를 재검사할 때 필요한 이전 입력과 해당 manifest도 전달 묶음에 포함한다. 저장소만 받은 새 환경의 기능 검증은 위 mTLS
 명령과 pytest로 수행하고, 평가 재현에는 별도로 해시가 고정된 자료 묶음을 사용한다.
 
 ## 보고서에 넣을 개인 활동 문안

@@ -20,7 +20,7 @@ FILES = {
 }
 
 
-def prepare(source, target):
+def prepare(source, target, *, previous_directory=None):
     source, target = Path(source), Path(target)
     if source.is_symlink() or not source.is_dir() or target.exists() or target.is_symlink():
         raise ValueError("regression replay requires existing source and fresh target")
@@ -51,6 +51,18 @@ def prepare(source, target):
                               "same_input_and_label_bytes": True,
                               "exposed_cases": True, "new_independent_evaluation": False},
     }
+    if previous_directory is not None:
+        if original["schema"] != "m7-execution-evaluation-1":
+            raise ValueError("previous directory relocation requires execution replay")
+        from scripts.evaluate_m7_execution_context import prior_artifacts
+        previous_directory = Path(previous_directory)
+        if previous_directory.is_symlink() or not previous_directory.is_dir():
+            raise ValueError("previous replay directory must be a regular directory")
+        # A path override never overrides the pinned input, labels or predictions.
+        prior_artifacts(previous_directory, original["previous_artifact_sha256"])
+        manifest["previous_directory"] = str(previous_directory.resolve())
+        manifest["regression_replay"]["original_previous_directory"] = original["previous_directory"]
+        manifest["regression_replay"]["previous_directory_relocated"] = True
     target.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=".regression-replay-", dir=target.parent) as name:
         stage = Path(name) / "bundle"
@@ -73,8 +85,10 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--directory", type=Path, required=True)
+    parser.add_argument("--previous-directory", type=Path,
+                        help="Relocated original context bundle; every historical artifact hash must match")
     args = parser.parse_args(argv)
-    print(json.dumps(prepare(args.source, args.directory)))
+    print(json.dumps(prepare(args.source, args.directory, previous_directory=args.previous_directory)))
 
 
 if __name__ == "__main__":
