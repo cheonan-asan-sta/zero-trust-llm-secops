@@ -3,27 +3,27 @@
   "use strict";
   const $ = (id) => document.getElementById(id);
   const pages = {
-    overview: ["관제 개요", "보안 운영 현황", "접근 판단부터 세션 회수까지, 현재 상태를 한눈에 확인하세요."],
-    logs: ["로그 탐색", "보안 로그 탐색", "위험도와 근거를 살피고, 개별 분석의 원문을 확인하세요."],
-    sessions: ["세션과 접근", "세션과 접근 판단", "인증 이후에도 달라지는 신뢰 상태와 판단 이력을 확인하세요."],
-    evidence: ["증거와 승인", "판단의 근거와 승인", "행위 문맥과 고위험 대응 요청을 현재 신원의 조회 범위에서 확인하세요."],
-    demo: ["시연 시나리오", "지속 검증 시연", "합성 입력으로 실제 로컬 접근 정책의 동작을 확인하세요."],
+    overview: ["관제 개요", "운영 현황", "분석 기록과 세션 상태"],
+    logs: ["로그 탐색", "분석 로그", "최근 100건의 판단 근거와 대응 제안"],
+    sessions: ["세션과 접근", "세션 상태", "접근 판단과 버전별 변경 이력"],
+    evidence: ["증거와 승인", "이력 및 승인", "행위 문맥과 대응 요청의 처리 기록"],
+    demo: ["시연 시나리오", "접근 테스트", "합성 신호로 정상 접근, 토큰 재사용, 회수 후 거부를 확인합니다."],
   };
   const tones = {
     LOW: "teal",
     MEDIUM: "amber",
     HIGH: "red",
-    CRITICAL: "purple",
+    CRITICAL: "critical",
     ALLOW: "teal",
     STEP_UP: "amber",
     HOLD: "amber",
     DENY: "red"
   };
   const colors = {
-    LOW: "#50d6bc",
-    MEDIUM: "#e7b86b",
-    HIGH: "#f57a87",
-    CRITICAL: "#b29bea"
+    LOW: "#83ad96",
+    MEDIUM: "#c4a364",
+    HIGH: "#cf8a6a",
+    CRITICAL: "#d97078"
   };
   const reviews = {
     PENDING: "검토 대기",
@@ -109,10 +109,10 @@
   const empty = (message) => node("p", message, "empty");
 
   function errorLabel(error) {
-    if (error.invalidResponse) return "서버 응답 형식을 확인할 수 없습니다. 데이터를 정상 결과로 표시하지 않습니다.";
+    if (error.invalidResponse) return "서버 응답 형식이 올바르지 않습니다.";
     if (error.status === 401) return "인증이 필요합니다. 연결 및 인증에서 키를 입력하세요.";
     if (error.status === 403) return "조회 권한이 없습니다. 역할과 전송 신원을 확인하세요.";
-    if (error.status === 404 || error.status === 503) return `이 기능을 조회할 수 없습니다 (HTTP ${error.status}). 서버 설정과 저장소를 확인하세요.`;
+    if (error.status === 404 || error.status === 503) return `조회할 수 없습니다 (HTTP ${error.status}). 서버 상태를 확인하세요.`;
     if (error.name === "AbortError") return "요청 시간이 초과되었습니다. 다시 조회하세요.";
     return error.status ? `요청에 실패했습니다 (HTTP ${error.status}).` : "서버에 연결할 수 없습니다. 다시 조회하세요.";
   }
@@ -229,9 +229,8 @@
     return section;
   }
 
-  function openDetail(title, kicker) {
+  function openDetail(title) {
     text("detailTitle", title);
-    text("detailKicker", kicker);
     $("detailBody").className = "detail-body";
     $("detailBody").replaceChildren(empty("기록을 불러오고 있습니다."));
     if (!$("detailDialog").open) $("detailDialog").showModal();
@@ -239,7 +238,7 @@
   }
   async function showRecord(record, type) {
     const epoch = state.epoch;
-    const sequence = openDetail(type === "log" ? "분석 기록 상세" : type === "session" ? "세션 판단 이력" : "대응 요청 상세", type.toUpperCase());
+    const sequence = openDetail(type === "log" ? "분석 기록" : type === "session" ? "세션 이력" : "대응 요청");
     try {
       const path = type === "log" ? `/results/${encodeURIComponent(record.event_id)}` : type === "session" ? `/zero-trust/sessions/${encodeURIComponent(record.session_id)}` : `/response/requests/${encodeURIComponent(record.request_id)}`;
       const item = checked(type === "session" ? "sessions" : type, await request(path));
@@ -278,7 +277,7 @@
           ["대상", item.target?.id],
           ["작업", item.action],
           ["승인", `${item.approved_by.length} / ${item.required_approvals}`]
-        ]), detailsList("요청 사유", [item.reason]), detailsList("검토 이력", item.reviews.map((review) => `${review.subject} / ${date(review.approved_at, true)} / ${review.reason}`)), node("p", "승인과 실행은 기존 API의 서로 다른 신원 및 권한 검사를 따릅니다. 실행 결과는 로컬 모의 대응입니다.", "scope-note"));
+        ]), detailsList("요청 사유", [item.reason]), detailsList("검토 이력", item.reviews.map((review) => `${review.subject} / ${date(review.approved_at, true)} / ${review.reason}`)), node("p", "서로 다른 검토자 2명의 승인이 필요합니다. 실행 결과는 로컬 모의 대응입니다.", "scope-note"));
       }
       body.append(rawPanel(item));
     } catch (error) {
@@ -287,7 +286,7 @@
   }
 
   function rowButton(record, type) {
-    const button = node("button", "상세 ↗", "row-button");
+    const button = node("button", "상세", "row-button");
     button.setAttribute("aria-label", `${record.event_id || record.session_id || record.request_id} 상세`);
     button.addEventListener("click", () => showRecord(record, type));
     return button;
@@ -431,14 +430,14 @@
     const points = (key) => buckets.map((b, i) => `${x(i)},${y(b[key])}`).join(" ");
     chart.append(svg("polygon", {
       points: `42,168 ${points("total")} 625,168`,
-      fill: "#50d6bc",
+      fill: "#8cb5d4",
       opacity: ".08"
     }));
     ["total", "risk"].forEach((key) => {
       chart.append(svg("polyline", {
         points: points(key),
         fill: "none",
-        stroke: key === "total" ? "#50d6bc" : "#f57a87",
+        stroke: key === "total" ? "#8cb5d4" : "#ce827b",
         "stroke-width": 2.2,
         "stroke-linejoin": "round"
       }));
@@ -447,7 +446,7 @@
           cx: x(i),
           cy: y(b[key]),
           r: 3,
-          fill: key === "total" ? "#50d6bc" : "#f57a87"
+          fill: key === "total" ? "#8cb5d4" : "#ce827b"
         });
         const title = svg("title");
         title.textContent = `${date(b.time)} ${key === "total" ? "전체" : "고위험"} ${b[key]}건`;
@@ -546,10 +545,10 @@
 
   function render() {
     const health = state.data.health;
-    text("modeBadge", health ? (health.dashboard_demo ? "합성 시연 데이터 / LOCAL" : `${health.environment.toUpperCase()} / ${health.auth_mode === "disabled" ? "인증 비활성" : "인증 사용"}`) : "연결 확인 필요");
+    text("modeBadge", health ? (health.dashboard_demo ? "합성 시연 데이터" : `${health.environment.toUpperCase()} / ${health.auth_mode === "disabled" ? "인증 비활성" : "인증 사용"}`) : "연결 확인 필요");
     const identity = state.data.identity;
     text("authLabel", identity?.subject || "조회 신원 확인 필요");
-    text("workspaceTenant", identity ? `Tenant / ${identity.tenant_id}` : "테넌트 확인 필요");
+    text("workspaceTenant", identity ? `테넌트: ${identity.tenant_id}` : "테넌트 확인 필요");
     text("identityInfo", identity ? `${identity.subject} / ${identity.tenant_id} / ${identity.roles.join(", ")}` : "현재 조회 신원을 확인할 수 없습니다.");
     text("analyzerMode", health ? {
       rule: "규칙 기반 분석",
@@ -562,7 +561,7 @@
     text("connectionStatus", coreOkay ? (errors.length ? "일부 조회 기능 확인 필요" : "조회 API 연결됨") : "데이터 조회 확인 필요");
     $("statusDot").className = `status-dot ${coreOkay && !errors.length ? "online" : ""}`;
     $("notice").hidden = !errors.length;
-    if (errors.length) text("notice", `${errors.length}개 조회 요청 실패. ${errorLabel(errors[0][1])} 실패한 영역은 이전 값을 표시하지 않습니다.`);
+    if (errors.length) text("notice", `${errors.length}개 항목 조회 실패. ${errorLabel(errors[0][1])}`);
     renderMetrics();
     renderChart();
     renderLogs();
@@ -654,7 +653,7 @@
     state.detailSequence++;
     $("detailDialog").close();
     $("detailBody").replaceChildren();
-    $("demoHistory").replaceChildren(node("li", "정상 세션을 생성하면 실행 기록이 표시됩니다.", "empty"));
+    $("demoHistory").replaceChildren(node("li", "실행 기록이 없습니다.", "empty"));
     text("demoStatus", "대기");
     text("lastUpdated", "마지막 갱신 —");
     $("credential").value = "";
@@ -784,7 +783,7 @@
     link.download = `security-logs-${new Date().toISOString().slice(0, 10)}.json`;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    notify("현재 필터의 로그를 내보냈습니다. 민감한 업무 정보가 포함될 수 있으니 공유 범위를 확인하세요.");
+    notify("선택한 로그를 저장했습니다. 업무 정보가 포함되어 있으니 공유 시 확인해 주세요.");
   });
   $("connectionButton").addEventListener("click", () => $("connectionDialog").showModal());
   $("closeConnection").addEventListener("click", () => {
