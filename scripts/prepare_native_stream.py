@@ -11,6 +11,7 @@ import json
 import shutil
 import sqlite3
 from collections import Counter
+from contextlib import ExitStack
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -70,9 +71,10 @@ def connect(path, maximum):
     return connection
 
 
-def prepare(directory, expected_manifest_sha256, output, *, profile=SEMANTIC_PROFILE, limits=None):
+def prepare(directory, expected_manifest_sha256, output, *, profile=SEMANTIC_PROFILE, limits=None, include_truth=True):
     limits = StreamLimits() if limits is None else limits
     limits.validate()
+    require(type(include_truth) is bool, 'stream_truth_mode')
     require(profile in {PROFILE, SEMANTIC_PROFILE}, 'stream_feature_profile')
     directory, output = Path(directory), Path(output)
     anchor(expected_manifest_sha256)
@@ -99,8 +101,12 @@ def prepare(directory, expected_manifest_sha256, output, *, profile=SEMANTIC_PRO
               'context': 'HTTP per physical source and client; event-time order with original ordinal ties; current and past only'}
     if profile == SEMANTIC_PROFILE:
         report['semantic_context'] = 'bounded HTTP semantic shapes; explicit local log account 60-second history within one source; equal timestamps follow original source ordinal; no authority claims'
+    if not include_truth:
+        report.update(schema='f1-native-raw-observations-1', labels_loaded=False,
+                      label_population_known=False, truth_sidecar_written=False)
     base_sha, base_bytes, budget = hashlib.sha256(), 0, OutputBudget(limits.output_bytes)
-    hashes = {name: hashlib.sha256() for name in ('inputs.jsonl', 'truth.jsonl', 'references.jsonl')}
+    names = ('inputs.jsonl', 'truth.jsonl', 'references.jsonl') if include_truth else ('inputs.jsonl', 'references.jsonl')
+    hashes = {name: hashlib.sha256() for name in names}
     sizes = Counter()
 
     def headroom():
@@ -117,8 +123,8 @@ def prepare(directory, expected_manifest_sha256, output, *, profile=SEMANTIC_PRO
         # Covers output, DB and its rollback journal; no quota depends on compression.
         require(shutil.disk_usage(output).free >= limits.min_free_bytes+limits.output_bytes+2*limits.database_bytes,
                 'stream_admission_headroom')
-        with (output/'inputs.jsonl.part').open('xb') as inputs, (output/'truth.jsonl.part').open('xb') as truth, (output/'references.jsonl.part').open('xb') as refs:
-            streams = dict(zip(hashes, (inputs, truth, refs), strict=True))
+        with ExitStack() as stack:
+            streams = {name: stack.enter_context((output/(name+'.part')).open('xb')) for name in names}
             for index, pair in enumerate(manifest['pairs']):
                 provenance = pair['provenance']
                 pair_members(provenance['raw_member'], provenance['label_member'])
@@ -127,7 +133,7 @@ def prepare(directory, expected_manifest_sha256, output, *, profile=SEMANTIC_PRO
                         'raw_pair_file')
                 start, end = provenance['simulation_start'], provenance['simulation_end']
                 require(type(start) is int and type(end) is int and 0 <= start < end, 'raw_simulation_bounds')
-                labels, _label_report = annotations(label_path, provenance['label_sha256'])
+                labels = annotations(label_path, provenance['label_sha256'])[0] if include_truth else None
                 database = output/f'spool-{index}.sqlite3'
                 connection = connect(database, limits.database_bytes)
                 sha, count, byte_count, requests = hashlib.sha256(), 0, 0, 0
@@ -188,7 +194,8 @@ def prepare(directory, expected_manifest_sha256, output, *, profile=SEMANTIC_PRO
                                 features.update(semantic_observations(line))
                         connection.execute('INSERT INTO observations VALUES (?,?,?)',
                                            (count, canonical(features), observation_error))
-                        write('truth.jsonl', {'case_id': case, 'malicious': count in labels, 'attack_labels': labels.get(count, ())}, streams)
+                        if include_truth:
+                            write('truth.jsonl', {'case_id': case, 'malicious': count in labels, 'attack_labels': labels.get(count, ())}, streams)
                         write('references.jsonl', {'case_id': case, 'pair_id': pair['pair_id'], 'source_line': count,
                                                   'source_row_sha256': hashlib.sha256(raw).hexdigest(),
                                                   'event_time': moment, 'time_error': time_error}, streams)
@@ -229,7 +236,8 @@ def prepare(directory, expected_manifest_sha256, output, *, profile=SEMANTIC_PRO
                         headroom()
                 require(emitted == count, 'stream_emitted_population')
                 report['pairs'].append({'raw_member': provenance['raw_member'], 'raw_sha256': sha.hexdigest(),
-                                        'rows': count, 'malicious': len(labels), 'normal': count-len(labels),
+                                        'rows': count, 'malicious': len(labels) if include_truth else None,
+                                        'normal': count-len(labels) if include_truth else None,
                                         'feature_errors': feature_errors, 'time_errors': time_errors,
                                         'outside_simulation': outside, 'backward_time_steps': backward,
                                         'minimum_event_time': minimum, 'maximum_event_time': maximum,
@@ -267,8 +275,10 @@ def main():
     parser.add_argument('--expected-manifest-sha256', required=True)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--feature-profile', choices=(PROFILE, SEMANTIC_PROFILE), default=SEMANTIC_PROFILE)
+    parser.add_argument('--observations-only', action='store_true', help='Never open labels or emit a truth sidecar')
     args = parser.parse_args()
-    report = prepare(args.pairs_directory, args.expected_manifest_sha256, args.output, profile=args.feature_profile)
+    report = prepare(args.pairs_directory, args.expected_manifest_sha256, args.output,
+                     profile=args.feature_profile, include_truth=not args.observations_only)
     print(json.dumps({'completed': report['completed'], 'files': report['files'], 'rows': sum(p['rows'] for p in report['pairs']),
                       'goal_qualified': report['goal_qualified']}))
 

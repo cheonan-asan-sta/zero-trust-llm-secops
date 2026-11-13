@@ -1,0 +1,16 @@
+{
+  "schema_version": "f1-public-assets-1",
+  "assets": [
+    {
+      "asset_id": "ait-lds21-harrison-sealed",
+      "record_id": 19483937,
+      "record_version": "v2_1",
+      "filename": "harrison_no-pcaps.zip",
+      "bytes": 667985140,
+      "publisher_md5": "4e837053ce4c5496227e0a3b65048c1c",
+      "license_id": "cc-by-nc-sa-4.0",
+      "data_role": "reserved_source_transfer_evaluation_archive_sealed_until_candidate_freeze",
+      "reference": "https://zenodo.org/records/19483937"
+    }
+  ]
+}
