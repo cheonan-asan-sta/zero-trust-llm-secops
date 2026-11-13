@@ -1,5 +1,8 @@
 # 웹 기록부 암호화 백업·복원과 외부 checkpoint v47
 
+후속 [v48 실제 로컬 HTTP 수집](extra-web-request-capture.md)에서 수신 바이트/서버 hook을 검증·기록·복원까지 연결했다.
+로컬 작성 요청의 기능 인수이며 아래 v47 당시 운영 관측/독립 F1 미완료 범위는 그대로 구분한다.
+
 2026-11-13 · `extra`에서 [v46 기록부](extra-web-evidence-ledger.md)의 일관된 백업·복원과
 **별도 지문으로 고정한 checkpoint 검사**를 추가했다.
 복원본에서 기존 위험이 유지됐고, 최신 checkpoint보다 오래된 백업과 전체 로컬 이력 되돌림을 거부했다.

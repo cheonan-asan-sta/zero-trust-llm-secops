@@ -1,6 +1,12 @@
 # 탐지 F1 목표 달성 실험 계획
 
-2026-11-13 최신 후속: [웹 기록부 백업·복원/checkpoint v47](extra-web-ledger-backup.md).
+2026-11-13 최신 후속: [실제 로컬 HTTP 요청 수집 v48](extra-web-request-capture.md).
+F2/F3 신호 확보 연결로 loopback9건의 실제 본문 SHA·서버 API-key/서비스 세션·정책/고정 child 관측을 수집했다.
+검증/영속 결정5건·통제조건10개·신규28포함 Windows/Linux 관련415개씩 통과했다.
+이9건은 관찰한 개발 자료이며 최종 독립 악성 정답이 아니다. 새 F1/운영 수집0·기존 앱/모델/라벨 보존이다.
+다음은 실제 IdP/PDP/실행 센서·세션/durable intake·원본 증거·사건 인수다. 유료 API/AWS·병합/push0이다.
+
+2026-11-13 이전 후속: [웹 기록부 백업·복원/checkpoint v47](extra-web-ledger-backup.md).
 F6 로컬 복구 경계로 암호화 스냅샷·외부 지문·복원 marker·접근 시 prefix 검증을 추가했다.
 예제10개·신규30포함 Windows/Linux 관련387개씩 통과했고 최신 pin보다 오래된 복원은 거부했다.
 실제 수집·새 독립/F1 평가0이며 운영 키/pin 보관·writer 절체·사건 인수는 남는다.

@@ -1,6 +1,11 @@
 # 개발 주차별 산출물
 
-2026-11-13 최신 후속: [웹 기록부 암호화 백업·복원 v47](extra-web-ledger-backup.md).
+2026-11-13 최신 후속: [로컬 HTTP 수집→검증/기록/복원 v48](extra-web-request-capture.md).
+실제 loopback9건의 본문 지문·서버 인증/세션·정책/고정 child 관측을 연결하고5건을 영속 판단했다.
+신규28포함 Windows/Linux 관련415개씩 통과. 실제 운영 IdP/EDR·MFA·독립 F1 평가와 구분한다.
+기존 앱/모델/라벨 보존·무료 로컬·병합/push0이다.
+
+2026-11-13 이전 후속: [웹 기록부 암호화 백업·복원 v47](extra-web-ledger-backup.md).
 일관된 스냅샷·암호화 묶음·외부 checkpoint 지문·복원본 접근 시 재검사를 추가했다.
 예제10개·새 process-exit5경계 포함 Windows/Linux 관련387개씩 통과했다.
 운영 키/원격 보관·실제 수집/F1 측정은 미완료이며 무료 로컬·앱 변경/병합/push0이다.

@@ -1,0 +1,853 @@
+{
+  "schema": "extra-web-request-capture-evidence-1",
+  "base_extra_commit": "dea13216ed7851d373d4526ba525d92a4b76b3da",
+  "scope": "real local TCP request bytes and controlled server hooks; not production IdP/EDR or independent attack evaluation",
+  "protocol": {
+    "path": "infra/f1-lab/web-capture-controls-protocol.json",
+    "sha256": "5ebaa094a9f120e69144ffcd8f94bca1f8c61453c2cb711a4bdb52375d486a0d"
+  },
+  "functional_run": {
+    "receipt": {
+      "path": "runtime/f1/web-capture-controls-v48-20261113/run.json",
+      "sha256": "4e3539b1c72cfa26bb20535beaa969ad2d3b88d8103aa8a8a38a580fd497fedc"
+    },
+    "report": {
+      "schema": "extra-web-capture-controls-1",
+      "completed": true,
+      "scope": "local TCP HTTP capture integration only; no independent attack labels",
+      "plan": {
+        "path": "infra/f1-lab/web-capture-controls-protocol.json",
+        "bytes": 1942,
+        "sha256": "5ebaa094a9f120e69144ffcd8f94bca1f8c61453c2cb711a4bdb52375d486a0d"
+      },
+      "sources": {
+        "scripts/f1_lab/web_request_capture.py": {
+          "path": "scripts/f1_lab/web_request_capture.py",
+          "bytes": 13787,
+          "sha256": "decdc3acef2080be102d5e7c343cad2f0fd45672584e141c3a6e6e6a1bc4a007"
+        },
+        "scripts/f1_lab/web_capture_lab.py": {
+          "path": "scripts/f1_lab/web_capture_lab.py",
+          "bytes": 10024,
+          "sha256": "a2930d8312badadc26ef767fb857375ca6b4800f613be855a4b65911d658fa92"
+        },
+        "scripts/f1_lab/web_capture_transport.py": {
+          "path": "scripts/f1_lab/web_capture_transport.py",
+          "bytes": 1394,
+          "sha256": "103923fa1c23b36c23ee1282f07d1d591063800e41e5143f2614993b191953a2"
+        },
+        "scripts/run_web_capture_controls.py": {
+          "path": "scripts/run_web_capture_controls.py",
+          "bytes": 9903,
+          "sha256": "6e16bce36e305aa1b4e165f7623f6ac4a037b73110e67b2e8350f4c1a5c735fb"
+        },
+        "scripts/f1_lab/web_verified_context.py": {
+          "path": "scripts/f1_lab/web_verified_context.py",
+          "bytes": 16342,
+          "sha256": "e39ab1fb95ce95ebf5b280badc025268c2a8eae468fa9e2e1485a267be59349e"
+        },
+        "scripts/f1_lab/web_durable_risk.py": {
+          "path": "scripts/f1_lab/web_durable_risk.py",
+          "bytes": 4639,
+          "sha256": "a2cb5ca3f252f4bcebdf404dfd5f6e7d2078d1131c85f0992dd108a22afe71af"
+        },
+        "scripts/f1_lab/web_evidence_ledger.py": {
+          "path": "scripts/f1_lab/web_evidence_ledger.py",
+          "bytes": 20181,
+          "sha256": "7c152de7c5d794116e2f47997a02573717c0e9d40a2401ded0e24044bb52951d"
+        },
+        "scripts/f1_lab/web_ledger_backup.py": {
+          "path": "scripts/f1_lab/web_ledger_backup.py",
+          "bytes": 18554,
+          "sha256": "38362dd0dd1d1bc8ea69b0e7c48c6d191d07468ab5ff9438748685d08d9944f2"
+        },
+        "app/security.py": {
+          "path": "app/security.py",
+          "bytes": 5747,
+          "sha256": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b"
+        },
+        "app/config.py": {
+          "path": "app/config.py",
+          "bytes": 4456,
+          "sha256": "d4bbd9536fa9a5c9ad69481ea2a8d2dac5cb4e502820e3b1fbd3cf189d08d3ac"
+        }
+      },
+      "cases": [
+        {
+          "case": "complete_actual_binary_body",
+          "expected_outcome_passed": true,
+          "capture_id": "c5973a01ccdd569b2cb4f34e30f5dc72",
+          "http_status": 200,
+          "body_complete": true
+        },
+        {
+          "case": "missing_credential_is_unbound",
+          "expected_outcome_passed": true,
+          "capture_id": "7329aafbd7f86357ab59aa51390b5d92",
+          "http_status": 401,
+          "body_complete": true
+        },
+        {
+          "case": "invalid_credential_is_unbound",
+          "expected_outcome_passed": true,
+          "capture_id": "d94d28ba9b81f84c675b0dd701e0b017",
+          "http_status": 401,
+          "body_complete": true
+        },
+        {
+          "case": "policy_denial_blocks_fixture",
+          "expected_outcome_passed": true,
+          "capture_id": "c9bf8b7db9c07d666241c6f113a050dd",
+          "http_status": 403,
+          "body_complete": true
+        },
+        {
+          "case": "client_identity_and_request_headers_ignored",
+          "expected_outcome_passed": true,
+          "capture_id": "1c6a0c18869398662ad961a64295e6d4",
+          "http_status": 200,
+          "body_complete": true
+        },
+        {
+          "case": "actually_empty_body_has_digest",
+          "expected_outcome_passed": true,
+          "capture_id": "9e94ed06650f565096392857774ef24a",
+          "http_status": 200,
+          "body_complete": true
+        },
+        {
+          "case": "overlimit_body_not_fabricated_complete",
+          "expected_outcome_passed": true,
+          "capture_id": "feec180d2675cfb90d6ed2563aa1f1af",
+          "http_status": 413,
+          "body_complete": false
+        },
+        {
+          "case": "revoked_local_service_session_rejected",
+          "expected_outcome_passed": true,
+          "capture_id": "429a1d06d3ddf94e62da630c77753298",
+          "http_status": 401,
+          "body_complete": true
+        },
+        {
+          "case": "controlled_denial_execution_contradiction_recorded",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "collected_adverse_survives_encrypted_restore",
+          "expected_outcome_passed": true
+        }
+      ],
+      "transport": "TCP 127.0.0.1 only; proxy headers disabled; client environment proxies disabled",
+      "authentication": "existing API-key digest verifier; local server-owned service session; no MFA performed",
+      "execution": "fixed server-owned Python fixture only; never client query commands",
+      "real_idp_or_edr_connected": false,
+      "production_enabled": false,
+      "independent_detection_performance_measured": false,
+      "native_public_rows_replayed": 0,
+      "paid_api_calls": 0,
+      "aws_sdk_calls": 0,
+      "github_pushes": 0,
+      "goal_qualified": false,
+      "api_and_signing_private_keys_persisted": false,
+      "demo_backup_recovery_key_persisted": false,
+      "summary": {
+        "expected_outcomes_passed": 10,
+        "cases": 10,
+        "local_http_requests_captured": 9,
+        "requests_with_durable_decisions": 5,
+        "fixed_child_processes": 4,
+        "restored_adverse": true,
+        "server_and_child_processes_stopped": true,
+        "production_observations_collected": 0,
+        "new_independent_final_cases": 0
+      },
+      "capture_receipts": [
+        {
+          "body_bytes": 17,
+          "body_complete": true,
+          "body_sha256": "00194a3c20dd193f3335adb69ebb50ddf3bbb27215472e7c5bd8de1b8a39c78e",
+          "capture_state": "complete",
+          "case_id": "cedc4e57d3b7869b1d77e80dc4c5f9a4ff9358d2f35dbe0c7dbe4681eac8f444",
+          "context_state": "review",
+          "decision": {
+            "alert": false,
+            "journal_head_sha256": "b2ca6778cbb6b4f68d43ee282dc4392c7efb597f668b013d30c5b915fdb113df",
+            "review": true,
+            "score": 0.0,
+            "verified_adverse": false
+          },
+          "execution_scope": "local_fixed_fixture_only",
+          "identity_sha256": "25d02eff2cb2c68bd31ce0ea723ea0f10265febe6507bf2fd7a05f78a5fad831",
+          "independent_malicious_label": null,
+          "method": "POST",
+          "observed_at": "2026-11-13T13:44:04.818889+00:00",
+          "request_id": "c5973a01ccdd569b2cb4f34e30f5dc72",
+          "schema": "zt-web-request-capture-1",
+          "source_kind": "local_asgi_projection",
+          "status": 200,
+          "target_sha256": "488f8c6b49bf22661fa5064bfdde04d1f2ef539e76c9ef8dd916dc1cda9ebb3d"
+        },
+        {
+          "body_bytes": 6,
+          "body_complete": true,
+          "body_sha256": "95473684d6763021793afa0472c775e8310d39a075895e93c5cf6d1247b46390",
+          "capture_state": "complete",
+          "context_state": "unavailable",
+          "decision": null,
+          "independent_malicious_label": null,
+          "method": "POST",
+          "observed_at": "2026-11-13T13:44:04.907923+00:00",
+          "request_id": "7329aafbd7f86357ab59aa51390b5d92",
+          "schema": "zt-web-request-capture-1",
+          "source_kind": "local_asgi_projection",
+          "status": 401,
+          "target_sha256": "488f8c6b49bf22661fa5064bfdde04d1f2ef539e76c9ef8dd916dc1cda9ebb3d"
+        },
+        {
+          "body_bytes": 7,
+          "body_complete": true,
+          "body_sha256": "8a891cac40cbb2b854a9835e52fcff621814a6ab21efbf54fe7ddee49fc02793",
+          "capture_state": "complete",
+          "context_state": "unavailable",
+          "decision": null,
+          "independent_malicious_label": null,
+          "method": "POST",
+          "observed_at": "2026-11-13T13:44:04.919900+00:00",
+          "request_id": "d94d28ba9b81f84c675b0dd701e0b017",
+          "schema": "zt-web-request-capture-1",
+          "source_kind": "local_asgi_projection",
+          "status": 401,
+          "target_sha256": "488f8c6b49bf22661fa5064bfdde04d1f2ef539e76c9ef8dd916dc1cda9ebb3d"
+        },
+        {
+          "body_bytes": 6,
+          "body_complete": true,
+          "body_sha256": "62d6c2330036f64bcf71b95791743d6c77c38e0d7c8cbedcbc525c77c57cf0ee",
+          "capture_state": "complete",
+          "case_id": "a359a745a60fd65fc00049822f2a26190731fffc33f7ab1d4acffb13d228dc9a",
+          "context_state": "review",
+          "decision": {
+            "alert": false,
+            "journal_head_sha256": "c3fb1abe007fe0ccbbe98896cee369ebe8f88d99d7d501cd98154eba735d9069",
+            "review": true,
+            "score": 0.0,
+            "verified_adverse": false
+          },
+          "execution_scope": "local_fixed_fixture_only",
+          "identity_sha256": "25d02eff2cb2c68bd31ce0ea723ea0f10265febe6507bf2fd7a05f78a5fad831",
+          "independent_malicious_label": null,
+          "method": "POST",
+          "observed_at": "2026-11-13T13:44:04.930671+00:00",
+          "request_id": "c9bf8b7db9c07d666241c6f113a050dd",
+          "schema": "zt-web-request-capture-1",
+          "source_kind": "local_asgi_projection",
+          "status": 403,
+          "target_sha256": "bd0e6e78da2ad061eeb8969f9d42881a780038061313f615145457bc981ca78a"
+        },
+        {
+          "body_bytes": 5,
+          "body_complete": true,
+          "body_sha256": "ea4e615786753f09c1b15439564f6ad0d489cd317748423d3a4512bbc31aa108",
+          "capture_state": "complete",
+          "case_id": "7dd0d6b5baf0d4552e109d9c57a97f1e2e8951c176205ed0747408c3af184251",
+          "context_state": "review",
+          "decision": {
+            "alert": false,
+            "journal_head_sha256": "a1d7577114720c1db0caf42e0adf4e69ac0f80ebbeeec8b3004bb0390107ef4b",
+            "review": true,
+            "score": 0.0,
+            "verified_adverse": false
+          },
+          "execution_scope": "local_fixed_fixture_only",
+          "identity_sha256": "25d02eff2cb2c68bd31ce0ea723ea0f10265febe6507bf2fd7a05f78a5fad831",
+          "independent_malicious_label": null,
+          "method": "POST",
+          "observed_at": "2026-11-13T13:44:05.604934+00:00",
+          "request_id": "1c6a0c18869398662ad961a64295e6d4",
+          "schema": "zt-web-request-capture-1",
+          "source_kind": "local_asgi_projection",
+          "status": 200,
+          "target_sha256": "488f8c6b49bf22661fa5064bfdde04d1f2ef539e76c9ef8dd916dc1cda9ebb3d"
+        },
+        {
+          "body_bytes": 0,
+          "body_complete": true,
+          "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "capture_state": "complete",
+          "case_id": "e26195eb2dea30dac33557779b162bfe2cf4f4c4f69ef2af6daa773bb7234d38",
+          "context_state": "review",
+          "decision": {
+            "alert": false,
+            "journal_head_sha256": "91c332d7d3b45223d777756b0290802e74462101463fe15cb76d37a5857fdc52",
+            "review": true,
+            "score": 0.0,
+            "verified_adverse": false
+          },
+          "execution_scope": "local_fixed_fixture_only",
+          "identity_sha256": "25d02eff2cb2c68bd31ce0ea723ea0f10265febe6507bf2fd7a05f78a5fad831",
+          "independent_malicious_label": null,
+          "method": "POST",
+          "observed_at": "2026-11-13T13:44:06.318703+00:00",
+          "request_id": "9e94ed06650f565096392857774ef24a",
+          "schema": "zt-web-request-capture-1",
+          "source_kind": "local_asgi_projection",
+          "status": 200,
+          "target_sha256": "488f8c6b49bf22661fa5064bfdde04d1f2ef539e76c9ef8dd916dc1cda9ebb3d"
+        },
+        {
+          "body_bytes": 1025,
+          "body_complete": false,
+          "body_sha256": null,
+          "capture_state": "body_limit",
+          "context_state": "unavailable",
+          "decision": null,
+          "independent_malicious_label": null,
+          "method": "POST",
+          "observed_at": "2026-11-13T13:44:06.387946+00:00",
+          "request_id": "feec180d2675cfb90d6ed2563aa1f1af",
+          "schema": "zt-web-request-capture-1",
+          "source_kind": "local_asgi_projection",
+          "status": 413,
+          "target_sha256": "488f8c6b49bf22661fa5064bfdde04d1f2ef539e76c9ef8dd916dc1cda9ebb3d"
+        },
+        {
+          "body_bytes": 7,
+          "body_complete": true,
+          "body_sha256": "4bb47f186df233e48b09d241ee4defb821add0c35ac8311469fe1522c6813dd5",
+          "capture_state": "complete",
+          "context_state": "unavailable",
+          "decision": null,
+          "independent_malicious_label": null,
+          "method": "POST",
+          "observed_at": "2026-11-13T13:44:06.399730+00:00",
+          "request_id": "429a1d06d3ddf94e62da630c77753298",
+          "schema": "zt-web-request-capture-1",
+          "source_kind": "local_asgi_projection",
+          "status": 401,
+          "target_sha256": "488f8c6b49bf22661fa5064bfdde04d1f2ef539e76c9ef8dd916dc1cda9ebb3d"
+        },
+        {
+          "body_bytes": 18,
+          "body_complete": true,
+          "body_sha256": "2e60ef4f99fc7242a8e7c82bf949fef348b747e0e634ef7cd6c4bda89abbe3ed",
+          "capture_state": "complete",
+          "case_id": "ade76b711e35abf70ae79e78b92724f27e553e01ccf3b0ad1d999e41f882e8f9",
+          "context_state": "adverse",
+          "decision": {
+            "alert": true,
+            "journal_head_sha256": "760eab09165f635a78f6fd684b7db14b8ed1d3a82a2087a426be0eab778d8d92",
+            "review": true,
+            "score": 1.0,
+            "verified_adverse": true
+          },
+          "execution_scope": "local_fixed_fixture_only",
+          "identity_sha256": "a518392ede2972142d3b0ef1cbe886c513adc3e78835599488ecd0527fbb4168",
+          "independent_malicious_label": null,
+          "method": "POST",
+          "observed_at": "2026-11-13T13:44:07.539524+00:00",
+          "request_id": "07fc8fd1e49864d7e399a2a47a373749",
+          "schema": "zt-web-request-capture-1",
+          "source_kind": "local_asgi_projection",
+          "status": 200,
+          "target_sha256": "bd0e6e78da2ad061eeb8969f9d42881a780038061313f615145457bc981ca78a"
+        }
+      ],
+      "checkpoint": {
+        "sha256": "3dc4adc4e8e488f2ca6e431846f5671ae6596e20f128e4d23d729bcabbdac1f3",
+        "checkpoint": {
+          "schema_version": "zt-web-external-checkpoint-1",
+          "head": {
+            "store_id": "28b7bfd8908e8dbbf3d273adcd478878",
+            "configuration": "901b2ddfc262332253f94a4c5196ea124a6b2e5fa147b7f68b352397033bbcab",
+            "seq": 2,
+            "hash": "760eab09165f635a78f6fd684b7db14b8ed1d3a82a2087a426be0eab778d8d92",
+            "last_now": "2026-11-13T13:44:07.539524+00:00"
+          },
+          "observed_until": "2026-11-13T13:44:07.858332+00:00",
+          "issued_at": "2026-11-13T13:44:07.858332+00:00"
+        }
+      },
+      "backup": {
+        "manifest_sha256": "6409a8fd9095b50c830a0376191bb0786b18003df7d2da16b32ee471b9f4deaf",
+        "checkpoint_sha256": "3dc4adc4e8e488f2ca6e431846f5671ae6596e20f128e4d23d729bcabbdac1f3",
+        "snapshot": {
+          "schema_version": "zt-web-external-checkpoint-1",
+          "head": {
+            "store_id": "28b7bfd8908e8dbbf3d273adcd478878",
+            "configuration": "901b2ddfc262332253f94a4c5196ea124a6b2e5fa147b7f68b352397033bbcab",
+            "seq": 2,
+            "hash": "760eab09165f635a78f6fd684b7db14b8ed1d3a82a2087a426be0eab778d8d92",
+            "last_now": "2026-11-13T13:44:07.539524+00:00"
+          },
+          "observed_until": "2026-11-13T13:44:07.858332+00:00",
+          "issued_at": "2026-11-13T13:44:07.858332+00:00"
+        },
+        "payload_bytes": 11691
+      },
+      "restore": {
+        "receipt_sha256": "0491c2867275f1e05a843a2d0c522bc7a8905c4e32cdbb02c896c1abe3588e4a",
+        "head": {
+          "store_id": "28b7bfd8908e8dbbf3d273adcd478878",
+          "configuration": "901b2ddfc262332253f94a4c5196ea124a6b2e5fa147b7f68b352397033bbcab",
+          "seq": 2,
+          "hash": "760eab09165f635a78f6fd684b7db14b8ed1d3a82a2087a426be0eab778d8d92",
+          "last_now": "2026-11-13T13:44:07.539524+00:00"
+        },
+        "activated": false
+      },
+      "models": {
+        "web": {
+          "path": "runtime/f1/web-refinement-v39-20261112-02/model.json",
+          "sha256": "21318fa61f830ae1d03d47de1a01acf2c40ae19ebaf769923e3d575613f74f38"
+        },
+        "heads": {
+          "path": "runtime/f1/ait-semantic-fit-heads-russell-20261112/model.json",
+          "sha256": "4ebbcb6bb5fce286e80beeedbc18139d566d00998575487a867f129330344075"
+        },
+        "vpn": {
+          "path": "runtime/f1/vpn-feature-ablation-v32-20261112/vpn-history-model.json",
+          "sha256": "c1ff27423e63ba607a80fc7dd891ff473baccd7f11853fb3eaba10e9e37b48b6"
+        }
+      }
+    }
+  },
+  "validation": {
+    "receipt": {
+      "path": "runtime/f1/web-capture-tests-v48-20261113/tests.json",
+      "sha256": "bb5e2ffdcbdf9581ad49ba877925de97e6891b2f4d060485cc09bd6e09dfd6b2"
+    },
+    "report": {
+      "schema": "extra-local-stream-validation-tests-1",
+      "started_at": "2026-11-13T13:44:20.919866+00:00",
+      "paid_api_calls": 0,
+      "aws_sdk_calls": 0,
+      "github_pushes": 0,
+      "windows": {
+        "exit_code": 0,
+        "seconds": 61.027,
+        "counts": {
+          "passed": 415
+        },
+        "log": "runtime/f1/web-capture-tests-v48-20261113/windows.log"
+      },
+      "linux": {
+        "exit_code": 0,
+        "seconds": 23.551,
+        "counts": {
+          "passed": 415
+        },
+        "log": "runtime/f1/web-capture-tests-v48-20261113/linux.log",
+        "executed": true,
+        "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+        "source_files": 756,
+        "source_archive_sha256": "904b8b9c3e7dd59e13b400b51634438ce024cb10696863958272f8b4955624f3",
+        "container_exit": 0,
+        "oom_killed": false,
+        "network_mode": "none",
+        "owned_container": "e0e18da82dad1a2f259db182344674f6c16e227b3448305605af389a059cbf7f",
+        "snapshot_sources_unchanged_after": true,
+        "owned_container_removed": true
+      },
+      "ended_at": "2026-11-13T13:46:17.166688+00:00"
+    },
+    "source_manifest": {
+      "path": "runtime/f1/web-capture-tests-v48-20261113/source-manifest.json",
+      "sha256": "9a7540c20582c2f9f0a693a78fb361c637addf050371404620e5a742869af7a0"
+    },
+    "code_fingerprints": [
+      {
+        "path": "scripts/f1_lab/web_request_capture.py",
+        "sha256": "decdc3acef2080be102d5e7c343cad2f0fd45672584e141c3a6e6e6a1bc4a007"
+      },
+      {
+        "path": "scripts/f1_lab/web_capture_lab.py",
+        "sha256": "a2930d8312badadc26ef767fb857375ca6b4800f613be855a4b65911d658fa92"
+      },
+      {
+        "path": "scripts/f1_lab/web_capture_transport.py",
+        "sha256": "103923fa1c23b36c23ee1282f07d1d591063800e41e5143f2614993b191953a2"
+      },
+      {
+        "path": "scripts/run_web_capture_controls.py",
+        "sha256": "6e16bce36e305aa1b4e165f7623f6ac4a037b73110e67b2e8350f4c1a5c735fb"
+      },
+      {
+        "path": "tests/test_f1_web_request_capture.py",
+        "sha256": "a430150c4a5db242bc882f2da6f3ccc4cf392a81e9825caca3741a1b6a5bd553"
+      },
+      {
+        "path": "infra/f1-lab/web-capture-controls-protocol.json",
+        "sha256": "5ebaa094a9f120e69144ffcd8f94bca1f8c61453c2cb711a4bdb52375d486a0d"
+      }
+    ],
+    "current_code_matches_linux_snapshot": true,
+    "new_tests_included": 28,
+    "actual_loopback_transport_test_passed": true,
+    "ruff_exit_code": 0,
+    "full_app_regression_repeated": false
+  },
+  "capture_receipts": [
+    {
+      "receipt": {
+        "path": "runtime/f1/web-capture-controls-v48-20261113/normal/captures/1c6a0c18869398662ad961a64295e6d4.json",
+        "sha256": "43ecf686e9a6d1e4375122e9fc7e00bf1e0f4215ba64b98adfe123d8438b6e10"
+      },
+      "record": {
+        "body_bytes": 5,
+        "body_complete": true,
+        "body_sha256": "ea4e615786753f09c1b15439564f6ad0d489cd317748423d3a4512bbc31aa108",
+        "capture_state": "complete",
+        "case_id": "7dd0d6b5baf0d4552e109d9c57a97f1e2e8951c176205ed0747408c3af184251",
+        "context_state": "review",
+        "decision": {
+          "alert": false,
+          "journal_head_sha256": "a1d7577114720c1db0caf42e0adf4e69ac0f80ebbeeec8b3004bb0390107ef4b",
+          "review": true,
+          "score": 0.0,
+          "verified_adverse": false
+        },
+        "execution_scope": "local_fixed_fixture_only",
+        "identity_sha256": "25d02eff2cb2c68bd31ce0ea723ea0f10265febe6507bf2fd7a05f78a5fad831",
+        "independent_malicious_label": null,
+        "method": "POST",
+        "observed_at": "2026-11-13T13:44:05.604934+00:00",
+        "request_id": "1c6a0c18869398662ad961a64295e6d4",
+        "schema": "zt-web-request-capture-1",
+        "source_kind": "local_asgi_projection",
+        "status": 200,
+        "target_sha256": "488f8c6b49bf22661fa5064bfdde04d1f2ef539e76c9ef8dd916dc1cda9ebb3d"
+      }
+    },
+    {
+      "receipt": {
+        "path": "runtime/f1/web-capture-controls-v48-20261113/normal/captures/429a1d06d3ddf94e62da630c77753298.json",
+        "sha256": "cd071e5344b73eab1659a315a110535367f67c0776ec20af75cdd5250415a151"
+      },
+      "record": {
+        "body_bytes": 7,
+        "body_complete": true,
+        "body_sha256": "4bb47f186df233e48b09d241ee4defb821add0c35ac8311469fe1522c6813dd5",
+        "capture_state": "complete",
+        "context_state": "unavailable",
+        "decision": null,
+        "independent_malicious_label": null,
+        "method": "POST",
+        "observed_at": "2026-11-13T13:44:06.399730+00:00",
+        "request_id": "429a1d06d3ddf94e62da630c77753298",
+        "schema": "zt-web-request-capture-1",
+        "source_kind": "local_asgi_projection",
+        "status": 401,
+        "target_sha256": "488f8c6b49bf22661fa5064bfdde04d1f2ef539e76c9ef8dd916dc1cda9ebb3d"
+      }
+    },
+    {
+      "receipt": {
+        "path": "runtime/f1/web-capture-controls-v48-20261113/normal/captures/7329aafbd7f86357ab59aa51390b5d92.json",
+        "sha256": "ff250bd4418093a761c4a636ffd4a1e750081cc97943296299045abf41be579b"
+      },
+      "record": {
+        "body_bytes": 6,
+        "body_complete": true,
+        "body_sha256": "95473684d6763021793afa0472c775e8310d39a075895e93c5cf6d1247b46390",
+        "capture_state": "complete",
+        "context_state": "unavailable",
+        "decision": null,
+        "independent_malicious_label": null,
+        "method": "POST",
+        "observed_at": "2026-11-13T13:44:04.907923+00:00",
+        "request_id": "7329aafbd7f86357ab59aa51390b5d92",
+        "schema": "zt-web-request-capture-1",
+        "source_kind": "local_asgi_projection",
+        "status": 401,
+        "target_sha256": "488f8c6b49bf22661fa5064bfdde04d1f2ef539e76c9ef8dd916dc1cda9ebb3d"
+      }
+    },
+    {
+      "receipt": {
+        "path": "runtime/f1/web-capture-controls-v48-20261113/normal/captures/9e94ed06650f565096392857774ef24a.json",
+        "sha256": "4a6d8e0d1fdb100a73d1f440d67f06fa926a20c3264542989acf060f904f150b"
+      },
+      "record": {
+        "body_bytes": 0,
+        "body_complete": true,
+        "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "capture_state": "complete",
+        "case_id": "e26195eb2dea30dac33557779b162bfe2cf4f4c4f69ef2af6daa773bb7234d38",
+        "context_state": "review",
+        "decision": {
+          "alert": false,
+          "journal_head_sha256": "91c332d7d3b45223d777756b0290802e74462101463fe15cb76d37a5857fdc52",
+          "review": true,
+          "score": 0.0,
+          "verified_adverse": false
+        },
+        "execution_scope": "local_fixed_fixture_only",
+        "identity_sha256": "25d02eff2cb2c68bd31ce0ea723ea0f10265febe6507bf2fd7a05f78a5fad831",
+        "independent_malicious_label": null,
+        "method": "POST",
+        "observed_at": "2026-11-13T13:44:06.318703+00:00",
+        "request_id": "9e94ed06650f565096392857774ef24a",
+        "schema": "zt-web-request-capture-1",
+        "source_kind": "local_asgi_projection",
+        "status": 200,
+        "target_sha256": "488f8c6b49bf22661fa5064bfdde04d1f2ef539e76c9ef8dd916dc1cda9ebb3d"
+      }
+    },
+    {
+      "receipt": {
+        "path": "runtime/f1/web-capture-controls-v48-20261113/normal/captures/c5973a01ccdd569b2cb4f34e30f5dc72.json",
+        "sha256": "1bdc53bee0a767ee7ebbdc30a0ab7990acbb0b4522d7bfe79f5f56ac7047fe6d"
+      },
+      "record": {
+        "body_bytes": 17,
+        "body_complete": true,
+        "body_sha256": "00194a3c20dd193f3335adb69ebb50ddf3bbb27215472e7c5bd8de1b8a39c78e",
+        "capture_state": "complete",
+        "case_id": "cedc4e57d3b7869b1d77e80dc4c5f9a4ff9358d2f35dbe0c7dbe4681eac8f444",
+        "context_state": "review",
+        "decision": {
+          "alert": false,
+          "journal_head_sha256": "b2ca6778cbb6b4f68d43ee282dc4392c7efb597f668b013d30c5b915fdb113df",
+          "review": true,
+          "score": 0.0,
+          "verified_adverse": false
+        },
+        "execution_scope": "local_fixed_fixture_only",
+        "identity_sha256": "25d02eff2cb2c68bd31ce0ea723ea0f10265febe6507bf2fd7a05f78a5fad831",
+        "independent_malicious_label": null,
+        "method": "POST",
+        "observed_at": "2026-11-13T13:44:04.818889+00:00",
+        "request_id": "c5973a01ccdd569b2cb4f34e30f5dc72",
+        "schema": "zt-web-request-capture-1",
+        "source_kind": "local_asgi_projection",
+        "status": 200,
+        "target_sha256": "488f8c6b49bf22661fa5064bfdde04d1f2ef539e76c9ef8dd916dc1cda9ebb3d"
+      }
+    },
+    {
+      "receipt": {
+        "path": "runtime/f1/web-capture-controls-v48-20261113/normal/captures/c9bf8b7db9c07d666241c6f113a050dd.json",
+        "sha256": "4b2956edcdf6452106a62dbef960c71ed17d17c093e434f474b3a517aa7a2933"
+      },
+      "record": {
+        "body_bytes": 6,
+        "body_complete": true,
+        "body_sha256": "62d6c2330036f64bcf71b95791743d6c77c38e0d7c8cbedcbc525c77c57cf0ee",
+        "capture_state": "complete",
+        "case_id": "a359a745a60fd65fc00049822f2a26190731fffc33f7ab1d4acffb13d228dc9a",
+        "context_state": "review",
+        "decision": {
+          "alert": false,
+          "journal_head_sha256": "c3fb1abe007fe0ccbbe98896cee369ebe8f88d99d7d501cd98154eba735d9069",
+          "review": true,
+          "score": 0.0,
+          "verified_adverse": false
+        },
+        "execution_scope": "local_fixed_fixture_only",
+        "identity_sha256": "25d02eff2cb2c68bd31ce0ea723ea0f10265febe6507bf2fd7a05f78a5fad831",
+        "independent_malicious_label": null,
+        "method": "POST",
+        "observed_at": "2026-11-13T13:44:04.930671+00:00",
+        "request_id": "c9bf8b7db9c07d666241c6f113a050dd",
+        "schema": "zt-web-request-capture-1",
+        "source_kind": "local_asgi_projection",
+        "status": 403,
+        "target_sha256": "bd0e6e78da2ad061eeb8969f9d42881a780038061313f615145457bc981ca78a"
+      }
+    },
+    {
+      "receipt": {
+        "path": "runtime/f1/web-capture-controls-v48-20261113/normal/captures/d94d28ba9b81f84c675b0dd701e0b017.json",
+        "sha256": "e1be276b0df71bdfe08a0c3c7c4068c756d3f23927d4bc9261d2ac5881e26240"
+      },
+      "record": {
+        "body_bytes": 7,
+        "body_complete": true,
+        "body_sha256": "8a891cac40cbb2b854a9835e52fcff621814a6ab21efbf54fe7ddee49fc02793",
+        "capture_state": "complete",
+        "context_state": "unavailable",
+        "decision": null,
+        "independent_malicious_label": null,
+        "method": "POST",
+        "observed_at": "2026-11-13T13:44:04.919900+00:00",
+        "request_id": "d94d28ba9b81f84c675b0dd701e0b017",
+        "schema": "zt-web-request-capture-1",
+        "source_kind": "local_asgi_projection",
+        "status": 401,
+        "target_sha256": "488f8c6b49bf22661fa5064bfdde04d1f2ef539e76c9ef8dd916dc1cda9ebb3d"
+      }
+    },
+    {
+      "receipt": {
+        "path": "runtime/f1/web-capture-controls-v48-20261113/normal/captures/feec180d2675cfb90d6ed2563aa1f1af.json",
+        "sha256": "1c587ef7b481ee46a7fa84d9360768ec4587e4493861ff11448e9fb455cbbbba"
+      },
+      "record": {
+        "body_bytes": 1025,
+        "body_complete": false,
+        "body_sha256": null,
+        "capture_state": "body_limit",
+        "context_state": "unavailable",
+        "decision": null,
+        "independent_malicious_label": null,
+        "method": "POST",
+        "observed_at": "2026-11-13T13:44:06.387946+00:00",
+        "request_id": "feec180d2675cfb90d6ed2563aa1f1af",
+        "schema": "zt-web-request-capture-1",
+        "source_kind": "local_asgi_projection",
+        "status": 413,
+        "target_sha256": "488f8c6b49bf22661fa5064bfdde04d1f2ef539e76c9ef8dd916dc1cda9ebb3d"
+      }
+    },
+    {
+      "receipt": {
+        "path": "runtime/f1/web-capture-controls-v48-20261113/controlled-fault/captures/07fc8fd1e49864d7e399a2a47a373749.json",
+        "sha256": "3a99eba6780fb0e2039a9fc83995c1a42823eae7d0811b4eea7d60bfb338c978"
+      },
+      "record": {
+        "body_bytes": 18,
+        "body_complete": true,
+        "body_sha256": "2e60ef4f99fc7242a8e7c82bf949fef348b747e0e634ef7cd6c4bda89abbe3ed",
+        "capture_state": "complete",
+        "case_id": "ade76b711e35abf70ae79e78b92724f27e553e01ccf3b0ad1d999e41f882e8f9",
+        "context_state": "adverse",
+        "decision": {
+          "alert": true,
+          "journal_head_sha256": "760eab09165f635a78f6fd684b7db14b8ed1d3a82a2087a426be0eab778d8d92",
+          "review": true,
+          "score": 1.0,
+          "verified_adverse": true
+        },
+        "execution_scope": "local_fixed_fixture_only",
+        "identity_sha256": "a518392ede2972142d3b0ef1cbe886c513adc3e78835599488ecd0527fbb4168",
+        "independent_malicious_label": null,
+        "method": "POST",
+        "observed_at": "2026-11-13T13:44:07.539524+00:00",
+        "request_id": "07fc8fd1e49864d7e399a2a47a373749",
+        "schema": "zt-web-request-capture-1",
+        "source_kind": "local_asgi_projection",
+        "status": 200,
+        "target_sha256": "bd0e6e78da2ad061eeb8969f9d42881a780038061313f615145457bc981ca78a"
+      }
+    }
+  ],
+  "source_exposure": {
+    "source_id": "local-http-capture-v48-20261113",
+    "role": "previously_observed_local_development_only",
+    "request_count": 9,
+    "unique_server_request_ids": 9,
+    "independent_malicious_labels": 0,
+    "new_independent_final_cases": 0,
+    "final_evaluation_eligible": false,
+    "note": "Carry these receipt/body hashes into future intake exposure review; no final split selected here.",
+    "observed_body_sha256": [
+      "00194a3c20dd193f3335adb69ebb50ddf3bbb27215472e7c5bd8de1b8a39c78e",
+      "2e60ef4f99fc7242a8e7c82bf949fef348b747e0e634ef7cd6c4bda89abbe3ed",
+      "4bb47f186df233e48b09d241ee4defb821add0c35ac8311469fe1522c6813dd5",
+      "62d6c2330036f64bcf71b95791743d6c77c38e0d7c8cbedcbc525c77c57cf0ee",
+      "8a891cac40cbb2b854a9835e52fcff621814a6ab21efbf54fe7ddee49fc02793",
+      "95473684d6763021793afa0472c775e8310d39a075895e93c5cf6d1247b46390",
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ea4e615786753f09c1b15439564f6ad0d489cd317748423d3a4512bbc31aa108"
+    ]
+  },
+  "trust_contract": {
+    "server_generated_request_id": true,
+    "body_hash_from_complete_received_bytes": true,
+    "missing_or_rejected_body_hash": null,
+    "client_identity_session_and_forwarded_headers_are_authority": false,
+    "authentication": "existing API-key hash verifier",
+    "session": "local server-owned service account state",
+    "mfa_performed": false,
+    "independent_sensor_process_isolation_proven": false,
+    "runtime": "fixed server-owned checksum child",
+    "client_query_commands_executed": false,
+    "original_body_target_credentials_or_plain_sessions_in_receipts": false
+  },
+  "storage_contract": {
+    "eligible_observations_verified_and_recorded_in_existing_ledger": 5,
+    "spool": "single-process bounded metadata files; not raw signed proof archive",
+    "collection_failure_success_response": false,
+    "response_failure_undoes_prior_execution": false,
+    "capture_timestamp": "ASGI response-start observation, not proof of wire delivery",
+    "encrypted_restore_preserved_collected_adverse": true
+  },
+  "preservation": {
+    "protected_paths_unchanged": [
+      "app",
+      "scripts/f1_lab/web_verified_context.py",
+      "scripts/f1_lab/web_durable_risk.py",
+      "scripts/f1_lab/web_evidence_ledger.py",
+      "scripts/f1_lab/web_ledger_backup.py",
+      "scripts/f1_lab/web_residual.py",
+      "scripts/app_state_recovery.py",
+      "scripts/authority_mtls_runtime.py"
+    ],
+    "earlier_public_evidence_byte_identical": [
+      {
+        "path": "docs/infrastructure-results/extra-web-backup-v47-20261113.json",
+        "sha256": "d58787a8997c7ad9e6f276170a2e80a55ccee0e967786de1852147a6ba921b85"
+      },
+      {
+        "path": "docs/infrastructure-results/extra-web-durable-v46-20261113.json",
+        "sha256": "187545a5487a1f776d42dc01e21c21d99c5a1475eba62fbb958d0c0f32a81ce4"
+      },
+      {
+        "path": "docs/infrastructure-results/extra-web-context-v45-20261113.json",
+        "sha256": "70dace7f917c93895831a60ada26e97de83754b653ae378de2f4faeb11b5a672"
+      },
+      {
+        "path": "docs/infrastructure-results/extra-web-residual-v44-20261113.json",
+        "sha256": "d361bb8f7583c7defd8c815999d6518a6d3a4ae84ef20d0fe519ceb7609a956f"
+      }
+    ],
+    "original_models": {
+      "web": {
+        "path": "runtime/f1/web-refinement-v39-20261112-02/model.json",
+        "sha256": "21318fa61f830ae1d03d47de1a01acf2c40ae19ebaf769923e3d575613f74f38"
+      },
+      "heads": {
+        "path": "runtime/f1/ait-semantic-fit-heads-russell-20261112/model.json",
+        "sha256": "4ebbcb6bb5fce286e80beeedbc18139d566d00998575487a867f129330344075"
+      },
+      "vpn": {
+        "path": "runtime/f1/vpn-feature-ablation-v32-20261112/vpn-history-model.json",
+        "sha256": "c1ff27423e63ba607a80fc7dd891ff473baccd7f11853fb3eaba10e9e37b48b6"
+      }
+    },
+    "benchmark_cases": {
+      "path": "app/data/benchmark/cases.jsonl",
+      "sha256": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f"
+    },
+    "benchmark_manifest": {
+      "path": "app/data/benchmark/manifest.json",
+      "sha256": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90"
+    },
+    "user_archives_modified": false
+  },
+  "boundaries": {
+    "local_http_requests_captured": 9,
+    "production_observations_collected": 0,
+    "new_independent_final_cases": 0,
+    "new_detection_performance_evaluations": 0,
+    "native_public_physical_rows_replayed": 0,
+    "last_web_fn_fp_not_remeasured": {
+      "fn": 30,
+      "fp": 19
+    },
+    "paid_api_calls": 0,
+    "aws_sdk_calls": 0,
+    "new_downloads": 0,
+    "github_pushes": 0,
+    "pr_merges": 0,
+    "reserved_bodies_or_labels_opened": 0,
+    "goal_qualified": false
+  },
+  "remaining": [
+    "Actual production IdP/PDP/runtime sensors and durable service session state.",
+    "Durable intake before handler execution and raw signed-evidence archiving.",
+    "Multiworker intake, writer failover and authorized incident review/closure.",
+    "New development/calibration data with provenance and labels before independent final evaluation."
+  ]
+}

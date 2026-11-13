@@ -1,6 +1,26 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
-## 현재 상태: v47 암호화 백업·복원과 외부 checkpoint
+## 현재 상태: v48 로컬 TCP HTTP 수집→검증/기록→암호화 복원
+
+[최신 요청 수집 설명](docs/extra-web-request-capture.md)과
+[실행·시험 근거](docs/infrastructure-results/extra-web-capture-v48-20261113.json)을 먼저 읽는다.
+새 web_request_capture/web_capture_lab/web_capture_transport와 실행기는 실제 loopback HTTP 바이트를 수집한다.
+서버 난수 ID·전체 본문 SHA·실제 API-key 검증·서버 소유 service session·고정 정책/child 관측으로 v45~47을 연결했다.
+사용자/세션/client request ID 헤더를 신뢰하지 않고 partial/timeout/oversize body를 빈 본문으로 만들지 않는다.
+MFA는 not_used이며 외부 IdP/EDR·실제 PHP/업로드/쿼리 명령 실행이 아니다. 고정 checksum child만 실행한다.
+source별 키는 분리됐지만 같은 프로세스라 센서 격리/attestation을 증명하지 않는다.
+
+실제 TCP9건 수집·검증/영속 결정5건·고정 child4회·통제 조건10개 기대 결과.
+통제된 정책 거부+고정 child 실행의 adverse가 checkpoint/암호화 복원 후에도 유지됐다.
+신규28포함 Windows/Linux 관련415개씩·Ruff 통과. Linux network none·756소스 전후 동일·exit0/OOM false·컨테이너 제거.
+listener/child 종료 확인. 실행 `runtime/f1/web-capture-controls-v48-20261113`, 시험 `runtime/f1/web-capture-tests-v48-20261113`.
+받은9건은 이미 관찰한 local development 자료이고 독립 malicious 라벨/최종 평가가 아니다.
+기존 고정 모델3종을 로드했지만 새F1 평가/운영 관측0·공개 원시재생0, app/기존코드/모델/라벨 보존이다.
+수집기 spool은 단일 프로세스 메타데이터이며 원본 proof 보관소가 아니다. 수집 실패503은 handler rollback이 아니다.
+자격 증명/서명/예제 복구 키는 메모리에만 생성, 운영 키 보관·원본증거/durable intake·실제 IdP/세션·writer/사건 인수는 남는다.
+유료API/AWS/다운로드/push/병합0·사용자ZIP 보존. 팀원 aitest/main에 병합하지 않는다.
+
+## v47 보존 기록: 암호화 백업·복원과 외부 checkpoint
 
 [최신 백업/복원 설명](docs/extra-web-ledger-backup.md)과
 [실행·시험 근거](docs/infrastructure-results/extra-web-backup-v47-20261113.json)을 먼저 읽는다.
