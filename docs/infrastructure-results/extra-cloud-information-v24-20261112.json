@@ -1,0 +1,529 @@
+{
+  "schema": "extra-cloud-information-v24-1",
+  "recorded_at": "2026-11-12T04:45:02.680862+00:00",
+  "branch": "extra",
+  "prior_commit": "0daa70678e5528f3bf6a72b6f277ef97e13aafa1",
+  "training_information_diagnostics": {
+    "base": {
+      "path": "runtime/f1/cloud-training-diagnostics-20261112/diagnostics.json",
+      "bytes": 2680,
+      "sha256": "680d5367421603ea1edcf3fa832e54de1b5620961f555e753cc5df5570c7ba90",
+      "aws_sdk_calls": 0,
+      "classifier_fitted": false,
+      "completed": true,
+      "conflicting_event_reference_labels": 0,
+      "counts": {
+        "known_attack": 541,
+        "known_normal": 20170,
+        "rows": 20711,
+        "usable_observations": 20711
+      },
+      "final_partition_certified": false,
+      "goal_qualified": false,
+      "input_sha256": {
+        "asset-0-observations.jsonl": "5f6da2a23b036cae2a20cb3ed83d3aa8729e9d8694dcc44f8774f7144124b287",
+        "asset-0-truth.jsonl": "b21f93b7a22aa51b5b46f4250e0a6c61190cc65045d0be394dd6d85e5f4bef67",
+        "asset-1-observations.jsonl": "852059dc2c1040ed16bdf27d5436e231a853c9a0e3d593c9039198a318561dee",
+        "asset-1-truth.jsonl": "d834b591b1ff487a936d34cb25a093d2d0868fea914bde0a3d1ac1d079d34f1d"
+      },
+      "labels_rewritten": false,
+      "linkage": {
+        "event_reference": {
+          "distinct_references": 20702,
+          "largest_reference_rows": 2,
+          "rows_in_shared_references": 0,
+          "shared_across_training_assets": 0
+        },
+        "issuer_reference": {
+          "distinct_references": 12,
+          "largest_reference_rows": 8157,
+          "rows_in_shared_references": 5487,
+          "shared_across_training_assets": 4
+        },
+        "principal_reference": {
+          "distinct_references": 364,
+          "largest_reference_rows": 4116,
+          "rows_in_shared_references": 7190,
+          "shared_across_training_assets": 7
+        },
+        "source_ip_reference": {
+          "distinct_references": 352,
+          "largest_reference_rows": 1982,
+          "rows_in_shared_references": 4138,
+          "shared_across_training_assets": 7
+        }
+      },
+      "linkage_scope": "principal/issuer/IP equality is not proof of session, physical device, current trust or safe final separation",
+      "original_six_domain_goal_replaced": false,
+      "paid_api_calls": 0,
+      "profile_scope": "same training rows only; exact age may encode near-unique history; bucket/no-age variants diagnose dependence",
+      "profiles": {
+        "bucketed_session_age": {
+          "gold_oracle_best_in_sample_f1": 0.9372549019607843,
+          "is_independent_evaluation": false,
+          "is_model_performance": false,
+          "known_attack": 541,
+          "known_normal": 20170,
+          "minimum_in_sample_classification_errors": 64,
+          "mixed_label_vectors": 11,
+          "oracle_fn": 63,
+          "oracle_fp": 1,
+          "oracle_tp": 478,
+          "rows_in_mixed_label_vectors": 1438,
+          "unique_vectors": 319
+        },
+        "exact": {
+          "gold_oracle_best_in_sample_f1": 0.9376218323586745,
+          "is_independent_evaluation": false,
+          "is_model_performance": false,
+          "known_attack": 541,
+          "known_normal": 20170,
+          "minimum_in_sample_classification_errors": 64,
+          "mixed_label_vectors": 11,
+          "oracle_fn": 60,
+          "oracle_fp": 4,
+          "oracle_tp": 481,
+          "rows_in_mixed_label_vectors": 1429,
+          "unique_vectors": 9470
+        },
+        "without_session_age": {
+          "gold_oracle_best_in_sample_f1": 0.9372549019607843,
+          "is_independent_evaluation": false,
+          "is_model_performance": false,
+          "known_attack": 541,
+          "known_normal": 20170,
+          "minimum_in_sample_classification_errors": 64,
+          "mixed_label_vectors": 9,
+          "oracle_fn": 63,
+          "oracle_fp": 1,
+          "oracle_tp": 478,
+          "rows_in_mixed_label_vectors": 1439,
+          "unique_vectors": 237
+        }
+      },
+      "schema": "f1-cloud-training-diagnostics-1",
+      "test_records_read": 0
+    },
+    "request": {
+      "path": "runtime/f1/cloud-training-request-diagnostics-20261112/diagnostics.json",
+      "bytes": 2681,
+      "sha256": "3d3c5484d972ba1ef6ce7f916eb666a5f1d9f4160c9b12504bf7ac42f5138db4",
+      "aws_sdk_calls": 0,
+      "classifier_fitted": false,
+      "completed": true,
+      "conflicting_event_reference_labels": 0,
+      "counts": {
+        "known_attack": 541,
+        "known_normal": 20170,
+        "rows": 20711,
+        "usable_observations": 20711
+      },
+      "final_partition_certified": false,
+      "goal_qualified": false,
+      "input_sha256": {
+        "asset-0-observations.jsonl": "da46681f1a3f678ba8be93849caa261a9984b860a425480e72e55060f4e74bb3",
+        "asset-0-truth.jsonl": "b21f93b7a22aa51b5b46f4250e0a6c61190cc65045d0be394dd6d85e5f4bef67",
+        "asset-1-observations.jsonl": "461cbb8b9e4dc1bb6e57323f9c0cd1d5ee827eca91cb7d0338364c35e54790b8",
+        "asset-1-truth.jsonl": "d834b591b1ff487a936d34cb25a093d2d0868fea914bde0a3d1ac1d079d34f1d"
+      },
+      "labels_rewritten": false,
+      "linkage": {
+        "event_reference": {
+          "distinct_references": 20702,
+          "largest_reference_rows": 2,
+          "rows_in_shared_references": 0,
+          "shared_across_training_assets": 0
+        },
+        "issuer_reference": {
+          "distinct_references": 12,
+          "largest_reference_rows": 8157,
+          "rows_in_shared_references": 5487,
+          "shared_across_training_assets": 4
+        },
+        "principal_reference": {
+          "distinct_references": 364,
+          "largest_reference_rows": 4116,
+          "rows_in_shared_references": 7190,
+          "shared_across_training_assets": 7
+        },
+        "source_ip_reference": {
+          "distinct_references": 352,
+          "largest_reference_rows": 1982,
+          "rows_in_shared_references": 4138,
+          "shared_across_training_assets": 7
+        }
+      },
+      "linkage_scope": "principal/issuer/IP equality is not proof of session, physical device, current trust or safe final separation",
+      "original_six_domain_goal_replaced": false,
+      "paid_api_calls": 0,
+      "profile_scope": "same training rows only; exact age may encode near-unique history; bucket/no-age variants diagnose dependence",
+      "profiles": {
+        "bucketed_session_age": {
+          "gold_oracle_best_in_sample_f1": 0.9372549019607843,
+          "is_independent_evaluation": false,
+          "is_model_performance": false,
+          "known_attack": 541,
+          "known_normal": 20170,
+          "minimum_in_sample_classification_errors": 64,
+          "mixed_label_vectors": 12,
+          "oracle_fn": 63,
+          "oracle_fp": 1,
+          "oracle_tp": 478,
+          "rows_in_mixed_label_vectors": 1438,
+          "unique_vectors": 320
+        },
+        "exact": {
+          "gold_oracle_best_in_sample_f1": 0.9376218323586745,
+          "is_independent_evaluation": false,
+          "is_model_performance": false,
+          "known_attack": 541,
+          "known_normal": 20170,
+          "minimum_in_sample_classification_errors": 64,
+          "mixed_label_vectors": 12,
+          "oracle_fn": 60,
+          "oracle_fp": 4,
+          "oracle_tp": 481,
+          "rows_in_mixed_label_vectors": 1429,
+          "unique_vectors": 9471
+        },
+        "without_session_age": {
+          "gold_oracle_best_in_sample_f1": 0.9372549019607843,
+          "is_independent_evaluation": false,
+          "is_model_performance": false,
+          "known_attack": 541,
+          "known_normal": 20170,
+          "minimum_in_sample_classification_errors": 64,
+          "mixed_label_vectors": 10,
+          "oracle_fn": 63,
+          "oracle_fp": 1,
+          "oracle_tp": 478,
+          "rows_in_mixed_label_vectors": 1439,
+          "unique_vectors": 238
+        }
+      },
+      "schema": "f1-cloud-training-diagnostics-1",
+      "test_records_read": 0
+    }
+  },
+  "request_profile": {
+    "path": "infra/f1-lab/cloud-request-profile.json",
+    "bytes": 1170,
+    "sha256": "27f1eaa4cd6cb57b6fc336b3174e94f45b5ff0f1cbeec77d804d200650771959"
+  },
+  "request_training_audit": {
+    "path": "runtime/f1/cloud-training-request-observations-20261112/audit.json",
+    "bytes": 6971,
+    "sha256": "83d19f13e18ef39917df304de9b951fc1c9d4c9cb97d4ed4f471c19167a50982"
+  },
+  "mixed_request_schema_audit": {
+    "path": "runtime/f1/cloud-mixed-schema-20261112/audit.json",
+    "bytes": 1815,
+    "sha256": "c7af378f1ea6fc591b6e9d3a2bc0f6e3804d9e453f68efbf6824d35aa6c5c59c"
+  },
+  "ztarad_acquisition": {
+    "path": "runtime/f1/ztarad-review-20261112/acquisition.json",
+    "bytes": 5256,
+    "sha256": "c76a13d59cf18b4ff5169579174333a0c245e29857dea4be134a20d4619cca67",
+    "schema": "ztarad-review-acquisition-1",
+    "completed": true,
+    "protocol_sha256": "ee3828a8f362dcd88979824d9245353928fb97f812959b4079deebbfa3fc1a2c",
+    "assets": [
+      {
+        "path": "DATA/IMBALANCED DATASETS/V2-ESPECIALISTA-dataset_com_risco.csv",
+        "bytes": 278120,
+        "sha256": "ed042739ab21bb7dc5dea797af29d1daf8f0f6ac33dd3afcf51fc7975698cf66"
+      },
+      {
+        "path": "SOURCE/insider_trhreats_V3.ipynb",
+        "bytes": 465464,
+        "sha256": "402a5c3ac4c102a273345d622099768c54bd0d625db61deb9a7c61f83129f265",
+        "code_cell_count": 36
+      },
+      {
+        "path": "SOURCE/treinamento_especialista.ipynb",
+        "bytes": 602824,
+        "sha256": "20c54a019fde336d6bde1840ba779908a13e180f87e235b69e1df97f5cd4c8d5",
+        "code_cell_count": 10
+      }
+    ],
+    "notebook_executions": 0,
+    "notebook_outputs_displayed": 0,
+    "model_fitted": false,
+    "goal_qualified": false,
+    "probe": {
+      "header": [
+        "user",
+        "computadores_distintos",
+        "total_logons",
+        "total_logoffs",
+        "computador_mais_usado",
+        "hora_logon_mais_comum",
+        "hora_logoff_mais_comum",
+        "logons_fim_de_semana",
+        "logons_dias_uteis",
+        "logons_fora_horario_comercial",
+        "logons_em_horario_comercial",
+        "logons_janela_acesso",
+        "proporcao_pc_mais_usado",
+        "pcs_distintos_dispositivo",
+        "total_atividades_dispositivo",
+        "connect_fora_horario_comercial",
+        "connect_em_horario_comercial",
+        "connect_fim_de_semana",
+        "connect_dias_uteis",
+        "connect_janela_acesso",
+        "total_connect_dispositivo",
+        "total_disconnect_dispositivo",
+        "conexoes_sem_desconexao",
+        "sites_distintos_visitados",
+        "total_acessos_http",
+        "acessos_fora_horario_comercial",
+        "acessos_em_horario_comercial",
+        "acessos_fim_de_semana",
+        "acessos_janela_acesso",
+        "visita_sites_compras",
+        "visita_sites_noticias",
+        "visita_sites_entretenimento",
+        "tamanho_medio_urls",
+        "termos_sensiveis_detectados",
+        "tamanho_medio_conteudo",
+        "diferenca_acessos_fora_dentro",
+        "risco",
+        "classe"
+      ],
+      "development_records_read": 128,
+      "first_row_field_types": {
+        "user": "str",
+        "computadores_distintos": "str",
+        "total_logons": "str",
+        "total_logoffs": "str",
+        "computador_mais_usado": "str",
+        "hora_logon_mais_comum": "str",
+        "hora_logoff_mais_comum": "str",
+        "logons_fim_de_semana": "str",
+        "logons_dias_uteis": "str",
+        "logons_fora_horario_comercial": "str",
+        "logons_em_horario_comercial": "str",
+        "logons_janela_acesso": "str",
+        "proporcao_pc_mais_usado": "str",
+        "pcs_distintos_dispositivo": "str",
+        "total_atividades_dispositivo": "str",
+        "connect_fora_horario_comercial": "str",
+        "connect_em_horario_comercial": "str",
+        "connect_fim_de_semana": "str",
+        "connect_dias_uteis": "str",
+        "connect_janela_acesso": "str",
+        "total_connect_dispositivo": "str",
+        "total_disconnect_dispositivo": "str",
+        "conexoes_sem_desconexao": "str",
+        "sites_distintos_visitados": "str",
+        "total_acessos_http": "str",
+        "acessos_fora_horario_comercial": "str",
+        "acessos_em_horario_comercial": "str",
+        "acessos_fim_de_semana": "str",
+        "acessos_janela_acesso": "str",
+        "visita_sites_compras": "str",
+        "visita_sites_noticias": "str",
+        "visita_sites_entretenimento": "str",
+        "tamanho_medio_urls": "str",
+        "termos_sensiveis_detectados": "str",
+        "tamanho_medio_conteudo": "str",
+        "diferenca_acessos_fora_dentro": "str",
+        "risco": "str",
+        "classe": "str"
+      },
+      "missing_values_by_field": {
+        "user": 0,
+        "computadores_distintos": 0,
+        "total_logons": 0,
+        "total_logoffs": 0,
+        "computador_mais_usado": 0,
+        "hora_logon_mais_comum": 0,
+        "hora_logoff_mais_comum": 0,
+        "logons_fim_de_semana": 0,
+        "logons_dias_uteis": 0,
+        "logons_fora_horario_comercial": 0,
+        "logons_em_horario_comercial": 0,
+        "logons_janela_acesso": 0,
+        "proporcao_pc_mais_usado": 0,
+        "pcs_distintos_dispositivo": 103,
+        "total_atividades_dispositivo": 103,
+        "connect_fora_horario_comercial": 103,
+        "connect_em_horario_comercial": 103,
+        "connect_fim_de_semana": 103,
+        "connect_dias_uteis": 103,
+        "connect_janela_acesso": 103,
+        "total_connect_dispositivo": 103,
+        "total_disconnect_dispositivo": 103,
+        "conexoes_sem_desconexao": 103,
+        "sites_distintos_visitados": 77,
+        "total_acessos_http": 77,
+        "acessos_fora_horario_comercial": 77,
+        "acessos_em_horario_comercial": 77,
+        "acessos_fim_de_semana": 77,
+        "acessos_janela_acesso": 77,
+        "visita_sites_compras": 77,
+        "visita_sites_noticias": 77,
+        "visita_sites_entretenimento": 77,
+        "tamanho_medio_urls": 77,
+        "termos_sensiveis_detectados": 77,
+        "tamanho_medio_conteudo": 77,
+        "diferenca_acessos_fora_dentro": 77,
+        "risco": 0,
+        "classe": 0
+      },
+      "case_values_displayed": 0,
+      "later_records_used": 0
+    }
+  },
+  "ztarad_catalog": {
+    "path": "runtime/f1/ztarad-catalog-20261112/catalog.json",
+    "bytes": 6731,
+    "sha256": "84278ad82a38cd8df0e23fbe617cc6b210c48146977d534528d05e8769844060"
+  },
+  "ztarad_pre_body_protocol": {
+    "path": "infra/f1-lab/ztarad-intake-protocol.json",
+    "bytes": 1934,
+    "sha256": "ee3828a8f362dcd88979824d9245353928fb97f812959b4079deebbfa3fc1a2c"
+  },
+  "ztarad_code_only_references": [
+    {
+      "path": "runtime/f1/ztarad-review-20261112/asset-1-code-only.txt",
+      "bytes": 33980,
+      "sha256": "0d2e8e91796e36dbb53f4f622d53269b5e5c9e6544d1c3ba93e0cea8ff5f6f07"
+    },
+    {
+      "path": "runtime/f1/ztarad-review-20261112/asset-2-code-only.txt",
+      "bytes": 24753,
+      "sha256": "3b29fce08fbd9ea25ea60fc05568f8ab8ebc45a24d3992a8d7a2626d7e821ca9"
+    }
+  ],
+  "ztarad_static_method_finding": {
+    "code_source": 1,
+    "lines": [
+      647,
+      726
+    ],
+    "finding": "Expert section computes aggregate rule scores, maps score to categorical/binary risk, and saves same-named CSV. Does not certify full public CSV execution equivalence or independent per-event attack adjudication."
+  },
+  "ztarad_adoption_selected": false,
+  "original_labels_changed": false,
+  "request_truth_sidecars_unchanged": true,
+  "reserved_ait_final_bodies_read": 0,
+  "cloud_test_archive_downloaded": false,
+  "original_six_domain_goal_replaced": false,
+  "independent_final_metrics": null,
+  "goal_qualified": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "tests": {
+    "windows": {
+      "path": "runtime/f1/extra-cloud-separation-final-20261112.xml",
+      "bytes": 28426,
+      "sha256": "28c1b931c69a5bebe8b634ed013612e1e5e9f57e6fd9f6bf5d906e72f68d196c",
+      "passed": 204
+    },
+    "linux": {
+      "path": "runtime/f1/extra-linux-public-native-20261112-12/checks.xml",
+      "bytes": 28432,
+      "sha256": "18a562a766b35d4eb2a0e61575c2dd411220e6fb3def642b4a27a821cc1abe68",
+      "passed": 204
+    }
+  },
+  "linux": {
+    "path": "runtime/f1/extra-linux-public-native-20261112-12/verification.json",
+    "bytes": 1395,
+    "sha256": "7d366bd99ce3433bbed59252331ace22a6189ba3f7c433157ed9e6c3c3fcccb3",
+    "schema": "extra-f1-linux-snapshot-1",
+    "completed": true,
+    "owner": "extra-f1-ef93257708d3",
+    "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "tests": [
+      "tests/test_f1_public_sources.py",
+      "tests/test_f1_bounded_zip.py",
+      "tests/test_f1_native_jsonl.py",
+      "tests/test_f1_native_preparation.py",
+      "tests/test_f1_line_truth.py",
+      "tests/test_f1_raw_observations.py",
+      "tests/test_f1_native_bayes.py",
+      "tests/test_f1_native_raw_workflow.py",
+      "tests/test_f1_raw_context.py",
+      "tests/test_f1_native_context_workflow.py",
+      "tests/test_f1_native_tree.py",
+      "tests/test_f1_frozen_native_tree.py",
+      "tests/test_f1_native_transfer.py",
+      "tests/test_f1_contextual_links.py",
+      "tests/test_f1_native_heads.py",
+      "tests/test_f1_native_binary_tree.py",
+      "tests/test_f1_cloud_observations.py",
+      "tests/test_f1_cloud_diagnostics.py"
+    ],
+    "host_mounts": 0,
+    "network": "none",
+    "cloud_calls": 0,
+    "paid_api_calls": 0,
+    "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+    "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+    "source_manifest_sha256": "6d8d36b0f0b877402b27f62ff0167805253f4c3a00d99e685bce819c6152d158",
+    "source_files": 434,
+    "container_exit_code": 0,
+    "source_verified_before_and_after": true,
+    "remaining_containers": 0
+  },
+  "initial_lint_failure": {
+    "path": "runtime/f1/extra-linux-public-native-20261112-11/verification.json",
+    "bytes": 1386,
+    "sha256": "0c28cac9b243ee2b391db14be2bfc56cd5188094ee91a107890c3c5d8a0eee4e",
+    "report": {
+      "schema": "extra-f1-linux-snapshot-1",
+      "completed": false,
+      "owner": "extra-f1-95872f02955b",
+      "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+      "tests": [
+        "tests/test_f1_public_sources.py",
+        "tests/test_f1_bounded_zip.py",
+        "tests/test_f1_native_jsonl.py",
+        "tests/test_f1_native_preparation.py",
+        "tests/test_f1_line_truth.py",
+        "tests/test_f1_raw_observations.py",
+        "tests/test_f1_native_bayes.py",
+        "tests/test_f1_native_raw_workflow.py",
+        "tests/test_f1_raw_context.py",
+        "tests/test_f1_native_context_workflow.py",
+        "tests/test_f1_native_tree.py",
+        "tests/test_f1_frozen_native_tree.py",
+        "tests/test_f1_native_transfer.py",
+        "tests/test_f1_contextual_links.py",
+        "tests/test_f1_native_heads.py",
+        "tests/test_f1_native_binary_tree.py",
+        "tests/test_f1_cloud_observations.py",
+        "tests/test_f1_cloud_diagnostics.py"
+      ],
+      "host_mounts": 0,
+      "network": "none",
+      "cloud_calls": 0,
+      "paid_api_calls": 0,
+      "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+      "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+      "source_manifest_sha256": "594cb43aef49825196e8d2d4e59d2721e0af0cbb91ff0b9aab37987464fa5e97",
+      "source_files": 434,
+      "container_exit_code": 1,
+      "failure_type": "RuntimeError",
+      "remaining_containers": 0
+    },
+    "log": {
+      "path": "runtime/f1/extra-linux-public-native-20261112-11/checks.log",
+      "bytes": 883,
+      "sha256": "f10f99aed4dc62cb6cf96aa464f87120891abf0ce023d782f08a9546f23e95ce"
+    },
+    "pytest_started": false,
+    "cause": "import formatting I001; missing JUnit copy also reported"
+  },
+  "baseline_app_diff_empty": true,
+  "currently_owned_f1_containers": 0,
+  "interrupted_soak_cleanup": {
+    "path": "docs/infrastructure-results/extra-interrupted-cleanup-v15-20261112.json",
+    "bytes": 3897,
+    "sha256": "956dc5c53ff011b57145be7cae9868743864adbc8674113f37a9e7dff5197b73"
+  }
+}

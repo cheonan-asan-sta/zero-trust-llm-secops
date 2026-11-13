@@ -199,7 +199,7 @@ class AuthorityRuntime(MonitoredRuntime):
         def healthy():
             try:
                 result = self.authority_health()
-            except (RuntimeFailure, ValueError):
+            except (RuntimeFailure, ValueError, subprocess.TimeoutExpired):
                 return False
             if result.get('healthy') is True and type(result.get('server_time')) is int:
                 ready.update(result)

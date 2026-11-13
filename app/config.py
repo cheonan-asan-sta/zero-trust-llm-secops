@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     outbox_log_path: Path = Path("runtime/integration-outbox.jsonl")
     zero_trust_db_path: Path = Path("runtime/zero-trust.sqlite3")
     behavior_context_db_path: Path | None = None
+    # Compatibility for offline legacy fixtures; the application uses behavior_context_db_path.
+    response_workflow_db_path: Path = Path("runtime/response-workflow.sqlite3")
     trusted_signal_sources_path: Path | None = None
     signal_inbox_max_pending: int = Field(default=1000, ge=1, le=10000)
     signal_inbox_max_records: int = Field(default=10000, ge=1, le=100000)

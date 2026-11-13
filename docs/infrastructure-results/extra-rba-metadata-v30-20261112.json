@@ -1,0 +1,128 @@
+{
+  "schema": "extra-rba-metadata-v30-1",
+  "recorded_at": "2026-11-12T06:18:49.945715+00:00",
+  "branch": "extra",
+  "prior_commit": "8a8da90ce2eafbb7681787140b768ea274b0244c",
+  "protocol_recorded_before_full_metadata_scan": {
+    "path": "infra/f1-lab/rba-metadata-protocol.json",
+    "bytes": 2265,
+    "sha256": "51bb733f45188e1a20d482785b2917b4a37bff3cd19c11136e8ad297228d3a91"
+  },
+  "auditor_source": {
+    "path": "scripts/f1_lab/rba_metadata.py",
+    "bytes": 14945,
+    "sha256": "2fb22e27f68b7afc31e3bdf76d8cf4b5fe844dc298212d287d541eeaf3c5569c"
+  },
+  "cli_source": {
+    "path": "scripts/audit_rba_metadata.py",
+    "bytes": 993,
+    "sha256": "70744f287b2aec5b6ac54e67091057d053cae5343617ccb2f349f087b65100af"
+  },
+  "actual_run_snapshot": {
+    "schema": "rba-metadata-run-1",
+    "started_at": "2026-11-12T06:13:10.826487+00:00",
+    "pid": 8660,
+    "protocol_sha256": "51bb733f45188e1a20d482785b2917b4a37bff3cd19c11136e8ad297228d3a91",
+    "source_sha256": "2fb22e27f68b7afc31e3bdf76d8cf4b5fe844dc298212d287d541eeaf3c5569c",
+    "output": "runtime/f1/rba-full-metadata-20261112",
+    "terminal": false,
+    "classifier_fitted": false,
+    "goal_qualified": false,
+    "tool_session_id": 94763,
+    "progress_at_snapshot": {
+      "elapsed_seconds": 335.33,
+      "records": 7800000,
+      "uncompressed_bytes": 2339075963
+    },
+    "process_observed_live": true,
+    "process_creation_matches_owned_start": true,
+    "metadata_scan_complete": false,
+    "full_csv_crc_verification_pending": true,
+    "conditional_tables_disclosed_to_model": false
+  },
+  "user_partition": "70/15/15 fixed hash; all observed81 probe users development; no reseeding on class support",
+  "device_template_or_future_time_independence_certified": false,
+  "tests": {
+    "windows": {
+      "path": "runtime/f1/extra-rba-metadata-final-20261112.xml",
+      "bytes": 34020,
+      "sha256": "9dc15a941c84dbe2d4c9c952b4cbf64b5ec36c1b116d310f388365507521d15d",
+      "passed": 244
+    },
+    "linux": {
+      "path": "runtime/f1/extra-linux-public-native-20261112-16/checks.xml",
+      "bytes": 34026,
+      "sha256": "ca251ed4afc3969ae9afa2a869774a55ccdff33aaa8972ba0db369e3d0de4a09",
+      "passed": 244
+    }
+  },
+  "labels_changed": false,
+  "reserved_ait_final_bodies_read": 0,
+  "cloud_test_archive_downloaded": false,
+  "classifier_fitted": false,
+  "binary_truth_contract_selected": false,
+  "original_six_domain_goal_replaced": false,
+  "independent_final_metrics": null,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "goal_qualified": false,
+  "first_focused_check": {
+    "path": "runtime/f1/extra-rba-metadata-focused-20261112.xml",
+    "bytes": 2250,
+    "sha256": "ca50cebc5f6f32e7b893922d9360985bc8b3aad31e91ed8a6cfc333b4ece37ee",
+    "passed": 7,
+    "failed": 1,
+    "reason": "Test incorrectly required aggregate development negative counts to change when balanced labels flip; corrected to verify per-user label change and unchanged assignments. Source data labels untouched."
+  },
+  "linux": {
+    "path": "runtime/f1/extra-linux-public-native-20261112-16/verification.json",
+    "bytes": 1547,
+    "sha256": "4649f156255577c95277fcfedc4c8e25e14db0f540f7373409cc4972ef64ed4a",
+    "schema": "extra-f1-linux-snapshot-1",
+    "completed": true,
+    "owner": "extra-f1-2bed4ee0ef52",
+    "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "tests": [
+      "tests/test_f1_public_sources.py",
+      "tests/test_f1_bounded_zip.py",
+      "tests/test_f1_native_jsonl.py",
+      "tests/test_f1_native_preparation.py",
+      "tests/test_f1_line_truth.py",
+      "tests/test_f1_raw_observations.py",
+      "tests/test_f1_native_bayes.py",
+      "tests/test_f1_native_raw_workflow.py",
+      "tests/test_f1_raw_context.py",
+      "tests/test_f1_native_context_workflow.py",
+      "tests/test_f1_native_tree.py",
+      "tests/test_f1_frozen_native_tree.py",
+      "tests/test_f1_native_transfer.py",
+      "tests/test_f1_contextual_links.py",
+      "tests/test_f1_native_heads.py",
+      "tests/test_f1_native_binary_tree.py",
+      "tests/test_f1_cloud_observations.py",
+      "tests/test_f1_cloud_diagnostics.py",
+      "tests/test_f1_cloud_context.py",
+      "tests/test_f1_cloud_identity.py",
+      "tests/test_f1_rba_probe.py",
+      "tests/test_f1_rba_metadata.py"
+    ],
+    "host_mounts": 0,
+    "network": "none",
+    "cloud_calls": 0,
+    "paid_api_calls": 0,
+    "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+    "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+    "source_manifest_sha256": "0bcbea91b476d8430bc1f75b09eff935515da355e0d83642a61a5e481bdd0bf8",
+    "source_files": 450,
+    "container_exit_code": 0,
+    "source_verified_before_and_after": true,
+    "remaining_containers": 0
+  },
+  "baseline_app_diff_empty": true,
+  "current_owned_f1_containers": 0,
+  "interrupted_soak_cleanup": {
+    "path": "docs/infrastructure-results/extra-interrupted-cleanup-v15-20261112.json",
+    "bytes": 3897,
+    "sha256": "956dc5c53ff011b57145be7cae9868743864adbc8674113f37a9e7dff5197b73"
+  }
+}

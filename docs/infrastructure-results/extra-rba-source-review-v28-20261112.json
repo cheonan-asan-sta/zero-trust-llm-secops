@@ -1,0 +1,71 @@
+{
+  "schema": "extra-rba-source-review-v28-1",
+  "recorded_at": "2026-11-12T05:10:20.619642+00:00",
+  "branch": "extra",
+  "source_commit": "ecead2cabe8764a22c692ee4485e45cbccdab124",
+  "publisher_review": {
+    "path": "runtime/f1/rba-publisher-review-20261112/review.json",
+    "bytes": 1521,
+    "sha256": "adc7b84d62f12e40ecc7f5615bf8c480812ee59e1c2e3aeb2bba66fed75bffbe",
+    "schema": "rba-publisher-review-1",
+    "recorded_at": "2026-11-12T05:08:28.864188+00:00",
+    "repository": "das-group/rba-dataset",
+    "commit": "7135779a45d574760b3cc0a23c23aa813166141f",
+    "assets": [
+      {
+        "source": "https://raw.githubusercontent.com/das-group/rba-dataset/7135779a45d574760b3cc0a23c23aa813166141f/README.md",
+        "filename": "README.md",
+        "bytes": 10114,
+        "sha256": "a1830f4ad8a4b1e61bec13deaf4508f6b8c32b72de06f9868bf2880b1f8a2d8f"
+      },
+      {
+        "source": "https://raw.githubusercontent.com/das-group/rba-dataset/7135779a45d574760b3cc0a23c23aa813166141f/RESULTS.md",
+        "filename": "RESULTS.md",
+        "bytes": 4150,
+        "sha256": "fda96e1773febf933b496cea2d0a24b044e7a86c42802abf29700b1e8490b582"
+      },
+      {
+        "source": "https://raw.githubusercontent.com/das-group/rba-dataset/7135779a45d574760b3cc0a23c23aa813166141f/LICENSE",
+        "filename": "LICENSE",
+        "bytes": 19199,
+        "sha256": "db5a13a74a35522a7d01dea794c7db3f436db9b3cb856a2e52bb27ae3f793aa6"
+      },
+      {
+        "source": "https://www.stephanwiefling.de/papers/rba-largescale-onlineservice-tops2022.pdf",
+        "filename": "publisher-paper.pdf",
+        "bytes": 4176268,
+        "sha256": "301cb600fdb11e9ad15a98e705192dcac4641cc356dd372ef0f545075c23d0f5"
+      }
+    ],
+    "csv_records_read": 0,
+    "model_fitted": false,
+    "goal_qualified": false,
+    "interpretation": "Documentation/paper only. Original study sample counts are not asserted as public CSV counts."
+  },
+  "method_boundary": "Original paper sample counts are not public CSV counts. ATO, attack-IP and failed-login targets differ. RTT was synthesized conditional on login outcome/geolocation. Input timing and history poisoning must be explicit. No final benign downsampling to inflate precision.",
+  "source_code_changed": false,
+  "new_tests_run": false,
+  "existing_test_evidence": {
+    "path": "docs/infrastructure-results/extra-rba-probe-reader-v27-20261112.json",
+    "bytes": 4408,
+    "sha256": "56c4ad5a6b1b675981cc724c91b488a86297f44f367abbaf74b419402f7bf714"
+  },
+  "rba_acquisition_progress_snapshot": {
+    "bytes_received": 256901120,
+    "elapsed_seconds": 815.31,
+    "expected_bytes": 1093700330,
+    "retry_count": 0
+  },
+  "collector_tool_session_last_observed_live": 34025,
+  "collector_terminal_receipt_present": false,
+  "actual_rba_csv_records_parsed": 0,
+  "baseline_app_diff_empty": true,
+  "original_labels_changed": false,
+  "reserved_ait_final_bodies_read": 0,
+  "cloud_test_archive_downloaded": false,
+  "original_six_domain_goal_replaced": false,
+  "independent_final_metrics": null,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "goal_qualified": false
+}

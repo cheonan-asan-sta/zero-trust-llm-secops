@@ -1,0 +1,54 @@
+{
+  "schema": "f1-web-refinement-protocol-1",
+  "recorded_at": "2026-11-12T11:40:36.312500+00:00",
+  "scope": "observed development/calibration only",
+  "feature_profile": "raw-http-auth-semantics-4",
+  "baseline": {
+    "path": "runtime/f1/ait-semantic-fit-heads-russell-20261112/model.json",
+    "sha256": "4ebbcb6bb5fce286e80beeedbc18139d566d00998575487a867f129330344075"
+  },
+  "training_policy": "first development R only; no S/Fox fitting or labels in inference",
+  "method": "fit an HTTP-only evidence tree without five rate/count features; lower original score only for complete successful GET/HEAD, evidence score<=0.05 and no retention guard",
+  "guards": "retain original on payload/scanner flags, >=100 requests/sec or >=500/min buckets, ambiguous/unavailable evidence or missing/invalid context",
+  "tree": {
+    "max_depth": 8,
+    "min_leaf": 5,
+    "class_balanced": true
+  },
+  "selection_history": "two exploratory feature projections were compared on already observed vectors; the minimal five-feature exclusion was retained; a direct replacement introduced false positives, so conservative one-way lowering was chosen; successful read-only scope is narrower than the preliminary 4-FP prototype",
+  "acceptance": "all three web access sources FPR<=5%, recall>=95%, no prior TP lost at 0.95, no new FP, non-HTTP scores identical; this does not qualify the six-domain independent goal",
+  "scenarios": [
+    {
+      "name": "russellmitchell",
+      "role": "training_development",
+      "directory": "runtime/f1/streaming-calibration-v37-20261112/russellmitchell",
+      "preparation_sha256": "0091ab22f3ffe3ee12773c7a7d6dfe127e78750faf6dbe4aca2550e39b2f3683",
+      "baseline_diagnostic": "runtime/f1/heads-score-diagnostic-v38b-20261112/russellmitchell/diagnostic.json",
+      "baseline_diagnostic_sha256": "f8d5d8dbf31cdf129b5bff0ee32fd742855c61d6cfc521a8ccba556581c06384",
+      "rows": 295243
+    },
+    {
+      "name": "santos",
+      "role": "observed_development",
+      "directory": "runtime/f1/streaming-calibration-v37-20261112/santos",
+      "preparation_sha256": "b6e960ddc26eff3c4251ba08319c0af45697b3ee4aabdd96ba50d09e154d4f9a",
+      "baseline_diagnostic": "runtime/f1/heads-score-diagnostic-v38b-20261112/santos/diagnostic.json",
+      "baseline_diagnostic_sha256": "cf432ffaa1ea9271fd8d0f50c6a5ee71017dc13f653373137e84bcd9d2125ff5",
+      "rows": 295976
+    },
+    {
+      "name": "fox",
+      "role": "observed_calibration",
+      "directory": "runtime/f1/streaming-calibration-v37-20261112/fox",
+      "preparation_sha256": "d03d22bd2aa708364dd1853ec45af22728e5be5b1451f26dde5e9fe5b2adb28b",
+      "baseline_diagnostic": "runtime/f1/heads-score-diagnostic-v38b-20261112/fox/diagnostic.json",
+      "baseline_diagnostic_sha256": "8690703b5dd121f510ae28d0767d19652fee9340d15fe46b29b869d4aa2e1646",
+      "rows": 668418
+    }
+  ],
+  "goal_qualified": false,
+  "production_adopted": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "github_pushes": 0
+}

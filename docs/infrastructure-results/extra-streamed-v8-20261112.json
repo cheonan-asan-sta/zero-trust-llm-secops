@@ -1,0 +1,3210 @@
+{
+  "schema": "extra-streamed-v8-checkpoint-1",
+  "base_commit": "c210bfc",
+  "windows": {
+    "tests": 307,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 64.877,
+    "sha256": "43b1f0e089f36ba9c6ec29bb15730bd44f75faf6002cf388a6ee19089a944219"
+  },
+  "linux": {
+    "schema": "extra-f1-linux-snapshot-1",
+    "completed": true,
+    "owner": "extra-f1-e0fa6ccaaf9e",
+    "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "tests": [
+      "tests/test_m7_streaming_audit.py",
+      "tests/test_m7_auth_dataset.py",
+      "tests/test_f1_resource_policy.py",
+      "tests/test_f1_calibration.py",
+      "tests/test_f1_source_registry.py",
+      "tests/test_f1_session_inference.py",
+      "tests/test_f1_confidence.py",
+      "tests/test_f1_temporal_store.py",
+      "tests/test_f1_approval_registry.py",
+      "tests/test_f1_shadow_approvals.py",
+      "tests/test_f1_shadow_detector.py",
+      "tests/test_f1_feature_audit.py",
+      "tests/test_f1_review.py",
+      "tests/test_detection_benchmark.py",
+      "tests/test_f1_provenance.py",
+      "tests/test_f1_session_controls.py"
+    ],
+    "host_mounts": 0,
+    "network": "none",
+    "cloud_calls": 0,
+    "paid_api_calls": 0,
+    "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+    "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+    "source_manifest_sha256": "f77b3326333c19f04a5380101b39927c429b575523a1571c746e3d87c0ac6273",
+    "source_files": 372,
+    "container_exit_code": 0,
+    "full_source_audit": {
+      "schema": "m7-streamed-readiness-1",
+      "source_commit": null,
+      "source_dirty": null,
+      "git_metadata": "unavailable_use_explicit_source_snapshot_hashes",
+      "source_files_lf_sha256": {
+        "scripts/audit_m7_source.py": "86d1e57bb908e58c7fa9db6aa54e4ce855283ae329b655761365e16195e5beb1",
+        "scripts/prepare_m7.py": "28dcb83e8e57e7ded87157c7cf32f244ae1ca550ef201617d1af6815648609f3",
+        "scripts/audit_f1_features.py": "a85ea7662bb54bb97dc190f5bbc81804e40a492fe219719bc3fa71c901f077db",
+        "scripts/f1_lab/provenance.py": "4f8a1c095f0fb43c0e303cd805c26a14c34c2fd076a4753a7ac4445cfa512678"
+      },
+      "source_contract_sha256": "0ace3370fb73551cf6b64c21aa004f447616bf75172b3023efbe7eff4f0efe5c",
+      "source_kind": "publisher_synthetic_authentication_logs",
+      "source_url": "https://raw.githubusercontent.com/KREONET/auth-anomaly-dataset/5fd5cae2001a6b67cafb952709db37e366cfa276/iam_anomaly_2026.jsonl",
+      "license": "CC-BY-4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "population": {
+        "events": 130767,
+        "session_labels": {
+          "anomaly": 4089,
+          "attack": 9573,
+          "benign": 9088
+        },
+        "source_top_level_fields": [
+          "action_by",
+          "category",
+          "client_ip",
+          "duration_ms",
+          "event_type",
+          "http_method",
+          "http_status",
+          "label",
+          "level",
+          "message",
+          "module",
+          "payload",
+          "ref",
+          "ref_id",
+          "referer",
+          "subcategory",
+          "timestamp",
+          "trace_id",
+          "uri",
+          "user_agent",
+          "user_id"
+        ],
+        "consumed_source_sha256": "445f69377a2e12b4203a68f15cd9a4013fbc7e0ef21c19843969f671b1334a30"
+      },
+      "analysis": {
+        "projections": {
+          "module_method_status_level_sequence": {
+            "three_class_patterns": 722,
+            "binary_authored_oracle_bound": {
+              "positive": 9573,
+              "negative": 9088,
+              "groups": 617,
+              "conflicting_groups": 69,
+              "minimum_misclassifications": 1377,
+              "maximum_accuracy_oracle": 0.926209742243181,
+              "maximum_f1_oracle": 0.9299343611662342,
+              "fp_cap_at_5_percent": 454,
+              "maximum_recall_with_precision_95_and_fpr_5_oracle": 0.8906298965841429,
+              "all_four_point_targets_feasible_for_projection_oracle": false,
+              "not_model_performance": true
+            },
+            "anomaly_excluded_from_binary_oracle": 4089,
+            "not_trained_or_measured_detector_performance": true
+          },
+          "same_plus_duration_sequence": {
+            "three_class_patterns": 22735,
+            "binary_authored_oracle_bound": {
+              "positive": 9573,
+              "negative": 9088,
+              "groups": 18646,
+              "conflicting_groups": 0,
+              "minimum_misclassifications": 0,
+              "maximum_accuracy_oracle": 1.0,
+              "maximum_f1_oracle": 1.0,
+              "fp_cap_at_5_percent": 454,
+              "maximum_recall_with_precision_95_and_fpr_5_oracle": 1.0,
+              "all_four_point_targets_feasible_for_projection_oracle": true,
+              "not_model_performance": true
+            },
+            "anomaly_excluded_from_binary_oracle": 4089,
+            "not_trained_or_measured_detector_performance": true
+          }
+        },
+        "families": [
+          {
+            "source_label": "anomaly",
+            "category": "access_anomaly",
+            "subcategory": "anomaly_concurrent_legit",
+            "sessions": 198
+          },
+          {
+            "source_label": "anomaly",
+            "category": "access_anomaly",
+            "subcategory": "anomaly_first_admin",
+            "sessions": 136
+          },
+          {
+            "source_label": "anomaly",
+            "category": "access_anomaly",
+            "subcategory": "anomaly_new_service",
+            "sessions": 84
+          },
+          {
+            "source_label": "anomaly",
+            "category": "access_anomaly",
+            "subcategory": "anomaly_rapid_service_switch",
+            "sessions": 244
+          },
+          {
+            "source_label": "anomaly",
+            "category": "behavioral",
+            "subcategory": "dormant_account_activity",
+            "sessions": 56
+          },
+          {
+            "source_label": "anomaly",
+            "category": "behavioral",
+            "subcategory": "evasive_dormant_account",
+            "sessions": 39
+          },
+          {
+            "source_label": "anomaly",
+            "category": "behavioral",
+            "subcategory": "evasive_impossible_travel",
+            "sessions": 34
+          },
+          {
+            "source_label": "anomaly",
+            "category": "behavioral",
+            "subcategory": "impossible_travel",
+            "sessions": 20
+          },
+          {
+            "source_label": "anomaly",
+            "category": "behavioral",
+            "subcategory": "unusual_time_access",
+            "sessions": 13
+          },
+          {
+            "source_label": "anomaly",
+            "category": "device_anomaly",
+            "subcategory": "anomaly_device_switch",
+            "sessions": 198
+          },
+          {
+            "source_label": "anomaly",
+            "category": "device_anomaly",
+            "subcategory": "anomaly_new_browser",
+            "sessions": 79
+          },
+          {
+            "source_label": "anomaly",
+            "category": "device_anomaly",
+            "subcategory": "anomaly_os_update",
+            "sessions": 58
+          },
+          {
+            "source_label": "anomaly",
+            "category": "infra_error",
+            "subcategory": "noise_bookmark_stale",
+            "sessions": 42
+          },
+          {
+            "source_label": "anomaly",
+            "category": "infra_error",
+            "subcategory": "noise_server_error_transient",
+            "sessions": 44
+          },
+          {
+            "source_label": "anomaly",
+            "category": "infra_error",
+            "subcategory": "noise_slow_response",
+            "sessions": 28
+          },
+          {
+            "source_label": "anomaly",
+            "category": "infra_error",
+            "subcategory": "noise_wrong_service",
+            "sessions": 30
+          },
+          {
+            "source_label": "anomaly",
+            "category": "location_anomaly",
+            "subcategory": "anomaly_mobile_network",
+            "sessions": 154
+          },
+          {
+            "source_label": "anomaly",
+            "category": "location_anomaly",
+            "subcategory": "anomaly_new_ip_login",
+            "sessions": 169
+          },
+          {
+            "source_label": "anomaly",
+            "category": "location_anomaly",
+            "subcategory": "anomaly_travel_login",
+            "sessions": 97
+          },
+          {
+            "source_label": "anomaly",
+            "category": "location_anomaly",
+            "subcategory": "anomaly_vpn_ip_change",
+            "sessions": 166
+          },
+          {
+            "source_label": "anomaly",
+            "category": "login_error",
+            "subcategory": "noise_login_caps_lock",
+            "sessions": 232
+          },
+          {
+            "source_label": "anomaly",
+            "category": "login_error",
+            "subcategory": "noise_login_expired_password",
+            "sessions": 124
+          },
+          {
+            "source_label": "anomaly",
+            "category": "login_error",
+            "subcategory": "noise_login_typo",
+            "sessions": 454
+          },
+          {
+            "source_label": "anomaly",
+            "category": "login_error",
+            "subcategory": "noise_login_typo_twice",
+            "sessions": 224
+          },
+          {
+            "source_label": "anomaly",
+            "category": "protocol_error",
+            "subcategory": "noise_oidc_callback_retry",
+            "sessions": 84
+          },
+          {
+            "source_label": "anomaly",
+            "category": "protocol_error",
+            "subcategory": "noise_oidc_state_expired",
+            "sessions": 90
+          },
+          {
+            "source_label": "anomaly",
+            "category": "protocol_error",
+            "subcategory": "noise_saml_decode_transient",
+            "sessions": 126
+          },
+          {
+            "source_label": "anomaly",
+            "category": "protocol_error",
+            "subcategory": "noise_saml_state_timeout",
+            "sessions": 54
+          },
+          {
+            "source_label": "anomaly",
+            "category": "protocol_error",
+            "subcategory": "noise_wrong_url",
+            "sessions": 51
+          },
+          {
+            "source_label": "anomaly",
+            "category": "session_error",
+            "subcategory": "noise_concurrent_tab",
+            "sessions": 94
+          },
+          {
+            "source_label": "anomaly",
+            "category": "session_error",
+            "subcategory": "noise_session_expired",
+            "sessions": 166
+          },
+          {
+            "source_label": "anomaly",
+            "category": "session_error",
+            "subcategory": "noise_session_refresh_timeout",
+            "sessions": 102
+          },
+          {
+            "source_label": "anomaly",
+            "category": "temporal_anomaly",
+            "subcategory": "anomaly_frequency_spike",
+            "sessions": 187
+          },
+          {
+            "source_label": "anomaly",
+            "category": "temporal_anomaly",
+            "subcategory": "anomaly_offhours_access",
+            "sessions": 60
+          },
+          {
+            "source_label": "anomaly",
+            "category": "temporal_anomaly",
+            "subcategory": "anomaly_post_vacation",
+            "sessions": 100
+          },
+          {
+            "source_label": "anomaly",
+            "category": "temporal_anomaly",
+            "subcategory": "anomaly_weekend_login",
+            "sessions": 52
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "abnormal_sp_access",
+            "sessions": 126
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "account_enumeration",
+            "sessions": 325
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "account_takeover",
+            "sessions": 55
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "admin_abuse",
+            "sessions": 68
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "admin_deletion_blocked",
+            "sessions": 5
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "bulk_config_change",
+            "sessions": 212
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "concurrent_sessions",
+            "sessions": 24
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "evasive_account_enumeration",
+            "sessions": 98
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "evasive_account_takeover",
+            "sessions": 54
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "evasive_concurrent_sessions",
+            "sessions": 32
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "evasive_mass_account_creation",
+            "sessions": 88
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "evasive_privilege_escalation",
+            "sessions": 26
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "evasive_registration_abuse",
+            "sessions": 33
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "evasive_session_hijack",
+            "sessions": 16
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "mass_account_creation",
+            "sessions": 315
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "novel_admin_oidc_op_manipulation",
+            "sessions": 117
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "novel_post_registration_escalation",
+            "sessions": 60
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "novel_registration_to_admin_takeover",
+            "sessions": 36
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "novel_rp_registration_abuse",
+            "sessions": 235
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "privilege_escalation",
+            "sessions": 24
+          },
+          {
+            "source_label": "attack",
+            "category": "account_abuse",
+            "subcategory": "registration_abuse",
+            "sessions": 144
+          },
+          {
+            "source_label": "attack",
+            "category": "behavioral_attack",
+            "subcategory": "evasive_ip_hopping",
+            "sessions": 48
+          },
+          {
+            "source_label": "attack",
+            "category": "behavioral_attack",
+            "subcategory": "evasive_user_agent_anomaly",
+            "sessions": 54
+          },
+          {
+            "source_label": "attack",
+            "category": "behavioral_attack",
+            "subcategory": "ip_hopping",
+            "sessions": 65
+          },
+          {
+            "source_label": "attack",
+            "category": "behavioral_attack",
+            "subcategory": "novel_idp_session_state_attack",
+            "sessions": 99
+          },
+          {
+            "source_label": "attack",
+            "category": "behavioral_attack",
+            "subcategory": "novel_session_lifecycle_attack",
+            "sessions": 36
+          },
+          {
+            "source_label": "attack",
+            "category": "behavioral_attack",
+            "subcategory": "novel_sp_session_manipulation",
+            "sessions": 74
+          },
+          {
+            "source_label": "attack",
+            "category": "behavioral_attack",
+            "subcategory": "session_hijack",
+            "sessions": 7
+          },
+          {
+            "source_label": "attack",
+            "category": "behavioral_attack",
+            "subcategory": "user_agent_anomaly",
+            "sessions": 72
+          },
+          {
+            "source_label": "attack",
+            "category": "credential",
+            "subcategory": "account_lockout_trigger",
+            "sessions": 50
+          },
+          {
+            "source_label": "attack",
+            "category": "credential",
+            "subcategory": "brute_force",
+            "sessions": 101
+          },
+          {
+            "source_label": "attack",
+            "category": "credential",
+            "subcategory": "credential_stuffing",
+            "sessions": 246
+          },
+          {
+            "source_label": "attack",
+            "category": "credential",
+            "subcategory": "evasive_brute_force",
+            "sessions": 30
+          },
+          {
+            "source_label": "attack",
+            "category": "credential",
+            "subcategory": "evasive_credential_stuffing",
+            "sessions": 104
+          },
+          {
+            "source_label": "attack",
+            "category": "credential",
+            "subcategory": "evasive_login_flood",
+            "sessions": 139
+          },
+          {
+            "source_label": "attack",
+            "category": "credential",
+            "subcategory": "evasive_password_change_abuse",
+            "sessions": 45
+          },
+          {
+            "source_label": "attack",
+            "category": "credential",
+            "subcategory": "evasive_password_spraying",
+            "sessions": 83
+          },
+          {
+            "source_label": "attack",
+            "category": "credential",
+            "subcategory": "forced_password_reset",
+            "sessions": 45
+          },
+          {
+            "source_label": "attack",
+            "category": "credential",
+            "subcategory": "login_flood",
+            "sessions": 450
+          },
+          {
+            "source_label": "attack",
+            "category": "credential",
+            "subcategory": "password_change_abuse",
+            "sessions": 178
+          },
+          {
+            "source_label": "attack",
+            "category": "credential",
+            "subcategory": "password_spraying",
+            "sessions": 138
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "authorization_error_flood",
+            "sessions": 181
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "endpoint_scanning",
+            "sessions": 20
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "entityid_scanning",
+            "sessions": 127
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "error_rate_spike",
+            "sessions": 199
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "evasive_abnormal_sp_access",
+            "sessions": 161
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "evasive_bulk_config_change",
+            "sessions": 42
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "evasive_client_enumeration",
+            "sessions": 74
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "evasive_federation_harvest",
+            "sessions": 113
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "evasive_forced_logout",
+            "sessions": 15
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "evasive_issuer_injection",
+            "sessions": 84
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "evasive_oidc_callback_manipulation",
+            "sessions": 96
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "evasive_scope_escalation",
+            "sessions": 85
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "evasive_token_abuse",
+            "sessions": 169
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "federation_metadata_harvesting",
+            "sessions": 148
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "flow_step_reversal",
+            "sessions": 14
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "flow_step_skip",
+            "sessions": 10
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "forced_logout",
+            "sessions": 42
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "issuer_scanning",
+            "sessions": 132
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "logout_error_flood",
+            "sessions": 176
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_agreement_bypass",
+            "sessions": 140
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_cross_protocol_attack",
+            "sessions": 36
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_device_flow_abuse",
+            "sessions": 128
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_external_idp_abuse",
+            "sessions": 106
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_federation_idp_injection",
+            "sessions": 41
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_ldap_mapping_abuse",
+            "sessions": 81
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_ldap_sync_exploitation",
+            "sessions": 77
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_logout_cascade_dos",
+            "sessions": 76
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_oidc_logout_manipulation",
+            "sessions": 82
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_oidc_token_introspection_leak",
+            "sessions": 75
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_recon_to_lateral_movement",
+            "sessions": 216
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_request_approval_manipulation",
+            "sessions": 71
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_request_probing",
+            "sessions": 60
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_rogue_idp_single",
+            "sessions": 79
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_rp_callback_hijack",
+            "sessions": 76
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_saml_assertion_replay",
+            "sessions": 76
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_saml_authn_injection",
+            "sessions": 76
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_saml_oidc_cross_protocol_chain",
+            "sessions": 93
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_saml_request_fuzzing",
+            "sessions": 84
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_saml_slo_disruption",
+            "sessions": 150
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_silent_auth_probe",
+            "sessions": 81
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_slo_cascade_then_phishing",
+            "sessions": 90
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_token_refresh_timing",
+            "sessions": 44
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "novel_user_status_probing",
+            "sessions": 118
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "oidc_callback_manipulation",
+            "sessions": 60
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "rp_registration_abuse",
+            "sessions": 208
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "saml_request_injection",
+            "sessions": 190
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "saml_response_creation_error_flood",
+            "sessions": 108
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "saml_response_forgery",
+            "sessions": 54
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "saml_session_attack",
+            "sessions": 93
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "slo_abuse",
+            "sessions": 82
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "token_abuse",
+            "sessions": 352
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "unauthorized_federation_fetch",
+            "sessions": 92
+          },
+          {
+            "source_label": "attack",
+            "category": "protocol_abuse",
+            "subcategory": "unknown_client_scan",
+            "sessions": 133
+          },
+          {
+            "source_label": "benign",
+            "category": "account",
+            "subcategory": null,
+            "sessions": 284
+          },
+          {
+            "source_label": "benign",
+            "category": "admin",
+            "subcategory": null,
+            "sessions": 70
+          },
+          {
+            "source_label": "benign",
+            "category": "infra",
+            "subcategory": null,
+            "sessions": 143
+          },
+          {
+            "source_label": "benign",
+            "category": "login",
+            "subcategory": null,
+            "sessions": 5911
+          },
+          {
+            "source_label": "benign",
+            "category": "logout",
+            "subcategory": null,
+            "sessions": 2204
+          },
+          {
+            "source_label": "benign",
+            "category": "session",
+            "subcategory": null,
+            "sessions": 476
+          }
+        ]
+      },
+      "pilot": {
+        "schema": "m7-auth-pilot-1",
+        "source_sha256": "445f69377a2e12b4203a68f15cd9a4013fbc7e0ef21c19843969f671b1334a30",
+        "source_contract_sha256": "0ace3370fb73551cf6b64c21aa004f447616bf75172b3023efbe7eff4f0efe5c",
+        "files": {
+          "development.jsonl": "888c43d05de050d7832e847be8a9a45867045405ab57482a3447a028acdf55c6",
+          "evaluation.jsonl": "47fb3890b1ea38c641be1dfa7abf4595718b516035e78e5ffe3daa4d89dc07b2",
+          "labels.jsonl": "6b1892f3ffd3c4b3c1022b2d097ea972b55aa3ec807a6c4b2ee44511249905c0"
+        },
+        "cohort": {
+          "development": {
+            "sessions": 24,
+            "events": 146,
+            "labels": {
+              "threat": 12,
+              "normal": 12
+            },
+            "families": 13
+          },
+          "evaluation": {
+            "sessions": 24,
+            "events": 138,
+            "labels": {
+              "normal": 12,
+              "threat": 12
+            },
+            "families": 11
+          }
+        },
+        "cross_split_overlap": {
+          "subjects": 0,
+          "clients": 0,
+          "families": 0,
+          "sessions": 0,
+          "records": 0,
+          "signal_patterns": 0
+        },
+        "label_review": "publisher_labels_pending_independent_team_review"
+      },
+      "pilot_source_pattern_context": {
+        "rows": [
+          {
+            "session_id": "m7-session-002b109a5d8b5c2d7329b837b6112f2643a0a7174b75c40688ce6c3b78c15e82",
+            "split": "development",
+            "source_label": "benign",
+            "pattern_sha256": "d5043b9e50a2bc4f1d0640bda1847996d28153408238646e71ecf7044f4dd423",
+            "full_source_same_pattern": {
+              "benign": 176,
+              "attack": 0,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-004a9a59c41433719a51d0fbba62d656b513d538b64d16488bc39b07c3237b11",
+            "split": "development",
+            "source_label": "benign",
+            "pattern_sha256": "2168b2f0beb4cc428b3c8e5cdaf2cb16d28165fe06f2bd0ba81cd8e77445eb19",
+            "full_source_same_pattern": {
+              "benign": 1320,
+              "attack": 31,
+              "anomaly": 7
+            },
+            "binary_label_conflict": true
+          },
+          {
+            "session_id": "m7-session-004bd15109d85485bf9c80a19c19a2f89e2b5143720778c26318c8db5ffa70d6",
+            "split": "development",
+            "source_label": "benign",
+            "pattern_sha256": "b3903d83875d058ae42a671a4ed88fd934cb4059af73e290aa33346d20c5c9da",
+            "full_source_same_pattern": {
+              "benign": 75,
+              "attack": 0,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-005a1050988c1f29ef2e0c67ccb12726ab6af2b00f923010581e579f5b3f2600",
+            "split": "development",
+            "source_label": "benign",
+            "pattern_sha256": "4636f58c7e3bab657aae8ac5b8a6bdf55316bc401be91ae6abc919281ddb07ab",
+            "full_source_same_pattern": {
+              "benign": 1381,
+              "attack": 15,
+              "anomaly": 0
+            },
+            "binary_label_conflict": true
+          },
+          {
+            "session_id": "m7-session-0071a51b764461e062bdd471ee894fc965ba137b9f0cbc808a9766084aa56309",
+            "split": "development",
+            "source_label": "benign",
+            "pattern_sha256": "cdd672de972a5247774af1d32f458526b66b46b50e7ca36af2aa57f428cdc482",
+            "full_source_same_pattern": {
+              "benign": 24,
+              "attack": 30,
+              "anomaly": 0
+            },
+            "binary_label_conflict": true
+          },
+          {
+            "session_id": "m7-session-0078ceea87e9fb3c7af2c92c7a5dbcd440ad819663e1730b147a0a4d13db3e39",
+            "split": "development",
+            "source_label": "benign",
+            "pattern_sha256": "5344d6699d428159648c3312cc7cedd20aeae6bb5bb7e4abd78d242b50797672",
+            "full_source_same_pattern": {
+              "benign": 231,
+              "attack": 0,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-0095ae60e5f018785072ce408fbf5c17bf736d07a1cf9fd7dc080833468dc277",
+            "split": "development",
+            "source_label": "benign",
+            "pattern_sha256": "6b38c2ff15f2576224d0e2129bf57a5d5bb1c48e320f1aa80cd770a1835db804",
+            "full_source_same_pattern": {
+              "benign": 98,
+              "attack": 79,
+              "anomaly": 0
+            },
+            "binary_label_conflict": true
+          },
+          {
+            "session_id": "m7-session-00cc766de313630abeb8ee13fdc9e4fdfddfb0f68046b2e289abe8be4b10d183",
+            "split": "development",
+            "source_label": "benign",
+            "pattern_sha256": "fd39600b7325293fab9f0a89e61db0395cad8564b604b652e81aa6abb0688dec",
+            "full_source_same_pattern": {
+              "benign": 153,
+              "attack": 0,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-00da68db1faecce7665b61f4277fbb4a5b7ed7f129d3235ec54729f9a281d38a",
+            "split": "development",
+            "source_label": "benign",
+            "pattern_sha256": "d5f411cd9337a201da69cadb1337357abecd819a3c47036cdad240492046ec52",
+            "full_source_same_pattern": {
+              "benign": 59,
+              "attack": 38,
+              "anomaly": 0
+            },
+            "binary_label_conflict": true
+          },
+          {
+            "session_id": "m7-session-00e56e8f3470538b5c2360d06f89fe16b4e9de4e6b3cb4356e82a5573b9b5ddf",
+            "split": "development",
+            "source_label": "benign",
+            "pattern_sha256": "481fbbe67fe14ce7fb77cd509ea83dbfe72fb41140b21731802f325cea57978d",
+            "full_source_same_pattern": {
+              "benign": 22,
+              "attack": 40,
+              "anomaly": 0
+            },
+            "binary_label_conflict": true
+          },
+          {
+            "session_id": "m7-session-00fa01c7bf27c8763a134632aec981e0c5f1758e6ffa181168861bf4691011a4",
+            "split": "development",
+            "source_label": "benign",
+            "pattern_sha256": "b5dd49fe87a724469abaa03b14b217ac8307f9a4a33a4de48c3eeb7ed42c5d27",
+            "full_source_same_pattern": {
+              "benign": 124,
+              "attack": 0,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-010ff9bf22f16008ebeba3b41c292af614e297eb0494fddcb22007f3f325f9d2",
+            "split": "development",
+            "source_label": "benign",
+            "pattern_sha256": "37d10d707c1c742bdc0eadf17f776346bfa5f3e538f8c20cc5dace01645e082d",
+            "full_source_same_pattern": {
+              "benign": 132,
+              "attack": 104,
+              "anomaly": 25
+            },
+            "binary_label_conflict": true
+          },
+          {
+            "session_id": "m7-session-000dd00c7b345a301340c929f8dbef905766f7f17adfd2532d82544a2fd38f6b",
+            "split": "development",
+            "source_label": "attack",
+            "pattern_sha256": "23e99e1e4714d977f16d78db89761d45c6e1362cb1df9a936ed5ae7fa76d8b12",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 15,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-002bb3ab17007deeb937e1cf1d0c100539da5cac81991d384b8ef9a05816a923",
+            "split": "development",
+            "source_label": "attack",
+            "pattern_sha256": "bc5f6ce552cea92167393c70add8b1459c213668d9b989cc5c600f93ebca440f",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 4,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-002f6eb489736a4daea3c1983aa729f655f98f9e14e43c24113c704b239bd682",
+            "split": "development",
+            "source_label": "attack",
+            "pattern_sha256": "e1ef7639880ccc916564fa8c3cbf904df512a23749c243b82124f4982fb3a473",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 97,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-0034966039d2c55e2c789a7be8f7f0500db5618441e1875a3b07748e0fc62e88",
+            "split": "development",
+            "source_label": "attack",
+            "pattern_sha256": "83057cf35109d553c11cea80c131ee4ee3368327f8832bdf55ad31be9ebd66a2",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 10,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-004a4533b9ad61da5dfe2da3083127056e97fe984d551cf2bae6458581355931",
+            "split": "development",
+            "source_label": "attack",
+            "pattern_sha256": "f1b740afdf9d2b0e17749c0ad0955136377192be3327fa228c196e91cdc101ab",
+            "full_source_same_pattern": {
+              "benign": 21,
+              "attack": 12,
+              "anomaly": 0
+            },
+            "binary_label_conflict": true
+          },
+          {
+            "session_id": "m7-session-007ecec4caa0509df9ccbed4b57575936f00b696219ce127308fdd9f5c0ba252",
+            "split": "development",
+            "source_label": "attack",
+            "pattern_sha256": "4c8986e769d9ea7f3555957dd4e695d0ae84f0528ece893ecdfe854e4cfcba47",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 63,
+              "anomaly": 16
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-0087819b56ae0ab5f8cffbeb7e304f9993fbe06a5a25039d42972262028b2909",
+            "split": "development",
+            "source_label": "attack",
+            "pattern_sha256": "347d9729f553494c68dd1fbb2618d8d96430122bf0935b2dd127cede79c04530",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 16,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-0099dfb463f827ffa28acc6e2833d8a9dcceeb8645bfd284e867f22f5ca85b5d",
+            "split": "development",
+            "source_label": "attack",
+            "pattern_sha256": "d0381892e4ed48c590033b4f7e31462b161e40d392b1aa42026464cbe239f7cf",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 331,
+              "anomaly": 35
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-00a0138d5cc8b4ed95179abf0072adbb2ed0bfa94c37116bf793cc4081fc88cf",
+            "split": "development",
+            "source_label": "attack",
+            "pattern_sha256": "195a48b0cc858c2df9fa24d7942f584105832caddc84dde015eb9ad8bcd98aa8",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 46,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-00bec1224c03f558a7b3259e0a8c2db25e31543400275376bdb1aea55c994bc9",
+            "split": "development",
+            "source_label": "attack",
+            "pattern_sha256": "c6947c55369b2532cccf6486eeaada29ca366978364934b93701e9c21dad0db3",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 1,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-00bf6519455d7984c9ed427c04cecf6b3584cecb7160f982932b8a4c0c1a7880",
+            "split": "development",
+            "source_label": "attack",
+            "pattern_sha256": "c2a7063e96b68afa9811d60cf89d8b9c488c931bea958ef98504981e80a95f2a",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 456,
+              "anomaly": 55
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-00f445898d4eaf83fbf828873095e96c57c216769207c416203d4746ddc3d63e",
+            "split": "development",
+            "source_label": "attack",
+            "pattern_sha256": "d93e88060c4e82cfbef5d4d4e37ac9a5699f218ef22fa23d1243097dd9042776",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 5,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-00d583f4aafa46eda7d1aeddc9d6d70a4ee4c0b04817d267b99e2b4afee5c8d1",
+            "split": "evaluation",
+            "source_label": "benign",
+            "pattern_sha256": "36f5fb020b796b9ffa2401318de72eb4085b78b9e7d4fe087f1631d00b152551",
+            "full_source_same_pattern": {
+              "benign": 171,
+              "attack": 0,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-0162bb26673df62cd150af0cca98665197487f8935776f2a0b42608c4f8a36ef",
+            "split": "evaluation",
+            "source_label": "benign",
+            "pattern_sha256": "c78947d765ce8213e464e3164eff812e42d2d0d1bbd19bde37a040f1cf3fb1f7",
+            "full_source_same_pattern": {
+              "benign": 120,
+              "attack": 228,
+              "anomaly": 345
+            },
+            "binary_label_conflict": true
+          },
+          {
+            "session_id": "m7-session-01a3c432a8de218d546bdcd85e8e5025304743fa1f5be7d0c782ffcca550a6b0",
+            "split": "evaluation",
+            "source_label": "benign",
+            "pattern_sha256": "8291e634ca3e905cbd9ace022564383877666ab30c3555d1a1d9b8f586d8e71a",
+            "full_source_same_pattern": {
+              "benign": 260,
+              "attack": 0,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-02597aef880739dc3146251aa72c6c65cfa7b90fb831fbc986cd2e3aa02707ec",
+            "split": "evaluation",
+            "source_label": "benign",
+            "pattern_sha256": "4360d1c4f9c15cf416e4a4b01ba07218cffaf73496724b00043dbac6579ccbfb",
+            "full_source_same_pattern": {
+              "benign": 480,
+              "attack": 0,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-02bf127d7881d93e81108b8404698bc08c5ef18bacb21fca278081b7ef44e016",
+            "split": "evaluation",
+            "source_label": "benign",
+            "pattern_sha256": "2384842774d8fb2a66caa5c3c0f200b7e8d281a35a16e7e77d7c5448aa5e9759",
+            "full_source_same_pattern": {
+              "benign": 43,
+              "attack": 0,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-03a345c99bc9563610cafc88c140a362e9be1e20c11a957c35c6470b2c37d814",
+            "split": "evaluation",
+            "source_label": "benign",
+            "pattern_sha256": "3fdbc7eb8c418647f6c44f2b29de4c6cc1f7d211a4b604ca3a93aefb93e772ac",
+            "full_source_same_pattern": {
+              "benign": 54,
+              "attack": 0,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-03af397991ed9f49abaef362d4b75a8097b26ab24fe84aeeec12743446340a30",
+            "split": "evaluation",
+            "source_label": "benign",
+            "pattern_sha256": "afaa1679874554f288d67dbef2229cc73ca2906298d73e9a9be895426d72dd19",
+            "full_source_same_pattern": {
+              "benign": 18,
+              "attack": 24,
+              "anomaly": 27
+            },
+            "binary_label_conflict": true
+          },
+          {
+            "session_id": "m7-session-05897be2dff925a318f2b6dbcfe89a4933ee84fb2f14f8c2e1a69e584c0c030e",
+            "split": "evaluation",
+            "source_label": "benign",
+            "pattern_sha256": "65be09e4a3a1184ce1ef187376aed02c298193512f05495c5aa558da32b25f94",
+            "full_source_same_pattern": {
+              "benign": 79,
+              "attack": 0,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-05cd0d80fffee6b6087ea76e19a645d6d2d38ddf0d6965cad240faeb6f06e7f5",
+            "split": "evaluation",
+            "source_label": "benign",
+            "pattern_sha256": "0cf499d392abb7d3f8b8f0fa5b50ba0688c326b02e5f39138253451053bb7c97",
+            "full_source_same_pattern": {
+              "benign": 421,
+              "attack": 0,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-061f3fd7e5c5e0f6fdf336043159656e8e0325a0a3f5d2306e019d3bcfa9776b",
+            "split": "evaluation",
+            "source_label": "benign",
+            "pattern_sha256": "5b8e42fb9306d50d23b8207e59af4c88c1c5bdd4541d143ca6d809d115b7708a",
+            "full_source_same_pattern": {
+              "benign": 87,
+              "attack": 0,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-080264d48e9372cafd4814f455828c1b502a518fccdbfce05e57846126e61559",
+            "split": "evaluation",
+            "source_label": "benign",
+            "pattern_sha256": "676f625f80e6138baf6d0997b527017f85c5ee86b2c3fc849b6b1affa2d09be6",
+            "full_source_same_pattern": {
+              "benign": 62,
+              "attack": 0,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-0bb3f032280da49bedccd443239066eec5c776a2c21de83a4d2945e06a0b3f99",
+            "split": "evaluation",
+            "source_label": "benign",
+            "pattern_sha256": "9be38e586ac0c718314a760960b3ba34380e8ef1434f76671b7815a102a6d0cd",
+            "full_source_same_pattern": {
+              "benign": 96,
+              "attack": 0,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-018088d280dca01715a4479a99b5895ae332fca72f9ed3a2e59943155cb18e2f",
+            "split": "evaluation",
+            "source_label": "attack",
+            "pattern_sha256": "48cca3bc4bbb74da997cd935de27b2dc779d93477a809ffb9a3769b858072177",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 44,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-01a9240a0a9e93f0688ab3223570cc2d72f1fbaeb787cbfff37c1bcd749d333a",
+            "split": "evaluation",
+            "source_label": "attack",
+            "pattern_sha256": "8d1eb29a74a0c9d251a358df43ff58716b62b531d27fa70b46671ee4611bf7b3",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 65,
+              "anomaly": 7
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-01d6aa8b25684ebbe48b51126f6ccad2a190472a6554e6db477d71236574aef6",
+            "split": "evaluation",
+            "source_label": "attack",
+            "pattern_sha256": "891260bb0fa26c25e21958d70446575ea27fc9dfa0a4008dd318886e6dbc7b8d",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 30,
+              "anomaly": 1
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-0211ef0e64ca4c67fe62aa8a51ba7a70d6fdbf06ffc44e5279cd77cb58dc80dc",
+            "split": "evaluation",
+            "source_label": "attack",
+            "pattern_sha256": "7536cccb44e2b1c246d2f8c8d62bd0606a80e2a2d47b6b444c21b21bcf2fc2c4",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 130,
+              "anomaly": 11
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-027e3eb60ef18e7da0e58e0fff6e9ec1a2c99fee23eb0975a33fc4a6068efb3c",
+            "split": "evaluation",
+            "source_label": "attack",
+            "pattern_sha256": "cab2eb0106596e8ef31302b61b642d3ef59c398b1d0f8f2972d3f4758d369419",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 157,
+              "anomaly": 18
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-02d550a40957332821afb39430d2154828d388d3497a43292df3631814845f6e",
+            "split": "evaluation",
+            "source_label": "attack",
+            "pattern_sha256": "99138e24a750df4127df751336722852703f512d91a0568fbcd77992ee43bec5",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 32,
+              "anomaly": 5
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-03a72a2e681da4adad25480a5a6fd750a6e2f92f75296d0ac4cf426e61e26bed",
+            "split": "evaluation",
+            "source_label": "attack",
+            "pattern_sha256": "280545f277f359181cbcd36dad7d1c5758f064f556ba2a581c917c1a7f77317b",
+            "full_source_same_pattern": {
+              "benign": 82,
+              "attack": 146,
+              "anomaly": 0
+            },
+            "binary_label_conflict": true
+          },
+          {
+            "session_id": "m7-session-03b99f951774e950f27cdd613edc4e46908f19ec6fa683c386da7c3c9c5243bf",
+            "split": "evaluation",
+            "source_label": "attack",
+            "pattern_sha256": "d38760f90027c52617589abdfb1b3d8662bece2b77b8801f59b8478552302ea5",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 20,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-03e4f6640a8e10976b9f85685eacf6569b3f7a93f528b37ebdea4702e564d4f0",
+            "split": "evaluation",
+            "source_label": "attack",
+            "pattern_sha256": "499f39192d3f00b984855cfbfd1b0c7e19b1aae972d08defc63f0bc2ccfb3a81",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 13,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-03e9eacfd804a8b1df919db05ccc27a2fc3e73543953d820aa5ad585e3492fc1",
+            "split": "evaluation",
+            "source_label": "attack",
+            "pattern_sha256": "34aa3d88576d5f3656b498c7509059cc2a3b7a5ee9d3d5e3d22ea99b5824552f",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 33,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-03f0533f47344793a7448d5b9cc89a945f6c81780a2b30f661776289bcafc28f",
+            "split": "evaluation",
+            "source_label": "attack",
+            "pattern_sha256": "c7ec191fca5d0d295136d1460c4491dc9e4ebee74a9557bf21718b2fde8dd6e4",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 23,
+              "anomaly": 0
+            },
+            "binary_label_conflict": false
+          },
+          {
+            "session_id": "m7-session-041fce1c1bd2a66739a4b147fb803caf7dd6a95fa533345603bfb0f6b46b9db1",
+            "split": "evaluation",
+            "source_label": "attack",
+            "pattern_sha256": "5158160274c9e2eb7e8a1a41739cd27d045d1db0ec43c7ef0c4ec8427058f380",
+            "full_source_same_pattern": {
+              "benign": 0,
+              "attack": 176,
+              "anomaly": 10
+            },
+            "binary_label_conflict": false
+          }
+        ],
+        "selected_sessions_with_binary_source_pattern_conflict": 11,
+        "scope": "Declared sequence projection excludes duration, IDs, payload and event_type; not a full-feature impossibility claim."
+      },
+      "reference_pilot_byte_identical": true,
+      "peak_spool_logical_bytes": 170610688,
+      "spool_limit_bytes": 536870912,
+      "memory_strategy": "2MiB SQLite cache; bounded one-session model materialization; no raw corpus in memory",
+      "memory_peak_measured": false,
+      "detector_inference_runs": 0,
+      "compatible_with_full_signed_security_events": false,
+      "missing_full_zero_trust_contracts": [
+        "trusted event signatures and issuer scopes",
+        "IdP role/active/MFA assertions",
+        "EDR device management/posture",
+        "resource-owner permissions/classification",
+        "download byte-delta and approved job evidence"
+      ],
+      "independent_review": "pending",
+      "new_independent_evaluation": false,
+      "goal_qualified": false,
+      "effects": {
+        "network_calls": 0,
+        "paid_api_calls": 0,
+        "cloud_calls": 0,
+        "baseline_writes": 0
+      }
+    },
+    "memory": {
+      "container_peak_memory_bytes": null,
+      "scope": "container cgroup, includes tests and full source audit",
+      "measurement": "cgroup-v2 memory.peak"
+    },
+    "oom_killed": false,
+    "source_verified_before_and_after": true,
+    "remaining_containers": 0,
+    "pytest": {
+      "tests": 307,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 32.095,
+      "sha256": "ef5c0e108a002b3f9e848b2789b062127d690865b6169ebee1a4bed873a09b8b"
+    }
+  },
+  "publisher_source_acquisition": {
+    "schema": "extra-public-source-acquisition-1",
+    "publisher": "KREONET / KAFE Research",
+    "source_url": "https://raw.githubusercontent.com/KREONET/auth-anomaly-dataset/5fd5cae2001a6b67cafb952709db37e366cfa276/iam_anomaly_2026.jsonl",
+    "revision": "5fd5cae2001a6b67cafb952709db37e366cfa276",
+    "expected_sha256": "445f69377a2e12b4203a68f15cd9a4013fbc7e0ef21c19843969f671b1334a30",
+    "expected_bytes": 91592665,
+    "license": "CC-BY-4.0",
+    "public_https_downloads": 1,
+    "aws_sdk_calls": 0,
+    "llm_calls": 0,
+    "paid_api_calls": 0,
+    "completed": true,
+    "actual_bytes": 91592665,
+    "actual_sha256": "445f69377a2e12b4203a68f15cd9a4013fbc7e0ef21c19843969f671b1334a30",
+    "elapsed_seconds": 18.735
+  },
+  "source_audit_windows": {
+    "schema": "m7-streamed-readiness-1",
+    "source_commit": "c210bfc2ecdd6ac47a256463014d5f0bf115279c",
+    "source_dirty": true,
+    "git_metadata": "available_snapshot_hashes_still_required",
+    "source_files_lf_sha256": {
+      "scripts/audit_m7_source.py": "86d1e57bb908e58c7fa9db6aa54e4ce855283ae329b655761365e16195e5beb1",
+      "scripts/prepare_m7.py": "28dcb83e8e57e7ded87157c7cf32f244ae1ca550ef201617d1af6815648609f3",
+      "scripts/audit_f1_features.py": "a85ea7662bb54bb97dc190f5bbc81804e40a492fe219719bc3fa71c901f077db",
+      "scripts/f1_lab/provenance.py": "4f8a1c095f0fb43c0e303cd805c26a14c34c2fd076a4753a7ac4445cfa512678"
+    },
+    "source_contract_sha256": "0ace3370fb73551cf6b64c21aa004f447616bf75172b3023efbe7eff4f0efe5c",
+    "source_kind": "publisher_synthetic_authentication_logs",
+    "source_url": "https://raw.githubusercontent.com/KREONET/auth-anomaly-dataset/5fd5cae2001a6b67cafb952709db37e366cfa276/iam_anomaly_2026.jsonl",
+    "license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "population": {
+      "events": 130767,
+      "session_labels": {
+        "anomaly": 4089,
+        "attack": 9573,
+        "benign": 9088
+      },
+      "source_top_level_fields": [
+        "action_by",
+        "category",
+        "client_ip",
+        "duration_ms",
+        "event_type",
+        "http_method",
+        "http_status",
+        "label",
+        "level",
+        "message",
+        "module",
+        "payload",
+        "ref",
+        "ref_id",
+        "referer",
+        "subcategory",
+        "timestamp",
+        "trace_id",
+        "uri",
+        "user_agent",
+        "user_id"
+      ],
+      "consumed_source_sha256": "445f69377a2e12b4203a68f15cd9a4013fbc7e0ef21c19843969f671b1334a30"
+    },
+    "analysis": {
+      "projections": {
+        "module_method_status_level_sequence": {
+          "three_class_patterns": 722,
+          "binary_authored_oracle_bound": {
+            "positive": 9573,
+            "negative": 9088,
+            "groups": 617,
+            "conflicting_groups": 69,
+            "minimum_misclassifications": 1377,
+            "maximum_accuracy_oracle": 0.926209742243181,
+            "maximum_f1_oracle": 0.9299343611662342,
+            "fp_cap_at_5_percent": 454,
+            "maximum_recall_with_precision_95_and_fpr_5_oracle": 0.8906298965841429,
+            "all_four_point_targets_feasible_for_projection_oracle": false,
+            "not_model_performance": true
+          },
+          "anomaly_excluded_from_binary_oracle": 4089,
+          "not_trained_or_measured_detector_performance": true
+        },
+        "same_plus_duration_sequence": {
+          "three_class_patterns": 22735,
+          "binary_authored_oracle_bound": {
+            "positive": 9573,
+            "negative": 9088,
+            "groups": 18646,
+            "conflicting_groups": 0,
+            "minimum_misclassifications": 0,
+            "maximum_accuracy_oracle": 1.0,
+            "maximum_f1_oracle": 1.0,
+            "fp_cap_at_5_percent": 454,
+            "maximum_recall_with_precision_95_and_fpr_5_oracle": 1.0,
+            "all_four_point_targets_feasible_for_projection_oracle": true,
+            "not_model_performance": true
+          },
+          "anomaly_excluded_from_binary_oracle": 4089,
+          "not_trained_or_measured_detector_performance": true
+        }
+      },
+      "families": [
+        {
+          "source_label": "anomaly",
+          "category": "access_anomaly",
+          "subcategory": "anomaly_concurrent_legit",
+          "sessions": 198
+        },
+        {
+          "source_label": "anomaly",
+          "category": "access_anomaly",
+          "subcategory": "anomaly_first_admin",
+          "sessions": 136
+        },
+        {
+          "source_label": "anomaly",
+          "category": "access_anomaly",
+          "subcategory": "anomaly_new_service",
+          "sessions": 84
+        },
+        {
+          "source_label": "anomaly",
+          "category": "access_anomaly",
+          "subcategory": "anomaly_rapid_service_switch",
+          "sessions": 244
+        },
+        {
+          "source_label": "anomaly",
+          "category": "behavioral",
+          "subcategory": "dormant_account_activity",
+          "sessions": 56
+        },
+        {
+          "source_label": "anomaly",
+          "category": "behavioral",
+          "subcategory": "evasive_dormant_account",
+          "sessions": 39
+        },
+        {
+          "source_label": "anomaly",
+          "category": "behavioral",
+          "subcategory": "evasive_impossible_travel",
+          "sessions": 34
+        },
+        {
+          "source_label": "anomaly",
+          "category": "behavioral",
+          "subcategory": "impossible_travel",
+          "sessions": 20
+        },
+        {
+          "source_label": "anomaly",
+          "category": "behavioral",
+          "subcategory": "unusual_time_access",
+          "sessions": 13
+        },
+        {
+          "source_label": "anomaly",
+          "category": "device_anomaly",
+          "subcategory": "anomaly_device_switch",
+          "sessions": 198
+        },
+        {
+          "source_label": "anomaly",
+          "category": "device_anomaly",
+          "subcategory": "anomaly_new_browser",
+          "sessions": 79
+        },
+        {
+          "source_label": "anomaly",
+          "category": "device_anomaly",
+          "subcategory": "anomaly_os_update",
+          "sessions": 58
+        },
+        {
+          "source_label": "anomaly",
+          "category": "infra_error",
+          "subcategory": "noise_bookmark_stale",
+          "sessions": 42
+        },
+        {
+          "source_label": "anomaly",
+          "category": "infra_error",
+          "subcategory": "noise_server_error_transient",
+          "sessions": 44
+        },
+        {
+          "source_label": "anomaly",
+          "category": "infra_error",
+          "subcategory": "noise_slow_response",
+          "sessions": 28
+        },
+        {
+          "source_label": "anomaly",
+          "category": "infra_error",
+          "subcategory": "noise_wrong_service",
+          "sessions": 30
+        },
+        {
+          "source_label": "anomaly",
+          "category": "location_anomaly",
+          "subcategory": "anomaly_mobile_network",
+          "sessions": 154
+        },
+        {
+          "source_label": "anomaly",
+          "category": "location_anomaly",
+          "subcategory": "anomaly_new_ip_login",
+          "sessions": 169
+        },
+        {
+          "source_label": "anomaly",
+          "category": "location_anomaly",
+          "subcategory": "anomaly_travel_login",
+          "sessions": 97
+        },
+        {
+          "source_label": "anomaly",
+          "category": "location_anomaly",
+          "subcategory": "anomaly_vpn_ip_change",
+          "sessions": 166
+        },
+        {
+          "source_label": "anomaly",
+          "category": "login_error",
+          "subcategory": "noise_login_caps_lock",
+          "sessions": 232
+        },
+        {
+          "source_label": "anomaly",
+          "category": "login_error",
+          "subcategory": "noise_login_expired_password",
+          "sessions": 124
+        },
+        {
+          "source_label": "anomaly",
+          "category": "login_error",
+          "subcategory": "noise_login_typo",
+          "sessions": 454
+        },
+        {
+          "source_label": "anomaly",
+          "category": "login_error",
+          "subcategory": "noise_login_typo_twice",
+          "sessions": 224
+        },
+        {
+          "source_label": "anomaly",
+          "category": "protocol_error",
+          "subcategory": "noise_oidc_callback_retry",
+          "sessions": 84
+        },
+        {
+          "source_label": "anomaly",
+          "category": "protocol_error",
+          "subcategory": "noise_oidc_state_expired",
+          "sessions": 90
+        },
+        {
+          "source_label": "anomaly",
+          "category": "protocol_error",
+          "subcategory": "noise_saml_decode_transient",
+          "sessions": 126
+        },
+        {
+          "source_label": "anomaly",
+          "category": "protocol_error",
+          "subcategory": "noise_saml_state_timeout",
+          "sessions": 54
+        },
+        {
+          "source_label": "anomaly",
+          "category": "protocol_error",
+          "subcategory": "noise_wrong_url",
+          "sessions": 51
+        },
+        {
+          "source_label": "anomaly",
+          "category": "session_error",
+          "subcategory": "noise_concurrent_tab",
+          "sessions": 94
+        },
+        {
+          "source_label": "anomaly",
+          "category": "session_error",
+          "subcategory": "noise_session_expired",
+          "sessions": 166
+        },
+        {
+          "source_label": "anomaly",
+          "category": "session_error",
+          "subcategory": "noise_session_refresh_timeout",
+          "sessions": 102
+        },
+        {
+          "source_label": "anomaly",
+          "category": "temporal_anomaly",
+          "subcategory": "anomaly_frequency_spike",
+          "sessions": 187
+        },
+        {
+          "source_label": "anomaly",
+          "category": "temporal_anomaly",
+          "subcategory": "anomaly_offhours_access",
+          "sessions": 60
+        },
+        {
+          "source_label": "anomaly",
+          "category": "temporal_anomaly",
+          "subcategory": "anomaly_post_vacation",
+          "sessions": 100
+        },
+        {
+          "source_label": "anomaly",
+          "category": "temporal_anomaly",
+          "subcategory": "anomaly_weekend_login",
+          "sessions": 52
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "abnormal_sp_access",
+          "sessions": 126
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "account_enumeration",
+          "sessions": 325
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "account_takeover",
+          "sessions": 55
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "admin_abuse",
+          "sessions": 68
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "admin_deletion_blocked",
+          "sessions": 5
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "bulk_config_change",
+          "sessions": 212
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "concurrent_sessions",
+          "sessions": 24
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "evasive_account_enumeration",
+          "sessions": 98
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "evasive_account_takeover",
+          "sessions": 54
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "evasive_concurrent_sessions",
+          "sessions": 32
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "evasive_mass_account_creation",
+          "sessions": 88
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "evasive_privilege_escalation",
+          "sessions": 26
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "evasive_registration_abuse",
+          "sessions": 33
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "evasive_session_hijack",
+          "sessions": 16
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "mass_account_creation",
+          "sessions": 315
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "novel_admin_oidc_op_manipulation",
+          "sessions": 117
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "novel_post_registration_escalation",
+          "sessions": 60
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "novel_registration_to_admin_takeover",
+          "sessions": 36
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "novel_rp_registration_abuse",
+          "sessions": 235
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "privilege_escalation",
+          "sessions": 24
+        },
+        {
+          "source_label": "attack",
+          "category": "account_abuse",
+          "subcategory": "registration_abuse",
+          "sessions": 144
+        },
+        {
+          "source_label": "attack",
+          "category": "behavioral_attack",
+          "subcategory": "evasive_ip_hopping",
+          "sessions": 48
+        },
+        {
+          "source_label": "attack",
+          "category": "behavioral_attack",
+          "subcategory": "evasive_user_agent_anomaly",
+          "sessions": 54
+        },
+        {
+          "source_label": "attack",
+          "category": "behavioral_attack",
+          "subcategory": "ip_hopping",
+          "sessions": 65
+        },
+        {
+          "source_label": "attack",
+          "category": "behavioral_attack",
+          "subcategory": "novel_idp_session_state_attack",
+          "sessions": 99
+        },
+        {
+          "source_label": "attack",
+          "category": "behavioral_attack",
+          "subcategory": "novel_session_lifecycle_attack",
+          "sessions": 36
+        },
+        {
+          "source_label": "attack",
+          "category": "behavioral_attack",
+          "subcategory": "novel_sp_session_manipulation",
+          "sessions": 74
+        },
+        {
+          "source_label": "attack",
+          "category": "behavioral_attack",
+          "subcategory": "session_hijack",
+          "sessions": 7
+        },
+        {
+          "source_label": "attack",
+          "category": "behavioral_attack",
+          "subcategory": "user_agent_anomaly",
+          "sessions": 72
+        },
+        {
+          "source_label": "attack",
+          "category": "credential",
+          "subcategory": "account_lockout_trigger",
+          "sessions": 50
+        },
+        {
+          "source_label": "attack",
+          "category": "credential",
+          "subcategory": "brute_force",
+          "sessions": 101
+        },
+        {
+          "source_label": "attack",
+          "category": "credential",
+          "subcategory": "credential_stuffing",
+          "sessions": 246
+        },
+        {
+          "source_label": "attack",
+          "category": "credential",
+          "subcategory": "evasive_brute_force",
+          "sessions": 30
+        },
+        {
+          "source_label": "attack",
+          "category": "credential",
+          "subcategory": "evasive_credential_stuffing",
+          "sessions": 104
+        },
+        {
+          "source_label": "attack",
+          "category": "credential",
+          "subcategory": "evasive_login_flood",
+          "sessions": 139
+        },
+        {
+          "source_label": "attack",
+          "category": "credential",
+          "subcategory": "evasive_password_change_abuse",
+          "sessions": 45
+        },
+        {
+          "source_label": "attack",
+          "category": "credential",
+          "subcategory": "evasive_password_spraying",
+          "sessions": 83
+        },
+        {
+          "source_label": "attack",
+          "category": "credential",
+          "subcategory": "forced_password_reset",
+          "sessions": 45
+        },
+        {
+          "source_label": "attack",
+          "category": "credential",
+          "subcategory": "login_flood",
+          "sessions": 450
+        },
+        {
+          "source_label": "attack",
+          "category": "credential",
+          "subcategory": "password_change_abuse",
+          "sessions": 178
+        },
+        {
+          "source_label": "attack",
+          "category": "credential",
+          "subcategory": "password_spraying",
+          "sessions": 138
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "authorization_error_flood",
+          "sessions": 181
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "endpoint_scanning",
+          "sessions": 20
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "entityid_scanning",
+          "sessions": 127
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "error_rate_spike",
+          "sessions": 199
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "evasive_abnormal_sp_access",
+          "sessions": 161
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "evasive_bulk_config_change",
+          "sessions": 42
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "evasive_client_enumeration",
+          "sessions": 74
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "evasive_federation_harvest",
+          "sessions": 113
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "evasive_forced_logout",
+          "sessions": 15
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "evasive_issuer_injection",
+          "sessions": 84
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "evasive_oidc_callback_manipulation",
+          "sessions": 96
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "evasive_scope_escalation",
+          "sessions": 85
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "evasive_token_abuse",
+          "sessions": 169
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "federation_metadata_harvesting",
+          "sessions": 148
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "flow_step_reversal",
+          "sessions": 14
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "flow_step_skip",
+          "sessions": 10
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "forced_logout",
+          "sessions": 42
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "issuer_scanning",
+          "sessions": 132
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "logout_error_flood",
+          "sessions": 176
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_agreement_bypass",
+          "sessions": 140
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_cross_protocol_attack",
+          "sessions": 36
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_device_flow_abuse",
+          "sessions": 128
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_external_idp_abuse",
+          "sessions": 106
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_federation_idp_injection",
+          "sessions": 41
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_ldap_mapping_abuse",
+          "sessions": 81
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_ldap_sync_exploitation",
+          "sessions": 77
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_logout_cascade_dos",
+          "sessions": 76
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_oidc_logout_manipulation",
+          "sessions": 82
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_oidc_token_introspection_leak",
+          "sessions": 75
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_recon_to_lateral_movement",
+          "sessions": 216
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_request_approval_manipulation",
+          "sessions": 71
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_request_probing",
+          "sessions": 60
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_rogue_idp_single",
+          "sessions": 79
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_rp_callback_hijack",
+          "sessions": 76
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_saml_assertion_replay",
+          "sessions": 76
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_saml_authn_injection",
+          "sessions": 76
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_saml_oidc_cross_protocol_chain",
+          "sessions": 93
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_saml_request_fuzzing",
+          "sessions": 84
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_saml_slo_disruption",
+          "sessions": 150
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_silent_auth_probe",
+          "sessions": 81
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_slo_cascade_then_phishing",
+          "sessions": 90
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_token_refresh_timing",
+          "sessions": 44
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "novel_user_status_probing",
+          "sessions": 118
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "oidc_callback_manipulation",
+          "sessions": 60
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "rp_registration_abuse",
+          "sessions": 208
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "saml_request_injection",
+          "sessions": 190
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "saml_response_creation_error_flood",
+          "sessions": 108
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "saml_response_forgery",
+          "sessions": 54
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "saml_session_attack",
+          "sessions": 93
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "slo_abuse",
+          "sessions": 82
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "token_abuse",
+          "sessions": 352
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "unauthorized_federation_fetch",
+          "sessions": 92
+        },
+        {
+          "source_label": "attack",
+          "category": "protocol_abuse",
+          "subcategory": "unknown_client_scan",
+          "sessions": 133
+        },
+        {
+          "source_label": "benign",
+          "category": "account",
+          "subcategory": null,
+          "sessions": 284
+        },
+        {
+          "source_label": "benign",
+          "category": "admin",
+          "subcategory": null,
+          "sessions": 70
+        },
+        {
+          "source_label": "benign",
+          "category": "infra",
+          "subcategory": null,
+          "sessions": 143
+        },
+        {
+          "source_label": "benign",
+          "category": "login",
+          "subcategory": null,
+          "sessions": 5911
+        },
+        {
+          "source_label": "benign",
+          "category": "logout",
+          "subcategory": null,
+          "sessions": 2204
+        },
+        {
+          "source_label": "benign",
+          "category": "session",
+          "subcategory": null,
+          "sessions": 476
+        }
+      ]
+    },
+    "pilot": {
+      "schema": "m7-auth-pilot-1",
+      "source_sha256": "445f69377a2e12b4203a68f15cd9a4013fbc7e0ef21c19843969f671b1334a30",
+      "source_contract_sha256": "0ace3370fb73551cf6b64c21aa004f447616bf75172b3023efbe7eff4f0efe5c",
+      "files": {
+        "development.jsonl": "888c43d05de050d7832e847be8a9a45867045405ab57482a3447a028acdf55c6",
+        "evaluation.jsonl": "47fb3890b1ea38c641be1dfa7abf4595718b516035e78e5ffe3daa4d89dc07b2",
+        "labels.jsonl": "6b1892f3ffd3c4b3c1022b2d097ea972b55aa3ec807a6c4b2ee44511249905c0"
+      },
+      "cohort": {
+        "development": {
+          "sessions": 24,
+          "events": 146,
+          "labels": {
+            "threat": 12,
+            "normal": 12
+          },
+          "families": 13
+        },
+        "evaluation": {
+          "sessions": 24,
+          "events": 138,
+          "labels": {
+            "normal": 12,
+            "threat": 12
+          },
+          "families": 11
+        }
+      },
+      "cross_split_overlap": {
+        "subjects": 0,
+        "clients": 0,
+        "families": 0,
+        "sessions": 0,
+        "records": 0,
+        "signal_patterns": 0
+      },
+      "label_review": "publisher_labels_pending_independent_team_review"
+    },
+    "pilot_source_pattern_context": {
+      "rows": [
+        {
+          "session_id": "m7-session-002b109a5d8b5c2d7329b837b6112f2643a0a7174b75c40688ce6c3b78c15e82",
+          "split": "development",
+          "source_label": "benign",
+          "pattern_sha256": "d5043b9e50a2bc4f1d0640bda1847996d28153408238646e71ecf7044f4dd423",
+          "full_source_same_pattern": {
+            "benign": 176,
+            "attack": 0,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-004a9a59c41433719a51d0fbba62d656b513d538b64d16488bc39b07c3237b11",
+          "split": "development",
+          "source_label": "benign",
+          "pattern_sha256": "2168b2f0beb4cc428b3c8e5cdaf2cb16d28165fe06f2bd0ba81cd8e77445eb19",
+          "full_source_same_pattern": {
+            "benign": 1320,
+            "attack": 31,
+            "anomaly": 7
+          },
+          "binary_label_conflict": true
+        },
+        {
+          "session_id": "m7-session-004bd15109d85485bf9c80a19c19a2f89e2b5143720778c26318c8db5ffa70d6",
+          "split": "development",
+          "source_label": "benign",
+          "pattern_sha256": "b3903d83875d058ae42a671a4ed88fd934cb4059af73e290aa33346d20c5c9da",
+          "full_source_same_pattern": {
+            "benign": 75,
+            "attack": 0,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-005a1050988c1f29ef2e0c67ccb12726ab6af2b00f923010581e579f5b3f2600",
+          "split": "development",
+          "source_label": "benign",
+          "pattern_sha256": "4636f58c7e3bab657aae8ac5b8a6bdf55316bc401be91ae6abc919281ddb07ab",
+          "full_source_same_pattern": {
+            "benign": 1381,
+            "attack": 15,
+            "anomaly": 0
+          },
+          "binary_label_conflict": true
+        },
+        {
+          "session_id": "m7-session-0071a51b764461e062bdd471ee894fc965ba137b9f0cbc808a9766084aa56309",
+          "split": "development",
+          "source_label": "benign",
+          "pattern_sha256": "cdd672de972a5247774af1d32f458526b66b46b50e7ca36af2aa57f428cdc482",
+          "full_source_same_pattern": {
+            "benign": 24,
+            "attack": 30,
+            "anomaly": 0
+          },
+          "binary_label_conflict": true
+        },
+        {
+          "session_id": "m7-session-0078ceea87e9fb3c7af2c92c7a5dbcd440ad819663e1730b147a0a4d13db3e39",
+          "split": "development",
+          "source_label": "benign",
+          "pattern_sha256": "5344d6699d428159648c3312cc7cedd20aeae6bb5bb7e4abd78d242b50797672",
+          "full_source_same_pattern": {
+            "benign": 231,
+            "attack": 0,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-0095ae60e5f018785072ce408fbf5c17bf736d07a1cf9fd7dc080833468dc277",
+          "split": "development",
+          "source_label": "benign",
+          "pattern_sha256": "6b38c2ff15f2576224d0e2129bf57a5d5bb1c48e320f1aa80cd770a1835db804",
+          "full_source_same_pattern": {
+            "benign": 98,
+            "attack": 79,
+            "anomaly": 0
+          },
+          "binary_label_conflict": true
+        },
+        {
+          "session_id": "m7-session-00cc766de313630abeb8ee13fdc9e4fdfddfb0f68046b2e289abe8be4b10d183",
+          "split": "development",
+          "source_label": "benign",
+          "pattern_sha256": "fd39600b7325293fab9f0a89e61db0395cad8564b604b652e81aa6abb0688dec",
+          "full_source_same_pattern": {
+            "benign": 153,
+            "attack": 0,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-00da68db1faecce7665b61f4277fbb4a5b7ed7f129d3235ec54729f9a281d38a",
+          "split": "development",
+          "source_label": "benign",
+          "pattern_sha256": "d5f411cd9337a201da69cadb1337357abecd819a3c47036cdad240492046ec52",
+          "full_source_same_pattern": {
+            "benign": 59,
+            "attack": 38,
+            "anomaly": 0
+          },
+          "binary_label_conflict": true
+        },
+        {
+          "session_id": "m7-session-00e56e8f3470538b5c2360d06f89fe16b4e9de4e6b3cb4356e82a5573b9b5ddf",
+          "split": "development",
+          "source_label": "benign",
+          "pattern_sha256": "481fbbe67fe14ce7fb77cd509ea83dbfe72fb41140b21731802f325cea57978d",
+          "full_source_same_pattern": {
+            "benign": 22,
+            "attack": 40,
+            "anomaly": 0
+          },
+          "binary_label_conflict": true
+        },
+        {
+          "session_id": "m7-session-00fa01c7bf27c8763a134632aec981e0c5f1758e6ffa181168861bf4691011a4",
+          "split": "development",
+          "source_label": "benign",
+          "pattern_sha256": "b5dd49fe87a724469abaa03b14b217ac8307f9a4a33a4de48c3eeb7ed42c5d27",
+          "full_source_same_pattern": {
+            "benign": 124,
+            "attack": 0,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-010ff9bf22f16008ebeba3b41c292af614e297eb0494fddcb22007f3f325f9d2",
+          "split": "development",
+          "source_label": "benign",
+          "pattern_sha256": "37d10d707c1c742bdc0eadf17f776346bfa5f3e538f8c20cc5dace01645e082d",
+          "full_source_same_pattern": {
+            "benign": 132,
+            "attack": 104,
+            "anomaly": 25
+          },
+          "binary_label_conflict": true
+        },
+        {
+          "session_id": "m7-session-000dd00c7b345a301340c929f8dbef905766f7f17adfd2532d82544a2fd38f6b",
+          "split": "development",
+          "source_label": "attack",
+          "pattern_sha256": "23e99e1e4714d977f16d78db89761d45c6e1362cb1df9a936ed5ae7fa76d8b12",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 15,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-002bb3ab17007deeb937e1cf1d0c100539da5cac81991d384b8ef9a05816a923",
+          "split": "development",
+          "source_label": "attack",
+          "pattern_sha256": "bc5f6ce552cea92167393c70add8b1459c213668d9b989cc5c600f93ebca440f",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 4,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-002f6eb489736a4daea3c1983aa729f655f98f9e14e43c24113c704b239bd682",
+          "split": "development",
+          "source_label": "attack",
+          "pattern_sha256": "e1ef7639880ccc916564fa8c3cbf904df512a23749c243b82124f4982fb3a473",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 97,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-0034966039d2c55e2c789a7be8f7f0500db5618441e1875a3b07748e0fc62e88",
+          "split": "development",
+          "source_label": "attack",
+          "pattern_sha256": "83057cf35109d553c11cea80c131ee4ee3368327f8832bdf55ad31be9ebd66a2",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 10,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-004a4533b9ad61da5dfe2da3083127056e97fe984d551cf2bae6458581355931",
+          "split": "development",
+          "source_label": "attack",
+          "pattern_sha256": "f1b740afdf9d2b0e17749c0ad0955136377192be3327fa228c196e91cdc101ab",
+          "full_source_same_pattern": {
+            "benign": 21,
+            "attack": 12,
+            "anomaly": 0
+          },
+          "binary_label_conflict": true
+        },
+        {
+          "session_id": "m7-session-007ecec4caa0509df9ccbed4b57575936f00b696219ce127308fdd9f5c0ba252",
+          "split": "development",
+          "source_label": "attack",
+          "pattern_sha256": "4c8986e769d9ea7f3555957dd4e695d0ae84f0528ece893ecdfe854e4cfcba47",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 63,
+            "anomaly": 16
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-0087819b56ae0ab5f8cffbeb7e304f9993fbe06a5a25039d42972262028b2909",
+          "split": "development",
+          "source_label": "attack",
+          "pattern_sha256": "347d9729f553494c68dd1fbb2618d8d96430122bf0935b2dd127cede79c04530",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 16,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-0099dfb463f827ffa28acc6e2833d8a9dcceeb8645bfd284e867f22f5ca85b5d",
+          "split": "development",
+          "source_label": "attack",
+          "pattern_sha256": "d0381892e4ed48c590033b4f7e31462b161e40d392b1aa42026464cbe239f7cf",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 331,
+            "anomaly": 35
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-00a0138d5cc8b4ed95179abf0072adbb2ed0bfa94c37116bf793cc4081fc88cf",
+          "split": "development",
+          "source_label": "attack",
+          "pattern_sha256": "195a48b0cc858c2df9fa24d7942f584105832caddc84dde015eb9ad8bcd98aa8",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 46,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-00bec1224c03f558a7b3259e0a8c2db25e31543400275376bdb1aea55c994bc9",
+          "split": "development",
+          "source_label": "attack",
+          "pattern_sha256": "c6947c55369b2532cccf6486eeaada29ca366978364934b93701e9c21dad0db3",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 1,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-00bf6519455d7984c9ed427c04cecf6b3584cecb7160f982932b8a4c0c1a7880",
+          "split": "development",
+          "source_label": "attack",
+          "pattern_sha256": "c2a7063e96b68afa9811d60cf89d8b9c488c931bea958ef98504981e80a95f2a",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 456,
+            "anomaly": 55
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-00f445898d4eaf83fbf828873095e96c57c216769207c416203d4746ddc3d63e",
+          "split": "development",
+          "source_label": "attack",
+          "pattern_sha256": "d93e88060c4e82cfbef5d4d4e37ac9a5699f218ef22fa23d1243097dd9042776",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 5,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-00d583f4aafa46eda7d1aeddc9d6d70a4ee4c0b04817d267b99e2b4afee5c8d1",
+          "split": "evaluation",
+          "source_label": "benign",
+          "pattern_sha256": "36f5fb020b796b9ffa2401318de72eb4085b78b9e7d4fe087f1631d00b152551",
+          "full_source_same_pattern": {
+            "benign": 171,
+            "attack": 0,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-0162bb26673df62cd150af0cca98665197487f8935776f2a0b42608c4f8a36ef",
+          "split": "evaluation",
+          "source_label": "benign",
+          "pattern_sha256": "c78947d765ce8213e464e3164eff812e42d2d0d1bbd19bde37a040f1cf3fb1f7",
+          "full_source_same_pattern": {
+            "benign": 120,
+            "attack": 228,
+            "anomaly": 345
+          },
+          "binary_label_conflict": true
+        },
+        {
+          "session_id": "m7-session-01a3c432a8de218d546bdcd85e8e5025304743fa1f5be7d0c782ffcca550a6b0",
+          "split": "evaluation",
+          "source_label": "benign",
+          "pattern_sha256": "8291e634ca3e905cbd9ace022564383877666ab30c3555d1a1d9b8f586d8e71a",
+          "full_source_same_pattern": {
+            "benign": 260,
+            "attack": 0,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-02597aef880739dc3146251aa72c6c65cfa7b90fb831fbc986cd2e3aa02707ec",
+          "split": "evaluation",
+          "source_label": "benign",
+          "pattern_sha256": "4360d1c4f9c15cf416e4a4b01ba07218cffaf73496724b00043dbac6579ccbfb",
+          "full_source_same_pattern": {
+            "benign": 480,
+            "attack": 0,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-02bf127d7881d93e81108b8404698bc08c5ef18bacb21fca278081b7ef44e016",
+          "split": "evaluation",
+          "source_label": "benign",
+          "pattern_sha256": "2384842774d8fb2a66caa5c3c0f200b7e8d281a35a16e7e77d7c5448aa5e9759",
+          "full_source_same_pattern": {
+            "benign": 43,
+            "attack": 0,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-03a345c99bc9563610cafc88c140a362e9be1e20c11a957c35c6470b2c37d814",
+          "split": "evaluation",
+          "source_label": "benign",
+          "pattern_sha256": "3fdbc7eb8c418647f6c44f2b29de4c6cc1f7d211a4b604ca3a93aefb93e772ac",
+          "full_source_same_pattern": {
+            "benign": 54,
+            "attack": 0,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-03af397991ed9f49abaef362d4b75a8097b26ab24fe84aeeec12743446340a30",
+          "split": "evaluation",
+          "source_label": "benign",
+          "pattern_sha256": "afaa1679874554f288d67dbef2229cc73ca2906298d73e9a9be895426d72dd19",
+          "full_source_same_pattern": {
+            "benign": 18,
+            "attack": 24,
+            "anomaly": 27
+          },
+          "binary_label_conflict": true
+        },
+        {
+          "session_id": "m7-session-05897be2dff925a318f2b6dbcfe89a4933ee84fb2f14f8c2e1a69e584c0c030e",
+          "split": "evaluation",
+          "source_label": "benign",
+          "pattern_sha256": "65be09e4a3a1184ce1ef187376aed02c298193512f05495c5aa558da32b25f94",
+          "full_source_same_pattern": {
+            "benign": 79,
+            "attack": 0,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-05cd0d80fffee6b6087ea76e19a645d6d2d38ddf0d6965cad240faeb6f06e7f5",
+          "split": "evaluation",
+          "source_label": "benign",
+          "pattern_sha256": "0cf499d392abb7d3f8b8f0fa5b50ba0688c326b02e5f39138253451053bb7c97",
+          "full_source_same_pattern": {
+            "benign": 421,
+            "attack": 0,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-061f3fd7e5c5e0f6fdf336043159656e8e0325a0a3f5d2306e019d3bcfa9776b",
+          "split": "evaluation",
+          "source_label": "benign",
+          "pattern_sha256": "5b8e42fb9306d50d23b8207e59af4c88c1c5bdd4541d143ca6d809d115b7708a",
+          "full_source_same_pattern": {
+            "benign": 87,
+            "attack": 0,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-080264d48e9372cafd4814f455828c1b502a518fccdbfce05e57846126e61559",
+          "split": "evaluation",
+          "source_label": "benign",
+          "pattern_sha256": "676f625f80e6138baf6d0997b527017f85c5ee86b2c3fc849b6b1affa2d09be6",
+          "full_source_same_pattern": {
+            "benign": 62,
+            "attack": 0,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-0bb3f032280da49bedccd443239066eec5c776a2c21de83a4d2945e06a0b3f99",
+          "split": "evaluation",
+          "source_label": "benign",
+          "pattern_sha256": "9be38e586ac0c718314a760960b3ba34380e8ef1434f76671b7815a102a6d0cd",
+          "full_source_same_pattern": {
+            "benign": 96,
+            "attack": 0,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-018088d280dca01715a4479a99b5895ae332fca72f9ed3a2e59943155cb18e2f",
+          "split": "evaluation",
+          "source_label": "attack",
+          "pattern_sha256": "48cca3bc4bbb74da997cd935de27b2dc779d93477a809ffb9a3769b858072177",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 44,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-01a9240a0a9e93f0688ab3223570cc2d72f1fbaeb787cbfff37c1bcd749d333a",
+          "split": "evaluation",
+          "source_label": "attack",
+          "pattern_sha256": "8d1eb29a74a0c9d251a358df43ff58716b62b531d27fa70b46671ee4611bf7b3",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 65,
+            "anomaly": 7
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-01d6aa8b25684ebbe48b51126f6ccad2a190472a6554e6db477d71236574aef6",
+          "split": "evaluation",
+          "source_label": "attack",
+          "pattern_sha256": "891260bb0fa26c25e21958d70446575ea27fc9dfa0a4008dd318886e6dbc7b8d",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 30,
+            "anomaly": 1
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-0211ef0e64ca4c67fe62aa8a51ba7a70d6fdbf06ffc44e5279cd77cb58dc80dc",
+          "split": "evaluation",
+          "source_label": "attack",
+          "pattern_sha256": "7536cccb44e2b1c246d2f8c8d62bd0606a80e2a2d47b6b444c21b21bcf2fc2c4",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 130,
+            "anomaly": 11
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-027e3eb60ef18e7da0e58e0fff6e9ec1a2c99fee23eb0975a33fc4a6068efb3c",
+          "split": "evaluation",
+          "source_label": "attack",
+          "pattern_sha256": "cab2eb0106596e8ef31302b61b642d3ef59c398b1d0f8f2972d3f4758d369419",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 157,
+            "anomaly": 18
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-02d550a40957332821afb39430d2154828d388d3497a43292df3631814845f6e",
+          "split": "evaluation",
+          "source_label": "attack",
+          "pattern_sha256": "99138e24a750df4127df751336722852703f512d91a0568fbcd77992ee43bec5",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 32,
+            "anomaly": 5
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-03a72a2e681da4adad25480a5a6fd750a6e2f92f75296d0ac4cf426e61e26bed",
+          "split": "evaluation",
+          "source_label": "attack",
+          "pattern_sha256": "280545f277f359181cbcd36dad7d1c5758f064f556ba2a581c917c1a7f77317b",
+          "full_source_same_pattern": {
+            "benign": 82,
+            "attack": 146,
+            "anomaly": 0
+          },
+          "binary_label_conflict": true
+        },
+        {
+          "session_id": "m7-session-03b99f951774e950f27cdd613edc4e46908f19ec6fa683c386da7c3c9c5243bf",
+          "split": "evaluation",
+          "source_label": "attack",
+          "pattern_sha256": "d38760f90027c52617589abdfb1b3d8662bece2b77b8801f59b8478552302ea5",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 20,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-03e4f6640a8e10976b9f85685eacf6569b3f7a93f528b37ebdea4702e564d4f0",
+          "split": "evaluation",
+          "source_label": "attack",
+          "pattern_sha256": "499f39192d3f00b984855cfbfd1b0c7e19b1aae972d08defc63f0bc2ccfb3a81",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 13,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-03e9eacfd804a8b1df919db05ccc27a2fc3e73543953d820aa5ad585e3492fc1",
+          "split": "evaluation",
+          "source_label": "attack",
+          "pattern_sha256": "34aa3d88576d5f3656b498c7509059cc2a3b7a5ee9d3d5e3d22ea99b5824552f",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 33,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-03f0533f47344793a7448d5b9cc89a945f6c81780a2b30f661776289bcafc28f",
+          "split": "evaluation",
+          "source_label": "attack",
+          "pattern_sha256": "c7ec191fca5d0d295136d1460c4491dc9e4ebee74a9557bf21718b2fde8dd6e4",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 23,
+            "anomaly": 0
+          },
+          "binary_label_conflict": false
+        },
+        {
+          "session_id": "m7-session-041fce1c1bd2a66739a4b147fb803caf7dd6a95fa533345603bfb0f6b46b9db1",
+          "split": "evaluation",
+          "source_label": "attack",
+          "pattern_sha256": "5158160274c9e2eb7e8a1a41739cd27d045d1db0ec43c7ef0c4ec8427058f380",
+          "full_source_same_pattern": {
+            "benign": 0,
+            "attack": 176,
+            "anomaly": 10
+          },
+          "binary_label_conflict": false
+        }
+      ],
+      "selected_sessions_with_binary_source_pattern_conflict": 11,
+      "scope": "Declared sequence projection excludes duration, IDs, payload and event_type; not a full-feature impossibility claim."
+    },
+    "reference_pilot_byte_identical": true,
+    "peak_spool_logical_bytes": 170610688,
+    "spool_limit_bytes": 536870912,
+    "memory_strategy": "2MiB SQLite cache; bounded one-session model materialization; no raw corpus in memory",
+    "memory_peak_measured": false,
+    "detector_inference_runs": 0,
+    "compatible_with_full_signed_security_events": false,
+    "missing_full_zero_trust_contracts": [
+      "trusted event signatures and issuer scopes",
+      "IdP role/active/MFA assertions",
+      "EDR device management/posture",
+      "resource-owner permissions/classification",
+      "download byte-delta and approved job evidence"
+    ],
+    "independent_review": "pending",
+    "new_independent_evaluation": false,
+    "goal_qualified": false,
+    "effects": {
+      "network_calls": 0,
+      "paid_api_calls": 0,
+      "cloud_calls": 0,
+      "baseline_writes": 0
+    }
+  },
+  "windows_linux_audit_fields_equal": true,
+  "audit_summary_sha256": "794e35baea6500ee35d8d6b95df834f2b504e38fda113d1dce06648882eee473",
+  "first_focused_checks": {
+    "tests": 10,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 2.336,
+    "sha256": "53492478af6b34c32759d9dc32903b0d80b0b6161724799a377cb871ef769585"
+  },
+  "second_focused_checks": {
+    "tests": 10,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 2.064,
+    "sha256": "b57bba354fef50d100e9fa4cd555ffe13c5ea5982f003157353d32320a2ac5f0"
+  },
+  "source_files_lf_sha256": {
+    "scripts/audit_m7_source.py": "86d1e57bb908e58c7fa9db6aa54e4ce855283ae329b655761365e16195e5beb1",
+    "tests/test_m7_streaming_audit.py": "00073ab57aaf55e13883503cc492c1c175f70363689c59800f689b64483a316d"
+  },
+  "original_app_baseline_changed": false,
+  "new_independent_evaluation": false,
+  "target_achieved": false,
+  "independent_review": "pending",
+  "aws_sdk_calls": 0,
+  "paid_api_calls": 0,
+  "actual_detector_runs_on_publisher_corpus": 0,
+  "counts_are_separate_overlapping_phases": true
+}

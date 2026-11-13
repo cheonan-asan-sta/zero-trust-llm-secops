@@ -1,0 +1,38 @@
+{
+  "schema_version": "f1-public-assets-1",
+  "assets": [
+    {
+      "asset_id": "ait-lds21-russellmitchell",
+      "record_id": 19483937,
+      "record_version": "v2_1",
+      "filename": "russellmitchell_no-pcaps.zip",
+      "bytes": 522084364,
+      "publisher_md5": "abb43a46c70939ad9f98669e3510d2b7",
+      "license_id": "cc-by-nc-sa-4.0",
+      "data_role": "publisher_simulated_raw_logs_with_separate_line_labels",
+      "reference": "https://zenodo.org/records/19483937"
+    },
+    {
+      "asset_id": "ait-ads1-alerts",
+      "record_id": 8263181,
+      "record_version": "1",
+      "filename": "ait_ads.zip",
+      "bytes": 96202946,
+      "publisher_md5": "43db6b1f0996e0024befd617706c50e9",
+      "license_id": "cc-by-4.0",
+      "data_role": "publisher_simulated_ids_alerts_not_all_raw_events",
+      "reference": "https://zenodo.org/records/8263181"
+    },
+    {
+      "asset_id": "ait-ads1-phase-labels",
+      "record_id": 8263181,
+      "record_version": "1",
+      "filename": "labels.csv",
+      "bytes": 3703,
+      "publisher_md5": "60ff33796c77fd2136c4d1a4bc841bd9",
+      "license_id": "cc-by-4.0",
+      "data_role": "publisher_attack_phase_intervals_not_per_alert_truth",
+      "reference": "https://zenodo.org/records/8263181"
+    }
+  ]
+}

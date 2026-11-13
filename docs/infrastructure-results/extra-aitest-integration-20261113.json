@@ -1,0 +1,124 @@
+{
+  "schema": "extra-aitest-integration-1",
+  "recorded_at": "2026-11-13T14:57:47.824109+00:00",
+  "aitest_base": "07ef9cc3fb685d2c31ceeea299819db8a4841a78",
+  "extra_source": "668096b3288ff5fbb9d97837c5270f3cb6b9d065",
+  "branch": "feature/chaeheeju-extra-aitest-integration",
+  "conflicted_files_resolved": [
+    "app/config.py",
+    "app/main.py",
+    "scripts/app_state_recovery.py",
+    "scripts/test_app_recovery_runtime.py",
+    "docs/mentoring-priority-roadmap.md",
+    "docs/roles/kimtaekhee.md"
+  ],
+  "code_sha256": {
+    "app/config.py": "df1e1367ddaa6c9ff71bcd2710dcc95f79b8b047d4682c4e08dc95ab410a772d",
+    "app/main.py": "ec2d77c0159fd2301c68f1638549caf010f6583063e08b5e38314ee0ddbf2582",
+    "scripts/app_state_recovery.py": "5c0646533631c794cb033c7730c9317755e3fab80e2987be75eb5937c5765e45",
+    "scripts/test_app_recovery_runtime.py": "72f3367437c61ec19add32172271f2ac8669cf9a3710154074fd3eaaf92f2d33"
+  },
+  "canonical_response_api": "/response/requests",
+  "required_distinct_reviewers_excluding_requester": 2,
+  "legacy_response_api_mounted": false,
+  "legacy_backup_requires_explicit_opt_in": true,
+  "linux_full_suite": {
+    "exit_code": 0,
+    "seconds": 653.317,
+    "counts": {
+      "passed": 4714
+    },
+    "log": "runtime/integration/full-linux-final-20261113/linux.log",
+    "executed": true,
+    "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "source_files": 887,
+    "source_archive_sha256": "205c7c31347e98bc38a8a08dd221a92af840843cab50f8bd3bbb219063b116de",
+    "container_exit": 0,
+    "oom_killed": false,
+    "network_mode": "none",
+    "owned_container": "8196d3e79871f03b613974c99458e34a27ade0ab294632d866d77751f2477f0b",
+    "snapshot_sources_unchanged_after": true,
+    "owned_container_removed": true
+  },
+  "windows_focused_suite": {
+    "exit_code": 0,
+    "seconds": 276.297,
+    "paths": [
+      "tests/test_app_storage_recovery.py",
+      "tests/test_response_workflow.py",
+      "tests/test_response_storage_recovery.py",
+      "tests/test_response_actions.py",
+      "tests/test_response_recovery.py",
+      "tests/test_behavior_context_recovery.py",
+      "tests/test_behavior_context_recovery_contract.py",
+      "tests/test_behavior_context_recovery_guard.py",
+      "tests/test_extra_aitest_integration.py"
+    ],
+    "counts": {
+      "passed": 183
+    },
+    "paid_api_calls": 0,
+    "aws_calls": 0
+  },
+  "initial_linux_full_suite": {
+    "exit_code": 1,
+    "seconds": 700.69,
+    "counts": {
+      "failed": 2,
+      "passed": 4709
+    },
+    "log": "runtime/integration/full-linux-20261113/linux.log",
+    "executed": true,
+    "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "source_files": 887,
+    "source_archive_sha256": "d8e8665366deb1cc8a641c57a5931171f76851b4cdb23c544eff4fd1e1ca6ed8",
+    "container_exit": 1,
+    "oom_killed": false,
+    "network_mode": "none",
+    "owned_container": "dc8becdc2f2358370162be625432a4194a6d4d855aad72e5f38eaf72b79038c7",
+    "snapshot_sources_unchanged_after": true,
+    "owned_container_removed": true
+  },
+  "windows_compatibility_suite": {
+    "exit_code": 0,
+    "seconds": 51.809,
+    "paths": [
+      "tests/test_f1_temporal_store.py",
+      "tests/test_m7_execution_evaluation.py"
+    ],
+    "counts": {
+      "passed": 80
+    },
+    "paid_api_calls": 0,
+    "aws_calls": 0
+  },
+  "early_recheck_stopped": {
+    "reason": "Stopped only the owned container after 94.505 seconds to pin the legacy inspector in every admission mode before the final run.",
+    "exit_code": 137,
+    "oom_killed": false,
+    "counted_as_pass": false,
+    "owned_container_removed": true
+  },
+  "compatibility_corrections": {
+    "pre_activation_signal": "Shared verifier rejects before the lab-specific guard; rejection and zero persisted events remain required.",
+    "historical_fixture_sha256_preserved": "12cf6f71ef3e8ce07ac9adf1f8272b555ec795b5e413a0b4c61329bda9c721c2",
+    "historical_fixture_lf_pinned": true
+  },
+  "raw_results": [
+    "runtime/integration/full-linux-final-20261113/tests.json",
+    "runtime/integration/windows-final-20261113/tests.json"
+  ],
+  "initial_development_smoke": {
+    "passed": 175,
+    "failed": 1,
+    "reason": "Application source changed while a checkpoint/process-exit test was in flight; the application digest gate refused it. Re-run against fixed source is recorded separately."
+  },
+  "scope": {
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "new_independent_detection_evaluation": false,
+    "f1_target_achieved_claim": false,
+    "human_independent_acceptance_completed": false
+  },
+  "ci": "Consult the integration PR Checks for exact head and all required jobs; not a reused historical run."
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "f1-native-data-protocol-1",
+  "stage": "development_data_acquisition_and_observation_contract",
+  "source_records": {
+    "raw_logs": "https://zenodo.org/records/19483937",
+    "ids_alerts": "https://zenodo.org/records/8263181"
+  },
+  "scenario_split_proposal": {
+    "development": ["russellmitchell", "santos", "shaw", "wheeler"],
+    "calibration": ["fox", "wardbeck"],
+    "reserved_final": ["harrison", "wilson"]
+  },
+  "split_status": "prospective_campaign_split; entity/template overlap and class support not yet audited",
+  "current_reads": "inventory plus development scenario members only; reserved final member bodies and labels stay unread before candidate freeze",
+  "raw_label_contract": "Use publisher per-line annotations only with the exact corresponding source file, original line numbers and simulation-time bounds. Never infer normal from a missing label file.",
+  "alert_label_contract": "Attack-phase time intervals are not automatically exact per-alert malicious labels; audit attribution and ambiguity before any binary score.",
+  "inference_input_exclusions": [
+    "publisher labels and label rules",
+    "scenario and split identifiers",
+    "source member path as a class feature",
+    "attacker ground-truth execution logs",
+    "absolute event time as a class shortcut",
+    "raw user/host/IP identifiers as memorization features"
+  ],
+  "missing_claim_policy": "No manufactured healthy device posture, managed flag, active identity, MFA, resource role or business approval. Unknown remains unknown.",
+  "denominator_policy": "Declare source scope before inference. Keep known-label parse errors, inference errors and abstentions in the evaluation population; no model-error-based filtering.",
+  "permitted_use": "Raw LDS CC-BY-NC-SA-4.0: noncommercial research/evaluation only. ADS CC-BY-4.0: preserve attribution. No automatic production artifact adoption.",
+  "operational_scope": "historical publisher testbed data, not live authenticated IdP/EDR signals or organization-approved business jobs",
+  "original_event_benchmark_preserved": true,
+  "original_six_domain_goal_replaced": false,
+  "full_six_domain_goal_eligible": false,
+  "independent_human_review": "not assigned; no reviewer identity or approval fabricated",
+  "new_metric_result": null,
+  "goal_qualified": false
+}

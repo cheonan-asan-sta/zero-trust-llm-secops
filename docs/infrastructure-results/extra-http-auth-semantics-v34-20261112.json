@@ -1,0 +1,961 @@
+{
+  "schema": "extra-http-auth-semantics-v34-1",
+  "recorded_at": "2026-11-12T07:42:14.596564+00:00",
+  "branch": "extra",
+  "prior_commit": "a1c86895d124fda6a5c9cfba3b65ba5d17a1b1e9",
+  "protocol": {
+    "path": "infra/f1-lab/semantic-candidate-protocol.json",
+    "bytes": 2832,
+    "sha256": "b49e7094fbddbbb448c19d5789ab44809192334666f0acdf0844caa3a54b5931"
+  },
+  "actual_run": {
+    "artifact": {
+      "path": "runtime/f1/semantic-candidate-v34-20261112-02/run.json",
+      "bytes": 12969,
+      "sha256": "cbe7c8ee01164204def0f28f0697add5758b9fc2f7674049148c51c908613b8d"
+    },
+    "schema": "extra-semantic-candidate-run-1",
+    "completed": true,
+    "protocol": {
+      "path": "infra/f1-lab/semantic-candidate-protocol.json",
+      "bytes": 2832,
+      "sha256": "b49e7094fbddbbb448c19d5789ab44809192334666f0acdf0844caa3a54b5931"
+    },
+    "prior_failed_run": {
+      "path": "runtime/f1/semantic-candidate-v34-20261112/run.json",
+      "bytes": 2291,
+      "sha256": "824c2524e4915769203d5fcd1127e4385b9b51b9b35a7df2bb9ca1718880db89"
+    },
+    "failure_preserved": true,
+    "sources": {
+      "scripts/f1_lab/raw_semantics.py": {
+        "path": "scripts/f1_lab/raw_semantics.py",
+        "bytes": 11693,
+        "sha256": "ba0cd6b9c8f25edaa858f3c729c0897a79c0f5a1f22612be9a52d64cdcb820b8"
+      },
+      "scripts/f1_lab/native_bayes.py": {
+        "path": "scripts/f1_lab/native_bayes.py",
+        "bytes": 5443,
+        "sha256": "2a27c33c034b7d42169f26ac854cdd5ab80858fdbb1ec1314ef3045490193944"
+      },
+      "scripts/f1_lab/native_heads.py": {
+        "path": "scripts/f1_lab/native_heads.py",
+        "bytes": 6479,
+        "sha256": "84376ba50c69280c1f6e2cbe8cb7909c2cf46c7f081ca8854b168b3160b1b521"
+      },
+      "scripts/prepare_native_context.py": {
+        "path": "scripts/prepare_native_context.py",
+        "bytes": 10973,
+        "sha256": "310922a3b3f68b43128288126914d310ba293a0f2567b524e068bb4320c42d86"
+      },
+      "scripts/fit_native_raw.py": {
+        "path": "scripts/fit_native_raw.py",
+        "bytes": 8759,
+        "sha256": "e9ce634ab600da6e7517eb8df02882a0a8e12b0fca5f2d7299688e480b8ed998"
+      },
+      "scripts/fit_native_heads.py": {
+        "path": "scripts/fit_native_heads.py",
+        "bytes": 4045,
+        "sha256": "28f5e7c9ff0ad201e1b6bdf1ab6214a48452ea212e3e53f6ce8eef137d901b52"
+      },
+      "scripts/evaluate_native_tree.py": {
+        "path": "scripts/evaluate_native_tree.py",
+        "bytes": 4159,
+        "sha256": "35a08ca022785d6f9dbf030729c4c3e363aa845ff8bc4b619b13a4126bceb1c9"
+      },
+      "scripts/f1_lab/native_binary_tree.py": {
+        "path": "scripts/f1_lab/native_binary_tree.py",
+        "bytes": 6903,
+        "sha256": "6c31d98f94ce1842b3f647ddfc364b489336ca39642a02ff933b5600141399b0"
+      }
+    },
+    "started_at": "2026-11-12T07:30:33.241998+00:00",
+    "preparations": {
+      "russellmitchell": {
+        "path": "runtime/f1/ait-semantic-russellmitchell-20261112/preparation.json",
+        "bytes": 6510,
+        "sha256": "b0fe1025f3cbf1aafe0a130fae6a9e7636a609da4358a1777cb47dc353ddd72e"
+      },
+      "santos": {
+        "path": "runtime/f1/semantic-compressed-output-v34-20261112/santos/preparation.json",
+        "bytes": 6487,
+        "sha256": "a3ceeb5204aaa77c37fa5133efef1ee8c503b45eeff055878167158f8b9f486d"
+      }
+    },
+    "models": {
+      "ordered_tree": {
+        "path": "runtime/f1/ait-semantic-fit-ordered_tree-russell-20261112/tree-model.json",
+        "bytes": 9187,
+        "sha256": "ad821b2e81514c22dff5499d4674104cb2144463ee02b2990821c205d6bfc841"
+      },
+      "heads": {
+        "path": "runtime/f1/ait-semantic-fit-heads-russell-20261112/model.json",
+        "bytes": 15139,
+        "sha256": "4ebbcb6bb5fce286e80beeedbc18139d566d00998575487a867f129330344075"
+      }
+    },
+    "transfers": {
+      "ordered_tree": {
+        "receipt": {
+          "path": "runtime/f1/ait-semantic-transfer-ordered_tree-santos-20261112/evaluation.json",
+          "bytes": 3242,
+          "sha256": "d25728fc11144acd895f55568b0313552d8e1b21132281cc89856b04c04092b5"
+        },
+        "metrics": {
+          "tp": 46400,
+          "fp": 16,
+          "fn": 967,
+          "tn": 248593,
+          "inference_errors": 0,
+          "population": 295976,
+          "precision": 0.9996552912788693,
+          "recall": 0.9795849431038487,
+          "f1": 0.9895183562052824,
+          "false_positive_rate": 6.435808840387918e-05,
+          "accuracy": 0.9966787847663324
+        },
+        "per_pair": [
+          {
+            "raw_member": "gather/internal_share/logs/audit/audit.log",
+            "metrics": {
+              "tp": 0,
+              "fp": 8,
+              "fn": 2,
+              "tn": 718,
+              "inference_errors": 0,
+              "population": 728,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "false_positive_rate": 0.011019283746556474,
+              "accuracy": 0.9862637362637363
+            }
+          },
+          {
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+            "metrics": {
+              "tp": 38506,
+              "fp": 5,
+              "fn": 920,
+              "tn": 236236,
+              "inference_errors": 0,
+              "population": 275667,
+              "precision": 0.9998701669652826,
+              "recall": 0.9766651448282859,
+              "f1": 0.9881314394960031,
+              "false_positive_rate": 2.1164827443161856e-05,
+              "accuracy": 0.9966445022436491
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/auth.log",
+            "metrics": {
+              "tp": 9,
+              "fp": 0,
+              "fn": 3,
+              "tn": 258,
+              "inference_errors": 0,
+              "population": 270,
+              "precision": 1.0,
+              "recall": 0.75,
+              "f1": 0.8571428571428571,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9888888888888889
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log",
+            "metrics": {
+              "tp": 7787,
+              "fp": 1,
+              "fn": 7,
+              "tn": 1667,
+              "inference_errors": 0,
+              "population": 9462,
+              "precision": 0.9998715973292245,
+              "recall": 0.9991018732358224,
+              "f1": 0.9994865870876652,
+              "false_positive_rate": 0.0005995203836930455,
+              "accuracy": 0.999154512787994
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+            "metrics": {
+              "tp": 40,
+              "fp": 1,
+              "fn": 2,
+              "tn": 1,
+              "inference_errors": 0,
+              "population": 44,
+              "precision": 0.975609756097561,
+              "recall": 0.9523809523809523,
+              "f1": 0.963855421686747,
+              "false_positive_rate": 0.5,
+              "accuracy": 0.9318181818181818
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/audit/audit.log",
+            "metrics": {
+              "tp": 14,
+              "fp": 0,
+              "fn": 5,
+              "tn": 2244,
+              "inference_errors": 0,
+              "population": 2263,
+              "precision": 1.0,
+              "recall": 0.7368421052631579,
+              "f1": 0.8484848484848485,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9977905435262925
+            }
+          },
+          {
+            "raw_member": "gather/vpn/logs/openvpn.log",
+            "metrics": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 28,
+              "tn": 5594,
+              "inference_errors": 0,
+              "population": 5622,
+              "precision": null,
+              "recall": 0.0,
+              "f1": 0.0,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9950195659907506
+            }
+          },
+          {
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log",
+            "metrics": {
+              "tp": 44,
+              "fp": 1,
+              "fn": 0,
+              "tn": 1875,
+              "inference_errors": 0,
+              "population": 1920,
+              "precision": 0.9777777777777777,
+              "recall": 1.0,
+              "f1": 0.9887640449438202,
+              "false_positive_rate": 0.0005330490405117271,
+              "accuracy": 0.9994791666666667
+            }
+          }
+        ]
+      },
+      "heads": {
+        "receipt": {
+          "path": "runtime/f1/ait-semantic-transfer-heads-santos-20261112/evaluation.json",
+          "bytes": 3379,
+          "sha256": "fffb39e079381397a52af4df3ed3bcb86af1b41a6f325ac665f808bcf6eeade1"
+        },
+        "metrics": {
+          "tp": 46405,
+          "fp": 1544,
+          "fn": 962,
+          "tn": 247065,
+          "inference_errors": 0,
+          "population": 295976,
+          "precision": 0.9677991198982252,
+          "recall": 0.9796905018261659,
+          "f1": 0.9737085064417307,
+          "false_positive_rate": 0.006210555530974341,
+          "accuracy": 0.9915330972781576
+        },
+        "per_pair": [
+          {
+            "raw_member": "gather/internal_share/logs/audit/audit.log",
+            "metrics": {
+              "tp": 1,
+              "fp": 42,
+              "fn": 1,
+              "tn": 684,
+              "inference_errors": 0,
+              "population": 728,
+              "precision": 0.023255813953488372,
+              "recall": 0.5,
+              "f1": 0.044444444444444446,
+              "false_positive_rate": 0.05785123966942149,
+              "accuracy": 0.9409340659340659
+            }
+          },
+          {
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+            "metrics": {
+              "tp": 38506,
+              "fp": 3,
+              "fn": 920,
+              "tn": 236238,
+              "inference_errors": 0,
+              "population": 275667,
+              "precision": 0.9999220961333715,
+              "recall": 0.9766651448282859,
+              "f1": 0.9881567973311093,
+              "false_positive_rate": 1.2698896465897114e-05,
+              "accuracy": 0.9966517573739331
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/auth.log",
+            "metrics": {
+              "tp": 12,
+              "fp": 1,
+              "fn": 0,
+              "tn": 257,
+              "inference_errors": 0,
+              "population": 270,
+              "precision": 0.9230769230769231,
+              "recall": 1.0,
+              "f1": 0.96,
+              "false_positive_rate": 0.003875968992248062,
+              "accuracy": 0.9962962962962963
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log",
+            "metrics": {
+              "tp": 7777,
+              "fp": 116,
+              "fn": 17,
+              "tn": 1552,
+              "inference_errors": 0,
+              "population": 9462,
+              "precision": 0.9853034334220195,
+              "recall": 0.997818835001283,
+              "f1": 0.9915216421240518,
+              "false_positive_rate": 0.06954436450839328,
+              "accuracy": 0.9859437751004017
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+            "metrics": {
+              "tp": 42,
+              "fp": 2,
+              "fn": 0,
+              "tn": 0,
+              "inference_errors": 0,
+              "population": 44,
+              "precision": 0.9545454545454546,
+              "recall": 1.0,
+              "f1": 0.9767441860465116,
+              "false_positive_rate": 1.0,
+              "accuracy": 0.9545454545454546
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/audit/audit.log",
+            "metrics": {
+              "tp": 14,
+              "fp": 227,
+              "fn": 5,
+              "tn": 2017,
+              "inference_errors": 0,
+              "population": 2263,
+              "precision": 0.058091286307053944,
+              "recall": 0.7368421052631579,
+              "f1": 0.1076923076923077,
+              "false_positive_rate": 0.10115864527629234,
+              "accuracy": 0.8974812196199735
+            }
+          },
+          {
+            "raw_member": "gather/vpn/logs/openvpn.log",
+            "metrics": {
+              "tp": 9,
+              "fp": 1152,
+              "fn": 19,
+              "tn": 4442,
+              "inference_errors": 0,
+              "population": 5622,
+              "precision": 0.007751937984496124,
+              "recall": 0.32142857142857145,
+              "f1": 0.015138772077375946,
+              "false_positive_rate": 0.20593493028244547,
+              "accuracy": 0.7917111348274636
+            }
+          },
+          {
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log",
+            "metrics": {
+              "tp": 44,
+              "fp": 1,
+              "fn": 0,
+              "tn": 1875,
+              "inference_errors": 0,
+              "population": 1920,
+              "precision": 0.9777777777777777,
+              "recall": 1.0,
+              "f1": 0.9887640449438202,
+              "false_positive_rate": 0.0005330490405117271,
+              "accuracy": 0.9994791666666667
+            }
+          }
+        ]
+      }
+    },
+    "goal_qualified": false,
+    "resource_recovery": "streamed fingerprints; new output inherits NTFS compression; completed R reused; failed S artifacts retained",
+    "new_directory_compression_inheritance_verified": true,
+    "source_unchanged": true
+  },
+  "model_freeze": {
+    "artifact": {
+      "path": "runtime/f1/semantic-models-frozen-v34-20261112.json",
+      "bytes": 738,
+      "sha256": "51e2b1e4d48b9246f0b01817e27dcb74f6d57c9d82466c65c6478998263344a5"
+    },
+    "recorded_at": "2026-11-12T07:35:56.083808+00:00",
+    "protocol": {
+      "path": "infra/f1-lab/semantic-candidate-protocol.json",
+      "bytes": 2832,
+      "sha256": "b49e7094fbddbbb448c19d5789ab44809192334666f0acdf0844caa3a54b5931"
+    },
+    "models": {
+      "ordered_tree": {
+        "path": "runtime/f1/ait-semantic-fit-ordered_tree-russell-20261112/tree-model.json",
+        "bytes": 9187,
+        "sha256": "ad821b2e81514c22dff5499d4674104cb2144463ee02b2990821c205d6bfc841"
+      },
+      "heads": {
+        "path": "runtime/f1/ait-semantic-fit-heads-russell-20261112/model.json",
+        "bytes": 15139,
+        "sha256": "4ebbcb6bb5fce286e80beeedbc18139d566d00998575487a867f129330344075"
+      }
+    },
+    "fox_member_bodies_read": 0
+  },
+  "previous_same_population": {
+    "metrics": {
+      "accuracy": 0.9962294240073519,
+      "f1": 0.9881114709391512,
+      "false_positive_rate": 0.0005108423267057911,
+      "fn": 989,
+      "fp": 127,
+      "inference_errors": 0,
+      "population": 295976,
+      "precision": 0.9972691108482958,
+      "recall": 0.9791204847256528,
+      "tn": 248482,
+      "tp": 46378
+    },
+    "artifact": {
+      "path": "runtime/f1/ait-native-flat-binary-transfer-santos-20261112/evaluation.json",
+      "bytes": 3257,
+      "sha256": "c934552f031c0e556f2f97452e7bd38dec0660d064b1cfc4f1e909cb6267e6c8"
+    }
+  },
+  "tests": {
+    "windows_final": {
+      "artifact": {
+        "path": "runtime/f1/extra-semantic-windows-20261112-02.xml",
+        "bytes": 40065,
+        "sha256": "414070f716fab46e002b8c33469b24d4ad9fe9f9123c4d4c64d058cfb9672437"
+      },
+      "counts": {
+        "tests": 287,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "runner_exit_code": 0
+    },
+    "linux": {
+      "artifact": {
+        "path": "runtime/f1/extra-linux-public-native-20261112-18/checks.xml",
+        "bytes": 40070,
+        "sha256": "ec9a87f90dfa4c129192facc1c7f144ff8eb389f48bb3615322b90f4fe2d52da"
+      },
+      "counts": {
+        "tests": 287,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "verification": {
+        "schema": "extra-f1-linux-snapshot-1",
+        "completed": true,
+        "owner": "extra-f1-680b89685da5",
+        "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+        "tests": [
+          "tests/test_f1_raw_semantics.py",
+          "tests/test_f1_semantic_heads.py",
+          "tests/test_f1_vpn_context.py",
+          "tests/test_f1_public_sources.py",
+          "tests/test_f1_bounded_zip.py",
+          "tests/test_f1_native_jsonl.py",
+          "tests/test_f1_native_preparation.py",
+          "tests/test_f1_line_truth.py",
+          "tests/test_f1_raw_observations.py",
+          "tests/test_f1_native_bayes.py",
+          "tests/test_f1_native_raw_workflow.py",
+          "tests/test_f1_raw_context.py",
+          "tests/test_f1_native_context_workflow.py",
+          "tests/test_f1_native_tree.py",
+          "tests/test_f1_frozen_native_tree.py",
+          "tests/test_f1_native_transfer.py",
+          "tests/test_f1_contextual_links.py",
+          "tests/test_f1_native_heads.py",
+          "tests/test_f1_native_binary_tree.py",
+          "tests/test_f1_cloud_observations.py",
+          "tests/test_f1_cloud_diagnostics.py",
+          "tests/test_f1_cloud_context.py",
+          "tests/test_f1_cloud_identity.py",
+          "tests/test_f1_rba_probe.py",
+          "tests/test_f1_rba_metadata.py"
+        ],
+        "host_mounts": 0,
+        "network": "none",
+        "cloud_calls": 0,
+        "paid_api_calls": 0,
+        "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+        "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+        "source_manifest_sha256": "2cd62ccbe5883793b7378037b1d77c37cd416a1f65e72bc933989b120ec4a3bc",
+        "source_files": 458,
+        "container_exit_code": 0,
+        "source_verified_before_and_after": true,
+        "remaining_containers": 0
+      },
+      "current_matches_all_snapshot_files": true
+    },
+    "windows_first": {
+      "artifact": {
+        "path": "runtime/f1/extra-semantic-windows-20261112.xml",
+        "bytes": 44713,
+        "sha256": "6e52ed4246894172b95bd1e46a9405bdf800bbab5fc1fbb53f15afcff9c76c5e"
+      },
+      "counts": {
+        "tests": 287,
+        "failures": 6,
+        "errors": 0,
+        "skipped": 0
+      },
+      "passed": 281,
+      "failure_reason": "unchanged real disk-headroom guard rejected six tiny RBA fixtures during concurrent disk pressure; source guard was not weakened"
+    },
+    "focused": {
+      "artifact": {
+        "path": "runtime/f1/extra-semantic-focused-final-20261112.xml",
+        "bytes": 5205,
+        "sha256": "4375bc859aa7e73eb01fc5ffbedf6a99da34fe79cbbdf04a09d38c81779a158c"
+      },
+      "counts": {
+        "tests": 36,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "failed_data_preparation": {
+    "artifact": {
+      "path": "runtime/f1/semantic-candidate-v34-20261112/run.json",
+      "bytes": 2291,
+      "sha256": "824c2524e4915769203d5fcd1127e4385b9b51b9b35a7df2bb9ca1718880db89"
+    },
+    "tool_session": 49865,
+    "terminal_exit_code": 1,
+    "error": "OSError ENOSPC while preparing S sidecars; completed R reused; failed S files preserved"
+  },
+  "storage_and_window_records": [
+    {
+      "artifact": {
+        "path": "runtime/f1/user-work-window-20261112.json",
+        "bytes": 522,
+        "sha256": "f9b9558fbf7b8195c7be538d6eebf7eb8752140211cfb067ccbb5fbf2c2951d5"
+      },
+      "record": {
+        "schema": "extra-user-work-window-1",
+        "started_at_utc": "2026-11-12T07:11:10+00:00",
+        "work_until_utc": "2026-11-12T08:11:10+00:00",
+        "work_until_kst": "2026-11-12T17:11:10+09:00",
+        "user_instruction": "\ud55c\uc2dc\uac04\ub4a4\uc5d0 \ub098\uac00\uc57c\ud558\ub294\ub370 \uadf8\ub54c\uae4c\uc9c0 \uc791\uc5c5\ud574\uc918",
+        "scope": "continue aligned local candidate implementation, comparison, tests and docs; independent final goal remains unproven",
+        "paid_calls_allowed": false,
+        "github_push_allowed": false,
+        "baseline_and_labels_preserved": true
+      }
+    },
+    {
+      "artifact": {
+        "path": "runtime/f1/fox-preflight-failure-20261112.json",
+        "bytes": 351,
+        "sha256": "13b1f5393993fa0ce72213f96c2662bf5f7fed6f4b260ad6b179fbfc86add91d"
+      },
+      "record": {
+        "schema": "extra-fox-preflight-failure-1",
+        "completed": false,
+        "tool_terminal_exit_code": 1,
+        "failure_code": "public_asset_disk_headroom",
+        "acquisition_directory_created": false,
+        "bytes_acquired": 0,
+        "subsequent_action": "lossless NTFS compression of 18 exact owned completed JSONL files, hashes verified; no files deleted"
+      }
+    },
+    {
+      "artifact": {
+        "path": "runtime/f1/owned-jsonl-compression-20261112.json",
+        "bytes": 6157,
+        "sha256": "4b4fd2ad3800aeaaefc14dbc064bb696b18de0aa9a6c3f15b7bc24e9b29e26bf"
+      },
+      "record": {
+        "schema": "extra-owned-jsonl-ntfs-compression-1",
+        "completed": true,
+        "files": [
+          {
+            "path": "runtime/f1/ait-raw-inputs-russell-20261112/inputs.jsonl",
+            "logical_bytes": 225702101,
+            "sha256": "b999e6621b25a716f4176f2ed4620e683003d96476cc947bcace1aa685a1ed5a",
+            "allocated_before": 225702101,
+            "allocated_after": 83894272,
+            "logical_bytes_unchanged": true
+          },
+          {
+            "path": "runtime/f1/ait-raw-inputs-russell-20261112/references.jsonl",
+            "logical_bytes": 90789080,
+            "sha256": "58c0903bd589e23773928887cddc702ce1f7161ee835bef4357e04566b264c59",
+            "allocated_before": 90789080,
+            "allocated_after": 46223360,
+            "logical_bytes_unchanged": true
+          },
+          {
+            "path": "runtime/f1/ait-raw-inputs-russell-20261112/truth.jsonl",
+            "logical_bytes": 36542948,
+            "sha256": "2e569fc8a2678d06ac62fec7152bf070969e4db9fe123da5301cafd617cd5a43",
+            "allocated_before": 36542948,
+            "allocated_after": 21819392,
+            "logical_bytes_unchanged": true
+          },
+          {
+            "path": "runtime/f1/ait-raw-inputs-santos-20261112/inputs.jsonl",
+            "logical_bytes": 226288307,
+            "sha256": "14c2d0ac10f027edec89d05ba42a404eaffda8b2787af5e78cb0d581d2ac1c02",
+            "allocated_before": 226288307,
+            "allocated_after": 84033536,
+            "logical_bytes_unchanged": true
+          },
+          {
+            "path": "runtime/f1/ait-raw-inputs-santos-20261112/references.jsonl",
+            "logical_bytes": 91012900,
+            "sha256": "d8b6ff6d3727083647f4843cfa2a99e791ab65cecc4a240cbc1ced996080a49e",
+            "allocated_before": 91012900,
+            "allocated_after": 47689728,
+            "logical_bytes_unchanged": true
+          },
+          {
+            "path": "runtime/f1/ait-raw-inputs-santos-20261112/truth.jsonl",
+            "logical_bytes": 36078704,
+            "sha256": "21f65f66a93489950507764cfae096752120d376d57d49e8c8b2d7e885b7c989",
+            "allocated_before": 36078704,
+            "allocated_after": 21839872,
+            "logical_bytes_unchanged": true
+          },
+          {
+            "path": "runtime/f1/ait-raw-context-russell-20261112/inputs.jsonl",
+            "logical_bytes": 373614300,
+            "sha256": "edd8262283661a47753afac67d64bef0b707491dd31c5e2a7f0afd25a82846eb",
+            "allocated_before": 373614300,
+            "allocated_after": 140103680,
+            "logical_bytes_unchanged": true
+          },
+          {
+            "path": "runtime/f1/ait-raw-context-russell-20261112/references.jsonl",
+            "logical_bytes": 90789080,
+            "sha256": "58c0903bd589e23773928887cddc702ce1f7161ee835bef4357e04566b264c59",
+            "allocated_before": 90789080,
+            "allocated_after": 46223360,
+            "logical_bytes_unchanged": true
+          },
+          {
+            "path": "runtime/f1/ait-raw-context-russell-20261112/truth.jsonl",
+            "logical_bytes": 36542948,
+            "sha256": "2e569fc8a2678d06ac62fec7152bf070969e4db9fe123da5301cafd617cd5a43",
+            "allocated_before": 36542948,
+            "allocated_after": 21819392,
+            "logical_bytes_unchanged": true
+          },
+          {
+            "path": "runtime/f1/ait-raw-context-santos-20261112/inputs.jsonl",
+            "logical_bytes": 374567106,
+            "sha256": "3e62613ebb73cbeb5ac9f9f6cf607027184e42bbc93ea6cb8a4612279fecaf89",
+            "allocated_before": 374567106,
+            "allocated_after": 140464128,
+            "logical_bytes_unchanged": true
+          },
+          {
+            "path": "runtime/f1/ait-raw-context-santos-20261112/references.jsonl",
+            "logical_bytes": 91012900,
+            "sha256": "d8b6ff6d3727083647f4843cfa2a99e791ab65cecc4a240cbc1ced996080a49e",
+            "allocated_before": 91012900,
+            "allocated_after": 47689728,
+            "logical_bytes_unchanged": true
+          },
+          {
+            "path": "runtime/f1/ait-raw-context-santos-20261112/truth.jsonl",
+            "logical_bytes": 36078704,
+            "sha256": "21f65f66a93489950507764cfae096752120d376d57d49e8c8b2d7e885b7c989",
+            "allocated_before": 36078704,
+            "allocated_after": 21839872,
+            "logical_bytes_unchanged": true
+          },
+          {
+            "path": "runtime/f1/ait-vpn-history-russellmitchell-20261112/inputs.jsonl",
+            "logical_bytes": 445626235,
+            "sha256": "5dba660fcff337a969517dd333b34a50dd3367fd0cbd5a4ff8fa322a97e0236d",
+            "allocated_before": 445626235,
+            "allocated_after": 167112704,
+            "logical_bytes_unchanged": true
+          },
+          {
+            "path": "runtime/f1/ait-vpn-history-russellmitchell-20261112/references.jsonl",
+            "logical_bytes": 90789080,
+            "sha256": "58c0903bd589e23773928887cddc702ce1f7161ee835bef4357e04566b264c59",
+            "allocated_before": 90789080,
+            "allocated_after": 46223360,
+            "logical_bytes_unchanged": true
+          },
+          {
+            "path": "runtime/f1/ait-vpn-history-russellmitchell-20261112/truth.jsonl",
+            "logical_bytes": 36542948,
+            "sha256": "2e569fc8a2678d06ac62fec7152bf070969e4db9fe123da5301cafd617cd5a43",
+            "allocated_before": 36542948,
+            "allocated_after": 21819392,
+            "logical_bytes_unchanged": true
+          },
+          {
+            "path": "runtime/f1/ait-vpn-history-santos-20261112/inputs.jsonl",
+            "logical_bytes": 446758519,
+            "sha256": "b3f5263373a7c38c7b50a64fdadf86b29868eb5f6ac3ed311501217bb47172d6",
+            "allocated_before": 446758519,
+            "allocated_after": 167534592,
+            "logical_bytes_unchanged": true
+          },
+          {
+            "path": "runtime/f1/ait-vpn-history-santos-20261112/references.jsonl",
+            "logical_bytes": 91012900,
+            "sha256": "d8b6ff6d3727083647f4843cfa2a99e791ab65cecc4a240cbc1ced996080a49e",
+            "allocated_before": 91012900,
+            "allocated_after": 47689728,
+            "logical_bytes_unchanged": true
+          },
+          {
+            "path": "runtime/f1/ait-vpn-history-santos-20261112/truth.jsonl",
+            "logical_bytes": 36078704,
+            "sha256": "21f65f66a93489950507764cfae096752120d376d57d49e8c8b2d7e885b7c989",
+            "allocated_before": 36078704,
+            "allocated_after": 21839872,
+            "logical_bytes_unchanged": true
+          }
+        ],
+        "started_at": "2026-11-12T07:15:15.945807+00:00",
+        "free_before": 946089984,
+        "method": "NTFS lossless compression of exact completed generated JSONL files; no deletion; original checksums preserved",
+        "free_after": 2575794176
+      }
+    },
+    {
+      "artifact": {
+        "path": "runtime/f1/exact-prefix-storage-deduplication-20261112.json",
+        "bytes": 695,
+        "sha256": "75c3a0167142d27eb58af9661f22c0e87007c05ff3da2ccae80c2de419de407d"
+      },
+      "record": {
+        "schema": "extra-exact-prefix-storage-deduplication-1",
+        "old_path": "runtime/f1/public-rba-20261112/rba-dataset.zip.part",
+        "bytes": 1069547520,
+        "sha256": "e1a38d275acd2a506fb20c9d1116e3371b59f2156e7f98fe802c81fcf177dc1d",
+        "recover_from": "runtime/f1/public-rba-20261112-02/rba-dataset.zip",
+        "reconstruction": "copy exactly the first 1069547520 bytes from the retained verified completed ZIP",
+        "source_full_sha256": "ca1d974e97aebfb30878a613f4ca5c793860a98ba2acb5185c9bc610d7432a33",
+        "prior_failure_receipt_and_range_logs_preserved": true,
+        "unique_data_deleted": false,
+        "original_app_or_labels_changed": false,
+        "free_before": 0,
+        "free_after": 1045704704
+      }
+    },
+    {
+      "artifact": {
+        "path": "runtime/f1/semantic-disk-failure-recovery-20261112.json",
+        "bytes": 2113,
+        "sha256": "4495872e7af7e37c07ce8421603fccb08fd4137d085bef1e5e7fc486796ea838"
+      },
+      "record": {
+        "schema": "extra-semantic-disk-failure-recovery-1",
+        "files": [
+          {
+            "path": "runtime/f1/ait-semantic-russellmitchell-20261112/inputs.jsonl",
+            "logical_bytes": 659354199,
+            "sha256": "7b5459d2ecef2bd3dc2b76c3aef832c8980b70e16ada7f3551d536722620492a",
+            "allocated_before": 278904832,
+            "allocated_after": 278904832
+          },
+          {
+            "path": "runtime/f1/ait-semantic-russellmitchell-20261112/references.jsonl",
+            "logical_bytes": 90789080,
+            "sha256": "58c0903bd589e23773928887cddc702ce1f7161ee835bef4357e04566b264c59",
+            "allocated_before": 46223360,
+            "allocated_after": 46223360
+          },
+          {
+            "path": "runtime/f1/ait-semantic-russellmitchell-20261112/truth.jsonl",
+            "logical_bytes": 36542948,
+            "sha256": "2e569fc8a2678d06ac62fec7152bf070969e4db9fe123da5301cafd617cd5a43",
+            "allocated_before": 21819392,
+            "allocated_after": 21819392
+          },
+          {
+            "path": "runtime/f1/ait-semantic-santos-20261112/inputs.jsonl.part",
+            "logical_bytes": 661013617,
+            "sha256": "a04b8ef199e0c9a89547a19ca8ebe22692707a2b7a74f17e101aa3b8349105a2",
+            "allocated_before": 661013617,
+            "allocated_after": 277078016
+          },
+          {
+            "path": "runtime/f1/ait-semantic-santos-20261112/references.jsonl.part",
+            "logical_bytes": 19922944,
+            "sha256": "f412e7b593ca2de398dc17cbcc53cd26a421539f3ef3fb77114ff31af5d2089f",
+            "allocated_before": 19922944,
+            "allocated_after": 10526720
+          },
+          {
+            "path": "runtime/f1/ait-semantic-santos-20261112/truth.jsonl.part",
+            "logical_bytes": 36078704,
+            "sha256": "21f65f66a93489950507764cfae096752120d376d57d49e8c8b2d7e885b7c989",
+            "allocated_before": 36078704,
+            "allocated_after": 21839872
+          }
+        ],
+        "free_before": 1032003584,
+        "failed_model_run_session": 49865,
+        "failed_model_run_terminal_exit_code": 1,
+        "windows_first_batch": "281 passed; 6 RBA fixtures failed at unchanged actual disk headroom guard",
+        "production_disk_guard_relaxed": false,
+        "any_file_deleted": false,
+        "free_after": 1433022464
+      }
+    },
+    {
+      "artifact": {
+        "path": "runtime/f1/completed-source-compression-20261112.json",
+        "bytes": 1363,
+        "sha256": "aec7d8adc9c2c3a3a8ff5fec9e802b564992f34c9f11945884459eb2ae33a4de"
+      },
+      "record": {
+        "schema": "extra-completed-source-compression-1",
+        "files": [
+          {
+            "path": "runtime/f1/contextual-schema-probe-20261112/events.csv",
+            "sha256": "cce55ca294323909a5ea8f99e97d581ebae74d9964999d58e0f466a21747cc1d",
+            "allocated_before": 838136631,
+            "allocated_after": 508014592,
+            "logical_bytes": 838136631
+          },
+          {
+            "path": "runtime/f1/rba-full-metadata-20261112/metadata.sqlite3",
+            "sha256": "952f1fb4f834d58efe5f0547ef85d612d3fb282c6798c7e60161376ebd875fc3",
+            "allocated_before": 273022976,
+            "allocated_after": 273022976,
+            "logical_bytes": 273022976
+          },
+          {
+            "path": "runtime/f1/ait-lds-dev-pairs-20261112/line-truth.sqlite3",
+            "sha256": "54d988dc1c46e9e7911774ccffe85dc95705cedc419023fb12c9109092ff3db6",
+            "allocated_before": 108892160,
+            "allocated_after": 57339904,
+            "logical_bytes": 108892160
+          },
+          {
+            "path": "runtime/f1/ait-lds-santos-pairs-20261112/line-truth.sqlite3",
+            "sha256": "7b97306be17eebb1aadac4d519bb45bdba04652c645bdfc51a3daa72008ead9a",
+            "allocated_before": 115765248,
+            "allocated_after": 60981248,
+            "logical_bytes": 115765248
+          }
+        ],
+        "free_before": 1378390016,
+        "logical_content_changed": false,
+        "records_parsed_for_model": 0,
+        "files_deleted": 0,
+        "free_after": 1806008320
+      }
+    },
+    {
+      "artifact": {
+        "path": "runtime/f1/owned-completed-lzx-compression-20261112.json",
+        "bytes": 1841,
+        "sha256": "271bf15b21e551a628e3a293092aa6081f3bb69ebf7876b57a5bb1884f01f292"
+      },
+      "record": {
+        "schema": "extra-owned-completed-lzx-compression-1",
+        "files": [
+          {
+            "path": "runtime/f1/ait-raw-context-russell-20261112/inputs.jsonl",
+            "logical_bytes": 373614300,
+            "sha256": "edd8262283661a47753afac67d64bef0b707491dd31c5e2a7f0afd25a82846eb",
+            "returncode": 0,
+            "free_after_file": 681791488
+          },
+          {
+            "path": "runtime/f1/ait-raw-context-santos-20261112/inputs.jsonl",
+            "logical_bytes": 374567106,
+            "sha256": "3e62613ebb73cbeb5ac9f9f6cf607027184e42bbc93ea6cb8a4612279fecaf89",
+            "returncode": 0,
+            "free_after_file": 802312192
+          },
+          {
+            "path": "runtime/f1/ait-vpn-history-russellmitchell-20261112/inputs.jsonl",
+            "logical_bytes": 445626235,
+            "sha256": "5dba660fcff337a969517dd333b34a50dd3367fd0cbd5a4ff8fa322a97e0236d",
+            "returncode": 0,
+            "free_after_file": 940204032
+          },
+          {
+            "path": "runtime/f1/ait-vpn-history-santos-20261112/inputs.jsonl",
+            "logical_bytes": 446758519,
+            "sha256": "b3f5263373a7c38c7b50a64fdadf86b29868eb5f6ac3ed311501217bb47172d6",
+            "returncode": 0,
+            "free_after_file": 1074294784
+          },
+          {
+            "path": "runtime/f1/contextual-schema-probe-20261112/events.csv",
+            "logical_bytes": 838136631,
+            "sha256": "cce55ca294323909a5ea8f99e97d581ebae74d9964999d58e0f466a21747cc1d",
+            "returncode": 0,
+            "free_after_file": 1475317760
+          }
+        ],
+        "completed": true,
+        "free_before": 553164800,
+        "files_deleted": 0,
+        "unique_content_changed": false,
+        "reference": "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/compact",
+        "method": "compact /C /EXE:LZX /F on exact inactive completed data files only; stream hashes before and after; no OS/volume compression settings changed",
+        "free_after": 1475317760
+      }
+    }
+  ],
+  "fox_current_acquisition_progress": {
+    "bytes_received": 469762048,
+    "elapsed_seconds": 1464.7,
+    "expected_bytes": 688586900,
+    "retry_count": 4
+  },
+  "fox_member_bodies_read": 0,
+  "fox_transfer_tool_session": 11206,
+  "fox_transfer_terminal_at_record": false,
+  "fox_usage": "predeclared calibration only; opaque download in progress; no final metrics claimed",
+  "new_profile_integrated_into_app": false,
+  "candidate_selected_for_final_or_production": false,
+  "labels_changed": false,
+  "baseline_preserved": true,
+  "original_six_domain_goal_replaced": false,
+  "independent_final_metrics": null,
+  "goal_qualified": false,
+  "current_owned_f1_containers": 0,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "github_pushes": 0
+}

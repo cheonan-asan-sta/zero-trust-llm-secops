@@ -1,0 +1,66 @@
+{
+  "schema": "extra-semantic-candidate-protocol-1",
+  "recorded_at": "2026-11-12T07:21:27.558295+00:00",
+  "profile": "raw-http-auth-semantics-4",
+  "sources": {
+    "scripts/f1_lab/raw_semantics.py": {
+      "path": "scripts/f1_lab/raw_semantics.py",
+      "bytes": 11693,
+      "sha256": "ba0cd6b9c8f25edaa858f3c729c0897a79c0f5a1f22612be9a52d64cdcb820b8"
+    },
+    "scripts/f1_lab/native_bayes.py": {
+      "path": "scripts/f1_lab/native_bayes.py",
+      "bytes": 5443,
+      "sha256": "2a27c33c034b7d42169f26ac854cdd5ab80858fdbb1ec1314ef3045490193944"
+    },
+    "scripts/f1_lab/native_heads.py": {
+      "path": "scripts/f1_lab/native_heads.py",
+      "bytes": 6479,
+      "sha256": "84376ba50c69280c1f6e2cbe8cb7909c2cf46c7f081ca8854b168b3160b1b521"
+    },
+    "scripts/prepare_native_context.py": {
+      "path": "scripts/prepare_native_context.py",
+      "bytes": 10973,
+      "sha256": "310922a3b3f68b43128288126914d310ba293a0f2567b524e068bb4320c42d86"
+    },
+    "scripts/fit_native_raw.py": {
+      "path": "scripts/fit_native_raw.py",
+      "bytes": 8759,
+      "sha256": "e9ce634ab600da6e7517eb8df02882a0a8e12b0fca5f2d7299688e480b8ed998"
+    },
+    "scripts/fit_native_heads.py": {
+      "path": "scripts/fit_native_heads.py",
+      "bytes": 4045,
+      "sha256": "28f5e7c9ff0ad201e1b6bdf1ab6214a48452ea212e3e53f6ce8eef137d901b52"
+    },
+    "scripts/evaluate_native_tree.py": {
+      "path": "scripts/evaluate_native_tree.py",
+      "bytes": 4159,
+      "sha256": "35a08ca022785d6f9dbf030729c4c3e363aa845ff8bc4b619b13a4126bceb1c9"
+    },
+    "scripts/f1_lab/native_binary_tree.py": {
+      "path": "scripts/f1_lab/native_binary_tree.py",
+      "bytes": 6903,
+      "sha256": "6c31d98f94ce1842b3f647ddfc364b489336ca39642a02ff933b5600141399b0"
+    }
+  },
+  "training": "russellmitchell full paired population; no class selection/downsampling",
+  "models": [
+    "flat ordered binary tree",
+    "observed format ordered binary heads"
+  ],
+  "hyperparameters": {
+    "max_depth": 8,
+    "min_leaf": 5,
+    "class_balanced": true,
+    "threshold": 0.5
+  },
+  "auth_history": "same source local exact logged account; 60 seconds; current row excluded; source ordinal breaks equal timestamp ties; no future rows or gold-cleaned history",
+  "http": "generic coarse semantics; at most two percent decodes; 64 query parameters; no raw path/host/query key/user identifiers as learned values",
+  "development_comparison": "santos previously observed; not independent final",
+  "prospective_calibration": "fox; source body remains unread until both model artifacts freeze; not reserved final",
+  "no_current_or_future_sensor_context_from_v33": true,
+  "original_app_or_truth_changed": false,
+  "original_six_domain_goal_replaced": false,
+  "goal_qualified": false
+}
