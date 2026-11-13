@@ -60,12 +60,14 @@ def access(archive, freeze_hash, phase):
     path.write_bytes(canonical(state)+b'\n')
 
 
-def prepare(root, archive, freeze_path, freeze_hash, output):
-    value = check_freeze(root, freeze_path, freeze_hash)
+def prepare(root, archive, freeze_path, freeze_hash, output, *, freeze_checker=None, pair_selector=None):
+    checker = check_freeze if freeze_checker is None else freeze_checker
+    selector = select_pairs if pair_selector is None else pair_selector
+    value = checker(root, freeze_path, freeze_hash)
     output = Path(output)
     require(not output.exists() and not output.is_symlink(), 'transfer_fresh_raw_directory')
     inventory = inspect(archive, value['archive_sha256'])
-    pairs, excluded = select_pairs(inventory['entries'])
+    pairs, excluded = selector(inventory['entries'])
     output.mkdir(parents=True)
     report = {'schema': 'f1-frozen-transfer-raw-intake-1', 'completed': False,
         'scope': 'one-shot source-held-out Apache/OpenVPN transfer only',
@@ -100,7 +102,7 @@ def prepare(root, archive, freeze_path, freeze_hash, output):
                 'source_timezone': 'UTC', 'label_body_opened': False,
                 'publisher_trimmed_pair': True, 'timezone_metadata': hosts[facts_member]}
             report['pairs'].append({'pair_id': sha(raw_path), 'raw_rows': rows, 'provenance': provenance})
-        check_freeze(root, freeze_path, freeze_hash)
+        checker(root, freeze_path, freeze_hash)
         require(len({p['provenance']['raw_sha256'] for p in report['pairs']}) == len(report['pairs']),
                 'transfer_duplicate_physical_source')
         report.update(completed=True, population=total, timezone_metadata=hosts)
@@ -110,8 +112,9 @@ def prepare(root, archive, freeze_path, freeze_hash, output):
 
 
 def truth_after_seal(root, archive, freeze_path, freeze_hash, raw_directory,
-                     prediction_manifest, manifest_hash, output):
-    value = check_freeze(root, freeze_path, freeze_hash)
+                     prediction_manifest, manifest_hash, output, *, freeze_checker=None):
+    checker = check_freeze if freeze_checker is None else freeze_checker
+    value = checker(root, freeze_path, freeze_hash)
     require(sha(prediction_manifest) == manifest_hash, 'transfer_prediction_seal_hash')
     sealed = decode(Path(prediction_manifest).read_bytes())
     require(sealed['phase'] == 'predictions_sealed' and sealed['candidate_freeze_sha256'] == freeze_hash,
