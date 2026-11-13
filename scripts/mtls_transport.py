@@ -18,6 +18,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 ROUTES = {
+    "execution-observer": [("POST", r"/detections/context/(?:captures|execution-evidence|evaluate)")],
+    "context-reviewer": [("GET", r"/detections/context/history"),
+                         ("POST", r"/detections/context/(?:baselines|approvals|evaluate|(?:baselines|approvals)/[A-Za-z0-9._-]+/revoke)")],
     "pep-bridge": [("POST", r"/zero-trust/protected-access")],
     "collector": [("POST", r"/zero-trust/signals/(?:evaluate|inbox)")],
     "api-gateway": [("POST", r"/zero-trust/(?:protected-access|signals/(?:evaluate|inbox))")],

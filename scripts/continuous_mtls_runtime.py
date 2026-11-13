@@ -210,7 +210,7 @@ for name,body in json.load(sys.stdin).items():
                           "release": captured}
             self.save()
             self.write_manifest()
-            command(["docker", "build", "--tag", self.state["image"], str(ROOT)], timeout=900)
+            command(["docker", "build", "--platform", "linux/amd64", "--tag", self.state["image"], str(ROOT)], timeout=900)
             self.state["image_id"] = command(["docker", "image", "inspect", self.state["image"], "--format", "{{.Id}}"]).strip()
             detail = json.loads(command(["docker", "image", "inspect", self.state["image"]]))[0]
             release.image_identity(detail, self.state["image_id"])

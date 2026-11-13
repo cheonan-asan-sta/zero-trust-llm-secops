@@ -21,8 +21,8 @@ from scripts.mtls_app_recovery import WRITERS
 RECOVERY_VOLUMES = ("recovery-authority", "recovery-public", "recovered-data")
 
 
-def recovery_spec(project, image, nginx, *, restored):
-    spec = compose_spec(project, image, nginx)
+def recovery_spec(project, image, nginx, *, restored, spec=None):
+    spec = compose_spec(project, image, nginx) if spec is None else spec
     for volume in RECOVERY_VOLUMES:
         spec["volumes"][volume] = {"external": True, "name": project + "-" + volume}
     for role in WRITERS:

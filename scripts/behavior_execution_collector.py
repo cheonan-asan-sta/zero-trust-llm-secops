@@ -10,8 +10,10 @@ import base64
 import hashlib
 import json
 import os
+import re
 import sqlite3
 import stat
+import time
 from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
 from http.client import HTTPException
@@ -22,7 +24,7 @@ from urllib.request import ProxyHandler, Request, build_opener
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
-from app.behavior_context_models import BehaviorScope
+from app.behavior_context_models import BehaviorScope, SignedBehaviorCapture
 from app.behavior_execution_models import SignedExecutionEvidence
 from app.config import get_settings
 from app.security import Principal, Role
@@ -30,6 +32,7 @@ from app.services.trusted_signals import (
     SignalRegistryUnavailable,
     SignalRejected,
     SignalVerifier,
+    canonical_behavior_capture,
     canonical_execution_evidence,
 )
 from scripts.continuous_signal_collector import exclusive_collector
@@ -44,6 +47,11 @@ ENVELOPE_FIELDS = {
     "issued_at", "expires_at", "signature",
 }
 STATUSES = {"pending", "acknowledged", "rejected"}
+
+
+class ContextDeliveryStatus(Exception):
+    def __init__(self, status):
+        self.status = status if type(status) is int else 0
 
 
 def _canonical(value):
@@ -73,7 +81,7 @@ def _owned(metadata, *, directory=False):
 
 def read_private(path, maximum=MAX_RECORD_BYTES):
     """Reject symlinks and non-regular input; check permissions on the opened object."""
-    descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+    descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0))
     with os.fdopen(descriptor, "rb") as stream:
         metadata = os.fstat(stream.fileno())
         _owned(metadata)
@@ -154,7 +162,9 @@ def initialize(directory, tenant_id, source_id, key_id, scopes, *, now=None, key
     return {"status": "initialized", "public_registry": str(directory / "sources.json")}
 
 
-def post_evidence(base_url, payload, *, tls_profile=None):
+def post_context(base_url, endpoint, payload, *, tls_profile=None):
+    if endpoint not in {ENDPOINT, "/detections/context/captures", "/detections/context/evaluate"}:
+        raise ValueError("execution_collector_endpoint")
     base_url = _target(base_url, tls_profile)
     headers = {"Content-Type": "application/json"}
     token = os.environ.get("EXECUTION_COLLECTOR_API_KEY")
@@ -165,9 +175,9 @@ def post_evidence(base_url, payload, *, tls_profile=None):
     wire = _canonical(payload)
     if tls_profile is not None:
         from scripts.mtls_transport import request
-        status, body = request(tls_profile, ENDPOINT, wire, headers)
+        status, body = request(tls_profile, endpoint, wire, headers)
     else:
-        request = Request(base_url + ENDPOINT, data=wire, method="POST", headers=headers)
+        request = Request(base_url + endpoint, data=wire, method="POST", headers=headers)
         opener = build_opener(ProxyHandler({}), _NoRedirect())
         try:
             response = opener.open(request, timeout=3)
@@ -180,11 +190,15 @@ def post_evidence(base_url, payload, *, tls_profile=None):
     return status, json.loads(body)
 
 
+def post_evidence(base_url, payload, *, tls_profile=None):
+    return post_context(base_url, ENDPOINT, payload, tls_profile=tls_profile)
+
+
 class ExecutionCollector:
     """Bounded persistent envelope queue; replays never reseal or replace evidence."""
 
     def __init__(self, directory, base_url, *, tls_profile=None, transport=None, clock=None,
-                 lifetime_seconds=90):
+                 lifetime_seconds=90, context_transport=None):
         if get_settings().app_environment not in {"local", "test"}:
             raise ValueError("execution_collector_local_only")
         self.directory = Path(directory)
@@ -202,6 +216,7 @@ class ExecutionCollector:
         self.lifetime_seconds = lifetime_seconds
         self.base_url = _target(base_url, tls_profile)
         self.tls_profile, self.transport = tls_profile, transport or post_evidence
+        self.context_transport = context_transport or post_context
         public = self.key.public_key().public_bytes(serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo)
         self.binding = _canonical(self.config | {
             "base_url": self.base_url, "public_key_sha256": _sha(public),
@@ -222,6 +237,14 @@ class ExecutionCollector:
                     )
                     connection.execute("INSERT INTO metadata VALUES(1,?)", (self.binding,))
             with self._connection() as connection:
+                connection.execute("CREATE TABLE IF NOT EXISTS input_files("
+                                   "name TEXT PRIMARY KEY,digest TEXT NOT NULL,evidence_id TEXT NOT NULL)")
+                connection.execute("CREATE TABLE IF NOT EXISTS bundles("
+                                   "evidence_id TEXT PRIMARY KEY,capture TEXT NOT NULL,"
+                                   "capture_sha256 TEXT NOT NULL,state TEXT NOT NULL,result TEXT)")
+                connection.execute("CREATE TABLE IF NOT EXISTS evaluations("
+                                   "evidence_id TEXT PRIMARY KEY,attempts INTEGER NOT NULL,"
+                                   "next_attempt TEXT NOT NULL,status TEXT NOT NULL,result TEXT)")
                 self._validate(connection)
 
     @contextmanager
@@ -249,6 +272,7 @@ class ExecutionCollector:
         if len(rows) > MAX_RECORDS:
             raise ValueError("execution_collector_spool_capacity")
         size = 0
+        records = {row["evidence_id"]: row for row in rows}
         for row in rows:
             raw = row["envelope"].encode()
             if len(raw) > MAX_RECORD_BYTES or _sha(raw) != row["envelope_sha256"]:
@@ -261,6 +285,40 @@ class ExecutionCollector:
                     or datetime.fromisoformat(row["next_attempt"]).utcoffset() is None):
                 raise ValueError("execution_collector_spool_corrupt")
             size += len(raw)
+        bundles = {row["evidence_id"]: row for row in connection.execute("SELECT * FROM bundles")}
+        for row in bundles.values():
+            raw = row["capture"].encode()
+            if (row["evidence_id"] not in records
+                    or len(raw) > MAX_RECORD_BYTES or _sha(raw) != row["capture_sha256"]
+                    or row["state"] not in {"capture_pending", "captured"}):
+                raise ValueError("execution_collector_bundle_corrupt")
+            SignedBehaviorCapture.model_validate_json(raw)
+            size += len(raw)
+        marks = connection.execute("SELECT * FROM input_files").fetchall()
+        if len(marks) > MAX_RECORDS:
+            raise ValueError("execution_collector_input_capacity")
+        for mark in marks:
+            if (Path(mark["name"]).name != mark["name"] or not mark["name"].endswith(".json")
+                    or re.fullmatch(r"[a-f0-9]{64}", mark["digest"]) is None
+                    or mark["evidence_id"] not in records):
+                raise ValueError("execution_collector_input_corrupt")
+        evaluations = connection.execute("SELECT * FROM evaluations").fetchall()
+        if {row["evidence_id"] for row in evaluations} != set(bundles):
+            raise ValueError("execution_collector_evaluation_corrupt")
+        for row in evaluations:
+            if (row["status"] not in STATUSES or type(row["attempts"]) is not int or row["attempts"] < 0
+                    or datetime.fromisoformat(row["next_attempt"]).utcoffset() is None):
+                raise ValueError("execution_collector_evaluation_corrupt")
+            if row["status"] == "acknowledged":
+                receipt = json.loads(row["result"])
+                capture = json.loads(bundles[row["evidence_id"]]["capture"])
+                if (records[row["evidence_id"]]["status"] != "acknowledged"
+                        or bundles[row["evidence_id"]]["state"] != "captured"
+                        or receipt.get("capture_id") != capture["capture_id"]
+                        or receipt.get("enforcement_eligible") is not False):
+                    raise ValueError("execution_collector_evaluation_corrupt")
+            if row["result"] is not None:
+                size += len(row["result"].encode())
         if size > MAX_TOTAL_BYTES:
             raise ValueError("execution_collector_spool_capacity")
         return rows, size
@@ -268,15 +326,59 @@ class ExecutionCollector:
     def enqueue_file(self, path):
         return self.enqueue(json.loads(read_private(path)))
 
-    def enqueue(self, record):
+    def enqueue(self, record, *, input_file=None, capture=None):
         """The record comes from a trusted upstream observer, not application users."""
         now = self.clock()
-        parsed = _unsigned(record, self.config, now, self.lifetime_seconds)
-        normalized = parsed.model_dump(mode="json", exclude=ENVELOPE_FIELDS)
-        record_hash = _sha(_canonical(normalized))
         with exclusive_collector(self.directory), self._connection() as connection:
             rows, size = self._validate(connection)
-            existing = next((row for row in rows if row["evidence_id"] == parsed.evidence_id), None)
+            identifier = record.get("evidence_id") if isinstance(record, dict) else None
+            existing = next((row for row in rows if row["evidence_id"] == identifier), None)
+            # An exact replay remains identifiable after the original observation expires.
+            # Only a new record is signed at the current time.
+            validation_time = (SignedExecutionEvidence.model_validate_json(existing["envelope"]).issued_at
+                               if existing is not None else now)
+            parsed = _unsigned(record, self.config, validation_time, self.lifetime_seconds)
+            normalized = parsed.model_dump(mode="json", exclude=ENVELOPE_FIELDS)
+            record_hash = _sha(_canonical(normalized))
+            if capture is not None:
+                capture = SignedBehaviorCapture.model_validate(capture)
+                if (capture.tenant_id != self.config["tenant_id"]
+                        or capture.capture_id != parsed.capture_id
+                        or _sha(canonical_behavior_capture(capture)) != parsed.capture_input_sha256
+                        or capture.scope != parsed.scope
+                        or capture.session_id != parsed.session_id
+                        or capture.session_version != parsed.session_version
+                        or capture.session_input_sha256 != parsed.session_input_sha256
+                        or set(capture.connection_ids) != set(parsed.connection_ids)
+                        or {event.id for event in capture.activity.events} != set(parsed.event_ids)):
+                    raise ValueError("execution_collector_capture_binding")
+                capture_raw = _canonical(capture.model_dump(mode="json"))
+                if len(capture_raw) > MAX_RECORD_BYTES:
+                    raise ValueError("execution_collector_file_too_large")
+                previous = connection.execute("SELECT capture_sha256 FROM bundles WHERE evidence_id=?",
+                                              (parsed.evidence_id,)).fetchone()
+                if previous is not None and previous["capture_sha256"] != _sha(capture_raw):
+                    raise ValueError("execution_collector_capture_conflict")
+                if existing is not None and previous is None:
+                    raise ValueError("execution_collector_bundle_changed")
+                if previous is None and size + len(capture_raw) > MAX_TOTAL_BYTES:
+                    raise ValueError("execution_collector_spool_capacity")
+                connection.execute("INSERT OR IGNORE INTO bundles VALUES(?,?,?,?,NULL)",
+                                   (parsed.evidence_id, capture_raw.decode(), _sha(capture_raw), "capture_pending"))
+                connection.execute("INSERT OR IGNORE INTO evaluations VALUES(?,?,?,'pending',NULL)",
+                                   (parsed.evidence_id, 0, now.isoformat()))
+                if previous is None:
+                    size += len(capture_raw)
+            if input_file is not None:
+                name, digest = input_file
+                mark = connection.execute("SELECT digest FROM input_files WHERE name=?", (name,)).fetchone()
+                if mark is not None and mark["digest"] != digest:
+                    raise ValueError("execution_collector_input_replaced")
+                count = connection.execute("SELECT COUNT(*) FROM input_files").fetchone()[0]
+                if mark is None and count >= MAX_RECORDS:
+                    raise ValueError("execution_collector_input_capacity")
+                connection.execute("INSERT OR IGNORE INTO input_files VALUES(?,?,?)",
+                                   (name, digest, parsed.evidence_id))
             if existing is not None:
                 if existing["record_sha256"] != record_hash:
                     raise ValueError("execution_collector_identifier_conflict")
@@ -295,6 +397,103 @@ class ExecutionCollector:
             return {"evidence_id": envelope.evidence_id, "duplicate": False,
                     "state": "pending", "input_digest": input_digest}
 
+    def capture_one(self, directory):
+        """Ingest immutable owner-only JSON files; marking and enqueue commit together.
+
+        Producers publish complete files with an atomic rename in this directory.
+        Rotation is a new filename, never a replacement. No file is removed here.
+        """
+        directory = Path(directory)
+        _owned(directory.lstat(), directory=True)
+        with os.scandir(directory) as entries:
+            names = []
+            for entry in entries:
+                if entry.name.endswith(".json"):
+                    names.append(entry.name)
+                    if len(names) > MAX_RECORDS:
+                        raise ValueError("execution_collector_input_capacity")
+        with exclusive_collector(self.directory), self._connection() as connection:
+            marks = {row["name"]: row["digest"] for row in connection.execute("SELECT name,digest FROM input_files")}
+        invalid = 0
+        for name in sorted(names):
+            try:
+                raw = read_private(directory / name)
+            except (OSError, ValueError):
+                invalid += 1
+                continue
+            digest = _sha(raw)
+            if name in marks:
+                if marks[name] != digest:
+                    raise ValueError("execution_collector_input_replaced")
+                continue
+            try:
+                record = json.loads(raw)
+                capture = None
+                if isinstance(record, dict) and set(record) == {"capture", "execution"}:
+                    capture, record = record["capture"], record["execution"]
+                result = self.enqueue(record, input_file=(name, digest), capture=capture)
+                return result | {"invalid_files_skipped": invalid}
+            except (ValueError, TypeError, RecursionError, SignalRejected, SignalRegistryUnavailable):
+                # Preserve the bad file for diagnosis; it cannot starve a later
+                # independently valid observation or become an accepted input mark.
+                invalid += 1
+        if invalid:
+            return {"state": "input_error", "error_code": "INPUT_UNAVAILABLE_OR_INVALID",
+                    "invalid_files": invalid}
+        return {"state": "idle"}
+
+    def tick(self, directory):
+        """A broken upstream input must not stop already durable delivery."""
+        try:
+            captured = self.capture_one(directory)
+        except (OSError, ValueError, TypeError, SignalRejected, SignalRegistryUnavailable):
+            captured = {"state": "input_error", "error_code": "INPUT_UNAVAILABLE_OR_INVALID"}
+        return {"input": captured, "delivery": self.send_once(), "evaluation": self.evaluate_once()}
+
+    def evaluate_once(self):
+        """Persist advisory results only after both receiver receipts are verified."""
+        with exclusive_collector(self.directory):
+            now = self.clock()
+            with self._connection() as connection:
+                self._validate(connection)
+                candidates = connection.execute(
+                    "SELECT e.*,b.capture FROM evaluations e JOIN records r USING(evidence_id) "
+                    "JOIN bundles b USING(evidence_id) WHERE e.status='pending' AND r.status='acknowledged' "
+                    "AND b.state='captured' ORDER BY r.seq",
+                ).fetchall()
+                pending = next((row for row in candidates
+                                if datetime.fromisoformat(row['next_attempt']) <= now), None)
+            if pending is None:
+                return {"state": "idle"}
+            capture_id = json.loads(pending["capture"])["capture_id"]
+            state, result = "pending", None
+            try:
+                status, receipt = self.context_transport(
+                    self.base_url, "/detections/context/evaluate", {"capture_id": capture_id},
+                    tls_profile=self.tls_profile,
+                )
+                if status == 200:
+                    if (not isinstance(receipt, dict) or receipt.get("capture_id") != capture_id
+                            or receipt.get("verdict") not in {"normal", "threat", "unknown"}
+                            or receipt.get("enforcement_eligible") is not False
+                            or type(receipt.get("duplicate")) is not bool
+                            or len(_canonical(receipt)) > 65_536):
+                        raise ValueError("execution_collector_evaluation_receipt")
+                    state, result = "acknowledged", _canonical(receipt).decode()
+                elif status in {401, 403, 409, 422}:
+                    state = "rejected"
+            except (OSError, HTTPException, ValueError, TypeError, KeyError):
+                pass
+            with self._connection() as connection:
+                _, size = self._validate(connection)
+                if result is not None and size + len(result.encode()) > MAX_TOTAL_BYTES:
+                    state, result = "pending", None
+                attempts = pending["attempts"] + 1
+                due = now + timedelta(seconds=min(2 ** min(attempts, 6), 60))
+                connection.execute("UPDATE evaluations SET status=?,result=?,attempts=?,next_attempt=? WHERE evidence_id=?",
+                                   (state, result, attempts, due.isoformat(), pending["evidence_id"]))
+            return {"state": state, "evidence_id": pending["evidence_id"], "attempts": attempts}
+
     def send_once(self):
         with exclusive_collector(self.directory):
             now = self.clock()
@@ -305,6 +504,8 @@ class ExecutionCollector:
                 if pending is None:
                     return {"state": "idle"}
                 envelope = json.loads(pending["envelope"])
+                bundle = connection.execute("SELECT * FROM bundles WHERE evidence_id=?",
+                                            (pending["evidence_id"],)).fetchone()
             state, code = "pending", "TRANSPORT_OR_RECEIPT_INVALID"
             try:
                 principal = Principal("execution-collector", self.config["tenant_id"],
@@ -313,6 +514,24 @@ class ExecutionCollector:
                     SignedExecutionEvidence.model_validate(envelope), principal, now,
                     enforce_freshness=False,
                 )
+                if bundle is not None and bundle["state"] == "capture_pending":
+                    raw = bundle["capture"].encode()
+                    if _sha(raw) != bundle["capture_sha256"]:
+                        raise ValueError("execution_collector_capture_corrupt")
+                    capture = SignedBehaviorCapture.model_validate_json(raw)
+                    status, receipt = self.context_transport(
+                        self.base_url, "/detections/context/captures", json.loads(raw), tls_profile=self.tls_profile,
+                    )
+                    if status in {200, 201}:
+                        if (not isinstance(receipt, dict) or receipt.get("capture_id") != capture.capture_id
+                                or receipt.get("input_digest") != _sha(canonical_behavior_capture(capture))
+                                or type(receipt.get("duplicate")) is not bool):
+                            raise ValueError("execution_collector_capture_receipt")
+                        with self._connection() as connection:
+                            connection.execute("UPDATE bundles SET state='captured' WHERE evidence_id=?",
+                                               (pending["evidence_id"],))
+                    else:
+                        raise ContextDeliveryStatus(status)
                 status, receipt = self.transport(self.base_url, envelope, tls_profile=self.tls_profile)
                 if status in {200, 201}:
                     if (not isinstance(receipt, dict) or receipt.get("evidence_id") != pending["evidence_id"]
@@ -324,6 +543,10 @@ class ExecutionCollector:
                     state, code = "rejected", "HTTP_" + str(status)
                 elif type(status) is int:
                     code = "HTTP_" + str(status)
+            except ContextDeliveryStatus as error:
+                if error.status in {401, 403, 409, 422}:
+                    state = "rejected"
+                code = "CAPTURE_HTTP_" + str(error.status)
             except (SignalRejected, SignalRegistryUnavailable):
                 code = "AUTHORITY_UNAVAILABLE"
             except (OSError, HTTPException, ValueError, TypeError, KeyError):
@@ -341,16 +564,21 @@ class ExecutionCollector:
         with exclusive_collector(self.directory), self._connection() as connection:
             rows, size = self._validate(connection)
             return {"records": len(rows), "bytes": size,
-                    **{name: sum(row["status"] == name for row in rows) for name in sorted(STATUSES)}}
+                    **{name: sum(row["status"] == name for row in rows) for name in sorted(STATUSES)},
+                    "evaluations": {name: connection.execute(
+                        "SELECT COUNT(*) FROM evaluations WHERE status=?", (name,),
+                    ).fetchone()[0] for name in sorted(STATUSES)}}
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("init", "enqueue", "send-once", "status"))
+    parser.add_argument("command", choices=("init", "enqueue", "send-once", "status", "run"))
     parser.add_argument("--directory", required=True, type=Path)
     parser.add_argument("--base-url", default="http://127.0.0.1:18080")
     parser.add_argument("--tls-profile", type=Path)
     parser.add_argument("--input", type=Path, help="Owner-only upstream JSON observation file")
+    parser.add_argument("--input-directory", type=Path, help="Immutable owner-only JSON observation feed")
+    parser.add_argument("--poll-seconds", type=float, default=1)
     parser.add_argument("--tenant")
     parser.add_argument("--source")
     parser.add_argument("--key-id", default="key-1")
@@ -370,6 +598,16 @@ def main(argv=None):
                 result = collector.enqueue_file(args.input)
             elif args.command == "send-once":
                 result = collector.send_once()
+            elif args.command == "run":
+                if args.input_directory is None or not 0.05 <= args.poll_seconds <= 60:
+                    raise ValueError("execution_collector_run_arguments")
+                previous = None
+                while True:
+                    current = json.dumps(collector.tick(args.input_directory), ensure_ascii=False)
+                    if current != previous:
+                        print(current, flush=True)
+                        previous = current
+                    time.sleep(args.poll_seconds)
             else:
                 result = collector.status()
         print(json.dumps(result, ensure_ascii=False))

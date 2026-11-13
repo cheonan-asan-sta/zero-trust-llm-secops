@@ -5,9 +5,9 @@ import hashlib
 import http.client
 import json
 import os
+import sqlite3
 import subprocess
 import sys
-import time
 from contextlib import closing
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
@@ -207,7 +207,7 @@ def test_signed_import_restarts_worker_and_scopes_real_http_access(tmp_path, for
                         api_key_tenant_id=PRINCIPAL.tenant_id, api_key_subject=PRINCIPAL.subject)
     monkeypatch.setattr("app.security.get_settings", lambda: settings)
     worker_env = env | {"ZERO_TRUST_DB_PATH": str(db), "TRUSTED_SIGNAL_SOURCES_PATH": str(registry),
-                        "SIGNAL_INBOX_LEASE_SECONDS": "0.1"}
+                        "SIGNAL_INBOX_LEASE_SECONDS": "2"}
     other_tenant = Principal(PRINCIPAL.subject, "tenant-b", PRINCIPAL.roles, "api_key")
     other = _session(operations, "other-tenant", principal=other_tenant)
     grants = [_session(operations, "related"), _session(operations, "unrelated", user="different-user"),
@@ -272,8 +272,15 @@ worker.process_one()
         assert crashed.returncode == 73, crashed.stderr
         assert inbox.get(PRINCIPAL.tenant_id, record["event_id"])["state"] == "processing"
         assert operations.history("related", PRINCIPAL)[-1].version == 2
-        after_lease = time.monotonic() + 0.11
-        wait_until(lambda: time.monotonic() >= after_lease)
+        # Wait for the lease that was actually committed. A 100ms lease can
+        # expire during the retry itself on a busy or emulated runner.
+        with sqlite3.connect(db) as connection:
+            expires = connection.execute(
+                "SELECT lease_expires_at FROM signal_inbox WHERE tenant_id=? AND event_id=?",
+                (PRINCIPAL.tenant_id, record["event_id"]),
+            ).fetchone()[0]
+        lease = datetime.fromisoformat(expires)
+        wait_until(lambda: datetime.now(UTC) >= lease)
         restarted = subprocess.run([sys.executable, "-m", "scripts.signal_worker", "--once"],
                                    cwd=ROOT, env=worker_env, capture_output=True, timeout=20, check=False)
         assert restarted.returncode == 0, restarted.stderr
