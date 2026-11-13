@@ -61,3 +61,6 @@ Wilson의 원문을 보기 전에 v49→v51→v52 코드·모델·행 선택·�
 후속 [스캐너 읽기 요청 후보](extra-scanner-read-review.md)는 관찰 개발 자료에서 미탐7건을 추가로 줄였다.
 위 Wilson 표는 기존 사전 고정 v52 결과이며 이 새 후보 결과로 덮어쓰지 않았다.
 [DNS 프로세스 경계 보완](extra-dns-process-boundary.md)은 이력 특징151행을 바로잡았고 기존 후보 판정은 모두 같았다.
+
+[개발 자료의 종류별 잔여 오류와 다음 순서](extra-development-error-priorities.md)는 v62까지의 R/S/F 전체를 별도로 집계한다.
+공유 서버 감사 F1 0%, 인증 미탐9행, DNS 미탐2,595행 등 전체 평균에 가려지는 문제도 유지해 공개했다.
