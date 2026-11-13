@@ -62,7 +62,7 @@ def run(plan_path, expected_plan_sha256, prior_path, expected_prior_sha256, outp
     require(plan['scope'] == prior['scope'] == 'observed_development_only'
             and plan['goal_qualified'] is False and prior['goal_qualified'] is False
             and prior['completed'] is True and plan['candidate'] == REASON
-            and plan['candidate_sha256'] == sha(ROOT/'scripts/f1_lab/web_scanner_review.py')
+            and plan['candidate_sha256'] == source_pins(ROOT)['scripts/f1_lab/web_scanner_review.py']
             and [s['name'] for s in plan['scenarios']] == SCENARIOS
             and set(prior['scenarios']) == set(SCENARIOS), 'scanner_development_contract')
     for spec in plan['scenarios']:

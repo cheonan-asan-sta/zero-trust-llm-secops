@@ -86,7 +86,7 @@ def test_existing_evidence_and_wrong_external_contract_are_not_overwritten(tmp_p
 
 def full_fixture(tmp_path):
     plan = {'scope': 'observed_development_only', 'goal_qualified': False, 'candidate': driver.REASON,
-        'candidate_sha256': sha(driver.ROOT/'scripts/f1_lab/web_scanner_review.py'), 'scenarios': []}
+        'candidate_sha256': driver.source_pins(driver.ROOT)['scripts/f1_lab/web_scanner_review.py'], 'scenarios': []}
     prior = {'completed': True, 'scope': 'observed_development_only', 'goal_qualified': False, 'scenarios': {}}
     for name in driver.SCENARIOS:
         folder = tmp_path/name

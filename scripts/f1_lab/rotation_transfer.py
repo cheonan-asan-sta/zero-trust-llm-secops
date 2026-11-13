@@ -35,6 +35,10 @@ POLICY = {
 
 
 def freeze(root, acquisition, archive, output):
+    return freeze_with_policy(root, acquisition, archive, output, POLICY)
+
+
+def freeze_with_policy(root, acquisition, archive, output, policy):
     root, archive, output = Path(root), Path(archive), Path(output)
     require(not output.exists() and not output.is_symlink(), 'rotated_transfer_fresh_freeze')
     asset = acquisition['asset']
@@ -43,14 +47,14 @@ def freeze(root, acquisition, archive, output):
     for asset_key, policy_key in (('asset_id', 'asset_id'), ('record_id', 'publisher_record'),
             ('record_version', 'publisher_version'), ('filename', 'filename'),
             ('publisher_md5', 'publisher_md5'), ('license_id', 'license_id')):
-        require(canonical(asset[asset_key]) == canonical(POLICY[policy_key]), 'rotated_transfer_publisher_contract')
+        require(canonical(asset[asset_key]) == canonical(policy[policy_key]), 'rotated_transfer_publisher_contract')
     require(sha(archive) == acquisition['local_sha256'] and archive.stat().st_size == asset['bytes']
             and not (archive.parent/'evaluation-access.json').exists(), 'rotated_transfer_unsealed_source')
     plan = decode((root/'infra/f1-lab/operation-refinement-protocol.json').read_bytes())
     for spec in plan['models'].values():
         require(sha(root/spec['path']) == spec['sha256'], 'rotated_transfer_model_pin')
     policy_path = 'runtime/f1/operation-refinement-v40-20261113/policy.json'
-    value = {'policy': POLICY, **{key: POLICY[key] for key in
+    value = {'policy': policy, **{key: policy[key] for key in
         ('source_id', 'metadata_source', 'simulation_start', 'simulation_end', 'maximum_total_rows')},
         'source_pins': source_pins(root), 'archive_sha256': acquisition['local_sha256'],
         'models': plan['models'], 'operation_policy': {'path': policy_path, 'sha256': sha(root/policy_path)},
@@ -63,11 +67,15 @@ def freeze(root, acquisition, archive, output):
 
 
 def check_freeze(root, path, expected_sha256):
+    return check_freeze_with_policy(root, path, expected_sha256, POLICY)
+
+
+def check_freeze_with_policy(root, path, expected_sha256, policy):
     root = Path(root)
     require(sha(path, 2*1024**2) == expected_sha256, 'rotated_transfer_freeze_hash')
     value = decode(Path(path).read_bytes())
-    require(canonical(value['policy']) == canonical(POLICY), 'rotated_transfer_policy_changed')
-    require(all(canonical(value[key]) == canonical(POLICY[key]) for key in
+    require(canonical(value['policy']) == canonical(policy), 'rotated_transfer_policy_changed')
+    require(all(canonical(value[key]) == canonical(policy[key]) for key in
         ('source_id', 'metadata_source', 'simulation_start', 'simulation_end', 'maximum_total_rows')),
         'rotated_transfer_duplicate_policy_drift')
     require(source_pins(root) == value['source_pins'], 'rotated_transfer_code_changed')

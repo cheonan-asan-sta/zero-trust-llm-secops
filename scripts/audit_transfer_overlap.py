@@ -62,6 +62,8 @@ def audit(root, freeze_path, freeze_hash, prediction_manifest, manifest_hash, pr
             'subject_session_attack_family_independence_established': False,
             'interpretation': 'coarse feature equality is not proof of duplicate raw events; all cases retained',
             'goal_qualified': False, 'model_selection_feedback_allowed': False}
+        if frozen.get('policy', {}).get('original_planned_role') == 'calibration':
+            result.update(original_planned_role='calibration', redesignated_as_final_holdout=False)
         checker(root, freeze_path, freeze_hash)
         (output/'audit.json').write_bytes(canonical(result)+b'\n')
         return result
@@ -80,11 +82,13 @@ def main():
     parser.add_argument('--prepared-directory', type=Path, required=True)
     parser.add_argument('--development', type=Path, action='append', required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--protocol', choices=('original', 'rotated'), default='original')
+    parser.add_argument('--protocol', choices=('original', 'rotated', 'scanner'), default='original')
     args = parser.parse_args()
     checker = check_freeze
     if args.protocol == 'rotated':
         from scripts.f1_lab.rotation_transfer import check_freeze as checker
+    elif args.protocol == 'scanner':
+        from scripts.f1_lab.scanner_transfer import check_freeze as checker
     print(canonical(audit(ROOT, args.freeze, args.freeze_sha256, args.prediction_manifest, args.manifest_sha256,
                           args.prepared_directory, args.development, args.output, freeze_checker=checker)).decode())
 
