@@ -1,5 +1,20 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 최신 작업 인수인계 — 2026-11-14 오전
+
+- 통합 기준은 PR58의 aitest `cea8303`이며, 후속 변경을 PR60에 한 번으로 묶어 반영할 준비 중이다.
+  실제 PR 병합 여부는 GitHub 상태를 확인한다. 아래 과거 단락의 예약/미완료 상태는 당시 기록이다.
+- [현재 성능](docs/extra-current-performance.md): 원래 여섯 영역의 독립 목표 미달. Wilson 전이 평가 전체 F1 99.9644%이나 VPN F1 21.875%.
+  Wilson은 평가를 마친 출처이며 재튜닝하지 않는다. Wardbeck은 원래 보정 출처로 유지한 고정 후보 평가 진행 중이다.
+- [개발 후보 v62](docs/extra-scanner-read-review.md): 기존 R/S/F/H 1,681,815행에서 추가 TP7, 새 FP/기존 TP 손실0.
+  이는 관측 개발 결과이며 운영 접근 제어에 연결하지 않았다. DNS 후보의 새 FP96 실패도 보존했다.
+- [종류별 잔여 오류](docs/extra-development-error-priorities.md): 큰 집단의 평균에 가려지는 감사·인증·VPN과 정상 오류 표본 부족을 공개했다.
+- [실제 mTLS 만료·회수 검증](docs/extra-outage-expiry-validation.md): 75조건 통과, 소유 자원 모두 정리.
+  정책 만료를 늘리거나 watchdog을 끄지 않고 만료 HOLD와 위험 신호 DENY의 이력 검사를 구분했다.
+- 무료 로컬 검증만 실행했다. 원본 작업 폴더와 동결 평가 코드를 보존한 별도 worktree에서 통합한다.
+  사용자의 ZIP·키·실행 DB·원시/정답 자료를 커밋하지 않는다. 전체 통합 Linux/PR CI 결과는 완료 후 최신 요약에 추가한다.
+
+
 ## 11월 14일 병합본 후속: 잔여 오류·출처 분리 평가 v49
 
 PR #58 병합 `aitest`의 `cea8303`에서 `feature/chaeheeju-postmerge-detection-evaluation`을 만들었다.
