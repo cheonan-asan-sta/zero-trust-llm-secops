@@ -598,7 +598,8 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
         except RuntimeFailure:
             pass  # The exec can be torn down with the dying container namespace.
         self.wait(lambda: (after := self.inspect(service))["Id"] == before["Id"]
-                  and after["State"]["Running"] and after["RestartCount"] > before["RestartCount"],
+                  and after["State"]["Running"] and after["RestartCount"] > before["RestartCount"]
+                  and after["State"]["StartedAt"] != before["State"]["StartedAt"],
                   "automatic_restart_" + service)
         after = self.inspect(service)
         self.require(after["State"]["StartedAt"] != before["State"]["StartedAt"], "restart_time_unchanged")
