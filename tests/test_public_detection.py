@@ -228,7 +228,7 @@ def test_strict_schema_rejects_labels_duplicates_and_naive_times():
     with pytest.raises(ValidationError):
         PublicSession.model_validate({**base, "events": [routine()[0], routine()[0]]})
     event = routine()[0]
-    event["timestamp"] = datetime(2026, 1, 1)  # noqa: DTZ001 - deliberately invalid naive input
+    event["timestamp"] = START.replace(tzinfo=None)  # Deliberately invalid naive input.
     with pytest.raises(ValidationError):
         PublicSession.model_validate({**base, "events": [event]})
 

@@ -120,5 +120,37 @@
     "f1_target_achieved_claim": false,
     "human_independent_acceptance_completed": false
   },
-  "ci": "Consult the integration PR Checks for exact head and all required jobs; not a reused historical run."
+  "ci": "Consult the integration PR Checks for exact head and all required jobs; not a reused historical run.",
+  "ci_compatibility_followup": {
+    "recorded_at": "2026-11-13T15:04:05.381925+00:00",
+    "original_integration_commit": "0349d30214d8169f5ebc54db5a4234dfd957edc2",
+    "failed_ci_job": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43448027379/job/131962541894",
+    "failure": "RUF100: the DTZ001 noqa was unused in the CI lint configuration; pytest was not run in that unit job.",
+    "correction": "Construct naive input with START.replace(tzinfo=None) and a normal explanation comment; no suppression or weaker rejection.",
+    "changed_test": "tests/test_public_detection.py",
+    "changed_test_sha256": "64f37677504f09454b8a26ff556980da9a65bfc03812e373c93081a7fac4f829",
+    "application_and_scripts_unchanged": true,
+    "windows_public_detection_passed": 91,
+    "ruff_with_RUF100": "passed",
+    "linux_public_detection_and_ruff": {
+      "exit_code": 0,
+      "seconds": 4.263,
+      "counts": {
+        "passed": 91
+      },
+      "log": "runtime/integration/ci-lint-compatibility-fixed-20261114/linux.log",
+      "executed": true,
+      "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+      "source_files": 889,
+      "source_archive_sha256": "f1166628c669cc2823517056e13302c36dda07f4ff4fd3d87dce68d85102efd6",
+      "container_exit": 0,
+      "oom_killed": false,
+      "network_mode": "none",
+      "owned_container": "32b216ef8d18eac71cd04ba62be44c19d4b0bcc4e8fc715842c66a7c1c84d89f",
+      "snapshot_sources_unchanged_after": true,
+      "owned_container_removed": true
+    },
+    "local_snapshot_note": "First lint snapshot lost Git executable mode for a 100755 script and stopped at EXE001. The successful snapshot preserves Git modes; no repository mode was changed.",
+    "full_local_suite_scope": "4714 tests passed before this test-fixture-expression-only change; require fresh full CI on the final PR head."
+  }
 }
