@@ -1,6 +1,12 @@
 # 탐지 F1 목표 달성 실험 계획
 
-최신 후속은 [v39 정상 웹 오탐 감소](extra-web-false-positive-reduction.md)다.
+2026-11-13 최신 후속은 [웹 오류·VPN 개선 v40/v40b](extra-error-vpn-refinement.md)다.
+웹 오류 정상 FP는 S2→0/Fox2→0이며 기존 공격 TP/FN은 유지했다.
+VPN은 같은0.95에서 자료별 FN28→0이지만 FP60/60/88·정밀도24.14~31.82%로 검토 후보에만 한정한다.
+전체 micro F1은 소폭 감소했고 운영 채택·여섯 영역 독립 목표 완료는 아니다.
+기존 정상 웹 보정·라벨·앱·과거 근거를 보존하며 AWS/유료 API/GitHub push는0이다.
+
+이전 v39 후속은 [v39 정상 웹 오탐 감소](extra-web-false-positive-reduction.md)다.
 같은 입력·0.95 비교에서 Fox 웹 FP483→12(FPR23.21→0.5766%), S116→7(FPR6.95→0.4197%)이고
 기존 웹 TP/FN과 비HTTP 점수를 유지했다. R만 학습한 별도 후보이며 실제 앱/권한 정책·원래 기준선/라벨은 보존한다.
 [v37~v38 전체 보정](extra-streaming-fox-calibration.md)의 실패/기존 수치도 그대로 남긴다.

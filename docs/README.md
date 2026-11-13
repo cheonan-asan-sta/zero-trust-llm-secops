@@ -1,11 +1,17 @@
 # 개발 주차별 산출물
 
-11/12 최신 `extra`: [정상 웹 오탐 감소와 전체 비교](extra-web-false-positive-reduction.md).
+2026-11-13 최신 후속은 [웹 오류·VPN 개선 v40/v40b](extra-error-vpn-refinement.md)다.
+웹 오류 정상 FP는 S2→0/Fox2→0이며 기존 공격 TP/FN은 유지했다.
+VPN은 같은0.95에서 자료별 FN28→0이지만 FP60/60/88·정밀도24.14~31.82%로 검토 후보에만 한정한다.
+전체 micro F1은 소폭 감소했고 운영 채택·여섯 영역 독립 목표 완료는 아니다.
+기존 정상 웹 보정·라벨·앱·과거 근거를 보존하며 AWS/유료 API/GitHub push는0이다.
+
+11/12 이전 `extra`: [정상 웹 오탐 감소와 전체 비교](extra-web-false-positive-reduction.md).
 Fox 웹 FP483→12(FPR23.21→0.5766%), S116→7(FPR6.95→0.4197%)이며 기존 웹 TP/FN·비HTTP 점수를 유지했다.
 R만 학습한 보정 후보로 성공 GET/HEAD 범위에 한정한다. Windows682·Linux전체3502 통과이며
 원본 앱/라벨/기존 결과를 보존했다. 운영 채택·새 독립 평가·원래 여섯 영역 목표 완료와 구분한다.
 
-11/12 최신 `extra`: [공간 복구 후 스트리밍·Fox 전체 보정·임계값 진단](extra-streaming-fox-calibration.md).
+11/12 이전 `extra`: [공간 복구 후 스트리밍·Fox 전체 보정·임계값 진단](extra-streaming-fox-calibration.md).
 R/S 입력 바이트 동일성과 Fox668,418행 전체를 검증했다. Fox 관측별 후보 F1은0.5에서99.7194%,0.95 진단에서99.8625%지만
 웹 정상 오탐23.21% 등 약점이 남아 선정/운영 채택·원래 여섯 영역 독립 최종 목표 완료로 표시하지 않는다.
 Linux 전체3455개와 별도 신규 Windows13/Linux13개를 확인했고 원본 앱·규칙·라벨·과거 실패 근거를 유지했다.

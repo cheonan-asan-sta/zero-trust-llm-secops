@@ -1,5 +1,9 @@
 # extra: 정상 웹 오탐 감소 — v39
 
+후속 [v40/v40b 웹 오류·VPN 비교](extra-error-vpn-refinement.md)는 이 동결 HTTP 후보를 그대로 재사용한다.
+웹 접근 결과는 유지하고 오류 경고 FP와 VPN FN을 별도 비교했다. VPN 추가 FP로 전체 F1은 소폭 감소한다.
+아래 v39 결과는 당시의 보존 기록이다.
+
 2026-11-12 · 비용 없는 로컬 구현/비교. 기존 [v37~v38](extra-streaming-fox-calibration.md)의 입력·정답·결과는 보존했다.
 **정상 웹 오탐을 줄였고, 비교한 세 자료에서 기존 위협 탐지 수는 유지했다. 새 독립 최종 평가나 운영 채택 결과는 아니다.**
 [전체 근거 JSON](infrastructure-results/extra-web-refinement-v39-20261112.json)에 모델·입력·코드·시험·잔여 오탐과 탐색 이력을 기록했다.
