@@ -189,7 +189,7 @@ def test_runtime_keeps_observer_credentials_and_input_separate():
     observer = spec['services']['execution-observer']
     assert observer['restart'] == 'unless-stopped' and observer['read_only']
     assert observer['networks'] == {'core': {}}
-    assert 'execution-input:/observer/input:ro' in observer['volumes']
+    assert 'execution-input:/observer/input' in observer['volumes']
     assert all('operator-auth' not in mount and 'reviewer' not in mount for mount in observer['volumes'])
     material = runtime.add_material(assets())
     account = next(row for row in json.loads(material['core-auth']['accounts.json'])['accounts']

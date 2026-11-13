@@ -11,17 +11,21 @@ import json
 import sqlite3
 import tempfile
 import time
+import zlib
 from contextlib import closing
 from functools import cache
 from pathlib import Path
 
 from app.services.behavior_context_store import (
     HASH,
+    MAX_ACTIVE_RECORDS,
     MAX_RECORDS,
     MAX_TOTAL_BYTES,
     ZERO_HASH,
     BehaviorContextStore,
     ContextStoreUnavailable,
+    canonical,
+    digest,
 )
 
 NAME = "app-behavior-context.sqlite3"
@@ -49,11 +53,13 @@ def _schema(connection):
 
 
 @cache
-def _expected_schema():
+def _expected_schema(version=2):
     with tempfile.TemporaryDirectory(prefix="behavior-context-schema-") as temporary:
         path = Path(temporary) / NAME
         BehaviorContextStore(path)
         with closing(sqlite3.connect(path)) as connection:
+            if version == 1:
+                connection.execute("DROP TABLE behavior_context_archive")
             return _schema(connection)
 
 
@@ -77,23 +83,23 @@ def _read(path, *, prefix=None):
         _require(connection.execute("PRAGMA integrity_check").fetchall() == [("ok",)],
                  "context_sqlite_integrity_failed")
         actual = _schema(connection)
-        _require(actual == _expected_schema(), "context_database_schema")
+        _require(actual in (_expected_schema(1), _expected_schema(2)), "context_database_schema")
         probe = object.__new__(BehaviorContextStore)
         probe.max_records, probe.max_bytes = MAX_RECORDS, MAX_TOTAL_BYTES
+        probe.max_active_records = MAX_ACTIVE_RECORDS
         entries, head, size = probe._load(connection)
         pin = {"format": 1, "schema_sha256": _digest(actual), "records": len(entries),
                "bytes": size, "head_sha256": head}
         if prefix is not None:
             _require(prefix["records"] <= pin["records"], "context_admission_prefix_missing")
-            row = connection.execute(
-                "SELECT digest FROM behavior_context_entries WHERE seq=?", (prefix["records"],),
-            ).fetchone()
-            head = ZERO_HASH if prefix["records"] == 0 else row[0]
-            size = connection.execute(
-                "SELECT COALESCE(SUM(length(CAST(payload AS BLOB))),0) "
-                "FROM behavior_context_entries WHERE seq<=?", (prefix["records"],),
-            ).fetchone()[0]
-            _require(pin["schema_sha256"] == prefix["schema_sha256"]
+            head, size = ZERO_HASH, 0
+            for entry in entries[:prefix["records"]]:
+                encoded = canonical(entry)
+                size += len(encoded.encode())
+                head = digest(head + "." + encoded)
+            # Both known layouts retain the same logical chain. A v1 admission
+            # pin therefore survives the transactional v1-to-v2 migration.
+            _require(prefix["schema_sha256"] in {_digest(_expected_schema(1)), _digest(_expected_schema(2))}
                      and head == prefix["head_sha256"] and size == prefix["bytes"],
                      "context_admission_prefix_changed")
     _require(_stamp(path) == before, "context_changed_during_inspection")
@@ -109,7 +115,7 @@ def inspect(directory, *, allow_missing=False):
             return {"format": 1, "schema_sha256": _digest(_expected_schema()),
                     "records": 0, "bytes": 0, "head_sha256": ZERO_HASH}
         return _read(path)[0]
-    except (sqlite3.Error, OSError, ValueError, TypeError, KeyError, IndexError) as exc:
+    except (sqlite3.Error, OSError, ValueError, TypeError, KeyError, IndexError, zlib.error) as exc:
         raise ContextStoreUnavailable("context_recovery_inspection_failed") from exc
 
 
@@ -146,7 +152,7 @@ def capture(source_dir, target_dir, *, timeout=15):
                      "context_empty_snapshot_invalid")
         progress(0, 0, 0)
         return copied
-    except (sqlite3.Error, OSError, ValueError, TypeError, KeyError, IndexError) as exc:
+    except (sqlite3.Error, OSError, ValueError, TypeError, KeyError, IndexError, zlib.error) as exc:
         raise ContextStoreUnavailable("context_recovery_snapshot_failed") from exc
 
 
@@ -160,5 +166,5 @@ def verify_prefix(directory, pin):
                  and all(isinstance(pin[key], str) and HASH.fullmatch(pin[key])
                          for key in ("schema_sha256", "head_sha256")), "context_admission_pin_invalid")
         return _read(Path(directory) / NAME, prefix=pin)[0]
-    except (sqlite3.Error, OSError, ValueError, TypeError, KeyError, IndexError) as exc:
+    except (sqlite3.Error, OSError, ValueError, TypeError, KeyError, IndexError, zlib.error) as exc:
         raise ContextStoreUnavailable("context_recovery_admission_failed") from exc

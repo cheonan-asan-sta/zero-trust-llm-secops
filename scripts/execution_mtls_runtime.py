@@ -39,7 +39,7 @@ def definition(project, image, nginx):
     spec = compose_spec(project, image, nginx)
     service = copy.deepcopy(spec['services']['collector'])
     service.update(entrypoint=['python', '-m', 'scripts.execution_mtls_runtime', 'serve'],
-                   volumes=['execution-state:/observer/state', 'execution-input:/observer/input:ro',
+                   volumes=['execution-state:/observer/state', 'execution-input:/observer/input',
                             'execution-tls:/tls:ro', 'execution-auth:/auth:ro'], networks={'core': {}},
                    logging={'driver': 'json-file', 'options': {'max-size': '2m', 'max-file': '3'}})
     spec['services']['execution-observer'] = service
