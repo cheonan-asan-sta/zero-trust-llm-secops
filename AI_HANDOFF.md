@@ -1,6 +1,28 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
-## 현재 상태: v41 VPN 오탐 감소는 미달, 기존 미탐0 유지
+## 현재 상태: v42 VPN 검증 신호 연결, 실제 공개자료 오탐/독립 목표는 미완료
+
+[최신 구현/비교](docs/extra-vpn-verified-signals.md)와
+[전체 근거](docs/infrastructure-results/extra-vpn-verified-signals-v42-20261113.json)를 먼저 읽는다.
+선택형 로컬 bridge로 등록 인증서↔사용자/기기, gateway/session/version/TLS 채널/원문/endpoint/일회 nonce를 결속한다.
+기존 FrozenSignalVerifier·기기 observation·SignedSessionSignal·PinnedApprovalVerifier·PinnedResourcePolicies를 재사용한다.
+gateway/IdP/기기 source와 승인자 키를 분리하고, 현재 등록 대장/권한/폐기/만료를 매 결정 재검증한다.
+새 grant/권한 복원/자동 차단은 하지 않는다. 어댑터는 부가 VPN 신규 연결 위험만 낮추고,
+기존 기준선 위험·60초 위험 유지·알려진 원시 보안 징후·검증된 adverse는 보존/경보한다.
+
+통제 기능 입력 49건: 정상20 FP20→0, 경보/검토 대상29건 누락0 유지. 실제 악성의 독립 정답/성능이 아니다.
+실제 과거 VPN18,458행에는 검증 신호가 없어서 모든 점수/경보/이유 SHA가 이전과 같고 FP60/60/88·FN0이다.
+실제 MDM/게이트웨이 TLS exporter/등록 수집·분산/영속 상태·운영 인수·원래 여섯 영역 독립 목표는 남는다.
+서명은 출처/무결성만 증명하며 기기 상태의 진실성·하드웨어 attestation을 대체하지 않는다.
+
+최초 전체 Windows F1 826·Linux 전체3646 통과 후 등록 결속/추가 guard/메타데이터를 마무리했다.
+최종 관련 Windows/Linux 각280 통과, 최종 코드/시험은 최종 Linux 소스와 같다.
+서로 다른 스냅샷의 중복 건수를 합쳐 한 번의 전체 실행으로 쓰지 않는다.
+각 실행 network none·OOM false·소유 컨테이너 제거 확인, 공개 등록부만 생성하고 개인키는 메모리에서만 사용했다.
+AWS·유료 API·GitHub push0, 원본 app/PEP·기준선/라벨/모델·사용자 ZIP 보존, harrison/wilson 본문 접근0.
+최초 데이터73232·최초 전체94759는 terminal 완료이며 최종 후속 receipt는 최신 JSON을 따른다.
+
+## v41 보존 기록: VPN 오탐 감소는 미달
 
 최신 요청은 VPN 정상 오탐 감소와 미탐 비증가·무료 로컬 비교·문서 업데이트다.
 [최신 검증](docs/extra-vpn-precision-audit.md)와

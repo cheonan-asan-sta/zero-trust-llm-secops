@@ -1,5 +1,8 @@
 # extra: VPN 정상 오탐 감소 검증 — v41
 
+후속 [v42 검증된 기기·권한 신호](extra-vpn-verified-signals.md)는 새로운 서명 신호가 있는 로컬 통제 경로를 구현했다.
+기존 공개 로그에는 이 근거가 없어 아래 오탐/미탐과 진단 하한은 그대로다.
+
 2026-11-13 · 비용 없는 로컬 비교. **미탐을 늘리지 않으면서 오탐을 줄이는 후보는 이번 비교에서 찾지 못했다.**
 [v40b](extra-error-vpn-refinement.md)의 VPN 미탐0건 설정과 모델·원래 라벨을 유지했다.
 [전체 근거 JSON](infrastructure-results/extra-vpn-precision-audit-v41-20261113.json)에 실패한 후보, 혼동행렬·사례 결속·시험 지문을 보존한다.
