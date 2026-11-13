@@ -1,0 +1,16 @@
+{
+  "schema_version": "f1-public-assets-1",
+  "assets": [
+    {
+      "asset_id": "rba-login-v1",
+      "record_id": 6782156,
+      "record_version": "v1.0.0",
+      "filename": "rba-dataset.zip",
+      "bytes": 1093700330,
+      "publisher_md5": "cc1b1078b3929650e6c08678caffcc57",
+      "license_id": "cc-by-4.0",
+      "data_role": "publisher_synthesized_login_research_with_external_incident_labels",
+      "reference": "https://zenodo.org/records/6782156"
+    }
+  ]
+}

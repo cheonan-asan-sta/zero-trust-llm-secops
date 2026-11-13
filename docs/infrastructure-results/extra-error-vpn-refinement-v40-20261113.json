@@ -1,0 +1,3059 @@
+{
+  "schema": "extra-error-vpn-refinement-evidence-1",
+  "date": "2026-11-13",
+  "scope": "observed development/calibration only",
+  "completed": true,
+  "goal_qualified": false,
+  "production_adopted": false,
+  "automatic_enforcement_allowed": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "github_pushes": 0,
+  "original_app_and_benchmark_unchanged_from": "9c67889",
+  "labels_changed": false,
+  "models_refitted": false,
+  "reserved_harrison_wilson_bodies_read": false,
+  "runs": {
+    "stateless": {
+      "receipt": {
+        "path": "runtime/f1/operation-refinement-v40-20261113/run.json",
+        "bytes": 24044,
+        "sha256": "87136d908635bfcb891c7ed4c1373db24be93185358e21b92c961f685674da2c"
+      },
+      "report": {
+        "automatic_enforcement_allowed": false,
+        "aws_sdk_calls": 0,
+        "completed": true,
+        "elapsed_seconds": 170.585,
+        "ended_at": "2026-11-13T04:49:37.703442+00:00",
+        "github_pushes": 0,
+        "goal_qualified": false,
+        "labels_changed": false,
+        "models_refitted": false,
+        "paid_api_calls": 0,
+        "plan": {
+          "bytes": 2685,
+          "path": "infra/f1-lab/operation-refinement-protocol.json",
+          "sha256": "f7fd853011b6eb6d3fa07d95146e6c8e774bf13395fb027c16961eb6813ce629"
+        },
+        "policy": {
+          "bytes": 547,
+          "path": "runtime/f1/operation-refinement-v40-20261113/policy.json",
+          "sha256": "c39db63f29cf2524963378b05a9b419ab0a8858066fb8c02a703eb317fb7c0c0"
+        },
+        "production_adopted": false,
+        "scenarios": {
+          "fox": {
+            "baseline_probability_sha256": "8673f0c70f3aa193e9748e4bf710f28f7e3b77e439eca89012e62fca38feec1b",
+            "context_rows": 8637,
+            "metrics": {
+              "alert": {
+                "accuracy": 0.998744797417185,
+                "f1": 0.9990812436828659,
+                "false_positive_rate": 0.0006192857885729953,
+                "fn": 708,
+                "fp": 131,
+                "inference_errors": 0,
+                "population": 668418,
+                "precision": 0.999712912578593,
+                "recall": 0.9984503725234414,
+                "tn": 211403,
+                "tp": 456176
+              },
+              "baseline": {
+                "accuracy": 0.9988255851877119,
+                "f1": 0.9991402771921563,
+                "false_positive_rate": 0.00024109599402460125,
+                "fn": 734,
+                "fp": 51,
+                "inference_errors": 0,
+                "population": 668418,
+                "precision": 0.9998882071718387,
+                "recall": 0.998393465299726,
+                "tn": 211483,
+                "tp": 456150
+              },
+              "review": {
+                "accuracy": 0.9986909389035005,
+                "f1": 0.9990418634496638,
+                "false_positive_rate": 0.0007989259409834826,
+                "fn": 706,
+                "fp": 169,
+                "inference_errors": 0,
+                "population": 668418,
+                "precision": 0.9996296677747416,
+                "recall": 0.9984547500021888,
+                "tn": 211365,
+                "tp": 456178
+              }
+            },
+            "per_pair": [
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9888641425389755,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.008928571428571428,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 898,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 888,
+                    "tp": 0
+                  },
+                  "baseline": {
+                    "accuracy": 0.9888641425389755,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.008928571428571428,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 898,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 888,
+                    "tp": 0
+                  },
+                  "review": {
+                    "accuracy": 0.9888641425389755,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.008928571428571428,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 898,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 888,
+                    "tp": 0
+                  }
+                },
+                "raw_member": "gather/internal_share/logs/audit/audit.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9971444247699329,
+                    "f1": 0.992238603626504,
+                    "false_positive_rate": 5.102509414129869e-06,
+                    "fn": 686,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 240582,
+                    "precision": 0.9999772287373335,
+                    "recall": 0.9846188340807175,
+                    "tn": 195981,
+                    "tp": 43914
+                  },
+                  "baseline": {
+                    "accuracy": 0.9971444247699329,
+                    "f1": 0.992238603626504,
+                    "false_positive_rate": 5.102509414129869e-06,
+                    "fn": 686,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 240582,
+                    "precision": 0.9999772287373335,
+                    "recall": 0.9846188340807175,
+                    "tn": 195981,
+                    "tp": 43914
+                  },
+                  "review": {
+                    "accuracy": 0.9971444247699329,
+                    "f1": 0.992238603626504,
+                    "false_positive_rate": 5.102509414129869e-06,
+                    "fn": 686,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 240582,
+                    "precision": 0.9999772287373335,
+                    "recall": 0.9846188340807175,
+                    "tn": 195981,
+                    "tp": 43914
+                  }
+                },
+                "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9947552447552448,
+                    "f1": 0.8571428571428571,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 572,
+                    "precision": 1.0,
+                    "recall": 0.75,
+                    "tn": 560,
+                    "tp": 9
+                  },
+                  "baseline": {
+                    "accuracy": 0.9947552447552448,
+                    "f1": 0.8571428571428571,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 572,
+                    "precision": 1.0,
+                    "recall": 0.75,
+                    "tn": 560,
+                    "tp": 9
+                  },
+                  "review": {
+                    "accuracy": 0.9947552447552448,
+                    "f1": 0.8571428571428571,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 572,
+                    "precision": 1.0,
+                    "recall": 0.75,
+                    "tn": 560,
+                    "tp": 9
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/auth.log"
+              },
+              {
+                "changes": {
+                  "alert_removed_fp": 2,
+                  "review_removed_fp": 2
+                },
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9970104633781763,
+                    "f1": 0.9985007496251874,
+                    "false_positive_rate": 0.0,
+                    "fn": 4,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 1338,
+                    "precision": 1.0,
+                    "recall": 0.9970059880239521,
+                    "tn": 2,
+                    "tp": 1332
+                  },
+                  "baseline": {
+                    "accuracy": 0.9955156950672646,
+                    "f1": 0.9977528089887641,
+                    "false_positive_rate": 1.0,
+                    "fn": 4,
+                    "fp": 2,
+                    "inference_errors": 0,
+                    "population": 1338,
+                    "precision": 0.9985007496251874,
+                    "recall": 0.9970059880239521,
+                    "tn": 0,
+                    "tp": 1332
+                  },
+                  "review": {
+                    "accuracy": 0.9970104633781763,
+                    "f1": 0.9985007496251874,
+                    "false_positive_rate": 0.0,
+                    "fn": 4,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 1338,
+                    "precision": 1.0,
+                    "recall": 0.9970059880239521,
+                    "tn": 2,
+                    "tp": 1332
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-error.log.1"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9999564082320632,
+                    "f1": 0.9999780938750474,
+                    "false_positive_rate": 0.005766458433445459,
+                    "fn": 6,
+                    "fp": 12,
+                    "inference_errors": 0,
+                    "population": 412922,
+                    "precision": 0.9999707920466743,
+                    "recall": 0.9999853958100579,
+                    "tn": 2069,
+                    "tp": 410835
+                  },
+                  "baseline": {
+                    "accuracy": 0.9999564082320632,
+                    "f1": 0.9999780938750474,
+                    "false_positive_rate": 0.005766458433445459,
+                    "fn": 6,
+                    "fp": 12,
+                    "inference_errors": 0,
+                    "population": 412922,
+                    "precision": 0.9999707920466743,
+                    "recall": 0.9999853958100579,
+                    "tn": 2069,
+                    "tp": 410835
+                  },
+                  "review": {
+                    "accuracy": 0.9999564082320632,
+                    "f1": 0.9999780938750474,
+                    "false_positive_rate": 0.005766458433445459,
+                    "fn": 6,
+                    "fp": 12,
+                    "inference_errors": 0,
+                    "population": 412922,
+                    "precision": 0.9999707920466743,
+                    "recall": 0.9999853958100579,
+                    "tn": 2069,
+                    "tp": 410835
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9892622099064773,
+                    "f1": 0.4745762711864407,
+                    "false_positive_rate": 0.00906555090655509,
+                    "fn": 5,
+                    "fp": 26,
+                    "inference_errors": 0,
+                    "population": 2887,
+                    "precision": 0.35,
+                    "recall": 0.7368421052631579,
+                    "tn": 2842,
+                    "tp": 14
+                  },
+                  "baseline": {
+                    "accuracy": 0.9892622099064773,
+                    "f1": 0.4745762711864407,
+                    "false_positive_rate": 0.00906555090655509,
+                    "fn": 5,
+                    "fp": 26,
+                    "inference_errors": 0,
+                    "population": 2887,
+                    "precision": 0.35,
+                    "recall": 0.7368421052631579,
+                    "tn": 2842,
+                    "tp": 14
+                  },
+                  "review": {
+                    "accuracy": 0.9892622099064773,
+                    "f1": 0.4745762711864407,
+                    "false_positive_rate": 0.00906555090655509,
+                    "fn": 5,
+                    "fp": 26,
+                    "inference_errors": 0,
+                    "population": 2887,
+                    "precision": 0.35,
+                    "recall": 0.7368421052631579,
+                    "tn": 2842,
+                    "tp": 14
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/audit/audit.log"
+              },
+              {
+                "changes": {
+                  "alert_introduced_fp": 82,
+                  "alert_new_tp": 26,
+                  "review_introduced_fp": 120,
+                  "review_new_tp": 28
+                },
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.988491574188245,
+                    "f1": 0.38235294117647056,
+                    "false_positive_rate": 0.01127767844863155,
+                    "fn": 2,
+                    "fp": 82,
+                    "inference_errors": 0,
+                    "population": 7299,
+                    "precision": 0.24074074074074073,
+                    "recall": 0.9285714285714286,
+                    "tn": 7189,
+                    "tp": 26
+                  },
+                  "baseline": {
+                    "accuracy": 0.9961638580627483,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.0,
+                    "fn": 28,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 7299,
+                    "precision": null,
+                    "recall": 0.0,
+                    "tn": 7271,
+                    "tp": 0
+                  },
+                  "review": {
+                    "accuracy": 0.9835593916974928,
+                    "f1": 0.3181818181818182,
+                    "false_positive_rate": 0.01650391968092422,
+                    "fn": 0,
+                    "fp": 120,
+                    "inference_errors": 0,
+                    "population": 7299,
+                    "precision": 0.1891891891891892,
+                    "recall": 1.0,
+                    "tn": 7151,
+                    "tp": 28
+                  }
+                },
+                "raw_member": "gather/vpn/logs/openvpn.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9989583333333333,
+                    "f1": 0.9787234042553191,
+                    "false_positive_rate": 0.0010672358591248667,
+                    "fn": 0,
+                    "fp": 2,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.9583333333333334,
+                    "recall": 1.0,
+                    "tn": 1872,
+                    "tp": 46
+                  },
+                  "baseline": {
+                    "accuracy": 0.9989583333333333,
+                    "f1": 0.9787234042553191,
+                    "false_positive_rate": 0.0010672358591248667,
+                    "fn": 0,
+                    "fp": 2,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.9583333333333334,
+                    "recall": 1.0,
+                    "tn": 1872,
+                    "tp": 46
+                  },
+                  "review": {
+                    "accuracy": 0.9989583333333333,
+                    "f1": 0.9787234042553191,
+                    "false_positive_rate": 0.0010672358591248667,
+                    "fn": 0,
+                    "fp": 2,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.9583333333333334,
+                    "recall": 1.0,
+                    "tn": 1872,
+                    "tp": 46
+                  }
+                },
+                "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-18-system.cpu.log"
+              }
+            ],
+            "population": 668418,
+            "reason_counts": {
+              "apache_missing_directory_warning": 2,
+              "retain_apache_or_unknown": 1336,
+              "untargeted_unchanged": 659781,
+              "vpn_history_risk_review": 7299
+            },
+            "role": "predeclared_calibration_only",
+            "sources": [
+              {
+                "kind": "apache_error",
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-error.log.1",
+                "raw_sha256": "3894781e6dadce252675d741e461109a937822850d4714204c52a50479205f2d",
+                "rows": 1338,
+                "time_errors": 0,
+                "vpn_feature_sequence_sha256": null
+              },
+              {
+                "kind": "vpn",
+                "raw_member": "gather/vpn/logs/openvpn.log",
+                "raw_sha256": "dc8357ad1a2a4ce9e8963f1eb5eaccdfc106d32de5ae720d052956cedc618722",
+                "rows": 7299,
+                "time_errors": 0,
+                "vpn_feature_sequence_sha256": "2e2415be4cdf3575533385c9306500e46c4f95020c7b7f276f33c4718c0f959d"
+              }
+            ],
+            "untargeted_rows_verified_unchanged": 659781
+          },
+          "russellmitchell": {
+            "baseline_probability_sha256": "4593c1dfe7267debcb9047261bac0a9982137905061f9cfd297c7aa8e0fe8fc5",
+            "context_rows": 5573,
+            "metrics": {
+              "alert": {
+                "accuracy": 0.9963284480919107,
+                "f1": 0.9911727822022443,
+                "false_positive_rate": 0.00034707195530056,
+                "fn": 1003,
+                "fp": 81,
+                "inference_errors": 0,
+                "population": 295243,
+                "precision": 0.9986708237610765,
+                "recall": 0.9837864925155992,
+                "tn": 233300,
+                "tp": 60859
+              },
+              "baseline": {
+                "accuracy": 0.9964300593070793,
+                "f1": 0.9914113428943937,
+                "false_positive_rate": 0.00010712097385819754,
+                "fn": 1029,
+                "fp": 25,
+                "inference_errors": 0,
+                "population": 295243,
+                "precision": 0.9995892076637418,
+                "recall": 0.9833662021919757,
+                "tn": 233356,
+                "tp": 60833
+              },
+              "review": {
+                "accuracy": 0.9962539332007871,
+                "f1": 0.9909955384765688,
+                "false_positive_rate": 0.00044990809020442965,
+                "fn": 1001,
+                "fp": 105,
+                "inference_errors": 0,
+                "population": 295243,
+                "precision": 0.9982777285700226,
+                "recall": 0.9838188225404934,
+                "tn": 233276,
+                "tp": 60861
+              }
+            },
+            "per_pair": [
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9863387978142076,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.010958904109589041,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 732,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 722,
+                    "tp": 0
+                  },
+                  "baseline": {
+                    "accuracy": 0.9863387978142076,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.010958904109589041,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 732,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 722,
+                    "tp": 0
+                  },
+                  "review": {
+                    "accuracy": 0.9863387978142076,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.010958904109589041,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 732,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 722,
+                    "tp": 0
+                  }
+                },
+                "raw_member": "gather/internal_share/logs/audit/audit.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9963972453787604,
+                    "f1": 0.9907177408811609,
+                    "false_positive_rate": 2.2536226984878192e-05,
+                    "fn": 989,
+                    "fp": 5,
+                    "inference_errors": 0,
+                    "population": 275900,
+                    "precision": 0.9999057510697253,
+                    "recall": 0.9816970482094939,
+                    "tn": 221860,
+                    "tp": 53046
+                  },
+                  "baseline": {
+                    "accuracy": 0.9963972453787604,
+                    "f1": 0.9907177408811609,
+                    "false_positive_rate": 2.2536226984878192e-05,
+                    "fn": 989,
+                    "fp": 5,
+                    "inference_errors": 0,
+                    "population": 275900,
+                    "precision": 0.9999057510697253,
+                    "recall": 0.9816970482094939,
+                    "tn": 221860,
+                    "tp": 53046
+                  },
+                  "review": {
+                    "accuracy": 0.9963972453787604,
+                    "f1": 0.9907177408811609,
+                    "false_positive_rate": 2.2536226984878192e-05,
+                    "fn": 989,
+                    "fp": 5,
+                    "inference_errors": 0,
+                    "population": 275900,
+                    "precision": 0.9999057510697253,
+                    "recall": 0.9816970482094939,
+                    "tn": 221860,
+                    "tp": 53046
+                  }
+                },
+                "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9889705882352942,
+                    "f1": 0.7692307692307693,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 272,
+                    "precision": 1.0,
+                    "recall": 0.625,
+                    "tn": 264,
+                    "tp": 5
+                  },
+                  "baseline": {
+                    "accuracy": 0.9889705882352942,
+                    "f1": 0.7692307692307693,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 272,
+                    "precision": 1.0,
+                    "recall": 0.625,
+                    "tn": 264,
+                    "tp": 5
+                  },
+                  "review": {
+                    "accuracy": 0.9889705882352942,
+                    "f1": 0.7692307692307693,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 272,
+                    "precision": 1.0,
+                    "recall": 0.625,
+                    "tn": 264,
+                    "tp": 5
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/auth.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 1.0,
+                    "f1": 1.0,
+                    "false_positive_rate": null,
+                    "fn": 0,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 36,
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "tn": 0,
+                    "tp": 36
+                  },
+                  "baseline": {
+                    "accuracy": 1.0,
+                    "f1": 1.0,
+                    "false_positive_rate": null,
+                    "fn": 0,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 36,
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "tn": 0,
+                    "tp": 36
+                  },
+                  "review": {
+                    "accuracy": 1.0,
+                    "f1": 1.0,
+                    "false_positive_rate": null,
+                    "fn": 0,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 36,
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "tn": 0,
+                    "tp": 36
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.999179366940211,
+                    "f1": 0.9995449522199831,
+                    "false_positive_rate": 0.0,
+                    "fn": 7,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 8530,
+                    "precision": 1.0,
+                    "recall": 0.999090318388564,
+                    "tn": 835,
+                    "tp": 7688
+                  },
+                  "baseline": {
+                    "accuracy": 0.999179366940211,
+                    "f1": 0.9995449522199831,
+                    "false_positive_rate": 0.0,
+                    "fn": 7,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 8530,
+                    "precision": 1.0,
+                    "recall": 0.999090318388564,
+                    "tn": 835,
+                    "tp": 7688
+                  },
+                  "review": {
+                    "accuracy": 0.999179366940211,
+                    "f1": 0.9995449522199831,
+                    "false_positive_rate": 0.0,
+                    "fn": 7,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 8530,
+                    "precision": 1.0,
+                    "recall": 0.999090318388564,
+                    "tn": 835,
+                    "tp": 7688
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9952504317789291,
+                    "f1": 0.6206896551724138,
+                    "false_positive_rate": 0.004768097095795405,
+                    "fn": 0,
+                    "fp": 11,
+                    "inference_errors": 0,
+                    "population": 2316,
+                    "precision": 0.45,
+                    "recall": 1.0,
+                    "tn": 2296,
+                    "tp": 9
+                  },
+                  "baseline": {
+                    "accuracy": 0.9952504317789291,
+                    "f1": 0.6206896551724138,
+                    "false_positive_rate": 0.004768097095795405,
+                    "fn": 0,
+                    "fp": 11,
+                    "inference_errors": 0,
+                    "population": 2316,
+                    "precision": 0.45,
+                    "recall": 1.0,
+                    "tn": 2296,
+                    "tp": 9
+                  },
+                  "review": {
+                    "accuracy": 0.9952504317789291,
+                    "f1": 0.6206896551724138,
+                    "false_positive_rate": 0.004768097095795405,
+                    "fn": 0,
+                    "fp": 11,
+                    "inference_errors": 0,
+                    "population": 2316,
+                    "precision": 0.45,
+                    "recall": 1.0,
+                    "tn": 2296,
+                    "tp": 9
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/audit/audit.log"
+              },
+              {
+                "changes": {
+                  "alert_introduced_fp": 56,
+                  "alert_new_tp": 26,
+                  "review_introduced_fp": 80,
+                  "review_new_tp": 28
+                },
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9895250135452411,
+                    "f1": 0.4727272727272727,
+                    "false_positive_rate": 0.010165184243964422,
+                    "fn": 2,
+                    "fp": 56,
+                    "inference_errors": 0,
+                    "population": 5537,
+                    "precision": 0.3170731707317073,
+                    "recall": 0.9285714285714286,
+                    "tn": 5453,
+                    "tp": 26
+                  },
+                  "baseline": {
+                    "accuracy": 0.9949431099873578,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.0,
+                    "fn": 28,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 5537,
+                    "precision": null,
+                    "recall": 0.0,
+                    "tn": 5509,
+                    "tp": 0
+                  },
+                  "review": {
+                    "accuracy": 0.9855517428210222,
+                    "f1": 0.4117647058823529,
+                    "false_positive_rate": 0.014521691777092031,
+                    "fn": 0,
+                    "fp": 80,
+                    "inference_errors": 0,
+                    "population": 5537,
+                    "precision": 0.25925925925925924,
+                    "recall": 1.0,
+                    "tn": 5429,
+                    "tp": 28
+                  }
+                },
+                "raw_member": "gather/vpn/logs/openvpn.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9994791666666667,
+                    "f1": 0.98989898989899,
+                    "false_positive_rate": 0.0005344735435595938,
+                    "fn": 0,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.98,
+                    "recall": 1.0,
+                    "tn": 1870,
+                    "tp": 49
+                  },
+                  "baseline": {
+                    "accuracy": 0.9994791666666667,
+                    "f1": 0.98989898989899,
+                    "false_positive_rate": 0.0005344735435595938,
+                    "fn": 0,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.98,
+                    "recall": 1.0,
+                    "tn": 1870,
+                    "tp": 49
+                  },
+                  "review": {
+                    "accuracy": 0.9994791666666667,
+                    "f1": 0.98989898989899,
+                    "false_positive_rate": 0.0005344735435595938,
+                    "fn": 0,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.98,
+                    "recall": 1.0,
+                    "tn": 1870,
+                    "tp": 49
+                  }
+                },
+                "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.cpu.log"
+              }
+            ],
+            "population": 295243,
+            "reason_counts": {
+              "retain_apache_or_unknown": 36,
+              "untargeted_unchanged": 289670,
+              "vpn_history_risk_review": 5537
+            },
+            "role": "previously_observed_training_development",
+            "sources": [
+              {
+                "kind": "apache_error",
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2",
+                "raw_sha256": "ff3d6815b660b87bc0576bbb7fee011d48a08c2a81d12ab83c052e98a58b281b",
+                "rows": 36,
+                "time_errors": 0,
+                "vpn_feature_sequence_sha256": null
+              },
+              {
+                "kind": "vpn",
+                "raw_member": "gather/vpn/logs/openvpn.log",
+                "raw_sha256": "08042e1ad03874326960ef3eef91a50305009cb2e7afe88827750dd839701bb1",
+                "rows": 5537,
+                "time_errors": 0,
+                "vpn_feature_sequence_sha256": "9e2acbdd40a23467caca4e25f811521a683dad6ef9f23313d6cf5903c262c3fe"
+              }
+            ],
+            "untargeted_rows_verified_unchanged": 289670
+          },
+          "santos": {
+            "baseline_probability_sha256": "46b951d1f4d06f699f64db4a9197737256aba5015990bcc791b8351976f46da3",
+            "context_rows": 5666,
+            "metrics": {
+              "alert": {
+                "accuracy": 0.9965402600210828,
+                "f1": 0.9890901342424888,
+                "false_positive_rate": 0.00030167853939318365,
+                "fn": 949,
+                "fp": 75,
+                "inference_errors": 0,
+                "population": 295976,
+                "precision": 0.9983868539350009,
+                "recall": 0.9799649545041906,
+                "tn": 248534,
+                "tp": 46418
+              },
+              "baseline": {
+                "accuracy": 0.9966348622861313,
+                "f1": 0.9893793985924504,
+                "false_positive_rate": 8.446999103009143e-05,
+                "fn": 975,
+                "fp": 21,
+                "inference_errors": 0,
+                "population": 295976,
+                "precision": 0.9995475405597569,
+                "recall": 0.9794160491481411,
+                "tn": 248588,
+                "tp": 46392
+              },
+              "review": {
+                "accuracy": 0.9964659296699733,
+                "f1": 0.9888588287923652,
+                "false_positive_rate": 0.00039821567199900245,
+                "fn": 947,
+                "fp": 99,
+                "inference_errors": 0,
+                "population": 295976,
+                "precision": 0.9978718373137858,
+                "recall": 0.9800071779931175,
+                "tn": 248510,
+                "tp": 46420
+              }
+            },
+            "per_pair": [
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9862637362637363,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.011019283746556474,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 728,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 718,
+                    "tp": 0
+                  },
+                  "baseline": {
+                    "accuracy": 0.9862637362637363,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.011019283746556474,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 728,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 718,
+                    "tp": 0
+                  },
+                  "review": {
+                    "accuracy": 0.9862637362637363,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.011019283746556474,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 728,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 718,
+                    "tp": 0
+                  }
+                },
+                "raw_member": "gather/internal_share/logs/audit/audit.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9966517573739331,
+                    "f1": 0.9881567973311093,
+                    "false_positive_rate": 1.2698896465897114e-05,
+                    "fn": 920,
+                    "fp": 3,
+                    "inference_errors": 0,
+                    "population": 275667,
+                    "precision": 0.9999220961333715,
+                    "recall": 0.9766651448282859,
+                    "tn": 236238,
+                    "tp": 38506
+                  },
+                  "baseline": {
+                    "accuracy": 0.9966517573739331,
+                    "f1": 0.9881567973311093,
+                    "false_positive_rate": 1.2698896465897114e-05,
+                    "fn": 920,
+                    "fp": 3,
+                    "inference_errors": 0,
+                    "population": 275667,
+                    "precision": 0.9999220961333715,
+                    "recall": 0.9766651448282859,
+                    "tn": 236238,
+                    "tp": 38506
+                  },
+                  "review": {
+                    "accuracy": 0.9966517573739331,
+                    "f1": 0.9881567973311093,
+                    "false_positive_rate": 1.2698896465897114e-05,
+                    "fn": 920,
+                    "fp": 3,
+                    "inference_errors": 0,
+                    "population": 275667,
+                    "precision": 0.9999220961333715,
+                    "recall": 0.9766651448282859,
+                    "tn": 236238,
+                    "tp": 38506
+                  }
+                },
+                "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9888888888888889,
+                    "f1": 0.8571428571428571,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 270,
+                    "precision": 1.0,
+                    "recall": 0.75,
+                    "tn": 258,
+                    "tp": 9
+                  },
+                  "baseline": {
+                    "accuracy": 0.9888888888888889,
+                    "f1": 0.8571428571428571,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 270,
+                    "precision": 1.0,
+                    "recall": 0.75,
+                    "tn": 258,
+                    "tp": 9
+                  },
+                  "review": {
+                    "accuracy": 0.9888888888888889,
+                    "f1": 0.8571428571428571,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 270,
+                    "precision": 1.0,
+                    "recall": 0.75,
+                    "tn": 258,
+                    "tp": 9
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/auth.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9974635383639823,
+                    "f1": 0.9984593657722429,
+                    "false_positive_rate": 0.004196642685851319,
+                    "fn": 17,
+                    "fp": 7,
+                    "inference_errors": 0,
+                    "population": 9462,
+                    "precision": 0.9991007194244604,
+                    "recall": 0.997818835001283,
+                    "tn": 1661,
+                    "tp": 7777
+                  },
+                  "baseline": {
+                    "accuracy": 0.9974635383639823,
+                    "f1": 0.9984593657722429,
+                    "false_positive_rate": 0.004196642685851319,
+                    "fn": 17,
+                    "fp": 7,
+                    "inference_errors": 0,
+                    "population": 9462,
+                    "precision": 0.9991007194244604,
+                    "recall": 0.997818835001283,
+                    "tn": 1661,
+                    "tp": 7777
+                  },
+                  "review": {
+                    "accuracy": 0.9974635383639823,
+                    "f1": 0.9984593657722429,
+                    "false_positive_rate": 0.004196642685851319,
+                    "fn": 17,
+                    "fp": 7,
+                    "inference_errors": 0,
+                    "population": 9462,
+                    "precision": 0.9991007194244604,
+                    "recall": 0.997818835001283,
+                    "tn": 1661,
+                    "tp": 7777
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log"
+              },
+              {
+                "changes": {
+                  "alert_removed_fp": 2,
+                  "review_removed_fp": 2
+                },
+                "metrics": {
+                  "alert": {
+                    "accuracy": 1.0,
+                    "f1": 1.0,
+                    "false_positive_rate": 0.0,
+                    "fn": 0,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 44,
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "tn": 2,
+                    "tp": 42
+                  },
+                  "baseline": {
+                    "accuracy": 0.9545454545454546,
+                    "f1": 0.9767441860465116,
+                    "false_positive_rate": 1.0,
+                    "fn": 0,
+                    "fp": 2,
+                    "inference_errors": 0,
+                    "population": 44,
+                    "precision": 0.9545454545454546,
+                    "recall": 1.0,
+                    "tn": 0,
+                    "tp": 42
+                  },
+                  "review": {
+                    "accuracy": 1.0,
+                    "f1": 1.0,
+                    "false_positive_rate": 0.0,
+                    "fn": 0,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 44,
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "tn": 2,
+                    "tp": 42
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9977905435262925,
+                    "f1": 0.8484848484848485,
+                    "false_positive_rate": 0.0,
+                    "fn": 5,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 2263,
+                    "precision": 1.0,
+                    "recall": 0.7368421052631579,
+                    "tn": 2244,
+                    "tp": 14
+                  },
+                  "baseline": {
+                    "accuracy": 0.9977905435262925,
+                    "f1": 0.8484848484848485,
+                    "false_positive_rate": 0.0,
+                    "fn": 5,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 2263,
+                    "precision": 1.0,
+                    "recall": 0.7368421052631579,
+                    "tn": 2244,
+                    "tp": 14
+                  },
+                  "review": {
+                    "accuracy": 0.9977905435262925,
+                    "f1": 0.8484848484848485,
+                    "false_positive_rate": 0.0,
+                    "fn": 5,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 2263,
+                    "precision": 1.0,
+                    "recall": 0.7368421052631579,
+                    "tn": 2244,
+                    "tp": 14
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/audit/audit.log"
+              },
+              {
+                "changes": {
+                  "alert_introduced_fp": 56,
+                  "alert_new_tp": 26,
+                  "review_introduced_fp": 80,
+                  "review_new_tp": 28
+                },
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9896833866951263,
+                    "f1": 0.4727272727272727,
+                    "false_positive_rate": 0.010010725777618877,
+                    "fn": 2,
+                    "fp": 56,
+                    "inference_errors": 0,
+                    "population": 5622,
+                    "precision": 0.3170731707317073,
+                    "recall": 0.9285714285714286,
+                    "tn": 5538,
+                    "tp": 26
+                  },
+                  "baseline": {
+                    "accuracy": 0.9950195659907506,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.0,
+                    "fn": 28,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 5622,
+                    "precision": null,
+                    "recall": 0.0,
+                    "tn": 5594,
+                    "tp": 0
+                  },
+                  "review": {
+                    "accuracy": 0.9857701885450018,
+                    "f1": 0.4117647058823529,
+                    "false_positive_rate": 0.014301036825169824,
+                    "fn": 0,
+                    "fp": 80,
+                    "inference_errors": 0,
+                    "population": 5622,
+                    "precision": 0.25925925925925924,
+                    "recall": 1.0,
+                    "tn": 5514,
+                    "tp": 28
+                  }
+                },
+                "raw_member": "gather/vpn/logs/openvpn.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9994791666666667,
+                    "f1": 0.9887640449438202,
+                    "false_positive_rate": 0.0005330490405117271,
+                    "fn": 0,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.9777777777777777,
+                    "recall": 1.0,
+                    "tn": 1875,
+                    "tp": 44
+                  },
+                  "baseline": {
+                    "accuracy": 0.9994791666666667,
+                    "f1": 0.9887640449438202,
+                    "false_positive_rate": 0.0005330490405117271,
+                    "fn": 0,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.9777777777777777,
+                    "recall": 1.0,
+                    "tn": 1875,
+                    "tp": 44
+                  },
+                  "review": {
+                    "accuracy": 0.9994791666666667,
+                    "f1": 0.9887640449438202,
+                    "false_positive_rate": 0.0005330490405117271,
+                    "fn": 0,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.9777777777777777,
+                    "recall": 1.0,
+                    "tn": 1875,
+                    "tp": 44
+                  }
+                },
+                "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log"
+              }
+            ],
+            "population": 295976,
+            "reason_counts": {
+              "apache_missing_directory_warning": 2,
+              "retain_apache_or_unknown": 42,
+              "untargeted_unchanged": 290310,
+              "vpn_history_risk_review": 5622
+            },
+            "role": "previously_observed_development",
+            "sources": [
+              {
+                "kind": "apache_error",
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+                "raw_sha256": "7ee7ca5fa22ff8d83c022bbaf050ec9a827c3e85f9d233442090ddd7103701f0",
+                "rows": 44,
+                "time_errors": 0,
+                "vpn_feature_sequence_sha256": null
+              },
+              {
+                "kind": "vpn",
+                "raw_member": "gather/vpn/logs/openvpn.log",
+                "raw_sha256": "f39a169c2ab4165b9848635c6e729a004bddb315f1f2f277f0341baf662e9ba7",
+                "rows": 5622,
+                "time_errors": 0,
+                "vpn_feature_sequence_sha256": "c86f45458e69ca086ffaff440a2eade81b2ef64392f3ed93e47239d31701278d"
+              }
+            ],
+            "untargeted_rows_verified_unchanged": 290310
+          }
+        },
+        "schema": "extra-error-vpn-comparison-1",
+        "sources": {
+          "scripts/f1_lab/operation_context.py": {
+            "bytes": 6473,
+            "path": "scripts/f1_lab/operation_context.py",
+            "sha256": "37cbf16d5c2982e62c4307f2b966e457213421e64d7e52fd0df926e90b3ee0c0"
+          },
+          "scripts/f1_lab/operation_refinement.py": {
+            "bytes": 4973,
+            "path": "scripts/f1_lab/operation_refinement.py",
+            "sha256": "3911de17da4ec603c08de7e4e09d12379186b2692bdb800e814a1ecf2ae695db"
+          },
+          "scripts/run_operation_refinement.py": {
+            "bytes": 12485,
+            "path": "scripts/run_operation_refinement.py",
+            "sha256": "1d8612d58cfa1a48dcf7889d2ff9fa3699ac07e5027e7d24e9f652115f7c83b6"
+          }
+        },
+        "started_at": "2026-11-13T04:46:47.118946+00:00"
+      }
+    },
+    "strict_past_retention": {
+      "receipt": {
+        "path": "runtime/f1/operation-retention-v40b-20261113/run.json",
+        "bytes": 27186,
+        "sha256": "2dbdf7b50cc652aa3140ff7afece6640e4b52d353d6c4e201ca21964c427ae82"
+      },
+      "report": {
+        "automatic_enforcement_allowed": false,
+        "aws_sdk_calls": 0,
+        "completed": true,
+        "elapsed_seconds": 191.322,
+        "ended_at": "2026-11-13T04:56:55.337300+00:00",
+        "github_pushes": 0,
+        "goal_qualified": false,
+        "labels_changed": false,
+        "models_refitted": false,
+        "paid_api_calls": 0,
+        "plan": {
+          "bytes": 2685,
+          "path": "infra/f1-lab/operation-refinement-protocol.json",
+          "sha256": "f7fd853011b6eb6d3fa07d95146e6c8e774bf13395fb027c16961eb6813ce629"
+        },
+        "policy": {
+          "alert_threshold": 0.95,
+          "equal_time_batch_withheld": true,
+          "held_risk_refreshes_expiry": false,
+          "lookback_seconds": 60,
+          "review_threshold": 0.9,
+          "scope": "physical source plus exact logged IP:port; no verified identity",
+          "strict_past": true
+        },
+        "production_adopted": false,
+        "scenarios": {
+          "fox": {
+            "baseline_probability_sha256": "8673f0c70f3aa193e9748e4bf710f28f7e3b77e439eca89012e62fca38feec1b",
+            "context_rows": 8637,
+            "metrics": {
+              "alert": {
+                "accuracy": 0.9987388131378868,
+                "f1": 0.9990768715252645,
+                "false_positive_rate": 0.000647650023164125,
+                "fn": 706,
+                "fp": 137,
+                "inference_errors": 0,
+                "population": 668418,
+                "precision": 0.9996997688000614,
+                "recall": 0.9984547500021888,
+                "tn": 211397,
+                "tp": 456178
+              },
+              "baseline": {
+                "accuracy": 0.9988255851877119,
+                "f1": 0.9991402771921563,
+                "false_positive_rate": 0.00024109599402460125,
+                "fn": 734,
+                "fp": 51,
+                "inference_errors": 0,
+                "population": 668418,
+                "precision": 0.9998882071718387,
+                "recall": 0.998393465299726,
+                "tn": 211483,
+                "tp": 456150
+              },
+              "review": {
+                "accuracy": 0.9986909389035005,
+                "f1": 0.9990418634496638,
+                "false_positive_rate": 0.0007989259409834826,
+                "fn": 706,
+                "fp": 169,
+                "inference_errors": 0,
+                "population": 668418,
+                "precision": 0.9996296677747416,
+                "recall": 0.9984547500021888,
+                "tn": 211365,
+                "tp": 456178
+              }
+            },
+            "per_pair": [
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9888641425389755,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.008928571428571428,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 898,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 888,
+                    "tp": 0
+                  },
+                  "baseline": {
+                    "accuracy": 0.9888641425389755,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.008928571428571428,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 898,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 888,
+                    "tp": 0
+                  },
+                  "review": {
+                    "accuracy": 0.9888641425389755,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.008928571428571428,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 898,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 888,
+                    "tp": 0
+                  }
+                },
+                "raw_member": "gather/internal_share/logs/audit/audit.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9971444247699329,
+                    "f1": 0.992238603626504,
+                    "false_positive_rate": 5.102509414129869e-06,
+                    "fn": 686,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 240582,
+                    "precision": 0.9999772287373335,
+                    "recall": 0.9846188340807175,
+                    "tn": 195981,
+                    "tp": 43914
+                  },
+                  "baseline": {
+                    "accuracy": 0.9971444247699329,
+                    "f1": 0.992238603626504,
+                    "false_positive_rate": 5.102509414129869e-06,
+                    "fn": 686,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 240582,
+                    "precision": 0.9999772287373335,
+                    "recall": 0.9846188340807175,
+                    "tn": 195981,
+                    "tp": 43914
+                  },
+                  "review": {
+                    "accuracy": 0.9971444247699329,
+                    "f1": 0.992238603626504,
+                    "false_positive_rate": 5.102509414129869e-06,
+                    "fn": 686,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 240582,
+                    "precision": 0.9999772287373335,
+                    "recall": 0.9846188340807175,
+                    "tn": 195981,
+                    "tp": 43914
+                  }
+                },
+                "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9947552447552448,
+                    "f1": 0.8571428571428571,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 572,
+                    "precision": 1.0,
+                    "recall": 0.75,
+                    "tn": 560,
+                    "tp": 9
+                  },
+                  "baseline": {
+                    "accuracy": 0.9947552447552448,
+                    "f1": 0.8571428571428571,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 572,
+                    "precision": 1.0,
+                    "recall": 0.75,
+                    "tn": 560,
+                    "tp": 9
+                  },
+                  "review": {
+                    "accuracy": 0.9947552447552448,
+                    "f1": 0.8571428571428571,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 572,
+                    "precision": 1.0,
+                    "recall": 0.75,
+                    "tn": 560,
+                    "tp": 9
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/auth.log"
+              },
+              {
+                "changes": {
+                  "alert_removed_fp": 2,
+                  "review_removed_fp": 2
+                },
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9970104633781763,
+                    "f1": 0.9985007496251874,
+                    "false_positive_rate": 0.0,
+                    "fn": 4,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 1338,
+                    "precision": 1.0,
+                    "recall": 0.9970059880239521,
+                    "tn": 2,
+                    "tp": 1332
+                  },
+                  "baseline": {
+                    "accuracy": 0.9955156950672646,
+                    "f1": 0.9977528089887641,
+                    "false_positive_rate": 1.0,
+                    "fn": 4,
+                    "fp": 2,
+                    "inference_errors": 0,
+                    "population": 1338,
+                    "precision": 0.9985007496251874,
+                    "recall": 0.9970059880239521,
+                    "tn": 0,
+                    "tp": 1332
+                  },
+                  "review": {
+                    "accuracy": 0.9970104633781763,
+                    "f1": 0.9985007496251874,
+                    "false_positive_rate": 0.0,
+                    "fn": 4,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 1338,
+                    "precision": 1.0,
+                    "recall": 0.9970059880239521,
+                    "tn": 2,
+                    "tp": 1332
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-error.log.1"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9999564082320632,
+                    "f1": 0.9999780938750474,
+                    "false_positive_rate": 0.005766458433445459,
+                    "fn": 6,
+                    "fp": 12,
+                    "inference_errors": 0,
+                    "population": 412922,
+                    "precision": 0.9999707920466743,
+                    "recall": 0.9999853958100579,
+                    "tn": 2069,
+                    "tp": 410835
+                  },
+                  "baseline": {
+                    "accuracy": 0.9999564082320632,
+                    "f1": 0.9999780938750474,
+                    "false_positive_rate": 0.005766458433445459,
+                    "fn": 6,
+                    "fp": 12,
+                    "inference_errors": 0,
+                    "population": 412922,
+                    "precision": 0.9999707920466743,
+                    "recall": 0.9999853958100579,
+                    "tn": 2069,
+                    "tp": 410835
+                  },
+                  "review": {
+                    "accuracy": 0.9999564082320632,
+                    "f1": 0.9999780938750474,
+                    "false_positive_rate": 0.005766458433445459,
+                    "fn": 6,
+                    "fp": 12,
+                    "inference_errors": 0,
+                    "population": 412922,
+                    "precision": 0.9999707920466743,
+                    "recall": 0.9999853958100579,
+                    "tn": 2069,
+                    "tp": 410835
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9892622099064773,
+                    "f1": 0.4745762711864407,
+                    "false_positive_rate": 0.00906555090655509,
+                    "fn": 5,
+                    "fp": 26,
+                    "inference_errors": 0,
+                    "population": 2887,
+                    "precision": 0.35,
+                    "recall": 0.7368421052631579,
+                    "tn": 2842,
+                    "tp": 14
+                  },
+                  "baseline": {
+                    "accuracy": 0.9892622099064773,
+                    "f1": 0.4745762711864407,
+                    "false_positive_rate": 0.00906555090655509,
+                    "fn": 5,
+                    "fp": 26,
+                    "inference_errors": 0,
+                    "population": 2887,
+                    "precision": 0.35,
+                    "recall": 0.7368421052631579,
+                    "tn": 2842,
+                    "tp": 14
+                  },
+                  "review": {
+                    "accuracy": 0.9892622099064773,
+                    "f1": 0.4745762711864407,
+                    "false_positive_rate": 0.00906555090655509,
+                    "fn": 5,
+                    "fp": 26,
+                    "inference_errors": 0,
+                    "population": 2887,
+                    "precision": 0.35,
+                    "recall": 0.7368421052631579,
+                    "tn": 2842,
+                    "tp": 14
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/audit/audit.log"
+              },
+              {
+                "changes": {
+                  "alert_introduced_fp": 88,
+                  "alert_new_tp": 28,
+                  "review_introduced_fp": 120,
+                  "review_new_tp": 28
+                },
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9879435539114947,
+                    "f1": 0.3888888888888889,
+                    "false_positive_rate": 0.012102874432677761,
+                    "fn": 0,
+                    "fp": 88,
+                    "inference_errors": 0,
+                    "population": 7299,
+                    "precision": 0.2413793103448276,
+                    "recall": 1.0,
+                    "tn": 7183,
+                    "tp": 28
+                  },
+                  "baseline": {
+                    "accuracy": 0.9961638580627483,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.0,
+                    "fn": 28,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 7299,
+                    "precision": null,
+                    "recall": 0.0,
+                    "tn": 7271,
+                    "tp": 0
+                  },
+                  "review": {
+                    "accuracy": 0.9835593916974928,
+                    "f1": 0.3181818181818182,
+                    "false_positive_rate": 0.01650391968092422,
+                    "fn": 0,
+                    "fp": 120,
+                    "inference_errors": 0,
+                    "population": 7299,
+                    "precision": 0.1891891891891892,
+                    "recall": 1.0,
+                    "tn": 7151,
+                    "tp": 28
+                  }
+                },
+                "raw_member": "gather/vpn/logs/openvpn.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9989583333333333,
+                    "f1": 0.9787234042553191,
+                    "false_positive_rate": 0.0010672358591248667,
+                    "fn": 0,
+                    "fp": 2,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.9583333333333334,
+                    "recall": 1.0,
+                    "tn": 1872,
+                    "tp": 46
+                  },
+                  "baseline": {
+                    "accuracy": 0.9989583333333333,
+                    "f1": 0.9787234042553191,
+                    "false_positive_rate": 0.0010672358591248667,
+                    "fn": 0,
+                    "fp": 2,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.9583333333333334,
+                    "recall": 1.0,
+                    "tn": 1872,
+                    "tp": 46
+                  },
+                  "review": {
+                    "accuracy": 0.9989583333333333,
+                    "f1": 0.9787234042553191,
+                    "false_positive_rate": 0.0010672358591248667,
+                    "fn": 0,
+                    "fp": 2,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.9583333333333334,
+                    "recall": 1.0,
+                    "tn": 1872,
+                    "tp": 46
+                  }
+                },
+                "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-18-system.cpu.log"
+              }
+            ],
+            "population": 668418,
+            "reason_counts": {
+              "apache_missing_directory_warning": 2,
+              "retain_apache_or_unknown": 1336,
+              "untargeted_unchanged": 659781,
+              "vpn_history_risk_review": 7291,
+              "vpn_strict_past_risk_retained": 8
+            },
+            "role": "predeclared_calibration_only",
+            "sources": [
+              {
+                "kind": "apache_error",
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-error.log.1",
+                "raw_sha256": "3894781e6dadce252675d741e461109a937822850d4714204c52a50479205f2d",
+                "rows": 1338,
+                "time_errors": 0,
+                "vpn_feature_sequence_sha256": null
+              },
+              {
+                "kind": "vpn",
+                "raw_member": "gather/vpn/logs/openvpn.log",
+                "raw_sha256": "dc8357ad1a2a4ce9e8963f1eb5eaccdfc106d32de5ae720d052956cedc618722",
+                "rows": 7299,
+                "time_errors": 0,
+                "vpn_feature_sequence_sha256": "2e2415be4cdf3575533385c9306500e46c4f95020c7b7f276f33c4718c0f959d"
+              }
+            ],
+            "stateless_metrics": {
+              "alert": {
+                "accuracy": 0.998744797417185,
+                "f1": 0.9990812436828659,
+                "false_positive_rate": 0.0006192857885729953,
+                "fn": 708,
+                "fp": 131,
+                "inference_errors": 0,
+                "population": 668418,
+                "precision": 0.999712912578593,
+                "recall": 0.9984503725234414,
+                "tn": 211403,
+                "tp": 456176
+              },
+              "baseline": {
+                "accuracy": 0.9988255851877119,
+                "f1": 0.9991402771921563,
+                "false_positive_rate": 0.00024109599402460125,
+                "fn": 734,
+                "fp": 51,
+                "inference_errors": 0,
+                "population": 668418,
+                "precision": 0.9998882071718387,
+                "recall": 0.998393465299726,
+                "tn": 211483,
+                "tp": 456150
+              },
+              "review": {
+                "accuracy": 0.9986909389035005,
+                "f1": 0.9990418634496638,
+                "false_positive_rate": 0.0007989259409834826,
+                "fn": 706,
+                "fp": 169,
+                "inference_errors": 0,
+                "population": 668418,
+                "precision": 0.9996296677747416,
+                "recall": 0.9984547500021888,
+                "tn": 211365,
+                "tp": 456178
+              }
+            },
+            "untargeted_rows_verified_unchanged": 659781
+          },
+          "russellmitchell": {
+            "baseline_probability_sha256": "4593c1dfe7267debcb9047261bac0a9982137905061f9cfd297c7aa8e0fe8fc5",
+            "context_rows": 5573,
+            "metrics": {
+              "alert": {
+                "accuracy": 0.9963216740108995,
+                "f1": 0.991156927887434,
+                "false_positive_rate": 0.0003642113111178716,
+                "fn": 1001,
+                "fp": 85,
+                "inference_errors": 0,
+                "population": 295243,
+                "precision": 0.9986053227447248,
+                "recall": 0.9838188225404934,
+                "tn": 233296,
+                "tp": 60861
+              },
+              "baseline": {
+                "accuracy": 0.9964300593070793,
+                "f1": 0.9914113428943937,
+                "false_positive_rate": 0.00010712097385819754,
+                "fn": 1029,
+                "fp": 25,
+                "inference_errors": 0,
+                "population": 295243,
+                "precision": 0.9995892076637418,
+                "recall": 0.9833662021919757,
+                "tn": 233356,
+                "tp": 60833
+              },
+              "review": {
+                "accuracy": 0.9962539332007871,
+                "f1": 0.9909955384765688,
+                "false_positive_rate": 0.00044990809020442965,
+                "fn": 1001,
+                "fp": 105,
+                "inference_errors": 0,
+                "population": 295243,
+                "precision": 0.9982777285700226,
+                "recall": 0.9838188225404934,
+                "tn": 233276,
+                "tp": 60861
+              }
+            },
+            "per_pair": [
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9863387978142076,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.010958904109589041,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 732,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 722,
+                    "tp": 0
+                  },
+                  "baseline": {
+                    "accuracy": 0.9863387978142076,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.010958904109589041,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 732,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 722,
+                    "tp": 0
+                  },
+                  "review": {
+                    "accuracy": 0.9863387978142076,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.010958904109589041,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 732,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 722,
+                    "tp": 0
+                  }
+                },
+                "raw_member": "gather/internal_share/logs/audit/audit.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9963972453787604,
+                    "f1": 0.9907177408811609,
+                    "false_positive_rate": 2.2536226984878192e-05,
+                    "fn": 989,
+                    "fp": 5,
+                    "inference_errors": 0,
+                    "population": 275900,
+                    "precision": 0.9999057510697253,
+                    "recall": 0.9816970482094939,
+                    "tn": 221860,
+                    "tp": 53046
+                  },
+                  "baseline": {
+                    "accuracy": 0.9963972453787604,
+                    "f1": 0.9907177408811609,
+                    "false_positive_rate": 2.2536226984878192e-05,
+                    "fn": 989,
+                    "fp": 5,
+                    "inference_errors": 0,
+                    "population": 275900,
+                    "precision": 0.9999057510697253,
+                    "recall": 0.9816970482094939,
+                    "tn": 221860,
+                    "tp": 53046
+                  },
+                  "review": {
+                    "accuracy": 0.9963972453787604,
+                    "f1": 0.9907177408811609,
+                    "false_positive_rate": 2.2536226984878192e-05,
+                    "fn": 989,
+                    "fp": 5,
+                    "inference_errors": 0,
+                    "population": 275900,
+                    "precision": 0.9999057510697253,
+                    "recall": 0.9816970482094939,
+                    "tn": 221860,
+                    "tp": 53046
+                  }
+                },
+                "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9889705882352942,
+                    "f1": 0.7692307692307693,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 272,
+                    "precision": 1.0,
+                    "recall": 0.625,
+                    "tn": 264,
+                    "tp": 5
+                  },
+                  "baseline": {
+                    "accuracy": 0.9889705882352942,
+                    "f1": 0.7692307692307693,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 272,
+                    "precision": 1.0,
+                    "recall": 0.625,
+                    "tn": 264,
+                    "tp": 5
+                  },
+                  "review": {
+                    "accuracy": 0.9889705882352942,
+                    "f1": 0.7692307692307693,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 272,
+                    "precision": 1.0,
+                    "recall": 0.625,
+                    "tn": 264,
+                    "tp": 5
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/auth.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 1.0,
+                    "f1": 1.0,
+                    "false_positive_rate": null,
+                    "fn": 0,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 36,
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "tn": 0,
+                    "tp": 36
+                  },
+                  "baseline": {
+                    "accuracy": 1.0,
+                    "f1": 1.0,
+                    "false_positive_rate": null,
+                    "fn": 0,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 36,
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "tn": 0,
+                    "tp": 36
+                  },
+                  "review": {
+                    "accuracy": 1.0,
+                    "f1": 1.0,
+                    "false_positive_rate": null,
+                    "fn": 0,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 36,
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "tn": 0,
+                    "tp": 36
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.999179366940211,
+                    "f1": 0.9995449522199831,
+                    "false_positive_rate": 0.0,
+                    "fn": 7,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 8530,
+                    "precision": 1.0,
+                    "recall": 0.999090318388564,
+                    "tn": 835,
+                    "tp": 7688
+                  },
+                  "baseline": {
+                    "accuracy": 0.999179366940211,
+                    "f1": 0.9995449522199831,
+                    "false_positive_rate": 0.0,
+                    "fn": 7,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 8530,
+                    "precision": 1.0,
+                    "recall": 0.999090318388564,
+                    "tn": 835,
+                    "tp": 7688
+                  },
+                  "review": {
+                    "accuracy": 0.999179366940211,
+                    "f1": 0.9995449522199831,
+                    "false_positive_rate": 0.0,
+                    "fn": 7,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 8530,
+                    "precision": 1.0,
+                    "recall": 0.999090318388564,
+                    "tn": 835,
+                    "tp": 7688
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9952504317789291,
+                    "f1": 0.6206896551724138,
+                    "false_positive_rate": 0.004768097095795405,
+                    "fn": 0,
+                    "fp": 11,
+                    "inference_errors": 0,
+                    "population": 2316,
+                    "precision": 0.45,
+                    "recall": 1.0,
+                    "tn": 2296,
+                    "tp": 9
+                  },
+                  "baseline": {
+                    "accuracy": 0.9952504317789291,
+                    "f1": 0.6206896551724138,
+                    "false_positive_rate": 0.004768097095795405,
+                    "fn": 0,
+                    "fp": 11,
+                    "inference_errors": 0,
+                    "population": 2316,
+                    "precision": 0.45,
+                    "recall": 1.0,
+                    "tn": 2296,
+                    "tp": 9
+                  },
+                  "review": {
+                    "accuracy": 0.9952504317789291,
+                    "f1": 0.6206896551724138,
+                    "false_positive_rate": 0.004768097095795405,
+                    "fn": 0,
+                    "fp": 11,
+                    "inference_errors": 0,
+                    "population": 2316,
+                    "precision": 0.45,
+                    "recall": 1.0,
+                    "tn": 2296,
+                    "tp": 9
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/audit/audit.log"
+              },
+              {
+                "changes": {
+                  "alert_introduced_fp": 60,
+                  "alert_new_tp": 28,
+                  "review_introduced_fp": 80,
+                  "review_new_tp": 28
+                },
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9891638071157667,
+                    "f1": 0.4827586206896552,
+                    "false_positive_rate": 0.010891268832819023,
+                    "fn": 0,
+                    "fp": 60,
+                    "inference_errors": 0,
+                    "population": 5537,
+                    "precision": 0.3181818181818182,
+                    "recall": 1.0,
+                    "tn": 5449,
+                    "tp": 28
+                  },
+                  "baseline": {
+                    "accuracy": 0.9949431099873578,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.0,
+                    "fn": 28,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 5537,
+                    "precision": null,
+                    "recall": 0.0,
+                    "tn": 5509,
+                    "tp": 0
+                  },
+                  "review": {
+                    "accuracy": 0.9855517428210222,
+                    "f1": 0.4117647058823529,
+                    "false_positive_rate": 0.014521691777092031,
+                    "fn": 0,
+                    "fp": 80,
+                    "inference_errors": 0,
+                    "population": 5537,
+                    "precision": 0.25925925925925924,
+                    "recall": 1.0,
+                    "tn": 5429,
+                    "tp": 28
+                  }
+                },
+                "raw_member": "gather/vpn/logs/openvpn.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9994791666666667,
+                    "f1": 0.98989898989899,
+                    "false_positive_rate": 0.0005344735435595938,
+                    "fn": 0,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.98,
+                    "recall": 1.0,
+                    "tn": 1870,
+                    "tp": 49
+                  },
+                  "baseline": {
+                    "accuracy": 0.9994791666666667,
+                    "f1": 0.98989898989899,
+                    "false_positive_rate": 0.0005344735435595938,
+                    "fn": 0,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.98,
+                    "recall": 1.0,
+                    "tn": 1870,
+                    "tp": 49
+                  },
+                  "review": {
+                    "accuracy": 0.9994791666666667,
+                    "f1": 0.98989898989899,
+                    "false_positive_rate": 0.0005344735435595938,
+                    "fn": 0,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.98,
+                    "recall": 1.0,
+                    "tn": 1870,
+                    "tp": 49
+                  }
+                },
+                "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.cpu.log"
+              }
+            ],
+            "population": 295243,
+            "reason_counts": {
+              "retain_apache_or_unknown": 36,
+              "untargeted_unchanged": 289670,
+              "vpn_history_risk_review": 5531,
+              "vpn_strict_past_risk_retained": 6
+            },
+            "role": "previously_observed_training_development",
+            "sources": [
+              {
+                "kind": "apache_error",
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2",
+                "raw_sha256": "ff3d6815b660b87bc0576bbb7fee011d48a08c2a81d12ab83c052e98a58b281b",
+                "rows": 36,
+                "time_errors": 0,
+                "vpn_feature_sequence_sha256": null
+              },
+              {
+                "kind": "vpn",
+                "raw_member": "gather/vpn/logs/openvpn.log",
+                "raw_sha256": "08042e1ad03874326960ef3eef91a50305009cb2e7afe88827750dd839701bb1",
+                "rows": 5537,
+                "time_errors": 0,
+                "vpn_feature_sequence_sha256": "9e2acbdd40a23467caca4e25f811521a683dad6ef9f23313d6cf5903c262c3fe"
+              }
+            ],
+            "stateless_metrics": {
+              "alert": {
+                "accuracy": 0.9963284480919107,
+                "f1": 0.9911727822022443,
+                "false_positive_rate": 0.00034707195530056,
+                "fn": 1003,
+                "fp": 81,
+                "inference_errors": 0,
+                "population": 295243,
+                "precision": 0.9986708237610765,
+                "recall": 0.9837864925155992,
+                "tn": 233300,
+                "tp": 60859
+              },
+              "baseline": {
+                "accuracy": 0.9964300593070793,
+                "f1": 0.9914113428943937,
+                "false_positive_rate": 0.00010712097385819754,
+                "fn": 1029,
+                "fp": 25,
+                "inference_errors": 0,
+                "population": 295243,
+                "precision": 0.9995892076637418,
+                "recall": 0.9833662021919757,
+                "tn": 233356,
+                "tp": 60833
+              },
+              "review": {
+                "accuracy": 0.9962539332007871,
+                "f1": 0.9909955384765688,
+                "false_positive_rate": 0.00044990809020442965,
+                "fn": 1001,
+                "fp": 105,
+                "inference_errors": 0,
+                "population": 295243,
+                "precision": 0.9982777285700226,
+                "recall": 0.9838188225404934,
+                "tn": 233276,
+                "tp": 60861
+              }
+            },
+            "untargeted_rows_verified_unchanged": 289670
+          },
+          "santos": {
+            "baseline_probability_sha256": "46b951d1f4d06f699f64db4a9197737256aba5015990bcc791b8351976f46da3",
+            "context_rows": 5666,
+            "metrics": {
+              "alert": {
+                "accuracy": 0.9965335027164365,
+                "f1": 0.9890695246415102,
+                "false_positive_rate": 0.0003177680614941535,
+                "fn": 947,
+                "fp": 79,
+                "inference_errors": 0,
+                "population": 295976,
+                "precision": 0.9983010387320157,
+                "recall": 0.9800071779931175,
+                "tn": 248530,
+                "tp": 46420
+              },
+              "baseline": {
+                "accuracy": 0.9966348622861313,
+                "f1": 0.9893793985924504,
+                "false_positive_rate": 8.446999103009143e-05,
+                "fn": 975,
+                "fp": 21,
+                "inference_errors": 0,
+                "population": 295976,
+                "precision": 0.9995475405597569,
+                "recall": 0.9794160491481411,
+                "tn": 248588,
+                "tp": 46392
+              },
+              "review": {
+                "accuracy": 0.9964659296699733,
+                "f1": 0.9888588287923652,
+                "false_positive_rate": 0.00039821567199900245,
+                "fn": 947,
+                "fp": 99,
+                "inference_errors": 0,
+                "population": 295976,
+                "precision": 0.9978718373137858,
+                "recall": 0.9800071779931175,
+                "tn": 248510,
+                "tp": 46420
+              }
+            },
+            "per_pair": [
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9862637362637363,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.011019283746556474,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 728,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 718,
+                    "tp": 0
+                  },
+                  "baseline": {
+                    "accuracy": 0.9862637362637363,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.011019283746556474,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 728,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 718,
+                    "tp": 0
+                  },
+                  "review": {
+                    "accuracy": 0.9862637362637363,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.011019283746556474,
+                    "fn": 2,
+                    "fp": 8,
+                    "inference_errors": 0,
+                    "population": 728,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "tn": 718,
+                    "tp": 0
+                  }
+                },
+                "raw_member": "gather/internal_share/logs/audit/audit.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9966517573739331,
+                    "f1": 0.9881567973311093,
+                    "false_positive_rate": 1.2698896465897114e-05,
+                    "fn": 920,
+                    "fp": 3,
+                    "inference_errors": 0,
+                    "population": 275667,
+                    "precision": 0.9999220961333715,
+                    "recall": 0.9766651448282859,
+                    "tn": 236238,
+                    "tp": 38506
+                  },
+                  "baseline": {
+                    "accuracy": 0.9966517573739331,
+                    "f1": 0.9881567973311093,
+                    "false_positive_rate": 1.2698896465897114e-05,
+                    "fn": 920,
+                    "fp": 3,
+                    "inference_errors": 0,
+                    "population": 275667,
+                    "precision": 0.9999220961333715,
+                    "recall": 0.9766651448282859,
+                    "tn": 236238,
+                    "tp": 38506
+                  },
+                  "review": {
+                    "accuracy": 0.9966517573739331,
+                    "f1": 0.9881567973311093,
+                    "false_positive_rate": 1.2698896465897114e-05,
+                    "fn": 920,
+                    "fp": 3,
+                    "inference_errors": 0,
+                    "population": 275667,
+                    "precision": 0.9999220961333715,
+                    "recall": 0.9766651448282859,
+                    "tn": 236238,
+                    "tp": 38506
+                  }
+                },
+                "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9888888888888889,
+                    "f1": 0.8571428571428571,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 270,
+                    "precision": 1.0,
+                    "recall": 0.75,
+                    "tn": 258,
+                    "tp": 9
+                  },
+                  "baseline": {
+                    "accuracy": 0.9888888888888889,
+                    "f1": 0.8571428571428571,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 270,
+                    "precision": 1.0,
+                    "recall": 0.75,
+                    "tn": 258,
+                    "tp": 9
+                  },
+                  "review": {
+                    "accuracy": 0.9888888888888889,
+                    "f1": 0.8571428571428571,
+                    "false_positive_rate": 0.0,
+                    "fn": 3,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 270,
+                    "precision": 1.0,
+                    "recall": 0.75,
+                    "tn": 258,
+                    "tp": 9
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/auth.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9974635383639823,
+                    "f1": 0.9984593657722429,
+                    "false_positive_rate": 0.004196642685851319,
+                    "fn": 17,
+                    "fp": 7,
+                    "inference_errors": 0,
+                    "population": 9462,
+                    "precision": 0.9991007194244604,
+                    "recall": 0.997818835001283,
+                    "tn": 1661,
+                    "tp": 7777
+                  },
+                  "baseline": {
+                    "accuracy": 0.9974635383639823,
+                    "f1": 0.9984593657722429,
+                    "false_positive_rate": 0.004196642685851319,
+                    "fn": 17,
+                    "fp": 7,
+                    "inference_errors": 0,
+                    "population": 9462,
+                    "precision": 0.9991007194244604,
+                    "recall": 0.997818835001283,
+                    "tn": 1661,
+                    "tp": 7777
+                  },
+                  "review": {
+                    "accuracy": 0.9974635383639823,
+                    "f1": 0.9984593657722429,
+                    "false_positive_rate": 0.004196642685851319,
+                    "fn": 17,
+                    "fp": 7,
+                    "inference_errors": 0,
+                    "population": 9462,
+                    "precision": 0.9991007194244604,
+                    "recall": 0.997818835001283,
+                    "tn": 1661,
+                    "tp": 7777
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log"
+              },
+              {
+                "changes": {
+                  "alert_removed_fp": 2,
+                  "review_removed_fp": 2
+                },
+                "metrics": {
+                  "alert": {
+                    "accuracy": 1.0,
+                    "f1": 1.0,
+                    "false_positive_rate": 0.0,
+                    "fn": 0,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 44,
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "tn": 2,
+                    "tp": 42
+                  },
+                  "baseline": {
+                    "accuracy": 0.9545454545454546,
+                    "f1": 0.9767441860465116,
+                    "false_positive_rate": 1.0,
+                    "fn": 0,
+                    "fp": 2,
+                    "inference_errors": 0,
+                    "population": 44,
+                    "precision": 0.9545454545454546,
+                    "recall": 1.0,
+                    "tn": 0,
+                    "tp": 42
+                  },
+                  "review": {
+                    "accuracy": 1.0,
+                    "f1": 1.0,
+                    "false_positive_rate": 0.0,
+                    "fn": 0,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 44,
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "tn": 2,
+                    "tp": 42
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9977905435262925,
+                    "f1": 0.8484848484848485,
+                    "false_positive_rate": 0.0,
+                    "fn": 5,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 2263,
+                    "precision": 1.0,
+                    "recall": 0.7368421052631579,
+                    "tn": 2244,
+                    "tp": 14
+                  },
+                  "baseline": {
+                    "accuracy": 0.9977905435262925,
+                    "f1": 0.8484848484848485,
+                    "false_positive_rate": 0.0,
+                    "fn": 5,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 2263,
+                    "precision": 1.0,
+                    "recall": 0.7368421052631579,
+                    "tn": 2244,
+                    "tp": 14
+                  },
+                  "review": {
+                    "accuracy": 0.9977905435262925,
+                    "f1": 0.8484848484848485,
+                    "false_positive_rate": 0.0,
+                    "fn": 5,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 2263,
+                    "precision": 1.0,
+                    "recall": 0.7368421052631579,
+                    "tn": 2244,
+                    "tp": 14
+                  }
+                },
+                "raw_member": "gather/intranet_server/logs/audit/audit.log"
+              },
+              {
+                "changes": {
+                  "alert_introduced_fp": 60,
+                  "alert_new_tp": 28,
+                  "review_introduced_fp": 80,
+                  "review_new_tp": 28
+                },
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9893276414087513,
+                    "f1": 0.4827586206896552,
+                    "false_positive_rate": 0.010725777618877368,
+                    "fn": 0,
+                    "fp": 60,
+                    "inference_errors": 0,
+                    "population": 5622,
+                    "precision": 0.3181818181818182,
+                    "recall": 1.0,
+                    "tn": 5534,
+                    "tp": 28
+                  },
+                  "baseline": {
+                    "accuracy": 0.9950195659907506,
+                    "f1": 0.0,
+                    "false_positive_rate": 0.0,
+                    "fn": 28,
+                    "fp": 0,
+                    "inference_errors": 0,
+                    "population": 5622,
+                    "precision": null,
+                    "recall": 0.0,
+                    "tn": 5594,
+                    "tp": 0
+                  },
+                  "review": {
+                    "accuracy": 0.9857701885450018,
+                    "f1": 0.4117647058823529,
+                    "false_positive_rate": 0.014301036825169824,
+                    "fn": 0,
+                    "fp": 80,
+                    "inference_errors": 0,
+                    "population": 5622,
+                    "precision": 0.25925925925925924,
+                    "recall": 1.0,
+                    "tn": 5514,
+                    "tp": 28
+                  }
+                },
+                "raw_member": "gather/vpn/logs/openvpn.log"
+              },
+              {
+                "changes": {},
+                "metrics": {
+                  "alert": {
+                    "accuracy": 0.9994791666666667,
+                    "f1": 0.9887640449438202,
+                    "false_positive_rate": 0.0005330490405117271,
+                    "fn": 0,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.9777777777777777,
+                    "recall": 1.0,
+                    "tn": 1875,
+                    "tp": 44
+                  },
+                  "baseline": {
+                    "accuracy": 0.9994791666666667,
+                    "f1": 0.9887640449438202,
+                    "false_positive_rate": 0.0005330490405117271,
+                    "fn": 0,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.9777777777777777,
+                    "recall": 1.0,
+                    "tn": 1875,
+                    "tp": 44
+                  },
+                  "review": {
+                    "accuracy": 0.9994791666666667,
+                    "f1": 0.9887640449438202,
+                    "false_positive_rate": 0.0005330490405117271,
+                    "fn": 0,
+                    "fp": 1,
+                    "inference_errors": 0,
+                    "population": 1920,
+                    "precision": 0.9777777777777777,
+                    "recall": 1.0,
+                    "tn": 1875,
+                    "tp": 44
+                  }
+                },
+                "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log"
+              }
+            ],
+            "population": 295976,
+            "reason_counts": {
+              "apache_missing_directory_warning": 2,
+              "retain_apache_or_unknown": 42,
+              "untargeted_unchanged": 290310,
+              "vpn_history_risk_review": 5616,
+              "vpn_strict_past_risk_retained": 6
+            },
+            "role": "previously_observed_development",
+            "sources": [
+              {
+                "kind": "apache_error",
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+                "raw_sha256": "7ee7ca5fa22ff8d83c022bbaf050ec9a827c3e85f9d233442090ddd7103701f0",
+                "rows": 44,
+                "time_errors": 0,
+                "vpn_feature_sequence_sha256": null
+              },
+              {
+                "kind": "vpn",
+                "raw_member": "gather/vpn/logs/openvpn.log",
+                "raw_sha256": "f39a169c2ab4165b9848635c6e729a004bddb315f1f2f277f0341baf662e9ba7",
+                "rows": 5622,
+                "time_errors": 0,
+                "vpn_feature_sequence_sha256": "c86f45458e69ca086ffaff440a2eade81b2ef64392f3ed93e47239d31701278d"
+              }
+            ],
+            "stateless_metrics": {
+              "alert": {
+                "accuracy": 0.9965402600210828,
+                "f1": 0.9890901342424888,
+                "false_positive_rate": 0.00030167853939318365,
+                "fn": 949,
+                "fp": 75,
+                "inference_errors": 0,
+                "population": 295976,
+                "precision": 0.9983868539350009,
+                "recall": 0.9799649545041906,
+                "tn": 248534,
+                "tp": 46418
+              },
+              "baseline": {
+                "accuracy": 0.9966348622861313,
+                "f1": 0.9893793985924504,
+                "false_positive_rate": 8.446999103009143e-05,
+                "fn": 975,
+                "fp": 21,
+                "inference_errors": 0,
+                "population": 295976,
+                "precision": 0.9995475405597569,
+                "recall": 0.9794160491481411,
+                "tn": 248588,
+                "tp": 46392
+              },
+              "review": {
+                "accuracy": 0.9964659296699733,
+                "f1": 0.9888588287923652,
+                "false_positive_rate": 0.00039821567199900245,
+                "fn": 947,
+                "fp": 99,
+                "inference_errors": 0,
+                "population": 295976,
+                "precision": 0.9978718373137858,
+                "recall": 0.9800071779931175,
+                "tn": 248510,
+                "tp": 46420
+              }
+            },
+            "untargeted_rows_verified_unchanged": 290310
+          }
+        },
+        "schema": "extra-causal-vpn-retention-comparison-1",
+        "sources": {
+          "scripts/f1_lab/operation_context.py": {
+            "bytes": 6473,
+            "path": "scripts/f1_lab/operation_context.py",
+            "sha256": "37cbf16d5c2982e62c4307f2b966e457213421e64d7e52fd0df926e90b3ee0c0"
+          },
+          "scripts/f1_lab/operation_refinement.py": {
+            "bytes": 4973,
+            "path": "scripts/f1_lab/operation_refinement.py",
+            "sha256": "3911de17da4ec603c08de7e4e09d12379186b2692bdb800e814a1ecf2ae695db"
+          },
+          "scripts/f1_lab/vpn_context.py": {
+            "bytes": 5371,
+            "path": "scripts/f1_lab/vpn_context.py",
+            "sha256": "315f223ebedcde010097d4c05bf2991fb703f629ba7cce441257f1bf58dd854a"
+          },
+          "scripts/f1_lab/vpn_risk_retention.py": {
+            "bytes": 4460,
+            "path": "scripts/f1_lab/vpn_risk_retention.py",
+            "sha256": "a251d71806ce13d2eca38505ff4aa0cec56b371c81d96485dd48b61f9db9b234"
+          },
+          "scripts/run_operation_refinement.py": {
+            "bytes": 12485,
+            "path": "scripts/run_operation_refinement.py",
+            "sha256": "1d8612d58cfa1a48dcf7889d2ff9fa3699ac07e5027e7d24e9f652115f7c83b6"
+          },
+          "scripts/run_vpn_risk_retention.py": {
+            "bytes": 6781,
+            "path": "scripts/run_vpn_risk_retention.py",
+            "sha256": "27fa39d5e84c03108fd6b02e8fe448912484896fc2468a3ccbf4346617524f8a"
+          }
+        },
+        "started_at": "2026-11-13T04:53:44.013410+00:00",
+        "stateless_run": {
+          "bytes": 24044,
+          "path": "runtime/f1/operation-refinement-v40-20261113/run.json",
+          "sha256": "87136d908635bfcb891c7ed4c1373db24be93185358e21b92c961f685674da2c"
+        }
+      }
+    }
+  },
+  "tests": {
+    "base_full": {
+      "receipt": {
+        "path": "runtime/f1/stream-tests-v40-20261113/tests.json",
+        "bytes": 1079,
+        "sha256": "ca03938f1eb399de474223b513ce6c2565a8fcac9c2986c270208e6d5219352a"
+      },
+      "report": {
+        "schema": "extra-local-stream-validation-tests-1",
+        "started_at": "2026-11-13T04:46:57.276962+00:00",
+        "paid_api_calls": 0,
+        "aws_sdk_calls": 0,
+        "github_pushes": 0,
+        "windows": {
+          "exit_code": 0,
+          "seconds": 179.368,
+          "counts": {
+            "passed": 714
+          },
+          "log": "runtime/f1/stream-tests-v40-20261113/windows.log"
+        },
+        "linux": {
+          "exit_code": 0,
+          "seconds": 456.605,
+          "counts": {
+            "passed": 3534
+          },
+          "log": "runtime/f1/stream-tests-v40-20261113/linux.log",
+          "executed": true,
+          "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+          "source_files": 699,
+          "source_archive_sha256": "8556eff2ba57f279762765033a6fca70f97bc2db380a4b618e8b41134337eb66",
+          "container_exit": 0,
+          "oom_killed": false,
+          "network_mode": "none",
+          "owned_container": "e63d6c13d296f3aa83f2d85625a3c7f01b75a7d313f4fe0c9ef716ad54e1b57b",
+          "snapshot_sources_unchanged_after": true,
+          "owned_container_removed": true
+        },
+        "ended_at": "2026-11-13T04:58:10.680411+00:00"
+      }
+    },
+    "extension_targeted": {
+      "receipt": {
+        "path": "runtime/f1/retention-tests-v40c-20261113/tests.json",
+        "bytes": 1080,
+        "sha256": "df19521d86f0741db46d867bc82c5037e41accc862156015ec25fb6290be9af9"
+      },
+      "report": {
+        "schema": "extra-local-stream-validation-tests-1",
+        "started_at": "2026-11-13T04:59:51.866200+00:00",
+        "paid_api_calls": 0,
+        "aws_sdk_calls": 0,
+        "github_pushes": 0,
+        "windows": {
+          "exit_code": 0,
+          "seconds": 3.147,
+          "counts": {
+            "passed": 47
+          },
+          "log": "runtime/f1/retention-tests-v40c-20261113/windows.log"
+        },
+        "linux": {
+          "exit_code": 0,
+          "seconds": 4.775,
+          "counts": {
+            "passed": 47
+          },
+          "log": "runtime/f1/retention-tests-v40c-20261113/linux.log",
+          "executed": true,
+          "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+          "source_files": 704,
+          "source_archive_sha256": "7c01fd1b5311425001018ee20f23f11aebe0b8cb98066bdd972ad66fcc0b2860",
+          "container_exit": 0,
+          "oom_killed": false,
+          "network_mode": "none",
+          "owned_container": "646a291604ebae9ef7e8cd75c0f73f09789f07f491e3d11216da7243c775dc22",
+          "snapshot_sources_unchanged_after": true,
+          "owned_container_removed": true
+        },
+        "ended_at": "2026-11-13T05:00:07.512674+00:00"
+      }
+    },
+    "note": "Separate snapshots. Targeted 47 overlaps 32 cases already in the full run; do not add counts as a single suite.",
+    "extension_initial_targeted": {
+      "receipt": {
+        "path": "runtime/f1/retention-tests-v40b-20261113/tests.json",
+        "bytes": 1080,
+        "sha256": "24613afca83159ad985f32ae24ef863a9b0f3db7f9949896d66519cc7f7191d2"
+      },
+      "report": {
+        "schema": "extra-local-stream-validation-tests-1",
+        "started_at": "2026-11-13T04:54:35.991158+00:00",
+        "paid_api_calls": 0,
+        "aws_sdk_calls": 0,
+        "github_pushes": 0,
+        "windows": {
+          "exit_code": 0,
+          "seconds": 2.506,
+          "counts": {
+            "passed": 47
+          },
+          "log": "runtime/f1/retention-tests-v40b-20261113/windows.log"
+        },
+        "linux": {
+          "exit_code": 0,
+          "seconds": 4.704,
+          "counts": {
+            "passed": 47
+          },
+          "log": "runtime/f1/retention-tests-v40b-20261113/linux.log",
+          "executed": true,
+          "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+          "source_files": 702,
+          "source_archive_sha256": "824e9ce9183745beeec7782dde03ba3c8c4dd68570731b70314f1df50667c5fe",
+          "container_exit": 0,
+          "oom_killed": false,
+          "network_mode": "none",
+          "owned_container": "3efbccdbc5cf13fdfbdcc3dac5bd632b6ece58499a196a29a3d5adeafa38102b",
+          "snapshot_sources_unchanged_after": true,
+          "owned_container_removed": true
+        },
+        "ended_at": "2026-11-13T04:54:50.715178+00:00"
+      }
+    }
+  },
+  "limitations": [
+    "VPN precision remains approximately 24-32%; review only, not auto-enforcement.",
+    "Risk retention raises normal false alarms; aggregate micro F1 decreases versus v39.",
+    "Apache each S/Fox has only two normal rows, correlated warnings. Zero observed FP is not proof of general zero FPR.",
+    "R/S/Fox have been repeatedly observed; physical log rows are not independent attacks/sessions.",
+    "VPN empirical weighted scores are not calibrated probabilities or identity/authority proof.",
+    "Exact logged source+IP:port is not cryptographic identity; NAT/port reuse can mix activity within the bounded window.",
+    "Original six-domain independent evaluation remains incomplete."
+  ],
+  "final_verification": {
+    "all_new_code_matches_final_targeted_linux_snapshot": true,
+    "base_implementation_matches_full_linux_snapshot": true,
+    "base_test_eof_only_normalized_after_full_run": true,
+    "documentation_updated_after_test_snapshots": true,
+    "local_markdown_file_links_resolve": true,
+    "frozen_model_bytes_unchanged": true,
+    "original_app_benchmark_unchanged": true,
+    "owned_f1_containers_remaining": 0
+  }
+}

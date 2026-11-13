@@ -1,0 +1,564 @@
+{
+  "schema": "extra-vpn-history-v32-1",
+  "recorded_at": "2026-11-12T06:55:44.182193+00:00",
+  "branch": "extra",
+  "prior_commit": "49b87a42f5346705abe6ed3c79345c3b6a134c94",
+  "protocol": {
+    "path": "infra/f1-lab/vpn-history-protocol.json",
+    "bytes": 3224,
+    "sha256": "d82e6ea0b8767139b0ee86e4065aed113a49dac8fc99e186c8f2b2d62beed234"
+  },
+  "actual_run": {
+    "path": "runtime/f1/vpn-candidate-v32-20261112/run.json",
+    "bytes": 6667,
+    "sha256": "b4ed2abc27551062c52f07138d13328f3c237f467108f7591c9d670db790ba09",
+    "schema": "extra-vpn-history-candidate-run-1",
+    "completed": true,
+    "protocol": {
+      "path": "infra/f1-lab/vpn-history-protocol.json",
+      "bytes": 3224,
+      "sha256": "d82e6ea0b8767139b0ee86e4065aed113a49dac8fc99e186c8f2b2d62beed234"
+    },
+    "started_at": "2026-11-12T06:50:39.282609+00:00",
+    "sources": {
+      "scripts/f1_lab/vpn_context.py": {
+        "path": "scripts/f1_lab/vpn_context.py",
+        "bytes": 5371,
+        "sha256": "315f223ebedcde010097d4c05bf2991fb703f629ba7cce441257f1bf58dd854a"
+      },
+      "scripts/f1_lab/native_bayes.py": {
+        "path": "scripts/f1_lab/native_bayes.py",
+        "bytes": 5221,
+        "sha256": "4df0736e8f2ff631ac8761d49ff1a1dfe8fe0ef43a78f3abb52394efe5e3b49c"
+      },
+      "scripts/prepare_native_context.py": {
+        "path": "scripts/prepare_native_context.py",
+        "bytes": 9569,
+        "sha256": "672ac228728951e7c29f6ab4f65a7ef1c2125f8fea6654eafce3ce0aed0391e7"
+      },
+      "scripts/f1_lab/native_binary_tree.py": {
+        "path": "scripts/f1_lab/native_binary_tree.py",
+        "bytes": 6903,
+        "sha256": "6c31d98f94ce1842b3f647ddfc364b489336ca39642a02ff933b5600141399b0"
+      },
+      "scripts/fit_native_raw.py": {
+        "path": "scripts/fit_native_raw.py",
+        "bytes": 8759,
+        "sha256": "e9ce634ab600da6e7517eb8df02882a0a8e12b0fca5f2d7299688e480b8ed998"
+      },
+      "scripts/evaluate_native_tree.py": {
+        "path": "scripts/evaluate_native_tree.py",
+        "bytes": 4159,
+        "sha256": "35a08ca022785d6f9dbf030729c4c3e363aa845ff8bc4b619b13a4126bceb1c9"
+      }
+    },
+    "goal_qualified": false,
+    "russellmitchell_preparation": {
+      "path": "runtime/f1/ait-vpn-history-russellmitchell-20261112/preparation.json",
+      "bytes": 6143,
+      "sha256": "0aa49ad5bf396d471368fd5cce131d0baf565f3eeab784753a4055e1152799dd"
+    },
+    "santos_preparation": {
+      "path": "runtime/f1/ait-vpn-history-santos-20261112/preparation.json",
+      "bytes": 6078,
+      "sha256": "9e7a6b578698757f31c41bf3248d946e1aca43ef2bff379ee07da16e2cf62197"
+    },
+    "fit": {
+      "path": "runtime/f1/ait-vpn-history-fit-russell-20261112/fit.json",
+      "bytes": 18862,
+      "sha256": "406d794e269ef5ef8798855ab48da3408f63f66a7cc8c5c32954fda6bec69a38"
+    },
+    "frozen_model": {
+      "path": "runtime/f1/ait-vpn-history-fit-russell-20261112/tree-model.json",
+      "bytes": 10964,
+      "sha256": "06f8df701f82a72a55e78a8c54c3320a4d3c6ac8fa332b49aa3bc05d300360c2"
+    },
+    "transfer": {
+      "path": "runtime/f1/ait-vpn-history-transfer-santos-20261112/evaluation.json",
+      "bytes": 3306,
+      "sha256": "f2958868635485bb96938626048e7fbebe4445b878403f7922441b0909d7a200"
+    },
+    "transfer_metrics": {
+      "tp": 46379,
+      "fp": 131,
+      "fn": 988,
+      "tn": 248478,
+      "inference_errors": 0,
+      "population": 295976,
+      "precision": 0.9971834014190497,
+      "recall": 0.9791415964701163,
+      "f1": 0.9880801474269523,
+      "false_positive_rate": 0.0005269318488067608,
+      "accuracy": 0.9962192880503825
+    },
+    "transfer_per_pair": [
+      {
+        "raw_member": "gather/internal_share/logs/audit/audit.log",
+        "metrics": {
+          "tp": 0,
+          "fp": 8,
+          "fn": 2,
+          "tn": 718,
+          "inference_errors": 0,
+          "population": 728,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "false_positive_rate": 0.011019283746556474,
+          "accuracy": 0.9862637362637363
+        }
+      },
+      {
+        "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+        "metrics": {
+          "tp": 38506,
+          "fp": 5,
+          "fn": 920,
+          "tn": 236236,
+          "inference_errors": 0,
+          "population": 275667,
+          "precision": 0.9998701669652826,
+          "recall": 0.9766651448282859,
+          "f1": 0.9881314394960031,
+          "false_positive_rate": 2.1164827443161856e-05,
+          "accuracy": 0.9966445022436491
+        }
+      },
+      {
+        "raw_member": "gather/intranet_server/logs/auth.log",
+        "metrics": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 10,
+          "tn": 258,
+          "inference_errors": 0,
+          "population": 270,
+          "precision": 1.0,
+          "recall": 0.16666666666666666,
+          "f1": 0.2857142857142857,
+          "false_positive_rate": 0.0,
+          "accuracy": 0.9629629629629629
+        }
+      },
+      {
+        "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log",
+        "metrics": {
+          "tp": 7772,
+          "fp": 112,
+          "fn": 22,
+          "tn": 1556,
+          "inference_errors": 0,
+          "population": 9462,
+          "precision": 0.9857940131912735,
+          "recall": 0.9971773158840134,
+          "f1": 0.9914529914529915,
+          "false_positive_rate": 0.0671462829736211,
+          "accuracy": 0.9858380891989008
+        }
+      },
+      {
+        "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+        "metrics": {
+          "tp": 40,
+          "fp": 1,
+          "fn": 2,
+          "tn": 1,
+          "inference_errors": 0,
+          "population": 44,
+          "precision": 0.975609756097561,
+          "recall": 0.9523809523809523,
+          "f1": 0.963855421686747,
+          "false_positive_rate": 0.5,
+          "accuracy": 0.9318181818181818
+        }
+      },
+      {
+        "raw_member": "gather/intranet_server/logs/audit/audit.log",
+        "metrics": {
+          "tp": 14,
+          "fp": 0,
+          "fn": 5,
+          "tn": 2244,
+          "inference_errors": 0,
+          "population": 2263,
+          "precision": 1.0,
+          "recall": 0.7368421052631579,
+          "f1": 0.8484848484848485,
+          "false_positive_rate": 0.0,
+          "accuracy": 0.9977905435262925
+        }
+      },
+      {
+        "raw_member": "gather/vpn/logs/openvpn.log",
+        "metrics": {
+          "tp": 1,
+          "fp": 4,
+          "fn": 27,
+          "tn": 5590,
+          "inference_errors": 0,
+          "population": 5622,
+          "precision": 0.2,
+          "recall": 0.03571428571428571,
+          "f1": 0.06060606060606061,
+          "false_positive_rate": 0.0007150518412584912,
+          "accuracy": 0.9944859480611882
+        }
+      },
+      {
+        "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log",
+        "metrics": {
+          "tp": 44,
+          "fp": 1,
+          "fn": 0,
+          "tn": 1875,
+          "inference_errors": 0,
+          "population": 1920,
+          "precision": 0.9777777777777777,
+          "recall": 1.0,
+          "f1": 0.9887640449438202,
+          "false_positive_rate": 0.0005330490405117271,
+          "accuracy": 0.9994791666666667
+        }
+      }
+    ],
+    "model_unchanged": true,
+    "source_verified_unchanged": true
+  },
+  "same_population_previous_comparison": {
+    "artifact": {
+      "path": "runtime/f1/ait-native-flat-binary-transfer-santos-20261112/evaluation.json",
+      "bytes": 3257,
+      "sha256": "c934552f031c0e556f2f97452e7bd38dec0660d064b1cfc4f1e909cb6267e6c8"
+    },
+    "metrics": {
+      "accuracy": 0.9962294240073519,
+      "f1": 0.9881114709391512,
+      "false_positive_rate": 0.0005108423267057911,
+      "fn": 989,
+      "fp": 127,
+      "inference_errors": 0,
+      "population": 295976,
+      "precision": 0.9972691108482958,
+      "recall": 0.9791204847256528,
+      "tn": 248482,
+      "tp": 46378
+    }
+  },
+  "vpn_ablation": {
+    "artifact": {
+      "path": "runtime/f1/vpn-feature-ablation-v32-20261112/ablation.json",
+      "bytes": 6264,
+      "sha256": "6b37bf98ef09e5aeeb4f278f0223c8f5589e99f320b0a15e06cf8cb75e8858c1"
+    },
+    "protocol": {
+      "path": "runtime/f1/vpn-feature-ablation-v32-20261112/protocol.json",
+      "bytes": 679,
+      "sha256": "bfba14253dc5ed9872ae3e3b25e506259c4ab9f3bdc616cad0fcc1b778592a90"
+    },
+    "schema": "extra-vpn-feature-ablation-1",
+    "completed": true,
+    "protocol_sha256": "bfba14253dc5ed9872ae3e3b25e506259c4ab9f3bdc616cad0fcc1b778592a90",
+    "models": {
+      "raw-rich-http-window-2": {
+        "path": "runtime/f1/vpn-feature-ablation-v32-20261112/old-profile-model.json",
+        "sha256": "f6c09bc84aa12a4885c492ef94acc710c5cd16670d497f90e3c75be087cc2171"
+      },
+      "raw-rich-vpn-history-3": {
+        "path": "runtime/f1/vpn-feature-ablation-v32-20261112/vpn-history-model.json",
+        "sha256": "c1ff27423e63ba607a80fc7dd891ff473baccd7f11853fb3eaba10e9e37b48b6"
+      }
+    },
+    "information_bounds": {
+      "russellmitchell": {
+        "raw-rich-http-window-2": {
+          "known_normal": 5509,
+          "known_attack": 28,
+          "unique_vectors": 12,
+          "mixed_label_vectors": 10,
+          "rows_in_mixed_label_vectors": 5359,
+          "minimum_in_sample_classification_errors": 28,
+          "gold_oracle_best_in_sample_f1": 0.02654867256637168,
+          "oracle_tp": 3,
+          "oracle_fp": 195,
+          "oracle_fn": 25,
+          "simultaneous_targets": {
+            "computed": true,
+            "target_precision_recall_f1": 0.95,
+            "target_max_false_positive_rate": 0.05,
+            "all_targets_feasible": false,
+            "best_precision_at_recall_target": 0.005269320843091335,
+            "best_recall_at_precision_target": null,
+            "frontier_states": 29,
+            "is_model_performance": false,
+            "is_independent_evaluation": false
+          },
+          "is_model_performance": false,
+          "is_independent_evaluation": false
+        },
+        "raw-rich-vpn-history-3": {
+          "known_normal": 5509,
+          "known_attack": 28,
+          "unique_vectors": 134,
+          "mixed_label_vectors": 11,
+          "rows_in_mixed_label_vectors": 108,
+          "minimum_in_sample_classification_errors": 28,
+          "gold_oracle_best_in_sample_f1": 0.47368421052631576,
+          "oracle_tp": 27,
+          "oracle_fp": 59,
+          "oracle_fn": 1,
+          "simultaneous_targets": {
+            "computed": true,
+            "target_precision_recall_f1": 0.95,
+            "target_max_false_positive_rate": 0.05,
+            "all_targets_feasible": false,
+            "best_precision_at_recall_target": 0.313953488372093,
+            "best_recall_at_precision_target": null,
+            "frontier_states": 29,
+            "is_model_performance": false,
+            "is_independent_evaluation": false
+          },
+          "is_model_performance": false,
+          "is_independent_evaluation": false
+        }
+      },
+      "santos": {
+        "raw-rich-http-window-2": {
+          "known_normal": 5594,
+          "known_attack": 28,
+          "unique_vectors": 13,
+          "mixed_label_vectors": 10,
+          "rows_in_mixed_label_vectors": 5456,
+          "minimum_in_sample_classification_errors": 28,
+          "gold_oracle_best_in_sample_f1": 0.023166023166023165,
+          "oracle_tp": 3,
+          "oracle_fp": 228,
+          "oracle_fn": 25,
+          "simultaneous_targets": {
+            "computed": true,
+            "target_precision_recall_f1": 0.95,
+            "target_max_false_positive_rate": 0.05,
+            "all_targets_feasible": false,
+            "best_precision_at_recall_target": 0.005176380368098159,
+            "best_recall_at_precision_target": null,
+            "frontier_states": 29,
+            "is_model_performance": false,
+            "is_independent_evaluation": false
+          },
+          "is_model_performance": false,
+          "is_independent_evaluation": false
+        },
+        "raw-rich-vpn-history-3": {
+          "known_normal": 5594,
+          "known_attack": 28,
+          "unique_vectors": 128,
+          "mixed_label_vectors": 11,
+          "rows_in_mixed_label_vectors": 108,
+          "minimum_in_sample_classification_errors": 28,
+          "gold_oracle_best_in_sample_f1": 0.4727272727272727,
+          "oracle_tp": 26,
+          "oracle_fp": 56,
+          "oracle_fn": 2,
+          "simultaneous_targets": {
+            "computed": true,
+            "target_precision_recall_f1": 0.95,
+            "target_max_false_positive_rate": 0.05,
+            "all_targets_feasible": false,
+            "best_precision_at_recall_target": 0.3068181818181818,
+            "best_recall_at_precision_target": null,
+            "frontier_states": 29,
+            "is_model_performance": false,
+            "is_independent_evaluation": false
+          },
+          "is_model_performance": false,
+          "is_independent_evaluation": false
+        }
+      }
+    },
+    "metrics": {
+      "russellmitchell": {
+        "raw-rich-http-window-2": {
+          "tp": 9,
+          "fp": 1055,
+          "fn": 19,
+          "tn": 4454,
+          "inference_errors": 0,
+          "population": 5537,
+          "precision": 0.008458646616541353,
+          "recall": 0.32142857142857145,
+          "f1": 0.016483516483516484,
+          "false_positive_rate": 0.19150481031040117,
+          "accuracy": 0.8060321473722232
+        },
+        "raw-rich-vpn-history-3": {
+          "tp": 28,
+          "fp": 80,
+          "fn": 0,
+          "tn": 5429,
+          "inference_errors": 0,
+          "population": 5537,
+          "precision": 0.25925925925925924,
+          "recall": 1.0,
+          "f1": 0.4117647058823529,
+          "false_positive_rate": 0.014521691777092031,
+          "accuracy": 0.9855517428210222
+        }
+      },
+      "santos": {
+        "raw-rich-http-window-2": {
+          "tp": 9,
+          "fp": 1152,
+          "fn": 19,
+          "tn": 4442,
+          "inference_errors": 0,
+          "population": 5622,
+          "precision": 0.007751937984496124,
+          "recall": 0.32142857142857145,
+          "f1": 0.015138772077375946,
+          "false_positive_rate": 0.20593493028244547,
+          "accuracy": 0.7917111348274636
+        },
+        "raw-rich-vpn-history-3": {
+          "tp": 28,
+          "fp": 80,
+          "fn": 0,
+          "tn": 5514,
+          "inference_errors": 0,
+          "population": 5622,
+          "precision": 0.25925925925925924,
+          "recall": 1.0,
+          "f1": 0.4117647058823529,
+          "false_positive_rate": 0.014301036825169824,
+          "accuracy": 0.9857701885450018
+        }
+      }
+    },
+    "goal_qualified": false,
+    "fitted_then_frozen_before_santos": true,
+    "original_app_or_truth_changed": false
+  },
+  "tests": {
+    "focused": {
+      "artifact": {
+        "path": "runtime/f1/extra-vpn-context-focused-20261112.xml",
+        "bytes": 4781,
+        "sha256": "9d88cf09a7cd2a068f42283a7010d96db6021caa343779c9b895916e9e2a43c8"
+      },
+      "passed": 31
+    },
+    "windows": {
+      "xml": {
+        "path": "runtime/f1/extra-vpn-context-windows-20261112.xml",
+        "bytes": 36492,
+        "sha256": "f1700a49cb4a1082d6ee12befebb356d1c885941272ac24da40c581088c4882e"
+      },
+      "log": {
+        "path": "runtime/f1/extra-vpn-context-windows-20261112.log",
+        "bytes": 493,
+        "sha256": "4f29e073e0bab95a6bce9528ade55778c1a8569ff75f2ce3159054739372bff5"
+      },
+      "verification": {
+        "path": "runtime/f1/extra-vpn-context-windows-verification-20261112.json",
+        "bytes": 474,
+        "sha256": "a7c8e8cc944a758f6d990a300b1a9ac600b9356dc49430a55f9bfc6b70086b69"
+      },
+      "completed_test_suites": true,
+      "counts": {
+        "tests": 261,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "xml_sha256": "f1700a49cb4a1082d6ee12befebb356d1c885941272ac24da40c581088c4882e",
+      "runner_terminal_exit_code": 1,
+      "runner_failure": "UnicodeEncodeError printing completed-test log with cp949 console",
+      "pytest_exit_code_not_recorded": true,
+      "log_has_261_passed": true,
+      "ruff_passed": true,
+      "tests_not_restarted": true
+    },
+    "linux": {
+      "xml": {
+        "path": "runtime/f1/extra-linux-public-native-20261112-17/checks.xml",
+        "bytes": 36498,
+        "sha256": "4a8f30ad1445dd1f847a7df602fb6a9e657a411ec32f70daa41fb2fda483c2b8"
+      },
+      "verification": {
+        "path": "runtime/f1/extra-linux-public-native-20261112-17/verification.json",
+        "bytes": 1584,
+        "sha256": "4219f81db599a4a1069a15afbc28711c1406f438bf97fdc9b293c0936a8e21b4"
+      },
+      "counts": {
+        "tests": 261,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "schema": "extra-f1-linux-snapshot-1",
+      "completed": true,
+      "owner": "extra-f1-f2f1e289ac51",
+      "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+      "tests": [
+        "tests/test_f1_vpn_context.py",
+        "tests/test_f1_public_sources.py",
+        "tests/test_f1_bounded_zip.py",
+        "tests/test_f1_native_jsonl.py",
+        "tests/test_f1_native_preparation.py",
+        "tests/test_f1_line_truth.py",
+        "tests/test_f1_raw_observations.py",
+        "tests/test_f1_native_bayes.py",
+        "tests/test_f1_native_raw_workflow.py",
+        "tests/test_f1_raw_context.py",
+        "tests/test_f1_native_context_workflow.py",
+        "tests/test_f1_native_tree.py",
+        "tests/test_f1_frozen_native_tree.py",
+        "tests/test_f1_native_transfer.py",
+        "tests/test_f1_contextual_links.py",
+        "tests/test_f1_native_heads.py",
+        "tests/test_f1_native_binary_tree.py",
+        "tests/test_f1_cloud_observations.py",
+        "tests/test_f1_cloud_diagnostics.py",
+        "tests/test_f1_cloud_context.py",
+        "tests/test_f1_cloud_identity.py",
+        "tests/test_f1_rba_probe.py",
+        "tests/test_f1_rba_metadata.py"
+      ],
+      "host_mounts": 0,
+      "network": "none",
+      "cloud_calls": 0,
+      "paid_api_calls": 0,
+      "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+      "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+      "source_manifest_sha256": "28d2b43ff7b814702bebfdeb681071b0daf73aa3df75659b2a748b6a53e5a2ed",
+      "source_files": 453,
+      "container_exit_code": 0,
+      "source_verified_before_and_after": true,
+      "remaining_containers": 0
+    },
+    "current_code_matches_all_453_linux_snapshot_files": true
+  },
+  "previous_frozen_artifacts_still_load_with_original_external_hashes": [
+    {
+      "path": "runtime/f1/ait-raw-context-tree-fit-russell-20261112/tree-model.json",
+      "bytes": 16137,
+      "sha256": "2d01d0ed310223ff51e185d53a51b2fc183226a4ad8f7593ec8ab5404f5419b1"
+    },
+    {
+      "path": "runtime/f1/ait-native-flat-binary-fit-russell-20261112/tree-model.json",
+      "bytes": 10758,
+      "sha256": "785862dedbb8d2627204e99b08400639d7b80f88a43e250707bd7b21130cc89f"
+    }
+  ],
+  "candidate_selected_for_final_or_production": false,
+  "reason": "Flat candidate VPN TP1/28 FP4; VPN-only candidate TP28/28 FP80 P25.93%; authentication/audit/web failures remain; no independent six-domain evaluation.",
+  "labels_changed": false,
+  "original_app_diff_empty": true,
+  "independent_final_metrics": null,
+  "reserved_ait_final_bodies_read": 0,
+  "cloud_test_archive_downloaded": false,
+  "original_six_domain_goal_replaced": false,
+  "current_owned_f1_containers": 0,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "github_pushes": 0,
+  "goal_qualified": false
+}

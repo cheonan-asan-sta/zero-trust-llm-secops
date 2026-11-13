@@ -1,0 +1,1033 @@
+{
+  "schema": "extra-native-transfer-context-intake-v21-1",
+  "recorded_at": "2026-11-12T03:54:31.236683+00:00",
+  "branch": "extra",
+  "santos_acquisition": {
+    "archive_extracted": false,
+    "asset": {
+      "asset_id": "ait-lds21-santos",
+      "bytes": 576734274,
+      "data_role": "second development scenario; not reserved final",
+      "filename": "santos_no-pcaps.zip",
+      "license_id": "cc-by-nc-sa-4.0",
+      "publisher_md5": "cb484a2c55ea03c63c556f0531fe8367",
+      "record_id": 19483937,
+      "record_version": "v2_1",
+      "reference": "https://zenodo.org/records/19483937"
+    },
+    "aws_sdk_calls": 0,
+    "bytes_received": 576734274,
+    "code_executed_from_asset": false,
+    "completed": true,
+    "elapsed_seconds": 1803.203,
+    "ended_at": "2026-11-12T03:47:17.416728+00:00",
+    "goal_qualified": false,
+    "local_sha256": "af69973fbf4edeb6a26f1e4ebeae97b577f0263cec15bda0d987cc470425be5d",
+    "local_sha256_kind": "local immutable follow-up anchor; not a publisher signature",
+    "paid_api_calls": 0,
+    "publisher_checksum_kind": "MD5; not a publisher digital signature",
+    "publisher_md5_verified": true,
+    "publisher_metadata_sha256": "09ce2689d83d48f967eb8aaadf269ca8710ba44d4bb7d057fc2b011d9c8d87c5",
+    "purpose": "noncommercial_research",
+    "range_retries": 0,
+    "ranged_transfer": true,
+    "resumed_prefix_bytes": 0,
+    "schema": "f1-public-asset-acquisition-1",
+    "started_at": "2026-11-12T03:17:14.202389+00:00"
+  },
+  "santos_preparation": {
+    "path": "runtime/f1/ait-raw-context-santos-20261112/preparation.json",
+    "sha256": "e050a0e4f1646361432111387c66319dde1eb92f7b0d28813580d40f4348c48a",
+    "aws_sdk_calls": 0,
+    "base_preparation_sha256": "79ca6a06843f475c9ece479956e4d38e8e990206289397b636d785e090bafaaf",
+    "completed": true,
+    "context": "HTTP per physical source and client; event-time order with original ordinal ties; current and past only",
+    "feature_profile": "raw-rich-http-window-2",
+    "files": {
+      "inputs.jsonl": {
+        "bytes": 374567106,
+        "sha256": "3e62613ebb73cbeb5ac9f9f6cf607027184e42bbc93ea6cb8a4612279fecaf89"
+      },
+      "references.jsonl": {
+        "bytes": 91012900,
+        "sha256": "d8b6ff6d3727083647f4843cfa2a99e791ab65cecc4a240cbc1ced996080a49e"
+      },
+      "truth.jsonl": {
+        "bytes": 36078704,
+        "sha256": "21f65f66a93489950507764cfae096752120d376d57d49e8c8b2d7e885b7c989"
+      }
+    },
+    "goal_qualified": false,
+    "historical_replay_only": true,
+    "http_context": [
+      {
+        "positive_extra_flags": {
+          "audit_uid_available": 720,
+          "audit_uid_is_zero": 720
+        },
+        "raw_member": "gather/internal_share/logs/audit/audit.log",
+        "requests": 0
+      },
+      {
+        "positive_extra_flags": {},
+        "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+        "requests": 0
+      },
+      {
+        "positive_extra_flags": {
+          "audit_interactive": 3,
+          "su_observed": 3,
+          "web_working_directory": 3
+        },
+        "raw_member": "gather/intranet_server/logs/auth.log",
+        "requests": 0
+      },
+      {
+        "positive_extra_flags": {
+          "http_window_available": 9441
+        },
+        "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log",
+        "requests": 9441
+      },
+      {
+        "positive_extra_flags": {},
+        "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+        "requests": 0
+      },
+      {
+        "positive_extra_flags": {
+          "audit_hex_command": 2,
+          "audit_interactive": 14,
+          "audit_uid_available": 2263,
+          "audit_uid_is_zero": 2257,
+          "decoded_sensitive_file": 1,
+          "web_working_directory": 2
+        },
+        "raw_member": "gather/intranet_server/logs/audit/audit.log",
+        "requests": 0
+      },
+      {
+        "positive_extra_flags": {},
+        "raw_member": "gather/vpn/logs/openvpn.log",
+        "requests": 0
+      },
+      {
+        "positive_extra_flags": {
+          "cpu_available": 1920
+        },
+        "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log",
+        "requests": 0
+      }
+    ],
+    "inputs_contain_truth": false,
+    "labels_changed": false,
+    "paid_api_calls": 0,
+    "pairs": [
+      {
+        "backward_time_steps": 0,
+        "feature_errors": 0,
+        "malicious": 2,
+        "maximum_event_time": 1642461421.754,
+        "minimum_event_time": 1642119421.514,
+        "normal": 726,
+        "outside_simulation": 0,
+        "positive_feature_counts": {
+          "auth_success": 610,
+          "cron": 530,
+          "service_start": 45,
+          "service_stop": 35,
+          "session_close": 106,
+          "session_open": 106
+        },
+        "raw_member": "gather/internal_share/logs/audit/audit.log",
+        "raw_sha256": "33b535b96f81473c60c6df10d9f2ac3753c9b2bfe3b9d749a3af5f9d89c1f3bd",
+        "rows": 728,
+        "time_errors": 0
+      },
+      {
+        "backward_time_steps": 0,
+        "feature_errors": 0,
+        "malicious": 39426,
+        "maximum_event_time": 1642463917.0,
+        "minimum_event_time": 1642118409.0,
+        "normal": 236241,
+        "outside_simulation": 0,
+        "positive_feature_counts": {
+          "dns_negative_reply": 19038,
+          "dns_non_hostname_chars": 38402,
+          "scanner_agent": 8
+        },
+        "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+        "raw_sha256": "2cee0cab1e1e4cd2b2ed43b93ec2044e9f8c7343ab1fe6d832d0372d5a1654b9",
+        "rows": 275667,
+        "time_errors": 0
+      },
+      {
+        "backward_time_steps": 0,
+        "feature_errors": 0,
+        "malicious": 12,
+        "maximum_event_time": 1642462741.0,
+        "minimum_event_time": 1642314314.0,
+        "normal": 258,
+        "outside_simulation": 0,
+        "positive_feature_counts": {
+          "cron": 257,
+          "privilege_tool": 7,
+          "sensitive_file": 1,
+          "session_close": 131,
+          "session_open": 132
+        },
+        "raw_member": "gather/intranet_server/logs/auth.log",
+        "raw_sha256": "e58e17ce592a3cbddf0a2280276642ffd19802b3e8265ff3d3fed961aebf52c7",
+        "rows": 270,
+        "time_errors": 0
+      },
+      {
+        "backward_time_steps": 2,
+        "feature_errors": 0,
+        "malicious": 7794,
+        "maximum_event_time": 1642451200.0,
+        "minimum_event_time": 1642400738.0,
+        "normal": 1668,
+        "outside_simulation": 0,
+        "positive_feature_counts": {
+          "cron": 18,
+          "dns_non_hostname_chars": 1,
+          "scanner_agent": 3291,
+          "uploaded_script": 36
+        },
+        "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log",
+        "raw_sha256": "92d8fae4669a1fc10fbb23832c18b1429e894d9033f135c7e77fc4d0d90287ba",
+        "rows": 9462,
+        "time_errors": 0
+      },
+      {
+        "backward_time_steps": 0,
+        "feature_errors": 0,
+        "malicious": 42,
+        "maximum_event_time": 1642423971.550938,
+        "minimum_event_time": 1642418522.607946,
+        "normal": 2,
+        "outside_simulation": 0,
+        "positive_feature_counts": {
+          "cron": 1,
+          "http_forbidden": 7
+        },
+        "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+        "raw_sha256": "7ee7ca5fa22ff8d83c022bbaf050ec9a827c3e85f9d233442090ddd7103701f0",
+        "rows": 44,
+        "time_errors": 0
+      },
+      {
+        "backward_time_steps": 0,
+        "feature_errors": 0,
+        "malicious": 19,
+        "maximum_event_time": 1642462753.889,
+        "minimum_event_time": 1642118941.668,
+        "normal": 2244,
+        "outside_simulation": 0,
+        "positive_feature_counts": {
+          "auth_success": 1964,
+          "cron": 1490,
+          "privilege_tool": 12,
+          "service_start": 230,
+          "service_stop": 227,
+          "session_close": 300,
+          "session_open": 302
+        },
+        "raw_member": "gather/intranet_server/logs/audit/audit.log",
+        "raw_sha256": "c0b288f21fe2d39e888f124b77a1162aafcc7329ba18f3e47c25398d8a15f54e",
+        "rows": 2263,
+        "time_errors": 0
+      },
+      {
+        "backward_time_steps": 0,
+        "feature_errors": 0,
+        "malicious": 28,
+        "maximum_event_time": 1642462889.0,
+        "minimum_event_time": 1642121379.0,
+        "normal": 5594,
+        "outside_simulation": 0,
+        "positive_feature_counts": {
+          "tls_failure": 10
+        },
+        "raw_member": "gather/vpn/logs/openvpn.log",
+        "raw_sha256": "f39a169c2ab4165b9848635c6e729a004bddb315f1f2f277f0341baf662e9ba7",
+        "rows": 5622,
+        "time_errors": 0
+      },
+      {
+        "backward_time_steps": 0,
+        "feature_errors": 0,
+        "malicious": 44,
+        "maximum_event_time": 1642463968.504,
+        "minimum_event_time": 1642377613.504,
+        "normal": 1876,
+        "outside_simulation": 0,
+        "positive_feature_counts": {},
+        "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log",
+        "raw_sha256": "1fe7e7e06d79e8e786e5fcebb2560aa2350b42439ab9a7c090c7faa89ca6f8d7",
+        "rows": 1920,
+        "time_errors": 0
+      }
+    ],
+    "row_policy": "every paired raw row retained",
+    "schema": "f1-native-raw-input-1",
+    "scope": "all eight physically paired label/raw files in development santos; not whole dataset or final evaluation",
+    "source_manifest_sha256": "f51c2482356856848704cc0b47209fb0100db3b4b0982381ff1ab444ed201e01",
+    "truth_copied_unchanged": true
+  },
+  "frozen_tree_transfer": {
+    "path": "runtime/f1/ait-raw-frozen-tree-santos-20261112/evaluation.json",
+    "sha256": "2811932c23fc8d6e20c55dfd04d2ceedb8700d67de1ec365dd991ed1c064acb8",
+    "aws_sdk_calls": 0,
+    "completed": true,
+    "evaluation_kind": "cross-scenario development diagnostic; not independent final acceptance",
+    "feature_profile": "raw-rich-http-window-2",
+    "goal_qualified": false,
+    "input_preparation_sha256": "e050a0e4f1646361432111387c66319dde1eb92f7b0d28813580d40f4348c48a",
+    "metrics": {
+      "accuracy": 0.9956753250263535,
+      "f1": 0.9863396725790271,
+      "false_positive_rate": 0.0004987751851300636,
+      "fn": 1156,
+      "fp": 124,
+      "inference_errors": 0,
+      "population": 295976,
+      "precision": 0.9973238372720405,
+      "recall": 0.9755948234002576,
+      "tn": 248485,
+      "tp": 46211
+    },
+    "model_sha256": "2d01d0ed310223ff51e185d53a51b2fc183226a4ad8f7593ec8ab5404f5419b1",
+    "model_state_before_after_sha256": "5b0c5354280f0e5fdf1808b6bc7d2c7164f03248f8dfc590e6c08a1667de73c1",
+    "model_unchanged": true,
+    "paid_api_calls": 0,
+    "per_pair": [
+      {
+        "metrics": {
+          "accuracy": 0.9972527472527473,
+          "f1": 0.0,
+          "false_positive_rate": 0.0,
+          "fn": 2,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 728,
+          "precision": null,
+          "recall": 0.0,
+          "tn": 726,
+          "tp": 0
+        },
+        "raw_member": "gather/internal_share/logs/audit/audit.log"
+      },
+      {
+        "metrics": {
+          "accuracy": 0.996285373294591,
+          "f1": 0.9868454858434819,
+          "false_positive_rate": 3.386372390905897e-05,
+          "fn": 1016,
+          "fp": 8,
+          "inference_errors": 0,
+          "population": 275667,
+          "precision": 0.9997917642771618,
+          "recall": 0.9742302034190635,
+          "tn": 236233,
+          "tp": 38410
+        },
+        "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+      },
+      {
+        "metrics": {
+          "accuracy": 0.9814814814814815,
+          "f1": 0.7368421052631579,
+          "false_positive_rate": 0.0,
+          "fn": 5,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 270,
+          "precision": 1.0,
+          "recall": 0.5833333333333334,
+          "tn": 258,
+          "tp": 7
+        },
+        "raw_member": "gather/intranet_server/logs/auth.log"
+      },
+      {
+        "metrics": {
+          "accuracy": 0.9857324032974001,
+          "f1": 0.9913930506853682,
+          "false_positive_rate": 0.06954436450839328,
+          "fn": 19,
+          "fp": 116,
+          "inference_errors": 0,
+          "population": 9462,
+          "precision": 0.9852997085287036,
+          "recall": 0.9975622273543752,
+          "tn": 1552,
+          "tp": 7775
+        },
+        "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log"
+      },
+      {
+        "metrics": {
+          "accuracy": 0.20454545454545456,
+          "f1": 0.2857142857142857,
+          "false_positive_rate": 0.0,
+          "fn": 35,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 44,
+          "precision": 1.0,
+          "recall": 0.16666666666666666,
+          "tn": 2,
+          "tp": 7
+        },
+        "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log"
+      },
+      {
+        "metrics": {
+          "accuracy": 0.9969067609368095,
+          "f1": 0.7741935483870968,
+          "false_positive_rate": 0.0,
+          "fn": 7,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 2263,
+          "precision": 1.0,
+          "recall": 0.631578947368421,
+          "tn": 2244,
+          "tp": 12
+        },
+        "raw_member": "gather/intranet_server/logs/audit/audit.log"
+      },
+      {
+        "metrics": {
+          "accuracy": 0.9950195659907506,
+          "f1": 0.0,
+          "false_positive_rate": 0.0,
+          "fn": 28,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 5622,
+          "precision": null,
+          "recall": 0.0,
+          "tn": 5594,
+          "tp": 0
+        },
+        "raw_member": "gather/vpn/logs/openvpn.log"
+      },
+      {
+        "metrics": {
+          "accuracy": 0.9770833333333333,
+          "f1": 0.0,
+          "false_positive_rate": 0.0,
+          "fn": 44,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 1920,
+          "precision": null,
+          "recall": 0.0,
+          "tn": 1876,
+          "tp": 0
+        },
+        "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log"
+      }
+    ],
+    "refit_performed": false,
+    "schema": "f1-native-tree-transfer-1",
+    "scope": "all eight physically paired label/raw files in development santos; not whole dataset or final evaluation",
+    "threshold": 0.5
+  },
+  "per_file_macro_recall": 0.41917142226773246,
+  "minimum_file_recall": 0.0,
+  "cross_scenario_development_only": true,
+  "independent_final_metrics": null,
+  "scope_and_template_independence_not_certified": true,
+  "original_six_domain_goal_replaced": false,
+  "contextual_archive": {
+    "schema": "contextual-archive-acquisition-1",
+    "contract_sha256": "f8d632856b614af72003cec5a5c222375d3a946636645627a9fc5bd2e0b3c126",
+    "url": "https://raw.githubusercontent.com/andrea-rossi-univpm/ZTA-GNN-GRAAI-Dataset/87a202d9ef3a36b3a9bb11fed64bd2cbbf0432d5/CSV_Inventory/Golden_Sample_CSV/export_22Dec2025_010633.csv.7z",
+    "completed": true,
+    "bytes_received": 25241476,
+    "dataset_member_bodies_read": 0,
+    "code_executed_from_archive": false,
+    "paid_api_calls": 0,
+    "aws_sdk_calls": 0,
+    "goal_qualified": false,
+    "archive_sha256": "9e7a5995797e3310a00a7684047ea298002328819599c65831b6d30c5d81d5f0",
+    "listing_sha256": "fac1dfa169f529446f49c11a210056a1c3cc099131229ad05de0a1211b8f3acf",
+    "elapsed_seconds": 5.64
+  },
+  "contextual_development_probe": {
+    "path": "runtime/f1/contextual-schema-probe-20261112/probe.json",
+    "sha256": "eee44b1c0e7cadf657ff16cfdfbbcabf22d85da8f6d2a806e1877712518d8579",
+    "schema": "contextual-csv-development-probe-1",
+    "completed": true,
+    "archive_extracted_wholesale": false,
+    "single_member_streamed_to_opaque_path": true,
+    "csv_full_bytes_hashed": 838136631,
+    "logical_records_inspected": 128,
+    "max_physical_probe_lines_including_header": 129,
+    "code_executed_from_source": false,
+    "goal_qualified": false,
+    "paid_api_calls": 0,
+    "aws_sdk_calls": 0,
+    "csv_sha256": "cce55ca294323909a5ea8f99e97d581ebae74d9964999d58e0f466a21747cc1d",
+    "seven_zip_exit": 0,
+    "csv_header": [
+      "time",
+      "host",
+      "source",
+      "sourcetype",
+      "message"
+    ],
+    "sourcetypes": {
+      "security:badraequest": 79,
+      "application:model": 23,
+      "opnsense:filterlog": 18,
+      "iis:httperr": 8
+    },
+    "label_probe_counts": {
+      "True": 79,
+      "False": 23
+    },
+    "message_parse_errors": 26,
+    "field_schema": [
+      {
+        "path": "Id",
+        "type": "int",
+        "records": 102
+      },
+      {
+        "path": "Description",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "HashCheck",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "IP",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "User",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "UserAgent",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "EventType",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Level",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Suspicious",
+        "type": "bool",
+        "records": 102
+      },
+      {
+        "path": "Route",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "HTTPStatusCode",
+        "type": "int",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint",
+        "type": "dict",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.ua",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.appCulture",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.current",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.browser",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.userSet",
+        "type": "bool",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.lang",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.langs",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.screen",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.availScreen",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.viewport",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.ratio",
+        "type": "int",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.colorDepth",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.jsZoom",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.memory",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.cores",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.ram",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.gpuVendor",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.gpu",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.battery",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.platform",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.deviceType",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.tz",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.touch",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.geo",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.cookies",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.storage",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.browserPermissions",
+        "type": "dict",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.browserPermissions.geolocation",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.browserPermissions.notifications",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.canvas",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.fpProtection",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.dnt",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.pageLoad",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.ts",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "Fingerprint.exTime",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "FingerprintHMAC",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "ResourceContext",
+        "type": "dict",
+        "records": 102
+      },
+      {
+        "path": "ResourceContext.database",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "ResourceContext.table",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "ResourceContext.server",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "ResourceContext.user",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "RequestMetadata",
+        "type": "dict",
+        "records": 102
+      },
+      {
+        "path": "RequestMetadata.url",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "RequestMetadata.method",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "RequestMetadata.scheme",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "RequestMetadata.host",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "RequestMetadata.protocol",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "RequestMetadata.traceId",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "RequestMetadata.connectionId",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "RequestMetadata.remoteEndpoint",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "RequestMetadata.localEndpoint",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "RequestMetadata.contentType",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "RequestMetadata.contentLength",
+        "type": "int",
+        "records": 102
+      },
+      {
+        "path": "RequestMetadata.isHttps",
+        "type": "bool",
+        "records": 102
+      },
+      {
+        "path": "RequestMetadata.referer",
+        "type": "str",
+        "records": 102
+      },
+      {
+        "path": "ClientCertificate",
+        "type": "NoneType",
+        "records": 92
+      },
+      {
+        "path": "JSON",
+        "type": "str",
+        "records": 91
+      },
+      {
+        "path": "SuspiciousDescription",
+        "type": "str",
+        "records": 79
+      },
+      {
+        "path": "SessionId",
+        "type": "str",
+        "records": 23
+      },
+      {
+        "path": "RequestMetadata.origin",
+        "type": "str",
+        "records": 23
+      },
+      {
+        "path": "RequestMetadata.acceptLanguage",
+        "type": "str",
+        "records": 23
+      },
+      {
+        "path": "UserContext",
+        "type": "dict",
+        "records": 23
+      },
+      {
+        "path": "UserContext.roles",
+        "type": "list",
+        "records": 23
+      },
+      {
+        "path": "UserContext.claims",
+        "type": "dict",
+        "records": 23
+      },
+      {
+        "path": "UserContext.claims.name",
+        "type": "str",
+        "records": 23
+      },
+      {
+        "path": "UserContext.claims.emailaddress",
+        "type": "str",
+        "records": 23
+      },
+      {
+        "path": "UserContext.claims.mobilephone",
+        "type": "str",
+        "records": 23
+      },
+      {
+        "path": "UserContext.claims.SessionId",
+        "type": "str",
+        "records": 23
+      },
+      {
+        "path": "ClientCertificate",
+        "type": "str",
+        "records": 10
+      }
+    ],
+    "top_level_shapes": [
+      {
+        "keys": [
+          "ClientCertificate",
+          "Description",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HTTPStatusCode",
+          "HashCheck",
+          "IP",
+          "Id",
+          "JSON",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "Route",
+          "Suspicious",
+          "SuspiciousDescription",
+          "User",
+          "UserAgent"
+        ],
+        "records": 79
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "Description",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HTTPStatusCode",
+          "HashCheck",
+          "IP",
+          "Id",
+          "JSON",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "Route",
+          "SessionId",
+          "Suspicious",
+          "User",
+          "UserAgent",
+          "UserContext"
+        ],
+        "records": 12
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "Description",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HTTPStatusCode",
+          "HashCheck",
+          "IP",
+          "Id",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "Route",
+          "SessionId",
+          "Suspicious",
+          "User",
+          "UserAgent",
+          "UserContext"
+        ],
+        "records": 11
+      }
+    ],
+    "uninspected_records_quarantined": true
+  },
+  "contextual_protocol": {
+    "path": "infra/f1-lab/contextual-intake-protocol.json",
+    "sha256": "f8d632856b614af72003cec5a5c222375d3a946636645627a9fc5bd2e0b3c126"
+  },
+  "contextual_nonjson_or_unknown_truth_not_defaulted_to_normal": true,
+  "initial_frozen_tree_focused_test": "7pass/1fail because invalid-category fixture added third boolean child, which was rejected earlier by split bound. Fixture corrected to replace a category; guard unchanged. Original XML preserved.",
+  "tests": {
+    "windows": {
+      "path": "runtime/f1/extra-native-transfer-final-20261112.xml",
+      "sha256": "9b51f8d4769fe00466e38250c0f9b879af00ff512ef3237ccf79068d797493e2",
+      "passed": 161
+    },
+    "linux": {
+      "path": "runtime/f1/extra-linux-public-native-20261112-08/checks.xml",
+      "sha256": "c8c9b5473564cad5a81fb419dff8f8ca51a59cff55874fe976ccd8638950ae6d",
+      "passed": 161
+    }
+  },
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "reserved_ait_final_bodies_read": 0,
+  "goal_qualified": false,
+  "final_candidate_selected": false,
+  "linux": {
+    "schema": "extra-f1-linux-snapshot-1",
+    "completed": true,
+    "owner": "extra-f1-437498bb3077",
+    "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "tests": [
+      "tests/test_f1_public_sources.py",
+      "tests/test_f1_bounded_zip.py",
+      "tests/test_f1_native_jsonl.py",
+      "tests/test_f1_native_preparation.py",
+      "tests/test_f1_line_truth.py",
+      "tests/test_f1_raw_observations.py",
+      "tests/test_f1_native_bayes.py",
+      "tests/test_f1_native_raw_workflow.py",
+      "tests/test_f1_raw_context.py",
+      "tests/test_f1_native_context_workflow.py",
+      "tests/test_f1_native_tree.py",
+      "tests/test_f1_frozen_native_tree.py",
+      "tests/test_f1_native_transfer.py"
+    ],
+    "host_mounts": 0,
+    "network": "none",
+    "cloud_calls": 0,
+    "paid_api_calls": 0,
+    "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+    "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+    "source_manifest_sha256": "709dd598bd4e54f2cef8bbba991d11b9f7d9c9ab42dd1306eb2afb2e7905b2fd",
+    "source_files": 416,
+    "container_exit_code": 0,
+    "source_verified_before_and_after": true,
+    "remaining_containers": 0
+  },
+  "baseline_app_diff_empty": true
+}

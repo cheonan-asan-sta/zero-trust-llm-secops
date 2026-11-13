@@ -1,5 +1,540 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 11월 13일 최신 aitest·extra 통합 기준
+
+사용자가 팀원 업로드 후 `aitest` 병합을 허용했다. `07ef9cc`와 `extra`의 `668096b`를
+`feature/chaeheeju-extra-aitest-integration`에서 통합하고 충돌 6곳을 해결했다.
+실제 앱은 팀원 `/response/requests`의 요청자 외 두 승인 주체 계약을 유지한다.
+이전 `/response/plans`는 앱에 연결하지 않는 과거 오프라인 구현이다.
+검증·역할·호환 경계와 최종 PR 확인 방법은 [통합 기록](docs/extra-aitest-integration-20261113.md)을 먼저 읽는다.
+아래 v48 및 날짜별 메모의 push/병합 0 또는 extra 제외는 당시 이력이며 현재 통합 지시를 대신하지 않는다.
+
+## v48 보존 기록: 로컬 TCP HTTP 수집→검증/기록→암호화 복원
+
+[최신 요청 수집 설명](docs/extra-web-request-capture.md)과
+[실행·시험 근거](docs/infrastructure-results/extra-web-capture-v48-20261113.json)을 먼저 읽는다.
+새 web_request_capture/web_capture_lab/web_capture_transport와 실행기는 실제 loopback HTTP 바이트를 수집한다.
+서버 난수 ID·전체 본문 SHA·실제 API-key 검증·서버 소유 service session·고정 정책/child 관측으로 v45~47을 연결했다.
+사용자/세션/client request ID 헤더를 신뢰하지 않고 partial/timeout/oversize body를 빈 본문으로 만들지 않는다.
+MFA는 not_used이며 외부 IdP/EDR·실제 PHP/업로드/쿼리 명령 실행이 아니다. 고정 checksum child만 실행한다.
+source별 키는 분리됐지만 같은 프로세스라 센서 격리/attestation을 증명하지 않는다.
+
+실제 TCP9건 수집·검증/영속 결정5건·고정 child4회·통제 조건10개 기대 결과.
+통제된 정책 거부+고정 child 실행의 adverse가 checkpoint/암호화 복원 후에도 유지됐다.
+신규28포함 Windows/Linux 관련415개씩·Ruff 통과. Linux network none·756소스 전후 동일·exit0/OOM false·컨테이너 제거.
+listener/child 종료 확인. 실행 `runtime/f1/web-capture-controls-v48-20261113`, 시험 `runtime/f1/web-capture-tests-v48-20261113`.
+받은9건은 이미 관찰한 local development 자료이고 독립 malicious 라벨/최종 평가가 아니다.
+기존 고정 모델3종을 로드했지만 새F1 평가/운영 관측0·공개 원시재생0, app/기존코드/모델/라벨 보존이다.
+수집기 spool은 단일 프로세스 메타데이터이며 원본 proof 보관소가 아니다. 수집 실패503은 handler rollback이 아니다.
+자격 증명/서명/예제 복구 키는 메모리에만 생성, 운영 키 보관·원본증거/durable intake·실제 IdP/세션·writer/사건 인수는 남는다.
+유료API/AWS/다운로드/push/병합0·사용자ZIP 보존. 팀원 aitest/main에 병합하지 않는다.
+
+## v47 보존 기록: 암호화 백업·복원과 외부 checkpoint
+
+[최신 백업/복원 설명](docs/extra-web-ledger-backup.md)과
+[실행·시험 근거](docs/infrastructure-results/extra-web-backup-v47-20261113.json)을 먼저 읽는다.
+새 `web_ledger_backup.py`는 잠금+SQLite backup 스냅샷과 witness/HMAC키를 AES-256-GCM으로 묶는다.
+별도 caller-held 복구 키32bytes·정확한 유지보수 주체+ADMIN·외부 manifest/checkpoint SHA를 요구한다.
+새 경로만 허용하고 검증 뒤 manifest/restore marker를 게시하며 자동 서비스 활성화는 없다.
+`CheckpointedWebLedger`는 매 접근마다 외부 pin/최소 prefix/시각을 검사해 로컬 전체 이력 rollback도 고정 지점까지 거부한다.
+기존 base ledger 경로에 자동 적용되지는 않는다. 마지막 pin 이후 미고정 기록은 이 보호 밖이다.
+
+예제10개·신규30포함 Windows/Linux 관련387개씩·Ruff 통과. 새 process-exit5경계(기존8도 회귀 포함).
+Linux network none·748소스 전후 동일·exit0/OOM false·컨테이너 제거.
+실제 실행 `runtime/f1/web-backup-controls-v47-20261113`, 시험 `runtime/f1/web-backup-tests-v47-20261113`.
+예제 복구 키는 메모리에만 있어 실행 후 재복호화할 운영 키를 제공하지 않는다. 테스트 key 파일/witness비밀은 공개/Git 금지다.
+remote WORM/KMS/물리 독립 보관·HA·writer fencing/절체·실제 센서/사건 인수는 미완료다.
+checkpoint와 기대SHA까지 함께 rollback하는 공격을 막으려면 별도 보호가 필요하다. 로컬 논리분리만 검증했다.
+실제 서버 수집/새 독립 평가/F1측정0, 앱·기존 모델/라벨/v44~46코드 보존.
+유료API/AWS/다운로드/push/병합0·사용자ZIP 보존. 다음은 실제 수집·키/pin 운영 보관·writer 절체/사건 인수다.
+
+## v46 보존 기록: 웹 위험/검토 영속화·중복/중단 복구
+
+[최신 기록부/복구 설명](docs/extra-web-evidence-ledger.md)과
+[실행·시험 근거](docs/infrastructure-results/extra-web-durable-v46-20261113.json)을 먼저 읽는다.
+새 `web_evidence_ledger.py`와 `web_durable_risk.py`는 v45 검증을 선택적으로 감싸
+SQLite FULL·해시 연결·별도 HMAC witness로 검증 시작/완료를 기록하고 완료 게시 뒤에만 응답한다.
+정확한 요청/운영자/nonce 해시로 중복과 충돌을 구분하며 이전 점수/경보/검토·adverse를 유지한다.
+메모리 challenge가 사라진 재개에서도 과거 위험을 복원하되 새 서명 검증으로 표현하지 않는다.
+미완료는30초 기한 후 명시적으로 불확실한 검토로 복구한다. 완료 저장 실패는 성공 응답이 아니다.
+기본2000이벤트·진행 중 완료 자리 예약·자동 삭제/종결 없음. 다른 owner/tenant·변조/DB단독 rollback은 거부한다.
+
+로컬 실행 예제10개 모두 기대 결과. 신규41포함 Windows/Linux 관련357개씩·Ruff 통과.
+실제 process exit8경계와 별도 process 동시 중복을 확인했다. Linux network none·742소스 전후 동일·exit0/OOM false·컨테이너 제거.
+실제 실행 `runtime/f1/web-durable-controls-v46-20261113`, 시험 `runtime/f1/web-durable-tests-v46-20261113`.
+Ed25519 개인키는 미저장이나 로컬 witness HMAC비밀키32bytes는 runtime에 의도적으로 저장한다. 공개/Git에 넣지 않는다.
+같은 호스트의 DB/witness/key를 함께 되돌리는 공격·호스트 소실·원격 WORM·HA는 보장하지 않는다.
+검증 뒤 완료 commit 전 종료는 실제 결론 미확정이며 review로 남긴다. 원본 proof 보관도 별도다.
+앱/승인·복구/PEP·기존v44/v45코드·모델·라벨 보존. 실제 수집/새독립평가/F1측정0이다.
+유료API/AWS/다운로드/push/병합0·사용자ZIP 보존. 다음은 보호 checkpoint/백업·실제 수집·사건 검토 종결 인수다.
+
+## v45 보존 기록: 웹 서버 근거 검증 어댑터·수집 계약
+
+[최신 웹 서버 근거 연결](docs/extra-web-verified-context.md)과
+[실행·시험 근거](docs/infrastructure-results/extra-web-context-v45-20261113.json)을 먼저 읽는다.
+`scripts/f1_lab/web_verified_context.py`는 요청별 인증/권한/실행3증거의 Ed25519 서명과
+별도 역할/키·외부 고정 등록부·자원 정책 SHA/버전·30초 challenge·일회 nonce를 검증한다.
+tenant/server/subject/session/version/request/resource/case/method/target/body/raw를 같은 요청에 결속한다.
+정상/unknown/잘못된 증거는 점수·경보·검토를 낮추지 않는다. 검증된 거부/인증·MFA 실패+실행만 추가 경보1.0이다.
+기존 `WebResidualRefinement`에 선택적으로 결합하며 실제 앱·승인/복구/PEP·모델·라벨을 수정하지 않았다.
+
+신규 기능 제어군13개 모두 기대 결과, 신규 테스트60포함 Windows/Linux 관련316개씩·Ruff 통과.
+Linux network none/735파일 전후 동일·exit0/OOM false·컨테이너 제거. 비공개키 저장0이다.
+통제 입력·고정 테스트 시계이며 실제 센서/IdP/PDP 연결·서버 관측 수집·새 독립 평가/F1 측정은0이다.
+v44 마지막 실측 FN30/FP19는 보존 기록이며 원시1,259,637행을 이번에 재생하지 않았다.
+body SHA는 서버 측 수집기가 실제 바이트에서 생성해야 하고 이 어댑터는 서명된 결속을 확인한다.
+운영 수집기·영속 adverse/검토 기록·상위 사고 흐름 연결은 미완료다. 재사용 fallback은 앞선 경보 취소 명령이 아니다.
+실제 실행 `runtime/f1/web-context-controls-v45-20261113`, 시험 `runtime/f1/web-verified-context-tests-v45-20261113`.
+유료API/AWS/다운로드/push/병합0, 팀원 aitest/main 병합 금지·사용자 ZIP 보존·최종 예약 본문/라벨 접근0이다.
+다음은 실제 서버/수집기 요청 상관 계약과 영속 검토/위험 기록·새 개발/보정 자료 인수다.
+
+## v44 보존 기록: 웹 잔여 오류 보강, 경보와 검토 분리
+
+[최신 웹 잔여 오류 검증](docs/extra-web-residual-review.md)과
+[공유 근거/실제 사례 목록](docs/infrastructure-results/extra-web-residual-v44-20261113.json)을 먼저 읽는다.
+`extra`에서 새2스크립트/45테스트와 실험 프로토콜만 추가했고 앱·기존 모델/규칙·라벨·분할은 보존했다.
+최종안은 동일 source/client의60초 내 서로 다른 이전3개 PHP missing-script 경로 뒤 새 경로에 경보를 보강한다.
+인코딩 명령 목록을 가진 uploads 스크립트 요청은 기존 점수/경보를 유지하고 검토만 추가한다.
+원문 SHA/ordinal과 단일 행 관측 지문을 결속하며 준비 단계의6개 HTTP 시간창 필드는 별도다.
+동일 시각은 과거로 사용하지 않고 미상시각/client/다른 source/반복 같은 경로는 근거로 보충하지 않는다.
+
+실제 기존 R/S/Fox 전체1,259,637행을 Windows에서 비교했다.
+웹432,332행 FP19→19·FN34→30, Fox error FN4→0·FP0 유지. 기존 TP 손실0·새 경보 FP0이다.
+비웹827,305행의 점수·경보·검토 SHA가 전후 같다. 명령 요청19건은 여전히 경보 FN이며 검토로만 표시한다.
+새 검토는 게시자 위협23건(새 경보4포함)·정상3건으로, 검토 부담까지0이라는 주장이 아니다.
+최초 지문 불일치 실행은 미완료로 보존했다. 이후 넓은 명령 경보안은 웹FN11까지 줄었지만
+새FP3(R/S/Fox각1)를 만들어 미채택했다. 원문/라벨을 바꾸거나3건을 제거하지 않았다.
+최종 `runtime/f1/web-residual-review-v44-20261113`과 review 프로토콜을 사용한다.
+
+최종 Windows/Linux 관련256개씩 통과(신규45포함)·Ruff 통과. network none/728소스 전후 동일·exit0/OOM false·컨테이너 제거.
+실제 데이터 재생은 Windows, Linux는 관련 pytest다. 기존 전체 앱을 다시 시험한 것은 아니다.
+새 독립 평가0·사람 검토0·목표 미완료, 운영 API/자동 집행 연결0이다.
+유료API/AWS/다운로드/학습/push/병합0, 사용자 ZIP 보존. 팀원 완료 전 aitest/main 병합 금지다.
+다음은 명령 요청·POST/리다이렉트의 실제 서버 인증/권한/본문/업무 근거 확보와 새 개발/보정 데이터다.
+harrison/wilson 본문/라벨은 열지 않았고 최종 적합성/여섯 영역 매핑은 미확인 상태다.
+
+## v43 보존 기록: 독립 평가 준비·오류 목록, 새 최종 사례0
+
+[최신 준비/검토 설명](docs/extra-independent-evaluation-preparation.md)과
+[공유 근거·44개 검토 항목](docs/infrastructure-results/extra-independent-preparation-v43-20261113.json)을 먼저 읽는다.
+사용자 요청은 팀원 작업 중 `extra`에서 독립 평가 준비와 기존 잔여 오류 정리를 진행하는 것이다.
+`aitest`/`main` 병합 금지, 앱·승인·복구 경로/기존 모델·규칙·라벨과 사용자 ZIP은 보존한다.
+
+신규 `scripts/f1_lab/evaluation_preparation.py`와 `scripts/prepare_independent_evaluation.py`는
+노출 source/payload/pattern 대장, 세션/주체/기기/계열/패턴의 추이 연결, 단위/시간/라벨 격리 검사와
+정확한 출력 inventory·지문 검증을 제공한다. 준비 전용이며 최종 평가기나 후보 동결기는 아니다.
+기존720건의 원래 dev360/holdout360은 보존하고 메타데이터 역할만 전부 개발/회귀로 표시했다.
+연결 성분67·최대20·삭제0, 새 독립 최종 사례0·후보 미동결·독립 검토0·목표 미달 상태다.
+기존 증거220건/22계열과 공개 로그22개 파일별 집계를 총44개 작업으로 정리했다.
+공개 로그 항목은 행별 사례 목록/원인 확정이 없으며 이번 원시 로그 재생0이다.
+harrison/wilson은 기존 예약 metadata만, 본문/라벨 접근0이며 여섯 영역 적합성도 미확인이다.
+
+실제 준비 `runtime/f1/independent-preparation-v43-20261113`, freeze SHA
+`d57753a97ee72b25799338102432c4657e0d73f46a61e2a46849601d369bd54c`.
+`check` 종료2는 준비 패킷 무결성 확인 후 최종 평가 미준비를 알리는 의도한 결과다.
+신규 집중44통과, Windows/Linux 관련 묶음181개씩 통과·Ruff 통과.
+Linux network none·721파일 전후 동일·exit0/OOM false·소유 컨테이너 제거. 전체 앱 재시험은 아니다.
+준비 추론/학습0(기존 회귀 fixture는 기준선 재현), 유료API/AWS/다운로드/push/병합0.
+다음은 기존 잔여 관측/라벨 검토와 새 개발/보정 자료·metadata 어댑터 확보다.
+후보 고정·새 최종 자료/라벨 심사·별도 최종 평가기/통합 회귀는 미완료다.
+
+## v42 보존 기록: VPN 검증 신호 연결, 실제 공개자료 오탐/독립 목표는 미완료
+
+[최신 구현/비교](docs/extra-vpn-verified-signals.md)와
+[전체 근거](docs/infrastructure-results/extra-vpn-verified-signals-v42-20261113.json)를 먼저 읽는다.
+선택형 로컬 bridge로 등록 인증서↔사용자/기기, gateway/session/version/TLS 채널/원문/endpoint/일회 nonce를 결속한다.
+기존 FrozenSignalVerifier·기기 observation·SignedSessionSignal·PinnedApprovalVerifier·PinnedResourcePolicies를 재사용한다.
+gateway/IdP/기기 source와 승인자 키를 분리하고, 현재 등록 대장/권한/폐기/만료를 매 결정 재검증한다.
+새 grant/권한 복원/자동 차단은 하지 않는다. 어댑터는 부가 VPN 신규 연결 위험만 낮추고,
+기존 기준선 위험·60초 위험 유지·알려진 원시 보안 징후·검증된 adverse는 보존/경보한다.
+
+통제 기능 입력 49건: 정상20 FP20→0, 경보/검토 대상29건 누락0 유지. 실제 악성의 독립 정답/성능이 아니다.
+실제 과거 VPN18,458행에는 검증 신호가 없어서 모든 점수/경보/이유 SHA가 이전과 같고 FP60/60/88·FN0이다.
+실제 MDM/게이트웨이 TLS exporter/등록 수집·분산/영속 상태·운영 인수·원래 여섯 영역 독립 목표는 남는다.
+서명은 출처/무결성만 증명하며 기기 상태의 진실성·하드웨어 attestation을 대체하지 않는다.
+
+최초 전체 Windows F1 826·Linux 전체3646 통과 후 등록 결속/추가 guard/메타데이터를 마무리했다.
+최종 관련 Windows/Linux 각280 통과, 최종 코드/시험은 최종 Linux 소스와 같다.
+서로 다른 스냅샷의 중복 건수를 합쳐 한 번의 전체 실행으로 쓰지 않는다.
+각 실행 network none·OOM false·소유 컨테이너 제거 확인, 공개 등록부만 생성하고 개인키는 메모리에서만 사용했다.
+AWS·유료 API·GitHub push0, 원본 app/PEP·기준선/라벨/모델·사용자 ZIP 보존, harrison/wilson 본문 접근0.
+최초 데이터73232·최초 전체94759는 terminal 완료이며 최종 후속 receipt는 최신 JSON을 따른다.
+
+## v41 보존 기록: VPN 오탐 감소는 미달
+
+최신 요청은 VPN 정상 오탐 감소와 미탐 비증가·무료 로컬 비교·문서 업데이트다.
+[최신 검증](docs/extra-vpn-precision-audit.md)와
+[근거 JSON](docs/infrastructure-results/extra-vpn-precision-audit-v41-20261113.json)을 먼저 읽는다.
+새 스크립트는 오프라인 가설/회귀 진단용이고 앱·기존 모델·라벨·v40 코드/정책은 바꾸지 않았다.
+채널 선언 단독 위험 제외안은 FP12/12/16건을 줄이지만 각 TP4건을 잃어 미채택했다.
+고정 임계값 비교에도 기존 TP 유지+FP 감소를 함께 만족한 후보가 없었다.
+선정은 v40b 유지: R/S/Fox TP28/FN0/FP60·60·88, P31.82·31.82·24.14% 그대로다.
+**오탐 감소 목표는 달성하지 못했다. 시험 완료·문서 작성 완료와 성능 개선 완료를 구분한다.**
+
+현재 전체 관측 특징+위험 이력의 정답 보조 진단에서 기존 TP를 전부 보존하면 남는 FP 하한은56/60/86이다.
+S60건은 전부 위협과 동일 벡터이며 이 투영에서 FN 없이 FP를 줄일 수 없다.
+이는 진단 하한이며 새 관측을 갖는 모든 모델의 불가능성 주장이 아니다.
+R/Fox 비혼합4/2행은 경과2초로 관측되며60초 보안 유지 정책을 위협의1초 구간에 맞춰 축소하지 않았다.
+다음은 검증된 기기/주체·자원 권한/승인·만료/회수 상태와 실제 VPN 연결을 묶는 선행 관측이다.
+현재 공개 로그에는 근거가 없고 TLS 성공/IP/이름을 신원/업무 승인으로 바꾸지 않는다.
+
+VPN18,458행 전체에서 이전 혼동행렬을 재현했다. 이번에125만 전체 행을 다시 실행한 것은 아니다.
+Windows/Linux 관련88개씩 통과(신규26), network none·707파일 스냅샷 불변·OOM false·소유 컨테이너 제거 확인.
+원래 앱·benchmark/라벨/모델 불변, AWS/유료 API/GitHub push0, harrison/wilson 본문 접근0이다.
+데이터 비교25964·시험42730은 terminal exit0이며 재poll/재시작하지 않는다.
+원래 여섯 영역 독립 목표·운영 채택·조건부 LLM 개선은 미완료다.
+
+## v40/v40b 보존 기록: 웹 오류·VPN 개선
+
+최신 요청은 웹 오류 로그 오탐·VPN 미탐 감소, 무료 로컬 시험·이전 비교·문서 업데이트다.
+[최신 비교](docs/extra-error-vpn-refinement.md)와
+[전체 근거](docs/infrastructure-results/extra-error-vpn-refinement-v40-20261113.json)를 먼저 읽는다.
+v39 웹 후보와 v32 VPN 이력 모델은 재학습 없이 동결 재사용했다.
+오류 보정은 정확한 PHP scandir ENOENT warn 문법·유효 시각/클라이언트·공격/이전 보안 오류 없음에만 적용한다.
+v40b는 같은 물리 원본/정확한 IP:port에서 엄격히 이전 위험0.95 이상을60초 유지한다.
+같은 시각 배치를 보류하며 유지된 위험은 자기 만료를 연장하지 않는다. 이 키는 검증된 신원이 아니다.
+
+125만9,637행·같은0.95 비교: 오류 FP S2→0/Fox2→0(각 정상2행뿐), 기존 오류 공격 TP/FN 유지.
+VPN FN 자료별28→0, FP0→60/60/88, P31.82/31.82/24.14%, F1 48.28/48.28/38.89%다.
+VPN 정밀도/F1은 목표 미달이고 추가 FP로 전체 micro F1은 이전보다 낮다. 검토용 후보이며 자동 차단/운영 채택은 아니다.
+v40 이력만0.95와 별도0.9 검토 비교도 보존한다. 기존 웹 접근·기타 비대상 판단·원래 앱/기준선/라벨은 그대로다.
+
+Windows F1 관련714·Linux 전체3534가 통과했고, v40b 후 별도 Windows/Linux 집중47개씩 통과했다.
+47개 중32개는 앞선 시험과 중복이며 서로 다른 스냅샷의 수를 한 번의 전체 실행으로 합산하지 않는다.
+두 Linux 실행 모두 network none·소스 스냅샷 불변·OOM false·소유 컨테이너 제거를 확인했다.
+AWS·유료 API·GitHub push0. 예약 harrison/wilson 본문 접근0이며 원래 여섯 영역 독립 목표/후속 LLM 개선은 미완료다.
+terminal 완료: v40 전체 비교6844, v40b 비교68227, v40 회귀65983, v40b 집중88506·최종 EOF 정규화 집중95750. 재시작/재poll하지 않는다.
+재현 계약/해시/CLI와 남은 IdP·권한·기기/세션 선행 신호 공백은 최신 문서를 따른다.
+
+## v39 보존 기록: 정상 웹 오탐 감소
+
+최신 요청은 정상 웹 오탐 감소·무료 로컬 시험·기존 결과 비교·문서 업데이트다.
+[v39 결과](docs/extra-web-false-positive-reduction.md)와
+[근거 JSON](docs/infrastructure-results/extra-web-refinement-v39-20261112.json)을 먼저 읽는다.
+`scripts/f1_lab/web_refinement.py`에 R만 학습한 HTTP 보정 후보와 해시 고정 로더를 구현했다.
+새 트리에서 다섯 요청량 특징을 제외하고, 낮은 경험 점수0.05 이하의 성공 GET/HEAD만 기존 점수를 낮춘다.
+공격 징후·스캐너·초당100/분당500건 이상·미상/오류/불확실성·POST/3xx/4xx/5xx는 기존 판단을 유지한다.
+이는 실험 경보 후보이며 접근 허용/신원 신뢰/권한 발급 근거가 아니다. 원본 앱/PDP/LLM/라벨/기준선은 그대로다.
+
+전체1,259,637행의 같은0.95 비교에서 웹 FP는 R0→0, S116→7(FPR6.9544→0.4197%),
+Fox483→12(FPR23.2100→0.5766%)다. 기존 웹 TP/FN은 세 자료 모두 같고 새 FP·기존 TP 손실0이다.
+비HTTP 점수는 매 행의 정확한 값 대조로 그대로임을 확인했다. Fox 전체 F1은99.8625→99.9140%다.
+초기 더 넓은 시범의 Fox4/S1 FP와 구분한다. 성공 GET/HEAD만 보정하는 최종 범위를 선택해 Fox12/S7이다.
+기존 모델의 HTTP 첫 분기는 분당25건 이상을 순수 공격 leaf로 처리해 브라우저 일괄 읽기를 오탐했다.
+저장소 LF 규칙에 맞춘 실행 계약으로 재현 비교하며 최초 실행·원본 설정·탐색 이력을 보존한다.
+
+Windows F1 관련 **682개**, network none Linux 전체 **3502개**가 통과했다. 신규34개를 포함한다.
+동결 artifact/정책 변조 거부·기존 위협/고속 요청 보존·비HTTP 불변성·정보 부족 시 기존 점수 유지 등을 시험했다.
+코드/라벨/모델에 원시 주체 ID나 시나리오를 학습 특징으로 넣지 않았다. AWS·유료 API·GitHub push0이다.
+잔여 정상 웹은 S POST5/GET2, Fox POST8/GET4이며 적용 범위/보안 징후 보존 조건에 해당한다.
+S/Fox는 이미 관찰한 개발/보정 자료다. 새 독립 평가·모든 새 공격의 무손실·운영 채택·원래 여섯 영역 목표 완료는 아니다.
+다음은 잔여 POST/리다이렉트/오류 응답의 실제 본문/권한 맥락과 VPN·감사 관측, 새 독립 평가 자료다.
+현재 조건부 후속 LLM 개선은 시작하지 않았고 원본 `app/`·기존 benchmark는9c67889와 같다.
+
+## v37~v38 보존 기록: 공간 복구 후 전체 보정
+
+**최신 지시:** 사용자는 공간 확보 후 중단했던 F1 목표 작업을 재개하고 무료 로컬 시험·문서 업데이트를 요청했다.
+이전 **17:11:10 KST 종료 시각은 이번 명시적 재개에 적용하지 않는다.**
+`runtime/f1/resumed-work-20261112.json`과 [v37~v38 결과](docs/extra-streaming-fox-calibration.md)를 먼저 읽는다.
+AWS·유료 API·GitHub push 없이 `extra`에서 수행했다. 원래 여섯 영역의 목표를 축소하거나 완료로 바꾸지 않는다.
+
+v37은 SQLite 인덱스 정렬·증분 HTTP 창을 구현해 R295,243/S295,976의 의미 입력·정답·참조를 기존 바이트로 재현했다.
+Fox는 **668,418행 전체·HTTP412,904요청**을 유지했고 기본 입력 가상 SHA·정답/참조 SHA도 기존과 같다.
+가장 큰 임시 DB1,792,798,720바이트·HTTP 활성 최대22,748·최종 출력1,787,481,728바이트이며 준비452.598초다.
+현재 성공 시도의 spool만 제거했다. v36 ENOSPC 실패 receipt·부분 파일은 그대로 보존하고 SHA를 재검증했다.
+
+동결된 단일 트리는 Fox F1 **62.5021%**·웹 미탐248,359로 실패했다. v38의10개 임계값 비교도 해결하지 못했다.
+동결된 관측 종류별 트리는 기본0.5에서 Fox P99.5967/R99.8424/F1 **99.7194%**/FPR0.8731%다.
+관찰된 R/S/Fox의 같은5개 임계값 비교에서0.95는 Fox FP1847→522·FN720→734·F1 **99.8625%**/FPR0.2468%였다.
+그러나 정상 웹 FP483/2081·FPR23.2100%는0.95에서도 그대로다. 기본0.5 VPN TP9/28, 감사·인증 약점도 남는다.
+전체 평균만 통과한 것이며 **모델/임계값 선정·앱 통합·운영 채택·원래 여섯 영역 F5 완료는 아니다.**
+`runtime/f1/streaming-calibration-v37-20261112/run.json`은 terminal 완료(도구35889 exit0),
+단일 트리 점수 분석23506과 관측별 점수 비교80299도 terminal exit0이다. 완료 작업을 다시 poll/재시작하지 않는다.
+Windows F1 관련635통과 뒤 fixture 예산만 보완해15개를 재확인했다. 최초 Linux3450통과/5실패는2GiB tmpfs에서
+기본21GiB 사전 예산을 쓴 기능 fixture 문제였다. 실제 준비기 안전 한도는 유지했고 수정 후 Linux 전체 **3455통과**다.
+점수 분석기/CLI 최신 별도 묶음 **Windows13/Linux13통과**, Ruff통과·소유 시험 컨테이너0이다.
+전체3455개와 신규13개는 서로 다른 스냅샷/실행이며 전체3468개를 한 번에 실행한 것으로 쓰지 않는다.
+`docs/infrastructure-results/extra-streaming-calibration-v37-v38-20261112.json`에 모든 회차와 소스 지문이 있다.
+
+다음은 웹 정상 오탐의 특징/leaf 충돌·과거 행동 신호 보강, VPN/감사의 실제 과거 권한/보안 신호와
+원래 여섯 영역의 새 독립 관측/정답/분할 근거 확보다. 예약 harrison/wilson 본문은 이번에 읽지 않았다.
+원본 `app/`·기존 benchmark는9c67889와 같다. 기존 라벨·모델 바이트·기존0.5 결과를 변경하지 않는다.
+높은 보정 micro F1로 전체 목표를 완료 처리하거나 조건부 후속 LLM 작업으로 넘어가지 않는다.
+
+## v34~v36 보존 기록: 이전 한 시간 작업 창
+
+당시 사용자는2026-11-12 16:11 KST경 한 시간만 작업하도록 요청해17:11:10 KST에 중단했다.
+과거 시간 계약은 `runtime/f1/user-work-window-20261112.json`이며 현재 재개 지시로 대체됐다.
+아래 Fox 미완료·다음 스트리밍 작업 지시는 **그 시점의 기록**이고 최신 결과는 위 v37~v38을 따른다.
+
+**v34 당시:** [HTTP/인증 의미 관측](docs/extra-http-auth-semantics.md)을 구현해 전체 개발 비교했다.
+Windows/Linux287개 통과·Linux458파일 일치·소유 컨테이너0. 최초 Windows281/6실패는 실제 디스크 여유 검사였고 보존한다.
+S 단일 후보는 TP46400/FP16/FN967/TN248593·P99.966/R97.958/F1 98.952/FPR0.00644%다.
+웹 접근 FP112→1·인증 TP2/12→9/12지만 VPN0/28·공유감사0/2·감사14/19는 남는다. S는 관찰된 개발 자료다.
+관측별 트리 전체 FP1544는 미채택이다. 원본 앱·정답 변경0이며 독립 전체 목표 달성은 아니다.
+모델 둘은 `runtime/f1/semantic-models-frozen-v34-20261112.json`에 동결했다. Fox는 원래 보정용 시나리오다.
+**Fox 다운로드11206은 terminal exit0**이다. 688,586,900바이트·발행자MD5검증·SHA
+`8d71d31a31df469d836c80bdbfdc35da566e90322cf9ae490233e176a0c88d49`,2264.297초다. 다시 poll/재시작하지 않는다.
+보정 도구60958은 **ENOSPC terminal exit1**이다. 다시 poll/재시작하지 않는다.
+원시/정답8쌍668,418행(정상211,534/공격456,884)·기본 변환은 완료했으나 의미 입력 준비에서 디스크가 부족했다.
+추론 실행/보정 지표는 없다. 별도 검사는 HTTP412,904요청이 기존100,000상한도 넘는 것을 확인했다. 두 원인을 혼동하지 않는다.
+[v36 상태](docs/extra-fox-calibration-status.md)와 [한 시간 정리](docs/extra-one-hour-summary-20261112.md)를 먼저 읽는다.
+원시/라벨/실패 부분 파일을 남겼고 완료된 base/inputs.jsonl 캐시 하나는 SHA 대조 후 정리했다.
+기대 SHA/재생성 방법은 `runtime/f1/fox-calibration-v34-20261112/storage-recovery.json`에 있다. base receipt만 보고 캐시 완비로 오인하지 않는다.
+모델/기존 라벨은 그대로다. 저장 복구54022는 terminal exit0, 소유 실험/수집 작업은 종료했고 F1 컨테이너0이다.
+다음은 한 번의 관측 추출·제한된 외부 정렬·증분 HTTP 창, R/S 특징/예측 동일성 검증을 갖춘 스트리밍 준비기다.
+전체668,418행을 유지하며 일부만 잘라 목표를 통과시키지 않는다. 원래 여섯 영역의 최종 목표도 미완료다.
+성분 비교87457·인증 하위 성분38250은 terminal exit0이다. 다시 poll/재시작하지 않는다.
+`runtime/f1/semantic-component-ablation-v35-20261112`·`semantic-auth-ablation-v35b-20261112`에 있다.
+[v35 성분 결과](docs/extra-semantic-component-results.md): 모든 새 필드를 끄면 v23 root/혼동행렬 정확히 재현,
+HTTP만 FP111감소/TP15증가, 계정 이력만 TP7증가, 정적 인증·감사만 개선0이었다. 모두 기존 개발 자료다.
+`runtime/f1/semantic-lzx-storage-20261112.json`에서 완료/실패 데이터의 논리 SHA 보존과 파일 압축을 추가 확인했다.
+새 독립 목표 달성이나 운영 채택은 아니다. 새 pytest는 실행하지 않았다.
+이전 데이터 준비49865는 ENOSPC로 terminal exit1, 재개51090·Windows98919·Linux98823·완료기록90272는 terminal exit0이다.
+정확한 실패/복구·저장 원자료는 [v34 근거](docs/infrastructure-results/extra-http-auth-semantics-v34-20261112.json)를 따른다.
+기존 실패 RBA prefix 파일은 완성 ZIP과 동일 prefix SHA를 대조해 중복만 제거했다. 원래 실패 기록은 남고 바이트는 완성본에서 복원 가능하다.
+`runtime/f1/exact-prefix-storage-deduplication-20261112.json`이 정확한 경로/길이/해시/복원 방법이다. 실패 S 부분 파일과 사용자 ZIP은 보존한다.
+
+[v33 실제 연결/센서 감사](docs/extra-causal-linkage-and-evaluation-blocker.md)와
+[감사 근거](docs/infrastructure-results/extra-native-causal-linkage-v33-20261112.json)를 가장 먼저 확인한다.
+현재 목표는 달성되지 않았다. v31/v32/v33에서 같은 독립 관측/정답/분할 부족을 재확인했고,
+최근 연결 가설도 필요한 시점의 근거를 제공하지 못했다. 현재 자료로는 최종 평가를 증명할 수 없다.
+원래 여섯 영역에 맞는 새 외부 평가 근거가 확보/확인되면 최종 평가를 진행하며 범위나 목표 수치를 축소하지 않는다.
+독립 사람 검토자 미지정만이 차단 사유는 아니다. 새 모델/임계값을 바꾸는 것으로 없는 외부 정답을 만들지 않는다.
+이 상태를 완료로 표시하거나 조건부 후속 LLM 작업으로 자동 전환하지 않는다.
+
+2026-11-12 사용자 재개 지시로 P/R/F1 각각95% 이상·FPR5% 이하의 **새 독립 평가**를 목표로 진행한다.
+이 목표에는 이전09:00 종료 시각을 적용하지 않는다. 원본 `app/`·규칙·기존 라벨은 보존한다.
+기존 관찰 holdout의 초안 F1 80%·FPR33.33%는 목표 미달이며 새 독립 성능이 아니다.
+새 자료가 없다는 사용자 답변에 따라 공개 자료와 무료 로컬 수집을 사용한다.
+독립 사람 검토자를 확보한 것으로 기록하지 않으며 검토자 신원·승인을 만들어 넣지 않는다.
+
+사용자 후속 요청(2026-11-12): 현재 새 독립 평가에서 P/R/F1 각각95% 이상·FPR5% 이하를 검증한 뒤
+LLM 개선으로 이어간다. 현재 탐지 목표를 먼저 유지하고 사건 분석/요약/대응 제안의 근거 정확도,
+프롬프트·구조화 출력·불확실성/공급자 오류 대응, 역할별 모델 라우팅과 비용/지연을 개선한다.
+접근 허용·차단은 정책 엔진의 검증된 규칙으로 결정하는 경계를 유지한다. LLM 품질은 근거 충실도·출력 유효성·
+부적절한 제안·실패 복구·비용/지연을 별도 평가하며 기존 탐지 지표로 대체하지 않는다.
+우선 로컬/저장 응답·모의 공급자로 검증하고 실호출의 요청/토큰/비용 상한을 별도로 관리한다.
+이 후속 요청 때문에 현재 유료 API를 호출하거나 현재 독립 평가 목표를 완료 처리하지 않는다.
+
+같은 Docker 엔진에 재연결하여 이전 두 소유 컨테이너의 exited255·OOMfalse를 직접 확인했다.
+최종 status가 없어 장시간 시험은 **미완료**다. 공개 증거만 회수한 뒤 정확한 두 컨테이너와
+소유 파생 이미지만 제거했고 남은 소유 컨테이너0을 확인했다. 다른 서비스/데몬은 변경하지 않았다.
+[v15 실제 정리 근거](docs/infrastructure-results/extra-interrupted-cleanup-v15-20261112.json)가
+v14의 정리 미확인을 갱신한다. 이전 Windows418·전체 Linux3153 통과는 그 소스의 기록으로 보존한다.
+
+AIT 공개 원시 로그/경보의 고정 버전·라이선스·크기·체크섬을 확인하고 수집기를 구현했다.
+[수집·평가 계약](docs/extra-native-evaluation.md)과 `infra/f1-lab/native-data-protocol.json`을 따른다.
+개발 시나리오만 본문을 읽고 최종 예약 시나리오의 본문/라벨은 후보 동결 전 읽지 않는다.
+새 독립 성능 수치는 아직 없다. 결측 IdP/EDR/업무 승인 정보를 정상으로 채우지 않는다.
+개발 경보45,544행 변환·파싱/관측 오류0, 현재 관련 집중 시험 Windows261·Linux261개 통과다.
+원시 ZIP522,084,364바이트 전체 MD5/SHA 검증 완료. 실제 최상위 gather/labels 경로·dataset.yaml을 지원했다.
+개발 원시8쌍295,243행(공격61,862/정상233,381)을 색인했다. 후속 시간 전수 감사에서 실패/범위 밖0,
+특징 오류0·웹 시간 역순3곳을 확인했다. [원시 후보 개발 진단](docs/extra-native-candidate.md)을 따른다.
+경보의 정확한 정답 연결은11,019건(공격10,918/정상101), 미확정34,525건으로 알려진 부분에 공격 편향이 크다.
+이 부분만 성능 분모로 삼지 않는다. 전체295,243 원시 행으로 새 통계 후보를 개발 재대입했다.
+임계값0.5의 F1 98.66%는 독립 성능이 아니며 파일별 평균 재현율30.28%·웹 FPR53.89%·감사/VPN/CPU R0으로 미채택이다.
+기존 holdout shadow F1 80%와 자료/범위가 다르므로 원본 대비 개선 폭으로 쓰지 않는다.
+후속 v20에서 실제 CPU/감사 명령·HTTP 과거 창을 추가했고 기존 파일·정답·실패한 후보는 보존했다.
+추가 관측 NB는 웹 FP506으로 악화했다. 결정트리 후보는 개발 재대입 F1 99.09%·웹 FP0/835·인트라넷 감사 TP8/9지만
+파일별 평균 재현율44.55%·VPN/CPU/공유감사 R0으로 최종 후보 미채택이다. 단독 특징의 기여도 실험은 아니다.
+다음은 관측 종류별 학습 불균형/판단 근거 부족과 다른 개발 시나리오에서의 일반화 검토다.
+AIT만으로 여섯 영역 전체를 입증할 수 없으므로 [추가 맥락 출처 검토](docs/extra-contextual-source-review.md)를 함께 진행한다.
+GRAAI 사전 계약 뒤 고정7z25,241,476바이트·단일 CSV838,136,631바이트 전체 해시를 검증했다.
+최초128개 개발 기록만 구조를 봤고102개 명시 JSON 라벨·26개 비JSON/미해석 메시지가 있었다.
+`runtime/f1/contextual-schema-probe-20261112`의 나머지 기록은 격리 상태이며 독립 최종 평가로 인증하지 않았다.
+후속 사전 감사 계약 뒤347,768건을 기계적으로 연결/라벨 메타데이터 검사했다. 사례별 후속 본문 출력/모델 학습0,
+명시 정상141,153·공격140,637·라벨 미확정65,978이다. 안정 브라우저/반복 요청 가정까지 적용한 probe 연결280,859행,
+미연결이지만 링크가 있는985행을 새 독립 최종으로 인증하지 않았다. 선언된 명시 신뢰 필드 이름 목록에 일치한 경로0이다.
+지문은 기기 건강 상태가 아니고 DB 연결 정보는 자원 소유자의 역할 정책이 아니다. 없는 라벨/신뢰 주장을 정상으로 채우지 않는다.
+santos 수집 세션69533과 준비/전이 세션36198은 완료exit0이다. 재시작하지 않는다.
+고정 v20 모델을 재학습 없이295,976행에 적용해 P99.73/R97.56/F1 98.63/FPR0.0499%였다.
+그러나 웹 FPR6.95%·파일별 평균 재현율41.92%·VPN/CPU R0이며 개발 시나리오 간 진단일 뿐 최종 인수가 아니다.
+[전이·새 맥락 자료 기록](docs/extra-native-transfer.md)을 따른다. 최종 예약 harrison/wilson 본문·행별 정답은 읽지 않는다.
+[v22 메타데이터·관측별 후보](docs/extra-metadata-and-heads.md)에서 종류별 학습과 순서 이진 분할을 추가했다.
+순서 이진 후보는 CPU R49/49·S44/44/FP각1로 개선했지만 S VPN FP1152/5594·웹 FP116/1668로 미채택이다.
+Santos는 이미 관찰한 개발 자료이며 v22 재적용을 새 독립 평가로 부르지 않는다. 이전 범주형 후보 실패도 남겼다.
+[v23 단일 이진·CloudTrail 감사](docs/extra-flat-tree-and-cloud.md)에서 단일 순서 이진 모델은 S 개발 자료
+P99.73/R97.91/F1 98.81/FPR0.0511%였다. CPU44/44·FP1로 개선했지만 VPN0/28·인증2/12·웹FPR6.71%로 미채택이다.
+S는 이미 관찰한 자료다. `785862dedbb8d2627204e99b08400639d7b80f88a43e250707bd7b21130cc89f` 모델을
+재학습 없이 전이했으며 최종 예약 AIT 자료는 읽지 않았다.
+고정 ArielCyber CloudTrail 학습 ZIP2개를 사전 계약 후 수집/검증하고20,711행(정상20,170·공격541)의 관측/정답을 분리했다.
+관측 오류/라벨 미확정0이지만 실제 계정 활성·기기 건강·자원 소유 정책·업무 승인은 없다.
+`mfaAuthenticated=false`는 MFA 미사용이며 실패가 아니다. 정상 AssumedRole에도 존재한다.
+라이선스 파일/API 명시가 없어 읽기 전용 구조 연구만 진행하고 제품 채택·재배포는 미선정이다.
+CloudTrail 모델 학습0·테스트 ZIP 다운로드0이다. 다음은 원래 여섯 영역의 데이터/권한 맥락과 새 자료의 주체·시나리오 경계를 보완하는 것이다.
+[v24 정보/라벨 검토](docs/extra-cloud-information-and-labels.md)에서 현재 CloudTrail 특징으로 같은 학습 자료에
+도달 가능한 이상적 최대F1은93.7622%·최소 오분류64였다. 정답을 쓰는 진단이며 모델 성능이 아니다.
+S3의 요청된 ACL/암호화만 추가한 별도 프로필도 상한 개선0·정답 지문 동일이다. 원본 관측을 덮어쓰지 않았다.
+학습 파일 공통principal7개/관련7190행·발급역할4개/5487행으로 무작위 행 분리의 독립성을 추정하지 않는다.
+ZTA-RAD 전문가 CSV 첫128개·노트북 코드2개만 조사했다. 전문가 CSV 생성 경로에 집계 위험 규칙이 있어
+독립 공격 사건 정답으로 채택하지 않았다. 기기 계열103/128·HTTP77/128 결측은 전체 비율이 아니다.
+이후 CSV 행 사례 분석/노트북 실행0·SMOTE/LLM 라벨 자료 미수집이다.
+다음은 미래/정답을 쓰지 않는 과거 이력·검증 가능한 주체/권한 맥락을 보완하는 것이다. 여섯 영역의 최종 평가 부족은 남는다.
+[v25 엄격한 과거 관측](docs/extra-cloud-causal-context.md)에서 동일 principal의10/60초·쓰기/오류/종류를
+추가했다. 같은 시각끼리 서로의 과거를 보지 않고 중복9행은 이력1회/정답 전부 보존, 결측연결3134행을 임의로 묶지 않았다.
+학습20,711행의 최소 오분류는64→50·이상적 최대F1은93.7622→95.1550%지만 **모델 성능이 아니다**.
+동시 목표의 정확한 가능 상태를 검사했다. P≥95%에서 최대R91.1275%, R≥95%에서 최대P41.0841%로 동시 목표 불가능이다.
+혼합 공격50건 중48건은 현재 principal 연결이 없는 AWSService HeadBucket/PutObject 기록이다.
+다음은 원본에 서비스 호출의 원래 주체/역할·세션으로 연결할 근거가 있는지 검토하는 것이다.
+원본 관측/정답 지문과 최종 자료 격리를 유지한다. 새 CloudTrail 분류 모델 학습/독립 평가0이다.
+[v26 신원 감사·RBA 수집](docs/extra-cloud-identity-and-rba.md)에서 CloudTrail 학습 원본20,711건을 대조했다.
+AWSService3107건(공격48)은 principal/ARN/세션/위임 연결 근거가 없고 정확한 교차 기록 후보도0이다.
+서비스 이름/IP를 사용자로 바꾸지 않았으며 현재 입력으로 목표 동시 미달을 유지한다.
+[v29 RBA 수집·실제 probe 완료](docs/extra-rba-acquisition-and-probe.md): 첫 세션34025는1069547520바이트에서
+시간 상한 종료exit1·timeout재시도2다. 이전 실패/부분 파일은 보존하고 새 세션4416에서 같은 자산을 검증하며 재개했다.
+재개exit0·전체1093700330바이트·발행자MD5/별도 재계산·SHA 대조 완료다. 두 세션 모두 terminal이며 다시 poll/재시작하지 않는다.
+완료본은 `runtime/f1/public-rba-20261112-02`, SHA256은 `ca1d974e97aebfb30878a613f4ca5c793860a98ba2acb5185c9bc610d7432a33`이다.
+ZIP12멤버·CSV9052907531바이트를 통째로 풀지 않았다. v27 리더로 처음128개·파서37393바이트만 실제 조사했다.
+ATOfalse128/true0·공격IPtrue9·성공65/실패63·RTT결측122·시간대없는시각128, 관찰 사용자81개다.
+이를 전체 클래스 수/결측 비율이나 탐지 성능으로 쓰지 않는다. prefix/사용자 해시는 `runtime/f1/rba-schema-probe-20261112/probe.json`에 있다.
+v29까지 나머지 CSV 기록은 파싱하지 않았다. 후속 v30의 메타데이터 기계적 파싱 진행은 아래를 따른다. 개발 관찰 사용자를 미관찰 최종으로 재사용하지 않는다.
+ZIP 내부 선읽기·CSV 전체 CRC 미검증을 명시한다. 합성 RBA는 생산 IDS용이 아니고 여섯 영역을 대체하지 않는다.
+v28 문헌 검토에서 `das-group/rba-dataset`의 고정 문서와 저자 논문을 확보했다.
+논문 원 연구31.3M/성공12.5M/실패18.8M/확인 탈취87은 공개 합성 CSV의 실제 클래스 수가 아니다.
+ATO/공격IP/로그인실패 정답과 입력 가능 시점·성공 이력 오염·합성 RTT 조건을 구분한다.
+최종 정상 행을 줄여 정밀도를 맞추지 않는다. 상세 경계는 `docs/extra-cloud-identity-and-rba.md`를 따른다.
+v28은 문헌/진행 근거만 갱신하며 코드는 그대로다. 새 시험을 돌린 것으로 쓰지 않는다.
+[v31 메타데이터 완료](docs/extra-rba-metadata-audit.md): 도구 세션94763·PID8660은 terminal exit0이다.
+재시작/poll하지 않는다. `runtime/f1/rba-metadata-run-20261112.json`과
+`runtime/f1/rba-full-metadata-20261112/{audit.json,metadata.sqlite3,verification.json}`을 따른다.
+31,269,264행·CSV9,052,907,531바이트 전체 EOF/CRC·ZIP 전후 SHA를 검증했다. 실행1553.562초다.
+별도 읽기 전용 DB 감사에서 무결성ok·4,304,857개 사용자 참조의 분할/라벨 수/행 수 보존을 전수 대조했다.
+개발/보정/예약 후보 행은26,122,183/2,572,078/2,575,003이고 ATO true는97/18/26, 미확정0이다.
+원 논문87건을 공개 CSV141건으로 소급 수정하지 않는다. 출처와 자료 버전이 다른 수치다.
+분할은 사용자 해시70/15/15로 고정하고 기존81명은 전체 개발 배정한다. 클래스 지지 때문에 재분할하지 않는다.
+세션 출력에 조건부 교차표가 포함될 수 있으므로 `text(write_stdin(...))`로 원문을 펼치지 않는다.
+함수 내에서 출력은 길이/종료 상태만 표시하고 `../tmp/extra_show_rba_metadata_status.py`로 지지 집계만 확인한다.
+예약 후보의 조건부 교차표·개별 사례/라벨을 모델 선택에 사용하지 않는다. 실제 기기/템플릿·미래시점 독립성은 미인증이다.
+최종 Windows/Linux244개 통과·Linux450파일 전후 지문/소유 컨테이너0. 완료 대조 시 코드 변경/새 pytest 실행0이다.
+다음은 여섯 영역의 출처별 정답 범위와 관측/분할 근거에 맞는 후보 개선이다. 예약 ATO26건은 예측 성능이 아니며
+ATO=false를 다른 영역까지 정상으로 바꾸지 않는다. 소스 변경·새 실패 없이 검사/문서 버전을 반복 생성하지 않는다.
+원본 앱·기존 라벨·예약 AIT/CloudTrail 최종 자료와 전체 여섯 영역 목표를 보존한다. 새 분류 모델은 학습하지 않았다.
+[v32 VPN 이력 후보](docs/extra-vpn-history-candidate.md)는 그 뒤 별도 프로필로 실제 학습/개발 전이했다.
+`raw-rich-vpn-history-3`은 동일 VPN 소스의 이전24시간만 보며 같은 시각 전체를 이력 반영 전 질의한다.
+IP/포트는 연결 키만 사용하고 이름은 존재 여부만 관측한다. 절대/시나리오 상대 시각·정답은 학습 값이 아니다.
+기존 두 프로필과 준비 기본값·원본 앱·sidecar는 보존한다. 모델 SHA는
+`06f8df701f82a72a55e78a8c54c3320a4d3c6ac8fa332b49aa3bc05d300360c2`다.
+고정 단일 후보의 S 전체 P99.718/R97.914/F1 98.808/FPR0.0527%는 개발 결과이며 VPN TP1/28·FP4다.
+VPN 전용 동조건 비교는 기존 TP9/FP1152에서 새 이력 TP28/FP80으로 개선했으나 P25.926%로 미채택이다.
+새 VPN 특징의 S 정답 이용 상한 진단도 R95%에서 최대P30.682%다. 모델 성능/전체 여섯 영역의 가능 상한이 아니다.
+Windows261/LINUX261의 실패·오류·건너뜀0·Linux453파일 전후/현재 지문·소유 컨테이너0을 대조했다.
+Windows 도우미는 시험 후 콘솔 출력 cp949 오류exit1이며 pytest 종료 코드 미기록이다. XML/로그 직접 대조로 시험 완료를 확인했다.
+실제 후보 세션9814·추가 비교90785·Linux12741은 terminal exit0, Windows69070은 위 출력 오류로 terminal exit1이다.
+재시작/poll하지 않는다. `runtime/f1/vpn-candidate-v32-20261112/run.json`과
+`runtime/f1/vpn-feature-ablation-v32-20261112/ablation.json`, [v32 근거](docs/infrastructure-results/extra-vpn-history-v32-20261112.json)를 따른다.
+다음은 개발 자료에 이전 보안 관측과 명시 세션/주체 연결이 실제 존재하는지 확인하는 것이다.
+이름/IP/가까운 시각만으로 사용자의 권한·기기 건강·승인을 만들어 넣지 않는다. 전체 목표/예약 자료 경계를 유지한다.
+v33에서 위 다음 단계를 실제 수행했다. 기존8쌍의 VPN 외부 주소 직접 연결0, 명시 내부 IP 할당 R66/S77개를 검증했으나
+엄격한 과거 관측 연결0이었다. 미사용 방화벽/VPN Suricata fast.log4개·7,551,882바이트를 CRC/SHA검증하며 읽었다.
+38,457센서 기록·파싱 오류0, 명시 호스트UTC를 고정 메타와 대조했다. 센서 경보를 정답으로 쓰지 않았다.
+두 시나리오의 공격VPN28건은 과거24시간·사건 이후1/10/60/300초 구간에 같은 주소 경보0,
+이후3600초 구간에만28건 연결이다. 나중 경보를 초기 입력에 소급해 점수를 올리지 않는다.
+원본/후보/라벨은 변경0·새 pytest실행0이며 Windows/Linux261은 직전 소스의 기록이다. 소유 F1 컨테이너0을 재확인했다.
+연결 세션56596·가상IP시간31216·완료대조48364는 terminal exit0이다. 재시작/poll하지 않는다.
+자료 경로는 `runtime/f1/native-{address-linkage,route-timing}-v33-20261112`와
+`runtime/f1/native-sensor-context-v33-20261112`다. 이 후보 검토로 독립 전체 평가 공백이 해결되지 않았다.
+[v18 실제 자료 근거](docs/infrastructure-results/extra-native-actual-pairs-v18-20261112.json)를 따른다.
+[v19 원시 후보 근거](docs/infrastructure-results/extra-native-raw-candidate-v19-20261112.json)는 개발 재대입과 미채택 사유다.
+[v20 맥락/트리 근거](docs/infrastructure-results/extra-native-context-tree-v20-20261112.json)도 독립 성능이나 원본 대비 개선 폭이 아니다.
+[v21 고정 전이·맥락 수집](docs/infrastructure-results/extra-native-transfer-v21-20261112.json)의 모델 상태 전후 일치와 잔여 문제를 보존한다.
+[v22 감사/후보 근거](docs/infrastructure-results/extra-metadata-heads-v22-20261112.json)는 여전히 goal_qualified=false다.
+[v23 단일 이진/학습 감사 근거](docs/infrastructure-results/extra-flat-cloud-v23-20261112.json)도 goal_qualified=false다.
+[v24 정보 부족/라벨 근거](docs/infrastructure-results/extra-cloud-information-v24-20261112.json)도 goal_qualified=false다.
+[v25 과거 관측/동시 목표 근거](docs/infrastructure-results/extra-cloud-context-v25-20261112.json)도 goal_qualified=false다.
+[v26 신원 감사/수집 중간 근거](docs/infrastructure-results/extra-cloud-identity-rba-v26-20261112.json)도 goal_qualified=false다.
+[v27 제한 리더/수집 중간 근거](docs/infrastructure-results/extra-rba-probe-reader-v27-20261112.json)도 goal_qualified=false다.
+[v28 문헌/수집 중간 근거](docs/infrastructure-results/extra-rba-source-review-v28-20261112.json)도 goal_qualified=false다.
+[v29 실제 수집/probe 근거](docs/infrastructure-results/extra-rba-actual-probe-v29-20261112.json)도 goal_qualified=false다.
+[v30 메타데이터 구현/진행 근거](docs/infrastructure-results/extra-rba-metadata-v30-20261112.json)도 goal_qualified=false다.
+로컬 구현·검증·문서만 수행하며 GitHub 업로드/병합·AWS·유료 API를 실행하지 않는다.
+
+아래의 **진행 중** 표기는 관측 중단 이전의 당시 기록이다.
+
+진행 중 목표(11/12 02:26 KST): 사용자가 목표 달성 또는 오늘9시까지 지속 작업을 지시했다.
+오전/오후 확인 전 종료 기준은 11/12 09:00 KST다. [extra 지속 실험](docs/extra-f1-experiments.md)을 이어간다.
+**진행 중 장시간 시험:** `runtime/f1/extra-soak-20261112-03/run.json`의 소유 컨테이너/파생 이미지를 확인한다.
+종료 예정08:50 KST이며 helper 세션70567이 공개 stdout 증거를 수집한 뒤 소유 자원을 정리한다.
+`extra_start_frozen_soak_03.py`를 사용했고 다른 기존 컨테이너/데몬은 중지하지 않는다.
+중간 checkpoint는 완료가 아니다. 종료 상태·공개 파일 SHA·private runtime0·컨테이너/이미지 제거를 확인해야 한다.
+**추가 진행 중:** 사용자 프로필 `runtime/f1/extra-subject-soak-20261112-02`는 전체 Linux pytest 뒤
+08:45 KST까지 실행한다. helper 세션55094, `extra_start_frozen_subject_soak_02.py`, 고정460파일이다.
+최초01은 통제 증거 문서2파일이 빠져3152통과/1실패·soak 시작0이며 소유 컨테이너/파생 이미지0으로 정리했다.
+앱 수정 없이 증거 문서를 source snapshot에 추가해02를 실행한다. 실패 회차는 보존한다.
+읽기 전용 Docker 자원 관측02 세션88019는 두 소유 컨테이너만60초 간격으로 측정하며08:51까지다.
+기존 관측 세션33253은01실패/기존 v9 관측 이력으로 별도 보존하며 회차 수를 합치지 않는다.
+두 시험은 서로 다른 소스/profile이다. 각 완료/해시/정리를 별도로 확인한다. 현재 Windows 최종418개 통과다.
+02 재실행 **전체 Linux3153개 통과·실패/오류/skip0** 뒤05:46 KST 첫20고유 이벤트/원장20행으로 soak를 시작했다.
+`start-checkpoint`는 공개 파일/전체 XML과 source460 지문이며 완료가 아니다.
+[v13 시작 근거](docs/infrastructure-results/extra-subject-soak-start-v13-20261112.json)를 따른다.
+최종에는 `extra_validate_public_soaks.py`로 공개 증거의 일정/원장/해시/실행 간격과 각 정리를 대조한다.
+기존 app/규칙/라벨은 보존하고 shadow v1은 관찰 holdout F1 80%·FPR33.33%로 **목표 미달**이다.
+서명 없는 승인 정보를 제외한 개발 투영에는 충돌30그룹이 있다. 서명 업무 맥락·초안/원본 비교를
+실험했고 v8 최종 Windows307·Linux307개가 각각 통과했다. 시계 high-water·비교기별 오류 분모,
+관측 출처 snapshot pin과 판단 근거 부족 표시를 보완했다.
+서명된 누적 작업 맥락을 넣은
+별도 제어군96세션은 TP54/FP0/FN0/TN42였으나 모의 조직 승인·작성된 시나리오다.
+[v3 근거](docs/infrastructure-results/extra-window-v3-20261112.json)와 실험 기록을 따른다.
+[v4 근거](docs/infrastructure-results/extra-inference-v4-20261112.json)는 최초 시계 회귀 실패와 수정 후 결과를 구분한다.
+[v5 근거](docs/infrastructure-results/extra-source-v5-20261112.json)는 원본56.25%·초안80% 재현과
+holdout 판단 근거 부족30건을 기록하며 분모에서 빼지 않는다.
+[v6 개발 한정 보정](docs/infrastructure-results/extra-calibration-v6-20261112.json)은7후보·31연결성분의
+그룹 교차 검증에서 F1 83.78%/FPR33.33%로 미달이다. 선택된 auth-5를 채택하지 않고 기본3/8/500을 유지한다.
+[v7 자원 정책](docs/infrastructure-results/extra-resource-v7-20261112.json)은 공개 정책 pin·행위/복수 역할·
+등록 민감도·이전 거부/at-risk 이력 보존을 검증한다. 실제 기업 정책/IdP 인수나 운영 연결은 아니다.
+[v8 원본 점검](docs/infrastructure-results/extra-streamed-v8-20261112.json)은 공개 원본91.6MB/130,767행을
+점검해 M7 4파일을 Windows/Linux에서 바이트 동일하게 재현했다. 선언 투영69충돌·파일럿11해당세션은
+F1 실측이 아닌 관측 모호성이다. [데이터 적합성](docs/f1-data-readiness.md)을 참고하며 사람 검토를 대체하지 않는다.
+[v9 시작 근거](docs/infrastructure-results/extra-soak-start-v9-20261112.json)는 tenant 내 기기/비활성 이력을
+새 세션에서도 유지하는 경계와 Linux323개·실제 시계 시험 시작을 기록한다. 세션 간 인증/유출 누적은 아직 후속이다.
+사람 독립 검토·새 평가·운영 통합/최종 채택은 완료가 아니며 목표도 미달 상태를 유지한다.
+
+[v10 입력 검토](docs/f1-data-intake.md)는 외부 anchor·관측/정답 분리·필수 보안값 명시·분할/시간/반대 라벨
+점검과 빈 사람 검토지를 준비한다. 최종6형식 예시 후 Windows348·Linux348개 각각 통과·소유 컨테이너0이다.
+의도적 부적합96세션 분할은 중복/시간 역전/동일 순서 반대 라벨을 검출했고96 pending이다.
+실제 출처/독립 검토/목표 달성은 false이며 새 검출기 성능을 측정하지 않았다.
+[v10 공개 결과](docs/infrastructure-results/extra-intake-v10-20261112.json)를 따른다. 장시간 시험은 고정 v9 소스만 포함한다.
+
+[v11 사용자 활동](docs/f1-subject-activity.md)은 tenant/analyst/user 범위에서 여러 세션·기기의
+실제 실패 로그인/다운로드 증분/fanout을 모으는 **별도 선택형**이다. 모든 기기/자원/행위/총량 승인과
+기존 verifier 혼합 거부·일회 집계/시계/네 지점 worker 종료를 확인했다.
+최종 Windows387·Linux387개 각각 통과·Linux382파일 전후 동일·소유 컨테이너0이다.
+[v11 공개 결과](docs/infrastructure-results/extra-subject-v11-20261112.json)를 따른다. 독립 F1 평가·운영 통합은 아니다.
+v9 고정 장시간 시험은 v11 사용자 프로필의 장시간 시험으로 대체하지 않는다.
+
+[v12 전체 원본 분할](docs/infrastructure-results/extra-source-splits-v12-20261112.json)은 전체/이진 모집단의
+계열+주체+클라이언트 연결 성분이 각각1개이며, 클라이언트 제외 후에도 정상 전체가 한 성분임을 확인했다.
+전체 모집단/선언 그룹 조건의 제약이며 모든 부분집합의 불가능성이나 분류 성능이 아니다.
+Windows 집중45·Linux403개 통과·전체 원본 분석 동일·소스384파일 전후 동일·소유 컨테이너0이다.
+새 분할 선정/파일럿 변경/검출기 실행0, 사람 검토와 목표는 여전히 미완료다.
+
+11/12 `extra`: 사용자 요청으로 `9c67889`에서 브랜치를 만들고 [F0/F1 기준선·오류 검토 도구](docs/extra-f1-baseline-review.md)를 구현한다.
+기존 탐지 규칙·임계값·라벨은 유지하며 새로운 품질 달성이나 사람의 원인 검토 완료로 기록하지 않는다.
+
+11/12 추가 사용자 요청: 남은 작업 뒤 F1 목표를 위한 [후속 계획 F0~F6](docs/f1-improvement-plan.md)을 수립했다.
+계획 수립이며 탐지 규칙·임계값·라벨 변경 지시는 아니다. 기존 holdout은 이미 관찰했으므로
+개선 후보의 최종 평가는 별도 새 분할로 한다. R10 최종 동결에 그 결과를 연결한다.
+
+11/12 후속: [정확한 잔여 작업](docs/week4-remaining-and-handoff.md)을 먼저 확인한다.
+선택형 전체 저장 계약의 승인 원장 복원과 M7 검토지 도구를 추가하며,
+M8은 네트워크 범위 판단이다. 사람의 독립 검토·최종 동결 승인으로 자동 전환하지 않는다.
+후속 Windows 묶음181개 통과·Ruff/diff check 통과. 새 Docker/AWS/유료 호출0, M7 실제 검토48 pending.
+초기 실패·중간26개와 최종181개를 별도로 보존하며 이전 Linux2,749개와 합산하지 않는다.
+
+## 2026-11-11~12 구현·검증 근거
+
+[4주차 잔여 구현·로컬 검증](docs/week4-local-batch.md)을 우선 확인한다.
+기준 PR52 `c83b857`, 작업 `feature/chaeheeju-week4-local-batch`다. M5 2인 승인 모의 대응,
+M7 동결 후보, 로컬 일괄 실행을 추가했다. 유료 모델·AWS 호출0, 탐지 규칙/임계값 변경0이다.
+Linux2,749·관측75·선정37·앱복원13 통과와 최초 CA51개 뒤 실패/정리0을 구분한다.
+초기 집중180개 이후 최종 집중57개·Ruff와 DB/백업 변경 경계25개 통과·정리0/0/0을 확인했다.
+CA 3회차·DB 실행기 종료4회는 직전17개 부분 실행의 성공 근거와 구분한다.
+정상 유지보수 중 소비·폐기 원장은 추가될 수 있으며 모든 기존 행을 보존해야 한다.
+그 뒤 DB 교체·재시작의 비교는 준비 후 전체 원장의 정확한 동일성을 요구한다.
+공급망 최초60분 제한과 이어 실행한 결과도 분리해 기록한다. 정확한 최종 결과는 연결 문서와
+공개 요약을 따른다. 기존 `docs.zip`, `docs/week03.zip`은 사용자 파일이므로 건드리지 않는다.
+팀원 독립 인수·라벨 검토·새 모델 비교·최종 동결 승인과 탐지 목표 달성은 완료로 표시하지 않는다.
+
 11/7 후속 묶음: [DB 교체 관리 잠금·실제 프로세스 종료 복구](docs/database-transport-process-recovery.md). 채희주가 시작/종료/purge와 교체기의 공통 잠금, 읽기 전용 상태 조회, 네 종료 지점의 같은 후보·고정 객체 재개를 구성·실행·측정한다. 초기 Linux2413/관측75와 CA27 중단·정리0을 보존했다. 비밀값 없는 실패 진단만 추가한 최종 소스의 집중211/신규31·실제 프로세스 종료4회를 포함한 인수54/54·정리0을 별도로 확인했다. 초기 실패 원인 해결로 확대하지 않으며 최종 전체 회귀·정확한 head/병합 후 CI는 PR을 따른다. DB/물리 HA·백업 통합·장기 checkpoint·독립 인수는 후속이다.
 
 11/7 DB 통신 자동 교체 묶음: [독립 전송 root·서버/client 키·중단 재개](docs/database-transport-rotation.md). 채희주가 별도 보관함·서명 계획·고정 객체 정지/게시·실제 DB TLS 검증을 연결한다. 초기 Linux2383/관측75와 마지막 변조 검사46 중단을 보존했다. 예외 분류·실행기 중복 차단·시험 대기를 보완한 최종 소스의 집중229/신규47·Ruff·실제48/48·정리0을 별도 확인했다. 최종 전체 회귀/정확한 head·병합 후 CI는 PR을 따른다. DB/물리 HA·전체 백업 통합·독립 인수는 후속이다.

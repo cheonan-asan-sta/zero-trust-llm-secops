@@ -1,0 +1,380 @@
+{
+  "schema": "extra-web-ledger-backup-evidence-1",
+  "base_extra_commit": "fbab54846043aa42d4ac4937ba0d25c0640537bf",
+  "scope": "local encrypted backup/restore and externally pinned minimum history; no host HA or actual collector acceptance",
+  "protocol": {
+    "path": "infra/f1-lab/web-backup-controls-protocol.json",
+    "sha256": "4f437e053bb24c9264d4e11a0ded1b01c81e3cc98ea35ded26acff2bfb9ff6d8"
+  },
+  "functional_run": {
+    "receipt": {
+      "path": "runtime/f1/web-backup-controls-v47-20261113/run.json",
+      "sha256": "2d32fcd6d0b10782d7045357e81c2bb0b1bf89cc63afae610240f0f1c409fdf5"
+    },
+    "report": {
+      "schema": "extra-web-backup-controls-1",
+      "completed": true,
+      "scope": "authored local encrypted-backup and checkpoint controls only",
+      "plan": {
+        "path": "infra/f1-lab/web-backup-controls-protocol.json",
+        "bytes": 1300,
+        "sha256": "4f437e053bb24c9264d4e11a0ded1b01c81e3cc98ea35ded26acff2bfb9ff6d8"
+      },
+      "sources": {
+        "scripts/f1_lab/web_ledger_backup.py": {
+          "path": "scripts/f1_lab/web_ledger_backup.py",
+          "bytes": 18554,
+          "sha256": "38362dd0dd1d1bc8ea69b0e7c48c6d191d07468ab5ff9438748685d08d9944f2"
+        },
+        "scripts/run_web_backup_controls.py": {
+          "path": "scripts/run_web_backup_controls.py",
+          "bytes": 9376,
+          "sha256": "ec063c2e0d6793ec06d5636e1cbfdc21c74f3d4a6bc91e304584fdea359adb09"
+        },
+        "scripts/f1_lab/web_evidence_ledger.py": {
+          "path": "scripts/f1_lab/web_evidence_ledger.py",
+          "bytes": 20181,
+          "sha256": "7c152de7c5d794116e2f47997a02573717c0e9d40a2401ded0e24044bb52951d"
+        },
+        "scripts/f1_lab/web_durable_risk.py": {
+          "path": "scripts/f1_lab/web_durable_risk.py",
+          "bytes": 4639,
+          "sha256": "a2cb5ca3f252f4bcebdf404dfd5f6e7d2078d1131c85f0992dd108a22afe71af"
+        },
+        "scripts/f1_lab/web_verified_context.py": {
+          "path": "scripts/f1_lab/web_verified_context.py",
+          "bytes": 16342,
+          "sha256": "e39ab1fb95ce95ebf5b280badc025268c2a8eae468fa9e2e1485a267be59349e"
+        }
+      },
+      "cases": [
+        {
+          "case": "encrypted_consistent_snapshot_created",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "restored_checkpointed_ledger_retains_adverse",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "legitimate_append_extends_history_without_clearing_risk",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "new_checkpoint_and_snapshot_restore_four_events",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "older_backup_rejected_by_latest_checkpoint",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "full_old_store_rejected_after_latest_pin_is_applied",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "wrong_recovery_key_rejected",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "tampered_ciphertext_rejected",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "unconfigured_maintenance_identity_rejected",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "existing_restore_destination_not_overwritten",
+          "expected_outcome_passed": true
+        }
+      ],
+      "checkpoints": [
+        {
+          "receipt": {
+            "path": "runtime/f1/web-backup-controls-v47-20261113/external-checkpoints/checkpoint-1.json",
+            "bytes": 394,
+            "sha256": "c2809ef91cdd87eae88839a37a08c0fe9c639ce1fa8473af81d07ffb12499e26"
+          },
+          "checkpoint": {
+            "schema_version": "zt-web-external-checkpoint-1",
+            "head": {
+              "store_id": "2e74463ea826d9ba84e14be43a6bf30a",
+              "configuration": "901b2ddfc262332253f94a4c5196ea124a6b2e5fa147b7f68b352397033bbcab",
+              "seq": 2,
+              "hash": "a5a200d374525898656741d4761f203c735b0a8285e3a325ed8ed2f289aa5d77",
+              "last_now": "2026-11-13T09:00:00+00:00"
+            },
+            "observed_until": "2026-11-13T09:00:00+00:00",
+            "issued_at": "2026-11-13T09:00:00+00:00"
+          }
+        },
+        {
+          "receipt": {
+            "path": "runtime/f1/web-backup-controls-v47-20261113/external-checkpoints/checkpoint-2.json",
+            "bytes": 394,
+            "sha256": "15f7f803680892e23972dda863248f447610ef0d7354827f194d7302e804b3ed"
+          },
+          "checkpoint": {
+            "schema_version": "zt-web-external-checkpoint-1",
+            "head": {
+              "store_id": "2e74463ea826d9ba84e14be43a6bf30a",
+              "configuration": "901b2ddfc262332253f94a4c5196ea124a6b2e5fa147b7f68b352397033bbcab",
+              "seq": 4,
+              "hash": "0acd48373a55fd81fcb75076f13e1078010350c5173b0ebd74e603c4635bf7ba",
+              "last_now": "2026-11-13T09:00:00+00:00"
+            },
+            "observed_until": "2026-11-13T09:00:00+00:00",
+            "issued_at": "2026-11-13T09:00:00+00:00"
+          }
+        }
+      ],
+      "recovery_key_persisted": false,
+      "recovery_key_published": false,
+      "witness_secret_in_plain_backup": false,
+      "automatic_activation_allowed": false,
+      "host_ha_or_remote_worm_demonstrated": false,
+      "actual_server_observations_collected": 0,
+      "detection_f1_measured": false,
+      "paid_api_calls": 0,
+      "aws_sdk_calls": 0,
+      "github_pushes": 0,
+      "goal_qualified": false,
+      "summary": {
+        "cases": 10,
+        "expected_outcomes_passed": 10,
+        "initial_checkpoint_seq": 2,
+        "latest_checkpoint_seq": 4,
+        "adverse_retained": true
+      },
+      "backups": [
+        {
+          "directory": "runtime/f1/web-backup-controls-v47-20261113/archives/snapshot-1",
+          "manifest_sha256": "ada20b205ff30aa98200282e69ea88551871b871c6e61eeb19a24826244d24e1",
+          "checkpoint_sha256": "c2809ef91cdd87eae88839a37a08c0fe9c639ce1fa8473af81d07ffb12499e26",
+          "snapshot": {
+            "schema_version": "zt-web-external-checkpoint-1",
+            "head": {
+              "store_id": "2e74463ea826d9ba84e14be43a6bf30a",
+              "configuration": "901b2ddfc262332253f94a4c5196ea124a6b2e5fa147b7f68b352397033bbcab",
+              "seq": 2,
+              "hash": "a5a200d374525898656741d4761f203c735b0a8285e3a325ed8ed2f289aa5d77",
+              "last_now": "2026-11-13T09:00:00+00:00"
+            },
+            "observed_until": "2026-11-13T09:00:00+00:00",
+            "issued_at": "2026-11-13T09:00:00+00:00"
+          },
+          "payload_bytes": 11675
+        },
+        {
+          "directory": "runtime/f1/web-backup-controls-v47-20261113/archives/snapshot-2",
+          "manifest_sha256": "39bf6b251d69a48c30a9947374db061b5ac286a59d9d58796432554e4fe55194",
+          "checkpoint_sha256": "15f7f803680892e23972dda863248f447610ef0d7354827f194d7302e804b3ed",
+          "snapshot": {
+            "schema_version": "zt-web-external-checkpoint-1",
+            "head": {
+              "store_id": "2e74463ea826d9ba84e14be43a6bf30a",
+              "configuration": "901b2ddfc262332253f94a4c5196ea124a6b2e5fa147b7f68b352397033bbcab",
+              "seq": 4,
+              "hash": "0acd48373a55fd81fcb75076f13e1078010350c5173b0ebd74e603c4635bf7ba",
+              "last_now": "2026-11-13T09:00:00+00:00"
+            },
+            "observed_until": "2026-11-13T09:00:00+00:00",
+            "issued_at": "2026-11-13T09:00:00+00:00"
+          },
+          "payload_bytes": 11675
+        }
+      ],
+      "restores": [
+        {
+          "directory": "runtime/f1/web-backup-controls-v47-20261113/restored/snapshot-1",
+          "receipt_sha256": "6f0aca2aff54ada8a9c7b716558310b81c61f49c4468357577556198c1d30828",
+          "head": {
+            "store_id": "2e74463ea826d9ba84e14be43a6bf30a",
+            "configuration": "901b2ddfc262332253f94a4c5196ea124a6b2e5fa147b7f68b352397033bbcab",
+            "seq": 2,
+            "hash": "a5a200d374525898656741d4761f203c735b0a8285e3a325ed8ed2f289aa5d77",
+            "last_now": "2026-11-13T09:00:00+00:00"
+          },
+          "activated": false
+        },
+        {
+          "directory": "runtime/f1/web-backup-controls-v47-20261113/restored/snapshot-2",
+          "receipt_sha256": "896b62dc09e6d1dc684fd516682f4dca3c4fd832f1b4b7d0094ec4d760912b83",
+          "head": {
+            "store_id": "2e74463ea826d9ba84e14be43a6bf30a",
+            "configuration": "901b2ddfc262332253f94a4c5196ea124a6b2e5fa147b7f68b352397033bbcab",
+            "seq": 4,
+            "hash": "0acd48373a55fd81fcb75076f13e1078010350c5173b0ebd74e603c4635bf7ba",
+            "last_now": "2026-11-13T09:00:00+00:00"
+          },
+          "activated": false
+        }
+      ]
+    }
+  },
+  "validation": {
+    "receipt": {
+      "path": "runtime/f1/web-backup-tests-v47-20261113/tests.json",
+      "sha256": "382d9edce07290d1d33d1642ce7d18b406b063d07ee440656c9cb7cc5676efe6"
+    },
+    "report": {
+      "schema": "extra-local-stream-validation-tests-1",
+      "started_at": "2026-11-13T12:56:32.141102+00:00",
+      "paid_api_calls": 0,
+      "aws_sdk_calls": 0,
+      "github_pushes": 0,
+      "windows": {
+        "exit_code": 0,
+        "seconds": 53.728,
+        "counts": {
+          "passed": 387
+        },
+        "log": "runtime/f1/web-backup-tests-v47-20261113/windows.log"
+      },
+      "linux": {
+        "exit_code": 0,
+        "seconds": 26.049,
+        "counts": {
+          "passed": 387
+        },
+        "log": "runtime/f1/web-backup-tests-v47-20261113/linux.log",
+        "executed": true,
+        "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+        "source_files": 748,
+        "source_archive_sha256": "97e530de2b40e1ef561df3c2414f6caaf338c89a227604e831e84b553f918e84",
+        "container_exit": 0,
+        "oom_killed": false,
+        "network_mode": "none",
+        "owned_container": "8e9769f788ec49d325215bda15b87594e1439ef752c5a384183d45938b372492",
+        "snapshot_sources_unchanged_after": true,
+        "owned_container_removed": true
+      },
+      "ended_at": "2026-11-13T12:58:15.143623+00:00"
+    },
+    "source_manifest": {
+      "path": "runtime/f1/web-backup-tests-v47-20261113/source-manifest.json",
+      "sha256": "0d2276973ffb0786a5964173b9e75a20be4d59c57db6f3e2f75f4cd0498f7eb5"
+    },
+    "code_fingerprints": [
+      {
+        "path": "scripts/f1_lab/web_ledger_backup.py",
+        "sha256": "38362dd0dd1d1bc8ea69b0e7c48c6d191d07468ab5ff9438748685d08d9944f2"
+      },
+      {
+        "path": "scripts/run_web_backup_controls.py",
+        "sha256": "ec063c2e0d6793ec06d5636e1cbfdc21c74f3d4a6bc91e304584fdea359adb09"
+      },
+      {
+        "path": "tests/test_f1_web_ledger_backup.py",
+        "sha256": "f6e67beedeb7918c00e10ec5d11d3f4ef6c1e03ad0037bd0651f2a692a2286c8"
+      },
+      {
+        "path": "infra/f1-lab/web-backup-controls-protocol.json",
+        "sha256": "4f437e053bb24c9264d4e11a0ded1b01c81e3cc98ea35ded26acff2bfb9ff6d8"
+      }
+    ],
+    "code_matches_linux_snapshot": true,
+    "new_tests_included": 30,
+    "new_actual_process_exit_boundary_cases": 5,
+    "combined_process_exit_boundary_cases_with_v46": 13,
+    "full_local_rollback_rejected_by_external_pin_test_passed": true,
+    "ruff_exit_code": 0,
+    "full_app_regression_repeated": false
+  },
+  "backup_contract": {
+    "consistent_sqlite_backup_under_lock": true,
+    "cipher": "AES-256-GCM",
+    "local_witness_and_secret_encrypted_in_package": true,
+    "recovery_key_in_backup": false,
+    "manifest_last_publication": true,
+    "fresh_output_only": true,
+    "exact_two_file_inventory": true,
+    "external_manifest_and_checkpoint_pins_required": true,
+    "explicit_store_maintainer_and_admin_required": true,
+    "restore_validated_before_publication": true,
+    "automatic_service_activation": false,
+    "checkpoint_guard_rechecks_pin_prefix_and_clock_each_operation": true
+  },
+  "key_custody": {
+    "demonstration_key_persisted": false,
+    "demonstration_archives_are_operational_backups": false,
+    "same_run_roundtrip_tested": true,
+    "unit_process_tests_use_private_temporary_key_files": true,
+    "secret_or_recovery_key_published": false
+  },
+  "limits": [
+    "Latest checkpoint and expected pins require protection outside the rollback domain.",
+    "Uncheckpointed later events are outside the minimum-prefix rollback guarantee.",
+    "Checkpoint file and expected pin rollback together is not prevented by local logical separation.",
+    "No remote WORM/KMS, independent physical-host storage, live writer fencing or failover acceptance.",
+    "The ordinary WebEvidenceLedger remains available; callers must opt into the checkpointed class.",
+    "Source signed-proof archiving, operational key custody and incident review/closure remain pending."
+  ],
+  "preservation": {
+    "protected_paths_unchanged": [
+      "app",
+      "scripts/app_state_recovery.py",
+      "scripts/authority_mtls_runtime.py",
+      "scripts/f1_lab/web_evidence_ledger.py",
+      "scripts/f1_lab/web_durable_risk.py",
+      "scripts/f1_lab/web_verified_context.py",
+      "scripts/f1_lab/web_residual.py"
+    ],
+    "prior_public_evidence_byte_identical": [
+      {
+        "path": "docs/infrastructure-results/extra-web-durable-v46-20261113.json",
+        "sha256": "187545a5487a1f776d42dc01e21c21d99c5a1475eba62fbb958d0c0f32a81ce4"
+      },
+      {
+        "path": "docs/infrastructure-results/extra-web-context-v45-20261113.json",
+        "sha256": "70dace7f917c93895831a60ada26e97de83754b653ae378de2f4faeb11b5a672"
+      },
+      {
+        "path": "docs/infrastructure-results/extra-web-residual-v44-20261113.json",
+        "sha256": "d361bb8f7583c7defd8c815999d6518a6d3a4ae84ef20d0fe519ceb7609a956f"
+      }
+    ],
+    "original_models": {
+      "web": {
+        "path": "runtime/f1/web-refinement-v39-20261112-02/model.json",
+        "sha256": "21318fa61f830ae1d03d47de1a01acf2c40ae19ebaf769923e3d575613f74f38"
+      },
+      "heads": {
+        "path": "runtime/f1/ait-semantic-fit-heads-russell-20261112/model.json",
+        "sha256": "4ebbcb6bb5fce286e80beeedbc18139d566d00998575487a867f129330344075"
+      },
+      "vpn": {
+        "path": "runtime/f1/vpn-feature-ablation-v32-20261112/vpn-history-model.json",
+        "sha256": "c1ff27423e63ba607a80fc7dd891ff473baccd7f11853fb3eaba10e9e37b48b6"
+      }
+    },
+    "benchmark_cases": {
+      "path": "app/data/benchmark/cases.jsonl",
+      "sha256": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f"
+    },
+    "benchmark_manifest": {
+      "path": "app/data/benchmark/manifest.json",
+      "sha256": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90"
+    },
+    "user_archives_modified": false
+  },
+  "boundaries": {
+    "actual_server_observations_collected": 0,
+    "new_independent_final_cases": 0,
+    "new_f1_evaluations": 0,
+    "native_physical_rows_replayed": 0,
+    "last_web_fn_fp_not_remeasured": {
+      "fn": 30,
+      "fp": 19
+    },
+    "paid_api_calls": 0,
+    "aws_sdk_calls": 0,
+    "new_downloads": 0,
+    "github_pushes": 0,
+    "pr_merges": 0,
+    "reserved_bodies_or_labels_opened": 0,
+    "automatic_enforcement_allowed": false,
+    "goal_qualified": false
+  }
+}

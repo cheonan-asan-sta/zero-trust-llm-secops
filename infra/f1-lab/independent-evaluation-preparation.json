@@ -1,0 +1,81 @@
+{
+  "schema_version": "f1-independent-preparation-1",
+  "stage": "preparation_only",
+  "candidate_freeze_sha256": null,
+  "metric_tracks": [
+    "event_detection",
+    "session_any_alert",
+    "policy_control"
+  ],
+  "domains": [
+    "credential",
+    "device",
+    "privilege",
+    "lateral",
+    "exfiltration",
+    "remote"
+  ],
+  "disjoint_axes": [
+    "session",
+    "subject",
+    "device",
+    "family",
+    "pattern"
+  ],
+  "targets": {
+    "precision": 0.95,
+    "recall": 0.95,
+    "f1": 0.95,
+    "false_positive_rate": 0.05
+  },
+  "planned_final_sessions": {
+    "normal": 300,
+    "threat": 300
+  },
+  "inputs": {
+    "benchmark_manifest": {
+      "path": "app/data/benchmark/manifest.json",
+      "sha256": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90"
+    },
+    "benchmark_cases": {
+      "path": "app/data/benchmark/cases.jsonl",
+      "sha256": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f"
+    },
+    "baseline_freeze": {
+      "path": "runtime/f1/extra-baseline-20261112/freeze.json",
+      "sha256": "801992ad587f3cc77bb857bfda0b3bfd0d857cc87e6aa1d2f479bfc10f8dfb7a"
+    },
+    "native_plan": {
+      "path": "infra/f1-lab/operation-refinement-protocol.json",
+      "sha256": "f7fd853011b6eb6d3fa07d95146e6c8e774bf13395fb027c16961eb6813ce629"
+    },
+    "native_comparison": {
+      "path": "runtime/f1/operation-retention-v40b-20261113/run.json",
+      "sha256": "2dbdf7b50cc652aa3140ff7afece6640e4b52d353d6c4e201ca21964c427ae82"
+    },
+    "vpn_evidence": {
+      "path": "docs/infrastructure-results/extra-vpn-verified-signals-v42-20261113.json",
+      "sha256": "cd831acbf2c91da4f4a5887a1123cfba11bf2773aa6f03894fa3e45c30512249"
+    }
+  },
+  "reserved_sources": [
+    {
+      "source_id": "ait-harrison",
+      "reference": "https://zenodo.org/records/19483937",
+      "status": "predeclared reservation; no raw/label body access before candidate freeze; grouping and original six-domain coverage unverified"
+    },
+    {
+      "source_id": "ait-wilson",
+      "reference": "https://zenodo.org/records/19483937",
+      "status": "predeclared reservation; no raw/label body access before candidate freeze; grouping and original six-domain coverage unverified"
+    }
+  ],
+  "notes": [
+    "Existing 720 events and all R/S/Fox/M7/RBA analyses are previously observed development/regression material.",
+    "Final labels stay sealed and cannot be passed in unseen case metadata.",
+    "Unknown labels are not normal; expected-alert controls are not malicious ground truth.",
+    "Connected components preserve all declared axes; do not delete difficult cases or relax axes to force a split.",
+    "Planned sample count is a collection target, not statistical sufficiency or proof of independence.",
+    "No final evaluator, model call, candidate training, app modification, merge or GitHub push in this preparation."
+  ]
+}

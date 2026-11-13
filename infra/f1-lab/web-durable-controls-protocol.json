@@ -1,0 +1,24 @@
+{
+  "schema": "f1-web-durable-controls-1",
+  "scope": "authored local durability controls only; not malicious ground truth",
+  "automatic_resolution_allowed": false,
+  "v45_receipt": {
+    "path": "runtime/f1/web-context-controls-v45-20261113/run.json",
+    "sha256": "2a8777d346b8d8709e48ed27549792e51efbe22ce6d177af047a61f84a572022"
+  },
+  "durability_contract": {
+    "journal": "SQLite synchronous FULL plus hash chain",
+    "witness": "separate local HMAC-authenticated head",
+    "capacity_events": 2000,
+    "nonce_replay": "deduplicate, never re-accept proof",
+    "acknowledgement": "after completed journal publication",
+    "unfinished": "explicit recovery after 30-second lease to uncertain review",
+    "automatic_risk_clear": false
+  },
+  "limits": [
+    "Local storage and logical witness separation; not host HA or protected remote WORM.",
+    "Loss/rollback of database, witness and key together is outside this local guarantee.",
+    "No raw bodies, Ed25519 private keys, plaintext nonce or signed proof bundle in journal.",
+    "Actual collector connection, production incident integration and new independent F1 evaluation remain pending."
+  ]
+}

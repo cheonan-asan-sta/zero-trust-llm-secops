@@ -1,0 +1,606 @@
+{
+  "schema": "extra-f1-source-splits-v12-1",
+  "date_kst": "2026-11-12",
+  "scope": "read-only grouped split readiness on entire pinned publisher synthetic corpus; not classifier metrics",
+  "windows_focused": {
+    "path": "runtime/f1/extra-split-focused-20261112.xml",
+    "tests": 45,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "linux_final": {
+    "schema": "extra-f1-linux-snapshot-1",
+    "completed": true,
+    "owner": "extra-f1-33672fe4b33b",
+    "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "tests": [
+      "tests/test_m7_split_audit.py",
+      "tests/test_f1_subject_temporal.py",
+      "tests/test_f1_intake.py",
+      "tests/test_f1_soak.py",
+      "tests/test_m7_streaming_audit.py",
+      "tests/test_m7_auth_dataset.py",
+      "tests/test_f1_resource_policy.py",
+      "tests/test_f1_calibration.py",
+      "tests/test_f1_source_registry.py",
+      "tests/test_f1_session_inference.py",
+      "tests/test_f1_confidence.py",
+      "tests/test_f1_temporal_store.py",
+      "tests/test_f1_approval_registry.py",
+      "tests/test_f1_shadow_approvals.py",
+      "tests/test_f1_shadow_detector.py",
+      "tests/test_f1_feature_audit.py",
+      "tests/test_f1_review.py",
+      "tests/test_detection_benchmark.py",
+      "tests/test_f1_provenance.py",
+      "tests/test_f1_session_controls.py"
+    ],
+    "host_mounts": 0,
+    "network": "none",
+    "cloud_calls": 0,
+    "paid_api_calls": 0,
+    "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+    "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+    "source_manifest_sha256": "401cc426e9fcd44790b14f423208cb9dc014f33008f7659f614e0d5519b1ee48",
+    "source_files": 384,
+    "container_exit_code": 0,
+    "memory": {
+      "container_peak_memory_bytes": null,
+      "scope": "container cgroup, includes tests and full source audit",
+      "measurement": "cgroup-v2 memory.peak"
+    },
+    "oom_killed": false,
+    "source_verified_before_and_after": true,
+    "remaining_containers": 0
+  },
+  "linux_final_junit": {
+    "path": "runtime/f1/extra-linux-splits-20261112-01/checks.xml",
+    "tests": 403,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "cross_platform_equivalent_fields": [
+    "source_files_lf_sha256",
+    "source_sha256",
+    "source_contract_sha256",
+    "population",
+    "analysis",
+    "new_split_selected",
+    "pilot_modified",
+    "effects"
+  ],
+  "cross_platform_equivalent": true,
+  "final_audit": {
+    "schema": "m7-source-split-readiness-1",
+    "source_commit": "184a13967f7b10f4721e2721767ec607db528d1b",
+    "source_dirty": true,
+    "git_metadata": "available_snapshot_hashes_still_required",
+    "source_files_lf_sha256": {
+      "scripts/audit_m7_splits.py": "2e7b96dba5aee7155febee6a8442b59d7a5d1806960e6fcd7235c0655475530a",
+      "scripts/audit_m7_source.py": "86d1e57bb908e58c7fa9db6aa54e4ce855283ae329b655761365e16195e5beb1",
+      "scripts/prepare_m7.py": "28dcb83e8e57e7ded87157c7cf32f244ae1ca550ef201617d1af6815648609f3",
+      "scripts/f1_lab/provenance.py": "4f8a1c095f0fb43c0e303cd805c26a14c34c2fd076a4753a7ac4445cfa512678"
+    },
+    "source_sha256": "445f69377a2e12b4203a68f15cd9a4013fbc7e0ef21c19843969f671b1334a30",
+    "source_contract_sha256": "0ace3370fb73551cf6b64c21aa004f447616bf75172b3023efbe7eff4f0efe5c",
+    "source_kind": "publisher_synthetic_authentication_logs",
+    "source_url": "https://raw.githubusercontent.com/KREONET/auth-anomaly-dataset/5fd5cae2001a6b67cafb952709db37e366cfa276/iam_anomaly_2026.jsonl",
+    "population": {
+      "events": 130767,
+      "session_labels": {
+        "anomaly": 4089,
+        "attack": 9573,
+        "benign": 9088
+      },
+      "source_top_level_fields": [
+        "action_by",
+        "category",
+        "client_ip",
+        "duration_ms",
+        "event_type",
+        "http_method",
+        "http_status",
+        "label",
+        "level",
+        "message",
+        "module",
+        "payload",
+        "ref",
+        "ref_id",
+        "referer",
+        "subcategory",
+        "timestamp",
+        "trace_id",
+        "uri",
+        "user_agent",
+        "user_id"
+      ],
+      "consumed_source_sha256": "445f69377a2e12b4203a68f15cd9a4013fbc7e0ef21c19843969f671b1334a30"
+    },
+    "family_definition": "publisher category plus subcategory; source label excluded from family key",
+    "sequence_projection": "ordered module/http_method/http_status/level; no duration, identity, timestamp, message or event_type",
+    "identity_definition": "known user_id/action_by values share a subject namespace; known client_ip is a client, not verified device",
+    "unknown_identity_policy": "null subjects and null clients do not become a shared identity; absence is reported, not proof of distinctness",
+    "cutoff": "2026-03-01T00:00:00+09:00",
+    "analysis": {
+      "all_publisher_classes": {
+        "sessions": 22750,
+        "source_label_counts": {
+          "anomaly": 4089,
+          "attack": 9573,
+          "benign": 9088
+        },
+        "excluded_anomaly_sessions": 0,
+        "known_identity_coverage": {
+          "sessions_without_known_subject": 5825,
+          "sessions_without_known_client": 0,
+          "events_without_known_subject": 76248,
+          "events_without_known_client": 0
+        },
+        "profiles": {
+          "semantic_family": {
+            "components": 136,
+            "largest_component_sessions": 5911,
+            "largest_component_fraction": 0.25982417582417583,
+            "components_containing_each_label": {
+              "anomaly": 36,
+              "attack": 94,
+              "benign": 6
+            },
+            "largest_five_component_label_counts": [
+              {
+                "benign": 5911
+              },
+              {
+                "benign": 2204
+              },
+              {
+                "benign": 476
+              },
+              {
+                "anomaly": 454
+              },
+              {
+                "attack": 450
+              }
+            ],
+            "requested_folds": 3,
+            "necessary_nonempty_label_support_conditions_met": true,
+            "balanced_split_constructed": false,
+            "feasibility_proven": false,
+            "interpretation": "Necessary conditions for keeping every declared group intact in three nonempty folds with every present label; not sufficient balance, independence or a claim about selected subsets."
+          },
+          "known_subject": {
+            "components": 8964,
+            "largest_component_sessions": 3300,
+            "largest_component_fraction": 0.14505494505494507,
+            "components_containing_each_label": {
+              "anomaly": 1694,
+              "attack": 6896,
+              "benign": 2555
+            },
+            "largest_five_component_label_counts": [
+              {
+                "anomaly": 397,
+                "attack": 1354,
+                "benign": 1549
+              },
+              {
+                "anomaly": 4,
+                "attack": 27,
+                "benign": 4
+              },
+              {
+                "attack": 23,
+                "benign": 6
+              },
+              {
+                "anomaly": 6,
+                "attack": 15,
+                "benign": 7
+              },
+              {
+                "attack": 20,
+                "benign": 4
+              }
+            ],
+            "requested_folds": 3,
+            "necessary_nonempty_label_support_conditions_met": true,
+            "balanced_split_constructed": false,
+            "feasibility_proven": false,
+            "interpretation": "Necessary conditions for keeping every declared group intact in three nonempty folds with every present label; not sufficient balance, independence or a claim about selected subsets."
+          },
+          "known_client": {
+            "components": 1845,
+            "largest_component_sessions": 18299,
+            "largest_component_fraction": 0.8043516483516483,
+            "components_containing_each_label": {
+              "anomaly": 810,
+              "attack": 622,
+              "benign": 1053
+            },
+            "largest_five_component_label_counts": [
+              {
+                "anomaly": 2845,
+                "attack": 8021,
+                "benign": 7433
+              },
+              {
+                "attack": 30
+              },
+              {
+                "attack": 21
+              },
+              {
+                "anomaly": 4,
+                "attack": 13,
+                "benign": 2
+              },
+              {
+                "attack": 18
+              }
+            ],
+            "requested_folds": 3,
+            "necessary_nonempty_label_support_conditions_met": true,
+            "balanced_split_constructed": false,
+            "feasibility_proven": false,
+            "interpretation": "Necessary conditions for keeping every declared group intact in three nonempty folds with every present label; not sufficient balance, independence or a claim about selected subsets."
+          },
+          "family_subject": {
+            "components": 42,
+            "largest_component_sessions": 17175,
+            "largest_component_fraction": 0.7549450549450549,
+            "components_containing_each_label": {
+              "anomaly": 2,
+              "attack": 41,
+              "benign": 1
+            },
+            "largest_five_component_label_counts": [
+              {
+                "anomaly": 4038,
+                "attack": 4049,
+                "benign": 9088
+              },
+              {
+                "attack": 450
+              },
+              {
+                "attack": 352
+              },
+              {
+                "attack": 325
+              },
+              {
+                "attack": 315
+              }
+            ],
+            "requested_folds": 3,
+            "necessary_nonempty_label_support_conditions_met": false,
+            "balanced_split_constructed": false,
+            "feasibility_proven": false,
+            "interpretation": "Necessary conditions for keeping every declared group intact in three nonempty folds with every present label; not sufficient balance, independence or a claim about selected subsets."
+          },
+          "family_subject_client": {
+            "components": 1,
+            "largest_component_sessions": 22750,
+            "largest_component_fraction": 1.0,
+            "components_containing_each_label": {
+              "anomaly": 1,
+              "attack": 1,
+              "benign": 1
+            },
+            "largest_five_component_label_counts": [
+              {
+                "anomaly": 4089,
+                "attack": 9573,
+                "benign": 9088
+              }
+            ],
+            "requested_folds": 3,
+            "necessary_nonempty_label_support_conditions_met": false,
+            "balanced_split_constructed": false,
+            "feasibility_proven": false,
+            "interpretation": "Necessary conditions for keeping every declared group intact in three nonempty folds with every present label; not sufficient balance, independence or a claim about selected subsets."
+          },
+          "family_subject_client_sequence": {
+            "components": 1,
+            "largest_component_sessions": 22750,
+            "largest_component_fraction": 1.0,
+            "components_containing_each_label": {
+              "anomaly": 1,
+              "attack": 1,
+              "benign": 1
+            },
+            "largest_five_component_label_counts": [
+              {
+                "anomaly": 4089,
+                "attack": 9573,
+                "benign": 9088
+              }
+            ],
+            "requested_folds": 3,
+            "necessary_nonempty_label_support_conditions_met": false,
+            "balanced_split_constructed": false,
+            "feasibility_proven": false,
+            "interpretation": "Necessary conditions for keeping every declared group intact in three nonempty folds with every present label; not sufficient balance, independence or a claim about selected subsets."
+          }
+        },
+        "fixed_time_cutoff": {
+          "before_sessions": 15317,
+          "after_sessions": 7433,
+          "spanning_sessions": 0,
+          "spanning_sessions_kept_separate": true,
+          "populations_modified": false,
+          "overlap": {
+            "family": {
+              "shared_keys": 132,
+              "before_sessions_touching_shared_keys": 15000,
+              "after_sessions_touching_shared_keys": 7433
+            },
+            "subjects": {
+              "shared_keys": 1916,
+              "before_sessions_touching_shared_keys": 7961,
+              "after_sessions_touching_shared_keys": 4838
+            },
+            "clients": {
+              "shared_keys": 1957,
+              "before_sessions_touching_shared_keys": 10628,
+              "after_sessions_touching_shared_keys": 6090
+            },
+            "sequence": {
+              "shared_keys": 533,
+              "before_sessions_touching_shared_keys": 14853,
+              "after_sessions_touching_shared_keys": 7378
+            }
+          }
+        }
+      },
+      "binary_benign_attack": {
+        "sessions": 18661,
+        "source_label_counts": {
+          "attack": 9573,
+          "benign": 9088
+        },
+        "excluded_anomaly_sessions": 4089,
+        "known_identity_coverage": {
+          "sessions_without_known_subject": 5531,
+          "sessions_without_known_client": 0,
+          "events_without_known_subject": 63050,
+          "events_without_known_client": 0
+        },
+        "profiles": {
+          "semantic_family": {
+            "components": 100,
+            "largest_component_sessions": 5911,
+            "largest_component_fraction": 0.316756872622046,
+            "components_containing_each_label": {
+              "attack": 94,
+              "benign": 6
+            },
+            "largest_five_component_label_counts": [
+              {
+                "benign": 5911
+              },
+              {
+                "benign": 2204
+              },
+              {
+                "benign": 476
+              },
+              {
+                "attack": 450
+              },
+              {
+                "attack": 352
+              }
+            ],
+            "requested_folds": 3,
+            "necessary_nonempty_label_support_conditions_met": true,
+            "balanced_split_constructed": false,
+            "feasibility_proven": false,
+            "interpretation": "Necessary conditions for keeping every declared group intact in three nonempty folds with every present label; not sufficient balance, independence or a claim about selected subsets."
+          },
+          "known_subject": {
+            "components": 8584,
+            "largest_component_sessions": 2903,
+            "largest_component_fraction": 0.15556508225711377,
+            "components_containing_each_label": {
+              "attack": 6896,
+              "benign": 2555
+            },
+            "largest_five_component_label_counts": [
+              {
+                "attack": 1354,
+                "benign": 1549
+              },
+              {
+                "attack": 27,
+                "benign": 4
+              },
+              {
+                "attack": 23,
+                "benign": 6
+              },
+              {
+                "attack": 20,
+                "benign": 4
+              },
+              {
+                "attack": 15,
+                "benign": 7
+              }
+            ],
+            "requested_folds": 3,
+            "necessary_nonempty_label_support_conditions_met": true,
+            "balanced_split_constructed": false,
+            "feasibility_proven": false,
+            "interpretation": "Necessary conditions for keeping every declared group intact in three nonempty folds with every present label; not sufficient balance, independence or a claim about selected subsets."
+          },
+          "known_client": {
+            "components": 1550,
+            "largest_component_sessions": 15185,
+            "largest_component_fraction": 0.813729167783077,
+            "components_containing_each_label": {
+              "attack": 664,
+              "benign": 1157
+            },
+            "largest_five_component_label_counts": [
+              {
+                "attack": 7914,
+                "benign": 7271
+              },
+              {
+                "attack": 30
+              },
+              {
+                "attack": 21
+              },
+              {
+                "attack": 18
+              },
+              {
+                "attack": 14,
+                "benign": 3
+              }
+            ],
+            "requested_folds": 3,
+            "necessary_nonempty_label_support_conditions_met": true,
+            "balanced_split_constructed": false,
+            "feasibility_proven": false,
+            "interpretation": "Necessary conditions for keeping every declared group intact in three nonempty folds with every present label; not sufficient balance, independence or a claim about selected subsets."
+          },
+          "family_subject": {
+            "components": 41,
+            "largest_component_sessions": 13137,
+            "largest_component_fraction": 0.7039815658324848,
+            "components_containing_each_label": {
+              "attack": 41,
+              "benign": 1
+            },
+            "largest_five_component_label_counts": [
+              {
+                "attack": 4049,
+                "benign": 9088
+              },
+              {
+                "attack": 450
+              },
+              {
+                "attack": 352
+              },
+              {
+                "attack": 325
+              },
+              {
+                "attack": 315
+              }
+            ],
+            "requested_folds": 3,
+            "necessary_nonempty_label_support_conditions_met": false,
+            "balanced_split_constructed": false,
+            "feasibility_proven": false,
+            "interpretation": "Necessary conditions for keeping every declared group intact in three nonempty folds with every present label; not sufficient balance, independence or a claim about selected subsets."
+          },
+          "family_subject_client": {
+            "components": 1,
+            "largest_component_sessions": 18661,
+            "largest_component_fraction": 1.0,
+            "components_containing_each_label": {
+              "attack": 1,
+              "benign": 1
+            },
+            "largest_five_component_label_counts": [
+              {
+                "attack": 9573,
+                "benign": 9088
+              }
+            ],
+            "requested_folds": 3,
+            "necessary_nonempty_label_support_conditions_met": false,
+            "balanced_split_constructed": false,
+            "feasibility_proven": false,
+            "interpretation": "Necessary conditions for keeping every declared group intact in three nonempty folds with every present label; not sufficient balance, independence or a claim about selected subsets."
+          },
+          "family_subject_client_sequence": {
+            "components": 1,
+            "largest_component_sessions": 18661,
+            "largest_component_fraction": 1.0,
+            "components_containing_each_label": {
+              "attack": 1,
+              "benign": 1
+            },
+            "largest_five_component_label_counts": [
+              {
+                "attack": 9573,
+                "benign": 9088
+              }
+            ],
+            "requested_folds": 3,
+            "necessary_nonempty_label_support_conditions_met": false,
+            "balanced_split_constructed": false,
+            "feasibility_proven": false,
+            "interpretation": "Necessary conditions for keeping every declared group intact in three nonempty folds with every present label; not sufficient balance, independence or a claim about selected subsets."
+          }
+        },
+        "fixed_time_cutoff": {
+          "before_sessions": 12573,
+          "after_sessions": 6088,
+          "spanning_sessions": 0,
+          "spanning_sessions_kept_separate": true,
+          "populations_modified": false,
+          "overlap": {
+            "family": {
+              "shared_keys": 97,
+              "before_sessions_touching_shared_keys": 12312,
+              "after_sessions_touching_shared_keys": 6088
+            },
+            "subjects": {
+              "shared_keys": 1586,
+              "before_sessions_touching_shared_keys": 5515,
+              "after_sessions_touching_shared_keys": 3513
+            },
+            "clients": {
+              "shared_keys": 1515,
+              "before_sessions_touching_shared_keys": 8472,
+              "after_sessions_touching_shared_keys": 4767
+            },
+            "sequence": {
+              "shared_keys": 440,
+              "before_sessions_touching_shared_keys": 12085,
+              "after_sessions_touching_shared_keys": 6041
+            }
+          }
+        }
+      }
+    },
+    "spool_logical_bytes": 122187776,
+    "memory_peak_measured": false,
+    "detector_inference_runs": 0,
+    "new_split_selected": false,
+    "pilot_modified": false,
+    "independent_review": "pending",
+    "new_independent_evaluation": false,
+    "goal_qualified": false,
+    "effects": {
+      "network_calls": 0,
+      "paid_api_calls": 0,
+      "cloud_calls": 0,
+      "baseline_writes": 0
+    }
+  },
+  "test_source_lf_sha256": "e1f62155e90de805c287fd5b5179c076e4c675090acc8fec232a3ebd1dfe90ec",
+  "earlier_audit": "runtime/f1/extra-m7-splits-v12-20261112 retained before adding the explicit family+subject profile; not summed or overwritten",
+  "limits": [
+    "Full-population group constraints differ from choosing smaller disjoint subsets.",
+    "A client IP is not a verified device or person; user_id/action_by namespace sharing is a declared conservative assumption.",
+    "Missing identities are reported and never treated as proof of distinctness.",
+    "Passing necessary component counts cannot prove balance or statistical independence."
+  ],
+  "independent_review": "pending",
+  "goal_qualified": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "original_app_baseline_changed": false
+}

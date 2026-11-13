@@ -1,0 +1,202 @@
+{
+  "schema": "extra-fox-calibration-window-v36-1",
+  "recorded_at": "2026-11-12T08:08:56.794309+00:00",
+  "branch": "extra",
+  "window": {
+    "schema": "extra-user-work-window-1",
+    "started_at_utc": "2026-11-12T07:11:10+00:00",
+    "work_until_utc": "2026-11-12T08:11:10+00:00",
+    "work_until_kst": "2026-11-12T17:11:10+09:00",
+    "user_instruction": "\ud55c\uc2dc\uac04\ub4a4\uc5d0 \ub098\uac00\uc57c\ud558\ub294\ub370 \uadf8\ub54c\uae4c\uc9c0 \uc791\uc5c5\ud574\uc918",
+    "scope": "continue aligned local candidate implementation, comparison, tests and docs; independent final goal remains unproven",
+    "paid_calls_allowed": false,
+    "github_push_allowed": false,
+    "baseline_and_labels_preserved": true
+  },
+  "acquisition": {
+    "artifact": {
+      "path": "runtime/f1/public-ait-lds21-fox-20261112/acquisition.json",
+      "bytes": 1297,
+      "sha256": "c9d664d9bbd7615697e70e4f01ba865d87ff56040b90580ca2ccd127f3a4c21e"
+    },
+    "archive_extracted": false,
+    "asset": {
+      "asset_id": "ait-lds21-fox",
+      "bytes": 688586900,
+      "data_role": "publisher_raw_logs_with_separate_line_labels_calibration_only",
+      "filename": "fox_no-pcaps.zip",
+      "license_id": "cc-by-nc-sa-4.0",
+      "publisher_md5": "27b09dd2876ec08ee99a9b53e8718c92",
+      "record_id": 19483937,
+      "record_version": "v2_1",
+      "reference": "https://zenodo.org/records/19483937"
+    },
+    "aws_sdk_calls": 0,
+    "bytes_received": 688586900,
+    "code_executed_from_asset": false,
+    "completed": true,
+    "elapsed_seconds": 2264.297,
+    "ended_at": "2026-11-12T07:55:34.648523+00:00",
+    "goal_qualified": false,
+    "local_sha256": "8d71d31a31df469d836c80bdbfdc35da566e90322cf9ae490233e176a0c88d49",
+    "local_sha256_kind": "local immutable follow-up anchor; not a publisher signature",
+    "paid_api_calls": 0,
+    "publisher_checksum_kind": "MD5; not a publisher digital signature",
+    "publisher_md5_verified": true,
+    "publisher_metadata_sha256": "09ce2689d83d48f967eb8aaadf269ca8710ba44d4bb7d057fc2b011d9c8d87c5",
+    "purpose": "noncommercial_research",
+    "range_retries": 6,
+    "ranged_transfer": true,
+    "resumed_prefix_bytes": 0,
+    "schema": "f1-public-asset-acquisition-1",
+    "started_at": "2026-11-12T07:17:50.358316+00:00",
+    "tool_session": 11206,
+    "tool_terminal_exit_code": 0,
+    "saved_archive_sha_recomputed_before_member_read": true
+  },
+  "calibration_attempt": {
+    "artifact": {
+      "path": "runtime/f1/fox-calibration-v34-20261112/calibration.json",
+      "bytes": 1292,
+      "sha256": "c4298e76284d96f52d278f272714733b963f32d75197fc8793dac23a2894083c"
+    },
+    "schema": "extra-fox-frozen-calibration-1",
+    "completed": false,
+    "started_at": "2026-11-12T07:57:01.835439+00:00",
+    "frozen_models_before_read": {
+      "path": "runtime/f1/semantic-models-frozen-v34-20261112.json",
+      "bytes": 738,
+      "sha256": "51e2b1e4d48b9246f0b01817e27dcb74f6d57c9d82466c65c6478998263344a5"
+    },
+    "source_archive": {
+      "path": "runtime/f1/public-ait-lds21-fox-20261112/fox_no-pcaps.zip",
+      "bytes": 688586900,
+      "sha256": "8d71d31a31df469d836c80bdbfdc35da566e90322cf9ae490233e176a0c88d49"
+    },
+    "evaluation": "previously unobserved predeclared calibration scenario; not independent final six-domain acceptance",
+    "models_refitted": false,
+    "goal_qualified": false,
+    "stages": {
+      "pairs": {
+        "path": "runtime/f1/fox-calibration-v34-20261112/pairs/audit.json",
+        "bytes": 18301,
+        "sha256": "b25dc0a29dade93be7d28f863ce310cd1bb4838b0d7fa2d9b7c33d478d1c318f"
+      },
+      "base": {
+        "path": "runtime/f1/fox-calibration-v34-20261112/base/preparation.json",
+        "bytes": 4336,
+        "sha256": "6fe7511a562c068576bfba26cd31d425258dcdcb2a8eb21f2ac13f62fc6a962b"
+      }
+    },
+    "metrics": {},
+    "failure_type": "OSError",
+    "failure_message": "[Errno 28] No space left on device",
+    "free_at_end": 53248,
+    "tool_session": 60958,
+    "tool_terminal_exit_code": 1
+  },
+  "population": {
+    "paired_files": 8,
+    "rows": 668418,
+    "normal": 211534,
+    "attack": 456884,
+    "pair_audit": {
+      "path": "runtime/f1/fox-calibration-v34-20261112/pairs/audit.json",
+      "bytes": 18301,
+      "sha256": "b25dc0a29dade93be7d28f863ce310cd1bb4838b0d7fa2d9b7c33d478d1c318f"
+    },
+    "raw_preparation": {
+      "path": "runtime/f1/fox-calibration-v34-20261112/base/preparation.json",
+      "bytes": 4336,
+      "sha256": "6fe7511a562c068576bfba26cd31d425258dcdcb2a8eb21f2ac13f62fc6a962b"
+    },
+    "feature_errors": 0,
+    "time_errors": 0,
+    "outside_simulation": 0,
+    "backward_time_steps": 15
+  },
+  "independent_http_admission": {
+    "artifact": {
+      "path": "runtime/f1/fox-calibration-v34-20261112/http-admission.json",
+      "bytes": 886,
+      "sha256": "afe01d5a9a755d63855396630c14e4a0f52ef9b10abd0eaba72674d664ee1892"
+    },
+    "schema": "extra-fox-http-context-admission-1",
+    "completed": true,
+    "files": [
+      {
+        "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-error.log.1",
+        "sha256": "3894781e6dadce252675d741e461109a937822850d4714204c52a50479205f2d",
+        "rows": 1338,
+        "requests": 0,
+        "utf8_errors": 0,
+        "exceeds_existing_request_bound": false
+      },
+      {
+        "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2",
+        "sha256": "ccdf27896c74e9e435fce0e4abbacae47511634e4ee195e07599f70687d009de",
+        "rows": 412922,
+        "requests": 412904,
+        "utf8_errors": 0,
+        "exceeds_existing_request_bound": true
+      }
+    ],
+    "existing_per_source_request_bound": 100000,
+    "source_code_limits_changed": false,
+    "rows_removed": 0,
+    "models_run": false,
+    "goal_qualified": false
+  },
+  "failure_storage_recovery": {
+    "artifact": {
+      "path": "runtime/f1/fox-calibration-v34-20261112/storage-recovery.json",
+      "bytes": 1040,
+      "sha256": "220623b28218276f1215fb706eba8224bf856dcd953c124319e7d3ff95fb1e18"
+    },
+    "schema": "extra-fox-failure-headroom-recovery-1",
+    "free_before": 131915776,
+    "completed_derived_cache_released": {
+      "path": "runtime/f1/fox-calibration-v34-20261112/base/inputs.jsonl",
+      "bytes": 509996520,
+      "sha256": "08e2443f15430eaee6bc91c6115adc4378bc0389497eccbd17cf1c9f5984486a",
+      "regenerate_with": "dd46d67 scripts.prepare_native_raw; retained pairs/audit.json and all exact raw/label files; use a fresh output directory",
+      "source_manifest_sha256": "b25dc0a29dade93be7d28f863ce310cd1bb4838b0d7fa2d9b7c33d478d1c318f"
+    },
+    "raw_logs_deleted": 0,
+    "truth_or_labels_deleted": 0,
+    "failed_partial_files_deleted": 0,
+    "frozen_models_changed": false,
+    "partial_files": [
+      {
+        "path": "runtime/f1/fox-calibration-v34-20261112/semantic/inputs.jsonl.part",
+        "sha256": "aff8bf28c2ff4f257f6377a6ed1f65c3426d3e1ff054e3396859c62c831d60ad",
+        "bytes": 436009259,
+        "compression_exit_code": 0
+      }
+    ],
+    "free_after_cache_release": 815058944,
+    "free_after": 1413795840
+  },
+  "base_cache_fully_available_for_reuse": false,
+  "resume_requires": "streaming/bounded external ordering and near-linear HTTP windows with R/S equivalence; all 668418 rows retained; raw/gold sources preserved; no unchecked limit increase or truncation",
+  "frozen_model_artifacts_unchanged": true,
+  "classifier_metrics_computed": false,
+  "calibration_metrics": null,
+  "current_related_tests": {
+    "windows": 287,
+    "linux": 287,
+    "code_changed_since_tests": false,
+    "new_tests_run_in_v36": false
+  },
+  "independent_final_metrics": null,
+  "original_six_domain_goal_replaced": false,
+  "goal_qualified": false,
+  "current_owned_f1_containers": 0,
+  "all_owned_tool_jobs_terminal": true,
+  "source_acquisition_restarted_after_completion": false,
+  "raw_or_truth_deleted": false,
+  "free_disk_bytes_at_record": 1375019008,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "github_pushes": 0
+}

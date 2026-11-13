@@ -1,0 +1,188 @@
+{
+  "schema": "extra-native-acquisition-v16-1",
+  "recorded_at": "2026-11-12T03:03:35.478431+00:00",
+  "branch": "extra",
+  "baseline_app_diff_empty": true,
+  "original_labels_changed": false,
+  "tests": {
+    "windows": {
+      "path": "runtime/f1/extra-native-focused-20261112.xml",
+      "sha256": "0c2bb2dc014dc98ce1088e0e0868a95c20a64f5dbbf04c9c86d168cead2a2dd4",
+      "passed": 83,
+      "failures_errors_skipped": 0
+    },
+    "linux": {
+      "path": "runtime/f1/extra-linux-public-native-20261112-02/checks.xml",
+      "sha256": "e0ee9ef75662cdf2c8fd9f3f7460a2c2abc7298908570cd15f2e1bdc85596887",
+      "passed": 83,
+      "failures_errors_skipped": 0
+    }
+  },
+  "linux_source_manifest_sha256": "d16f6a503d87ca84412b0bef85d5ae4a150facdd6eb1a50f3a9c2d186bd14d58",
+  "linux_remaining_owned_containers": 0,
+  "linux_network": "none",
+  "linux_host_mounts": 0,
+  "public_ads_acquisition": {
+    "archive_extracted": false,
+    "asset": {
+      "asset_id": "ait-ads1-alerts",
+      "bytes": 96202946,
+      "data_role": "publisher_simulated_ids_alerts_not_all_raw_events",
+      "filename": "ait_ads.zip",
+      "license_id": "cc-by-4.0",
+      "publisher_md5": "43db6b1f0996e0024befd617706c50e9",
+      "record_id": 8263181,
+      "record_version": "1",
+      "reference": "https://zenodo.org/records/8263181"
+    },
+    "aws_sdk_calls": 0,
+    "bytes_received": 96202946,
+    "code_executed_from_asset": false,
+    "completed": true,
+    "elapsed_seconds": 214.312,
+    "ended_at": "2026-11-12T02:50:24.659489+00:00",
+    "goal_qualified": false,
+    "local_sha256": "9f0595c4ebe56ac9223763881f55369dd4f249a8108064e4ae108eb3309aeeb9",
+    "local_sha256_kind": "local immutable follow-up anchor; not a publisher signature",
+    "paid_api_calls": 0,
+    "prefix_publisher_verified": false,
+    "prior_acquisition_sha256": "a94c3bfd75e79486b9a72e0e3e8780351e83e873963d167a571ad0e7b25bad97",
+    "publisher_checksum_kind": "MD5; not a publisher digital signature",
+    "publisher_md5_verified": true,
+    "publisher_metadata_sha256": "292a72be71c5509824ba3c909f63b30fb35be0a4abc521f39a4ae6d540ef480f",
+    "purpose": "noncommercial_research",
+    "range_retries": 0,
+    "ranged_transfer": true,
+    "resumed_prefix_bytes": 30089740,
+    "resumed_prefix_sha256": "5339e518c3465c44e3e204ddf548d56c6fabf02cd21c57bf4d67cb82bbfb7e29",
+    "schema": "f1-public-asset-acquisition-1",
+    "started_at": "2026-11-12T02:46:50.339920+00:00"
+  },
+  "raw_lds_acquisition": {
+    "completed": false,
+    "stage": "range_transfer_in_progress; no partial used for evaluation"
+  },
+  "protocol_sha256": "b5f227e62533ac225ef1da357945e2a496f309910ea1250d1cabe4909f0da7ca",
+  "asset_contract_sha256": "d391d79307d1df160052cbf1d08a338f731ef873cbfa4e04a7d066d8b5305c94",
+  "development_preparations": {
+    "wazuh": {
+      "path": "runtime/f1/ait-ads-native-inputs-wazuh-20261112/preparation.json",
+      "sha256": "99a612218059635c72cce5af7b5226860549973058df1e63205cb03ed7a5f4a2",
+      "classifier_trained": false,
+      "completed": true,
+      "files": {
+        "inputs.jsonl": {
+          "bytes": 23882461,
+          "sha256": "31d57daa2c578a0bce91753d32d948abc5600cb99fd5ec51ae67784c5999084f"
+        },
+        "references.jsonl": {
+          "bytes": 15323868,
+          "sha256": "cc9e8f3671531b6f6991bf031a8b15f15f3d323b293114ba00769dd221e6fb69"
+        }
+      },
+      "finding_families": {
+        "anomaly": 0,
+        "authentication_failure": 141,
+        "authentication_success": 14442,
+        "execution": 0,
+        "exfiltration": 0,
+        "integrity": 0,
+        "malware": 0,
+        "privilege": 2,
+        "reconnaissance": 0,
+        "service_health": 0,
+        "software_update": 776,
+        "web_attack": 2
+      },
+      "full_six_domain_goal_replaced": false,
+      "goal_qualified": false,
+      "historical_replay_only": true,
+      "observation_errors": {},
+      "row_policy": "every physical source row retained",
+      "scan": {
+        "bytes": 45282051,
+        "goal_qualified": false,
+        "parse_errors": 0,
+        "parsed_rows": 41488,
+        "physical_rows": 41488,
+        "schema": "f1-native-jsonl-scan-1",
+        "source_sha256": "da4b882de7df765d4fbedd772a5bf892e7a440580d3654c585d6d124bfb94832",
+        "source_verified_before_and_after": true
+      },
+      "schema": "f1-native-alert-input-1",
+      "sensor": "wazuh",
+      "severities": {
+        "10": 729,
+        "11": 7,
+        "3": 24455,
+        "5": 7274,
+        "6": 8976,
+        "8": 47
+      },
+      "source_sha256": "da4b882de7df765d4fbedd772a5bf892e7a440580d3654c585d6d124bfb94832",
+      "truth_in_inputs": false
+    },
+    "aminer": {
+      "path": "runtime/f1/ait-ads-native-inputs-aminer-20261112/preparation.json",
+      "sha256": "7456bc77d46ff79e4e07fc5b1f2ee822614699864f4cdb1d5c7d61a11739c867",
+      "classifier_trained": false,
+      "completed": true,
+      "files": {
+        "inputs.jsonl": {
+          "bytes": 2351930,
+          "sha256": "70495e840e5fd9730812f0a81b55cb3cac37fc5e8f80daf568a499ee742c7a82"
+        },
+        "references.jsonl": {
+          "bytes": 1626402,
+          "sha256": "7c3889988b4ee7d24060387db6a89cd94bae3f1d7c70d3e78d0f9f4689cfd26e"
+        }
+      },
+      "finding_families": {
+        "anomaly": 550,
+        "authentication_failure": 0,
+        "authentication_success": 0,
+        "execution": 0,
+        "exfiltration": 0,
+        "integrity": 0,
+        "malware": 0,
+        "privilege": 0,
+        "reconnaissance": 0,
+        "service_health": 0,
+        "software_update": 0,
+        "web_attack": 0
+      },
+      "full_six_domain_goal_replaced": false,
+      "goal_qualified": false,
+      "historical_replay_only": true,
+      "observation_errors": {},
+      "row_policy": "every physical source row retained",
+      "scan": {
+        "bytes": 3411024,
+        "goal_qualified": false,
+        "parse_errors": 0,
+        "parsed_rows": 4056,
+        "physical_rows": 4056,
+        "schema": "f1-native-jsonl-scan-1",
+        "source_sha256": "f8f7698833836d0e24624d53981474795ec6f8991a1b33d5fb2e9e411c24752f",
+        "source_verified_before_and_after": true
+      },
+      "schema": "f1-native-alert-input-1",
+      "sensor": "aminer",
+      "severities": {
+        "None": 4056
+      },
+      "source_sha256": "f8f7698833836d0e24624d53981474795ec6f8991a1b33d5fb2e9e411c24752f",
+      "truth_in_inputs": false
+    }
+  },
+  "reserved_final_bodies_read": 0,
+  "publisher_phase_labels_body_read": false,
+  "new_binary_metrics": null,
+  "six_domain_goal_replaced": false,
+  "independent_human_review": "not assigned",
+  "actual_organization_approvals": 0,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "previous_owned_resources_cleanup": "extra-interrupted-cleanup-v15-20261112.json",
+  "goal_qualified": false
+}

@@ -1,0 +1,988 @@
+{
+  "schema": "detection-baseline-error-review-1",
+  "new_evaluation": false,
+  "rules_or_thresholds_or_labels_changed": false,
+  "independent_review": "pending",
+  "splits": {
+    "development": {
+      "source_report": "runtime/c02/infra-batches/week4-20261111-final1/detection-quality/development.json",
+      "source_sha256": "2138ae2dc218aae749b9b8e23bc64ef3ce5aae894cdc289ad128fe309ffeee5a",
+      "confusion": {
+        "tp": 170,
+        "fp": 50,
+        "fn": 10,
+        "tn": 130
+      },
+      "metrics": {
+        "precision": 0.7727272727272727,
+        "recall": 0.9444444444444444,
+        "f1": 0.85,
+        "false_positive_rate": 0.2777777777777778
+      },
+      "ruleset_digest_sha256": "7b769a999a252e112e4848cd5026976ee55de4bf853ac49b00d883d36b7a6231",
+      "evaluation_fingerprint_sha256": "48da856334a05d98d8d3286155bef105f96c3f656462a7734073f6c35d2c9cef",
+      "domains": {
+        "credential": {
+          "confusion": {
+            "tp": 30,
+            "fp": 10,
+            "fn": 0,
+            "tn": 20
+          },
+          "metrics": {
+            "precision": 0.75,
+            "recall": 1.0,
+            "f1": 0.8571428571428571,
+            "false_positive_rate": 0.3333333333333333
+          }
+        },
+        "device": {
+          "confusion": {
+            "tp": 20,
+            "fp": 10,
+            "fn": 10,
+            "tn": 20
+          },
+          "metrics": {
+            "precision": 0.6666666666666666,
+            "recall": 0.6666666666666666,
+            "f1": 0.6666666666666666,
+            "false_positive_rate": 0.3333333333333333
+          }
+        },
+        "exfiltration": {
+          "confusion": {
+            "tp": 30,
+            "fp": 0,
+            "fn": 0,
+            "tn": 30
+          },
+          "metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "false_positive_rate": 0.0
+          }
+        },
+        "lateral": {
+          "confusion": {
+            "tp": 30,
+            "fp": 10,
+            "fn": 0,
+            "tn": 20
+          },
+          "metrics": {
+            "precision": 0.75,
+            "recall": 1.0,
+            "f1": 0.8571428571428571,
+            "false_positive_rate": 0.3333333333333333
+          }
+        },
+        "privilege": {
+          "confusion": {
+            "tp": 30,
+            "fp": 10,
+            "fn": 0,
+            "tn": 20
+          },
+          "metrics": {
+            "precision": 0.75,
+            "recall": 1.0,
+            "f1": 0.8571428571428571,
+            "false_positive_rate": 0.3333333333333333
+          }
+        },
+        "remote": {
+          "confusion": {
+            "tp": 30,
+            "fp": 10,
+            "fn": 0,
+            "tn": 20
+          },
+          "metrics": {
+            "precision": 0.75,
+            "recall": 1.0,
+            "f1": 0.8571428571428571,
+            "false_positive_rate": 0.3333333333333333
+          }
+        }
+      },
+      "error_families": [
+        {
+          "outcome": "FN",
+          "domain": "device",
+          "family_id": "device-unregistered-login",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "device-unregistered-login-00",
+              "session_id": "s-bbfeccfaa5f579fb15cd",
+              "family_id": "device-unregistered-login",
+              "domain": "device",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "6891f75e7a175665103aff19fb20f504b8f149356f61eb9d8cb079b157b7ab38"
+            },
+            {
+              "case_id": "device-unregistered-login-01",
+              "session_id": "s-c8157d4ff3c86679fae8",
+              "family_id": "device-unregistered-login",
+              "domain": "device",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "3c1fc927d202b005324665b5b0e3bb772e38cd0195ad0c618c08b65612483862"
+            }
+          ]
+        },
+        {
+          "outcome": "FP",
+          "domain": "credential",
+          "family_id": "credential-approved-health-retry",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "credential-approved-health-retry-00",
+              "session_id": "s-86baba2174e6e3fb4f83",
+              "family_id": "credential-approved-health-retry",
+              "domain": "credential",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "933fd11f9d62e1ec524b89d9bd37d27ce7dc6abbd5c763835792716b6c3ae999"
+            },
+            {
+              "case_id": "credential-approved-health-retry-01",
+              "session_id": "s-19a1f5d07bb5ec49707f",
+              "family_id": "credential-approved-health-retry",
+              "domain": "credential",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "9957ed3221a470716ada1a54bd0f211058723cfd22d2ee10af2c10b30b0ae4c9"
+            }
+          ]
+        },
+        {
+          "outcome": "FP",
+          "domain": "device",
+          "family_id": "device-approved-enrollment",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "device-approved-enrollment-00",
+              "session_id": "s-34d095cfdd175a506208",
+              "family_id": "device-approved-enrollment",
+              "domain": "device",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "a044cb8a18487fc76ec58339c9d340744825e249ba3cad80d476bd49eaf1fb2b"
+            },
+            {
+              "case_id": "device-approved-enrollment-01",
+              "session_id": "s-736c8d158e9eae95120c",
+              "family_id": "device-approved-enrollment",
+              "domain": "device",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "a8249b312da027dde58657e1baff09e5604b33567f1c053f0c847898f995f71f"
+            }
+          ]
+        },
+        {
+          "outcome": "FP",
+          "domain": "lateral",
+          "family_id": "lateral-approved-deployment",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "lateral-approved-deployment-00",
+              "session_id": "s-575ed0919a86bfda3026",
+              "family_id": "lateral-approved-deployment",
+              "domain": "lateral",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+                "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "af0e6c3b025a831c4488e0814b61cd9c519011ff572cd2b18924438860bbadd4"
+            },
+            {
+              "case_id": "lateral-approved-deployment-01",
+              "session_id": "s-e3adec8a178cdfa52e8b",
+              "family_id": "lateral-approved-deployment",
+              "domain": "lateral",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+                "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "bc03d152b9271e9ba86a460e39c0c7887513ce730c3e2dcd4aa516dc54e59cf2"
+            }
+          ]
+        },
+        {
+          "outcome": "FP",
+          "domain": "privilege",
+          "family_id": "privilege-approved-emergency",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "privilege-approved-emergency-00",
+              "session_id": "s-0d22af63e256117470d6",
+              "family_id": "privilege-approved-emergency",
+              "domain": "privilege",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "32966a7e4d181e8daf72489b940d081d15ebae886867705a2204e3e23541990b"
+            },
+            {
+              "case_id": "privilege-approved-emergency-01",
+              "session_id": "s-7bbaa58e89cf13f7334b",
+              "family_id": "privilege-approved-emergency",
+              "domain": "privilege",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "3c3b69a860854f0467b25594a1f6e7007536a8c48a2d1c941a098480dbf34703"
+            }
+          ]
+        },
+        {
+          "outcome": "FP",
+          "domain": "remote",
+          "family_id": "remote-approved-support",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "remote-approved-support-00",
+              "session_id": "s-32a35371729befc5fa5d",
+              "family_id": "remote-approved-support",
+              "domain": "remote",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "db58838b1ae415370c663a7004e320cfffade61f32fdb9247830b4a9a3d61f1f"
+            },
+            {
+              "case_id": "remote-approved-support-01",
+              "session_id": "s-cad54b23dbd70973612e",
+              "family_id": "remote-approved-support",
+              "domain": "remote",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "bc09e7190e78f49f465939ac10c84976925ce1cd770af1b8100546cb4b52f38c"
+            }
+          ]
+        }
+      ],
+      "evaluation_error_count": 0
+    },
+    "holdout": {
+      "source_report": "runtime/c02/infra-batches/week4-20261111-final1/detection-quality/holdout.json",
+      "source_sha256": "84ef91d1ef2e70a8533697585ecb85b953bf927ba59703153b230f5bf02ce671",
+      "confusion": {
+        "tp": 90,
+        "fp": 50,
+        "fn": 90,
+        "tn": 130
+      },
+      "metrics": {
+        "precision": 0.6428571428571429,
+        "recall": 0.5,
+        "f1": 0.5625,
+        "false_positive_rate": 0.2777777777777778
+      },
+      "ruleset_digest_sha256": "7b769a999a252e112e4848cd5026976ee55de4bf853ac49b00d883d36b7a6231",
+      "evaluation_fingerprint_sha256": "ed68b3b0c2d9ea5d04cb51eaa51291fa2f13086f25e00601143357080c383b16",
+      "domains": {
+        "credential": {
+          "confusion": {
+            "tp": 10,
+            "fp": 10,
+            "fn": 20,
+            "tn": 20
+          },
+          "metrics": {
+            "precision": 0.5,
+            "recall": 0.3333333333333333,
+            "f1": 0.4,
+            "false_positive_rate": 0.3333333333333333
+          }
+        },
+        "device": {
+          "confusion": {
+            "tp": 10,
+            "fp": 0,
+            "fn": 20,
+            "tn": 30
+          },
+          "metrics": {
+            "precision": 1.0,
+            "recall": 0.3333333333333333,
+            "f1": 0.5,
+            "false_positive_rate": 0.0
+          }
+        },
+        "exfiltration": {
+          "confusion": {
+            "tp": 10,
+            "fp": 0,
+            "fn": 20,
+            "tn": 30
+          },
+          "metrics": {
+            "precision": 1.0,
+            "recall": 0.3333333333333333,
+            "f1": 0.5,
+            "false_positive_rate": 0.0
+          }
+        },
+        "lateral": {
+          "confusion": {
+            "tp": 20,
+            "fp": 20,
+            "fn": 10,
+            "tn": 10
+          },
+          "metrics": {
+            "precision": 0.5,
+            "recall": 0.6666666666666666,
+            "f1": 0.5714285714285714,
+            "false_positive_rate": 0.6666666666666666
+          }
+        },
+        "privilege": {
+          "confusion": {
+            "tp": 20,
+            "fp": 0,
+            "fn": 10,
+            "tn": 30
+          },
+          "metrics": {
+            "precision": 1.0,
+            "recall": 0.6666666666666666,
+            "f1": 0.8,
+            "false_positive_rate": 0.0
+          }
+        },
+        "remote": {
+          "confusion": {
+            "tp": 20,
+            "fp": 20,
+            "fn": 10,
+            "tn": 10
+          },
+          "metrics": {
+            "precision": 0.5,
+            "recall": 0.6666666666666666,
+            "f1": 0.5714285714285714,
+            "false_positive_rate": 0.6666666666666666
+          }
+        }
+      },
+      "error_families": [
+        {
+          "outcome": "FN",
+          "domain": "credential",
+          "family_id": "credential-distributed-slow",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "credential-distributed-slow-00",
+              "session_id": "s-f216351f13cf60b43966",
+              "family_id": "credential-distributed-slow",
+              "domain": "credential",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "90aa8a4fea47fb4270d875863fb3ddfa576f04d54fc500b76680884354f2d117"
+            },
+            {
+              "case_id": "credential-distributed-slow-01",
+              "session_id": "s-d255004300af1f58317c",
+              "family_id": "credential-distributed-slow",
+              "domain": "credential",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "6c180a84b32fc0dd134f3c53cc0eea2960661d7c8f464f9d940baab30c0c30c3"
+            }
+          ]
+        },
+        {
+          "outcome": "FN",
+          "domain": "credential",
+          "family_id": "credential-stolen-success",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "credential-stolen-success-00",
+              "session_id": "s-ce75f2dff30d6906a523",
+              "family_id": "credential-stolen-success",
+              "domain": "credential",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "af1d546edce67de0385664ffbc1dbc4ffcab5b840b5091f933d9890be963f07f"
+            },
+            {
+              "case_id": "credential-stolen-success-01",
+              "session_id": "s-17c40a0769f451a7d17d",
+              "family_id": "credential-stolen-success",
+              "domain": "credential",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "44599f2d8d7a45f90f2687a7db73fc8ce6412620ce007bddebf079e232126ba0"
+            }
+          ]
+        },
+        {
+          "outcome": "FN",
+          "domain": "device",
+          "family_id": "device-managed-compromise",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "device-managed-compromise-00",
+              "session_id": "s-ad6fff04fc3967358399",
+              "family_id": "device-managed-compromise",
+              "domain": "device",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "90d7b6d1f609d803190ef4161297520ce897243d7cb274c8b365b429c5ef1f4c"
+            },
+            {
+              "case_id": "device-managed-compromise-01",
+              "session_id": "s-d00a14447ef83f409d07",
+              "family_id": "device-managed-compromise",
+              "domain": "device",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "450e008afc32c94e1a1061e2dfb32a2dc2d1ca06ee091fa3db4923ee20eec9d0"
+            }
+          ]
+        },
+        {
+          "outcome": "FN",
+          "domain": "device",
+          "family_id": "device-unmanaged-at-risk",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "device-unmanaged-at-risk-00",
+              "session_id": "s-b487a2cfcf01e27bd5be",
+              "family_id": "device-unmanaged-at-risk",
+              "domain": "device",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "bc6d7c51c39cadc41dfaef4a076a766d803c0d7a0fac024773302c09433bcbe3"
+            },
+            {
+              "case_id": "device-unmanaged-at-risk-01",
+              "session_id": "s-57ca13f51fbaae7e1e4c",
+              "family_id": "device-unmanaged-at-risk",
+              "domain": "device",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "0fd8134637f8497e2c314ec97f194d7f020c912f5a0350d3a0c0ed032497557f"
+            }
+          ]
+        },
+        {
+          "outcome": "FN",
+          "domain": "exfiltration",
+          "family_id": "exfiltration-high-sensitivity-export",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "exfiltration-high-sensitivity-export-00",
+              "session_id": "s-506f53372672825240e1",
+              "family_id": "exfiltration-high-sensitivity-export",
+              "domain": "exfiltration",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "f36dab3068217010ab646f432aa5f0e926447d2a93e79e654f5af08334715bec"
+            },
+            {
+              "case_id": "exfiltration-high-sensitivity-export-01",
+              "session_id": "s-b2ae5f92d04d1c7b5ecf",
+              "family_id": "exfiltration-high-sensitivity-export",
+              "domain": "exfiltration",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "337d704664b463542690f8b198ce878b7c4398b8c3d254a46aaa44000d8fe313"
+            }
+          ]
+        },
+        {
+          "outcome": "FN",
+          "domain": "exfiltration",
+          "family_id": "exfiltration-low-and-slow",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "exfiltration-low-and-slow-00",
+              "session_id": "s-a1af02e59e079a3f7b71",
+              "family_id": "exfiltration-low-and-slow",
+              "domain": "exfiltration",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "d2cd9803dae5e7552211572a924e3831bdf7166b1fb500bbd8d97b01cf664316"
+            },
+            {
+              "case_id": "exfiltration-low-and-slow-01",
+              "session_id": "s-3606f5ff3c6424853866",
+              "family_id": "exfiltration-low-and-slow",
+              "domain": "exfiltration",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "5d69934ae00e23fb7d5e5c47c47fff8330d8288bd41f091f5bfbdc0552f94261"
+            }
+          ]
+        },
+        {
+          "outcome": "FN",
+          "domain": "lateral",
+          "family_id": "lateral-api-traversal",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "lateral-api-traversal-00",
+              "session_id": "s-4716fe995ecb3118462e",
+              "family_id": "lateral-api-traversal",
+              "domain": "lateral",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "f93d1e98cf296437b076b79e6f027a3f31e0c78208bbcf98b73bb4c37a8596cb"
+            },
+            {
+              "case_id": "lateral-api-traversal-01",
+              "session_id": "s-53425b63d34b4bad7956",
+              "family_id": "lateral-api-traversal",
+              "domain": "lateral",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "ee03a4e4a983d55d0a063b76e4cb554f38249d6792054b559904fdb8e99d318a"
+            }
+          ]
+        },
+        {
+          "outcome": "FN",
+          "domain": "privilege",
+          "family_id": "privilege-unauthorized-download",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "privilege-unauthorized-download-00",
+              "session_id": "s-fb0910fc51ab03238885",
+              "family_id": "privilege-unauthorized-download",
+              "domain": "privilege",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "2a94ffc0a1050b32772adc3108c656d667fecf658c46ff4afb2d803244a26cfc"
+            },
+            {
+              "case_id": "privilege-unauthorized-download-01",
+              "session_id": "s-eb94555a5410467d19f1",
+              "family_id": "privilege-unauthorized-download",
+              "domain": "privilege",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "1111da17426f508cfa0b91cb3f756ea07ff9f7f84ca1f0844ec48f829c89b80e"
+            }
+          ]
+        },
+        {
+          "outcome": "FN",
+          "domain": "remote",
+          "family_id": "remote-misclassified-activity",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "remote-misclassified-activity-00",
+              "session_id": "s-5da377f0f514decd1ede",
+              "family_id": "remote-misclassified-activity",
+              "domain": "remote",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "2db422bcea0079fbac15e8d34fcff3fe0219c79f92c171c6d1a41ed6907e61a4"
+            },
+            {
+              "case_id": "remote-misclassified-activity-01",
+              "session_id": "s-a00505de54a1a1ed1208",
+              "family_id": "remote-misclassified-activity",
+              "domain": "remote",
+              "threat": true,
+              "detected": false,
+              "expected_rule_ids": [
+                "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+              ],
+              "predicted_rule_ids": [],
+              "error": null,
+              "outcome": "FN",
+              "pattern_sha256": "7c2f5078074ad33f7c31f9da555e6795a0926914a371b6a9aa9782cb210485d3"
+            }
+          ]
+        },
+        {
+          "outcome": "FP",
+          "domain": "credential",
+          "family_id": "credential-authorized-drill",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "credential-authorized-drill-00",
+              "session_id": "s-ca2b1fd662566c02d8e3",
+              "family_id": "credential-authorized-drill",
+              "domain": "credential",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "fd5ab91181dcdcb3107aee676c3329a1b7bba4d4ffb7119025ef22857b9ae177"
+            },
+            {
+              "case_id": "credential-authorized-drill-01",
+              "session_id": "s-c8e153b300197c5a1170",
+              "family_id": "credential-authorized-drill",
+              "domain": "credential",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "9fb7fc92130c61e8b4c30cea961c9a2d35630803c457e1e48ad6ed189018915e"
+            }
+          ]
+        },
+        {
+          "outcome": "FP",
+          "domain": "lateral",
+          "family_id": "lateral-fleet-deployment",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "lateral-fleet-deployment-00",
+              "session_id": "s-ce58dbea417bb1e93a3a",
+              "family_id": "lateral-fleet-deployment",
+              "domain": "lateral",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+                "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "9984b7273fcd7a42b54c4049c9481c6454e62fdb4aca78f92bfc3fc95f9dcdc9"
+            },
+            {
+              "case_id": "lateral-fleet-deployment-01",
+              "session_id": "s-bac73019ab3fb4fea619",
+              "family_id": "lateral-fleet-deployment",
+              "domain": "lateral",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+                "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "d10d1a57ec2a1475a898650dbda1105c0b0be3999ff8c6a7431675f158626165"
+            }
+          ]
+        },
+        {
+          "outcome": "FP",
+          "domain": "lateral",
+          "family_id": "lateral-incident-response",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "lateral-incident-response-00",
+              "session_id": "s-4869dcef92389341ff60",
+              "family_id": "lateral-incident-response",
+              "domain": "lateral",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+                "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "899285cf8df1d11f0c11eb1955d3b0af47922b92f832caf0d27639729b64292b"
+            },
+            {
+              "case_id": "lateral-incident-response-01",
+              "session_id": "s-cc30277ea0ba51abde6c",
+              "family_id": "lateral-incident-response",
+              "domain": "lateral",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+                "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "b5b2f59625de4e0a098e8db5fdb5097b5a92b2570c6ceea5b625c6c8eacc90e0"
+            }
+          ]
+        },
+        {
+          "outcome": "FP",
+          "domain": "remote",
+          "family_id": "remote-approved-night-support",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "remote-approved-night-support-00",
+              "session_id": "s-ec3e79d0e02078f0e62f",
+              "family_id": "remote-approved-night-support",
+              "domain": "remote",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "3a5c26c43a59c931310304f22273e37294795202d1919c0c4dfdf2718ba82414"
+            },
+            {
+              "case_id": "remote-approved-night-support-01",
+              "session_id": "s-9c2ee08a8603e5ee1bae",
+              "family_id": "remote-approved-night-support",
+              "domain": "remote",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "c4422cf09c783b722aef32ed1d0c5d24ed5720634a7ae05330f940749615e81f"
+            }
+          ]
+        },
+        {
+          "outcome": "FP",
+          "domain": "remote",
+          "family_id": "remote-approved-vpn-maintenance",
+          "count": 10,
+          "examples": [
+            {
+              "case_id": "remote-approved-vpn-maintenance-00",
+              "session_id": "s-894b4a6bcddcd55a22ee",
+              "family_id": "remote-approved-vpn-maintenance",
+              "domain": "remote",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "0756fb084125758e3eb8f8d54f5d1b4f36e2b955c57efa8d06db68a673a67fc5"
+            },
+            {
+              "case_id": "remote-approved-vpn-maintenance-01",
+              "session_id": "s-26c7def4a6cd92412feb",
+              "family_id": "remote-approved-vpn-maintenance",
+              "domain": "remote",
+              "threat": false,
+              "detected": true,
+              "expected_rule_ids": [],
+              "predicted_rule_ids": [
+                "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+              ],
+              "error": null,
+              "outcome": "FP",
+              "pattern_sha256": "5ee847e8f6c03990ea4eba04352ddff65538471c8771540f099159d0788e4b77"
+            }
+          ]
+        }
+      ],
+      "evaluation_error_count": 0
+    }
+  }
+}
