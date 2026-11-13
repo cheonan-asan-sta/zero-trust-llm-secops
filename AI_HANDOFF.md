@@ -1,6 +1,26 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
-## 현재 상태: v44 웹 잔여 오류 보강, 경보와 검토 분리
+## 현재 상태: v45 웹 서버 근거 검증 어댑터·수집 계약
+
+[최신 웹 서버 근거 연결](docs/extra-web-verified-context.md)과
+[실행·시험 근거](docs/infrastructure-results/extra-web-context-v45-20261113.json)을 먼저 읽는다.
+`scripts/f1_lab/web_verified_context.py`는 요청별 인증/권한/실행3증거의 Ed25519 서명과
+별도 역할/키·외부 고정 등록부·자원 정책 SHA/버전·30초 challenge·일회 nonce를 검증한다.
+tenant/server/subject/session/version/request/resource/case/method/target/body/raw를 같은 요청에 결속한다.
+정상/unknown/잘못된 증거는 점수·경보·검토를 낮추지 않는다. 검증된 거부/인증·MFA 실패+실행만 추가 경보1.0이다.
+기존 `WebResidualRefinement`에 선택적으로 결합하며 실제 앱·승인/복구/PEP·모델·라벨을 수정하지 않았다.
+
+신규 기능 제어군13개 모두 기대 결과, 신규 테스트60포함 Windows/Linux 관련316개씩·Ruff 통과.
+Linux network none/735파일 전후 동일·exit0/OOM false·컨테이너 제거. 비공개키 저장0이다.
+통제 입력·고정 테스트 시계이며 실제 센서/IdP/PDP 연결·서버 관측 수집·새 독립 평가/F1 측정은0이다.
+v44 마지막 실측 FN30/FP19는 보존 기록이며 원시1,259,637행을 이번에 재생하지 않았다.
+body SHA는 서버 측 수집기가 실제 바이트에서 생성해야 하고 이 어댑터는 서명된 결속을 확인한다.
+운영 수집기·영속 adverse/검토 기록·상위 사고 흐름 연결은 미완료다. 재사용 fallback은 앞선 경보 취소 명령이 아니다.
+실제 실행 `runtime/f1/web-context-controls-v45-20261113`, 시험 `runtime/f1/web-verified-context-tests-v45-20261113`.
+유료API/AWS/다운로드/push/병합0, 팀원 aitest/main 병합 금지·사용자 ZIP 보존·최종 예약 본문/라벨 접근0이다.
+다음은 실제 서버/수집기 요청 상관 계약과 영속 검토/위험 기록·새 개발/보정 자료 인수다.
+
+## v44 보존 기록: 웹 잔여 오류 보강, 경보와 검토 분리
 
 [최신 웹 잔여 오류 검증](docs/extra-web-residual-review.md)과
 [공유 근거/실제 사례 목록](docs/infrastructure-results/extra-web-residual-v44-20261113.json)을 먼저 읽는다.
