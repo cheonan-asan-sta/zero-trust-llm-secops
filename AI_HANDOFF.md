@@ -1,6 +1,31 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
-## 현재 상태: v42 VPN 검증 신호 연결, 실제 공개자료 오탐/독립 목표는 미완료
+## 현재 상태: v43 독립 평가 준비·오류 목록, 새 최종 사례0
+
+[최신 준비/검토 설명](docs/extra-independent-evaluation-preparation.md)과
+[공유 근거·44개 검토 항목](docs/infrastructure-results/extra-independent-preparation-v43-20261113.json)을 먼저 읽는다.
+사용자 요청은 팀원 작업 중 `extra`에서 독립 평가 준비와 기존 잔여 오류 정리를 진행하는 것이다.
+`aitest`/`main` 병합 금지, 앱·승인·복구 경로/기존 모델·규칙·라벨과 사용자 ZIP은 보존한다.
+
+신규 `scripts/f1_lab/evaluation_preparation.py`와 `scripts/prepare_independent_evaluation.py`는
+노출 source/payload/pattern 대장, 세션/주체/기기/계열/패턴의 추이 연결, 단위/시간/라벨 격리 검사와
+정확한 출력 inventory·지문 검증을 제공한다. 준비 전용이며 최종 평가기나 후보 동결기는 아니다.
+기존720건의 원래 dev360/holdout360은 보존하고 메타데이터 역할만 전부 개발/회귀로 표시했다.
+연결 성분67·최대20·삭제0, 새 독립 최종 사례0·후보 미동결·독립 검토0·목표 미달 상태다.
+기존 증거220건/22계열과 공개 로그22개 파일별 집계를 총44개 작업으로 정리했다.
+공개 로그 항목은 행별 사례 목록/원인 확정이 없으며 이번 원시 로그 재생0이다.
+harrison/wilson은 기존 예약 metadata만, 본문/라벨 접근0이며 여섯 영역 적합성도 미확인이다.
+
+실제 준비 `runtime/f1/independent-preparation-v43-20261113`, freeze SHA
+`d57753a97ee72b25799338102432c4657e0d73f46a61e2a46849601d369bd54c`.
+`check` 종료2는 준비 패킷 무결성 확인 후 최종 평가 미준비를 알리는 의도한 결과다.
+신규 집중44통과, Windows/Linux 관련 묶음181개씩 통과·Ruff 통과.
+Linux network none·721파일 전후 동일·exit0/OOM false·소유 컨테이너 제거. 전체 앱 재시험은 아니다.
+준비 추론/학습0(기존 회귀 fixture는 기준선 재현), 유료API/AWS/다운로드/push/병합0.
+다음은 기존 잔여 관측/라벨 검토와 새 개발/보정 자료·metadata 어댑터 확보다.
+후보 고정·새 최종 자료/라벨 심사·별도 최종 평가기/통합 회귀는 미완료다.
+
+## v42 보존 기록: VPN 검증 신호 연결, 실제 공개자료 오탐/독립 목표는 미완료
 
 [최신 구현/비교](docs/extra-vpn-verified-signals.md)와
 [전체 근거](docs/infrastructure-results/extra-vpn-verified-signals-v42-20261113.json)를 먼저 읽는다.

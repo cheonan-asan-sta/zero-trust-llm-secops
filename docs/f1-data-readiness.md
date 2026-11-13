@@ -1,5 +1,11 @@
 # F1 평가 자료의 적합성과 추가 수집 근거
 
+2026-11-13 후속 [독립 평가 준비 v43](extra-independent-evaluation-preparation.md)는
+노출 이력·추이 연결·라벨/단위 격리 검사를 추가했다. 기존720건은 이미 본 회귀 자료이고
+새 독립 최종 사례는0이다. 예약 harrison/wilson의 본문/라벨은 열지 않았고 원래 여섯 영역
+적합성도 미확인이다. 준비 도구 통과·메타데이터 생성이 독립성/성능 검증 완료를 뜻하지 않는다.
+기존 오류44개 검토 항목과 실행 지문은 [공유 근거](infrastructure-results/extra-independent-preparation-v43-20261113.json)를 따른다.
+
 후속 [OpTC 스키마·정오표 검토](extra-optc-observation-review.md)에서 명시적인 프로세스/흐름 연결 후보와
 결측 sentinel·중복 객체·시간 필드의 주의점을 구체화했다. 발행 문서만 조사했으며 원시 평가나 전체 목표 충족 근거는 아니다.
 
