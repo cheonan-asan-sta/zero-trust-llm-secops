@@ -53,3 +53,9 @@ python -m scripts.summarize_transfer_results --directory <sealed-evaluation> --e
 
 Wilson 후보의 고정 코드와 별도 작업 폴더에서 구현했다. 이 보고 도구 때문에 고정 후보의
 추론 코드가 바뀌거나 Wilson 정답을 미리 열지 않았다. 유료 LLM·AWS 호출은0이다.
+
+## Wilson 실제 평가 완료
+
+동결한 v53 후보의455,452행도 같은 도구로 재채점하고 [종류별 최종 결과](extra-wilson-source-transfer.md)를 발행했다.
+전체 F1은99.9644%지만 VPN F1은21.875%이고 error 로그는 정상 표본0으로 오탐률을 산출할 수 없다.
+원래 목표 통과 판정은 false이며, 큰 웹 집단으로 VPN 실패나 정상 오류 로그 부족을 숨기지 않았다.

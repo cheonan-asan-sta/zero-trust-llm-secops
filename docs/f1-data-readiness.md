@@ -5,7 +5,10 @@
 아래 이전 단계의 예약·미접근 기록은 당시 상태다. 관측한 R/S/F/H 개발 자료에서는 v51/v52로
 미탐9건·오탐122건을 줄이고 기존 TP 손실0을 확인했다. Harrison 웹 개발 F1은99.9689%,
 오탐률4.6013%지만, 기존 Harrison VPN 출처 평가 F1은25%로 목표 미달이다.
-Wilson은 별도 출처 전이 평가를 준비 중이며 아직 새 결과를 완료했다고 주장하지 않는다.
+Wilson은 [455,452행의 사전 고정 출처 전이 평가](extra-wilson-source-transfer.md)를 완료했다.
+오탐54건 감소·기존 TP 손실0이지만 VPN F1은21.875%이고, error 로그의 정상 표본은0이다.
+[관측 구간 감사](extra-vpn-observation-support.md)에서 Harrison/Wilson의 TP28행은 각각 한 위협 관측 구간이었다.
+전체 현재 상태는 [성능·잔여 과제 요약](extra-current-performance.md)을 참조한다.
 원래 여섯 영역의 독립 최종 목표는 미완료이고, 아래 개발/기능 시험을 새 최종 자료로 재분류하지 않는다.
 
 2026-11-13 [v48 로컬 HTTP 수집](extra-web-request-capture.md)에서 실제 loopback 요청9건의 바이트/서버 맥락을
