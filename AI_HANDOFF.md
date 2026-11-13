@@ -1,6 +1,26 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
-## 현재 상태: v45 웹 서버 근거 검증 어댑터·수집 계약
+## 현재 상태: v46 웹 위험/검토 영속화·중복/중단 복구
+
+[최신 기록부/복구 설명](docs/extra-web-evidence-ledger.md)과
+[실행·시험 근거](docs/infrastructure-results/extra-web-durable-v46-20261113.json)을 먼저 읽는다.
+새 `web_evidence_ledger.py`와 `web_durable_risk.py`는 v45 검증을 선택적으로 감싸
+SQLite FULL·해시 연결·별도 HMAC witness로 검증 시작/완료를 기록하고 완료 게시 뒤에만 응답한다.
+정확한 요청/운영자/nonce 해시로 중복과 충돌을 구분하며 이전 점수/경보/검토·adverse를 유지한다.
+메모리 challenge가 사라진 재개에서도 과거 위험을 복원하되 새 서명 검증으로 표현하지 않는다.
+미완료는30초 기한 후 명시적으로 불확실한 검토로 복구한다. 완료 저장 실패는 성공 응답이 아니다.
+기본2000이벤트·진행 중 완료 자리 예약·자동 삭제/종결 없음. 다른 owner/tenant·변조/DB단독 rollback은 거부한다.
+
+로컬 실행 예제10개 모두 기대 결과. 신규41포함 Windows/Linux 관련357개씩·Ruff 통과.
+실제 process exit8경계와 별도 process 동시 중복을 확인했다. Linux network none·742소스 전후 동일·exit0/OOM false·컨테이너 제거.
+실제 실행 `runtime/f1/web-durable-controls-v46-20261113`, 시험 `runtime/f1/web-durable-tests-v46-20261113`.
+Ed25519 개인키는 미저장이나 로컬 witness HMAC비밀키32bytes는 runtime에 의도적으로 저장한다. 공개/Git에 넣지 않는다.
+같은 호스트의 DB/witness/key를 함께 되돌리는 공격·호스트 소실·원격 WORM·HA는 보장하지 않는다.
+검증 뒤 완료 commit 전 종료는 실제 결론 미확정이며 review로 남긴다. 원본 proof 보관도 별도다.
+앱/승인·복구/PEP·기존v44/v45코드·모델·라벨 보존. 실제 수집/새독립평가/F1측정0이다.
+유료API/AWS/다운로드/push/병합0·사용자ZIP 보존. 다음은 보호 checkpoint/백업·실제 수집·사건 검토 종결 인수다.
+
+## v45 보존 기록: 웹 서버 근거 검증 어댑터·수집 계약
 
 [최신 웹 서버 근거 연결](docs/extra-web-verified-context.md)과
 [실행·시험 근거](docs/infrastructure-results/extra-web-context-v45-20261113.json)을 먼저 읽는다.
