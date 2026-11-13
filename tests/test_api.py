@@ -105,6 +105,15 @@ def test_dashboard_is_available() -> None:
     assert response.status_code == 200
     assert "천안아산역" in response.text
     assert "Zero Trust SecOps" in response.text
+    assert "로그 탐색" in response.text
+    assert "세션과 접근" in response.text
+    assert "/static/dashboard.js" in response.text
+    assert "/static/workbench.html" in response.text
+
+
+def test_analysis_workbench_is_preserved() -> None:
+    response = client.get("/static/workbench.html")
+    assert response.status_code == 200
     assert "AI 교차분석" in response.text
     assert "ANALYST REVIEW" in response.text
     assert "보안 통제 준비도" in response.text
