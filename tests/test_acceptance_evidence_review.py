@@ -86,6 +86,25 @@ def test_missing_and_ambiguous_log_reports_are_rejected(evidence):
         module.extract_reports(log_for(reports))
 
 
+def test_unknown_step_export_requires_exact_job_schema_and_one_report(evidence):
+    _, reports = evidence
+    text = log_for(reports).replace('\tReport verification\t', '\tUNKNOWN STEP\t')
+    assert module.extract_reports(text) == reports
+    unrelated = 'runtime (selection)\tUNKNOWN STEP\t2026-11-13T01:00:00Z '
+    assert module.extract_reports(text + '\n' + unrelated + '{"checks": {"other": true}}') == reports
+    duplicate = log_for({'selection': reports['selection']}).replace(
+        '\tReport verification\t', '\tUNKNOWN STEP\t')
+    assert module.extract_reports(text + '\n' + duplicate) == reports
+    conflicting = copy.deepcopy(reports['selection'])
+    conflicting['completed'] = False
+    duplicate = log_for({'selection': conflicting}).replace(
+        '\tReport verification\t', '\tUNKNOWN STEP\t')
+    with pytest.raises(ValueError, match='ambiguous'):
+        module.extract_reports(text + '\n' + duplicate)
+    with pytest.raises(ValueError):
+        module.extract_reports(text.replace('runtime (selection)', 'runtime (application)'))
+
+
 def test_cli_requires_fresh_output_and_never_echoes_untrusted_input(tmp_path, capsys):
     ci, log, output = tmp_path / 'ci.json', tmp_path / 'ci.log', tmp_path / 'output'
     ci.write_text('{"private_key": "secret-never-output", broken')

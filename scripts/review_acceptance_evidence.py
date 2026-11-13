@@ -42,17 +42,18 @@ def require(condition, code):
 
 
 def extract_reports(log):
-    """Read gh run view --log output, retaining the runtime/Report step binding."""
+    """Bind each report to its runtime job, including gh's UNKNOWN STEP export."""
     groups = defaultdict(list)
     for line in ANSI.sub('', log).splitlines():
         parts = line.split('\t', 2)
-        if len(parts) != 3 or not parts[0].startswith('runtime (') or not parts[1].startswith('Report '):
+        if (len(parts) != 3 or not parts[0].startswith('runtime (')
+                or not (parts[1].startswith('Report ') or parts[1] == 'UNKNOWN STEP')):
             continue
         kind = parts[0][9:-1]
         if kind in RUNTIME_REPORTS:
             groups[(kind, parts[1])].append(re.sub(r'^\S+Z ', '', parts[2]))
     reports = {}
-    for (kind, _), lines in groups.items():
+    for (kind, step), lines in groups.items():
         raw = '\n'.join(lines)
         candidates = []
         for match in re.finditer(r'^\{', raw, re.MULTILINE):
@@ -60,8 +61,13 @@ def extract_reports(log):
                 value, _ = json.JSONDecoder().raw_decode(raw[match.start():])
             except ValueError:
                 continue
-            if isinstance(value, dict) and isinstance(value.get('checks'), (list, dict)):
+            if (isinstance(value, dict) and isinstance(value.get('checks'), (list, dict))
+                    and value.get('schema') == RUNTIME_REPORTS[kind][0]):
                 candidates.append(value)
+        if step == 'UNKNOWN STEP':
+            # The verify command and its later cat/report step can emit the
+            # identical final document. Never choose between conflicting ones.
+            candidates = list({digest(value): value for value in candidates}.values())
         require(len(candidates) == 1 and kind not in reports, 'ambiguous_or_missing_runtime_report')
         reports[kind] = candidates[0]
     require(set(reports) == set(RUNTIME_REPORTS), 'missing_runtime_report')
