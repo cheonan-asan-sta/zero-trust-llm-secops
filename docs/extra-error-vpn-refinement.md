@@ -1,5 +1,8 @@
 # extra: 웹 오류 로그 오탐·VPN 미탐 감소 — v40/v40b
 
+후속 [v41 VPN 오탐 감소 검증](extra-vpn-precision-audit.md)은 미탐 방지 조건을 통과하지 못해 기존 후보를 유지했다.
+아래 v40/v40b 결과·모델·기준선은 보존한다.
+
 2026-11-13 · 무료 로컬 개발 비교. [v39 정상 웹 보정](extra-web-false-positive-reduction.md)과 기존 라벨·입력·모델·결과를 보존했다.
 **웹 오류 정상 오탐4건을 제거했고, VPN 미탐은 자료별28건→0건으로 줄였다. VPN 정상 오탐이 늘어 정밀도는 아직 낮고 전체 F1은 소폭 감소한다.**
 [전체 근거 JSON](infrastructure-results/extra-error-vpn-refinement-v40-20261113.json)에 두 후보·세 자료의 전체 혼동행렬·코드/입력/모델/시험 지문과 한계를 남겼다.
