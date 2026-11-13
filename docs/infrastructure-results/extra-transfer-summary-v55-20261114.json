@@ -1,0 +1,255 @@
+{
+  "schema": "extra-transfer-summary-evidence-1",
+  "scope": "Reporting validation on already observed Harrison v49; no new independent performance",
+  "summary": {
+    "all_declared_kind_point_targets_met": false,
+    "all_declared_kinds_have_two_classes": false,
+    "aws_calls": 0,
+    "by_telemetry_kind": [
+      {
+        "kind": "access",
+        "metrics": null,
+        "present": false
+      },
+      {
+        "kind": "error",
+        "metrics": null,
+        "present": false
+      },
+      {
+        "kind": "vpn",
+        "metrics": {
+          "after": {
+            "accuracy": 0.9848512173128945,
+            "both_classes_present": true,
+            "f1": 0.25,
+            "false_negative_rate": 0.0,
+            "false_positive_rate": 0.015187127101789911,
+            "fn": 0,
+            "fp": 168,
+            "inference_errors": 0,
+            "negative_support": 11062,
+            "observed_metric_targets_met": false,
+            "population": 11090,
+            "positive_fraction": 0.0025247971145175834,
+            "positive_support": 28,
+            "precision": 0.14285714285714285,
+            "recall": 1.0,
+            "target_conditions": {
+              "f1": false,
+              "false_negative_rate": true,
+              "false_positive_rate": true,
+              "precision": false,
+              "recall": true
+            },
+            "tn": 10894,
+            "tp": 28
+          },
+          "before": {
+            "accuracy": 0.9848512173128945,
+            "both_classes_present": true,
+            "f1": 0.25,
+            "false_negative_rate": 0.0,
+            "false_positive_rate": 0.015187127101789911,
+            "fn": 0,
+            "fp": 168,
+            "inference_errors": 0,
+            "negative_support": 11062,
+            "observed_metric_targets_met": false,
+            "population": 11090,
+            "positive_fraction": 0.0025247971145175834,
+            "positive_support": 28,
+            "precision": 0.14285714285714285,
+            "recall": 1.0,
+            "target_conditions": {
+              "f1": false,
+              "false_negative_rate": true,
+              "false_positive_rate": true,
+              "precision": false,
+              "recall": true
+            },
+            "tn": 10894,
+            "tp": 28
+          }
+        },
+        "present": true
+      }
+    ],
+    "candidate_freeze_sha256": "66fd8015cdd49245cefd1685b19be2f2315db06e312131d75b22065a793093d9",
+    "completed": true,
+    "confidence_intervals": null,
+    "evaluation_unit": "physical_log_line",
+    "goal_qualified": false,
+    "independent_human_review": false,
+    "limitations": [
+      "descriptive line counts; repeated/correlated events are not independent sessions",
+      "access/error/VPN telemetry kinds are not the original six security domains",
+      "undefined rates remain null; no absent class is counted as successful evaluation",
+      "observed point targets do not certify independence, production performance or goal completion"
+    ],
+    "original_domain_coverage": {
+      "credential": "unverified",
+      "device": "unverified",
+      "exfiltration": "unverified",
+      "lateral": "unverified",
+      "privilege": "unverified",
+      "remote": "unverified"
+    },
+    "original_six_domain_goal_replaced": false,
+    "overall": {
+      "after": {
+        "accuracy": 0.9848512173128945,
+        "both_classes_present": true,
+        "f1": 0.25,
+        "false_negative_rate": 0.0,
+        "false_positive_rate": 0.015187127101789911,
+        "fn": 0,
+        "fp": 168,
+        "inference_errors": 0,
+        "negative_support": 11062,
+        "observed_metric_targets_met": false,
+        "population": 11090,
+        "positive_fraction": 0.0025247971145175834,
+        "positive_support": 28,
+        "precision": 0.14285714285714285,
+        "recall": 1.0,
+        "target_conditions": {
+          "f1": false,
+          "false_negative_rate": true,
+          "false_positive_rate": true,
+          "precision": false,
+          "recall": true
+        },
+        "tn": 10894,
+        "tp": 28
+      },
+      "before": {
+        "accuracy": 0.9848512173128945,
+        "both_classes_present": true,
+        "f1": 0.25,
+        "false_negative_rate": 0.0,
+        "false_positive_rate": 0.015187127101789911,
+        "fn": 0,
+        "fp": 168,
+        "inference_errors": 0,
+        "negative_support": 11062,
+        "observed_metric_targets_met": false,
+        "population": 11090,
+        "positive_fraction": 0.0025247971145175834,
+        "positive_support": 28,
+        "precision": 0.14285714285714285,
+        "recall": 1.0,
+        "target_conditions": {
+          "f1": false,
+          "false_negative_rate": true,
+          "false_positive_rate": true,
+          "precision": false,
+          "recall": true
+        },
+        "tn": 10894,
+        "tp": 28
+      }
+    },
+    "paid_api_calls": 0,
+    "per_source": [
+      {
+        "kind": "vpn",
+        "metrics": {
+          "after": {
+            "accuracy": 0.9848512173128945,
+            "both_classes_present": true,
+            "f1": 0.25,
+            "false_negative_rate": 0.0,
+            "false_positive_rate": 0.015187127101789911,
+            "fn": 0,
+            "fp": 168,
+            "inference_errors": 0,
+            "negative_support": 11062,
+            "observed_metric_targets_met": false,
+            "population": 11090,
+            "positive_fraction": 0.0025247971145175834,
+            "positive_support": 28,
+            "precision": 0.14285714285714285,
+            "recall": 1.0,
+            "target_conditions": {
+              "f1": false,
+              "false_negative_rate": true,
+              "false_positive_rate": true,
+              "precision": false,
+              "recall": true
+            },
+            "tn": 10894,
+            "tp": 28
+          },
+          "before": {
+            "accuracy": 0.9848512173128945,
+            "both_classes_present": true,
+            "f1": 0.25,
+            "false_negative_rate": 0.0,
+            "false_positive_rate": 0.015187127101789911,
+            "fn": 0,
+            "fp": 168,
+            "inference_errors": 0,
+            "negative_support": 11062,
+            "observed_metric_targets_met": false,
+            "population": 11090,
+            "positive_fraction": 0.0025247971145175834,
+            "positive_support": 28,
+            "precision": 0.14285714285714285,
+            "recall": 1.0,
+            "target_conditions": {
+              "f1": false,
+              "false_negative_rate": true,
+              "false_positive_rate": true,
+              "precision": false,
+              "recall": true
+            },
+            "tn": 10894,
+            "tp": 28
+          }
+        },
+        "source_index": 0
+      }
+    ],
+    "prediction_manifest_sha256": "1095eedf0fbeea381b7c5db160a1f1200b11e96c7823c101412db34482231ece",
+    "predictions_rescored": true,
+    "schema": "f1-stratified-source-transfer-summary-1",
+    "score_sha256": "5a5a0980b9319fb7f91ebce45f08c4431b1335ef20876461f3b6411828a8866a",
+    "session_metrics_measured": false,
+    "source_id": "ait-harrison",
+    "targets": {
+      "f1": 0.95,
+      "false_negative_rate": 0.05,
+      "false_positive_rate": 0.05,
+      "precision": 0.95,
+      "recall": 0.95
+    }
+  },
+  "validation": {
+    "windows_new_passed": 20,
+    "linux": {
+      "exit_code": 0,
+      "seconds": 6.87,
+      "counts": {
+        "passed": 61
+      },
+      "log": "runtime/f1/transfer-summary-tests-v55-20261114/linux.log",
+      "executed": true,
+      "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+      "source_files": 927,
+      "source_archive_sha256": "ce9fef74d62d6f074cbced4b286f2925e7d06b0aaffce7ba9bc4369e876cb804",
+      "container_exit": 0,
+      "oom_killed": false,
+      "network_mode": "none",
+      "owned_container": "819d5c508f337b8f182e2c6c706123312ce6c9785f6c326b111a91f7b760f9a8",
+      "snapshot_sources_unchanged_after": true,
+      "owned_container_removed": true
+    }
+  },
+  "summary_sha256": "07beafdd814cc66687314ca2d2bea23bc6f9de67d9c896e63b6b879eb85a169c",
+  "tests_sha256": "3c4f957cf852360705e785c19eb15a19883267604614ed841f4c40d58942f9c5",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "detector_modified": false,
+  "frozen_wilson_code_modified": false
+}
