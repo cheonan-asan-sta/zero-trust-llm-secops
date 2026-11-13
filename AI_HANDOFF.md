@@ -1,6 +1,31 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
-## 현재 상태: v43 독립 평가 준비·오류 목록, 새 최종 사례0
+## 현재 상태: v44 웹 잔여 오류 보강, 경보와 검토 분리
+
+[최신 웹 잔여 오류 검증](docs/extra-web-residual-review.md)과
+[공유 근거/실제 사례 목록](docs/infrastructure-results/extra-web-residual-v44-20261113.json)을 먼저 읽는다.
+`extra`에서 새2스크립트/45테스트와 실험 프로토콜만 추가했고 앱·기존 모델/규칙·라벨·분할은 보존했다.
+최종안은 동일 source/client의60초 내 서로 다른 이전3개 PHP missing-script 경로 뒤 새 경로에 경보를 보강한다.
+인코딩 명령 목록을 가진 uploads 스크립트 요청은 기존 점수/경보를 유지하고 검토만 추가한다.
+원문 SHA/ordinal과 단일 행 관측 지문을 결속하며 준비 단계의6개 HTTP 시간창 필드는 별도다.
+동일 시각은 과거로 사용하지 않고 미상시각/client/다른 source/반복 같은 경로는 근거로 보충하지 않는다.
+
+실제 기존 R/S/Fox 전체1,259,637행을 Windows에서 비교했다.
+웹432,332행 FP19→19·FN34→30, Fox error FN4→0·FP0 유지. 기존 TP 손실0·새 경보 FP0이다.
+비웹827,305행의 점수·경보·검토 SHA가 전후 같다. 명령 요청19건은 여전히 경보 FN이며 검토로만 표시한다.
+새 검토는 게시자 위협23건(새 경보4포함)·정상3건으로, 검토 부담까지0이라는 주장이 아니다.
+최초 지문 불일치 실행은 미완료로 보존했다. 이후 넓은 명령 경보안은 웹FN11까지 줄었지만
+새FP3(R/S/Fox각1)를 만들어 미채택했다. 원문/라벨을 바꾸거나3건을 제거하지 않았다.
+최종 `runtime/f1/web-residual-review-v44-20261113`과 review 프로토콜을 사용한다.
+
+최종 Windows/Linux 관련256개씩 통과(신규45포함)·Ruff 통과. network none/728소스 전후 동일·exit0/OOM false·컨테이너 제거.
+실제 데이터 재생은 Windows, Linux는 관련 pytest다. 기존 전체 앱을 다시 시험한 것은 아니다.
+새 독립 평가0·사람 검토0·목표 미완료, 운영 API/자동 집행 연결0이다.
+유료API/AWS/다운로드/학습/push/병합0, 사용자 ZIP 보존. 팀원 완료 전 aitest/main 병합 금지다.
+다음은 명령 요청·POST/리다이렉트의 실제 서버 인증/권한/본문/업무 근거 확보와 새 개발/보정 데이터다.
+harrison/wilson 본문/라벨은 열지 않았고 최종 적합성/여섯 영역 매핑은 미확인 상태다.
+
+## v43 보존 기록: 독립 평가 준비·오류 목록, 새 최종 사례0
 
 [최신 준비/검토 설명](docs/extra-independent-evaluation-preparation.md)과
 [공유 근거·44개 검토 항목](docs/infrastructure-results/extra-independent-preparation-v43-20261113.json)을 먼저 읽는다.
