@@ -1,0 +1,2 @@
+# Install with systemd-sysusers after reviewing the service account on the host.
+u secops-collector - "SecOps execution evidence collector" / /usr/sbin/nologin

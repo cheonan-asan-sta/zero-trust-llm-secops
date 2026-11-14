@@ -1,5 +1,7 @@
 # systemd 운영 연동·호출 신원 결속 — v69
 
+v70 후속: [운영 수집기 실제 인수·자격 수명주기](extra-systemd-collector-runtime.md)에서 템플릿의 실제 기동 문제를 수정했다. 아래 설치 준비 설명은 v69 당시 기록이며, 최신 계정·소켓·직접 자격 읽기 방식은 v70을 따른다.
+
 2026-11-14. [v68 실행 근거 수집](extra-shared-execution-evidence.md)의 후속이다.
 **실제 systemd 255가 PID 1인 로컬 Ubuntu 24.04 WSL에서 서비스 시작·현재 프로세스·journal·호출 신원을 연결했다.**
 사용자 선택에 따라 인증원은 로컬 서명 토큰 fixture로 검증했다. 회사·학교 SSO 로그인이나 실제 사람의 현장 참여를 검증한 결과는 아니다.
