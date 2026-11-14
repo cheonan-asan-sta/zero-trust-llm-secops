@@ -1,5 +1,7 @@
 # zero-trust-llm-secops
 
+2026-11-14 v77: [선택 부하의 안전한 오류 진단·실제 장애 인수](docs/extra-selection-diagnostics.md). 집중100개·전체 회귀와 실제 정상37/의도적 장애2조건을 구분하며 과거 CI 원인 미확정·장기 시험 미완료를 유지한다.
+
 2026-11-14 최신: [캡처 보관 DB 암호화 백업·격리 복원 v75](docs/extra-capture-backup.md) — 관련552개·실제 systemd63조건, 원본 DB 부재 복원/캡처6건 바이트 일치·외부 pin 검증. 기존1,681,815행 판정 유지, API/AWS0. 운영 키/백업 저장·일정과 지속 부하는 후속이다.
 
 2026-11-14 최신: [수집 상태·보관 용량 경보 v74](docs/extra-collector-alerts.md) — PR61~67 aitest 병합, 순서 의존 시험은 PR68로 수정. 관련511개·실제 systemd53조건·실제 관측 도구13조건 통과, 기존1,681,815행 판정 유지. 운영 지속 mTLS 마운트/lock 인수는 별도다.
