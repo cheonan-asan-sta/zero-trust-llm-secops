@@ -25,15 +25,22 @@ def main():
     parser.add_argument(
         "--output", type=Path, help="New directory outside the managed root, required for restore"
     )
+    parser.add_argument(
+        "--status-output", type=Path, help="Optional public aggregate snapshot for apply"
+    )
     args = parser.parse_args()
+    if args.status_output and not args.apply:
+        parser.error("--status-output requires --apply")
     if bool(args.restore) != bool(args.output):
         parser.error("--restore and --output must be supplied together")
+    scope = None
     try:
+        scope = ArchiveScope(
+            tenant_id=args.tenant, server_id=args.server, unit=args.unit, source_id=args.source
+        )
         archive = CaptureArchive(
             Path(args.root),
-            ArchiveScope(
-                tenant_id=args.tenant, server_id=args.server, unit=args.unit, source_id=args.source
-            ),
+            scope,
             policy=ArchivePolicy(
                 max_hot_records=args.max_hot_records,
                 max_hot_bytes=args.max_hot_bytes,
@@ -58,16 +65,28 @@ def main():
                 "ready" if met and result["archive_capacity_available"] else "storage_pressure"
             )
         result["worker_security"] = current_security_status()
+        if args.status_output:
+            from scripts.f1_lab.collector_status_bridge import archive_report, publish
+
+            publish(args.status_output, archive_report(scope, result))
         print(json.dumps(result))
         return 0 if result["state"] in {"ready", "restored_for_review"} else 2
     except (ValueError, OSError, sqlite3.Error, zlib.error, RecursionError) as error:
+        state = "storage_pressure" if isinstance(error, ArchiveFull) else "unavailable"
+        if args.status_output and scope is not None:
+            try:
+                from scripts.f1_lab.collector_status_bridge import archive_report, publish
+
+                publish(
+                    args.status_output, archive_report(scope, {"completed": False, "state": state})
+                )
+            except (ValueError, OSError, RecursionError):
+                pass  # Previous report expires; never retain an indefinitely healthy value.
         print(
             json.dumps(
                 {
                     "completed": False,
-                    "state": "storage_pressure"
-                    if isinstance(error, ArchiveFull)
-                    else "unavailable",
+                    "state": state,
                     "error_type": type(error).__name__,
                     "authenticity_or_freshness_asserted": False,
                 }

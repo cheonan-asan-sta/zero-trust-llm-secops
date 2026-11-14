@@ -25,6 +25,11 @@ def service(role):
         argv = ["-m", "scripts.signal_metrics_exporter", "--upstream", "https://reader:8000/zero-trust/signals/inbox",
                 "--token-file", "/auth/scrape.token", "--listen", "0.0.0.0", "--server-tls-profile", "/tls/server.json",
                 "--upstream-tls-profile", "/tls/reader.json"]
+        collector_profile = os.environ.get("C01_COLLECTOR_PROFILE")
+        if collector_profile:
+            if collector_profile != "/collector/profile.json":
+                raise ValueError("monitoring_collector_profile_path")
+            argv += ["--collector-profile", collector_profile]
     else:
         raise ValueError("monitoring_role")
     os.execv(sys.executable, [sys.executable, *argv])

@@ -26,6 +26,9 @@ def main():
     ):
         parser.add_argument("--" + name, required=True)
     parser.add_argument("--observe-worker-security", action="store_true")
+    parser.add_argument(
+        "--status-output", type=Path, help="Optional public aggregate status snapshot"
+    )
     args = parser.parse_args()
     try:
         scope = CollectorScope(
@@ -49,6 +52,12 @@ def main():
         )
         if args.observe_worker_security:
             body["worker_security"] = current_security_status()
+        if args.status_output:
+            from scripts.f1_lab.collector_status_bridge import health_report, publish
+
+            publish(
+                args.status_output, health_report(scope, result, args.capture, monitor.registry)
+            )
     except (ValueError, OSError, sqlite3.Error):
         body = {
             "state": "unavailable",

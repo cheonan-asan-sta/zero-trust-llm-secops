@@ -1,0 +1,1089 @@
+{
+  "schema": "extra-collector-alerts-1",
+  "completed": true,
+  "base_commit": "71b4050a7356ab3c2795913ac5e41ef45ee50427",
+  "scope": "infrastructure aggregate status publication and opt-in monitoring alerts",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "goal_qualified": false,
+  "automatic_enforcement_allowed": false,
+  "organizational_SSO_login_tested": false,
+  "production_deployment_completed": false,
+  "merged_stack": {
+    "repository": "cheonan-asan-sta/zero-trust-llm-secops",
+    "target": "aitest",
+    "records": [
+      {
+        "PR": 61,
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/pull/61",
+        "head": "a861f1adbcb6a826e6813b1e78786c1980dcea6c",
+        "previous_aitest": "34157ee332d60d4949e45629cfe2e6e325431bc8",
+        "merge_commit": "45ea21071788a3bd021cd3f7192d9b6855a42ae4",
+        "merged_at": "2026-11-14T08:41:55Z",
+        "all_16_premerge_checks_passed": true,
+        "merged_tree_equals_tested_head_tree": true
+      },
+      {
+        "PR": 62,
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/pull/62",
+        "head": "26c2d346e7437204c6d3fbf5a314f77001d6964b",
+        "previous_aitest": "45ea21071788a3bd021cd3f7192d9b6855a42ae4",
+        "merge_commit": "df585bf66610dea18e2fc65d2cb9107219880030",
+        "merged_at": "2026-11-14T08:42:16Z",
+        "all_16_premerge_checks_passed": true,
+        "merged_tree_equals_tested_head_tree": true
+      },
+      {
+        "PR": 63,
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/pull/63",
+        "head": "08d682314b2a08c332ac06f6d55c480b936e93fe",
+        "previous_aitest": "df585bf66610dea18e2fc65d2cb9107219880030",
+        "merge_commit": "40bf8e62ba1d9ba5c6e7d8fbf5b1f40cdaf30ebc",
+        "merged_at": "2026-11-14T08:42:40Z",
+        "all_16_premerge_checks_passed": true,
+        "merged_tree_equals_tested_head_tree": true
+      },
+      {
+        "PR": 64,
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/pull/64",
+        "head": "2f35cdb317052833b4edddeaf400870412acc3bf",
+        "previous_aitest": "40bf8e62ba1d9ba5c6e7d8fbf5b1f40cdaf30ebc",
+        "merge_commit": "e600bd034523af83cc523cdfe9dadd4826b9af2b",
+        "merged_at": "2026-11-14T08:43:10Z",
+        "all_16_premerge_checks_passed": true,
+        "merged_tree_equals_tested_head_tree": true
+      },
+      {
+        "PR": 65,
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/pull/65",
+        "head": "4142d4952e74db16068b9f3cd0e21099be897967",
+        "previous_aitest": "e600bd034523af83cc523cdfe9dadd4826b9af2b",
+        "merge_commit": "0b458e96a3375bde8f4f6b62b57aa2604e973d50",
+        "merged_at": "2026-11-14T08:43:35Z",
+        "all_16_premerge_checks_passed": true,
+        "merged_tree_equals_tested_head_tree": true
+      },
+      {
+        "PR": 66,
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/pull/66",
+        "head": "ba721966de53f82f2c1bb0d52bf4b380528d95d7",
+        "previous_aitest": "0b458e96a3375bde8f4f6b62b57aa2604e973d50",
+        "merge_commit": "70537d17a5066e90ba236e81a6d3c82c0733825a",
+        "merged_at": "2026-11-14T08:44:01Z",
+        "all_16_premerge_checks_passed": true,
+        "merged_tree_equals_tested_head_tree": true
+      },
+      {
+        "PR": 67,
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/pull/67",
+        "head": "4471ee527977a6e5a6ffc7d40ecf80f81e809f6b",
+        "previous_aitest": "70537d17a5066e90ba236e81a6d3c82c0733825a",
+        "merge_commit": "71b4050a7356ab3c2795913ac5e41ef45ee50427",
+        "merged_at": "2026-11-14T08:44:26Z",
+        "all_16_premerge_checks_passed": true,
+        "merged_tree_equals_tested_head_tree": true
+      }
+    ],
+    "other_PRs_modified": false,
+    "initial_aitest": "34157ee332d60d4949e45629cfe2e6e325431bc8",
+    "final_aitest": "71b4050a7356ab3c2795913ac5e41ef45ee50427",
+    "completed": true,
+    "final_tree_equals_PR67": true
+  },
+  "initial_postmerge_unit": {
+    "run": 43577241225,
+    "failed": 1,
+    "passed": 5359,
+    "skipped": 2,
+    "failed_test": "test_changed_source_after_commit_is_not_deleted",
+    "cause": "arbitrary filesystem iteration selected an unarchived hot file; the expected exception was inapplicable",
+    "fix_PR": 68,
+    "fix": "select three actually archived targets by original observation time and prove original archive bytes remain intact",
+    "failure_log_sha256": "deeb8dcfbd4b142126eca96c50131db0bf691dc3a1cf5da5ee5e8237f51fee9b"
+  },
+  "linux": {
+    "exit_code": 0,
+    "seconds": 145.063,
+    "counts": {
+      "passed": 511
+    },
+    "log": "runtime/f1/collector-alerts-batch-v74-final-20261114/linux.log",
+    "executed": true,
+    "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "source_files": 1033,
+    "source_archive_sha256": "bffc3173564700981db5ce816335c577694f111c1a70d37b745d8dc7b3c527c6",
+    "container_exit": 0,
+    "oom_killed": false,
+    "network_mode": "none",
+    "owned_container": "f1059d3cf028e05142cc79a74df07c3743d286a52d3c9e910881f53402927aa9",
+    "snapshot_sources_unchanged_after": true,
+    "owned_container_removed": true
+  },
+  "native": {
+    "source_archive_sha256": "076fa21a2d56572cea91462ffcc723dae4bc1d5b3c9b914d9725cd51c980f373",
+    "aws_calls": 0,
+    "paid_api_calls": 0,
+    "exit_code": 0,
+    "template_sha256": "0b83f3372037ff26cef119b1b5df4951ef7ee5e4cd3c5502c4b173ce5d8f74ab",
+    "template_verify_exit_code": 0,
+    "template_installation_paths_substituted": true,
+    "native_seconds": 92.772,
+    "owned_snapshot_removed": true
+  },
+  "native_controls": {
+    "schema": "extra-collector-alert-runtime-1",
+    "completed": true,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "goal_qualified": false,
+    "scope": "real systemd collector sandbox and credential lifecycle, local functional controls",
+    "real_human_login_tested": false,
+    "production_installation_completed": false,
+    "cases": [
+      {
+        "name": "service_account_configuration_dry_run",
+        "passed": true
+      },
+      {
+        "name": "collector_is_static_nonroot_fixture",
+        "passed": true
+      },
+      {
+        "name": "only_required_effective_and_bounding_capabilities",
+        "passed": true
+      },
+      {
+        "name": "no_new_privileges_is_observed",
+        "passed": true
+      },
+      {
+        "name": "normal_capture_and_authorization_keep_baseline",
+        "passed": true
+      },
+      {
+        "name": "credential_was_a_socket_not_key_file",
+        "passed": true
+      },
+      {
+        "name": "initial_signed_latest_is_fresh",
+        "passed": true
+      },
+      {
+        "name": "controlled_31_second_gap_is_stale",
+        "passed": true
+      },
+      {
+        "name": "controlled_clock_rollback_after_restart_is_unavailable",
+        "passed": true
+      },
+      {
+        "name": "rotated_key_without_current_pin_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "rotation_with_new_public_pin_collects_fresh_evidence",
+        "passed": true
+      },
+      {
+        "name": "old_key_proof_is_rejected_by_current_registry",
+        "passed": true
+      },
+      {
+        "name": "expired_signing_authority_cannot_create_capture",
+        "passed": true
+      },
+      {
+        "name": "failed_expired_key_keeps_previous_latest",
+        "passed": true
+      },
+      {
+        "name": "not_yet_valid_signing_authority_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "runtime_proof_expiry_is_clipped_to_signer",
+        "passed": true
+      },
+      {
+        "name": "missing_key_provider_fails_at_systemd_credentials",
+        "passed": true
+      },
+      {
+        "name": "provider_outage_cannot_replace_latest",
+        "passed": true
+      },
+      {
+        "name": "provider_restart_collects_new_signed_evidence",
+        "passed": true
+      },
+      {
+        "name": "restoring_an_older_valid_capture_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "archive_preview_keeps_every_hot_byte",
+        "passed": true
+      },
+      {
+        "name": "archive_worker_is_nonroot_without_capabilities",
+        "passed": true
+      },
+      {
+        "name": "archive_capacity_pressure_keeps_hot_and_latest",
+        "passed": true
+      },
+      {
+        "name": "committed_archive_keeps_latest_and_meets_hot_limit",
+        "passed": true
+      },
+      {
+        "name": "all_cold_payloads_equal_original_hot_bytes",
+        "passed": true
+      },
+      {
+        "name": "restore_preserves_every_original_byte",
+        "passed": true
+      },
+      {
+        "name": "restored_old_capture_does_not_become_current",
+        "passed": true
+      },
+      {
+        "name": "latest_remains_fresh_after_compaction",
+        "passed": true
+      },
+      {
+        "name": "timers_are_disabled_before_explicit_fixture_start",
+        "passed": true
+      },
+      {
+        "name": "timer_repeats_new_signed_normal_observations",
+        "passed": true
+      },
+      {
+        "name": "scheduled_health_worker_is_nonroot_without_capabilities",
+        "passed": true
+      },
+      {
+        "name": "scheduled_health_never_claims_authorization_or_enforcement",
+        "passed": true
+      },
+      {
+        "name": "archive_timer_preserves_payloads_and_current_latest",
+        "passed": true
+      },
+      {
+        "name": "scheduled_provider_failure_preserves_last_signed_capture",
+        "passed": true
+      },
+      {
+        "name": "actual_collection_gap_becomes_stale_without_clock_injection",
+        "passed": true
+      },
+      {
+        "name": "timer_recovers_after_provider_restore_without_manual_collector_start",
+        "passed": true
+      },
+      {
+        "name": "timer_restart_collects_current_observation_not_backfill",
+        "passed": true
+      },
+      {
+        "name": "stopped_timers_do_not_keep_collecting",
+        "passed": true
+      },
+      {
+        "name": "timed_normal_observations_preserve_baseline",
+        "passed": true
+      },
+      {
+        "name": "fresh_normal_capture_precedes_public_status",
+        "passed": true
+      },
+      {
+        "name": "status_dropin_publishes_revalidated_fresh_observation",
+        "passed": true
+      },
+      {
+        "name": "status_dropin_publishes_current_archive_counters",
+        "passed": true
+      },
+      {
+        "name": "status_snapshots_are_public_aggregates_without_original_identity",
+        "passed": true
+      },
+      {
+        "name": "public_status_permissions_do_not_change_private_capture_permissions",
+        "passed": true
+      },
+      {
+        "name": "native_status_files_feed_bounded_exporter_metrics",
+        "passed": true
+      },
+      {
+        "name": "invalid_current_trust_publishes_unavailable_not_old_fresh",
+        "passed": true
+      },
+      {
+        "name": "valid_trust_recovers_status_without_replacing_capture",
+        "passed": true
+      },
+      {
+        "name": "archive_capacity_failure_publishes_pressure_and_preserves_latest",
+        "passed": true
+      },
+      {
+        "name": "archive_report_recovers_after_capacity_configuration_restored",
+        "passed": true
+      },
+      {
+        "name": "disabled_collector_key_cannot_create_capture",
+        "passed": true
+      },
+      {
+        "name": "stopped_target_cannot_be_backfilled",
+        "passed": true
+      },
+      {
+        "name": "only_root_manager_read_credentials",
+        "passed": true
+      },
+      {
+        "name": "credential_socket_removed_and_provider_stopped",
+        "passed": true
+      }
+    ],
+    "collector_runs": [
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "3a638726326a13d99d53f46eb23af089e22bf4e064680b574b68b2a535bdd949",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "3c21e3b90adb95813cfbd8b55f72880043198d8e66e72be4c31df553fe539ec4",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "564c2a5feb197f406f0fd8387e9151b236770f8a446d44d766eed6a230459332",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "failure_stage": "systemd_credentials"
+        }
+      },
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "660ca9bdb8136f955c32191e9ba1514a2712c239c1626153ce777cc862573652",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "44df2112c1f6d8407c162a16e49ba49f95292fb90514b88f71ed991222be6956",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "native_collection",
+          "failure_code": "native_source_service_manager_binding",
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      }
+    ],
+    "archive_controls": {
+      "completed": true,
+      "scope": "owned real-systemd lossless archival controls",
+      "runs": [
+        {
+          "mode": "preview",
+          "summary": {
+            "completed": true,
+            "applied": false,
+            "hot_before_records": 4,
+            "hot_before_bytes": 5768,
+            "planned": 3,
+            "deleted_hot_files": 0,
+            "archive_records": 0,
+            "archive_raw_bytes": 0,
+            "archive_compressed_payload_bytes": 0,
+            "skipped_entries": 0,
+            "archive_capacity_available": true,
+            "latest_protected": true,
+            "projected_hot_records": 1,
+            "projected_hot_bytes": 1442,
+            "projected_budget_satisfied": true,
+            "authenticity_or_freshness_asserted": false,
+            "hot_after_records": 4,
+            "hot_after_bytes": 5768,
+            "managed_budget_satisfied": false,
+            "archive_database_file_bytes": 0,
+            "mode": "preview",
+            "state": "ready",
+            "worker_security": {
+              "effective_uid": 1,
+              "effective_capabilities": 0,
+              "bounding_capabilities": 0,
+              "no_new_privileges": true
+            }
+          }
+        },
+        {
+          "mode": "pressure",
+          "summary": {
+            "completed": false,
+            "state": "storage_pressure",
+            "error_type": "ArchiveFull",
+            "authenticity_or_freshness_asserted": false
+          }
+        },
+        {
+          "mode": "apply",
+          "summary": {
+            "completed": true,
+            "applied": true,
+            "hot_before_records": 4,
+            "hot_before_bytes": 5768,
+            "planned": 3,
+            "deleted_hot_files": 3,
+            "archive_records": 3,
+            "archive_raw_bytes": 4326,
+            "archive_compressed_payload_bytes": 2473,
+            "skipped_entries": 0,
+            "archive_capacity_available": true,
+            "latest_protected": true,
+            "projected_hot_records": 1,
+            "projected_hot_bytes": 1442,
+            "projected_budget_satisfied": true,
+            "authenticity_or_freshness_asserted": false,
+            "hot_after_records": 1,
+            "hot_after_bytes": 1442,
+            "managed_budget_satisfied": true,
+            "archive_database_file_bytes": 16384,
+            "mode": "apply",
+            "state": "ready",
+            "worker_security": {
+              "effective_uid": 1,
+              "effective_capabilities": 0,
+              "bounding_capabilities": 0,
+              "no_new_privileges": true
+            }
+          }
+        },
+        {
+          "mode": "restore",
+          "summary": {
+            "completed": true,
+            "raw_sha256": "564c2a5feb197f406f0fd8387e9151b236770f8a446d44d766eed6a230459332",
+            "raw_bytes": 1442,
+            "authenticity_or_freshness_asserted": false,
+            "mode": "restore",
+            "state": "restored_for_review",
+            "worker_security": {
+              "effective_uid": 1,
+              "effective_capabilities": 0,
+              "bounding_capabilities": 0,
+              "no_new_privileges": true
+            }
+          }
+        }
+      ],
+      "restored_raw_sha256": "564c2a5feb197f406f0fd8387e9151b236770f8a446d44d766eed6a230459332",
+      "all_three_archived_payloads_byte_equal": true,
+      "cold_payload_compression_is_not_database_file_size": true,
+      "paid_api_calls": 0,
+      "aws_calls": 0,
+      "fixture_account_substituted": true,
+      "operational_service_account_created": false,
+      "owned_archive_unit_removed": true,
+      "owned_restore_state_removed": true
+    },
+    "schedule_controls": {
+      "completed": true,
+      "paid_api_calls": 0,
+      "aws_calls": 0,
+      "real_elapsed_outage_tested": true,
+      "OS_clock_changed": false,
+      "production_timers_enabled": false,
+      "fixture_intervals_substituted": true,
+      "observations": [
+        {
+          "event_sha256": "384bdbd1ace9c899c76373faeb55ea638ffeb0a1e4f6727d30fb83857fe9c4a2",
+          "observed_at": "2026-11-14T08:55:04.820304+00:00",
+          "raw_sha256": "203ff14b8f8fc5b8d3030f5c4c6d8cf6242db901607857f4139b25f9730bd25c"
+        },
+        {
+          "event_sha256": "ab147830bea23209d796f9cbcc3a759509afbbd2afb90b5de65ac5e363f857fa",
+          "observed_at": "2026-11-14T08:55:08.242663+00:00",
+          "raw_sha256": "e0be3707fba167016fb2c908b5ae62f1bd622f709e95d0bc4493315a192cb4b4"
+        },
+        {
+          "event_sha256": "eee6e94da775e8f2b59f3023ba42baea840c897a3f675b24962d7af32e7d71a3",
+          "observed_at": "2026-11-14T08:55:45.380956+00:00",
+          "raw_sha256": "459fca71da82aefbba43b0eef0e9bd1cef71c12de67277a5a4f98fea5b90219e"
+        },
+        {
+          "event_sha256": "d12b7b56a5f2821c1b9f927a4d41cd0be1138e1c50471c8fa46bb49b0da66fa8",
+          "observed_at": "2026-11-14T08:55:48.325562+00:00",
+          "raw_sha256": "95698c44ab57cad2586721b0fc582d5134ed2f6e252d094b49d1735afefaec62"
+        }
+      ],
+      "normal_controls": 4,
+      "normal_added_alerts": 0,
+      "real_outage_elapsed_seconds": 28.631,
+      "stale_observation_age_seconds": 31.513,
+      "initial_health": {
+        "state": "fresh",
+        "reason": "recent_signed_observation",
+        "event_sha256": "ab147830bea23209d796f9cbcc3a759509afbbd2afb90b5de65ac5e363f857fa",
+        "observed_at": "2026-11-14T08:55:08.242663+00:00",
+        "scope": "signed_collector_observation_freshness",
+        "authorization_checked": false,
+        "automatic_enforcement_allowed": false,
+        "worker_security": {
+          "effective_uid": 1,
+          "effective_capabilities": 0,
+          "bounding_capabilities": 0,
+          "no_new_privileges": true
+        }
+      },
+      "stale_health": {
+        "state": "stale",
+        "reason": "observation_expired",
+        "event_sha256": "837313feba7fe989c2f86fa2f3797e0c201fdb1e70c382000e07fea7315e2652",
+        "observed_at": "2026-11-14T08:55:11.525705+00:00",
+        "scope": "signed_collector_observation_freshness",
+        "authorization_checked": false,
+        "automatic_enforcement_allowed": false,
+        "worker_security": {
+          "effective_uid": 1,
+          "effective_capabilities": 0,
+          "bounding_capabilities": 0,
+          "no_new_privileges": true
+        }
+      },
+      "recovered_health": {
+        "state": "fresh",
+        "reason": "recent_signed_observation",
+        "event_sha256": "eee6e94da775e8f2b59f3023ba42baea840c897a3f675b24962d7af32e7d71a3",
+        "observed_at": "2026-11-14T08:55:45.380956+00:00",
+        "scope": "signed_collector_observation_freshness",
+        "authorization_checked": false,
+        "automatic_enforcement_allowed": false,
+        "worker_security": {
+          "effective_uid": 1,
+          "effective_capabilities": 0,
+          "bounding_capabilities": 0,
+          "no_new_privileges": true
+        }
+      },
+      "verified_archive_records": 5,
+      "quiescent_hot_records": 2,
+      "fixture_account_substituted": true,
+      "operational_account_created": false,
+      "owned_timer_and_service_files_removed": true,
+      "owned_health_state_removed": true,
+      "credential_deliveries": 5
+    },
+    "status_controls": {
+      "completed": true,
+      "paid_api_calls": 0,
+      "aws_calls": 0,
+      "operational_installation_completed": false,
+      "health": {
+        "checked_at": "2026-11-14T08:55:59.104264+00:00",
+        "expires_at": "2026-11-14T08:56:24.947472+00:00",
+        "kind": "health",
+        "observed_at": "2026-11-14T08:55:54.947472+00:00",
+        "schema": "zt-collector-status-1",
+        "scope_sha256": "99fcb4cca8bcdde0a1f397f1564bc7e8462c22bad0219ee878fe8b6ea5dc9c06",
+        "state": "fresh",
+        "values": {}
+      },
+      "archive": {
+        "checked_at": "2026-11-14T08:56:01.593858+00:00",
+        "expires_at": null,
+        "kind": "archive",
+        "observed_at": null,
+        "schema": "zt-collector-status-1",
+        "scope_sha256": "99fcb4cca8bcdde0a1f397f1564bc7e8462c22bad0219ee878fe8b6ea5dc9c06",
+        "state": "ready",
+        "values": {
+          "archive_compressed_payload_bytes": 4937,
+          "archive_database_file_bytes": 24576,
+          "archive_raw_bytes": 8652,
+          "archive_records": 6,
+          "hot_after_bytes": 5768,
+          "hot_after_records": 4
+        }
+      },
+      "pressure": {
+        "checked_at": "2026-11-14T08:56:00.348915+00:00",
+        "expires_at": null,
+        "kind": "archive",
+        "observed_at": null,
+        "schema": "zt-collector-status-1",
+        "scope_sha256": "99fcb4cca8bcdde0a1f397f1564bc7e8462c22bad0219ee878fe8b6ea5dc9c06",
+        "state": "storage_pressure",
+        "values": {}
+      },
+      "native_metrics": "# TYPE secops_collector_bridge_enabled gauge\nsecops_collector_bridge_enabled 1\nsecops_collector_status_success{worker=\"health\"} 1\nsecops_collector_observation_fresh 1\nsecops_collector_observation_age_seconds 2.122238\nsecops_collector_status_success{worker=\"archive\"} 1\nsecops_collector_archive_storage_pressure 0\nsecops_collector_archive_compressed_payload_bytes 4937\nsecops_collector_archive_database_file_bytes 24576\nsecops_collector_archive_raw_bytes 8652\nsecops_collector_archive_records 6\nsecops_collector_hot_after_bytes 5768\nsecops_collector_hot_after_records 4\n",
+      "fixture_account_substituted": true,
+      "private_capture_permissions_preserved": true,
+      "owned_status_units_removed": true,
+      "owned_status_state_removed": true
+    },
+    "normal_controls": 5,
+    "normal_added_alerts": 0,
+    "private_key_disk_files_created": 0,
+    "systemd_memory_credential_copy": true,
+    "private_key_persisted": false,
+    "tokens_persisted": false,
+    "real_systemd_tested": true,
+    "template_security_directives_preserved": true,
+    "template_installation_paths_substituted": true,
+    "collector_security": {
+      "effective_uid": 1,
+      "effective_capabilities": 524292,
+      "bounding_capabilities": 524292,
+      "no_new_privileges": true
+    },
+    "existing_static_fixture_account_used": true,
+    "real_service_account_created": false,
+    "freshness_controlled_clock_used": true,
+    "scheduling_real_elapsed_outage_used": true,
+    "systemd_version": "systemd 255 (255.4-1ubuntu8.18)",
+    "owned_units_removed": true,
+    "owned_state_removed": true,
+    "owned_config_and_socket_removed": true,
+    "systemd_credentials_removed": true
+  },
+  "alert_flow_tests": {
+    "source_archive_sha256": "076fa21a2d56572cea91462ffcc723dae4bc1d5b3c9b914d9725cd51c980f373",
+    "image_id": "sha256:6d43157db19ffa87cf82a3788a36bec04d1b649797117eec5cd9c5bd45e6d5e5",
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "exit_code": 0,
+    "container_exit": 0,
+    "oom_killed": false,
+    "network_mode": "none",
+    "owned_container_removed": true
+  },
+  "alert_flow": {
+    "completed": true,
+    "scope": "controlled aggregate fixtures through real cached Prometheus/Alertmanager and local authenticated webhook",
+    "cases": [
+      {
+        "name": "real_prometheus_scrapes_authenticated_opt_in_bridge",
+        "passed": true
+      },
+      {
+        "name": "default_exporter_has_no_collector_metrics_or_alerts",
+        "passed": true
+      },
+      {
+        "name": "normal_bridge_has_no_collector_alert",
+        "passed": true
+      },
+      {
+        "name": "stale_observation_reaches_real_alertmanager_receiver",
+        "passed": true
+      },
+      {
+        "name": "constant_fault_does_not_create_new_alert_identity_or_repeated_notifications",
+        "passed": true
+      },
+      {
+        "name": "recovery_resolves_the_same_health_alert_episode",
+        "passed": true
+      },
+      {
+        "name": "storage_pressure_archive_condition_reaches_receiver_without_changing_health",
+        "passed": true
+      },
+      {
+        "name": "storage_pressure_archive_recovery_resolves_same_episode",
+        "passed": true
+      },
+      {
+        "name": "missing_archive_condition_reaches_receiver_without_changing_health",
+        "passed": true
+      },
+      {
+        "name": "missing_archive_recovery_resolves_same_episode",
+        "passed": true
+      },
+      {
+        "name": "stopped_reporter_expires_in_real_time_instead_of_reusing_cached_fresh",
+        "passed": true
+      },
+      {
+        "name": "reporter_restart_recovers_and_resolves_fault",
+        "passed": true
+      },
+      {
+        "name": "metrics_do_not_expose_keys_or_original_identity",
+        "passed": true
+      }
+    ],
+    "versions": {
+      "prometheus": "prometheus, version 3.15.1 (branch: HEAD, revision: bae3eced0a5369e050e83ea73bc381d7c4b1a719)",
+      "alertmanager": "alertmanager, version 0.34.2 (branch: HEAD, revision: e8349048265ccc0871c3d0d668b05eacc68baf50)"
+    },
+    "notifications": [
+      {
+        "alertname": "C01ExporterDown",
+        "status": "firing",
+        "instance": null,
+        "job": "zt-signals",
+        "fingerprint": "559eb396eb6104fc",
+        "starts_at": "2026-11-14T08:54:41.802Z",
+        "received_at": "2026-11-14T08:54:41.819335+00:00"
+      },
+      {
+        "alertname": "C01ExporterDown",
+        "status": "resolved",
+        "instance": null,
+        "job": "zt-signals",
+        "fingerprint": "559eb396eb6104fc",
+        "starts_at": "2026-11-14T08:54:41.802Z",
+        "received_at": "2026-11-14T08:54:45.819738+00:00"
+      },
+      {
+        "alertname": "C01CollectorObservationNotFresh",
+        "status": "firing",
+        "instance": "127.0.0.1:40643",
+        "job": "zt-signals",
+        "fingerprint": "93570442abe4a9b6",
+        "starts_at": "2026-11-14T08:54:50.802Z",
+        "received_at": "2026-11-14T08:54:50.810496+00:00"
+      },
+      {
+        "alertname": "C01CollectorObservationNotFresh",
+        "status": "resolved",
+        "instance": "127.0.0.1:40643",
+        "job": "zt-signals",
+        "fingerprint": "93570442abe4a9b6",
+        "starts_at": "2026-11-14T08:54:50.802Z",
+        "received_at": "2026-11-14T08:54:54.811968+00:00"
+      },
+      {
+        "alertname": "C01CollectorArchivePressure",
+        "status": "firing",
+        "instance": "127.0.0.1:40643",
+        "job": "zt-signals",
+        "fingerprint": "21d747aed7801a41",
+        "starts_at": "2026-11-14T08:54:57.802Z",
+        "received_at": "2026-11-14T08:54:57.811622+00:00"
+      },
+      {
+        "alertname": "C01CollectorArchivePressure",
+        "status": "resolved",
+        "instance": "127.0.0.1:40643",
+        "job": "zt-signals",
+        "fingerprint": "21d747aed7801a41",
+        "starts_at": "2026-11-14T08:54:57.802Z",
+        "received_at": "2026-11-14T08:54:58.813086+00:00"
+      },
+      {
+        "alertname": "C01CollectorArchiveUnavailable",
+        "status": "firing",
+        "instance": "127.0.0.1:40643",
+        "job": "zt-signals",
+        "fingerprint": "1acb27ceb65839f1",
+        "starts_at": "2026-11-14T08:55:01.802Z",
+        "received_at": "2026-11-14T08:55:01.810687+00:00"
+      },
+      {
+        "alertname": "C01CollectorArchiveUnavailable",
+        "status": "resolved",
+        "instance": "127.0.0.1:40643",
+        "job": "zt-signals",
+        "fingerprint": "1acb27ceb65839f1",
+        "starts_at": "2026-11-14T08:55:01.802Z",
+        "received_at": "2026-11-14T08:55:03.811850+00:00"
+      },
+      {
+        "alertname": "C01CollectorObservationNotFresh",
+        "status": "firing",
+        "instance": "127.0.0.1:40643",
+        "job": "zt-signals",
+        "fingerprint": "93570442abe4a9b6",
+        "starts_at": "2026-11-14T08:55:15.802Z",
+        "received_at": "2026-11-14T08:55:15.815635+00:00"
+      },
+      {
+        "alertname": "C01CollectorObservationNotFresh",
+        "status": "resolved",
+        "instance": "127.0.0.1:40643",
+        "job": "zt-signals",
+        "fingerprint": "93570442abe4a9b6",
+        "starts_at": "2026-11-14T08:55:15.802Z",
+        "received_at": "2026-11-14T08:55:29.833425+00:00"
+      }
+    ],
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "independent_detection_evaluation": false,
+    "production_mTLS_flow_tested_here": false,
+    "network_boundary": "single isolated container network namespace, loopback only",
+    "owned_processes_stopped": true
+  },
+  "legacy_regression": {
+    "aws_calls": 0,
+    "completed": true,
+    "goal_qualified": false,
+    "native_actor_command_evidence_added_to_legacy": 0,
+    "paid_api_calls": 0,
+    "population": 1681815,
+    "scenarios": {
+      "fox": {
+        "after_decision_sha256": "29e3e42b17e13d9f4ce8f785b2c1121ee52aa9a6ebbd323c5328e38644929832",
+        "before_decision_sha256": "29e3e42b17e13d9f4ce8f785b2c1121ee52aa9a6ebbd323c5328e38644929832",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 668418,
+        "predictions_sha256": "3a95e16120e53c888203f0d25d57526b0c614deeaa1e86b43ed98694976702cc",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.998765742394729,
+          "f1": 0.9990965864106885,
+          "false_positive_rate": 0.0006145584161411404,
+          "fn": 695,
+          "fp": 130,
+          "inference_errors": 0,
+          "population": 668418,
+          "precision": 0.9997151115776464,
+          "recall": 0.9984788261352991,
+          "tn": 211404,
+          "tp": 456189
+        }
+      },
+      "harrison_observed": {
+        "after_decision_sha256": "de38509b07982c34ab69e57eb7df9ebb0517674d06cd1329d594c93c503be1c9",
+        "before_decision_sha256": "de38509b07982c34ab69e57eb7df9ebb0517674d06cd1329d594c93c503be1c9",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 422178,
+        "predictions_sha256": "c7e557b7d8e137cedc35649505ad389d06c593fe9f53e09caccf10d28220a9e0",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9993983580385525,
+          "f1": 0.9996953318603709,
+          "false_positive_rate": 0.046012832263978,
+          "fn": 3,
+          "fp": 251,
+          "inference_errors": 0,
+          "population": 422178,
+          "precision": 0.9993980396718237,
+          "recall": 0.9999928009733084,
+          "tn": 5204,
+          "tp": 416720
+        }
+      },
+      "russellmitchell": {
+        "after_decision_sha256": "2c4aecb63800cb85dfc8a6685f03b17d53c2f88e727b47c415eac6c1d2d70276",
+        "before_decision_sha256": "2c4aecb63800cb85dfc8a6685f03b17d53c2f88e727b47c415eac6c1d2d70276",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 295243,
+        "predictions_sha256": "2ee9ee30497a6a4a48c12461e0c6ce76dcdc3392db71f04caf3f7f92383dfaf4",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9963386092134275,
+          "f1": 0.991198000211704,
+          "false_positive_rate": 0.0003642113111178716,
+          "fn": 996,
+          "fp": 85,
+          "inference_errors": 0,
+          "population": 295243,
+          "precision": 0.9986054371544355,
+          "recall": 0.9838996476027286,
+          "tn": 233296,
+          "tp": 60866
+        }
+      },
+      "santos": {
+        "after_decision_sha256": "90fd3e70c751fe8da7fd2fbc26fd70688c07f8989ded90e48af67f7a4662d99a",
+        "before_decision_sha256": "90fd3e70c751fe8da7fd2fbc26fd70688c07f8989ded90e48af67f7a4662d99a",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 295976,
+        "predictions_sha256": "92dc1b9932ffd57562e29454ea81c25f70b071406d6aed89587e5dada6c7a220",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9966010757628997,
+          "f1": 0.9892837359921599,
+          "false_positive_rate": 0.00029765615886794125,
+          "fn": 932,
+          "fp": 74,
+          "inference_errors": 0,
+          "population": 295976,
+          "precision": 0.9984089101034208,
+          "recall": 0.9803238541600693,
+          "tn": 248535,
+          "tp": 46435
+        }
+      }
+    },
+    "schema": "extra-shared-execution-legacy-regression-1",
+    "scope": "prior observed-development decision regression only; no new ground truth",
+    "source_prior_sha256": "35ec2a206d0a3a475d37dfb38b9459044291aee79cfea9adbbcae8da7b428ee4"
+  },
+  "source_qualification": "Final511 unit/regression snapshot differs from the successful53 systemd/13 real-monitoring snapshot only in tests/test_capture_archive.py. All app/scripts/infra product bytes are identical; the final unit batch includes the deterministic three-target fix. Native/flow results were not rerun for a test-only change.",
+  "original_source_archive_sha256": "076fa21a2d56572cea91462ffcc723dae4bc1d5b3c9b914d9725cd51c980f373",
+  "final_source_archive_sha256": "bffc3173564700981db5ce816335c577694f111c1a70d37b745d8dc7b3c527c6",
+  "trust_boundary": "Unsigned public aggregate snapshots rely on a trusted local writer/configuration. Health reports expire after25s and at their signed-observation deadline; archive after180s. Metrics are advisory last-check evidence, not current authorization or instant revocation attestation.",
+  "transport_boundary": "Native systemd publication tested with real signed captures. Prometheus/Alertmanager receiver flow uses controlled aggregate fixtures in one offline container loopback namespace, not a new production mTLS deployment.",
+  "source_sha256": {
+    "infra/observability/alerts.yaml": "1cdaef585c5eee3afb67b7f7e18b712a4f8fa11e963b9f9dfdb361c4664fb059",
+    "infra/systemd/secops-capture-health@.service.d/collector-metrics.conf": "80041c9ee56f2af3b7e54c17108cfcbddbbacbc7b43b02cc608c2f1c985ce202",
+    "infra/systemd/secops-capture-archive@.service.d/collector-metrics.conf": "aeffe32392a5f58053e0a53ff95d63c20267b28dda5ff5aab275c0a90b1ac917",
+    "scripts/f1_lab/collector_status_bridge.py": "9e14329be654ef1ec6c1908bda0da9c597e22433b8b334df6f139038c9f388ec",
+    "scripts/f1_lab/collector_status_runtime.py": "a455838474bc39401f83c16f2b068685a59e139f013d9c842decf68b878290bc",
+    "scripts/run_collector_status.py": "491e68747f94f48e013b30f59b5c0d67ec6d784b371002cf7285832d73f39da4",
+    "scripts/run_collector_alert_flow.py": "94fa5f93e2fceee36d49e975a6b981b65a318510b2af0bfa1ce9639e763bafb5",
+    "scripts/run_systemd_collector_runtime.py": "11426da8144d454f56e7c19b5f6bae0b056c3d96132f5c4e805946f306c889cb",
+    "scripts/service_capture_status.py": "485398da47bb936072a95c5d5d2c95c5efa33806e423c936c946eb6be6bb523a",
+    "scripts/archive_service_captures.py": "427529102f3e3b05ff8e24e1e86f3b187756d5fce5dc7b8d68d801265d2661f9",
+    "scripts/signal_metrics_exporter.py": "6841b55e27b85cc9b407ac1d6eb88dbf39d4c13b135907a1a561bfe92287d05e",
+    "scripts/monitoring_runtime_control.py": "72ca3c7dba64e1d88041696472abe2f773a8a0a520f4e7f05ae0399291021d44",
+    "tests/test_collector_status_bridge.py": "073859f44d434d123f9f8c836b9b63f9d4a81b5220cbc5dc8f401cb6e1e3f86e",
+    "tests/test_capture_archive.py": "08caaf281a710106db466cf15108ac7fc826ac7a52e9d6cee3c32dc9b9d9cdb9"
+  },
+  "artifact_sha256": {
+    "final/tests.json": "711b84db251eec9b9e1dfab7715dec0876b1fea1470776eab2c4428a63fca12f",
+    "final/linux.xml": "6140837289fdb1041d1d7f487c60dfc97bbef05c2e30864e6c2a907a00fd1bde",
+    "final/source-manifest.json": "8abc4dac17d18ff8dc7dbd491033d86f235dc58ce852005d89b525532f6761a6",
+    "final/legacy-regression/run.json": "a2d03c97bbd4bb19b8ba9fe478599953379639e33df4230ee145d3fa27cf1be0",
+    "initial/native-tests.json": "a3131a65127fea6d956339afe0670397db5e9cd3f6b9a71abc469490b0004fdf",
+    "initial/actual-systemd/run.json": "4ff61346ab330cc2bc3f5c18e78a03c8f69174a3a5a1b77916d472af75d71d52",
+    "initial/actual-systemd/status-controls.json": "7bb4fccfe87d7e9fbdbb678855e2b1ccedcb9e487e6307a23ca5c5c2ed036fec",
+    "initial/alert-flow-tests.json": "4322e49bd63bc48dc14bf65b08b777f3ef86a4df4c77a03d996b52c43f31a731",
+    "initial/alert-flow/run.json": "3714df5573f6e0737891ac73a66c748226c7bf94c02a5162764b04b67abd863c",
+    "initial/source-manifest.json": "7ba8fbcdb72fb43d3221f5430b4138b4d6ace6a0fc8a62d66e4433a1d991e649"
+  }
+}
