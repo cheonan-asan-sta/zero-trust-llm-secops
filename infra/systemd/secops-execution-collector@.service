@@ -1,0 +1,31 @@
+[Unit]
+Description=SecOps read-only execution evidence for %i
+After=systemd-journald.service
+
+[Service]
+Type=oneshot
+# Install the checkout/venv in /opt/secops; this template does not install it.
+# Instance app observes app.service: secops-execution-collector@app.service
+WorkingDirectory=/opt/secops
+Environment=PYTHONDONTWRITEBYTECODE=1
+EnvironmentFile=/etc/secops/collector.conf
+LoadCredential=runtime-key:/etc/secops/runtime-key.raw
+StandardInput=file:%d/runtime-key
+ExecStart=/opt/secops/.venv/bin/python -m scripts.collect_shared_execution --tenant ${TENANT_ID} --server ${SERVER_ID} --unit %i.service --source ${RUNTIME_SOURCE_ID} --key-id ${RUNTIME_KEY_ID} --registry /etc/secops/service-registry.json --registry-sha256 ${SERVICE_REGISTRY_SHA256} --output /var/lib/secops-evidence/%i/${INVOCATION_ID}
+StateDirectory=secops-evidence
+StateDirectoryMode=0700
+UMask=0077
+PrivateNetwork=yes
+PrivateTmp=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+CapabilityBoundingSet=CAP_SYS_PTRACE CAP_DAC_READ_SEARCH
+MemoryMax=256M
+TasksMax=16
+TimeoutStartSec=20

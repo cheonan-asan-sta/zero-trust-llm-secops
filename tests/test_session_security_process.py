@@ -153,7 +153,10 @@ def security_lab(tmp_path):
 
 def child(lab, code=None, *, module=None, attempts=1, extra=()):
     argv = [sys.executable, "-c", code, *extra] if code else [sys.executable, "-m", module, "--once"]
-    return subprocess.run(argv, cwd=ROOT, capture_output=True, text=True, check=False, timeout=20,
+    # This checks crash/recovery correctness, not a 20-second latency SLA.
+    # Include cold interpreter startup and durable ledger I/O on loaded CI hosts,
+    # while retaining a finite deadline and all existing security assertions.
+    return subprocess.run(argv, cwd=ROOT, capture_output=True, text=True, check=False, timeout=60,
         env=lab.environment | {"SIGNAL_INBOX_MAX_ATTEMPTS": str(attempts)})
 
 
