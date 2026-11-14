@@ -108,3 +108,5 @@ kernel 실행 이력·조직 SSO/앱 연동·새 독립 성능 평가는 별도 
 - [systemd 자원 회계](https://www.freedesktop.org/software/systemd/man/latest/systemd.resource-control.html), [Python resource](https://docs.python.org/3.12/library/resource.html), [Linux tmpfs](https://docs.kernel.org/filesystems/tmpfs.html): 회계 범위·프로세스 자원·격리된 공간 부족 주입의 선정 근거다. 시험 호스트는 systemd255.4이며 최신 문서에만 있는 옵션을 요구하지 않는다.
 
 채희주 요청에 따른 Codex 보조 구현·실행·측정이며 팀원의 독립 검토로 기록하지 않는다.
+
+후속 선택 검증 오류 보존·실제 mTLS 인수는 [v77](extra-selection-diagnostics.md)을 따른다. 과거 CI 원인 확정과 장기/systemd 회계 검증은 별도로 남는다.

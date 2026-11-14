@@ -3,7 +3,6 @@
 import argparse
 import copy
 import json
-import re
 import subprocess
 import time
 from datetime import UTC, datetime
@@ -11,6 +10,7 @@ from pathlib import Path
 
 from scripts.continuous_mtls_runtime import ROOT, RuntimeFailure, command
 from scripts.infra_load_probe import validate_rows
+from scripts.infra_probe_diagnostics import PROBE_ERRORS, execute_probe, failure
 from scripts.measure_signal_infrastructure import Sampler
 from scripts.monitoring_readiness import FRESH_UP
 from scripts.test_monitored_mtls_runtime import MonitoredChecks
@@ -36,27 +36,103 @@ class SelectionChecks(MonitoredChecks):
                 and len(rows := self.query(FRESH_UP)) == 1 and rows[0]['value'][1] == '1')
 
     def workload(self, repeat, concurrency, kind):
-        before = self.served()
-        value = json.loads(self.runtime.execute('operator', ['python', '-m', 'scripts.infra_load_probe'],
-                           json.dumps({'kind': kind, 'concurrency': concurrency}), timeout=120))
-        after = self.served()
-        expected = {'valid': 16, 'shared': 1, 'missing': 0}[kind]
-        value.update(repeat=repeat, delivered=after - before, expected_delivered=expected,
-                     resource_before=before, resource_after=after, passed=False)
-        self.report['workloads'].append(value)
-        self.save()  # Keep actual statuses/timings/counters even when the first assertion fails.
-        # A shared wave and its replay are bracketed by one resource counter.
-        timing = validate_rows(value['rows'], expected, after - before)
-        if kind == 'shared':
-            replay = validate_rows(value['replay']['rows'], 0, 0)
-            value['replay']['timing'] = replay
-        self.require(value['kind'] == kind and value['concurrency'] == concurrency, 'selection_wrong_wave')
-        self.require(self.healthy(), 'selection_monitoring_not_healthy_under_load')
-        value.update(passed=True, timing=timing)
-        self.add(f'load_{repeat}_{concurrency}_{kind}', delivered=after - before)
+        if (
+            type(repeat) is not int
+            or not 1 <= repeat <= 3
+            or type(concurrency) is not int
+            or concurrency not in {1, 4, 8}
+            or kind not in {"valid", "shared", "missing"}
+        ):
+            raise ValueError("selection_workload_scope")
+        expected = {"valid": 16, "shared": 1, "missing": 0}[kind]
+        value = {
+            "repeat": repeat,
+            "concurrency": concurrency,
+            "kind": kind,
+            "expected_delivered": expected,
+            "passed": False,
+        }
+        self.report["workloads"].append(value)
+
+        def mark(stage):
+            value["stage"] = stage
+            self.report["selection_phase"] = {
+                "stage": stage,
+                "repeat": repeat,
+                "concurrency": concurrency,
+                "kind": kind,
+            }
+            self.save()
+
+        try:
+            mark("counter_before")
+            before = self.served()
+            self.require(type(before) is int and before >= 0, "selection_counter_shape")
+            value["resource_before"] = before
+            mark("command")
+            execution = execute_probe(self.runtime, kind, concurrency)
+            value["probe_exit_code"] = execution["exit_code"]
+            if execution["report"] is not None:
+                value.update(execution["report"])
+            value["probe_failure"] = execution["failure"]
+            mark("counter_after")
+            try:
+                after = self.served()
+                self.require(type(after) is int and after >= before, "selection_counter_shape")
+                value.update(resource_after=after, delivered=after - before)
+            except Exception as error:
+                value["counter_after_failure"] = failure(error, "counter_after")
+                self.save()
+                if (
+                    execution["failure"] is not None
+                    or execution["report"] is None
+                    or not value.get("probe_completed")
+                ):
+                    mark("command")
+                    raise RuntimeFailure("selection_probe_failed") from None
+                raise
+            mark("command")
+            self.require(
+                execution["exit_code"] == 0
+                and execution["report"] is not None
+                and value.get("probe_completed") is True
+                and execution["failure"] is None,
+                "selection_probe_failed",
+            )
+            # Keep the original delivery, content, TLS, replay and health checks.
+            mark("response_validation")
+            timing = validate_rows(value["rows"], expected, after - before)
+            if kind == "shared":
+                mark("replay_validation")
+                value["replay"]["timing"] = validate_rows(value["replay"]["rows"], 0, 0)
+            self.require(
+                value["kind"] == kind and value["concurrency"] == concurrency,
+                "selection_wrong_wave",
+            )
+            mark("health")
+            self.require(self.healthy(), "selection_monitoring_not_healthy_under_load")
+            value.update(passed=True, timing=timing, stage="complete")
+            self.add(f"load_{repeat}_{concurrency}_{kind}", delivered=after - before)
+            self.save()
+        except Exception as error:
+            value["host_failure"] = failure(error, value["stage"])
+            self.record_selection_failure(error, value["stage"])
+            raise
+
+    def record_selection_failure(self, error, stage):
+        self.report.setdefault("selection_failure", failure(error, stage))
+        # Reuse the bounded, allowlisted C01 diagnostics before cleanup. An
+        # unavailable diagnostic must never replace the original failure.
+        if isinstance(getattr(self.runtime, "state", None), dict):
+            try:
+                self.record_monitoring_failure("selection_" + stage)
+            except (*PROBE_ERRORS, AttributeError):
+                self.report["monitoring_failure_diagnostics"] = {"available": False}
         self.save()
 
     def recovery(self, repeat):
+        self.report['selection_phase'] = {'stage': 'recovery', 'repeat': repeat}
+        self.save()
         pair = self.mint(f'selection-fault-{repeat}')
         before = self.served()
         gateway = self.runtime.container('gateway')
@@ -142,6 +218,8 @@ print(json.dumps({'status':status}))
 
     def run(self):
         runtime = self.runtime
+        self.report['selection_phase'] = {'stage': 'prepare'}
+        self.save()
         runtime.up()
         for name in ('project', 'image_id', 'source_commit', 'source_dirty', 'image_source_verified'):
             self.report[name] = runtime.state[name]
@@ -177,8 +255,9 @@ def main():
     try:
         checks.run()
     except (RuntimeFailure, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as exc:
-        reason = str(exc) if isinstance(exc, RuntimeFailure) or re.fullmatch(r'selection_[a-z_]{1,96}', str(exc)) else type(exc).__name__
-        checks.report.update(completed=False, failure=reason)
+        stage = checks.report.get('selection_phase', {}).get('stage', 'prepare')
+        checks.record_selection_failure(exc, stage)
+        checks.report.update(completed=False, failure='selection_' + failure(exc, stage)['code'])
     finally:
         try:
             checks.cleanup()
