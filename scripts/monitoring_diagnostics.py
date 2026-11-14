@@ -2,10 +2,13 @@
 
 import json
 import math
+import os
 import re
 import subprocess
 import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
+from http.client import HTTPException
 
 from scripts.continuous_mtls_runtime import RuntimeFailure, command
 
@@ -69,6 +72,64 @@ def rules(body):
     return {'available': True, 'rules': result[:32], 'truncated': len(result) > 32}
 
 
+def collect_probes(probe=None):
+    """One operator process, four fixed read-only mTLS queries, public output only."""
+    if os.environ.get('APP_ENVIRONMENT', 'local') not in {'local', 'test'}:
+        raise ValueError('monitoring_diagnostics_local_test_only')
+    if probe is None:
+        from scripts.monitoring_runtime_control import probe
+    requests = {key: {'query': expression} for key, expression in QUERIES.items()}
+    requests['rules'] = {'path': '/api/v1/rules?type=alert'}
+
+    def observe(item):
+        key, request = item
+        body = None
+        try:
+            response = probe({'profile': 'prometheus', **request})
+            if isinstance(response, dict) and response.get('status') == 200:
+                body = response.get('body')
+        except (RuntimeFailure, OSError, HTTPException, ValueError, KeyError, TypeError, subprocess.SubprocessError):
+            pass
+        return key, rules(body) if key == 'rules' else vector(body)
+
+    # Each tls.request uses a fresh pinned context and bounded socket timeout.
+    # The parent exec still has the original overall wall-time deadline.
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        result = dict(pool.map(observe, requests.items()))
+    return {'schema': 'public-c01-probe-batch-1', 'prometheus': result}
+
+
+def public_batch(value):
+    """Revalidate child output; never pass through arbitrary labels or errors."""
+    result = {key: {'available': False} for key in (*QUERIES, 'rules')}
+    if (not isinstance(value, dict) or value.get('schema') != 'public-c01-probe-batch-1'
+            or not isinstance(value.get('prometheus'), dict)):
+        return result
+    for key in (*QUERIES, 'rules'):
+        item = value['prometheus'].get(key)
+        if not isinstance(item, dict) or item.get('available') is not True:
+            continue
+        if key != 'rules':
+            samples = item.get('samples')
+            if not isinstance(samples, list):
+                continue
+            rows = [{'metric': row.get('labels'), 'value': [row.get('timestamp'), row.get('value')]}
+                    for row in samples[:32] if isinstance(row, dict)]
+            result[key] = vector({'status': 'success', 'data': {'resultType': 'vector', 'result': rows}})
+            result[key]['truncated'] = len(samples) > 32 or item.get('truncated') is True
+        else:
+            entries = item.get('rules')
+            if not isinstance(entries, list):
+                continue
+            rows = [{'name': row.get('name'), 'state': row.get('state'), 'health': row.get('health'),
+                     'lastError': row.get('evaluation_error') is not False,
+                     'evaluationTime': row.get('evaluation_seconds')}
+                    for row in entries[:32] if isinstance(row, dict)]
+            result[key] = rules({'status': 'success', 'data': {'groups': [{'rules': rows}]}})
+            result[key]['truncated'] = len(entries) > 32 or item.get('truncated') is True
+    return result
+
+
 def collect(runtime, reason, *, budget_seconds=20):
     """Collect before cleanup, under a wall-time budget; never replace the failure."""
     budget_seconds = min(20, max(1, budget_seconds))
@@ -99,19 +160,24 @@ def collect(runtime, reason, *, budget_seconds=20):
     except (RuntimeFailure, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError):
         output['service_probe_unavailable'] = True
 
-    def probe(payload):
-        remaining = until - time.monotonic()
-        if remaining <= 0 or operator is None:
-            return None
+    value = None
+    remaining = until - time.monotonic()
+    output['probe_launches'] = 0
+    if remaining > 0 and operator is not None:
+        output['probe_launches'] = 1
         try:
-            value = json.loads(command(['docker', 'exec', '-i', operator, 'python', '-m', 'scripts.monitoring_runtime_control', 'probe'],
-                payload=json.dumps({'profile': 'prometheus', **payload}), timeout=min(4, remaining)))
-            return value.get('body') if value.get('status') == 200 else None
+            value = json.loads(command(['docker', 'exec', operator, 'python', '-m',
+                                       'scripts.monitoring_diagnostics', '--batch'], timeout=min(14, remaining)))
         except (RuntimeFailure, OSError, ValueError, TypeError, KeyError, subprocess.SubprocessError):
-            return None
-
-    for key, expression in QUERIES.items():
-        output['prometheus'][key] = vector(probe({'query': expression}))
-    output['prometheus']['rules'] = rules(probe({'path': '/api/v1/rules?type=alert'}))
+            output['batch_probe_unavailable'] = True
+    output['prometheus'] = public_batch(value)
     output['budget_exhausted'] = time.monotonic() >= until
     return output
+
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--batch', action='store_true', required=True)
+    parser.parse_args()
+    print(json.dumps(collect_probes(), allow_nan=False))

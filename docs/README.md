@@ -1,5 +1,34 @@
 # 개발 주차별 산출물
 
+## 11월 14일 현재 성능과 후속 검증
+
+팀 공유의 시작점은 [현재 성능·남은 목표](extra-current-performance.md)다.
+[Wilson 고정 출처 평가](extra-wilson-source-transfer.md)는455,452행에서 오탐54건 감소·기존 TP 손실0을 확인했다.
+전체 F1 99.9644%와 달리 VPN F1은21.875%이며 error의 정상 표본은0이다. 원래 여섯 영역의 독립 목표 달성은 아니다.
+[VPN 관측 구간 감사](extra-vpn-observation-support.md)는 위협28행이 한 관측 구간임을 보여준다.
+
+[스캐너 읽기 요청 후보](extra-scanner-read-review.md)는 관찰된 R/S/F/H1,681,815행에서 미탐7건을 추가로 줄였다.
+새 FP·기존 TP 손실0이며, 아래 과거 v49 수치와 Wilson의 사전 고정 결과를 새 후보 수치로 덮어쓰지 않는다.
+[DNS 프로세스 경계](extra-dns-process-boundary.md)에서는 잘못 이어진 이력151행을 바로잡았고 판정은 변하지 않았다.
+[Wardbeck 고정 후보 검증](extra-scanner-calibration-transfer.md)은 원래 보정 자료 역할을 유지하며 현재 준비·평가 상태를 구분한다.
+[Wardbeck 실제 보정 출처 결과](extra-wardbeck-calibration-result.md)는24,851행에서 미탐4건 감소·새 FP/TP 손실0이다. VPN F1 27.4510%와 정상 error0행의 한계도 유지한다.
+후보는 오프라인 검토용이다. 자동 차단/권한 복원·실제 기업 운영 인수와 탐지 성능 평가는 별개다.
+통합 Linux 전체5,096개·Ruff+RUF100과 [실제 monitored mTLS75조건](extra-outage-expiry-validation.md)을 통과했다.
+[종류별 잔여 오류](extra-development-error-priorities.md)는 작은 감사·인증·VPN 집단의 실패와 추가 근거를 정리한다.
+아래 `Wilson 예약 유지`, push/병합0 및 실행 미완료 문구는 해당 날짜/버전의 이력이다.
+
+## 11월 14일 병합 후 탐지·평가 v49
+
+[최신 개선·출처 분리 평가](extra-postmerge-detection-evaluation.md)와
+[공유 근거 JSON](infrastructure-results/extra-postmerge-detection-evaluation-v49-20261114.json)을 먼저 읽는다.
+PR #58 병합 `aitest` 기준으로 기존1,259,637행을 재현해 웹 FN30→27·FP19 유지·기존 TP 손실0을 확인했다.
+VPN의 낮은 정밀도와 FP60/60/88은 그대로 공개한다. Windows 집중66·Linux 전체4773·Ruff 통과다.
+새 실행기는 코드/모델을 동결하고 정답 없이 예측을 봉인한 뒤 별도로 채점한다.
+Harrison 평가의 실제 완료/노출 상태와 결과는 위 문서/JSON에 기록하며 원래 여섯 영역 최종 독립 목표 통과로 해석하지 않는다.
+완료된 새 출처 VPN11,090행은 TP28/FP168/FN0·정밀도14.29%/F1 25%다. 특징 벡터는 전부 개발 자료와 겹친다.
+웹의 라벨 쌍은 회전 로그라 이번 문법 밖이므로 새 웹 전이 성능은 미측정이다. Harrison 소비·Wilson 예약 유지다.
+무료 로컬·기존 앱/모델/라벨 보존이다. 아래 날짜별 push/병합0·평가 미실행은 당시 이력이다.
+
 ## 11월 13일 최신 aitest·extra 통합 기준
 
 사용자가 팀원 업로드 후 `aitest` 병합을 허용했다. `07ef9cc`와 `extra`의 `668096b`를

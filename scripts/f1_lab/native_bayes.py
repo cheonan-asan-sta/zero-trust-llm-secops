@@ -4,6 +4,8 @@ import hashlib
 import json
 import math
 
+from scripts.f1_lab.dns_context import DNS_DOMAINS
+from scripts.f1_lab.dns_context import PROFILE as DNS_PROFILE
 from scripts.f1_lab.native_jsonl import require
 from scripts.f1_lab.raw_context import PROFILE, RICH_DOMAINS
 from scripts.f1_lab.raw_observations import raw_features
@@ -27,10 +29,11 @@ FEATURE_CONTRACT_SHA256 = hashlib.sha256(json.dumps(DOMAINS, sort_keys=True).enc
 
 
 def feature_domains(profile):
-    require(profile in {'base', PROFILE, VPN_PROFILE, SEMANTIC_PROFILE}, 'native_feature_profile')
+    require(profile in {'base', PROFILE, VPN_PROFILE, SEMANTIC_PROFILE, DNS_PROFILE}, 'native_feature_profile')
     if profile == 'base':
         return DOMAINS
-    additions = VPN_DOMAINS if profile == VPN_PROFILE else SEMANTIC_DOMAINS if profile == SEMANTIC_PROFILE else {}
+    additions = (VPN_DOMAINS if profile == VPN_PROFILE else {**SEMANTIC_DOMAINS, **DNS_DOMAINS}
+                 if profile == DNS_PROFILE else SEMANTIC_DOMAINS if profile == SEMANTIC_PROFILE else {})
     return {**DOMAINS, **RICH_DOMAINS, **additions}
 
 

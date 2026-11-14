@@ -1,5 +1,37 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+## 최신 작업 인수인계 — 2026-11-14 오전
+
+- 통합 기준은 PR58의 aitest `cea8303`이며, 후속 변경을 PR60에 한 번으로 묶어 반영할 준비 중이다.
+  실제 PR 병합 여부는 GitHub 상태를 확인한다. 아래 과거 단락의 예약/미완료 상태는 당시 기록이다.
+- [현재 성능](docs/extra-current-performance.md): 원래 여섯 영역의 독립 목표 미달. Wilson 전이 평가 전체 F1 99.9644%이나 VPN F1 21.875%.
+  Wilson은 평가를 마친 출처이며 재튜닝하지 않는다. Wardbeck도 원래 보정 역할을 유지해 평가 완료했다. 24,851행에서 미탐4 감소·새 FP/TP 손실0이며 VPN F1 27.4510%로 목표 미달이다.
+- [개발 후보 v62](docs/extra-scanner-read-review.md): 기존 R/S/F/H 1,681,815행에서 추가 TP7, 새 FP/기존 TP 손실0.
+  이는 관측 개발 결과이며 운영 접근 제어에 연결하지 않았다. DNS 후보의 새 FP96 실패도 보존했다.
+- [종류별 잔여 오류](docs/extra-development-error-priorities.md): 큰 집단의 평균에 가려지는 감사·인증·VPN과 정상 오류 표본 부족을 공개했다.
+- [실제 mTLS 만료·회수 검증](docs/extra-outage-expiry-validation.md): 75조건 통과, 소유 자원 모두 정리.
+  정책 만료를 늘리거나 watchdog을 끄지 않고 만료 HOLD와 위험 신호 DENY의 이력 검사를 구분했다.
+- 무료 로컬 검증만 실행했다. 원본 작업 폴더와 동결 평가 코드를 보존한 별도 worktree에서 통합한다.
+  사용자의 ZIP·키·실행 DB·원시/정답 자료를 커밋하지 않는다. 최신 통합 Linux 전체5,096개·Ruff+RUF100을 통과했다. PR CI/병합은 실제 GitHub 상태를 확인한다.
+
+
+## 11월 14일 병합본 후속: 잔여 오류·출처 분리 평가 v49
+
+PR #58 병합 `aitest`의 `cea8303`에서 `feature/chaeheeju-postmerge-detection-evaluation`을 만들었다.
+후보 코드 커밋은 `d21f11d`다. [최신 결과와 재현 경계](docs/extra-postmerge-detection-evaluation.md),
+[공유 실행 근거](docs/infrastructure-results/extra-postmerge-detection-evaluation-v49-20261114.json)를 먼저 읽는다.
+같은 개발 로그1,259,637행에서 웹 FN30→27·FP19 유지·기존 TP 손실0·추론 오류0을 확인했다.
+VPN FP60/60/88·FN0은 유지하며 검증된 기기/권한을 만들어 넣지 않는다.
+Windows 집중66·network none Linux 전체4773·전체 Ruff 통과, 소유 테스트 컨테이너 제거 완료.
+Harrison 한 출처의 코드/모델 동결→라벨 없는 준비/예측→봉인 후 채점 경로를 추가했다.
+실제 새 평가 대상은 VPN11,090행뿐이며 TP28/FP168/FN0·정밀도14.29%/F1 25%로 목표 미달이다.
+특징 벡터 전부가 개발 자료와 겹친다. 웹의 라벨 쌍은 `.log.1`이어서 고정 문법 밖이며 웹 독립 성능은 미측정이다.
+Harrison은 소비한 출처, Wilson은 본문 미접근 예약 유지다. 결과 후 코드/선정 문법/모델 조정은 하지 않았다.
+정확한 평가 완료/노출 상태와 수치는 위 최신 문서/JSON을 따르고, 이미 사용한 출처를 다시 미관측으로 부르지 않는다.
+같은 합성 생성 계열·물리 행 단위·독립 사람 심사0이므로 원래 여섯 영역 최종 목표 완료는 아니다.
+기존 모델/라벨/프로토콜과 앱·두 승인자 계약은 보존한다. 유료 API/AWS 호출0, 사용자 ZIP 보존.
+아래 과거 v43~v48의 미실행/미관측/병합0 표시는 당시 기록이다.
+
 ## 11월 13일 최신 aitest·extra 통합 기준
 
 사용자가 팀원 업로드 후 `aitest` 병합을 허용했다. `07ef9cc`와 `extra`의 `668096b`를

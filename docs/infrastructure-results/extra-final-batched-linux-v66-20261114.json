@@ -1,0 +1,42 @@
+{
+  "schema": "extra-final-batched-linux-validation-1",
+  "completed": true,
+  "source_commit": "508045cf539c140a0135c179470ab18ba3db305b",
+  "started_at": "2026-11-13T19:57:42.306871+00:00",
+  "ended_at": "2026-11-13T20:12:42.762630+00:00",
+  "linux": {
+    "exit_code": 0,
+    "seconds": 880.481,
+    "counts": {
+      "passed": 5096
+    },
+    "log": "runtime/f1/final-batched-linux-v66-20261114/linux.log",
+    "executed": true,
+    "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "source_files": 968,
+    "source_archive_sha256": "62dbeac9bdc8fc611f75107ead7361621f54600daae759adb0fb3a52450e569e",
+    "container_exit": 0,
+    "oom_killed": false,
+    "network_mode": "none",
+    "owned_container": "3732ced8394ca5a7fe148993452512e6b945db89b8e0bed9e02503482d18f285",
+    "snapshot_sources_unchanged_after": true,
+    "owned_container_removed": true
+  },
+  "source_manifest_sha256": "d55e15e31a2631dfe7c4e454fc6f47478326f90cba1478f1b1181bd2b88259eb",
+  "junit_sha256": "aaef21d3447446c4a7c36d3379d8000659dda71dfdf2ca1ce05ca6b2e7fcf59c",
+  "report_sha256": "7566b365693061e11ad46387fb7e78c5d20d635297ba235eab7fa89f958673fa",
+  "runtime_validation": {
+    "checks": 75,
+    "completed": true,
+    "cleanup": {
+      "containers": 0,
+      "volumes": 0,
+      "networks": 0
+    },
+    "evidence": "extra-outage-expiry-validation-v58-20261114.json"
+  },
+  "scope": "full tests/ plus Ruff RUF100; functional regression, not detection quality certification",
+  "goal_qualified": false,
+  "paid_api_calls": 0,
+  "aws_calls": 0
+}

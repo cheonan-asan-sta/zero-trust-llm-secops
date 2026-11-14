@@ -1,0 +1,276 @@
+{
+  "schema": "extra-local-development-followup-1",
+  "completed": true,
+  "goal_qualified": false,
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "production_detector_changed": false,
+  "dns_risk_retention": {
+    "aws_calls": 0,
+    "completed": true,
+    "goal_qualified": false,
+    "history": "strictly earlier time and ordinal; 60sec; only intrinsic original alert seeds extend TTL; no response client inference",
+    "paid_api_calls": 0,
+    "scenarios": {
+      "fox": {
+        "after": {
+          "accuracy": 0.9971444247699329,
+          "f1": 0.992238603626504,
+          "false_positive_rate": 5.102509414129869e-06,
+          "fn": 686,
+          "fp": 1,
+          "inference_errors": 0,
+          "population": 240582,
+          "precision": 0.9999772287373335,
+          "recall": 0.9846188340807175,
+          "tn": 195981,
+          "tp": 43914
+        },
+        "before": {
+          "accuracy": 0.9971444247699329,
+          "f1": 0.992238603626504,
+          "false_positive_rate": 5.102509414129869e-06,
+          "fn": 686,
+          "fp": 1,
+          "inference_errors": 0,
+          "population": 240582,
+          "precision": 0.9999772287373335,
+          "recall": 0.9846188340807175,
+          "tn": 195981,
+          "tp": 43914
+        },
+        "changes": {
+          "introduced_fp": 0,
+          "lost_tp": 0,
+          "new_tp": 0,
+          "removed_fp": 0
+        },
+        "witnesses": []
+      },
+      "russellmitchell": {
+        "after": {
+          "accuracy": 0.9963972453787604,
+          "f1": 0.9907177408811609,
+          "false_positive_rate": 2.2536226984878192e-05,
+          "fn": 989,
+          "fp": 5,
+          "inference_errors": 0,
+          "population": 275900,
+          "precision": 0.9999057510697253,
+          "recall": 0.9816970482094939,
+          "tn": 221860,
+          "tp": 53046
+        },
+        "before": {
+          "accuracy": 0.9963972453787604,
+          "f1": 0.9907177408811609,
+          "false_positive_rate": 2.2536226984878192e-05,
+          "fn": 989,
+          "fp": 5,
+          "inference_errors": 0,
+          "population": 275900,
+          "precision": 0.9999057510697253,
+          "recall": 0.9816970482094939,
+          "tn": 221860,
+          "tp": 53046
+        },
+        "changes": {
+          "introduced_fp": 0,
+          "lost_tp": 0,
+          "new_tp": 0,
+          "removed_fp": 0
+        },
+        "witnesses": []
+      },
+      "santos": {
+        "after": {
+          "accuracy": 0.9966517573739331,
+          "f1": 0.9881567973311093,
+          "false_positive_rate": 1.2698896465897114e-05,
+          "fn": 920,
+          "fp": 3,
+          "inference_errors": 0,
+          "population": 275667,
+          "precision": 0.9999220961333715,
+          "recall": 0.9766651448282859,
+          "tn": 236238,
+          "tp": 38506
+        },
+        "before": {
+          "accuracy": 0.9966517573739331,
+          "f1": 0.9881567973311093,
+          "false_positive_rate": 1.2698896465897114e-05,
+          "fn": 920,
+          "fp": 3,
+          "inference_errors": 0,
+          "population": 275667,
+          "precision": 0.9999220961333715,
+          "recall": 0.9766651448282859,
+          "tn": 236238,
+          "tp": 38506
+        },
+        "changes": {
+          "introduced_fp": 0,
+          "lost_tp": 0,
+          "new_tp": 0,
+          "removed_fp": 0
+        },
+        "witnesses": []
+      }
+    },
+    "scope": "Observed development counterfactual only; not adopted",
+    "scope_key": "physical source, resolver process, explicit client, exact all-but-first-label suffix, query type",
+    "seed": "original alert AND existing DNS shape reference: name bucket>=3 (96 chars), entropy bucket>=4 (4 bits)"
+  },
+  "vpn_prior_web_link_support": {
+    "aws_calls": 0,
+    "completed": true,
+    "decision_changes": 0,
+    "diagnostic_script_sha256": "a674589a9665e36bd10b8c79a24997385cc4d6868f2c6822a688a1023a034150",
+    "goal_qualified": false,
+    "labels_used_to_choose_seed": false,
+    "link": "same scenario, equal normalized logged network address, strictly earlier time; not a verified identity",
+    "paid_api_calls": 0,
+    "protocol_sha256": "f7fd853011b6eb6d3fa07d95146e6c8e774bf13395fb027c16961eb6813ce629",
+    "scenarios": {
+      "fox": {
+        "counts": {
+          "error": {
+            "linked": 0,
+            "unlinked": 0
+          },
+          "fn": {
+            "linked": 0,
+            "unlinked": 0
+          },
+          "fp": {
+            "linked": 0,
+            "unlinked": 88
+          },
+          "tn": {
+            "linked": 0,
+            "unlinked": 7183
+          },
+          "tp": {
+            "linked": 0,
+            "unlinked": 28
+          }
+        },
+        "inputs": {
+          "prediction_sha256": "696ac26e32865735f8d6f17691b50718e7395cf48f644bfcc9110d69a543b455",
+          "raw_correlation_sha256": "f4d3542ee68f62fbc55396e600e6a89188ba86bfa9da86b7cf9587289eb41fc5",
+          "raw_hashes": {
+            "4": "ccdf27896c74e9e435fce0e4abbacae47511634e4ee195e07599f70687d009de",
+            "6": "dc8357ad1a2a4ce9e8963f1eb5eaccdfc106d32de5ae720d052956cedc618722"
+          },
+          "truth_sha256": "3a4a132a3172a2ed8901bb47a7f5abd1658a3815c0145c6e896d2e207a8af00d"
+        },
+        "raw_seed_rows": 1,
+        "vpn_rows": 7299
+      },
+      "russellmitchell": {
+        "counts": {
+          "error": {
+            "linked": 0,
+            "unlinked": 0
+          },
+          "fn": {
+            "linked": 0,
+            "unlinked": 0
+          },
+          "fp": {
+            "linked": 0,
+            "unlinked": 60
+          },
+          "tn": {
+            "linked": 0,
+            "unlinked": 5449
+          },
+          "tp": {
+            "linked": 0,
+            "unlinked": 28
+          }
+        },
+        "inputs": {
+          "prediction_sha256": "d374df5063de4c5ad636369f180a4f32202454b1f309ab57a0f360604c5a10c2",
+          "raw_correlation_sha256": "e0d8b204dacd91e3fc1ae8d4416499dfa488ce8e5a6bf9a3987e59fdce50bf32",
+          "raw_hashes": {
+            "4": "4d3d700f50c6dde5295ebc57a00701b7c3049812c6f6709b3f809e36be362153",
+            "6": "08042e1ad03874326960ef3eef91a50305009cb2e7afe88827750dd839701bb1"
+          },
+          "truth_sha256": "2e569fc8a2678d06ac62fec7152bf070969e4db9fe123da5301cafd617cd5a43"
+        },
+        "raw_seed_rows": 1,
+        "vpn_rows": 5537
+      },
+      "santos": {
+        "counts": {
+          "error": {
+            "linked": 0,
+            "unlinked": 0
+          },
+          "fn": {
+            "linked": 0,
+            "unlinked": 0
+          },
+          "fp": {
+            "linked": 0,
+            "unlinked": 60
+          },
+          "tn": {
+            "linked": 0,
+            "unlinked": 5534
+          },
+          "tp": {
+            "linked": 0,
+            "unlinked": 28
+          }
+        },
+        "inputs": {
+          "prediction_sha256": "8f6c2f4473dfc74ea1c2d08afa450f10a4a1e0e2a6c9825f4ad327e5cac0d906",
+          "raw_correlation_sha256": "fae54fc96a42e038190b6765352bbbbc29aa8002a65488eab1320d01b636662a",
+          "raw_hashes": {
+            "3": "92d8fae4669a1fc10fbb23832c18b1429e894d9033f135c7e77fc4d0d90287ba",
+            "6": "f39a169c2ab4165b9848635c6e729a004bddb315f1f2f277f0341baf662e9ba7"
+          },
+          "truth_sha256": "21f65f66a93489950507764cfae096752120d376d57d49e8c8b2d7e885b7c989"
+        },
+        "raw_seed_rows": 1,
+        "vpn_rows": 5622
+      }
+    },
+    "scope": "R/S/F observed development support diagnostic; not a classifier or authorization",
+    "seed": "exact bounded encoded credential-file-read intent in Apache access",
+    "window_seconds": 3600
+  },
+  "full_linux_validation": {
+    "schema": "extra-aitest-integration-local-tests-1",
+    "started_at": "2026-11-13T18:33:21.179190+00:00",
+    "paid_api_calls": 0,
+    "aws_sdk_calls": 0,
+    "phase": "pre-push",
+    "windows": {},
+    "linux": {
+      "exit_code": 0,
+      "seconds": 1066.961,
+      "counts": {
+        "passed": 4957
+      },
+      "log": "runtime/f1/development-full-tests-v56-20261114/linux.log",
+      "executed": true,
+      "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+      "source_files": 935,
+      "source_archive_sha256": "32d39c9271f2d356e166ee5f88a964bd65dae597ab478b6632ce8b9da770c614",
+      "container_exit": 0,
+      "oom_killed": false,
+      "network_mode": "none",
+      "owned_container": "786b17ec22e462b0207a2a06c15516712506a5051ff56c356e53edec56d65473",
+      "snapshot_sources_unchanged_after": true,
+      "owned_container_removed": true
+    },
+    "ended_at": "2026-11-13T18:51:20.881606+00:00"
+  },
+  "full_linux_candidate_commit": "736e4cb",
+  "scope": "observed development diagnostics and code verification; no independent goal certification",
+  "interpretation": "Zero new DNS detections and zero eligible VPN links. Neither hypothesis was adopted."
+}

@@ -273,6 +273,44 @@ print(json.dumps({'consumed':found}))
         self.require(result["body"]["session"]["status"] == "ACTIVE", "mint_not_active")
         return label, result["body"]["grant_token"]
 
+    def outage_history(self, history, event_id):
+        """One adverse transition, with an optional earlier expiry-only HOLD."""
+        self.require(isinstance(history, list) and len(history) in {2, 3}, "outage_policy_history_count")
+        initial = history[0]
+        self.require(initial.get("version") == 1 and initial.get("status") == "ACTIVE"
+                     and initial.get("decision") == "ALLOW", "outage_policy_initial_state")
+        scope = ("tenant_id", "session_id", "user_id", "device_id", "resource_id", "action")
+        self.require(all(isinstance(initial.get(key), str) and initial[key] for key in scope),
+                     "outage_policy_initial_scope")
+        for index, row in enumerate(history):
+            self.require(type(row.get("version")) is int and row["version"] == index+1
+                         and all(row.get(key) == initial[key] for key in scope)
+                         and isinstance(row.get("reason_codes"), list)
+                         and isinstance(row.get("evidence"), list), "outage_policy_history_binding")
+        expiry = len(history) == 3
+        if expiry:
+            held = history[1]
+            self.require(held["status"] == "HELD" and held["decision"] == "HOLD"
+                         and held["reason_codes"] == [*initial["reason_codes"], "SIGNAL_PROOF_EXPIRED"]
+                         and held["evidence"] == initial["evidence"], "outage_policy_unexpected_intermediate")
+            expiration = datetime.fromisoformat(initial["signal_expires_at"])
+            evaluated = datetime.fromisoformat(held["evaluated_at"])
+            self.require(expiration.utcoffset() is not None and evaluated.utcoffset() is not None
+                         and evaluated >= expiration, "outage_policy_premature_expiry")
+        previous, final = history[-2:]
+        expected_event = "obs-" + hashlib.sha256(
+            (initial["tenant_id"] + "." + event_id + "." + initial["session_id"]).encode()).hexdigest()
+        expected_evidence = f"identity:{initial['user_id']}:{event_id}"
+        self.require(final["status"] == "REVOKED" and final["decision"] == "DENY"
+                     and final["reason_codes"] == [*previous["reason_codes"], "CONTINUOUS_IDENTITY_DENY"]
+                     and final.get("event_id") == expected_event
+                     and final["evidence"] == [*previous["evidence"], expected_evidence],
+                     "outage_policy_adverse_transition")
+        self.require(all(row.get(key) is None for row in history[1:]
+                         for key in ("grant_expires_at", "challenge_id", "challenge_expires_at")),
+                     "outage_policy_restriction_reissued_grant")
+        return {"history_versions": len(history), "expiry_transitions": int(expiry), "adverse_transitions": 1}
+
     def security_checkpoint(self, session_id):
         # Explicit synthetic legacy boundary, not 200 live evaluations. Keep the
         # original decision and append a synthetic non-granting v200 checkpoint.
@@ -423,6 +461,8 @@ print(json.dumps({'storage':s.storage_status(),'live_sha256':hashlib.sha256(json
         return json.loads(self.runtime.execute("app", ["python", "-c", program]))
 
     def inbox_security(self, affected):
+        affected_history = self.history(affected[0])
+        self.outage_history(affected_history, "runtime-outage-observation")
         # Keep a live lease and a pending delivery while archiving a real receipt.
         # Direct mTLS submissions here do not alter the collector's feed counters.
         event_id = "runtime-outage-observation"
@@ -506,7 +546,7 @@ print(json.dumps({'event_id':r['event_id'],'state':r['state']}))
         command(["docker", "start", worker_id])
         self.wait(lambda: self.completed("runtime-inbox-processing") and self.completed("runtime-inbox-pending"),
                   "inbox_live_deliveries_not_recovered")
-        self.require(len(self.history(affected[0])) == 2 and self.receipt(event_id)["body"] == original_receipt,
+        self.require(self.history(affected[0]) == affected_history and self.receipt(event_id)["body"] == original_receipt,
                      "inbox_restart_reapplied_archived_effect")
         self.add("inbox_restart_recovers_pending_and_expired_lease_without_reapplying_archive", recovered=2)
         self.access(affected, False, "server_inbox_maintenance_restart_preserves_revoked_access_denial")
@@ -598,7 +638,8 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
         except RuntimeFailure:
             pass  # The exec can be torn down with the dying container namespace.
         self.wait(lambda: (after := self.inspect(service))["Id"] == before["Id"]
-                  and after["State"]["Running"] and after["RestartCount"] > before["RestartCount"],
+                  and after["State"]["Running"] and after["RestartCount"] > before["RestartCount"]
+                  and after["State"]["StartedAt"] != before["State"]["StartedAt"],
                   "automatic_restart_" + service)
         after = self.inspect(service)
         self.require(after["State"]["StartedAt"] != before["State"]["StartedAt"], "restart_time_unchanged")
@@ -660,11 +701,16 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
         command(["docker", "start", app_id])
         self.wait(lambda: self.completed("runtime-outage-observation") and self.collector()["acknowledged"] == 1,
                   "outage_recovered")
-        self.require(len(self.history(affected[0])) == 2 and self.history(affected[0])[-1]["status"] == "REVOKED",
-                     "outage_policy_effect_count")
+        recovered_history = self.history(affected[0])
+        self.report["outage_recovery_history"] = [
+            {key: row.get(key) for key in ("version", "status", "decision", "reason_codes", "evaluated_at", "grant_expires_at")}
+            for row in recovered_history[:4]]
+        self.save()  # Preserve the bounded public history even if validation fails.
+        outage_effect = self.outage_history(recovered_history, "runtime-outage-observation")
+        self.report["outage_recovery_validation"] = outage_effect
         self.require(self.spool()["envelopes"][0][0] == original, "outage_envelope_lost")
         self.add("outage_restart_recovers_persisted_envelope_once", original_envelope_sha256=original,
-                 captured=1, acknowledged=1, policy_transitions=1)
+                  captured=1, acknowledged=1, policy_transitions=1, **outage_effect)
         self.access(affected, False, "recovered_observation_denies_unconsumed_grant")
         self.unrelated_after_outage(unrelated)
 
@@ -673,7 +719,8 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
             "from pathlib import Path;print(Path('/collector/producer/input.jsonl').read_text().splitlines()[0])"])
         self.append_record(json.loads(first_event))
         self.wait(lambda: self.collector()["offset"] == 2 * first["offset"], "duplicate_input_captured")
-        self.require(self.collector()["captured"] == 1 and len(self.history(affected[0])) == 2, "duplicate_policy_effect")
+        self.require(self.collector()["captured"] == 1 and self.history(affected[0]) == recovered_history,
+                     "duplicate_policy_effect")
         self.add("duplicate_feed_preserves_one_receipt_and_policy_effect")
         self.inbox_security(affected)
 
@@ -706,7 +753,7 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
         self.append_record(json.loads(first_event))
         self.wait(lambda: self.collector()["offset"] > 0, "compacted_duplicate_not_read")
         self.require(self.collector()["captured"] == 2 and self.collector()["acknowledged"] == 2
-                     and len(self.history(affected[0])) == 2, "compacted_duplicate_reapplied")
+                     and self.history(affected[0]) == recovered_history, "compacted_duplicate_reapplied")
         self.add("compacted_duplicate_skipped_across_input_generation")
         self.access(affected, False, "maintenance_restart_preserves_revoked_access_denial")
 

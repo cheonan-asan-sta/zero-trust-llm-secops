@@ -1,0 +1,95 @@
+{
+  "completed": true,
+  "scope": "already observed R/S/F development diagnostic",
+  "goal_qualified": false,
+  "classifier_changed": false,
+  "source_audit_sha256": "780f03cfd32531ab3a1b205d0f2c7e4ff0e807ecfde64d1dd177184988d2b888",
+  "diagnostic_code_sha256": "ab82005906458ff5ba17c675bea64ca291433b1b170c0e05d3547043d7bf264e",
+  "scenarios": {
+    "russellmitchell": [
+      {
+        "source_index": 0,
+        "kind": "audit",
+        "raw_sha256": "3b91178b6874141755e8461779aa9fa3f079de85867855e47a75e1fbde7bb940",
+        "rows": 732,
+        "malicious_rows": 2,
+        "malicious_rows_sharing_generic_features_with_normal": 2
+      },
+      {
+        "source_index": 2,
+        "kind": "auth",
+        "raw_sha256": "091920347866802f42b869575c9b1139fa4fa783b83630a9ca1e0ce68a184e39",
+        "rows": 272,
+        "malicious_rows": 8,
+        "malicious_rows_sharing_generic_features_with_normal": 4
+      },
+      {
+        "source_index": 5,
+        "kind": "audit",
+        "raw_sha256": "8dbee7a1f2d998c4bee99748b3be2cc16479f1e81fe30a71b1f9197f53f2601c",
+        "rows": 2316,
+        "malicious_rows": 9,
+        "malicious_rows_sharing_generic_features_with_normal": 0
+      }
+    ],
+    "santos": [
+      {
+        "source_index": 0,
+        "kind": "audit",
+        "raw_sha256": "33b535b96f81473c60c6df10d9f2ac3753c9b2bfe3b9d749a3af5f9d89c1f3bd",
+        "rows": 728,
+        "malicious_rows": 2,
+        "malicious_rows_sharing_generic_features_with_normal": 2
+      },
+      {
+        "source_index": 2,
+        "kind": "auth",
+        "raw_sha256": "e58e17ce592a3cbddf0a2280276642ffd19802b3e8265ff3d3fed961aebf52c7",
+        "rows": 270,
+        "malicious_rows": 12,
+        "malicious_rows_sharing_generic_features_with_normal": 2
+      },
+      {
+        "source_index": 5,
+        "kind": "audit",
+        "raw_sha256": "c0b288f21fe2d39e888f124b77a1162aafcc7329ba18f3e47c25398d8a15f54e",
+        "rows": 2263,
+        "malicious_rows": 19,
+        "malicious_rows_sharing_generic_features_with_normal": 2
+      }
+    ],
+    "fox": [
+      {
+        "source_index": 0,
+        "kind": "audit",
+        "raw_sha256": "2f3cb0dd94d0a24dc4db5bf750d1cf78fddeac051235bcd2f8be9697173f28c2",
+        "rows": 898,
+        "malicious_rows": 2,
+        "malicious_rows_sharing_generic_features_with_normal": 2
+      },
+      {
+        "source_index": 2,
+        "kind": "auth",
+        "raw_sha256": "ded3e39860960ed9dd3be998fcf634976eb49dea3d10ac627f2bf22320d100f7",
+        "rows": 572,
+        "malicious_rows": 12,
+        "malicious_rows_sharing_generic_features_with_normal": 5
+      },
+      {
+        "source_index": 5,
+        "kind": "audit",
+        "raw_sha256": "a78734b020a9fa7566bdcb2921f9ec8dfc3627f3cb19b72abfef07e3dbccfb13",
+        "rows": 2887,
+        "malicious_rows": 19,
+        "malicious_rows_sharing_generic_features_with_normal": 16
+      }
+    ]
+  },
+  "feature_scope": "raw_features only, not full chronological context or all possible observations",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "share_positive_event_types": {
+    "SERVICE_START": 3,
+    "SERVICE_STOP": 3
+  }
+}
