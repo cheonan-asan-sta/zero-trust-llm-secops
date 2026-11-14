@@ -12,6 +12,7 @@ from pathlib import Path
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 
+from scripts.f1_lab.collector_security import current_security_status
 from scripts.f1_lab.native_jsonl import require
 from scripts.f1_lab.operation_context import canonical
 from scripts.f1_lab.shared_execution_collector import (
@@ -19,6 +20,7 @@ from scripts.f1_lab.shared_execution_collector import (
     collect_latest_systemd,
 )
 from scripts.f1_lab.shared_execution_evidence import PinnedServiceRegistry
+from scripts.f1_lab.systemd_credential_reader import read_systemd_key
 from scripts.f1_lab.web_verified_context import public_bytes
 
 
@@ -40,15 +42,24 @@ def main():
         choices=["manager_snapshot", "native_journal"],
         default="manager_snapshot",
     )
+    parser.add_argument(
+        "--systemd-credential",
+        action="store_true",
+        help="Read the system manager's runtime-key credential; no stdin fallback",
+    )
     args = parser.parse_args()
+    stage = "key_input"
+    security = None
     try:
-        secret = sys.stdin.buffer.read(33)
+        secret = read_systemd_key() if args.systemd_credential else sys.stdin.buffer.read(33)
         require(len(secret) == 32, "service_collector_key_input")
         key = Ed25519PrivateKey.from_private_bytes(secret)
         public = key.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw)
+        stage = "registry"
         registry = PinnedServiceRegistry(args.registry, args.registry_sha256).current(
             datetime.now(UTC)
         )
+        stage = "signing_scope"
         authorities = [
             a
             for a in registry.authorities
@@ -62,6 +73,9 @@ def main():
             and public_bytes(authorities[0].public_key) == public,
             "service_collector_signing_scope",
         )
+        stage = "collector_security"
+        security = current_security_status()
+        stage = "native_collection"
         collect = (
             collect_current_systemd
             if args.collection_basis == "manager_snapshot"
@@ -75,6 +89,7 @@ def main():
             source_id=args.source,
             key_id=args.key_id,
         )
+        stage = "output"
         output = Path(args.output)
         output.mkdir(mode=0o700, parents=True, exist_ok=False)
         body = (
@@ -98,15 +113,28 @@ def main():
                     "capture_sha256": hashlib.sha256(body).hexdigest(),
                     "command_plaintext_persisted": False,
                     "private_key_persisted": False,
+                    "collector_security": security,
                 }
             )
         )
     except (ValueError, TypeError, OSError, OverflowError, subprocess.SubprocessError) as error:
+        public_codes = {
+            "native_source_service_manager_unavailable", "native_source_service_manager_fields",
+            "native_source_service_manager_binding", "native_source_service_manager_event_mismatch",
+            "native_source_service_manager_changed", "native_source_service_process_changed_during_collection",
+            "native_source_service_boot_id", "native_source_service_collection_bound",
+            "native_source_service_proc_state", "native_source_service_proc_identity",
+            "native_source_service_capture_window",
+        }
+        code = str(error) if type(error) is ValueError and str(error) in public_codes else None
         print(
             json.dumps(
                 {
                     "completed": False,
                     "failure_type": type(error).__name__,
+                    "failure_stage": stage,
+                    "failure_code": code,
+                    "collector_security": security,
                     "execution_evidence_available": False,
                 }
             )
