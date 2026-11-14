@@ -7,6 +7,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 from scripts.f1_lab.collector_freshness import CollectorMonitor, CollectorScope
+from scripts.f1_lab.collector_security import current_security_status
 from scripts.f1_lab.shared_execution_evidence import PinnedServiceRegistry
 
 
@@ -24,6 +25,7 @@ def main():
         "ledger",
     ):
         parser.add_argument("--" + name, required=True)
+    parser.add_argument("--observe-worker-security", action="store_true")
     args = parser.parse_args()
     try:
         scope = CollectorScope(
@@ -45,6 +47,8 @@ def main():
             authorization_checked=False,
             automatic_enforcement_allowed=False,
         )
+        if args.observe_worker_security:
+            body["worker_security"] = current_security_status()
     except (ValueError, OSError, sqlite3.Error):
         body = {
             "state": "unavailable",

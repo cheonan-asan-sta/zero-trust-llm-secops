@@ -53,8 +53,9 @@ def command(*arguments, check=True):
     )
 
 
-def run(directory, *, freshness=False, archival=False):
+def run(directory, *, freshness=False, archival=False, scheduling=False):
     require(not archival or freshness, "archive_fixture_requires_freshness")
+    require(not scheduling or archival, "schedule_fixture_requires_archive")
     require(os.name == "posix" and os.geteuid() == 0, "collector_runtime_root_required")
     require(Path("/proc/1/comm").read_text().strip() == "systemd", "collector_runtime_systemd")
     source = Path(__file__).resolve().parents[1]
@@ -84,7 +85,9 @@ def run(directory, *, freshness=False, archival=False):
     active_key = [keys["runtime"]]
     captures = []
     report = {
-        "schema": "extra-capture-archive-runtime-1"
+        "schema": "extra-collector-schedule-runtime-1"
+        if scheduling
+        else "extra-capture-archive-runtime-1"
         if archival
         else "extra-collector-freshness-runtime-1"
         if freshness
@@ -102,7 +105,8 @@ def run(directory, *, freshness=False, archival=False):
     previous = OperationDecision(0.1, 0.1, False, False, "baseline")
     expected_caps = (1 << 19) | (1 << 2)  # SYS_PTRACE, DAC_READ_SEARCH
     executable = executable_hash(Path("/usr/bin/python3"))
-    argv = ["/usr/bin/python3", "-u", "-c", FIXTURE]
+    fixture_script = FIXTURE.replace("time.sleep(90)", "time.sleep(180)") if scheduling else FIXTURE
+    argv = ["/usr/bin/python3", "-u", "-c", fixture_script]
     command_hash = hashlib.sha256(b"".join(v.encode() + b"\0" for v in argv)).hexdigest()
     versions = [0]
     latest_path = state_dir / fixture_name / "latest.json"
@@ -246,8 +250,9 @@ def run(directory, *, freshness=False, archival=False):
             stream.write(
                 "[Service]\nType=exec\nUser=nobody\nPrivateNetwork=yes\nNoNewPrivileges=yes\n"
                 "ProtectSystem=strict\nProtectHome=yes\nMemoryMax=64M\nTasksMax=8\n"
-                'RuntimeMaxSec=120\nRestart=no\nExecStart=/usr/bin/python3 -u -c "'
-                + FIXTURE
+                + ("RuntimeMaxSec=240\n" if scheduling else "RuntimeMaxSec=120\n")
+                + 'Restart=no\nExecStart=/usr/bin/python3 -u -c "'
+                + fixture_script
                 + '"\n'
             )
         template = (source / "infra/systemd/secops-execution-collector@.service").read_text()
@@ -296,6 +301,8 @@ def run(directory, *, freshness=False, archival=False):
             ExitStack() as replacements,
         ):
             active_provider = provider
+            credential_providers = [provider]
+            scheduled_deliveries = 0
             observed = datetime.now(UTC)
             summary, first_event, first_proof = capture(True)
             security = summary["collector_security"]
@@ -437,6 +444,7 @@ def run(directory, *, freshness=False, archival=False):
                         ),
                     )
                 )
+                credential_providers.append(active_provider)
                 observed = datetime.now(UTC)
                 _, recovered_event, recovered_proof = capture(True)
                 authorized(recovered_event, recovered_proof, pin, observed)
@@ -465,6 +473,35 @@ def run(directory, *, freshness=False, archival=False):
                         output,
                         check,
                     )
+                if scheduling:
+                    from scripts.f1_lab.collector_schedule_runtime import run_schedule_controls
+
+                    def restore_provider():
+                        replacement = replacements.enter_context(
+                            CredentialSocket(
+                                credential_path,
+                                lambda: active_key[0].private_bytes(
+                                    Encoding.Raw, PrivateFormat.Raw, NoEncryption()
+                                ),
+                            )
+                        )
+                        credential_providers.append(replacement)
+                        return replacement
+
+                    schedule_report, active_provider = run_schedule_controls(
+                        source,
+                        state_dir / fixture_name,
+                        scope,
+                        monitor,
+                        active_provider,
+                        restore_provider,
+                        lambda event, proof: authorized(event, proof, pin, event.observed_at),
+                        output,
+                        check,
+                        collector_unit,
+                    )
+                    report["schedule_controls"] = schedule_report
+                    scheduled_deliveries = schedule_report["credential_deliveries"]
             disabled = rotated.model_copy(
                 update={
                     "version": 3,
@@ -481,10 +518,9 @@ def run(directory, *, freshness=False, archival=False):
             check("stopped_target_cannot_be_backfilled", capture(False) is None)
             check(
                 "only_root_manager_read_credentials",
-                provider.delivered
-                + (active_provider.delivered if active_provider is not provider else 0)
-                == (9 if freshness else 5)
-                and provider.rejected == active_provider.rejected == 0,
+                sum(item.delivered for item in credential_providers)
+                == (9 if freshness else 5) + scheduled_deliveries
+                and all(item.rejected == 0 for item in credential_providers),
             )
         check(
             "credential_socket_removed_and_provider_stopped",
@@ -505,6 +541,7 @@ def run(directory, *, freshness=False, archival=False):
             existing_static_fixture_account_used=True,
             real_service_account_created=False,
             freshness_controlled_clock_used=freshness,
+            scheduling_real_elapsed_outage_used=scheduling,
             systemd_version=subprocess.check_output(
                 ["/usr/bin/systemctl", "--version"], env=READ_ENV, text=True
             ).splitlines()[0],

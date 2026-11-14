@@ -1,5 +1,7 @@
 # zero-trust-llm-secops
 
+2026-11-14 최신: [수집·보관·신선도 주기 실행 v73](docs/extra-collector-schedule.md) — PR66 CI16개 성공 확인 후 관련388개·실제 systemd43조건 통과. 실제 공백 stale→공급자 복원 후 timer 자동 fresh 회복, 기존1,681,815행 결정 유지. 운영 배포/조직 SSO 인수는 별도다.
+
 2026-11-14 최신: [실행 캡처 무손실 보관·복원 v72](docs/extra-capture-archive.md) — PR65 CI16개 성공 확인 후 관련384개·실제 systemd32조건 통과. 기존1,681,815행 결정 유지. 로컬 보관/복원이며 현재 trust·신선도를 갱신하지 않는다. 작은 시험의 SQLite 오버헤드와 운영 용량 과제도 기록했다.
 
 2026-11-14 최신: [수집키 유효기간·근거 신선도·복구 v71](docs/extra-collector-freshness.md) — PR64 CI16개 성공 후 진행. 관련353개·실제 systemd24조건·기존1,681,815행 결정 유지 검증. 수집 상태를 탐지/인가로 확대하지 않으며 실제 운영/조직 SSO 인수는 남아 있다.
