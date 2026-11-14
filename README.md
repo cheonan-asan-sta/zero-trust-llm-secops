@@ -1,5 +1,7 @@
 # zero-trust-llm-secops
 
+2026-11-15 v79: [실제 systemd 자원 계측·로컬 제한 검증](docs/extra-systemd-resources.md). 작업자별 현재 invocation·혼합 cgroup을 확인하며 장기/운영 인수는 별도다.
+
 2026-11-15 v78: [실행 mTLS 보관 단계별 안전한 진단](docs/extra-execution-maintenance.md). 과거 CI 원인 미확인·자동 재시도0, 정상 인수와 실제 Linux 잠금 경합을 구분한다.
 
 2026-11-14 v77: [선택 부하의 안전한 오류 진단·실제 장애 인수](docs/extra-selection-diagnostics.md). 집중100개·전체 회귀와 실제 정상37/의도적 장애2조건을 구분하며 과거 CI 원인 미확정·장기 시험 미완료를 유지한다.
