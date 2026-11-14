@@ -65,8 +65,13 @@ def test_socket_transfer_is_bounded_private_and_peer_checked(tmp_path, mode):
                 body = client.recv(33)
             assert body == (secret if mode == "valid" else b"")
             provider.thread.join(timeout=3)
+            assert not provider.thread.is_alive()
             assert provider.delivered == (1 if mode == "valid" else 0)
             assert provider.rejected == (0 if mode == "valid" else 1)
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as client:
+                client.settimeout(0.5)
+                with pytest.raises(ConnectionRefusedError):
+                    client.connect(str(path))
         assert not path.exists() and not provider.thread.is_alive()
 
 

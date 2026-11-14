@@ -54,12 +54,24 @@ def command(*arguments, check=True):
 
 
 def run(
-    directory, *, freshness=False, archival=False, scheduling=False, reporting=False, backups=False
+    directory,
+    *,
+    freshness=False,
+    archival=False,
+    scheduling=False,
+    reporting=False,
+    backups=False,
+    load_seconds=0,
 ):
     require(not archival or freshness, "archive_fixture_requires_freshness")
     require(not scheduling or archival, "schedule_fixture_requires_archive")
     require(not reporting or scheduling, "reporting_fixture_requires_schedule")
     require(not backups or reporting, "backup_fixture_requires_reporting")
+    require(
+        type(load_seconds) is int and (load_seconds == 0 or 10 <= load_seconds <= 600),
+        "load_duration",
+    )
+    require(not load_seconds or backups, "load_fixture_requires_backups")
     require(os.name == "posix" and os.geteuid() == 0, "collector_runtime_root_required")
     require(Path("/proc/1/comm").read_text().strip() == "systemd", "collector_runtime_systemd")
     source = Path(__file__).resolve().parents[1]
@@ -89,7 +101,9 @@ def run(
     active_key = [keys["runtime"]]
     captures = []
     report = {
-        "schema": "extra-capture-backup-runtime-1"
+        "schema": "extra-capture-load-runtime-1"
+        if load_seconds
+        else "extra-capture-backup-runtime-1"
         if backups
         else "extra-collector-alert-runtime-1"
         if reporting
@@ -113,7 +127,13 @@ def run(
     previous = OperationDecision(0.1, 0.1, False, False, "baseline")
     expected_caps = (1 << 19) | (1 << 2)  # SYS_PTRACE, DAC_READ_SEARCH
     executable = executable_hash(Path("/usr/bin/python3"))
-    fixture_script = FIXTURE.replace("time.sleep(90)", "time.sleep(180)") if scheduling else FIXTURE
+    fixture_script = (
+        FIXTURE.replace("time.sleep(90)", "time.sleep(" + str(load_seconds + 300) + ")")
+        if load_seconds
+        else FIXTURE.replace("time.sleep(90)", "time.sleep(180)")
+        if scheduling
+        else FIXTURE
+    )
     argv = ["/usr/bin/python3", "-u", "-c", fixture_script]
     command_hash = hashlib.sha256(b"".join(v.encode() + b"\0" for v in argv)).hexdigest()
     versions = [0]
@@ -258,7 +278,13 @@ def run(
             stream.write(
                 "[Service]\nType=exec\nUser=nobody\nPrivateNetwork=yes\nNoNewPrivileges=yes\n"
                 "ProtectSystem=strict\nProtectHome=yes\nMemoryMax=64M\nTasksMax=8\n"
-                + ("RuntimeMaxSec=240\n" if scheduling else "RuntimeMaxSec=120\n")
+                + (
+                    "RuntimeMaxSec=" + str(load_seconds + 360) + "\n"
+                    if load_seconds
+                    else "RuntimeMaxSec=240\n"
+                    if scheduling
+                    else "RuntimeMaxSec=120\n"
+                )
                 + 'Restart=no\nExecStart=/usr/bin/python3 -u -c "'
                 + fixture_script
                 + '"\n'
@@ -312,6 +338,7 @@ def run(
             credential_providers = [provider]
             scheduled_deliveries = 0
             reporting_deliveries = 0
+            load_deliveries = 0
             observed = datetime.now(UTC)
             summary, first_event, first_proof = capture(True)
             security = summary["collector_security"]
@@ -530,6 +557,25 @@ def run(
                     report["backup_controls"] = run_backup_controls(
                         source, state_dir / fixture_name, scope, monitor, output, check
                     )
+                if load_seconds:
+                    from scripts.f1_lab.capture_load_runtime import run_load_controls
+
+                    report["load_controls"], active_provider = run_load_controls(
+                        source,
+                        state_dir / fixture_name,
+                        scope,
+                        monitor,
+                        capture,
+                        lambda event, proof: authorized(event, proof, pin, event.observed_at),
+                        output,
+                        check,
+                        collector_unit,
+                        target_unit,
+                        load_seconds,
+                        active_provider,
+                        restore_provider,
+                    )
+                    load_deliveries = report["load_controls"]["credential_deliveries"]
             disabled = rotated.model_copy(
                 update={
                     "version": 3,
@@ -547,7 +593,10 @@ def run(
             check(
                 "only_root_manager_read_credentials",
                 sum(item.delivered for item in credential_providers)
-                == (9 if freshness else 5) + scheduled_deliveries + reporting_deliveries
+                == (9 if freshness else 5)
+                + scheduled_deliveries
+                + reporting_deliveries
+                + load_deliveries
                 and all(item.rejected == 0 for item in credential_providers),
             )
         check(

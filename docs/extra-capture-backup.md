@@ -126,3 +126,5 @@ WSL systemd는 기존 정적 fixture daemon UID1과 치환 경로를 썼고 실�
 - [공개 결과·소스/판정 지문](infrastructure-results/extra-capture-backup-v75-20261114.json)
 - [백업 구현](../scripts/f1_lab/capture_backup.py), [CLI](../scripts/capture_archive_backup.py), [단위/프로세스 종료 시험](../tests/test_capture_backup.py), [실제 systemd 시험](../scripts/f1_lab/capture_backup_runtime.py)
 - [Python SQLite backup API](https://docs.python.org/3.12/library/sqlite3.html#sqlite3.Connection.backup), [AES-GCM API](https://cryptography.io/en/latest/hazmat/primitives/aead/#cryptography.hazmat.primitives.ciphers.aead.AESGCM): 일관된 DB 복사와 인증 암호화에 사용했다.
+
+후속 부하·용량·장애 시험과 8시간 장기 검증의 미완료 범위는 [v76 결과](extra-capture-load.md)를 따른다.
