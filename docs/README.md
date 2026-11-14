@@ -287,3 +287,5 @@ MVP는 실제 계정 차단, 권한 변경, 세션 격리를 실행하지 않는
 - [캡처 부하·용량·장애 검증 v76](extra-capture-load.md): 전체 pytest/실제 systemd 측정, 8시간 장기 시험 미실행 구분.
 
 - [선택 부하 오류 진단·인수 v77](extra-selection-diagnostics.md): 안전한 단계/부분 응답, 실제 정상37/의도적 장애2조건, 과거 원인 미확정 구분.
+
+- [실행 mTLS 보관 진단 v78](extra-execution-maintenance.md): 안전한 단계/부분 수, 실제 Linux 잠금과 정상 복원 인수.

@@ -82,3 +82,5 @@ python -m pytest tests/test_infra_probe_diagnostics.py tests/test_infra_selectio
 - [Python subprocess](https://docs.python.org/3.12/library/subprocess.html#subprocess.run), [HTTP 예외](https://docs.python.org/3.12/library/http.client.html#http.client.RemoteDisconnected), [Pydantic extra 설정](https://docs.pydantic.dev/latest/api/config/#pydantic.config.ConfigDict.extra): 반환 코드/오류 종류/추가 필드 거부의 선정 근거다.
 
 채희주 요청에 따른 Codex 보조 구현·실행·측정이며 팀원 독립 검토나 운영 승인으로 기록하지 않는다.
+
+실행 mTLS 보관 구간의 후속 단계별 진단은 [v78](extra-execution-maintenance.md)을 따른다. 과거 두 CI 실패의 원인 확정과는 구분한다.
