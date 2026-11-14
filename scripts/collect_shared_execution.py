@@ -6,12 +6,14 @@ import hashlib
 import json
 import subprocess
 import sys
+from contextlib import nullcontext
 from datetime import UTC, datetime
 from pathlib import Path
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 
+from scripts.f1_lab.capture_store import capture_store_lock
 from scripts.f1_lab.collector_freshness import (
     CollectorScope,
     atomic_capture,
@@ -130,9 +132,30 @@ def main():
         output = Path(args.output)
         output.mkdir(mode=0o700, parents=True, exist_ok=False)
         body = canonical(payload) + b"\n"
-        atomic_capture(output / "capture.json", body)
-        if args.latest is not None:
-            atomic_capture(args.latest, body)
+        managed = (
+            args.latest is not None and args.latest.parent.resolve() == output.parent.resolve()
+        )
+        with capture_store_lock(output.parent) if managed else nullcontext():
+            if managed:
+                stage = "publication_trust"
+                scope = CollectorScope(
+                    tenant_id=args.tenant,
+                    server_id=args.server,
+                    unit=args.unit,
+                    source_id=args.source,
+                    key_id=args.key_id,
+                )
+                require(
+                    inspect_capture(
+                        payload, scope, PinnedServiceRegistry(args.registry, args.registry_sha256)
+                    ).state
+                    == "fresh",
+                    "collector_publication_freshness",
+                )
+            stage = "output"
+            atomic_capture(output / "capture.json", body)
+            if args.latest is not None:
+                atomic_capture(args.latest, body)
         print(
             json.dumps(
                 {

@@ -1,5 +1,7 @@
 # 수집키 유효기간·관측 신선도·공급자 복구 — v71
 
+후속 [v72 실행 캡처 무손실 보관·복원](extra-capture-archive.md)에서 보관/관리 hot 한도·중단 후 재개·정확한 복원을 검증했다. 아래353개/24조건과 보관 미구현 설명은 v71 당시 기록이다. 상시 스케줄링/운영 용량 인수는 여전히 남아 있다.
+
 2026-11-14. 인프라 담당 범위에서 [v70 수집기 인수](extra-systemd-collector-runtime.md)를 보강했다.
 시작 전 [PR64 CI](https://github.com/cheonan-asan-sta/zero-trust-llm-secops/pull/64)의 기준 커밋2f35cdb에 대해
 **집계 포함16개 검사 모두 성공**을 확인했다. CI unit은5,288통과·2skip·2warnings였다.
