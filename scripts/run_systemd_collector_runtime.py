@@ -13,7 +13,8 @@ import os
 import shutil
 import subprocess
 import uuid
-from datetime import UTC, datetime
+from contextlib import ExitStack
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -24,6 +25,7 @@ from cryptography.hazmat.primitives.serialization import (
     PublicFormat,
 )
 
+from scripts.f1_lab.collector_freshness import CollectorMonitor, CollectorScope
 from scripts.f1_lab.native_jsonl import decode, require
 from scripts.f1_lab.operation_context import canonical
 from scripts.f1_lab.operation_refinement import OperationDecision
@@ -51,7 +53,7 @@ def command(*arguments, check=True):
     )
 
 
-def run(directory):
+def run(directory, *, freshness=False):
     require(os.name == "posix" and os.geteuid() == 0, "collector_runtime_root_required")
     require(Path("/proc/1/comm").read_text().strip() == "systemd", "collector_runtime_systemd")
     source = Path(__file__).resolve().parents[1]
@@ -81,7 +83,9 @@ def run(directory):
     active_key = [keys["runtime"]]
     captures = []
     report = {
-        "schema": "extra-systemd-collector-runtime-1",
+        "schema": "extra-collector-freshness-runtime-1"
+        if freshness
+        else "extra-systemd-collector-runtime-1",
         "completed": False,
         "paid_api_calls": 0,
         "aws_calls": 0,
@@ -97,12 +101,23 @@ def run(directory):
     executable = executable_hash(Path("/usr/bin/python3"))
     argv = ["/usr/bin/python3", "-u", "-c", FIXTURE]
     command_hash = hashlib.sha256(b"".join(v.encode() + b"\0" for v in argv)).hexdigest()
+    versions = [0]
+    latest_path = state_dir / fixture_name / "latest.json"
+    scope = CollectorScope(
+        tenant_id="local-lab",
+        server_id="shared-lab",
+        unit=target_unit,
+        source_id="local-proc",
+        key_id="proc-1",
+    )
 
     def check(name, condition):
         require(condition, "collector_runtime_control_" + name)
         report["cases"].append({"name": name, "passed": True})
 
     def configure(value):
+        versions[0] += 1
+        value = value.model_copy(update={"version": versions[0]})
         registry_path.write_bytes(canonical(value.model_dump(mode="json")))
         registry_path.chmod(0o644)
         pin = hashlib.sha256(registry_path.read_bytes()).hexdigest()
@@ -118,7 +133,7 @@ def run(directory):
     def all_captures():
         return sorted(state_dir.glob("*/*/capture.json")) if state_dir.exists() else []
 
-    def capture(expected_success):
+    def capture(expected_success, *, credential_failure=False):
         before = set(all_captures())
         result = command("start", "--", collector_unit, check=False)
         messages = subprocess.run(
@@ -146,6 +161,24 @@ def run(directory):
             message = row.get("MESSAGE")
             if isinstance(message, str) and message.startswith('{"completed":'):
                 summaries.append(decode(message.encode()))
+        added = set(all_captures()) - before
+        if credential_failure:
+            state = command(
+                "show", "--no-pager", "--property=Result,ExecMainStatus", "--", collector_unit
+            ).stdout
+            require(
+                result.returncode != 0 and not added and b"ExecMainStatus=243" in state,
+                "collector_credential_start_failure",
+            )
+            report["collector_runs"].append(
+                {
+                    "succeeded": False,
+                    "new_captures": 0,
+                    "summary": {"failure_stage": "systemd_credentials"},
+                }
+            )
+            command("reset-failed", "--", collector_unit, check=False)
+            return None
         if not summaries:
             report["collector_start_failure"] = (
                 command(
@@ -156,7 +189,6 @@ def run(directory):
             )
         require(bool(summaries), "collector_summary_missing")
         latest = summaries[-1]
-        added = set(all_captures()) - before
         require(
             (result.returncode == 0) == expected_success
             and latest["completed"] == expected_success
@@ -216,6 +248,9 @@ def run(directory):
                 + '"\n'
             )
         template = (source / "infra/systemd/secops-execution-collector@.service").read_text()
+        if freshness:
+            # Exercise bounded fault cases quickly on this owned fixture only.
+            template = template.replace("[Unit]", "[Unit]\nStartLimitBurst=30")
         # Use an existing static nonroot fixture account; never create/change
         # real host accounts in this acceptance harness.
         template = template.replace("User=secops-collector", "User=daemon")
@@ -236,15 +271,28 @@ def run(directory):
             stream.write(template)
         command("daemon-reload")
         users = subprocess.run(
-            ["/usr/bin/systemd-sysusers", "--dry-run", str(source / "infra/systemd/secops-collector.sysusers")],
-            env=READ_ENV, capture_output=True, timeout=5, check=False,
+            [
+                "/usr/bin/systemd-sysusers",
+                "--dry-run",
+                str(source / "infra/systemd/secops-collector.sysusers"),
+            ],
+            env=READ_ENV,
+            capture_output=True,
+            timeout=5,
+            check=False,
         )
         check("service_account_configuration_dry_run", users.returncode == 0)
         command("start", "--", target_unit)
-        with CredentialSocket(
-            credential_path,
-            lambda: active_key[0].private_bytes(Encoding.Raw, PrivateFormat.Raw, NoEncryption()),
-        ) as provider:
+        with (
+            CredentialSocket(
+                credential_path,
+                lambda: active_key[0].private_bytes(
+                    Encoding.Raw, PrivateFormat.Raw, NoEncryption()
+                ),
+            ) as provider,
+            ExitStack() as replacements,
+        ):
+            active_provider = provider
             observed = datetime.now(UTC)
             summary, first_event, first_proof = capture(True)
             security = summary["collector_security"]
@@ -259,6 +307,25 @@ def run(directory):
             first_permission = authorized(first_event, first_proof, pin, observed)
             check("normal_capture_and_authorization_keep_baseline", first_permission is not None)
             check("credential_was_a_socket_not_key_file", credential_path.is_socket())
+            if freshness:
+                monitor = CollectorMonitor(scope, pin, output / "freshness.sqlite3")
+                check("initial_signed_latest_is_fresh", monitor.check(latest_path).state == "fresh")
+                stale_monitor = CollectorMonitor(scope, pin, output / "controlled-clock.sqlite3")
+                check(
+                    "controlled_31_second_gap_is_stale",
+                    stale_monitor.check(
+                        latest_path, now=first_event.observed_at + timedelta(seconds=31)
+                    ).state
+                    == "stale",
+                )
+                restarted_clock = CollectorMonitor(scope, pin, output / "controlled-clock.sqlite3")
+                check(
+                    "controlled_clock_rollback_after_restart_is_unavailable",
+                    restarted_clock.check(
+                        latest_path, now=first_event.observed_at + timedelta(seconds=30)
+                    ).reason
+                    == "clock_regression",
+                )
             active_key[0] = Ed25519PrivateKey.generate()
             check("rotated_key_without_current_pin_is_rejected", capture(False) is None)
             public = (
@@ -292,6 +359,96 @@ def run(directory):
                 .state
                 == "unavailable",
             )
+            if freshness:
+                last_bytes = latest_path.read_bytes()
+                expired_at = datetime.now(UTC)
+                expired = rotated.model_copy(
+                    update={
+                        "authorities": [
+                            a.model_copy(
+                                update={
+                                    "issued_at": expired_at - timedelta(seconds=60),
+                                    "expires_at": expired_at - timedelta(seconds=1),
+                                }
+                            )
+                            if a.kind == "runtime"
+                            else a
+                            for a in rotated.authorities
+                        ]
+                    }
+                )
+                configure(expired)
+                check("expired_signing_authority_cannot_create_capture", capture(False) is None)
+                check(
+                    "failed_expired_key_keeps_previous_latest",
+                    latest_path.read_bytes() == last_bytes,
+                )
+                future_at = datetime.now(UTC) + timedelta(seconds=60)
+                future = rotated.model_copy(
+                    update={
+                        "authorities": [
+                            a.model_copy(update={"issued_at": future_at})
+                            if a.kind == "runtime"
+                            else a
+                            for a in rotated.authorities
+                        ]
+                    }
+                )
+                configure(future)
+                check("not_yet_valid_signing_authority_is_rejected", capture(False) is None)
+                short_expiry = datetime.now(UTC) + timedelta(seconds=20)
+                short = rotated.model_copy(
+                    update={
+                        "authorities": [
+                            a.model_copy(update={"expires_at": short_expiry})
+                            if a.kind == "runtime"
+                            else a
+                            for a in rotated.authorities
+                        ]
+                    }
+                )
+                pin = configure(short)
+                observed = datetime.now(UTC)
+                _, short_event, short_proof = capture(True)
+                authorized(short_event, short_proof, pin, observed)
+                check(
+                    "runtime_proof_expiry_is_clipped_to_signer",
+                    short_proof.expires_at == short_expiry,
+                )
+                pin = configure(rotated)
+                before_outage = latest_path.read_bytes()
+                provider.close()
+                check(
+                    "missing_key_provider_fails_at_systemd_credentials",
+                    capture(False, credential_failure=True) is None,
+                )
+                check(
+                    "provider_outage_cannot_replace_latest",
+                    latest_path.read_bytes() == before_outage,
+                )
+                active_provider = replacements.enter_context(
+                    CredentialSocket(
+                        credential_path,
+                        lambda: active_key[0].private_bytes(
+                            Encoding.Raw, PrivateFormat.Raw, NoEncryption()
+                        ),
+                    )
+                )
+                observed = datetime.now(UTC)
+                _, recovered_event, recovered_proof = capture(True)
+                authorized(recovered_event, recovered_proof, pin, observed)
+                monitor.registry = pin
+                check(
+                    "provider_restart_collects_new_signed_evidence",
+                    recovered_event.sha256 != short_event.sha256
+                    and monitor.check(latest_path).state == "fresh",
+                )
+                old_path = output / "old-latest.json"
+                old_path.write_bytes(before_outage)
+                check(
+                    "restoring_an_older_valid_capture_is_rejected",
+                    monitor.check(old_path).reason == "capture_regression",
+                )
             disabled = rotated.model_copy(
                 update={
                     "version": 3,
@@ -308,7 +465,10 @@ def run(directory):
             check("stopped_target_cannot_be_backfilled", capture(False) is None)
             check(
                 "only_root_manager_read_credentials",
-                provider.delivered == 5 and provider.rejected == 0,
+                provider.delivered
+                + (active_provider.delivered if active_provider is not provider else 0)
+                == (9 if freshness else 5)
+                and provider.rejected == active_provider.rejected == 0,
             )
         check(
             "credential_socket_removed_and_provider_stopped",
@@ -316,7 +476,7 @@ def run(directory):
         )
         report.update(
             completed=True,
-            normal_controls=2,
+            normal_controls=len(captures),
             normal_added_alerts=0,
             private_key_disk_files_created=0,
             systemd_memory_credential_copy=True,
@@ -328,14 +488,16 @@ def run(directory):
             collector_security=security,
             existing_static_fixture_account_used=True,
             real_service_account_created=False,
+            freshness_controlled_clock_used=freshness,
             systemd_version=subprocess.check_output(
                 ["/usr/bin/systemctl", "--version"], env=READ_ENV, text=True
             ).splitlines()[0],
         )
     finally:
-        for unit in (collector_unit, target_unit):
-            command("stop", "--", unit, check=False)
-            command("reset-failed", "--", unit, check=False)
+        for unit, owned_path in ((collector_unit, template_path), (target_unit, target_path)):
+            if owned_path in created:
+                command("stop", "--", unit, check=False)
+                command("reset-failed", "--", unit, check=False)
         for path in created:
             path.unlink()
         command("daemon-reload")

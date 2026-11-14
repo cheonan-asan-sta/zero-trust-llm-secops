@@ -14,7 +14,7 @@ EnvironmentFile=/etc/secops/collector.conf
 # Root-owned Unix stream credential provider; private keys need not be files.
 LoadCredential=runtime-key:/run/secops-credentials/runtime-key.sock
 StandardInput=null
-ExecStart=/opt/secops/.venv/bin/python -m scripts.collect_shared_execution --systemd-credential --tenant ${TENANT_ID} --server ${SERVER_ID} --unit %i.service --source ${RUNTIME_SOURCE_ID} --key-id ${RUNTIME_KEY_ID} --registry /etc/secops/service-registry.json --registry-sha256 ${SERVICE_REGISTRY_SHA256} --output /var/lib/secops-evidence/%i/${INVOCATION_ID}
+ExecStart=/opt/secops/.venv/bin/python -m scripts.collect_shared_execution --systemd-credential --tenant ${TENANT_ID} --server ${SERVER_ID} --unit %i.service --source ${RUNTIME_SOURCE_ID} --key-id ${RUNTIME_KEY_ID} --registry /etc/secops/service-registry.json --registry-sha256 ${SERVICE_REGISTRY_SHA256} --output /var/lib/secops-evidence/%i/${INVOCATION_ID} --latest /var/lib/secops-evidence/%i/latest.json
 StateDirectory=secops-evidence
 StateDirectoryMode=0700
 UMask=0077

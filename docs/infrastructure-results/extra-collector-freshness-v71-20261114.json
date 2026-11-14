@@ -1,0 +1,618 @@
+{
+  "schema": "extra-collector-freshness-1",
+  "completed": true,
+  "base_commit": "2f35cdb317052833b4edddeaf400870412acc3bf",
+  "depends_on_PR": 64,
+  "scope": "infrastructure collector authority validity, signed capture freshness and local credential outage recovery",
+  "goal_qualified": false,
+  "production_installation_completed": false,
+  "organizational_SSO_login_tested": false,
+  "automatic_enforcement_allowed": false,
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "PR64_CI_gate": {
+    "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/pull/64",
+    "head": "2f35cdb317052833b4edddeaf400870412acc3bf",
+    "all_16_checks_passed": true,
+    "checks": [
+      {
+        "name": "unit",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43566294884/job/132360774711"
+      },
+      {
+        "name": "docker",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43566294884/job/132360774733"
+      },
+      {
+        "name": "runtime (application)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43566294884/job/132360774796"
+      },
+      {
+        "name": "runtime (application-mtls)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43566294884/job/132360774789"
+      },
+      {
+        "name": "runtime (response-mtls)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43566294884/job/132360774741"
+      },
+      {
+        "name": "runtime (execution-mtls)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43566294884/job/132360774710"
+      },
+      {
+        "name": "runtime (monitored)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43566294884/job/132360774736"
+      },
+      {
+        "name": "runtime (authority)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43566294884/job/132360774866"
+      },
+      {
+        "name": "runtime (rekey)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43566294884/job/132360774769"
+      },
+      {
+        "name": "runtime (authority-ha)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43566294884/job/132360774849"
+      },
+      {
+        "name": "runtime (database-transport)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43566294884/job/132360774819"
+      },
+      {
+        "name": "runtime (database-backup)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43566294884/job/132360774722"
+      },
+      {
+        "name": "runtime (database-recovery)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43566294884/job/132360774799"
+      },
+      {
+        "name": "runtime (selection)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43566294884/job/132360774831"
+      },
+      {
+        "name": "lambda",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43566294884/job/132360774473"
+      },
+      {
+        "name": "test",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43566294884/job/132365220253"
+      }
+    ],
+    "unit_run": {
+      "run": 43566294884,
+      "job": 132360774711,
+      "source_head": "2f35cdb317052833b4edddeaf400870412acc3bf",
+      "unit_summary": [
+        "unit\tRun tests\t2026-11-14T06:33:40.9526897Z 5288 passed, 2 skipped, 2 warnings in 447.97s (0:07:27)"
+      ],
+      "unit_log_sha256": "4c441788ddc14cbc82400dac0b1f2050d379b094e5889680c81966d44ac012af"
+    }
+  },
+  "linux": {
+    "exit_code": 0,
+    "seconds": 305.999,
+    "counts": {
+      "passed": 353
+    },
+    "log": "runtime/f1/collector-freshness-batch-v71-20261114/linux.log",
+    "executed": true,
+    "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "source_files": 1006,
+    "source_archive_sha256": "c4d5f2805a083b2bca16ef3a5edc4fdf05b6bcf7b569b6db7e4d7620bc8a5f7c",
+    "container_exit": 0,
+    "oom_killed": false,
+    "network_mode": "none",
+    "owned_container": "60556858b2431d27eaa53afb4aa2ab0e1e9f4b5c944ccc64ddc98e134c7d4a3c",
+    "snapshot_sources_unchanged_after": true,
+    "owned_container_removed": true
+  },
+  "native": {
+    "source_archive_sha256": "c4d5f2805a083b2bca16ef3a5edc4fdf05b6bcf7b569b6db7e4d7620bc8a5f7c",
+    "aws_calls": 0,
+    "paid_api_calls": 0,
+    "exit_code": 0,
+    "template_sha256": "0b83f3372037ff26cef119b1b5df4951ef7ee5e4cd3c5502c4b173ce5d8f74ab",
+    "template_verify_exit_code": 0,
+    "template_installation_paths_substituted": true,
+    "native_seconds": 16.274,
+    "owned_snapshot_removed": true
+  },
+  "controls": {
+    "schema": "extra-collector-freshness-runtime-1",
+    "completed": true,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "goal_qualified": false,
+    "scope": "real systemd collector sandbox and credential lifecycle, local functional controls",
+    "real_human_login_tested": false,
+    "production_installation_completed": false,
+    "cases": [
+      {
+        "name": "service_account_configuration_dry_run",
+        "passed": true
+      },
+      {
+        "name": "collector_is_static_nonroot_fixture",
+        "passed": true
+      },
+      {
+        "name": "only_required_effective_and_bounding_capabilities",
+        "passed": true
+      },
+      {
+        "name": "no_new_privileges_is_observed",
+        "passed": true
+      },
+      {
+        "name": "normal_capture_and_authorization_keep_baseline",
+        "passed": true
+      },
+      {
+        "name": "credential_was_a_socket_not_key_file",
+        "passed": true
+      },
+      {
+        "name": "initial_signed_latest_is_fresh",
+        "passed": true
+      },
+      {
+        "name": "controlled_31_second_gap_is_stale",
+        "passed": true
+      },
+      {
+        "name": "controlled_clock_rollback_after_restart_is_unavailable",
+        "passed": true
+      },
+      {
+        "name": "rotated_key_without_current_pin_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "rotation_with_new_public_pin_collects_fresh_evidence",
+        "passed": true
+      },
+      {
+        "name": "old_key_proof_is_rejected_by_current_registry",
+        "passed": true
+      },
+      {
+        "name": "expired_signing_authority_cannot_create_capture",
+        "passed": true
+      },
+      {
+        "name": "failed_expired_key_keeps_previous_latest",
+        "passed": true
+      },
+      {
+        "name": "not_yet_valid_signing_authority_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "runtime_proof_expiry_is_clipped_to_signer",
+        "passed": true
+      },
+      {
+        "name": "missing_key_provider_fails_at_systemd_credentials",
+        "passed": true
+      },
+      {
+        "name": "provider_outage_cannot_replace_latest",
+        "passed": true
+      },
+      {
+        "name": "provider_restart_collects_new_signed_evidence",
+        "passed": true
+      },
+      {
+        "name": "restoring_an_older_valid_capture_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "disabled_collector_key_cannot_create_capture",
+        "passed": true
+      },
+      {
+        "name": "stopped_target_cannot_be_backfilled",
+        "passed": true
+      },
+      {
+        "name": "only_root_manager_read_credentials",
+        "passed": true
+      },
+      {
+        "name": "credential_socket_removed_and_provider_stopped",
+        "passed": true
+      }
+    ],
+    "collector_runs": [
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "f0fee21972106673969f1ceca0ee6c311cb07ddf06d51bfe9d14554e7f5b7023",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "6af4a0c8bf14fae5862c8b081be1d5ea79b2179f15aef62f769100761d92b47b",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "e21a80b9a599b2d9dd1cfc1d7bcd97240ec349f85b187c05de6bce2de5da4b0d",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "failure_stage": "systemd_credentials"
+        }
+      },
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "f15f107227cb63c9410eeb073aca81305e9441a03cebf45d8e8472bb6ea9ddc0",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "native_collection",
+          "failure_code": "native_source_service_manager_binding",
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      }
+    ],
+    "normal_controls": 4,
+    "normal_added_alerts": 0,
+    "private_key_disk_files_created": 0,
+    "systemd_memory_credential_copy": true,
+    "private_key_persisted": false,
+    "tokens_persisted": false,
+    "real_systemd_tested": true,
+    "template_security_directives_preserved": true,
+    "template_installation_paths_substituted": true,
+    "collector_security": {
+      "effective_uid": 1,
+      "effective_capabilities": 524292,
+      "bounding_capabilities": 524292,
+      "no_new_privileges": true
+    },
+    "existing_static_fixture_account_used": true,
+    "real_service_account_created": false,
+    "freshness_controlled_clock_used": true,
+    "systemd_version": "systemd 255 (255.4-1ubuntu8.18)",
+    "owned_units_removed": true,
+    "owned_state_removed": true,
+    "owned_config_and_socket_removed": true,
+    "systemd_credentials_removed": true
+  },
+  "legacy_controls": {
+    "schema": "extra-shared-execution-controls-1",
+    "completed": true,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "scope": "real local process observations and controlled policy cases; not independent attack performance",
+    "goal_qualified": false,
+    "production_systemd_integration_tested": false,
+    "cases": [
+      {
+        "name": "actual_allowed_process_does_not_add_alarm",
+        "passed": true
+      },
+      {
+        "name": "actual_process_conflicts_with_prior_denial",
+        "passed": true
+      },
+      {
+        "name": "restart_duplicate_is_bound_and_idempotent",
+        "passed": true
+      },
+      {
+        "name": "missing_native_evidence_keeps_baseline",
+        "passed": true
+      },
+      {
+        "name": "different_invocation_cannot_borrow_proof",
+        "passed": true
+      },
+      {
+        "name": "post_event_policy_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "lab_evidence_cannot_satisfy_systemd_mode",
+        "passed": true
+      }
+    ],
+    "normal_controls": 1,
+    "normal_added_alerts": 0,
+    "adverse_controls": 1,
+    "adverse_detected": 1,
+    "owned_child_processes_stopped": true,
+    "private_keys_persisted": false,
+    "plaintext_commands_persisted": false,
+    "actual_observation_fields": [
+      "argument_count",
+      "audit_session_id",
+      "command_sha256",
+      "effective_uid",
+      "executable_sha256",
+      "kind",
+      "login_uid",
+      "parent_pid",
+      "parent_ref_sha256",
+      "pid",
+      "real_uid",
+      "start_ticks"
+    ],
+    "actor_collection": {
+      "uid_read_from_proc": true,
+      "login_uid_present": false,
+      "audit_session_present": false,
+      "parent_reference_present": true,
+      "authenticated_human_identity_proven": false
+    }
+  },
+  "legacy_regression": {
+    "aws_calls": 0,
+    "completed": true,
+    "goal_qualified": false,
+    "native_actor_command_evidence_added_to_legacy": 0,
+    "paid_api_calls": 0,
+    "population": 1681815,
+    "scenarios": {
+      "fox": {
+        "after_decision_sha256": "29e3e42b17e13d9f4ce8f785b2c1121ee52aa9a6ebbd323c5328e38644929832",
+        "before_decision_sha256": "29e3e42b17e13d9f4ce8f785b2c1121ee52aa9a6ebbd323c5328e38644929832",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 668418,
+        "predictions_sha256": "3a95e16120e53c888203f0d25d57526b0c614deeaa1e86b43ed98694976702cc",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.998765742394729,
+          "f1": 0.9990965864106885,
+          "false_positive_rate": 0.0006145584161411404,
+          "fn": 695,
+          "fp": 130,
+          "inference_errors": 0,
+          "population": 668418,
+          "precision": 0.9997151115776464,
+          "recall": 0.9984788261352991,
+          "tn": 211404,
+          "tp": 456189
+        }
+      },
+      "harrison_observed": {
+        "after_decision_sha256": "de38509b07982c34ab69e57eb7df9ebb0517674d06cd1329d594c93c503be1c9",
+        "before_decision_sha256": "de38509b07982c34ab69e57eb7df9ebb0517674d06cd1329d594c93c503be1c9",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 422178,
+        "predictions_sha256": "c7e557b7d8e137cedc35649505ad389d06c593fe9f53e09caccf10d28220a9e0",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9993983580385525,
+          "f1": 0.9996953318603709,
+          "false_positive_rate": 0.046012832263978,
+          "fn": 3,
+          "fp": 251,
+          "inference_errors": 0,
+          "population": 422178,
+          "precision": 0.9993980396718237,
+          "recall": 0.9999928009733084,
+          "tn": 5204,
+          "tp": 416720
+        }
+      },
+      "russellmitchell": {
+        "after_decision_sha256": "2c4aecb63800cb85dfc8a6685f03b17d53c2f88e727b47c415eac6c1d2d70276",
+        "before_decision_sha256": "2c4aecb63800cb85dfc8a6685f03b17d53c2f88e727b47c415eac6c1d2d70276",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 295243,
+        "predictions_sha256": "2ee9ee30497a6a4a48c12461e0c6ce76dcdc3392db71f04caf3f7f92383dfaf4",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9963386092134275,
+          "f1": 0.991198000211704,
+          "false_positive_rate": 0.0003642113111178716,
+          "fn": 996,
+          "fp": 85,
+          "inference_errors": 0,
+          "population": 295243,
+          "precision": 0.9986054371544355,
+          "recall": 0.9838996476027286,
+          "tn": 233296,
+          "tp": 60866
+        }
+      },
+      "santos": {
+        "after_decision_sha256": "90fd3e70c751fe8da7fd2fbc26fd70688c07f8989ded90e48af67f7a4662d99a",
+        "before_decision_sha256": "90fd3e70c751fe8da7fd2fbc26fd70688c07f8989ded90e48af67f7a4662d99a",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 295976,
+        "predictions_sha256": "92dc1b9932ffd57562e29454ea81c25f70b071406d6aed89587e5dada6c7a220",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9966010757628997,
+          "f1": 0.9892837359921599,
+          "false_positive_rate": 0.00029765615886794125,
+          "fn": 932,
+          "fp": 74,
+          "inference_errors": 0,
+          "population": 295976,
+          "precision": 0.9984089101034208,
+          "recall": 0.9803238541600693,
+          "tn": 248535,
+          "tp": 46435
+        }
+      }
+    },
+    "schema": "extra-shared-execution-legacy-regression-1",
+    "scope": "prior observed-development decision regression only; no new ground truth",
+    "source_prior_sha256": "35ec2a206d0a3a475d37dfb38b9459044291aee79cfea9adbbcae8da7b428ee4"
+  },
+  "clock_control_qualification": "Signed observations are from real systemd captures. The31-second stale and rollback cases inject the monitor clock in an isolated ledger; no OS clock was changed and no31-second real outage is claimed.",
+  "source_sha256": {
+    "scripts/f1_lab/collector_freshness.py": "37cb10f24f6e8db1277331c299e9a6a85ab2bb25e20bd06f8347f4e4c79ec26a",
+    "scripts/collect_shared_execution.py": "0f2a326f4ca3fb263350a9339fa2839244bdbb6b0dedc1985ff64dac11f787a4",
+    "scripts/service_capture_status.py": "d560c9e19aa26cba98546448c95767719180ee85ca18e4a25ae538a4abe75664",
+    "scripts/run_systemd_collector_runtime.py": "995c945d22664046000ec46d83b3cedf5219c9c5a8edd9f407359f026eb8187a",
+    "scripts/run_collector_freshness.py": "13445b8731d39f8199a002e4b63d0963e75996e56ca464cd6120dd9cca5cf6e6",
+    "tests/test_collector_freshness.py": "d2bcc25d0ce680b7ec787975a045c164c922239e83660cc62b038dd8dc2e9f50",
+    "infra/systemd/secops-execution-collector@.service": "5df65bd4e00559bb2da318e923266e2c2e338490214658ee4344d6d591f7536f"
+  },
+  "artifact_sha256": {
+    "tests.json": "869d6560f0d81896c49d4ce06be9c5a7ce63a0b937dd0daec7cfeffca24fbd30",
+    "linux.xml": "6ba9a8de65dd5adefba97ac9b563ef1efb0ef8f582003fdcc3b62f9cd8e2b970",
+    "source-manifest.json": "c02134fbad1af84a917b1b6567514509e3394aa2c5eb27380164b1cfb898537c",
+    "native-tests.json": "bf00834c1c7cc1d4ab2c1af77bb7c7c4156662833417932c8e9ff129bc211d70",
+    "actual-systemd/run.json": "9477bdb0c67b298db43b979aa31dafb3f3f48cced811f85aafaa6a364cb0ceab",
+    "legacy-regression/run.json": "a2d03c97bbd4bb19b8ba9fe478599953379639e33df4230ee145d3fa27cf1be0",
+    "capture-controls/run.json": "df43e4588a4ecf37180f99e91153f1410553d792b34ba9fba8154ed612155903",
+    "unit-template-verify.log": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  }
+}
