@@ -77,24 +77,30 @@ class CredentialSocket:
 
     def serve(self):
         attempts = 0
-        while not self.stopped.is_set() and attempts < self.maximum:
-            try:
-                connection, _ = self.sock.accept()
-            except TimeoutError:
-                continue
-            except OSError:
-                break
-            attempts += 1
-            with connection:
+        try:
+            while not self.stopped.is_set() and attempts < self.maximum:
                 try:
-                    connection.settimeout(2)
-                    require(peer_uid(connection) == self.allowed_uid, "credential_peer_uid")
-                    key = self.supplier()
-                    require(type(key) is bytes and len(key) == 32, "credential_raw_key_size")
-                    connection.sendall(key)
-                    self.delivered += 1
-                except (OSError, ValueError, TypeError, RuntimeError):
-                    self.rejected += 1
+                    connection, _ = self.sock.accept()
+                except TimeoutError:
+                    continue
+                except OSError:
+                    break
+                attempts += 1
+                with connection:
+                    try:
+                        connection.settimeout(2)
+                        require(peer_uid(connection) == self.allowed_uid, "credential_peer_uid")
+                        key = self.supplier()
+                        require(type(key) is bytes and len(key) == 32, "credential_raw_key_size")
+                        connection.sendall(key)
+                        self.delivered += 1
+                    except (OSError, ValueError, TypeError, RuntimeError):
+                        self.rejected += 1
+        finally:
+            # An exhausted adapter must refuse new connections, not leave a
+            # listening socket with no reader until the consumer times out.
+            # The owner still verifies/removes the pathname in close().
+            self.sock.close()
 
     def close(self):
         self.stopped.set()

@@ -1612,3 +1612,5 @@ docs/weekXX 문서에 맞춰 구분해야 한다.
 5. 작업 대상과 관련된 `docs/weekXX/README.md`와 테스트 파일
 6. [`docs/zero-trust-operations.md`](docs/zero-trust-operations.md): 핵심 운영 경로와 한계
 7. [`docs/mentoring-priority-roadmap.md`](docs/mentoring-priority-roadmap.md): 현재 피드백 우선순위와 비용 경계
+
+2026-11-14 v76: 캡처 부하·공간 부족·잠금·작업자 종료와 실제 systemd 계측은 [명세](docs/extra-capture-load.md)를 따른다. 8~12시간 장기 시험과 운영 SLO는 미완료다.

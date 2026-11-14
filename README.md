@@ -603,3 +603,5 @@ scripts/           대상 계정 검증이 포함된 AWS 배포 스크립트
 - [OCSF 1.9.0 Incident Finding](https://github.com/ocsf/ocsf-schema/blob/v1.9.0/events/findings/incident_finding.json)
 - [Splunk Attack Data](https://github.com/splunk/attack_data)
 - [Microsoft Sentinel Sample Data](https://github.com/Azure/Azure-Sentinel/tree/master/Sample%20Data)
+
+캡처 부하·용량·장애 검증과 실제 측정/장기 시험 경계는 [v76 문서](docs/extra-capture-load.md)를 따른다.
