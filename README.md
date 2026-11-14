@@ -1,5 +1,7 @@
 # zero-trust-llm-secops
 
+2026-11-14 최신: [캡처 보관 DB 암호화 백업·격리 복원 v75](docs/extra-capture-backup.md) — 관련552개·실제 systemd63조건, 원본 DB 부재 복원/캡처6건 바이트 일치·외부 pin 검증. 기존1,681,815행 판정 유지, API/AWS0. 운영 키/백업 저장·일정과 지속 부하는 후속이다.
+
 2026-11-14 최신: [수집 상태·보관 용량 경보 v74](docs/extra-collector-alerts.md) — PR61~67 aitest 병합, 순서 의존 시험은 PR68로 수정. 관련511개·실제 systemd53조건·실제 관측 도구13조건 통과, 기존1,681,815행 판정 유지. 운영 지속 mTLS 마운트/lock 인수는 별도다.
 
 2026-11-14 최신: [수집·보관·신선도 주기 실행 v73](docs/extra-collector-schedule.md) — PR66 CI16개 성공 확인 후 관련388개·실제 systemd43조건 통과. 실제 공백 stale→공급자 복원 후 timer 자동 fresh 회복, 기존1,681,815행 결정 유지. 운영 배포/조직 SSO 인수는 별도다.
