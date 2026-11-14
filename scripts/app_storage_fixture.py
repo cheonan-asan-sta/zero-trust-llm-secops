@@ -2,6 +2,7 @@
 
 import asyncio
 from datetime import UTC, datetime, timedelta
+from unittest.mock import patch
 
 from app.analyzers.rule_based import RuleBasedAnalyzer
 from app.models import (
@@ -58,6 +59,22 @@ def seed_logs(directory):
 
 
 async def _populate(directory):
+    # Recovery fixtures are synthetic history, not a wall-clock monotonicity test.
+    # VM clock corrections must not make the next case version predate creation.
+    from app.services import cases as case_module
+
+    instant = datetime.now(UTC)
+
+    class FixtureClock(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return instant.astimezone(tz) if tz is not None else instant.replace(tzinfo=None)
+
+    with patch.object(case_module, "datetime", FixtureClock):
+        await _populate_at(directory)
+
+
+async def _populate_at(directory):
     audit = AuditStore(directory / FILES["audit"])
     cases = CaseStore(directory / FILES["cases"])
     outbox = IntegrationOutboxService(IntegrationOutboxStore(directory / FILES["outbox"]))

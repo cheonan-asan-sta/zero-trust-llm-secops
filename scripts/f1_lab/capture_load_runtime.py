@@ -3,6 +3,7 @@
 import hashlib
 import json
 import shutil
+import subprocess
 import time
 import uuid
 from pathlib import Path
@@ -11,13 +12,40 @@ from scripts.f1_lab.capture_load import distribution, footprint, inventory, inve
 from scripts.f1_lab.collector_schedule_runtime import command, property_value
 from scripts.f1_lab.native_jsonl import decode, require
 from scripts.f1_lab.shared_execution_collector import READ_ENV
+from scripts.systemd_resources import PREFIX, validate
 
 
-def accounting(unit):
+def accounting(unit, kind):
     result = {}
+    sources = {}
     for name in ("CPUUsageNSec", "MemoryPeak"):
         text = property_value(unit, name)
         result[name] = int(text) if text.isdecimal() and int(text) < 2**63 else None
+        sources[name] = "systemd_property" if result[name] is not None else None
+    invocation = property_value(unit, "InvocationID")
+    metrics = None
+    if len(invocation) == 32 and all(c in "0123456789abcdef" for c in invocation):
+        raw = subprocess.run(
+            ["/usr/bin/journalctl", "--no-pager", "--lines=16", "--output=json",
+             "--output-fields=MESSAGE,_SYSTEMD_INVOCATION_ID", "--unit=" + unit,
+             "_SYSTEMD_INVOCATION_ID=" + invocation],
+            env=READ_ENV, capture_output=True, timeout=5, check=True,
+        ).stdout
+        matches = []
+        for line in raw.splitlines():
+            row = decode(line)
+            message = row.get("MESSAGE")
+            if (row.get("_SYSTEMD_INVOCATION_ID") == invocation and isinstance(message, str)
+                    and message.startswith(PREFIX)):
+                matches.append(validate(decode(message[len(PREFIX):].encode()),
+                                        kind=kind, invocation=invocation))
+        require(len(matches) == 1, "load_resource_receipt_missing_or_duplicate")
+        metrics = matches[0]
+        for name, metric, source in [("CPUUsageNSec", "cpu_usage_nsec", "cpu_source"),
+                                     ("MemoryPeak", "memory_peak_bytes", "memory_source")]:
+            if result[name] is None:
+                result[name], sources[name] = metrics[metric], metrics[source]
+    result.update(sources=sources, invocation_id=invocation, kernel_snapshot=metrics)
     return result
 
 
@@ -101,6 +129,8 @@ def run_load_controls(
             "StateDirectory=secops-capture-health": "StateDirectory=" + health_name,
         }.items():
             body = body.replace(old, new)
+        for module in ("scripts.archive_service_captures", "scripts.service_capture_status"):
+            body = body.replace("-m " + module, "-m scripts.measure_systemd_worker " + module)
         return body.replace(
             "[Service]", "[Service]\nRemainAfterExit=yes\nCPUAccounting=yes\nMemoryAccounting=yes"
         )
@@ -109,7 +139,7 @@ def run_load_controls(
         began = time.monotonic()
         result = command("start", "--", unit, check=False)
         summary = last_summary(unit)
-        usage = accounting(unit)
+        usage = accounting(unit, kind)
         command("stop", "--", unit, check=False)
         if not expect:
             command("reset-failed", "--", unit, check=False)
@@ -118,9 +148,14 @@ def run_load_controls(
 
     try:
         dropin_dir.mkdir(exist_ok=False)
+        original_collector = (Path("/run/systemd/system") / (collector_unit.split("@")[0] + "@.service")).read_text()
+        entry = next(line for line in original_collector.splitlines() if line.startswith("ExecStart="))
+        entry = entry.replace("-m scripts.collect_shared_execution",
+                              "-m scripts.measure_systemd_worker scripts.collect_shared_execution")
         install(
             dropin_dir / "accounting.conf",
-            "[Service]\nRemainAfterExit=yes\nCPUAccounting=yes\nMemoryAccounting=yes\n",
+            "[Service]\nRemainAfterExit=yes\nCPUAccounting=yes\nMemoryAccounting=yes\nExecStart=\n"
+            + entry + "\n",
         )
         for unit, name in (
             (archive_unit, "secops-capture-archive@.service"),
@@ -163,7 +198,7 @@ def run_load_controls(
                 "cycle": cycles + 1,
                 "elapsed_seconds": time.monotonic() - start,
                 "collector_ms": (time.monotonic() - at) * 1000,
-                "collector_accounting": accounting(collector_unit),
+                "collector_accounting": accounting(collector_unit, "collector"),
             }
             command("stop", "--", collector_unit)
             raw = latest.read_bytes()
@@ -192,6 +227,11 @@ def run_load_controls(
         )
         check("native_load_health_never_grants_or_enforces", True)
         check("native_load_capture_remains_fresh", monitor.check(latest).state == "fresh")
+        coverage = {kind: sum(all(s[name][field] is not None for field in ("CPUUsageNSec", "MemoryPeak"))
+                              for s in samples)
+                    for kind, name in [("collector", "collector_accounting"),
+                                       ("archive", "archive"), ("health", "health")]}
+        check("native_load_each_worker_cpu_and_memory_observed", all(n == len(samples) for n in coverage.values()))
         report.update(
             completed=True,
             cycles=cycles,
@@ -211,6 +251,8 @@ def run_load_controls(
             first_sample=samples[0],
             last_sample=samples[-1],
             samples=samples,
+            resource_accounting_coverage=coverage,
+            resource_measurement_scope="same-process exit snapshot, including optional wrapper overhead; no host/root totals",
         )
     finally:
         for unit in (collector_unit, archive_unit, health_unit):
