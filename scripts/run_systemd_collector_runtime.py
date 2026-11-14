@@ -53,10 +53,13 @@ def command(*arguments, check=True):
     )
 
 
-def run(directory, *, freshness=False, archival=False, scheduling=False, reporting=False):
+def run(
+    directory, *, freshness=False, archival=False, scheduling=False, reporting=False, backups=False
+):
     require(not archival or freshness, "archive_fixture_requires_freshness")
     require(not scheduling or archival, "schedule_fixture_requires_archive")
     require(not reporting or scheduling, "reporting_fixture_requires_schedule")
+    require(not backups or reporting, "backup_fixture_requires_reporting")
     require(os.name == "posix" and os.geteuid() == 0, "collector_runtime_root_required")
     require(Path("/proc/1/comm").read_text().strip() == "systemd", "collector_runtime_systemd")
     source = Path(__file__).resolve().parents[1]
@@ -86,7 +89,9 @@ def run(directory, *, freshness=False, archival=False, scheduling=False, reporti
     active_key = [keys["runtime"]]
     captures = []
     report = {
-        "schema": "extra-collector-alert-runtime-1"
+        "schema": "extra-capture-backup-runtime-1"
+        if backups
+        else "extra-collector-alert-runtime-1"
         if reporting
         else "extra-collector-schedule-runtime-1"
         if scheduling
@@ -518,6 +523,12 @@ def run(directory, *, freshness=False, archival=False, scheduling=False, reporti
                     reporting_deliveries = 1
                     report["status_controls"] = run_status_controls(
                         source, state_dir / fixture_name, scope, output, check
+                    )
+                if backups:
+                    from scripts.f1_lab.capture_backup_runtime import run_backup_controls
+
+                    report["backup_controls"] = run_backup_controls(
+                        source, state_dir / fixture_name, scope, monitor, output, check
                     )
             disabled = rotated.model_copy(
                 update={

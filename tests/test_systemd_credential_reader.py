@@ -27,6 +27,24 @@ def test_reads_exact_readonly_systemd_copy(tmp_path, monkeypatch):
     assert len(path.read_bytes()) == 32 and reader.read_systemd_key() == path.read_bytes()
 
 
+def test_backup_credential_never_falls_back_to_runtime_signing_key(tmp_path, monkeypatch):
+    _, directory, runtime = fixture(tmp_path, monkeypatch)
+    with pytest.raises(OSError):
+        reader.read_systemd_key(credential_name="capture-backup-key")
+    backup = directory / "capture-backup-key"
+    backup.write_bytes(b"b" * 32)
+    backup.chmod(0o400)
+    assert reader.read_systemd_key(credential_name="capture-backup-key") == b"b" * 32
+    assert reader.read_systemd_key() == runtime.read_bytes()
+
+
+@pytest.mark.parametrize("name", ["../runtime-key", "unrelated-key"])
+def test_credential_name_is_fixed_not_an_arbitrary_file(tmp_path, monkeypatch, name):
+    fixture(tmp_path, monkeypatch)
+    with pytest.raises(ValueError):
+        reader.read_systemd_key(credential_name=name)
+
+
 def test_accepts_readonly_systemd_acl_mask_in_private_directory(tmp_path, monkeypatch):
     _, _, path = fixture(tmp_path, monkeypatch)
     path.chmod(0o440)

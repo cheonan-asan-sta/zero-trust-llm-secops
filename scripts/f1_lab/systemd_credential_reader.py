@@ -9,7 +9,8 @@ from scripts.f1_lab.native_jsonl import require
 CREDENTIALS_ROOT = Path("/run/credentials")
 
 
-def read_systemd_key():
+def read_systemd_key(*, credential_name="runtime-key"):
+    require(credential_name in {"runtime-key", "capture-backup-key"}, "credential_fixed_name")
     require(os.name == "posix" and hasattr(os, "O_NOFOLLOW"), "credential_linux_file_required")
     supplied = os.environ.get("CREDENTIALS_DIRECTORY", "")
     directory = Path(supplied)
@@ -22,9 +23,11 @@ def read_systemd_key():
         "credential_system_service_directory",
     )
     parent = directory.stat()
-    require(parent.st_uid in {0, os.geteuid()} and stat.S_IMODE(parent.st_mode) & 0o007 == 0,
-            "credential_private_service_directory")
-    path = directory / "runtime-key"
+    require(
+        parent.st_uid in {0, os.geteuid()} and stat.S_IMODE(parent.st_mode) & 0o007 == 0,
+        "credential_private_service_directory",
+    )
+    path = directory / credential_name
     # No fallback to stdin, another file, environment secret, or network source.
     fd = os.open(path, os.O_RDONLY | os.O_CLOEXEC | os.O_NOFOLLOW | os.O_NONBLOCK)
     with os.fdopen(fd, "rb") as stream:
