@@ -98,7 +98,9 @@ stdin은 별도의 키 전달 경로로 연결한다. 키·명령 원문을 위 
 위233개는 관련 시험 묶음이다. v67 전체5,134개 통과 기록을 이번 전체 재실행으로 바꾸어 쓰지 않는다.
 제어 사례1+1건은 기능 검증이며 독립 탐지 F1이나 기업 성능 합격률로 제시하지 않는다.
 Linux `/proc`는 실제로 검증했고 UID와 부모 지문은 수집됐다. 이 환경의 audit login UID/session은 없어 미확인이며 사람 신원을 증명하지 않았다.
-Docker의 PID1은 systemd가 아니므로 실제 운영 systemd 호스트 인수는 미실시다. native adapter의 파서·명령·변조 거부 경로는 시험 입력으로 검증했다.
+v68 시험의 Docker PID1은 systemd가 아니어서 당시 실제 systemd 인수는 미실시였다.
+후속 [v69 systemd·호출 신원 결속](extra-systemd-caller-identity.md)에서는 실제 WSL systemd 연동15조건을 검증했다.
+로컬 인증원 시험이며 실제 외부 SSO/사람 로그인·운영 수집기 설치 인수는 아직 남아 있다. native adapter의 파서·명령·변조 거부 경로는 시험 입력으로 검증했다.
 
 ## 기존 결과와 남은 작업
 
