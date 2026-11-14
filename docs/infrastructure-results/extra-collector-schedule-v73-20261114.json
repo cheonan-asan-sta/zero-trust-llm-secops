@@ -1,0 +1,1007 @@
+{
+  "schema": "extra-collector-schedule-1",
+  "completed": true,
+  "base_commit": "ba721966de53f82f2c1bb0d52bf4b380528d95d7",
+  "depends_on_PR": 66,
+  "scope": "infrastructure opt-in periodic collection, lossless compaction and independent advisory freshness health",
+  "goal_qualified": false,
+  "production_installation_completed": false,
+  "organizational_SSO_login_tested": false,
+  "automatic_enforcement_allowed": false,
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "PR66_CI_gate": {
+    "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/pull/66",
+    "head": "ba721966de53f82f2c1bb0d52bf4b380528d95d7",
+    "all_16_checks_passed": true,
+    "checks": [
+      {
+        "name": "unit",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43572185079/job/132378749162"
+      },
+      {
+        "name": "docker",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43572185079/job/132378749126"
+      },
+      {
+        "name": "runtime (application)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43572185079/job/132378749342"
+      },
+      {
+        "name": "runtime (application-mtls)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43572185079/job/132378749569"
+      },
+      {
+        "name": "runtime (response-mtls)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43572185079/job/132378749349"
+      },
+      {
+        "name": "runtime (execution-mtls)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43572185079/job/132378749239"
+      },
+      {
+        "name": "runtime (monitored)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43572185079/job/132378749251"
+      },
+      {
+        "name": "runtime (authority)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43572185079/job/132378749320"
+      },
+      {
+        "name": "runtime (rekey)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43572185079/job/132378749376"
+      },
+      {
+        "name": "runtime (authority-ha)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43572185079/job/132378749258"
+      },
+      {
+        "name": "runtime (database-transport)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43572185079/job/132378749213"
+      },
+      {
+        "name": "runtime (database-backup)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43572185079/job/132378749449"
+      },
+      {
+        "name": "runtime (database-recovery)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43572185079/job/132378749402"
+      },
+      {
+        "name": "runtime (selection)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43572185079/job/132378749305"
+      },
+      {
+        "name": "lambda",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43572185079/job/132378749001"
+      },
+      {
+        "name": "test",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43572185079/job/132382554842"
+      }
+    ],
+    "unit_run": {
+      "run": 43572185079,
+      "job": 132378749162,
+      "source_head": "ba721966de53f82f2c1bb0d52bf4b380528d95d7",
+      "unit_summary": [
+        "2026-11-14T07:46:52.8750422Z 5356 passed, 2 skipped, 2 warnings in 374.94s (0:06:14)"
+      ],
+      "unit_log_sha256": "4412759097d82183e3bef00a4262d5ca17104878dd77975d9fe9d4d7d9a1e301"
+    }
+  },
+  "preflight_retry": {
+    "stage": "native source snapshot integrity guard before extraction or test fixtures",
+    "first_attempt": "Rejected: snapshot tar was still being built when its host digest was read.",
+    "resolution": "Waited for closed tar and complete source manifest, then retried the native consumer. Added manifest readiness assertion to local orchestration. No product source or classification change for this retry."
+  },
+  "linux": {
+    "exit_code": 0,
+    "seconds": 152.746,
+    "counts": {
+      "passed": 388
+    },
+    "log": "runtime/f1/collector-scheduling-batch-v73-final-20261114/linux.log",
+    "executed": true,
+    "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "source_files": 1024,
+    "source_archive_sha256": "73913c405cab6a36ce82f9269b34955f582ca35bf7faae6aec80e871881a5f52",
+    "container_exit": 0,
+    "oom_killed": false,
+    "network_mode": "none",
+    "owned_container": "a413a6d0cd0e7e19141970dde83a7cc5256412b0408b9b7337ad4c5655f21c14",
+    "snapshot_sources_unchanged_after": true,
+    "owned_container_removed": true
+  },
+  "native": {
+    "source_archive_sha256": "73913c405cab6a36ce82f9269b34955f582ca35bf7faae6aec80e871881a5f52",
+    "aws_calls": 0,
+    "paid_api_calls": 0,
+    "exit_code": 0,
+    "template_sha256": "0b83f3372037ff26cef119b1b5df4951ef7ee5e4cd3c5502c4b173ce5d8f74ab",
+    "template_verify_exit_code": 0,
+    "template_installation_paths_substituted": true,
+    "native_seconds": 70.917,
+    "owned_snapshot_removed": true
+  },
+  "controls": {
+    "schema": "extra-collector-schedule-runtime-1",
+    "completed": true,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "goal_qualified": false,
+    "scope": "real systemd collector sandbox and credential lifecycle, local functional controls",
+    "real_human_login_tested": false,
+    "production_installation_completed": false,
+    "cases": [
+      {
+        "name": "service_account_configuration_dry_run",
+        "passed": true
+      },
+      {
+        "name": "collector_is_static_nonroot_fixture",
+        "passed": true
+      },
+      {
+        "name": "only_required_effective_and_bounding_capabilities",
+        "passed": true
+      },
+      {
+        "name": "no_new_privileges_is_observed",
+        "passed": true
+      },
+      {
+        "name": "normal_capture_and_authorization_keep_baseline",
+        "passed": true
+      },
+      {
+        "name": "credential_was_a_socket_not_key_file",
+        "passed": true
+      },
+      {
+        "name": "initial_signed_latest_is_fresh",
+        "passed": true
+      },
+      {
+        "name": "controlled_31_second_gap_is_stale",
+        "passed": true
+      },
+      {
+        "name": "controlled_clock_rollback_after_restart_is_unavailable",
+        "passed": true
+      },
+      {
+        "name": "rotated_key_without_current_pin_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "rotation_with_new_public_pin_collects_fresh_evidence",
+        "passed": true
+      },
+      {
+        "name": "old_key_proof_is_rejected_by_current_registry",
+        "passed": true
+      },
+      {
+        "name": "expired_signing_authority_cannot_create_capture",
+        "passed": true
+      },
+      {
+        "name": "failed_expired_key_keeps_previous_latest",
+        "passed": true
+      },
+      {
+        "name": "not_yet_valid_signing_authority_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "runtime_proof_expiry_is_clipped_to_signer",
+        "passed": true
+      },
+      {
+        "name": "missing_key_provider_fails_at_systemd_credentials",
+        "passed": true
+      },
+      {
+        "name": "provider_outage_cannot_replace_latest",
+        "passed": true
+      },
+      {
+        "name": "provider_restart_collects_new_signed_evidence",
+        "passed": true
+      },
+      {
+        "name": "restoring_an_older_valid_capture_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "archive_preview_keeps_every_hot_byte",
+        "passed": true
+      },
+      {
+        "name": "archive_worker_is_nonroot_without_capabilities",
+        "passed": true
+      },
+      {
+        "name": "archive_capacity_pressure_keeps_hot_and_latest",
+        "passed": true
+      },
+      {
+        "name": "committed_archive_keeps_latest_and_meets_hot_limit",
+        "passed": true
+      },
+      {
+        "name": "all_cold_payloads_equal_original_hot_bytes",
+        "passed": true
+      },
+      {
+        "name": "restore_preserves_every_original_byte",
+        "passed": true
+      },
+      {
+        "name": "restored_old_capture_does_not_become_current",
+        "passed": true
+      },
+      {
+        "name": "latest_remains_fresh_after_compaction",
+        "passed": true
+      },
+      {
+        "name": "timers_are_disabled_before_explicit_fixture_start",
+        "passed": true
+      },
+      {
+        "name": "timer_repeats_new_signed_normal_observations",
+        "passed": true
+      },
+      {
+        "name": "scheduled_health_worker_is_nonroot_without_capabilities",
+        "passed": true
+      },
+      {
+        "name": "scheduled_health_never_claims_authorization_or_enforcement",
+        "passed": true
+      },
+      {
+        "name": "archive_timer_preserves_payloads_and_current_latest",
+        "passed": true
+      },
+      {
+        "name": "scheduled_provider_failure_preserves_last_signed_capture",
+        "passed": true
+      },
+      {
+        "name": "actual_collection_gap_becomes_stale_without_clock_injection",
+        "passed": true
+      },
+      {
+        "name": "timer_recovers_after_provider_restore_without_manual_collector_start",
+        "passed": true
+      },
+      {
+        "name": "timer_restart_collects_current_observation_not_backfill",
+        "passed": true
+      },
+      {
+        "name": "stopped_timers_do_not_keep_collecting",
+        "passed": true
+      },
+      {
+        "name": "timed_normal_observations_preserve_baseline",
+        "passed": true
+      },
+      {
+        "name": "disabled_collector_key_cannot_create_capture",
+        "passed": true
+      },
+      {
+        "name": "stopped_target_cannot_be_backfilled",
+        "passed": true
+      },
+      {
+        "name": "only_root_manager_read_credentials",
+        "passed": true
+      },
+      {
+        "name": "credential_socket_removed_and_provider_stopped",
+        "passed": true
+      }
+    ],
+    "collector_runs": [
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "5dc42186f301062887043a93b68ebf1255549e1cad89c989ece14592caf4fc2e",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "f517115929fa5fef32d6635448b67f8e521f6cf19c8cae9088d1b6d77f15686b",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "12757194837830f20b682e838f8587a5aadf182bec102d63da91445edf065eed",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "failure_stage": "systemd_credentials"
+        }
+      },
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "b63c425d21ea48ade8f42c3c9c68e3687f833daf72e94fa415c725972a2fd766",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "native_collection",
+          "failure_code": "native_source_service_manager_binding",
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      }
+    ],
+    "archive_controls": {
+      "completed": true,
+      "scope": "owned real-systemd lossless archival controls",
+      "runs": [
+        {
+          "mode": "preview",
+          "summary": {
+            "completed": true,
+            "applied": false,
+            "hot_before_records": 4,
+            "hot_before_bytes": 5768,
+            "planned": 3,
+            "deleted_hot_files": 0,
+            "archive_records": 0,
+            "archive_raw_bytes": 0,
+            "archive_compressed_payload_bytes": 0,
+            "skipped_entries": 0,
+            "archive_capacity_available": true,
+            "latest_protected": true,
+            "projected_hot_records": 1,
+            "projected_hot_bytes": 1442,
+            "projected_budget_satisfied": true,
+            "authenticity_or_freshness_asserted": false,
+            "hot_after_records": 4,
+            "hot_after_bytes": 5768,
+            "managed_budget_satisfied": false,
+            "archive_database_file_bytes": 0,
+            "mode": "preview",
+            "state": "ready",
+            "worker_security": {
+              "effective_uid": 1,
+              "effective_capabilities": 0,
+              "bounding_capabilities": 0,
+              "no_new_privileges": true
+            }
+          }
+        },
+        {
+          "mode": "pressure",
+          "summary": {
+            "completed": false,
+            "state": "storage_pressure",
+            "error_type": "ArchiveFull",
+            "authenticity_or_freshness_asserted": false
+          }
+        },
+        {
+          "mode": "apply",
+          "summary": {
+            "completed": true,
+            "applied": true,
+            "hot_before_records": 4,
+            "hot_before_bytes": 5768,
+            "planned": 3,
+            "deleted_hot_files": 3,
+            "archive_records": 3,
+            "archive_raw_bytes": 4326,
+            "archive_compressed_payload_bytes": 2462,
+            "skipped_entries": 0,
+            "archive_capacity_available": true,
+            "latest_protected": true,
+            "projected_hot_records": 1,
+            "projected_hot_bytes": 1442,
+            "projected_budget_satisfied": true,
+            "authenticity_or_freshness_asserted": false,
+            "hot_after_records": 1,
+            "hot_after_bytes": 1442,
+            "managed_budget_satisfied": true,
+            "archive_database_file_bytes": 16384,
+            "mode": "apply",
+            "state": "ready",
+            "worker_security": {
+              "effective_uid": 1,
+              "effective_capabilities": 0,
+              "bounding_capabilities": 0,
+              "no_new_privileges": true
+            }
+          }
+        },
+        {
+          "mode": "restore",
+          "summary": {
+            "completed": true,
+            "raw_sha256": "12757194837830f20b682e838f8587a5aadf182bec102d63da91445edf065eed",
+            "raw_bytes": 1442,
+            "authenticity_or_freshness_asserted": false,
+            "mode": "restore",
+            "state": "restored_for_review",
+            "worker_security": {
+              "effective_uid": 1,
+              "effective_capabilities": 0,
+              "bounding_capabilities": 0,
+              "no_new_privileges": true
+            }
+          }
+        }
+      ],
+      "restored_raw_sha256": "12757194837830f20b682e838f8587a5aadf182bec102d63da91445edf065eed",
+      "all_three_archived_payloads_byte_equal": true,
+      "cold_payload_compression_is_not_database_file_size": true,
+      "paid_api_calls": 0,
+      "aws_calls": 0,
+      "fixture_account_substituted": true,
+      "operational_service_account_created": false,
+      "owned_archive_unit_removed": true,
+      "owned_restore_state_removed": true
+    },
+    "schedule_controls": {
+      "completed": true,
+      "paid_api_calls": 0,
+      "aws_calls": 0,
+      "real_elapsed_outage_tested": true,
+      "OS_clock_changed": false,
+      "production_timers_enabled": false,
+      "fixture_intervals_substituted": true,
+      "observations": [
+        {
+          "event_sha256": "be043b2ba44202f5ed6379fd746cfbbb6f45735be71d5c06988b1918d612e873",
+          "observed_at": "2026-11-14T08:02:30.018941+00:00",
+          "raw_sha256": "6e11081f3915fd46f5f51ade9e56554746b50c357da87b12933b014b2be695da"
+        },
+        {
+          "event_sha256": "fa8b221b04db8619540f32b75dbd0effb97010af0bff656b0c49ef8b55bc5b68",
+          "observed_at": "2026-11-14T08:02:33.108004+00:00",
+          "raw_sha256": "4725253c5f45e30f390b19e5142ec3f1c1df053625ab46d976a625db08da6d97"
+        },
+        {
+          "event_sha256": "63a39ab706d45f6a5b007c7d4ce6b0ea4929a43587e4bbaee953f3cedb98f419",
+          "observed_at": "2026-11-14T08:03:07.698752+00:00",
+          "raw_sha256": "90f6d6154f07cdc4bd74182954d77338673fb35d4e77517e85be46349735e988"
+        },
+        {
+          "event_sha256": "6a465e6489a50ee8c2aa81d75fa65f5220f5a8dc72d0b09fd3777460793c7c14",
+          "observed_at": "2026-11-14T08:03:11.275992+00:00",
+          "raw_sha256": "c00ff60a377db92a48a84c5618389fc2a47a3211eaecbd47834b521c385e26cc"
+        }
+      ],
+      "normal_controls": 4,
+      "normal_added_alerts": 0,
+      "real_outage_elapsed_seconds": 27.508,
+      "stale_observation_age_seconds": 30.123,
+      "initial_health": {
+        "state": "fresh",
+        "reason": "recent_signed_observation",
+        "event_sha256": "fa8b221b04db8619540f32b75dbd0effb97010af0bff656b0c49ef8b55bc5b68",
+        "observed_at": "2026-11-14T08:02:33.108004+00:00",
+        "scope": "signed_collector_observation_freshness",
+        "authorization_checked": false,
+        "automatic_enforcement_allowed": false,
+        "worker_security": {
+          "effective_uid": 1,
+          "effective_capabilities": 0,
+          "bounding_capabilities": 0,
+          "no_new_privileges": true
+        }
+      },
+      "stale_health": {
+        "state": "stale",
+        "reason": "observation_expired",
+        "event_sha256": "18334c72977ef9d70e3fb04f98fe05fa26a93136b67e0582a23ddcc2541280a5",
+        "observed_at": "2026-11-14T08:02:36.191877+00:00",
+        "scope": "signed_collector_observation_freshness",
+        "authorization_checked": false,
+        "automatic_enforcement_allowed": false,
+        "worker_security": {
+          "effective_uid": 1,
+          "effective_capabilities": 0,
+          "bounding_capabilities": 0,
+          "no_new_privileges": true
+        }
+      },
+      "recovered_health": {
+        "state": "fresh",
+        "reason": "recent_signed_observation",
+        "event_sha256": "63a39ab706d45f6a5b007c7d4ce6b0ea4929a43587e4bbaee953f3cedb98f419",
+        "observed_at": "2026-11-14T08:03:07.698752+00:00",
+        "scope": "signed_collector_observation_freshness",
+        "authorization_checked": false,
+        "automatic_enforcement_allowed": false,
+        "worker_security": {
+          "effective_uid": 1,
+          "effective_capabilities": 0,
+          "bounding_capabilities": 0,
+          "no_new_privileges": true
+        }
+      },
+      "verified_archive_records": 5,
+      "quiescent_hot_records": 2,
+      "fixture_account_substituted": true,
+      "operational_account_created": false,
+      "owned_timer_and_service_files_removed": true,
+      "owned_health_state_removed": true,
+      "credential_deliveries": 5
+    },
+    "normal_controls": 4,
+    "normal_added_alerts": 0,
+    "private_key_disk_files_created": 0,
+    "systemd_memory_credential_copy": true,
+    "private_key_persisted": false,
+    "tokens_persisted": false,
+    "real_systemd_tested": true,
+    "template_security_directives_preserved": true,
+    "template_installation_paths_substituted": true,
+    "collector_security": {
+      "effective_uid": 1,
+      "effective_capabilities": 524292,
+      "bounding_capabilities": 524292,
+      "no_new_privileges": true
+    },
+    "existing_static_fixture_account_used": true,
+    "real_service_account_created": false,
+    "freshness_controlled_clock_used": true,
+    "scheduling_real_elapsed_outage_used": true,
+    "systemd_version": "systemd 255 (255.4-1ubuntu8.18)",
+    "owned_units_removed": true,
+    "owned_state_removed": true,
+    "owned_config_and_socket_removed": true,
+    "systemd_credentials_removed": true
+  },
+  "schedule_controls": {
+    "completed": true,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "real_elapsed_outage_tested": true,
+    "OS_clock_changed": false,
+    "production_timers_enabled": false,
+    "fixture_intervals_substituted": true,
+    "observations": [
+      {
+        "event_sha256": "be043b2ba44202f5ed6379fd746cfbbb6f45735be71d5c06988b1918d612e873",
+        "observed_at": "2026-11-14T08:02:30.018941+00:00",
+        "raw_sha256": "6e11081f3915fd46f5f51ade9e56554746b50c357da87b12933b014b2be695da"
+      },
+      {
+        "event_sha256": "fa8b221b04db8619540f32b75dbd0effb97010af0bff656b0c49ef8b55bc5b68",
+        "observed_at": "2026-11-14T08:02:33.108004+00:00",
+        "raw_sha256": "4725253c5f45e30f390b19e5142ec3f1c1df053625ab46d976a625db08da6d97"
+      },
+      {
+        "event_sha256": "63a39ab706d45f6a5b007c7d4ce6b0ea4929a43587e4bbaee953f3cedb98f419",
+        "observed_at": "2026-11-14T08:03:07.698752+00:00",
+        "raw_sha256": "90f6d6154f07cdc4bd74182954d77338673fb35d4e77517e85be46349735e988"
+      },
+      {
+        "event_sha256": "6a465e6489a50ee8c2aa81d75fa65f5220f5a8dc72d0b09fd3777460793c7c14",
+        "observed_at": "2026-11-14T08:03:11.275992+00:00",
+        "raw_sha256": "c00ff60a377db92a48a84c5618389fc2a47a3211eaecbd47834b521c385e26cc"
+      }
+    ],
+    "normal_controls": 4,
+    "normal_added_alerts": 0,
+    "real_outage_elapsed_seconds": 27.508,
+    "stale_observation_age_seconds": 30.123,
+    "initial_health": {
+      "state": "fresh",
+      "reason": "recent_signed_observation",
+      "event_sha256": "fa8b221b04db8619540f32b75dbd0effb97010af0bff656b0c49ef8b55bc5b68",
+      "observed_at": "2026-11-14T08:02:33.108004+00:00",
+      "scope": "signed_collector_observation_freshness",
+      "authorization_checked": false,
+      "automatic_enforcement_allowed": false,
+      "worker_security": {
+        "effective_uid": 1,
+        "effective_capabilities": 0,
+        "bounding_capabilities": 0,
+        "no_new_privileges": true
+      }
+    },
+    "stale_health": {
+      "state": "stale",
+      "reason": "observation_expired",
+      "event_sha256": "18334c72977ef9d70e3fb04f98fe05fa26a93136b67e0582a23ddcc2541280a5",
+      "observed_at": "2026-11-14T08:02:36.191877+00:00",
+      "scope": "signed_collector_observation_freshness",
+      "authorization_checked": false,
+      "automatic_enforcement_allowed": false,
+      "worker_security": {
+        "effective_uid": 1,
+        "effective_capabilities": 0,
+        "bounding_capabilities": 0,
+        "no_new_privileges": true
+      }
+    },
+    "recovered_health": {
+      "state": "fresh",
+      "reason": "recent_signed_observation",
+      "event_sha256": "63a39ab706d45f6a5b007c7d4ce6b0ea4929a43587e4bbaee953f3cedb98f419",
+      "observed_at": "2026-11-14T08:03:07.698752+00:00",
+      "scope": "signed_collector_observation_freshness",
+      "authorization_checked": false,
+      "automatic_enforcement_allowed": false,
+      "worker_security": {
+        "effective_uid": 1,
+        "effective_capabilities": 0,
+        "bounding_capabilities": 0,
+        "no_new_privileges": true
+      }
+    },
+    "verified_archive_records": 5,
+    "quiescent_hot_records": 2,
+    "fixture_account_substituted": true,
+    "operational_account_created": false,
+    "owned_timer_and_service_files_removed": true,
+    "owned_health_state_removed": true,
+    "credential_deliveries": 5
+  },
+  "legacy_controls": {
+    "schema": "extra-shared-execution-controls-1",
+    "completed": true,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "scope": "real local process observations and controlled policy cases; not independent attack performance",
+    "goal_qualified": false,
+    "production_systemd_integration_tested": false,
+    "cases": [
+      {
+        "name": "actual_allowed_process_does_not_add_alarm",
+        "passed": true
+      },
+      {
+        "name": "actual_process_conflicts_with_prior_denial",
+        "passed": true
+      },
+      {
+        "name": "restart_duplicate_is_bound_and_idempotent",
+        "passed": true
+      },
+      {
+        "name": "missing_native_evidence_keeps_baseline",
+        "passed": true
+      },
+      {
+        "name": "different_invocation_cannot_borrow_proof",
+        "passed": true
+      },
+      {
+        "name": "post_event_policy_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "lab_evidence_cannot_satisfy_systemd_mode",
+        "passed": true
+      }
+    ],
+    "normal_controls": 1,
+    "normal_added_alerts": 0,
+    "adverse_controls": 1,
+    "adverse_detected": 1,
+    "owned_child_processes_stopped": true,
+    "private_keys_persisted": false,
+    "plaintext_commands_persisted": false,
+    "actual_observation_fields": [
+      "argument_count",
+      "audit_session_id",
+      "command_sha256",
+      "effective_uid",
+      "executable_sha256",
+      "kind",
+      "login_uid",
+      "parent_pid",
+      "parent_ref_sha256",
+      "pid",
+      "real_uid",
+      "start_ticks"
+    ],
+    "actor_collection": {
+      "uid_read_from_proc": true,
+      "login_uid_present": false,
+      "audit_session_present": false,
+      "parent_reference_present": true,
+      "authenticated_human_identity_proven": false
+    }
+  },
+  "legacy_regression": {
+    "aws_calls": 0,
+    "completed": true,
+    "goal_qualified": false,
+    "native_actor_command_evidence_added_to_legacy": 0,
+    "paid_api_calls": 0,
+    "population": 1681815,
+    "scenarios": {
+      "fox": {
+        "after_decision_sha256": "29e3e42b17e13d9f4ce8f785b2c1121ee52aa9a6ebbd323c5328e38644929832",
+        "before_decision_sha256": "29e3e42b17e13d9f4ce8f785b2c1121ee52aa9a6ebbd323c5328e38644929832",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 668418,
+        "predictions_sha256": "3a95e16120e53c888203f0d25d57526b0c614deeaa1e86b43ed98694976702cc",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.998765742394729,
+          "f1": 0.9990965864106885,
+          "false_positive_rate": 0.0006145584161411404,
+          "fn": 695,
+          "fp": 130,
+          "inference_errors": 0,
+          "population": 668418,
+          "precision": 0.9997151115776464,
+          "recall": 0.9984788261352991,
+          "tn": 211404,
+          "tp": 456189
+        }
+      },
+      "harrison_observed": {
+        "after_decision_sha256": "de38509b07982c34ab69e57eb7df9ebb0517674d06cd1329d594c93c503be1c9",
+        "before_decision_sha256": "de38509b07982c34ab69e57eb7df9ebb0517674d06cd1329d594c93c503be1c9",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 422178,
+        "predictions_sha256": "c7e557b7d8e137cedc35649505ad389d06c593fe9f53e09caccf10d28220a9e0",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9993983580385525,
+          "f1": 0.9996953318603709,
+          "false_positive_rate": 0.046012832263978,
+          "fn": 3,
+          "fp": 251,
+          "inference_errors": 0,
+          "population": 422178,
+          "precision": 0.9993980396718237,
+          "recall": 0.9999928009733084,
+          "tn": 5204,
+          "tp": 416720
+        }
+      },
+      "russellmitchell": {
+        "after_decision_sha256": "2c4aecb63800cb85dfc8a6685f03b17d53c2f88e727b47c415eac6c1d2d70276",
+        "before_decision_sha256": "2c4aecb63800cb85dfc8a6685f03b17d53c2f88e727b47c415eac6c1d2d70276",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 295243,
+        "predictions_sha256": "2ee9ee30497a6a4a48c12461e0c6ce76dcdc3392db71f04caf3f7f92383dfaf4",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9963386092134275,
+          "f1": 0.991198000211704,
+          "false_positive_rate": 0.0003642113111178716,
+          "fn": 996,
+          "fp": 85,
+          "inference_errors": 0,
+          "population": 295243,
+          "precision": 0.9986054371544355,
+          "recall": 0.9838996476027286,
+          "tn": 233296,
+          "tp": 60866
+        }
+      },
+      "santos": {
+        "after_decision_sha256": "90fd3e70c751fe8da7fd2fbc26fd70688c07f8989ded90e48af67f7a4662d99a",
+        "before_decision_sha256": "90fd3e70c751fe8da7fd2fbc26fd70688c07f8989ded90e48af67f7a4662d99a",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 295976,
+        "predictions_sha256": "92dc1b9932ffd57562e29454ea81c25f70b071406d6aed89587e5dada6c7a220",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9966010757628997,
+          "f1": 0.9892837359921599,
+          "false_positive_rate": 0.00029765615886794125,
+          "fn": 932,
+          "fp": 74,
+          "inference_errors": 0,
+          "population": 295976,
+          "precision": 0.9984089101034208,
+          "recall": 0.9803238541600693,
+          "tn": 248535,
+          "tp": 46435
+        }
+      }
+    },
+    "schema": "extra-shared-execution-legacy-regression-1",
+    "scope": "prior observed-development decision regression only; no new ground truth",
+    "source_prior_sha256": "35ec2a206d0a3a475d37dfb38b9459044291aee79cfea9adbbcae8da7b428ee4"
+  },
+  "production_timer_defaults": {
+    "collector": {
+      "on_active_seconds": 2,
+      "on_inactive_seconds": 10,
+      "accuracy_seconds": 1,
+      "random_delay_seconds": 1
+    },
+    "health": {
+      "on_active_seconds": 5,
+      "on_inactive_seconds": 10,
+      "accuracy_seconds": 1,
+      "random_delay_seconds": 1
+    },
+    "archive": {
+      "on_active_seconds": 30,
+      "on_inactive_seconds": 60,
+      "accuracy_seconds": 5,
+      "random_delay_seconds": 5
+    },
+    "opt_in": true,
+    "persistent_calendar_catchup": false
+  },
+  "trust_boundary": "Scheduling does not attest current service liveness, human identity, authorization or threat absence. Health reports observation freshness only and cannot enforce. No historical catch-up evidence is generated.",
+  "source_sha256": {
+    "infra/systemd/secops-execution-collector@.timer": "71feb648ffd9619a7d1038e832d41173b4a5033ab5648f69d72c2ade69eb656d",
+    "infra/systemd/secops-capture-archive@.timer": "23374ecd53a7e834233f002a7dd07a25858253479af1d9320bb386c67749ce8c",
+    "infra/systemd/secops-capture-health@.timer": "986bd74e6a4244f449d5485806e8ea491a4cd51770f7a17c5bc77de77c81149e",
+    "infra/systemd/secops-capture-health@.service": "9a2694e4774751d5b6a5371880770a61e3fe6085f3923be676406e9b0ef9e919",
+    "scripts/service_capture_status.py": "b0a4a7502e1e2aafd44c88303e8dd782e15ab650b2bdd5e16c3135c1922f2eba",
+    "scripts/f1_lab/collector_schedule_runtime.py": "121f065ce405e5f40f175e3a47ebd366cb7256ebc6b52df1f75deb8cadd21390",
+    "scripts/run_systemd_collector_runtime.py": "52cb4bf1fd8cbe2d26f09b5f2efd527a02dd9a804d03a0a5f73a3c30171d1d90",
+    "scripts/run_collector_schedule.py": "a92cb908fa6a952d690eda2578c0a3f995aad79343ea5d756e46f0cef3d3a382",
+    "tests/test_collector_schedule.py": "c3285b088e0c445ee2c1aa63299ac42ecbf8784866eb6dab04bf22a123ede685"
+  },
+  "artifact_sha256": {
+    "tests.json": "2d5af94a0c478919136550903d0f216dc41fa07701dd61c5817d433a55fdebc0",
+    "linux.xml": "d67429456253adb67d0774eaadd95c18bd5be5efdb89e5f2bc3ae9df55edd26e",
+    "source-manifest.json": "80b8722164c7f76f011b1dbf4e00973e09c8a8aed3242f29afd812e02426ff67",
+    "native-tests.json": "e465482daa0ef81ce1fcf26ed740f8c899aa38a7d62253befedb712f08b7f4e4",
+    "actual-systemd/run.json": "7a780bed539337bc25a38d1102550f3959b109217f0415a9ba6a1d9e7433a93d",
+    "actual-systemd/schedule-controls.json": "1f27cfa09e1f0114327354737fee7ab519c2f93b135a493c37d93ddd8311dd4a",
+    "actual-systemd/archive-controls.json": "da8be0b995a2205721d35e0a284529c40685f6c8cdfc0720699a57756ccfbc5d",
+    "legacy-regression/run.json": "a2d03c97bbd4bb19b8ba9fe478599953379639e33df4230ee145d3fa27cf1be0",
+    "capture-controls/run.json": "df43e4588a4ecf37180f99e91153f1410553d792b34ba9fba8154ed612155903",
+    "unit-template-verify.log": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  }
+}

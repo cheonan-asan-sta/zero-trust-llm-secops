@@ -1,5 +1,7 @@
 # 실행 캡처 무손실 보관·복원 — v72
 
+후속 [v73 수집·보관·신선도 주기 실행](extra-collector-schedule.md)에서 선택형 timer와 실제 공백/자동 재개를 검증했다. 아래384개/32조건 및 timer 미구현 설명은 v72 당시 기록이다. 운영 상시 배포·장기 용량 인수는 남아 있다.
+
 2026-11-14. 인프라 담당 범위에서 [v71 수집 신선도](extra-collector-freshness.md)의 실행별 파일 누적 문제를 보강했다.
 시작 조건인 [PR65](https://github.com/cheonan-asan-sta/zero-trust-llm-secops/pull/65)의 기준 커밋4142d49에 대해 **CI16개 모두 성공**을 확인한 뒤 별도 이름 브랜치에서 구현했다. 해당 CI unit은5,325통과·2skip·2warnings다.
 
