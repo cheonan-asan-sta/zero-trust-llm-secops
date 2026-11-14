@@ -73,3 +73,5 @@ python -m scripts.run_audit_auth_review --plan <고정계획.json> --plan-sha256
 [공개 실행 근거](infrastructure-results/extra-audit-auth-refinement-v67-20261114.json)에 모든 종류별 전후 행렬,
 출처별 변화·원본/코드/예측 봉인 지문·회귀 결과와 공유 서버 자료 점검 범위를 기록했다.
 원시 로그·정답·대형 예측 파일은 로컬 runtime에 보존하고 Git에 추가하지 않는다.
+
+후속 [v68 실행 근거 수집·연결](extra-shared-execution-evidence.md)에서 실제 Linux 프로세스 수집을 검증했다. 과거 공유 서버6건에는 소급 적용하지 않았고 기존 지표는 유지했다.
