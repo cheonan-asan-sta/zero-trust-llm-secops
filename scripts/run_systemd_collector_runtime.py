@@ -53,7 +53,8 @@ def command(*arguments, check=True):
     )
 
 
-def run(directory, *, freshness=False):
+def run(directory, *, freshness=False, archival=False):
+    require(not archival or freshness, "archive_fixture_requires_freshness")
     require(os.name == "posix" and os.geteuid() == 0, "collector_runtime_root_required")
     require(Path("/proc/1/comm").read_text().strip() == "systemd", "collector_runtime_systemd")
     source = Path(__file__).resolve().parents[1]
@@ -83,7 +84,9 @@ def run(directory, *, freshness=False):
     active_key = [keys["runtime"]]
     captures = []
     report = {
-        "schema": "extra-collector-freshness-runtime-1"
+        "schema": "extra-capture-archive-runtime-1"
+        if archival
+        else "extra-collector-freshness-runtime-1"
         if freshness
         else "extra-systemd-collector-runtime-1",
         "completed": False,
@@ -449,6 +452,19 @@ def run(directory, *, freshness=False):
                     "restoring_an_older_valid_capture_is_rejected",
                     monitor.check(old_path).reason == "capture_regression",
                 )
+                if archival:
+                    from scripts.f1_lab.capture_archive_runtime import run_archive_controls
+
+                    report["archive_controls"] = run_archive_controls(
+                        source,
+                        state_dir / fixture_name,
+                        latest_path,
+                        scope,
+                        monitor,
+                        short_event,
+                        output,
+                        check,
+                    )
             disabled = rotated.model_copy(
                 update={
                     "version": 3,
