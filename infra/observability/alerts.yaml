@@ -22,3 +22,18 @@ groups:
         for: 2s
         labels:
           severity: critical
+      - alert: C01CollectorObservationNotFresh
+        expr: secops_collector_bridge_enabled == 1 and on(job,instance) secops_collector_observation_fresh == 0
+        for: 2s
+        labels:
+          severity: critical
+      - alert: C01CollectorArchiveUnavailable
+        expr: secops_collector_bridge_enabled == 1 and on(job,instance) secops_collector_status_success{worker="archive"} == 0
+        for: 2s
+        labels:
+          severity: critical
+      - alert: C01CollectorArchivePressure
+        expr: secops_collector_bridge_enabled == 1 and on(job,instance) secops_collector_archive_storage_pressure == 1
+        for: 2s
+        labels:
+          severity: warning

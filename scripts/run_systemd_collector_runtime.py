@@ -53,9 +53,10 @@ def command(*arguments, check=True):
     )
 
 
-def run(directory, *, freshness=False, archival=False, scheduling=False):
+def run(directory, *, freshness=False, archival=False, scheduling=False, reporting=False):
     require(not archival or freshness, "archive_fixture_requires_freshness")
     require(not scheduling or archival, "schedule_fixture_requires_archive")
+    require(not reporting or scheduling, "reporting_fixture_requires_schedule")
     require(os.name == "posix" and os.geteuid() == 0, "collector_runtime_root_required")
     require(Path("/proc/1/comm").read_text().strip() == "systemd", "collector_runtime_systemd")
     source = Path(__file__).resolve().parents[1]
@@ -85,7 +86,9 @@ def run(directory, *, freshness=False, archival=False, scheduling=False):
     active_key = [keys["runtime"]]
     captures = []
     report = {
-        "schema": "extra-collector-schedule-runtime-1"
+        "schema": "extra-collector-alert-runtime-1"
+        if reporting
+        else "extra-collector-schedule-runtime-1"
         if scheduling
         else "extra-capture-archive-runtime-1"
         if archival
@@ -303,6 +306,7 @@ def run(directory, *, freshness=False, archival=False, scheduling=False):
             active_provider = provider
             credential_providers = [provider]
             scheduled_deliveries = 0
+            reporting_deliveries = 0
             observed = datetime.now(UTC)
             summary, first_event, first_proof = capture(True)
             security = summary["collector_security"]
@@ -502,6 +506,19 @@ def run(directory, *, freshness=False, archival=False, scheduling=False):
                     )
                     report["schedule_controls"] = schedule_report
                     scheduled_deliveries = schedule_report["credential_deliveries"]
+                if reporting:
+                    from scripts.f1_lab.collector_status_runtime import run_status_controls
+
+                    observed = datetime.now(UTC)
+                    _, status_event, status_proof = capture(True)
+                    check(
+                        "fresh_normal_capture_precedes_public_status",
+                        authorized(status_event, status_proof, pin, observed) is not None,
+                    )
+                    reporting_deliveries = 1
+                    report["status_controls"] = run_status_controls(
+                        source, state_dir / fixture_name, scope, output, check
+                    )
             disabled = rotated.model_copy(
                 update={
                     "version": 3,
@@ -519,7 +536,7 @@ def run(directory, *, freshness=False, archival=False, scheduling=False):
             check(
                 "only_root_manager_read_credentials",
                 sum(item.delivered for item in credential_providers)
-                == (9 if freshness else 5) + scheduled_deliveries
+                == (9 if freshness else 5) + scheduled_deliveries + reporting_deliveries
                 and all(item.rejected == 0 for item in credential_providers),
             )
         check(

@@ -111,7 +111,7 @@ def metrics(url, key, fetch=fetch_summary):
             + result)
 
 
-def handler(url, key, token, tls_profile=None):
+def handler(url, key, token, tls_profile=None, collector_profile=None):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *_):
             pass
@@ -132,6 +132,9 @@ def handler(url, key, token, tls_profile=None):
                 body = metrics(url, key).encode()
             else:
                 body = metrics(url, key, lambda u, k: fetch_summary(u, k, tls_profile=tls_profile)).encode()
+            if collector_profile is not None:
+                from scripts.f1_lab.collector_status_bridge import metrics as collector_metrics
+                body += collector_metrics(collector_profile).encode()
             self.send_response(200)
             self.send_header("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
             self.send_header("Cache-Control", "no-store")
@@ -149,12 +152,17 @@ def main():
     parser.add_argument("--port", type=int, default=9101)
     parser.add_argument("--server-tls-profile", type=Path)
     parser.add_argument("--upstream-tls-profile", type=Path)
+    parser.add_argument("--collector-profile", type=Path)
     args = parser.parse_args()
     token = args.token_file.read_text(encoding="utf-8").strip()
     key = os.environ.get("C01_UPSTREAM_API_KEY", "")
     if not 32 <= len(token) <= 128 or not key:
         raise ValueError("credentials_required")
-    service = handler(validate_upstream(args.upstream), key, token, args.upstream_tls_profile)
+    collector_profile = None
+    if args.collector_profile:
+        from scripts.f1_lab.collector_status_bridge import load_profile
+        collector_profile = load_profile(args.collector_profile)
+    service = handler(validate_upstream(args.upstream), key, token, args.upstream_tls_profile, collector_profile)
     if args.server_tls_profile:
         from scripts.mtls_native import NativeServer
         server = NativeServer((args.listen, args.port), args.server_tls_profile, service)

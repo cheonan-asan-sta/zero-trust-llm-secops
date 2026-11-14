@@ -1,5 +1,7 @@
 # 수집·보관·신선도 확인의 주기 실행 — v73
 
+후속 [v74 수집 상태·보관 용량 경보](extra-collector-alerts.md)에서 선택형 집계 게시와 경보/해제 흐름을 검증했다. 아래388개/43조건과 exporter 미연결 설명은 v73 당시 기록이다.
+
 2026-11-14. 인프라 담당 범위의 [v72 무손실 보관·복원](extra-capture-archive.md)에 선택형 주기 실행을 연결했다.
 시작 전 [PR66](https://github.com/cheonan-asan-sta/zero-trust-llm-secops/pull/66)의 ba72196 기준 **CI16개 모두 성공**을 확인했다.
 해당 CI unit은5,356통과·2skip·2warnings이며, 전체 성공 후 별도 이름 브랜치에서 신규 구현을 시작했다.
