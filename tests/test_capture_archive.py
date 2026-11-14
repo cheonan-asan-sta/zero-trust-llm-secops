@@ -219,9 +219,14 @@ def test_failed_archive_commit_never_removes_hot_files(tmp_path, monkeypatch):
         assert archive.load(con)[0] == {}
 
 
-def test_changed_source_after_commit_is_not_deleted(tmp_path, monkeypatch):
-    root, _, archive, *_ = fixture(tmp_path)
-    victim = next(iter(hot(root)))
+@pytest.mark.parametrize("ordinal", [0, 1, 2])
+def test_changed_source_after_commit_is_not_deleted(tmp_path, monkeypatch, ordinal):
+    root, originals, archive, *_ = fixture(tmp_path)
+    # Directory iteration order is arbitrary. Choose each of the three old
+    # captures that this fixture's hot budget actually selects for archival.
+    victim = sorted(originals, key=lambda rid: json.loads(originals[rid])["event"]["observed_at"])[
+        ordinal
+    ]
     changed = b"changed after preservation"
 
     def alter():
@@ -231,6 +236,11 @@ def test_changed_source_after_commit_is_not_deleted(tmp_path, monkeypatch):
     with pytest.raises(ValueError):
         archive.compact(apply=True)
     assert (root / victim / "capture.json").read_bytes() == changed
+    with archive.connection() as con:
+        size, payload, expected = con.execute(
+            "SELECT raw_bytes,payload,raw_sha FROM captures WHERE run_id=?", (victim,)
+        ).fetchone()
+    assert archive.unpack(payload, size, expected) == originals[victim]
 
 
 @pytest.mark.parametrize(
