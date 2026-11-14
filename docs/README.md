@@ -11,7 +11,10 @@
 새 FP·기존 TP 손실0이며, 아래 과거 v49 수치와 Wilson의 사전 고정 결과를 새 후보 수치로 덮어쓰지 않는다.
 [DNS 프로세스 경계](extra-dns-process-boundary.md)에서는 잘못 이어진 이력151행을 바로잡았고 판정은 변하지 않았다.
 [Wardbeck 고정 후보 검증](extra-scanner-calibration-transfer.md)은 원래 보정 자료 역할을 유지하며 현재 준비·평가 상태를 구분한다.
+[Wardbeck 실제 보정 출처 결과](extra-wardbeck-calibration-result.md)는24,851행에서 미탐4건 감소·새 FP/TP 손실0이다. VPN F1 27.4510%와 정상 error0행의 한계도 유지한다.
 후보는 오프라인 검토용이다. 자동 차단/권한 복원·실제 기업 운영 인수와 탐지 성능 평가는 별개다.
+통합 Linux 전체5,096개·Ruff+RUF100과 [실제 monitored mTLS75조건](extra-outage-expiry-validation.md)을 통과했다.
+[종류별 잔여 오류](extra-development-error-priorities.md)는 작은 감사·인증·VPN 집단의 실패와 추가 근거를 정리한다.
 아래 `Wilson 예약 유지`, push/병합0 및 실행 미완료 문구는 해당 날짜/버전의 이력이다.
 
 ## 11월 14일 병합 후 탐지·평가 v49
