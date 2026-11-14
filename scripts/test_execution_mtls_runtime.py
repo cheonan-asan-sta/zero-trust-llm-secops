@@ -14,6 +14,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from scripts.continuous_mtls_runtime import ROOT, RuntimeFailure
+from scripts.execution_maintenance_probe import execute as execute_maintenance
 from scripts.execution_mtls_runtime import ExecutionRuntime
 from scripts.test_continuous_mtls_runtime import Checks as BaseChecks
 from scripts.test_recoverable_mtls_runtime import READ_STATE, RESTORE_EXITS
@@ -62,6 +63,18 @@ class Checks(BaseChecks):
     def __init__(self, directory):
         super().__init__(directory, runtime_class=ExecutionRuntime)
         self.report['schema'] = 'execution-mtls-verification-1'
+
+    def maintenance(self, operation):
+        row = {'operation': operation, 'completed': False}
+        self.report.setdefault('maintenance', []).append(row)
+        self.save()  # Persist the exact operation before starting the fixed child.
+        result = execute_maintenance(self.runtime, operation)
+        row.update(result)
+        row['completed'] = (result['exit_code'] == 0 and result['issue'] is None
+                            and result['receipt'] is not None and result['receipt']['completed'] is True)
+        self.save()  # Original failure survives cleanup; no retry or result substitution.
+        self.require(row['completed'], 'execution_maintenance_failed')
+        return result['receipt']
 
     def expect_reply(self, result, expected, label):
         if (not isinstance(result, dict) or type(result.get('status')) is not int
@@ -245,17 +258,10 @@ print(json.dumps({'records':[dict(r) for r in c.execute('SELECT evidence_id,stat
         self.add('trusted_signal_enforcement_timing', event_id='execution-adverse',
                  sent_at=sent.isoformat(), observed_at=datetime.now(UTC).isoformat())
         # Archive within the live mTLS graph before exercising the restore fence.
-        retained = json.loads(runtime.execute('execution-observer', [
-            'python', '-m', 'scripts.behavior_execution_collector', 'compact',
-            '--directory', '/observer/state', '--base-url', 'https://core:8000',
-            '--tls-profile', '/tls/core.json', '--input-directory', '/observer/input',
-        ]))
+        retained = self.maintenance('observer_archive')
         self.require(retained['compacted'] >= 5 and retained['retired_inputs'] >= 5,
                      'execution_terminal_history_not_archived')
-        server = json.loads(runtime.execute('app', [
-            'python', '-m', 'scripts.context_maintenance', 'compact',
-            '--database', '/data/app-behavior-context.sqlite3',
-        ]))
+        server = self.maintenance('server_archive')
         self.require(server['archived_records'] > 0, 'execution_server_history_not_archived')
         history = self.spool()['archive']
         self.publish(normal, filename='duplicate-normal')
