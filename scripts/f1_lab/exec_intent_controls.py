@@ -14,7 +14,7 @@ from scripts.f1_lab.native_jsonl import require
 
 
 def run(lab, launcher, private, root, outbox, output, check, *, recovery_observability=False,
-        scope=None, coherent_backup=False):
+        scope=None, coherent_backup=False, bundle_observability=False):
     journal = ExecIntentJournal(private/'intents',lab.broker.joiner.registry,lab.broker.registry)
     # This reconciliation facade exposes neither a signing key nor issuance,
     # launch, grant consumption or dispatch methods.
@@ -110,7 +110,8 @@ def run(lab, launcher, private, root, outbox, output, check, *, recovery_observa
         if coherent_backup:
             from scripts.f1_lab.exec_bundle_controls import run as run_bundle
 
-            run_bundle(lab,launcher,private,root,restarted,scope,output,check)
+            run_bundle(lab,launcher,private,root,restarted,scope,output,check,
+                       bundle_observability=bundle_observability)
     (output/'intent-controls.json').write_text(json.dumps({
         'completed':True,'actual_additional_execs':2,'actual_broker_process_losses':2,
         'total_execs_including_outbox_base_four':6,

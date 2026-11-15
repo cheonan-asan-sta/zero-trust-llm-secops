@@ -1,0 +1,34 @@
+[Unit]
+Description=Keyless verification of execution recovery bundle for %i
+
+[Service]
+Type=oneshot
+User=secops-collector
+Group=secops-collector
+EnvironmentFile=/etc/secops/exec-bundle/%i.conf
+ExecStart=/opt/secops/.venv/bin/python -m scripts.exec_bundle_status --tenant ${BUNDLE_TENANT} --server ${BUNDLE_SERVER} --unit ${BUNDLE_UNIT} --source ${BUNDLE_SOURCE} --registry /etc/secops/service-registry.json --registry-sha256 ${SERVICE_REGISTRY_SHA256} --caller-registry /etc/secops/caller-registry.json --caller-registry-sha256 ${CALLER_REGISTRY_SHA256} --package /var/lib/secops-exec-bundles/%i/package --checkpoint /etc/secops/exec-bundle-pins/%i/checkpoint.json --checkpoint-sha256 ${CHECKPOINT_SHA256} --review /var/lib/secops-exec-bundles/%i/review --receipt-sha256 ${RECEIPT_SHA256} --status-output /var/cache/secops-exec-bundle/%i.json
+WorkingDirectory=/opt/secops
+CacheDirectory=secops-exec-bundle
+CacheDirectoryMode=0755
+UMask=0077
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+PrivateNetwork=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictSUIDSGID=yes
+LockPersonality=yes
+CPUQuota=50%
+MemoryMax=768M
+TasksMax=8
+TimeoutStartSec=60
+
+# Opt-in, no install section. Preprovision checker-owned0700 copies/0600 files
+# and external pins. Only CacheDirectory is writable, no evidence lock writes.
+# No recovery key, signer, token, launch or live activation is supplied.

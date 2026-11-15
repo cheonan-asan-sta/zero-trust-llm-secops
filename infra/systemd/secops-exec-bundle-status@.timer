@@ -1,0 +1,10 @@
+[Unit]
+Description=Periodically recheck pinned execution recovery bundle for %i
+
+[Timer]
+OnBootSec=15s
+OnUnitActiveSec=20s
+AccuracySec=1s
+Unit=secops-exec-bundle-status@%i.service
+
+# Opt-in only; no automatic enable/install.

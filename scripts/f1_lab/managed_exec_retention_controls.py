@@ -20,7 +20,8 @@ from scripts.f1_lab.native_jsonl import decode, require
 
 
 def run(lab, gate, result, launcher, private, output, check, *, outbox_recovery=False,
-        intent_recovery=False, recovery_observability=False, coherent_backup=False):
+        intent_recovery=False, recovery_observability=False, coherent_backup=False,
+        bundle_observability=False):
     root, outbox, intents = private / "retained", private / "outbox", private / "intents"
     for path in (root, outbox, intents):
         path.mkdir(mode=0o700)
@@ -206,7 +207,7 @@ def run(lab, gate, result, launcher, private, output, check, *, outbox_recovery=
 
         run_intent(lab,launcher,private,root,outbox,output,check,
                    recovery_observability=recovery_observability,scope=archive_scope,
-                   coherent_backup=coherent_backup)
+                   coherent_backup=coherent_backup,bundle_observability=bundle_observability)
     exported = output / "retention-public"
     exported.mkdir(exist_ok=False)
     for path in public.glob("*.json"):
