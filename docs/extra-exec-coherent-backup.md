@@ -54,3 +54,14 @@
 기존 v85의 1,681,815건 판정 SHA는 동일하며 새 FP·기존 TP 손실·정답 재열람은 0이다. 공유 감사 F1 0%·FP24/FN6, 웹 감사 F1 80.70%·FP21/FN1, 인증 F1 95.08%·FP0/FN3를 유지한다. 별도 v87 새 멤버 8,908행과 섞지 않으며 원래 여섯 영역 독립 목표는 미달이다.
 
 소유 컨테이너·임시 unit·WSL 소스·개인 시험 상태와 WAL 임시 사본을 정리했다. AWS/유료 API는 0이고 8/12시간 soak는 유예한다. 부모 PR81은 CI 17개 성공 후 aitest `ace85d3`에 병합됐으며 이 작업의 게시/CI/병합은 후속 PR 기록을 따른다. [공개 실행 근거](infrastructure-results/extra-exec-coherent-backup-v89-20261116.json).
+
+
+## PR83 CI에서 확인한 보관 잠금 경합과 후속 수정
+
+기존 head `e68f0a9`의 CI43743937515에서 execution-mTLS와 종합 test가 실패했다. 안전한 원본 receipt는 `observer_archive / observer_init / collector_busy`였다. 실행 중인 observer와 시험 보관 작업이 같은 비차단 수집 잠금을 경합했다. 다른15개 check 성공을 전체 성공으로 기록하거나 단순 재실행하지 않는다.
+
+`fdd9dd0`은 잠금 정책을 유지하고 시험 소유 observer만 멈춘 후, 정확한 release/image·volume 소유권/미사용 상태를 확인해 한 번의 고정 offline 작업을 수행한다. network none·비root·capability0·NNP·read-only root·제한된 세 volume이며 임의 명령을 받지 않는다. typed receipt 성공·종료0·소유 작업 정리 확인 후에만 원래 observer를 재개한다. 실패/부분 성공에서는 자동 재시도·성공 카운터 치환 없이 멈춘 상태를 유지한다.
+
+새 경계18개를 포함한 집중70개와 실제 Docker mTLS25조건이 통과했다. 실제 보관 compact9/input retire10/server archive30, 권한 없는 입력 거부·중복/강제 종료 재개·관련 접근403/무관200·복원 중단/재개·기존 토큰403/새 토큰200·이력 보존을 확인했다. 소유 시험 자원 정리도 완료했다. 이는 실제 실행의 관측 수치이며 임의로 고정한 운영 보관량 목표가 아니다.
+
+기존6,017개 전체 시험은 이전 고정 archive `4a9f8e206466243a4e15a626d1f79eb8c2f96023383fc6c3019d7140a369b226`의 결과다. 이번 수정 head에 그 전체 시험을 실행했다고 바꾸지 않는다. 변경은 시험 조정 두 파일과 새 시험 한 파일이며 app/기존 모델·정책의 지문은 유지했다. 새 head의 CI와 후속 통합 archive 전체 인수는 별도 결과로 기록한다. [실패·수정·실제 재검증 근거](infrastructure-results/extra-execution-maintenance-quiesce-v89-20261116.json).
