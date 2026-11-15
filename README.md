@@ -1,5 +1,7 @@
 # zero-trust-llm-secops
 
+2026-11-16 v84 최신 aitest 통합·로컬 인수 완료: [outbox 경보·전체 암호화 백업·복원 후 정리](docs/extra-exec-outbox-recovery.md). 집중331·전체5,770·실제 systemd36조건·실제 관측8조건 통과. 실제 실행4건 전체 byte 동일 복원, 게시3건만 정리·미게시1건 보존. 기존1,681,815건 결정 동일·추가 FP/기존 TP 손실0, 독립 F1 개선은 아니다. 팀원 PR59 대시보드 보존. AWS/유료 API0·8시간 soak 유예. 게시/CI/병합은 후속 PR 기록을 따른다.
+
 관제 대시보드: [화면 구성과 로컬 시연 안내](docs/dashboard-guide.md).
 `python -m scripts.serve_dashboard_demo --seed`로 기존 평가 기록과 분리된 규칙 기반 시연 환경을
 실행합니다. 새 관제 화면은 `/`, 기존 분석 워크벤치는 `/static/workbench.html`입니다.
