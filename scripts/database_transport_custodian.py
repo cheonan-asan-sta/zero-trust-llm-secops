@@ -19,6 +19,7 @@ from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
 from scripts import authority_custodian as custody
 from scripts import database_transport_preflight as preflight
 from scripts.certificate_controller import LifecycleError, atomic, remove_file, save
+from scripts.transport_verification import child_reason
 
 POLICY = {'period_seconds': 86400, 'margin_seconds': 86400, 'root_days': 30, 'leaf_days': 7}
 FILES = {name: ('root.pem', 'server.pem', 'server.key') if index == 0 else ('root.pem', 'client.pem', 'client.key')
@@ -263,9 +264,9 @@ def main():
         print(json.dumps(result))
         return 0
     except (OSError, ValueError, TypeError, KeyError, AttributeError, OverflowError, InvalidSignature,
-            UnsupportedAlgorithm, x509.ExtensionNotFound, x509.DuplicateExtension):
+            UnsupportedAlgorithm, x509.ExtensionNotFound, x509.DuplicateExtension) as error:
         # Library and filesystem errors may include key bytes/paths; fixed output only.
-        print(json.dumps({'verified': False, 'reason': 'database_transport_ceremony_failed'}))
+        print(json.dumps({'verified': False, 'reason': child_reason(error)}))
         return 1
 
 

@@ -19,6 +19,7 @@ from scripts.database_transport_runtime import (
     management_lease,
     runtime_type,
 )
+from scripts.transport_verification import VerificationFailure
 
 CHECKPOINTS = {'stopped': 'after', 'installed': 'before', 'resuming': 'before', 'idle': 'before'}
 
@@ -37,7 +38,13 @@ def public_failure(error):
         path = Path(frame.filename).resolve()
         if path.is_relative_to(ROOT / 'scripts') and path.is_file():
             frames.append({'file': path.relative_to(ROOT).as_posix(), 'line': frame.lineno})
-    return {'reason': reason, 'frames': frames[-8:]}
+    result = {'reason': reason, 'frames': frames[-8:]}
+    if isinstance(error, VerificationFailure):
+        safe = VerificationFailure(error.diagnostic.get('reason'),
+            exit_code=error.diagnostic.get('cli_exit_code'), child=error.diagnostic.get('child_reason'),
+            cleanup=error.diagnostic.get('owned_helper_cleanup_confirmed'))
+        result['transport_verification'] = safe.diagnostic
+    return result
 
 
 def kill_worker(child):
