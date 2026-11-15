@@ -1,5 +1,7 @@
 # 현재 성능과 남은 목표 — 2026-11-16
 
+2026-11-16 v88 로컬 통합 인수: [실행 불확실·원본 미게시 경보](extra-exec-recovery-observability.md). 집중448·전체5,976·실제 systemd53·실제 관측10조건 통과. 실제6exec에서 과거 cold유실까지 미게시1→2→1→0, 확인불가1은 계속pending. 기존1,681,815건 판정동일·새FP/TP손실0. AWS/유료API0·장기soak유예·독립목표미달.
+
 2026-11-16 v87 [감사·인증 추가 멤버 평가](extra-audit-member-transfer.md): 고정8,908행에서 Wilson FP8감소·Wardbeck유지, 새 FP/TP 손실0. 웹 감사 F1 65.45%/67.92%, 공유 감사0%, 인증 재현율91.67%로 목표 미달이다. 부분 노출된 같은 생성 계열이며 Wardbeck 보정 역할 유지. 집중171·전체5,887통과·AWS/유료 API0·장기 soak유예.
 
 2026-11-16 v86 로컬 통합 인수: [실행 intent·중단 후 원본 대조](extra-exec-intent-reconciliation.md). 집중378·전체5,868·실제 systemd44조건 통과. 실제6건 중 브로커 종료2건에서 봉인 전 indeterminate 보존·완성 원본 동일 bytes 재게시·명령/권한 재발급0을 확인했다. v85의1,681,815건 결정 동일, 새 독립 성능이 아니다. PR78 병합, AWS/유료 API0·장기 soak 유예.
