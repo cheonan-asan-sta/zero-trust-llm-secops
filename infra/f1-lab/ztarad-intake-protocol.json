@@ -1,0 +1,20 @@
+{
+  "schema": "f1-ztarad-intake-protocol-1",
+  "stage": "schema_and_label_method_review_only",
+  "publisher_page": "https://data.mendeley.com/datasets/d6hvsrxdts/1",
+  "publisher_license": "CC-BY-4.0 dataset declaration; repository/data equivalence and upstream CERT terms require review before adoption",
+  "repository": "radharanisr/insider-threats",
+  "commit": "c94d5f769376239d8d2f283979afc750a04459e5",
+  "assets": [
+    {"path": "DATA/IMBALANCED DATASETS/V2-ESPECIALISTA-dataset_com_risco.csv", "bytes": 278120, "git_blob_sha1": "8c9a1fe75f36391e2b2aba38e48f6009751fb2a7", "read_scope": "Header and first128 data records are development probe only; no rest-of-file case inspection or model fit in this stage"},
+    {"path": "SOURCE/insider_trhreats_V3.ipynb", "bytes": 465464, "git_blob_sha1": "8c49e9350fa3521d0185daebb7bb94469b7f817b", "read_scope": "JSON code-cell source only; do not display outputs or execute any code"},
+    {"path": "SOURCE/treinamento_especialista.ipynb", "bytes": 602824, "git_blob_sha1": "2dd5ec92da54ab7b41033a0d364b1f95b243e96f", "read_scope": "JSON code-cell source only; do not display outputs or execute any code"}
+  ],
+  "integrity": "Bounded fixed-commit HTTPS assets; exact size and Git blob SHA1 then local SHA256. Never execute notebooks, source code or source payloads.",
+  "excluded_assets": "All SMOTE-balanced data, all LLM-labeled variants and notebook outputs are outside this intake",
+  "label_policy": "Do not map low/medium/high risk to binary policy violation without a justified contract. Do not assume expert provenance proves independent per-event review. Inspect method and missing authority first.",
+  "scope_preservation": "Do not invent identity-active, device-health, role ownership or business approval, and do not substitute this risk dataset for the original six-domain goal.",
+  "model_fitted": false,
+  "final_partition_certified": false,
+  "goal_qualified": false
+}

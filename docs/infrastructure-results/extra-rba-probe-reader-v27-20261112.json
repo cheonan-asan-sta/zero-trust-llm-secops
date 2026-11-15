@@ -1,0 +1,118 @@
+{
+  "schema": "extra-rba-probe-reader-v27-1",
+  "recorded_at": "2026-11-12T05:05:52.818295+00:00",
+  "branch": "extra",
+  "prior_commit": "652699a5a543f8ad5f4a0f372f73211bad8625b5",
+  "reader_source": {
+    "path": "scripts/f1_lab/rba_probe.py",
+    "bytes": 6442,
+    "sha256": "40a58be27859b8708dddc30f9c3d691208650af03420a978007dcd7954dde23e"
+  },
+  "reader_cli": {
+    "path": "scripts/probe_rba_schema.py",
+    "bytes": 867,
+    "sha256": "704b4c77fa53d8395f10f3aa9f13e4de1c61cc0d12ce9441fac257c74b5d2c7c"
+  },
+  "rba_intake_protocol": {
+    "path": "infra/f1-lab/rba-intake-protocol.json",
+    "bytes": 2021,
+    "sha256": "247550c61f1fd7e7ba64f7d9dda9cdf01ec92e4f9d33bc617ec5b50d104558fc"
+  },
+  "limits": {
+    "records": 128,
+    "parser_bytes": 1048576,
+    "physical_line_bytes": 65536,
+    "declared_csv_bytes": 34359738368,
+    "whole_member_copy_cap_unchanged": 536870912
+  },
+  "real_rba_reader_execution_performed": false,
+  "actual_rba_csv_records_parsed": 0,
+  "full_csv_crc_verification_claimed": false,
+  "classifier_fitted": false,
+  "rba_live_acquisition_snapshot": {
+    "pid": 314588,
+    "tool_session_id": 34025,
+    "process_creation_matches_owned_start": true,
+    "process_observed_live": true,
+    "progress": {
+      "bytes_received": 171966464,
+      "elapsed_seconds": 546.06,
+      "expected_bytes": 1093700330,
+      "retry_count": 0
+    },
+    "archive_integrity_complete": false,
+    "note": "Partial download verified live; preserve same handle and do not restart on observation timeout."
+  },
+  "labels_changed": false,
+  "reserved_ait_final_bodies_read": 0,
+  "cloud_test_archive_downloaded": false,
+  "original_six_domain_goal_replaced": false,
+  "independent_final_metrics": null,
+  "goal_qualified": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "tests": {
+    "windows": {
+      "path": "runtime/f1/extra-rba-probe-final-20261112.xml",
+      "bytes": 32894,
+      "sha256": "fab26c7f99b3bc8ea094ed9e864901cb8e352b33aad2d77d7a0189b7578976d3",
+      "passed": 236
+    },
+    "linux": {
+      "path": "runtime/f1/extra-linux-public-native-20261112-15/checks.xml",
+      "bytes": 32900,
+      "sha256": "8882aa9744f216530b97e4190919aa73d60e8b41456afcf4262dfc5d40e12392",
+      "passed": 236
+    }
+  },
+  "linux": {
+    "path": "runtime/f1/extra-linux-public-native-20261112-15/verification.json",
+    "bytes": 1509,
+    "sha256": "47b846b2fa5e1ab5ee0859c3964a67271fad850273f3b7785adc1ec92f2f09b8",
+    "schema": "extra-f1-linux-snapshot-1",
+    "completed": true,
+    "owner": "extra-f1-6c00dc3ef140",
+    "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "tests": [
+      "tests/test_f1_public_sources.py",
+      "tests/test_f1_bounded_zip.py",
+      "tests/test_f1_native_jsonl.py",
+      "tests/test_f1_native_preparation.py",
+      "tests/test_f1_line_truth.py",
+      "tests/test_f1_raw_observations.py",
+      "tests/test_f1_native_bayes.py",
+      "tests/test_f1_native_raw_workflow.py",
+      "tests/test_f1_raw_context.py",
+      "tests/test_f1_native_context_workflow.py",
+      "tests/test_f1_native_tree.py",
+      "tests/test_f1_frozen_native_tree.py",
+      "tests/test_f1_native_transfer.py",
+      "tests/test_f1_contextual_links.py",
+      "tests/test_f1_native_heads.py",
+      "tests/test_f1_native_binary_tree.py",
+      "tests/test_f1_cloud_observations.py",
+      "tests/test_f1_cloud_diagnostics.py",
+      "tests/test_f1_cloud_context.py",
+      "tests/test_f1_cloud_identity.py",
+      "tests/test_f1_rba_probe.py"
+    ],
+    "host_mounts": 0,
+    "network": "none",
+    "cloud_calls": 0,
+    "paid_api_calls": 0,
+    "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+    "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+    "source_manifest_sha256": "35750323b891d69fd6c9d0598072c0c422c4b70382387dea3a26b73e7ff357b6",
+    "source_files": 446,
+    "container_exit_code": 0,
+    "source_verified_before_and_after": true,
+    "remaining_containers": 0
+  },
+  "baseline_app_diff_empty": true,
+  "currently_owned_f1_containers": 0,
+  "interrupted_soak_cleanup": {
+    "path": "docs/infrastructure-results/extra-interrupted-cleanup-v15-20261112.json",
+    "bytes": 3897,
+    "sha256": "956dc5c53ff011b57145be7cae9868743864adbc8674113f37a9e7dff5197b73"
+  }
+}

@@ -64,20 +64,23 @@ def test_scoped_inspection_and_queries_do_not_export_docker_or_api_secrets(monke
     ident = 'a' * 64
     def command(argv, **kwargs):
         calls.append(argv)
-        assert kwargs['timeout'] <= 4
+        assert kwargs['timeout'] <= 14
         if argv[1] == 'ps':
             assert argv[-1] == 'label=secops.runtime=kmtls-012345abcdef'
             return ident
         if argv[1] == 'inspect':
             return json.dumps({'id': ident, 'service': 'operator', 'running': True, 'restarting': False,
                                'oom': False, 'exit_code': 0, 'restarts': 2, 'raw': 'secret-sentinel'})
-        assert argv[:4] == ['docker', 'exec', '-i', ident]
-        assert json.loads(kwargs['payload'])['profile'] == 'prometheus'
-        return json.dumps({'status': 200, 'body': {'status': 'success',
-            'data': {'resultType': 'vector', 'result': [], 'groups': []}, 'token': 'secret-sentinel'}})
+        assert argv[:3] == ['docker', 'exec', ident]
+        assert argv[-2:] == ['scripts.monitoring_diagnostics', '--batch']
+        assert 'payload' not in kwargs
+        return json.dumps({'schema': 'public-c01-probe-batch-1', 'prometheus': {
+            **{key: {'available': True, 'samples': [], 'truncated': False} for key in diag.QUERIES},
+            'rules': {'available': True, 'rules': [], 'truncated': False}}, 'token': 'secret-sentinel'})
     monkeypatch.setattr(diag, 'command', command)
     result = diag.collect(SimpleNamespace(state={'project': 'kmtls-012345abcdef'}, services=('operator',)), 'query_failed')
-    assert len(calls) == 6 and result['prometheus']['up']['available']
+    assert len(calls) == 3 and result['prometheus']['up']['available']
+    assert result['probe_launches'] == 1
     assert result['prometheus']['alert_sample_timestamps']['available']
     assert 'secret-sentinel' not in json.dumps(result) and ident not in json.dumps(result)
 

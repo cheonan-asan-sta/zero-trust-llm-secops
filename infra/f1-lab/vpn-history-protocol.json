@@ -1,0 +1,82 @@
+{
+  "schema": "extra-vpn-history-candidate-protocol-1",
+  "recorded_at": "2026-11-12T06:50:39.259865+00:00",
+  "feature_profile": "raw-rich-vpn-history-3",
+  "sources": {
+    "scripts/f1_lab/vpn_context.py": {
+      "path": "scripts/f1_lab/vpn_context.py",
+      "bytes": 5371,
+      "sha256": "315f223ebedcde010097d4c05bf2991fb703f629ba7cce441257f1bf58dd854a"
+    },
+    "scripts/f1_lab/native_bayes.py": {
+      "path": "scripts/f1_lab/native_bayes.py",
+      "bytes": 5221,
+      "sha256": "4df0736e8f2ff631ac8761d49ff1a1dfe8fe0ef43a78f3abb52394efe5e3b49c"
+    },
+    "scripts/prepare_native_context.py": {
+      "path": "scripts/prepare_native_context.py",
+      "bytes": 9569,
+      "sha256": "672ac228728951e7c29f6ab4f65a7ef1c2125f8fea6654eafce3ce0aed0391e7"
+    },
+    "scripts/f1_lab/native_binary_tree.py": {
+      "path": "scripts/f1_lab/native_binary_tree.py",
+      "bytes": 6903,
+      "sha256": "6c31d98f94ce1842b3f647ddfc364b489336ca39642a02ff933b5600141399b0"
+    },
+    "scripts/fit_native_raw.py": {
+      "path": "scripts/fit_native_raw.py",
+      "bytes": 8759,
+      "sha256": "e9ce634ab600da6e7517eb8df02882a0a8e12b0fca5f2d7299688e480b8ed998"
+    },
+    "scripts/evaluate_native_tree.py": {
+      "path": "scripts/evaluate_native_tree.py",
+      "bytes": 4159,
+      "sha256": "35a08ca022785d6f9dbf030729c4c3e363aa845ff8bc4b619b13a4126bceb1c9"
+    }
+  },
+  "training": {
+    "scenario": "russellmitchell",
+    "tree": "ordered_binary",
+    "max_depth": 8,
+    "min_leaf": 5,
+    "class_balanced": true,
+    "threshold": 0.5
+  },
+  "comparison": "santos; previously observed development; not new blind/final evidence",
+  "history": "24-hour lookback; strictly earlier event times; all timestamp ties withheld; duplicate source bytes count once; per physical source/host",
+  "endpoint": "IPv4 and port grouping only; name presence observed; none proves identity, authority or health; IPv6/unknown remain unavailable",
+  "ids_absolute_or_scenario_relative_time_as_learned_values": false,
+  "labels_as_features": false,
+  "change_original_app_or_truth": false,
+  "independent_final_evaluation": false,
+  "original_six_domain_scope_retained": true,
+  "goal_qualified": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "inputs": {
+    "russellmitchell": {
+      "base": {
+        "path": "runtime/f1/ait-raw-inputs-russell-20261112/preparation.json",
+        "bytes": 4326,
+        "sha256": "21c230d4e13f0aee08dbdec1298d7b0245a297de9c75a84c6106588e72b2defe"
+      },
+      "pairs": {
+        "path": "runtime/f1/ait-lds-dev-pairs-20261112/audit.json",
+        "bytes": 18516,
+        "sha256": "1fd4067e4254246833deca7f65df8a13a1eada20c7d6d76d5ed8c6589baab762"
+      }
+    },
+    "santos": {
+      "base": {
+        "path": "runtime/f1/ait-raw-inputs-santos-20261112/preparation.json",
+        "bytes": 4283,
+        "sha256": "79ca6a06843f475c9ece479956e4d38e8e990206289397b636d785e090bafaaf"
+      },
+      "pairs": {
+        "path": "runtime/f1/ait-lds-santos-pairs-20261112/audit.json",
+        "bytes": 18194,
+        "sha256": "f51c2482356856848704cc0b47209fb0100db3b4b0982381ff1ab444ed201e01"
+      }
+    }
+  }
+}

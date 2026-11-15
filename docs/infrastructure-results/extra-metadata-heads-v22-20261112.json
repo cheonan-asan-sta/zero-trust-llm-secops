@@ -1,0 +1,1726 @@
+{
+  "schema": "extra-contextual-metadata-heads-v22-1",
+  "recorded_at": "2026-11-12T04:19:43.501637+00:00",
+  "branch": "extra",
+  "contextual_metadata_audit": {
+    "path": "runtime/f1/contextual-full-metadata-audit-20261112/audit.json",
+    "sha256": "73440e0654add0f51b8dab076f78bd9d7fb7c5efbb975ebfe3e37c7600caf65d",
+    "schema": "f1-contextual-metadata-audit-1",
+    "completed": true,
+    "csv_sha256": "cce55ca294323909a5ea8f99e97d581ebae74d9964999d58e0f466a21747cc1d",
+    "mechanical_metadata_audit": true,
+    "later_bodies_displayed": 0,
+    "classifier_fitted": false,
+    "development_probe": 128,
+    "final_partition_certified": false,
+    "original_six_domain_goal_replaced": false,
+    "goal_qualified": false,
+    "field_presence_is_authenticated_authority": false,
+    "paid_api_calls": 0,
+    "aws_sdk_calls": 0,
+    "counts": {
+      "records": 347768,
+      "json_objects": 285903,
+      "template_parse_errors": 0,
+      "present_UserContext": 214098,
+      "present_ClientCertificate": 25593,
+      "present_ResourceContext": 281692,
+      "present_SessionId": 214724,
+      "present_Fingerprint": 280809,
+      "truth_attack": 140637,
+      "truth_normal": 141153,
+      "nonjson_or_invalid_json": 61865,
+      "truth_unknown": 65978
+    },
+    "sourcetypes": {
+      "security:badraequest": 89002,
+      "application:model": 111218,
+      "opnsense:filterlog": 52379,
+      "iis:httperr": 120,
+      "fingerprint": 1777,
+      "opnsense:ntpd": 1709,
+      "opnsense:syslog": 4888,
+      "snort": 2501,
+      "application:exception": 10804,
+      "security:jwt:attack": 626,
+      "security:jwt": 8,
+      "security:audit": 243,
+      "opnsense:suricata": 2635,
+      "opnsense:lighttpd": 57,
+      "opnsense:captiveportal": 19,
+      "security:alert": 8040,
+      "security:honeypot": 12090,
+      "security:forbidden": 995,
+      "application:document": 2010,
+      "security:ratelimit": 3390,
+      "application:chat": 43072,
+      "application:db-backup": 90,
+      "security:log": 31,
+      "opnsense:unbound": 33,
+      "opnsense:dnsmasq": 6,
+      "apache:error": 19,
+      "auth:user": 6
+    },
+    "declared_claim_fields": [],
+    "top_level_shapes": [
+      {
+        "keys": [
+          "ClientCertificate",
+          "Description",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HTTPStatusCode",
+          "HashCheck",
+          "IP",
+          "Id",
+          "JSON",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "Route",
+          "Suspicious",
+          "SuspiciousDescription",
+          "User",
+          "UserAgent"
+        ],
+        "records": 66052
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "Description",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HTTPStatusCode",
+          "HashCheck",
+          "IP",
+          "Id",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "Route",
+          "SessionId",
+          "Suspicious",
+          "User",
+          "UserAgent",
+          "UserContext"
+        ],
+        "records": 51227
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "Description",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HTTPStatusCode",
+          "HashCheck",
+          "IP",
+          "Id",
+          "JSON",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "Route",
+          "SessionId",
+          "Suspicious",
+          "User",
+          "UserAgent",
+          "UserContext"
+        ],
+        "records": 48014
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HTTPStatusCode",
+          "HashCheck",
+          "IP",
+          "Id",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "Route",
+          "SessionId",
+          "Suspicious",
+          "User",
+          "UserAgent",
+          "UserContext"
+        ],
+        "records": 41545
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "Description",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HTTPStatusCode",
+          "HashCheck",
+          "IP",
+          "Id",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "Route",
+          "SessionId",
+          "Suspicious",
+          "SuspiciousDescription",
+          "User",
+          "UserAgent",
+          "UserContext"
+        ],
+        "records": 37571
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "Description",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HTTPStatusCode",
+          "HashCheck",
+          "IP",
+          "Id",
+          "JSON",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "Route",
+          "SessionId",
+          "Suspicious",
+          "SuspiciousDescription",
+          "User",
+          "UserAgent",
+          "UserContext"
+        ],
+        "records": 31727
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HTTPStatusCode",
+          "HashCheck",
+          "IP",
+          "Id",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "Route",
+          "SessionId",
+          "Suspicious",
+          "SuspiciousDescription",
+          "User",
+          "UserAgent",
+          "UserContext"
+        ],
+        "records": 3597
+      },
+      {
+        "keys": [
+          "UNIFIED2_PACKET",
+          "classification",
+          "event_snort_id",
+          "event_time",
+          "message",
+          "sha256",
+          "sourceIP",
+          "targetIP"
+        ],
+        "records": 2501
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "Description",
+          "EventType",
+          "FingerprintHMAC",
+          "HTTPStatusCode",
+          "HashCheck",
+          "IP",
+          "Id",
+          "JSON",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "Route",
+          "Suspicious",
+          "SuspiciousDescription",
+          "User",
+          "UserAgent"
+        ],
+        "records": 984
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.112",
+          "192.168.3.120",
+          "192.168.3.121",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 669
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "Description",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HashCheck",
+          "IP",
+          "Id",
+          "JSON",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "SessionId",
+          "Suspicious",
+          "SuspiciousDescription",
+          "User",
+          "UserAgent"
+        ],
+        "records": 606
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.110",
+          "192.168.3.112",
+          "192.168.3.120",
+          "192.168.3.121",
+          "192.168.3.33",
+          "192.168.3.5",
+          "192.168.3.65",
+          "192.168.3.68",
+          "192.168.3.9",
+          "192.168.3.96",
+          "192.168.3.99",
+          "SuspiciousDescription",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 411
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HashCheck",
+          "IP",
+          "Id",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "SessionId",
+          "Suspicious",
+          "User",
+          "UserAgent",
+          "UserContext"
+        ],
+        "records": 180
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.110",
+          "192.168.3.112",
+          "192.168.3.120",
+          "192.168.3.121",
+          "192.168.3.14",
+          "192.168.3.33",
+          "192.168.3.5",
+          "192.168.3.65",
+          "192.168.3.68",
+          "192.168.3.72",
+          "192.168.3.9",
+          "192.168.3.96",
+          "192.168.3.99",
+          "SuspiciousDescription",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 161
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HashCheck",
+          "IP",
+          "Id",
+          "JSON",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "SessionId",
+          "Suspicious",
+          "User",
+          "UserAgent",
+          "UserContext"
+        ],
+        "records": 122
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.120",
+          "192.168.3.121",
+          "192.168.3.5",
+          "192.168.3.65",
+          "192.168.3.68",
+          "192.168.3.9",
+          "192.168.3.96",
+          "SuspiciousDescription",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 66
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.120",
+          "192.168.3.121",
+          "192.168.3.5",
+          "192.168.3.9",
+          "SuspiciousDescription",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 61
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.110",
+          "192.168.3.112",
+          "192.168.3.120",
+          "192.168.3.121",
+          "192.168.3.14",
+          "192.168.3.33",
+          "192.168.3.5",
+          "192.168.3.65",
+          "192.168.3.68",
+          "192.168.3.9",
+          "192.168.3.96",
+          "192.168.3.99",
+          "SuspiciousDescription",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 60
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.120",
+          "192.168.3.121",
+          "192.168.3.99",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 52
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "Description",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HashCheck",
+          "IP",
+          "Id",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "SessionId",
+          "Suspicious",
+          "SuspiciousDescription",
+          "User",
+          "UserAgent",
+          "UserContext"
+        ],
+        "records": 46
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "Description",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HashCheck",
+          "IP",
+          "Id",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "SessionId",
+          "Suspicious",
+          "User",
+          "UserAgent",
+          "UserContext"
+        ],
+        "records": 45
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.120",
+          "192.168.3.121",
+          "192.168.3.15",
+          "192.168.3.99",
+          "SuspiciousDescription",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 28
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "Description",
+          "EventType",
+          "FingerprintHMAC",
+          "HTTPStatusCode",
+          "HashCheck",
+          "IP",
+          "Id",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "Route",
+          "Suspicious",
+          "SuspiciousDescription",
+          "User",
+          "UserAgent"
+        ],
+        "records": 25
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HashCheck",
+          "IP",
+          "Id",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "SessionId",
+          "Suspicious",
+          "SuspiciousDescription",
+          "User",
+          "UserAgent",
+          "UserContext"
+        ],
+        "records": 21
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.120",
+          "192.168.3.121",
+          "192.168.3.33",
+          "192.168.3.5",
+          "192.168.3.65",
+          "192.168.3.68",
+          "192.168.3.9",
+          "192.168.3.96",
+          "SuspiciousDescription",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 21
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "Description",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HashCheck",
+          "IP",
+          "Id",
+          "JSON",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "SessionId",
+          "Suspicious",
+          "User",
+          "UserAgent"
+        ],
+        "records": 20
+      },
+      {
+        "keys": [
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "SHA256",
+          "ip",
+          "ipBehindProxy",
+          "referrer_js",
+          "userAgent_js",
+          "userAgent_php"
+        ],
+        "records": 20
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.120",
+          "192.168.3.121",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 14
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.120",
+          "192.168.3.121",
+          "192.168.3.20",
+          "192.168.3.99",
+          "SuspiciousDescription",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 12
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.120",
+          "192.168.3.121",
+          "192.168.3.33",
+          "192.168.3.5",
+          "192.168.3.65",
+          "192.168.3.68",
+          "192.168.3.9",
+          "192.168.3.96",
+          "192.168.3.99",
+          "SuspiciousDescription",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 11
+      },
+      {
+        "keys": [
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "SHA256",
+          "_suspicious",
+          "ip",
+          "ipBehindProxy",
+          "mac",
+          "referrer_js",
+          "referrer_match",
+          "referrer_php",
+          "result",
+          "sessionId",
+          "startTime",
+          "userAgent_js",
+          "userAgent_match",
+          "userAgent_php",
+          "username"
+        ],
+        "records": 8
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "Description",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HashCheck",
+          "IP",
+          "Id",
+          "JSON",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "Suspicious",
+          "SuspiciousDescription",
+          "User",
+          "UserAgent"
+        ],
+        "records": 5
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.120",
+          "192.168.3.121",
+          "192.168.3.5",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 4
+      },
+      {
+        "keys": [
+          "ClientCertificate",
+          "Description",
+          "EventType",
+          "Fingerprint",
+          "FingerprintHMAC",
+          "HashCheck",
+          "IP",
+          "Id",
+          "JSON",
+          "Level",
+          "RequestMetadata",
+          "ResourceContext",
+          "SessionId",
+          "Suspicious",
+          "SuspiciousDescription",
+          "User",
+          "UserAgent",
+          "UserContext"
+        ],
+        "records": 3
+      },
+      {
+        "keys": [
+          "HMAC",
+          "TimeGenerated",
+          "data"
+        ],
+        "records": 3
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.110",
+          "192.168.3.120",
+          "192.168.3.121",
+          "192.168.3.33",
+          "192.168.3.5",
+          "192.168.3.65",
+          "192.168.3.68",
+          "192.168.3.9",
+          "192.168.3.96",
+          "192.168.3.99",
+          "SuspiciousDescription",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 3
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.120",
+          "192.168.3.121",
+          "192.168.3.5",
+          "192.168.3.9",
+          "192.168.3.96",
+          "SuspiciousDescription",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 1
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.120",
+          "192.168.3.121",
+          "192.168.3.5",
+          "192.168.3.65",
+          "192.168.3.9",
+          "192.168.3.96",
+          "SuspiciousDescription",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 1
+      },
+      {
+        "keys": [
+          "192.168.3.101",
+          "192.168.3.120",
+          "192.168.3.121",
+          "192.168.3.5",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 1
+      },
+      {
+        "keys": [
+          "192.168.3.101",
+          "192.168.3.121",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 1
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.121",
+          "192.168.3.20",
+          "192.168.3.99",
+          "SuspiciousDescription",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 1
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.121",
+          "192.168.3.99",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 1
+      },
+      {
+        "keys": [
+          "192.168.3.100",
+          "192.168.3.101",
+          "192.168.3.99",
+          "device_count",
+          "devicesHMAC",
+          "devicesHash",
+          "session_id"
+        ],
+        "records": 1
+      },
+      {
+        "keys": [
+          "EventType",
+          "FingerprintHMAC",
+          "SHA256",
+          "_suspicious",
+          "authUsername",
+          "fingerprint",
+          "ip",
+          "ipBehindProxy",
+          "referrer_js",
+          "referrer_php",
+          "userAgent_js",
+          "userAgent_match",
+          "userAgent_php"
+        ],
+        "records": 1
+      }
+    ],
+    "linkage": {
+      "identity": {
+        "rows": 347768,
+        "components": 133070,
+        "largest_component_rows": 83150,
+        "probe_tainted_components": 108,
+        "probe_tainted_rows": 83884,
+        "unlinked_rows": 133044,
+        "remaining_linked_untouched_rows": 130945,
+        "final_partition_certified": false
+      },
+      "identity_profile": {
+        "rows": 347768,
+        "components": 101803,
+        "largest_component_rows": 116756,
+        "probe_tainted_components": 86,
+        "probe_tainted_rows": 234127,
+        "unlinked_rows": 66959,
+        "remaining_linked_untouched_rows": 46708,
+        "final_partition_certified": false
+      },
+      "identity_profile_template": {
+        "rows": 347768,
+        "components": 66195,
+        "largest_component_rows": 280833,
+        "probe_tainted_components": 27,
+        "probe_tainted_rows": 280859,
+        "unlinked_rows": 65950,
+        "remaining_linked_untouched_rows": 985,
+        "final_partition_certified": false
+      }
+    },
+    "metadata_db_sha256": "186d9dcbadbc059013faf9718932a0b515e32cf6d2dc213e8d00d34e5b9c3460"
+  },
+  "metadata_audit_protocol": {
+    "path": "infra/f1-lab/contextual-audit-protocol.json",
+    "sha256": "d794b6bd65949e1493b561e65d472aef0a99a00716f9df41bdf1f9b01a8efac8"
+  },
+  "native_head_experiments": {
+    "categorical": {
+      "fit": {
+        "path": "runtime/f1/ait-native-heads-fit-russell-20261112/fit.json",
+        "sha256": "ae3d879cb914c46e44356b3d7bda095f7d36ee04c3ceaaed0f9532628ee20009",
+        "aws_sdk_calls": 0,
+        "completed": true,
+        "evaluation_kind": "development resubstitution only",
+        "final_candidate_selected": false,
+        "goal_qualified": false,
+        "head_gate": "observed-format-1",
+        "head_training_class_counts": {
+          "audit": [
+            2608,
+            11
+          ],
+          "auth": [
+            264,
+            7
+          ],
+          "cpu": [
+            1871,
+            49
+          ],
+          "dns": [
+            210487,
+            53919
+          ],
+          "http": [
+            821,
+            7695
+          ],
+          "other": [
+            11821,
+            153
+          ],
+          "vpn": [
+            5509,
+            28
+          ]
+        },
+        "metrics": {
+          "accuracy": 0.9926196387382596,
+          "f1": 0.9823869377197592,
+          "false_positive_rate": 0.004649050265445773,
+          "fn": 1094,
+          "fp": 1085,
+          "inference_errors": 0,
+          "population": 295243,
+          "precision": 0.9824584094546748,
+          "recall": 0.9823154763829168,
+          "tn": 232296,
+          "tp": 60768
+        },
+        "model_sha256": "e6e9b38e32592d4e7b50f801c4b41c4ae4c09e6bd67d73d214b57291b3b69f1b",
+        "original_six_domain_goal_replaced": false,
+        "paid_api_calls": 0,
+        "per_pair": [
+          {
+            "metrics": {
+              "accuracy": 0.9972677595628415,
+              "f1": 0.0,
+              "false_positive_rate": 0.0,
+              "fn": 2,
+              "fp": 0,
+              "inference_errors": 0,
+              "population": 732,
+              "precision": null,
+              "recall": 0.0,
+              "tn": 730,
+              "tp": 0
+            },
+            "raw_member": "gather/internal_share/logs/audit/audit.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9963718738673433,
+              "f1": 0.9906531584107569,
+              "false_positive_rate": 5.85941901606833e-05,
+              "fn": 988,
+              "fp": 13,
+              "inference_errors": 0,
+              "population": 275900,
+              "precision": 0.9997549943460233,
+              "recall": 0.9817155547330434,
+              "tn": 221852,
+              "tp": 53047
+            },
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9816176470588235,
+              "f1": 0.7368421052631579,
+              "false_positive_rate": 0.015151515151515152,
+              "fn": 1,
+              "fp": 4,
+              "inference_errors": 0,
+              "population": 272,
+              "precision": 0.6363636363636364,
+              "recall": 0.875,
+              "tn": 260,
+              "tp": 7
+            },
+            "raw_member": "gather/intranet_server/logs/auth.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.19444444444444445,
+              "f1": 0.32558139534883723,
+              "false_positive_rate": null,
+              "fn": 29,
+              "fp": 0,
+              "inference_errors": 0,
+              "population": 36,
+              "precision": 1.0,
+              "recall": 0.19444444444444445,
+              "tn": 0,
+              "tp": 7
+            },
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9990621336459554,
+              "f1": 0.9994799115849694,
+              "false_positive_rate": 0.0,
+              "fn": 8,
+              "fp": 0,
+              "inference_errors": 0,
+              "population": 8530,
+              "precision": 1.0,
+              "recall": 0.9989603638726445,
+              "tn": 835,
+              "tp": 7687
+            },
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9987046632124352,
+              "f1": 0.8571428571428571,
+              "false_positive_rate": 0.0013003901170351106,
+              "fn": 0,
+              "fp": 3,
+              "inference_errors": 0,
+              "population": 2316,
+              "precision": 0.75,
+              "recall": 1.0,
+              "tn": 2304,
+              "tp": 9
+            },
+            "raw_member": "gather/intranet_server/logs/audit/audit.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.8060321473722232,
+              "f1": 0.016483516483516484,
+              "false_positive_rate": 0.19150481031040117,
+              "fn": 19,
+              "fp": 1055,
+              "inference_errors": 0,
+              "population": 5537,
+              "precision": 0.008458646616541353,
+              "recall": 0.32142857142857145,
+              "tn": 4454,
+              "tp": 9
+            },
+            "raw_member": "gather/vpn/logs/openvpn.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9703125,
+              "f1": 0.06557377049180328,
+              "false_positive_rate": 0.005344735435595938,
+              "fn": 47,
+              "fp": 10,
+              "inference_errors": 0,
+              "population": 1920,
+              "precision": 0.16666666666666666,
+              "recall": 0.04081632653061224,
+              "tn": 1861,
+              "tp": 2
+            },
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.cpu.log"
+          }
+        ],
+        "rows_unusable_for_fit": 0,
+        "schema": "f1-native-heads-fit-1",
+        "scope": "all eight physically paired label/raw files in development russellmitchell; not whole dataset or final evaluation",
+        "selected_heads": {
+          "audit": 2619,
+          "auth": 271,
+          "cpu": 1920,
+          "dns": 264406,
+          "http": 8516,
+          "other": 11974,
+          "vpn": 5537
+        },
+        "threshold": 0.5,
+        "training_preparation_sha256": "354f95cccd3f2a2dbbda0c81329aba3068890b85f0affe3451ea779df78c9b62"
+      },
+      "santos_observed_development": {
+        "path": "runtime/f1/ait-native-heads-transfer-santos-20261112/evaluation.json",
+        "sha256": "6fa36fc417e18df4ecfb211fdade1d461d8004ff8a9a6c98a07c8dab685791fe",
+        "aws_sdk_calls": 0,
+        "completed": true,
+        "evaluation_kind": "cross-scenario development diagnostic; not independent final acceptance",
+        "feature_profile": "raw-rich-http-window-2",
+        "goal_qualified": false,
+        "input_preparation_sha256": "e050a0e4f1646361432111387c66319dde1eb92f7b0d28813580d40f4348c48a",
+        "metrics": {
+          "accuracy": 0.9919452928615834,
+          "f1": 0.9749121293119778,
+          "false_positive_rate": 0.005381945142774396,
+          "fn": 1046,
+          "fp": 1338,
+          "inference_errors": 0,
+          "population": 295976,
+          "precision": 0.9719255544598082,
+          "recall": 0.9779171152912365,
+          "tn": 247271,
+          "tp": 46321
+        },
+        "model_kind": "heads",
+        "model_sha256": "e6e9b38e32592d4e7b50f801c4b41c4ae4c09e6bd67d73d214b57291b3b69f1b",
+        "model_state_before_after_sha256": "dc6143d33634032652f514f1780ac6e4baeac3b65f140927e508d23ea0b2f9e7",
+        "model_unchanged": true,
+        "paid_api_calls": 0,
+        "per_pair": [
+          {
+            "metrics": {
+              "accuracy": 0.9972527472527473,
+              "f1": 0.0,
+              "false_positive_rate": 0.0,
+              "fn": 2,
+              "fp": 0,
+              "inference_errors": 0,
+              "population": 728,
+              "precision": null,
+              "recall": 0.0,
+              "tn": 726,
+              "tp": 0
+            },
+            "raw_member": "gather/internal_share/logs/audit/audit.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.996430475900271,
+              "f1": 0.9873829978202333,
+              "false_positive_rate": 0.00025821089480657463,
+              "fn": 923,
+              "fp": 61,
+              "inference_errors": 0,
+              "population": 275667,
+              "precision": 0.9984182138782284,
+              "recall": 0.9765890529092477,
+              "tn": 236180,
+              "tp": 38503
+            },
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9962962962962963,
+              "f1": 0.9565217391304348,
+              "false_positive_rate": 0.0,
+              "fn": 1,
+              "fp": 0,
+              "inference_errors": 0,
+              "population": 270,
+              "precision": 1.0,
+              "recall": 0.9166666666666666,
+              "tn": 258,
+              "tp": 11
+            },
+            "raw_member": "gather/intranet_server/logs/auth.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9858380891989008,
+              "f1": 0.9914573505036338,
+              "false_positive_rate": 0.06954436450839328,
+              "fn": 18,
+              "fp": 116,
+              "inference_errors": 0,
+              "population": 9462,
+              "precision": 0.9853015712113533,
+              "recall": 0.9976905311778291,
+              "tn": 1552,
+              "tp": 7776
+            },
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.20454545454545456,
+              "f1": 0.2857142857142857,
+              "false_positive_rate": 0.0,
+              "fn": 35,
+              "fp": 0,
+              "inference_errors": 0,
+              "population": 44,
+              "precision": 1.0,
+              "recall": 0.16666666666666666,
+              "tn": 2,
+              "tp": 7
+            },
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9977905435262925,
+              "f1": 0.8484848484848485,
+              "false_positive_rate": 0.0,
+              "fn": 5,
+              "fp": 0,
+              "inference_errors": 0,
+              "population": 2263,
+              "precision": 1.0,
+              "recall": 0.7368421052631579,
+              "tn": 2244,
+              "tp": 14
+            },
+            "raw_member": "gather/intranet_server/logs/audit/audit.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.7917111348274636,
+              "f1": 0.015138772077375946,
+              "false_positive_rate": 0.20593493028244547,
+              "fn": 19,
+              "fp": 1152,
+              "inference_errors": 0,
+              "population": 5622,
+              "precision": 0.007751937984496124,
+              "recall": 0.32142857142857145,
+              "tn": 4442,
+              "tp": 9
+            },
+            "raw_member": "gather/vpn/logs/openvpn.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9729166666666667,
+              "f1": 0.037037037037037035,
+              "false_positive_rate": 0.004797441364605544,
+              "fn": 43,
+              "fp": 9,
+              "inference_errors": 0,
+              "population": 1920,
+              "precision": 0.1,
+              "recall": 0.022727272727272728,
+              "tn": 1867,
+              "tp": 1
+            },
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log"
+          }
+        ],
+        "refit_performed": false,
+        "schema": "f1-native-tree-transfer-1",
+        "scope": "all eight physically paired label/raw files in development santos; not whole dataset or final evaluation",
+        "threshold": 0.5
+      }
+    },
+    "ordered_binary": {
+      "fit": {
+        "path": "runtime/f1/ait-native-ordered-heads-fit-russell-20261112/fit.json",
+        "sha256": "ec8425dd90353f0e24af82ef3be0df7b770badf30cc1cfc4b9e00522873d70b0",
+        "aws_sdk_calls": 0,
+        "completed": true,
+        "evaluation_kind": "development resubstitution only",
+        "final_candidate_selected": false,
+        "goal_qualified": false,
+        "head_gate": "observed-format-1",
+        "head_training_class_counts": {
+          "audit": [
+            2608,
+            11
+          ],
+          "auth": [
+            264,
+            7
+          ],
+          "cpu": [
+            1871,
+            49
+          ],
+          "dns": [
+            210487,
+            53919
+          ],
+          "http": [
+            821,
+            7695
+          ],
+          "other": [
+            11821,
+            153
+          ],
+          "vpn": [
+            5509,
+            28
+          ]
+        },
+        "metrics": {
+          "accuracy": 0.9928702797356753,
+          "f1": 0.9830002018978397,
+          "false_positive_rate": 0.004726177366623676,
+          "fn": 1002,
+          "fp": 1103,
+          "inference_errors": 0,
+          "population": 295243,
+          "precision": 0.982199054274325,
+          "recall": 0.9838026575280463,
+          "tn": 232278,
+          "tp": 60860
+        },
+        "model_sha256": "cd184036ee57bcd403700237256c723d956b0626917448ddc2fc5b1387825ea8",
+        "original_six_domain_goal_replaced": false,
+        "paid_api_calls": 0,
+        "per_pair": [
+          {
+            "metrics": {
+              "accuracy": 0.9863387978142076,
+              "f1": 0.0,
+              "false_positive_rate": 0.010958904109589041,
+              "fn": 2,
+              "fp": 8,
+              "inference_errors": 0,
+              "population": 732,
+              "precision": 0.0,
+              "recall": 0.0,
+              "tn": 722,
+              "tp": 0
+            },
+            "raw_member": "gather/internal_share/logs/audit/audit.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9963863718738674,
+              "f1": 0.9906927679913369,
+              "false_positive_rate": 0.00010817388952741532,
+              "fn": 973,
+              "fp": 24,
+              "inference_errors": 0,
+              "population": 275900,
+              "precision": 0.9995479034020269,
+              "recall": 0.9819931525862866,
+              "tn": 221841,
+              "tp": 53062
+            },
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9816176470588235,
+              "f1": 0.7368421052631579,
+              "false_positive_rate": 0.015151515151515152,
+              "fn": 1,
+              "fp": 4,
+              "inference_errors": 0,
+              "population": 272,
+              "precision": 0.6363636363636364,
+              "recall": 0.875,
+              "tn": 260,
+              "tp": 7
+            },
+            "raw_member": "gather/intranet_server/logs/auth.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 1.0,
+              "f1": 1.0,
+              "false_positive_rate": null,
+              "fn": 0,
+              "fp": 0,
+              "inference_errors": 0,
+              "population": 36,
+              "precision": 1.0,
+              "recall": 1.0,
+              "tn": 0,
+              "tp": 36
+            },
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.999179366940211,
+              "f1": 0.9995449522199831,
+              "false_positive_rate": 0.0,
+              "fn": 7,
+              "fp": 0,
+              "inference_errors": 0,
+              "population": 8530,
+              "precision": 1.0,
+              "recall": 0.999090318388564,
+              "tn": 835,
+              "tp": 7688
+            },
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9952504317789291,
+              "f1": 0.6206896551724138,
+              "false_positive_rate": 0.004768097095795405,
+              "fn": 0,
+              "fp": 11,
+              "inference_errors": 0,
+              "population": 2316,
+              "precision": 0.45,
+              "recall": 1.0,
+              "tn": 2296,
+              "tp": 9
+            },
+            "raw_member": "gather/intranet_server/logs/audit/audit.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.8060321473722232,
+              "f1": 0.016483516483516484,
+              "false_positive_rate": 0.19150481031040117,
+              "fn": 19,
+              "fp": 1055,
+              "inference_errors": 0,
+              "population": 5537,
+              "precision": 0.008458646616541353,
+              "recall": 0.32142857142857145,
+              "tn": 4454,
+              "tp": 9
+            },
+            "raw_member": "gather/vpn/logs/openvpn.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9994791666666667,
+              "f1": 0.98989898989899,
+              "false_positive_rate": 0.0005344735435595938,
+              "fn": 0,
+              "fp": 1,
+              "inference_errors": 0,
+              "population": 1920,
+              "precision": 0.98,
+              "recall": 1.0,
+              "tn": 1870,
+              "tp": 49
+            },
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.cpu.log"
+          }
+        ],
+        "rows_unusable_for_fit": 0,
+        "schema": "f1-native-heads-fit-1",
+        "scope": "all eight physically paired label/raw files in development russellmitchell; not whole dataset or final evaluation",
+        "selected_heads": {
+          "audit": 2619,
+          "auth": 271,
+          "cpu": 1920,
+          "dns": 264406,
+          "http": 8516,
+          "other": 11974,
+          "vpn": 5537
+        },
+        "threshold": 0.5,
+        "training_preparation_sha256": "354f95cccd3f2a2dbbda0c81329aba3068890b85f0affe3451ea779df78c9b62",
+        "tree_variant": "ordered_binary"
+      },
+      "santos_observed_development": {
+        "path": "runtime/f1/ait-native-ordered-heads-transfer-santos-20261112/evaluation.json",
+        "sha256": "48109f93b4a09eac30ece8eb6ebc90311391fcf9a024b81f1f58ee64a9b403af",
+        "aws_sdk_calls": 0,
+        "completed": true,
+        "evaluation_kind": "cross-scenario development diagnostic; not independent final acceptance",
+        "feature_profile": "raw-rich-http-window-2",
+        "goal_qualified": false,
+        "input_preparation_sha256": "e050a0e4f1646361432111387c66319dde1eb92f7b0d28813580d40f4348c48a",
+        "metrics": {
+          "accuracy": 0.9924115468821796,
+          "f1": 0.9763708285990826,
+          "false_positive_rate": 0.005156691833360819,
+          "fn": 964,
+          "fp": 1282,
+          "inference_errors": 0,
+          "population": 295976,
+          "precision": 0.9731152353989724,
+          "recall": 0.979648278337239,
+          "tn": 247327,
+          "tp": 46403
+        },
+        "model_kind": "heads",
+        "model_sha256": "cd184036ee57bcd403700237256c723d956b0626917448ddc2fc5b1387825ea8",
+        "model_state_before_after_sha256": "f964ef3b5715febf91f0e76f06f937e8b90ea1be685dce21eede2a80682a6a01",
+        "model_unchanged": true,
+        "paid_api_calls": 0,
+        "per_pair": [
+          {
+            "metrics": {
+              "accuracy": 0.9862637362637363,
+              "f1": 0.0,
+              "false_positive_rate": 0.011019283746556474,
+              "fn": 2,
+              "fp": 8,
+              "inference_errors": 0,
+              "population": 728,
+              "precision": 0.0,
+              "recall": 0.0,
+              "tn": 718,
+              "tp": 0
+            },
+            "raw_member": "gather/internal_share/logs/audit/audit.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9966517573739331,
+              "f1": 0.9881567973311093,
+              "false_positive_rate": 1.2698896465897114e-05,
+              "fn": 920,
+              "fp": 3,
+              "inference_errors": 0,
+              "population": 275667,
+              "precision": 0.9999220961333715,
+              "recall": 0.9766651448282859,
+              "tn": 236238,
+              "tp": 38506
+            },
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9962962962962963,
+              "f1": 0.9565217391304348,
+              "false_positive_rate": 0.0,
+              "fn": 1,
+              "fp": 0,
+              "inference_errors": 0,
+              "population": 270,
+              "precision": 1.0,
+              "recall": 0.9166666666666666,
+              "tn": 258,
+              "tp": 11
+            },
+            "raw_member": "gather/intranet_server/logs/auth.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9859437751004017,
+              "f1": 0.9915216421240518,
+              "false_positive_rate": 0.06954436450839328,
+              "fn": 17,
+              "fp": 116,
+              "inference_errors": 0,
+              "population": 9462,
+              "precision": 0.9853034334220195,
+              "recall": 0.997818835001283,
+              "tn": 1552,
+              "tp": 7777
+            },
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9545454545454546,
+              "f1": 0.9767441860465116,
+              "false_positive_rate": 1.0,
+              "fn": 0,
+              "fp": 2,
+              "inference_errors": 0,
+              "population": 44,
+              "precision": 0.9545454545454546,
+              "recall": 1.0,
+              "tn": 0,
+              "tp": 42
+            },
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9977905435262925,
+              "f1": 0.8484848484848485,
+              "false_positive_rate": 0.0,
+              "fn": 5,
+              "fp": 0,
+              "inference_errors": 0,
+              "population": 2263,
+              "precision": 1.0,
+              "recall": 0.7368421052631579,
+              "tn": 2244,
+              "tp": 14
+            },
+            "raw_member": "gather/intranet_server/logs/audit/audit.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.7917111348274636,
+              "f1": 0.015138772077375946,
+              "false_positive_rate": 0.20593493028244547,
+              "fn": 19,
+              "fp": 1152,
+              "inference_errors": 0,
+              "population": 5622,
+              "precision": 0.007751937984496124,
+              "recall": 0.32142857142857145,
+              "tn": 4442,
+              "tp": 9
+            },
+            "raw_member": "gather/vpn/logs/openvpn.log"
+          },
+          {
+            "metrics": {
+              "accuracy": 0.9994791666666667,
+              "f1": 0.9887640449438202,
+              "false_positive_rate": 0.0005330490405117271,
+              "fn": 0,
+              "fp": 1,
+              "inference_errors": 0,
+              "population": 1920,
+              "precision": 0.9777777777777777,
+              "recall": 1.0,
+              "tn": 1875,
+              "tp": 44
+            },
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log"
+          }
+        ],
+        "refit_performed": false,
+        "schema": "f1-native-tree-transfer-1",
+        "scope": "all eight physically paired label/raw files in development santos; not whole dataset or final evaluation",
+        "threshold": 0.5
+      }
+    }
+  },
+  "santos_previously_observed": true,
+  "candidate_selected": false,
+  "model_variants_not_single_ablation": true,
+  "categorical_artifact_note": "initial categorical-head artifact predates optional tree_variant metadata; original bytes and failed results retained. Final source also supports loading that version.",
+  "independent_final_metrics": null,
+  "goal_qualified": false,
+  "original_six_domain_goal_replaced": false,
+  "reserved_ait_final_bodies_read": 0,
+  "labels_changed": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "tests": {
+    "windows": {
+      "path": "runtime/f1/extra-metadata-heads-final-20261112.xml",
+      "sha256": "abfa6e6a11d97b0d97ac8164f0a59ba7af5a87c85e75b6e71968d5823d18c063",
+      "passed": 182
+    },
+    "linux": {
+      "path": "runtime/f1/extra-linux-public-native-20261112-09/checks.xml",
+      "sha256": "737c79ad6869d5df4ade02367b332899dd07f3d84b9eeb8124b54bed207bfb49",
+      "passed": 182
+    }
+  },
+  "linux": {
+    "schema": "extra-f1-linux-snapshot-1",
+    "completed": true,
+    "owner": "extra-f1-bb8e05572d61",
+    "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "tests": [
+      "tests/test_f1_public_sources.py",
+      "tests/test_f1_bounded_zip.py",
+      "tests/test_f1_native_jsonl.py",
+      "tests/test_f1_native_preparation.py",
+      "tests/test_f1_line_truth.py",
+      "tests/test_f1_raw_observations.py",
+      "tests/test_f1_native_bayes.py",
+      "tests/test_f1_native_raw_workflow.py",
+      "tests/test_f1_raw_context.py",
+      "tests/test_f1_native_context_workflow.py",
+      "tests/test_f1_native_tree.py",
+      "tests/test_f1_frozen_native_tree.py",
+      "tests/test_f1_native_transfer.py",
+      "tests/test_f1_contextual_links.py",
+      "tests/test_f1_native_heads.py",
+      "tests/test_f1_native_binary_tree.py"
+    ],
+    "host_mounts": 0,
+    "network": "none",
+    "cloud_calls": 0,
+    "paid_api_calls": 0,
+    "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+    "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+    "source_manifest_sha256": "43fdc07d467221e221e520a8fe14b6c885de1cf32599463706971597a028ae2a",
+    "source_files": 425,
+    "container_exit_code": 0,
+    "source_verified_before_and_after": true,
+    "remaining_containers": 0
+  },
+  "baseline_app_diff_empty": true
+}

@@ -1,5 +1,135 @@
 # 개발 주차별 산출물
 
+2026-11-15 v81: [백업·복구 검증 상태 지표/경보](extra-backup-recovery-status.md). 집중 196개·전체 5,623개·실제 systemd 71조건·관측 23조건 통과. 8시간은 유예하며 운영 활성화와 독립 F1 평가는 별도다.
+
+2026-11-15 v80: [지속 시험 구현·부분 관측·유예](extra-systemd-soak.md). 전체5,583개/사전68조건은 통과했으나 두 장기 실행은 중단됐다.8시간/12시간은 미완료·유예이며 자동 재개하지 않는다.
+
+2026-11-14 최신: [캡처 보관 DB 암호화 백업·격리 복원 v75](extra-capture-backup.md) — 관련552개·실제 systemd63조건, 원본 DB 부재 복원/캡처6건 바이트 일치·외부 pin 검증. 기존1,681,815행 판정 유지, API/AWS0. 운영 키/백업 저장·일정과 지속 부하는 후속이다.
+
+2026-11-14 최신: [수집 상태·보관 용량 경보 v74](extra-collector-alerts.md) — PR61~67 aitest 병합, 순서 의존 시험은 PR68로 수정. 관련511개·실제 systemd53조건·실제 관측 도구13조건 통과, 기존1,681,815행 판정 유지. 운영 지속 mTLS 마운트/lock 인수는 별도다.
+
+2026-11-14 최신: [수집·보관·신선도 주기 실행 v73](extra-collector-schedule.md) — PR66 CI16개 성공 확인 후 관련388개·실제 systemd43조건 통과. 실제 공백 stale→공급자 복원 후 timer 자동 fresh 회복, 기존1,681,815행 결정 유지. 운영 배포/조직 SSO 인수는 별도다.
+
+2026-11-14 최신: [실행 캡처 무손실 보관·복원 v72](extra-capture-archive.md) — PR65 CI16개 성공 확인 후 관련384개·실제 systemd32조건 통과. 기존1,681,815행 결정 유지. 로컬 보관/복원이며 현재 trust·신선도를 갱신하지 않는다. 작은 시험의 SQLite 오버헤드와 운영 용량 과제도 기록했다.
+
+2026-11-14 최신: [수집키 유효기간·근거 신선도·복구 v71](extra-collector-freshness.md) — PR64 CI16개 성공 후 진행. 관련353개·실제 systemd24조건·기존1,681,815행 결정 유지 검증. 수집 상태를 탐지/인가로 확대하지 않으며 실제 운영/조직 SSO 인수는 남아 있다.
+
+2026-11-14 최신: [systemd 수집기·자격 수명주기 v70](extra-systemd-collector-runtime.md) — 전용 비root 구성·소켓 자격 공급·교체/폐기/종료 인수. 최종316개·실제13조건·기존1,681,815행 결정 유지 검증. 실제 조직 SSO/운영 설치 인수는 남아 있다.
+
+2026-11-14 최신 후속: [systemd 운영 연동·호출 신원 결속 v69](extra-systemd-caller-identity.md) — 실제 WSL systemd15조건·관련281개·기존1,681,815행 결정 유지 검증. 로컬 인증원의 요청 결속을 확인했으며 실제 외부 SSO/사람 로그인 인수는 미완료다. v68의 systemd 미시험 표기는 당시 기록이다.
+
+2026-11-14 후속: [공유 서버 실행 근거 수집·연결 v68](extra-shared-execution-evidence.md) — 실제 Linux 프로세스 관측·서명/별도 권한 결속을 구현했다. 관련233개·제어7조건·기존1,681,815행 결정 유지 확인. 공유 서버 과거 F1 0%는 유지하며 운영 systemd 인수·사람 신원 검증은 미완료다.
+
+2026-11-14 후속: [감사·인증 개발 개선 v67](extra-audit-auth-refinement.md) — 미탐15행 감소·새 FP/TP 손실0. 인증 F1 95.08%/재현율90.625%, 웹 감사 F1 70.77%, 공유 서버 개선 미완료. 무료 로컬 묶음 검증이며 독립 목표 달성은 아니다.
+
+## 11월 14일 현재 성능과 후속 검증
+
+팀 공유의 시작점은 [현재 성능·남은 목표](extra-current-performance.md)다.
+[Wilson 고정 출처 평가](extra-wilson-source-transfer.md)는455,452행에서 오탐54건 감소·기존 TP 손실0을 확인했다.
+전체 F1 99.9644%와 달리 VPN F1은21.875%이며 error의 정상 표본은0이다. 원래 여섯 영역의 독립 목표 달성은 아니다.
+[VPN 관측 구간 감사](extra-vpn-observation-support.md)는 위협28행이 한 관측 구간임을 보여준다.
+
+[스캐너 읽기 요청 후보](extra-scanner-read-review.md)는 관찰된 R/S/F/H1,681,815행에서 미탐7건을 추가로 줄였다.
+새 FP·기존 TP 손실0이며, 아래 과거 v49 수치와 Wilson의 사전 고정 결과를 새 후보 수치로 덮어쓰지 않는다.
+[DNS 프로세스 경계](extra-dns-process-boundary.md)에서는 잘못 이어진 이력151행을 바로잡았고 판정은 변하지 않았다.
+[Wardbeck 고정 후보 검증](extra-scanner-calibration-transfer.md)은 원래 보정 자료 역할을 유지하며 현재 준비·평가 상태를 구분한다.
+[Wardbeck 실제 보정 출처 결과](extra-wardbeck-calibration-result.md)는24,851행에서 미탐4건 감소·새 FP/TP 손실0이다. VPN F1 27.4510%와 정상 error0행의 한계도 유지한다.
+후보는 오프라인 검토용이다. 자동 차단/권한 복원·실제 기업 운영 인수와 탐지 성능 평가는 별개다.
+통합 Linux 전체5,096개·Ruff+RUF100과 [실제 monitored mTLS75조건](extra-outage-expiry-validation.md)을 통과했다.
+[종류별 잔여 오류](extra-development-error-priorities.md)는 작은 감사·인증·VPN 집단의 실패와 추가 근거를 정리한다.
+아래 `Wilson 예약 유지`, push/병합0 및 실행 미완료 문구는 해당 날짜/버전의 이력이다.
+
+## 11월 14일 병합 후 탐지·평가 v49
+
+[최신 개선·출처 분리 평가](extra-postmerge-detection-evaluation.md)와
+[공유 근거 JSON](infrastructure-results/extra-postmerge-detection-evaluation-v49-20261114.json)을 먼저 읽는다.
+PR #58 병합 `aitest` 기준으로 기존1,259,637행을 재현해 웹 FN30→27·FP19 유지·기존 TP 손실0을 확인했다.
+VPN의 낮은 정밀도와 FP60/60/88은 그대로 공개한다. Windows 집중66·Linux 전체4773·Ruff 통과다.
+새 실행기는 코드/모델을 동결하고 정답 없이 예측을 봉인한 뒤 별도로 채점한다.
+Harrison 평가의 실제 완료/노출 상태와 결과는 위 문서/JSON에 기록하며 원래 여섯 영역 최종 독립 목표 통과로 해석하지 않는다.
+완료된 새 출처 VPN11,090행은 TP28/FP168/FN0·정밀도14.29%/F1 25%다. 특징 벡터는 전부 개발 자료와 겹친다.
+웹의 라벨 쌍은 회전 로그라 이번 문법 밖이므로 새 웹 전이 성능은 미측정이다. Harrison 소비·Wilson 예약 유지다.
+무료 로컬·기존 앱/모델/라벨 보존이다. 아래 날짜별 push/병합0·평가 미실행은 당시 이력이다.
+
+## 11월 13일 최신 aitest·extra 통합 기준
+
+사용자가 팀원 업로드 후 `aitest` 병합을 허용했다. `07ef9cc`와 `extra`의 `668096b`를
+`feature/chaeheeju-extra-aitest-integration`에서 통합하고 충돌 6곳을 해결했다.
+실제 앱은 팀원 `/response/requests`의 요청자 외 두 승인 주체 계약을 유지한다.
+이전 `/response/plans`는 앱에 연결하지 않는 과거 오프라인 구현이다.
+검증·역할·호환 경계와 최종 PR 확인 방법은 [통합 기록](extra-aitest-integration-20261113.md)을 먼저 읽는다.
+아래 v48 및 날짜별 메모의 push/병합 0 또는 extra 제외는 당시 이력이며 현재 통합 지시를 대신하지 않는다.
+
+2026-11-13 최신 후속: [로컬 HTTP 수집→검증/기록/복원 v48](extra-web-request-capture.md).
+실제 loopback9건의 본문 지문·서버 인증/세션·정책/고정 child 관측을 연결하고5건을 영속 판단했다.
+신규28포함 Windows/Linux 관련415개씩 통과. 실제 운영 IdP/EDR·MFA·독립 F1 평가와 구분한다.
+기존 앱/모델/라벨 보존·무료 로컬·병합/push0이다.
+
+2026-11-13 이전 후속: [웹 기록부 암호화 백업·복원 v47](extra-web-ledger-backup.md).
+일관된 스냅샷·암호화 묶음·외부 checkpoint 지문·복원본 접근 시 재검사를 추가했다.
+예제10개·새 process-exit5경계 포함 Windows/Linux 관련387개씩 통과했다.
+운영 키/원격 보관·실제 수집/F1 측정은 미완료이며 무료 로컬·앱 변경/병합/push0이다.
+
+2026-11-13 이전 후속: [웹 위험·검토 영속화 v46](extra-web-evidence-ledger.md).
+검증 시작/완료 기록·중복·재시작 위험 유지·중단 복구·DB/witness 무결성 검사를 추가했다.
+기능 예제10개·실제 process exit8경계 포함 Windows/Linux 관련357개씩 통과했다.
+기존 경보 자동 해제/앱 연결·실제 수집/새F1 측정은 없고 무료 로컬·병합/push0이다.
+
+2026-11-13 이전 후속: [웹 서버 근거 연결 v45](extra-web-verified-context.md).
+인증·권한·실행 관측의 별도 서명/역할·요청별 결속·일회 nonce·정책 대조 어댑터를 추가했다.
+기능 제어군13개·Windows/Linux 관련316개씩 통과. 실제 서버 관측 수집/새 F1 측정은0이며
+정상 증거로 기존 경보를 낮추지 않는다. 무료 로컬·앱 변경/병합/push0이다.
+
+2026-11-13 이전 후속: [웹 잔여 오류·검토 분리 v44](extra-web-residual-review.md).
+기존 전체1,259,637행 비교에서 Fox error FN4→0·웹 전체FN34→30·경보FP19 유지·기존TP 손실0이다.
+명령 요청19건은 경보 FN을 유지한 별도 검토이고, 정상3건의 추가 검토 부담도 공개한다.
+새FP3을 만든 넓은 명령 경보안은 미채택했다. 최종 Windows/Linux 관련256개씩 통과,
+무료 로컬·앱 변경/유료 API/병합/push0이며 원래 여섯 영역 독립 목표 완료는 아니다.
+
+2026-11-13 이전 후속: [독립 평가 준비·잔여 오류 검토 v43](extra-independent-evaluation-preparation.md).
+노출 대장·다섯 그룹 축의 추이 연결·라벨/단위 격리·준비 패킷 지문 검증을 추가했다.
+기존720건은 회귀 역할로 보존(67연결 성분), 오류44개 작업을 공유 근거에 정리했다.
+새 독립 최종 사례0·후보 미동결·독립 검토0이며 성능/목표 달성을 주장하지 않는다.
+Windows/Linux 관련181개씩 통과·무료 로컬, 앱 변경/병합/push0이다.
+
+2026-11-13 이전 후속: [VPN 검증 기기·권한 신호 v42](extra-vpn-verified-signals.md).
+등록 인증서·세션/TLS 채널·일회 nonce에 별도 IdP/기기/승인 서명과 현재 자원 권한을 결속하는 로컬 선택형 경로를 구현했다.
+통제 입력 정상20건 FP20→0·경보/검토 대상29건 누락0 유지. 기존 공개 VPN18,458행은 근거가 없어 FP60/60/88·FN0 그대로다.
+실제 MDM/VPN 운영 인수·독립 목표/자동 집행은 아니다. 전체 회귀 후 최종 관련 Windows/Linux280개씩 확인했다.
+
+2026-11-13 이전 후속: [VPN 오탐 감소 검증 v41](extra-vpn-precision-audit.md).
+선언 보정은 FP12/12/16건 감소와 동시에 기존 TP4건씩을 잃어 미채택했다.
+기존 미탐0·FP60/60/88을 유지하며 오탐 감소 목표는 달성하지 못했다.
+동일 관측 충돌·임계값 비교·기존 TP 손실 거부 검증을 추가하고 Windows/Linux 관련88개씩 통과했다.
+
+2026-11-13 이전 후속은 [웹 오류·VPN 개선 v40/v40b](extra-error-vpn-refinement.md)다.
+웹 오류 정상 FP는 S2→0/Fox2→0이며 기존 공격 TP/FN은 유지했다.
+VPN은 같은0.95에서 자료별 FN28→0이지만 FP60/60/88·정밀도24.14~31.82%로 검토 후보에만 한정한다.
+전체 micro F1은 소폭 감소했고 운영 채택·여섯 영역 독립 목표 완료는 아니다.
+기존 정상 웹 보정·라벨·앱·과거 근거를 보존하며 AWS/유료 API/GitHub push는0이다.
+
+11/12 이전 `extra`: [정상 웹 오탐 감소와 전체 비교](extra-web-false-positive-reduction.md).
+Fox 웹 FP483→12(FPR23.21→0.5766%), S116→7(FPR6.95→0.4197%)이며 기존 웹 TP/FN·비HTTP 점수를 유지했다.
+R만 학습한 보정 후보로 성공 GET/HEAD 범위에 한정한다. Windows682·Linux전체3502 통과이며
+원본 앱/라벨/기존 결과를 보존했다. 운영 채택·새 독립 평가·원래 여섯 영역 목표 완료와 구분한다.
+
+11/12 이전 `extra`: [공간 복구 후 스트리밍·Fox 전체 보정·임계값 진단](extra-streaming-fox-calibration.md).
+R/S 입력 바이트 동일성과 Fox668,418행 전체를 검증했다. Fox 관측별 후보 F1은0.5에서99.7194%,0.95 진단에서99.8625%지만
+웹 정상 오탐23.21% 등 약점이 남아 선정/운영 채택·원래 여섯 영역 독립 최종 목표 완료로 표시하지 않는다.
+Linux 전체3455개와 별도 신규 Windows13/Linux13개를 확인했고 원본 앱·규칙·라벨·과거 실패 근거를 유지했다.
+공간 확보 후 재개 지시로 이전17:11 KST 종료 조건은 해제됐다. 아래는 앞선 단계의 보존 기록이다.
+
+11/12 `extra` 진행: [F1 기준선 고정·규칙/사례별 오류 검토](extra-f1-baseline-review.md).
+자동 추적과 사람이 해야 할 원인/라벨 검토를 구분하며 아직 탐지 성능을 변경하지 않는다.
+
+11/12 품질 후속 예정: [F1 목표 달성 실험 계획](f1-improvement-plan.md).
+기존 잔여 인수 이후 개발/보정 개선과 새 독립 평가를 진행하고 최종 동결에 연결한다. 아직 규칙/라벨 변경 없음.
+
+11/12 후속: [4주차 잔여·직접 할 일](week4-remaining-and-handoff.md),
+[승인 원장 복원](response-workflow-recovery.md), [M7 검토지](m7-independent-review.md),
+[M8 네트워크 범위](m8-network-scope.md), [조건부 후보 제안](technology-decisions/conditional-scope-20261112.md).
+[탐지 기준선 오류 분해](detection-baseline-error-review.md)는 규칙 변경 없이 기존 미탐·오탐 계열을 정리한다.
+
 개발 로드맵 후속 [CA·DB·NGINX·Lambda·테스트 이미지 확장 검사](seven-image-supply-chain.md): 동일 소스·갱신 DB의 일곱 이미지 검증과 Git 원본 LF 자료를 읽기 전용으로 제공한 Linux2728 통과. 첫 M7 CRLF 회귀4실패와 후속 LF 체크아웃 정책을 구분해 기록한다. 실제 실행 커밋에 범위를 고정하고 테스트 이미지의 후속 문서 입력 차이·미검사 builder/helper·독립 영향 검토/운영 승인 대기를 구분한다. 아래 과거 기록의 나머지 이미지 검사 대기는 이 후속 결과로 대체하며, 독립 영향 검토·운영 승인은 남는다. 아래 날짜·주차는 개발 로드맵 분류이며 실제 수행 주차나 기간 전체 완료가 아니다.
 
 개발 로드맵 후속 [현재 앱·관측 이미지 공급망 재검사](current-image-supply-chain.md): 앱 Grype191/Trivy194, 관측 Grype196/Trivy197 native 항목. 동일한 갱신 DB·3반복·원본 보존·소유 자원0, Linux2637. 앱 영향 독립 검토·나머지 이미지·C03 운영 선정은 남긴다. 아래 날짜·주차는 원계획의 분류이며 실제 수행 주차나 해당 기간 전체 완료를 뜻하지 않는다.
@@ -155,3 +285,13 @@ v0.17의 제로 트러스트 운영 구조·서명 수집기 설정·재인증·
 ## 안전 범위
 
 MVP는 실제 계정 차단, 권한 변경, 세션 격리를 실행하지 않는다. 모든 대응은 `simulation` 모드의 미리보기이며 고위험·불확실·파괴적 조치는 사람 검토 대상으로 남긴다. v0.15 연동 아웃박스도 외부 전송을 기본 비활성화하며 실제 SIEM·ITSM 목적지 호출은 운영 통합 단계로 남긴다.
+
+- [4주차 잔여 구현과 로컬 일괄 검증](week4-local-batch.md): 승인·동결 후보·전체 회귀와 남은 외부 인수.
+
+- [캡처 부하·용량·장애 검증 v76](extra-capture-load.md): 전체 pytest/실제 systemd 측정, 8시간 장기 시험 미실행 구분.
+
+- [선택 부하 오류 진단·인수 v77](extra-selection-diagnostics.md): 안전한 단계/부분 응답, 실제 정상37/의도적 장애2조건, 과거 원인 미확정 구분.
+
+- [실행 mTLS 보관 진단 v78](extra-execution-maintenance.md): 안전한 단계/부분 수, 실제 Linux 잠금과 정상 복원 인수.
+
+- [실제 systemd 자원·제한 검증 v79](extra-systemd-resources.md): invocation 결속·혼합 cgroup·측정 출처·소유 압력 fixture.

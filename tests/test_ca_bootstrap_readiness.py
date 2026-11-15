@@ -2,6 +2,7 @@
 
 import json
 import ssl
+import subprocess
 from types import SimpleNamespace
 
 import jwt
@@ -66,13 +67,15 @@ def test_tls_verification_failure_never_becomes_readiness(monkeypatch):
 
 
 @pytest.mark.parametrize('unavailable', [False, True])
-def test_grants_only_created_after_authenticated_readiness(monkeypatch, unavailable):
+@pytest.mark.parametrize('transient', [runtime.RuntimeFailure('transient'),
+                                     subprocess.TimeoutExpired(['synthetic-health'], 5)])
+def test_grants_only_created_after_authenticated_readiness(monkeypatch, unavailable, transient):
     value = runtime.AuthorityRuntime(runtime.ROOT / 'runtime/c02/unit-ca-readiness')
     value.state = {}
     value._bootstrap_provisioners = {'collector-clientAuth': ('entry', 'synthetic-key')}
     events = []
     inventory = {'uid': {'name': 'collector', 'purpose': 'clientAuth', 'csr': 'synthetic-csr'}}
-    answers = iter([runtime.RuntimeFailure('transient'), {'healthy': False}, {'healthy': True, 'server_time': 123}])
+    answers = iter([transient, {'healthy': False}, {'healthy': True, 'server_time': 123}])
 
     def health():
         answer = next(answers)

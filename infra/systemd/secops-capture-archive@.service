@@ -1,0 +1,36 @@
+[Unit]
+Description=SecOps lossless capture compaction for %i
+
+[Service]
+Type=oneshot
+User=secops-collector
+Group=secops-collector
+WorkingDirectory=/opt/secops
+Environment=PYTHONDONTWRITEBYTECODE=1
+EnvironmentFile=/etc/secops/collector.conf
+# Opt-in service: inspect the CLI's default preview before installing/running.
+# Only byte-preserved managed captures can be removed from hot storage.
+ExecStart=/opt/secops/.venv/bin/python -m scripts.archive_service_captures --apply --root /var/lib/secops-evidence/%i --tenant ${TENANT_ID} --server ${SERVER_ID} --unit %i.service --source ${RUNTIME_SOURCE_ID}
+StateDirectory=secops-evidence
+StateDirectoryMode=0700
+UMask=0077
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+RestrictNamespaces=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+MemoryMax=256M
+TasksMax=16
+TimeoutStartSec=60

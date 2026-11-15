@@ -1,0 +1,945 @@
+{
+  "schema": "extra-selection-diagnostics-1",
+  "completed": true,
+  "base_commit": "d9188cf006d88db20a7cec121b671377e1410f7d",
+  "goal_qualified": false,
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "production_deployment_completed": false,
+  "historical_CI_failure_root_cause_confirmed": false,
+  "prior_CI": {
+    "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43594805787",
+    "attempt": 2,
+    "all_16_checks_passed": true,
+    "first_postmerge_selection_failure_preserved": true,
+    "single_rerun_recorded": true
+  },
+  "linux": {
+    "exit_code": 0,
+    "seconds": 703.489,
+    "counts": {
+      "passed": 5491
+    },
+    "log": "runtime/f1/selection-diagnostics-batch-v77-final-20261114/linux.log",
+    "executed": true,
+    "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "source_files": 1053,
+    "source_archive_sha256": "a2b70beabef59c7cddbc0799188687a50bd49d7134f888ddeba778eeee377711",
+    "container_exit": 0,
+    "oom_killed": false,
+    "network_mode": "none",
+    "owned_container": "9461b172267f5378e039124f89a1703c75e821cc36efd91b1ff6e5a5c9293412",
+    "snapshot_sources_unchanged_after": true,
+    "owned_container_removed": true
+  },
+  "focused_units": {
+    "passed": 100,
+    "failed": 0,
+    "skipped": 0
+  },
+  "runtime": {
+    "source_archive_sha256": "a2b70beabef59c7cddbc0799188687a50bd49d7134f888ddeba778eeee377711",
+    "public_asset_cache": {
+      "prometheus-3.15.1.linux-amd64.tar.gz": "sha256:6a726885328ad9efebbf36e876ce2fb6225468a71fd1e7ce3ba666d5f4d97a84",
+      "alertmanager-0.34.2.linux-amd64.tar.gz": "sha256:17ee14acd0f6ba6e25a436ff223d9c17ddd5cf484f543ad12f0932eaa89ba186"
+    },
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "image_recipe": "original repository Dockerfile; reuse build/dependency caches, public fetches permitted",
+    "host_configuration_changed": false,
+    "completed": true,
+    "exit_code": 0,
+    "seconds": 1638.641,
+    "snapshot_sources_unchanged_after": true
+  },
+  "real_normal_acceptance": {
+    "checks_passed": 37,
+    "waves": 27,
+    "requests": 576,
+    "allowed": 153,
+    "denied": 423,
+    "gateway_recoveries": [
+      {
+        "repeat": 1,
+        "denied_status": 500,
+        "gateway_ready_status": 422,
+        "outage_deliveries": 0,
+        "post_recovery_deliveries": 1,
+        "stop_seconds": 1.0939999999827705,
+        "start_to_new_grant_delivery_seconds": 21.578000000008615,
+        "start_to_monitoring_healthy_seconds": 30.203000000008615
+      },
+      {
+        "repeat": 2,
+        "denied_status": 500,
+        "gateway_ready_status": 422,
+        "outage_deliveries": 0,
+        "post_recovery_deliveries": 1,
+        "stop_seconds": 1.1559999999881256,
+        "start_to_new_grant_delivery_seconds": 21.59399999998277,
+        "start_to_monitoring_healthy_seconds": 30.280999999988126
+      },
+      {
+        "repeat": 3,
+        "denied_status": 500,
+        "gateway_ready_status": 422,
+        "outage_deliveries": 0,
+        "post_recovery_deliveries": 1,
+        "stop_seconds": 1.1400000000139698,
+        "start_to_new_grant_delivery_seconds": 22.17200000002049,
+        "start_to_monitoring_healthy_seconds": 30.828000000008615
+      }
+    ],
+    "services": {
+      "app": {
+        "image_id": "sha256:246f89a3f919a96afc1e1da3ad46ad22197ab7916a2f037c60bf6e434abadc85",
+        "published_ports": false,
+        "host_binds": false
+      },
+      "gateway": {
+        "image_id": "sha256:246f89a3f919a96afc1e1da3ad46ad22197ab7916a2f037c60bf6e434abadc85",
+        "published_ports": false,
+        "host_binds": false
+      },
+      "bridge": {
+        "image_id": "sha256:246f89a3f919a96afc1e1da3ad46ad22197ab7916a2f037c60bf6e434abadc85",
+        "published_ports": false,
+        "host_binds": false
+      },
+      "resource": {
+        "image_id": "sha256:246f89a3f919a96afc1e1da3ad46ad22197ab7916a2f037c60bf6e434abadc85",
+        "published_ports": false,
+        "host_binds": false
+      },
+      "proxy": {
+        "image_id": "sha256:303efa6fbe0d78a747e4b4a8713ee57810ef4d0066bb1b556187fcf2e3e5f396",
+        "published_ports": false,
+        "host_binds": false
+      },
+      "collector": {
+        "image_id": "sha256:246f89a3f919a96afc1e1da3ad46ad22197ab7916a2f037c60bf6e434abadc85",
+        "published_ports": false,
+        "host_binds": false
+      },
+      "worker": {
+        "image_id": "sha256:246f89a3f919a96afc1e1da3ad46ad22197ab7916a2f037c60bf6e434abadc85",
+        "published_ports": false,
+        "host_binds": false
+      },
+      "watchdog": {
+        "image_id": "sha256:246f89a3f919a96afc1e1da3ad46ad22197ab7916a2f037c60bf6e434abadc85",
+        "published_ports": false,
+        "host_binds": false
+      },
+      "operator": {
+        "image_id": "sha256:246f89a3f919a96afc1e1da3ad46ad22197ab7916a2f037c60bf6e434abadc85",
+        "published_ports": false,
+        "host_binds": false
+      },
+      "reader": {
+        "image_id": "sha256:246f89a3f919a96afc1e1da3ad46ad22197ab7916a2f037c60bf6e434abadc85",
+        "published_ports": false,
+        "host_binds": false
+      },
+      "exporter": {
+        "image_id": "sha256:246f89a3f919a96afc1e1da3ad46ad22197ab7916a2f037c60bf6e434abadc85",
+        "published_ports": false,
+        "host_binds": false
+      },
+      "prometheus": {
+        "image_id": "sha256:35d18c3e116e1a5b04bb02b7a4aae5c5091c6dc634f22befa6091dc922aa967d",
+        "published_ports": false,
+        "host_binds": false
+      },
+      "alertmanager": {
+        "image_id": "sha256:35d18c3e116e1a5b04bb02b7a4aae5c5091c6dc634f22befa6091dc922aa967d",
+        "published_ports": false,
+        "host_binds": false
+      },
+      "sink": {
+        "image_id": "sha256:246f89a3f919a96afc1e1da3ad46ad22197ab7916a2f037c60bf6e434abadc85",
+        "published_ports": false,
+        "host_binds": false
+      }
+    },
+    "resource_sample_count": 2520,
+    "resource_errors": [],
+    "source_dirty": true,
+    "image_source_verified": true,
+    "release_image_payload_verified": true,
+    "cleanup": {
+      "containers": 0,
+      "volumes": 0,
+      "networks": 0
+    }
+  },
+  "real_diagnostic_acceptance": {
+    "schema": "selection-diagnostics-acceptance-1",
+    "completed": true,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "historical_CI_failure_root_cause_confirmed": false,
+    "baseline_checks": 37,
+    "transport_failure": {
+      "expected_failure_recorded": true,
+      "actual_error_rows": 16,
+      "outage_deliveries": 0,
+      "automatic_retries": 0
+    },
+    "command_failure": {
+      "exit_code": 1,
+      "report": null,
+      "failure": {
+        "stage": "command",
+        "code": "command_exit",
+        "request_index": null
+      },
+      "public_runtime_state": {
+        "schema": "public-c01-diagnostics-1",
+        "captured_at": "2026-11-14T14:10:56.571733+00:00",
+        "reason": "selection_deliberate_operator_stop",
+        "budget_seconds": 20,
+        "prometheus": {
+          "up": {
+            "available": false
+          },
+          "alerts": {
+            "available": false
+          },
+          "alert_sample_timestamps": {
+            "available": false
+          },
+          "rules": {
+            "available": false
+          }
+        },
+        "services": [
+          {
+            "service": "proxy",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "operator",
+            "running": false,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 143,
+            "restarts": 0
+          },
+          {
+            "service": "resource",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "bridge",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "collector",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "gateway",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "exporter",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "app",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "reader",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "prometheus",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "alertmanager",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "sink",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "worker",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          },
+          {
+            "service": "watchdog",
+            "running": true,
+            "restarting": false,
+            "oom": false,
+            "exit_code": 0,
+            "restarts": 0
+          }
+        ],
+        "probe_launches": 0,
+        "budget_exhausted": false
+      }
+    },
+    "actual_fault_controls": 2,
+    "baseline_normal_denial_recovered": true,
+    "no_resource_delivery_under_faults": true,
+    "cleanup": {
+      "containers": 0,
+      "volumes": 0,
+      "networks": 0
+    },
+    "baseline_report_sha256": "c66c44fd54ac56498d4470798bba85328a302b4620f0edf342732faa2f2d2502"
+  },
+  "deliberate_transport_failure": {
+    "schema": "selection-deliberate-transport-failure-1",
+    "completed": false,
+    "checks": [],
+    "workloads": [
+      {
+        "repeat": 1,
+        "concurrency": 8,
+        "kind": "missing",
+        "expected_delivered": 0,
+        "passed": false,
+        "stage": "command",
+        "resource_before": 156,
+        "probe_exit_code": 1,
+        "rows": [
+          {
+            "request_index": 0,
+            "status": null,
+            "body_sha256": null,
+            "tls_version": null,
+            "http_ms": 19.740702000035526,
+            "error": {
+              "stage": "request",
+              "code": "io",
+              "request_index": 0
+            }
+          },
+          {
+            "request_index": 1,
+            "status": null,
+            "body_sha256": null,
+            "tls_version": null,
+            "http_ms": 20.081600000139588,
+            "error": {
+              "stage": "request",
+              "code": "io",
+              "request_index": 1
+            }
+          },
+          {
+            "request_index": 2,
+            "status": null,
+            "body_sha256": null,
+            "tls_version": null,
+            "http_ms": 19.64414200028841,
+            "error": {
+              "stage": "request",
+              "code": "io",
+              "request_index": 2
+            }
+          },
+          {
+            "request_index": 3,
+            "status": null,
+            "body_sha256": null,
+            "tls_version": null,
+            "http_ms": 17.447363999963272,
+            "error": {
+              "stage": "request",
+              "code": "io",
+              "request_index": 3
+            }
+          },
+          {
+            "request_index": 4,
+            "status": null,
+            "body_sha256": null,
+            "tls_version": null,
+            "http_ms": 16.808874000162177,
+            "error": {
+              "stage": "request",
+              "code": "io",
+              "request_index": 4
+            }
+          },
+          {
+            "request_index": 5,
+            "status": null,
+            "body_sha256": null,
+            "tls_version": null,
+            "http_ms": 15.694336999786174,
+            "error": {
+              "stage": "request",
+              "code": "io",
+              "request_index": 5
+            }
+          },
+          {
+            "request_index": 6,
+            "status": null,
+            "body_sha256": null,
+            "tls_version": null,
+            "http_ms": 15.870019999965734,
+            "error": {
+              "stage": "request",
+              "code": "io",
+              "request_index": 6
+            }
+          },
+          {
+            "request_index": 7,
+            "status": null,
+            "body_sha256": null,
+            "tls_version": null,
+            "http_ms": 15.70534599977691,
+            "error": {
+              "stage": "request",
+              "code": "io",
+              "request_index": 7
+            }
+          },
+          {
+            "request_index": 8,
+            "status": null,
+            "body_sha256": null,
+            "tls_version": null,
+            "http_ms": 77.27955000018483,
+            "error": {
+              "stage": "request",
+              "code": "io",
+              "request_index": 8
+            }
+          },
+          {
+            "request_index": 9,
+            "status": null,
+            "body_sha256": null,
+            "tls_version": null,
+            "http_ms": 82.14110399967467,
+            "error": {
+              "stage": "request",
+              "code": "io",
+              "request_index": 9
+            }
+          },
+          {
+            "request_index": 10,
+            "status": null,
+            "body_sha256": null,
+            "tls_version": null,
+            "http_ms": 81.55904500017641,
+            "error": {
+              "stage": "request",
+              "code": "io",
+              "request_index": 10
+            }
+          },
+          {
+            "request_index": 11,
+            "status": null,
+            "body_sha256": null,
+            "tls_version": null,
+            "http_ms": 81.44353900024726,
+            "error": {
+              "stage": "request",
+              "code": "io",
+              "request_index": 11
+            }
+          },
+          {
+            "request_index": 12,
+            "status": null,
+            "body_sha256": null,
+            "tls_version": null,
+            "http_ms": 78.21725399981005,
+            "error": {
+              "stage": "request",
+              "code": "io",
+              "request_index": 12
+            }
+          },
+          {
+            "request_index": 13,
+            "status": null,
+            "body_sha256": null,
+            "tls_version": null,
+            "http_ms": 79.02787800003352,
+            "error": {
+              "stage": "request",
+              "code": "io",
+              "request_index": 13
+            }
+          },
+          {
+            "request_index": 14,
+            "status": null,
+            "body_sha256": null,
+            "tls_version": null,
+            "http_ms": 79.43278800030384,
+            "error": {
+              "stage": "request",
+              "code": "io",
+              "request_index": 14
+            }
+          },
+          {
+            "request_index": 15,
+            "status": null,
+            "body_sha256": null,
+            "tls_version": null,
+            "http_ms": 78.9639409999836,
+            "error": {
+              "stage": "request",
+              "code": "io",
+              "request_index": 15
+            }
+          }
+        ],
+        "wave_seconds": 0.1032121879998158,
+        "schema_version": "infra-load-probe-2",
+        "probe_completed": false,
+        "minted": 0,
+        "mint_status": null,
+        "replay": null,
+        "failure": {
+          "stage": "request",
+          "code": "io",
+          "request_index": 0
+        },
+        "probe_failure": {
+          "stage": "request",
+          "code": "io",
+          "request_index": 0
+        },
+        "resource_after": 156,
+        "delivered": 0,
+        "host_failure": {
+          "stage": "command",
+          "code": "runtime_control",
+          "request_index": null
+        }
+      }
+    ],
+    "selection_phase": {
+      "stage": "command",
+      "repeat": 1,
+      "concurrency": 8,
+      "kind": "missing"
+    },
+    "selection_failure": {
+      "stage": "command",
+      "code": "runtime_control",
+      "request_index": null
+    },
+    "monitoring_failure_diagnostics": {
+      "schema": "public-c01-diagnostics-1",
+      "captured_at": "2026-11-14T14:10:36.764423+00:00",
+      "reason": "selection_command",
+      "budget_seconds": 20,
+      "prometheus": {
+        "up": {
+          "available": true,
+          "samples": [
+            {
+              "labels": {
+                "instance": "exporter:9101",
+                "job": "zt-signals"
+              },
+              "timestamp": 1794665440.054,
+              "value": 1.0
+            }
+          ],
+          "truncated": false
+        },
+        "alerts": {
+          "available": true,
+          "samples": [],
+          "truncated": false
+        },
+        "alert_sample_timestamps": {
+          "available": true,
+          "samples": [],
+          "truncated": false
+        },
+        "rules": {
+          "available": true,
+          "rules": [
+            {
+              "name": "C01SignalQueueBacklog",
+              "state": "inactive",
+              "health": "ok",
+              "evaluation_error": false,
+              "evaluation_seconds": 0.000234847
+            },
+            {
+              "name": "C01SignalCollectionUnavailable",
+              "state": "inactive",
+              "health": "ok",
+              "evaluation_error": false,
+              "evaluation_seconds": 3.9105e-05
+            },
+            {
+              "name": "C01ExporterDown",
+              "state": "inactive",
+              "health": "ok",
+              "evaluation_error": false,
+              "evaluation_seconds": 5.6241e-05
+            },
+            {
+              "name": "C01SignalProcessingFailed",
+              "state": "inactive",
+              "health": "ok",
+              "evaluation_error": false,
+              "evaluation_seconds": 3.2579e-05
+            }
+          ],
+          "truncated": false
+        }
+      },
+      "services": [
+        {
+          "service": "proxy",
+          "running": false,
+          "restarting": false,
+          "oom": false,
+          "exit_code": 0,
+          "restarts": 0
+        },
+        {
+          "service": "operator",
+          "running": true,
+          "restarting": false,
+          "oom": false,
+          "exit_code": 0,
+          "restarts": 0
+        },
+        {
+          "service": "resource",
+          "running": true,
+          "restarting": false,
+          "oom": false,
+          "exit_code": 0,
+          "restarts": 0
+        },
+        {
+          "service": "bridge",
+          "running": true,
+          "restarting": false,
+          "oom": false,
+          "exit_code": 0,
+          "restarts": 0
+        },
+        {
+          "service": "collector",
+          "running": true,
+          "restarting": false,
+          "oom": false,
+          "exit_code": 0,
+          "restarts": 0
+        },
+        {
+          "service": "gateway",
+          "running": true,
+          "restarting": false,
+          "oom": false,
+          "exit_code": 0,
+          "restarts": 0
+        },
+        {
+          "service": "exporter",
+          "running": true,
+          "restarting": false,
+          "oom": false,
+          "exit_code": 0,
+          "restarts": 0
+        },
+        {
+          "service": "app",
+          "running": true,
+          "restarting": false,
+          "oom": false,
+          "exit_code": 0,
+          "restarts": 0
+        },
+        {
+          "service": "reader",
+          "running": true,
+          "restarting": false,
+          "oom": false,
+          "exit_code": 0,
+          "restarts": 0
+        },
+        {
+          "service": "prometheus",
+          "running": true,
+          "restarting": false,
+          "oom": false,
+          "exit_code": 0,
+          "restarts": 0
+        },
+        {
+          "service": "alertmanager",
+          "running": true,
+          "restarting": false,
+          "oom": false,
+          "exit_code": 0,
+          "restarts": 0
+        },
+        {
+          "service": "sink",
+          "running": true,
+          "restarting": false,
+          "oom": false,
+          "exit_code": 0,
+          "restarts": 0
+        },
+        {
+          "service": "worker",
+          "running": true,
+          "restarting": false,
+          "oom": false,
+          "exit_code": 0,
+          "restarts": 0
+        },
+        {
+          "service": "watchdog",
+          "running": true,
+          "restarting": false,
+          "oom": false,
+          "exit_code": 0,
+          "restarts": 0
+        }
+      ],
+      "probe_launches": 1,
+      "budget_exhausted": false
+    }
+  },
+  "legacy_regression": {
+    "aws_calls": 0,
+    "completed": true,
+    "goal_qualified": false,
+    "native_actor_command_evidence_added_to_legacy": 0,
+    "paid_api_calls": 0,
+    "population": 1681815,
+    "scenarios": {
+      "fox": {
+        "after_decision_sha256": "29e3e42b17e13d9f4ce8f785b2c1121ee52aa9a6ebbd323c5328e38644929832",
+        "before_decision_sha256": "29e3e42b17e13d9f4ce8f785b2c1121ee52aa9a6ebbd323c5328e38644929832",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 668418,
+        "predictions_sha256": "3a95e16120e53c888203f0d25d57526b0c614deeaa1e86b43ed98694976702cc",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.998765742394729,
+          "f1": 0.9990965864106885,
+          "false_positive_rate": 0.0006145584161411404,
+          "fn": 695,
+          "fp": 130,
+          "inference_errors": 0,
+          "population": 668418,
+          "precision": 0.9997151115776464,
+          "recall": 0.9984788261352991,
+          "tn": 211404,
+          "tp": 456189
+        }
+      },
+      "harrison_observed": {
+        "after_decision_sha256": "de38509b07982c34ab69e57eb7df9ebb0517674d06cd1329d594c93c503be1c9",
+        "before_decision_sha256": "de38509b07982c34ab69e57eb7df9ebb0517674d06cd1329d594c93c503be1c9",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 422178,
+        "predictions_sha256": "c7e557b7d8e137cedc35649505ad389d06c593fe9f53e09caccf10d28220a9e0",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9993983580385525,
+          "f1": 0.9996953318603709,
+          "false_positive_rate": 0.046012832263978,
+          "fn": 3,
+          "fp": 251,
+          "inference_errors": 0,
+          "population": 422178,
+          "precision": 0.9993980396718237,
+          "recall": 0.9999928009733084,
+          "tn": 5204,
+          "tp": 416720
+        }
+      },
+      "russellmitchell": {
+        "after_decision_sha256": "2c4aecb63800cb85dfc8a6685f03b17d53c2f88e727b47c415eac6c1d2d70276",
+        "before_decision_sha256": "2c4aecb63800cb85dfc8a6685f03b17d53c2f88e727b47c415eac6c1d2d70276",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 295243,
+        "predictions_sha256": "2ee9ee30497a6a4a48c12461e0c6ce76dcdc3392db71f04caf3f7f92383dfaf4",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9963386092134275,
+          "f1": 0.991198000211704,
+          "false_positive_rate": 0.0003642113111178716,
+          "fn": 996,
+          "fp": 85,
+          "inference_errors": 0,
+          "population": 295243,
+          "precision": 0.9986054371544355,
+          "recall": 0.9838996476027286,
+          "tn": 233296,
+          "tp": 60866
+        }
+      },
+      "santos": {
+        "after_decision_sha256": "90fd3e70c751fe8da7fd2fbc26fd70688c07f8989ded90e48af67f7a4662d99a",
+        "before_decision_sha256": "90fd3e70c751fe8da7fd2fbc26fd70688c07f8989ded90e48af67f7a4662d99a",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 295976,
+        "predictions_sha256": "92dc1b9932ffd57562e29454ea81c25f70b071406d6aed89587e5dada6c7a220",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9966010757628997,
+          "f1": 0.9892837359921599,
+          "false_positive_rate": 0.00029765615886794125,
+          "fn": 932,
+          "fp": 74,
+          "inference_errors": 0,
+          "population": 295976,
+          "precision": 0.9984089101034208,
+          "recall": 0.9803238541600693,
+          "tn": 248535,
+          "tp": 46435
+        }
+      }
+    },
+    "schema": "extra-shared-execution-legacy-regression-1",
+    "scope": "prior observed-development decision regression only; no new ground truth",
+    "source_prior_sha256": "35ec2a206d0a3a475d37dfb38b9459044291aee79cfea9adbbcae8da7b428ee4"
+  },
+  "coverage_boundary": "Expected owned proxy/operator stop controls validate diagnostics, not the historical CI root cause. No credential body/header, token, arbitrary exception text, stderr, environment, volume key files or raw logs are published. Probe stdout is captured privately in RAM and only a strict <=32KiB envelope is admitted; this is not a hard subprocess memory limit.",
+  "initial_static_diagnostic": {
+    "rule": "TRY004",
+    "tests_started": false,
+    "runtime_started": false,
+    "fix": "Use TypeError for invalid raw report type",
+    "tests_sha256": "c5649d545d6b31bf56945a0c3c8522347adecea627a42d97c0f7185baf70ec80"
+  },
+  "retired_development_candidate": {
+    "qualified": false,
+    "focused_passed": 95,
+    "full_passed": 5486,
+    "reason": "Before final strict completion/terminal-envelope guards, explicitly stop only owned proxy and retire partial native run",
+    "historical_failure_reproduced": false,
+    "control": {
+      "intentional_controlled_stop": true,
+      "reason": "retire development candidate before adding strict completion flag and terminal-error parsing",
+      "historical_CI_failure_reproduced": false,
+      "project": "kmtls-62fa54a288bf",
+      "service": "proxy",
+      "at": "2026-11-14T13:39:56.808808+00:00"
+    },
+    "artifact_sha256": {
+      "tests.json": "b0bb1d4b8bfeadd863f4a91e5d531aeb9aa5f28d24792b6183006f7a0c61ab4c",
+      "runtime-tests.json": "c0221614d06992cdc40e5511b6e09c7666155652b68c4531c61c71cedd7074cd",
+      "candidate-retirement.json": "2347fa232bffad8fd522779fad259239ff0782571b5b0c22c645c05ecfdcbc9d"
+    }
+  },
+  "bounds": {
+    "probe_input_bytes": 1024,
+    "admitted_report_bytes": 32768,
+    "rows_per_wave": 16,
+    "concurrency": [
+      1,
+      4,
+      8
+    ],
+    "operator_command_timeout_seconds": 120,
+    "existing_C01_diagnostic_budget_seconds": 20
+  },
+  "source_sha256": {
+    "scripts/infra_probe_diagnostics.py": "9eba4fab914f8839b8f0246e8a0710bb44dbd9bbdf80131564dfed4e79bd33e3",
+    "scripts/infra_load_probe.py": "c3722adafe7707127ff8ba10ed3b606d8e71bb76e7b4d1f98e611893998f2a90",
+    "scripts/test_infra_selection_runtime.py": "c31eb5f820e71220f680d0f30caacf8edac494681b1714e9365868aa1aa62289",
+    "scripts/test_selection_diagnostics_runtime.py": "a1d6ae56074a835aff95d394e466e234dc1e8f2b4f73be14f5c90d8fed08d70a",
+    "tests/test_infra_probe_diagnostics.py": "3ca2779a869c0de975ff9c35a7cf6bb7b8d7ef97fdcb045374ac5d74354edad4",
+    "tests/test_infra_selection.py": "d66bf704ead6709a84aae47250289fc09a7ae3ce573bca8130bc6bb8ce6151ad"
+  },
+  "artifact_sha256": {
+    "tests.json": "d3f9d17b3e7d8196f86e623e63ff76449462f2f64d0078fc9336534e2a1a457f",
+    "linux.xml": "6fa89ff9d5eb4082dec934455552d45fda29338552d1b52adf70554586550797",
+    "diagnostic-units.xml": "9775e32e52cc94269b21505d0ba078f4970d87f9f308f2ac6b1e60d1af17e0d2",
+    "source-manifest.json": "9d51798924d129c3a887c0c190d21f8ff631c9c4bc16f28cdd4f47ef7755ed33",
+    "runtime-tests.json": "dc0b325057e767c6b7805dde068788ef5c533a93eef1052aa1a7cd9d93e7eaf3",
+    "legacy-regression/run.json": "a2d03c97bbd4bb19b8ba9fe478599953379639e33df4230ee145d3fa27cf1be0"
+  },
+  "runtime_artifact_sha256": {
+    "verification.json": "c66c44fd54ac56498d4470798bba85328a302b4620f0edf342732faa2f2d2502",
+    "diagnostics-acceptance.json": "658d1d701f7ea6ba59cd3b634b353723f4d3a8b6d84e3d0043bd160022341ca9",
+    "deliberate-transport-failure.json": "2a02ddc4768a52689696d2cd77c9146cb8dfecc9802307e9c6d24746a50e84a3"
+  }
+}

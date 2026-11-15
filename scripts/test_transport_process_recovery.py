@@ -28,7 +28,9 @@ def public_failure(error):
     allowed = {*("authority_child_" + code for code in PUBLIC_FAILURE_REASONS),
         'authority_docker_timeout', 'authority_docker_command_failed',
         'authority_child_retired_jwk_still_authorized', 'authority_child_authority_migration_incomplete',
-        'authority_child_authority_requires_leaf_quiescence', 'authority_child_authority_replica_unhealthy'}
+        'authority_child_authority_requires_leaf_quiescence', 'authority_child_authority_replica_unhealthy',
+        'transport_candidate_not_ready', 'transport_database_anchor_changed',
+        'transport_ca_not_ready', 'transport_live_database_identity_failed'}
     reason = str(error) if str(error) in allowed else failure_reason(error)
     frames = []
     for frame in traceback.extract_tb(error.__traceback__):
@@ -85,8 +87,19 @@ def main():
     parser.add_argument('--checkpoint', choices=CHECKPOINTS, required=True)
     parser.add_argument('--token', required=True)
     args = parser.parse_args()
-    checkpoint_worker(args.directory, args.checkpoint, args.token)
+    directory = args.directory.resolve()
+    if (re.fullmatch('[a-f0-9]{24}', args.token) is None
+            or not directory.is_relative_to((ROOT / 'runtime/c02').resolve())
+            or directory == (ROOT / 'runtime/c02').resolve()):
+        return 1
+    try:
+        checkpoint_worker(directory, args.checkpoint, args.token)
+    except (OSError, ValueError, KeyError, TypeError, RuntimeError, subprocess.SubprocessError) as error:
+        save(directory / ('transport-fault-failure-' + args.token + '.json'),
+             {'token': args.token, 'failure': public_failure(error)})
+        return 1
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

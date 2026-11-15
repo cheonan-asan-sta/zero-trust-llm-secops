@@ -1,0 +1,552 @@
+{
+  "schema": "extra-inference-v4-checkpoint-1",
+  "base_commit": "e9565ca",
+  "source_snapshot_during_tests": "working tree; complete Linux manifest stored in runtime",
+  "windows": {
+    "tests": 216,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 58.321,
+    "sha256": "2e3061ba72da630bda3b5d071a8e8fe6730700128fc3e5994cb64b3807087c1d"
+  },
+  "linux": {
+    "schema": "extra-f1-linux-snapshot-1",
+    "completed": true,
+    "owner": "extra-f1-0979b6aeebf1",
+    "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "tests": [
+      "tests/test_f1_session_inference.py",
+      "tests/test_f1_confidence.py",
+      "tests/test_f1_temporal_store.py",
+      "tests/test_f1_approval_registry.py",
+      "tests/test_f1_shadow_approvals.py",
+      "tests/test_f1_shadow_detector.py",
+      "tests/test_f1_feature_audit.py",
+      "tests/test_f1_review.py",
+      "tests/test_detection_benchmark.py",
+      "tests/test_f1_provenance.py",
+      "tests/test_f1_session_controls.py"
+    ],
+    "host_mounts": 0,
+    "network": "none",
+    "cloud_calls": 0,
+    "paid_api_calls": 0,
+    "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+    "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+    "source_manifest_sha256": "f90add2c7d99f81e5a3d230ed1f088d2bdd2666d9e2a518ea6fd8ecb9fe435f6",
+    "source_files": 362,
+    "container_exit_code": 0,
+    "source_verified_before_and_after": true,
+    "remaining_containers": 0,
+    "pytest": {
+      "tests": 216,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 28.759,
+      "sha256": "70dd60298b400cca1bb6b00920e180adbfe7bb8535388be1a8cc0a5260a673f8"
+    }
+  },
+  "initial_inference_check": {
+    "tests": 9,
+    "errors": 0,
+    "failures": 1,
+    "skipped": 0,
+    "seconds": 11.052,
+    "sha256": "391d96742c89d44f81f5a866a63f6aea742bc1d4bcfce4c330682bf78e005ec6"
+  },
+  "initial_clock_regression": {
+    "tests": 3,
+    "errors": 0,
+    "failures": 2,
+    "skipped": 0,
+    "seconds": 1.714,
+    "sha256": "b005bb56caf07fad3d6c57298fc6e05987a9696ef8a58e61d12365e32a361d06"
+  },
+  "initial_clock_selection_error_zero_tests": {
+    "tests": 0,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 0.003,
+    "sha256": "60aa7e9f733f5400c584574e6d36591c8bb25ad1564d70bc91798cca73f7aa6c"
+  },
+  "experiment": {
+    "dataset_manifest_sha256": "47113a819b2adb9942b822d962d92f02e028d6a40f6130e00edce46dac46d7f8",
+    "effects": {
+      "access_grants": 0,
+      "cloud_calls": 0,
+      "paid_api_calls": 0,
+      "session_changes": 0
+    },
+    "ephemeral_stores_remaining": 0,
+    "failed_event_attempts": {
+      "context_issuance_failed_events": 0,
+      "single_event_failed_events": 0,
+      "temporal_failed_events": 0
+    },
+    "fixture_approvals_enabled": true,
+    "fixture_window_approvals_enabled": true,
+    "git_metadata": "available_snapshot_hashes_still_required",
+    "goals": {
+      "goal_qualified": false,
+      "original_event_benchmark_replaced": false
+    },
+    "independent_review": "pending",
+    "inference_failure_policy": "Each comparator continues independently; every session stays in its denominator and any error fails its gate.",
+    "limits": [
+      "Controlled regression fixtures, not actual enterprise sessions or blind evaluation.",
+      "Optional approvals are explicitly simulated operator plans, not real business authorization.",
+      "Session metrics and existing 720-event metrics have separate denominators.",
+      "Source timestamps use a controlled virtual clock; latency uses measured wall time."
+    ],
+    "metric_unit": "session_any_alert",
+    "new_independent_evaluation": false,
+    "per_event_end_to_end_latency_ms": {
+      "key_generation_and_setup_excluded": true,
+      "network_latency_included": false,
+      "p50": 67.32344999909401,
+      "p95": 128.67790006566793,
+      "p95_method": "nearest-rank",
+      "samples": 330,
+      "scope": "local producer encoding/signing, optional fixture issuance, both comparator evaluations"
+    },
+    "producer_failure_policy": "Input or producer signing failure aborts publication; no passing summary is written.",
+    "public_approval_registry_sha256": "ea97247cf332de11ab07ef91206ed190301dcf0692f9767a8dafbf4dceddbe2e",
+    "public_source_registry_sha256": "cdc15d6f70fe3bcb0e3555be49d872ab511e8a9fe8fc6ce0e5de4c1cd222dbb2",
+    "real_business_approvals": 0,
+    "scenario_families": 32,
+    "schema": "f1-controlled-session-result-2",
+    "sessions": 96,
+    "signed_events": 330,
+    "signed_temporal_any_alert": {
+      "case_count": 96,
+      "complete_inference_run": true,
+      "confusion": {
+        "fn": 0,
+        "fp": 0,
+        "tn": 42,
+        "tp": 54
+      },
+      "evaluation_errors": 0,
+      "family_confidence": {
+        "confidence_level": 0.95,
+        "family_count": 32,
+        "intervals": {
+          "f1": {
+            "lower": 1.0,
+            "upper": 1.0,
+            "valid_replicates": 1000
+          },
+          "false_positive_rate": {
+            "lower": 0.0,
+            "upper": 0.0,
+            "valid_replicates": 1000
+          },
+          "precision": {
+            "lower": 1.0,
+            "upper": 1.0,
+            "valid_replicates": 1000
+          },
+          "recall": {
+            "lower": 1.0,
+            "upper": 1.0,
+            "valid_replicates": 1000
+          }
+        },
+        "method": "label-stratified-family-cluster-percentile-bootstrap",
+        "repetitions": 1000,
+        "scope": "Variation among authored families; not a population guarantee or independent-row interval.",
+        "seed": 20261101
+      },
+      "gate_passed": true,
+      "hypothetical_independent_trial_reference": {
+        "assumptions_verified": false,
+        "bounds_meet_targets_under_hypothetical_independence": false,
+        "conditional_bounds_and_caller_assumption_pass": false,
+        "data_eligibility_review": "not_performed_by_this_math_function",
+        "f1_lower_from_precision_recall": 0.9151591865233261,
+        "false_positive_rate": {
+          "confidence": 0.9833333333333333,
+          "lower": 0.0,
+          "successes": 0,
+          "trials": 42,
+          "upper": 0.10773124651544096
+        },
+        "joint_nominal_confidence_if_assumptions_hold": 0.95,
+        "limits": [
+          "Only a reference if independent fixed-distribution trials are justified.",
+          "Author-labeled family variants and selected cases do not establish those assumptions.",
+          "This does not replace grouped uncertainty, independent review or an unseen evaluation."
+        ],
+        "method": "exact-binomial-marginals-bonferroni-three-hypothetical-independent-trials",
+        "population_target_supported": false,
+        "precision": {
+          "confidence": 0.9833333333333333,
+          "lower": 0.9151591865233261,
+          "successes": 54,
+          "trials": 54,
+          "upper": 1.0
+        },
+        "primary_source": "https://www.itl.nist.gov/div898/handbook/prc/section2/prc241.htm",
+        "recall": {
+          "confidence": 0.9833333333333333,
+          "lower": 0.9151591865233261,
+          "successes": 54,
+          "trials": 54,
+          "upper": 1.0
+        }
+      },
+      "metrics": {
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "precision": 1.0,
+        "recall": 1.0
+      },
+      "point_targets_met": true,
+      "rules": [
+        {
+          "confusion": {
+            "fn": 0,
+            "fp": 0,
+            "tn": 78,
+            "tp": 18
+          },
+          "metrics": {
+            "f1": 1.0,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "point_targets_met": true,
+          "positive_families": 6,
+          "rule_id": "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+        },
+        {
+          "confusion": {
+            "fn": 0,
+            "fp": 0,
+            "tn": 84,
+            "tp": 12
+          },
+          "metrics": {
+            "f1": 1.0,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "point_targets_met": true,
+          "positive_families": 4,
+          "rule_id": "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+        },
+        {
+          "confusion": {
+            "fn": 0,
+            "fp": 0,
+            "tn": 90,
+            "tp": 6
+          },
+          "metrics": {
+            "f1": 1.0,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "point_targets_met": true,
+          "positive_families": 2,
+          "rule_id": "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+        },
+        {
+          "confusion": {
+            "fn": 0,
+            "fp": 0,
+            "tn": 90,
+            "tp": 6
+          },
+          "metrics": {
+            "f1": 1.0,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "point_targets_met": true,
+          "positive_families": 2,
+          "rule_id": "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60"
+        },
+        {
+          "confusion": {
+            "fn": 0,
+            "fp": 0,
+            "tn": 90,
+            "tp": 6
+          },
+          "metrics": {
+            "f1": 1.0,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "point_targets_met": true,
+          "positive_families": 2,
+          "rule_id": "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+        },
+        {
+          "confusion": {
+            "fn": 0,
+            "fp": 0,
+            "tn": 90,
+            "tp": 6
+          },
+          "metrics": {
+            "f1": 1.0,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "point_targets_met": true,
+          "positive_families": 2,
+          "rule_id": "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+        }
+      ],
+      "statistical_support_scope": "Controlled, author-labeled variants do not establish independent population support.",
+      "statistical_target_supported": false,
+      "within_authored_family_bootstrap_target_supported": true
+    },
+    "simulated_service_principal": true,
+    "single_event_any_alert": {
+      "case_count": 96,
+      "complete_inference_run": true,
+      "confusion": {
+        "fn": 15,
+        "fp": 0,
+        "tn": 42,
+        "tp": 39
+      },
+      "evaluation_errors": 0,
+      "family_confidence": {
+        "confidence_level": 0.95,
+        "family_count": 32,
+        "intervals": {
+          "f1": {
+            "lower": 0.6666666666666666,
+            "upper": 0.9411764705882353,
+            "valid_replicates": 1000
+          },
+          "false_positive_rate": {
+            "lower": 0.0,
+            "upper": 0.0,
+            "valid_replicates": 1000
+          },
+          "precision": {
+            "lower": 1.0,
+            "upper": 1.0,
+            "valid_replicates": 1000
+          },
+          "recall": {
+            "lower": 0.5,
+            "upper": 0.8888888888888888,
+            "valid_replicates": 1000
+          }
+        },
+        "method": "label-stratified-family-cluster-percentile-bootstrap",
+        "repetitions": 1000,
+        "scope": "Variation among authored families; not a population guarantee or independent-row interval.",
+        "seed": 20261101
+      },
+      "gate_passed": false,
+      "hypothetical_independent_trial_reference": {
+        "assumptions_verified": false,
+        "bounds_meet_targets_under_hypothetical_independence": false,
+        "conditional_bounds_and_caller_assumption_pass": false,
+        "data_eligibility_review": "not_performed_by_this_math_function",
+        "f1_lower_from_precision_recall": 0.6811472783043857,
+        "false_positive_rate": {
+          "confidence": 0.9833333333333333,
+          "lower": 0.0,
+          "successes": 0,
+          "trials": 42,
+          "upper": 0.10773124651544096
+        },
+        "joint_nominal_confidence_if_assumptions_hold": 0.95,
+        "limits": [
+          "Only a reference if independent fixed-distribution trials are justified.",
+          "Author-labeled family variants and selected cases do not establish those assumptions.",
+          "This does not replace grouped uncertainty, independent review or an unseen evaluation."
+        ],
+        "method": "exact-binomial-marginals-bonferroni-three-hypothetical-independent-trials",
+        "population_target_supported": false,
+        "precision": {
+          "confidence": 0.9833333333333333,
+          "lower": 0.8844792736211589,
+          "successes": 39,
+          "trials": 39,
+          "upper": 1.0
+        },
+        "primary_source": "https://www.itl.nist.gov/div898/handbook/prc/section2/prc241.htm",
+        "recall": {
+          "confidence": 0.9833333333333333,
+          "lower": 0.5538282854266583,
+          "successes": 39,
+          "trials": 54,
+          "upper": 0.8550342462242226
+        }
+      },
+      "metrics": {
+        "f1": 0.8387096774193549,
+        "false_positive_rate": 0.0,
+        "precision": 1.0,
+        "recall": 0.7222222222222222
+      },
+      "point_targets_met": false,
+      "rules": [
+        {
+          "confusion": {
+            "fn": 6,
+            "fp": 0,
+            "tn": 78,
+            "tp": 12
+          },
+          "metrics": {
+            "f1": 0.8,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.6666666666666666
+          },
+          "point_targets_met": false,
+          "positive_families": 6,
+          "rule_id": "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+        },
+        {
+          "confusion": {
+            "fn": 0,
+            "fp": 0,
+            "tn": 84,
+            "tp": 12
+          },
+          "metrics": {
+            "f1": 1.0,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "point_targets_met": true,
+          "positive_families": 4,
+          "rule_id": "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+        },
+        {
+          "confusion": {
+            "fn": 0,
+            "fp": 0,
+            "tn": 90,
+            "tp": 6
+          },
+          "metrics": {
+            "f1": 1.0,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "point_targets_met": true,
+          "positive_families": 2,
+          "rule_id": "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+        },
+        {
+          "confusion": {
+            "fn": 3,
+            "fp": 0,
+            "tn": 90,
+            "tp": 3
+          },
+          "metrics": {
+            "f1": 0.6666666666666666,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.5
+          },
+          "point_targets_met": false,
+          "positive_families": 2,
+          "rule_id": "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60"
+        },
+        {
+          "confusion": {
+            "fn": 6,
+            "fp": 0,
+            "tn": 90,
+            "tp": 0
+          },
+          "metrics": {
+            "f1": 0.0,
+            "false_positive_rate": 0.0,
+            "precision": null,
+            "recall": 0.0
+          },
+          "point_targets_met": false,
+          "positive_families": 2,
+          "rule_id": "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+        },
+        {
+          "confusion": {
+            "fn": 0,
+            "fp": 0,
+            "tn": 90,
+            "tp": 6
+          },
+          "metrics": {
+            "f1": 1.0,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 1.0
+          },
+          "point_targets_met": true,
+          "positive_families": 2,
+          "rule_id": "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+        }
+      ],
+      "statistical_support_scope": "Controlled, author-labeled variants do not establish independent population support.",
+      "statistical_target_supported": false,
+      "within_authored_family_bootstrap_target_supported": false
+    },
+    "source_commit": "e9565cab769a22dc54f09dc2a586ee86ebead936",
+    "source_dirty": true,
+    "source_files_lf_sha256": {
+      "app/config.py": "017fe285b68cedc45d57f4f46e7f199b5f47f8877eb8df828b0a34889e2c8b8e",
+      "app/continuous_signal_models.py": "05c4cca46ebb60ee829371bbcd55a9eeb1433ee416da72866f2dea397cd593b6",
+      "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+      "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+      "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+      "app/services/trusted_signals.py": "3c25ea18f16e8038cc49d8d46cfb7ebe4db62694ef0712011ddb1fa792a0de06",
+      "app/zero_trust_models.py": "dff08f28bb2da9eab3719ef60f544beecee1b983a6909c6dd3cf89a870a511eb",
+      "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+      "scripts/evaluate_f1_sessions.py": "d73347d5df03fc67d582147aff70be63673c4fc5ed999d511f9963ad2988a220",
+      "scripts/evaluate_f1_shadow.py": "7e3698a1b838d7ea090bda5581221e937ff617c8bff73c3fc8b35e094b9a375b",
+      "scripts/f1_lab/__init__.py": "62985db032a0261b06546af2b9e839c0790d41d6fe85e44ec2ffb1c423a120b0",
+      "scripts/f1_lab/approvals.py": "165b6340a0b195703c038419fcee8ad7e2c48dbe90039da5844305c60a6a72a1",
+      "scripts/f1_lab/confidence.py": "4c10c7b1d7147197d2ae89ed09f351b7eed99b4ff879b437ab8840b021ca3eb9",
+      "scripts/f1_lab/detector.py": "2a803c5bcd3ec5f0bcffb3a42141f5bede373082b1847ed0f803323867640fc5",
+      "scripts/f1_lab/provenance.py": "4f8a1c095f0fb43c0e303cd805c26a14c34c2fd076a4753a7ac4445cfa512678",
+      "scripts/f1_lab/registry.py": "e1b76dba89e13fdc78e3a35c044a9c43d922123ba399fc9a0324d3c7d74c3e8c",
+      "scripts/f1_lab/session_controls.py": "8568aedb7ff457d76419e311f87f0fb992a8e86d7c0a1ed4519938a448700029",
+      "scripts/f1_lab/session_inference.py": "bdbd6750354e8978120399ea93257b3a404a5e9ac57ea49141cf7ef2f11fb4a1",
+      "scripts/f1_lab/temporal.py": "b000c98aae49846b92100b2cb2dcfe8520eed6ca7b2ee53311d12fa46a9a0572"
+    },
+    "time_mode": "explicit_controlled_virtual_clock"
+  },
+  "experiment_summary_sha256": "eee5e5508fab10d94bc60e925e3bc7e8051ead4e585c622e63d6f0313fb6a33e",
+  "source_files_lf_sha256": {
+    "scripts/evaluate_f1_sessions.py": "d73347d5df03fc67d582147aff70be63673c4fc5ed999d511f9963ad2988a220",
+    "scripts/f1_lab/session_inference.py": "bdbd6750354e8978120399ea93257b3a404a5e9ac57ea49141cf7ef2f11fb4a1",
+    "scripts/f1_lab/temporal.py": "b000c98aae49846b92100b2cb2dcfe8520eed6ca7b2ee53311d12fa46a9a0572",
+    "tests/test_f1_session_inference.py": "8f6587c1b06f86a17ddb1428410c492628251f11b99babbc94d939d25b38bfbd",
+    "tests/test_f1_temporal_store.py": "10a6f165d71b5ca15e9fbb74b1971da1ecda1089db9a59e0795e1d6a03966caa"
+  },
+  "original_event_baseline_changed": false,
+  "original_event_f1": 0.5625,
+  "original_observed_holdout_shadow_v1_f1": 0.8,
+  "new_independent_evaluation": false,
+  "target_achieved": false,
+  "independent_review": "pending",
+  "cloud_calls": 0,
+  "paid_api_calls": 0,
+  "counts_are_separate_overlapping_phases": true
+}

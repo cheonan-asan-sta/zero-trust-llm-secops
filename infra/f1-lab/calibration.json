@@ -1,0 +1,18 @@
+{
+  "schema": "f1-shadow-calibration-1",
+  "input_role": "previously_observed_synthetic_development_only",
+  "outer_folds": 3,
+  "grouping": "connected_family_subject_device_session_and_declared_security_projection",
+  "selection": "maximize minimum signed margin to four point targets, then F1, then lower FPR, then earlier declared candidate",
+  "candidates": [
+    {"id": "baseline", "credential_failures": 3, "resource_fanout": 8, "bulk_download_mb": 500},
+    {"id": "auth-2", "credential_failures": 2, "resource_fanout": 8, "bulk_download_mb": 500},
+    {"id": "auth-5", "credential_failures": 5, "resource_fanout": 8, "bulk_download_mb": 500},
+    {"id": "fanout-6", "credential_failures": 3, "resource_fanout": 6, "bulk_download_mb": 500},
+    {"id": "fanout-12", "credential_failures": 3, "resource_fanout": 12, "bulk_download_mb": 500},
+    {"id": "download-250", "credential_failures": 3, "resource_fanout": 8, "bulk_download_mb": 250},
+    {"id": "download-1000", "credential_failures": 3, "resource_fanout": 8, "bulk_download_mb": 1000}
+  ],
+  "promotion": "none; diagnostic selection only, no app configuration writes",
+  "new_independent_evaluation": false
+}

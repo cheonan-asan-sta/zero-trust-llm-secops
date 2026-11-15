@@ -1,0 +1,32 @@
+{
+  "schema": "f1-web-residual-experiment-1",
+  "scope": "previously observed development only",
+  "policy": {
+    "schema": "f1-web-residual-policy-1",
+    "scope": "observed development advisory only; no access effects",
+    "alert_floor": 0.95,
+    "error_window_seconds": 60,
+    "prior_distinct_missing_scripts": 3,
+    "max_decode_layers": 2,
+    "max_query_values": 32,
+    "max_encoded_value": 4096,
+    "max_argv_items": 32,
+    "score_lowering_allowed": false
+  },
+  "operation_plan": {
+    "path": "infra/f1-lab/operation-refinement-protocol.json",
+    "sha256": "f7fd853011b6eb6d3fa07d95146e6c8e774bf13395fb027c16961eb6813ce629"
+  },
+  "prior_run": {
+    "path": "runtime/f1/operation-retention-v40b-20261113/run.json",
+    "sha256": "2dbdf7b50cc652aa3140ff7afece6640e4b52d353d6c4e201ca21964c427ae82"
+  },
+  "stateless_run": {
+    "path": "runtime/f1/operation-refinement-v40-20261113/run.json",
+    "sha256": "87136d908635bfcb891c7ed4c1373db24be93185358e21b92c961f685674da2c"
+  },
+  "selection_note": "Additive candidate after inspecting previously observed R/S/Fox residuals. No independent claim or final source access.",
+  "goal_qualified": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0
+}

@@ -22,6 +22,7 @@ from scripts.database_backup_runtime import (
 )
 from scripts.database_transport_runtime import TransportCoordinator, management_lease
 from scripts.persistent_authority_control import read
+from scripts.persistent_authority_runtime import GraphBackend
 from scripts.test_database_transport_runtime import Checks as ParentChecks
 from scripts.test_persistent_authority_runtime import AcceptanceRuntime
 from scripts.test_transport_process_recovery import kill_worker, public_failure
@@ -118,23 +119,6 @@ else:
         super().run()
         self.backup_checks()
 
-    def refresh_active_leaves(self):
-        r = self.runtime
-        before = self.pause()
-        original = r.controller_configuration()['renew_before']
-        self.configure(paused=False, renew_before={c['name']: 3599 if c['name'].startswith('renew-') else 1199
-            for c in before['credentials'].values()})
-        try:
-            self.wait(lambda: all(c['generation'] > before['credentials'][uid]['generation']
-                for uid, c in r.controller_status()['credentials'].items() if uid != self.collector),
-                'backup_active_renewal_not_completed', timeout=120)
-        finally:
-            current = self.pause()
-            self.configure(renew_before=original)
-        self.require(current['credentials'][self.collector]['fingerprint'] == before['credentials'][self.collector]['fingerprint'],
-                     'backup_preparation_reissued_retired_identity')
-        return current
-
     def refresh_before_backup(self):
         r = self.runtime
         current = self.refresh_active_leaves()
@@ -170,7 +154,7 @@ print(json.dumps(verify(json.load(sys.stdin))))
                 r.helper = original_helper
             self.add(label)
 
-    def focused(self):
+    def setup_focused(self):
         r = self.runtime
         r.up()
         self.pause()
@@ -181,13 +165,50 @@ print(json.dumps(verify(json.load(sys.stdin))))
             self.report[name] = copy.deepcopy(r.state[key])
         current = r.controller_status()
         self.collector = next(uid for uid, c in current['credentials'].items() if c['name'] == 'collector')
+
+    def retire_focused_collector(self):
+        r = self.runtime
+        current = r.controller_status()
         self.require(self.rpc('revoke', id=self.collector)['revoked'], 'backup_focused_revocation_failed')
         self.configure(disabled=[self.collector])
         profile = json.loads(r.execute('gateway', ['python', '-c', "from pathlib import Path;print(Path('/tls/profile.json').read_text())"]))
         self.require(profile['peers'].pop(current['credentials'][self.collector]['fingerprint']) == 'collector', 'backup_focused_pin_scope')
         r.write_volume('gateway-tls', {'profile.json': json.dumps(profile)})
         self.require(int(r.sql('SELECT count(*) FROM revoked_x509_certs;')) > 0, 'backup_focused_revocation_missing')
+
+    def focused(self):
+        self.setup_focused()
+        self.retire_focused_collector()
         self.report['schema'] = 'database-backup-focused-verification-1'
+        self.backup_checks()
+
+    def transport_backup_focused(self):
+        """Replay the failed boundary without repeating unrelated HA fault drills."""
+        self.setup_focused()
+        r = self.runtime
+        self.report['schema'] = 'database-transport-backup-focused-verification-1'
+        self.backend = GraphBackend(r, json.loads(r.profile_path.read_bytes()))
+        for epoch, part in ((1, 'root'), (2, 'jwk')):
+            self.force_due(part)
+            self.drive(epoch)
+        self.retire_focused_collector()
+        self.force_due('issuer')
+        self.drive(3)
+        self.report['final_certificates'] = r.controller_status()
+        self.transport_checks()
+        self.backup_checks()
+
+    def db_transport_backup_focused(self):
+        """Validate changed DB/backup boundaries without replaying passed CA faults."""
+        self.setup_focused()
+        self.retire_focused_collector()
+        r = self.runtime
+        self.backend = GraphBackend(r, json.loads(r.profile_path.read_bytes()))
+        epoch = r.journal()['epoch']
+        self.report.update(schema='database-transport-backup-regression-1',
+            authority_rotations_replayed=False, process_faults_replayed=False,
+            authority_epoch_for_transport=epoch)
+        self.transport_checks(authority_epoch=epoch, interrupt=False)
         self.backup_checks()
 
     def backup_checks(self):
@@ -253,11 +274,23 @@ print(json.dumps(verify(json.load(sys.stdin))))
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--directory', type=Path, default=ROOT / 'runtime/c02/database-backup-acceptance')
-    parser.add_argument('--backup-only', action='store_true', help='Focused backup and retired/active expiry boundary on a fresh graph')
+    focus = parser.add_mutually_exclusive_group()
+    focus.add_argument('--backup-only', action='store_true', help='Focused backup and retired/active expiry boundary on a fresh graph')
+    focus.add_argument('--transport-backup-only', action='store_true',
+                       help='Three authority epochs, two DB rotations, restart and backup drill')
+    focus.add_argument('--db-transport-backup-only', action='store_true',
+        help='Two DB rotations, restart and backup; no CA key rotation or process-fault replay')
     args = parser.parse_args()
     checks = Checks(args.directory)
     try:
-        checks.focused() if args.backup_only else checks.run()
+        if args.db_transport_backup_only:
+            checks.db_transport_backup_focused()
+        elif args.transport_backup_only:
+            checks.transport_backup_focused()
+        elif args.backup_only:
+            checks.focused()
+        else:
+            checks.run()
     except (RuntimeError, OSError, ValueError, TypeError, KeyError, subprocess.SubprocessError) as error:
         checks.report.update(completed=False, failure='database_backup_acceptance_failed', failure_detail=public_failure(error))
         checks.record_authority_failure()

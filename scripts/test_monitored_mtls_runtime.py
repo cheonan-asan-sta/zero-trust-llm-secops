@@ -221,12 +221,13 @@ print(json.dumps({'status':status,'denied':status in (0,403)}))
                 if service == 'exporter':
                     from scripts.monitoring_diagnostics import collect
                     snapshot = collect(runtime, 'synthetic_exporter_outage')
+                    self.report['monitoring_diagnostic_validation'] = snapshot
+                    self.save()
                     self.require(any(row['value'] == 0 for row in snapshot['prometheus']['up'].get('samples', []))
                                  and any(row.get('labels', {}).get('alertname') == alert and row['value'] == 1
                                          for row in snapshot['prometheus']['alerts'].get('samples', []))
                                  and any(row['service'] == 'exporter' and row.get('running') is False
                                          for row in snapshot['services']), 'monitoring_diagnostics_missing_live_fault')
-                    self.report['monitoring_diagnostic_validation'] = snapshot
                     self.add('monitoring_diagnostics_capture_actual_outage_before_cleanup')
             finally:
                 command(["docker", "start", runtime.container(service)])

@@ -4,6 +4,40 @@
 `python -m scripts.serve_dashboard_demo --seed`로 기존 평가 기록과 분리된 규칙 기반 시연 환경을
 실행합니다. 새 관제 화면은 `/`, 기존 분석 워크벤치는 `/static/workbench.html`입니다.
 
+2026-11-15 v81: [백업·복구 검증 상태 지표/경보](docs/extra-backup-recovery-status.md). 집중 196개·전체 5,623개·실제 systemd 71조건·관측 23조건 통과. 8시간은 유예하며 운영 활성화와 독립 F1 평가는 별도다.
+
+2026-11-15 v80: [지속 시험 구현·부분 관측·유예](docs/extra-systemd-soak.md). 전체5,583개/사전68조건은 통과했으나 두 장기 실행은 중단됐다.8시간/12시간은 미완료·유예이며 자동 재개하지 않는다.
+
+2026-11-15 v79: [실제 systemd 자원 계측·로컬 제한 검증](docs/extra-systemd-resources.md). 작업자별 현재 invocation·혼합 cgroup을 확인하며 장기/운영 인수는 별도다.
+
+2026-11-15 v78: [실행 mTLS 보관 단계별 안전한 진단](docs/extra-execution-maintenance.md). 과거 CI 원인 미확인·자동 재시도0, 정상 인수와 실제 Linux 잠금 경합을 구분한다.
+
+2026-11-14 v77: [선택 부하의 안전한 오류 진단·실제 장애 인수](docs/extra-selection-diagnostics.md). 집중100개·전체 회귀와 실제 정상37/의도적 장애2조건을 구분하며 과거 CI 원인 미확정·장기 시험 미완료를 유지한다.
+
+2026-11-14 최신: [캡처 보관 DB 암호화 백업·격리 복원 v75](docs/extra-capture-backup.md) — 관련552개·실제 systemd63조건, 원본 DB 부재 복원/캡처6건 바이트 일치·외부 pin 검증. 기존1,681,815행 판정 유지, API/AWS0. 운영 키/백업 저장·일정과 지속 부하는 후속이다.
+
+2026-11-14 최신: [수집 상태·보관 용량 경보 v74](docs/extra-collector-alerts.md) — PR61~67 aitest 병합, 순서 의존 시험은 PR68로 수정. 관련511개·실제 systemd53조건·실제 관측 도구13조건 통과, 기존1,681,815행 판정 유지. 운영 지속 mTLS 마운트/lock 인수는 별도다.
+
+2026-11-14 최신: [수집·보관·신선도 주기 실행 v73](docs/extra-collector-schedule.md) — PR66 CI16개 성공 확인 후 관련388개·실제 systemd43조건 통과. 실제 공백 stale→공급자 복원 후 timer 자동 fresh 회복, 기존1,681,815행 결정 유지. 운영 배포/조직 SSO 인수는 별도다.
+
+2026-11-14 최신: [실행 캡처 무손실 보관·복원 v72](docs/extra-capture-archive.md) — PR65 CI16개 성공 확인 후 관련384개·실제 systemd32조건 통과. 기존1,681,815행 결정 유지. 로컬 보관/복원이며 현재 trust·신선도를 갱신하지 않는다. 작은 시험의 SQLite 오버헤드와 운영 용량 과제도 기록했다.
+
+2026-11-14 최신: [수집키 유효기간·근거 신선도·복구 v71](docs/extra-collector-freshness.md) — PR64 CI16개 성공 후 진행. 관련353개·실제 systemd24조건·기존1,681,815행 결정 유지 검증. 수집 상태를 탐지/인가로 확대하지 않으며 실제 운영/조직 SSO 인수는 남아 있다.
+
+2026-11-14 최신: [systemd 수집기·자격 수명주기 v70](docs/extra-systemd-collector-runtime.md) — 전용 비root 구성·소켓 자격 공급·교체/폐기/종료 인수. 최종316개·실제13조건·기존1,681,815행 결정 유지 검증. 실제 조직 SSO/운영 설치 인수는 남아 있다.
+
+2026-11-14 최신 후속: [systemd 운영 연동·호출 신원 결속 v69](docs/extra-systemd-caller-identity.md) — 실제 WSL systemd15조건·관련281개·기존1,681,815행 결정 유지 검증. 로컬 인증원의 요청 결속을 확인했으며 실제 외부 SSO/사람 로그인 인수는 미완료다. v68의 systemd 미시험 표기는 당시 기록이다.
+
+2026-11-14 후속: [공유 서버 실행 근거 수집·연결 v68](docs/extra-shared-execution-evidence.md) — 실제 Linux 프로세스 관측·서명/별도 권한 결속을 구현했다. 관련233개·제어7조건·기존1,681,815행 결정 유지 확인. 공유 서버 과거 F1 0%는 유지하며 운영 systemd 인수·사람 신원 검증은 미완료다.
+
+2026-11-14 후속: [감사·인증 개발 개선 v67](docs/extra-audit-auth-refinement.md) — 미탐15행 감소·새 FP/TP 손실0. 인증 F1 95.08%/재현율90.625%, 웹 감사 F1 70.77%, 공유 서버 개선 미완료. 무료 로컬 묶음 검증이며 독립 목표 달성은 아니다.
+
+11/14 탐지·평가 후속: [현재 성능과 남은 목표](docs/extra-current-performance.md)를 먼저 읽습니다.
+Wilson 사전 고정 평가455,452행에서 웹 오탐54건 감소·기존 TP 손실0을 확인했지만 VPN F1은21.875%입니다.
+관찰 개발 자료의 후속 스캐너 후보는 미탐7건을 추가로 줄였으며, 원래 여섯 영역의 독립95% 목표는 미완료입니다.
+후보는 오프라인 경보 검토용이고 권한 집행에 연결하지 않았습니다. [Wardbeck 검증](docs/extra-scanner-calibration-transfer.md)은 원래 보정용 자료 역할을 유지합니다.
+아래 날짜별 구현·검증 내용은 당시의 기록이며 최신 수치와 진행 상태는 연결된 현재 문서를 따릅니다.
+
 11/8 후속 [개인키 회차·자원 측정 구간 격리](docs/rekey-and-resource-measurement-isolation.md): PR47 첫 병합 후 개인키12개 중단과 자원 수집2건 실패를 보존한다. 시험은 동일 pending키/정확히1세대 증가를 검사하고, 관측v2는 준비·실제 부하·의도적 장애 구간을 구분한다. 로컬22/37·Linux2577·소유 자원0이며 새 정확한 head/병합 후 CI는 후속 PR을 따른다. C01/C02 로컬 조건부·C03 보류·독립 인수/3주차 전체 미완료는 유지한다.
 
 11/8 3주차 잔여 묶음: [인프라 조건부 선정·현재 mTLS 부하/복구](docs/infrastructure-selection-acceptance.md). 채희주가 동시성1/4/8·3반복의576요청(153허용/423거부), gateway장애3회 전달0·새 grant복구, 인증된 관측·37개 인수와 Linux2560개를 검증했다. 과거 후보 비교 지문과 현재 실행 증거를 연결해 C01/C02는 로컬 조건부, C03는 현재 이미지 재검사/앱 영향 독립 대조 전 보류한다. 운영 승인·대안 후보의 현재 부하 새 비교·팀원 독립 재현·3주차 전체 완료와 구분하며 정확한 head/병합 후 CI는 PR을 따른다.
@@ -583,3 +617,5 @@ scripts/           대상 계정 검증이 포함된 AWS 배포 스크립트
 - [OCSF 1.9.0 Incident Finding](https://github.com/ocsf/ocsf-schema/blob/v1.9.0/events/findings/incident_finding.json)
 - [Splunk Attack Data](https://github.com/splunk/attack_data)
 - [Microsoft Sentinel Sample Data](https://github.com/Azure/Azure-Sentinel/tree/master/Sample%20Data)
+
+캡처 부하·용량·장애 검증과 실제 측정/장기 시험 경계는 [v76 문서](docs/extra-capture-load.md)를 따른다.

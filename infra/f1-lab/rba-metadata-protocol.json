@@ -1,0 +1,23 @@
+{
+  "schema": "f1-rba-metadata-audit-1",
+  "stage": "mechanical_metadata_only_before_model_fit",
+  "archive_sha256": "ca1d974e97aebfb30878a613f4ca5c793860a98ba2acb5185c9bc610d7432a33",
+  "archive_bytes": 1093700330,
+  "csv_member": "rba-dataset.csv",
+  "csv_bytes": 9052907531,
+  "csv_crc32": "864184c1",
+  "probe_receipt_sha256": "a3fd499deae8427f5558b57b06f45ad1af34ec9219b1041ed874b63364044f40",
+  "header": ["index", "Login Timestamp", "User ID", "Round-Trip Time [ms]", "IP Address", "Country", "Region", "City", "ASN", "User Agent String", "Browser Name and Version", "OS Name and Version", "Device Type", "Login Successful", "Is Attack IP", "Is Account Takeover"],
+  "partition": "Exact decimal CSV User ID string hashed as SHA256(UTF8('rba-user:'+value)). Previously observed probe-user hashes always development. Otherwise first8 digest bytes as unsigned big-endian integer modulo100:0..69 development,70..84 calibration,85..99 reserved_candidate. Never reseed/reassign based on label support or model results.",
+  "label_scope": "Count the three explicit publisher boolean fields separately and jointly; unknown stays unknown. No conversion of failed login/attack IP/ATO=false into generic six-domain threat/benign truth.",
+  "observation_scope": "User support/partition, timestamp shape/ranges/order, field missingness and RTT validity only. Do not display/export case values or fit a model. Original user strings are transient, stored metadata uses user hashes only.",
+  "maximum_rows": 40000000,
+  "batch_rows": 25000,
+  "maximum_seconds": 3600,
+  "resource_bounds": "Streaming CSV at most16GiB, physical line/field64KiB, SQLite metadata max1GiB with16MiB cache, bounded in-memory batch. No full CSV extraction. Verify archive before/after; claim member CRC only at full EOF with exact byte count.",
+  "limitations": "User partitions do not certify physical-device, request-template, exact-event or future-time independence. Aggregate reserved-candidate label support may be audited but no final per-case predictions/labels are shown or used to fit/tune a classifier. All final eligibility remains unproven.",
+  "original_six_domain_goal_replaced": false,
+  "classifier_fitted": false,
+  "final_partition_certified": false,
+  "goal_qualified": false
+}

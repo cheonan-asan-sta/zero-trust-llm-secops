@@ -1,0 +1,36 @@
+{
+  "schema": "f1-web-context-controls-1",
+  "scope": "authored functional controls only; not independent malicious truth",
+  "score_lowering_allowed": false,
+  "automatic_enforcement_allowed": false,
+  "v44_receipt": {
+    "path": "runtime/f1/web-residual-review-v44-20261113/run.json",
+    "sha256": "411a6a71f22fc6db73a6c6321d4b1f4ee708cb433bd81cf19d2e42b01d48e57d"
+  },
+  "collection_contract": {
+    "sources": [
+      "authentication",
+      "authorization",
+      "runtime"
+    ],
+    "challenge_seconds": 30,
+    "exact_request_fields": [
+      "tenant",
+      "server",
+      "subject",
+      "session/version",
+      "request",
+      "resource",
+      "case",
+      "method",
+      "target/body/raw hashes"
+    ],
+    "keys": "separate operator-pinned Ed25519 public keys; generated private keys stay in test memory"
+  },
+  "limitations": [
+    "No actual IdP/PDP/runtime sensor connected. Authored observations only.",
+    "No production API, persistent collector, durable adverse state or access effects.",
+    "Historical logs receive no invented body, identity, permission or execution facts.",
+    "Original six-domain P/R/F1 targets and independent final evaluation remain incomplete."
+  ]
+}

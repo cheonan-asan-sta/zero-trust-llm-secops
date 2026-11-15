@@ -1,0 +1,1136 @@
+{
+  "schema": "extra-capture-backup-1",
+  "completed": true,
+  "base_commit": "08921170b0297c553d7a2ffbeedc425f4f457e6f",
+  "scope": "encrypted cold capture archive backup, external minimum checkpoint and isolated review restore",
+  "goal_qualified": false,
+  "automatic_activation_allowed": false,
+  "authenticity_or_freshness_asserted": false,
+  "production_deployment_completed": false,
+  "organizational_SSO_login_tested": false,
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "prior_aitest_CI": {
+    "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43580211763",
+    "head": "08921170b0297c553d7a2ffbeedc425f4f457e6f",
+    "all_16_checks_passed": true,
+    "unit_passed": 5395,
+    "unit_skipped": 2
+  },
+  "linux": {
+    "exit_code": 0,
+    "seconds": 194.44,
+    "counts": {
+      "passed": 552
+    },
+    "log": "runtime/f1/capture-backup-batch-v75-20261114/linux.log",
+    "executed": true,
+    "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "source_files": 1041,
+    "source_archive_sha256": "c6b59e15f7e2c71fce9491077dd0dfc0f9916db679394c977d0acf4e5e0ceace",
+    "container_exit": 0,
+    "oom_killed": false,
+    "network_mode": "none",
+    "owned_container": "5f6bc239c96bc70d76da38e9916decd6b1c92f2dc481923283d3803e0ba21564",
+    "snapshot_sources_unchanged_after": true,
+    "owned_container_removed": true
+  },
+  "native": {
+    "source_archive_sha256": "c6b59e15f7e2c71fce9491077dd0dfc0f9916db679394c977d0acf4e5e0ceace",
+    "aws_calls": 0,
+    "paid_api_calls": 0,
+    "exit_code": 0,
+    "template_sha256": "0b83f3372037ff26cef119b1b5df4951ef7ee5e4cd3c5502c4b173ce5d8f74ab",
+    "template_verify_exit_code": 0,
+    "template_installation_paths_substituted": true,
+    "native_seconds": 91.701,
+    "owned_snapshot_removed": true
+  },
+  "controls": {
+    "schema": "extra-capture-backup-runtime-1",
+    "completed": true,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "goal_qualified": false,
+    "scope": "real systemd collector sandbox and credential lifecycle, local functional controls",
+    "real_human_login_tested": false,
+    "production_installation_completed": false,
+    "cases": [
+      {
+        "name": "service_account_configuration_dry_run",
+        "passed": true
+      },
+      {
+        "name": "collector_is_static_nonroot_fixture",
+        "passed": true
+      },
+      {
+        "name": "only_required_effective_and_bounding_capabilities",
+        "passed": true
+      },
+      {
+        "name": "no_new_privileges_is_observed",
+        "passed": true
+      },
+      {
+        "name": "normal_capture_and_authorization_keep_baseline",
+        "passed": true
+      },
+      {
+        "name": "credential_was_a_socket_not_key_file",
+        "passed": true
+      },
+      {
+        "name": "initial_signed_latest_is_fresh",
+        "passed": true
+      },
+      {
+        "name": "controlled_31_second_gap_is_stale",
+        "passed": true
+      },
+      {
+        "name": "controlled_clock_rollback_after_restart_is_unavailable",
+        "passed": true
+      },
+      {
+        "name": "rotated_key_without_current_pin_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "rotation_with_new_public_pin_collects_fresh_evidence",
+        "passed": true
+      },
+      {
+        "name": "old_key_proof_is_rejected_by_current_registry",
+        "passed": true
+      },
+      {
+        "name": "expired_signing_authority_cannot_create_capture",
+        "passed": true
+      },
+      {
+        "name": "failed_expired_key_keeps_previous_latest",
+        "passed": true
+      },
+      {
+        "name": "not_yet_valid_signing_authority_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "runtime_proof_expiry_is_clipped_to_signer",
+        "passed": true
+      },
+      {
+        "name": "missing_key_provider_fails_at_systemd_credentials",
+        "passed": true
+      },
+      {
+        "name": "provider_outage_cannot_replace_latest",
+        "passed": true
+      },
+      {
+        "name": "provider_restart_collects_new_signed_evidence",
+        "passed": true
+      },
+      {
+        "name": "restoring_an_older_valid_capture_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "archive_preview_keeps_every_hot_byte",
+        "passed": true
+      },
+      {
+        "name": "archive_worker_is_nonroot_without_capabilities",
+        "passed": true
+      },
+      {
+        "name": "archive_capacity_pressure_keeps_hot_and_latest",
+        "passed": true
+      },
+      {
+        "name": "committed_archive_keeps_latest_and_meets_hot_limit",
+        "passed": true
+      },
+      {
+        "name": "all_cold_payloads_equal_original_hot_bytes",
+        "passed": true
+      },
+      {
+        "name": "restore_preserves_every_original_byte",
+        "passed": true
+      },
+      {
+        "name": "restored_old_capture_does_not_become_current",
+        "passed": true
+      },
+      {
+        "name": "latest_remains_fresh_after_compaction",
+        "passed": true
+      },
+      {
+        "name": "timers_are_disabled_before_explicit_fixture_start",
+        "passed": true
+      },
+      {
+        "name": "timer_repeats_new_signed_normal_observations",
+        "passed": true
+      },
+      {
+        "name": "scheduled_health_worker_is_nonroot_without_capabilities",
+        "passed": true
+      },
+      {
+        "name": "scheduled_health_never_claims_authorization_or_enforcement",
+        "passed": true
+      },
+      {
+        "name": "archive_timer_preserves_payloads_and_current_latest",
+        "passed": true
+      },
+      {
+        "name": "scheduled_provider_failure_preserves_last_signed_capture",
+        "passed": true
+      },
+      {
+        "name": "actual_collection_gap_becomes_stale_without_clock_injection",
+        "passed": true
+      },
+      {
+        "name": "timer_recovers_after_provider_restore_without_manual_collector_start",
+        "passed": true
+      },
+      {
+        "name": "timer_restart_collects_current_observation_not_backfill",
+        "passed": true
+      },
+      {
+        "name": "stopped_timers_do_not_keep_collecting",
+        "passed": true
+      },
+      {
+        "name": "timed_normal_observations_preserve_baseline",
+        "passed": true
+      },
+      {
+        "name": "fresh_normal_capture_precedes_public_status",
+        "passed": true
+      },
+      {
+        "name": "status_dropin_publishes_revalidated_fresh_observation",
+        "passed": true
+      },
+      {
+        "name": "status_dropin_publishes_current_archive_counters",
+        "passed": true
+      },
+      {
+        "name": "status_snapshots_are_public_aggregates_without_original_identity",
+        "passed": true
+      },
+      {
+        "name": "public_status_permissions_do_not_change_private_capture_permissions",
+        "passed": true
+      },
+      {
+        "name": "native_status_files_feed_bounded_exporter_metrics",
+        "passed": true
+      },
+      {
+        "name": "invalid_current_trust_publishes_unavailable_not_old_fresh",
+        "passed": true
+      },
+      {
+        "name": "valid_trust_recovers_status_without_replacing_capture",
+        "passed": true
+      },
+      {
+        "name": "archive_capacity_failure_publishes_pressure_and_preserves_latest",
+        "passed": true
+      },
+      {
+        "name": "archive_report_recovers_after_capacity_configuration_restored",
+        "passed": true
+      },
+      {
+        "name": "cold_archive_checkpoint_is_published_outside_source",
+        "passed": true
+      },
+      {
+        "name": "backup_service_is_nonroot_without_capabilities",
+        "passed": true
+      },
+      {
+        "name": "backup_is_encrypted_and_contains_no_hot_latest",
+        "passed": true
+      },
+      {
+        "name": "wrong_recovery_key_creates_no_review",
+        "passed": true
+      },
+      {
+        "name": "missing_backup_key_provider_cannot_publish_package",
+        "passed": true
+      },
+      {
+        "name": "restore_succeeds_while_original_archive_database_is_absent",
+        "passed": true
+      },
+      {
+        "name": "isolated_restored_archive_matches_all_original_capture_bytes",
+        "passed": true
+      },
+      {
+        "name": "extracted_historical_capture_does_not_become_fresh",
+        "passed": true
+      },
+      {
+        "name": "backup_restore_never_changes_original_database_or_latest",
+        "passed": true
+      },
+      {
+        "name": "only_root_manager_receives_separate_recovery_credential",
+        "passed": true
+      },
+      {
+        "name": "disabled_collector_key_cannot_create_capture",
+        "passed": true
+      },
+      {
+        "name": "stopped_target_cannot_be_backfilled",
+        "passed": true
+      },
+      {
+        "name": "only_root_manager_read_credentials",
+        "passed": true
+      },
+      {
+        "name": "credential_socket_removed_and_provider_stopped",
+        "passed": true
+      }
+    ],
+    "collector_runs": [
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "9552f3b4c9738f572d03544e6055e2ab368474de0bf8cf89d987bd7048700149",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "29d271123935fc1a0715f458611d5326064d67ee1ad52dfafc271d614212d7c6",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "d879de73fb409dac3bd07bac5c9ab20e87f4ba7f4884d478b42ff1ffeb2dddf7",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "failure_stage": "systemd_credentials"
+        }
+      },
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "23a99291a7b2114333e242447f7a00782471a4e9b6fe192bfe947d2bdc57f655",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "344c06b5ded7b2b45d66115d86f8cd477e4f8494595dc9bb4f25022b7282df7b",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "native_collection",
+          "failure_code": "native_source_service_manager_binding",
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      }
+    ],
+    "archive_controls": {
+      "completed": true,
+      "scope": "owned real-systemd lossless archival controls",
+      "runs": [
+        {
+          "mode": "preview",
+          "summary": {
+            "completed": true,
+            "applied": false,
+            "hot_before_records": 4,
+            "hot_before_bytes": 5768,
+            "planned": 3,
+            "deleted_hot_files": 0,
+            "archive_records": 0,
+            "archive_raw_bytes": 0,
+            "archive_compressed_payload_bytes": 0,
+            "skipped_entries": 0,
+            "archive_capacity_available": true,
+            "latest_protected": true,
+            "projected_hot_records": 1,
+            "projected_hot_bytes": 1442,
+            "projected_budget_satisfied": true,
+            "authenticity_or_freshness_asserted": false,
+            "hot_after_records": 4,
+            "hot_after_bytes": 5768,
+            "managed_budget_satisfied": false,
+            "archive_database_file_bytes": 0,
+            "mode": "preview",
+            "state": "ready",
+            "worker_security": {
+              "effective_uid": 1,
+              "effective_capabilities": 0,
+              "bounding_capabilities": 0,
+              "no_new_privileges": true
+            }
+          }
+        },
+        {
+          "mode": "pressure",
+          "summary": {
+            "completed": false,
+            "state": "storage_pressure",
+            "error_type": "ArchiveFull",
+            "authenticity_or_freshness_asserted": false
+          }
+        },
+        {
+          "mode": "apply",
+          "summary": {
+            "completed": true,
+            "applied": true,
+            "hot_before_records": 4,
+            "hot_before_bytes": 5768,
+            "planned": 3,
+            "deleted_hot_files": 3,
+            "archive_records": 3,
+            "archive_raw_bytes": 4326,
+            "archive_compressed_payload_bytes": 2463,
+            "skipped_entries": 0,
+            "archive_capacity_available": true,
+            "latest_protected": true,
+            "projected_hot_records": 1,
+            "projected_hot_bytes": 1442,
+            "projected_budget_satisfied": true,
+            "authenticity_or_freshness_asserted": false,
+            "hot_after_records": 1,
+            "hot_after_bytes": 1442,
+            "managed_budget_satisfied": true,
+            "archive_database_file_bytes": 16384,
+            "mode": "apply",
+            "state": "ready",
+            "worker_security": {
+              "effective_uid": 1,
+              "effective_capabilities": 0,
+              "bounding_capabilities": 0,
+              "no_new_privileges": true
+            }
+          }
+        },
+        {
+          "mode": "restore",
+          "summary": {
+            "completed": true,
+            "raw_sha256": "d879de73fb409dac3bd07bac5c9ab20e87f4ba7f4884d478b42ff1ffeb2dddf7",
+            "raw_bytes": 1442,
+            "authenticity_or_freshness_asserted": false,
+            "mode": "restore",
+            "state": "restored_for_review",
+            "worker_security": {
+              "effective_uid": 1,
+              "effective_capabilities": 0,
+              "bounding_capabilities": 0,
+              "no_new_privileges": true
+            }
+          }
+        }
+      ],
+      "restored_raw_sha256": "d879de73fb409dac3bd07bac5c9ab20e87f4ba7f4884d478b42ff1ffeb2dddf7",
+      "all_three_archived_payloads_byte_equal": true,
+      "cold_payload_compression_is_not_database_file_size": true,
+      "paid_api_calls": 0,
+      "aws_calls": 0,
+      "fixture_account_substituted": true,
+      "operational_service_account_created": false,
+      "owned_archive_unit_removed": true,
+      "owned_restore_state_removed": true
+    },
+    "schedule_controls": {
+      "completed": true,
+      "paid_api_calls": 0,
+      "aws_calls": 0,
+      "real_elapsed_outage_tested": true,
+      "OS_clock_changed": false,
+      "production_timers_enabled": false,
+      "fixture_intervals_substituted": true,
+      "observations": [
+        {
+          "event_sha256": "9f573aa471c69e1ac7d8d3851cf5b7275493e6a2a5c74508fe002246dd20d9c9",
+          "observed_at": "2026-11-14T10:01:56.050546+00:00",
+          "raw_sha256": "7c32d15b5bdd84a741417f5a6b77f2debe794a814141a0814ca902b5b321fe27"
+        },
+        {
+          "event_sha256": "47ba5ce35189fece3747b8ed46398d4c66c7a85cf10828ba6ac3f393952457e2",
+          "observed_at": "2026-11-14T10:01:59.284412+00:00",
+          "raw_sha256": "e5e16fb2e36efa52b7fafd95c9f005a6473789bd29e2b5859d46975615bfc0f4"
+        },
+        {
+          "event_sha256": "cc6d0d6d93546a109f85934609d64c20d210b8c978fd14f7e0dbcaadb64db74e",
+          "observed_at": "2026-11-14T10:02:35.167848+00:00",
+          "raw_sha256": "abdc8e0677b6a1c0ace9bd8af471588aa623e6e12f3843e59a93267f3757ea68"
+        },
+        {
+          "event_sha256": "5075e05667b15a52b677c7e7a43f825c67b5dc3372e23ab05ed1208c11eae1fc",
+          "observed_at": "2026-11-14T10:02:39.947560+00:00",
+          "raw_sha256": "6dfc6ae8863748666419cd486a3cae67f29dd7a6d1e77e01009e9617d01c7d11"
+        }
+      ],
+      "normal_controls": 4,
+      "normal_added_alerts": 0,
+      "real_outage_elapsed_seconds": 27.629,
+      "stale_observation_age_seconds": 30.775,
+      "initial_health": {
+        "state": "fresh",
+        "reason": "recent_signed_observation",
+        "event_sha256": "47ba5ce35189fece3747b8ed46398d4c66c7a85cf10828ba6ac3f393952457e2",
+        "observed_at": "2026-11-14T10:01:59.284412+00:00",
+        "scope": "signed_collector_observation_freshness",
+        "authorization_checked": false,
+        "automatic_enforcement_allowed": false,
+        "worker_security": {
+          "effective_uid": 1,
+          "effective_capabilities": 0,
+          "bounding_capabilities": 0,
+          "no_new_privileges": true
+        }
+      },
+      "stale_health": {
+        "state": "stale",
+        "reason": "observation_expired",
+        "event_sha256": "6fc4aad24a12ff6f827d4e6845c2937ae1d553c0bc66eaef1167fbabf4810d75",
+        "observed_at": "2026-11-14T10:02:02.702701+00:00",
+        "scope": "signed_collector_observation_freshness",
+        "authorization_checked": false,
+        "automatic_enforcement_allowed": false,
+        "worker_security": {
+          "effective_uid": 1,
+          "effective_capabilities": 0,
+          "bounding_capabilities": 0,
+          "no_new_privileges": true
+        }
+      },
+      "recovered_health": {
+        "state": "fresh",
+        "reason": "recent_signed_observation",
+        "event_sha256": "cc6d0d6d93546a109f85934609d64c20d210b8c978fd14f7e0dbcaadb64db74e",
+        "observed_at": "2026-11-14T10:02:35.167848+00:00",
+        "scope": "signed_collector_observation_freshness",
+        "authorization_checked": false,
+        "automatic_enforcement_allowed": false,
+        "worker_security": {
+          "effective_uid": 1,
+          "effective_capabilities": 0,
+          "bounding_capabilities": 0,
+          "no_new_privileges": true
+        }
+      },
+      "verified_archive_records": 5,
+      "quiescent_hot_records": 2,
+      "fixture_account_substituted": true,
+      "operational_account_created": false,
+      "owned_timer_and_service_files_removed": true,
+      "owned_health_state_removed": true,
+      "credential_deliveries": 5
+    },
+    "status_controls": {
+      "completed": true,
+      "paid_api_calls": 0,
+      "aws_calls": 0,
+      "operational_installation_completed": false,
+      "health": {
+        "checked_at": "2026-11-14T10:02:50.949265+00:00",
+        "expires_at": "2026-11-14T10:03:16.567647+00:00",
+        "kind": "health",
+        "observed_at": "2026-11-14T10:02:46.567647+00:00",
+        "schema": "zt-collector-status-1",
+        "scope_sha256": "214320085b1de4b3c7c8caf3665bb07c34221a1a3132e13b517208594d18af3e",
+        "state": "fresh",
+        "values": {}
+      },
+      "archive": {
+        "checked_at": "2026-11-14T10:02:53.523453+00:00",
+        "expires_at": null,
+        "kind": "archive",
+        "observed_at": null,
+        "schema": "zt-collector-status-1",
+        "scope_sha256": "214320085b1de4b3c7c8caf3665bb07c34221a1a3132e13b517208594d18af3e",
+        "state": "ready",
+        "values": {
+          "archive_compressed_payload_bytes": 4923,
+          "archive_database_file_bytes": 24576,
+          "archive_raw_bytes": 8652,
+          "archive_records": 6,
+          "hot_after_bytes": 5768,
+          "hot_after_records": 4
+        }
+      },
+      "pressure": {
+        "checked_at": "2026-11-14T10:02:52.195456+00:00",
+        "expires_at": null,
+        "kind": "archive",
+        "observed_at": null,
+        "schema": "zt-collector-status-1",
+        "scope_sha256": "214320085b1de4b3c7c8caf3665bb07c34221a1a3132e13b517208594d18af3e",
+        "state": "storage_pressure",
+        "values": {}
+      },
+      "native_metrics": "# TYPE secops_collector_bridge_enabled gauge\nsecops_collector_bridge_enabled 1\nsecops_collector_status_success{worker=\"health\"} 1\nsecops_collector_observation_fresh 1\nsecops_collector_observation_age_seconds 2.29574\nsecops_collector_status_success{worker=\"archive\"} 1\nsecops_collector_archive_storage_pressure 0\nsecops_collector_archive_compressed_payload_bytes 4923\nsecops_collector_archive_database_file_bytes 24576\nsecops_collector_archive_raw_bytes 8652\nsecops_collector_archive_records 6\nsecops_collector_hot_after_bytes 5768\nsecops_collector_hot_after_records 4\n",
+      "fixture_account_substituted": true,
+      "private_capture_permissions_preserved": true,
+      "owned_status_units_removed": true,
+      "owned_status_state_removed": true
+    },
+    "backup_controls": {
+      "completed": true,
+      "paid_api_calls": 0,
+      "aws_calls": 0,
+      "recovery_key_persisted": false,
+      "private_signing_key_in_backup": false,
+      "automatic_activation_allowed": false,
+      "production_installation_completed": false,
+      "records": 6,
+      "results": [
+        {
+          "mode": "checkpoint",
+          "summary": {
+            "completed": true,
+            "checkpoint_sha256": "686b8b023ba974f6198397dcceae5043f92450c4506fa8d5018fc271ba5e54dc",
+            "checkpoint": {
+              "schema_version": "zt-capture-checkpoint-1",
+              "scope_sha256": "214320085b1de4b3c7c8caf3665bb07c34221a1a3132e13b517208594d18af3e",
+              "records": 6,
+              "raw_bytes": 8652,
+              "head": "3e159fdb54260c5f068a51ffbd52bc60393ece5137d3a8cf8e338d5592ad6f2b",
+              "issued_at": "2026-11-14T10:02:55.569485+00:00"
+            },
+            "automatic_activation_allowed": false,
+            "authenticity_or_freshness_asserted": false,
+            "worker_security": {
+              "effective_uid": 1,
+              "effective_capabilities": 0,
+              "bounding_capabilities": 0,
+              "no_new_privileges": true
+            }
+          }
+        },
+        {
+          "mode": "backup",
+          "summary": {
+            "completed": true,
+            "manifest_sha256": "97f0955bb820937953ebf41e508359e0d29c512f51b31d2230d0d7505d27adbd",
+            "checkpoint_sha256": "686b8b023ba974f6198397dcceae5043f92450c4506fa8d5018fc271ba5e54dc",
+            "records": 6,
+            "database_bytes": 24576,
+            "payload_bytes": 24592,
+            "automatic_activation_allowed": false,
+            "authenticity_or_freshness_asserted": false,
+            "worker_security": {
+              "effective_uid": 1,
+              "effective_capabilities": 0,
+              "bounding_capabilities": 0,
+              "no_new_privileges": true
+            }
+          }
+        },
+        {
+          "mode": "restore",
+          "summary": {
+            "completed": false,
+            "state": "unavailable",
+            "mode": "restore",
+            "automatic_activation_allowed": false,
+            "authenticity_or_freshness_asserted": false
+          }
+        },
+        {
+          "mode": "backup",
+          "summary": {
+            "completed": false,
+            "stage": "systemd_credentials"
+          }
+        },
+        {
+          "mode": "restore",
+          "summary": {
+            "completed": true,
+            "receipt_sha256": "0d909dadce47c90a82e3d12794b7a57d0ebc79015110a2c43554b308fe36a7cb",
+            "records": 6,
+            "automatic_activation_allowed": false,
+            "authenticity_or_freshness_asserted": false,
+            "worker_security": {
+              "effective_uid": 1,
+              "effective_capabilities": 0,
+              "bounding_capabilities": 0,
+              "no_new_privileges": true
+            }
+          }
+        },
+        {
+          "mode": "verify",
+          "summary": {
+            "completed": true,
+            "records": 6,
+            "head": "3e159fdb54260c5f068a51ffbd52bc60393ece5137d3a8cf8e338d5592ad6f2b",
+            "automatic_activation_allowed": false,
+            "authenticity_or_freshness_asserted": false,
+            "worker_security": {
+              "effective_uid": 1,
+              "effective_capabilities": 0,
+              "bounding_capabilities": 0,
+              "no_new_privileges": true
+            }
+          }
+        },
+        {
+          "mode": "extract",
+          "summary": {
+            "completed": true,
+            "raw_sha256": "e5e16fb2e36efa52b7fafd95c9f005a6473789bd29e2b5859d46975615bfc0f4",
+            "raw_bytes": 1442,
+            "authenticity_or_freshness_asserted": false,
+            "mode": "restore",
+            "state": "restored_for_review",
+            "worker_security": {
+              "effective_uid": 1,
+              "effective_capabilities": 0,
+              "bounding_capabilities": 0,
+              "no_new_privileges": true
+            }
+          }
+        }
+      ],
+      "worker_security": {
+        "effective_uid": 1,
+        "effective_capabilities": 0,
+        "bounding_capabilities": 0,
+        "no_new_privileges": true
+      },
+      "source_database_unchanged": true,
+      "latest_unchanged": true,
+      "all_original_cold_capture_bytes_preserved": true,
+      "systemd_memory_credential_copy": true,
+      "owned_units_removed": true,
+      "owned_backup_state_removed": true,
+      "owned_credential_socket_removed": true
+    },
+    "normal_controls": 5,
+    "normal_added_alerts": 0,
+    "private_key_disk_files_created": 0,
+    "systemd_memory_credential_copy": true,
+    "private_key_persisted": false,
+    "tokens_persisted": false,
+    "real_systemd_tested": true,
+    "template_security_directives_preserved": true,
+    "template_installation_paths_substituted": true,
+    "collector_security": {
+      "effective_uid": 1,
+      "effective_capabilities": 524292,
+      "bounding_capabilities": 524292,
+      "no_new_privileges": true
+    },
+    "existing_static_fixture_account_used": true,
+    "real_service_account_created": false,
+    "freshness_controlled_clock_used": true,
+    "scheduling_real_elapsed_outage_used": true,
+    "systemd_version": "systemd 255 (255.4-1ubuntu8.18)",
+    "owned_units_removed": true,
+    "owned_state_removed": true,
+    "owned_config_and_socket_removed": true,
+    "systemd_credentials_removed": true
+  },
+  "backup_controls": {
+    "completed": true,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "recovery_key_persisted": false,
+    "private_signing_key_in_backup": false,
+    "automatic_activation_allowed": false,
+    "production_installation_completed": false,
+    "records": 6,
+    "results": [
+      {
+        "mode": "checkpoint",
+        "summary": {
+          "completed": true,
+          "checkpoint_sha256": "686b8b023ba974f6198397dcceae5043f92450c4506fa8d5018fc271ba5e54dc",
+          "checkpoint": {
+            "schema_version": "zt-capture-checkpoint-1",
+            "scope_sha256": "214320085b1de4b3c7c8caf3665bb07c34221a1a3132e13b517208594d18af3e",
+            "records": 6,
+            "raw_bytes": 8652,
+            "head": "3e159fdb54260c5f068a51ffbd52bc60393ece5137d3a8cf8e338d5592ad6f2b",
+            "issued_at": "2026-11-14T10:02:55.569485+00:00"
+          },
+          "automatic_activation_allowed": false,
+          "authenticity_or_freshness_asserted": false,
+          "worker_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 0,
+            "bounding_capabilities": 0,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "mode": "backup",
+        "summary": {
+          "completed": true,
+          "manifest_sha256": "97f0955bb820937953ebf41e508359e0d29c512f51b31d2230d0d7505d27adbd",
+          "checkpoint_sha256": "686b8b023ba974f6198397dcceae5043f92450c4506fa8d5018fc271ba5e54dc",
+          "records": 6,
+          "database_bytes": 24576,
+          "payload_bytes": 24592,
+          "automatic_activation_allowed": false,
+          "authenticity_or_freshness_asserted": false,
+          "worker_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 0,
+            "bounding_capabilities": 0,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "mode": "restore",
+        "summary": {
+          "completed": false,
+          "state": "unavailable",
+          "mode": "restore",
+          "automatic_activation_allowed": false,
+          "authenticity_or_freshness_asserted": false
+        }
+      },
+      {
+        "mode": "backup",
+        "summary": {
+          "completed": false,
+          "stage": "systemd_credentials"
+        }
+      },
+      {
+        "mode": "restore",
+        "summary": {
+          "completed": true,
+          "receipt_sha256": "0d909dadce47c90a82e3d12794b7a57d0ebc79015110a2c43554b308fe36a7cb",
+          "records": 6,
+          "automatic_activation_allowed": false,
+          "authenticity_or_freshness_asserted": false,
+          "worker_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 0,
+            "bounding_capabilities": 0,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "mode": "verify",
+        "summary": {
+          "completed": true,
+          "records": 6,
+          "head": "3e159fdb54260c5f068a51ffbd52bc60393ece5137d3a8cf8e338d5592ad6f2b",
+          "automatic_activation_allowed": false,
+          "authenticity_or_freshness_asserted": false,
+          "worker_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 0,
+            "bounding_capabilities": 0,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "mode": "extract",
+        "summary": {
+          "completed": true,
+          "raw_sha256": "e5e16fb2e36efa52b7fafd95c9f005a6473789bd29e2b5859d46975615bfc0f4",
+          "raw_bytes": 1442,
+          "authenticity_or_freshness_asserted": false,
+          "mode": "restore",
+          "state": "restored_for_review",
+          "worker_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 0,
+            "bounding_capabilities": 0,
+            "no_new_privileges": true
+          }
+        }
+      }
+    ],
+    "worker_security": {
+      "effective_uid": 1,
+      "effective_capabilities": 0,
+      "bounding_capabilities": 0,
+      "no_new_privileges": true
+    },
+    "source_database_unchanged": true,
+    "latest_unchanged": true,
+    "all_original_cold_capture_bytes_preserved": true,
+    "systemd_memory_credential_copy": true,
+    "owned_units_removed": true,
+    "owned_backup_state_removed": true,
+    "owned_credential_socket_removed": true
+  },
+  "legacy_regression": {
+    "aws_calls": 0,
+    "completed": true,
+    "goal_qualified": false,
+    "native_actor_command_evidence_added_to_legacy": 0,
+    "paid_api_calls": 0,
+    "population": 1681815,
+    "scenarios": {
+      "fox": {
+        "after_decision_sha256": "29e3e42b17e13d9f4ce8f785b2c1121ee52aa9a6ebbd323c5328e38644929832",
+        "before_decision_sha256": "29e3e42b17e13d9f4ce8f785b2c1121ee52aa9a6ebbd323c5328e38644929832",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 668418,
+        "predictions_sha256": "3a95e16120e53c888203f0d25d57526b0c614deeaa1e86b43ed98694976702cc",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.998765742394729,
+          "f1": 0.9990965864106885,
+          "false_positive_rate": 0.0006145584161411404,
+          "fn": 695,
+          "fp": 130,
+          "inference_errors": 0,
+          "population": 668418,
+          "precision": 0.9997151115776464,
+          "recall": 0.9984788261352991,
+          "tn": 211404,
+          "tp": 456189
+        }
+      },
+      "harrison_observed": {
+        "after_decision_sha256": "de38509b07982c34ab69e57eb7df9ebb0517674d06cd1329d594c93c503be1c9",
+        "before_decision_sha256": "de38509b07982c34ab69e57eb7df9ebb0517674d06cd1329d594c93c503be1c9",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 422178,
+        "predictions_sha256": "c7e557b7d8e137cedc35649505ad389d06c593fe9f53e09caccf10d28220a9e0",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9993983580385525,
+          "f1": 0.9996953318603709,
+          "false_positive_rate": 0.046012832263978,
+          "fn": 3,
+          "fp": 251,
+          "inference_errors": 0,
+          "population": 422178,
+          "precision": 0.9993980396718237,
+          "recall": 0.9999928009733084,
+          "tn": 5204,
+          "tp": 416720
+        }
+      },
+      "russellmitchell": {
+        "after_decision_sha256": "2c4aecb63800cb85dfc8a6685f03b17d53c2f88e727b47c415eac6c1d2d70276",
+        "before_decision_sha256": "2c4aecb63800cb85dfc8a6685f03b17d53c2f88e727b47c415eac6c1d2d70276",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 295243,
+        "predictions_sha256": "2ee9ee30497a6a4a48c12461e0c6ce76dcdc3392db71f04caf3f7f92383dfaf4",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9963386092134275,
+          "f1": 0.991198000211704,
+          "false_positive_rate": 0.0003642113111178716,
+          "fn": 996,
+          "fp": 85,
+          "inference_errors": 0,
+          "population": 295243,
+          "precision": 0.9986054371544355,
+          "recall": 0.9838996476027286,
+          "tn": 233296,
+          "tp": 60866
+        }
+      },
+      "santos": {
+        "after_decision_sha256": "90fd3e70c751fe8da7fd2fbc26fd70688c07f8989ded90e48af67f7a4662d99a",
+        "before_decision_sha256": "90fd3e70c751fe8da7fd2fbc26fd70688c07f8989ded90e48af67f7a4662d99a",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 295976,
+        "predictions_sha256": "92dc1b9932ffd57562e29454ea81c25f70b071406d6aed89587e5dada6c7a220",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9966010757628997,
+          "f1": 0.9892837359921599,
+          "false_positive_rate": 0.00029765615886794125,
+          "fn": 932,
+          "fp": 74,
+          "inference_errors": 0,
+          "population": 295976,
+          "precision": 0.9984089101034208,
+          "recall": 0.9803238541600693,
+          "tn": 248535,
+          "tp": 46435
+        }
+      }
+    },
+    "schema": "extra-shared-execution-legacy-regression-1",
+    "scope": "prior observed-development decision regression only; no new ground truth",
+    "source_prior_sha256": "35ec2a206d0a3a475d37dfb38b9459044291aee79cfea9adbbcae8da7b428ee4"
+  },
+  "bounds": {
+    "snapshot_database_bytes": 67108864,
+    "packages_per_dedicated_parent": 16,
+    "cooperative_lock_wait_seconds": 5,
+    "sqlite_copy_progress_deadline_seconds": 20
+  },
+  "trust_boundary": "Recovery key and externally retained checkpoint/manifest/receipt pins are trusted operator inputs. Restored historical signatures are not renewed. Full host/pin rollback, remote WORM, physical disaster recovery and operational key custody are not demonstrated.",
+  "coverage_boundary": "Only cold archive.sqlite3 is backed up. Hot/latest captures, freshness ledger, keys, policies and application/CA databases are outside this package. Restore is a new private review directory with no automatic activation.",
+  "source_sha256": {
+    "scripts/f1_lab/capture_backup.py": "95963df2b3dff9531be265482e8c4ccc920e3e506c93d779c9652fb6989db389",
+    "scripts/f1_lab/capture_backup_runtime.py": "8daa434b50f98c6bdb394d81b2bfabb52ca5a153adc312ac6fed70a36b41fcad",
+    "scripts/capture_archive_backup.py": "bccde980f89db6dcb9c769652c80c4e2773026c3289e52912defb262f45e1cce",
+    "scripts/run_capture_backup.py": "b67f61d02bb348124781a6449cfe45fe8b452e714487c6a1afb692422375c15b",
+    "infra/systemd/secops-capture-backup@.service": "88e409650860a0b5e3f31ee2c16a9b465415c1caf80c4a813738b93f7c05cd2a",
+    "scripts/f1_lab/systemd_credential_reader.py": "44de5f39e4532dc1da18fbbc280151417772398faf0670b657c210d72d30ee95",
+    "scripts/run_systemd_collector_runtime.py": "e75b4f6cb0a636eee7f4af81dc99ea7ede3ea9443a4c7828e40978cbbcb5c21a",
+    "tests/test_capture_backup.py": "d3de6116a26dc8a14ec23e8c86933ae2720006cd8d815712641bae9905d36184",
+    "tests/test_systemd_credential_reader.py": "c6c44ed826ebd36154c967cb48c2005048c028a17956274d6c312f00dbb5fd9f"
+  },
+  "artifact_sha256": {
+    "tests.json": "5f8ebce7d1543a73f1a64677c201a1a66ad920cefbaf268d623805ee2fc110b5",
+    "linux.xml": "d31f36bc659e29646a32444e6c86426fc436fab3588ab8adcca95125ad10cab1",
+    "source-manifest.json": "00039a521d92272ddb3ddaa52ae833131f711cfd753e9f998c364ef31dd0bb16",
+    "native-tests.json": "d60a0b1e45e9c7b23568399eca46618c09127391d3b0dd8fd6fda2533c8ca73f",
+    "actual-systemd/run.json": "20e9820c856e1fdd75996779b5d8ce56658ddc6c135ef66e2214cbcc992acfe5",
+    "actual-systemd/backup-controls.json": "a59867f1944c6b9ef04490c2f2e4d92d2ee439635cf6bd6d7f7c0ada36a380a6",
+    "legacy-regression/run.json": "a2d03c97bbd4bb19b8ba9fe478599953379639e33df4230ee145d3fa27cf1be0",
+    "unit-template-verify.log": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  }
+}

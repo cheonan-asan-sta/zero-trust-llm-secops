@@ -1,0 +1,41 @@
+[Unit]
+Description=SecOps pinned encrypted cold archive backup for %i
+
+[Service]
+Type=oneshot
+User=secops-collector
+Group=secops-collector
+WorkingDirectory=/opt/secops
+Environment=PYTHONDONTWRITEBYTECODE=1
+EnvironmentFile=/etc/secops/collector.conf
+# Public key ID and an externally retained current checkpoint SHA, no secrets.
+EnvironmentFile=/etc/secops/capture-backup.conf
+LoadCredential=capture-backup-key:/run/secops-credentials/capture-backup-key.sock
+StandardInput=null
+ExecStart=/opt/secops/.venv/bin/python -m scripts.capture_archive_backup backup --systemd-credential --tenant ${TENANT_ID} --server ${SERVER_ID} --unit %i.service --source ${RUNTIME_SOURCE_ID} --key-id ${CAPTURE_BACKUP_KEY_ID} --root /var/lib/secops-evidence/%i --checkpoint ${CAPTURE_CHECKPOINT_PATH} --checkpoint-sha256 ${CAPTURE_CHECKPOINT_SHA256} --output /var/lib/secops-capture-backups/%i/${INVOCATION_ID}
+StateDirectory=secops-capture-backups/%i
+StateDirectoryMode=0700
+ReadOnlyPaths=/var/lib/secops-evidence/%i /var/lib/secops-capture-checkpoints/%i
+# SQLite is read-only; only the existing cooperative lock is writable.
+ReadWritePaths=/var/lib/secops-evidence/%i/.capture-store.lock
+UMask=0077
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+RestrictNamespaces=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+MemoryMax=512M
+TasksMax=16
+TimeoutStartSec=60

@@ -1,0 +1,15 @@
+{
+  "schema": "f1-cloud-request-profile-2",
+  "data_scope": "Same two already-observed development training assets in cloud-intake-protocol.json; reserved test asset remains unread",
+  "purpose": "Add policy-relevant caller request observations before attempting a new classifier; never infer permission from attack labels or raw names",
+  "request_allowlist": ["requestParameters.x-amz-acl", "requestParameters.x-amz-server-side-encryption"],
+  "operations": ["s3.amazonaws.com:PutObject", "s3.amazonaws.com:PutBucketAcl", "s3.amazonaws.com:CreateBucket"],
+  "features": {
+    "requested_s3_acl_scope": ["broad", "limited", "unknown"],
+    "requested_s3_encryption_kind": ["AES256", "aws:kms", "aws:kms:dsse", "unknown"]
+  },
+  "semantics": "Caller-requested canned ACL/encryption settings only. Missing is unknown, not no encryption/private. A broad ACL can be legitimate and is not itself an independently labeled attack or authorization violation.",
+  "excluded": "No raw bucket/object/role/account/IP identifiers as features; no arbitrary policy bodies, credentials, source labels or source partitions",
+  "old_profile_preserved": true,
+  "goal_qualified": false
+}

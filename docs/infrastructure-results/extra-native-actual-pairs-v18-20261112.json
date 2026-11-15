@@ -1,0 +1,381 @@
+{
+  "schema": "extra-native-actual-pairs-v18-1",
+  "recorded_at": "2026-11-12T03:15:38.935016+00:00",
+  "branch": "extra",
+  "raw_acquisition": {
+    "archive_extracted": false,
+    "asset": {
+      "asset_id": "ait-lds21-russellmitchell",
+      "bytes": 522084364,
+      "data_role": "publisher_simulated_raw_logs_with_separate_line_labels",
+      "filename": "russellmitchell_no-pcaps.zip",
+      "license_id": "cc-by-nc-sa-4.0",
+      "publisher_md5": "abb43a46c70939ad9f98669e3510d2b7",
+      "record_id": 19483937,
+      "record_version": "v2_1",
+      "reference": "https://zenodo.org/records/19483937"
+    },
+    "aws_sdk_calls": 0,
+    "bytes_received": 522084364,
+    "code_executed_from_asset": false,
+    "completed": true,
+    "elapsed_seconds": 1510.422,
+    "ended_at": "2026-11-12T03:12:00.763626+00:00",
+    "goal_qualified": false,
+    "local_sha256": "51a03f51daea0fbbdcfe9b8abe0dbbe10633716f4f98074f861204a162ee1978",
+    "local_sha256_kind": "local immutable follow-up anchor; not a publisher signature",
+    "paid_api_calls": 0,
+    "prefix_publisher_verified": false,
+    "prior_acquisition_sha256": "fd9ed8ee7a82c73fcc2be03197b40561b2e2d9dd7888c82f43a74af825c39e8d",
+    "publisher_checksum_kind": "MD5; not a publisher digital signature",
+    "publisher_md5_verified": true,
+    "publisher_metadata_sha256": "09ce2689d83d48f967eb8aaadf269ca8710ba44d4bb7d057fc2b011d9c8d87c5",
+    "purpose": "noncommercial_research",
+    "range_retries": 1,
+    "ranged_transfer": true,
+    "resumed_prefix_bytes": 26214400,
+    "resumed_prefix_sha256": "6bdf78d8d3fde5b0b410e47dfd2e0a326ed3079588e6bbd95face6f21d67ae10",
+    "schema": "f1-public-asset-acquisition-1",
+    "started_at": "2026-11-12T02:46:50.339920+00:00"
+  },
+  "development_archive_inventory": {
+    "path": "runtime/f1/ait-lds-dev-inspection-20261112-02/inventory.json",
+    "sha256": "8f2db97ed6c69abd45be67f7d76cfff51201262b142ca8f3ff02d967b41af6d6",
+    "members": 14898,
+    "uncompressed_bytes": 7247563244,
+    "whole_archive_extracted": false
+  },
+  "metadata_file_names": [
+    "dataset.yaml",
+    "processing/config/servers.yaml"
+  ],
+  "actual_archive_root": "gather/... and labels/...; no enclosing scenario folder",
+  "initial_probe": "01 matched only enclosing-prefix patterns and found zero; preserved and corrected in02, not evidence of absent labels",
+  "native_pair_audit": {
+    "path": "runtime/f1/ait-lds-dev-pairs-20261112/audit.json",
+    "sha256": "1fd4067e4254246833deca7f65df8a13a1eada20c7d6d76d5ed8c6589baab762",
+    "scope": "all eight physically paired label/raw files in development russellmitchell; not whole dataset or final evaluation",
+    "pairs": [
+      {
+        "schema": "f1-native-pair-index-1",
+        "pair_id": "97d1703b92e375ca6fbdb7cdaff2ac922dbde029bedd59e359110d99a6db899c",
+        "provenance": {
+          "archive_sha256": "51a03f51daea0fbbdcfe9b8abe0dbbe10633716f4f98074f861204a162ee1978",
+          "raw_sha256": "3b91178b6874141755e8461779aa9fa3f079de85867855e47a75e1fbde7bb940",
+          "label_sha256": "1c7bcf8b4c2c8c520eeb2e7a9bdeec95b65c60f7615b6119c23a707e3c45c7ca",
+          "raw_member": "gather/internal_share/logs/audit/audit.log",
+          "label_member": "labels/internal_share/logs/audit/audit.log",
+          "simulation_start": 1642723200,
+          "simulation_end": 1643068800,
+          "coverage": "publisher says paired labeled logs are trimmed to simulation bounds",
+          "timestamp_audit_performed": false,
+          "entity": "10.143.0.103",
+          "location": "/var/log/audit/audit.log"
+        },
+        "raw_rows": 732,
+        "malicious_rows": 2,
+        "normal_rows": 730,
+        "annotation_scan": {
+          "schema": "f1-native-jsonl-scan-1",
+          "source_sha256": "1c7bcf8b4c2c8c520eeb2e7a9bdeec95b65c60f7615b6119c23a707e3c45c7ca",
+          "bytes": 376,
+          "physical_rows": 2,
+          "parsed_rows": 2,
+          "parse_errors": 0,
+          "source_verified_before_and_after": true,
+          "goal_qualified": false
+        },
+        "goal_qualified": false
+      },
+      {
+        "schema": "f1-native-pair-index-1",
+        "pair_id": "3875fd09532f95130940886a7774ce488f1e9883b0ce6aea771fc18718929efd",
+        "provenance": {
+          "archive_sha256": "51a03f51daea0fbbdcfe9b8abe0dbbe10633716f4f98074f861204a162ee1978",
+          "raw_sha256": "3b26c8774eab02ea72c46e7c3eead9e7a3601c6f169ce83b3bd4cafd7674888b",
+          "label_sha256": "3712f7e48ee1121a23f37d7dd14a4e729b3a86ad58ba9f365f7209dfc58cb5fe",
+          "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+          "label_member": "labels/inet-firewall/logs/dnsmasq.log",
+          "simulation_start": 1642723200,
+          "simulation_end": 1643068800,
+          "coverage": "publisher says paired labeled logs are trimmed to simulation bounds",
+          "timestamp_audit_performed": false,
+          "entity": "172.19.128.1",
+          "location": "/var/log/dnsmasq.log"
+        },
+        "raw_rows": 275900,
+        "malicious_rows": 54035,
+        "normal_rows": 221865,
+        "annotation_scan": {
+          "schema": "f1-native-jsonl-scan-1",
+          "source_sha256": "3712f7e48ee1121a23f37d7dd14a4e729b3a86ad58ba9f365f7209dfc58cb5fe",
+          "bytes": 11156515,
+          "physical_rows": 54035,
+          "parsed_rows": 54035,
+          "parse_errors": 0,
+          "source_verified_before_and_after": true,
+          "goal_qualified": false
+        },
+        "goal_qualified": false
+      },
+      {
+        "schema": "f1-native-pair-index-1",
+        "pair_id": "cf40416c4a6d40fde9963e01dba126e7ebe46d64f426df6cbcfaa05cc14228a6",
+        "provenance": {
+          "archive_sha256": "51a03f51daea0fbbdcfe9b8abe0dbbe10633716f4f98074f861204a162ee1978",
+          "raw_sha256": "091920347866802f42b869575c9b1139fa4fa783b83630a9ca1e0ce68a184e39",
+          "label_sha256": "a5c8c79f03471928f2e2cc2eadd6282ccf836f2ab4b5770c34ddf52e317d2bd2",
+          "raw_member": "gather/intranet_server/logs/auth.log",
+          "label_member": "labels/intranet_server/logs/auth.log",
+          "simulation_start": 1642723200,
+          "simulation_end": 1643068800,
+          "coverage": "publisher says paired labeled logs are trimmed to simulation bounds",
+          "timestamp_audit_performed": false,
+          "entity": "10.143.2.4",
+          "location": "/var/log/auth.log"
+        },
+        "raw_rows": 272,
+        "malicious_rows": 8,
+        "normal_rows": 264,
+        "annotation_scan": {
+          "schema": "f1-native-jsonl-scan-1",
+          "source_sha256": "a5c8c79f03471928f2e2cc2eadd6282ccf836f2ab4b5770c34ddf52e317d2bd2",
+          "bytes": 2536,
+          "physical_rows": 8,
+          "parsed_rows": 8,
+          "parse_errors": 0,
+          "source_verified_before_and_after": true,
+          "goal_qualified": false
+        },
+        "goal_qualified": false
+      },
+      {
+        "schema": "f1-native-pair-index-1",
+        "pair_id": "28ead399b4e9750fe55052dc81b9e55a7e1bad784a0b0b4e7d7bff37c1f70046",
+        "provenance": {
+          "archive_sha256": "51a03f51daea0fbbdcfe9b8abe0dbbe10633716f4f98074f861204a162ee1978",
+          "raw_sha256": "ff3d6815b660b87bc0576bbb7fee011d48a08c2a81d12ab83c052e98a58b281b",
+          "label_sha256": "14b014f6e3cfeb33c2ea6aa6fe9fc2938587f5c7cfdfd267cc9e00de8e66fe10",
+          "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2",
+          "label_member": "labels/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2",
+          "simulation_start": 1642723200,
+          "simulation_end": 1643068800,
+          "coverage": "publisher says paired labeled logs are trimmed to simulation bounds",
+          "timestamp_audit_performed": false,
+          "entity": "10.143.2.4",
+          "location": "/var/log/apache2/intranet-error.log"
+        },
+        "raw_rows": 36,
+        "malicious_rows": 36,
+        "normal_rows": 0,
+        "annotation_scan": {
+          "schema": "f1-native-jsonl-scan-1",
+          "source_sha256": "14b014f6e3cfeb33c2ea6aa6fe9fc2938587f5c7cfdfd267cc9e00de8e66fe10",
+          "bytes": 9693,
+          "physical_rows": 36,
+          "parsed_rows": 36,
+          "parse_errors": 0,
+          "source_verified_before_and_after": true,
+          "goal_qualified": false
+        },
+        "goal_qualified": false
+      },
+      {
+        "schema": "f1-native-pair-index-1",
+        "pair_id": "0a42634ce987b507f92b58239adecf6f53e4bd90b0a9955ea4ab377682fbdf3b",
+        "provenance": {
+          "archive_sha256": "51a03f51daea0fbbdcfe9b8abe0dbbe10633716f4f98074f861204a162ee1978",
+          "raw_sha256": "4d3d700f50c6dde5295ebc57a00701b7c3049812c6f6709b3f809e36be362153",
+          "label_sha256": "ab6a834e2f9b8321cb7045cd78e0d88eea851a0f4b5231827f16e87ca7286154",
+          "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2",
+          "label_member": "labels/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2",
+          "simulation_start": 1642723200,
+          "simulation_end": 1643068800,
+          "coverage": "publisher says paired labeled logs are trimmed to simulation bounds",
+          "timestamp_audit_performed": false,
+          "entity": "10.143.2.4",
+          "location": "/var/log/apache2/intranet-access.log"
+        },
+        "raw_rows": 8530,
+        "malicious_rows": 7695,
+        "normal_rows": 835,
+        "annotation_scan": {
+          "schema": "f1-native-jsonl-scan-1",
+          "source_sha256": "ab6a834e2f9b8321cb7045cd78e0d88eea851a0f4b5231827f16e87ca7286154",
+          "bytes": 1637968,
+          "physical_rows": 7695,
+          "parsed_rows": 7695,
+          "parse_errors": 0,
+          "source_verified_before_and_after": true,
+          "goal_qualified": false
+        },
+        "goal_qualified": false
+      },
+      {
+        "schema": "f1-native-pair-index-1",
+        "pair_id": "ab3adade29a4d0b10d79cdbaa3acc568fccf7d4bc51176ae4f8e08b9306e952f",
+        "provenance": {
+          "archive_sha256": "51a03f51daea0fbbdcfe9b8abe0dbbe10633716f4f98074f861204a162ee1978",
+          "raw_sha256": "8dbee7a1f2d998c4bee99748b3be2cc16479f1e81fe30a71b1f9197f53f2601c",
+          "label_sha256": "4ae8b5dcb024f9ffd9c5249cc6af4a2fb93e20620f5c0876af9c216b05b23c23",
+          "raw_member": "gather/intranet_server/logs/audit/audit.log",
+          "label_member": "labels/intranet_server/logs/audit/audit.log",
+          "simulation_start": 1642723200,
+          "simulation_end": 1643068800,
+          "coverage": "publisher says paired labeled logs are trimmed to simulation bounds",
+          "timestamp_audit_performed": false,
+          "entity": "10.143.2.4",
+          "location": "/var/log/audit/audit.log"
+        },
+        "raw_rows": 2316,
+        "malicious_rows": 9,
+        "normal_rows": 2307,
+        "annotation_scan": {
+          "schema": "f1-native-jsonl-scan-1",
+          "source_sha256": "4ae8b5dcb024f9ffd9c5249cc6af4a2fb93e20620f5c0876af9c216b05b23c23",
+          "bytes": 2397,
+          "physical_rows": 9,
+          "parsed_rows": 9,
+          "parse_errors": 0,
+          "source_verified_before_and_after": true,
+          "goal_qualified": false
+        },
+        "goal_qualified": false
+      },
+      {
+        "schema": "f1-native-pair-index-1",
+        "pair_id": "9c6087d08ed8d2fcb6a268673c08c44f884582cecc1655cf3d4b4eb13edd9e03",
+        "provenance": {
+          "archive_sha256": "51a03f51daea0fbbdcfe9b8abe0dbbe10633716f4f98074f861204a162ee1978",
+          "raw_sha256": "08042e1ad03874326960ef3eef91a50305009cb2e7afe88827750dd839701bb1",
+          "label_sha256": "24a46d40bf7e6ca91ee9f25f499ab1f709e881271d6944173e157f607c0d8e0d",
+          "raw_member": "gather/vpn/logs/openvpn.log",
+          "label_member": "labels/vpn/logs/openvpn.log",
+          "simulation_start": 1642723200,
+          "simulation_end": 1643068800,
+          "coverage": "publisher says paired labeled logs are trimmed to simulation bounds",
+          "timestamp_audit_performed": false,
+          "entity": "172.19.131.174",
+          "location": "/var/log/openvpn.log"
+        },
+        "raw_rows": 5537,
+        "malicious_rows": 28,
+        "normal_rows": 5509,
+        "annotation_scan": {
+          "schema": "f1-native-jsonl-scan-1",
+          "source_sha256": "24a46d40bf7e6ca91ee9f25f499ab1f709e881271d6944173e157f607c0d8e0d",
+          "bytes": 4312,
+          "physical_rows": 28,
+          "parsed_rows": 28,
+          "parse_errors": 0,
+          "source_verified_before_and_after": true,
+          "goal_qualified": false
+        },
+        "goal_qualified": false
+      },
+      {
+        "schema": "f1-native-pair-index-1",
+        "pair_id": "f5b4ec4b97e42888ee8f3c07e6ae3ed6fcc711ef0302dda917d743d7c5aacc7c",
+        "provenance": {
+          "archive_sha256": "51a03f51daea0fbbdcfe9b8abe0dbbe10633716f4f98074f861204a162ee1978",
+          "raw_sha256": "4bd9d49a8c78bcc5ece4f8c38c93720735e919658b5e408b3620335dc251767b",
+          "label_sha256": "bbbb78d92e606b0bb1ed54e4cf468a9f3374054f8dd60a70778749c976a88f09",
+          "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.cpu.log",
+          "label_member": "labels/monitoring/logs/logstash/intranet-server/2022-01-24-system.cpu.log",
+          "simulation_start": 1642723200,
+          "simulation_end": 1643068800,
+          "coverage": "publisher says paired labeled logs are trimmed to simulation bounds",
+          "timestamp_audit_performed": false,
+          "entity": "10.143.0.35",
+          "location": "/var/log/logstash/intranet-server/system.cpu.log"
+        },
+        "raw_rows": 1920,
+        "malicious_rows": 49,
+        "normal_rows": 1871,
+        "annotation_scan": {
+          "schema": "f1-native-jsonl-scan-1",
+          "source_sha256": "bbbb78d92e606b0bb1ed54e4cf468a9f3374054f8dd60a70778749c976a88f09",
+          "bytes": 7889,
+          "physical_rows": 49,
+          "parsed_rows": 49,
+          "parse_errors": 0,
+          "source_verified_before_and_after": true,
+          "goal_qualified": false
+        },
+        "goal_qualified": false
+      }
+    ],
+    "alert_joins": {
+      "wazuh": {
+        "unknown": 33844,
+        "total": 41488,
+        "normal": 5,
+        "malicious": 7639
+      },
+      "aminer": {
+        "unknown": 681,
+        "total": 4056,
+        "malicious": 3279,
+        "normal": 96
+      }
+    },
+    "raw_rows": 295243,
+    "raw_malicious_rows": 61862,
+    "raw_normal_rows": 233381
+  },
+  "alert_truth_coverage": {
+    "known": 11019,
+    "unknown": 34525,
+    "known_malicious": 10918,
+    "known_normal": 101,
+    "total": 45544,
+    "known_percent": 24.194185842262428,
+    "warning": "known alert subset is strongly attack-biased; never score it as overall raw detection"
+  },
+  "timestamp_full_audit_performed": false,
+  "publisher_trimmed_pair_contract_asserted": true,
+  "tests": {
+    "windows": {
+      "path": "runtime/f1/extra-native-actual-pair-20261112.xml",
+      "sha256": "3b0293408916101099b6eca12d5fce9c71bb30b5025cdecdda4abf6e996f95da",
+      "passed": 98
+    },
+    "linux": {
+      "path": "runtime/f1/extra-linux-public-native-20261112-04/checks.xml",
+      "sha256": "cbd1e531601909a6fa094cf1c3c21338abba4c360a491d28af664b28ff301f58",
+      "passed": 98
+    }
+  },
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "reserved_final_bodies_read": 0,
+  "new_binary_metrics": null,
+  "goal_qualified": false,
+  "six_domain_goal_replaced": false,
+  "independent_human_review": "not assigned",
+  "linux": {
+    "schema": "extra-f1-linux-snapshot-1",
+    "completed": true,
+    "owner": "extra-f1-1f26dd04e5cd",
+    "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "tests": [
+      "tests/test_f1_public_sources.py",
+      "tests/test_f1_bounded_zip.py",
+      "tests/test_f1_native_jsonl.py",
+      "tests/test_f1_native_preparation.py",
+      "tests/test_f1_line_truth.py"
+    ],
+    "host_mounts": 0,
+    "network": "none",
+    "cloud_calls": 0,
+    "paid_api_calls": 0,
+    "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+    "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+    "source_manifest_sha256": "a32acd687423b2b77fea3e75dad1cea8c6c47ccadaf6114a185e1bcb34308780",
+    "source_files": 398,
+    "container_exit_code": 0,
+    "source_verified_before_and_after": true,
+    "remaining_containers": 0
+  },
+  "baseline_app_diff_empty": true
+}

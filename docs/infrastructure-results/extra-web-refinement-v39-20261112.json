@@ -1,0 +1,1949 @@
+{
+  "schema": "extra-web-false-positive-reduction-v39-1",
+  "recorded_at": "2026-11-12T11:52:59.032876+00:00",
+  "branch": "extra",
+  "prior_commit": "d17494ecf77c88b810a1a4a4ae9bf445f4082e72",
+  "actual_run": {
+    "artifact": {
+      "path": "runtime/f1/web-refinement-v39-20261112-02/run.json",
+      "bytes": 29794,
+      "sha256": "abab9ba2e69eee20098738c1724a876f4ed71ae3f2765bb0123619e2a5766c10"
+    },
+    "aws_sdk_calls": 0,
+    "baseline_refitted": false,
+    "candidate": {
+      "bytes": 3258,
+      "path": "runtime/f1/web-refinement-v39-20261112-02/model.json",
+      "sha256": "21318fa61f830ae1d03d47de1a01acf2c40ae19ebaf769923e3d575613f74f38"
+    },
+    "candidate_frozen_at": "2026-11-12T11:51:25.219237+00:00",
+    "completed": true,
+    "elapsed_seconds": 81.045,
+    "ended_at": "2026-11-12T11:52:30.980797+00:00",
+    "github_pushes": 0,
+    "goal_qualified": false,
+    "independent_final_metrics": null,
+    "labels_changed": false,
+    "local_web_comparison_passed": true,
+    "original_app_changed": false,
+    "paid_api_calls": 0,
+    "plan": {
+      "bytes": 2991,
+      "path": "infra/f1-lab/web-refinement-protocol.json",
+      "sha256": "63a4ca3e2a4b984ade71b60710f041f2a6b2b09daf25d879b6feef39e6968b05"
+    },
+    "production_adopted": false,
+    "scenarios": {
+      "fox": {
+        "baseline_probability_sha256": "46a1d04fba4220b050b478549b462f062d9bd4673cef71086a05ae26aa2b01de",
+        "metrics": {
+          "0.5": {
+            "baseline": {
+              "accuracy": 0.9961595887603266,
+              "f1": 0.9971942135436307,
+              "false_positive_rate": 0.00873145688163605,
+              "fn": 720,
+              "fp": 1847,
+              "inference_errors": 0,
+              "population": 668418,
+              "precision": 0.9959673457624381,
+              "recall": 0.9984241076509573,
+              "tn": 209687,
+              "tp": 456164
+            },
+            "refined": {
+              "accuracy": 0.9968642376476995,
+              "f1": 0.9977078466881885,
+              "false_positive_rate": 0.006504864466232379,
+              "fn": 720,
+              "fp": 1376,
+              "inference_errors": 0,
+              "population": 668418,
+              "precision": 0.9969926126677449,
+              "recall": 0.9984241076509573,
+              "tn": 210158,
+              "tp": 456164
+            }
+          },
+          "0.95": {
+            "baseline": {
+              "accuracy": 0.998120936300339,
+              "f1": 0.9986251526999987,
+              "false_positive_rate": 0.0024676884094282717,
+              "fn": 734,
+              "fp": 522,
+              "inference_errors": 0,
+              "population": 668418,
+              "precision": 0.9988569476560858,
+              "recall": 0.998393465299726,
+              "tn": 211012,
+              "tp": 456150
+            },
+            "refined": {
+              "accuracy": 0.9988255851877119,
+              "f1": 0.9991402771921563,
+              "false_positive_rate": 0.00024109599402460125,
+              "fn": 734,
+              "fp": 51,
+              "inference_errors": 0,
+              "population": 668418,
+              "precision": 0.9998882071718387,
+              "recall": 0.998393465299726,
+              "tn": 211483,
+              "tp": 456150
+            }
+          }
+        },
+        "non_http_rows_verified": 255514,
+        "non_http_scores_unchanged": true,
+        "per_pair": [
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.9443207126948775,
+                  "f1": 0.038461538461538464,
+                  "false_positive_rate": 0.0546875,
+                  "fn": 1,
+                  "fp": 49,
+                  "inference_errors": 0,
+                  "population": 898,
+                  "precision": 0.02,
+                  "recall": 0.5,
+                  "tn": 847,
+                  "tp": 1
+                },
+                "refined": {
+                  "accuracy": 0.9443207126948775,
+                  "f1": 0.038461538461538464,
+                  "false_positive_rate": 0.0546875,
+                  "fn": 1,
+                  "fp": 49,
+                  "inference_errors": 0,
+                  "population": 898,
+                  "precision": 0.02,
+                  "recall": 0.5,
+                  "tn": 847,
+                  "tp": 1
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9888641425389755,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.008928571428571428,
+                  "fn": 2,
+                  "fp": 8,
+                  "inference_errors": 0,
+                  "population": 898,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "tn": 888,
+                  "tp": 0
+                },
+                "refined": {
+                  "accuracy": 0.9888641425389755,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.008928571428571428,
+                  "fn": 2,
+                  "fp": 8,
+                  "inference_errors": 0,
+                  "population": 898,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "tn": 888,
+                  "tp": 0
+                }
+              }
+            },
+            "raw_member": "gather/internal_share/logs/audit/audit.log"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.9971485813568762,
+                  "f1": 0.9922499887026074,
+                  "false_positive_rate": 5.102509414129869e-06,
+                  "fn": 685,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 240582,
+                  "precision": 0.9999772292558521,
+                  "recall": 0.9846412556053812,
+                  "tn": 195981,
+                  "tp": 43915
+                },
+                "refined": {
+                  "accuracy": 0.9971485813568762,
+                  "f1": 0.9922499887026074,
+                  "false_positive_rate": 5.102509414129869e-06,
+                  "fn": 685,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 240582,
+                  "precision": 0.9999772292558521,
+                  "recall": 0.9846412556053812,
+                  "tn": 195981,
+                  "tp": 43915
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9971444247699329,
+                  "f1": 0.992238603626504,
+                  "false_positive_rate": 5.102509414129869e-06,
+                  "fn": 686,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 240582,
+                  "precision": 0.9999772287373335,
+                  "recall": 0.9846188340807175,
+                  "tn": 195981,
+                  "tp": 43914
+                },
+                "refined": {
+                  "accuracy": 0.9971444247699329,
+                  "f1": 0.992238603626504,
+                  "false_positive_rate": 5.102509414129869e-06,
+                  "fn": 686,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 240582,
+                  "precision": 0.9999772287373335,
+                  "recall": 0.9846188340807175,
+                  "tn": 195981,
+                  "tp": 43914
+                }
+              }
+            },
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.9877622377622378,
+                  "f1": 0.7741935483870968,
+                  "false_positive_rate": 0.0125,
+                  "fn": 0,
+                  "fp": 7,
+                  "inference_errors": 0,
+                  "population": 572,
+                  "precision": 0.631578947368421,
+                  "recall": 1.0,
+                  "tn": 553,
+                  "tp": 12
+                },
+                "refined": {
+                  "accuracy": 0.9877622377622378,
+                  "f1": 0.7741935483870968,
+                  "false_positive_rate": 0.0125,
+                  "fn": 0,
+                  "fp": 7,
+                  "inference_errors": 0,
+                  "population": 572,
+                  "precision": 0.631578947368421,
+                  "recall": 1.0,
+                  "tn": 553,
+                  "tp": 12
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9947552447552448,
+                  "f1": 0.8571428571428571,
+                  "false_positive_rate": 0.0,
+                  "fn": 3,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 572,
+                  "precision": 1.0,
+                  "recall": 0.75,
+                  "tn": 560,
+                  "tp": 9
+                },
+                "refined": {
+                  "accuracy": 0.9947552447552448,
+                  "f1": 0.8571428571428571,
+                  "false_positive_rate": 0.0,
+                  "fn": 3,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 572,
+                  "precision": 1.0,
+                  "recall": 0.75,
+                  "tn": 560,
+                  "tp": 9
+                }
+              }
+            },
+            "raw_member": "gather/intranet_server/logs/auth.log"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.9955156950672646,
+                  "f1": 0.9977528089887641,
+                  "false_positive_rate": 1.0,
+                  "fn": 4,
+                  "fp": 2,
+                  "inference_errors": 0,
+                  "population": 1338,
+                  "precision": 0.9985007496251874,
+                  "recall": 0.9970059880239521,
+                  "tn": 0,
+                  "tp": 1332
+                },
+                "refined": {
+                  "accuracy": 0.9955156950672646,
+                  "f1": 0.9977528089887641,
+                  "false_positive_rate": 1.0,
+                  "fn": 4,
+                  "fp": 2,
+                  "inference_errors": 0,
+                  "population": 1338,
+                  "precision": 0.9985007496251874,
+                  "recall": 0.9970059880239521,
+                  "tn": 0,
+                  "tp": 1332
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9955156950672646,
+                  "f1": 0.9977528089887641,
+                  "false_positive_rate": 1.0,
+                  "fn": 4,
+                  "fp": 2,
+                  "inference_errors": 0,
+                  "population": 1338,
+                  "precision": 0.9985007496251874,
+                  "recall": 0.9970059880239521,
+                  "tn": 0,
+                  "tp": 1332
+                },
+                "refined": {
+                  "accuracy": 0.9955156950672646,
+                  "f1": 0.9977528089887641,
+                  "false_positive_rate": 1.0,
+                  "fn": 4,
+                  "fp": 2,
+                  "inference_errors": 0,
+                  "population": 1338,
+                  "precision": 0.9985007496251874,
+                  "recall": 0.9970059880239521,
+                  "tn": 0,
+                  "tp": 1332
+                }
+              }
+            },
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-error.log.1"
+          },
+          {
+            "changes_at_0_95": {
+              "removed_fp": 471
+            },
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.9988157569710502,
+                  "f1": 0.9994052245368596,
+                  "false_positive_rate": 0.23209995194617972,
+                  "fn": 6,
+                  "fp": 483,
+                  "inference_errors": 0,
+                  "population": 412922,
+                  "precision": 0.9988257260805509,
+                  "recall": 0.9999853958100579,
+                  "tn": 1598,
+                  "tp": 410835
+                },
+                "refined": {
+                  "accuracy": 0.9999564082320632,
+                  "f1": 0.9999780938750474,
+                  "false_positive_rate": 0.005766458433445459,
+                  "fn": 6,
+                  "fp": 12,
+                  "inference_errors": 0,
+                  "population": 412922,
+                  "precision": 0.9999707920466743,
+                  "recall": 0.9999853958100579,
+                  "tn": 2069,
+                  "tp": 410835
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9988157569710502,
+                  "f1": 0.9994052245368596,
+                  "false_positive_rate": 0.23209995194617972,
+                  "fn": 6,
+                  "fp": 483,
+                  "inference_errors": 0,
+                  "population": 412922,
+                  "precision": 0.9988257260805509,
+                  "recall": 0.9999853958100579,
+                  "tn": 1598,
+                  "tp": 410835
+                },
+                "refined": {
+                  "accuracy": 0.9999564082320632,
+                  "f1": 0.9999780938750474,
+                  "false_positive_rate": 0.005766458433445459,
+                  "fn": 6,
+                  "fp": 12,
+                  "inference_errors": 0,
+                  "population": 412922,
+                  "precision": 0.9999707920466743,
+                  "recall": 0.9999853958100579,
+                  "tn": 2069,
+                  "tp": 410835
+                }
+              }
+            },
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.8915829580879806,
+                  "f1": 0.08211143695014662,
+                  "false_positive_rate": 0.10739191073919108,
+                  "fn": 5,
+                  "fp": 308,
+                  "inference_errors": 0,
+                  "population": 2887,
+                  "precision": 0.043478260869565216,
+                  "recall": 0.7368421052631579,
+                  "tn": 2560,
+                  "tp": 14
+                },
+                "refined": {
+                  "accuracy": 0.8915829580879806,
+                  "f1": 0.08211143695014662,
+                  "false_positive_rate": 0.10739191073919108,
+                  "fn": 5,
+                  "fp": 308,
+                  "inference_errors": 0,
+                  "population": 2887,
+                  "precision": 0.043478260869565216,
+                  "recall": 0.7368421052631579,
+                  "tn": 2560,
+                  "tp": 14
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9892622099064773,
+                  "f1": 0.4745762711864407,
+                  "false_positive_rate": 0.00906555090655509,
+                  "fn": 5,
+                  "fp": 26,
+                  "inference_errors": 0,
+                  "population": 2887,
+                  "precision": 0.35,
+                  "recall": 0.7368421052631579,
+                  "tn": 2842,
+                  "tp": 14
+                },
+                "refined": {
+                  "accuracy": 0.9892622099064773,
+                  "f1": 0.4745762711864407,
+                  "false_positive_rate": 0.00906555090655509,
+                  "fn": 5,
+                  "fp": 26,
+                  "inference_errors": 0,
+                  "population": 2887,
+                  "precision": 0.35,
+                  "recall": 0.7368421052631579,
+                  "tn": 2842,
+                  "tp": 14
+                }
+              }
+            },
+            "raw_member": "gather/intranet_server/logs/audit/audit.log"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.8610768598438142,
+                  "f1": 0.01744186046511628,
+                  "false_positive_rate": 0.1368450006876633,
+                  "fn": 19,
+                  "fp": 995,
+                  "inference_errors": 0,
+                  "population": 7299,
+                  "precision": 0.008964143426294821,
+                  "recall": 0.32142857142857145,
+                  "tn": 6276,
+                  "tp": 9
+                },
+                "refined": {
+                  "accuracy": 0.8610768598438142,
+                  "f1": 0.01744186046511628,
+                  "false_positive_rate": 0.1368450006876633,
+                  "fn": 19,
+                  "fp": 995,
+                  "inference_errors": 0,
+                  "population": 7299,
+                  "precision": 0.008964143426294821,
+                  "recall": 0.32142857142857145,
+                  "tn": 6276,
+                  "tp": 9
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9961638580627483,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.0,
+                  "fn": 28,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 7299,
+                  "precision": null,
+                  "recall": 0.0,
+                  "tn": 7271,
+                  "tp": 0
+                },
+                "refined": {
+                  "accuracy": 0.9961638580627483,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.0,
+                  "fn": 28,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 7299,
+                  "precision": null,
+                  "recall": 0.0,
+                  "tn": 7271,
+                  "tp": 0
+                }
+              }
+            },
+            "raw_member": "gather/vpn/logs/openvpn.log"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.9989583333333333,
+                  "f1": 0.9787234042553191,
+                  "false_positive_rate": 0.0010672358591248667,
+                  "fn": 0,
+                  "fp": 2,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.9583333333333334,
+                  "recall": 1.0,
+                  "tn": 1872,
+                  "tp": 46
+                },
+                "refined": {
+                  "accuracy": 0.9989583333333333,
+                  "f1": 0.9787234042553191,
+                  "false_positive_rate": 0.0010672358591248667,
+                  "fn": 0,
+                  "fp": 2,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.9583333333333334,
+                  "recall": 1.0,
+                  "tn": 1872,
+                  "tp": 46
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9989583333333333,
+                  "f1": 0.9787234042553191,
+                  "false_positive_rate": 0.0010672358591248667,
+                  "fn": 0,
+                  "fp": 2,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.9583333333333334,
+                  "recall": 1.0,
+                  "tn": 1872,
+                  "tp": 46
+                },
+                "refined": {
+                  "accuracy": 0.9989583333333333,
+                  "f1": 0.9787234042553191,
+                  "false_positive_rate": 0.0010672358591248667,
+                  "fn": 0,
+                  "fp": 2,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.9583333333333334,
+                  "recall": 1.0,
+                  "tn": 1872,
+                  "tp": 46
+                }
+              }
+            },
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-18-system.cpu.log"
+          }
+        ],
+        "population": 668418,
+        "reason_counts": {
+          "ineligible_or_unknown_context": 411167,
+          "low_evidence_score": 1504,
+          "non_http_unchanged": 255514,
+          "retain_ambiguous_score": 8,
+          "retain_security_or_extreme_rate": 225
+        },
+        "refined_probability_sha256": "8673f0c70f3aa193e9748e4bf710f28f7e3b77e439eca89012e62fca38feec1b",
+        "role": "observed_calibration",
+        "seconds": 35.017,
+        "unique_vectors": 985
+      },
+      "russellmitchell": {
+        "baseline_probability_sha256": "4593c1dfe7267debcb9047261bac0a9982137905061f9cfd297c7aa8e0fe8fc5",
+        "metrics": {
+          "0.5": {
+            "baseline": {
+              "accuracy": 0.9919659399206755,
+              "f1": 0.98088576585869,
+              "false_positive_rate": 0.005878799045337881,
+              "fn": 1000,
+              "fp": 1372,
+              "inference_errors": 0,
+              "population": 295243,
+              "precision": 0.9779541729601182,
+              "recall": 0.9838349875529404,
+              "tn": 232009,
+              "tp": 60862
+            },
+            "refined": {
+              "accuracy": 0.9919659399206755,
+              "f1": 0.98088576585869,
+              "false_positive_rate": 0.005878799045337881,
+              "fn": 1000,
+              "fp": 1372,
+              "inference_errors": 0,
+              "population": 295243,
+              "precision": 0.9779541729601182,
+              "recall": 0.9838349875529404,
+              "tn": 232009,
+              "tp": 60862
+            }
+          },
+          "0.95": {
+            "baseline": {
+              "accuracy": 0.9964300593070793,
+              "f1": 0.9914113428943937,
+              "false_positive_rate": 0.00010712097385819754,
+              "fn": 1029,
+              "fp": 25,
+              "inference_errors": 0,
+              "population": 295243,
+              "precision": 0.9995892076637418,
+              "recall": 0.9833662021919757,
+              "tn": 233356,
+              "tp": 60833
+            },
+            "refined": {
+              "accuracy": 0.9964300593070793,
+              "f1": 0.9914113428943937,
+              "false_positive_rate": 0.00010712097385819754,
+              "fn": 1029,
+              "fp": 25,
+              "inference_errors": 0,
+              "population": 295243,
+              "precision": 0.9995892076637418,
+              "recall": 0.9833662021919757,
+              "tn": 233356,
+              "tp": 60833
+            }
+          }
+        },
+        "non_http_rows_verified": 286727,
+        "non_http_scores_unchanged": true,
+        "per_pair": [
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.9385245901639344,
+                  "f1": 0.0425531914893617,
+                  "false_positive_rate": 0.06027397260273973,
+                  "fn": 1,
+                  "fp": 44,
+                  "inference_errors": 0,
+                  "population": 732,
+                  "precision": 0.022222222222222223,
+                  "recall": 0.5,
+                  "tn": 686,
+                  "tp": 1
+                },
+                "refined": {
+                  "accuracy": 0.9385245901639344,
+                  "f1": 0.0425531914893617,
+                  "false_positive_rate": 0.06027397260273973,
+                  "fn": 1,
+                  "fp": 44,
+                  "inference_errors": 0,
+                  "population": 732,
+                  "precision": 0.022222222222222223,
+                  "recall": 0.5,
+                  "tn": 686,
+                  "tp": 1
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9863387978142076,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.010958904109589041,
+                  "fn": 2,
+                  "fp": 8,
+                  "inference_errors": 0,
+                  "population": 732,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "tn": 722,
+                  "tp": 0
+                },
+                "refined": {
+                  "accuracy": 0.9863387978142076,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.010958904109589041,
+                  "fn": 2,
+                  "fp": 8,
+                  "inference_errors": 0,
+                  "population": 732,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "tn": 722,
+                  "tp": 0
+                }
+              }
+            },
+            "raw_member": "gather/internal_share/logs/audit/audit.log"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.9963863718738674,
+                  "f1": 0.9906927679913369,
+                  "false_positive_rate": 0.00010817388952741532,
+                  "fn": 973,
+                  "fp": 24,
+                  "inference_errors": 0,
+                  "population": 275900,
+                  "precision": 0.9995479034020269,
+                  "recall": 0.9819931525862866,
+                  "tn": 221841,
+                  "tp": 53062
+                },
+                "refined": {
+                  "accuracy": 0.9963863718738674,
+                  "f1": 0.9906927679913369,
+                  "false_positive_rate": 0.00010817388952741532,
+                  "fn": 973,
+                  "fp": 24,
+                  "inference_errors": 0,
+                  "population": 275900,
+                  "precision": 0.9995479034020269,
+                  "recall": 0.9819931525862866,
+                  "tn": 221841,
+                  "tp": 53062
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9963972453787604,
+                  "f1": 0.9907177408811609,
+                  "false_positive_rate": 2.2536226984878192e-05,
+                  "fn": 989,
+                  "fp": 5,
+                  "inference_errors": 0,
+                  "population": 275900,
+                  "precision": 0.9999057510697253,
+                  "recall": 0.9816970482094939,
+                  "tn": 221860,
+                  "tp": 53046
+                },
+                "refined": {
+                  "accuracy": 0.9963972453787604,
+                  "f1": 0.9907177408811609,
+                  "false_positive_rate": 2.2536226984878192e-05,
+                  "fn": 989,
+                  "fp": 5,
+                  "inference_errors": 0,
+                  "population": 275900,
+                  "precision": 0.9999057510697253,
+                  "recall": 0.9816970482094939,
+                  "tn": 221860,
+                  "tp": 53046
+                }
+              }
+            },
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.9742647058823529,
+                  "f1": 0.6956521739130435,
+                  "false_positive_rate": 0.026515151515151516,
+                  "fn": 0,
+                  "fp": 7,
+                  "inference_errors": 0,
+                  "population": 272,
+                  "precision": 0.5333333333333333,
+                  "recall": 1.0,
+                  "tn": 257,
+                  "tp": 8
+                },
+                "refined": {
+                  "accuracy": 0.9742647058823529,
+                  "f1": 0.6956521739130435,
+                  "false_positive_rate": 0.026515151515151516,
+                  "fn": 0,
+                  "fp": 7,
+                  "inference_errors": 0,
+                  "population": 272,
+                  "precision": 0.5333333333333333,
+                  "recall": 1.0,
+                  "tn": 257,
+                  "tp": 8
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9889705882352942,
+                  "f1": 0.7692307692307693,
+                  "false_positive_rate": 0.0,
+                  "fn": 3,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 272,
+                  "precision": 1.0,
+                  "recall": 0.625,
+                  "tn": 264,
+                  "tp": 5
+                },
+                "refined": {
+                  "accuracy": 0.9889705882352942,
+                  "f1": 0.7692307692307693,
+                  "false_positive_rate": 0.0,
+                  "fn": 3,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 272,
+                  "precision": 1.0,
+                  "recall": 0.625,
+                  "tn": 264,
+                  "tp": 5
+                }
+              }
+            },
+            "raw_member": "gather/intranet_server/logs/auth.log"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 1.0,
+                  "f1": 1.0,
+                  "false_positive_rate": null,
+                  "fn": 0,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 36,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "tn": 0,
+                  "tp": 36
+                },
+                "refined": {
+                  "accuracy": 1.0,
+                  "f1": 1.0,
+                  "false_positive_rate": null,
+                  "fn": 0,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 36,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "tn": 0,
+                  "tp": 36
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 1.0,
+                  "f1": 1.0,
+                  "false_positive_rate": null,
+                  "fn": 0,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 36,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "tn": 0,
+                  "tp": 36
+                },
+                "refined": {
+                  "accuracy": 1.0,
+                  "f1": 1.0,
+                  "false_positive_rate": null,
+                  "fn": 0,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 36,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "tn": 0,
+                  "tp": 36
+                }
+              }
+            },
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.999179366940211,
+                  "f1": 0.9995449522199831,
+                  "false_positive_rate": 0.0,
+                  "fn": 7,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 8530,
+                  "precision": 1.0,
+                  "recall": 0.999090318388564,
+                  "tn": 835,
+                  "tp": 7688
+                },
+                "refined": {
+                  "accuracy": 0.999179366940211,
+                  "f1": 0.9995449522199831,
+                  "false_positive_rate": 0.0,
+                  "fn": 7,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 8530,
+                  "precision": 1.0,
+                  "recall": 0.999090318388564,
+                  "tn": 835,
+                  "tp": 7688
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.999179366940211,
+                  "f1": 0.9995449522199831,
+                  "false_positive_rate": 0.0,
+                  "fn": 7,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 8530,
+                  "precision": 1.0,
+                  "recall": 0.999090318388564,
+                  "tn": 835,
+                  "tp": 7688
+                },
+                "refined": {
+                  "accuracy": 0.999179366940211,
+                  "f1": 0.9995449522199831,
+                  "false_positive_rate": 0.0,
+                  "fn": 7,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 8530,
+                  "precision": 1.0,
+                  "recall": 0.999090318388564,
+                  "tn": 835,
+                  "tp": 7688
+                }
+              }
+            },
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.8959412780656304,
+                  "f1": 0.0694980694980695,
+                  "false_positive_rate": 0.10446467273515388,
+                  "fn": 0,
+                  "fp": 241,
+                  "inference_errors": 0,
+                  "population": 2316,
+                  "precision": 0.036,
+                  "recall": 1.0,
+                  "tn": 2066,
+                  "tp": 9
+                },
+                "refined": {
+                  "accuracy": 0.8959412780656304,
+                  "f1": 0.0694980694980695,
+                  "false_positive_rate": 0.10446467273515388,
+                  "fn": 0,
+                  "fp": 241,
+                  "inference_errors": 0,
+                  "population": 2316,
+                  "precision": 0.036,
+                  "recall": 1.0,
+                  "tn": 2066,
+                  "tp": 9
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9952504317789291,
+                  "f1": 0.6206896551724138,
+                  "false_positive_rate": 0.004768097095795405,
+                  "fn": 0,
+                  "fp": 11,
+                  "inference_errors": 0,
+                  "population": 2316,
+                  "precision": 0.45,
+                  "recall": 1.0,
+                  "tn": 2296,
+                  "tp": 9
+                },
+                "refined": {
+                  "accuracy": 0.9952504317789291,
+                  "f1": 0.6206896551724138,
+                  "false_positive_rate": 0.004768097095795405,
+                  "fn": 0,
+                  "fp": 11,
+                  "inference_errors": 0,
+                  "population": 2316,
+                  "precision": 0.45,
+                  "recall": 1.0,
+                  "tn": 2296,
+                  "tp": 9
+                }
+              }
+            },
+            "raw_member": "gather/intranet_server/logs/audit/audit.log"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.8060321473722232,
+                  "f1": 0.016483516483516484,
+                  "false_positive_rate": 0.19150481031040117,
+                  "fn": 19,
+                  "fp": 1055,
+                  "inference_errors": 0,
+                  "population": 5537,
+                  "precision": 0.008458646616541353,
+                  "recall": 0.32142857142857145,
+                  "tn": 4454,
+                  "tp": 9
+                },
+                "refined": {
+                  "accuracy": 0.8060321473722232,
+                  "f1": 0.016483516483516484,
+                  "false_positive_rate": 0.19150481031040117,
+                  "fn": 19,
+                  "fp": 1055,
+                  "inference_errors": 0,
+                  "population": 5537,
+                  "precision": 0.008458646616541353,
+                  "recall": 0.32142857142857145,
+                  "tn": 4454,
+                  "tp": 9
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9949431099873578,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.0,
+                  "fn": 28,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 5537,
+                  "precision": null,
+                  "recall": 0.0,
+                  "tn": 5509,
+                  "tp": 0
+                },
+                "refined": {
+                  "accuracy": 0.9949431099873578,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.0,
+                  "fn": 28,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 5537,
+                  "precision": null,
+                  "recall": 0.0,
+                  "tn": 5509,
+                  "tp": 0
+                }
+              }
+            },
+            "raw_member": "gather/vpn/logs/openvpn.log"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.9994791666666667,
+                  "f1": 0.98989898989899,
+                  "false_positive_rate": 0.0005344735435595938,
+                  "fn": 0,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.98,
+                  "recall": 1.0,
+                  "tn": 1870,
+                  "tp": 49
+                },
+                "refined": {
+                  "accuracy": 0.9994791666666667,
+                  "f1": 0.98989898989899,
+                  "false_positive_rate": 0.0005344735435595938,
+                  "fn": 0,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.98,
+                  "recall": 1.0,
+                  "tn": 1870,
+                  "tp": 49
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9994791666666667,
+                  "f1": 0.98989898989899,
+                  "false_positive_rate": 0.0005344735435595938,
+                  "fn": 0,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.98,
+                  "recall": 1.0,
+                  "tn": 1870,
+                  "tp": 49
+                },
+                "refined": {
+                  "accuracy": 0.9994791666666667,
+                  "f1": 0.98989898989899,
+                  "false_positive_rate": 0.0005344735435595938,
+                  "fn": 0,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.98,
+                  "recall": 1.0,
+                  "tn": 1870,
+                  "tp": 49
+                }
+              }
+            },
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.cpu.log"
+          }
+        ],
+        "population": 295243,
+        "reason_counts": {
+          "ineligible_or_unknown_context": 7798,
+          "low_evidence_score": 658,
+          "non_http_unchanged": 286727,
+          "retain_ambiguous_score": 9,
+          "retain_security_or_extreme_rate": 51
+        },
+        "refined_probability_sha256": "4593c1dfe7267debcb9047261bac0a9982137905061f9cfd297c7aa8e0fe8fc5",
+        "role": "training_development",
+        "seconds": 15.077,
+        "unique_vectors": 640
+      },
+      "santos": {
+        "baseline_probability_sha256": "c988332a0b3c652145907f0688ed527f3ce8f56504acadb9657820d5d2fd7bb7",
+        "metrics": {
+          "0.5": {
+            "baseline": {
+              "accuracy": 0.9915330972781576,
+              "f1": 0.9737085064417307,
+              "false_positive_rate": 0.006210555530974341,
+              "fn": 962,
+              "fp": 1544,
+              "inference_errors": 0,
+              "population": 295976,
+              "precision": 0.9677991198982252,
+              "recall": 0.9796905018261659,
+              "tn": 247065,
+              "tp": 46405
+            },
+            "refined": {
+              "accuracy": 0.9919013703813823,
+              "f1": 0.9748232798008549,
+              "false_positive_rate": 0.005772116053722914,
+              "fn": 962,
+              "fp": 1435,
+              "inference_errors": 0,
+              "population": 295976,
+              "precision": 0.9700041806020067,
+              "recall": 0.9796905018261659,
+              "tn": 247174,
+              "tp": 46405
+            }
+          },
+          "0.95": {
+            "baseline": {
+              "accuracy": 0.9962665891829067,
+              "f1": 0.9882307831588365,
+              "false_positive_rate": 0.0005229094682815184,
+              "fn": 975,
+              "fp": 130,
+              "inference_errors": 0,
+              "population": 295976,
+              "precision": 0.9972056231460384,
+              "recall": 0.9794160491481411,
+              "tn": 248479,
+              "tp": 46392
+            },
+            "refined": {
+              "accuracy": 0.9966348622861313,
+              "f1": 0.9893793985924504,
+              "false_positive_rate": 8.446999103009143e-05,
+              "fn": 975,
+              "fp": 21,
+              "inference_errors": 0,
+              "population": 295976,
+              "precision": 0.9995475405597569,
+              "recall": 0.9794160491481411,
+              "tn": 248588,
+              "tp": 46392
+            }
+          }
+        },
+        "non_http_rows_verified": 286535,
+        "non_http_scores_unchanged": true,
+        "per_pair": [
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.9409340659340659,
+                  "f1": 0.044444444444444446,
+                  "false_positive_rate": 0.05785123966942149,
+                  "fn": 1,
+                  "fp": 42,
+                  "inference_errors": 0,
+                  "population": 728,
+                  "precision": 0.023255813953488372,
+                  "recall": 0.5,
+                  "tn": 684,
+                  "tp": 1
+                },
+                "refined": {
+                  "accuracy": 0.9409340659340659,
+                  "f1": 0.044444444444444446,
+                  "false_positive_rate": 0.05785123966942149,
+                  "fn": 1,
+                  "fp": 42,
+                  "inference_errors": 0,
+                  "population": 728,
+                  "precision": 0.023255813953488372,
+                  "recall": 0.5,
+                  "tn": 684,
+                  "tp": 1
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9862637362637363,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.011019283746556474,
+                  "fn": 2,
+                  "fp": 8,
+                  "inference_errors": 0,
+                  "population": 728,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "tn": 718,
+                  "tp": 0
+                },
+                "refined": {
+                  "accuracy": 0.9862637362637363,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.011019283746556474,
+                  "fn": 2,
+                  "fp": 8,
+                  "inference_errors": 0,
+                  "population": 728,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "tn": 718,
+                  "tp": 0
+                }
+              }
+            },
+            "raw_member": "gather/internal_share/logs/audit/audit.log"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.9966517573739331,
+                  "f1": 0.9881567973311093,
+                  "false_positive_rate": 1.2698896465897114e-05,
+                  "fn": 920,
+                  "fp": 3,
+                  "inference_errors": 0,
+                  "population": 275667,
+                  "precision": 0.9999220961333715,
+                  "recall": 0.9766651448282859,
+                  "tn": 236238,
+                  "tp": 38506
+                },
+                "refined": {
+                  "accuracy": 0.9966517573739331,
+                  "f1": 0.9881567973311093,
+                  "false_positive_rate": 1.2698896465897114e-05,
+                  "fn": 920,
+                  "fp": 3,
+                  "inference_errors": 0,
+                  "population": 275667,
+                  "precision": 0.9999220961333715,
+                  "recall": 0.9766651448282859,
+                  "tn": 236238,
+                  "tp": 38506
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9966517573739331,
+                  "f1": 0.9881567973311093,
+                  "false_positive_rate": 1.2698896465897114e-05,
+                  "fn": 920,
+                  "fp": 3,
+                  "inference_errors": 0,
+                  "population": 275667,
+                  "precision": 0.9999220961333715,
+                  "recall": 0.9766651448282859,
+                  "tn": 236238,
+                  "tp": 38506
+                },
+                "refined": {
+                  "accuracy": 0.9966517573739331,
+                  "f1": 0.9881567973311093,
+                  "false_positive_rate": 1.2698896465897114e-05,
+                  "fn": 920,
+                  "fp": 3,
+                  "inference_errors": 0,
+                  "population": 275667,
+                  "precision": 0.9999220961333715,
+                  "recall": 0.9766651448282859,
+                  "tn": 236238,
+                  "tp": 38506
+                }
+              }
+            },
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.9962962962962963,
+                  "f1": 0.96,
+                  "false_positive_rate": 0.003875968992248062,
+                  "fn": 0,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 270,
+                  "precision": 0.9230769230769231,
+                  "recall": 1.0,
+                  "tn": 257,
+                  "tp": 12
+                },
+                "refined": {
+                  "accuracy": 0.9962962962962963,
+                  "f1": 0.96,
+                  "false_positive_rate": 0.003875968992248062,
+                  "fn": 0,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 270,
+                  "precision": 0.9230769230769231,
+                  "recall": 1.0,
+                  "tn": 257,
+                  "tp": 12
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9888888888888889,
+                  "f1": 0.8571428571428571,
+                  "false_positive_rate": 0.0,
+                  "fn": 3,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 270,
+                  "precision": 1.0,
+                  "recall": 0.75,
+                  "tn": 258,
+                  "tp": 9
+                },
+                "refined": {
+                  "accuracy": 0.9888888888888889,
+                  "f1": 0.8571428571428571,
+                  "false_positive_rate": 0.0,
+                  "fn": 3,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 270,
+                  "precision": 1.0,
+                  "recall": 0.75,
+                  "tn": 258,
+                  "tp": 9
+                }
+              }
+            },
+            "raw_member": "gather/intranet_server/logs/auth.log"
+          },
+          {
+            "changes_at_0_95": {
+              "removed_fp": 109
+            },
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.9859437751004017,
+                  "f1": 0.9915216421240518,
+                  "false_positive_rate": 0.06954436450839328,
+                  "fn": 17,
+                  "fp": 116,
+                  "inference_errors": 0,
+                  "population": 9462,
+                  "precision": 0.9853034334220195,
+                  "recall": 0.997818835001283,
+                  "tn": 1552,
+                  "tp": 7777
+                },
+                "refined": {
+                  "accuracy": 0.9974635383639823,
+                  "f1": 0.9984593657722429,
+                  "false_positive_rate": 0.004196642685851319,
+                  "fn": 17,
+                  "fp": 7,
+                  "inference_errors": 0,
+                  "population": 9462,
+                  "precision": 0.9991007194244604,
+                  "recall": 0.997818835001283,
+                  "tn": 1661,
+                  "tp": 7777
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9859437751004017,
+                  "f1": 0.9915216421240518,
+                  "false_positive_rate": 0.06954436450839328,
+                  "fn": 17,
+                  "fp": 116,
+                  "inference_errors": 0,
+                  "population": 9462,
+                  "precision": 0.9853034334220195,
+                  "recall": 0.997818835001283,
+                  "tn": 1552,
+                  "tp": 7777
+                },
+                "refined": {
+                  "accuracy": 0.9974635383639823,
+                  "f1": 0.9984593657722429,
+                  "false_positive_rate": 0.004196642685851319,
+                  "fn": 17,
+                  "fp": 7,
+                  "inference_errors": 0,
+                  "population": 9462,
+                  "precision": 0.9991007194244604,
+                  "recall": 0.997818835001283,
+                  "tn": 1661,
+                  "tp": 7777
+                }
+              }
+            },
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.9545454545454546,
+                  "f1": 0.9767441860465116,
+                  "false_positive_rate": 1.0,
+                  "fn": 0,
+                  "fp": 2,
+                  "inference_errors": 0,
+                  "population": 44,
+                  "precision": 0.9545454545454546,
+                  "recall": 1.0,
+                  "tn": 0,
+                  "tp": 42
+                },
+                "refined": {
+                  "accuracy": 0.9545454545454546,
+                  "f1": 0.9767441860465116,
+                  "false_positive_rate": 1.0,
+                  "fn": 0,
+                  "fp": 2,
+                  "inference_errors": 0,
+                  "population": 44,
+                  "precision": 0.9545454545454546,
+                  "recall": 1.0,
+                  "tn": 0,
+                  "tp": 42
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9545454545454546,
+                  "f1": 0.9767441860465116,
+                  "false_positive_rate": 1.0,
+                  "fn": 0,
+                  "fp": 2,
+                  "inference_errors": 0,
+                  "population": 44,
+                  "precision": 0.9545454545454546,
+                  "recall": 1.0,
+                  "tn": 0,
+                  "tp": 42
+                },
+                "refined": {
+                  "accuracy": 0.9545454545454546,
+                  "f1": 0.9767441860465116,
+                  "false_positive_rate": 1.0,
+                  "fn": 0,
+                  "fp": 2,
+                  "inference_errors": 0,
+                  "population": 44,
+                  "precision": 0.9545454545454546,
+                  "recall": 1.0,
+                  "tn": 0,
+                  "tp": 42
+                }
+              }
+            },
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.8974812196199735,
+                  "f1": 0.1076923076923077,
+                  "false_positive_rate": 0.10115864527629234,
+                  "fn": 5,
+                  "fp": 227,
+                  "inference_errors": 0,
+                  "population": 2263,
+                  "precision": 0.058091286307053944,
+                  "recall": 0.7368421052631579,
+                  "tn": 2017,
+                  "tp": 14
+                },
+                "refined": {
+                  "accuracy": 0.8974812196199735,
+                  "f1": 0.1076923076923077,
+                  "false_positive_rate": 0.10115864527629234,
+                  "fn": 5,
+                  "fp": 227,
+                  "inference_errors": 0,
+                  "population": 2263,
+                  "precision": 0.058091286307053944,
+                  "recall": 0.7368421052631579,
+                  "tn": 2017,
+                  "tp": 14
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9977905435262925,
+                  "f1": 0.8484848484848485,
+                  "false_positive_rate": 0.0,
+                  "fn": 5,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 2263,
+                  "precision": 1.0,
+                  "recall": 0.7368421052631579,
+                  "tn": 2244,
+                  "tp": 14
+                },
+                "refined": {
+                  "accuracy": 0.9977905435262925,
+                  "f1": 0.8484848484848485,
+                  "false_positive_rate": 0.0,
+                  "fn": 5,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 2263,
+                  "precision": 1.0,
+                  "recall": 0.7368421052631579,
+                  "tn": 2244,
+                  "tp": 14
+                }
+              }
+            },
+            "raw_member": "gather/intranet_server/logs/audit/audit.log"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.7917111348274636,
+                  "f1": 0.015138772077375946,
+                  "false_positive_rate": 0.20593493028244547,
+                  "fn": 19,
+                  "fp": 1152,
+                  "inference_errors": 0,
+                  "population": 5622,
+                  "precision": 0.007751937984496124,
+                  "recall": 0.32142857142857145,
+                  "tn": 4442,
+                  "tp": 9
+                },
+                "refined": {
+                  "accuracy": 0.7917111348274636,
+                  "f1": 0.015138772077375946,
+                  "false_positive_rate": 0.20593493028244547,
+                  "fn": 19,
+                  "fp": 1152,
+                  "inference_errors": 0,
+                  "population": 5622,
+                  "precision": 0.007751937984496124,
+                  "recall": 0.32142857142857145,
+                  "tn": 4442,
+                  "tp": 9
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9950195659907506,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.0,
+                  "fn": 28,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 5622,
+                  "precision": null,
+                  "recall": 0.0,
+                  "tn": 5594,
+                  "tp": 0
+                },
+                "refined": {
+                  "accuracy": 0.9950195659907506,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.0,
+                  "fn": 28,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 5622,
+                  "precision": null,
+                  "recall": 0.0,
+                  "tn": 5594,
+                  "tp": 0
+                }
+              }
+            },
+            "raw_member": "gather/vpn/logs/openvpn.log"
+          },
+          {
+            "changes_at_0_95": {},
+            "metrics": {
+              "0.5": {
+                "baseline": {
+                  "accuracy": 0.9994791666666667,
+                  "f1": 0.9887640449438202,
+                  "false_positive_rate": 0.0005330490405117271,
+                  "fn": 0,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.9777777777777777,
+                  "recall": 1.0,
+                  "tn": 1875,
+                  "tp": 44
+                },
+                "refined": {
+                  "accuracy": 0.9994791666666667,
+                  "f1": 0.9887640449438202,
+                  "false_positive_rate": 0.0005330490405117271,
+                  "fn": 0,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.9777777777777777,
+                  "recall": 1.0,
+                  "tn": 1875,
+                  "tp": 44
+                }
+              },
+              "0.95": {
+                "baseline": {
+                  "accuracy": 0.9994791666666667,
+                  "f1": 0.9887640449438202,
+                  "false_positive_rate": 0.0005330490405117271,
+                  "fn": 0,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.9777777777777777,
+                  "recall": 1.0,
+                  "tn": 1875,
+                  "tp": 44
+                },
+                "refined": {
+                  "accuracy": 0.9994791666666667,
+                  "f1": 0.9887640449438202,
+                  "false_positive_rate": 0.0005330490405117271,
+                  "fn": 0,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.9777777777777777,
+                  "recall": 1.0,
+                  "tn": 1875,
+                  "tp": 44
+                }
+              }
+            },
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log"
+          }
+        ],
+        "population": 295976,
+        "reason_counts": {
+          "ineligible_or_unknown_context": 8130,
+          "low_evidence_score": 1248,
+          "non_http_unchanged": 286535,
+          "retain_ambiguous_score": 7,
+          "retain_security_or_extreme_rate": 56
+        },
+        "refined_probability_sha256": "46b951d1f4d06f699f64db4a9197737256aba5015990bcc791b8351976f46da3",
+        "role": "observed_development",
+        "seconds": 15.631,
+        "unique_vectors": 759
+      }
+    },
+    "schema": "extra-native-web-refinement-1",
+    "scope": "observed development/calibration only",
+    "sources": {
+      "scripts/f1_lab/web_refinement.py": {
+        "bytes": 7475,
+        "path": "scripts/f1_lab/web_refinement.py",
+        "sha256": "ea7ac8d5dfc74e727306398b83ed54f2ffb4eabd46f318f83dd262a09c071f1d"
+      },
+      "scripts/run_web_refinement.py": {
+        "bytes": 10093,
+        "path": "scripts/run_web_refinement.py",
+        "sha256": "f88f6f6dcdc21f089d5962e5741ff6f0c5656cf0212fd54067a698ac12ba7b5b"
+      }
+    },
+    "started_at": "2026-11-12T11:51:09.934585+00:00",
+    "thresholds": [
+      0.5,
+      0.95
+    ],
+    "training": {
+      "http_classes": [
+        821,
+        7695
+      ],
+      "non_http": 286727,
+      "population": 295243,
+      "unusable": 0
+    }
+  },
+  "tests": {
+    "artifact": {
+      "path": "runtime/f1/stream-tests-v39-20261112/tests.json",
+      "bytes": 1079,
+      "sha256": "d75eeec82207fc328bf9c1fb7c25558d0a0799e21b9fe8ecff9c74df31e6fefd"
+    },
+    "schema": "extra-local-stream-validation-tests-1",
+    "started_at": "2026-11-12T11:40:46.401613+00:00",
+    "paid_api_calls": 0,
+    "aws_sdk_calls": 0,
+    "github_pushes": 0,
+    "windows": {
+      "exit_code": 0,
+      "seconds": 152.022,
+      "counts": {
+        "passed": 682
+      },
+      "log": "runtime/f1/stream-tests-v39-20261112/windows.log"
+    },
+    "linux": {
+      "exit_code": 0,
+      "seconds": 387.003,
+      "counts": {
+        "passed": 3502
+      },
+      "log": "runtime/f1/stream-tests-v39-20261112/linux.log",
+      "executed": true,
+      "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+      "source_files": 691,
+      "source_archive_sha256": "d6a5f657b878b190de5316fd464f68bf3c13500d52916ef84a47d63285691c0a",
+      "container_exit": 0,
+      "oom_killed": false,
+      "network_mode": "none",
+      "owned_container": "950b971de1110af23dd6c34026ac9824f10507e176039e5b8edbf82620ee0c40",
+      "snapshot_sources_unchanged_after": true,
+      "owned_container_removed": true
+    },
+    "ended_at": "2026-11-12T11:49:50.365671+00:00"
+  },
+  "source_files": {
+    "scripts/f1_lab/web_refinement.py": {
+      "path": "scripts/f1_lab/web_refinement.py",
+      "bytes": 7475,
+      "sha256": "ea7ac8d5dfc74e727306398b83ed54f2ffb4eabd46f318f83dd262a09c071f1d"
+    },
+    "scripts/run_web_refinement.py": {
+      "path": "scripts/run_web_refinement.py",
+      "bytes": 10093,
+      "sha256": "f88f6f6dcdc21f089d5962e5741ff6f0c5656cf0212fd54067a698ac12ba7b5b"
+    },
+    "tests/test_f1_web_refinement.py": {
+      "path": "tests/test_f1_web_refinement.py",
+      "bytes": 6992,
+      "sha256": "6f5dfa8f8e6a8187e7647956801657f34b667dfec428a71b74d127a5fb7fbd19"
+    }
+  },
+  "test_snapshot_code_files_match": 400,
+  "protocol_not_in_linux_fixture_archive": "The newly untracked protocol JSON was checked by the actual Windows full-data run and its hash above. Linux pytest tests the model/runner source; it does not run the 1.26M-row dataset campaign.",
+  "input_audit": {
+    "path": "runtime/f1/web-error-audit-v39-20261112/audit.json",
+    "bytes": 3445402,
+    "sha256": "d87655a89eec4a4f1d38b17e533e7efbc5f8f79aebe2c0e82c6f7e5d9304d6f1"
+  },
+  "first_full_comparison": {
+    "path": "runtime/f1/web-refinement-v39-20261112/run.json",
+    "bytes": 29792,
+    "sha256": "a30dedcad21a6b60e8b0725dc503df528d4de7953f5b9c90e85ead843e088af0"
+  },
+  "lf_protocol_replay": {
+    "artifact": {
+      "path": "runtime/f1/web-refinement-v39-20261112-02/lf-replay.json",
+      "bytes": 428,
+      "sha256": "bed1257f79d25986e044c8fe2976e3d71d888205d7e462133b0dce4ec8c34311"
+    },
+    "schema": "web-protocol-lf-replay-1",
+    "original_protocol_sha256": "d78877ed6f45be8dec4d3f0757e1f85ecdaaf657cd60a97c84c62250eddd7b1f",
+    "committed_lf_protocol_sha256": "63a4ca3e2a4b984ade71b60710f041f2a6b2b09daf25d879b6feef39e6968b05",
+    "parsed_plan_unchanged": true,
+    "candidate_bytes_identical": true,
+    "all_three_score_hashes_and_metrics_identical": true,
+    "first_run_preserved": true,
+    "replay_completed": true
+  },
+  "residual_review": {
+    "artifact": {
+      "path": "runtime/f1/web-refinement-v39-20261112-02/residual-review.json",
+      "bytes": 695,
+      "sha256": "29e65e196d228c01a255319a8b8fdebee03db66caea31ddff6e2e7c3d803b531"
+    },
+    "russellmitchell": {
+      "remaining_fp": 0,
+      "reasons": {},
+      "status_classes": {},
+      "methods": {}
+    },
+    "santos": {
+      "remaining_fp": 7,
+      "reasons": {
+        "ineligible_or_unknown_context": 6,
+        "retain_security_or_extreme_rate": 1
+      },
+      "status_classes": {
+        "4": 1,
+        "2": 6
+      },
+      "methods": {
+        "GET": 2,
+        "POST": 5
+      }
+    },
+    "fox": {
+      "remaining_fp": 12,
+      "reasons": {
+        "ineligible_or_unknown_context": 11,
+        "retain_security_or_extreme_rate": 1
+      },
+      "status_classes": {
+        "2": 8,
+        "3": 3,
+        "4": 1
+      },
+      "methods": {
+        "POST": 8,
+        "GET": 4
+      }
+    }
+  },
+  "exploration": {
+    "contract": {
+      "path": "runtime/f1/web-refinement-prototype-v39-20261112/contract.json",
+      "bytes": 1291,
+      "sha256": "e1047d7b547a43813cc14cd66a921e65e374ae72659138372892015947bd2e3f"
+    },
+    "direct_projection_a": {
+      "path": "runtime/f1/web-refinement-prototype-v39-20261112/without_volume-comparison.json",
+      "bytes": 1298,
+      "sha256": "cf3257009dceb8cb135d5a89aeeaef9f34755b2956b163f2f30178bf5d528bbc"
+    },
+    "direct_projection_b": {
+      "path": "runtime/f1/web-refinement-prototype-v39-20261112/without_volume_line_size-comparison.json",
+      "bytes": 1298,
+      "sha256": "cf3257009dceb8cb135d5a89aeeaef9f34755b2956b163f2f30178bf5d528bbc"
+    },
+    "broad_conservative_prototype_with_sample_list_bug": {
+      "path": "runtime/f1/web-refinement-prototype-v39-20261112/conservative-comparison.json",
+      "bytes": 630475,
+      "sha256": "ad7048d457c39e017f2a52a046a60be26f78bafebc82f116e836f2d21cb7b351"
+    },
+    "note": "Prototype sample lists included zero-multiplicity attack entries by mistake; scalar confusion matrices were unaffected. The list generator was corrected; final evidence is the separate every-row runner, not this prototype list. Broad 4-FP Fox prototype was narrowed to successful GET/HEAD, with unknown/POST/redirect/error/extreme-rate retention; final Fox has12 FP."
+  },
+  "original_app_and_labels_preserved": true,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "github_pushes": 0,
+  "remaining_owned_test_containers": 0,
+  "free_disk_bytes": 115159113728,
+  "goal_qualified": false,
+  "independent_final_metrics": null,
+  "production_adopted": false
+}

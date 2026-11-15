@@ -1,0 +1,55 @@
+{
+  "schema": "extra-scanner-calibration-transfer-ready-1",
+  "completed": true,
+  "readiness_only": true,
+  "actual_source_evaluation_completed": false,
+  "original_planned_role": "calibration",
+  "redesignated_as_final_holdout": false,
+  "goal_qualified": false,
+  "original_six_domain_goal_replaced": false,
+  "source_id": "ait-wardbeck",
+  "publisher_record": 19483937,
+  "filename": "wardbeck_no-pcaps.zip",
+  "publisher_md5": "14eeacd83571a83615c2cce1f6a6eacf",
+  "source_body_access_before_freeze": 0,
+  "publisher_schedule_metadata_visible": true,
+  "comparison": "v52 versus v62; v49/v51 intermediate stages retained",
+  "validation": {
+    "windows_related_passed": 48,
+    "linux": {
+      "exit_code": 0,
+      "seconds": 11.739,
+      "counts": {
+        "passed": 170
+      },
+      "log": "runtime/f1/scanner-transfer-tests-v63-20261114/linux.log",
+      "executed": true,
+      "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+      "source_files": 956,
+      "source_archive_sha256": "32bcf22c09605b8b7c7ad2cfab760214a841d2d921ea62093eff08f3395e187e",
+      "container_exit": 0,
+      "oom_killed": false,
+      "network_mode": "none",
+      "owned_container": "ef92b0765e293862340b7ff33c7084c0c5bdeea1805f3eb4ba9b29a96ee8622a",
+      "snapshot_sources_unchanged_after": true,
+      "owned_container_removed": true
+    },
+    "synthetic_control_rows": 6,
+    "synthetic_new_tp": 1,
+    "synthetic_new_fp": 0,
+    "synthetic_lost_tp": 0,
+    "label_members_read_before_prediction_seal": 0
+  },
+  "source_files": {
+    "scripts/f1_lab/rotation_transfer.py": "a6e46d1a415a76be1cf88644cb91735b739c832e81b36b9ea453b8672418fb43",
+    "scripts/f1_lab/scanner_transfer.py": "226f0c8a790e39d8ad2dea900814abfc549be50754e74bc8b87186c94822d444",
+    "scripts/run_rotated_transfer.py": "a65f286900df65875bb875bd55996f1d91468f2ac4017bcbf79e116f4f956731",
+    "scripts/run_scanner_transfer.py": "a5362944602061401dd141a22cc8fdc1ca31c2220b22e8d6c1bd7e0daa9bfd6a",
+    "scripts/audit_transfer_overlap.py": "aa1e236aa24e87a2aba090e78b91467c94e24985007edacb826c72f2fcedc8cb",
+    "scripts/run_web_scanner_review.py": "1280d9703f28d037df3952e1ec4d05ff0a1ffbf24c2c20fb8a6319833bc8668f",
+    "tests/test_web_scanner_replay.py": "3680611600ea8217e505a36fb21695dd1caa529e2855a7da106446779314c93a",
+    "tests/test_scanner_transfer.py": "c4083d768679451536f434970522ed5c5ac3af9729fa3e811ff5761afdb49cf5"
+  },
+  "paid_api_calls": 0,
+  "aws_calls": 0
+}

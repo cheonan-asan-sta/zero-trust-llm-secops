@@ -1,0 +1,496 @@
+{
+  "schema": "extra-resource-v7-checkpoint-1",
+  "base_commit": "250464b",
+  "windows": {
+    "tests": 278,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 66.719,
+    "sha256": "878cd3814cb32e602ae70f417ca72d83954eca0068bf015c42af17bb4d61cdd9"
+  },
+  "linux": {
+    "schema": "extra-f1-linux-snapshot-1",
+    "completed": true,
+    "owner": "extra-f1-926d8e1e7a1b",
+    "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "tests": [
+      "tests/test_f1_resource_policy.py",
+      "tests/test_f1_calibration.py",
+      "tests/test_f1_source_registry.py",
+      "tests/test_f1_session_inference.py",
+      "tests/test_f1_confidence.py",
+      "tests/test_f1_temporal_store.py",
+      "tests/test_f1_approval_registry.py",
+      "tests/test_f1_shadow_approvals.py",
+      "tests/test_f1_shadow_detector.py",
+      "tests/test_f1_feature_audit.py",
+      "tests/test_f1_review.py",
+      "tests/test_detection_benchmark.py",
+      "tests/test_f1_provenance.py",
+      "tests/test_f1_session_controls.py"
+    ],
+    "host_mounts": 0,
+    "network": "none",
+    "cloud_calls": 0,
+    "paid_api_calls": 0,
+    "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+    "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+    "source_manifest_sha256": "7e3f0f1e77e1b93cffdbf48449e30ff6584f95b8513ed807a2675633cf5606e4",
+    "source_files": 370,
+    "container_exit_code": 0,
+    "source_verified_before_and_after": true,
+    "remaining_containers": 0,
+    "pytest": {
+      "tests": 278,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 44.0,
+      "sha256": "e549a60e7515238852b8dbc3f143fb168c8039ce95b0e1898927b12220b9643f"
+    }
+  },
+  "original_event_diagnostic": {
+    "schema": "f1-shadow-comparison-1",
+    "started_at_utc": "2026-11-11T18:48:08.426785+00:00",
+    "finished_at_utc": "2026-11-11T18:48:08.466842+00:00",
+    "source_commit": "250464ba2f6d58f44f1283ab361b6df1fc746303",
+    "source_dirty": true,
+    "git_metadata": "available_snapshot_hashes_still_required",
+    "source_files_lf_sha256": {
+      "scripts/f1_lab/__init__.py": "62985db032a0261b06546af2b9e839c0790d41d6fe85e44ec2ffb1c423a120b0",
+      "scripts/f1_lab/approvals.py": "165b6340a0b195703c038419fcee8ad7e2c48dbe90039da5844305c60a6a72a1",
+      "scripts/f1_lab/calibration.py": "4a1e06de1a285cfee57a881e2d8eaf8cb6d7c174f8060203995488f5cd8bb178",
+      "scripts/f1_lab/confidence.py": "4c10c7b1d7147197d2ae89ed09f351b7eed99b4ff879b437ab8840b021ca3eb9",
+      "scripts/f1_lab/detector.py": "c8b2245814796ace04de1b40809d78fa8b09a9d3a781420ddf46825960bf7ca9",
+      "scripts/f1_lab/provenance.py": "4f8a1c095f0fb43c0e303cd805c26a14c34c2fd076a4753a7ac4445cfa512678",
+      "scripts/f1_lab/registry.py": "e1b76dba89e13fdc78e3a35c044a9c43d922123ba399fc9a0324d3c7d74c3e8c",
+      "scripts/f1_lab/resource_policy.py": "35edb7c67a572bd00f00bb6cda153a32acaeb262f93f8f6c13f5c717d752a0e1",
+      "scripts/f1_lab/session_controls.py": "8568aedb7ff457d76419e311f87f0fb992a8e86d7c0a1ed4519938a448700029",
+      "scripts/f1_lab/session_inference.py": "62a37226e30f0bf75de354bf8b58e52322c76d8eb1ba40b13708e5fdff10bc1f",
+      "scripts/f1_lab/source_registry.py": "f12661135bc0a0fd2999618c7221832b99535c27cdbcd0a3e4a700505c962ffd",
+      "scripts/f1_lab/temporal.py": "f9ea1470781205aa68907aa115ea4fbd212f71f41893ad1988ab88698996adff",
+      "scripts/evaluate_f1_shadow.py": "339ef5c2195b2200ab970924174408b2adc40b0362e8e94abd69977aedb45c1a",
+      "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+      "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+      "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+      "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+      "app/data/benchmark/cases.jsonl": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f",
+      "app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+      "app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+      "app/data/sigma/credential_anomaly.yml": "27ee3ff5ce6eb25bdffeb5d25a59998b21c799fcff48768204be57f2974b4086",
+      "app/data/sigma/data_exfiltration.yml": "e378a7df56ac30a3c5568d42e86be53bfd43ce88489ae500c84d16e8ee8466e7",
+      "app/data/sigma/lateral_movement.yml": "cd13987a9a7ae36d57f718a2b9a87cb0fb224e5a78380311dec8edcd78dfe0c8",
+      "app/data/sigma/privilege_escalation.yml": "337b23a4ba5bed1081828f30d771f777628d8bdd88ee1298a776e7f3f21eb880",
+      "app/data/sigma/remote_desktop_logon.yml": "35a4a4fbe7ae16484a16a4287e6287239697648018be40dd4e9c33e04b0c61ee",
+      "app/data/sigma/unmanaged_device_access.yml": "b0c3ef8498458e9d687c32ca554147de44db7cdf84857eacf4224050b8122004"
+    },
+    "thresholds": {
+      "credential_failures": 3,
+      "resource_fanout": 8,
+      "bulk_download_mb": 500.0
+    },
+    "config_sha256": "30c4a4decb18e79aa04346cffd80f97cb255d3d1a4528a548b77adf0fd1e5bea",
+    "manifest_sha256": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+    "baseline_ruleset_sha256": "7b769a999a252e112e4848cd5026976ee55de4bf853ac49b00d883d36b7a6231",
+    "data_role": "previously_observed_synthetic_development_and_diagnostic_holdout",
+    "new_independent_evaluation": false,
+    "independent_review": "pending",
+    "production_integrated": false,
+    "baseline_rules_changed": false,
+    "unsigned_approval_claims_used_by_candidate": false,
+    "signed_approvals_supplied": 0,
+    "paid_api_calls": 0,
+    "cloud_calls": 0,
+    "access_grants": 0,
+    "session_changes": 0,
+    "goal_qualified": false,
+    "comparisons": {
+      "development": {
+        "baseline": {
+          "confusion": {
+            "tp": 170,
+            "fp": 50,
+            "fn": 10,
+            "tn": 130
+          },
+          "metrics": {
+            "precision": 0.7727272727272727,
+            "recall": 0.9444444444444444,
+            "f1": 0.85,
+            "false_positive_rate": 0.2777777777777778
+          },
+          "statistical_target_supported": false,
+          "gate_passed": false
+        },
+        "shadow": {
+          "confusion": {
+            "tp": 180,
+            "fp": 60,
+            "fn": 0,
+            "tn": 120
+          },
+          "metrics": {
+            "precision": 0.75,
+            "recall": 1.0,
+            "f1": 0.8571428571428571,
+            "false_positive_rate": 0.3333333333333333
+          },
+          "case_count": 360,
+          "inconclusive_cases": 10,
+          "inconclusive_kept_in_denominator": true,
+          "point_targets_met": false,
+          "gate_passed": false,
+          "statistical_target_supported": false,
+          "family_confidence": {
+            "method": "label-stratified-family-cluster-percentile-bootstrap",
+            "confidence_level": 0.95,
+            "repetitions": 1000,
+            "seed": 20261101,
+            "family_count": 36,
+            "intervals": {
+              "precision": {
+                "lower": 0.6428571428571429,
+                "upper": 0.9,
+                "valid_replicates": 1000
+              },
+              "recall": {
+                "lower": 1.0,
+                "upper": 1.0,
+                "valid_replicates": 1000
+              },
+              "f1": {
+                "lower": 0.782608695652174,
+                "upper": 0.9473684210526315,
+                "valid_replicates": 1000
+              },
+              "false_positive_rate": {
+                "lower": 0.1111111111111111,
+                "upper": 0.5555555555555556,
+                "valid_replicates": 1000
+              }
+            },
+            "scope": "Variation among authored families; not a population guarantee or independent-row interval."
+          },
+          "evaluation_errors": 0,
+          "rules": [
+            {
+              "rule_id": "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d",
+              "confusion": {
+                "tp": 30,
+                "fp": 10,
+                "fn": 0,
+                "tn": 320
+              },
+              "metrics": {
+                "precision": 0.75,
+                "recall": 1.0,
+                "f1": 0.8571428571428571,
+                "false_positive_rate": 0.030303030303030304
+              },
+              "positive_families": 3,
+              "point_targets_met": false
+            },
+            {
+              "rule_id": "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e",
+              "confusion": {
+                "tp": 30,
+                "fp": 20,
+                "fn": 0,
+                "tn": 310
+              },
+              "metrics": {
+                "precision": 0.6,
+                "recall": 1.0,
+                "f1": 0.75,
+                "false_positive_rate": 0.06060606060606061
+              },
+              "positive_families": 3,
+              "point_targets_met": false
+            },
+            {
+              "rule_id": "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f",
+              "confusion": {
+                "tp": 30,
+                "fp": 10,
+                "fn": 0,
+                "tn": 320
+              },
+              "metrics": {
+                "precision": 0.75,
+                "recall": 1.0,
+                "f1": 0.8571428571428571,
+                "false_positive_rate": 0.030303030303030304
+              },
+              "positive_families": 3,
+              "point_targets_met": false
+            },
+            {
+              "rule_id": "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+              "confusion": {
+                "tp": 40,
+                "fp": 10,
+                "fn": 0,
+                "tn": 310
+              },
+              "metrics": {
+                "precision": 0.8,
+                "recall": 1.0,
+                "f1": 0.8888888888888888,
+                "false_positive_rate": 0.03125
+              },
+              "positive_families": 4,
+              "point_targets_met": false
+            },
+            {
+              "rule_id": "ce5f6071-8293-4eaf-801b-2c3d4e5f6071",
+              "confusion": {
+                "tp": 30,
+                "fp": 10,
+                "fn": 0,
+                "tn": 320
+              },
+              "metrics": {
+                "precision": 0.75,
+                "recall": 1.0,
+                "f1": 0.8571428571428571,
+                "false_positive_rate": 0.030303030303030304
+              },
+              "positive_families": 3,
+              "point_targets_met": false
+            },
+            {
+              "rule_id": "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6",
+              "confusion": {
+                "tp": 60,
+                "fp": 20,
+                "fn": 0,
+                "tn": 280
+              },
+              "metrics": {
+                "precision": 0.75,
+                "recall": 1.0,
+                "f1": 0.8571428571428571,
+                "false_positive_rate": 0.06666666666666667
+              },
+              "positive_families": 6,
+              "point_targets_met": false
+            }
+          ]
+        }
+      },
+      "holdout": {
+        "baseline": {
+          "confusion": {
+            "tp": 90,
+            "fp": 50,
+            "fn": 90,
+            "tn": 130
+          },
+          "metrics": {
+            "precision": 0.6428571428571429,
+            "recall": 0.5,
+            "f1": 0.5625,
+            "false_positive_rate": 0.2777777777777778
+          },
+          "statistical_target_supported": false,
+          "gate_passed": false
+        },
+        "shadow": {
+          "confusion": {
+            "tp": 160,
+            "fp": 60,
+            "fn": 20,
+            "tn": 120
+          },
+          "metrics": {
+            "precision": 0.7272727272727273,
+            "recall": 0.8888888888888888,
+            "f1": 0.8,
+            "false_positive_rate": 0.3333333333333333
+          },
+          "case_count": 360,
+          "inconclusive_cases": 30,
+          "inconclusive_kept_in_denominator": true,
+          "point_targets_met": false,
+          "gate_passed": false,
+          "statistical_target_supported": false,
+          "family_confidence": {
+            "method": "label-stratified-family-cluster-percentile-bootstrap",
+            "confidence_level": 0.95,
+            "repetitions": 1000,
+            "seed": 20261101,
+            "family_count": 36,
+            "intervals": {
+              "precision": {
+                "lower": 0.6084782608695652,
+                "upper": 0.8823529411764706,
+                "valid_replicates": 1000
+              },
+              "recall": {
+                "lower": 0.7222222222222222,
+                "upper": 1.0,
+                "valid_replicates": 1000
+              },
+              "f1": {
+                "lower": 0.6814393939393939,
+                "upper": 0.9,
+                "valid_replicates": 1000
+              },
+              "false_positive_rate": {
+                "lower": 0.1111111111111111,
+                "upper": 0.5555555555555556,
+                "valid_replicates": 1000
+              }
+            },
+            "scope": "Variation among authored families; not a population guarantee or independent-row interval."
+          },
+          "evaluation_errors": 0,
+          "rules": [
+            {
+              "rule_id": "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d",
+              "confusion": {
+                "tp": 30,
+                "fp": 10,
+                "fn": 0,
+                "tn": 320
+              },
+              "metrics": {
+                "precision": 0.75,
+                "recall": 1.0,
+                "f1": 0.8571428571428571,
+                "false_positive_rate": 0.030303030303030304
+              },
+              "positive_families": 3,
+              "point_targets_met": false
+            },
+            {
+              "rule_id": "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e",
+              "confusion": {
+                "tp": 30,
+                "fp": 10,
+                "fn": 0,
+                "tn": 320
+              },
+              "metrics": {
+                "precision": 0.75,
+                "recall": 1.0,
+                "f1": 0.8571428571428571,
+                "false_positive_rate": 0.030303030303030304
+              },
+              "positive_families": 3,
+              "point_targets_met": false
+            },
+            {
+              "rule_id": "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f",
+              "confusion": {
+                "tp": 20,
+                "fp": 0,
+                "fn": 10,
+                "tn": 330
+              },
+              "metrics": {
+                "precision": 1.0,
+                "recall": 0.6666666666666666,
+                "f1": 0.8,
+                "false_positive_rate": 0.0
+              },
+              "positive_families": 3,
+              "point_targets_met": false
+            },
+            {
+              "rule_id": "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+              "confusion": {
+                "tp": 20,
+                "fp": 20,
+                "fn": 10,
+                "tn": 310
+              },
+              "metrics": {
+                "precision": 0.5,
+                "recall": 0.6666666666666666,
+                "f1": 0.5714285714285714,
+                "false_positive_rate": 0.06060606060606061
+              },
+              "positive_families": 3,
+              "point_targets_met": false
+            },
+            {
+              "rule_id": "ce5f6071-8293-4eaf-801b-2c3d4e5f6071",
+              "confusion": {
+                "tp": 20,
+                "fp": 10,
+                "fn": 10,
+                "tn": 320
+              },
+              "metrics": {
+                "precision": 0.6666666666666666,
+                "recall": 0.6666666666666666,
+                "f1": 0.6666666666666666,
+                "false_positive_rate": 0.030303030303030304
+              },
+              "positive_families": 3,
+              "point_targets_met": false
+            },
+            {
+              "rule_id": "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6",
+              "confusion": {
+                "tp": 50,
+                "fp": 40,
+                "fn": 0,
+                "tn": 270
+              },
+              "metrics": {
+                "precision": 0.5555555555555556,
+                "recall": 1.0,
+                "f1": 0.7142857142857143,
+                "false_positive_rate": 0.12903225806451613
+              },
+              "positive_families": 5,
+              "point_targets_met": false
+            }
+          ]
+        }
+      }
+    },
+    "limits": [
+      "Candidate is draft advice only and has no access or session API.",
+      "Legacy baseline reads an unsigned approval field; the candidate deliberately does not trust it.",
+      "Observed holdout is diagnostic and cannot establish new independent performance.",
+      "No approvals are fabricated from labels, family names or unsigned claims."
+    ]
+  },
+  "diagnostic_summary_sha256": "64ecbb034db00f816f4a384bc6780da1727bd2d371a1696425b3edd759dde36b",
+  "focused_first_checks": {
+    "tests": 82,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 32.018,
+    "sha256": "35cda44639d675749355f71dd25adc57b92b41c986f38777e74678c8cd0c7a38"
+  },
+  "focused_second_checks": {
+    "tests": 85,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 40.368,
+    "sha256": "0cf5108af8971dfa1ebc24a43f8b78535467abe6c5164d3d1e8456c1792efcf9"
+  },
+  "source_files_lf_sha256": {
+    "scripts/f1_lab/resource_policy.py": "35edb7c67a572bd00f00bb6cda153a32acaeb262f93f8f6c13f5c717d752a0e1",
+    "scripts/f1_lab/detector.py": "c8b2245814796ace04de1b40809d78fa8b09a9d3a781420ddf46825960bf7ca9",
+    "scripts/f1_lab/temporal.py": "f9ea1470781205aa68907aa115ea4fbd212f71f41893ad1988ab88698996adff",
+    "tests/test_f1_resource_policy.py": "a2f89be56c9f0950a015658a82517a4e92ac143da345d77346032597e8030a2f",
+    "tests/test_f1_temporal_store.py": "309c99e07dfcb4e955cdb4faf64a6005107e8c2cc7054806cbbf08e4de3bb614"
+  },
+  "policy_scope": "optional externally pinned operator snapshot; test resource policies only",
+  "actual_enterprise_resource_policy_or_idp_review": "pending",
+  "original_app_baseline_changed": false,
+  "new_independent_evaluation": false,
+  "target_achieved": false,
+  "independent_review": "pending",
+  "cloud_calls": 0,
+  "paid_api_calls": 0,
+  "counts_are_separate_overlapping_phases": true
+}

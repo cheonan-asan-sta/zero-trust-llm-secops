@@ -1,0 +1,107 @@
+{
+  "schema": "extra-f1-subject-soak-start-v13-1",
+  "date_kst": "2026-11-12",
+  "scope": "all available isolated cached Linux pytest checks followed by real-clock subject-window exercise; no Docker deployment campaign",
+  "windows_final": {
+    "path": "runtime/f1/extra-subject-soak-final-windows-20261112.xml",
+    "tests": 418,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 418
+  },
+  "focused": {
+    "path": "runtime/f1/extra-subject-soak-first-20261112.xml",
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 15
+  },
+  "linux_start_checkpoint": {
+    "schema": "extra-subject-soak-start-checkpoint-1",
+    "captured_at": "2026-11-11T20:46:12.563571+00:00",
+    "completed": false,
+    "long_soak_complete": false,
+    "owner": "extra-f1-subject-soak-5bbfa1fa8226",
+    "container_id": "308dceb4c2e254b73500cb8025ace02196e26072cdba8dc45874ba10b5916c5b",
+    "derived_image": "sha256:35d4bca6238eb86a518d7086b6cc394931057510d106faec5399eab16f30f0df",
+    "deadline": "2026-11-11T23:45:00+00:00",
+    "source_files": 460,
+    "source_manifest_sha256": "09a00fd91b115a84bcdcf7c0c8cc998dd2f7b8e59cde85ba000d4907dbdd65b9",
+    "full_linux_checks": {
+      "tests": 3153,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 3153
+    },
+    "source_verified_before_and_after_checks": true,
+    "public_artifact_sha256": {
+      "checks.xml": "25de92fafb59b74c07f0efa7355be29423abd9d3bd51daf7dd993637f2a85f54",
+      "public-sources.json": "7bb9bb88fe5c6ad5080fb6d08c9504ef50b41b231cd920100f80750fe47fec73",
+      "public-policies.json": "2d255b1964eaddee2aca80990e89e1b1ddf8eb13c730d9e7671efeaf0d5e85f3",
+      "public-approvals.json": "1f2bef52f532cc58e97a6a9b5b364ff212c8c66a466b940014559617abe74c70",
+      "public-pins.json": "48026a2dd18a6e90c9dd1dc743eee0635c2a88412d3e454c5de19b56ee24919d"
+    },
+    "latest_heartbeat": {
+      "cycle": 0,
+      "accepted_unique_events": 20,
+      "worker_exits_recovered": 0,
+      "exact_retries": 3,
+      "negative_probes_rejected": 1,
+      "approved_fixture_jobs": 1,
+      "partial_device_approvals_rejected": 1,
+      "unapproved_export_episodes": 1,
+      "failed_login_episodes": 1,
+      "fanout_episodes": 1,
+      "risk_episodes": 1,
+      "expired_risk_observations": 0,
+      "isolation_probes": 1,
+      "journal_seq": 20,
+      "journal_sha256": "833163fb6660b71dacb4b5860b1749ba40187fe6ef3a677324f437f206457b1b",
+      "at_utc": "2026-11-11T20:46:08.135377+00:00"
+    },
+    "goal_qualified": false,
+    "paid_api_calls": 0,
+    "aws_sdk_calls": 0
+  },
+  "prior_failed_full_suite": {
+    "directory": "runtime/f1/extra-subject-soak-20261112-01",
+    "junit_counts": {
+      "tests": 3153,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "passed": 3152,
+    "reason": "Source snapshot omitted docs/reference-catalog-enterprise-public-sector.md and docs/enterprise-readiness.md required by control evidence-location test.",
+    "soak_started": false,
+    "containers_remaining": 0,
+    "derived_image_removed": true,
+    "recovery": "Added those two existing tracked documents to the isolated source allowlist; no app or test assertion changes."
+  },
+  "source_files_lf_sha256": {
+    "scripts/run_f1_subject_soak.py": "713b24e181883c32de8a8cf63b71de95e4ff3b9fc360817099c0c810c8f529d9",
+    "tests/test_f1_subject_soak.py": "54a9b4f8424c3910bdc106bf389692fb9fa21a3a7dd6f81b744acc55a1e0855a",
+    "scripts/f1_lab/subject_temporal.py": "b8e543d4d31164ab4a02da8f7f7fbb8b8fbe65a332f2ce537356a616c19978e0"
+  },
+  "original_app_diff_from_9c67889": [],
+  "source_frozen": true,
+  "deadline_kst": "2026-11-12T08:45:00+09:00",
+  "long_soak_completed": false,
+  "goal_qualified": false,
+  "new_independent_evaluation": false,
+  "actual_idp_or_mtls_login_exercised_by_soak": false,
+  "principal_kind": "manually constructed fixture analyst; auth_method field is not an HTTP authentication test",
+  "real_organization_approvals": 0,
+  "keys": "ephemeral fixture signing keys only in parent memory; private witness stays in unexported tmpfs and is removed",
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "limits": [
+    "Real-clock and worker-process recovery are separate from disk/power/Docker daemon recovery.",
+    "Window/source authority completeness applies only to received events.",
+    "Authority has device/resource/action scopes; volume ceiling is signed context, not an independent issuer budget.",
+    "The earlier v9 long run is a different session profile and source snapshot."
+  ]
+}

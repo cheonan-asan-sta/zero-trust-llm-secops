@@ -1,0 +1,84 @@
+{
+  "schema": "extra-interrupted-cleanup-v15-1",
+  "observed_at": "2026-11-12T02:26:09.626822+00:00",
+  "profiles": {
+    "session": {
+      "directory": "extra-soak-20261112-03",
+      "owner": "extra-f1-soak-ba1921a58ef8",
+      "container_id": "b86f2cc1b6765b6dd2aa094b5e6329e8be336d048968a8b6b50dd59fbd7b732e",
+      "derived_image": "sha256:55c20c14aff5ae1e8a45acbd08d7372221cb4a693b4d2d365d8f425ab19d2090",
+      "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+      "prior_exit_code": 255,
+      "prior_oom_killed": false,
+      "recovered_heartbeats": 278,
+      "last_heartbeat": {
+        "cycle": 277,
+        "accepted_unique_events": 409,
+        "journal_seq": 409,
+        "negative_probes_rejected": 84,
+        "worker_exits_recovered": 4,
+        "exact_retries": 28,
+        "approved_fixture_jobs": 14,
+        "unapproved_export_episodes": 7,
+        "failed_login_episodes": 5,
+        "resource_denial_episodes": 4,
+        "journal_sha256": "2d6cd500a20bf6e516fa1c7d27b23f2d5d3bd241a5784e828c564cb45ca08fbf",
+        "at_utc": "2026-11-11T21:44:12.383864+00:00"
+      },
+      "public_artifact_sha256": {
+        "checks.xml": "1d93e9ce024f22413508c1585107341c8ed1514d4f5dbbacb1820a6765e3061b",
+        "public-sources.json": "3c20a92d99d3fa2d9a0016a105191431f69cf8e8f5a4e9a5a6c037cb097e02a4",
+        "public-policies.json": "0f04c8cf692c399440c1934c5e2b0b62ab4e434516d026121fd8aa4b7c27adb3",
+        "public-approvals.json": "82b6d0355ba50026fe5f13b7339132592b3e8ddf1b9c43077f870075cf245c1e",
+        "public-pins.json": "20c796009619726510f9a6055db005fe7555c322660a1873003f3ec52060add5"
+      },
+      "final_runtime_status_present": false,
+      "owned_containers_remaining": 0,
+      "derived_image_removed": true
+    },
+    "subject": {
+      "directory": "extra-subject-soak-20261112-02",
+      "owner": "extra-f1-subject-soak-5bbfa1fa8226",
+      "container_id": "308dceb4c2e254b73500cb8025ace02196e26072cdba8dc45874ba10b5916c5b",
+      "derived_image": "sha256:35d4bca6238eb86a518d7086b6cc394931057510d106faec5399eab16f30f0df",
+      "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+      "prior_exit_code": 255,
+      "prior_oom_killed": false,
+      "recovered_heartbeats": 117,
+      "last_heartbeat": {
+        "cycle": 116,
+        "accepted_unique_events": 183,
+        "worker_exits_recovered": 2,
+        "exact_retries": 24,
+        "negative_probes_rejected": 12,
+        "approved_fixture_jobs": 6,
+        "partial_device_approvals_rejected": 6,
+        "unapproved_export_episodes": 3,
+        "failed_login_episodes": 2,
+        "fanout_episodes": 2,
+        "risk_episodes": 3,
+        "expired_risk_observations": 57,
+        "isolation_probes": 12,
+        "journal_seq": 183,
+        "journal_sha256": "f3bf86890069c75b7d4fdf84332c5d1a2b7a3367bfd73245a2576ac83349927a",
+        "at_utc": "2026-11-11T21:44:11.910011+00:00"
+      },
+      "public_artifact_sha256": {
+        "checks.xml": "25de92fafb59b74c07f0efa7355be29423abd9d3bd51daf7dd993637f2a85f54",
+        "public-sources.json": "7bb9bb88fe5c6ad5080fb6d08c9504ef50b41b231cd920100f80750fe47fec73",
+        "public-policies.json": "2d255b1964eaddee2aca80990e89e1b1ddf8eb13c730d9e7671efeaf0d5e85f3",
+        "public-approvals.json": "1f2bef52f532cc58e97a6a9b5b364ff212c8c66a466b940014559617abe74c70",
+        "public-pins.json": "48026a2dd18a6e90c9dd1dc743eee0635c2a88412d3e454c5de19b56ee24919d"
+      },
+      "final_runtime_status_present": false,
+      "owned_containers_remaining": 0,
+      "derived_image_removed": true
+    }
+  },
+  "long_soak_completed": false,
+  "goal_qualified": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "scope": "Only two exact owned exited containers and their untagged derived images; cached base and unrelated services preserved.",
+  "cleanup_completed": true
+}

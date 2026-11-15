@@ -1,0 +1,435 @@
+{
+  "schema": "extra-web-verified-context-evidence-1",
+  "base_extra_commit": "ba17926938469c846ca7b7990e44443e357eb363",
+  "scope": "local request-bound functional contract and adapter; actual collectors not connected",
+  "protocol": {
+    "path": "infra/f1-lab/web-context-controls-protocol.json",
+    "sha256": "6d9bb3d0201a3a32960aa27349c098aa27d6081433794dead3d20e84f6233803"
+  },
+  "functional_run": {
+    "receipt": {
+      "path": "runtime/f1/web-context-controls-v45-20261113/run.json",
+      "sha256": "2a8777d346b8d8709e48ed27549792e51efbe22ce6d177af047a61f84a572022"
+    },
+    "report": {
+      "actual_server_observations_collected": 0,
+      "automatic_enforcement_allowed": false,
+      "aws_sdk_calls": 0,
+      "cases": [
+        {
+          "after_alert": false,
+          "after_review": true,
+          "after_score": 0.02,
+          "before_alert": false,
+          "before_score": 0.02,
+          "case": "consistent_execution",
+          "evidence_sha256": "efaa29c0a973f00ed4ac5c3a59a2f52695dd3b21a5ee1e356c459cc1c25aa7d9",
+          "evidence_state": "consistent",
+          "expected_outcome_passed": true,
+          "label_purpose": "functional_policy_expectation_only",
+          "reason": "uploaded_script_encoded_argv"
+        },
+        {
+          "after_alert": true,
+          "after_review": true,
+          "after_score": 1.0,
+          "before_alert": false,
+          "before_score": 0.02,
+          "case": "permission_denied_but_executed",
+          "evidence_sha256": "45ec2424cd0f665626e2c92758ca249700ea2a366f822f9ab74dbd89c64d4c26",
+          "evidence_state": "adverse",
+          "expected_outcome_passed": true,
+          "label_purpose": "functional_policy_expectation_only",
+          "reason": "web_verified_denial_or_auth_failure_with_execution"
+        },
+        {
+          "after_alert": true,
+          "after_review": true,
+          "after_score": 1.0,
+          "before_alert": false,
+          "before_score": 0.02,
+          "case": "authentication_failed_but_executed",
+          "evidence_sha256": "b2f450f9054007264cdc28dab191b8077310db3b216cd8f44482ca13cb448fe1",
+          "evidence_state": "adverse",
+          "expected_outcome_passed": true,
+          "label_purpose": "functional_policy_expectation_only",
+          "reason": "web_verified_denial_or_auth_failure_with_execution"
+        },
+        {
+          "after_alert": true,
+          "after_review": true,
+          "after_score": 1.0,
+          "before_alert": false,
+          "before_score": 0.02,
+          "case": "mfa_failed_but_executed",
+          "evidence_sha256": "f0cdc60c9ef6cde62ba0da173ae3316c2a9b6ae471e75eec5f5d31007ec866ec",
+          "evidence_state": "adverse",
+          "expected_outcome_passed": true,
+          "label_purpose": "functional_policy_expectation_only",
+          "reason": "web_verified_denial_or_auth_failure_with_execution"
+        },
+        {
+          "after_alert": false,
+          "after_review": true,
+          "after_score": 0.02,
+          "before_alert": false,
+          "before_score": 0.02,
+          "case": "permission_denied_and_blocked",
+          "evidence_sha256": "1218e1f67e790ee7963e8da74877e73552f7722ab9686b0a80fc5b5385038bef",
+          "evidence_state": "review",
+          "expected_outcome_passed": true,
+          "label_purpose": "functional_policy_expectation_only",
+          "reason": "uploaded_script_encoded_argv"
+        },
+        {
+          "after_alert": false,
+          "after_review": true,
+          "after_score": 0.02,
+          "before_alert": false,
+          "before_score": 0.02,
+          "case": "authentication_unknown",
+          "evidence_sha256": "abc1c6fc8367d47269d3a98c98c6a8bc7c43c2c504bddb6ac84de8af4fe631dd",
+          "evidence_state": "incomplete",
+          "expected_outcome_passed": true,
+          "label_purpose": "functional_policy_expectation_only",
+          "reason": "uploaded_script_encoded_argv"
+        },
+        {
+          "after_alert": false,
+          "after_review": true,
+          "after_score": 0.02,
+          "before_alert": false,
+          "before_score": 0.02,
+          "case": "permission_unknown",
+          "evidence_sha256": "ed9e8503b00745f648bea8354b7b6b156cd896bcae90b4304a3e078fbaf718d8",
+          "evidence_state": "incomplete",
+          "expected_outcome_passed": true,
+          "label_purpose": "functional_policy_expectation_only",
+          "reason": "uploaded_script_encoded_argv"
+        },
+        {
+          "after_alert": false,
+          "after_review": true,
+          "after_score": 0.02,
+          "before_alert": false,
+          "before_score": 0.02,
+          "case": "execution_unknown",
+          "evidence_sha256": "f460ca285b06187bf074623da227cd10acc7e8dde458268b4e92d8851153d2c6",
+          "evidence_state": "incomplete",
+          "expected_outcome_passed": true,
+          "label_purpose": "functional_policy_expectation_only",
+          "reason": "uploaded_script_encoded_argv"
+        },
+        {
+          "after_alert": false,
+          "after_review": true,
+          "after_score": 0.02,
+          "before_alert": false,
+          "before_score": 0.02,
+          "case": "mfa_unknown",
+          "evidence_sha256": "ee4336de72c98c03e5f52ac4f3ce554d02a2fa1018a673e61723d18c34d9ad1b",
+          "evidence_state": "review",
+          "expected_outcome_passed": true,
+          "label_purpose": "functional_policy_expectation_only",
+          "reason": "uploaded_script_encoded_argv"
+        },
+        {
+          "after_alert": false,
+          "after_review": true,
+          "after_score": 0.02,
+          "before_alert": false,
+          "before_score": 0.02,
+          "case": "missing_bundle",
+          "evidence_sha256": null,
+          "evidence_state": "unavailable",
+          "expected_outcome_passed": true,
+          "label_purpose": "functional_policy_expectation_only",
+          "reason": "uploaded_script_encoded_argv"
+        },
+        {
+          "after_alert": false,
+          "after_review": true,
+          "after_score": 0.02,
+          "before_alert": false,
+          "before_score": 0.02,
+          "case": "forged_runtime",
+          "evidence_sha256": null,
+          "evidence_state": "unavailable",
+          "expected_outcome_passed": true,
+          "label_purpose": "functional_policy_expectation_only",
+          "reason": "uploaded_script_encoded_argv"
+        },
+        {
+          "after_alert": false,
+          "after_review": true,
+          "after_score": 0.02,
+          "before_alert": false,
+          "before_score": 0.02,
+          "case": "replay_after_valid_verification",
+          "evidence_sha256": null,
+          "evidence_state": "unavailable",
+          "expected_outcome_passed": true,
+          "label_purpose": "functional_policy_expectation_only",
+          "reason": "uploaded_script_encoded_argv"
+        },
+        {
+          "after_alert": true,
+          "after_review": true,
+          "after_score": 0.99,
+          "before_alert": true,
+          "before_score": 0.99,
+          "case": "consistent_context_keeps_existing_alert",
+          "evidence_sha256": "f2c773443f22b4a8fe755bbd7e855ab04ec7176e065e0578c51f92b00ce356f6",
+          "evidence_state": "consistent",
+          "expected_outcome_passed": true,
+          "label_purpose": "functional_policy_expectation_only",
+          "reason": "uploaded_script_encoded_argv"
+        }
+      ],
+      "completed": true,
+      "created_at": "2026-11-13T12:09:29.008002+00:00",
+      "detection_f1_measured": false,
+      "ended_at": "2026-11-13T12:09:29.059517+00:00",
+      "github_pushes": 0,
+      "goal_qualified": false,
+      "historical_native_data_replayed": false,
+      "historical_sidecars_supplied": 0,
+      "labels_changed": false,
+      "new_independent_final_cases": 0,
+      "paid_api_calls": 0,
+      "plan": {
+        "bytes": 1208,
+        "path": "infra/f1-lab/web-context-controls-protocol.json",
+        "sha256": "6d9bb3d0201a3a32960aa27349c098aa27d6081433794dead3d20e84f6233803"
+      },
+      "private_keys_persisted": false,
+      "production_adopted": false,
+      "public_registry": {
+        "bytes": 1376,
+        "path": "runtime/f1/web-context-controls-v45-20261113/public-controls/web-registry.json",
+        "sha256": "44ee2808a05265822495b1e09ec815ca205c25920d17c90ee3ad2c0f3695fa89"
+      },
+      "schema": "extra-web-context-controls-1",
+      "scope": "authored functional controls only; not independent malicious truth",
+      "sources": {
+        "scripts/f1_lab/operation_refinement.py": {
+          "bytes": 4973,
+          "path": "scripts/f1_lab/operation_refinement.py",
+          "sha256": "3911de17da4ec603c08de7e4e09d12379186b2692bdb800e814a1ecf2ae695db"
+        },
+        "scripts/f1_lab/web_context_controls.py": {
+          "bytes": 5614,
+          "path": "scripts/f1_lab/web_context_controls.py",
+          "sha256": "6ad9bc87ecf7ead1dd22dc2ddd61d759e47915f5325b27b0b850fe33a895cdd9"
+        },
+        "scripts/f1_lab/web_residual.py": {
+          "bytes": 9861,
+          "path": "scripts/f1_lab/web_residual.py",
+          "sha256": "d6963cfe866eea1ab3c0d135a0df776c7ab6ef0d4efccd9d4bedbb6edfc700cd"
+        },
+        "scripts/f1_lab/web_verified_context.py": {
+          "bytes": 16342,
+          "path": "scripts/f1_lab/web_verified_context.py",
+          "sha256": "e39ab1fb95ce95ebf5b280badc025268c2a8eae468fa9e2e1485a267be59349e"
+        },
+        "scripts/run_web_context_controls.py": {
+          "bytes": 6670,
+          "path": "scripts/run_web_context_controls.py",
+          "sha256": "3af9853d9c9ba972b83735b0e2ca8f5a7267f8ed18e2744463fed3bec8514a58"
+        }
+      },
+      "summary": {
+        "cases": 13,
+        "expected_outcomes_passed": 13,
+        "states": {
+          "adverse": 3,
+          "consistent": 2,
+          "incomplete": 3,
+          "review": 2,
+          "unavailable": 3
+        }
+      }
+    }
+  },
+  "test_validation": {
+    "receipt": {
+      "path": "runtime/f1/web-verified-context-tests-v45-20261113/tests.json",
+      "sha256": "df9f161b0bc3c9ef5c1301602ab25efaf5fe9fee23b06d4257c821096894e57f"
+    },
+    "report": {
+      "schema": "extra-local-stream-validation-tests-1",
+      "started_at": "2026-11-13T12:09:29.995051+00:00",
+      "paid_api_calls": 0,
+      "aws_sdk_calls": 0,
+      "github_pushes": 0,
+      "windows": {
+        "exit_code": 0,
+        "seconds": 13.565,
+        "counts": {
+          "passed": 316
+        },
+        "log": "runtime/f1/web-verified-context-tests-v45-20261113/windows.log"
+      },
+      "linux": {
+        "exit_code": 0,
+        "seconds": 9.652,
+        "counts": {
+          "passed": 316
+        },
+        "log": "runtime/f1/web-verified-context-tests-v45-20261113/linux.log",
+        "executed": true,
+        "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+        "source_files": 735,
+        "source_archive_sha256": "8bc4d5a34960d45b6c41edaa3237a7d4c65632917c638371974adbcc325d0544",
+        "container_exit": 0,
+        "oom_killed": false,
+        "network_mode": "none",
+        "owned_container": "8d573d0de24421c5d7fba8fff6ac5d32fbc8f8c4c2007d0ff7375c183a69c3b7",
+        "snapshot_sources_unchanged_after": true,
+        "owned_container_removed": true
+      },
+      "ended_at": "2026-11-13T12:10:20.454171+00:00"
+    },
+    "source_manifest": {
+      "path": "runtime/f1/web-verified-context-tests-v45-20261113/source-manifest.json",
+      "sha256": "2d8172a5471860a54d86acbe9550fbd7fae055de5afb269ddf970406d22a8ddd"
+    },
+    "new_tests_included": 60,
+    "code_fingerprints": [
+      {
+        "path": "scripts/f1_lab/web_verified_context.py",
+        "sha256": "e39ab1fb95ce95ebf5b280badc025268c2a8eae468fa9e2e1485a267be59349e"
+      },
+      {
+        "path": "scripts/f1_lab/web_context_controls.py",
+        "sha256": "6ad9bc87ecf7ead1dd22dc2ddd61d759e47915f5325b27b0b850fe33a895cdd9"
+      },
+      {
+        "path": "scripts/run_web_context_controls.py",
+        "sha256": "3af9853d9c9ba972b83735b0e2ca8f5a7267f8ed18e2744463fed3bec8514a58"
+      },
+      {
+        "path": "tests/test_f1_web_verified_context.py",
+        "sha256": "20ddea8e55e0441ae1531a5d22e74e8c721b9359e8956f9f94b878632cc1bef4"
+      },
+      {
+        "path": "infra/f1-lab/web-context-controls-protocol.json",
+        "sha256": "6d9bb3d0201a3a32960aa27349c098aa27d6081433794dead3d20e84f6233803"
+      }
+    ],
+    "final_code_matches_linux_snapshot": true,
+    "ruff": {
+      "exit_code": 0,
+      "files": [
+        "scripts/f1_lab/web_verified_context.py",
+        "scripts/f1_lab/web_context_controls.py",
+        "scripts/run_web_context_controls.py",
+        "tests/test_f1_web_verified_context.py"
+      ]
+    },
+    "full_app_regression_repeated": false
+  },
+  "authority_contract": {
+    "kinds": [
+      "authentication",
+      "authorization",
+      "runtime"
+    ],
+    "key_and_source_role_separation_required": true,
+    "external_registry_pin_required": true,
+    "minimum_registry_and_policy_versions_required": true,
+    "challenge_lifetime_seconds": 30,
+    "one_verification_attempt_per_nonce": true,
+    "owner_and_tenant_scoped": true,
+    "target_body_raw_session_request_binding_required": true,
+    "signature_is_not_truth_or_hardware_attestation": true,
+    "actual_source_process_isolation_demonstrated": false
+  },
+  "behavior_contract": {
+    "verified_denial_or_auth_mfa_failure_with_execution": "add advisory alert at score1",
+    "consistent_or_unknown_or_invalid_proof": "keep baseline score, alert and review",
+    "no_nonce_or_bridge": "exact baseline decision",
+    "score_lowering_allowed": false,
+    "permission_grants_revocation_or_restore": false,
+    "durable_adverse_or_case_store_implemented": false,
+    "fallback_is_not_prior_alert_cancellation": true
+  },
+  "historical_data": {
+    "v44_public_receipt": {
+      "path": "docs/infrastructure-results/extra-web-residual-v44-20261113.json",
+      "sha256": "d361bb8f7583c7defd8c815999d6518a6d3a4ae84ef20d0fe519ceb7609a956f"
+    },
+    "v44_native_receipt": {
+      "path": "runtime/f1/web-residual-review-v44-20261113/run.json",
+      "sha256": "411a6a71f22fc6db73a6c6321d4b1f4ee708cb433bd81cf19d2e42b01d48e57d"
+    },
+    "last_web_confusion_not_remeasured": {
+      "fn": 30,
+      "fp": 19
+    },
+    "historical_sidecars_supplied": 0,
+    "missing_fields_not_filled": [
+      "server identity",
+      "body bytes/hash",
+      "permission policy",
+      "process execution"
+    ],
+    "raw_rows_replayed": 0,
+    "models_refitted": false,
+    "labels_changed": false
+  },
+  "preservation": {
+    "protected_paths_unchanged": [
+      "app",
+      "scripts/app_state_recovery.py",
+      "scripts/authority_mtls_runtime.py",
+      "scripts/f1_lab/web_residual.py",
+      "scripts/run_web_residual.py"
+    ],
+    "original_models": {
+      "web": {
+        "path": "runtime/f1/web-refinement-v39-20261112-02/model.json",
+        "sha256": "21318fa61f830ae1d03d47de1a01acf2c40ae19ebaf769923e3d575613f74f38"
+      },
+      "heads": {
+        "path": "runtime/f1/ait-semantic-fit-heads-russell-20261112/model.json",
+        "sha256": "4ebbcb6bb5fce286e80beeedbc18139d566d00998575487a867f129330344075"
+      },
+      "vpn": {
+        "path": "runtime/f1/vpn-feature-ablation-v32-20261112/vpn-history-model.json",
+        "sha256": "c1ff27423e63ba607a80fc7dd891ff473baccd7f11853fb3eaba10e9e37b48b6"
+      }
+    },
+    "benchmark_cases": {
+      "path": "app/data/benchmark/cases.jsonl",
+      "sha256": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f"
+    },
+    "benchmark_manifest": {
+      "path": "app/data/benchmark/manifest.json",
+      "sha256": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90"
+    },
+    "v44_public_evidence_byte_identical": true,
+    "user_archives_modified": false
+  },
+  "boundaries": {
+    "actual_server_observations_collected": 0,
+    "new_independent_final_cases": 0,
+    "independent_reviews_verified": 0,
+    "new_f1_evaluations": 0,
+    "private_keys_persisted": false,
+    "paid_api_calls": 0,
+    "aws_sdk_calls": 0,
+    "new_downloads": 0,
+    "github_pushes": 0,
+    "pr_merges": 0,
+    "reserved_bodies_or_labels_opened": 0,
+    "automatic_enforcement_allowed": false,
+    "goal_qualified": false
+  },
+  "remaining": [
+    "Connect trusted request IDs and body hashing to actual server collection.",
+    "Bind real IdP/PDP/runtime sensors with tested correlation and independent authority operations.",
+    "Persist review/adverse evidence and integrate incident workflow before any production use.",
+    "Acquire development/calibration data; keep final sources sealed until candidate freeze."
+  ]
+}

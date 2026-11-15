@@ -361,6 +361,6 @@ def test_full_release_identity_cannot_pass_legacy_sqlite_only_gate(full, monkeyp
 
 
 def test_full_checkpoint_refuses_changed_recovery_code_identity(full, monkeypatch):
-    monkeypatch.setattr(recovery, "recovery_digest", lambda _mode: "f" * 64)
+    monkeypatch.setattr(recovery, "recovery_digest", lambda _mode, _response=False: "f" * 64)
     with pytest.raises(recovery.RecoveryError, match="application_version_mismatch"):
         full.store.restore(full.backup["backup_id"])

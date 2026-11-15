@@ -148,20 +148,39 @@ def test_outside_existing_directory_is_refused_before_runtime(tmp_path):
         SelectionChecks(tmp_path)
 
 
-def test_failed_wave_is_saved_before_assertion_with_actual_responses_and_resource_counters(tmp_path):
+def test_failed_wave_is_saved_before_assertion_with_actual_responses_and_resource_counters(
+    tmp_path, monkeypatch
+):
     from types import SimpleNamespace
+
+    from scripts import test_infra_selection_runtime as driver
+
     obj = object.__new__(SelectionChecks)
-    obj.report, obj.path = {'workloads': []}, tmp_path / 'verification.json'
-    obj.runtime = SimpleNamespace(execute=lambda *a, **kw: json.dumps({
-        'kind': 'valid', 'concurrency': 8, 'rows': rows(15), 'wave_seconds': .1}))
+    obj.report, obj.path = {"workloads": []}, tmp_path / "verification.json"
+    obj.runtime = SimpleNamespace()
+    monkeypatch.setattr(
+        driver,
+        "execute_probe",
+        lambda *a: {
+            "exit_code": 0,
+            "failure": None,
+            "report": {
+                "kind": "valid",
+                "concurrency": 8,
+                "probe_completed": True,
+                "rows": rows(15),
+                "wave_seconds": 0.1,
+            },
+        },
+    )
     counter = iter([0, 15])
     obj.served = lambda: next(counter)
-    with pytest.raises(ValueError, match='delivery_count'):
-        obj.workload(2, 8, 'valid')
-    saved = json.loads(obj.path.read_text())['workloads'][0]
-    assert saved['passed'] is False and saved['expected_delivered'] == 16
-    assert saved['resource_before'] == 0 and saved['resource_after'] == saved['delivered'] == 15
-    assert len(saved['rows']) == 16 and saved['rows'][-1]['status'] == 403
+    with pytest.raises(ValueError, match="delivery_count"):
+        obj.workload(2, 8, "valid")
+    saved = json.loads(obj.path.read_text())["workloads"][0]
+    assert saved["passed"] is False and saved["expected_delivered"] == 16
+    assert saved["resource_before"] == 0 and saved["resource_after"] == saved["delivered"] == 15
+    assert len(saved["rows"]) == 16 and saved["rows"][-1]["status"] == 403
 
 
 def test_resource_sampler_joins_before_fault_and_each_new_window_has_a_fresh_valid_baseline(tmp_path, monkeypatch):

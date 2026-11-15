@@ -14,7 +14,7 @@ from scripts.app_state_recovery import ROOT, app_digest, canonical, require, sha
 SOURCE_FILES = ("scripts/app_state_recovery.py", "scripts/app_recovery_fixture.py",
                 "scripts/serve_recovered_app.py", "scripts/test_app_recovery_runtime.py",
                 "scripts/app_storage_contract.py", "scripts/app_storage_fixture.py",
-                "scripts/behavior_context_recovery.py")
+                "scripts/behavior_context_recovery.py", "scripts/response_storage_contract.py")
 
 
 def fingerprint():

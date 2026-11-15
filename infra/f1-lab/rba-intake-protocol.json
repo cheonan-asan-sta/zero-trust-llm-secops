@@ -1,0 +1,17 @@
+{
+  "schema": "f1-rba-intake-protocol-1",
+  "stage": "opaque_archive_acquisition_then_bounded_development_schema_probe",
+  "asset_contract": "infra/f1-lab/public-assets-rba.json",
+  "source": "https://zenodo.org/records/6782156",
+  "role": "Supplemental authentication/ATO research only. Does not replace credential/device/privilege/lateral/exfiltration/remote six-domain goal.",
+  "source_limits": "Publisher synthesizes feature values from real login behavior. They explicitly prohibit productive IDS use. Historical incident-response ATO labels and attacker-IP indicators are distinct; neither is current user/device/authorization authority.",
+  "label_exclusions": ["Is Account Takeover", "Is Attack IP", "any publisher label/decision field"],
+  "truth_policy": "Validate literal booleans and retain unknown/conflicts. Do not equate failed login, known attack IP, account takeover and policy-denied access. No binary relabeling contract selected yet.",
+  "acquisition": "Pinned version, exact bytes and publisher MD5 plus local SHA256, bounded4MiB ranged transfer/retry8/max1h, disk headroom before start. No archive execution or whole member extraction.",
+  "probe": "Only header and first128 CSV data records may be inspected as development schema probe after full archive integrity verification. All later CSV records remain quarantined pending a separate partition/label protocol. Probe users/events cannot later be called unseen final data.",
+  "archive": "Inventory only before member read. ZIP may contain a large CSV; existing generic512MiB member extraction cap stays unchanged. Any subsequent prefix/stream reader needs its own decompression/record bound and must not claim full member CRC from a prefix read.",
+  "input_limits": "No fabricated active identity, managed/healthy device, MFA, owner role or business approval. Pseudonyms support linkage only; browser/device type is not physical device posture.",
+  "final_partition_certified": false,
+  "classifier_fitted": false,
+  "goal_qualified": false
+}

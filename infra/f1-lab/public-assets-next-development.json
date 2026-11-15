@@ -1,0 +1,16 @@
+{
+  "schema_version": "f1-public-assets-1",
+  "assets": [
+    {
+      "asset_id": "ait-lds21-santos",
+      "record_id": 19483937,
+      "record_version": "v2_1",
+      "filename": "santos_no-pcaps.zip",
+      "bytes": 576734274,
+      "publisher_md5": "cb484a2c55ea03c63c556f0531fe8367",
+      "license_id": "cc-by-nc-sa-4.0",
+      "data_role": "second development scenario; not reserved final",
+      "reference": "https://zenodo.org/records/19483937"
+    }
+  ]
+}

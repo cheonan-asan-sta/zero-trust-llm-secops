@@ -1,0 +1,129 @@
+{
+  "schema": "extra-rba-metadata-completed-v31-1",
+  "recorded_at": "2026-11-12T06:45:39.740187+00:00",
+  "branch": "extra",
+  "prior_commit": "372cbd8e32dec42c8446392f9867368b9d2054dc",
+  "previous_progress_record": {
+    "path": "docs/infrastructure-results/extra-rba-metadata-v30-20261112.json",
+    "bytes": 5201,
+    "sha256": "16647f0128666c36862423f1bfb99b99488d846dfe8b8267f51d8082119b56b6"
+  },
+  "artifacts": {
+    "audit": {
+      "path": "runtime/f1/rba-full-metadata-20261112/audit.json",
+      "bytes": 3594,
+      "sha256": "707b2f1a6b40c5c3a1d571cf3221fcd5d5eee7d15d1fa497f3cc632b6437c9d4"
+    },
+    "verification": {
+      "path": "runtime/f1/rba-full-metadata-20261112/verification.json",
+      "bytes": 1440,
+      "sha256": "b9286b52e4f0772d143b9de49581d880cc71d491a43cf57c8b247a47925e99e8"
+    },
+    "database": {
+      "path": "runtime/f1/rba-full-metadata-20261112/metadata.sqlite3",
+      "bytes": 273022976,
+      "sha256": "952f1fb4f834d58efe5f0547ef85d612d3fb282c6798c7e60161376ebd875fc3"
+    },
+    "protocol": {
+      "path": "infra/f1-lab/rba-metadata-protocol.json",
+      "bytes": 2265,
+      "sha256": "51bb733f45188e1a20d482785b2917b4a37bff3cd19c11136e8ad297228d3a91"
+    },
+    "source": {
+      "path": "scripts/f1_lab/rba_metadata.py",
+      "bytes": 14945,
+      "sha256": "2fb22e27f68b7afc31e3bdf76d8cf4b5fe844dc298212d287d541eeaf3c5569c"
+    }
+  },
+  "completed_metadata": {
+    "completed": true,
+    "records": 31269264,
+    "structural_errors": 0,
+    "unsupported_user_ids": 0,
+    "elapsed_seconds": 1553.562,
+    "full_csv_crc_verified_at_eof": true,
+    "uncompressed_csv_sha256": "001f3589595821519b53428aee656b4458e43d8f5b4b9beb6ec2bed8f2209067",
+    "uncompressed_csv_bytes": 9052907531,
+    "physical_lines": 31269265
+  },
+  "verification": {
+    "schema": "rba-completed-metadata-verification-1",
+    "completed": true,
+    "audit_sha256": "707b2f1a6b40c5c3a1d571cf3221fcd5d5eee7d15d1fa497f3cc632b6437c9d4",
+    "metadata_sqlite_sha256": "952f1fb4f834d58efe5f0547ef85d612d3fb282c6798c7e60161376ebd875fc3",
+    "metadata_sqlite_bytes": 273022976,
+    "sqlite_integrity": "ok",
+    "all_user_assignments_verified": true,
+    "per_user_and_global_row_conservation": true,
+    "probe_users_verified": 81,
+    "support": {
+      "development": {
+        "users": 3013339,
+        "rows": 26122183,
+        "ato_true": 97,
+        "ato_false": 26122086,
+        "ato_unknown": 0,
+        "probe_users": 81,
+        "probe_user_rows": 14028892,
+        "users_with_ato_true": 95
+      },
+      "calibration": {
+        "users": 644492,
+        "rows": 2572078,
+        "ato_true": 18,
+        "ato_false": 2572060,
+        "ato_unknown": 0,
+        "probe_users": 0,
+        "probe_user_rows": 0,
+        "users_with_ato_true": 18
+      },
+      "reserved_candidate": {
+        "users": 647026,
+        "rows": 2575003,
+        "ato_true": 26,
+        "ato_false": 2574977,
+        "ato_unknown": 0,
+        "probe_users": 0,
+        "probe_user_rows": 0,
+        "users_with_ato_true": 25
+      }
+    },
+    "reserved_conditional_tables_displayed": false,
+    "tool_terminal_exit_code": 0,
+    "tool_session": 94763,
+    "current_owned_f1_containers": 0,
+    "source_code_unchanged_since": "372cbd8",
+    "goal_qualified": false
+  },
+  "unique_user_references": 4304857,
+  "ato_true_records": 141,
+  "partition_assignment": "Fixed 70/15/15 user hash buckets; all 81 previously observed probe users and their 14028892 rows remain development; no class-based reseeding.",
+  "reserved_case_or_conditional_tables_used_for_model_selection": false,
+  "group_time_device_template_independence_certified": false,
+  "ato_negative_means_verified_benign_across_six_domains": false,
+  "classifier_fitted": false,
+  "binary_truth_contract_selected": false,
+  "independent_final_metrics": null,
+  "original_six_domain_goal_replaced": false,
+  "goal_qualified": false,
+  "tests_rerun_in_this_completion_step": false,
+  "previous_tests": {
+    "windows_passed": 244,
+    "linux_passed": 244,
+    "source_commit": "372cbd8"
+  },
+  "source_code_changed_since_previous_tests": false,
+  "baseline_app_diff_empty": true,
+  "labels_changed": false,
+  "reserved_ait_final_bodies_read": 0,
+  "cloud_test_archive_downloaded": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "github_pushes": 0,
+  "limitations": [
+    "Metadata processing and SQLite conservation are complete; no classifier predictions or independent detection performance measured.",
+    "Public CSV 141 ATO-marked records differ from original-paper 87; neither count is silently relabeled.",
+    "26 reserved ATO-positive records offer limited attack support; their existence is not a performance result.",
+    "No invented active-account, device-health, owner-role-policy or business-approval evidence."
+  ]
+}

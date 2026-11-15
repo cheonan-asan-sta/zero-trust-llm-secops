@@ -1,0 +1,2451 @@
+{
+  "schema": "systemd-resources-verification-1",
+  "completed": true,
+  "base_commit": "5e1410af2bb3509141a8fd60b3e7e209bb310cb9",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "global_configuration_changed": false,
+  "production_deployed": false,
+  "linux": {
+    "exit_code": 0,
+    "seconds": 601.136,
+    "counts": {
+      "passed": 5563
+    },
+    "log": "runtime/f1/systemd-resource-batch-v79-final-20261115/linux.log",
+    "executed": true,
+    "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "source_files": 1065,
+    "source_archive_sha256": "ea833e2a8862eb98dea48b9f42aa9b725eb882dad9e62d85a9e4a3c041e361b3",
+    "container_exit": 0,
+    "oom_killed": false,
+    "network_mode": "none",
+    "owned_container": "ebbe696659da14528f6ea141c1e393cf2daa470bfe2558f43edf8e265e4a4cdf",
+    "snapshot_sources_unchanged_after": true,
+    "owned_container_removed": true
+  },
+  "native": {
+    "completed": true,
+    "source_archive_sha256": "ea833e2a8862eb98dea48b9f42aa9b725eb882dad9e62d85a9e4a3c041e361b3",
+    "dependencies_sha256": "c2c0b3a3b8b31e69a532a23554d0fa74b5dbe3423cbc6ba305b6aef7dab59cef",
+    "dependency_image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "global_configuration_changed": false,
+    "limits_exit_code": 0,
+    "actual-systemd_exit_code": 0,
+    "exit_code": 0,
+    "native_seconds": 144.884,
+    "owned_snapshot_removed": true,
+    "snapshot_sources_unchanged_after": true
+  },
+  "focused_units": {
+    "passed": 118,
+    "failed": 0,
+    "skipped": 0
+  },
+  "worker_summary": {
+    "collector": {
+      "samples": 25,
+      "cpu_seconds_sum": 14.423301,
+      "memory_peak_mib": 40.676,
+      "cpu_sources": [
+        "cgroup2_cpu_stat"
+      ],
+      "memory_sources": [
+        "cgroup1_memory_peak"
+      ],
+      "kernel_memory_limit_bytes": 268435456,
+      "kernel_tasks_limit": 16
+    },
+    "archive": {
+      "samples": 25,
+      "cpu_seconds_sum": 13.656879,
+      "memory_peak_mib": 37.934,
+      "cpu_sources": [
+        "cgroup2_cpu_stat"
+      ],
+      "memory_sources": [
+        "cgroup1_memory_peak"
+      ],
+      "kernel_memory_limit_bytes": 268435456,
+      "kernel_tasks_limit": 16
+    },
+    "health": {
+      "samples": 25,
+      "cpu_seconds_sum": 13.234156,
+      "memory_peak_mib": 38.016,
+      "cpu_sources": [
+        "cgroup2_cpu_stat"
+      ],
+      "memory_sources": [
+        "cgroup1_memory_peak"
+      ],
+      "kernel_memory_limit_bytes": 268435456,
+      "kernel_tasks_limit": 16
+    }
+  },
+  "worker_accounting_samples": [
+    {
+      "cycle": 1,
+      "collector_accounting": {
+        "CPUUsageNSec": 501953000,
+        "MemoryPeak": 42467328,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "e4ce56cd42e848babb492dfa3af8c3a9",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 501953000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42467328,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 701.2212700000191,
+        "CPUUsageNSec": 534117000,
+        "MemoryPeak": 39571456,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "a33595dd37f4484ba33417b02a82490e",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 534117000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39571456,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 872.3112689999653,
+        "CPUUsageNSec": 683010000,
+        "MemoryPeak": 39809024,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "2cdaa27fe1b4403aaa413ac2fc81832c",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 683010000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39809024,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 2,
+      "collector_accounting": {
+        "CPUUsageNSec": 525352000,
+        "MemoryPeak": 42315776,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "0f8d156351914f6ea3937ba2f9089d1f",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 525352000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42315776,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 664.8992209999278,
+        "CPUUsageNSec": 530657000,
+        "MemoryPeak": 39456768,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "3ec2dc6aa62244408722bc6841d7b105",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 530657000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39456768,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 619.0396440000541,
+        "CPUUsageNSec": 482171000,
+        "MemoryPeak": 39759872,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "211911d6585c473d91a06927586f6829",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 482171000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39759872,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 3,
+      "collector_accounting": {
+        "CPUUsageNSec": 492910000,
+        "MemoryPeak": 42385408,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "6171d5892efa41998120b339b227b20c",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 492910000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42385408,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 584.6914640000023,
+        "CPUUsageNSec": 462232000,
+        "MemoryPeak": 39501824,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "667b8abbd56d4fc0a9d8faf65d62a335",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 462232000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39501824,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 606.7110289999391,
+        "CPUUsageNSec": 464208000,
+        "MemoryPeak": 39862272,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "23c5e63c0daa4573afc94caf9f3eb69a",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 464208000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39862272,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 4,
+      "collector_accounting": {
+        "CPUUsageNSec": 516040000,
+        "MemoryPeak": 42496000,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "e62816742e494b379bb75fb1f2698c22",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 516040000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42496000,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 649.5639900000469,
+        "CPUUsageNSec": 504174000,
+        "MemoryPeak": 39534592,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "0fce68fcec8846a0bd5b4b18941c8166",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 504174000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39534592,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 619.9917970000115,
+        "CPUUsageNSec": 468026000,
+        "MemoryPeak": 39821312,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "554a15c690d944a4bae6a30db95a5859",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 468026000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39821312,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 5,
+      "collector_accounting": {
+        "CPUUsageNSec": 513065000,
+        "MemoryPeak": 42438656,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "6251fa64296747479c846cd75201d432",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 513065000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42438656,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 686.2455770000224,
+        "CPUUsageNSec": 498611000,
+        "MemoryPeak": 39727104,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "b2f43742d06845e895334a93a7aaca6e",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 498611000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39727104,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 648.0523359999779,
+        "CPUUsageNSec": 486428000,
+        "MemoryPeak": 39686144,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "1cac449ed8a749c7a66596243d50772d",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 486428000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39686144,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 6,
+      "collector_accounting": {
+        "CPUUsageNSec": 659029000,
+        "MemoryPeak": 42360832,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "b2a6e1a841af46f4bf57f1ab7874e0f8",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 659029000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42360832,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 643.7994770000159,
+        "CPUUsageNSec": 479728000,
+        "MemoryPeak": 39649280,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "f05301f506ab4bfea88f603323eff531",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 479728000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39649280,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 628.0128719999993,
+        "CPUUsageNSec": 487496000,
+        "MemoryPeak": 39751680,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "cd6f08b9945643f4bd005e59094c07f9",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 487496000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39751680,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 7,
+      "collector_accounting": {
+        "CPUUsageNSec": 515987000,
+        "MemoryPeak": 42414080,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "43c07623799a41cbb4334e702f63e72f",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 515987000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42414080,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 689.2936830000735,
+        "CPUUsageNSec": 500633000,
+        "MemoryPeak": 39632896,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "fa3f71fdac77457b820010e09a84d064",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 500633000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39632896,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 673.0600019999429,
+        "CPUUsageNSec": 514251000,
+        "MemoryPeak": 39804928,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "61caa29ad7d54ebab7d6aedad01a3e42",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 514251000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39804928,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 8,
+      "collector_accounting": {
+        "CPUUsageNSec": 646544000,
+        "MemoryPeak": 42536960,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "09ff6e7d56124a9793b67dc351d22b7e",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 646544000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42536960,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 884.6992040000714,
+        "CPUUsageNSec": 689651000,
+        "MemoryPeak": 39665664,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "b3d62602b0a64245bcdd215d415085eb",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 689651000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39665664,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 730.0664390000975,
+        "CPUUsageNSec": 576280000,
+        "MemoryPeak": 39686144,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "27bb99a287734e488758de70cdfe292d",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 576280000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39686144,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 9,
+      "collector_accounting": {
+        "CPUUsageNSec": 577233000,
+        "MemoryPeak": 42369024,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "86520b3407db41059d9d6fbad2649873",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 577233000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42369024,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 773.365861000002,
+        "CPUUsageNSec": 609841000,
+        "MemoryPeak": 39776256,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "3d8d8501f05345bea106d4c26414ba55",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 609841000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39776256,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 699.454861999925,
+        "CPUUsageNSec": 560282000,
+        "MemoryPeak": 39776256,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "40d8571d1e334bf5b50a14244d2091fd",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 560282000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39776256,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 10,
+      "collector_accounting": {
+        "CPUUsageNSec": 725938000,
+        "MemoryPeak": 42385408,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "8299b5aeb10348c98a97216014793dc6",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 725938000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42385408,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 723.7501839999823,
+        "CPUUsageNSec": 559559000,
+        "MemoryPeak": 39772160,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "44e18e24ba424a10a48a6ea3b59b4fe1",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 559559000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39772160,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 672.3267170000327,
+        "CPUUsageNSec": 545006000,
+        "MemoryPeak": 39759872,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "5b4da09fc8d148c5b3ccf17c82c1fc34",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 545006000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39759872,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 11,
+      "collector_accounting": {
+        "CPUUsageNSec": 531312000,
+        "MemoryPeak": 42651648,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "a578b26bcd3e4394986a780f94d3a605",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 531312000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42651648,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 684.3448529999705,
+        "CPUUsageNSec": 518188000,
+        "MemoryPeak": 39731200,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "455c9791a75d44d9b7f2570dafbf608a",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 518188000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39731200,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 616.6664979999723,
+        "CPUUsageNSec": 490858000,
+        "MemoryPeak": 39673856,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "8ddb0046f82642cd95e1da64ab585283",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 490858000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39673856,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 12,
+      "collector_accounting": {
+        "CPUUsageNSec": 554376000,
+        "MemoryPeak": 42471424,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "8e3f199bd53243ffb54188f14ac16fd3",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 554376000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42471424,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 691.6914720000022,
+        "CPUUsageNSec": 511198000,
+        "MemoryPeak": 39575552,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "74131f8dd78f4a64bee3de846b0c851f",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 511198000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39575552,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 745.641886000044,
+        "CPUUsageNSec": 569805000,
+        "MemoryPeak": 39686144,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "4abd2d5d02f542f5b807828ce33523b5",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 569805000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39686144,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 13,
+      "collector_accounting": {
+        "CPUUsageNSec": 582016000,
+        "MemoryPeak": 42479616,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "55b979989f8440c7b8e2763b0c4d2a73",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 582016000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42479616,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 683.9187260000017,
+        "CPUUsageNSec": 500408000,
+        "MemoryPeak": 39587840,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "789f460686444e8086018544e8e6e11d",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 500408000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39587840,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 634.5204379999814,
+        "CPUUsageNSec": 498161000,
+        "MemoryPeak": 39690240,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "c61635e70b3d4398a1b3eeb04d9ebe52",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 498161000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39690240,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 14,
+      "collector_accounting": {
+        "CPUUsageNSec": 703080000,
+        "MemoryPeak": 42397696,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "7387fe884ff84ba7a83c8e433f115b49",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 703080000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42397696,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 780.3252869999824,
+        "CPUUsageNSec": 596553000,
+        "MemoryPeak": 39649280,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "519b49118ed3494da772b0b802a52a15",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 596553000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39649280,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 667.9262050000716,
+        "CPUUsageNSec": 547489000,
+        "MemoryPeak": 39854080,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "839c6c1f878f4e4b99f6d1a8f90ae6a6",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 547489000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39854080,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 15,
+      "collector_accounting": {
+        "CPUUsageNSec": 539428000,
+        "MemoryPeak": 42352640,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "4818c710e1fc477f8cc39138e91d8c3c",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 539428000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42352640,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 736.6626330000372,
+        "CPUUsageNSec": 552069000,
+        "MemoryPeak": 39657472,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "5cd63d8e6b5e4d8c9dc3147e549e5864",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 552069000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39657472,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 730.2394449999383,
+        "CPUUsageNSec": 552476000,
+        "MemoryPeak": 39731200,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "10019569520a4b7e9d85eefd8257e81d",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 552476000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39731200,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 16,
+      "collector_accounting": {
+        "CPUUsageNSec": 585713000,
+        "MemoryPeak": 42401792,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "b3d73f5a195544ab84d76cffac1b9d1a",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 585713000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42401792,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 666.5410019999172,
+        "CPUUsageNSec": 485455000,
+        "MemoryPeak": 39677952,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "ef5eba4a5fdd4b5fa3478161ad20be7c",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 485455000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39677952,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 657.2619920000307,
+        "CPUUsageNSec": 512900000,
+        "MemoryPeak": 39673856,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "19d7a9c9e694433598d0f76d9ab04834",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 512900000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39673856,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 17,
+      "collector_accounting": {
+        "CPUUsageNSec": 502197000,
+        "MemoryPeak": 42401792,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "090f27a0da154c988df235b9e987d903",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 502197000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42401792,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 696.979897999995,
+        "CPUUsageNSec": 514984000,
+        "MemoryPeak": 39624704,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "1a00c419f6104327a6f1e93c1700302c",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 514984000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39624704,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 644.6342159999858,
+        "CPUUsageNSec": 492821000,
+        "MemoryPeak": 39718912,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "6d09687b1c964ba881d8991224fdb31c",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 492821000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39718912,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 18,
+      "collector_accounting": {
+        "CPUUsageNSec": 621174000,
+        "MemoryPeak": 42319872,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "52f3377979074081958bff15028e01aa",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 621174000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42319872,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 857.8230940000822,
+        "CPUUsageNSec": 662454000,
+        "MemoryPeak": 39690240,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "cbe56a5d6c4e4b28b9caee236e1796ae",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 662454000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39690240,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 630.3122759999269,
+        "CPUUsageNSec": 493330000,
+        "MemoryPeak": 39796736,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "2a6a8082685a40779086a3dc86c73926",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 493330000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39796736,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 19,
+      "collector_accounting": {
+        "CPUUsageNSec": 498277000,
+        "MemoryPeak": 42336256,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "7462ed76638742e5af210e3bce1e926c",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 498277000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42336256,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 671.129245999964,
+        "CPUUsageNSec": 501366000,
+        "MemoryPeak": 39759872,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "ccbb80afe89e484d900347a85f927065",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 501366000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39759872,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 643.5763219999444,
+        "CPUUsageNSec": 503178000,
+        "MemoryPeak": 39862272,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "87aae8f6bebc4a2d9f9060aff58c038b",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 503178000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39862272,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 20,
+      "collector_accounting": {
+        "CPUUsageNSec": 645861000,
+        "MemoryPeak": 42385408,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "f8c0bdeafa1a46fab1758cb41ea404a0",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 645861000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42385408,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 732.0013519999975,
+        "CPUUsageNSec": 570191000,
+        "MemoryPeak": 39714816,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "fcbd5b15370040eeb2965e904f7df0e0",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 570191000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39714816,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 706.319639999947,
+        "CPUUsageNSec": 562714000,
+        "MemoryPeak": 39727104,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "52a128c30dd24e438d3c8ebd17dd437c",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 562714000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39727104,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 21,
+      "collector_accounting": {
+        "CPUUsageNSec": 607527000,
+        "MemoryPeak": 42405888,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "5b0db4fca47a4caeb32b0617be6cb2a3",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 607527000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42405888,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 762.5210989999687,
+        "CPUUsageNSec": 595524000,
+        "MemoryPeak": 39731200,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "75317f629493448985df2abfd5b68e05",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 595524000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39731200,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 710.6898700000102,
+        "CPUUsageNSec": 557211000,
+        "MemoryPeak": 39788544,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "4091fc5cc94c45de974643eb72ce0d35",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 557211000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39788544,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 22,
+      "collector_accounting": {
+        "CPUUsageNSec": 624983000,
+        "MemoryPeak": 42299392,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "082e747fa0f645189452c5ebcd4dd3ba",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 624983000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42299392,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 859.900582000023,
+        "CPUUsageNSec": 630108000,
+        "MemoryPeak": 39694336,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "b279e3cc693748bb9882cc1ae250f691",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 630108000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39694336,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 744.0341049999688,
+        "CPUUsageNSec": 585343000,
+        "MemoryPeak": 39604224,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "54c803ab0e914ab7898a0436a1f3b76a",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 585343000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39604224,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 23,
+      "collector_accounting": {
+        "CPUUsageNSec": 635002000,
+        "MemoryPeak": 42426368,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "67263cc6b6ca490ca91949d2caabb383",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 635002000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42426368,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 831.6346369999792,
+        "CPUUsageNSec": 608545000,
+        "MemoryPeak": 39694336,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "a27f426b283c4eaf9518870089dbed7e",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 608545000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39694336,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 749.993805000031,
+        "CPUUsageNSec": 580389000,
+        "MemoryPeak": 39661568,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "51bca129a3044eaba5b10e5f78ed7f39",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 580389000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39661568,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 24,
+      "collector_accounting": {
+        "CPUUsageNSec": 572800000,
+        "MemoryPeak": 42508288,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "b8d676f2ac2445059b3ae4fa58e3735e",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 572800000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42508288,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 695.415672000081,
+        "CPUUsageNSec": 532177000,
+        "MemoryPeak": 39747584,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "9d5f719a186949c291c5f5c62a518e27",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 532177000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39747584,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 646.0665969999582,
+        "CPUUsageNSec": 514277000,
+        "MemoryPeak": 39653376,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "b6de1d1d5a404c03b047648e7d0e673a",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 514277000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39653376,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    },
+    {
+      "cycle": 25,
+      "collector_accounting": {
+        "CPUUsageNSec": 545504000,
+        "MemoryPeak": 42500096,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "4e310aca26504f0e9a177ef797df79ad",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 545504000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 42500096,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "archive": {
+        "kind": "archive",
+        "elapsed_ms": 671.3102670000808,
+        "CPUUsageNSec": 508456000,
+        "MemoryPeak": 39661568,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "383967b692dc4fe0b7cc815906f1a2e6",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 508456000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39661568,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      },
+      "health": {
+        "kind": "health",
+        "elapsed_ms": 654.2508170000474,
+        "CPUUsageNSec": 506046000,
+        "MemoryPeak": 39723008,
+        "sources": {
+          "CPUUsageNSec": "cgroup2_cpu_stat",
+          "MemoryPeak": "cgroup1_memory_peak"
+        },
+        "invocation_id": "cb9bad2e529146f585075b53cf09b440",
+        "kernel_snapshot": {
+          "cpu_usage_nsec": 506046000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 39723008,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": null,
+          "throttled_periods": null,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 16
+        }
+      }
+    }
+  ],
+  "resource_limits": {
+    "completed": true,
+    "global_configuration_changed": false,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "cases": [
+      {
+        "mode": "cpu",
+        "unit": "zt79-limit-f40bdff4709e-cpu.service",
+        "passed": true,
+        "launch_exit_code": 0,
+        "properties": {
+          "Result": "success",
+          "ExecMainCode": "1",
+          "ExecMainStatus": "0",
+          "CPUQuotaPerSecUSec": "250ms",
+          "MemoryMax": "67108864",
+          "TasksMax": "8",
+          "InvocationID": "9e698c7708fb48c980729c6c5207be59"
+        },
+        "receipts": [
+          {
+            "schema": "systemd-resource-control-1",
+            "mode": "cpu",
+            "stage": "ready",
+            "invocation_id": "9e698c7708fb48c980729c6c5207be59",
+            "metrics": {
+              "cpu_usage_nsec": 44996000,
+              "cpu_source": "cgroup2_cpu_stat",
+              "memory_peak_bytes": 6451200,
+              "memory_source": "cgroup1_memory_peak",
+              "memory_limit_bytes": 67108864,
+              "cpu_quota_percent": 25.0,
+              "throttled_periods": 1,
+              "memory_limit_hits": 0,
+              "memory_oom_kills": 0,
+              "tasks_limit": 8
+            }
+          },
+          {
+            "schema": "systemd-resource-control-1",
+            "mode": "cpu",
+            "stage": "complete",
+            "invocation_id": "9e698c7708fb48c980729c6c5207be59",
+            "metrics": {
+              "cpu_usage_nsec": 420769000,
+              "cpu_source": "cgroup2_cpu_stat",
+              "memory_peak_bytes": 6451200,
+              "memory_source": "cgroup1_memory_peak",
+              "memory_limit_bytes": 67108864,
+              "cpu_quota_percent": 25.0,
+              "throttled_periods": 16,
+              "memory_limit_hits": 0,
+              "memory_oom_kills": 0,
+              "tasks_limit": 8
+            }
+          },
+          {
+            "schema": "systemd-resource-control-1",
+            "mode": "cpu",
+            "stage": "stop",
+            "invocation_id": "9e698c7708fb48c980729c6c5207be59",
+            "metrics": {
+              "cpu_usage_nsec": 33290000,
+              "cpu_source": "cgroup2_cpu_stat",
+              "memory_peak_bytes": 6397952,
+              "memory_source": "cgroup1_memory_peak",
+              "memory_limit_bytes": 67108864,
+              "cpu_quota_percent": 25.0,
+              "throttled_periods": 1,
+              "memory_limit_hits": 0,
+              "memory_oom_kills": 0,
+              "tasks_limit": 8
+            }
+          }
+        ],
+        "evidence": "kernel_quota_and_throttled_counter_increase",
+        "owned_unit_removed": true
+      },
+      {
+        "mode": "memory",
+        "unit": "zt79-limit-abe7bcec7407-memory.service",
+        "passed": true,
+        "launch_exit_code": 0,
+        "properties": {
+          "Result": "success",
+          "ExecMainCode": "1",
+          "ExecMainStatus": "0",
+          "CPUQuotaPerSecUSec": "250ms",
+          "MemoryMax": "67108864",
+          "TasksMax": "8",
+          "InvocationID": "160a9a8abfbd484aa619c9b823959c1c"
+        },
+        "receipts": [
+          {
+            "schema": "systemd-resource-control-1",
+            "mode": "memory",
+            "stage": "ready",
+            "invocation_id": "160a9a8abfbd484aa619c9b823959c1c",
+            "metrics": {
+              "cpu_usage_nsec": 40202000,
+              "cpu_source": "cgroup2_cpu_stat",
+              "memory_peak_bytes": 6553600,
+              "memory_source": "cgroup1_memory_peak",
+              "memory_limit_bytes": 67108864,
+              "cpu_quota_percent": 25.0,
+              "throttled_periods": 1,
+              "memory_limit_hits": 0,
+              "memory_oom_kills": 0,
+              "tasks_limit": 8
+            }
+          },
+          {
+            "schema": "systemd-resource-control-1",
+            "mode": "memory",
+            "stage": "complete",
+            "invocation_id": "160a9a8abfbd484aa619c9b823959c1c",
+            "metrics": {
+              "cpu_usage_nsec": 327478000,
+              "cpu_source": "cgroup2_cpu_stat",
+              "memory_peak_bytes": 67108864,
+              "memory_source": "cgroup1_memory_peak",
+              "memory_limit_bytes": 67108864,
+              "cpu_quota_percent": 25.0,
+              "throttled_periods": 5,
+              "memory_limit_hits": 13544,
+              "memory_oom_kills": 0,
+              "tasks_limit": 8
+            }
+          },
+          {
+            "schema": "systemd-resource-control-1",
+            "mode": "memory",
+            "stage": "stop",
+            "invocation_id": "160a9a8abfbd484aa619c9b823959c1c",
+            "metrics": {
+              "cpu_usage_nsec": 31905000,
+              "cpu_source": "cgroup2_cpu_stat",
+              "memory_peak_bytes": 6348800,
+              "memory_source": "cgroup1_memory_peak",
+              "memory_limit_bytes": 67108864,
+              "cpu_quota_percent": 25.0,
+              "throttled_periods": 1,
+              "memory_limit_hits": 0,
+              "memory_oom_kills": 0,
+              "tasks_limit": 8
+            }
+          }
+        ],
+        "evidence": "kernel_memory_limit_reclaim_counter",
+        "owned_unit_removed": true
+      }
+    ]
+  },
+  "real_systemd": {
+    "checks": [
+      {
+        "name": "service_account_configuration_dry_run",
+        "passed": true
+      },
+      {
+        "name": "collector_is_static_nonroot_fixture",
+        "passed": true
+      },
+      {
+        "name": "only_required_effective_and_bounding_capabilities",
+        "passed": true
+      },
+      {
+        "name": "no_new_privileges_is_observed",
+        "passed": true
+      },
+      {
+        "name": "normal_capture_and_authorization_keep_baseline",
+        "passed": true
+      },
+      {
+        "name": "credential_was_a_socket_not_key_file",
+        "passed": true
+      },
+      {
+        "name": "initial_signed_latest_is_fresh",
+        "passed": true
+      },
+      {
+        "name": "controlled_31_second_gap_is_stale",
+        "passed": true
+      },
+      {
+        "name": "controlled_clock_rollback_after_restart_is_unavailable",
+        "passed": true
+      },
+      {
+        "name": "rotated_key_without_current_pin_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "rotation_with_new_public_pin_collects_fresh_evidence",
+        "passed": true
+      },
+      {
+        "name": "old_key_proof_is_rejected_by_current_registry",
+        "passed": true
+      },
+      {
+        "name": "expired_signing_authority_cannot_create_capture",
+        "passed": true
+      },
+      {
+        "name": "failed_expired_key_keeps_previous_latest",
+        "passed": true
+      },
+      {
+        "name": "not_yet_valid_signing_authority_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "runtime_proof_expiry_is_clipped_to_signer",
+        "passed": true
+      },
+      {
+        "name": "missing_key_provider_fails_at_systemd_credentials",
+        "passed": true
+      },
+      {
+        "name": "provider_outage_cannot_replace_latest",
+        "passed": true
+      },
+      {
+        "name": "provider_restart_collects_new_signed_evidence",
+        "passed": true
+      },
+      {
+        "name": "restoring_an_older_valid_capture_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "archive_preview_keeps_every_hot_byte",
+        "passed": true
+      },
+      {
+        "name": "archive_worker_is_nonroot_without_capabilities",
+        "passed": true
+      },
+      {
+        "name": "archive_capacity_pressure_keeps_hot_and_latest",
+        "passed": true
+      },
+      {
+        "name": "committed_archive_keeps_latest_and_meets_hot_limit",
+        "passed": true
+      },
+      {
+        "name": "all_cold_payloads_equal_original_hot_bytes",
+        "passed": true
+      },
+      {
+        "name": "restore_preserves_every_original_byte",
+        "passed": true
+      },
+      {
+        "name": "restored_old_capture_does_not_become_current",
+        "passed": true
+      },
+      {
+        "name": "latest_remains_fresh_after_compaction",
+        "passed": true
+      },
+      {
+        "name": "timers_are_disabled_before_explicit_fixture_start",
+        "passed": true
+      },
+      {
+        "name": "timer_repeats_new_signed_normal_observations",
+        "passed": true
+      },
+      {
+        "name": "scheduled_health_worker_is_nonroot_without_capabilities",
+        "passed": true
+      },
+      {
+        "name": "scheduled_health_never_claims_authorization_or_enforcement",
+        "passed": true
+      },
+      {
+        "name": "archive_timer_preserves_payloads_and_current_latest",
+        "passed": true
+      },
+      {
+        "name": "scheduled_provider_failure_preserves_last_signed_capture",
+        "passed": true
+      },
+      {
+        "name": "actual_collection_gap_becomes_stale_without_clock_injection",
+        "passed": true
+      },
+      {
+        "name": "timer_recovers_after_provider_restore_without_manual_collector_start",
+        "passed": true
+      },
+      {
+        "name": "timer_restart_collects_current_observation_not_backfill",
+        "passed": true
+      },
+      {
+        "name": "stopped_timers_do_not_keep_collecting",
+        "passed": true
+      },
+      {
+        "name": "timed_normal_observations_preserve_baseline",
+        "passed": true
+      },
+      {
+        "name": "fresh_normal_capture_precedes_public_status",
+        "passed": true
+      },
+      {
+        "name": "status_dropin_publishes_revalidated_fresh_observation",
+        "passed": true
+      },
+      {
+        "name": "status_dropin_publishes_current_archive_counters",
+        "passed": true
+      },
+      {
+        "name": "status_snapshots_are_public_aggregates_without_original_identity",
+        "passed": true
+      },
+      {
+        "name": "public_status_permissions_do_not_change_private_capture_permissions",
+        "passed": true
+      },
+      {
+        "name": "native_status_files_feed_bounded_exporter_metrics",
+        "passed": true
+      },
+      {
+        "name": "invalid_current_trust_publishes_unavailable_not_old_fresh",
+        "passed": true
+      },
+      {
+        "name": "valid_trust_recovers_status_without_replacing_capture",
+        "passed": true
+      },
+      {
+        "name": "archive_capacity_failure_publishes_pressure_and_preserves_latest",
+        "passed": true
+      },
+      {
+        "name": "archive_report_recovers_after_capacity_configuration_restored",
+        "passed": true
+      },
+      {
+        "name": "cold_archive_checkpoint_is_published_outside_source",
+        "passed": true
+      },
+      {
+        "name": "backup_service_is_nonroot_without_capabilities",
+        "passed": true
+      },
+      {
+        "name": "backup_is_encrypted_and_contains_no_hot_latest",
+        "passed": true
+      },
+      {
+        "name": "wrong_recovery_key_creates_no_review",
+        "passed": true
+      },
+      {
+        "name": "missing_backup_key_provider_cannot_publish_package",
+        "passed": true
+      },
+      {
+        "name": "restore_succeeds_while_original_archive_database_is_absent",
+        "passed": true
+      },
+      {
+        "name": "isolated_restored_archive_matches_all_original_capture_bytes",
+        "passed": true
+      },
+      {
+        "name": "extracted_historical_capture_does_not_become_fresh",
+        "passed": true
+      },
+      {
+        "name": "backup_restore_never_changes_original_database_or_latest",
+        "passed": true
+      },
+      {
+        "name": "only_root_manager_receives_separate_recovery_credential",
+        "passed": true
+      },
+      {
+        "name": "native_load_preserves_all_preexisting_and_new_capture_bytes",
+        "passed": true
+      },
+      {
+        "name": "native_load_repeated_workers_and_target_restart_succeed",
+        "passed": true
+      },
+      {
+        "name": "native_load_health_never_grants_or_enforces",
+        "passed": true
+      },
+      {
+        "name": "native_load_capture_remains_fresh",
+        "passed": true
+      },
+      {
+        "name": "native_load_each_worker_cpu_and_memory_observed",
+        "passed": true
+      },
+      {
+        "name": "disabled_collector_key_cannot_create_capture",
+        "passed": true
+      },
+      {
+        "name": "stopped_target_cannot_be_backfilled",
+        "passed": true
+      },
+      {
+        "name": "only_root_manager_read_credentials",
+        "passed": true
+      },
+      {
+        "name": "credential_socket_removed_and_provider_stopped",
+        "passed": true
+      }
+    ],
+    "systemd_version": "systemd 255 (255.4-1ubuntu8.18)",
+    "normal_added_alerts": 0,
+    "cleanup": {
+      "owned_units_removed": true,
+      "owned_state_removed": true,
+      "owned_config_and_socket_removed": true,
+      "systemd_credentials_removed": true
+    }
+  },
+  "load": {
+    "requested_seconds": 60,
+    "real_elapsed_seconds": 60.435,
+    "cycles": 25,
+    "preserved_captures": 35,
+    "expected_inventory_sha256": "965d6fce6e462a354906a27dabe98371225e50e36165d5de8c712142963559d3",
+    "actual_inventory_sha256": "965d6fce6e462a354906a27dabe98371225e50e36165d5de8c712142963559d3",
+    "resource_accounting_coverage": {
+      "collector": 25,
+      "archive": 25,
+      "health": 25
+    },
+    "actual_timer_scheduling_measured": false,
+    "long_soak_8h_completed": false,
+    "production_SLO_proven": false,
+    "owned_units_and_accounting_override_removed": true,
+    "owned_health_state_removed": true
+  },
+  "legacy_regression": {
+    "aws_calls": 0,
+    "completed": true,
+    "goal_qualified": false,
+    "native_actor_command_evidence_added_to_legacy": 0,
+    "paid_api_calls": 0,
+    "population": 1681815,
+    "scenarios": {
+      "fox": {
+        "after_decision_sha256": "29e3e42b17e13d9f4ce8f785b2c1121ee52aa9a6ebbd323c5328e38644929832",
+        "before_decision_sha256": "29e3e42b17e13d9f4ce8f785b2c1121ee52aa9a6ebbd323c5328e38644929832",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 668418,
+        "predictions_sha256": "3a95e16120e53c888203f0d25d57526b0c614deeaa1e86b43ed98694976702cc",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.998765742394729,
+          "f1": 0.9990965864106885,
+          "false_positive_rate": 0.0006145584161411404,
+          "fn": 695,
+          "fp": 130,
+          "inference_errors": 0,
+          "population": 668418,
+          "precision": 0.9997151115776464,
+          "recall": 0.9984788261352991,
+          "tn": 211404,
+          "tp": 456189
+        }
+      },
+      "harrison_observed": {
+        "after_decision_sha256": "de38509b07982c34ab69e57eb7df9ebb0517674d06cd1329d594c93c503be1c9",
+        "before_decision_sha256": "de38509b07982c34ab69e57eb7df9ebb0517674d06cd1329d594c93c503be1c9",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 422178,
+        "predictions_sha256": "c7e557b7d8e137cedc35649505ad389d06c593fe9f53e09caccf10d28220a9e0",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9993983580385525,
+          "f1": 0.9996953318603709,
+          "false_positive_rate": 0.046012832263978,
+          "fn": 3,
+          "fp": 251,
+          "inference_errors": 0,
+          "population": 422178,
+          "precision": 0.9993980396718237,
+          "recall": 0.9999928009733084,
+          "tn": 5204,
+          "tp": 416720
+        }
+      },
+      "russellmitchell": {
+        "after_decision_sha256": "2c4aecb63800cb85dfc8a6685f03b17d53c2f88e727b47c415eac6c1d2d70276",
+        "before_decision_sha256": "2c4aecb63800cb85dfc8a6685f03b17d53c2f88e727b47c415eac6c1d2d70276",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 295243,
+        "predictions_sha256": "2ee9ee30497a6a4a48c12461e0c6ce76dcdc3392db71f04caf3f7f92383dfaf4",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9963386092134275,
+          "f1": 0.991198000211704,
+          "false_positive_rate": 0.0003642113111178716,
+          "fn": 996,
+          "fp": 85,
+          "inference_errors": 0,
+          "population": 295243,
+          "precision": 0.9986054371544355,
+          "recall": 0.9838996476027286,
+          "tn": 233296,
+          "tp": 60866
+        }
+      },
+      "santos": {
+        "after_decision_sha256": "90fd3e70c751fe8da7fd2fbc26fd70688c07f8989ded90e48af67f7a4662d99a",
+        "before_decision_sha256": "90fd3e70c751fe8da7fd2fbc26fd70688c07f8989ded90e48af67f7a4662d99a",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 295976,
+        "predictions_sha256": "92dc1b9932ffd57562e29454ea81c25f70b071406d6aed89587e5dada6c7a220",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9966010757628997,
+          "f1": 0.9892837359921599,
+          "false_positive_rate": 0.00029765615886794125,
+          "fn": 932,
+          "fp": 74,
+          "inference_errors": 0,
+          "population": 295976,
+          "precision": 0.9984089101034208,
+          "recall": 0.9803238541600693,
+          "tn": 248535,
+          "tp": 46435
+        }
+      }
+    },
+    "schema": "extra-shared-execution-legacy-regression-1",
+    "scope": "prior observed-development decision regression only; no new ground truth",
+    "source_prior_sha256": "35ec2a206d0a3a475d37dfb38b9459044291aee79cfea9adbbcae8da7b428ee4"
+  },
+  "prior_v76_accounting": {
+    "invocations_per_kind": 63,
+    "valid_cpu_samples": 0,
+    "valid_memory_peak_samples": 0,
+    "meaning": "unmeasured; not zero resource usage"
+  },
+  "initial_candidate": {
+    "qualified": false,
+    "full_passed": 5561,
+    "full_setup_errors": 1,
+    "native_cases_passed": 68,
+    "failure": "recovery fixture case updated_at precedes created_at",
+    "fix": "one scoped synthetic fixture clock; production case chronology validation unchanged",
+    "artifact_sha256": {
+      "tests.json": "e6b291007314a4c9b8936b8220c06559ea9d11c6a6b0d3e34cebfa34d8c2550b",
+      "linux.xml": "42da1ad6486f5e8a954523437ad2444bb614146a7b494b7c69f1fae454f7d9fe",
+      "native-tests.json": "6fbb85dacb7ef8ab8202215695b8d89778ceb4eda74f3d78b123d38f019aa0d1"
+    }
+  },
+  "scope": "Kernel cgroup counters sampled in the same Python worker immediately before exit, with wrapper overhead. Memory is group peak, not RSS. Separate bounded pressure fixtures test CPU quota and memory reclaim; no production quota or long soak approval.",
+  "source_sha256": {
+    "scripts/systemd_resources.py": "654929dd6ad83197ed47a48ec7f3f61516c9e72078f42340ed80c3fc8204c84e",
+    "scripts/measure_systemd_worker.py": "dce7bb7f93766209d2ae653601ade51bf45a884d3643c9a18c0c0cc2bfde9f16",
+    "scripts/systemd_resource_load.py": "f4dcef898dfc69cdef0e7140a837a3f14d354f5676600aabf4fa2754cb5b310e",
+    "scripts/run_systemd_resource_limits.py": "5e53e453bff2304d037d2054874883d4e6b9bbc51fc623da359029858e51a8af",
+    "scripts/f1_lab/capture_load_runtime.py": "c8cd7ab728b375375d2325bf5d2d86616f9935b2eef61e50d297f948d9599b0a",
+    "tests/test_systemd_resources.py": "5ea8dfeb1dc5d8263957300278f1561ead269c652c1a638817aea78ec9765dee",
+    "scripts/app_storage_fixture.py": "dc36bc0d6b8d279dde3b0d719b34f2681a80f0e70bb836f2fb66bb725586b561",
+    "tests/test_storage_fixture_clock.py": "e4b67d4ede5160e74a2bcdef77ca5462bd902788c96f3527a24412660eb359eb"
+  },
+  "artifact_sha256": {
+    "tests.json": "58fb56d8a7d21cccf4ba05e01949bfc1eae1207a18ab1b586c3936e6e6fa35c7",
+    "linux.xml": "21e69872b4c907e4aa16e3a19caf8f2a80dadc70ea001690d9ecd9417563e96a",
+    "diagnostic-units.xml": "08d6ca041f17bfde577a57816595a54f93733f5e15d9be1a77dc18eebf2a0bbe",
+    "source-manifest.json": "f6a603fb7d7e403f6b61f4d5ff86d8b4f8986adeb663e69bb3c6488af3bcc228",
+    "native-input.json": "b25aedaad368ae75e88277ab43b1e8fbdc4a7fb197416f5965035cb52a60c6d7",
+    "native-tests.json": "903d8fdc41659dcd1a549cc625448b3ee0b648bcaf9d575784184404d5076758",
+    "limits/limits.json": "aee2ba701a830aedb4c147011b24c2f7aef937648658e07039a335c6be8b75b4",
+    "actual-systemd/run.json": "41e7804d4e9de5cf22eb68688545f4294975e0f46815c16ed6858177ff1d6a6d",
+    "actual-systemd/load-controls.json": "35f8af7ec51c40090c6337b9f801681397eb0148dcec4c6d0744dea58708045a",
+    "legacy-regression/run.json": "a2d03c97bbd4bb19b8ba9fe478599953379639e33df4230ee145d3fa27cf1be0"
+  }
+}

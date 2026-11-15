@@ -1,0 +1,54 @@
+{
+  "schema": "f1-error-vpn-experiment-1",
+  "scope": "observed development/calibration only",
+  "models": {
+    "web": {
+      "path": "runtime/f1/web-refinement-v39-20261112-02/model.json",
+      "sha256": "21318fa61f830ae1d03d47de1a01acf2c40ae19ebaf769923e3d575613f74f38"
+    },
+    "heads": {
+      "path": "runtime/f1/ait-semantic-fit-heads-russell-20261112/model.json",
+      "sha256": "4ebbcb6bb5fce286e80beeedbc18139d566d00998575487a867f129330344075"
+    },
+    "vpn": {
+      "path": "runtime/f1/vpn-feature-ablation-v32-20261112/vpn-history-model.json",
+      "sha256": "c1ff27423e63ba607a80fc7dd891ff473baccd7f11853fb3eaba10e9e37b48b6"
+    }
+  },
+  "v39_run": {
+    "path": "runtime/f1/web-refinement-v39-20261112-02/run.json",
+    "sha256": "abab9ba2e69eee20098738c1724a876f4ed71ae3f2765bb0123619e2a5766c10"
+  },
+  "apache_policy": "Only parsed PHP warn/scandir ENOENT with valid time/client, no bounded-decoded payload or strictly earlier same-client error in60s can lower score to0.05. Unknown and other errors retain baseline. Same-time batch withheld.",
+  "vpn_policy": "Reuse frozen v32 source/endpoint-history model. Strictly earlier same-source history, equal-time batch withheld,24h window. Alert0.95; separate review0.9; never automatic enforcement.",
+  "limits": "per physical source100000rows/64MiB; history groups10000; all physical evaluation rows retained",
+  "selection": "Already observed R/S/Fox; no refitting. New warning rule motivated by observed false positives, not independent final validation.",
+  "scenarios": [
+    {
+      "name": "russellmitchell",
+      "directory": "runtime/f1/streaming-calibration-v37-20261112/russellmitchell",
+      "preparation_sha256": "0091ab22f3ffe3ee12773c7a7d6dfe127e78750faf6dbe4aca2550e39b2f3683",
+      "pairs_directory": "runtime/f1/ait-lds-dev-pairs-20261112",
+      "role": "previously_observed_training_development"
+    },
+    {
+      "name": "santos",
+      "directory": "runtime/f1/streaming-calibration-v37-20261112/santos",
+      "preparation_sha256": "b6e960ddc26eff3c4251ba08319c0af45697b3ee4aabdd96ba50d09e154d4f9a",
+      "pairs_directory": "runtime/f1/ait-lds-santos-pairs-20261112",
+      "role": "previously_observed_development"
+    },
+    {
+      "name": "fox",
+      "directory": "runtime/f1/streaming-calibration-v37-20261112/fox",
+      "preparation_sha256": "d03d22bd2aa708364dd1853ec45af22728e5be5b1451f26dde5e9fe5b2adb28b",
+      "pairs_directory": "runtime/f1/fox-calibration-v34-20261112/pairs",
+      "role": "predeclared_calibration_only"
+    }
+  ],
+  "goal_qualified": false,
+  "automatic_enforcement_allowed": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "github_pushes": 0
+}

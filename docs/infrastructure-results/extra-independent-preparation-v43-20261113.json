@@ -1,0 +1,2073 @@
+{
+  "schema": "extra-independent-preparation-evidence-1",
+  "stage": "preparation_only",
+  "base_extra_commit": "8879898e8f73dbb0cc70306e24b8152fd0240753",
+  "teammate_aitest_comparison_reference": "740028f49c08a9384693d3a8ede3b7237bb757c2",
+  "teammate_reference_is_latest_network_check": false,
+  "protocol": {
+    "path": "infra/f1-lab/independent-evaluation-preparation.json",
+    "sha256": "259bbb3c4192899c3513a2af4b848208be9c4deb0edb2dbe3f0f0a1a136b7d78"
+  },
+  "actual_preparation": {
+    "directory": "runtime/f1/independent-preparation-v43-20261113",
+    "freeze_sha256": "d57753a97ee72b25799338102432c4657e0d73f46a61e2a46849601d369bd54c",
+    "freeze": {
+      "aws_sdk_calls": 0,
+      "files": {
+        "catalog.jsonl": "fb1c7fe0e023b76ae113c5e0f58b283726c905876a73d3391f4090d2c9c7b34a",
+        "error-review-queue.jsonl": "2a5ce05f4762546c323f88c2b8691661db9f8b2fafb7e94a3092c971fe05a240",
+        "exposure-ledger.json": "abbce972f46f25dbb4d2b71769442cdd83e89627af0600b3036d61d413da9ff2",
+        "preparation-report.json": "f82df45f266f4280719cd593aa388e396fe2d8724cf18bb48dece14709e2198d",
+        "protocol.json": "259bbb3c4192899c3513a2af4b848208be9c4deb0edb2dbe3f0f0a1a136b7d78",
+        "source-inventory.json": "542bc2c73c49bab668ddec64d2848523b2b9062c83b1ee9661ba7cb48ca58c4a",
+        "split-components.json": "6fbdaa8afee2aa97d7221cb8c37efab2f2b3d4df47a13332aad79114a5003c1f"
+      },
+      "final_evaluation_ready": false,
+      "github_pushes": 0,
+      "goal_qualified": false,
+      "inference_runs": 0,
+      "paid_api_calls": 0,
+      "protocol_sha256": "259bbb3c4192899c3513a2af4b848208be9c4deb0edb2dbe3f0f0a1a136b7d78",
+      "schema": "f1-independent-preparation-freeze-1",
+      "sources": {
+        "scripts/audit_f1_features.py": "a85ea7662bb54bb97dc190f5bbc81804e40a492fe219719bc3fa71c901f077db",
+        "scripts/f1_lab/evaluation_preparation.py": "473a6c3524162095b1efd9fdf9682b046046fd5b3b43a668e416b7a99fd8f145",
+        "scripts/prepare_f1_intake.py": "3d23ed50bcb4ab5fb3a11e8d3219f3e79cd493c216a37bc1e43be5be9609e720",
+        "scripts/prepare_f1_review.py": "c64b33c9a8ccbdeed532c70c0943ee345192ba9a2a13f365b02bd2ed1aa8c529",
+        "scripts/prepare_independent_evaluation.py": "eb656829e5a6904f2f11cdd3c92c0263c6d45e915a6750c6670107dc3e9b754b"
+      }
+    },
+    "report": {
+      "candidate_frozen": false,
+      "cases_dropped": 0,
+      "cases_preserved": 720,
+      "components": 67,
+      "components_crossing_splits": 0,
+      "created_at": "2026-11-13T07:58:36.541625+00:00",
+      "evaluation_blockers": [
+        "three_populated_splits_required",
+        "no_final_cases_acquired",
+        "candidate_not_frozen",
+        "source_and_label_adjudication_pending",
+        "final_class_support_unverified"
+      ],
+      "final_case_blockers": {},
+      "final_evaluation_ready": false,
+      "final_label_bodies_opened": 0,
+      "final_observation_bodies_opened": 0,
+      "forward_time_contract_passed": true,
+      "goal_qualified": false,
+      "independent_review_verified": false,
+      "label_visibility": "Only previously observed benchmark labels read; reserved source bodies and labels remain unopened.",
+      "labels_changed": false,
+      "largest_component_cases": 20,
+      "metadata_structure_ready": false,
+      "metric_units_separated": true,
+      "missing_group_metadata": {
+        "device": 0,
+        "family": 0,
+        "pattern": 0,
+        "session": 0,
+        "subject": 0
+      },
+      "model_inference_runs": 0,
+      "observed_cases": 720,
+      "original_source_splits_preserved": {
+        "development": 360,
+        "holdout": 360
+      },
+      "preparation_receipt_pins": [
+        {
+          "path": "runtime/f1/streaming-calibration-v37-20261112/russellmitchell/preparation.json",
+          "sha256": "0091ab22f3ffe3ee12773c7a7d6dfe127e78750faf6dbe4aca2550e39b2f3683"
+        },
+        {
+          "path": "runtime/f1/streaming-calibration-v37-20261112/santos/preparation.json",
+          "sha256": "b6e960ddc26eff3c4251ba08319c0af45697b3ee4aabdd96ba50d09e154d4f9a"
+        },
+        {
+          "path": "runtime/f1/streaming-calibration-v37-20261112/fox/preparation.json",
+          "sha256": "d03d22bd2aa708364dd1853ec45af22728e5be5b1451f26dde5e9fe5b2adb28b"
+        }
+      ],
+      "protocol_sha256": "259bbb3c4192899c3513a2af4b848208be9c4deb0edb2dbe3f0f0a1a136b7d78",
+      "review_queue": {
+        "by_track": {
+          "authored_event_baseline": 22,
+          "observed_native_development": 22
+        },
+        "groups": 44,
+        "independent_reviews_completed": 0,
+        "legacy_evidence_cases": 220,
+        "legacy_evidence_cases_preserved": true,
+        "native_rows_replayed": 0
+      },
+      "schema": "f1-independent-preparation-report-1",
+      "structural_blockers": [
+        "three_populated_splits_required",
+        "no_final_cases_acquired"
+      ],
+      "support": {
+        "calibration": {
+          "event_detection": {
+            "cases": 0,
+            "domain_case_support": {
+              "credential": 0,
+              "device": 0,
+              "exfiltration": 0,
+              "lateral": 0,
+              "privilege": 0,
+              "remote": 0
+            },
+            "known_labels": {},
+            "sealed_labels_unread": 0
+          },
+          "policy_control": {
+            "cases": 0,
+            "domain_case_support": {
+              "credential": 0,
+              "device": 0,
+              "exfiltration": 0,
+              "lateral": 0,
+              "privilege": 0,
+              "remote": 0
+            },
+            "known_labels": {},
+            "sealed_labels_unread": 0
+          },
+          "session_any_alert": {
+            "cases": 0,
+            "domain_case_support": {
+              "credential": 0,
+              "device": 0,
+              "exfiltration": 0,
+              "lateral": 0,
+              "privilege": 0,
+              "remote": 0
+            },
+            "known_labels": {},
+            "sealed_labels_unread": 0
+          }
+        },
+        "development": {
+          "event_detection": {
+            "cases": 720,
+            "domain_case_support": {
+              "credential": 120,
+              "device": 120,
+              "exfiltration": 120,
+              "lateral": 120,
+              "privilege": 120,
+              "remote": 120
+            },
+            "known_labels": {
+              "normal": 360,
+              "threat": 360
+            },
+            "sealed_labels_unread": 0
+          },
+          "policy_control": {
+            "cases": 0,
+            "domain_case_support": {
+              "credential": 0,
+              "device": 0,
+              "exfiltration": 0,
+              "lateral": 0,
+              "privilege": 0,
+              "remote": 0
+            },
+            "known_labels": {},
+            "sealed_labels_unread": 0
+          },
+          "session_any_alert": {
+            "cases": 0,
+            "domain_case_support": {
+              "credential": 0,
+              "device": 0,
+              "exfiltration": 0,
+              "lateral": 0,
+              "privilege": 0,
+              "remote": 0
+            },
+            "known_labels": {},
+            "sealed_labels_unread": 0
+          }
+        },
+        "final_reserved": {
+          "event_detection": {
+            "cases": 0,
+            "domain_case_support": {
+              "credential": 0,
+              "device": 0,
+              "exfiltration": 0,
+              "lateral": 0,
+              "privilege": 0,
+              "remote": 0
+            },
+            "known_labels": {},
+            "sealed_labels_unread": 0
+          },
+          "policy_control": {
+            "cases": 0,
+            "domain_case_support": {
+              "credential": 0,
+              "device": 0,
+              "exfiltration": 0,
+              "lateral": 0,
+              "privilege": 0,
+              "remote": 0
+            },
+            "known_labels": {},
+            "sealed_labels_unread": 0
+          },
+          "session_any_alert": {
+            "cases": 0,
+            "domain_case_support": {
+              "credential": 0,
+              "device": 0,
+              "exfiltration": 0,
+              "lateral": 0,
+              "privilege": 0,
+              "remote": 0
+            },
+            "known_labels": {},
+            "sealed_labels_unread": 0
+          }
+        }
+      }
+    }
+  },
+  "source_inventory": [
+    {
+      "group_audit": "pending_for_new_final",
+      "metric_unit": "physical_log_row",
+      "new_independent_cases": 0,
+      "population": 295243,
+      "role": "observed_development",
+      "source_id": "ait-russellmitchell",
+      "source_reference": "runtime/f1/streaming-calibration-v37-20261112/russellmitchell"
+    },
+    {
+      "group_audit": "pending_for_new_final",
+      "metric_unit": "physical_log_row",
+      "new_independent_cases": 0,
+      "population": 295976,
+      "role": "observed_development",
+      "source_id": "ait-santos",
+      "source_reference": "runtime/f1/streaming-calibration-v37-20261112/santos"
+    },
+    {
+      "group_audit": "pending_for_new_final",
+      "metric_unit": "physical_log_row",
+      "new_independent_cases": 0,
+      "population": 668418,
+      "role": "observed_development",
+      "source_id": "ait-fox",
+      "source_reference": "runtime/f1/streaming-calibration-v37-20261112/fox"
+    },
+    {
+      "case_metadata_prepared": 720,
+      "metric_unit": "event_detection",
+      "new_independent_cases": 0,
+      "population": 720,
+      "role": "observed_regression",
+      "source_id": "authored-benchmark-720"
+    },
+    {
+      "metric_unit": "authentication_flow",
+      "new_independent_cases": 0,
+      "population": 22750,
+      "role": "observed_development",
+      "scope_note": "Prior whole-source audit, not reread or re-evaluated here.",
+      "source_id": "m7-authentication"
+    },
+    {
+      "label_purpose": "expected_alert_policy_not_independent_malicious_truth",
+      "metric_unit": "policy_control",
+      "new_independent_cases": 0,
+      "population": 49,
+      "role": "functional_controls_only",
+      "source_id": "vpn-policy-controls"
+    },
+    {
+      "group_and_label_adjudication": "pending",
+      "labels_opened": 0,
+      "new_independent_cases": 0,
+      "raw_bodies_opened": 0,
+      "reference": "https://zenodo.org/records/19483937",
+      "role": "reserved_metadata_only",
+      "source_id": "ait-harrison"
+    },
+    {
+      "group_and_label_adjudication": "pending",
+      "labels_opened": 0,
+      "new_independent_cases": 0,
+      "raw_bodies_opened": 0,
+      "reference": "https://zenodo.org/records/19483937",
+      "role": "reserved_metadata_only",
+      "source_id": "ait-wilson"
+    }
+  ],
+  "exposure_ledger_summary": {
+    "evidence_references": 6,
+    "observed_pattern_sha256": 601,
+    "observed_payload_sha256": 769,
+    "observed_source_ids": 7,
+    "observed_source_sha256": 35
+  },
+  "review_queue": {
+    "summary": {
+      "by_track": {
+        "authored_event_baseline": 22,
+        "observed_native_development": 22
+      },
+      "groups": 44,
+      "independent_reviews_completed": 0,
+      "legacy_evidence_cases": 220,
+      "legacy_evidence_cases_preserved": true,
+      "native_rows_replayed": 0
+    },
+    "categories": {
+      "authored_baseline": 22,
+      "other_raw_observation": 12,
+      "authentication": 3,
+      "web_error": 1,
+      "web_access": 3,
+      "vpn": 3
+    },
+    "items": [
+      {
+        "case_count": 10,
+        "case_ids": [
+          "credential-approved-health-retry-00",
+          "credential-approved-health-retry-01",
+          "credential-approved-health-retry-02",
+          "credential-approved-health-retry-03",
+          "credential-approved-health-retry-04",
+          "credential-approved-health-retry-05",
+          "credential-approved-health-retry-06",
+          "credential-approved-health-retry-07",
+          "credential-approved-health-retry-08",
+          "credential-approved-health-retry-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "credential"
+        ],
+        "family_id": "credential-approved-health-retry",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 0,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 10
+        },
+        "outcomes": {
+          "FP": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-credential-approved-health-retry",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "development"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 10
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "credential-authorized-drill-00",
+          "credential-authorized-drill-01",
+          "credential-authorized-drill-02",
+          "credential-authorized-drill-03",
+          "credential-authorized-drill-04",
+          "credential-authorized-drill-05",
+          "credential-authorized-drill-06",
+          "credential-authorized-drill-07",
+          "credential-authorized-drill-08",
+          "credential-authorized-drill-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "credential"
+        ],
+        "family_id": "credential-authorized-drill",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 0,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 10
+        },
+        "outcomes": {
+          "FP": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-credential-authorized-drill",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "holdout"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 10
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "credential-distributed-slow-00",
+          "credential-distributed-slow-01",
+          "credential-distributed-slow-02",
+          "credential-distributed-slow-03",
+          "credential-distributed-slow-04",
+          "credential-distributed-slow-05",
+          "credential-distributed-slow-06",
+          "credential-distributed-slow-07",
+          "credential-distributed-slow-08",
+          "credential-distributed-slow-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "credential"
+        ],
+        "family_id": "credential-distributed-slow",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 10,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 0
+        },
+        "outcomes": {
+          "FN": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-credential-distributed-slow",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "holdout"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 0
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "credential-stolen-success-00",
+          "credential-stolen-success-01",
+          "credential-stolen-success-02",
+          "credential-stolen-success-03",
+          "credential-stolen-success-04",
+          "credential-stolen-success-05",
+          "credential-stolen-success-06",
+          "credential-stolen-success-07",
+          "credential-stolen-success-08",
+          "credential-stolen-success-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "credential"
+        ],
+        "family_id": "credential-stolen-success",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 10,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 10,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 0
+        },
+        "outcomes": {
+          "FN": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-credential-stolen-success",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "holdout"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 0
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "device-approved-enrollment-00",
+          "device-approved-enrollment-01",
+          "device-approved-enrollment-02",
+          "device-approved-enrollment-03",
+          "device-approved-enrollment-04",
+          "device-approved-enrollment-05",
+          "device-approved-enrollment-06",
+          "device-approved-enrollment-07",
+          "device-approved-enrollment-08",
+          "device-approved-enrollment-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "device"
+        ],
+        "family_id": "device-approved-enrollment",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 0,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 10,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 10
+        },
+        "outcomes": {
+          "FP": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-device-approved-enrollment",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "development"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 10
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "device-managed-compromise-00",
+          "device-managed-compromise-01",
+          "device-managed-compromise-02",
+          "device-managed-compromise-03",
+          "device-managed-compromise-04",
+          "device-managed-compromise-05",
+          "device-managed-compromise-06",
+          "device-managed-compromise-07",
+          "device-managed-compromise-08",
+          "device-managed-compromise-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "device"
+        ],
+        "family_id": "device-managed-compromise",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 10,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 0
+        },
+        "outcomes": {
+          "FN": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-device-managed-compromise",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "holdout"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 0
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "device-unmanaged-at-risk-00",
+          "device-unmanaged-at-risk-01",
+          "device-unmanaged-at-risk-02",
+          "device-unmanaged-at-risk-03",
+          "device-unmanaged-at-risk-04",
+          "device-unmanaged-at-risk-05",
+          "device-unmanaged-at-risk-06",
+          "device-unmanaged-at-risk-07",
+          "device-unmanaged-at-risk-08",
+          "device-unmanaged-at-risk-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "device"
+        ],
+        "family_id": "device-unmanaged-at-risk",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 10,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 0
+        },
+        "outcomes": {
+          "FN": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-device-unmanaged-at-risk",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "holdout"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 0
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "device-unregistered-login-00",
+          "device-unregistered-login-01",
+          "device-unregistered-login-02",
+          "device-unregistered-login-03",
+          "device-unregistered-login-04",
+          "device-unregistered-login-05",
+          "device-unregistered-login-06",
+          "device-unregistered-login-07",
+          "device-unregistered-login-08",
+          "device-unregistered-login-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "device"
+        ],
+        "family_id": "device-unregistered-login",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 10,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 10,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 0
+        },
+        "outcomes": {
+          "FN": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-device-unregistered-login",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "development"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 0
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "exfiltration-high-sensitivity-export-00",
+          "exfiltration-high-sensitivity-export-01",
+          "exfiltration-high-sensitivity-export-02",
+          "exfiltration-high-sensitivity-export-03",
+          "exfiltration-high-sensitivity-export-04",
+          "exfiltration-high-sensitivity-export-05",
+          "exfiltration-high-sensitivity-export-06",
+          "exfiltration-high-sensitivity-export-07",
+          "exfiltration-high-sensitivity-export-08",
+          "exfiltration-high-sensitivity-export-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "exfiltration"
+        ],
+        "family_id": "exfiltration-high-sensitivity-export",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 10,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 0
+        },
+        "outcomes": {
+          "FN": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-exfiltration-high-sensitivity-export",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "holdout"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 0
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "exfiltration-low-and-slow-00",
+          "exfiltration-low-and-slow-01",
+          "exfiltration-low-and-slow-02",
+          "exfiltration-low-and-slow-03",
+          "exfiltration-low-and-slow-04",
+          "exfiltration-low-and-slow-05",
+          "exfiltration-low-and-slow-06",
+          "exfiltration-low-and-slow-07",
+          "exfiltration-low-and-slow-08",
+          "exfiltration-low-and-slow-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "exfiltration"
+        ],
+        "family_id": "exfiltration-low-and-slow",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 10,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 0
+        },
+        "outcomes": {
+          "FN": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-exfiltration-low-and-slow",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "holdout"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 0
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "lateral-api-traversal-00",
+          "lateral-api-traversal-01",
+          "lateral-api-traversal-02",
+          "lateral-api-traversal-03",
+          "lateral-api-traversal-04",
+          "lateral-api-traversal-05",
+          "lateral-api-traversal-06",
+          "lateral-api-traversal-07",
+          "lateral-api-traversal-08",
+          "lateral-api-traversal-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "lateral"
+        ],
+        "family_id": "lateral-api-traversal",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 10,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 0
+        },
+        "outcomes": {
+          "FN": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-lateral-api-traversal",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "holdout"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 0
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "lateral-approved-deployment-00",
+          "lateral-approved-deployment-01",
+          "lateral-approved-deployment-02",
+          "lateral-approved-deployment-03",
+          "lateral-approved-deployment-04",
+          "lateral-approved-deployment-05",
+          "lateral-approved-deployment-06",
+          "lateral-approved-deployment-07",
+          "lateral-approved-deployment-08",
+          "lateral-approved-deployment-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "lateral"
+        ],
+        "family_id": "lateral-approved-deployment",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 0,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 10
+        },
+        "outcomes": {
+          "FP": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-lateral-approved-deployment",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "development"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 10
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "lateral-below-resource-limit-00",
+          "lateral-below-resource-limit-01",
+          "lateral-below-resource-limit-02",
+          "lateral-below-resource-limit-03",
+          "lateral-below-resource-limit-04",
+          "lateral-below-resource-limit-05",
+          "lateral-below-resource-limit-06",
+          "lateral-below-resource-limit-07",
+          "lateral-below-resource-limit-08",
+          "lateral-below-resource-limit-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "lateral"
+        ],
+        "family_id": "lateral-below-resource-limit",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 10,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 0
+        },
+        "outcomes": {
+          "TP": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-lateral-below-resource-limit",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "holdout"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 0
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "lateral-fleet-deployment-00",
+          "lateral-fleet-deployment-01",
+          "lateral-fleet-deployment-02",
+          "lateral-fleet-deployment-03",
+          "lateral-fleet-deployment-04",
+          "lateral-fleet-deployment-05",
+          "lateral-fleet-deployment-06",
+          "lateral-fleet-deployment-07",
+          "lateral-fleet-deployment-08",
+          "lateral-fleet-deployment-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "lateral"
+        ],
+        "family_id": "lateral-fleet-deployment",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 0,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 10
+        },
+        "outcomes": {
+          "FP": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-lateral-fleet-deployment",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "holdout"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 10
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "lateral-incident-response-00",
+          "lateral-incident-response-01",
+          "lateral-incident-response-02",
+          "lateral-incident-response-03",
+          "lateral-incident-response-04",
+          "lateral-incident-response-05",
+          "lateral-incident-response-06",
+          "lateral-incident-response-07",
+          "lateral-incident-response-08",
+          "lateral-incident-response-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "lateral"
+        ],
+        "family_id": "lateral-incident-response",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 0,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 10
+        },
+        "outcomes": {
+          "FP": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-lateral-incident-response",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "holdout"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 10
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "lateral-slow-fanout-00",
+          "lateral-slow-fanout-01",
+          "lateral-slow-fanout-02",
+          "lateral-slow-fanout-03",
+          "lateral-slow-fanout-04",
+          "lateral-slow-fanout-05",
+          "lateral-slow-fanout-06",
+          "lateral-slow-fanout-07",
+          "lateral-slow-fanout-08",
+          "lateral-slow-fanout-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "lateral"
+        ],
+        "family_id": "lateral-slow-fanout",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 10,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 0
+        },
+        "outcomes": {
+          "TP": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-lateral-slow-fanout",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "holdout"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 0
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "privilege-approved-emergency-00",
+          "privilege-approved-emergency-01",
+          "privilege-approved-emergency-02",
+          "privilege-approved-emergency-03",
+          "privilege-approved-emergency-04",
+          "privilege-approved-emergency-05",
+          "privilege-approved-emergency-06",
+          "privilege-approved-emergency-07",
+          "privilege-approved-emergency-08",
+          "privilege-approved-emergency-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "privilege"
+        ],
+        "family_id": "privilege-approved-emergency",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 0,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 10
+        },
+        "outcomes": {
+          "FP": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-privilege-approved-emergency",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "development"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 10
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "privilege-unauthorized-download-00",
+          "privilege-unauthorized-download-01",
+          "privilege-unauthorized-download-02",
+          "privilege-unauthorized-download-03",
+          "privilege-unauthorized-download-04",
+          "privilege-unauthorized-download-05",
+          "privilege-unauthorized-download-06",
+          "privilege-unauthorized-download-07",
+          "privilege-unauthorized-download-08",
+          "privilege-unauthorized-download-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "privilege"
+        ],
+        "family_id": "privilege-unauthorized-download",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 10,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 0
+        },
+        "outcomes": {
+          "FN": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-privilege-unauthorized-download",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "holdout"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 0
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "remote-approved-night-support-00",
+          "remote-approved-night-support-01",
+          "remote-approved-night-support-02",
+          "remote-approved-night-support-03",
+          "remote-approved-night-support-04",
+          "remote-approved-night-support-05",
+          "remote-approved-night-support-06",
+          "remote-approved-night-support-07",
+          "remote-approved-night-support-08",
+          "remote-approved-night-support-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "remote"
+        ],
+        "family_id": "remote-approved-night-support",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 0,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 10
+        },
+        "outcomes": {
+          "FP": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-remote-approved-night-support",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "holdout"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 10
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "remote-approved-support-00",
+          "remote-approved-support-01",
+          "remote-approved-support-02",
+          "remote-approved-support-03",
+          "remote-approved-support-04",
+          "remote-approved-support-05",
+          "remote-approved-support-06",
+          "remote-approved-support-07",
+          "remote-approved-support-08",
+          "remote-approved-support-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "remote"
+        ],
+        "family_id": "remote-approved-support",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 0,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 10
+        },
+        "outcomes": {
+          "FP": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-remote-approved-support",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "development"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 10
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "remote-approved-vpn-maintenance-00",
+          "remote-approved-vpn-maintenance-01",
+          "remote-approved-vpn-maintenance-02",
+          "remote-approved-vpn-maintenance-03",
+          "remote-approved-vpn-maintenance-04",
+          "remote-approved-vpn-maintenance-05",
+          "remote-approved-vpn-maintenance-06",
+          "remote-approved-vpn-maintenance-07",
+          "remote-approved-vpn-maintenance-08",
+          "remote-approved-vpn-maintenance-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "remote"
+        ],
+        "family_id": "remote-approved-vpn-maintenance",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 0,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 0,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 10
+        },
+        "outcomes": {
+          "FP": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-remote-approved-vpn-maintenance",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "holdout"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 10
+      },
+      {
+        "case_count": 10,
+        "case_ids": [
+          "remote-misclassified-activity-00",
+          "remote-misclassified-activity-01",
+          "remote-misclassified-activity-02",
+          "remote-misclassified-activity-03",
+          "remote-misclassified-activity-04",
+          "remote-misclassified-activity-05",
+          "remote-misclassified-activity-06",
+          "remote-misclassified-activity-07",
+          "remote-misclassified-activity-08",
+          "remote-misclassified-activity-09"
+        ],
+        "cause_confirmed": false,
+        "domains": [
+          "remote"
+        ],
+        "family_id": "remote-misclassified-activity",
+        "label_changed": false,
+        "metric_unit": "event_detection",
+        "missed_expected_rule_cases": 10,
+        "next_action": "Compare existing rule trace and evidence; record missing observations, label disputes and counterexamples.",
+        "observed_review_flags": {
+          "mfa_unknown": 10,
+          "posture_unknown": 0,
+          "resource_role_missing": 0,
+          "unsigned_exception_claim": 0
+        },
+        "outcomes": {
+          "FN": 10
+        },
+        "priority": "P1",
+        "review_id": "legacy-remote-misclassified-activity",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "source_evidence_sha256": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+        "source_split": [
+          "holdout"
+        ],
+        "track": "authored_event_baseline",
+        "unexpected_rule_cases": 0
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "other_raw_observation",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9888641425389755,
+          "f1": 0.0,
+          "false_positive_rate": 0.008928571428571428,
+          "fn": 2,
+          "fp": 8,
+          "inference_errors": 0,
+          "population": 898,
+          "precision": 0.0,
+          "recall": 0.0,
+          "tn": 888,
+          "tp": 0
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Inspect source-specific FN/FP and label/observation ambiguity; establish domain mapping before improvement.",
+        "priority": "P2",
+        "raw_member": "gather/internal_share/logs/audit/audit.log",
+        "review_id": "native-b8d6b02075a83cf738c3656a",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "fox",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "other_raw_observation",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9971444247699329,
+          "f1": 0.992238603626504,
+          "false_positive_rate": 5.102509414129869e-06,
+          "fn": 686,
+          "fp": 1,
+          "inference_errors": 0,
+          "population": 240582,
+          "precision": 0.9999772287373335,
+          "recall": 0.9846188340807175,
+          "tn": 195981,
+          "tp": 43914
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Inspect source-specific FN/FP and label/observation ambiguity; establish domain mapping before improvement.",
+        "priority": "P2",
+        "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+        "review_id": "native-066257bf497daecccab35d56",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "fox",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "authentication",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9947552447552448,
+          "f1": 0.8571428571428571,
+          "false_positive_rate": 0.0,
+          "fn": 3,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 572,
+          "precision": 1.0,
+          "recall": 0.75,
+          "tn": 560,
+          "tp": 9
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Inspect raw authentication semantics and strictly earlier context without invented identity/device facts.",
+        "priority": "P1",
+        "raw_member": "gather/intranet_server/logs/auth.log",
+        "review_id": "native-56fa5a251c0774ca2f22e116",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "fox",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "web_error",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9970104633781763,
+          "f1": 0.9985007496251874,
+          "false_positive_rate": 0.0,
+          "fn": 4,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 1338,
+          "precision": 1.0,
+          "recall": 0.9970059880239521,
+          "tn": 2,
+          "tp": 1332
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Review missed malicious error rows; keep narrow ENOENT scope and existing threat detection.",
+        "priority": "P1",
+        "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-error.log.1",
+        "review_id": "native-1521efbfa15a23d6a2f7760d",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "fox",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "web_access",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9999564082320632,
+          "f1": 0.9999780938750474,
+          "false_positive_rate": 0.005766458433445459,
+          "fn": 6,
+          "fp": 12,
+          "inference_errors": 0,
+          "population": 412922,
+          "precision": 0.9999707920466743,
+          "recall": 0.9999853958100579,
+          "tn": 2069,
+          "tp": 410835
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Review POST/redirect/error response and missing body/authorization context before new exceptions.",
+        "priority": "P1",
+        "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2",
+        "review_id": "native-7fff552e939538d2718edda1",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "fox",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "other_raw_observation",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9892622099064773,
+          "f1": 0.4745762711864407,
+          "false_positive_rate": 0.00906555090655509,
+          "fn": 5,
+          "fp": 26,
+          "inference_errors": 0,
+          "population": 2887,
+          "precision": 0.35,
+          "recall": 0.7368421052631579,
+          "tn": 2842,
+          "tp": 14
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Inspect source-specific FN/FP and label/observation ambiguity; establish domain mapping before improvement.",
+        "priority": "P2",
+        "raw_member": "gather/intranet_server/logs/audit/audit.log",
+        "review_id": "native-5ea4307c7f364ae5ffe70a0c",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "fox",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "vpn",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9879435539114947,
+          "f1": 0.3888888888888889,
+          "false_positive_rate": 0.012102874432677761,
+          "fn": 0,
+          "fp": 88,
+          "inference_errors": 0,
+          "population": 7299,
+          "precision": 0.2413793103448276,
+          "recall": 1.0,
+          "tn": 7183,
+          "tp": 28
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Acquire real verified device/permission sidecars; v41 tested reductions lost TP. Keep existing alerts.",
+        "priority": "P1",
+        "raw_member": "gather/vpn/logs/openvpn.log",
+        "review_id": "native-52cba2ded387347e78e10d9f",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "fox",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "other_raw_observation",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9989583333333333,
+          "f1": 0.9787234042553191,
+          "false_positive_rate": 0.0010672358591248667,
+          "fn": 0,
+          "fp": 2,
+          "inference_errors": 0,
+          "population": 1920,
+          "precision": 0.9583333333333334,
+          "recall": 1.0,
+          "tn": 1872,
+          "tp": 46
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Inspect source-specific FN/FP and label/observation ambiguity; establish domain mapping before improvement.",
+        "priority": "P2",
+        "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-18-system.cpu.log",
+        "review_id": "native-3fbe34d3c98d87d2d774ec7b",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "fox",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "other_raw_observation",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9863387978142076,
+          "f1": 0.0,
+          "false_positive_rate": 0.010958904109589041,
+          "fn": 2,
+          "fp": 8,
+          "inference_errors": 0,
+          "population": 732,
+          "precision": 0.0,
+          "recall": 0.0,
+          "tn": 722,
+          "tp": 0
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Inspect source-specific FN/FP and label/observation ambiguity; establish domain mapping before improvement.",
+        "priority": "P2",
+        "raw_member": "gather/internal_share/logs/audit/audit.log",
+        "review_id": "native-cbaf1209a1b172f37419a1e3",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "russellmitchell",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "other_raw_observation",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9963972453787604,
+          "f1": 0.9907177408811609,
+          "false_positive_rate": 2.2536226984878192e-05,
+          "fn": 989,
+          "fp": 5,
+          "inference_errors": 0,
+          "population": 275900,
+          "precision": 0.9999057510697253,
+          "recall": 0.9816970482094939,
+          "tn": 221860,
+          "tp": 53046
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Inspect source-specific FN/FP and label/observation ambiguity; establish domain mapping before improvement.",
+        "priority": "P2",
+        "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+        "review_id": "native-e888a20ea1357ae3fb8b845e",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "russellmitchell",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "authentication",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9889705882352942,
+          "f1": 0.7692307692307693,
+          "false_positive_rate": 0.0,
+          "fn": 3,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 272,
+          "precision": 1.0,
+          "recall": 0.625,
+          "tn": 264,
+          "tp": 5
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Inspect raw authentication semantics and strictly earlier context without invented identity/device facts.",
+        "priority": "P1",
+        "raw_member": "gather/intranet_server/logs/auth.log",
+        "review_id": "native-1501be9fff409129e652bb69",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "russellmitchell",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "web_access",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.999179366940211,
+          "f1": 0.9995449522199831,
+          "false_positive_rate": 0.0,
+          "fn": 7,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 8530,
+          "precision": 1.0,
+          "recall": 0.999090318388564,
+          "tn": 835,
+          "tp": 7688
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Review POST/redirect/error response and missing body/authorization context before new exceptions.",
+        "priority": "P1",
+        "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2",
+        "review_id": "native-38b7c17771a6728847bbdbbb",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "russellmitchell",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "other_raw_observation",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9952504317789291,
+          "f1": 0.6206896551724138,
+          "false_positive_rate": 0.004768097095795405,
+          "fn": 0,
+          "fp": 11,
+          "inference_errors": 0,
+          "population": 2316,
+          "precision": 0.45,
+          "recall": 1.0,
+          "tn": 2296,
+          "tp": 9
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Inspect source-specific FN/FP and label/observation ambiguity; establish domain mapping before improvement.",
+        "priority": "P2",
+        "raw_member": "gather/intranet_server/logs/audit/audit.log",
+        "review_id": "native-508bcb529f523e7654b3bb23",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "russellmitchell",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "vpn",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9891638071157667,
+          "f1": 0.4827586206896552,
+          "false_positive_rate": 0.010891268832819023,
+          "fn": 0,
+          "fp": 60,
+          "inference_errors": 0,
+          "population": 5537,
+          "precision": 0.3181818181818182,
+          "recall": 1.0,
+          "tn": 5449,
+          "tp": 28
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Acquire real verified device/permission sidecars; v41 tested reductions lost TP. Keep existing alerts.",
+        "priority": "P1",
+        "raw_member": "gather/vpn/logs/openvpn.log",
+        "review_id": "native-a09b5cc9e59490e59c83f2c9",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "russellmitchell",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "other_raw_observation",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9994791666666667,
+          "f1": 0.98989898989899,
+          "false_positive_rate": 0.0005344735435595938,
+          "fn": 0,
+          "fp": 1,
+          "inference_errors": 0,
+          "population": 1920,
+          "precision": 0.98,
+          "recall": 1.0,
+          "tn": 1870,
+          "tp": 49
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Inspect source-specific FN/FP and label/observation ambiguity; establish domain mapping before improvement.",
+        "priority": "P2",
+        "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.cpu.log",
+        "review_id": "native-aaee91f141af181d5e23f41c",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "russellmitchell",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "other_raw_observation",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9862637362637363,
+          "f1": 0.0,
+          "false_positive_rate": 0.011019283746556474,
+          "fn": 2,
+          "fp": 8,
+          "inference_errors": 0,
+          "population": 728,
+          "precision": 0.0,
+          "recall": 0.0,
+          "tn": 718,
+          "tp": 0
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Inspect source-specific FN/FP and label/observation ambiguity; establish domain mapping before improvement.",
+        "priority": "P2",
+        "raw_member": "gather/internal_share/logs/audit/audit.log",
+        "review_id": "native-fdef7046b480d18c77086503",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "santos",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "other_raw_observation",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9966517573739331,
+          "f1": 0.9881567973311093,
+          "false_positive_rate": 1.2698896465897114e-05,
+          "fn": 920,
+          "fp": 3,
+          "inference_errors": 0,
+          "population": 275667,
+          "precision": 0.9999220961333715,
+          "recall": 0.9766651448282859,
+          "tn": 236238,
+          "tp": 38506
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Inspect source-specific FN/FP and label/observation ambiguity; establish domain mapping before improvement.",
+        "priority": "P2",
+        "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+        "review_id": "native-f75851e5fdde9172be322644",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "santos",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "authentication",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9888888888888889,
+          "f1": 0.8571428571428571,
+          "false_positive_rate": 0.0,
+          "fn": 3,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 270,
+          "precision": 1.0,
+          "recall": 0.75,
+          "tn": 258,
+          "tp": 9
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Inspect raw authentication semantics and strictly earlier context without invented identity/device facts.",
+        "priority": "P1",
+        "raw_member": "gather/intranet_server/logs/auth.log",
+        "review_id": "native-0b0438c8878fb3bff7dc7e7a",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "santos",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "web_access",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9974635383639823,
+          "f1": 0.9984593657722429,
+          "false_positive_rate": 0.004196642685851319,
+          "fn": 17,
+          "fp": 7,
+          "inference_errors": 0,
+          "population": 9462,
+          "precision": 0.9991007194244604,
+          "recall": 0.997818835001283,
+          "tn": 1661,
+          "tp": 7777
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Review POST/redirect/error response and missing body/authorization context before new exceptions.",
+        "priority": "P1",
+        "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log",
+        "review_id": "native-fd594ceca675256e6fd3840d",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "santos",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "other_raw_observation",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9977905435262925,
+          "f1": 0.8484848484848485,
+          "false_positive_rate": 0.0,
+          "fn": 5,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 2263,
+          "precision": 1.0,
+          "recall": 0.7368421052631579,
+          "tn": 2244,
+          "tp": 14
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Inspect source-specific FN/FP and label/observation ambiguity; establish domain mapping before improvement.",
+        "priority": "P2",
+        "raw_member": "gather/intranet_server/logs/audit/audit.log",
+        "review_id": "native-1514db4c754f5efcd38f8450",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "santos",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "vpn",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9893276414087513,
+          "f1": 0.4827586206896552,
+          "false_positive_rate": 0.010725777618877368,
+          "fn": 0,
+          "fp": 60,
+          "inference_errors": 0,
+          "population": 5622,
+          "precision": 0.3181818181818182,
+          "recall": 1.0,
+          "tn": 5534,
+          "tp": 28
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Acquire real verified device/permission sidecars; v41 tested reductions lost TP. Keep existing alerts.",
+        "priority": "P1",
+        "raw_member": "gather/vpn/logs/openvpn.log",
+        "review_id": "native-6440742da702815248ef2581",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "santos",
+        "track": "observed_native_development"
+      },
+      {
+        "case_ids": [],
+        "case_inventory_available": false,
+        "category": "other_raw_observation",
+        "cause_confirmed": false,
+        "confusion": {
+          "accuracy": 0.9994791666666667,
+          "f1": 0.9887640449438202,
+          "false_positive_rate": 0.0005330490405117271,
+          "fn": 0,
+          "fp": 1,
+          "inference_errors": 0,
+          "population": 1920,
+          "precision": 0.9777777777777777,
+          "recall": 1.0,
+          "tn": 1875,
+          "tp": 44
+        },
+        "domain_mapping_status": "unverified",
+        "domains": [],
+        "label_changed": false,
+        "metric_unit": "physical_log_row",
+        "next_action": "Inspect source-specific FN/FP and label/observation ambiguity; establish domain mapping before improvement.",
+        "priority": "P2",
+        "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log",
+        "review_id": "native-0b18aea20409425993892f09",
+        "review_status": "pending",
+        "reviewer_subject": null,
+        "scenario": "santos",
+        "track": "observed_native_development"
+      }
+    ]
+  },
+  "validation": {
+    "new_focused_tests_passed": 44,
+    "related_tests": {
+      "schema": "extra-local-stream-validation-tests-1",
+      "started_at": "2026-11-13T08:02:02.497166+00:00",
+      "paid_api_calls": 0,
+      "aws_sdk_calls": 0,
+      "github_pushes": 0,
+      "windows": {
+        "exit_code": 0,
+        "seconds": 26.714,
+        "counts": {
+          "passed": 181
+        },
+        "log": "runtime/f1/independent-preparation-tests-v43-20261113/windows.log"
+      },
+      "linux": {
+        "exit_code": 0,
+        "seconds": 12.653,
+        "counts": {
+          "passed": 181
+        },
+        "log": "runtime/f1/independent-preparation-tests-v43-20261113/linux.log",
+        "executed": true,
+        "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+        "source_files": 721,
+        "source_archive_sha256": "224d909b3f88ab5c268a8acbd3c0ab2afe23ab51dd10f7bf64f5caf7491c631b",
+        "container_exit": 0,
+        "oom_killed": false,
+        "network_mode": "none",
+        "owned_container": "2cf2e2ef01827d09f6058fee5a54be585f45b4dc1f2139daef5cf36312dbcce1",
+        "snapshot_sources_unchanged_after": true,
+        "owned_container_removed": true
+      },
+      "ended_at": "2026-11-13T08:03:20.529942+00:00"
+    },
+    "test_files": [
+      "tests/test_f1_evaluation_preparation.py",
+      "tests/test_f1_intake.py",
+      "tests/test_f1_review.py",
+      "tests/test_f1_feature_audit.py",
+      "tests/test_m7_split_audit.py",
+      "tests/test_f1_vpn_precision_audit.py",
+      "tests/test_detection_benchmark.py"
+    ],
+    "test_receipt_sha256": "8077c75e5b1190b5de9f3a54ea39f6b7181233a49ed6c207182773f8c84b0a23",
+    "source_manifest_sha256": "210523834196939049caac4b6bacc76fbdabad4053f6c994691d11247ccca21b",
+    "current_code_matches_linux_snapshot": true,
+    "code_fingerprints": {
+      "scripts/f1_lab/evaluation_preparation.py": "473a6c3524162095b1efd9fdf9682b046046fd5b3b43a668e416b7a99fd8f145",
+      "scripts/prepare_independent_evaluation.py": "eb656829e5a6904f2f11cdd3c92c0263c6d45e915a6750c6670107dc3e9b754b",
+      "tests/test_f1_evaluation_preparation.py": "229f2188ea6b9b15a90882f1841ea0e671a028a32463e3a146104c4be56f91ec",
+      "infra/f1-lab/independent-evaluation-preparation.json": "259bbb3c4192899c3513a2af4b848208be9c4deb0edb2dbe3f0f0a1a136b7d78"
+    },
+    "ruff": {
+      "exit_code": 0,
+      "files": [
+        "scripts/f1_lab/evaluation_preparation.py",
+        "scripts/prepare_independent_evaluation.py",
+        "tests/test_f1_evaluation_preparation.py"
+      ]
+    },
+    "scope": "Related regression only. Fixtures reproduce old baseline; no new final performance evaluation."
+  },
+  "preservation": {
+    "protected_paths_unchanged_against_extra_base": [
+      "app",
+      "scripts/app_state_recovery.py",
+      "scripts/authority_mtls_runtime.py"
+    ],
+    "original_benchmark_cases_sha256": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f",
+    "original_benchmark_manifest_sha256": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+    "original_source_splits_preserved": {
+      "development": 360,
+      "holdout": 360
+    },
+    "labels_changed": false,
+    "cases_dropped": 0,
+    "detector_or_candidate_model_changed": false,
+    "user_archives_modified": false,
+    "reserved_bodies_or_labels_opened": 0
+  },
+  "boundaries": {
+    "new_independent_final_cases": 0,
+    "preparation_inference_runs": 0,
+    "final_performance_runs": 0,
+    "candidate_training_runs": 0,
+    "independent_reviews_verified": 0,
+    "paid_api_calls": 0,
+    "aws_sdk_calls": 0,
+    "new_downloads": 0,
+    "github_pushes": 0,
+    "pr_merges": 0,
+    "final_evaluation_ready": false,
+    "goal_qualified": false
+  },
+  "remaining": [
+    "adjudicate observed residual cases without invented security facts",
+    "acquire suitable development/calibration observations and source metadata adapters",
+    "freeze candidate before final source/label access",
+    "verify reserved source suitability, label provenance, group and domain support",
+    "implement separate final evaluation protocol and run once after prerequisites",
+    "review teammate integration only after teammate work completes"
+  ]
+}
