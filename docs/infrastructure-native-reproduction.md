@@ -25,3 +25,14 @@ python3 -m scripts.run_infrastructure_native_batch \
 모듈당 제한은540초다. timeout/예외/정리 영수증 누락 시 완료로 표시하지 않고 소유 소스를 보존한다. 이 경우 `snapshot_retained_for_unconfirmed_cleanup=true`이며 실제 해당 unit/프로세스의 종료와 소유 자원 정리를 확인한 후 소스를 정리한다. 운영 서비스나 호스트 전체를 강제 종료·prune하지 않는다. 정상 종료하고 모듈별 소유 unit/상태/공급자의 정리 확인이 모두 있을 때만 임시 소스를 제거한다. 로컬 root·커널·systemd 관리자는 시험의 신뢰 경계다.
 
 Docker의 CA/DB/NGINX 수명주기 인수는 별도 `scripts.test_database_transport_runtime`를 사용한다. 이 실행기는 Docker 소켓·부모 Docker 데몬 제어 권한을 요구하지 않는다. 물리 다중 호스트·조직 SSO·운영 ACL·외부 재난 복구와 독립 탐지 성능 인수를 대신하지 않는다.
+
+
+## 이번 고정 묶음
+
+소스 SHA: `99779191d514987e1b8c308996bf3b3df74c85d95378006fa50bf55e28e5b362`
+
+의존성 SHA: `c2c0b3a3b8b31e69a532a23554d0fa74b5dbe3423cbc6ba305b6aef7dab59cef`
+
+test.lock SHA: `9824d5fb26b94cc0fb9b36a52a70ca98eabc1801d93c11c77b2621cd2930c7ba`
+
+세 native 묶음67/10/18조건을 같은 소스로 통과했고 모든 소유 unit/공급자/상태와 임시 소스의 정리를 확인했다. source.tar에는 고정 시험 당시 문서가 들어 있으며 최신 설명은 별도 [현재 상태](infrastructure-current-state-20261116.md)를 읽는다. Docker DB 인수는 본인 PC의 로컬 Linux Docker context에서 별도 실행한다.

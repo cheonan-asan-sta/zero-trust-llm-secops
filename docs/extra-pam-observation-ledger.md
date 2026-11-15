@@ -18,4 +18,11 @@
 
 ## 검증
 
-재시작/동시 제출·창 겹침·원문 의미가 같은 JSON 재직렬화·cursor 충돌·새 invocation·명시적 키 교체·원래 시각·만료·시계 역행·손상/외부 schema·링크/권한·저장 한도·실제 CLI를 묶어 검사한다. 실제 systemd 시험은 원래 collector에 전용 키만 주고, 별도 daemon UID1/capability0/NNP 프로세스에서 공개 capture를 받아 DB를 쓴다. 첫2건→중복0건→새 invocation2건→새 키의 같은 사건0건, 총 원래4건 보존을 확인한다. 합성 parser 검사와 실제 OS 프로세스 검증을 구분하고 최종 결과는 실행 후 기록한다. AWS/유료 API는 사용하지 않으며 8/12시간 soak는 유예한다.
+재시작/동시 제출·창 겹침·원문 의미가 같은 JSON 재직렬화·cursor 충돌·새 invocation·명시적 키 교체·원래 시각·만료·시계 역행·손상/외부 schema·링크/권한·저장 한도·실제 CLI를 묶어 검사한다. 실제 systemd 시험은 원래 collector에 전용 키만 주고, 별도 daemon UID1/capability0/NNP 프로세스에서 공개 capture를 받아 DB를 쓴다. 첫2건→중복0건→새 invocation2건→새 키의 같은 사건0건, 총 원래4건 보존을 확인한다. 합성 parser 검사와 실제 OS 프로세스 검증을 구분하고 [집계·소스 지문·실행 근거](infrastructure-results/extra-infrastructure-overnight-v97-20261116.json)에서 최종 결과를 확인한다. AWS/유료 API는 사용하지 않으며 8/12시간 soak는 유예한다.
+
+원장과 그 상위 경로는 신뢰하는 소유자·OS ACL로 보호해야 한다. 같은 UID의 적대적 파일 교체나 관리자에 대한 격리 경계가 아니다. transaction은 중복 기록을 막지만, 검증 시각/발급 순서가 역전된 동시 제출은 거부될 수 있다. 현재 운영 모델은 출처별 단일 작성자이며 모든 동시 작성자의 성공 가용성을 보장하지 않는다.
+
+
+## 최종 통합 결과
+
+고정 소스 `99779191d514987e1b8c308996bf3b3df74c85d95378006fa50bf55e28e5b362`에서 신규 대장29개를 포함한 집중475·전체6,332개가 통과했다. 실제 PAM18조건 중 대장 관련6조건에서 별도 daemon UID1/capability0/NNP 프로세스가 첫2건→재시작 중복0→새 invocation2건→명시적 auth2 교체 후 중복0, 총 원래4건을 보존했다. 원래 시각·폐기한 auth1·미상 신원/승인 상태는 유지했다. 기존1,681,815행 판정과FP/FN은 바뀌지 않았다. [집계·소스 지문·실행 근거](infrastructure-results/extra-infrastructure-overnight-v97-20261116.json).
