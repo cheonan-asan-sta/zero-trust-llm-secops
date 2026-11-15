@@ -26,7 +26,7 @@ SUITES = (
      ('owned_unit_removed', 'owned_private_state_removed')),
     ('provider', 'scripts.run_collector_provider_controls', (),
      ('owned_units_removed', 'owned_provider_processes_stopped', 'owned_state_removed')),
-    ('pam', 'scripts.run_pam_journal_controls', ('--ledger',),
+    ('pam', 'scripts.run_pam_journal_controls', ('--ledger', '--checkpoint'),
      ('owned_units_removed', 'owned_provider_stopped', 'owned_state_removed', 'owned_ledger_state_removed')),
 )
 
