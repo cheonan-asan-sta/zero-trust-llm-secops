@@ -14,7 +14,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from scripts.continuous_mtls_runtime import ROOT, RuntimeFailure
-from scripts.execution_maintenance_probe import execute as execute_maintenance
+from scripts.execution_maintenance_probe import execute_for_runtime as execute_maintenance
 from scripts.execution_mtls_runtime import ExecutionRuntime
 from scripts.test_continuous_mtls_runtime import Checks as BaseChecks
 from scripts.test_recoverable_mtls_runtime import READ_STATE, RESTORE_EXITS
