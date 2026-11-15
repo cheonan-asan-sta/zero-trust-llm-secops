@@ -4,11 +4,19 @@ import hashlib
 import json
 import shutil
 import subprocess
+import sys
+import tarfile
 import time
 import uuid
 from pathlib import Path
 
-from scripts.f1_lab.capture_load import distribution, footprint, inventory, inventory_sha
+from scripts.f1_lab.capture_load import (
+    distribution,
+    footprint,
+    inventory,
+    inventory_sha,
+    resource_sample,
+)
 from scripts.f1_lab.collector_schedule_runtime import command, property_value
 from scripts.f1_lab.native_jsonl import decode, require
 from scripts.f1_lab.shared_execution_collector import READ_ENV
@@ -78,8 +86,17 @@ def run_load_controls(
     seconds,
     provider,
     restore_provider,
+    *,
+    soak_profile=None,
+    renew_authority=None,
 ):
-    require(type(seconds) is int and 10 <= seconds <= 600, "load_native_duration_bounds")
+    from scripts.f1_lab.native_soak import Progress, SoakProfile
+
+    if soak_profile is None:
+        require(type(seconds) is int and 10 <= seconds <= 600, "load_native_duration_bounds")
+    else:
+        require(type(soak_profile) is SoakProfile and seconds == soak_profile.seconds
+                and callable(renew_authority), "soak_runtime_profile")
     require(
         collector_unit.startswith("zt70c-") and root.parent.name.startswith("secops-v70-"),
         "load_owned_runtime",
@@ -98,6 +115,9 @@ def run_load_controls(
     before_deliveries = 0
     provider_restarts = 0
     latest = root / "latest.json"
+    progress = None
+    lease_renewals = 0
+    outage_tested = False
     report = {
         "completed": False,
         "requested_seconds": seconds,
@@ -167,12 +187,22 @@ def run_load_controls(
             install(Path("/run/systemd/system") / unit, body)
         command("daemon-reload")
         start = time.monotonic()
+        if soak_profile:
+            progress = Progress(output, soak_profile)
+            start = progress.start
+        last_renewal = start
         previous = None
         gaps = []
         restarted = False
         first_invocation = None
         observed_new_invocation = False
         while time.monotonic() - start < seconds or cycles < 3:
+            if progress:
+                progress.elapsed()
+            if soak_profile and (not lease_renewals or time.monotonic() - last_renewal >= soak_profile.renewal):
+                renew_authority()
+                lease_renewals += 1
+                last_renewal = time.monotonic()
             # The bounded credential adapter is not an unlimited vault. Keep
             # its limit and explicitly renew this owned fixture before it is
             # exhausted; reserve deliveries for the parent's final controls.
@@ -181,6 +211,14 @@ def run_load_controls(
                 provider = restore_provider()
                 provider_restarts += 1
             began = time.monotonic()
+            if soak_profile and not outage_tested and began - start >= seconds / 3:
+                before_outage = latest.read_bytes()
+                provider.close()
+                require(capture(False, credential_failure=True) is None, "soak_outage_capture_accepted")
+                require(latest.read_bytes() == before_outage, "soak_outage_replaced_latest")
+                provider = restore_provider()
+                provider_restarts += 1
+                outage_tested = True
             if previous is not None:
                 gaps.append((began - previous) * 1000)
             previous = began
@@ -212,12 +250,18 @@ def run_load_controls(
                 "load_native_health_grant",
             )
             sample.update(footprint(root))
+            if progress:
+                sample.update(controller_process=resource_sample(), lease_renewals=lease_renewals,
+                              provider_restarts=provider_restarts, provider_outage_verified=outage_tested)
+                progress.add(sample)
             samples.append(sample)
             cycles += 1
             if not restarted and time.monotonic() - start >= seconds / 2:
                 command("restart", "--", target_unit)
                 restarted = True
-            time.sleep(max(0, 2 - (time.monotonic() - began)))
+            interval = soak_profile.interval if soak_profile else 2
+            time.sleep(min(max(0, interval - (time.monotonic() - began)),
+                       max(0, seconds - (time.monotonic() - start))))
         elapsed = time.monotonic() - start
         actual = inventory(root)
         check("native_load_preserves_all_preexisting_and_new_capture_bytes", actual == expected)
@@ -232,6 +276,9 @@ def run_load_controls(
                     for kind, name in [("collector", "collector_accounting"),
                                        ("archive", "archive"), ("health", "health")]}
         check("native_load_each_worker_cpu_and_memory_observed", all(n == len(samples) for n in coverage.values()))
+        if progress:
+            require(outage_tested and lease_renewals >= 2, "soak_lifecycle_controls_missing")
+            report["soak"] = progress.finish()
         report.update(
             completed=True,
             cycles=cycles,
@@ -254,10 +301,30 @@ def run_load_controls(
             resource_accounting_coverage=coverage,
             resource_measurement_scope="same-process exit snapshot, including optional wrapper overhead; no host/root totals",
         )
+        report["long_soak_8h_completed"] = bool(progress and soak_profile.mode == "soak")
     finally:
+        primary_failure = sys.exc_info()[0] is not None
+        snapshot_failure = False
         for unit in (collector_unit, archive_unit, health_unit):
             command("stop", "--", unit, check=False)
             command("reset-failed", "--", unit, check=False)
+        if progress:
+            try:
+                with tarfile.open(output / "soak-evidence.tar", "w") as bundle:
+                    for path in sorted(root.rglob("*")):
+                        require(not path.is_symlink(), "soak_evidence_link")
+                        if path.is_file():
+                            bundle.add(path, arcname=path.relative_to(root), recursive=False)
+                report["evidence_tar_sha256"] = hashlib.sha256((output / "soak-evidence.tar").read_bytes()).hexdigest()
+            except (OSError, ValueError, tarfile.TarError):
+                snapshot_failure = True
+                report.update(completed=False, long_soak_8h_completed=False, evidence_snapshot_failed=True)
+            finally:
+                try:
+                    progress.close(report["completed"])
+                except (OSError, ValueError):
+                    snapshot_failure = True
+                    report.update(completed=False, long_soak_8h_completed=False, progress_write_failed=True)
         for path in created:
             require(path.is_relative_to(Path("/run/systemd/system")), "load_unit_cleanup_scope")
             path.unlink()
@@ -280,4 +347,6 @@ def run_load_controls(
         )
         report["cycles_observed_including_partial_run"] = len(samples)
         (output / "load-controls.json").write_text(json.dumps(report, indent=2) + "\n")
+        if snapshot_failure and not primary_failure:
+            require(False, "soak_final_evidence_failure")
     return report, provider

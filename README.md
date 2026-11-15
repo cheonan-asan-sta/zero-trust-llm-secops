@@ -1,5 +1,9 @@
 # zero-trust-llm-secops
 
+2026-11-15 v81: [백업·복구 검증 상태 지표/경보](docs/extra-backup-recovery-status.md). 집중 196개·전체 5,623개·실제 systemd 71조건·관측 23조건 통과. 8시간은 유예하며 운영 활성화와 독립 F1 평가는 별도다.
+
+2026-11-15 v80: [지속 시험 구현·부분 관측·유예](docs/extra-systemd-soak.md). 전체5,583개/사전68조건은 통과했으나 두 장기 실행은 중단됐다.8시간/12시간은 미완료·유예이며 자동 재개하지 않는다.
+
 2026-11-15 v79: [실제 systemd 자원 계측·로컬 제한 검증](docs/extra-systemd-resources.md). 작업자별 현재 invocation·혼합 cgroup을 확인하며 장기/운영 인수는 별도다.
 
 2026-11-15 v78: [실행 mTLS 보관 단계별 안전한 진단](docs/extra-execution-maintenance.md). 과거 CI 원인 미확인·자동 재시도0, 정상 인수와 실제 Linux 잠금 경합을 구분한다.

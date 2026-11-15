@@ -111,3 +111,6 @@ scope나 시각을 label로 늘리지 않고 worker 두 값만 사용한다. 외
 - [공개 검증·병합·소스/판정 지문](infrastructure-results/extra-collector-alerts-v74-20261114.json)
 - [집계·만료·프로필 구현](../scripts/f1_lab/collector_status_bridge.py), [실제 systemd 제어](../scripts/f1_lab/collector_status_runtime.py), [실제 경보 흐름](../scripts/run_collector_alert_flow.py), [단위/거부 회귀](../tests/test_collector_status_bridge.py)
 - [Prometheus 지표 형식](https://prometheus.io/docs/instrumenting/exposition_formats/), [경보 설계 지침](https://prometheus.io/docs/practices/alerting/): 제한된 집계 지표와 상태/용량 증상 중심의 경보·실제 전달 확인에 참고했다.
+
+
+후속 [백업·복구 상태 지표/경보 v81](extra-backup-recovery-status.md)에서 키 없는 pinned 검증과 기간 초과·보고자 만료 경보를 추가했다. 위의 미구현 표기는 당시 상태다. 운영 키·외부 pin과 실제 배포·수신 인수는 계속 별도다.

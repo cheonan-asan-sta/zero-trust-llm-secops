@@ -128,3 +128,6 @@ WSL systemd는 기존 정적 fixture daemon UID1과 치환 경로를 썼고 실�
 - [Python SQLite backup API](https://docs.python.org/3.12/library/sqlite3.html#sqlite3.Connection.backup), [AES-GCM API](https://cryptography.io/en/latest/hazmat/primitives/aead/#cryptography.hazmat.primitives.ciphers.aead.AESGCM): 일관된 DB 복사와 인증 암호화에 사용했다.
 
 후속 부하·용량·장애 시험과 8시간 장기 검증의 미완료 범위는 [v76 결과](extra-capture-load.md)를 따른다.
+
+
+후속 [백업·복구 상태 지표/경보 v81](extra-backup-recovery-status.md)에서 키 없는 pinned 검증과 기간 초과·보고자 만료 경보를 추가했다. 위의 미구현 표기는 당시 상태다. 운영 키·외부 pin과 실제 배포·수신 인수는 계속 별도다.

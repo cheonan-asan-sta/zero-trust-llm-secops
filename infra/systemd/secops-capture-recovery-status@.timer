@@ -1,0 +1,12 @@
+[Unit]
+Description=Check existing pinned backup recovery evidence for %i
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec=60s
+AccuracySec=1s
+RandomizedDelaySec=0
+Unit=secops-capture-recovery-status@%i.service
+
+[Install]
+WantedBy=timers.target
