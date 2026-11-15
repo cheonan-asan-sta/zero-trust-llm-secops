@@ -38,7 +38,9 @@ def child_reason(error):
 
 class VerificationFailure(RuntimeFailure):
     def __init__(self, reason, *, exit_code=None, child=None, cleanup=None):
-        super().__init__('database_transport_verification_failed')
+        # Preserve the established admission-denial contract while retaining
+        # typed detail for operators. Parent CA/DB fault tests depend on this.
+        super().__init__('database_transport_preflight_failed')
         self.diagnostic = {
             'schema': 'transport-verification-failure-1', 'operation': 'verify',
             'reason': reason if type(reason) is str and reason in FAILURES else 'invalid_receipt',
