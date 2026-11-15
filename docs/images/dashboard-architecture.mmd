@@ -18,7 +18,7 @@ flowchart TB
     CONTEXT --> STORE
     RESPONSE --> STORE
   end
-  SOURCES["신원, 기기, 실행 신호<br/>GuardDuty 로컬 입력 어댑터"] --> INBOX
+  SOURCES["신원, 기기, 세션 증명<br/>GuardDuty 로컬 입력 어댑터"] --> INBOX
   AUTH --> ANALYSIS
   AUTH --> INBOX
   AUTH --> CONTEXT

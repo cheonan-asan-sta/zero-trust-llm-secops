@@ -34,7 +34,7 @@
 <text x="108" y="953" class="small">분석 결과와 검토 이력 저장</text>
 <text x="108" y="982" class="small">AI가 접근 토큰을 발급하지 않음</text>
 <text x="460" y="578" class="heading">지속 검증과 접근</text>
-<text x="460" y="617" class="body">신원, 기기, 실행 신호</text>
+<text x="460" y="617" class="body">신원, 기기, 세션 증명</text>
 <text x="460" y="648" class="body">GuardDuty 로컬 입력 어댑터</text>
 <path d="M600 665 L600 697" fill="none" stroke="#56718c" stroke-width="2.5" marker-end="url(#arrow)"/>
 <text x="460" y="727" class="body">서명, 출처, 테넌트 검증</text>
