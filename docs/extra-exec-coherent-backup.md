@@ -1,0 +1,43 @@
+# 실행 복구 상태의 일관된 암호화 묶음 백업
+
+## 해결하는 문제
+
+이전 outbox 백업은 완성된 실행 원본을 보관한다. 부모 프로세스가 seal 전에 사라진 실행의 intent, 앱의 이미 소비한 grant, 브로커의 bound/uncertain 기록까지 같은 상태로 보존하지는 않았다. 이 기능은 별도 형식 `zt-exec-recovery-snapshot-1`로 그 상태를 묶는다. 캡처 DB에 가짜 이벤트를 넣어 서로 다른 자료를 억지로 저장하지 않는다.
+
+대상은 관리자가 선택한 **단일 테넌트 앱 DB·단일 서버/unit 브로커 DB**와 intent 저널이다. 다른 테넌트/서버/unit 기록이 섞인 DB, 예상하지 않은 SQLite 테이블·뷰·트리거, 현재 신뢰/정책과 맞지 않는 원본은 거부한다. 운영의 다중 테넌트 DB 전체 백업을 대체하지 않는다.
+
+## 일관성·보안 경계
+
+1. 소유자 전용 intent 잠금 → 브로커 `BEGIN IMMEDIATE` → 기존 앱 검증 트랜잭션 순서로 잠근다. 브로커에 launching 상태가 하나라도 있으면 백업을 거부한다. 새로운 dispatch의 상태 전환은 이 DB 잠금에 막힌다. intent·브로커·앱의 협력 writer 계약을 따르지 않는 root/외부 writer까지 막는 분산 트랜잭션은 아니다.
+2. 앱·브로커는 잠금 안에서 동일한 SQLite 상태를 직렬화한다. WAL 파일을 단순 복사하지 않는다. WAL 모드이면 별도의 읽기 연결에서 SQLite backup으로0700 임시 디렉터리의0600 사본을 만들고 그 사본만 standalone 모드로 바꾼다. 원래 DB의 WAL 설정은 유지하며, 새 사본의 앱 chain/head·브로커 행이 잠금 안에서 읽은 값과 같아야 한다. 이 경우 복원 대상은 일관된 standalone 스냅샷이며 원래 WAL 파일/페이지 표현 전체의 byte 동일 사본은 아니다. 원래 chain/세션 상태 검증과 앱 access hash·호출자·세션·정책·원본 seal 결합을 확인한다. 각 DB 최대16MiB, 스냅샷 최대64MiB, intent 최대10,000건이다. 한도나 수집 기한을 넘기면 부분 성공으로 처리하지 않는다.
+3. intent.json, 선택적인 완성 capture.json, 설정된 최대16개 worker 디렉터리의 capture.json만 읽는다. request.json·명령 argv·키 디렉터리·토큰 파일은 재귀 복사하지 않는다. worker 경로가 재사용되어 다른 요청의 파일이면 `reused`, 파일이 없으면 `missing`을 남긴다. worker 파일 존재를 승인 또는 독립 실행 증명으로 승격하지 않는다.
+4. 원래 앱 DB에 있는 grant hash와 회수/소비 이력은 복원 상태의 일부다. 원문 grant token·OIDC token·서명 개인키·복구 키를 스냅샷에 추가하지 않는다. 사용자 식별자와 서명된 경로 등 원본 상태 자체에는 민감한 정보가 있으므로 평문 staging/복원 디렉터리는0700, 파일은0600이다.
+5. AES-256-GCM payload와 manifest를 만들고, **원본 트리·패키지 밖의 checkpoint** SHA를 외부에서 고정한다. nonce·키 ID·범위·스냅샷 hash/시각은 AAD에 결속한다. 복구 키는 별도32바이트 입력이며 저장·출력하지 않는다. 최신 외부 checkpoint로 과거의 유효한 다른 패키지를 복원하려 하면 거부한다. 관리자가 오래된 pin까지 함께 되돌리는 특권 행위는 이 로컬 도구의 보장 밖이다.
+
+## 격리 복원·재검증
+
+복원은 현재 공개 신뢰/정책, 외부 checkpoint, ciphertext hash/GCM, 원본 intent/seal과 DB 상호 결합을 전부 검증한 뒤 **새 격리 디렉터리**를 만든다. 원래 signed worker 절대 경로를 따라가거나 원래 앱/브로커/intent 경로에 쓰지 않는다. 기존 출력은 덮어쓰지 않는다. 완료 marker `restore.json`을 마지막에 쓰며, 쓰다 중단된 디렉터리는 유효 복원본으로 인정하지 않는다.
+
+복원 파일 inventory와 원본 스냅샷 hash를 receipt에 결속한다. `verify_review`는 복구 키 없이 현재 공개 신뢰와 외부 receipt/checkpoint pin으로 모든 복원 바이트를 다시 조립·대조하고 서명·DB·미완료 상태를 재검증한다. 기존 정책 DB를 앱 서비스로 활성화하지 않으며, grant 환불·재발급·명령 실행·누락된 seal 생성 API는 없다. 신뢰된 운영자가 검토 사본을 별도로 강제 활성화하는 행위까지 막았다는 뜻은 아니다.
+
+## 실행 방법
+
+로컬 관리 명령은 `python -m scripts.exec_recovery_bundle {backup,restore,verify}`다. 세 하위 명령에 범위(`--tenant/--server/--unit/--source`)와 공개 registry/caller-registry 파일 및 SHA, `--checkpoint`를 지정한다. 기본 호출자 환경은 실제 oidc이며 로컬 fixture만 `--caller-environment local_oidc`를 명시한다.
+
+| 명령 | 추가 입력 | 결과 |
+|---|---|---|
+| backup | `--intents`, `--broker-db`, `--app-db`, `--worker-directory`(반복 가능), `--key-file`, `--key-id`, `--output`; 필요 시 `--app-policy` | 새 encrypted package와 외부 checkpoint SHA |
+| restore | `--package`, `--checkpoint-sha256`, `--key-file`, `--key-id`, `--output` | 새 격리 review와 receipt SHA |
+| verify | `--review`, `--receipt-sha256`, `--checkpoint-sha256` | 복원본의 현재 재검증 집계, 복구 키 입력 없음 |
+
+원본 DB와 부모 디렉터리는 사전에 관리자 소유0600/0700으로 준비해야 한다. CLI는 DB를 만들거나 초기화/마이그레이션하지 않는다. backup의 읽기용 객체에는 signer·issue·dispatch·access API가 없다. 기존 앱 검증 트랜잭션만 재사용한다. 키는32바이트0600 파일에서 읽으며 실패 출력은 민감한 경로나 원문 대신 unavailable 집계만 제공한다. 자동 timer·원격 업로드·AWS·유료 API는 없다.
+
+## 로컬 인수와 한계
+
+예비 계약92개와 실제 systemd62조건이 통과했다. 실제 exec6회 중 첫 수동 실행은 intent 도입 전 경로여서 이 묶음의 대상이 아니다. **intent5건 중 완성4건·확인 불가1건**을 백업하고 실제 선택 원본 DB·intent·worker 디렉터리를 제거한 뒤 격리 복원했다. 앱/브로커 DB와 전체 intent/seal 바이트가 일치하고 원래 live 경로는 계속 부재다. worker 경로가 재사용되어 현재1건만 보존 가능한 사실도 숨기지 않는다. 잘못된 복구 키와 실제 ciphertext 변조는 출력 디렉터리 생성 전에 거부됐다.
+
+최종 CLI/프로세스 간 잠금 추가 검증 및 전체 회귀는 진행 중이며, 완료 후 같은 후보의 소스 hash/결과를 추가한다. 최초 외부 도우미의 Linux 스크립트 파일명 오타는 native 시험 시작 전에 실패했다. 프로젝트 코드/기준을 바꾸지 않고 호출 경로만 수정해 같은 동결본에서 실행했으며 최초 로그를 보존했다.
+
+추가 WAL 시험은 처음에 직렬화한 WAL 헤더를 메모리에서 열지 못해 실패했다. 메모리 backup 사본의 journal mode 변경만으로는 standalone 헤더가 만들어지지 않는 실패도 보존했다. 원래 DB 설정을 바꾸거나 헤더 바이트를 수동 수정하지 않고 위의 전용 파일 사본 방식으로 수정한 뒤 관련35개가 통과했다. 외부 집중 selector가 새 CLI 시험 파일을 포함하지 못했던 경우도 기록했고, 같은 소스의 이미 통과한93개를 반복하지 않고 빠진 CLI6개만 별도 실행해 통과했다.
+
+기존 여섯 영역 탐지 정답·임계값·모델을 바꾸지 않는다. 복구/잠금/암호화 조건을 공격 탐지 표본이나 F1로 합산하지 않는다. 실제 조직 SSO·MDM·물리 호스트/외부 저장소 복원·운영 복구키 escrow·다중 writer 절체 인수는 별도다. 8시간/12시간 soak는 계속 유예한다.
