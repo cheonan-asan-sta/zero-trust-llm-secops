@@ -34,3 +34,12 @@ unavailable 동안 개별 집계 경보가 해제되는 것은 상태가 해결�
 그 실행에서 만든 실제 공개 보고서 verified → ciphertext bitflip으로 unavailable → 같은 바이트 수리 후 verified를 실제 Prometheus/Alertmanager에 전달한다. unknown1과 최초 시각은 보존해야 한다. 실제30초 경과로 snapshot 나이 경보, 명시적인 나이 정책 변경에 따른 해제(새 snapshot/restore가 아님), 실제60초 경과 보고서 만료도 확인한다. 로컬 파일 브리지 검증이며 운영 다중 호스트 mTLS·물리 외부 저장소 재난 복구 인수를 대신하지 않는다.
 
 최종 고정 소스·집중/전체/실제 경보 결과는 완료 후 추가한다. 기존 탐지 모델·정답·임계값과 분리하며 운영 경보 조건 수를 F1 표본에 합산하지 않는다. AWS/유료 API0, 사용자 유예한8시간/12시간 soak는 실행하지 않는다.
+
+
+## 최신 통합 인수 — 2026-11-16
+
+부모의 보관 잠금 경합 수정까지 포함한 고정 소스 `36122c3f796fc28f63ab4bcd9bfbd98c65db1d999d33e16c7fbc4733652b1418`에서 집중542개·전체6,070개·실제systemd67조건·실제Prometheus/Alertmanager9조건을 통과했다. 신규35개이며 실패/skip0이다. 집중은 전체의 부분집합이고, 이전524/6,052 결과를 합산하지 않는다. 원래 qualification commit은 `b813dd9`이며 게시 전 코드/설정 지문 동일성을 확인했다. 부모 PR83은 수정 head의 CI17개 성공 후 aitest `b31f3b5`에 병합됐다.
+
+별도 PID1 nobody worker는 UID65534·effective/bounding capability0·NNP이며 복구키와 서명키를 받지 않았다. 실제 payload·review DB·checkpoint 쓰기가 거절됐다. 손상한 ciphertext에서 unavailable, 정확한 바이트 수리 후 verified로 돌아와도 원래 시각과 확인불가1건은 그대로다. 실제30초 나이 경보와60초 보고서 만료, 정책 변경에 의한 경보 해제를 구분했다. 소유 사본 기반 시험이며 운영 원본 ACL 전환·물리 외부 저장소 인수가 완료됐다는 의미는 아니다.
+
+기존1,681,815행 판정 지문은 동일하고 새 FP/기존 TP 손실/정답 재열람은0이다. 공유 감사F1 0%·웹 감사80.70%·인증95.08%와 각각의 재현율 미달은 유지한다. 이 운영 통제 수를 탐지 F1 표본에 합산하지 않는다. 소유 컨테이너·unit·상태·소스·관측 프로세스를 정리했다. AWS/유료 API0, 장기 soak유예다. [집계·코드 지문·실행 원본 근거](infrastructure-results/extra-exec-bundle-status-v90-20261116.json).
