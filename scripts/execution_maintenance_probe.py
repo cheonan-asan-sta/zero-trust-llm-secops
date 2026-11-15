@@ -4,6 +4,7 @@ import json
 import sqlite3
 import subprocess
 import sys
+import uuid
 from pathlib import Path
 from typing import Literal
 
@@ -145,6 +146,10 @@ def execute(runtime, operation):
         )
     except (OSError, RuntimeFailure, ValueError, subprocess.SubprocessError) as error:
         return {"exit_code": None, "receipt": None, "issue": issue(error, "command")}
+    return result_receipt(result, operation)
+
+
+def result_receipt(result, operation):
     try:
         receipt = Receipt.model_validate(report_value(result.stdout))
         if receipt.operation != operation:
@@ -157,6 +162,106 @@ def execute(runtime, operation):
     if result.returncode and failure is None:
         failure = Issue(phase="command", category="command_exit").model_dump(mode="json")
     return {"exit_code": result.returncode, "receipt": receipt.model_dump(mode="json"), "issue": failure}
+
+
+def running(container):
+    result = subprocess.run(['docker', 'inspect', '--format', '{{json .State.Running}}', container],
+        stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=10, check=False)
+    value = report_value(result.stdout)
+    if result.returncode or type(value) is not bool:
+        raise RuntimeFailure('execution_maintenance_container_state')
+    return value
+
+
+def remove_job(name, project, nonce):
+    listed = subprocess.run(['docker', 'ps', '--all', '--quiet', '--no-trunc', '--filter', 'name=^/'+name+'$'],
+        stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=10, check=False)
+    if listed.returncode or len(listed.stdout) > 128:
+        raise RuntimeFailure('execution_maintenance_job_lookup')
+    container = listed.stdout.decode('ascii').strip()
+    if not container:
+        return True  # Successful daemon query confirms --rm already removed it.
+    if len(container) != 64 or set(container)-set('0123456789abcdef'):
+        raise RuntimeFailure('execution_maintenance_job_identity')
+    result = subprocess.run(['docker', 'inspect', '--format', '{{json .Config.Labels}}', container],
+        stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=10, check=False)
+    labels = report_value(result.stdout)
+    if (result.returncode or type(labels) is not dict or labels.get('secops.runtime') != project
+            or labels.get('secops.execution-maintenance') != nonce):
+        raise RuntimeFailure('execution_maintenance_job_scope')
+    result = subprocess.run(['docker', 'rm', '--force', container], stdout=subprocess.DEVNULL,
+                             stderr=subprocess.DEVNULL, timeout=10, check=False)
+    return result.returncode == 0
+
+
+def execute_quiesced_observer(runtime):
+    """One offline maintenance job after stopping the owned live writer.
+
+    The collector's nonblocking lock is unchanged. A failed/partial job stays
+    failed and leaves the observer stopped for inspection; no retry or reseal.
+    """
+    coordination = {'observer_stopped': False, 'job_started': False, 'job_removed': False,
+                    'observer_restarted': False, 'network': 'none'}
+    result = {'exit_code': None, 'receipt': None, 'issue': None}
+    nonce = uuid.uuid4().hex
+    name = project = None
+    try:
+        runtime.verify_release()
+        original = runtime.container('execution-observer')  # checks owned labels
+        if not running(original):
+            raise RuntimeFailure('execution_maintenance_observer_not_running')
+        runtime.compose('stop', '--timeout', '10', 'execution-observer', timeout=30)
+        if runtime.container('execution-observer') != original or running(original):
+            raise RuntimeFailure('execution_maintenance_observer_not_stopped')
+        coordination['observer_stopped'] = True
+        runtime._assert_unused('execution-state', 'execution-input')
+        project = runtime.state['project']
+        name = project+'-execution-maintenance-'+nonce[:12]
+        argv = ['docker', 'run', '--rm', '--interactive', '--name', name, '--network', 'none',
+                '--read-only', '--user', '10001:10001', '--cap-drop=ALL',
+                '--security-opt=no-new-privileges:true', '--pids-limit', '128',
+                '--memory', '896m', '--memory-swap', '896m',
+                '--label', 'secops.runtime='+project, '--label', 'secops.execution-maintenance='+nonce,
+                '--tmpfs', '/tmp:rw,nosuid,nodev,size=64m,uid=10001,gid=10001',
+                '--tmpfs', '/data:rw,nosuid,nodev,size=1m,uid=10001,gid=10001',
+                '--env', 'APP_ENVIRONMENT=local']
+        for label, path, readonly in [('execution-state', '/observer/state', False),
+                ('execution-input', '/observer/input', False), ('execution-tls', '/tls', True)]:
+            argv.extend(['--mount', 'type=volume,src='+runtime._volume(label)+',dst='+path
+                         +(',readonly' if readonly else '')])
+        argv.extend(['--entrypoint', 'python', runtime.state['image_id'], '-m', 'scripts.execution_maintenance_probe'])
+        coordination['job_started'] = True
+        child = subprocess.run(argv, input=b'{"operation":"observer_archive"}', stdout=subprocess.PIPE,
+                               stderr=subprocess.DEVNULL, timeout=30, check=False)
+        result = result_receipt(child, 'observer_archive')
+    except (OSError, RuntimeFailure, ValueError, TypeError, KeyError, subprocess.SubprocessError) as error:
+        result['issue'] = issue(error, 'command')
+    finally:
+        if coordination['job_started']:
+            try:
+                coordination['job_removed'] = remove_job(name, project, nonce)
+                if not coordination['job_removed']:
+                    raise RuntimeFailure('execution_maintenance_job_not_removed')
+            except (OSError, RuntimeFailure, ValueError, subprocess.SubprocessError) as error:
+                result['issue'] = issue(error, 'command')
+    if (result['issue'] is None and result['exit_code'] == 0 and result['receipt'] is not None
+            and result['receipt']['completed'] and coordination['observer_stopped'] and coordination['job_removed']):
+        try:
+            if runtime.container('execution-observer') != original:
+                raise RuntimeFailure('execution_maintenance_observer_replaced')
+            runtime.compose('start', 'execution-observer', timeout=30)
+            if not running(original):
+                raise RuntimeFailure('execution_maintenance_observer_not_resumed')
+            coordination['observer_restarted'] = True
+        except (OSError, RuntimeFailure, ValueError, subprocess.SubprocessError) as error:
+            result['issue'] = issue(error, 'command')
+    return {**result, 'coordination': coordination}
+
+
+def execute_for_runtime(runtime, operation):
+    if operation == 'observer_archive':
+        return execute_quiesced_observer(runtime)
+    return execute(runtime, operation)
 
 
 def main():
