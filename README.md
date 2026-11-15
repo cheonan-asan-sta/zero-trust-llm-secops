@@ -1,5 +1,9 @@
 # zero-trust-llm-secops
 
+관제 대시보드: [화면 구성과 로컬 시연 안내](docs/dashboard-guide.md).
+`python -m scripts.serve_dashboard_demo --seed`로 기존 평가 기록과 분리된 규칙 기반 시연 환경을
+실행합니다. 새 관제 화면은 `/`, 기존 분석 워크벤치는 `/static/workbench.html`입니다.
+
 2026-11-15 v81: [백업·복구 검증 상태 지표/경보](docs/extra-backup-recovery-status.md). 집중 196개·전체 5,623개·실제 systemd 71조건·관측 23조건 통과. 8시간은 유예하며 운영 활성화와 독립 F1 평가는 별도다.
 
 2026-11-15 v80: [지속 시험 구현·부분 관측·유예](docs/extra-systemd-soak.md). 전체5,583개/사전68조건은 통과했으나 두 장기 실행은 중단됐다.8시간/12시간은 미완료·유예이며 자동 재개하지 않는다.
