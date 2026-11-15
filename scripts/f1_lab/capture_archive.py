@@ -22,9 +22,10 @@ from pydantic import Field
 from app.models import StrictModel
 from scripts.f1_lab.capture_store import capture_store_lock
 from scripts.f1_lab.collector_freshness import MAX_CAPTURE, atomic_capture
+from scripts.f1_lab.managed_exec_capture import capture_parts
 from scripts.f1_lab.native_jsonl import decode, require
 from scripts.f1_lab.operation_context import canonical
-from scripts.f1_lab.shared_execution_evidence import ServiceEvent, ServiceProof, Unit, digest
+from scripts.f1_lab.shared_execution_evidence import Unit, digest
 from scripts.f1_lab.web_verified_context import Identifier
 
 MAX_RECORDS = 10000
@@ -101,15 +102,7 @@ class CaptureArchive:
     def shape(self, raw):
         """Structural scope checks only; archival is not signature re-attestation."""
         payload = decode(raw)
-        require(
-            type(payload) is dict
-            and set(payload) == {"schema", "event", "runtime_proof", "authorization_proof_included"}
-            and payload["schema"] == "zt-service-capture-1"
-            and payload["authorization_proof_included"] is False,
-            "archive_capture_envelope",
-        )
-        event = ServiceEvent.model_validate(payload["event"])
-        proof = ServiceProof.model_validate(payload["runtime_proof"])
+        event, proof = capture_parts(payload)
         require(
             (event.tenant_id, event.server_id, event.unit, event.mode)
             == (self.scope.tenant_id, self.scope.server_id, self.scope.unit, "systemd")

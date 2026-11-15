@@ -175,7 +175,7 @@ def setup_app(directory, unit, *, executable_sha256="a" * 64, command_sha256="b"
     )
 
 
-def run(directory):
+def run(directory, *, retention=False):
     require(
         sys.platform == "linux"
         and os.geteuid() == 0
@@ -201,6 +201,7 @@ def run(directory):
         "paid_api_calls": 0,
         "aws_calls": 0,
         "goal_qualified": False,
+        "managed_exec_retention_tested": retention,
         "cases": [],
     }
 
@@ -345,6 +346,10 @@ StandardError=journal
             "exec_history_private_values",
         )
         passed("capture_excludes_identity_token_key_and_raw_subject")
+        if retention:
+            from scripts.f1_lab.managed_exec_retention_controls import run as run_retention
+
+            run_retention(lab, gate, (receipt, event, proofs), launcher, private, output, passed)
         report["completed"] = True
     except Exception:
         diagnostic = subprocess.run(
@@ -376,7 +381,9 @@ StandardError=journal
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--directory", type=Path, required=True)
-    result = run(parser.parse_args().directory)
+    parser.add_argument("--retention", action="store_true")
+    args = parser.parse_args()
+    result = run(args.directory, retention=args.retention)
     print(json.dumps({"completed": result["completed"], "cases": len(result["cases"])}))
 
 
