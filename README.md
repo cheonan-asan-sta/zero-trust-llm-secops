@@ -4,6 +4,8 @@
 `python -m scripts.serve_dashboard_demo --seed`로 기존 평가 기록과 분리된 규칙 기반 시연 환경을
 실행합니다. 새 관제 화면은 `/`, 기존 분석 워크벤치는 `/static/workbench.html`입니다.
 
+2026-11-15 v82 로컬 완료·미병합: [실행 당시 이력·신원·앱 정책 연결](docs/extra-exec-history-app-binding.md). 집중 308개·전체 5,672개·실제 systemd/ptrace11조건 통과, 기존 1,681,815건 판정 동일·새 FP/TP 손실0. 관리 경로의 초기 exec만 수집하며 호스트 전체 감사·조직 SSO·독립 F1 완료가 아니다. AWS/유료 API0, 8시간은 계속 유예한다.
+
 2026-11-15 v81: [백업·복구 검증 상태 지표/경보](docs/extra-backup-recovery-status.md). 집중 196개·전체 5,623개·실제 systemd 71조건·관측 23조건 통과. 8시간은 유예하며 운영 활성화와 독립 F1 평가는 별도다.
 
 2026-11-15 v80: [지속 시험 구현·부분 관측·유예](docs/extra-systemd-soak.md). 전체5,583개/사전68조건은 통과했으나 두 장기 실행은 중단됐다.8시간/12시간은 미완료·유예이며 자동 재개하지 않는다.

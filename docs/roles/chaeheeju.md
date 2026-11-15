@@ -1,5 +1,7 @@
 # 채희주 개인 실행 계획
 
+2026-11-15 v82 로컬 완료·미병합: [실행 당시 이력·신원·앱 정책 연결](../extra-exec-history-app-binding.md). 집중 308개·전체 5,672개·실제 systemd/ptrace11조건 통과, 기존 1,681,815건 판정 동일·새 FP/TP 손실0. 관리 경로의 초기 exec만 수집하며 호스트 전체 감사·조직 SSO·독립 F1 완료가 아니다. AWS/유료 API0, 8시간은 계속 유예한다.
+
 ## 11월 14일 후속 구현·측정 v49
 
 채희주 요청으로 Codex가 [병합 후 오류 개선·출처 분리 평가](../extra-postmerge-detection-evaluation.md)의

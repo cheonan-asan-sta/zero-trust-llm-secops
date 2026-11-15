@@ -1,0 +1,26 @@
+[Unit]
+Description=Observe one approved service child at its initial kernel exec stop
+
+[Service]
+Type=oneshot
+# Keep the system-manager default UID 0. Explicit User=root with
+# NoNewPrivileges strips CAP_SETUID on the tested systemd 255.4.
+WorkingDirectory=/opt/secops
+ExecStart=/opt/secops/.venv/bin/python -m scripts.collect_exec_history --directory /var/lib/secops-exec-history/%i
+LoadCredential=runtime-key:/etc/secops/exec-history/%i.key
+Environment=PYTHONDONTWRITEBYTECODE=1 AWS_EC2_METADATA_DISABLED=true
+NoNewPrivileges=yes
+PrivateNetwork=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/secops-exec-history/%i
+RestrictAddressFamilies=AF_UNIX
+CapabilityBoundingSet=CAP_SETUID CAP_SETGID CAP_SYS_PTRACE CAP_DAC_READ_SEARCH CAP_KILL
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryMax=192M
+TasksMax=16
+TimeoutStartSec=15
+StandardOutput=null
+StandardError=journal
