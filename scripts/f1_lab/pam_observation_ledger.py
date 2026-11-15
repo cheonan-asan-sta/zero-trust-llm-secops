@@ -8,6 +8,7 @@ an administrator rewriting a consistent database is not prevented.
 
 import hashlib
 import os
+import re
 import sqlite3
 import stat
 from contextlib import closing, contextmanager
@@ -173,47 +174,90 @@ class PamObservationLedger:
     def inventory(self):
         """Hash-checked retained contents, never a statement of current freshness."""
         with self._connect() as con:
-            captures = list(con.execute('SELECT sha,body,admitted,new_events,duplicates FROM captures ORDER BY rowid'))
-            events = list(con.execute('SELECT id,body,sha,first_capture FROM events ORDER BY id'))
-            require(len(captures) <= self.capacity and len(events) <= self.event_capacity, 'pam_ledger_inventory_capacity')
-            originals, expected, first_captures = {}, {}, {}
-            last = None
-            for capture_sha, body, admitted, new_count, duplicates in captures:
-                require(type(body) is bytes and len(body) <= 4*1024**2 and digest(body) == capture_sha,
-                        'pam_ledger_capture_inventory')
-                capture = PamCapture.model_validate(decode(body))
-                require(capture.scope.model_dump(mode='json', exclude={'key_id'}) == self.identity, 'pam_ledger_inventory_scope')
-                originals[capture_sha] = capture
-                admitted_at = datetime.fromisoformat(admitted)
-                require(admitted_at.tzinfo is not None and admitted_at >= capture.issued_at
-                    and type(new_count) is int and type(duplicates) is int
-                    and new_count >= 0 and duplicates >= 0 and new_count+duplicates == len(capture.records),
-                    'pam_ledger_admission_inventory')
-                if last is not None:
-                    require(capture.issued_at > last.issued_at and capture.window_end_us >= last.window_end_us,
-                            'pam_ledger_sequence_inventory')
-                original_count = len(expected)
-                for record in capture.records:
-                    event_id = digest(canonical([self.identity, capture.boot_id, record.cursor_sha256]))
-                    value = event_body(capture, record)
-                    require(event_id not in expected or expected[event_id] == value, 'pam_ledger_inventory_conflict')
-                    first_captures.setdefault(event_id, capture_sha)
-                    expected[event_id] = value
-                require(len(expected)-original_count == new_count, 'pam_ledger_duplicate_inventory')
-                last = capture
-            require(len(expected) == len(events), 'pam_ledger_inventory_population')
-            for event_id, body, body_sha, first in events:
-                require(first in originals and first_captures[event_id] == first and event_id in expected and expected[event_id] == body
-                    and digest(body) == body_sha, 'pam_ledger_event_inventory')
-            checked, issued, latest, window_end = con.execute(
-                'SELECT checked,issued,latest,window_end FROM metadata WHERE id=1').fetchone()
-            if last is None:
-                require((checked, issued, latest, window_end) == (None, None, None, None), 'pam_ledger_empty_metadata')
-            else:
-                require(latest == captures[-1][0] and issued == last.issued_at.astimezone(UTC).isoformat()
-                    and window_end == last.window_end_us and datetime.fromisoformat(checked) >= last.issued_at,
-                    'pam_ledger_latest_inventory')
-            return {'schema': 'zt-pam-observation-inventory-1', 'completed': True,
-                'captures': len(captures), 'unique_events': len(events), 'current_freshness_verified': False,
-                'human_authenticated': False, 'authorization_asserted': False,
-                'automatic_enforcement_allowed': False, 'goal_qualified': False}
+            return self._inventory(con)
+
+    def _inventory(self, con):
+        captures = list(con.execute('SELECT sha,body,admitted,new_events,duplicates FROM captures ORDER BY rowid'))
+        events = list(con.execute('SELECT id,body,sha,first_capture FROM events ORDER BY id'))
+        require(len(captures) <= self.capacity and len(events) <= self.event_capacity, 'pam_ledger_inventory_capacity')
+        originals, expected, first_captures = {}, {}, {}
+        last = None
+        for capture_sha, body, admitted, new_count, duplicates in captures:
+            require(type(body) is bytes and len(body) <= 4*1024**2 and digest(body) == capture_sha,
+                    'pam_ledger_capture_inventory')
+            capture = PamCapture.model_validate(decode(body))
+            require(capture.scope.model_dump(mode='json', exclude={'key_id'}) == self.identity, 'pam_ledger_inventory_scope')
+            originals[capture_sha] = capture
+            admitted_at = datetime.fromisoformat(admitted)
+            require(admitted_at.tzinfo is not None and admitted_at >= capture.issued_at
+                and type(new_count) is int and type(duplicates) is int
+                and new_count >= 0 and duplicates >= 0 and new_count+duplicates == len(capture.records),
+                'pam_ledger_admission_inventory')
+            if last is not None:
+                require(capture.issued_at > last.issued_at and capture.window_end_us >= last.window_end_us,
+                        'pam_ledger_sequence_inventory')
+            original_count = len(expected)
+            for record in capture.records:
+                event_id = digest(canonical([self.identity, capture.boot_id, record.cursor_sha256]))
+                value = event_body(capture, record)
+                require(event_id not in expected or expected[event_id] == value, 'pam_ledger_inventory_conflict')
+                first_captures.setdefault(event_id, capture_sha)
+                expected[event_id] = value
+            require(len(expected)-original_count == new_count, 'pam_ledger_duplicate_inventory')
+            last = capture
+        require(len(expected) == len(events), 'pam_ledger_inventory_population')
+        for event_id, body, body_sha, first in events:
+            require(first in originals and first_captures[event_id] == first and event_id in expected and expected[event_id] == body
+                and digest(body) == body_sha, 'pam_ledger_event_inventory')
+        checked, issued, latest, window_end = con.execute(
+            'SELECT checked,issued,latest,window_end FROM metadata WHERE id=1').fetchone()
+        if last is None:
+            require((checked, issued, latest, window_end) == (None, None, None, None), 'pam_ledger_empty_metadata')
+        else:
+            require(latest == captures[-1][0] and issued == last.issued_at.astimezone(UTC).isoformat()
+                and window_end == last.window_end_us and datetime.fromisoformat(checked) >= last.issued_at,
+                'pam_ledger_latest_inventory')
+        return {'schema': 'zt-pam-observation-inventory-1', 'completed': True,
+            'captures': len(captures), 'unique_events': len(events), 'current_freshness_verified': False,
+            'human_authenticated': False, 'authorization_asserted': False,
+            'automatic_enforcement_allowed': False, 'goal_qualified': False}
+
+    def checkpoint(self, expected_sha256=None):
+        """Bind one locked historical inventory to an externally retained pin.
+
+        This does not reverify current signing authority or freshness. The pin
+        must be stored independently by the operator; keeping it beside this
+        DB does not protect against an administrator rolling both back.
+        """
+        require(expected_sha256 is None or (type(expected_sha256) is str
+            and re.fullmatch(r'[a-f0-9]{64}', expected_sha256)), 'pam_checkpoint_pin')
+        with self._connect() as con:
+            inventory = self._inventory(con)
+            content = hashlib.sha256(b'zt-pam-observation-content-1\x00')
+
+            def append(kind, row):
+                encoded = canonical([kind, list(row)])
+                content.update(len(encoded).to_bytes(8, 'big'))
+                content.update(encoded)
+
+            # Config binds logical source and capacity, independent of the
+            # currently selected signer key_id. SHA fields cover validated raw
+            # capture/event bodies; admission order and original times remain.
+            append('config', [digest(self.config)])
+            for row in con.execute('SELECT checked,issued,latest,window_end FROM metadata WHERE id=1'):
+                append('metadata', row)
+            for row in con.execute('SELECT sha,admitted,new_events,duplicates FROM captures ORDER BY rowid'):
+                append('capture', row)
+            for row in con.execute('SELECT id,sha,first_capture FROM events ORDER BY id'):
+                append('event', row)
+            result = {'schema': 'zt-pam-observation-checkpoint-1', 'completed': True,
+                'configuration_sha256': digest(self.config), 'contents_sha256': content.hexdigest(),
+                'captures': inventory['captures'], 'unique_events': inventory['unique_events'],
+                'current_freshness_verified': False, 'human_authenticated': False,
+                'authorization_asserted': False, 'automatic_enforcement_allowed': False,
+                'goal_qualified': False}
+            checkpoint_sha = digest(canonical(result))
+            require(expected_sha256 is None or checkpoint_sha == expected_sha256,
+                    'pam_checkpoint_mismatch')
+        return {**result, 'checkpoint_sha256': checkpoint_sha,
+                'external_pin_matched': expected_sha256 is not None}

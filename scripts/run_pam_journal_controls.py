@@ -32,7 +32,8 @@ from scripts.f1_lab.systemd_credentials import CredentialSocket
 from scripts.run_shared_execution_controls import setup
 
 
-def run(directory, *, ledger=False):
+def run(directory, *, ledger=False, checkpoint=False):
+    require(not checkpoint or ledger, 'pam_controls_checkpoint_requires_ledger')
     source = Path(__file__).resolve().parents[1]
     require(os.geteuid() == 0 and Path('/proc/1/comm').read_text().strip() == 'systemd'
             and source.parent == Path('/run') and source.name.startswith('zt-pam-journal-v93-'),
@@ -49,6 +50,7 @@ def run(directory, *, ledger=False):
     ledger_state_name = 'secops-pal95-'+tag
     ledger_state = Path('/var/lib')/ledger_state_name
     admission_unit = 'zpa95a-'+tag[:12]+'.service'
+    checkpoint_unit = 'zpa98p-'+tag[:12]+'.service'
     registry_path, env_path, keyless_copy = config/'service-registry.json', config/'public.conf', config/'keyless.json'
     created, checks, launches = [], [], []
     provider = None
@@ -172,6 +174,27 @@ def run(directory, *, ledger=False):
                 'pam_controls_admission_security')
         return row
 
+    def checkpoint_run(pin=None, *, expected=True):
+        path = Path('/run/systemd/system')/checkpoint_unit
+        text = base('daemon')+f'StateDirectory={ledger_state_name}\nStateDirectoryMode=0700\nUMask=0077\n'
+        text += f'ExecStart=/usr/bin/python3 -m scripts.checkpoint_pam_observations --tenant local-lab --server shared-lab --unit {target} --source local-auth-journal --key-id auth-1 --ledger-directory {ledger_state}/observations'
+        text += '\n' if pin is None else f' --expected-sha256 {pin}\n'
+        if path not in created:
+            install(checkpoint_unit, text)
+        else:
+            path.write_text(text, encoding='utf8')
+        require(command('daemon-reload').returncode == 0, 'pam_controls_checkpoint_reload')
+        command('reset-failed', checkpoint_unit)
+        result = command('start', checkpoint_unit)
+        value = messages(checkpoint_unit)
+        require(value['completed'] is expected and (result.returncode == 0) is expected,
+                'pam_controls_checkpoint_result')
+        if expected:
+            require(security(value, 1) and not value['current_freshness_verified']
+                and not value['human_authenticated'] and not value['automatic_enforcement_allowed'],
+                'pam_controls_checkpoint_security')
+        return value
+
     py_path = os.environ.get('PYTHONPATH', '')
     require(bool(re.fullmatch(r'[A-Za-z0-9_/:.-]{1,2048}', py_path)), 'pam_controls_dependency_path')
 
@@ -246,6 +269,12 @@ def run(directory, *, ledger=False):
             unchanged = admit(first_raw, boot, invocation)
             check('damaged_owned_capture_fails_external_pin_without_erasing_or_recounting_ledger',
                   unchanged['new_events'] == 0 and unchanged['unique_events_retained'] == 2)
+            if checkpoint:
+                original_checkpoint = checkpoint_run()
+                original_database = (ledger_state/'observations/observations.sqlite3').read_bytes()
+                checked_checkpoint = checkpoint_run(original_checkpoint['checkpoint_sha256'])
+                check('separate_keyless_cap0_daemon_checks_two_original_events_against_external_pin',
+                      checked_checkpoint['external_pin_matched'] and checked_checkpoint['unique_events'] == 2)
         probe = ("import os,json;blocked=False\ntry:\n fd=os.open("+repr(str(keyless_copy))+",os.O_WRONLY);os.close(fd)\nexcept OSError as error:blocked=error.errno in (13,30)\nprint(json.dumps({'write_denied':blocked}))")
         escaped = probe.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
         install(write_unit, base('daemon')+f'ExecStart=/usr/bin/python3 -c "{escaped}"\n')
@@ -267,6 +296,9 @@ def run(directory, *, ledger=False):
             second_admission = admit(second_raw, boot2, invocation2)
             check('new_owned_invocation_retains_prior_two_and_adds_only_two_new_cursor_events',
                   second_admission['new_events'] == 2 and second_admission['unique_events_retained'] == 4)
+            if checkpoint:
+                checkpoint_run(original_checkpoint['checkpoint_sha256'], expected=False)
+                check('new_invocation_changes_checkpoint_without_recounting_old_events')
         keyless(first_raw, boot2, invocation2, expected=False)
         check('old_capture_cannot_be_rebound_to_current_target_invocation')
         selected_key['value'] = keys['runtime']
@@ -306,6 +338,23 @@ def run(directory, *, ledger=False):
             report['durable_pam_ledger_tested'] = True
             report['ledger_worker_security'] = rotated['worker_security']
             report['unique_original_pam_events_retained'] = 4
+            if checkpoint:
+                latest_checkpoint = checkpoint_run()
+                latest_database = (ledger_state/'observations/observations.sqlite3').read_bytes()
+                check('historical_checkpoint_after_signer_rotation_does_not_reactivate_old_auth_key',
+                      latest_checkpoint['unique_events'] == 4
+                      and not next(a for a in renewed.authorities if a.key_id == 'auth-1').enabled)
+                # Owned fixture only; never install a restored database into a
+                # production writer. Preserve both original byte images in RAM.
+                (ledger_state/'observations/observations.sqlite3').write_bytes(original_database)
+                checkpoint_run(latest_checkpoint['checkpoint_sha256'], expected=False)
+                check('actual_whole_owned_database_rollback_fails_separately_retained_latest_pin')
+                (ledger_state/'observations/observations.sqlite3').write_bytes(latest_database)
+                restored = checkpoint_run(latest_checkpoint['checkpoint_sha256'])
+                check('exact_owned_fixture_reinstatement_matches_pin_and_keeps_four_original_events',
+                      restored['external_pin_matched'] and restored['unique_events'] == 4)
+                report['external_pam_checkpoint_tested'] = True
+                report['checkpoint_worker_security'] = restored['worker_security']
         report.update(completed=True, verified_records_each=2,
             original_event_times=[r.recorded_at_us for r in second.records],
             collector_user=65534, keyless_user=1, target_fixture_restarts=1,
@@ -348,8 +397,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--directory', type=Path, required=True)
     parser.add_argument('--ledger', action='store_true')
+    parser.add_argument('--checkpoint', action='store_true')
     args = parser.parse_args()
-    result = run(args.directory, ledger=args.ledger)
+    result = run(args.directory, ledger=args.ledger, checkpoint=args.checkpoint)
     print(json.dumps({'completed': result['completed'], 'cases': len(result['cases']),
                       'aws_calls': 0, 'paid_api_calls': 0}))
 
