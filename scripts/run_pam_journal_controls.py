@@ -32,7 +32,7 @@ from scripts.f1_lab.systemd_credentials import CredentialSocket
 from scripts.run_shared_execution_controls import setup
 
 
-def run(directory):
+def run(directory, *, ledger=False):
     source = Path(__file__).resolve().parents[1]
     require(os.geteuid() == 0 and Path('/proc/1/comm').read_text().strip() == 'systemd'
             and source.parent == Path('/run') and source.name.startswith('zt-pam-journal-v93-'),
@@ -46,6 +46,9 @@ def run(directory):
     collector_prefix, verifier_unit, write_unit = 'zpa93c-'+tag[:12], 'zpa93v-'+tag[:12]+'.service', 'zpa93w-'+tag[:12]+'.service'
     state_name = 'secops-pa93-'+tag
     state = Path('/var/lib')/state_name
+    ledger_state_name = 'secops-pal95-'+tag
+    ledger_state = Path('/var/lib')/ledger_state_name
+    admission_unit = 'zpa95a-'+tag[:12]+'.service'
     registry_path, env_path, keyless_copy = config/'service-registry.json', config/'public.conf', config/'keyless.json'
     created, checks, launches = [], [], []
     provider = None
@@ -144,6 +147,31 @@ def run(directory):
                     and not row['authorization_asserted'], 'pam_controls_keyless_security')
         return row
 
+    def admit(raw, boot, invocation, *, initialize=False, registry_pin=None, key_id='auth-1', pin=None, expected=True):
+        keyless_copy.write_bytes(raw)
+        keyless_copy.chmod(0o444)
+        pin = hashlib.sha256(raw).hexdigest() if pin is None else pin
+        registry_pin = original_pin if registry_pin is None else registry_pin
+        path = Path('/run/systemd/system')/admission_unit
+        text = base('daemon')+f'StateDirectory={ledger_state_name}\nStateDirectoryMode=0700\nUMask=0077\n'
+        text += f'ExecStart=/usr/bin/python3 -m scripts.admit_pam_journal {common} --key-id {key_id} --registry-sha256 {registry_pin} --capture {keyless_copy} --capture-sha256 {pin} --boot-id {boot} --invocation-id {invocation} --ledger-directory {ledger_state}/observations'
+        text += ' --initialize\n' if initialize else '\n'
+        if path not in created:
+            install(admission_unit, text)
+        else:
+            path.write_text(text, encoding='utf8')
+        require(command('daemon-reload').returncode == 0, 'pam_controls_admission_reload')
+        command('reset-failed', admission_unit)
+        result = command('start', admission_unit)
+        row = messages(admission_unit)
+        require(row['completed'] is expected and (result.returncode == 0) is expected,
+                'pam_controls_admission_result')
+        if expected:
+            require(security(row, 1) and not row['human_authenticated']
+                and not row['authorization_asserted'] and not row['automatic_enforcement_allowed'],
+                'pam_controls_admission_security')
+        return row
+
     py_path = os.environ.get('PYTHONPATH', '')
     require(bool(re.fullmatch(r'[A-Za-z0-9_/:.-]{1,2048}', py_path)), 'pam_controls_dependency_path')
 
@@ -204,6 +232,20 @@ def run(directory):
         first_keyless = keyless(first_raw, boot, invocation)
         report['keyless_worker_security'] = first_keyless['worker_security']
         check('separate_pid1_keyless_daemon_verifies_owned_readonly_copy_without_key_input')
+        if ledger:
+            admitted = admit(first_raw, boot, invocation, initialize=True)
+            check('actual_separate_cap0_nnp_daemon_admits_two_real_pam_events_without_signing_key',
+                  admitted['new_events'] == 2 and admitted['unique_events_retained'] == 2)
+            repeated = admit(first_raw, boot, invocation)
+            check('separate_admission_process_restart_deduplicates_same_original_capture',
+                  repeated['new_events'] == 0 and repeated['duplicate_capture']
+                  and repeated['original_window_end_us'] == admitted['original_window_end_us'])
+            admit(first_raw, boot, invocation, initialize=True, expected=False)
+            check('existing_durable_pam_ledger_cannot_be_reinitialized')
+            admit(first_raw+b' ', boot, invocation, pin=hashlib.sha256(first_raw).hexdigest(), expected=False)
+            unchanged = admit(first_raw, boot, invocation)
+            check('damaged_owned_capture_fails_external_pin_without_erasing_or_recounting_ledger',
+                  unchanged['new_events'] == 0 and unchanged['unique_events_retained'] == 2)
         probe = ("import os,json;blocked=False\ntry:\n fd=os.open("+repr(str(keyless_copy))+",os.O_WRONLY);os.close(fd)\nexcept OSError as error:blocked=error.errno in (13,30)\nprint(json.dumps({'write_denied':blocked}))")
         escaped = probe.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
         install(write_unit, base('daemon')+f'ExecStart=/usr/bin/python3 -c "{escaped}"\n')
@@ -216,11 +258,15 @@ def run(directory):
         require(command('restart', target).returncode == 0, 'pam_controls_target_restart')
         boot2, invocation2 = unit_invocation(target)
         require(boot2 == boot and invocation2 != invocation, 'pam_controls_new_invocation')
-        second, _ = collect('two')
+        second, second_raw = collect('two')
         check('actual_owned_target_restart_keeps_old_invocation_events_out_of_new_capture',
               second.invocation_id == invocation2 and len(second.records) == 2
               and second.rejections.untrusted_pam >= 4
               and not {r.cursor_sha256 for r in first.records} & {r.cursor_sha256 for r in second.records})
+        if ledger:
+            second_admission = admit(second_raw, boot2, invocation2)
+            check('new_owned_invocation_retains_prior_two_and_adds_only_two_new_cursor_events',
+                  second_admission['new_events'] == 2 and second_admission['unique_events_retained'] == 4)
         keyless(first_raw, boot2, invocation2, expected=False)
         check('old_capture_cannot_be_rebound_to_current_target_invocation')
         selected_key['value'] = keys['runtime']
@@ -252,6 +298,14 @@ def run(directory):
               == [(r.cursor_sha256, r.recorded_at_us) for r in third.records]
               and not third.human_authenticated and not third.authorization_asserted
               and renewed.version == 3 and not next(a for a in renewed.authorities if a.key_id == 'auth-1').enabled)
+        if ledger:
+            rotated = admit(third_raw, boot2, invocation2, registry_pin=renewed_pin, key_id='auth-2')
+            check('explicit_new_auth_key_preserves_same_cursor_dedup_and_all_four_original_events',
+                  rotated['new_events'] == 0 and rotated['overlapping_events'] == 2
+                  and rotated['unique_events_retained'] == 4)
+            report['durable_pam_ledger_tested'] = True
+            report['ledger_worker_security'] = rotated['worker_security']
+            report['unique_original_pam_events_retained'] = 4
         report.update(completed=True, verified_records_each=2,
             original_event_times=[r.recorded_at_us for r in second.records],
             collector_user=65534, keyless_user=1, target_fixture_restarts=1,
@@ -278,9 +332,14 @@ def run(directory):
         require(state.parent == Path('/var/lib') and state.name == 'secops-pa93-'+tag, 'pam_controls_cleanup_state')
         if state.exists():
             shutil.rmtree(state)
+        require(ledger_state.parent == Path('/var/lib') and ledger_state.name == 'secops-pal95-'+tag,
+                'pam_controls_cleanup_ledger')
+        if ledger_state.exists():
+            shutil.rmtree(ledger_state)
         report['owned_units_removed'] = reloaded and all(not path.exists() for path in created)
         report['owned_provider_stopped'] = provider is None or not provider.thread.is_alive()
         report['owned_state_removed'] = not state.exists() and not config.exists()
+        report['owned_ledger_state_removed'] = not ledger_state.exists()
         save()
     return report
 
@@ -288,8 +347,9 @@ def run(directory):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--directory', type=Path, required=True)
+    parser.add_argument('--ledger', action='store_true')
     args = parser.parse_args()
-    result = run(args.directory)
+    result = run(args.directory, ledger=args.ledger)
     print(json.dumps({'completed': result['completed'], 'cases': len(result['cases']),
                       'aws_calls': 0, 'paid_api_calls': 0}))
 
