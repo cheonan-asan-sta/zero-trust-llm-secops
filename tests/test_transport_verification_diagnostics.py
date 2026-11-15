@@ -55,7 +55,7 @@ def test_child_failure_preserves_exit_without_claiming_oom(monkeypatch, code):
 
 
 def test_exit_failure_cannot_be_overridden_by_success_json(monkeypatch):
-    with pytest.raises(v.VerificationFailure, match='verification_failed'):
+    with pytest.raises(v.VerificationFailure, match='preflight_failed'):
         call(monkeypatch, code=1)
 
 
@@ -145,3 +145,19 @@ def test_timeout_cleanup_removes_only_inspected_owned_id(monkeypatch):
     monkeypatch.setattr(v.subprocess, 'run', run)
     assert v.timeout_cleanup('owned', 'token', IMAGE) is True
     assert calls[-1] == ['docker', 'rm', '--force', 'owned-id']
+
+
+def test_admission_preserves_existing_public_denial_and_typed_diagnostics(monkeypatch):
+    from scripts.database_transport_runtime import TransportRuntime
+    from scripts.persistent_authority_runtime import PersistentAuthorityRuntime
+    monkeypatch.setattr(PersistentAuthorityRuntime, 'verify_authority_public_assets', lambda _: None)
+    runtime = object.__new__(TransportRuntime)
+    error = v.VerificationFailure('child_failed', exit_code=1, child='database_transport_private_file_required')
+    def fail(operation):
+        assert operation == 'verify'
+        raise error
+    monkeypatch.setattr(runtime, 'transport_job', fail)
+    with pytest.raises(v.VerificationFailure) as caught:
+        runtime.verify_authority_public_assets()
+    assert caught.value is error and str(error) == 'database_transport_preflight_failed'
+    assert public_failure(error)['transport_verification']['child_reason'] == 'database_transport_private_file_required'
