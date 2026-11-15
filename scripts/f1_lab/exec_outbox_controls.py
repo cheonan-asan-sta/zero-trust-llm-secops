@@ -29,7 +29,8 @@ def begin(lab, launcher, private, root, outbox, scope, public, output, check):
         retention, "publish_sealed", side_effect=OSError("owned publication interruption")
     ):
         try:
-            retention.dispatch_and_retain(gate, next_launcher, lab.permission, root, outbox)
+            retention.dispatch_and_retain(gate, next_launcher, lab.permission, root, outbox,
+                                         intent_root=private / "intents")
         except OSError:
             pass
         else:

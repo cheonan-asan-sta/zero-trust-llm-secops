@@ -1,5 +1,7 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+2026-11-16 v86 로컬 통합 인수: [실행 intent·중단 후 원본 대조](docs/extra-exec-intent-reconciliation.md). 집중378·전체5,868·실제 systemd44조건 통과. 실제6건 중 브로커 종료2건에서 봉인 전 indeterminate 보존·완성 원본 동일 bytes 재게시·명령/권한 재발급0을 확인했다. v85의1,681,815건 결정 동일, 새 독립 성능이 아니다. PR78 병합, AWS/유료 API0·장기 soak 유예.
+
 2026-11-16 v85 관측 개발 비교: [명시적 AppArmor 변경 생략 문맥](docs/extra-apparmor-noop-review.md)으로 웹 감사 FP37→21·F1 70.77%→80.70%, FN1 유지. 전체1,681,815행에서 추가 FP/기존 TP 손실0. 집중133·전체5,849개 통과. 공유 감사 FP24/FN6·인증 FP0/FN3 유지, 독립 여섯 영역 목표는 미달이다. PR77은 CI17개 통과 후 aitest에 병합됐다. AWS/유료 API0·장기 soak 유예.
 
 2026-11-16 v84 최신 aitest 통합·로컬 인수 완료: [outbox 경보·전체 암호화 백업·복원 후 정리](docs/extra-exec-outbox-recovery.md). 집중331·전체5,770·실제 systemd36조건·실제 관측8조건 통과. 실제 실행4건 전체 byte 동일 복원, 게시3건만 정리·미게시1건 보존. 기존1,681,815건 결정 동일·추가 FP/기존 TP 손실0, 독립 F1 개선은 아니다. 팀원 PR59 대시보드 보존. AWS/유료 API0·8시간 soak 유예. 게시/CI/병합은 후속 PR 기록을 따른다.
