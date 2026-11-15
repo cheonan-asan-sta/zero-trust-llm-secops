@@ -13,7 +13,8 @@ from scripts.f1_lab.exec_intent import ExecIntentJournal
 from scripts.f1_lab.native_jsonl import require
 
 
-def run(lab, launcher, private, root, outbox, output, check):
+def run(lab, launcher, private, root, outbox, output, check, *, recovery_observability=False,
+        scope=None):
     journal = ExecIntentJournal(private/'intents',lab.broker.joiner.registry,lab.broker.registry)
     # This reconciliation facade exposes neither a signing key nor issuance,
     # launch, grant consumption or dispatch methods.
@@ -22,6 +23,11 @@ def run(lab, launcher, private, root, outbox, output, check):
                                   connect=lab.broker.connect)
     app_view = SimpleNamespace(policy_digest=lab.operations.policy_digest,
                               _transaction=lab.operations._transaction)
+    observer = None
+    if recovery_observability:
+        from scripts.f1_lab.exec_recovery_controls import RecoveryObserver
+
+        observer = RecoveryObserver(lab,root,private/'intents',outbox,scope,output,check)
 
     def execute_then_exit(phase, exit_code):
         for name in ('request.json','capture.json'):
@@ -67,11 +73,19 @@ def run(lab, launcher, private, root, outbox, output, check):
             and hashlib.sha256(lab.broker.path.read_bytes()).hexdigest() == before_broker,
             'exec_intent_readonly_before_resume')
     check('unsealed_reconciliation_does_not_change_app_or_broker_ledgers')
+    if observer is not None:
+        observer.frame('indeterminate',expected={'intents':4,'sealed':3,'indeterminate':1,
+                                               'unpublished':1,'published':2})
+        check('recovery_inventory_observes_actual_preseal_loss_and_old_cold_publication_loss')
 
     sealed = execute_then_exit('pre_outbox',72)
     raw = (private/'intents'/sealed/'capture.json').read_bytes()
     require(not (outbox/(sealed+'.json')).exists(), 'exec_intent_outbox_not_written_before_exit')
     check('actual_second_broker_process_disappears_after_durable_seal_before_outbox')
+    if observer is not None:
+        observer.frame('pending',expected={'intents':5,'sealed':4,'indeterminate':1,
+                                          'unpublished':2,'published':2})
+        check('recovery_inventory_finds_completed_original_even_before_outbox_file_exists')
     before_app = hashlib.sha256(lab.operations.path.read_bytes()).hexdigest()
     before_broker = hashlib.sha256(lab.broker.path.read_bytes()).hexdigest()
     restarted = ExecIntentJournal(private/'intents',lab.broker.joiner.registry,lab.broker.registry)
@@ -89,6 +103,10 @@ def run(lab, launcher, private, root, outbox, output, check):
     require(not (outbox/(unsealed+'.json')).exists()
             and not (private/'intents'/unsealed/'capture.json').exists(), 'exec_intent_unknown_not_upgraded')
     check('later_success_does_not_promote_an_older_indeterminate_execution')
+    if observer is not None:
+        observer.frame('partial',expected={'intents':5,'sealed':4,'indeterminate':1,
+                                          'unpublished':1,'published':3})
+        observer.finish(unsealed,sealed,restarted,broker_view,app_view)
     (output/'intent-controls.json').write_text(json.dumps({
         'completed':True,'actual_additional_execs':2,'actual_broker_process_losses':2,
         'total_execs_including_outbox_base_four':6,

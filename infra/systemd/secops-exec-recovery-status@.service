@@ -1,0 +1,35 @@
+[Unit]
+Description=Recheck execution intent and original publication status for %i
+
+[Service]
+Type=oneshot
+User=secops-collector
+Group=secops-collector
+EnvironmentFile=/etc/secops/exec-recovery/%i.conf
+ExecStart=/opt/secops/.venv/bin/python -m scripts.exec_recovery_status --tenant ${RECOVERY_TENANT} --server ${RECOVERY_SERVER} --unit ${RECOVERY_UNIT} --source ${RECOVERY_SOURCE} --root /var/lib/secops-evidence/%i --intents /var/lib/secops-exec-intents/%i --registry /etc/secops/service-registry.json --registry-sha256 ${SERVICE_REGISTRY_SHA256} --caller-registry /etc/secops/caller-registry.json --caller-registry-sha256 ${CALLER_REGISTRY_SHA256} --status-output /var/cache/secops-exec-recovery/%i.json
+WorkingDirectory=/opt/secops
+CacheDirectory=secops-exec-recovery
+CacheDirectoryMode=0755
+UMask=0077
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+PrivateNetwork=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictSUIDSGID=yes
+LockPersonality=yes
+ReadWritePaths=/var/lib/secops-evidence/%i/.capture-store.lock /var/lib/secops-exec-intents/%i/.capture-store.lock
+CPUQuota=50%
+MemoryMax=256M
+TasksMax=8
+TimeoutStartSec=20
+
+# Opt-in only. Preprovision owner0700 input stores,0600 cooperative locks and
+# pinned public registries. No private key, broker/app DB, worker argv or
+# execution/authorization API is provided to this checker.

@@ -175,7 +175,9 @@ def setup_app(directory, unit, *, executable_sha256="a" * 64, command_sha256="b"
     )
 
 
-def run(directory, *, retention=False, outbox_recovery=False, intent_recovery=False):
+def run(directory, *, retention=False, outbox_recovery=False, intent_recovery=False,
+        recovery_observability=False):
+    intent_recovery = intent_recovery or recovery_observability
     outbox_recovery = outbox_recovery or intent_recovery
     retention = retention or outbox_recovery
     require(
@@ -206,6 +208,7 @@ def run(directory, *, retention=False, outbox_recovery=False, intent_recovery=Fa
         "managed_exec_retention_tested": retention,
         "exec_outbox_recovery_tested": outbox_recovery,
         "exec_intent_recovery_tested": intent_recovery,
+        "exec_recovery_observability_tested": recovery_observability,
         "cases": [],
     }
 
@@ -363,6 +366,7 @@ StandardError=journal
                 passed,
                 outbox_recovery=outbox_recovery,
                 intent_recovery=intent_recovery,
+                recovery_observability=recovery_observability,
             )
         report["completed"] = True
     except Exception:
@@ -397,10 +401,11 @@ def main():
     parser.add_argument("--directory", type=Path, required=True)
     parser.add_argument("--retention", action="store_true")
     parser.add_argument("--outbox-recovery", action="store_true")
+    parser.add_argument("--recovery-observability", action="store_true")
     parser.add_argument("--intent-recovery", action="store_true")
     args = parser.parse_args()
     result = run(args.directory, retention=args.retention, outbox_recovery=args.outbox_recovery,
-                 intent_recovery=args.intent_recovery)
+                 intent_recovery=args.intent_recovery,recovery_observability=args.recovery_observability)
     print(json.dumps({"completed": result["completed"], "cases": len(result["cases"])}))
 
 

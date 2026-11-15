@@ -1,0 +1,11 @@
+[Unit]
+Description=Periodically recheck execution recovery artifacts for %i
+
+[Timer]
+OnBootSec=15s
+OnUnitActiveSec=15s
+AccuracySec=1s
+Unit=secops-exec-recovery-status@%i.service
+
+[Install]
+WantedBy=timers.target

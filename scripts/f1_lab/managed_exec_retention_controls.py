@@ -20,7 +20,7 @@ from scripts.f1_lab.native_jsonl import decode, require
 
 
 def run(lab, gate, result, launcher, private, output, check, *, outbox_recovery=False,
-        intent_recovery=False):
+        intent_recovery=False, recovery_observability=False):
     root, outbox, intents = private / "retained", private / "outbox", private / "intents"
     for path in (root, outbox, intents):
         path.mkdir(mode=0o700)
@@ -204,7 +204,8 @@ def run(lab, gate, result, launcher, private, output, check, *, outbox_recovery=
     if intent_recovery:
         from scripts.f1_lab.exec_intent_controls import run as run_intent
 
-        run_intent(lab,launcher,private,root,outbox,output,check)
+        run_intent(lab,launcher,private,root,outbox,output,check,
+                   recovery_observability=recovery_observability,scope=archive_scope)
     exported = output / "retention-public"
     exported.mkdir(exist_ok=False)
     for path in public.glob("*.json"):
