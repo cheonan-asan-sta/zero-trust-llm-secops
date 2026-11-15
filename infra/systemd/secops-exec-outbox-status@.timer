@@ -1,0 +1,11 @@
+[Unit]
+Description=Optional sealed execution outbox status interval for %i
+
+[Timer]
+OnBootSec=20s
+OnUnitActiveSec=20s
+AccuracySec=1s
+Unit=secops-exec-outbox-status@%i.service
+
+[Install]
+WantedBy=timers.target

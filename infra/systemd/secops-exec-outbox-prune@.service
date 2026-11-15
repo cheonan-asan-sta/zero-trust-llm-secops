@@ -1,0 +1,35 @@
+[Unit]
+Description=Prune only old published execution evidence with verified restored backup for %i
+
+[Service]
+Type=oneshot
+User=secops-collector
+Group=secops-collector
+WorkingDirectory=/opt/secops
+EnvironmentFile=/etc/secops/exec-outbox/%i.conf
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/opt/secops/.venv/bin/python -m scripts.exec_outbox_prune --tenant ${OUTBOX_TENANT} --server ${OUTBOX_SERVER} --unit ${OUTBOX_UNIT} --source ${OUTBOX_SOURCE} --root /var/lib/secops-evidence/%i --outbox /var/lib/secops-outbox/%i --review /var/lib/secops-outbox-review/%i --receipt-sha256 ${OUTBOX_RESTORE_RECEIPT_SHA256} --checkpoint /etc/secops/exec-outbox/%i-checkpoint.json --checkpoint-sha256 ${OUTBOX_CHECKPOINT_SHA256} --min-age-seconds ${OUTBOX_MIN_AGE_SECONDS} --limit 64 --apply
+UMask=0077
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+PrivateNetwork=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictSUIDSGID=yes
+LockPersonality=yes
+ReadWritePaths=/var/lib/secops-outbox/%i /var/lib/secops-evidence/%i/.capture-store.lock /var/lib/secops-outbox-review/%i/review/.capture-store.lock
+CPUQuota=50%
+MemoryMax=512M
+TasksMax=8
+TimeoutStartSec=60
+
+# Optional, disabled until an operator provisions review locks and explicitly
+# pins a successfully verified isolated restore. Does not decrypt, update pins,
+# delete unpublished/unbacked evidence, or contain any signing/recovery key.

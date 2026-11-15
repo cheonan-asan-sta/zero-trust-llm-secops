@@ -20,11 +20,10 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
 from app.models import StrictModel
+from scripts.f1_lab.managed_exec_capture import ManagedExecCapture, capture_parts, verify_managed
 from scripts.f1_lab.native_jsonl import decode, require
 from scripts.f1_lab.shared_execution_evidence import (
     PinnedServiceRegistry,
-    ServiceEvent,
-    ServiceProof,
     Unit,
     digest,
     proof_bytes,
@@ -75,22 +74,19 @@ class CaptureStatus:
     observed_at: datetime | None = None
 
 
-def inspect_capture(payload, scope, pinned, *, now=None):
+def inspect_capture(payload, scope, pinned, *, now=None, caller_registry=None):
     now = datetime.now(UTC) if now is None else now
     stage = "envelope"
     try:
         Window.aware(now)
         scope = CollectorScope.model_validate(scope.model_dump())
         require(isinstance(pinned, PinnedServiceRegistry), "collector_registry_type")
-        require(
-            type(payload) is dict
-            and set(payload) == {"schema", "event", "runtime_proof", "authorization_proof_included"}
-            and payload["schema"] == "zt-service-capture-1"
-            and payload["authorization_proof_included"] is False,
-            "collector_envelope",
-        )
-        event = ServiceEvent.model_validate(payload["event"])
-        proof = ServiceProof.model_validate(payload["runtime_proof"])
+        event, proof = capture_parts(payload)
+        if payload.get("schema_version") == "zt-managed-exec-capture-1":
+            stage = "managed_seal"
+            verify_managed(
+                ManagedExecCapture.model_validate(payload), pinned, caller_registry, now=now
+            )
         stage = "binding"
         require(
             (event.tenant_id, event.server_id, event.unit, event.mode)
@@ -196,7 +192,7 @@ def atomic_capture(path, body):
 class CollectorMonitor:
     """Bounded advisory state; no detection score, grant or response side effect."""
 
-    def __init__(self, scope, registry, ledger, *, capacity=1000):
+    def __init__(self, scope, registry, ledger, *, capacity=1000, caller_registry=None):
         self.scope = CollectorScope.model_validate(scope.model_dump())
         require(
             isinstance(registry, PinnedServiceRegistry)
@@ -205,6 +201,7 @@ class CollectorMonitor:
             "collector_monitor_configuration",
         )
         self.registry, self.path, self.capacity = registry, Path(ledger), capacity
+        self.caller_registry = caller_registry
         require(self.path.parent.is_dir(), "collector_monitor_parent")
         with self.connect() as con:
             con.execute(
@@ -238,7 +235,11 @@ class CollectorMonitor:
                 )
                 try:
                     result = inspect_capture(
-                        read_capture(capture), self.scope, self.registry, now=now
+                        read_capture(capture),
+                        self.scope,
+                        self.registry,
+                        now=now,
+                        caller_registry=self.caller_registry,
                     )
                 except (ValueError, OSError, RecursionError):
                     return CaptureStatus("unavailable", "capture_file_unavailable")

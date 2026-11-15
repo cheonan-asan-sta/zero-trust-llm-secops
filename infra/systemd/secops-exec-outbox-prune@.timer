@@ -1,0 +1,11 @@
+[Unit]
+Description=Optional verified execution outbox retention interval for %i
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=1h
+AccuracySec=1min
+Unit=secops-exec-outbox-prune@%i.service
+
+[Install]
+WantedBy=timers.target

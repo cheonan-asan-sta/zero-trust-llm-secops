@@ -666,7 +666,14 @@ class ZeroTrustOperations:
             return session
 
     def access(self, request: ProtectedAccessRequest, principal: Principal,
-               *, now: datetime | None = None) -> ProtectedAccessResult:
+               *, now: datetime | None = None,
+               execution_request_sha256: str | None = None) -> ProtectedAccessResult:
+        if execution_request_sha256 is not None and (
+            not isinstance(execution_request_sha256, str)
+            or len(execution_request_sha256) != 64
+            or any(c not in "0123456789abcdef" for c in execution_request_sha256)
+        ):
+            raise ValueError("invalid execution request binding")
         now = now or datetime.now(UTC)
         with self._transaction() as transaction:
             entry = self._latest(transaction[1], principal.tenant_id, request.session_id)
@@ -703,12 +710,15 @@ class ZeroTrustOperations:
                     else:
                         reason = "ACCESS_GRANTED"
             allowed = reason == "ACCESS_GRANTED"
+            binding = ({"execution_request_sha256": execution_request_sha256}
+                       if execution_request_sha256 is not None else {})
             self._append(transaction, {"kind": "access", "tenant_id": principal.tenant_id,
                                        "operator_id": principal.subject, "session_id": request.session_id,
                                        "resource_id": request.resource_id, "action": request.action.value,
                                        "session_version": version, "allowed": allowed,
                                        "reason_code": reason,
-                                       "grant_hash": token_hash, "recorded_at": now.isoformat()})
+                                       "grant_hash": token_hash, "recorded_at": now.isoformat(),
+                                       **binding})
             return ProtectedAccessResult(
                 allowed=allowed, reason_code=reason, session_version=version,
                 content="모의 업무 자원에 대한 접근이 허용되었습니다." if allowed else None,

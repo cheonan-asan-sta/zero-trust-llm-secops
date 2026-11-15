@@ -1,5 +1,7 @@
 # systemd 운영 연동·호출 신원 결속 — v69
 
+2026-11-15 v82 로컬 완료·미병합: [실행 당시 이력·신원·앱 정책 연결](extra-exec-history-app-binding.md). 집중 308개·전체 5,672개·실제 systemd/ptrace11조건 통과, 기존 1,681,815건 판정 동일·새 FP/TP 손실0. 관리 경로의 초기 exec만 수집하며 호스트 전체 감사·조직 SSO·독립 F1 완료가 아니다. AWS/유료 API0, 8시간은 계속 유예한다.
+
 v70 후속: [운영 수집기 실제 인수·자격 수명주기](extra-systemd-collector-runtime.md)에서 템플릿의 실제 기동 문제를 수정했다. 아래 설치 준비 설명은 v69 당시 기록이며, 최신 계정·소켓·직접 자격 읽기 방식은 v70을 따른다.
 
 2026-11-14. [v68 실행 근거 수집](extra-shared-execution-evidence.md)의 후속이다.

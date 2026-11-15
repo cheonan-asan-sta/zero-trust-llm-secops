@@ -42,12 +42,15 @@ class ServiceEvent(StrictModel):
     process_id: int = Field(strict=True, ge=1, le=4294967294)
     observed_at: datetime
     mode: Mode
-    collection_basis: Literal["native_journal", "manager_snapshot", "local_process_lab"]
+    collection_basis: Literal[
+        "native_journal", "manager_snapshot", "local_process_lab", "ptrace_exec", "ptrace_exec_lab"
+    ]
 
     @model_validator(mode="after")
     def origin_binding(self):
         require(
-            (self.collection_basis == "local_process_lab") == (self.mode == "local_process_lab"),
+            (self.collection_basis in {"local_process_lab", "ptrace_exec_lab"})
+            == (self.mode == "local_process_lab"),
             "service_collection_mode",
         )
         return self
