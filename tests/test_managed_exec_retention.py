@@ -30,8 +30,8 @@ from scripts.run_exec_history_controls import setup_app
 
 def fixture(tmp_path):
     lab = setup_app(tmp_path / "control", "fixture.service")
-    root, outbox, worker = [tmp_path / n for n in ("store", "outbox", "worker")]
-    for path in (root, outbox, worker):
+    root, outbox, worker, intents = [tmp_path / n for n in ("store", "outbox", "worker", "intents")]
+    for path in (root, outbox, worker, intents):
         path.mkdir(mode=0o700)
     launches = []
 
@@ -90,7 +90,7 @@ def fixture(tmp_path):
     def execute():
         gate = lab.gate(lab.new_request(), lab.new_access())
         result, publication = retention.dispatch_and_retain(
-            gate, launcher, lab.permission, root, outbox
+            gate, launcher, lab.permission, root, outbox, intent_root=intents
         )
         raw = (outbox / (gate.request.request_id + ".json")).read_bytes()
         return gate, result, publication, raw
@@ -99,6 +99,7 @@ def fixture(tmp_path):
         lab=lab,
         root=root,
         outbox=outbox,
+        intents=intents,
         launcher=launcher,
         scope=scope,
         archive_scope=archive_scope,
@@ -133,7 +134,8 @@ def test_complete_private_record_and_idempotent_publication(tmp_path):
         retention.publish_sealed(raw, f.root, f.lab.broker.joiner.registry, f.lab.broker.registry)
     assert len(f.launches) == 1
     with pytest.raises(ValueError):
-        retention.dispatch_and_retain(gate, f.launcher, f.lab.permission, f.root, f.outbox)
+        retention.dispatch_and_retain(gate, f.launcher, f.lab.permission, f.root, f.outbox,
+                                     intent_root=f.intents)
     assert len(f.launches) == 1
 
 
@@ -369,7 +371,8 @@ def test_private_paths_reject_links_and_unexpected_files(tmp_path, kind):
                 root = link
         gate = f.lab.gate(f.lab.new_request(), f.lab.new_access())
         with pytest.raises(ValueError):
-            retention.dispatch_and_retain(gate, f.launcher, f.lab.permission, root, outbox)
+            retention.dispatch_and_retain(gate, f.launcher, f.lab.permission, root, outbox,
+                                         intent_root=f.intents)
         assert not f.launches
     else:
         gate, _, _, raw = f.execute()

@@ -1,8 +1,8 @@
 """Trusted completed-execution to archive adapter, with a private sealed outbox.
 
 Publication retry accepts the same signed bytes only; it never invokes systemd,
-refreshes a timestamp or returns a consumed app grant. A crash before the outbox
-is durable still requires operator reconciliation, not automatic re-execution.
+refreshes a timestamp or returns a consumed app grant. Durable proposed intent
+records pre-seal uncertainty; only an original completed seal can resume bytes.
 """
 
 import base64
@@ -160,13 +160,15 @@ def publish_sealed(raw, root, service_pin, caller_pin, *, now=None):
     }
 
 
-def dispatch_and_retain(gate, launcher, policy_proof, root, outbox):
-    """Execute once, durably seal, then publish. On failure retry outbox only.
+def dispatch_and_retain(gate, launcher, policy_proof, root, outbox, *, intent_root):
+    """Persist proposed intent, execute once, durably seal, then publish bytes.
 
     root/outbox are preconfigured private directories, never client paths. The
-    outbox is outside the archive root and needs its own operator cleanup after
-    a verified backup; archive compaction must not silently delete pending work.
+    intent and outbox are outside the archive root and need operator retention;
+    archive compaction must not silently delete pending or uncertain work.
     """
+    from scripts.f1_lab.exec_intent import ExecIntentJournal
+
     root, outbox = private_directory(root), private_directory(outbox)
     require(
         root != outbox and root not in outbox.parents and outbox not in root.parents,
@@ -178,9 +180,12 @@ def dispatch_and_retain(gate, launcher, policy_proof, root, outbox):
         require(
             not pending.exists() and not pending.is_symlink(), "retention_request_already_sealed"
         )
+    journal = ExecIntentJournal(intent_root, gate.broker.joiner.registry, gate.broker.registry)
+    intent = journal.prepare(gate, launcher, root, outbox)
     result = gate.dispatch(launcher, policy_proof)
     worker = decode(private_file(Path(launcher.directory) / "capture.json", 16384))
     raw = seal_completed(gate, result, worker)
+    journal.complete(intent, raw)
     with capture_store_lock(outbox):
         require(len(bounded_entries(outbox)) < MAX_SCAN, "retention_outbox_capacity")
         fresh_file(pending, raw)

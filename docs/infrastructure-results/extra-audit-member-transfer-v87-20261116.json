@@ -6260,5 +6260,24 @@
     "web audit65.45/67.92percent and shared audit0 remain below targets; authrecall91.67belowtarget",
     "raw logs, labels and large predictions remain local; replay needs pinned model/source caches",
     "long soak remains deferred; no operational or paid deployment"
-  ]
+  ],
+  "subsequent_infrastructure_integration": {
+    "aitest_commit": "bd270f7a92455f4f82a6444837d26aa77c810de6",
+    "pr": 79,
+    "premerge_checks_succeeded": 17,
+    "method": "Feature-branch merge preserves original c100801 experiment commit as ancestor; no direct aitest push",
+    "changed_existing_source_pins": [
+      "scripts/f1_lab/exec_outbox_controls.py",
+      "scripts/f1_lab/managed_exec_retention.py",
+      "scripts/f1_lab/managed_exec_retention_controls.py",
+      "scripts/run_exec_history_controls.py"
+    ],
+    "added_source_pins": [
+      "scripts/f1_lab/exec_intent.py",
+      "scripts/f1_lab/exec_intent_controls.py"
+    ],
+    "all_other_original_pins_including_eval_chain_preserved": true,
+    "original_frozen_code_replay_requires_checkout_of_c100801_or_source_archive": true,
+    "combined_branch_ci_to_be_checked_separately": true
+  }
 }

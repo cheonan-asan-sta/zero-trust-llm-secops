@@ -19,9 +19,10 @@ from scripts.f1_lab.managed_exec_retention import (
 from scripts.f1_lab.native_jsonl import decode, require
 
 
-def run(lab, gate, result, launcher, private, output, check, *, outbox_recovery=False):
-    root, outbox = private / "retained", private / "outbox"
-    for path in (root, outbox):
+def run(lab, gate, result, launcher, private, output, check, *, outbox_recovery=False,
+        intent_recovery=False):
+    root, outbox, intents = private / "retained", private / "outbox", private / "intents"
+    for path in (root, outbox, intents):
         path.mkdir(mode=0o700)
     scope = CollectorScope(
         tenant_id=lab.target.tenant_id,
@@ -46,7 +47,8 @@ def run(lab, gate, result, launcher, private, output, check, *, outbox_recovery=
             lab.target, launcher.argv, launcher.directory, source_id="local-proc", key_id="proc-1"
         )
         next_gate = lab.gate(lab.new_request(), lab.new_access())
-        _, published = dispatch_and_retain(next_gate, current, lab.permission, root, outbox)
+        _, published = dispatch_and_retain(next_gate, current, lab.permission, root, outbox,
+                                           intent_root=intents)
         raw = (outbox / (published["run_id"] + ".json")).read_bytes()
         records.append((published["run_id"], raw))
     require(len(records) == 3, "retention_native_records")
@@ -199,6 +201,10 @@ def run(lab, gate, result, launcher, private, output, check, *, outbox_recovery=
     check("only_bounded_aggregates_cross_to_monitoring_no_identity_grants_or_keys")
     if finish_outbox is not None:
         finish_outbox()
+    if intent_recovery:
+        from scripts.f1_lab.exec_intent_controls import run as run_intent
+
+        run_intent(lab,launcher,private,root,outbox,output,check)
     exported = output / "retention-public"
     exported.mkdir(exist_ok=False)
     for path in public.glob("*.json"):

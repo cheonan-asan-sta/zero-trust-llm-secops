@@ -1,5 +1,7 @@
 # 실행 outbox 경보와 최신 원본 전체 백업·안전한 정리
 
+2026-11-16 v86 로컬 통합 인수: [실행 intent·중단 후 원본 대조](extra-exec-intent-reconciliation.md). 집중378·전체5,868·실제 systemd44조건 통과. 실제6건 중 브로커 종료2건에서 봉인 전 indeterminate 보존·완성 원본 동일 bytes 재게시·명령/권한 재발급0을 확인했다. v85의1,681,815건 결정 동일, 새 독립 성능이 아니다. PR78 병합, AWS/유료 API0·장기 soak 유예.
+
 v84 · 11월15~16일 개발 세션 · 최신 aitest 통합·로컬 묶음 검증 완료
 
 채희주 담당의 v83 원래 커밋 `00edfc6`(최신 aitest 재적용 `e492c4a`) 후속이다. [오전8시까지의 목표](extra-overnight-target-20261116.md)에 따라 outbox 잔여 항목부터 처리한다. AWS·유료 API·장기8시간 soak·운영 배포는 실행하지 않는다.
