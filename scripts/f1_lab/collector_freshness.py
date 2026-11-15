@@ -74,12 +74,21 @@ class CaptureStatus:
     observed_at: datetime | None = None
 
 
-def inspect_capture(payload, scope, pinned, *, now=None, caller_registry=None):
+def alternate_keys(scope, values):
+    require(type(values) in {list, tuple} and len(values) <= 1, 'collector_alternate_key_count')
+    for value in values:
+        require(type(value) is str and value != scope.key_id, 'collector_alternate_key_identity')
+        CollectorScope.model_validate({**scope.model_dump(), 'key_id': value})
+    return tuple(values)
+
+
+def inspect_capture(payload, scope, pinned, *, now=None, caller_registry=None, alternate_key_ids=()):
     now = datetime.now(UTC) if now is None else now
     stage = "envelope"
     try:
         Window.aware(now)
         scope = CollectorScope.model_validate(scope.model_dump())
+        allowed = alternate_keys(scope, alternate_key_ids)
         require(isinstance(pinned, PinnedServiceRegistry), "collector_registry_type")
         event, proof = capture_parts(payload)
         if payload.get("schema_version") == "zt-managed-exec-capture-1":
@@ -88,6 +97,9 @@ def inspect_capture(payload, scope, pinned, *, now=None, caller_registry=None):
                 ManagedExecCapture.model_validate(payload), pinned, caller_registry, now=now
             )
         stage = "binding"
+        if proof.key_id != scope.key_id:
+            require(proof.key_id in allowed, 'collector_unconfigured_alternate_key')
+            scope = scope.model_copy(update={'key_id': proof.key_id})
         require(
             (event.tenant_id, event.server_id, event.unit, event.mode)
             == (scope.tenant_id, scope.server_id, scope.unit, "systemd")
@@ -192,8 +204,10 @@ def atomic_capture(path, body):
 class CollectorMonitor:
     """Bounded advisory state; no detection score, grant or response side effect."""
 
-    def __init__(self, scope, registry, ledger, *, capacity=1000, caller_registry=None):
+    def __init__(self, scope, registry, ledger, *, capacity=1000, caller_registry=None,
+                 alternate_key_ids=()):
         self.scope = CollectorScope.model_validate(scope.model_dump())
+        self.alternate_key_ids = alternate_keys(self.scope, alternate_key_ids)
         require(
             isinstance(registry, PinnedServiceRegistry)
             and type(capacity) is int
@@ -240,6 +254,7 @@ class CollectorMonitor:
                         self.registry,
                         now=now,
                         caller_registry=self.caller_registry,
+                        alternate_key_ids=self.alternate_key_ids,
                     )
                 except (ValueError, OSError, RecursionError):
                     return CaptureStatus("unavailable", "capture_file_unavailable")

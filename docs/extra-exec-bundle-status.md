@@ -1,5 +1,7 @@
 # 실행 복구 묶음의 키 없는 재검증과 경보
 
+**최신 판정 — 2026-11-16:** [현재 구현·검증·남은 작업](infrastructure-current-state-20261116.md). 고정 로컬 전체6,332·집중475개와 실제 systemd/DB 인수 결과를 연결했다. 탐지 독립 목표는 미달·장기 soak는 유예다. 아래의 이전 날짜 수치/상태는 작성 당시 누적 기록이며 최신 판정은 연결한 문서를 따른다.
+
 ## 관측 범위
 
 `zt-exec-recovery-bundle-status-1`은 v89의 암호화 묶음 **현재 바이트와 이미 격리 복원한 사본**을 함께 재검증한다. 외부 checkpoint·manifest·payload SHA와 외부 receipt pin, 복원 파일 inventory, 원래 스냅샷 SHA, 현재 서비스/호출자 공개 신뢰와 앱/브로커 결합을 다시 검사한다. 복구 키로 새로 복호화하거나 checkpoint/receipt를 자동 갱신하지 않는다. 최초 GCM 복호화와 검증을 완료한 신뢰된 복원 절차가 발급한 receipt를 근거로 한다.
