@@ -175,7 +175,8 @@ def setup_app(directory, unit, *, executable_sha256="a" * 64, command_sha256="b"
     )
 
 
-def run(directory, *, retention=False):
+def run(directory, *, retention=False, outbox_recovery=False):
+    retention = retention or outbox_recovery
     require(
         sys.platform == "linux"
         and os.geteuid() == 0
@@ -202,6 +203,7 @@ def run(directory, *, retention=False):
         "aws_calls": 0,
         "goal_qualified": False,
         "managed_exec_retention_tested": retention,
+        "exec_outbox_recovery_tested": outbox_recovery,
         "cases": [],
     }
 
@@ -349,7 +351,16 @@ StandardError=journal
         if retention:
             from scripts.f1_lab.managed_exec_retention_controls import run as run_retention
 
-            run_retention(lab, gate, (receipt, event, proofs), launcher, private, output, passed)
+            run_retention(
+                lab,
+                gate,
+                (receipt, event, proofs),
+                launcher,
+                private,
+                output,
+                passed,
+                outbox_recovery=outbox_recovery,
+            )
         report["completed"] = True
     except Exception:
         diagnostic = subprocess.run(
@@ -382,8 +393,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--directory", type=Path, required=True)
     parser.add_argument("--retention", action="store_true")
+    parser.add_argument("--outbox-recovery", action="store_true")
     args = parser.parse_args()
-    result = run(args.directory, retention=args.retention)
+    result = run(args.directory, retention=args.retention, outbox_recovery=args.outbox_recovery)
     print(json.dumps({"completed": result["completed"], "cases": len(result["cases"])}))
 
 

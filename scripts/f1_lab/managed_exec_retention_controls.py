@@ -19,7 +19,7 @@ from scripts.f1_lab.managed_exec_retention import (
 from scripts.f1_lab.native_jsonl import decode, require
 
 
-def run(lab, gate, result, launcher, private, output, check):
+def run(lab, gate, result, launcher, private, output, check, *, outbox_recovery=False):
     root, outbox = private / "retained", private / "outbox"
     for path in (root, outbox):
         path.mkdir(mode=0o700)
@@ -86,10 +86,19 @@ def run(lab, gate, result, launcher, private, output, check):
     )
     publish(public / "archive.json", archive_report(scope, {**compacted, "state": "ready"}))
     check("existing_compaction_preserves_newest_and_archives_two_complete_records")
+    finish_outbox = None
+    if outbox_recovery:
+        from scripts.f1_lab.exec_outbox_controls import begin
+
+        finish_outbox = begin(
+            lab, launcher, private, root, outbox, archive_scope, public, output, check
+        )
     manager = CaptureBackup(archive_scope)
     checkpoint = private / "checkpoint.json"
     pinned = manager.checkpoint(root, checkpoint)
-    package, review = private / "encrypted", private / "isolated-restore"
+    packages = private / "cold-packages"
+    packages.mkdir(mode=0o700)
+    package, review = packages / "encrypted", private / "isolated-restore"
     key = secrets.token_bytes(32)
     backup = manager.backup(root, package, checkpoint, pinned["checkpoint_sha256"], key, "local-1")
     require(first not in (package / "payload.aesgcm").read_bytes(), "retention_ciphertext")
@@ -166,7 +175,7 @@ def run(lab, gate, result, launcher, private, output, check):
     check("sealed_outbox_retry_preserves_bytes_and_cannot_roll_latest_back")
     summaries = {
         "completed": True,
-        "actual_executions": 3,
+        "actual_executions": 4 if outbox_recovery else 3,
         "cold_records": 2,
         "byte_exact_restored_records": 2,
         "source_database_loss_tested": True,
@@ -188,6 +197,8 @@ def run(lab, gate, result, launcher, private, output, check):
         "retention_public_privacy",
     )
     check("only_bounded_aggregates_cross_to_monitoring_no_identity_grants_or_keys")
+    if finish_outbox is not None:
+        finish_outbox()
     exported = output / "retention-public"
     exported.mkdir(exist_ok=False)
     for path in public.glob("*.json"):

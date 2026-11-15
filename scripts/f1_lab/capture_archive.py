@@ -292,6 +292,74 @@ class CaptureArchive:
     def after_archive_commit(self):
         """Crash boundary after durable byte preservation, before hot cleanup."""
 
+    def preserve(self, items):
+        """Copy explicit original records to cold storage without deleting inputs.
+
+        Used for an isolated outbox backup mirror: no synthetic latest capture,
+        no timestamp renewal and no automatic publication into a live store.
+        The ordinary hot compactor keeps its separate cleanup contract.
+        """
+        prepared, total_input = {}, 0
+        for count, (rid, raw) in enumerate(items, 1):
+            require(
+                count <= self.policy.max_records and type(rid) is str and RUN.fullmatch(rid),
+                "archive_preserve_capacity_or_identifier",
+            )
+            require(type(raw) is bytes and 0 < len(raw) <= MAX_CAPTURE, "archive_preserve_bytes")
+            event = self.shape(raw)
+            require(rid not in prepared, "archive_preserve_duplicate")
+            total_input += len(raw)
+            require(total_input <= self.policy.max_raw_bytes, "archive_preserve_raw_capacity")
+            prepared[rid] = (raw, event.sha256)
+        with capture_store_lock(self.root):
+            self.initialize()
+            with self.connection() as con:
+                con.execute("BEGIN IMMEDIATE")
+                try:
+                    records, total, _, head = self.load(con)
+                    added = 0
+                    for rid, (raw, event_sha) in sorted(prepared.items()):
+                        raw_sha = sha(raw)
+                        if rid in records:
+                            require(
+                                records[rid]["raw_sha"] == raw_sha, "archive_preserve_collision"
+                            )
+                            continue
+                        require(
+                            len(records) < self.policy.max_records
+                            and total + len(raw) <= self.policy.max_raw_bytes,
+                            "archive_preserve_archive_capacity",
+                        )
+                        packed = zlib.compress(raw)
+                        packed_sha, ordinal = sha(packed), len(records) + 1
+                        con.execute(
+                            "INSERT INTO captures VALUES (?,?,?,?,?,?,?,1)",
+                            (ordinal, rid, raw_sha, event_sha, len(raw), packed, packed_sha),
+                        )
+                        head = self.chain(
+                            head, [ordinal, rid, raw_sha, event_sha, len(raw), packed_sha]
+                        )
+                        records[rid] = {"raw_sha": raw_sha}
+                        total += len(raw)
+                        added += 1
+                    con.execute(
+                        "UPDATE archive_head SET records=?,raw_bytes=?,head=? WHERE id=1",
+                        (len(records), total, head),
+                    )
+                    self.commit_archive(con)
+                except Exception:
+                    con.rollback()
+                    raise
+                self.load(con)
+            return {
+                "completed": True,
+                "records": len(records),
+                "added": added,
+                "raw_bytes": total,
+                "inputs_deleted": False,
+                "authenticity_or_freshness_asserted": False,
+            }
+
     def after_unlink(self):
         """Crash boundary: payload exists in archive, directory may remain empty."""
 

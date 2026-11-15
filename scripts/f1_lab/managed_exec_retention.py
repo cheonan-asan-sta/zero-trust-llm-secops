@@ -7,6 +7,7 @@ is durable still requires operator reconciliation, not automatic re-execution.
 
 import base64
 from datetime import UTC, datetime
+from itertools import islice
 from pathlib import Path
 
 from scripts.f1_lab.app_execution_gate import AppExecutionGate
@@ -14,6 +15,7 @@ from scripts.f1_lab.capture_archive import MAX_SCAN, raw_capture
 from scripts.f1_lab.capture_backup import fresh_file, private_directory, private_file
 from scripts.f1_lab.capture_store import capture_store_lock
 from scripts.f1_lab.collector_freshness import MAX_CAPTURE, atomic_capture
+from scripts.f1_lab.exec_outbox import bounded_entries
 from scripts.f1_lab.managed_exec_capture import (
     AppUseReceipt,
     ManagedExecCapture,
@@ -135,7 +137,10 @@ def publish_sealed(raw, root, service_pin, caller_pin, *, now=None):
             promote = old.observed_at <= capture.event.observed_at
         run = root / capture.request.request_id
         if not run.exists():
-            require(sum(1 for _ in root.iterdir()) < MAX_SCAN - 3, "retention_store_capacity")
+            require(
+                len(list(islice(root.iterdir(), MAX_SCAN))) < MAX_SCAN - 3,
+                "retention_store_capacity",
+            )
             run.mkdir(mode=0o700)
         private_directory(run)
         require({p.name for p in run.iterdir()} <= {"capture.json"}, "retention_run_inventory")
@@ -167,12 +172,17 @@ def dispatch_and_retain(gate, launcher, policy_proof, root, outbox):
         root != outbox and root not in outbox.parents and outbox not in root.parents,
         "retention_outbox_separate",
     )
-    require(sum(1 for _ in outbox.iterdir()) < MAX_SCAN, "retention_outbox_capacity")
     pending = outbox / (gate.request.request_id + ".json")
-    require(not pending.exists() and not pending.is_symlink(), "retention_request_already_sealed")
+    with capture_store_lock(outbox):
+        require(len(bounded_entries(outbox)) < MAX_SCAN, "retention_outbox_capacity")
+        require(
+            not pending.exists() and not pending.is_symlink(), "retention_request_already_sealed"
+        )
     result = gate.dispatch(launcher, policy_proof)
     worker = decode(private_file(Path(launcher.directory) / "capture.json", 16384))
     raw = seal_completed(gate, result, worker)
-    fresh_file(pending, raw)
+    with capture_store_lock(outbox):
+        require(len(bounded_entries(outbox)) < MAX_SCAN, "retention_outbox_capacity")
+        fresh_file(pending, raw)
     publication = publish_sealed(raw, root, gate.broker.joiner.registry, gate.broker.registry)
     return result, publication
