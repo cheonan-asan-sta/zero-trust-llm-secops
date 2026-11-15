@@ -107,27 +107,47 @@ def main():
         choices=["manager_snapshot", "native_journal"],
         default="manager_snapshot",
     )
-    parser.add_argument(
+    credentials = parser.add_mutually_exclusive_group()
+    credentials.add_argument(
         "--systemd-credential",
         action="store_true",
         help="Read the system manager's runtime-key credential; no stdin fallback",
     )
+    credentials.add_argument('--provider-profile', type=Path)
+    parser.add_argument('--provider-profile-sha256')
     parser.add_argument(
         "--latest", type=Path, help="Atomically publish the signed capture to a trusted latest file"
     )
     args = parser.parse_args()
     stage = "key_input"
     security = None
+    selection = None
     try:
-        secret = read_systemd_key() if args.systemd_credential else sys.stdin.buffer.read(33)
-        require(len(secret) == 32, "service_collector_key_input")
-        key = Ed25519PrivateKey.from_private_bytes(secret)
+        require((args.provider_profile is None) == (args.provider_profile_sha256 is None),
+                'collector_provider_profile_pin_pair')
+        configured_scope = None
+        if args.provider_profile is not None:
+            from scripts.f1_lab.collector_provider_ha import load_profile, select_key
+
+            stage = 'provider_selection'
+            configured_scope = CollectorScope(tenant_id=args.tenant, server_id=args.server,
+                unit=args.unit, source_id=args.source, key_id=args.key_id)
+            pinned = PinnedServiceRegistry(args.registry, args.registry_sha256)
+            profile = load_profile(args.provider_profile, args.provider_profile_sha256, configured_scope, pinned)
+            key, selected_scope, selection = select_key(profile, pinned)
+            args.key_id = selected_scope.key_id
+        else:
+            secret = read_systemd_key() if args.systemd_credential else sys.stdin.buffer.read(33)
+            require(len(secret) == 32, "service_collector_key_input")
+            key = Ed25519PrivateKey.from_private_bytes(secret)
 
         def phase(value):
             nonlocal stage
             stage = value
 
         payload, security = collect_payload(args, key, phase)
+        if configured_scope is not None:
+            load_profile(args.provider_profile, args.provider_profile_sha256, configured_scope, pinned)
         stage = "output"
         output = Path(args.output)
         output.mkdir(mode=0o700, parents=True, exist_ok=False)
@@ -164,6 +184,7 @@ def main():
                     "command_plaintext_persisted": False,
                     "private_key_persisted": False,
                     "collector_security": security,
+                    **({'provider_selection': selection} if selection is not None else {}),
                 }
             )
         )

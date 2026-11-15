@@ -28,6 +28,7 @@ def main():
     ):
         parser.add_argument("--" + name, required=True)
     parser.add_argument("--observe-worker-security", action="store_true")
+    parser.add_argument("--alternate-key-id", action="append", default=[])
     parser.add_argument("--caller-registry", type=Path)
     parser.add_argument("--caller-registry-sha256")
     parser.add_argument("--caller-environment", choices=("oidc", "local_oidc"), default="oidc")
@@ -61,6 +62,7 @@ def main():
             PinnedServiceRegistry(args.registry, args.registry_sha256),
             Path(args.ledger),
             caller_registry=caller,
+            alternate_key_ids=args.alternate_key_id,
         )
         result = monitor.check(Path(args.capture))
         body = asdict(result)
@@ -79,7 +81,8 @@ def main():
             publish(
                 args.status_output,
                 health_report(
-                    scope, result, args.capture, monitor.registry, caller_registry=caller
+                    scope, result, args.capture, monitor.registry, caller_registry=caller,
+                    alternate_key_ids=monitor.alternate_key_ids,
                 ),
             )
     except (ValueError, OSError, sqlite3.Error):
