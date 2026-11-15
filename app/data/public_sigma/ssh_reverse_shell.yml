@@ -1,0 +1,33 @@
+title: SSH Reverse Shell Command Attempt
+id: 717f0b99-8190-47d3-8f22-bd48d15cfd88
+status: test
+description: Observed executable command invoking a reverse shell pattern. Successful
+  execution is not assumed.
+author: Cheonan-Asan Team
+date: '2026-11-09'
+taxonomy: ocsf
+logsource:
+  category: application
+  product: cowrie
+detection:
+  selection:
+    unmapped.public.source: cowrie
+    unmapped.public.ssh_reverse_shell: true
+  condition: selection
+falsepositives:
+- Authorized security exercises or remote debugging.
+level: high
+x_secops:
+  lifecycle: approved
+  version: 1.1.0
+  approved_by: reference-rule-test-harness
+  approved_on: '2026-11-09'
+  test_case_ids:
+  - PUBLIC-SSH-03
+  authority: reference_only
+  approval_scope: Offline detector execution acceptance only; grants no enforcement
+    authority.
+  public_detection:
+    feature: ssh_reverse_shell
+    disposition: threat
+modified: '2026-11-10'

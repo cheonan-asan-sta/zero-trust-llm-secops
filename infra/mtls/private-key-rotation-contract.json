@@ -1,0 +1,38 @@
+{
+  "schema": "private-key-rotation-contract-1",
+  "scope": "opt-in local workload and management TLS leaf keys; CA and delegated JWK signing keys excluded",
+  "reused_checks_per_trial": 153,
+  "key_rotation_checks_per_trial": 21,
+  "expected_checks": [
+    "rotation_registration_preserves_retired_and_expired_identities",
+    "all_active_workload_and_management_tls_keys_changed",
+    "every_key_copy_matches_its_certificate_and_mode_0600",
+    "all_retired_key_and_certificate_copies_removed",
+    "fourteen_native_nginx_go_servers_use_rekeyed_certificates",
+    "protected_document_access_after_first_key_rotation",
+    "previously_retired_identity_is_not_restored",
+    "retired_client_cannot_rekey_at_ca",
+    "reload_unconfirmed_retains_old_keys_before_cleanup",
+    "controller_crash_resumes_activated_key_publication",
+    "crash_recovery_uses_same_pending_keys_without_reissuance",
+    "controller_restart_and_timer_rotate_all_keys_again",
+    "second_rotation_removes_first_generation_key_files",
+    "protected_document_access_after_second_key_rotation",
+    "ca_outage_retains_active_keys_and_protected_access",
+    "ca_recovery_completes_pending_rotation_without_bootstrap",
+    "protected_document_access_after_ca_recovery",
+    "delegated_signing_keys_distinct_from_rotating_tls_keys_and_unchanged",
+    "rekey_prometheus_scrapes_with_renewed_credentials",
+    "rekey_new_alert_episode_delivered_after_renewal",
+    "rekey_same_alert_episode_resolved_after_renewal"
+  ],
+  "publication": "immutable generation pairs; overlap pins; atomic profile/config switches; reload ack and live TLS; retire pins; self-revoke old client serials; grace then unlink old files",
+  "limits": [
+    "trusted single control plane with access to selected leaf keys; not independent workload attestation",
+    "no CA root/intermediate or delegated signing authority key rotation, HSM, HA, production deployment",
+    "unlink is not guaranteed physical erasure; process memory, open descriptors and backups are outside this guarantee",
+    "not a distributed transaction or zero-downtime SLA; stale profile readers fail closed after cleanup",
+    "passive revocation does not terminate existing sessions; native Go/NGINX CA/SAN paths have no exact client leaf pin",
+    "no new paid API or cloud use; existing unrelated Docker work is preserved"
+  ]
+}

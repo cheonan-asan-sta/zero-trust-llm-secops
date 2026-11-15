@@ -1,0 +1,18 @@
+{
+  "schema": "infra-selection-evidence-1",
+  "purpose": "Pinned historical paired evidence; not current-image or production approval",
+  "inputs": {
+    "C01": {
+      "path": "docs/infrastructure-results/c01-windows-20261103.json",
+      "sha256": "aec43eb1e113e24099549da92ac37207e1d03920218f437760b1a4ad6dc48aed"
+    },
+    "C02": {
+      "path": "docs/infrastructure-results/c02-windows-20261103.json",
+      "sha256": "a0a7c68a7635a115a3d46b21e67f2141a9633051a8fd9c97b3b5493d399760ae"
+    },
+    "C03": {
+      "path": "docs/infrastructure-results/c03-patched-scan-20261105.json",
+      "sha256": "461e4f9b6c7c5b6ef820e9868d96a0a71b689b5ea72c8f4c6f4aae9be72d4f4b"
+    }
+  }
+}

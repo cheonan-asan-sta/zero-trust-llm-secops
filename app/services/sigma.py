@@ -176,6 +176,10 @@ class SigmaEngine:
 
     def evaluate(self, normalized: NormalizedSecurityEvent) -> SigmaDetectionResult:
         event = normalized.event.model_dump(mode="json", exclude_none=True)
+        return self.evaluate_fields(event)
+
+    def evaluate_fields(self, event: dict[str, object]) -> SigmaDetectionResult:
+        """Evaluate observed fields, retaining missing values for source-aware adapters."""
         matches: list[SigmaDetectionMatch] = []
         for rule in self.approved_rules:
             selector_results = {

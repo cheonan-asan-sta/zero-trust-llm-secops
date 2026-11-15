@@ -1,0 +1,5725 @@
+{
+  "evaluation_version": "1.0.0",
+  "source_kind": "authored_synthetic",
+  "split": "holdout",
+  "label_policy": "Operationally unauthorized or malicious activity; approved business activity is benign, even if an alert fires.",
+  "review_status": "author_assigned_pending_independent_team_review",
+  "corpus_case_count": 720,
+  "corpus_family_count": 72,
+  "case_count": 360,
+  "family_count": 36,
+  "threat_count": 180,
+  "benign_count": 180,
+  "unique_signal_pattern_count": 321,
+  "duplicate_pattern_label_count": 39,
+  "ambiguous_pattern_count": 0,
+  "deduplicated": {
+    "case_count": 321,
+    "confusion": {
+      "tp": 76,
+      "fp": 36,
+      "fn": 83,
+      "tn": 126
+    },
+    "metrics": {
+      "precision": 0.6785714285714286,
+      "recall": 0.4779874213836478,
+      "f1": 0.5608856088560885,
+      "false_positive_rate": 0.2222222222222222
+    }
+  },
+  "confusion": {
+    "tp": 90,
+    "fp": 50,
+    "fn": 90,
+    "tn": 130
+  },
+  "metrics": {
+    "precision": 0.6428571428571429,
+    "recall": 0.5,
+    "f1": 0.5625,
+    "false_positive_rate": 0.2777777777777778
+  },
+  "confidence": {
+    "method": "label-stratified-family-cluster-percentile-bootstrap",
+    "confidence_level": 0.95,
+    "repetitions": 1000,
+    "seed": 20261101,
+    "family_count": 36,
+    "intervals": {
+      "precision": {
+        "lower": 0.45454545454545453,
+        "upper": 0.8333333333333334,
+        "valid_replicates": 1000
+      },
+      "recall": {
+        "lower": 0.2777777777777778,
+        "upper": 0.7222222222222222,
+        "valid_replicates": 1000
+      },
+      "f1": {
+        "lower": 0.35714285714285715,
+        "upper": 0.7272727272727273,
+        "valid_replicates": 1000
+      },
+      "false_positive_rate": {
+        "lower": 0.1111111111111111,
+        "upper": 0.5,
+        "valid_replicates": 1000
+      }
+    },
+    "scope": "Variation among authored families; not a population guarantee or independent-row interval."
+  },
+  "statistical_target_supported": false,
+  "targets": {
+    "minimum_precision": 0.95,
+    "minimum_recall": 0.95,
+    "minimum_f1": 0.95,
+    "maximum_false_positive_rate": 0.05,
+    "minimum_positive_families_per_rule": 2,
+    "minimum_negative_families": 12
+  },
+  "targets_met": {
+    "precision": false,
+    "recall": false,
+    "f1": false,
+    "false_positive_rate": false,
+    "evaluation_errors": true,
+    "every_rule_supported": true,
+    "every_rule_meets_targets": false,
+    "negative_family_support": true
+  },
+  "gate_passed": false,
+  "evaluation_error_count": 0,
+  "split_overlap_counts": {
+    "family": 0,
+    "session": 0,
+    "user": 0,
+    "device": 0,
+    "pattern": 0
+  },
+  "rule_coverage_rate": 1.0,
+  "rules": [
+    {
+      "rule_id": "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d",
+      "title": "Zero Trust Credential Anomaly",
+      "confusion": {
+        "tp": 10,
+        "fp": 10,
+        "fn": 20,
+        "tn": 320
+      },
+      "metrics": {
+        "precision": 0.5,
+        "recall": 0.3333333333333333,
+        "f1": 0.4,
+        "false_positive_rate": 0.030303030303030304
+      },
+      "positive_family_count": 3,
+      "negative_count": 330,
+      "support_sufficient": true,
+      "targets_met": {
+        "precision": false,
+        "recall": false,
+        "f1": false,
+        "false_positive_rate": true
+      },
+      "passed": false
+    },
+    {
+      "rule_id": "ce5f6071-8293-4eaf-801b-2c3d4e5f6071",
+      "title": "Zero Trust Unapproved Bulk Download",
+      "confusion": {
+        "tp": 10,
+        "fp": 0,
+        "fn": 20,
+        "tn": 330
+      },
+      "metrics": {
+        "precision": 1.0,
+        "recall": 0.3333333333333333,
+        "f1": 0.5,
+        "false_positive_rate": 0.0
+      },
+      "positive_family_count": 3,
+      "negative_count": 330,
+      "support_sufficient": true,
+      "targets_met": {
+        "precision": true,
+        "recall": false,
+        "f1": false,
+        "false_positive_rate": true
+      },
+      "passed": false
+    },
+    {
+      "rule_id": "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+      "title": "Zero Trust Lateral Movement Pattern",
+      "confusion": {
+        "tp": 0,
+        "fp": 20,
+        "fn": 30,
+        "tn": 310
+      },
+      "metrics": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "false_positive_rate": 0.06060606060606061
+      },
+      "positive_family_count": 3,
+      "negative_count": 330,
+      "support_sufficient": true,
+      "targets_met": {
+        "precision": false,
+        "recall": false,
+        "f1": false,
+        "false_positive_rate": false
+      },
+      "passed": false
+    },
+    {
+      "rule_id": "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f",
+      "title": "Zero Trust Privilege Scope Mismatch",
+      "confusion": {
+        "tp": 20,
+        "fp": 0,
+        "fn": 10,
+        "tn": 330
+      },
+      "metrics": {
+        "precision": 1.0,
+        "recall": 0.6666666666666666,
+        "f1": 0.8,
+        "false_positive_rate": 0.0
+      },
+      "positive_family_count": 3,
+      "negative_count": 330,
+      "support_sufficient": true,
+      "targets_met": {
+        "precision": true,
+        "recall": false,
+        "f1": false,
+        "false_positive_rate": true
+      },
+      "passed": false
+    },
+    {
+      "rule_id": "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6",
+      "title": "Zero Trust Remote Desktop Logon",
+      "confusion": {
+        "tp": 40,
+        "fp": 40,
+        "fn": 10,
+        "tn": 270
+      },
+      "metrics": {
+        "precision": 0.5,
+        "recall": 0.8,
+        "f1": 0.6153846153846154,
+        "false_positive_rate": 0.12903225806451613
+      },
+      "positive_family_count": 5,
+      "negative_count": 310,
+      "support_sufficient": true,
+      "targets_met": {
+        "precision": false,
+        "recall": false,
+        "f1": false,
+        "false_positive_rate": false
+      },
+      "passed": false
+    },
+    {
+      "rule_id": "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e",
+      "title": "Zero Trust Unmanaged Device Access",
+      "confusion": {
+        "tp": 10,
+        "fp": 0,
+        "fn": 20,
+        "tn": 330
+      },
+      "metrics": {
+        "precision": 1.0,
+        "recall": 0.3333333333333333,
+        "f1": 0.5,
+        "false_positive_rate": 0.0
+      },
+      "positive_family_count": 3,
+      "negative_count": 330,
+      "support_sufficient": true,
+      "targets_met": {
+        "precision": true,
+        "recall": false,
+        "f1": false,
+        "false_positive_rate": true
+      },
+      "passed": false
+    }
+  ],
+  "domains": {
+    "credential": {
+      "confusion": {
+        "tp": 10,
+        "fp": 10,
+        "fn": 20,
+        "tn": 20
+      },
+      "metrics": {
+        "precision": 0.5,
+        "recall": 0.3333333333333333,
+        "f1": 0.4,
+        "false_positive_rate": 0.3333333333333333
+      }
+    },
+    "device": {
+      "confusion": {
+        "tp": 10,
+        "fp": 0,
+        "fn": 20,
+        "tn": 30
+      },
+      "metrics": {
+        "precision": 1.0,
+        "recall": 0.3333333333333333,
+        "f1": 0.5,
+        "false_positive_rate": 0.0
+      }
+    },
+    "exfiltration": {
+      "confusion": {
+        "tp": 10,
+        "fp": 0,
+        "fn": 20,
+        "tn": 30
+      },
+      "metrics": {
+        "precision": 1.0,
+        "recall": 0.3333333333333333,
+        "f1": 0.5,
+        "false_positive_rate": 0.0
+      }
+    },
+    "lateral": {
+      "confusion": {
+        "tp": 20,
+        "fp": 20,
+        "fn": 10,
+        "tn": 10
+      },
+      "metrics": {
+        "precision": 0.5,
+        "recall": 0.6666666666666666,
+        "f1": 0.5714285714285714,
+        "false_positive_rate": 0.6666666666666666
+      }
+    },
+    "privilege": {
+      "confusion": {
+        "tp": 20,
+        "fp": 0,
+        "fn": 10,
+        "tn": 30
+      },
+      "metrics": {
+        "precision": 1.0,
+        "recall": 0.6666666666666666,
+        "f1": 0.8,
+        "false_positive_rate": 0.0
+      }
+    },
+    "remote": {
+      "confusion": {
+        "tp": 20,
+        "fp": 20,
+        "fn": 10,
+        "tn": 10
+      },
+      "metrics": {
+        "precision": 0.5,
+        "recall": 0.6666666666666666,
+        "f1": 0.5714285714285714,
+        "false_positive_rate": 0.6666666666666666
+      }
+    }
+  },
+  "cases": [
+    {
+      "case_id": "credential-distributed-slow-00",
+      "session_id": "s-f216351f13cf60b43966",
+      "family_id": "credential-distributed-slow",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "90aa8a4fea47fb4270d875863fb3ddfa576f04d54fc500b76680884354f2d117"
+    },
+    {
+      "case_id": "credential-distributed-slow-01",
+      "session_id": "s-d255004300af1f58317c",
+      "family_id": "credential-distributed-slow",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "6c180a84b32fc0dd134f3c53cc0eea2960661d7c8f464f9d940baab30c0c30c3"
+    },
+    {
+      "case_id": "credential-distributed-slow-02",
+      "session_id": "s-1bb0f5c5fcb302066398",
+      "family_id": "credential-distributed-slow",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "415c56ec61c37640ba33e76c1a1d62e020862f252ae655819ffcd2afbc05ed37"
+    },
+    {
+      "case_id": "credential-distributed-slow-03",
+      "session_id": "s-282747fd6cb81c285120",
+      "family_id": "credential-distributed-slow",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "5f84cf9c03138a26b68a7e16e4203da2d11b017f6f535cf3ea897d8a7cb1d5cd"
+    },
+    {
+      "case_id": "credential-distributed-slow-04",
+      "session_id": "s-fb77255442c91d205fa0",
+      "family_id": "credential-distributed-slow",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "f26cdc0cc703a7c4f9f6224d820145fc2e6e048dfcf24f1dba8099890bc33e73"
+    },
+    {
+      "case_id": "credential-distributed-slow-05",
+      "session_id": "s-21c4dcd0fe10ff20828a",
+      "family_id": "credential-distributed-slow",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "da6d1c226f83aea4bbd4b8789c797892d925424ec8722b618418116089400d76"
+    },
+    {
+      "case_id": "credential-distributed-slow-06",
+      "session_id": "s-8654abbce8112b4aa87b",
+      "family_id": "credential-distributed-slow",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "45fa45671c7bce545ea1f2d263e515e66999e38241612ce426df6ff0adde6d46"
+    },
+    {
+      "case_id": "credential-distributed-slow-07",
+      "session_id": "s-64db98bb414591a83b07",
+      "family_id": "credential-distributed-slow",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "3ff80a9e0973f71769943b92ab193074ce739a32ccda4128b71f778d9961e9cb"
+    },
+    {
+      "case_id": "credential-distributed-slow-08",
+      "session_id": "s-af43fa65a2d68ed87ef7",
+      "family_id": "credential-distributed-slow",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "8778bbbeb70828e873102eb18e842a4a47b6f3f0fb91ee4421122da8a127b088"
+    },
+    {
+      "case_id": "credential-distributed-slow-09",
+      "session_id": "s-87b8be281927d739138a",
+      "family_id": "credential-distributed-slow",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "3acaee1b00a496fc7bea158a0e1bfcc0c01fabe36f0045c887122772c32cf4ca"
+    },
+    {
+      "case_id": "credential-credential-stuffing-00",
+      "session_id": "s-e12c6a4a03a103fdc130",
+      "family_id": "credential-credential-stuffing",
+      "domain": "credential",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "d15713ca1a50cf04c711618afc2e22b81214dd709e3ae98dce6f8c460bd7a227"
+    },
+    {
+      "case_id": "credential-credential-stuffing-01",
+      "session_id": "s-a8bbf75ec4f13a194902",
+      "family_id": "credential-credential-stuffing",
+      "domain": "credential",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "e88826be9a3c24240966a85878913a5743af4f233c3bd746feda78da19925e50"
+    },
+    {
+      "case_id": "credential-credential-stuffing-02",
+      "session_id": "s-527ccf3cd41e706c71e4",
+      "family_id": "credential-credential-stuffing",
+      "domain": "credential",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "e6fc321c30c3d5bbebca17de31de0982aaf3d03c86a2f4e37a045f0d1dbf9a70"
+    },
+    {
+      "case_id": "credential-credential-stuffing-03",
+      "session_id": "s-105abadd8f9f74b405ea",
+      "family_id": "credential-credential-stuffing",
+      "domain": "credential",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "205dfe25c07cdb8eb89e82b17cb6bc812b967d9c57cd62ebcf82d497674c4d19"
+    },
+    {
+      "case_id": "credential-credential-stuffing-04",
+      "session_id": "s-10698965449bffbdd05d",
+      "family_id": "credential-credential-stuffing",
+      "domain": "credential",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "47938aeba41a8b821e243eac3d778ecda6f9d436ed8ec1b74fcf14cb17c320a3"
+    },
+    {
+      "case_id": "credential-credential-stuffing-05",
+      "session_id": "s-2d3b0df6380392c8dd3e",
+      "family_id": "credential-credential-stuffing",
+      "domain": "credential",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "7b0eeed8a02eb70b6efaa0a589b7a7b4f0938122f3c0f49bb20d96b308287fb3"
+    },
+    {
+      "case_id": "credential-credential-stuffing-06",
+      "session_id": "s-83c2dbe6a96522eecd8f",
+      "family_id": "credential-credential-stuffing",
+      "domain": "credential",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "3af0f5273b682491444ec81d6a065c410644086ca7769455fd0bf16528d05cf8"
+    },
+    {
+      "case_id": "credential-credential-stuffing-07",
+      "session_id": "s-cebbca35b3c0fc46b1c1",
+      "family_id": "credential-credential-stuffing",
+      "domain": "credential",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "13ca40a8a08d01ff860ba4cf5f00736ab584f95b0865a2a8c85bcef829566c2f"
+    },
+    {
+      "case_id": "credential-credential-stuffing-08",
+      "session_id": "s-c7b038e200d4bf755bbd",
+      "family_id": "credential-credential-stuffing",
+      "domain": "credential",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "e5cdbbcb399fd856395c98e20f417ea8915cef5fa2ba66eb12916496983b7df6"
+    },
+    {
+      "case_id": "credential-credential-stuffing-09",
+      "session_id": "s-ebaef30a623ff02e2112",
+      "family_id": "credential-credential-stuffing",
+      "domain": "credential",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "5f72d8ea0589f8b6617df25adf42ddbce6dcfbe090edf2033db011f35403db88"
+    },
+    {
+      "case_id": "credential-stolen-success-00",
+      "session_id": "s-ce75f2dff30d6906a523",
+      "family_id": "credential-stolen-success",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "af1d546edce67de0385664ffbc1dbc4ffcab5b840b5091f933d9890be963f07f"
+    },
+    {
+      "case_id": "credential-stolen-success-01",
+      "session_id": "s-17c40a0769f451a7d17d",
+      "family_id": "credential-stolen-success",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "44599f2d8d7a45f90f2687a7db73fc8ce6412620ce007bddebf079e232126ba0"
+    },
+    {
+      "case_id": "credential-stolen-success-02",
+      "session_id": "s-ab7a2585177df6454c33",
+      "family_id": "credential-stolen-success",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "f95b14fdb11ccbf4c08974ee7a910f20d09ed1bb9d1c852b91e37932c541b2f4"
+    },
+    {
+      "case_id": "credential-stolen-success-03",
+      "session_id": "s-67a513c23fd5d1608e70",
+      "family_id": "credential-stolen-success",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "fd2a86cdfd53fdb9a943e2990805b5c8e473b43d54953cf05c8b4e50746dfd07"
+    },
+    {
+      "case_id": "credential-stolen-success-04",
+      "session_id": "s-c65da928b8b2dc6126c3",
+      "family_id": "credential-stolen-success",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "9681f64f7ff2eb653c16dbef349d4ce07ba5d997c9d881d13632a5c63160c6e2"
+    },
+    {
+      "case_id": "credential-stolen-success-05",
+      "session_id": "s-444f3cc25e63acd9970f",
+      "family_id": "credential-stolen-success",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "bb650effa2f9af0114da3507d0c18c39facfb87e45533105fd56e35e41340d5c"
+    },
+    {
+      "case_id": "credential-stolen-success-06",
+      "session_id": "s-eed1e49f0c5cc3ae80a2",
+      "family_id": "credential-stolen-success",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "80435ffaf2fef27069d0fc7a757e494a5baf25b959a978e1e0a3a190e586629c"
+    },
+    {
+      "case_id": "credential-stolen-success-07",
+      "session_id": "s-bf0c6f339802a7ce6d53",
+      "family_id": "credential-stolen-success",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "b7aedcd08276120d6bba431c9b42a4ec99372c2caf9c81b708a4017d5296d655"
+    },
+    {
+      "case_id": "credential-stolen-success-08",
+      "session_id": "s-b735315aea0fb9e1780a",
+      "family_id": "credential-stolen-success",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "f6f5793b53bd0f2fc234eee9390cefca9625fbbf9d37bb75fe76c00eaa29a8a2"
+    },
+    {
+      "case_id": "credential-stolen-success-09",
+      "session_id": "s-cfa5e6100164ffab1ea9",
+      "family_id": "credential-stolen-success",
+      "domain": "credential",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "982d68ff2a9e89b017f98b5672710ca9a1591825c94659c438f5c997871381cc"
+    },
+    {
+      "case_id": "credential-vpn-mfa-00",
+      "session_id": "s-9d9ecbc5d54c6b10d462",
+      "family_id": "credential-vpn-mfa",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "8d7b7bc181fd95e3be6d2838200b3449712b512b596f5f7580c0a3f090499a53"
+    },
+    {
+      "case_id": "credential-vpn-mfa-01",
+      "session_id": "s-2853d79345715586f98c",
+      "family_id": "credential-vpn-mfa",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "70bec5a9c4e1cb30fa8f980535d0d4cd54bf68bc46cec82d450a4aa8a10c2912"
+    },
+    {
+      "case_id": "credential-vpn-mfa-02",
+      "session_id": "s-1472440e0e5ca96e0ae4",
+      "family_id": "credential-vpn-mfa",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "58eea6d79dcee912defbcb909fa8de1e531afcbafc0605fb913b4378e73db260"
+    },
+    {
+      "case_id": "credential-vpn-mfa-03",
+      "session_id": "s-623ad11572bff8209879",
+      "family_id": "credential-vpn-mfa",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "528e3a06ee6a3ca4474ffe9ae459be079f0bd42821203502a0a076858b808a59"
+    },
+    {
+      "case_id": "credential-vpn-mfa-04",
+      "session_id": "s-cdf1cf24cb1fea421a49",
+      "family_id": "credential-vpn-mfa",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "2bb41cf0b69be02006691213d39b50a6b88c779c13385cc03f29d9d71cf6851d"
+    },
+    {
+      "case_id": "credential-vpn-mfa-05",
+      "session_id": "s-3ac0dbde4b9fffe4ef1b",
+      "family_id": "credential-vpn-mfa",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "0c8c87559c59196fe92641056e6d7be57757859f909672b19e0d1d562cbdf7a5"
+    },
+    {
+      "case_id": "credential-vpn-mfa-06",
+      "session_id": "s-9b4b94ff57a5d45f9429",
+      "family_id": "credential-vpn-mfa",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "bc40fde9611d69cd99eb3eb4726c03ec9a1e1c279abcb22aea2685e2dee50bf9"
+    },
+    {
+      "case_id": "credential-vpn-mfa-07",
+      "session_id": "s-d6339f5cad9ca0eee539",
+      "family_id": "credential-vpn-mfa",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "2efd1809f698e2e6faf979ad4eb1243b307b702f8b930b25e5239a7320c0475b"
+    },
+    {
+      "case_id": "credential-vpn-mfa-08",
+      "session_id": "s-d79d924a722595e1455b",
+      "family_id": "credential-vpn-mfa",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "c4063608697e5b0c5a4836c256f13c0da56db0dffbf69b9addf4820727c5a5aa"
+    },
+    {
+      "case_id": "credential-vpn-mfa-09",
+      "session_id": "s-23325ac0e97a2f4f7946",
+      "family_id": "credential-vpn-mfa",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "41560b4eba841f631d49633ded99b73f76db72d7f81a9834da9c6ae51dde8a30"
+    },
+    {
+      "case_id": "credential-authorized-drill-00",
+      "session_id": "s-ca2b1fd662566c02d8e3",
+      "family_id": "credential-authorized-drill",
+      "domain": "credential",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "fd5ab91181dcdcb3107aee676c3329a1b7bba4d4ffb7119025ef22857b9ae177"
+    },
+    {
+      "case_id": "credential-authorized-drill-01",
+      "session_id": "s-c8e153b300197c5a1170",
+      "family_id": "credential-authorized-drill",
+      "domain": "credential",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "9fb7fc92130c61e8b4c30cea961c9a2d35630803c457e1e48ad6ed189018915e"
+    },
+    {
+      "case_id": "credential-authorized-drill-02",
+      "session_id": "s-6f14e7b6884fe2b0f43c",
+      "family_id": "credential-authorized-drill",
+      "domain": "credential",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "92fbd9fcc8101eae22199c16313cac28fbba1259f7f23f168d9e87f14a4987fa"
+    },
+    {
+      "case_id": "credential-authorized-drill-03",
+      "session_id": "s-4cff2d1ef050d35ac2a9",
+      "family_id": "credential-authorized-drill",
+      "domain": "credential",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "d8cf708ecdc139f8080fe2a894e8ca7349a2f27e0b8bd8ade1d4c574e4f82e54"
+    },
+    {
+      "case_id": "credential-authorized-drill-04",
+      "session_id": "s-cd036810663c93883aff",
+      "family_id": "credential-authorized-drill",
+      "domain": "credential",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "179c36a320a169833c9de86b296ed1feb9b53f8db0928e366bc5edf482ab4406"
+    },
+    {
+      "case_id": "credential-authorized-drill-05",
+      "session_id": "s-46d027ca71787510c2c9",
+      "family_id": "credential-authorized-drill",
+      "domain": "credential",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "bea2b09419b098e682e789e5fe3a6fe0b05323760304dd87c335a63698e4bae9"
+    },
+    {
+      "case_id": "credential-authorized-drill-06",
+      "session_id": "s-7d1e8829f1ac2cd782f8",
+      "family_id": "credential-authorized-drill",
+      "domain": "credential",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "065d0c0048f5cc564d8e1a5763c7976896aa41f295de13907686622b48c3221a"
+    },
+    {
+      "case_id": "credential-authorized-drill-07",
+      "session_id": "s-1b218edbe4b3fce9ca44",
+      "family_id": "credential-authorized-drill",
+      "domain": "credential",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "eb8d4384d68381f3051544f76935687b5d6b221dd02258289277aeb51f1ab67d"
+    },
+    {
+      "case_id": "credential-authorized-drill-08",
+      "session_id": "s-6d43c664b2ec5a3d86c1",
+      "family_id": "credential-authorized-drill",
+      "domain": "credential",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "fff74772a0512c35fb957d717147ccfbd01fb717396501e2d7a9daa90c988cdc"
+    },
+    {
+      "case_id": "credential-authorized-drill-09",
+      "session_id": "s-a9866b853a5bfe161101",
+      "family_id": "credential-authorized-drill",
+      "domain": "credential",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "215a776e47543257c5b5b0d498f8e50e128aa9d1086f44a1253bd19b23f011fc"
+    },
+    {
+      "case_id": "credential-recovered-success-00",
+      "session_id": "s-ef2c48658aeb39b6388d",
+      "family_id": "credential-recovered-success",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "e0df4cf756482c1520f240a3255b1759a9000a96dd835cc1fe42cd929d31817c"
+    },
+    {
+      "case_id": "credential-recovered-success-01",
+      "session_id": "s-e3f28177ebd46f9096c6",
+      "family_id": "credential-recovered-success",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "545f9554879b1dc6fc184355a2747e9dd1b75c92304fc41ead2ae0775ddbc23f"
+    },
+    {
+      "case_id": "credential-recovered-success-02",
+      "session_id": "s-c78ae158fb0ed514bd7c",
+      "family_id": "credential-recovered-success",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "7b7f986d751e52c13aed961e502eb8d489384088e8e66a39676cebd0426e9a74"
+    },
+    {
+      "case_id": "credential-recovered-success-03",
+      "session_id": "s-56ce0fcb35a43027f987",
+      "family_id": "credential-recovered-success",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "bf5c1563ed8b4b3ca77f5c40471e13f2ae68a1a3750e7f369ecbe0a9ef80547d"
+    },
+    {
+      "case_id": "credential-recovered-success-04",
+      "session_id": "s-89b3fd87d3159a0a20a4",
+      "family_id": "credential-recovered-success",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "2a5115c17e811c949d6131f8ce598406ef2bd6d23ad4d722f17c358d015f460f"
+    },
+    {
+      "case_id": "credential-recovered-success-05",
+      "session_id": "s-491b634da731c7cd3241",
+      "family_id": "credential-recovered-success",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "14ccd35f2cffd9932eb56fcc547ff79c089e624348418ae8e272f76091b841db"
+    },
+    {
+      "case_id": "credential-recovered-success-06",
+      "session_id": "s-d2260fc5b5d923995c5c",
+      "family_id": "credential-recovered-success",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "ce57e3a891d8693e94fbc81aa070981fa22df1f69aaed45a82451ab1791ce6bd"
+    },
+    {
+      "case_id": "credential-recovered-success-07",
+      "session_id": "s-b67f6af84d56525e4409",
+      "family_id": "credential-recovered-success",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "1c6c2b2b4533a0febc6ab30b5f4cb63ed08daf4c6554640d657b477f1816955a"
+    },
+    {
+      "case_id": "credential-recovered-success-08",
+      "session_id": "s-27a89943b14496e534a8",
+      "family_id": "credential-recovered-success",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "44d9c6d757a68af9a3792395150a246f41e112c6909ef70ba8680aae9a0cbeb5"
+    },
+    {
+      "case_id": "credential-recovered-success-09",
+      "session_id": "s-a23202fc1fb42fcc1d76",
+      "family_id": "credential-recovered-success",
+      "domain": "credential",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "bc6254b2cab4676129de8a9cb3ed0404ca2c7376ce393d2fcaf1178a7be24a3c"
+    },
+    {
+      "case_id": "device-managed-compromise-00",
+      "session_id": "s-ad6fff04fc3967358399",
+      "family_id": "device-managed-compromise",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "90d7b6d1f609d803190ef4161297520ce897243d7cb274c8b365b429c5ef1f4c"
+    },
+    {
+      "case_id": "device-managed-compromise-01",
+      "session_id": "s-d00a14447ef83f409d07",
+      "family_id": "device-managed-compromise",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "450e008afc32c94e1a1061e2dfb32a2dc2d1ca06ee091fa3db4923ee20eec9d0"
+    },
+    {
+      "case_id": "device-managed-compromise-02",
+      "session_id": "s-ebf68ef8ac672eea28f8",
+      "family_id": "device-managed-compromise",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "ebc8b09df094d16959042288faa5a38f3151de15d081454f3d0a3d35742c3b98"
+    },
+    {
+      "case_id": "device-managed-compromise-03",
+      "session_id": "s-5e2ac40710978308a60c",
+      "family_id": "device-managed-compromise",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "c86a84eed641ec796183f1e2be9db3b23efb891f24ccd57a8f12e9988095034a"
+    },
+    {
+      "case_id": "device-managed-compromise-04",
+      "session_id": "s-6e6809c1b2e7f26cf240",
+      "family_id": "device-managed-compromise",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "d11be383c6495b34175c47a896e38e03387baf54735458a6022b245a6aa372c1"
+    },
+    {
+      "case_id": "device-managed-compromise-05",
+      "session_id": "s-04ee9a6ea43425e9828c",
+      "family_id": "device-managed-compromise",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "6203f8faed2c4955f2346ade88134a0900eac625f36b5139adfbcc6b353cf955"
+    },
+    {
+      "case_id": "device-managed-compromise-06",
+      "session_id": "s-765739adf94c01c83ba6",
+      "family_id": "device-managed-compromise",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "d650169f9ad968d2be4f3d51913c2bb965c1233ceeafddf7d7d70f0f0a1605c8"
+    },
+    {
+      "case_id": "device-managed-compromise-07",
+      "session_id": "s-7f2f2c69769b6cbe7c2b",
+      "family_id": "device-managed-compromise",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "5c09baf267b14f5c4b00feed6cf3de99282d6d36d7ae60b9a4ef05109013a4f1"
+    },
+    {
+      "case_id": "device-managed-compromise-08",
+      "session_id": "s-5a4c0351b4669aa859c6",
+      "family_id": "device-managed-compromise",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "cdf5b9e48f53e162932eab5fcd8465d121d27f49efac8d8ef68f1f0153103b72"
+    },
+    {
+      "case_id": "device-managed-compromise-09",
+      "session_id": "s-ee9fa73f1abafe1c6315",
+      "family_id": "device-managed-compromise",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "5727d19db97359f5c130f8d5a160c61cc21d2dfa7b2148ad7643055c2f073025"
+    },
+    {
+      "case_id": "device-unmanaged-at-risk-00",
+      "session_id": "s-b487a2cfcf01e27bd5be",
+      "family_id": "device-unmanaged-at-risk",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "bc6d7c51c39cadc41dfaef4a076a766d803c0d7a0fac024773302c09433bcbe3"
+    },
+    {
+      "case_id": "device-unmanaged-at-risk-01",
+      "session_id": "s-57ca13f51fbaae7e1e4c",
+      "family_id": "device-unmanaged-at-risk",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "0fd8134637f8497e2c314ec97f194d7f020c912f5a0350d3a0c0ed032497557f"
+    },
+    {
+      "case_id": "device-unmanaged-at-risk-02",
+      "session_id": "s-c9cc719d5f34aa045b7e",
+      "family_id": "device-unmanaged-at-risk",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "0286024a15b8be4b77389746df9867259b561cb13d7ff8ae9aef5146c8a25d24"
+    },
+    {
+      "case_id": "device-unmanaged-at-risk-03",
+      "session_id": "s-c8b2ba687c7454bb6acb",
+      "family_id": "device-unmanaged-at-risk",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "3590b2a4f6317f64e844fcaa4a2f63b80b0f295d3898ca85b5df1342ac719f33"
+    },
+    {
+      "case_id": "device-unmanaged-at-risk-04",
+      "session_id": "s-a493b905dfdc4feedac9",
+      "family_id": "device-unmanaged-at-risk",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "3cfb3e4ec48af5d1040009da6d28581ac6cba28d2ef1d4ebdc83eb04ec1b2d65"
+    },
+    {
+      "case_id": "device-unmanaged-at-risk-05",
+      "session_id": "s-b6afa6c7a190a7419c33",
+      "family_id": "device-unmanaged-at-risk",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "e51fc80e12816c2c73518661759eec92af87959bd2b7db2beab50b4b78bcf880"
+    },
+    {
+      "case_id": "device-unmanaged-at-risk-06",
+      "session_id": "s-5b1d43e3c160dc51a987",
+      "family_id": "device-unmanaged-at-risk",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "25aac4b246d6a3e6b8ab81276596e659aa824b932e18be85f3f796d092ac0175"
+    },
+    {
+      "case_id": "device-unmanaged-at-risk-07",
+      "session_id": "s-34ff28eafd7e75ccb35d",
+      "family_id": "device-unmanaged-at-risk",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "62bc0a4d6dae8da53aa48f46a51e4202aabb58c2ea058a6156bf9252d2d460b8"
+    },
+    {
+      "case_id": "device-unmanaged-at-risk-08",
+      "session_id": "s-98a3b47d69fb2aec8d74",
+      "family_id": "device-unmanaged-at-risk",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "eda6fcbc7c7ea3563f288be7acd7b96305121d00d9f77147b060e35235a270ac"
+    },
+    {
+      "case_id": "device-unmanaged-at-risk-09",
+      "session_id": "s-01d6437e25e8c3b030fb",
+      "family_id": "device-unmanaged-at-risk",
+      "domain": "device",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "4445baec811b0979c13fa4742a4a08d60c150beac2172ac146be1173512b8092"
+    },
+    {
+      "case_id": "device-unregistered-download-00",
+      "session_id": "s-241eef2fd3ffa79c0c05",
+      "family_id": "device-unregistered-download",
+      "domain": "device",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "f611a5c46b8bdcea6465d6e70f2adff603194a0dfff519e993410a46ac5b96af"
+    },
+    {
+      "case_id": "device-unregistered-download-01",
+      "session_id": "s-dfe61677072a0de36893",
+      "family_id": "device-unregistered-download",
+      "domain": "device",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "79f69301ed4081e21dcc9f198bb6e78a1128927933848039d4d3c8a3cf8721d9"
+    },
+    {
+      "case_id": "device-unregistered-download-02",
+      "session_id": "s-821096d2684d20e377c7",
+      "family_id": "device-unregistered-download",
+      "domain": "device",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "cec71121c5531939fd92b6cca4553d9534cb80d4ae0b4a46becaf263fb85f463"
+    },
+    {
+      "case_id": "device-unregistered-download-03",
+      "session_id": "s-f9b1e5989fae2481fb67",
+      "family_id": "device-unregistered-download",
+      "domain": "device",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "bbaa1ad12e92d32a64719a89749d6bd015b98a577c210a56e7b2ebe45749e481"
+    },
+    {
+      "case_id": "device-unregistered-download-04",
+      "session_id": "s-812d67a1fa8554493c57",
+      "family_id": "device-unregistered-download",
+      "domain": "device",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "4d118febdc57056ff30d608795d44bc56a57613307b2f6b627931c3286800535"
+    },
+    {
+      "case_id": "device-unregistered-download-05",
+      "session_id": "s-9afa22715ae99ece35ec",
+      "family_id": "device-unregistered-download",
+      "domain": "device",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "dd60038e14ce40db9169dd2b7713e36210d6deccb390904ed48f91dbfdcda51a"
+    },
+    {
+      "case_id": "device-unregistered-download-06",
+      "session_id": "s-70a8597feed6c54fbe10",
+      "family_id": "device-unregistered-download",
+      "domain": "device",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "582b78e5f068e4e78151bfbbef7378292f32c54ce84ed15f97d7daf8edf08bcd"
+    },
+    {
+      "case_id": "device-unregistered-download-07",
+      "session_id": "s-559b1ba66b00d020475c",
+      "family_id": "device-unregistered-download",
+      "domain": "device",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "7ec17ac7ed69d64bb30e65878eb1d1c80f888237ef15408dd104b380dbab5119"
+    },
+    {
+      "case_id": "device-unregistered-download-08",
+      "session_id": "s-94aa71973e983ef8f481",
+      "family_id": "device-unregistered-download",
+      "domain": "device",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "9cc23d663c944fec0f95f70b6e529896a1eacc7c0e864d597cdbd08daf26a153"
+    },
+    {
+      "case_id": "device-unregistered-download-09",
+      "session_id": "s-790aeeba616a391e9c5d",
+      "family_id": "device-unregistered-download",
+      "domain": "device",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "predicted_rule_ids": [
+        "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "ba82bb156602edb0c79fae697e4786d4a8f2c6daf9d97e95fdcf7006dc3676c8"
+    },
+    {
+      "case_id": "device-inventory-refresh-00",
+      "session_id": "s-4bbc4cbe1d03b8cfa13a",
+      "family_id": "device-inventory-refresh",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "49132bbb54d00eed26c3a6e83377a7a8a63b1c74ed0a34659b00f9cd9e4cf53b"
+    },
+    {
+      "case_id": "device-inventory-refresh-01",
+      "session_id": "s-19bfe85a523d429920b5",
+      "family_id": "device-inventory-refresh",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "da5aeb600d4f6b0b7cc488221bce017c21731f135d84c99d6290bfc0e54c0a0a"
+    },
+    {
+      "case_id": "device-inventory-refresh-02",
+      "session_id": "s-5991610a96bc97bb8d7c",
+      "family_id": "device-inventory-refresh",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "f0fb97b6b78cd17734e9453440bda7606f1179fc08cdb2e7ee521227b904b049"
+    },
+    {
+      "case_id": "device-inventory-refresh-03",
+      "session_id": "s-8d3e1b2fe93ef41979e5",
+      "family_id": "device-inventory-refresh",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "f34d891628fce4e1dc991055bc295496f7a211d360724a71b4fa23a014208924"
+    },
+    {
+      "case_id": "device-inventory-refresh-04",
+      "session_id": "s-87483bdb3e1d694ec107",
+      "family_id": "device-inventory-refresh",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "b8b3be666331bc1b0f163775ab945d6832f1fc383ff236adc8ed1a9a3f2c03d0"
+    },
+    {
+      "case_id": "device-inventory-refresh-05",
+      "session_id": "s-031a802d4dc6bf223077",
+      "family_id": "device-inventory-refresh",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "04dec2794bd8b415923afded15820036d506fbf994294077a1e1aba9346e024a"
+    },
+    {
+      "case_id": "device-inventory-refresh-06",
+      "session_id": "s-f2e6b213b2c072c31733",
+      "family_id": "device-inventory-refresh",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "4a4cd8ccb3eeb2b667a159d4eb3ec2bf34d0415a8b42f150b6a758f807436b86"
+    },
+    {
+      "case_id": "device-inventory-refresh-07",
+      "session_id": "s-3c1cf286131a09888ce4",
+      "family_id": "device-inventory-refresh",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "8e56afe58a6b37bee22d6beca1d0ceffd70cdd1646ee8479e2f44f14f1481681"
+    },
+    {
+      "case_id": "device-inventory-refresh-08",
+      "session_id": "s-1b0931a25bb2fd04b5cf",
+      "family_id": "device-inventory-refresh",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "1f6f71f4b87f17d4351594c6e0655e55934cd3fd8b0bf43ea96d8252ae29324b"
+    },
+    {
+      "case_id": "device-inventory-refresh-09",
+      "session_id": "s-d1ffb32b1987e3c588aa",
+      "family_id": "device-inventory-refresh",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "94f8011eead5c98ac73edb28977e03d8300b2d2d9bdff19b93b812eba224330c"
+    },
+    {
+      "case_id": "device-healthy-byod-enrollment-00",
+      "session_id": "s-46f43f28682c65bfb3da",
+      "family_id": "device-healthy-byod-enrollment",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "7274bd66ace4f52a117851f84742fc69a81a50aea3041f42caea3691fda653c5"
+    },
+    {
+      "case_id": "device-healthy-byod-enrollment-01",
+      "session_id": "s-317bbd8486d679626a07",
+      "family_id": "device-healthy-byod-enrollment",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "ad6ddc8c8f0fd8f94bab2c157f3f5b5db9e85be3ff1281d9852936761c61aca5"
+    },
+    {
+      "case_id": "device-healthy-byod-enrollment-02",
+      "session_id": "s-893e9e43bfaa19c968e3",
+      "family_id": "device-healthy-byod-enrollment",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "84a6fc8219c7eca957742e111837475be839e219c1eba597ef279b5989620954"
+    },
+    {
+      "case_id": "device-healthy-byod-enrollment-03",
+      "session_id": "s-f43fdbe437f52664488f",
+      "family_id": "device-healthy-byod-enrollment",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "5fa031e9c646c1f8f8f20992466f213a1d68df89f7bbf11b59dfcb8c98df101c"
+    },
+    {
+      "case_id": "device-healthy-byod-enrollment-04",
+      "session_id": "s-46396b93c212b4ddf6f8",
+      "family_id": "device-healthy-byod-enrollment",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "2d0a051bcc16651c24736629ee043c70393e44d9af0c183f88f5f7e86bb63e3f"
+    },
+    {
+      "case_id": "device-healthy-byod-enrollment-05",
+      "session_id": "s-8ea14cc20a6874088c09",
+      "family_id": "device-healthy-byod-enrollment",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "af8e716ae00e6e9a5b2dbc6a87465dc850af3fa2c4e3058d846d4b5b8b568a86"
+    },
+    {
+      "case_id": "device-healthy-byod-enrollment-06",
+      "session_id": "s-61b3ee12ec4e55f2c6d2",
+      "family_id": "device-healthy-byod-enrollment",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "54663747aef4f06913ef9b440380962c8ebf0d1365885e74527cb256131449a7"
+    },
+    {
+      "case_id": "device-healthy-byod-enrollment-07",
+      "session_id": "s-19f300e6e2e51198b606",
+      "family_id": "device-healthy-byod-enrollment",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "9668bf1c4a1b3c40b2aeca2037d57f4c37b3bbb11703a841fab7fcb8298a3962"
+    },
+    {
+      "case_id": "device-healthy-byod-enrollment-08",
+      "session_id": "s-0c919398c1f17c9413c9",
+      "family_id": "device-healthy-byod-enrollment",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "0098ebcd328b2ec6135c73406c7dce1dc8013c979948618662b8198933664955"
+    },
+    {
+      "case_id": "device-healthy-byod-enrollment-09",
+      "session_id": "s-6af4e62a29891fbb13a2",
+      "family_id": "device-healthy-byod-enrollment",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "2b358e85f14ef1ea2f8c5cb99c4abdae22b4fa9f290b5496a58b42d58d75aab2"
+    },
+    {
+      "case_id": "device-managed-local-logon-00",
+      "session_id": "s-ead47856119dfffd56aa",
+      "family_id": "device-managed-local-logon",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "75789f5551d4736a7e90bafea805264e083e8a932218d49de4e4a504fd053bcb"
+    },
+    {
+      "case_id": "device-managed-local-logon-01",
+      "session_id": "s-b59ae798875d56eaeb17",
+      "family_id": "device-managed-local-logon",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "a12fe10fb6f27a22e62381e43892d8b8e3a8fb24743ad36e18604b24720a1642"
+    },
+    {
+      "case_id": "device-managed-local-logon-02",
+      "session_id": "s-ae729a2bc06ac06953f7",
+      "family_id": "device-managed-local-logon",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "7b0cfb67301a62f838e06969b3fd17eda57ebd728bc8cf1136296f2aba531403"
+    },
+    {
+      "case_id": "device-managed-local-logon-03",
+      "session_id": "s-9742259ca923449a23a7",
+      "family_id": "device-managed-local-logon",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "004eff84405156d3366205d79bfbe4247f91c1f8b9178c75a2b4432f995dcc58"
+    },
+    {
+      "case_id": "device-managed-local-logon-04",
+      "session_id": "s-0ef201fef68b6a006ce1",
+      "family_id": "device-managed-local-logon",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "b7e7b0cdc9b0057eef1c0612d9e8c40203f0854b3e6dae492c59c0f919ce8b72"
+    },
+    {
+      "case_id": "device-managed-local-logon-05",
+      "session_id": "s-dfdd002ff2a0e93b1c84",
+      "family_id": "device-managed-local-logon",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "7802957e66265f6a24f4423e3a6f699d3f318700fd9ec1b0c442e2650b0f7178"
+    },
+    {
+      "case_id": "device-managed-local-logon-06",
+      "session_id": "s-d47b6f2dbc921dd1d172",
+      "family_id": "device-managed-local-logon",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "8cb45b9022f6cd2e3830fba2625f744853460dfd273decb2a77d8179d5ee0f5f"
+    },
+    {
+      "case_id": "device-managed-local-logon-07",
+      "session_id": "s-7ae3888e81537e4b96e3",
+      "family_id": "device-managed-local-logon",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "10b3945611222f1f6b6281c25aa686700e71de1bcddd7b35723aca7c6a173613"
+    },
+    {
+      "case_id": "device-managed-local-logon-08",
+      "session_id": "s-36883291125a90bbcdf9",
+      "family_id": "device-managed-local-logon",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "7f4eea8891fce3738f7665bdfaa519a4597aaa8a79c756c7493bf8e8cb38d956"
+    },
+    {
+      "case_id": "device-managed-local-logon-09",
+      "session_id": "s-d20808a94c68b223f9d0",
+      "family_id": "device-managed-local-logon",
+      "domain": "device",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "949a094d4174edac51c89fa3f5e83f925fbfa4a2637e90f43603aba4f8196736"
+    },
+    {
+      "case_id": "privilege-security-admin-00",
+      "session_id": "s-0b16292ff57c333b5579",
+      "family_id": "privilege-security-admin",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "aadf6e74cd2648f28553ccecf8f7b8164f9bc2207d82780ba213b354314efc84"
+    },
+    {
+      "case_id": "privilege-security-admin-01",
+      "session_id": "s-7dce0ceba63f28d4131d",
+      "family_id": "privilege-security-admin",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "b63e22578fa20dec8b653b6c2cd7f303c285010a7342b0c1b8e5b84c545ca114"
+    },
+    {
+      "case_id": "privilege-security-admin-02",
+      "session_id": "s-1d72d1091665db0caa69",
+      "family_id": "privilege-security-admin",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "07cd2cbaf9efc6dadb8ca8f17aa8680d6a27dcd4b7cb4674e49d7efcb11f2a2f"
+    },
+    {
+      "case_id": "privilege-security-admin-03",
+      "session_id": "s-af81e14840e5d11ff168",
+      "family_id": "privilege-security-admin",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "86ac54d6711b9ffad41f3efa952284a20f429ed096f79f10d515bd71a21f14f0"
+    },
+    {
+      "case_id": "privilege-security-admin-04",
+      "session_id": "s-91d16f2fb319e3732d67",
+      "family_id": "privilege-security-admin",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "c18a31ef09284257d84ec143a9e91933d07476a7ce38ce1cc0dff07764d2bbc5"
+    },
+    {
+      "case_id": "privilege-security-admin-05",
+      "session_id": "s-f39d8a22849901b8dfd0",
+      "family_id": "privilege-security-admin",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "19f477fb518ab36f4afe3724bedae865404853c1da02df59c9d095fbc9cbdd6a"
+    },
+    {
+      "case_id": "privilege-security-admin-06",
+      "session_id": "s-4bb73bd23d47e40cca73",
+      "family_id": "privilege-security-admin",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "e59d902adb3d9f743f6da47c88bffd9b0a2a42e1c9556f8d11911c9628b725e1"
+    },
+    {
+      "case_id": "privilege-security-admin-07",
+      "session_id": "s-83b016d42317608dfc65",
+      "family_id": "privilege-security-admin",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "6932d5875683ab87aff0628bba29b2e3db739a94b3818a73362bdaca9812f830"
+    },
+    {
+      "case_id": "privilege-security-admin-08",
+      "session_id": "s-70203610df0b40d77c21",
+      "family_id": "privilege-security-admin",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "ef59d6c90975bcb10be715c6a5eb9fc846f938318c3219313aa44c6cab3e2d4b"
+    },
+    {
+      "case_id": "privilege-security-admin-09",
+      "session_id": "s-1816c4a01fae4ba6741e",
+      "family_id": "privilege-security-admin",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "460db0eb372a4a552789c5e19d80ec9eaf9bea7d631d6535f1e733f34b8cacb7"
+    },
+    {
+      "case_id": "privilege-unauthorized-download-00",
+      "session_id": "s-fb0910fc51ab03238885",
+      "family_id": "privilege-unauthorized-download",
+      "domain": "privilege",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "2a94ffc0a1050b32772adc3108c656d667fecf658c46ff4afb2d803244a26cfc"
+    },
+    {
+      "case_id": "privilege-unauthorized-download-01",
+      "session_id": "s-eb94555a5410467d19f1",
+      "family_id": "privilege-unauthorized-download",
+      "domain": "privilege",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "1111da17426f508cfa0b91cb3f756ea07ff9f7f84ca1f0844ec48f829c89b80e"
+    },
+    {
+      "case_id": "privilege-unauthorized-download-02",
+      "session_id": "s-36cc6c1692a628fb85d4",
+      "family_id": "privilege-unauthorized-download",
+      "domain": "privilege",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "9e1eb24b4a3798e89f44a928547e0ba0365dbe9c3ab9dc4fc564aeb974ab2d59"
+    },
+    {
+      "case_id": "privilege-unauthorized-download-03",
+      "session_id": "s-4d710fd8b5d7c09298c4",
+      "family_id": "privilege-unauthorized-download",
+      "domain": "privilege",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "90014c045769e9077066c5d638a8af983ade597192b6e53bb2e29ee15db58940"
+    },
+    {
+      "case_id": "privilege-unauthorized-download-04",
+      "session_id": "s-e689ddfc7bca3bec395d",
+      "family_id": "privilege-unauthorized-download",
+      "domain": "privilege",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "e911b12df8953bbd88df0725187df5ad1f234689376e827664664d60a2ded6b6"
+    },
+    {
+      "case_id": "privilege-unauthorized-download-05",
+      "session_id": "s-0accad6777d44eea3454",
+      "family_id": "privilege-unauthorized-download",
+      "domain": "privilege",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "8f7eb7a225f3980bdf14a1426a5dacc1f048f0e283279006bb514b62e8d88a9a"
+    },
+    {
+      "case_id": "privilege-unauthorized-download-06",
+      "session_id": "s-c4ef141e4cb90cbd2003",
+      "family_id": "privilege-unauthorized-download",
+      "domain": "privilege",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "2d7683afe83de4b39f1e54d195288c748f4bad087e2439d0e28265214ff6ab33"
+    },
+    {
+      "case_id": "privilege-unauthorized-download-07",
+      "session_id": "s-e78119e9271b0029f996",
+      "family_id": "privilege-unauthorized-download",
+      "domain": "privilege",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "ce1a86e268558140149e4cafac0a31e89832122307916ea4a949e0f90f590e16"
+    },
+    {
+      "case_id": "privilege-unauthorized-download-08",
+      "session_id": "s-2d07db56f6df657a22c1",
+      "family_id": "privilege-unauthorized-download",
+      "domain": "privilege",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "2d67daad648a7e31e8572ccb4d92a24dd9ef9cf3cf23fd6c900e7202e4b52add"
+    },
+    {
+      "case_id": "privilege-unauthorized-download-09",
+      "session_id": "s-31291d0378c781131450",
+      "family_id": "privilege-unauthorized-download",
+      "domain": "privilege",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "95a5c4bd037fb41dc919aa495f32819b6da264b4d7cfd559ffca43ccbd0b0d5e"
+    },
+    {
+      "case_id": "privilege-missing-resource-role-00",
+      "session_id": "s-26ee4ec1b025d9d1fd39",
+      "family_id": "privilege-missing-resource-role",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "53906987f18cb6ffed48ad41f66d0b82bcb230deecae650e64727617e9e78c80"
+    },
+    {
+      "case_id": "privilege-missing-resource-role-01",
+      "session_id": "s-e0f1f6eea1eb1a9e947d",
+      "family_id": "privilege-missing-resource-role",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "6d92ccd87c4972259b24078515c607a632192614cdc170e7ef23613e0447e3e9"
+    },
+    {
+      "case_id": "privilege-missing-resource-role-02",
+      "session_id": "s-317083969ae59ae3ea07",
+      "family_id": "privilege-missing-resource-role",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "a3cd2ddf5eb7176a36944cca46d7eb77515450feb03877dc1ea7964eb832c2a1"
+    },
+    {
+      "case_id": "privilege-missing-resource-role-03",
+      "session_id": "s-6e2e473a10fefda9432b",
+      "family_id": "privilege-missing-resource-role",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "0eebe4a03fca2f6f8c7eb60c0817ee8faddac6e465707e72a626c68f9b8c6191"
+    },
+    {
+      "case_id": "privilege-missing-resource-role-04",
+      "session_id": "s-32abb0eb644734dde1ab",
+      "family_id": "privilege-missing-resource-role",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "12df570f49df7cef5a8871c1c8fc99771e96dc3f1f763754ead183c82c8206f6"
+    },
+    {
+      "case_id": "privilege-missing-resource-role-05",
+      "session_id": "s-5d86661d7b3469755135",
+      "family_id": "privilege-missing-resource-role",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "9b1360f42a1a9e5fb9502bfc677431b87ef1dc85fda3442053a47d1759119d0b"
+    },
+    {
+      "case_id": "privilege-missing-resource-role-06",
+      "session_id": "s-e03ddcd16c74211f9b8c",
+      "family_id": "privilege-missing-resource-role",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "38ee33b11672925af726cad1c90afa9acef20ef43a29bcec11783e27c696335c"
+    },
+    {
+      "case_id": "privilege-missing-resource-role-07",
+      "session_id": "s-ec012572a1dccc155a7e",
+      "family_id": "privilege-missing-resource-role",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "4e0ef829f26050e9a4b610467f4b7946b54a5b2ff53f63d2c0d92f2f44bc321a"
+    },
+    {
+      "case_id": "privilege-missing-resource-role-08",
+      "session_id": "s-b346c2170a698a58d473",
+      "family_id": "privilege-missing-resource-role",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "29817f155ebb6eb7f39715980ca7a1cca085d06df2c26b5b600e8abda2216b80"
+    },
+    {
+      "case_id": "privilege-missing-resource-role-09",
+      "session_id": "s-82f6e91bc93a46c23de4",
+      "family_id": "privilege-missing-resource-role",
+      "domain": "privilege",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "predicted_rule_ids": [
+        "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "646f8d91f417f0731e5515a0927cf9f83d58642fce3b65316e605550c7c0d019"
+    },
+    {
+      "case_id": "privilege-analyst-admin-00",
+      "session_id": "s-5b6b5b0d99d2ed6c6148",
+      "family_id": "privilege-analyst-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "f07fb190ff8c01386312d603f6fb90348bf7f79e5c1bb7a3c2cd2a31ae2d22d8"
+    },
+    {
+      "case_id": "privilege-analyst-admin-01",
+      "session_id": "s-4219ba0203498f51f037",
+      "family_id": "privilege-analyst-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "c182f57b774bbb400900a51cb577b1009b4efe67ae3b0fe5afdad9d0cf1b9412"
+    },
+    {
+      "case_id": "privilege-analyst-admin-02",
+      "session_id": "s-8accdf86faafb0a17a27",
+      "family_id": "privilege-analyst-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "eb4b75e39ee5d4d4346d1ff0cd1eee5813aab363fc72d6a6db58dc77fce619c9"
+    },
+    {
+      "case_id": "privilege-analyst-admin-03",
+      "session_id": "s-ac1fe0378150907ae51c",
+      "family_id": "privilege-analyst-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "80f3979682e2254b7c688dd9a67023eaaf3f11b80b3e043eda4c85c65d14c1af"
+    },
+    {
+      "case_id": "privilege-analyst-admin-04",
+      "session_id": "s-461d6888a56599b1b1f7",
+      "family_id": "privilege-analyst-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "8776efd384ab4a8455207135b8f687b0e9f8359469daa2b964928ca61a306db2"
+    },
+    {
+      "case_id": "privilege-analyst-admin-05",
+      "session_id": "s-9900fa9c7a9c02e5451c",
+      "family_id": "privilege-analyst-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "4a035c7eff5366dd4a4000ab61b9d1b48c0edc8ac2e2fa4871b5251719ac778a"
+    },
+    {
+      "case_id": "privilege-analyst-admin-06",
+      "session_id": "s-3114aea455e6ea05ceb1",
+      "family_id": "privilege-analyst-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "2df337c21d738f828176871e4fbdcc8a1950c18a1daa39e4054456cc550c1da1"
+    },
+    {
+      "case_id": "privilege-analyst-admin-07",
+      "session_id": "s-a72a3dad1848e9965d58",
+      "family_id": "privilege-analyst-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "f53524cb67fe2406c44257c933b75adf64366521706b39e2077cd697ab5d0905"
+    },
+    {
+      "case_id": "privilege-analyst-admin-08",
+      "session_id": "s-e0fe6052ded0b05d901c",
+      "family_id": "privilege-analyst-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "e90ab03c5de7d4bcefc597d60e1c021f428334dc4c38325e620ace4766d421f6"
+    },
+    {
+      "case_id": "privilege-analyst-admin-09",
+      "session_id": "s-ec0efbddf1c294390d6a",
+      "family_id": "privilege-analyst-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "bf8e85a765c9ff87ace9fc4371802c21918ebcff24894032a873b13e8c24e05c"
+    },
+    {
+      "case_id": "privilege-backup-admin-00",
+      "session_id": "s-025a6eb5169081119e18",
+      "family_id": "privilege-backup-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "a08be1e50384b1fcc9d7f03d09ba578555fa2c46c531de481afef5b5cdd9b0af"
+    },
+    {
+      "case_id": "privilege-backup-admin-01",
+      "session_id": "s-2046b72ce5c3792a91fb",
+      "family_id": "privilege-backup-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "20db9cbe2f5a8ea0d7f9268a06a07987657cd640ee6bf3bf1df2514254701bfd"
+    },
+    {
+      "case_id": "privilege-backup-admin-02",
+      "session_id": "s-701a33c244c5a91c00f6",
+      "family_id": "privilege-backup-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "ea5af19ac12538fe036de1aaefa295ec6bd1d2117823ca7c02c8d1d5b1c75201"
+    },
+    {
+      "case_id": "privilege-backup-admin-03",
+      "session_id": "s-80984d06b659288c3fe8",
+      "family_id": "privilege-backup-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "5812d91ca864c762cb0971aae2cd548033226fea1a6885f92986d0ddfb438f48"
+    },
+    {
+      "case_id": "privilege-backup-admin-04",
+      "session_id": "s-2c88a793b62379ef99dc",
+      "family_id": "privilege-backup-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "6d9b6a6ff5e930f123110f8a4a771dc2399489db38d132aefa5c2a2459ff145c"
+    },
+    {
+      "case_id": "privilege-backup-admin-05",
+      "session_id": "s-4579e03a35365941d372",
+      "family_id": "privilege-backup-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "dbac8bce9700c3871f43de1eec419d662890c87f943662e542503dd3324dd420"
+    },
+    {
+      "case_id": "privilege-backup-admin-06",
+      "session_id": "s-59c8f6c7f17efab476a4",
+      "family_id": "privilege-backup-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "072ca26708195f36ea7587f7a549d42e79574223dce897e5ae912d07614e6a9a"
+    },
+    {
+      "case_id": "privilege-backup-admin-07",
+      "session_id": "s-f55bd719ddfc32dafcc5",
+      "family_id": "privilege-backup-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "d6cb81488bd68a70ad8095f1329ee4e5a93998c1005e84c3e794e2d0fb2dd62c"
+    },
+    {
+      "case_id": "privilege-backup-admin-08",
+      "session_id": "s-3b6fbe988b6b89392aa8",
+      "family_id": "privilege-backup-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "b75c5da5b6aa604335baf20b8281bb765016c16443f3c87e7b3552c179c90cbc"
+    },
+    {
+      "case_id": "privilege-backup-admin-09",
+      "session_id": "s-f14ec6c5fb38f1d76eb2",
+      "family_id": "privilege-backup-admin",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "ce1af7ef18c8062edf7e848faf8ea43bc248cd533494ea9130934964ad2a3ed6"
+    },
+    {
+      "case_id": "privilege-viewer-read-00",
+      "session_id": "s-7d33b1e49a72c4b4c5ed",
+      "family_id": "privilege-viewer-read",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "72e075e23a9d9bd6af1a27db98eb6779c33ecdc1de9f8bca455f9380e1875e10"
+    },
+    {
+      "case_id": "privilege-viewer-read-01",
+      "session_id": "s-ae06ac501aa447357cc2",
+      "family_id": "privilege-viewer-read",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "ee1a05bcf169d997c43920e09cec6f625eab678a87509ce335b0fe78215e6129"
+    },
+    {
+      "case_id": "privilege-viewer-read-02",
+      "session_id": "s-798eeaff0c3fdb6cdbb5",
+      "family_id": "privilege-viewer-read",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "7809d69283c626225b4594260446e5ceea3a955f205815301b124029d4217c5a"
+    },
+    {
+      "case_id": "privilege-viewer-read-03",
+      "session_id": "s-aa9847ebeec70d9353ba",
+      "family_id": "privilege-viewer-read",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "271691c609d594fb21525ad6da11377f2979384047ade412b8faf35f0537b96f"
+    },
+    {
+      "case_id": "privilege-viewer-read-04",
+      "session_id": "s-c07d15efc777bf446f0d",
+      "family_id": "privilege-viewer-read",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "eddb6968be31bdbb77ec8b2eeefcbc30c361424f98bbe64a0b705d2048d64cde"
+    },
+    {
+      "case_id": "privilege-viewer-read-05",
+      "session_id": "s-d5deb3c9aa5b57792fb7",
+      "family_id": "privilege-viewer-read",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "35bc5ed6c596d7eb6a67c1ffaf81f41b087618ad254777ced9d70788135b6814"
+    },
+    {
+      "case_id": "privilege-viewer-read-06",
+      "session_id": "s-0396b1d5a8025d2c0764",
+      "family_id": "privilege-viewer-read",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "86acedfc933a7630481fb9a7dc04ec41e339596bf83f5b23696226762e16aa60"
+    },
+    {
+      "case_id": "privilege-viewer-read-07",
+      "session_id": "s-be9437b237a3cbe4250c",
+      "family_id": "privilege-viewer-read",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "a4cdb9a68153911a3b51f7f0a49fda93ad8e7bf752d4b4eeb9b91a0edb015746"
+    },
+    {
+      "case_id": "privilege-viewer-read-08",
+      "session_id": "s-285f4392b74fdaad4aa1",
+      "family_id": "privilege-viewer-read",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "d9c671bb9f67d26a0afed6a6811694c65a8543304927052469bd3c72e2762619"
+    },
+    {
+      "case_id": "privilege-viewer-read-09",
+      "session_id": "s-7531854971fcecaf8d78",
+      "family_id": "privilege-viewer-read",
+      "domain": "privilege",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "ec840e5bbb6a6e136c3eea5d9f180e46d84f20a50c5eb72c40ec0eb36c5b8f1d"
+    },
+    {
+      "case_id": "remote-compromised-vpn-00",
+      "session_id": "s-cdc29fb5a8b246251c17",
+      "family_id": "remote-compromised-vpn",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "cc385f0afe4365421a094585738c913ef0ce61d8ce4bfdec2f2d9a99feab9699"
+    },
+    {
+      "case_id": "remote-compromised-vpn-01",
+      "session_id": "s-5e7a702dbcf83f442154",
+      "family_id": "remote-compromised-vpn",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "0e0be4e89360345a628144381f5d20e7fdd90c0a02481e44e4301e40c4095643"
+    },
+    {
+      "case_id": "remote-compromised-vpn-02",
+      "session_id": "s-490c4d8beeef4a87191e",
+      "family_id": "remote-compromised-vpn",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "be61abb71377065eae20acdc999a806da7c2ba01d1998310ff93549e0ab56847"
+    },
+    {
+      "case_id": "remote-compromised-vpn-03",
+      "session_id": "s-185d520358ec4e5cc36d",
+      "family_id": "remote-compromised-vpn",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "ff4e84c79814b592953464b982c81677a3deb48c68dbc287d290f48c1b88d5d4"
+    },
+    {
+      "case_id": "remote-compromised-vpn-04",
+      "session_id": "s-8286c73451f885bc07aa",
+      "family_id": "remote-compromised-vpn",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "3df5d8b5abd85da4aba83eec44fad2e40c409c1b86a35dede7ad10cc85eb1a9c"
+    },
+    {
+      "case_id": "remote-compromised-vpn-05",
+      "session_id": "s-e26dc8f3f5e281e2f1c3",
+      "family_id": "remote-compromised-vpn",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "ebeb7056e2cd9f4b1d3112430807c52c9d4dd2138ecc2a4bc2fc0d56b1e08611"
+    },
+    {
+      "case_id": "remote-compromised-vpn-06",
+      "session_id": "s-c44e3b51749d19ff9e48",
+      "family_id": "remote-compromised-vpn",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "053d88af389974ed527953d8698559d628fdd14211c92d520f02190257d72f7d"
+    },
+    {
+      "case_id": "remote-compromised-vpn-07",
+      "session_id": "s-280a74bf143cae9e176d",
+      "family_id": "remote-compromised-vpn",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "1f4bfd14ab000f63c9858718396a309518eb377d9630ff05a27e0c72243634f0"
+    },
+    {
+      "case_id": "remote-compromised-vpn-08",
+      "session_id": "s-db62faa0dd8c12b9ea96",
+      "family_id": "remote-compromised-vpn",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "69991eff450fa13a81a5cec9b7b066c46d87bc5f63dc92aa14ae8b6900b5cb86"
+    },
+    {
+      "case_id": "remote-compromised-vpn-09",
+      "session_id": "s-84908f6a0453d8d4d91d",
+      "family_id": "remote-compromised-vpn",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "b1fbf2cbb6fc37fb302c035a2910e5df0399a1cb0143781c71af5c2f6c57df23"
+    },
+    {
+      "case_id": "remote-misclassified-activity-00",
+      "session_id": "s-5da377f0f514decd1ede",
+      "family_id": "remote-misclassified-activity",
+      "domain": "remote",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "2db422bcea0079fbac15e8d34fcff3fe0219c79f92c171c6d1a41ed6907e61a4"
+    },
+    {
+      "case_id": "remote-misclassified-activity-01",
+      "session_id": "s-a00505de54a1a1ed1208",
+      "family_id": "remote-misclassified-activity",
+      "domain": "remote",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "7c2f5078074ad33f7c31f9da555e6795a0926914a371b6a9aa9782cb210485d3"
+    },
+    {
+      "case_id": "remote-misclassified-activity-02",
+      "session_id": "s-9e5a1ac0b0f0e666f516",
+      "family_id": "remote-misclassified-activity",
+      "domain": "remote",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "9bb904521f6cc9268cbbad20a34a7f5351047f25cd4b7dfef81ddd1a0eafe196"
+    },
+    {
+      "case_id": "remote-misclassified-activity-03",
+      "session_id": "s-db081a3260f699390523",
+      "family_id": "remote-misclassified-activity",
+      "domain": "remote",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "ebd08370bfcc5e71ba4c18aa019249cebd734d93abfddedfaf12c1eac565c2f5"
+    },
+    {
+      "case_id": "remote-misclassified-activity-04",
+      "session_id": "s-33471a27e4bd7549804a",
+      "family_id": "remote-misclassified-activity",
+      "domain": "remote",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "6d68b8aeda493a18de4fb64bd8a1231d55bb7181b942b7084fab08fa4d366832"
+    },
+    {
+      "case_id": "remote-misclassified-activity-05",
+      "session_id": "s-dbf269ca8420de883b4b",
+      "family_id": "remote-misclassified-activity",
+      "domain": "remote",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "db4f0c2fea2dd1e477ef19984a8458aaab4dc8a5001c738aa7c3c05eba136019"
+    },
+    {
+      "case_id": "remote-misclassified-activity-06",
+      "session_id": "s-e4e2a8f5f5a186910939",
+      "family_id": "remote-misclassified-activity",
+      "domain": "remote",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "ebf100c93d4baf1497116a74594e41073b735ff80dd23a4999465f56c8373afe"
+    },
+    {
+      "case_id": "remote-misclassified-activity-07",
+      "session_id": "s-1103b8bc42b5a440dd36",
+      "family_id": "remote-misclassified-activity",
+      "domain": "remote",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "ea727bb2233e71f7ca3ea361ba1b05e7349c74a70093fbb37fbe15cd29148414"
+    },
+    {
+      "case_id": "remote-misclassified-activity-08",
+      "session_id": "s-64f689f2fb896591d45b",
+      "family_id": "remote-misclassified-activity",
+      "domain": "remote",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "a171f613b7aa600e7d9292f1364cf133922e7316f861cd67035814295d0bed0c"
+    },
+    {
+      "case_id": "remote-misclassified-activity-09",
+      "session_id": "s-ef88c5937229ffb58103",
+      "family_id": "remote-misclassified-activity",
+      "domain": "remote",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "6385c49fdec42d46080e4d83e2e0b4e237eae5178367aba2fcfc53dee315218b"
+    },
+    {
+      "case_id": "remote-unmanaged-existing-00",
+      "session_id": "s-5cb6ff6c37db58decce1",
+      "family_id": "remote-unmanaged-existing",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "a1f64ef1a7e1bf4239ab9d1f7eb029e7305c7cd841636b0077bdd559edc07c2d"
+    },
+    {
+      "case_id": "remote-unmanaged-existing-01",
+      "session_id": "s-8722ba1d9514dd0e5035",
+      "family_id": "remote-unmanaged-existing",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "4568d22e8804127466230dfe661f17c5dee500df140f1e82de7d8d2f710d9421"
+    },
+    {
+      "case_id": "remote-unmanaged-existing-02",
+      "session_id": "s-3c647106e9e5246e2062",
+      "family_id": "remote-unmanaged-existing",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "a7252cacfe1b7405525113360f5bba63d0f9aa5df6f750810ede476c4458ff76"
+    },
+    {
+      "case_id": "remote-unmanaged-existing-03",
+      "session_id": "s-da89a2a7833254e80af0",
+      "family_id": "remote-unmanaged-existing",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "3c771eff8b3a9fb563ad801c20d96a19cad2d5a22c2f566066356c1900f2f335"
+    },
+    {
+      "case_id": "remote-unmanaged-existing-04",
+      "session_id": "s-acd80a2b3337c1666fcc",
+      "family_id": "remote-unmanaged-existing",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "ead36335a16733e45c8a4bc45b20f652459c7258bbf94032a808e1c1e346a6ae"
+    },
+    {
+      "case_id": "remote-unmanaged-existing-05",
+      "session_id": "s-558398c875576cb96c1f",
+      "family_id": "remote-unmanaged-existing",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "a585ec1cba723df97ac8e907e2cc4b58e909989b3727cac21e90ecda39885f06"
+    },
+    {
+      "case_id": "remote-unmanaged-existing-06",
+      "session_id": "s-869304a47b846c8ca868",
+      "family_id": "remote-unmanaged-existing",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "6210495e9f09205ef7308280316957eda9735667e3e7324066a64b1870897c6a"
+    },
+    {
+      "case_id": "remote-unmanaged-existing-07",
+      "session_id": "s-4b38655555d48dda906b",
+      "family_id": "remote-unmanaged-existing",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "9827e401b19bdca6d2ae0e3e103dd444c7187732e7b2608d26a23b79e82c1e8b"
+    },
+    {
+      "case_id": "remote-unmanaged-existing-08",
+      "session_id": "s-63dadc780449917d0fd0",
+      "family_id": "remote-unmanaged-existing",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "8bbe04f21faebdbcc76dd318677fb66de7b5b582fa47a901e92df9616349644e"
+    },
+    {
+      "case_id": "remote-unmanaged-existing-09",
+      "session_id": "s-20c3023eb7c9439e3707",
+      "family_id": "remote-unmanaged-existing",
+      "domain": "remote",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "6aa18bbad1d2ddade0803d468f37b5329c58e7c7bd656e9b57fa5f2612ef5129"
+    },
+    {
+      "case_id": "remote-approved-vpn-maintenance-00",
+      "session_id": "s-894b4a6bcddcd55a22ee",
+      "family_id": "remote-approved-vpn-maintenance",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "0756fb084125758e3eb8f8d54f5d1b4f36e2b955c57efa8d06db68a673a67fc5"
+    },
+    {
+      "case_id": "remote-approved-vpn-maintenance-01",
+      "session_id": "s-26c7def4a6cd92412feb",
+      "family_id": "remote-approved-vpn-maintenance",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "5ee847e8f6c03990ea4eba04352ddff65538471c8771540f099159d0788e4b77"
+    },
+    {
+      "case_id": "remote-approved-vpn-maintenance-02",
+      "session_id": "s-0a96cadb961e2c940205",
+      "family_id": "remote-approved-vpn-maintenance",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "aab5dbec9c890d9256cf488950596f882280ba167f7037160d51a0e680a0a82e"
+    },
+    {
+      "case_id": "remote-approved-vpn-maintenance-03",
+      "session_id": "s-1e030ed713871d79d41d",
+      "family_id": "remote-approved-vpn-maintenance",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "326ff6bbb45e31b59aced608a6730b6c384a28f9f890f40718a143e36695a11a"
+    },
+    {
+      "case_id": "remote-approved-vpn-maintenance-04",
+      "session_id": "s-dc67ac3788b8d01cab3c",
+      "family_id": "remote-approved-vpn-maintenance",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "2cdb01e045dd20d8f5252791df0d64bb1f25de8c500a3df356d8cb8e893b6471"
+    },
+    {
+      "case_id": "remote-approved-vpn-maintenance-05",
+      "session_id": "s-06e6deae7dc6774fc37b",
+      "family_id": "remote-approved-vpn-maintenance",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "1f39e96926512f818bcb8abccbcced180447fbaaa3ba9d87bda4474ec01b44ba"
+    },
+    {
+      "case_id": "remote-approved-vpn-maintenance-06",
+      "session_id": "s-ac298114c57c66fb1189",
+      "family_id": "remote-approved-vpn-maintenance",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "fcd41ac61ff39a803b6aa9479c0af88bccc5e8fdce02432696017cc675ca5c1c"
+    },
+    {
+      "case_id": "remote-approved-vpn-maintenance-07",
+      "session_id": "s-b5579c9472ed6024519f",
+      "family_id": "remote-approved-vpn-maintenance",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "00f5a6d71fb747bbf1fc786e0ed3c2408e46301d8349e05b365f16da6921e0d2"
+    },
+    {
+      "case_id": "remote-approved-vpn-maintenance-08",
+      "session_id": "s-8d1a00dd31b233c86539",
+      "family_id": "remote-approved-vpn-maintenance",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "43e9b9c8dda309e9cc9cd977717e4c40e8ee4c6bbc7bac2881ebded84cbc4689"
+    },
+    {
+      "case_id": "remote-approved-vpn-maintenance-09",
+      "session_id": "s-46de9aa20e63411988f8",
+      "family_id": "remote-approved-vpn-maintenance",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "06891480109d7763f74d2ea005970dd4c60ceb32665d9577591dd37ecd583947"
+    },
+    {
+      "case_id": "remote-approved-night-support-00",
+      "session_id": "s-ec3e79d0e02078f0e62f",
+      "family_id": "remote-approved-night-support",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "3a5c26c43a59c931310304f22273e37294795202d1919c0c4dfdf2718ba82414"
+    },
+    {
+      "case_id": "remote-approved-night-support-01",
+      "session_id": "s-9c2ee08a8603e5ee1bae",
+      "family_id": "remote-approved-night-support",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "c4422cf09c783b722aef32ed1d0c5d24ed5720634a7ae05330f940749615e81f"
+    },
+    {
+      "case_id": "remote-approved-night-support-02",
+      "session_id": "s-c565cc8dffc4c6e9c905",
+      "family_id": "remote-approved-night-support",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "623a79c2ad48f19c3ced75d8bf7b2551ce7693df2a4497bfa00df67819e2044c"
+    },
+    {
+      "case_id": "remote-approved-night-support-03",
+      "session_id": "s-57d461d22cf02714a647",
+      "family_id": "remote-approved-night-support",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "64a5d32540617bd7c6afc8703046b2b45bbd05ca025db30211611954424791f2"
+    },
+    {
+      "case_id": "remote-approved-night-support-04",
+      "session_id": "s-77d469e0b6a7e18203bd",
+      "family_id": "remote-approved-night-support",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "a9bc3fbda69be04a69bbadac733d4414b95b4f1772254c927713452481bc1cfc"
+    },
+    {
+      "case_id": "remote-approved-night-support-05",
+      "session_id": "s-d1f9bff23fa57b400e5d",
+      "family_id": "remote-approved-night-support",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "c7b60055d109a4154ef1065ddb5fbcdfd02f0ac56fb7a6214e7d094e79498cab"
+    },
+    {
+      "case_id": "remote-approved-night-support-06",
+      "session_id": "s-a5bd536d2656d5c541aa",
+      "family_id": "remote-approved-night-support",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "3d8fad409ce78ae1b1f2d1211100d773eb56ec66e87a76056a902dbfad7e75ae"
+    },
+    {
+      "case_id": "remote-approved-night-support-07",
+      "session_id": "s-272910e4726c10c16080",
+      "family_id": "remote-approved-night-support",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "15b9eb80aad49b5f283d582db633930da73c6f5738d6ff07b12dc18b922fa359"
+    },
+    {
+      "case_id": "remote-approved-night-support-08",
+      "session_id": "s-ae1eed4743ad04bef8e0",
+      "family_id": "remote-approved-night-support",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "48cc7dd23121f7ec570f26ce947a9898b87a9b35d59bd698578339827f987f06"
+    },
+    {
+      "case_id": "remote-approved-night-support-09",
+      "session_id": "s-79eeec8db8033a6bbe2d",
+      "family_id": "remote-approved-night-support",
+      "domain": "remote",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "7bbc3f261f9731eb200cc3dc108646bc31398a76a0a163529daa786a98abd65a"
+    },
+    {
+      "case_id": "remote-local-night-login-00",
+      "session_id": "s-7a2cc39e7a3fba2b2e49",
+      "family_id": "remote-local-night-login",
+      "domain": "remote",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "9807f13dfe849d176a285aa2da825e53ae4cb4f75141e703d5160cae48a03a02"
+    },
+    {
+      "case_id": "remote-local-night-login-01",
+      "session_id": "s-d7481f38172909850684",
+      "family_id": "remote-local-night-login",
+      "domain": "remote",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "65963d3c057cb8dce45bfebea279aac9b9129facc4da7e70d8c7c39af94d187f"
+    },
+    {
+      "case_id": "remote-local-night-login-02",
+      "session_id": "s-f137506939fd9ec04d3b",
+      "family_id": "remote-local-night-login",
+      "domain": "remote",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "865393d6ef206fef9f71f4da3caa183b0e82fe380f977ce935b1b83568919241"
+    },
+    {
+      "case_id": "remote-local-night-login-03",
+      "session_id": "s-be00a0a0589b8cc01a6f",
+      "family_id": "remote-local-night-login",
+      "domain": "remote",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "797c77b2dc32f377c6d02771bf8ed05f967962941d53a40b5f75f8d087ef2e5c"
+    },
+    {
+      "case_id": "remote-local-night-login-04",
+      "session_id": "s-41bc3b5de5dee6f29623",
+      "family_id": "remote-local-night-login",
+      "domain": "remote",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "6373cf318b3c40fea0283b1f27b75176ec81d54a0bef76f82708bc8904f1d44a"
+    },
+    {
+      "case_id": "remote-local-night-login-05",
+      "session_id": "s-cab80b8124364b776c0c",
+      "family_id": "remote-local-night-login",
+      "domain": "remote",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "0025fc96d19f07451cce3a6cec78925fba6e8e49b9d8de451f36d16a469729e0"
+    },
+    {
+      "case_id": "remote-local-night-login-06",
+      "session_id": "s-db72e011b96c2a91fda0",
+      "family_id": "remote-local-night-login",
+      "domain": "remote",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "78f43e1aadc6102d5195f4b22cd2c5d33497025ef4f0988941830a9ed8115edc"
+    },
+    {
+      "case_id": "remote-local-night-login-07",
+      "session_id": "s-d8930bab883a694da299",
+      "family_id": "remote-local-night-login",
+      "domain": "remote",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "23151341a26f274df6abd08b9f22c96ed95a0c53ac1031fee4ef446a75f27bae"
+    },
+    {
+      "case_id": "remote-local-night-login-08",
+      "session_id": "s-b2bf676d597c2ec8276c",
+      "family_id": "remote-local-night-login",
+      "domain": "remote",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "ff1d7f836e019f7ccc6bf8a5878a0c84c648709ff250cac49b83eab7e6716cad"
+    },
+    {
+      "case_id": "remote-local-night-login-09",
+      "session_id": "s-2b18ae2472a1673d16d3",
+      "family_id": "remote-local-night-login",
+      "domain": "remote",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "b789740ed2f74bd4a84fefc16edd1a685d206d7605c32498ecaa673aa769fee9"
+    },
+    {
+      "case_id": "lateral-slow-fanout-00",
+      "session_id": "s-d41990a18458cdfaaa64",
+      "family_id": "lateral-slow-fanout",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "3fafa98848c74cc81d70d0fca80030537f373b6c474af0cd98e9145aaecde271"
+    },
+    {
+      "case_id": "lateral-slow-fanout-01",
+      "session_id": "s-3af08af195ecbeffd4a7",
+      "family_id": "lateral-slow-fanout",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "f2705df0c1f0ff0d520ef57c39db03469104cc03669decb47fbba484fd9c2cd7"
+    },
+    {
+      "case_id": "lateral-slow-fanout-02",
+      "session_id": "s-1e068eb82f6c722bb12a",
+      "family_id": "lateral-slow-fanout",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "f3f0042f760b774b5db896435621a2ee002dc6b53bd447805aabb60af1f2d001"
+    },
+    {
+      "case_id": "lateral-slow-fanout-03",
+      "session_id": "s-c925700ed2960730adf2",
+      "family_id": "lateral-slow-fanout",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "3fafa98848c74cc81d70d0fca80030537f373b6c474af0cd98e9145aaecde271"
+    },
+    {
+      "case_id": "lateral-slow-fanout-04",
+      "session_id": "s-3352691b859e3b2395ad",
+      "family_id": "lateral-slow-fanout",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "f2705df0c1f0ff0d520ef57c39db03469104cc03669decb47fbba484fd9c2cd7"
+    },
+    {
+      "case_id": "lateral-slow-fanout-05",
+      "session_id": "s-77d50196ebc7ae9283a1",
+      "family_id": "lateral-slow-fanout",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "f3f0042f760b774b5db896435621a2ee002dc6b53bd447805aabb60af1f2d001"
+    },
+    {
+      "case_id": "lateral-slow-fanout-06",
+      "session_id": "s-f18023a344c40a23e441",
+      "family_id": "lateral-slow-fanout",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "3fafa98848c74cc81d70d0fca80030537f373b6c474af0cd98e9145aaecde271"
+    },
+    {
+      "case_id": "lateral-slow-fanout-07",
+      "session_id": "s-6a827828a111a59461f7",
+      "family_id": "lateral-slow-fanout",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "f2705df0c1f0ff0d520ef57c39db03469104cc03669decb47fbba484fd9c2cd7"
+    },
+    {
+      "case_id": "lateral-slow-fanout-08",
+      "session_id": "s-0308806306684e402de2",
+      "family_id": "lateral-slow-fanout",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "f3f0042f760b774b5db896435621a2ee002dc6b53bd447805aabb60af1f2d001"
+    },
+    {
+      "case_id": "lateral-slow-fanout-09",
+      "session_id": "s-993e20ab550115ca7d6f",
+      "family_id": "lateral-slow-fanout",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "3fafa98848c74cc81d70d0fca80030537f373b6c474af0cd98e9145aaecde271"
+    },
+    {
+      "case_id": "lateral-below-resource-limit-00",
+      "session_id": "s-9edfbe14b04e583de3b1",
+      "family_id": "lateral-below-resource-limit",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "0256267eca30ceed9be3fd8671938490d07a65ea7b0b7c248ef9ecaea7fa246d"
+    },
+    {
+      "case_id": "lateral-below-resource-limit-01",
+      "session_id": "s-cb4c0005d1280f821541",
+      "family_id": "lateral-below-resource-limit",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "936ce84e93f720fa18fdec8a9841dc9705bb3eab5e9bbfafdb2b62f5cb4dc08d"
+    },
+    {
+      "case_id": "lateral-below-resource-limit-02",
+      "session_id": "s-c235c6dfe7d61b9c79d9",
+      "family_id": "lateral-below-resource-limit",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "2c99e8dd68b7e397266be7caf54f90d6c5f23283e41be2ad64572acea5752d65"
+    },
+    {
+      "case_id": "lateral-below-resource-limit-03",
+      "session_id": "s-a8c45bcf1b4e254ce0f9",
+      "family_id": "lateral-below-resource-limit",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "0256267eca30ceed9be3fd8671938490d07a65ea7b0b7c248ef9ecaea7fa246d"
+    },
+    {
+      "case_id": "lateral-below-resource-limit-04",
+      "session_id": "s-11112507ccedeec9c6fa",
+      "family_id": "lateral-below-resource-limit",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "936ce84e93f720fa18fdec8a9841dc9705bb3eab5e9bbfafdb2b62f5cb4dc08d"
+    },
+    {
+      "case_id": "lateral-below-resource-limit-05",
+      "session_id": "s-6c8f89452d331e024ec4",
+      "family_id": "lateral-below-resource-limit",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "2c99e8dd68b7e397266be7caf54f90d6c5f23283e41be2ad64572acea5752d65"
+    },
+    {
+      "case_id": "lateral-below-resource-limit-06",
+      "session_id": "s-7d2a186ec2876f3c6e2b",
+      "family_id": "lateral-below-resource-limit",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "0256267eca30ceed9be3fd8671938490d07a65ea7b0b7c248ef9ecaea7fa246d"
+    },
+    {
+      "case_id": "lateral-below-resource-limit-07",
+      "session_id": "s-37c8110de480f18ca321",
+      "family_id": "lateral-below-resource-limit",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "936ce84e93f720fa18fdec8a9841dc9705bb3eab5e9bbfafdb2b62f5cb4dc08d"
+    },
+    {
+      "case_id": "lateral-below-resource-limit-08",
+      "session_id": "s-87fa495006848debcb26",
+      "family_id": "lateral-below-resource-limit",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "2c99e8dd68b7e397266be7caf54f90d6c5f23283e41be2ad64572acea5752d65"
+    },
+    {
+      "case_id": "lateral-below-resource-limit-09",
+      "session_id": "s-5a3061f09af67808f4c8",
+      "family_id": "lateral-below-resource-limit",
+      "domain": "lateral",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "predicted_rule_ids": [
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "0256267eca30ceed9be3fd8671938490d07a65ea7b0b7c248ef9ecaea7fa246d"
+    },
+    {
+      "case_id": "lateral-api-traversal-00",
+      "session_id": "s-4716fe995ecb3118462e",
+      "family_id": "lateral-api-traversal",
+      "domain": "lateral",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "f93d1e98cf296437b076b79e6f027a3f31e0c78208bbcf98b73bb4c37a8596cb"
+    },
+    {
+      "case_id": "lateral-api-traversal-01",
+      "session_id": "s-53425b63d34b4bad7956",
+      "family_id": "lateral-api-traversal",
+      "domain": "lateral",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "ee03a4e4a983d55d0a063b76e4cb554f38249d6792054b559904fdb8e99d318a"
+    },
+    {
+      "case_id": "lateral-api-traversal-02",
+      "session_id": "s-e293f4a7c54e5a708efc",
+      "family_id": "lateral-api-traversal",
+      "domain": "lateral",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "f42d2f0d3f078bd753ae77ed2fae8a549fe26e6d7899bd5aff6e537f19df47bc"
+    },
+    {
+      "case_id": "lateral-api-traversal-03",
+      "session_id": "s-793b2ab30f5483728312",
+      "family_id": "lateral-api-traversal",
+      "domain": "lateral",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "f93d1e98cf296437b076b79e6f027a3f31e0c78208bbcf98b73bb4c37a8596cb"
+    },
+    {
+      "case_id": "lateral-api-traversal-04",
+      "session_id": "s-739921bb87b49fb3ab06",
+      "family_id": "lateral-api-traversal",
+      "domain": "lateral",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "ee03a4e4a983d55d0a063b76e4cb554f38249d6792054b559904fdb8e99d318a"
+    },
+    {
+      "case_id": "lateral-api-traversal-05",
+      "session_id": "s-655b1cbfd08f37c69254",
+      "family_id": "lateral-api-traversal",
+      "domain": "lateral",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "f42d2f0d3f078bd753ae77ed2fae8a549fe26e6d7899bd5aff6e537f19df47bc"
+    },
+    {
+      "case_id": "lateral-api-traversal-06",
+      "session_id": "s-069e73e7361c498b1afb",
+      "family_id": "lateral-api-traversal",
+      "domain": "lateral",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "f93d1e98cf296437b076b79e6f027a3f31e0c78208bbcf98b73bb4c37a8596cb"
+    },
+    {
+      "case_id": "lateral-api-traversal-07",
+      "session_id": "s-b2142537668766bf38bb",
+      "family_id": "lateral-api-traversal",
+      "domain": "lateral",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "ee03a4e4a983d55d0a063b76e4cb554f38249d6792054b559904fdb8e99d318a"
+    },
+    {
+      "case_id": "lateral-api-traversal-08",
+      "session_id": "s-48d536091e61804ea3e4",
+      "family_id": "lateral-api-traversal",
+      "domain": "lateral",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "f42d2f0d3f078bd753ae77ed2fae8a549fe26e6d7899bd5aff6e537f19df47bc"
+    },
+    {
+      "case_id": "lateral-api-traversal-09",
+      "session_id": "s-37906d8768b7ede6b014",
+      "family_id": "lateral-api-traversal",
+      "domain": "lateral",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "f93d1e98cf296437b076b79e6f027a3f31e0c78208bbcf98b73bb4c37a8596cb"
+    },
+    {
+      "case_id": "lateral-fleet-deployment-00",
+      "session_id": "s-ce58dbea417bb1e93a3a",
+      "family_id": "lateral-fleet-deployment",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "9984b7273fcd7a42b54c4049c9481c6454e62fdb4aca78f92bfc3fc95f9dcdc9"
+    },
+    {
+      "case_id": "lateral-fleet-deployment-01",
+      "session_id": "s-bac73019ab3fb4fea619",
+      "family_id": "lateral-fleet-deployment",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "d10d1a57ec2a1475a898650dbda1105c0b0be3999ff8c6a7431675f158626165"
+    },
+    {
+      "case_id": "lateral-fleet-deployment-02",
+      "session_id": "s-27efcdd088415bca7a96",
+      "family_id": "lateral-fleet-deployment",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "aafb3c018f553e63292b8e43f4c7c7959401eb784328099f4462486cbcd820f7"
+    },
+    {
+      "case_id": "lateral-fleet-deployment-03",
+      "session_id": "s-3b5f87e2f233d72f120e",
+      "family_id": "lateral-fleet-deployment",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "9984b7273fcd7a42b54c4049c9481c6454e62fdb4aca78f92bfc3fc95f9dcdc9"
+    },
+    {
+      "case_id": "lateral-fleet-deployment-04",
+      "session_id": "s-58ac70d413f68177d9da",
+      "family_id": "lateral-fleet-deployment",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "d10d1a57ec2a1475a898650dbda1105c0b0be3999ff8c6a7431675f158626165"
+    },
+    {
+      "case_id": "lateral-fleet-deployment-05",
+      "session_id": "s-87894c13b5b6ae996cb5",
+      "family_id": "lateral-fleet-deployment",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "aafb3c018f553e63292b8e43f4c7c7959401eb784328099f4462486cbcd820f7"
+    },
+    {
+      "case_id": "lateral-fleet-deployment-06",
+      "session_id": "s-126ac34fd9518efdee26",
+      "family_id": "lateral-fleet-deployment",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "9984b7273fcd7a42b54c4049c9481c6454e62fdb4aca78f92bfc3fc95f9dcdc9"
+    },
+    {
+      "case_id": "lateral-fleet-deployment-07",
+      "session_id": "s-a1c2a09265bc7674e745",
+      "family_id": "lateral-fleet-deployment",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "d10d1a57ec2a1475a898650dbda1105c0b0be3999ff8c6a7431675f158626165"
+    },
+    {
+      "case_id": "lateral-fleet-deployment-08",
+      "session_id": "s-c20fb6b4526137dc1add",
+      "family_id": "lateral-fleet-deployment",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "aafb3c018f553e63292b8e43f4c7c7959401eb784328099f4462486cbcd820f7"
+    },
+    {
+      "case_id": "lateral-fleet-deployment-09",
+      "session_id": "s-75720ccbc8c1a023f937",
+      "family_id": "lateral-fleet-deployment",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "9984b7273fcd7a42b54c4049c9481c6454e62fdb4aca78f92bfc3fc95f9dcdc9"
+    },
+    {
+      "case_id": "lateral-incident-response-00",
+      "session_id": "s-4869dcef92389341ff60",
+      "family_id": "lateral-incident-response",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "899285cf8df1d11f0c11eb1955d3b0af47922b92f832caf0d27639729b64292b"
+    },
+    {
+      "case_id": "lateral-incident-response-01",
+      "session_id": "s-cc30277ea0ba51abde6c",
+      "family_id": "lateral-incident-response",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "b5b2f59625de4e0a098e8db5fdb5097b5a92b2570c6ceea5b625c6c8eacc90e0"
+    },
+    {
+      "case_id": "lateral-incident-response-02",
+      "session_id": "s-d337de9d1068025fdb68",
+      "family_id": "lateral-incident-response",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "5a555491372347e1792cffdf4ebe5ce1ee0ce4df95a5f511c4da64c1356c2fe3"
+    },
+    {
+      "case_id": "lateral-incident-response-03",
+      "session_id": "s-fd0492c7c03be80de0e1",
+      "family_id": "lateral-incident-response",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "899285cf8df1d11f0c11eb1955d3b0af47922b92f832caf0d27639729b64292b"
+    },
+    {
+      "case_id": "lateral-incident-response-04",
+      "session_id": "s-e52b5885740d5833f3e0",
+      "family_id": "lateral-incident-response",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "b5b2f59625de4e0a098e8db5fdb5097b5a92b2570c6ceea5b625c6c8eacc90e0"
+    },
+    {
+      "case_id": "lateral-incident-response-05",
+      "session_id": "s-77761a7aa04bb0c65569",
+      "family_id": "lateral-incident-response",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "5a555491372347e1792cffdf4ebe5ce1ee0ce4df95a5f511c4da64c1356c2fe3"
+    },
+    {
+      "case_id": "lateral-incident-response-06",
+      "session_id": "s-d018656f49adb42e0760",
+      "family_id": "lateral-incident-response",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "899285cf8df1d11f0c11eb1955d3b0af47922b92f832caf0d27639729b64292b"
+    },
+    {
+      "case_id": "lateral-incident-response-07",
+      "session_id": "s-a7833b9af58e6c304efc",
+      "family_id": "lateral-incident-response",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "b5b2f59625de4e0a098e8db5fdb5097b5a92b2570c6ceea5b625c6c8eacc90e0"
+    },
+    {
+      "case_id": "lateral-incident-response-08",
+      "session_id": "s-56c801ad47810ed237cc",
+      "family_id": "lateral-incident-response",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "5a555491372347e1792cffdf4ebe5ce1ee0ce4df95a5f511c4da64c1356c2fe3"
+    },
+    {
+      "case_id": "lateral-incident-response-09",
+      "session_id": "s-643dbd3cb2598db39ebe",
+      "family_id": "lateral-incident-response",
+      "domain": "lateral",
+      "threat": false,
+      "detected": true,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [
+        "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+        "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+      ],
+      "error": null,
+      "outcome": "FP",
+      "pattern_sha256": "899285cf8df1d11f0c11eb1955d3b0af47922b92f832caf0d27639729b64292b"
+    },
+    {
+      "case_id": "lateral-bounded-reporting-00",
+      "session_id": "s-1281e02fd582b6fbbbee",
+      "family_id": "lateral-bounded-reporting",
+      "domain": "lateral",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "4a5a7f721585b67fc934eb409f2105cd36300e675e889925f63f527095a5dde2"
+    },
+    {
+      "case_id": "lateral-bounded-reporting-01",
+      "session_id": "s-7d14a64f4b061d6c3db4",
+      "family_id": "lateral-bounded-reporting",
+      "domain": "lateral",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "004f8e6823bbd7de48dd2a232768d2404e88869a05df667a647ddbeddbcee16e"
+    },
+    {
+      "case_id": "lateral-bounded-reporting-02",
+      "session_id": "s-840455a9172b9923516b",
+      "family_id": "lateral-bounded-reporting",
+      "domain": "lateral",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "bfec26f90882ed8bc01c429f7f6adab91623e542ff2aed89354a0660f7c88ef9"
+    },
+    {
+      "case_id": "lateral-bounded-reporting-03",
+      "session_id": "s-99df5b3364bf1ace3945",
+      "family_id": "lateral-bounded-reporting",
+      "domain": "lateral",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "2266b7fb5f8b1f4bac6fb57752f69e6e09e1cddec498176f3e0329368f6177c9"
+    },
+    {
+      "case_id": "lateral-bounded-reporting-04",
+      "session_id": "s-5d1923f8c0be086b73d7",
+      "family_id": "lateral-bounded-reporting",
+      "domain": "lateral",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "400bdfb29f5f1995e451589f5fc09a53626f4b3ae21f676117b88725009ea6fd"
+    },
+    {
+      "case_id": "lateral-bounded-reporting-05",
+      "session_id": "s-4bf8b1ed68ec817f00dc",
+      "family_id": "lateral-bounded-reporting",
+      "domain": "lateral",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "38caae1b6b34ec432b562aeb32f990952dc458d04d48372de6faedb9ae04be6f"
+    },
+    {
+      "case_id": "lateral-bounded-reporting-06",
+      "session_id": "s-b8618a8b30b9e3ceebc4",
+      "family_id": "lateral-bounded-reporting",
+      "domain": "lateral",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "4a5a7f721585b67fc934eb409f2105cd36300e675e889925f63f527095a5dde2"
+    },
+    {
+      "case_id": "lateral-bounded-reporting-07",
+      "session_id": "s-09cd76d17d46e0a97caa",
+      "family_id": "lateral-bounded-reporting",
+      "domain": "lateral",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "004f8e6823bbd7de48dd2a232768d2404e88869a05df667a647ddbeddbcee16e"
+    },
+    {
+      "case_id": "lateral-bounded-reporting-08",
+      "session_id": "s-779bf7d4a7cfc351c70c",
+      "family_id": "lateral-bounded-reporting",
+      "domain": "lateral",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "bfec26f90882ed8bc01c429f7f6adab91623e542ff2aed89354a0660f7c88ef9"
+    },
+    {
+      "case_id": "lateral-bounded-reporting-09",
+      "session_id": "s-2559575b586e5d27deb3",
+      "family_id": "lateral-bounded-reporting",
+      "domain": "lateral",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "2266b7fb5f8b1f4bac6fb57752f69e6e09e1cddec498176f3e0329368f6177c9"
+    },
+    {
+      "case_id": "exfiltration-high-sensitivity-export-00",
+      "session_id": "s-506f53372672825240e1",
+      "family_id": "exfiltration-high-sensitivity-export",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "f36dab3068217010ab646f432aa5f0e926447d2a93e79e654f5af08334715bec"
+    },
+    {
+      "case_id": "exfiltration-high-sensitivity-export-01",
+      "session_id": "s-b2ae5f92d04d1c7b5ecf",
+      "family_id": "exfiltration-high-sensitivity-export",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "337d704664b463542690f8b198ce878b7c4398b8c3d254a46aaa44000d8fe313"
+    },
+    {
+      "case_id": "exfiltration-high-sensitivity-export-02",
+      "session_id": "s-bc123092a4dea4fc3fac",
+      "family_id": "exfiltration-high-sensitivity-export",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "74c3ab2cbda62d1ab29ac161488d2cc5c15216807fc8d691854d78ee5a835cd4"
+    },
+    {
+      "case_id": "exfiltration-high-sensitivity-export-03",
+      "session_id": "s-22a71f752455e5b5b7eb",
+      "family_id": "exfiltration-high-sensitivity-export",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "47e8aeb39a0e56668366031c0ed93bdda3a4fbae84c320041b907c8470ba3143"
+    },
+    {
+      "case_id": "exfiltration-high-sensitivity-export-04",
+      "session_id": "s-77046e8a9dd4f103cab3",
+      "family_id": "exfiltration-high-sensitivity-export",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "5fb282d8226fad50e4cf3f37d467517f716426a04c7dab3b8423639304b4513f"
+    },
+    {
+      "case_id": "exfiltration-high-sensitivity-export-05",
+      "session_id": "s-9fc39538411d55e2db04",
+      "family_id": "exfiltration-high-sensitivity-export",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "91e3e40778bf8801ec52e24e00c9ac69fd3034522f28dbaf8fdd5cd21d222293"
+    },
+    {
+      "case_id": "exfiltration-high-sensitivity-export-06",
+      "session_id": "s-998aa8f57970283a323c",
+      "family_id": "exfiltration-high-sensitivity-export",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "1359f67a995e0a73bc496da6f3c038edb378ddc8d2dbbdc0070f71ca870794ab"
+    },
+    {
+      "case_id": "exfiltration-high-sensitivity-export-07",
+      "session_id": "s-ef34b56db2586834304a",
+      "family_id": "exfiltration-high-sensitivity-export",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "0b9b69b635fafe3cc4aad4da8fd52b6d2dd8dcbafb75374f79f506cfd5c79f8e"
+    },
+    {
+      "case_id": "exfiltration-high-sensitivity-export-08",
+      "session_id": "s-18157b0fa73b488d3ec0",
+      "family_id": "exfiltration-high-sensitivity-export",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "a64d3933838b5f31f4d7888c5f3e5d1233a16825bb537d7be31399ae6a34b077"
+    },
+    {
+      "case_id": "exfiltration-high-sensitivity-export-09",
+      "session_id": "s-8b756b21fadd57c12f3a",
+      "family_id": "exfiltration-high-sensitivity-export",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "4681dce0353be82bafc91c4e221b987124eec48e2eb90124cead0b32c9f7d68e"
+    },
+    {
+      "case_id": "exfiltration-low-and-slow-00",
+      "session_id": "s-a1af02e59e079a3f7b71",
+      "family_id": "exfiltration-low-and-slow",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "d2cd9803dae5e7552211572a924e3831bdf7166b1fb500bbd8d97b01cf664316"
+    },
+    {
+      "case_id": "exfiltration-low-and-slow-01",
+      "session_id": "s-3606f5ff3c6424853866",
+      "family_id": "exfiltration-low-and-slow",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "5d69934ae00e23fb7d5e5c47c47fff8330d8288bd41f091f5bfbdc0552f94261"
+    },
+    {
+      "case_id": "exfiltration-low-and-slow-02",
+      "session_id": "s-4f4398b1977a871fc3d9",
+      "family_id": "exfiltration-low-and-slow",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "fafed081189644b1b68d11f0d3b17d01e5945847a54c57c8dec17567417f4fe7"
+    },
+    {
+      "case_id": "exfiltration-low-and-slow-03",
+      "session_id": "s-6cb3cb56855b85f80d04",
+      "family_id": "exfiltration-low-and-slow",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "e214a12c3c91babc600e916d85a2caf762824ee6c065d5298dfb2ebe3bb71f5f"
+    },
+    {
+      "case_id": "exfiltration-low-and-slow-04",
+      "session_id": "s-8a9c6f88501b1f0bad0e",
+      "family_id": "exfiltration-low-and-slow",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "22c2625a72e1a3c0115c92086fbb01ba1aa8c7c419320995835816cdd7f8b89a"
+    },
+    {
+      "case_id": "exfiltration-low-and-slow-05",
+      "session_id": "s-dadf4c9aaccbe4507392",
+      "family_id": "exfiltration-low-and-slow",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "b133bad4802a7756572af4fdcc93056c2753463db836d3ff6f4803e5115a7cab"
+    },
+    {
+      "case_id": "exfiltration-low-and-slow-06",
+      "session_id": "s-b385c94edb8f9fda5d7f",
+      "family_id": "exfiltration-low-and-slow",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "d56be81ae80d59f6558dad34530d0e6fe50a09d02a52e3ad6f28df6bf3705ce3"
+    },
+    {
+      "case_id": "exfiltration-low-and-slow-07",
+      "session_id": "s-5203852769de5098010d",
+      "family_id": "exfiltration-low-and-slow",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "fed1058396677687586727bf046a31ff9054d9e02942eed5b1e457ff3b178a22"
+    },
+    {
+      "case_id": "exfiltration-low-and-slow-08",
+      "session_id": "s-f51c6760d07f46aec75a",
+      "family_id": "exfiltration-low-and-slow",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "df61fbef91349917f3288bea461e9b4357b1ad77f13b88c0fac110072665629d"
+    },
+    {
+      "case_id": "exfiltration-low-and-slow-09",
+      "session_id": "s-bf6feebc0c9ebab73c6e",
+      "family_id": "exfiltration-low-and-slow",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": false,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "FN",
+      "pattern_sha256": "a2c33e0b50ed85c88f742220bd5d8ea1475d3dd3d17364cfbb95fff455b3a0e1"
+    },
+    {
+      "case_id": "exfiltration-rapid-critical-00",
+      "session_id": "s-a08c81ee8f0bcb0b0f90",
+      "family_id": "exfiltration-rapid-critical",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "36e08c4cf550531cdba5eb11b6a0dcbbcd435bceb9846706bf53c2e0967ad3ed"
+    },
+    {
+      "case_id": "exfiltration-rapid-critical-01",
+      "session_id": "s-dbbe2222c792daf81b8b",
+      "family_id": "exfiltration-rapid-critical",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "d73818221d1ca014fdf9711388a8bc0bdef91714ff8b06e7da7d11bfaf025bef"
+    },
+    {
+      "case_id": "exfiltration-rapid-critical-02",
+      "session_id": "s-5bf9417d48c03574c545",
+      "family_id": "exfiltration-rapid-critical",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "0b6dec889574891d0f20cd940eb02fe16345c1ec06484c8372afb70fefc5420b"
+    },
+    {
+      "case_id": "exfiltration-rapid-critical-03",
+      "session_id": "s-8fc370ac5cd1917a1368",
+      "family_id": "exfiltration-rapid-critical",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "f6e800a100ac00ddf03f82cae61fc237dcf2a60bbc1c37c89112f0cec50401aa"
+    },
+    {
+      "case_id": "exfiltration-rapid-critical-04",
+      "session_id": "s-3b1419ebc429470f84a0",
+      "family_id": "exfiltration-rapid-critical",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "f0b63757cab9f468ed7164cc3ae63e30f88fb0c8e5342864eeabadf63065b538"
+    },
+    {
+      "case_id": "exfiltration-rapid-critical-05",
+      "session_id": "s-7badc8dce0007bcdcc9d",
+      "family_id": "exfiltration-rapid-critical",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "5a5958b642982adbd6890c0d2dda05d9552ff89a512678d2310fab3a1b12b784"
+    },
+    {
+      "case_id": "exfiltration-rapid-critical-06",
+      "session_id": "s-5b400e2bffe90bdf6647",
+      "family_id": "exfiltration-rapid-critical",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "11b3a9414641263bce6bdee111da7d995221b884d1c5fc816ddc8856965b355d"
+    },
+    {
+      "case_id": "exfiltration-rapid-critical-07",
+      "session_id": "s-ae9cfbc7d5e599d965c7",
+      "family_id": "exfiltration-rapid-critical",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "ac0f0c42ddd6076dcdd6251fbf0e0c93bbeef7bf2044ad140cd7bba007cd2f80"
+    },
+    {
+      "case_id": "exfiltration-rapid-critical-08",
+      "session_id": "s-c186a3582204cf418f31",
+      "family_id": "exfiltration-rapid-critical",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "ecfc9a84624003627a9ca1a58f0949944fef408f846b4960578f38fb07281b14"
+    },
+    {
+      "case_id": "exfiltration-rapid-critical-09",
+      "session_id": "s-61f70cb48bd6f33331e9",
+      "family_id": "exfiltration-rapid-critical",
+      "domain": "exfiltration",
+      "threat": true,
+      "detected": true,
+      "expected_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "predicted_rule_ids": [
+        "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+      ],
+      "error": null,
+      "outcome": "TP",
+      "pattern_sha256": "0876e59c6713e5f0b7b751287bc47b4dfaff15500492b8f32402c42b3ed46517"
+    },
+    {
+      "case_id": "exfiltration-approved-migration-00",
+      "session_id": "s-a9a74f1a38cdb96b2ed4",
+      "family_id": "exfiltration-approved-migration",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "cf82bdd148b704263ad128c9f111979e23e2c4c64830c520896e119333fa41ba"
+    },
+    {
+      "case_id": "exfiltration-approved-migration-01",
+      "session_id": "s-cd0232e8f9105ddaa18a",
+      "family_id": "exfiltration-approved-migration",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "6c47e2e0bbe478c015c10cb7ba7dab5f6ca9206a8c363b0bc6221eb5e9a3ec8a"
+    },
+    {
+      "case_id": "exfiltration-approved-migration-02",
+      "session_id": "s-855339b45a4bf04ee627",
+      "family_id": "exfiltration-approved-migration",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "fd503376bb52dc17289a4bd405c1d9876a29e0b85d5e01a59506ad174f35384b"
+    },
+    {
+      "case_id": "exfiltration-approved-migration-03",
+      "session_id": "s-e336576a1ae56a7474c6",
+      "family_id": "exfiltration-approved-migration",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "73fcf5a77ae1adb3a8ec41197b0490a5f949cc5906e2c719feda6325a2440470"
+    },
+    {
+      "case_id": "exfiltration-approved-migration-04",
+      "session_id": "s-825c470cc61af1af42eb",
+      "family_id": "exfiltration-approved-migration",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "01351a49c63d71c40328dd9bfd89f0c8a4ac1e2b6c5e7609c11410f7f935f5c3"
+    },
+    {
+      "case_id": "exfiltration-approved-migration-05",
+      "session_id": "s-7e07ee4e25a583e73305",
+      "family_id": "exfiltration-approved-migration",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "870386628f3e4c3e687636a536e732657ded00ee5f2bf3c7c30a0d43b2e9b760"
+    },
+    {
+      "case_id": "exfiltration-approved-migration-06",
+      "session_id": "s-e6368b87fa3d2596472a",
+      "family_id": "exfiltration-approved-migration",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "6a1fd786cceb177379d015942adc1305ddb481120af3e2174630f5b8f5dba4eb"
+    },
+    {
+      "case_id": "exfiltration-approved-migration-07",
+      "session_id": "s-7c1e88df942f151dce5c",
+      "family_id": "exfiltration-approved-migration",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "551e6ec7e9c51ebb127a999e282a35056e5b0ea54f7ba15db3a9a71b4c833c9b"
+    },
+    {
+      "case_id": "exfiltration-approved-migration-08",
+      "session_id": "s-0ea53020d6a2f2a61578",
+      "family_id": "exfiltration-approved-migration",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "6eb5d179c36d636edd744991c3f02657c6ad0dc7e505643f591eac4cfe98316c"
+    },
+    {
+      "case_id": "exfiltration-approved-migration-09",
+      "session_id": "s-f937eb709562063b3517",
+      "family_id": "exfiltration-approved-migration",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "0e37df7877e48596462018f2b47fa008f1a90521905a2b01eb67768aeb1d087e"
+    },
+    {
+      "case_id": "exfiltration-internal-report-export-00",
+      "session_id": "s-d615988013022851985f",
+      "family_id": "exfiltration-internal-report-export",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "5ac1748cbb82f2e8fada52f648859544bc479229db4ed5a6c293a5078badeb03"
+    },
+    {
+      "case_id": "exfiltration-internal-report-export-01",
+      "session_id": "s-bb5429ef82d16c6fab08",
+      "family_id": "exfiltration-internal-report-export",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "0782c6b8c9ef81c679fd85df80dc286932ebc076c47d9cd363bc1beec719b288"
+    },
+    {
+      "case_id": "exfiltration-internal-report-export-02",
+      "session_id": "s-8fdc5f56025aba772040",
+      "family_id": "exfiltration-internal-report-export",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "74416f2ce35c202dfa5a2fb3196f163bbc60e895003728abe15ad0889bcedf86"
+    },
+    {
+      "case_id": "exfiltration-internal-report-export-03",
+      "session_id": "s-e0a7d11451c4db51da4a",
+      "family_id": "exfiltration-internal-report-export",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "2553babda31428fc43989eb5e5458bbce028d308f65f6a801cbc1370e9a16a69"
+    },
+    {
+      "case_id": "exfiltration-internal-report-export-04",
+      "session_id": "s-36f0f092d96bb5275420",
+      "family_id": "exfiltration-internal-report-export",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "4e0904c433a65da1d59aa417a9b65828781c5497a15f7901133de4df3b7850ab"
+    },
+    {
+      "case_id": "exfiltration-internal-report-export-05",
+      "session_id": "s-3c111a0eb153f0896dc0",
+      "family_id": "exfiltration-internal-report-export",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "96b5659f3e8ba7f76f9fcf38956c19dd4176b65c6aed3846c48b2392c6e014b1"
+    },
+    {
+      "case_id": "exfiltration-internal-report-export-06",
+      "session_id": "s-2025bcfc2d6afaf8b7da",
+      "family_id": "exfiltration-internal-report-export",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "40ef80cc98f1eda773554790339652d7db143793dd4e1efc6034dabe124bb473"
+    },
+    {
+      "case_id": "exfiltration-internal-report-export-07",
+      "session_id": "s-759760789dae87094147",
+      "family_id": "exfiltration-internal-report-export",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "f414b6c0346bb6c0d31ba98c1b5464c39513e43d17e80eb3e5a9200e0282d27e"
+    },
+    {
+      "case_id": "exfiltration-internal-report-export-08",
+      "session_id": "s-68a412cd4c31f1c0d686",
+      "family_id": "exfiltration-internal-report-export",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "e3c0659e1137a317a86dfe8b4f06acb5a7b9c19444525dca0b229e2251c007f9"
+    },
+    {
+      "case_id": "exfiltration-internal-report-export-09",
+      "session_id": "s-070ec97574d0ff6f5d43",
+      "family_id": "exfiltration-internal-report-export",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "8e4a5f8ea47c0ff71241f3feaad5bba2a9e38f2fa4779166d75627c6034c518c"
+    },
+    {
+      "case_id": "exfiltration-metadata-only-00",
+      "session_id": "s-71ffd5ab446997375bed",
+      "family_id": "exfiltration-metadata-only",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "7e0e27cc5a27a8186894f826dc3c11a973a3c191acf9355e1d0a9240e6b8cec2"
+    },
+    {
+      "case_id": "exfiltration-metadata-only-01",
+      "session_id": "s-3752fa38251e824af6a1",
+      "family_id": "exfiltration-metadata-only",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "2c2d8f4c27f7a7f49d90bbfc9bb90a2272d4fa49cb40bf8dda0897c43e39b462"
+    },
+    {
+      "case_id": "exfiltration-metadata-only-02",
+      "session_id": "s-ad1c9ff0cf7870aa00e9",
+      "family_id": "exfiltration-metadata-only",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "b1c531528983016e2d7252c92ea329dd09c8bbc663a57615b629bd4d1531365f"
+    },
+    {
+      "case_id": "exfiltration-metadata-only-03",
+      "session_id": "s-d25fdf997389e86fbb0f",
+      "family_id": "exfiltration-metadata-only",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "1804c78abc4e9c1a4687d68e5223b62eda1929bd36721c9eac2ee985da57ba14"
+    },
+    {
+      "case_id": "exfiltration-metadata-only-04",
+      "session_id": "s-22a6575a2074e055f6eb",
+      "family_id": "exfiltration-metadata-only",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "758185e7704ef90c8153de5e15ef58b8667ef2f6b46e7c11e8ff1d6c2ce2e51c"
+    },
+    {
+      "case_id": "exfiltration-metadata-only-05",
+      "session_id": "s-81ccbc97f6b234dfbd7c",
+      "family_id": "exfiltration-metadata-only",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "fde05fa86aad6913322801979a43a2624d2b83de1ca51cf4bc92b664d2ec59a5"
+    },
+    {
+      "case_id": "exfiltration-metadata-only-06",
+      "session_id": "s-7e413459abef0f9a2b13",
+      "family_id": "exfiltration-metadata-only",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "ecad898e688b57987a7e56968df2fb4108dbbb589635c58ec4e3cd1569a72cf3"
+    },
+    {
+      "case_id": "exfiltration-metadata-only-07",
+      "session_id": "s-a55c38c380aff38cf508",
+      "family_id": "exfiltration-metadata-only",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "62a35d901fecd52c766f69d9295a68fa0b1e30016f65f6e16d531dff92fc30c6"
+    },
+    {
+      "case_id": "exfiltration-metadata-only-08",
+      "session_id": "s-f3737fea1f0025524ced",
+      "family_id": "exfiltration-metadata-only",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "54b4db3ce29b9ab405d26072cc27270c8538005a03bdc906e150ad8cc04be21d"
+    },
+    {
+      "case_id": "exfiltration-metadata-only-09",
+      "session_id": "s-21304ca382c2c280c88b",
+      "family_id": "exfiltration-metadata-only",
+      "domain": "exfiltration",
+      "threat": false,
+      "detected": false,
+      "expected_rule_ids": [],
+      "predicted_rule_ids": [],
+      "error": null,
+      "outcome": "TN",
+      "pattern_sha256": "5a4904535e51d4707400211cd25da4a058d98d88b0b8bf9d0e1bd55cf497e424"
+    }
+  ],
+  "macro_rule_metrics": {
+    "precision": 0.6666666666666666,
+    "recall": 0.41111111111111115,
+    "f1": 0.4692307692307693,
+    "false_positive_rate": 0.036656891495601175
+  },
+  "manifest_digest_sha256": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+  "cases_digest_sha256": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f",
+  "ruleset_digest_sha256": "7b769a999a252e112e4848cd5026976ee55de4bf853ac49b00d883d36b7a6231",
+  "evaluation_fingerprint_sha256": "ed68b3b0c2d9ea5d04cb51eaa51291fa2f13086f25e00601143357080c383b16",
+  "limitations": [
+    "Authored operational labels await independent team review; holdout is family-separated, not an external blind test.",
+    "Variants share scenario mechanics and are not independent real-world attacks; inspect unique patterns and family intervals.",
+    "Balanced case mix does not represent enterprise threat prevalence.",
+    "Evaluates Sigma event alerts, not LLM accuracy, session policy enforcement or incident correlation.",
+    "Rules were not tuned on this holdout; benchmark failure is an observed result, not a test-runner error."
+  ]
+}

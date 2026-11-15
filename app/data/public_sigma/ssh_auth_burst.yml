@@ -1,0 +1,33 @@
+title: SSH Authentication Failure Burst
+id: a12f82ae-3a99-421a-a2f6-7390b4ebbd40
+status: test
+description: At least five observed failed logins from a grouped source within 60
+  seconds. This is an investigation candidate without verified attack context.
+author: Cheonan-Asan Team
+date: '2026-11-09'
+taxonomy: ocsf
+logsource:
+  category: application
+  product: cowrie
+detection:
+  selection:
+    unmapped.public.source: cowrie
+    unmapped.public.ssh_auth_burst: true
+  condition: selection
+falsepositives:
+- Legitimate login retries or an incorrectly aggregated source.
+level: medium
+x_secops:
+  lifecycle: approved
+  version: 1.1.0
+  approved_by: reference-rule-test-harness
+  approved_on: '2026-11-09'
+  test_case_ids:
+  - PUBLIC-SSH-01
+  authority: reference_only
+  approval_scope: Offline detector execution acceptance only; grants no enforcement
+    authority.
+  public_detection:
+    feature: ssh_auth_burst
+    disposition: investigate
+modified: '2026-11-10'

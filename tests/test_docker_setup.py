@@ -38,3 +38,5 @@ def test_docker_test_image_normalizes_windows_file_modes() -> None:
 
     assert 'find app -type f -name "*.py" -exec chmod 0644' in dockerfile
     assert 'find tests -type f -name "*.py" -exec chmod 0644' in dockerfile
+    assert 'find scripts -type f -name "*.py" -exec chmod 0644' in dockerfile
+    assert 'chmod 0755 scripts/local_signal_collector.py' in dockerfile

@@ -296,6 +296,8 @@ h1 span { color: var(--blue); }
 .review-feedback { min-height: 15px; margin: 9px 0 0 !important; color: var(--muted) !important; font-size: 9px !important; }
 
 .metric-grid { margin-top: 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.zt-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+#zeroTrustSection .metric-grid strong { font-size: 17px; }
 .metric-grid article { padding: 18px; border: 1px solid var(--line); border-radius: 10px; display: grid; gap: 8px; }
 .metric-grid span { color: var(--muted); font-size: 11px; }
 .metric-grid strong { font-size: 26px; letter-spacing: -0.05em; overflow-wrap: anywhere; }

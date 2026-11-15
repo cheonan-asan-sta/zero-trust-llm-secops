@@ -1,0 +1,1241 @@
+[
+  {
+    "family_id": "credential-geo-burst",
+    "domain": "credential",
+    "split": "development",
+    "threat": true,
+    "rationale": "Unauthorized password guesses from an anomalous location.",
+    "patch": {
+      "action": "LOGIN",
+      "auth_context.authentication_result": "failure",
+      "network.location_anomaly": true
+    },
+    "variations": {
+      "auth_context.failed_attempts": [
+        3,
+        4,
+        5
+      ]
+    },
+    "approval": false,
+    "expected_rule_ids": [
+      "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+    ]
+  },
+  {
+    "family_id": "credential-local-burst",
+    "domain": "credential",
+    "split": "development",
+    "threat": true,
+    "rationale": "Unauthorized automated guesses from a familiar address.",
+    "patch": {
+      "action": "LOGIN",
+      "auth_context.authentication_result": "failure",
+      "behavior.request_rate": "high"
+    },
+    "variations": {
+      "auth_context.failed_attempts": [
+        6,
+        7,
+        8
+      ]
+    },
+    "approval": false,
+    "expected_rule_ids": [
+      "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+    ]
+  },
+  {
+    "family_id": "credential-mfa-fatigue",
+    "domain": "credential",
+    "split": "development",
+    "threat": true,
+    "rationale": "Repeated rejected MFA prompts during account takeover.",
+    "patch": {
+      "action": "LOGIN",
+      "auth_context.mfa": "failed",
+      "behavior.request_rate": "high"
+    },
+    "variations": {
+      "auth_context.failed_attempts": [
+        9,
+        10,
+        11
+      ]
+    },
+    "approval": false,
+    "expected_rule_ids": [
+      "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+    ]
+  },
+  {
+    "family_id": "credential-typing-errors",
+    "domain": "credential",
+    "split": "development",
+    "threat": false,
+    "rationale": "Legitimate user makes one or two typing errors without anomalous activity.",
+    "patch": {
+      "action": "LOGIN",
+      "auth_context.authentication_result": "failure",
+      "behavior.request_rate": "normal"
+    },
+    "variations": {
+      "auth_context.failed_attempts": [
+        1,
+        2
+      ]
+    },
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "credential-travel-success",
+    "domain": "credential",
+    "split": "development",
+    "threat": false,
+    "rationale": "Authorized traveler completes MFA despite a location change.",
+    "patch": {
+      "action": "LOGIN",
+      "network.location_anomaly": true
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "credential-approved-health-retry",
+    "domain": "credential",
+    "split": "development",
+    "threat": false,
+    "rationale": "Approved service-health retry burst; an alert here is operational noise.",
+    "patch": {
+      "action": "LOGIN",
+      "auth_context.authentication_result": "failure",
+      "behavior.request_rate": "high"
+    },
+    "variations": {
+      "auth_context.failed_attempts": [
+        3,
+        4,
+        5
+      ]
+    },
+    "approval": true,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "credential-distributed-slow",
+    "domain": "credential",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "Distributed attacker stays below the per-source failure threshold.",
+    "patch": {
+      "action": "LOGIN",
+      "auth_context.authentication_result": "failure",
+      "behavior.unusual_time": true
+    },
+    "variations": {
+      "auth_context.failed_attempts": [
+        1,
+        2
+      ]
+    },
+    "approval": false,
+    "expected_rule_ids": [
+      "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+    ]
+  },
+  {
+    "family_id": "credential-credential-stuffing",
+    "domain": "credential",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "High-volume credential stuffing against an account.",
+    "patch": {
+      "action": "LOGIN",
+      "auth_context.authentication_result": "failure",
+      "behavior.request_rate": "high"
+    },
+    "variations": {
+      "auth_context.failed_attempts": [
+        12,
+        15,
+        17
+      ]
+    },
+    "approval": false,
+    "expected_rule_ids": [
+      "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+    ]
+  },
+  {
+    "family_id": "credential-stolen-success",
+    "domain": "credential",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "Stolen password succeeds without verified MFA; the missing signal is not proof of safety.",
+    "patch": {
+      "action": "LOGIN",
+      "auth_context.mfa": "unknown",
+      "network.location_anomaly": true
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d"
+    ]
+  },
+  {
+    "family_id": "credential-vpn-mfa",
+    "domain": "credential",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "Authorized VPN authentication succeeds with MFA.",
+    "patch": {
+      "action": "LOGIN",
+      "network.access_method": "vpn"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "credential-authorized-drill",
+    "domain": "credential",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "Explicitly approved authentication load drill generates failures.",
+    "patch": {
+      "action": "LOGIN",
+      "auth_context.authentication_result": "failure",
+      "behavior.request_rate": "high"
+    },
+    "variations": {
+      "auth_context.failed_attempts": [
+        18,
+        20,
+        22
+      ]
+    },
+    "approval": true,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "credential-recovered-success",
+    "domain": "credential",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "User succeeds after prior failures; historical attempts alone do not mean an active attack.",
+    "patch": {
+      "action": "LOGIN"
+    },
+    "variations": {
+      "auth_context.failed_attempts": [
+        4,
+        5,
+        6
+      ]
+    },
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "device-unregistered-document",
+    "domain": "device",
+    "split": "development",
+    "threat": true,
+    "rationale": "Unapproved new unmanaged endpoint requests internal data.",
+    "patch": {
+      "device.managed": false,
+      "device.security_posture": "unknown",
+      "behavior.new_device": true
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+    ]
+  },
+  {
+    "family_id": "device-unregistered-admin",
+    "domain": "device",
+    "split": "development",
+    "threat": true,
+    "rationale": "Unapproved new unmanaged endpoint invokes an otherwise role-matched admin operation.",
+    "patch": {
+      "action": "ADMIN",
+      "device.managed": false,
+      "device.security_posture": "unknown",
+      "behavior.new_device": true
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+    ]
+  },
+  {
+    "family_id": "device-unregistered-login",
+    "domain": "device",
+    "split": "development",
+    "threat": true,
+    "rationale": "Unapproved new unmanaged endpoint attempts authentication.",
+    "patch": {
+      "action": "LOGIN",
+      "device.managed": false,
+      "device.security_posture": "unknown",
+      "behavior.new_device": true
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+    ]
+  },
+  {
+    "family_id": "device-managed-document",
+    "domain": "device",
+    "split": "development",
+    "threat": false,
+    "rationale": "Healthy managed endpoint reads an authorized internal document.",
+    "patch": {},
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "device-registered-byod",
+    "domain": "device",
+    "split": "development",
+    "threat": false,
+    "rationale": "Known healthy BYOD device is permitted for this resource.",
+    "patch": {
+      "device.managed": false
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "device-approved-enrollment",
+    "domain": "device",
+    "split": "development",
+    "threat": false,
+    "rationale": "A scoped enrollment window explicitly permits this new BYOD endpoint.",
+    "patch": {
+      "device.managed": false,
+      "device.security_posture": "unknown",
+      "behavior.new_device": true
+    },
+    "variations": {},
+    "approval": true,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "device-managed-compromise",
+    "domain": "device",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "A previously managed endpoint is now compromised.",
+    "patch": {
+      "device.security_posture": "compromised"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+    ]
+  },
+  {
+    "family_id": "device-unmanaged-at-risk",
+    "domain": "device",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "An unapproved unmanaged endpoint has known adverse posture rather than unknown posture.",
+    "patch": {
+      "device.managed": false,
+      "device.security_posture": "at_risk",
+      "behavior.new_device": true
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+    ]
+  },
+  {
+    "family_id": "device-unregistered-download",
+    "domain": "device",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "Unapproved new unmanaged endpoint requests a download.",
+    "patch": {
+      "action": "DOWNLOAD",
+      "device.managed": false,
+      "device.security_posture": "unknown",
+      "behavior.new_device": true
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e"
+    ]
+  },
+  {
+    "family_id": "device-inventory-refresh",
+    "domain": "device",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "Managed enrollment is approved while inventory posture is being refreshed.",
+    "patch": {
+      "device.security_posture": "unknown",
+      "behavior.new_device": true
+    },
+    "variations": {},
+    "approval": true,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "device-healthy-byod-enrollment",
+    "domain": "device",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "Approved healthy new BYOD device accesses a limited resource.",
+    "patch": {
+      "device.managed": false,
+      "behavior.new_device": true
+    },
+    "variations": {},
+    "approval": true,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "device-managed-local-logon",
+    "domain": "device",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "Healthy managed local logon with a verified device identity.",
+    "patch": {
+      "action": "LOGIN",
+      "behavior.new_device": true
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "privilege-employee-admin",
+    "domain": "privilege",
+    "split": "development",
+    "threat": true,
+    "rationale": "Employee attempts an admin-only operation.",
+    "patch": {
+      "action": "ADMIN",
+      "resource.required_role": "administrator"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+    ]
+  },
+  {
+    "family_id": "privilege-analyst-backup-admin",
+    "domain": "privilege",
+    "split": "development",
+    "threat": true,
+    "rationale": "Analyst attempts a backup-operator-only administration operation.",
+    "patch": {
+      "action": "ADMIN",
+      "user.role": "analyst",
+      "resource.required_role": "backup-operator"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+    ]
+  },
+  {
+    "family_id": "privilege-guest-operator",
+    "domain": "privilege",
+    "split": "development",
+    "threat": true,
+    "rationale": "Guest attempts operator administration.",
+    "patch": {
+      "action": "ADMIN",
+      "user.role": "guest",
+      "resource.required_role": "operator"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+    ]
+  },
+  {
+    "family_id": "privilege-administrator",
+    "domain": "privilege",
+    "split": "development",
+    "threat": false,
+    "rationale": "Administrator performs role-matched administration.",
+    "patch": {
+      "action": "ADMIN",
+      "user.role": "administrator",
+      "resource.required_role": "administrator"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "privilege-employee-read",
+    "domain": "privilege",
+    "split": "development",
+    "threat": false,
+    "rationale": "Employee reads public data within their role.",
+    "patch": {
+      "resource.sensitivity": "public"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "privilege-approved-emergency",
+    "domain": "privilege",
+    "split": "development",
+    "threat": false,
+    "rationale": "Approved short-lived emergency role activation permits the operation.",
+    "patch": {
+      "action": "ADMIN",
+      "resource.required_role": "administrator"
+    },
+    "variations": {},
+    "approval": true,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "privilege-security-admin",
+    "domain": "privilege",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "Employee attempts a security-admin-only configuration change.",
+    "patch": {
+      "action": "ADMIN",
+      "resource.required_role": "security-admin"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+    ]
+  },
+  {
+    "family_id": "privilege-unauthorized-download",
+    "domain": "privilege",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "Employee reads data reserved for administrators through a download operation.",
+    "patch": {
+      "action": "DOWNLOAD",
+      "resource.required_role": "administrator",
+      "behavior.download_volume_mb": 10
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+    ]
+  },
+  {
+    "family_id": "privilege-missing-resource-role",
+    "domain": "privilege",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "External resource policy denies this admin action but its required role is missing from the log.",
+    "patch": {
+      "action": "ADMIN",
+      "resource.required_role": null
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+    ]
+  },
+  {
+    "family_id": "privilege-analyst-admin",
+    "domain": "privilege",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "Analyst performs an explicitly role-matched administration operation.",
+    "patch": {
+      "action": "ADMIN",
+      "user.role": "analyst",
+      "resource.required_role": "analyst"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "privilege-backup-admin",
+    "domain": "privilege",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "Backup operator manages its own authorized backup resource.",
+    "patch": {
+      "action": "ADMIN",
+      "user.role": "backup-operator",
+      "resource.required_role": "backup-operator"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "privilege-viewer-read",
+    "domain": "privilege",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "Viewer performs an authorized document read.",
+    "patch": {
+      "user.role": "viewer",
+      "resource.required_role": "viewer"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "remote-unapproved-rdp",
+    "domain": "remote",
+    "split": "development",
+    "threat": true,
+    "rationale": "Unauthorized remote desktop connection is established.",
+    "patch": {
+      "action": "REMOTE_ACCESS",
+      "network.access_method": "remote"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+    ]
+  },
+  {
+    "family_id": "remote-vpn-fanout",
+    "domain": "remote",
+    "split": "development",
+    "threat": true,
+    "rationale": "Unauthorized VPN remote session rapidly accesses many resources.",
+    "patch": {
+      "action": "REMOTE_ACCESS",
+      "network.access_method": "vpn",
+      "behavior.request_rate": "high"
+    },
+    "variations": {
+      "behavior.distinct_resources_10m": [
+        8,
+        9,
+        10
+      ]
+    },
+    "approval": false,
+    "expected_rule_ids": [
+      "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+      "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+    ]
+  },
+  {
+    "family_id": "remote-unverified-mfa",
+    "domain": "remote",
+    "split": "development",
+    "threat": true,
+    "rationale": "Unauthorized remote session lacks verified MFA.",
+    "patch": {
+      "action": "REMOTE_ACCESS",
+      "network.access_method": "remote",
+      "auth_context.mfa": "unknown"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+    ]
+  },
+  {
+    "family_id": "remote-vpn-read",
+    "domain": "remote",
+    "split": "development",
+    "threat": false,
+    "rationale": "Approved VPN user reads a role-matched document.",
+    "patch": {
+      "network.access_method": "vpn"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "remote-remote-login",
+    "domain": "remote",
+    "split": "development",
+    "threat": false,
+    "rationale": "Authorized remote user completes a normal authentication event.",
+    "patch": {
+      "action": "LOGIN",
+      "network.access_method": "remote"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "remote-approved-support",
+    "domain": "remote",
+    "split": "development",
+    "threat": false,
+    "rationale": "Scoped remote support is authorized; alerting alone does not make this malicious.",
+    "patch": {
+      "action": "REMOTE_ACCESS",
+      "network.access_method": "remote"
+    },
+    "variations": {},
+    "approval": true,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "remote-compromised-vpn",
+    "domain": "remote",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "Compromised endpoint establishes an unauthorized VPN remote session.",
+    "patch": {
+      "action": "REMOTE_ACCESS",
+      "network.access_method": "vpn",
+      "device.security_posture": "compromised"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+    ]
+  },
+  {
+    "family_id": "remote-misclassified-activity",
+    "domain": "remote",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "Unauthorized remote work is logged as READ, exposing a source-action observability gap.",
+    "patch": {
+      "network.access_method": "remote",
+      "auth_context.mfa": "unknown"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+    ]
+  },
+  {
+    "family_id": "remote-unmanaged-existing",
+    "domain": "remote",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "Unauthorized remote session originates from a known unmanaged endpoint.",
+    "patch": {
+      "action": "REMOTE_ACCESS",
+      "network.access_method": "remote",
+      "device.managed": false,
+      "device.security_posture": "unknown"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+    ]
+  },
+  {
+    "family_id": "remote-approved-vpn-maintenance",
+    "domain": "remote",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "Scoped VPN maintenance is approved for a healthy administrator.",
+    "patch": {
+      "action": "REMOTE_ACCESS",
+      "network.access_method": "vpn",
+      "user.role": "administrator",
+      "resource.required_role": "administrator"
+    },
+    "variations": {},
+    "approval": true,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "remote-approved-night-support",
+    "domain": "remote",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "Authorized remote support occurs outside normal working hours.",
+    "patch": {
+      "action": "REMOTE_ACCESS",
+      "network.access_method": "remote",
+      "behavior.unusual_time": true
+    },
+    "variations": {},
+    "approval": true,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "remote-local-night-login",
+    "domain": "remote",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "Approved local login outside normal working hours.",
+    "patch": {
+      "action": "LOGIN",
+      "behavior.unusual_time": true
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "lateral-threshold-fanout",
+    "domain": "lateral",
+    "split": "development",
+    "threat": true,
+    "rationale": "Unauthorized remote fanout reaches the distinct-resource boundary.",
+    "patch": {
+      "action": "REMOTE_ACCESS",
+      "network.access_method": "remote",
+      "behavior.request_rate": "high",
+      "behavior.distinct_resources_10m": 8
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+      "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+    ]
+  },
+  {
+    "family_id": "lateral-vpn-scanning",
+    "domain": "lateral",
+    "split": "development",
+    "threat": true,
+    "rationale": "Unauthorized VPN scanning touches many resources.",
+    "patch": {
+      "action": "REMOTE_ACCESS",
+      "network.access_method": "vpn",
+      "behavior.request_rate": "high"
+    },
+    "variations": {
+      "behavior.distinct_resources_10m": [
+        11,
+        12,
+        13
+      ]
+    },
+    "approval": false,
+    "expected_rule_ids": [
+      "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+      "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+    ]
+  },
+  {
+    "family_id": "lateral-compromised-fanout",
+    "domain": "lateral",
+    "split": "development",
+    "threat": true,
+    "rationale": "Compromised endpoint rapidly fans out through remote access.",
+    "patch": {
+      "action": "REMOTE_ACCESS",
+      "network.access_method": "remote",
+      "behavior.request_rate": "high",
+      "device.security_posture": "compromised"
+    },
+    "variations": {
+      "behavior.distinct_resources_10m": [
+        14,
+        15,
+        16
+      ]
+    },
+    "approval": false,
+    "expected_rule_ids": [
+      "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+      "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+    ]
+  },
+  {
+    "family_id": "lateral-approved-deployment",
+    "domain": "lateral",
+    "split": "development",
+    "threat": false,
+    "rationale": "Approved deployment automation legitimately fans out.",
+    "patch": {
+      "action": "REMOTE_ACCESS",
+      "network.access_method": "remote",
+      "behavior.request_rate": "high",
+      "behavior.distinct_resources_10m": 10
+    },
+    "variations": {},
+    "approval": true,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "lateral-small-workflow",
+    "domain": "lateral",
+    "split": "development",
+    "threat": false,
+    "rationale": "Routine work touches a small number of resources.",
+    "patch": {
+      "behavior.distinct_resources_10m": 2
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "lateral-local-admin-workflow",
+    "domain": "lateral",
+    "split": "development",
+    "threat": false,
+    "rationale": "Role-matched local administration uses a limited set of resources.",
+    "patch": {
+      "action": "ADMIN",
+      "user.role": "administrator",
+      "resource.required_role": "administrator",
+      "resource.sensitivity": "high",
+      "behavior.distinct_resources_10m": 3
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "lateral-slow-fanout",
+    "domain": "lateral",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "Attacker spreads remote traversal over time to avoid the high-rate flag.",
+    "patch": {
+      "action": "REMOTE_ACCESS",
+      "network.access_method": "remote",
+      "behavior.distinct_resources_10m": 9,
+      "behavior.request_rate": "normal"
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+      "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+    ]
+  },
+  {
+    "family_id": "lateral-below-resource-limit",
+    "domain": "lateral",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "Attacker stays just below the distinct-resource threshold.",
+    "patch": {
+      "action": "REMOTE_ACCESS",
+      "network.access_method": "vpn",
+      "behavior.request_rate": "high",
+      "behavior.distinct_resources_10m": 7
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+      "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
+    ]
+  },
+  {
+    "family_id": "lateral-api-traversal",
+    "domain": "lateral",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "Unauthorized cross-resource traversal uses READ rather than REMOTE_ACCESS.",
+    "patch": {
+      "network.access_method": "vpn",
+      "behavior.request_rate": "high",
+      "behavior.distinct_resources_10m": 20
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60"
+    ]
+  },
+  {
+    "family_id": "lateral-fleet-deployment",
+    "domain": "lateral",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "Approved fleet deployment touches many endpoints over VPN.",
+    "patch": {
+      "action": "REMOTE_ACCESS",
+      "network.access_method": "vpn",
+      "behavior.request_rate": "high",
+      "behavior.distinct_resources_10m": 25
+    },
+    "variations": {},
+    "approval": true,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "lateral-incident-response",
+    "domain": "lateral",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "Approved response personnel inspect multiple resources.",
+    "patch": {
+      "action": "REMOTE_ACCESS",
+      "network.access_method": "remote",
+      "behavior.request_rate": "high",
+      "behavior.distinct_resources_10m": 18,
+      "user.role": "responder",
+      "resource.required_role": "responder"
+    },
+    "variations": {},
+    "approval": true,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "lateral-bounded-reporting",
+    "domain": "lateral",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "Authorized report generation touches seven resources at normal rate.",
+    "patch": {
+      "behavior.distinct_resources_10m": 7
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "exfiltration-at-volume-limit",
+    "domain": "exfiltration",
+    "split": "development",
+    "threat": true,
+    "rationale": "Unauthorized critical-data export at the detection boundary.",
+    "patch": {
+      "action": "DOWNLOAD",
+      "resource.sensitivity": "critical",
+      "behavior.download_volume_mb": 500
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+    ]
+  },
+  {
+    "family_id": "exfiltration-bulk-critical",
+    "domain": "exfiltration",
+    "split": "development",
+    "threat": true,
+    "rationale": "Unauthorized large export of critical data.",
+    "patch": {
+      "action": "DOWNLOAD",
+      "resource.sensitivity": "critical"
+    },
+    "variations": {
+      "behavior.download_volume_mb": [
+        750,
+        1000,
+        1500
+      ]
+    },
+    "approval": false,
+    "expected_rule_ids": [
+      "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+    ]
+  },
+  {
+    "family_id": "exfiltration-multiple-critical",
+    "domain": "exfiltration",
+    "split": "development",
+    "threat": true,
+    "rationale": "Unauthorized critical exports span several resources.",
+    "patch": {
+      "action": "DOWNLOAD",
+      "resource.sensitivity": "critical",
+      "behavior.distinct_resources_10m": 4
+    },
+    "variations": {
+      "behavior.download_volume_mb": [
+        501,
+        502,
+        503
+      ]
+    },
+    "approval": false,
+    "expected_rule_ids": [
+      "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+    ]
+  },
+  {
+    "family_id": "exfiltration-small-critical",
+    "domain": "exfiltration",
+    "split": "development",
+    "threat": false,
+    "rationale": "Authorized bounded transfer stays below the bulk threshold.",
+    "patch": {
+      "action": "DOWNLOAD",
+      "resource.sensitivity": "critical"
+    },
+    "variations": {
+      "behavior.download_volume_mb": [
+        498,
+        499,
+        499.999
+      ]
+    },
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "exfiltration-public-export",
+    "domain": "exfiltration",
+    "split": "development",
+    "threat": false,
+    "rationale": "Authorized bulk export of public information.",
+    "patch": {
+      "action": "DOWNLOAD",
+      "resource.sensitivity": "public",
+      "behavior.download_volume_mb": 2000
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "exfiltration-approved-backup",
+    "domain": "exfiltration",
+    "split": "development",
+    "threat": false,
+    "rationale": "Scoped backup approval covers this critical-data transfer.",
+    "patch": {
+      "action": "DOWNLOAD",
+      "resource.sensitivity": "critical",
+      "behavior.download_volume_mb": 1800
+    },
+    "variations": {},
+    "approval": true,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "exfiltration-high-sensitivity-export",
+    "domain": "exfiltration",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "Unauthorized export of high-sensitivity rather than critical data.",
+    "patch": {
+      "action": "DOWNLOAD",
+      "resource.sensitivity": "high",
+      "behavior.download_volume_mb": 2500
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": [
+      "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+    ]
+  },
+  {
+    "family_id": "exfiltration-low-and-slow",
+    "domain": "exfiltration",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "Attacker splits a critical-data export into smaller off-hours transfers.",
+    "patch": {
+      "action": "DOWNLOAD",
+      "resource.sensitivity": "critical",
+      "behavior.unusual_time": true
+    },
+    "variations": {
+      "behavior.download_volume_mb": [
+        450,
+        475,
+        490
+      ]
+    },
+    "approval": false,
+    "expected_rule_ids": [
+      "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+    ]
+  },
+  {
+    "family_id": "exfiltration-rapid-critical",
+    "domain": "exfiltration",
+    "split": "holdout",
+    "threat": true,
+    "rationale": "Unauthorized critical-data export at high request rate.",
+    "patch": {
+      "action": "DOWNLOAD",
+      "resource.sensitivity": "critical",
+      "behavior.request_rate": "high"
+    },
+    "variations": {
+      "behavior.download_volume_mb": [
+        3000,
+        4000,
+        5000
+      ]
+    },
+    "approval": false,
+    "expected_rule_ids": [
+      "ce5f6071-8293-4eaf-801b-2c3d4e5f6071"
+    ]
+  },
+  {
+    "family_id": "exfiltration-approved-migration",
+    "domain": "exfiltration",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "Scoped migration approval covers an exact-capacity critical export.",
+    "patch": {
+      "action": "DOWNLOAD",
+      "resource.sensitivity": "critical",
+      "behavior.download_volume_mb": 6000
+    },
+    "variations": {},
+    "approval": true,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "exfiltration-internal-report-export",
+    "domain": "exfiltration",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "Authorized internal report export is within its business purpose.",
+    "patch": {
+      "action": "DOWNLOAD",
+      "resource.sensitivity": "internal",
+      "behavior.download_volume_mb": 3500
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  },
+  {
+    "family_id": "exfiltration-metadata-only",
+    "domain": "exfiltration",
+    "split": "holdout",
+    "threat": false,
+    "rationale": "A download request returns no data bytes.",
+    "patch": {
+      "action": "DOWNLOAD",
+      "resource.sensitivity": "critical",
+      "behavior.download_volume_mb": 0
+    },
+    "variations": {},
+    "approval": false,
+    "expected_rule_ids": []
+  }
+]

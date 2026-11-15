@@ -1,0 +1,15 @@
+{
+  "schema": "f1-cloud-causal-context-3",
+  "stage": "same_observed_training_rows_only",
+  "inputs": "cloud-request-facts-2 prepared outputs, externally pinned by v24 diagnostics",
+  "grouping": "principal_reference only. Missing principal/time has unavailable history, never global fallback. Issuer/IP equality is not a physical device or session assertion.",
+  "ordering": "Event time ascending. Features use only strictly earlier timestamps within the preceding10/60 seconds. All equal-time events are withheld until the entire tie group is evaluated. Returned rows keep original case IDs and order.",
+  "duplicates": "An identical repeated event reference/view contributes once to history; every source row/label remains. Later conflicting reference content yields unavailable enrichment and does not retroactively change earlier observations.",
+  "features": "Fixed count/ratio buckets for observed calls10/60s, writes/errors60s, API and resource diversity60s, missing resource evidence60s and observed prefix age. No absolute time, raw identifiers, scenario names or labels as features.",
+  "censoring": "Public logs may be sampled or incomplete. Zero is zero observed history, not proof of no activity. No continuous collection/current cryptographic trust is certified.",
+  "truth": "Opaque byte-identical truth sidecars; no relabeling, row filtering or final-data reads",
+  "models": "No classifier fit or final-test selection in this preparation stage. Gold-based collision diagnostics are training information bounds only.",
+  "maximum_rows": 50000,
+  "goal_qualified": false,
+  "original_six_domain_goal_replaced": false
+}

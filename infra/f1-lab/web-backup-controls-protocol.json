@@ -1,0 +1,23 @@
+{
+  "schema": "f1-web-backup-controls-1",
+  "scope": "authored local encrypted-backup and checkpoint controls only",
+  "automatic_activation_allowed": false,
+  "v46_receipt": {
+    "path": "runtime/f1/web-durable-controls-v46-20261113/run.json",
+    "sha256": "32f8ca229d2cff0de298a216e73bbfb51a63ceda04e9bf373ecd95a9c8e85e69"
+  },
+  "contract": {
+    "encryption": "AES-256-GCM; caller-held 32-byte recovery key",
+    "checkpoint": "separate immutable file plus out-of-band SHA",
+    "snapshot": "SQLite backup API under ledger lock; authenticated witness and key in ciphertext",
+    "restore": "fresh private output; authenticated validation before publication; no automatic activation",
+    "ongoing_access": "CheckpointedWebLedger verifies minimum prefix and clock on every operation"
+  },
+  "limits": [
+    "Local logical separation; no remote WORM or physical-host HA.",
+    "Latest checkpoint and expected hashes must be protected outside the rollback domain.",
+    "Events after the last checkpoint are outside its rollback guarantee.",
+    "Demonstration recovery key is ephemeral and not persisted. Real key custody and remote storage are operational prerequisites.",
+    "No real IdP/PDP/sensor collection, new independent performance evaluation or production incident integration."
+  ]
+}

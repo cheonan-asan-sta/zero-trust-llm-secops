@@ -1,0 +1,23 @@
+{
+  "schema": "f1-contextual-intake-protocol-1",
+  "stage": "source_schema_and_provenance_audit_only",
+  "repo": "andrea-rossi-univpm/ZTA-GNN-GRAAI-Dataset",
+  "commit": "87a202d9ef3a36b3a9bb11fed64bd2cbbf0432d5",
+  "asset": "CSV_Inventory/Golden_Sample_CSV/export_22Dec2025_010633.csv.7z",
+  "archive_bytes": 25241476,
+  "archive_sha256": "9e7a5995797e3310a00a7684047ea298002328819599c65831b6d30c5d81d5f0",
+  "csv_sha256": "cce55ca294323909a5ea8f99e97d581ebae74d9964999d58e0f466a21747cc1d",
+  "license_reference": "MIT repository LICENSE at pinned commit; preserve attribution; verify data-specific notices",
+  "body_inspection_before_split": "first 128 physical CSV data records are a declared development schema probe; all later records remain quarantined, not a certified final population",
+  "taint_policy": "Any component connected by subject/session/device or identical content/template to an observed development probe belongs to development. Do not promote it to final evaluation.",
+  "split_status": "not yet certified; inspect only file/schema metadata and development probe before defining source-specific group/split procedure",
+  "label_contract": "Only explicit publisher boolean Suspicious values are candidate truth; missing/nonboolean values are unknown. Audit generation meaning and consistency before treating this as independent security truth.",
+  "input_exclusions": ["Suspicious", "publisher labeling rules", "derived risk/decision flags", "label-derived event categories", "raw identifiers or source/time memorization", "integrity/hash fields covering truth-bearing data"],
+  "missing_claims": "Never manufacture managed/healthy posture, MFA, identity-active state, resource-owner role policy or business approval. A historical data field is not current authenticated authority.",
+  "file_handling": "Pinned whole hashes; bounded listing and one named regular CSV streamed to an opaque path; no code or macro execution, no arbitrary archive extraction.",
+  "source_scope": "publisher isolated cyber-range bot and attack traffic, not actual enterprise operations",
+  "original_app_and_labels_preserved": true,
+  "original_six_domain_goal_replaced": false,
+  "new_independent_metrics": null,
+  "goal_qualified": false
+}

@@ -1,0 +1,877 @@
+{
+  "schema": "extra-capture-archive-1",
+  "completed": true,
+  "base_commit": "4142d4952e74db16068b9f3cd0e21099be897967",
+  "depends_on_PR": 65,
+  "scope": "infrastructure lossless capture archival, bounded managed hot storage and byte-exact review restore",
+  "goal_qualified": false,
+  "production_installation_completed": false,
+  "organizational_SSO_login_tested": false,
+  "automatic_enforcement_allowed": false,
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "PR65_CI_gate": {
+    "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/pull/65",
+    "head": "4142d4952e74db16068b9f3cd0e21099be897967",
+    "all_16_checks_passed": true,
+    "checks": [
+      {
+        "name": "unit",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43568967097/job/132368955423"
+      },
+      {
+        "name": "docker",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43568967097/job/132368955305"
+      },
+      {
+        "name": "runtime (application)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43568967097/job/132368955527"
+      },
+      {
+        "name": "runtime (application-mtls)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43568967097/job/132368955507"
+      },
+      {
+        "name": "runtime (response-mtls)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43568967097/job/132368955499"
+      },
+      {
+        "name": "runtime (execution-mtls)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43568967097/job/132368955528"
+      },
+      {
+        "name": "runtime (monitored)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43568967097/job/132368955582"
+      },
+      {
+        "name": "runtime (authority)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43568967097/job/132368955554"
+      },
+      {
+        "name": "runtime (rekey)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43568967097/job/132368955580"
+      },
+      {
+        "name": "runtime (authority-ha)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43568967097/job/132368955666"
+      },
+      {
+        "name": "runtime (database-transport)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43568967097/job/132368955521"
+      },
+      {
+        "name": "runtime (database-backup)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43568967097/job/132368955539"
+      },
+      {
+        "name": "runtime (database-recovery)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43568967097/job/132368955440"
+      },
+      {
+        "name": "runtime (selection)",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43568967097/job/132368955505"
+      },
+      {
+        "name": "lambda",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43568967097/job/132368955454"
+      },
+      {
+        "name": "test",
+        "status": "COMPLETED",
+        "conclusion": "SUCCESS",
+        "url": "https://github.com/cheonan-asan-sta/zero-trust-llm-secops/actions/runs/43568967097/job/132372927781"
+      }
+    ],
+    "unit_run": {
+      "run": 43568967097,
+      "job": 132368955423,
+      "source_head": "4142d4952e74db16068b9f3cd0e21099be897967",
+      "unit_summary": [
+        "unit\tRun tests\t2026-11-14T07:05:13.6886635Z 5325 passed, 2 skipped, 2 warnings in 307.55s (0:05:07)"
+      ],
+      "unit_log_sha256": "ecf8f528da8f4742e5773f1aeb772eeee05a79a1a179dde7b91545bf9f1ac33b"
+    }
+  },
+  "first_attempt": {
+    "counts": {
+      "failed": 1,
+      "passed": 383
+    },
+    "exit_code": 1,
+    "reason": "The missing-latest test expected ValueError; safe file read raised FileNotFoundError. Expected exception corrected, no product exception suppression added. Full related batch rerun.",
+    "source_sha256": "a3706c14dd65211674c0cac833549254f3ee423cba5a48348d6d45d8ed3df396"
+  },
+  "linux": {
+    "exit_code": 0,
+    "seconds": 157.209,
+    "counts": {
+      "passed": 384
+    },
+    "log": "runtime/f1/capture-archive-batch-v72-final-20261114/linux.log",
+    "executed": true,
+    "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "source_files": 1015,
+    "source_archive_sha256": "2c1cee3207e308de30b1674feead5fb160b00e48071c34f1a6c466145e9b3d16",
+    "container_exit": 0,
+    "oom_killed": false,
+    "network_mode": "none",
+    "owned_container": "972f6c92d972bfdb924377ece2d47b5f3d855cabb7aa8135b556baa8b179952d",
+    "snapshot_sources_unchanged_after": true,
+    "owned_container_removed": true
+  },
+  "native": {
+    "source_archive_sha256": "2c1cee3207e308de30b1674feead5fb160b00e48071c34f1a6c466145e9b3d16",
+    "aws_calls": 0,
+    "paid_api_calls": 0,
+    "exit_code": 0,
+    "template_sha256": "0b83f3372037ff26cef119b1b5df4951ef7ee5e4cd3c5502c4b173ce5d8f74ab",
+    "template_verify_exit_code": 0,
+    "template_installation_paths_substituted": true,
+    "native_seconds": 21.206,
+    "owned_snapshot_removed": true
+  },
+  "controls": {
+    "schema": "extra-capture-archive-runtime-1",
+    "completed": true,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "goal_qualified": false,
+    "scope": "real systemd collector sandbox and credential lifecycle, local functional controls",
+    "real_human_login_tested": false,
+    "production_installation_completed": false,
+    "cases": [
+      {
+        "name": "service_account_configuration_dry_run",
+        "passed": true
+      },
+      {
+        "name": "collector_is_static_nonroot_fixture",
+        "passed": true
+      },
+      {
+        "name": "only_required_effective_and_bounding_capabilities",
+        "passed": true
+      },
+      {
+        "name": "no_new_privileges_is_observed",
+        "passed": true
+      },
+      {
+        "name": "normal_capture_and_authorization_keep_baseline",
+        "passed": true
+      },
+      {
+        "name": "credential_was_a_socket_not_key_file",
+        "passed": true
+      },
+      {
+        "name": "initial_signed_latest_is_fresh",
+        "passed": true
+      },
+      {
+        "name": "controlled_31_second_gap_is_stale",
+        "passed": true
+      },
+      {
+        "name": "controlled_clock_rollback_after_restart_is_unavailable",
+        "passed": true
+      },
+      {
+        "name": "rotated_key_without_current_pin_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "rotation_with_new_public_pin_collects_fresh_evidence",
+        "passed": true
+      },
+      {
+        "name": "old_key_proof_is_rejected_by_current_registry",
+        "passed": true
+      },
+      {
+        "name": "expired_signing_authority_cannot_create_capture",
+        "passed": true
+      },
+      {
+        "name": "failed_expired_key_keeps_previous_latest",
+        "passed": true
+      },
+      {
+        "name": "not_yet_valid_signing_authority_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "runtime_proof_expiry_is_clipped_to_signer",
+        "passed": true
+      },
+      {
+        "name": "missing_key_provider_fails_at_systemd_credentials",
+        "passed": true
+      },
+      {
+        "name": "provider_outage_cannot_replace_latest",
+        "passed": true
+      },
+      {
+        "name": "provider_restart_collects_new_signed_evidence",
+        "passed": true
+      },
+      {
+        "name": "restoring_an_older_valid_capture_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "archive_preview_keeps_every_hot_byte",
+        "passed": true
+      },
+      {
+        "name": "archive_worker_is_nonroot_without_capabilities",
+        "passed": true
+      },
+      {
+        "name": "archive_capacity_pressure_keeps_hot_and_latest",
+        "passed": true
+      },
+      {
+        "name": "committed_archive_keeps_latest_and_meets_hot_limit",
+        "passed": true
+      },
+      {
+        "name": "all_cold_payloads_equal_original_hot_bytes",
+        "passed": true
+      },
+      {
+        "name": "restore_preserves_every_original_byte",
+        "passed": true
+      },
+      {
+        "name": "restored_old_capture_does_not_become_current",
+        "passed": true
+      },
+      {
+        "name": "latest_remains_fresh_after_compaction",
+        "passed": true
+      },
+      {
+        "name": "disabled_collector_key_cannot_create_capture",
+        "passed": true
+      },
+      {
+        "name": "stopped_target_cannot_be_backfilled",
+        "passed": true
+      },
+      {
+        "name": "only_root_manager_read_credentials",
+        "passed": true
+      },
+      {
+        "name": "credential_socket_removed_and_provider_stopped",
+        "passed": true
+      }
+    ],
+    "collector_runs": [
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "c62af9b0d324fdde8ed4e3c4bea54fdf152e840e238e92b31a82d1cfec51a2e4",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "3120910f929ddd9b9b279229b0b431f50f19c6df6d57addc88e4f8bbede9f4be",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "5e36d06109071a7ce8d58a6ec1b9a5f6cb295a4a708aca67574e6ed6e96b2d4d",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "failure_stage": "systemd_credentials"
+        }
+      },
+      {
+        "succeeded": true,
+        "new_captures": 1,
+        "summary": {
+          "completed": true,
+          "capture_sha256": "724fdde1c9be6db0d0e777742157ed8b2c9fbd7f8a7dd434ebefaffd5a4790f7",
+          "command_plaintext_persisted": false,
+          "private_key_persisted": false,
+          "collector_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 524292,
+            "bounding_capabilities": 524292,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "signing_scope",
+          "failure_code": null,
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      },
+      {
+        "succeeded": false,
+        "new_captures": 0,
+        "summary": {
+          "completed": false,
+          "failure_type": "ValueError",
+          "failure_stage": "native_collection",
+          "failure_code": "native_source_service_manager_binding",
+          "collector_security": null,
+          "execution_evidence_available": false
+        }
+      }
+    ],
+    "archive_controls": {
+      "completed": true,
+      "scope": "owned real-systemd lossless archival controls",
+      "runs": [
+        {
+          "mode": "preview",
+          "summary": {
+            "completed": true,
+            "applied": false,
+            "hot_before_records": 4,
+            "hot_before_bytes": 5772,
+            "planned": 3,
+            "deleted_hot_files": 0,
+            "archive_records": 0,
+            "archive_raw_bytes": 0,
+            "archive_compressed_payload_bytes": 0,
+            "skipped_entries": 0,
+            "archive_capacity_available": true,
+            "latest_protected": true,
+            "projected_hot_records": 1,
+            "projected_hot_bytes": 1443,
+            "projected_budget_satisfied": true,
+            "authenticity_or_freshness_asserted": false,
+            "hot_after_records": 4,
+            "hot_after_bytes": 5772,
+            "managed_budget_satisfied": false,
+            "archive_database_file_bytes": 0,
+            "mode": "preview",
+            "state": "ready",
+            "worker_security": {
+              "effective_uid": 1,
+              "effective_capabilities": 0,
+              "bounding_capabilities": 0,
+              "no_new_privileges": true
+            }
+          }
+        },
+        {
+          "mode": "pressure",
+          "summary": {
+            "completed": false,
+            "state": "storage_pressure",
+            "error_type": "ArchiveFull",
+            "authenticity_or_freshness_asserted": false
+          }
+        },
+        {
+          "mode": "apply",
+          "summary": {
+            "completed": true,
+            "applied": true,
+            "hot_before_records": 4,
+            "hot_before_bytes": 5772,
+            "planned": 3,
+            "deleted_hot_files": 3,
+            "archive_records": 3,
+            "archive_raw_bytes": 4329,
+            "archive_compressed_payload_bytes": 2466,
+            "skipped_entries": 0,
+            "archive_capacity_available": true,
+            "latest_protected": true,
+            "projected_hot_records": 1,
+            "projected_hot_bytes": 1443,
+            "projected_budget_satisfied": true,
+            "authenticity_or_freshness_asserted": false,
+            "hot_after_records": 1,
+            "hot_after_bytes": 1443,
+            "managed_budget_satisfied": true,
+            "archive_database_file_bytes": 16384,
+            "mode": "apply",
+            "state": "ready",
+            "worker_security": {
+              "effective_uid": 1,
+              "effective_capabilities": 0,
+              "bounding_capabilities": 0,
+              "no_new_privileges": true
+            }
+          }
+        },
+        {
+          "mode": "restore",
+          "summary": {
+            "completed": true,
+            "raw_sha256": "5e36d06109071a7ce8d58a6ec1b9a5f6cb295a4a708aca67574e6ed6e96b2d4d",
+            "raw_bytes": 1443,
+            "authenticity_or_freshness_asserted": false,
+            "mode": "restore",
+            "state": "restored_for_review",
+            "worker_security": {
+              "effective_uid": 1,
+              "effective_capabilities": 0,
+              "bounding_capabilities": 0,
+              "no_new_privileges": true
+            }
+          }
+        }
+      ],
+      "restored_raw_sha256": "5e36d06109071a7ce8d58a6ec1b9a5f6cb295a4a708aca67574e6ed6e96b2d4d",
+      "all_three_archived_payloads_byte_equal": true,
+      "cold_payload_compression_is_not_database_file_size": true,
+      "paid_api_calls": 0,
+      "aws_calls": 0,
+      "fixture_account_substituted": true,
+      "operational_service_account_created": false,
+      "owned_archive_unit_removed": true,
+      "owned_restore_state_removed": true
+    },
+    "normal_controls": 4,
+    "normal_added_alerts": 0,
+    "private_key_disk_files_created": 0,
+    "systemd_memory_credential_copy": true,
+    "private_key_persisted": false,
+    "tokens_persisted": false,
+    "real_systemd_tested": true,
+    "template_security_directives_preserved": true,
+    "template_installation_paths_substituted": true,
+    "collector_security": {
+      "effective_uid": 1,
+      "effective_capabilities": 524292,
+      "bounding_capabilities": 524292,
+      "no_new_privileges": true
+    },
+    "existing_static_fixture_account_used": true,
+    "real_service_account_created": false,
+    "freshness_controlled_clock_used": true,
+    "systemd_version": "systemd 255 (255.4-1ubuntu8.18)",
+    "owned_units_removed": true,
+    "owned_state_removed": true,
+    "owned_config_and_socket_removed": true,
+    "systemd_credentials_removed": true
+  },
+  "archive_controls": {
+    "completed": true,
+    "scope": "owned real-systemd lossless archival controls",
+    "runs": [
+      {
+        "mode": "preview",
+        "summary": {
+          "completed": true,
+          "applied": false,
+          "hot_before_records": 4,
+          "hot_before_bytes": 5772,
+          "planned": 3,
+          "deleted_hot_files": 0,
+          "archive_records": 0,
+          "archive_raw_bytes": 0,
+          "archive_compressed_payload_bytes": 0,
+          "skipped_entries": 0,
+          "archive_capacity_available": true,
+          "latest_protected": true,
+          "projected_hot_records": 1,
+          "projected_hot_bytes": 1443,
+          "projected_budget_satisfied": true,
+          "authenticity_or_freshness_asserted": false,
+          "hot_after_records": 4,
+          "hot_after_bytes": 5772,
+          "managed_budget_satisfied": false,
+          "archive_database_file_bytes": 0,
+          "mode": "preview",
+          "state": "ready",
+          "worker_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 0,
+            "bounding_capabilities": 0,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "mode": "pressure",
+        "summary": {
+          "completed": false,
+          "state": "storage_pressure",
+          "error_type": "ArchiveFull",
+          "authenticity_or_freshness_asserted": false
+        }
+      },
+      {
+        "mode": "apply",
+        "summary": {
+          "completed": true,
+          "applied": true,
+          "hot_before_records": 4,
+          "hot_before_bytes": 5772,
+          "planned": 3,
+          "deleted_hot_files": 3,
+          "archive_records": 3,
+          "archive_raw_bytes": 4329,
+          "archive_compressed_payload_bytes": 2466,
+          "skipped_entries": 0,
+          "archive_capacity_available": true,
+          "latest_protected": true,
+          "projected_hot_records": 1,
+          "projected_hot_bytes": 1443,
+          "projected_budget_satisfied": true,
+          "authenticity_or_freshness_asserted": false,
+          "hot_after_records": 1,
+          "hot_after_bytes": 1443,
+          "managed_budget_satisfied": true,
+          "archive_database_file_bytes": 16384,
+          "mode": "apply",
+          "state": "ready",
+          "worker_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 0,
+            "bounding_capabilities": 0,
+            "no_new_privileges": true
+          }
+        }
+      },
+      {
+        "mode": "restore",
+        "summary": {
+          "completed": true,
+          "raw_sha256": "5e36d06109071a7ce8d58a6ec1b9a5f6cb295a4a708aca67574e6ed6e96b2d4d",
+          "raw_bytes": 1443,
+          "authenticity_or_freshness_asserted": false,
+          "mode": "restore",
+          "state": "restored_for_review",
+          "worker_security": {
+            "effective_uid": 1,
+            "effective_capabilities": 0,
+            "bounding_capabilities": 0,
+            "no_new_privileges": true
+          }
+        }
+      }
+    ],
+    "restored_raw_sha256": "5e36d06109071a7ce8d58a6ec1b9a5f6cb295a4a708aca67574e6ed6e96b2d4d",
+    "all_three_archived_payloads_byte_equal": true,
+    "cold_payload_compression_is_not_database_file_size": true,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "fixture_account_substituted": true,
+    "operational_service_account_created": false,
+    "owned_archive_unit_removed": true,
+    "owned_restore_state_removed": true
+  },
+  "legacy_controls": {
+    "schema": "extra-shared-execution-controls-1",
+    "completed": true,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "scope": "real local process observations and controlled policy cases; not independent attack performance",
+    "goal_qualified": false,
+    "production_systemd_integration_tested": false,
+    "cases": [
+      {
+        "name": "actual_allowed_process_does_not_add_alarm",
+        "passed": true
+      },
+      {
+        "name": "actual_process_conflicts_with_prior_denial",
+        "passed": true
+      },
+      {
+        "name": "restart_duplicate_is_bound_and_idempotent",
+        "passed": true
+      },
+      {
+        "name": "missing_native_evidence_keeps_baseline",
+        "passed": true
+      },
+      {
+        "name": "different_invocation_cannot_borrow_proof",
+        "passed": true
+      },
+      {
+        "name": "post_event_policy_is_rejected",
+        "passed": true
+      },
+      {
+        "name": "lab_evidence_cannot_satisfy_systemd_mode",
+        "passed": true
+      }
+    ],
+    "normal_controls": 1,
+    "normal_added_alerts": 0,
+    "adverse_controls": 1,
+    "adverse_detected": 1,
+    "owned_child_processes_stopped": true,
+    "private_keys_persisted": false,
+    "plaintext_commands_persisted": false,
+    "actual_observation_fields": [
+      "argument_count",
+      "audit_session_id",
+      "command_sha256",
+      "effective_uid",
+      "executable_sha256",
+      "kind",
+      "login_uid",
+      "parent_pid",
+      "parent_ref_sha256",
+      "pid",
+      "real_uid",
+      "start_ticks"
+    ],
+    "actor_collection": {
+      "uid_read_from_proc": true,
+      "login_uid_present": false,
+      "audit_session_present": false,
+      "parent_reference_present": true,
+      "authenticated_human_identity_proven": false
+    }
+  },
+  "legacy_regression": {
+    "aws_calls": 0,
+    "completed": true,
+    "goal_qualified": false,
+    "native_actor_command_evidence_added_to_legacy": 0,
+    "paid_api_calls": 0,
+    "population": 1681815,
+    "scenarios": {
+      "fox": {
+        "after_decision_sha256": "29e3e42b17e13d9f4ce8f785b2c1121ee52aa9a6ebbd323c5328e38644929832",
+        "before_decision_sha256": "29e3e42b17e13d9f4ce8f785b2c1121ee52aa9a6ebbd323c5328e38644929832",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 668418,
+        "predictions_sha256": "3a95e16120e53c888203f0d25d57526b0c614deeaa1e86b43ed98694976702cc",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.998765742394729,
+          "f1": 0.9990965864106885,
+          "false_positive_rate": 0.0006145584161411404,
+          "fn": 695,
+          "fp": 130,
+          "inference_errors": 0,
+          "population": 668418,
+          "precision": 0.9997151115776464,
+          "recall": 0.9984788261352991,
+          "tn": 211404,
+          "tp": 456189
+        }
+      },
+      "harrison_observed": {
+        "after_decision_sha256": "de38509b07982c34ab69e57eb7df9ebb0517674d06cd1329d594c93c503be1c9",
+        "before_decision_sha256": "de38509b07982c34ab69e57eb7df9ebb0517674d06cd1329d594c93c503be1c9",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 422178,
+        "predictions_sha256": "c7e557b7d8e137cedc35649505ad389d06c593fe9f53e09caccf10d28220a9e0",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9993983580385525,
+          "f1": 0.9996953318603709,
+          "false_positive_rate": 0.046012832263978,
+          "fn": 3,
+          "fp": 251,
+          "inference_errors": 0,
+          "population": 422178,
+          "precision": 0.9993980396718237,
+          "recall": 0.9999928009733084,
+          "tn": 5204,
+          "tp": 416720
+        }
+      },
+      "russellmitchell": {
+        "after_decision_sha256": "2c4aecb63800cb85dfc8a6685f03b17d53c2f88e727b47c415eac6c1d2d70276",
+        "before_decision_sha256": "2c4aecb63800cb85dfc8a6685f03b17d53c2f88e727b47c415eac6c1d2d70276",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 295243,
+        "predictions_sha256": "2ee9ee30497a6a4a48c12461e0c6ce76dcdc3392db71f04caf3f7f92383dfaf4",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9963386092134275,
+          "f1": 0.991198000211704,
+          "false_positive_rate": 0.0003642113111178716,
+          "fn": 996,
+          "fp": 85,
+          "inference_errors": 0,
+          "population": 295243,
+          "precision": 0.9986054371544355,
+          "recall": 0.9838996476027286,
+          "tn": 233296,
+          "tp": 60866
+        }
+      },
+      "santos": {
+        "after_decision_sha256": "90fd3e70c751fe8da7fd2fbc26fd70688c07f8989ded90e48af67f7a4662d99a",
+        "before_decision_sha256": "90fd3e70c751fe8da7fd2fbc26fd70688c07f8989ded90e48af67f7a4662d99a",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 295976,
+        "predictions_sha256": "92dc1b9932ffd57562e29454ea81c25f70b071406d6aed89587e5dada6c7a220",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9966010757628997,
+          "f1": 0.9892837359921599,
+          "false_positive_rate": 0.00029765615886794125,
+          "fn": 932,
+          "fp": 74,
+          "inference_errors": 0,
+          "population": 295976,
+          "precision": 0.9984089101034208,
+          "recall": 0.9803238541600693,
+          "tn": 248535,
+          "tp": 46435
+        }
+      }
+    },
+    "schema": "extra-shared-execution-legacy-regression-1",
+    "scope": "prior observed-development decision regression only; no new ground truth",
+    "source_prior_sha256": "35ec2a206d0a3a475d37dfb38b9459044291aee79cfea9adbbcae8da7b428ee4"
+  },
+  "trust_boundary": "Archive validates structure/scope and preserves bytes; it does not validate historic signatures against current trust or renew authority/freshness. Restore is for review; normal verification remains required.",
+  "storage_boundary": "Limits cover recognized managed hot captures and logical archive row/raw-byte budgets, not a hard physical filesystem quota. Compression is not encryption; local unkeyed digests do not prevent privileged rewrite or whole-database rollback.",
+  "source_sha256": {
+    "scripts/f1_lab/capture_archive.py": "b63f8fa9d62b0034edaa02a6285db4f712747d2c9b469589739534cbc98a9277",
+    "scripts/f1_lab/capture_store.py": "e3e2e1983451fd2d8196fe5c73473aca8e158f20d7b894e080110be79bfbd9e0",
+    "scripts/f1_lab/capture_archive_runtime.py": "1d8bcd4aaa086599d36f281f2437e34507a817fd74717f3a36d9cfd674b9e4d2",
+    "scripts/archive_service_captures.py": "03b439fad4bf45d51a73d74c93f66296249a5ead99c6cc7a1861497103d389a2",
+    "scripts/run_capture_archive.py": "953b99133a773cc9bc95a57c215727795ee9744ce55e82ddf4bdc5e65499d329",
+    "scripts/collect_shared_execution.py": "98248b20c6f0411b7177dde3282e5d58b21413b6ebfe1dfb39773a43124d8329",
+    "scripts/run_systemd_collector_runtime.py": "2a325f7f0b8aad1a44895f69f52fdf8b7025cc935df91faa5d4233f2df26c470",
+    "tests/test_capture_archive.py": "1581e5e75d55b6079fc8df18f1eab12e53d774e36e77528bdaa621b4ad2d4ca0",
+    "infra/systemd/secops-capture-archive@.service": "6cdef11778f0e397026d384a7df42c29bc3b7fb22dc51fdb28095fe82fa1b597"
+  },
+  "artifact_sha256": {
+    "tests.json": "ac2b975fc25a3ce5830f7de39b7722da42dc9a7069642242e353d7d2889bbef7",
+    "linux.xml": "6cc8aa70aae5a3cf9b7707e11e99dade268c798e06025850201d8feaab7b22ee",
+    "source-manifest.json": "29f596e8749ebe6d8ba0bf69347844f4cfc332d6e6e432a58cc39b9079fec3bd",
+    "native-tests.json": "e4ff615bddd45624002616f98af66797c765353fe8adafec860d519182b950c4",
+    "actual-systemd/run.json": "0c76f762f16e0ce716c1a363edaa3ec4fa39e762d41f710977b9fec4e55d63b6",
+    "actual-systemd/archive-controls.json": "36b3699748fb12616721a2111675c71f943555fa53ce721b2135e70ec2393568",
+    "legacy-regression/run.json": "a2d03c97bbd4bb19b8ba9fe478599953379639e33df4230ee145d3fa27cf1be0",
+    "capture-controls/run.json": "df43e4588a4ecf37180f99e91153f1410553d792b34ba9fba8154ed612155903",
+    "unit-template-verify.log": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  }
+}

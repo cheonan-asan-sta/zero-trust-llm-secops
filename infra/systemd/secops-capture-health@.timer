@@ -1,0 +1,13 @@
+[Unit]
+Description=SecOps periodic signed capture freshness for %i
+
+[Timer]
+OnActiveSec=5s
+OnUnitInactiveSec=10s
+AccuracySec=1s
+RandomizedDelaySec=1s
+Persistent=no
+Unit=secops-capture-health@%i.service
+
+[Install]
+WantedBy=timers.target

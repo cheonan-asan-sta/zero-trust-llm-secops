@@ -1,0 +1,34 @@
+title: Cloud Identity Provisioning Chain
+id: 79f782de-367e-4be7-a965-5bef8a2103d5
+status: test
+description: Same actor creates a user and access key then attaches or writes a policy
+  for the same target within ten minutes. Privilege content is not inferred. This
+  is an investigation candidate without verified attack context.
+author: Cheonan-Asan Team
+date: '2026-11-09'
+taxonomy: ocsf
+logsource:
+  category: application
+  product: cloudtrail
+detection:
+  selection:
+    unmapped.public.source: cloudtrail
+    unmapped.public.cloud_identity_chain: true
+  condition: selection
+falsepositives:
+- Approved identity provisioning automation.
+level: medium
+x_secops:
+  lifecycle: approved
+  version: 1.1.0
+  approved_by: reference-rule-test-harness
+  approved_on: '2026-11-09'
+  test_case_ids:
+  - PUBLIC-AWS-01
+  authority: reference_only
+  approval_scope: Offline detector execution acceptance only; grants no enforcement
+    authority.
+  public_detection:
+    feature: cloud_identity_chain
+    disposition: investigate
+modified: '2026-11-10'

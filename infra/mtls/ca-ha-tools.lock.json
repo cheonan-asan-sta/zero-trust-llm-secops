@@ -1,0 +1,11 @@
+{
+  "schema": "ca-ha-tools-1",
+  "platform": "linux/amd64",
+  "postgres": {
+    "image": "postgres:17-bookworm@sha256:2cd2c0f809604aaeff6f0ec8f40aecbd025613107561015c69369a1a7f1d3416",
+    "observed_version": "17.11-bookworm",
+    "index_digest": "sha256:839fbb5a4942a7758dd93e18b42ea5649807491a0545b5eeeb8f0b8bb11857a5",
+    "source_revision": "2603e26e245e558218728ee14e0a42dcb020dc7f",
+    "source": "https://github.com/docker-library/postgres/tree/2603e26e245e558218728ee14e0a42dcb020dc7f/17/bookworm"
+  }
+}

@@ -1,0 +1,39 @@
+[Unit]
+Description=SecOps pinned backup and isolated recovery status for %i
+
+[Service]
+Type=oneshot
+User=secops-collector
+Group=secops-collector
+WorkingDirectory=/opt/secops
+Environment=PYTHONDONTWRITEBYTECODE=1
+EnvironmentFile=/etc/secops/collector.conf
+# Public paths and external pins only. No key credential is required.
+EnvironmentFile=/etc/secops/capture-recovery-status.conf
+ExecStart=/opt/secops/.venv/bin/python -m scripts.capture_backup_status --tenant ${TENANT_ID} --server ${SERVER_ID} --unit %i.service --source ${RUNTIME_SOURCE_ID} --backup ${CAPTURE_BACKUP_PATH} --manifest-sha256 ${CAPTURE_BACKUP_MANIFEST_SHA256} --checkpoint ${CAPTURE_CHECKPOINT_PATH} --checkpoint-sha256 ${CAPTURE_CHECKPOINT_SHA256} --review ${CAPTURE_REVIEW_PATH} --receipt-sha256 ${CAPTURE_RESTORE_RECEIPT_SHA256} --status-file /var/lib/secops-capture-recovery-status/%i/status.json
+StateDirectory=secops-capture-recovery-status/%i
+StateDirectoryMode=0755
+ReadOnlyPaths=/var/lib/secops-capture-backups/%i /var/lib/secops-capture-checkpoints/%i /var/lib/secops-capture-reviews/%i
+# Run the initial manual verify to create this cooperative lock before activation.
+ReadWritePaths=/var/lib/secops-capture-reviews/%i/restored/review/.capture-store.lock
+UMask=0077
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+RestrictNamespaces=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+MemoryMax=512M
+TasksMax=16
+TimeoutStartSec=60

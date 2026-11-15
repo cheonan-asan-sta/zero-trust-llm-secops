@@ -1,0 +1,1534 @@
+{
+  "schema": "week4-local-public-evidence-1",
+  "exported_at": "2026-11-11T16:01:04.194163+00:00",
+  "base_commit": "c83b8579c59c96972648df55f446df018c4dd1bd",
+  "branch": "feature/chaeheeju-week4-local-batch",
+  "all_week4_complete": false,
+  "independent_review": "pending",
+  "aws_calls": 0,
+  "paid_model_calls": 0,
+  "detection_rules_or_labels_tuned": false,
+  "execution": "Codex local tool execution; not teammate independent review",
+  "primary_batch_completed": false,
+  "linux": {
+    "name": "linux",
+    "passed": true,
+    "result": {
+      "passed": 2749,
+      "skipped": 0,
+      "seconds": 754.36
+    },
+    "seconds": 798.609
+  },
+  "monitored": {
+    "name": "monitored",
+    "passed": true,
+    "result": {
+      "checks": 75,
+      "report": "monitored/verification.json",
+      "report_sha256": "c8d138a38b95d543392c1d53d4f9ada08a72d921de9eeba14ecb9046e205a604",
+      "cleanup": {
+        "containers": 0,
+        "volumes": 0,
+        "networks": 0
+      }
+    },
+    "seconds": 1918.938
+  },
+  "selection": {
+    "completed": true,
+    "checks": 37,
+    "workload_requests": 576,
+    "observed_http200": 153,
+    "observed_http403": 423,
+    "expected_allow": 153,
+    "expected_deny": 423,
+    "resource_samples": 1918,
+    "resource_errors": 0,
+    "cleanup": {
+      "containers": 0,
+      "volumes": 0,
+      "networks": 0
+    },
+    "waves": [
+      {
+        "kind": "valid",
+        "concurrency": 1,
+        "repeat": 1,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 47.06544299915549,
+          "p95_ms": 56.6437039997254,
+          "max_ms": 56.6437039997254
+        }
+      },
+      {
+        "kind": "shared",
+        "concurrency": 1,
+        "repeat": 1,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 41.042113000003155,
+          "p95_ms": 51.34979600006773,
+          "max_ms": 51.34979600006773
+        }
+      },
+      {
+        "kind": "missing",
+        "concurrency": 1,
+        "repeat": 1,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 7.249738000609796,
+          "p95_ms": 34.5797930003755,
+          "max_ms": 34.5797930003755
+        }
+      },
+      {
+        "kind": "valid",
+        "concurrency": 4,
+        "repeat": 1,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 52.27539100087597,
+          "p95_ms": 522.018751998985,
+          "max_ms": 522.018751998985
+        }
+      },
+      {
+        "kind": "shared",
+        "concurrency": 4,
+        "repeat": 1,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 56.337164000069606,
+          "p95_ms": 375.7921199994598,
+          "max_ms": 375.7921199994598
+        }
+      },
+      {
+        "kind": "missing",
+        "concurrency": 4,
+        "repeat": 1,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 11.371900000085589,
+          "p95_ms": 92.21574100047292,
+          "max_ms": 92.21574100047292
+        }
+      },
+      {
+        "kind": "valid",
+        "concurrency": 8,
+        "repeat": 1,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 120.80881899964879,
+          "p95_ms": 840.9875870001997,
+          "max_ms": 840.9875870001997
+        }
+      },
+      {
+        "kind": "shared",
+        "concurrency": 8,
+        "repeat": 1,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 120.89632199968037,
+          "p95_ms": 756.1128750003263,
+          "max_ms": 756.1128750003263
+        }
+      },
+      {
+        "kind": "missing",
+        "concurrency": 8,
+        "repeat": 1,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 77.22397399993497,
+          "p95_ms": 118.10905299898877,
+          "max_ms": 118.10905299898877
+        }
+      },
+      {
+        "kind": "valid",
+        "concurrency": 8,
+        "repeat": 2,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 159.6427019994735,
+          "p95_ms": 744.3652140009362,
+          "max_ms": 744.3652140009362
+        }
+      },
+      {
+        "kind": "shared",
+        "concurrency": 8,
+        "repeat": 2,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 183.63077200046973,
+          "p95_ms": 620.3672520005057,
+          "max_ms": 620.3672520005057
+        }
+      },
+      {
+        "kind": "missing",
+        "concurrency": 8,
+        "repeat": 2,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 39.03898799944727,
+          "p95_ms": 104.99305299890693,
+          "max_ms": 104.99305299890693
+        }
+      },
+      {
+        "kind": "valid",
+        "concurrency": 4,
+        "repeat": 2,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 67.62571099898196,
+          "p95_ms": 637.0917629992618,
+          "max_ms": 637.0917629992618
+        }
+      },
+      {
+        "kind": "shared",
+        "concurrency": 4,
+        "repeat": 2,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 120.41153700010909,
+          "p95_ms": 397.9192579990922,
+          "max_ms": 397.9192579990922
+        }
+      },
+      {
+        "kind": "missing",
+        "concurrency": 4,
+        "repeat": 2,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 13.853511001798324,
+          "p95_ms": 84.00433499991777,
+          "max_ms": 84.00433499991777
+        }
+      },
+      {
+        "kind": "valid",
+        "concurrency": 1,
+        "repeat": 2,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 59.21995799872093,
+          "p95_ms": 64.98535900027491,
+          "max_ms": 64.98535900027491
+        }
+      },
+      {
+        "kind": "shared",
+        "concurrency": 1,
+        "repeat": 2,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 55.45761900066282,
+          "p95_ms": 73.65152800048236,
+          "max_ms": 73.65152800048236
+        }
+      },
+      {
+        "kind": "missing",
+        "concurrency": 1,
+        "repeat": 2,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 5.791079000118771,
+          "p95_ms": 68.34874699961802,
+          "max_ms": 68.34874699961802
+        }
+      },
+      {
+        "kind": "valid",
+        "concurrency": 1,
+        "repeat": 3,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 60.05217799975071,
+          "p95_ms": 69.47180199858849,
+          "max_ms": 69.47180199858849
+        }
+      },
+      {
+        "kind": "shared",
+        "concurrency": 1,
+        "repeat": 3,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 46.32929300169053,
+          "p95_ms": 100.81195499878959,
+          "max_ms": 100.81195499878959
+        }
+      },
+      {
+        "kind": "missing",
+        "concurrency": 1,
+        "repeat": 3,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 6.842505999884452,
+          "p95_ms": 44.509160999950836,
+          "max_ms": 44.509160999950836
+        }
+      },
+      {
+        "kind": "valid",
+        "concurrency": 4,
+        "repeat": 3,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 87.06994999920425,
+          "p95_ms": 433.46157199994195,
+          "max_ms": 433.46157199994195
+        }
+      },
+      {
+        "kind": "shared",
+        "concurrency": 4,
+        "repeat": 3,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 88.17171599912399,
+          "p95_ms": 904.0797689995088,
+          "max_ms": 904.0797689995088
+        }
+      },
+      {
+        "kind": "missing",
+        "concurrency": 4,
+        "repeat": 3,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 15.754803998788702,
+          "p95_ms": 73.12311900022905,
+          "max_ms": 73.12311900022905
+        }
+      },
+      {
+        "kind": "valid",
+        "concurrency": 8,
+        "repeat": 3,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 145.03038700058823,
+          "p95_ms": 1289.6797049997986,
+          "max_ms": 1289.6797049997986
+        }
+      },
+      {
+        "kind": "shared",
+        "concurrency": 8,
+        "repeat": 3,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 136.9863500003703,
+          "p95_ms": 1069.0728400004446,
+          "max_ms": 1069.0728400004446
+        }
+      },
+      {
+        "kind": "missing",
+        "concurrency": 8,
+        "repeat": 3,
+        "passed": true,
+        "timing": {
+          "n": 16,
+          "p50_ms": 71.83765800073161,
+          "p95_ms": 107.32168499998807,
+          "max_ms": 107.32168499998807
+        }
+      }
+    ]
+  },
+  "app_restore": {
+    "completed": true,
+    "checks": 13,
+    "cleanup": {
+      "containers": 0,
+      "volumes": 0,
+      "networks": 0
+    }
+  },
+  "authority_followup": {
+    "completed": true,
+    "schema": "database-transport-backup-regression-1",
+    "cleanup": {
+      "containers": 0,
+      "volumes": 0,
+      "networks": 0
+    },
+    "started_at": "2026-11-11T15:33:30.249104+00:00",
+    "finished_at": "2026-11-11T15:59:56.528741+00:00",
+    "checks": 25,
+    "started_at_kst": "2026-11-12T00:33:30.249104+09:00",
+    "finished_at_kst": "2026-11-12T00:59:56.528741+09:00",
+    "check_results": [
+      {
+        "label": "active_leaves_renew_before_paused_transport_ceremony",
+        "passed": true,
+        "cycle": 1
+      },
+      {
+        "label": "old_database_client_authenticates_before_transport_rotation",
+        "passed": true
+      },
+      {
+        "label": "timer_rotates_db_root_server_and_both_client_private_keys_with_live_mtls_barrier",
+        "passed": true
+      },
+      {
+        "label": "old_db_client_denied_under_current_server_trust_after_root_rotation",
+        "passed": true
+      },
+      {
+        "label": "transport_rotation_preserves_exact_consumed_nonce_and_revocation_table_rows",
+        "passed": true
+      },
+      {
+        "label": "workload_ca_epoch_leaf_identities_and_retired_collector_unchanged_by_db_rotation",
+        "passed": true
+      },
+      {
+        "label": "active_leaves_renew_before_paused_transport_ceremony",
+        "passed": true,
+        "cycle": 2
+      },
+      {
+        "label": "preparation_retains_every_prior_consumed_nonce_and_revocation_row",
+        "passed": true
+      },
+      {
+        "label": "second_timed_transport_rotation_chains_to_first_without_resealing_anchor",
+        "passed": true
+      },
+      {
+        "label": "normal_down_up_preserves_rotated_db_trust_and_signed_transport_epoch",
+        "passed": true
+      },
+      {
+        "label": "tampered_transport_signed_history_refuses_all_services_before_start",
+        "passed": true
+      },
+      {
+        "label": "post_rotation_restart_and_tamper_recovery_retain_original_security_state",
+        "passed": true
+      },
+      {
+        "label": "active_leaves_renew_before_backup_without_reissuing_retired_collector",
+        "passed": true
+      },
+      {
+        "label": "expired_retired_identity_without_pins_passes_integrity_only",
+        "passed": true
+      },
+      {
+        "label": "expired_active_identity_still_refuses_admission",
+        "passed": true
+      },
+      {
+        "label": "backup_ciphertext_and_key_volumes_are_separate_and_absent_from_online_services",
+        "passed": true
+      },
+      {
+        "label": "backup_actual_process_kill_after_encrypted_publish_before_ack",
+        "passed": true
+      },
+      {
+        "label": "pending_backup_blocks_normal_start_stop_rotation_but_allows_observation",
+        "passed": true
+      },
+      {
+        "label": "tampered_ciphertext_refuses_resume_and_keeps_both_ca_writers_stopped",
+        "passed": true
+      },
+      {
+        "label": "lost_publish_ack_reuses_same_authenticated_archive_and_manifest",
+        "passed": true
+      },
+      {
+        "label": "custom_dump_restores_in_network_none_tmpfs_postgres_and_matches_five_security_tables",
+        "passed": true
+      },
+      {
+        "label": "backup_restore_drill_preserves_live_nonce_revocation_certificates_and_anchor",
+        "passed": true
+      },
+      {
+        "label": "same_ca_db_leaf_objects_and_original_pause_restored_after_live_tls_checks",
+        "passed": true
+      },
+      {
+        "label": "normal_restart_preserves_backup_journal_and_leaves_no_restore_container",
+        "passed": true
+      },
+      {
+        "label": "second_backup_keeps_first_archive_independently_restorable_in_isolation",
+        "passed": true
+      }
+    ],
+    "backup_interruption": {
+      "checkpoint": "sealed",
+      "persisted_phase": "stopped",
+      "boundary": "before",
+      "exit_nonzero": true,
+      "lock_reacquired": true,
+      "manifest_sha256": "efbd9172899d1f310e7869630d9ecd2a01ce666b87222af0df16f3b8b28ba04e",
+      "archive_sha256": "5054b7a8fe5c84b227c85a777cc1588f70e2db2d82ddaf5ad25627b7bc1f36a5"
+    },
+    "fixture_renewal_security": {
+      "original_consumed_nonces_retained": true,
+      "original_revocation_rows_retained": true,
+      "observed_server_generation_increments": 11,
+      "observed_new_consumed_nonces": 11,
+      "removed_consumed_nonce_rows": 0,
+      "observed_new_revocation_rows": 27,
+      "removed_revocation_rows": 0,
+      "maintenance_additions_are_measurement_only": true
+    },
+    "authority_rotations_replayed": false,
+    "authority_epoch_for_transport": 0
+  },
+  "m7": {
+    "name": "m7-freeze",
+    "passed": true,
+    "anchor": "9bde091bdc8d516816091d2766adf86c7f3e1806e38f6c52485e171e4c8be545"
+  },
+  "m6": {
+    "mode": "offline_mock_pilot",
+    "case_count": 24,
+    "mock_requests": 48,
+    "actual_provider_requests": 0,
+    "actual_usd": "0"
+  },
+  "supply_chain": {
+    "completed": true,
+    "images": {
+      "application": {
+        "image_id": "sha256:bd73a09797f3744d52b2bf990a701aacf198a0e3fc752ce73c98d53a9327c210",
+        "counts": {
+          "grype": 209,
+          "trivy": 209
+        },
+        "summary_sha256": "8b389c689116b964029d89bf4c6b50398761110efb99b91419d6ca5020d198c0",
+        "review_sha256": "e9b867e086c3fae3c1a196f528dd4cd315eb3bf27cd14d62593c2094fd2a80cb"
+      },
+      "monitoring": {
+        "image_id": "sha256:6d43157db19ffa87cf82a3788a36bec04d1b649797117eec5cd9c5bd45e6d5e5",
+        "counts": {
+          "grype": 214,
+          "trivy": 212
+        },
+        "summary_sha256": "b91247f111e736280ea0c3b8bd8bf98f6696db5d0f2085df2dccea4bb371103b",
+        "review_sha256": "2ab29832188d59ae6a75f1ee9f084fc171b0c88b0c3bb9c4ac769683f446cabd"
+      }
+    },
+    "cleanup": {
+      "owned_resources_remaining": 0
+    },
+    "continuation": {
+      "reason": "outer_3600_second_timeout_during_monitoring_controls",
+      "started_at": "2026-11-11T13:50:53.725643+00:00",
+      "repeated_image_scans": 0,
+      "original_result": "verification.interrupted.json",
+      "controls_reexecuted": true
+    },
+    "original_database_unchanged": true
+  },
+  "quality": {
+    "development": {
+      "case_count": 360,
+      "confusion": {
+        "tp": 170,
+        "fp": 50,
+        "fn": 10,
+        "tn": 130
+      },
+      "metrics": {
+        "precision": 0.7727272727272727,
+        "recall": 0.9444444444444444,
+        "f1": 0.85,
+        "false_positive_rate": 0.2777777777777778
+      },
+      "gate_passed": false,
+      "targets_met": {
+        "precision": false,
+        "recall": false,
+        "f1": false,
+        "false_positive_rate": false,
+        "evaluation_errors": true,
+        "every_rule_supported": true,
+        "every_rule_meets_targets": false,
+        "negative_family_support": true
+      },
+      "statistical_target_supported": false,
+      "ruleset_digest_sha256": "7b769a999a252e112e4848cd5026976ee55de4bf853ac49b00d883d36b7a6231",
+      "limitations": [
+        "Authored operational labels await independent team review; holdout is family-separated, not an external blind test.",
+        "Variants share scenario mechanics and are not independent real-world attacks; inspect unique patterns and family intervals.",
+        "Balanced case mix does not represent enterprise threat prevalence.",
+        "Evaluates Sigma event alerts, not LLM accuracy, session policy enforcement or incident correlation.",
+        "Rules were not tuned on this holdout; benchmark failure is an observed result, not a test-runner error."
+      ]
+    },
+    "holdout": {
+      "case_count": 360,
+      "confusion": {
+        "tp": 90,
+        "fp": 50,
+        "fn": 90,
+        "tn": 130
+      },
+      "metrics": {
+        "precision": 0.6428571428571429,
+        "recall": 0.5,
+        "f1": 0.5625,
+        "false_positive_rate": 0.2777777777777778
+      },
+      "gate_passed": false,
+      "targets_met": {
+        "precision": false,
+        "recall": false,
+        "f1": false,
+        "false_positive_rate": false,
+        "evaluation_errors": true,
+        "every_rule_supported": true,
+        "every_rule_meets_targets": false,
+        "negative_family_support": true
+      },
+      "statistical_target_supported": false,
+      "ruleset_digest_sha256": "7b769a999a252e112e4848cd5026976ee55de4bf853ac49b00d883d36b7a6231",
+      "limitations": [
+        "Authored operational labels await independent team review; holdout is family-separated, not an external blind test.",
+        "Variants share scenario mechanics and are not independent real-world attacks; inspect unique patterns and family intervals.",
+        "Balanced case mix does not represent enterprise threat prevalence.",
+        "Evaluates Sigma event alerts, not LLM accuracy, session policy enforcement or incident correlation.",
+        "Rules were not tuned on this holdout; benchmark failure is an observed result, not a test-runner error."
+      ]
+    }
+  },
+  "test_fixture_validation": {
+    "passed": 180,
+    "new_cases_included": 4,
+    "observed": "isolated worktree pytest output before nonce-baseline followup; overlaps existing tests, not added to 2749"
+  },
+  "pending": [
+    "independent_replay_and_labels",
+    "new_models_controlled_real_comparison",
+    "technology_final_selection_and_operational_approval",
+    "M8_final_freeze",
+    "detection_quality_targets",
+    "approval_ledger_backup_contract_extension"
+  ],
+  "authority_attempts": [
+    {
+      "attempt": "initial_full",
+      "completed": false,
+      "checks": 51,
+      "cleanup": {
+        "containers": 0,
+        "volumes": 0,
+        "networks": 0
+      },
+      "started_at": "2026-11-11T11:44:05.025480+00:00",
+      "finished_at": "2026-11-11T12:25:46.972713+00:00",
+      "check_outcomes": [
+        {
+          "label": "eighteen_services_ten_internal_networks_39_owned_volumes",
+          "passed": true
+        },
+        {
+          "label": "all_online_services_non_root_read_only_without_vault_socket_or_host_binds",
+          "passed": true
+        },
+        {
+          "label": "all_39_identities_enrolled_and_eleven_native_servers_observed",
+          "passed": true
+        },
+        {
+          "label": "offline_preflight_verifies_db_transport_identity_key_permissions_and_expiry",
+          "passed": true
+        },
+        {
+          "label": "database_private_key_permissions_refuses_all_services_before_start",
+          "passed": true
+        },
+        {
+          "label": "database_private_key_mismatch_refuses_all_services_before_start",
+          "passed": true
+        },
+        {
+          "label": "both_ca_nodes_use_distinct_client_certificates_and_verified_database_tls",
+          "passed": true
+        },
+        {
+          "label": "shared_database_role_unprivileged_and_serializable",
+          "passed": true
+        },
+        {
+          "label": "database_tls_valid_positive_or_negative_control",
+          "passed": true
+        },
+        {
+          "label": "database_tls_plaintext_positive_or_negative_control",
+          "passed": true
+        },
+        {
+          "label": "database_tls_no_client_certificate_positive_or_negative_control",
+          "passed": true
+        },
+        {
+          "label": "database_tls_wrong_server_name_positive_or_negative_control",
+          "passed": true
+        },
+        {
+          "label": "current_iat_new_nonce_accepted_and_consumed_nonce_denied_by_both_nodes",
+          "passed": true
+        },
+        {
+          "label": "six_simultaneous_cross_node_nonce_races_have_exactly_one_winner",
+          "passed": true
+        },
+        {
+          "label": "revocation_on_primary_denies_same_unexpired_certificate_on_secondary_with_current_identity_control",
+          "passed": true
+        },
+        {
+          "label": "fresh_issuance_and_managed_mtls_renewal_survive_primary_stop",
+          "passed": true
+        },
+        {
+          "label": "all_39_leaf_keys_and_pins_rotate_with_only_secondary_ca_available",
+          "passed": true
+        },
+        {
+          "label": "fresh_issuance_and_managed_mtls_renewal_survive_primary_pause",
+          "passed": true
+        },
+        {
+          "label": "fresh_issuance_and_managed_mtls_renewal_survive_primary_disconnect",
+          "passed": true
+        },
+        {
+          "label": "both_ca_outage_denies_new_issuance_while_existing_protected_access_remains_available",
+          "passed": true
+        },
+        {
+          "label": "database_outage_denies_new_issuance_while_existing_protected_access_remains_available",
+          "passed": true
+        },
+        {
+          "label": "both_ca_and_database_restart_preserve_nonce_and_revocation_state_with_current_positive_controls",
+          "passed": true
+        },
+        {
+          "label": "host_coordinator_recreation_and_leaf_controller_restart_reuse_same_signed_pending_plan",
+          "passed": true
+        },
+        {
+          "label": "authority_epoch_1_keeps_only_current_sealed_bundle_issuer_key_and_eleven_signers",
+          "passed": true
+        },
+        {
+          "label": "authority_secret_job_runs_uid_10001_network_none_mode_0600_without_docker_socket",
+          "passed": true
+        },
+        {
+          "label": "root_issuer_and_all_50_jwks_rotate_on_both_nodes_after_all_39_leaves_migrate",
+          "passed": true
+        },
+        {
+          "label": "unexpired_old_root_client_rejected_at_tls_with_new_client_positive_control",
+          "passed": true
+        },
+        {
+          "label": "authority_epoch_2_keeps_only_current_sealed_bundle_issuer_key_and_eleven_signers",
+          "passed": true
+        },
+        {
+          "label": "jwk_only_timer_rotates_all_50_keys_and_both_nodes_deny_all_retired_jwks",
+          "passed": true
+        },
+        {
+          "label": "authority_epoch_3_keeps_only_current_sealed_bundle_issuer_key_and_eleven_signers",
+          "passed": true
+        },
+        {
+          "label": "issuer_only_timer_migrates_38_active_identities_without_reissuing_retired_collector",
+          "passed": true
+        },
+        {
+          "label": "retired_collector_and_removed_peer_pin_stay_denied_after_authority_rotations",
+          "passed": true
+        },
+        {
+          "label": "clean_down_up_preserves_signed_epoch_certificates_database_and_retired_identity",
+          "passed": true
+        },
+        {
+          "label": "unsigned_ca_policy_change_refuses_all_services_before_start",
+          "passed": true
+        },
+        {
+          "label": "tampered_signed_authority_history_refuses_all_services_before_start",
+          "passed": true
+        },
+        {
+          "label": "missing_nonce_table_refuses_host_start_before_any_ca_or_workload",
+          "passed": true
+        },
+        {
+          "label": "ca_container_entrypoint_refuses_empty_database_even_without_host_preflight",
+          "passed": true
+        },
+        {
+          "label": "original_database_restore_retains_retired_collector_revocation_and_signed_epoch",
+          "passed": true
+        },
+        {
+          "label": "old_database_client_authenticates_before_transport_rotation",
+          "passed": true
+        },
+        {
+          "label": "live_scheduler_lease_blocks_start_stop_purge_ticks_and_preflight",
+          "passed": true
+        },
+        {
+          "label": "status_during_live_scheduler_reads_signed_journal_without_writing_inputs",
+          "passed": true
+        },
+        {
+          "label": "pending_transport_blocks_ordinary_start_and_new_coordinator_resumes_same_plan",
+          "passed": true
+        },
+        {
+          "label": "actual_host_process_kill_and_resume_at_stopped",
+          "passed": true
+        },
+        {
+          "label": "actual_host_process_kill_and_resume_at_installed",
+          "passed": true
+        },
+        {
+          "label": "actual_host_process_kill_and_resume_at_resuming",
+          "passed": true
+        },
+        {
+          "label": "actual_host_process_kill_and_resume_at_idle",
+          "passed": true
+        },
+        {
+          "label": "timer_rotates_db_root_server_and_both_client_private_keys_with_live_mtls_barrier",
+          "passed": true
+        },
+        {
+          "label": "old_db_client_denied_under_current_server_trust_after_root_rotation",
+          "passed": true
+        },
+        {
+          "label": "transport_rotation_preserves_exact_consumed_nonce_and_revocation_table_rows",
+          "passed": true
+        },
+        {
+          "label": "workload_ca_epoch_leaf_identities_and_retired_collector_unchanged_by_db_rotation",
+          "passed": true
+        },
+        {
+          "label": "second_timed_transport_rotation_chains_to_first_without_resealing_anchor",
+          "passed": true
+        }
+      ],
+      "failure": "database_backup_acceptance_failed",
+      "failure_detail": {
+        "reason": "validation_failure",
+        "frames": [
+          {
+            "file": "scripts/authority_mtls_runtime.py",
+            "line": 151
+          },
+          {
+            "file": "scripts/monitored_mtls_runtime.py",
+            "line": 156
+          },
+          {
+            "file": "scripts/database_transport_runtime.py",
+            "line": 108
+          },
+          {
+            "file": "scripts/persistent_authority_runtime.py",
+            "line": 147
+          },
+          {
+            "file": "scripts/test_persistent_authority_runtime.py",
+            "line": 27
+          },
+          {
+            "file": "scripts/persistent_authority_runtime.py",
+            "line": 124
+          },
+          {
+            "file": "scripts/authority_mtls_runtime.py",
+            "line": 136
+          },
+          {
+            "file": "scripts/continuous_mtls_runtime.py",
+            "line": 37
+          }
+        ]
+      },
+      "source": "zero-trust-llm-secops\\runtime\\c02\\infra-batches\\week4-20261111-final1\\infrastructure\\authority-ha\\verification.json",
+      "sha256": "7706169be6224020d6c62da7655ce1140a1ae8e2bb9ae57ae4fddd6d7a0dba8c"
+    },
+    {
+      "attempt": "first_focused_bootstrap_timeout",
+      "completed": false,
+      "checks": 0,
+      "cleanup": {
+        "containers": 0,
+        "volumes": 0,
+        "networks": 0
+      },
+      "started_at": "2026-11-11T12:59:51.229424+00:00",
+      "finished_at": "2026-11-11T13:26:29.847458+00:00",
+      "check_outcomes": [],
+      "failure": "database_backup_acceptance_failed",
+      "failure_detail": {
+        "reason": "operation_failure",
+        "frames": [
+          {
+            "file": "scripts/continuous_mtls_runtime.py",
+            "line": 277
+          },
+          {
+            "file": "scripts/persistent_authority_runtime.py",
+            "line": 271
+          },
+          {
+            "file": "scripts/authority_mtls_runtime.py",
+            "line": 210
+          },
+          {
+            "file": "scripts/continuous_mtls_runtime.py",
+            "line": 321
+          },
+          {
+            "file": "scripts/authority_mtls_runtime.py",
+            "line": 201
+          },
+          {
+            "file": "scripts/persistent_authority_runtime.py",
+            "line": 277
+          },
+          {
+            "file": "scripts/continuous_mtls_runtime.py",
+            "line": 305
+          },
+          {
+            "file": "scripts/continuous_mtls_runtime.py",
+            "line": 34
+          }
+        ]
+      },
+      "source": "tmp\\week4-ca-retest\\runtime\\c02\\ca-transport-retest-20261111\\verification.json",
+      "sha256": "e81eabec2b502675371dcb4843cdef8bb051e74d136cbae77b7b58f19eea4274"
+    },
+    {
+      "attempt": "second_focused_nonce_snapshot_failed",
+      "completed": false,
+      "checks": 20,
+      "cleanup": {
+        "containers": 0,
+        "volumes": 0,
+        "networks": 0
+      },
+      "started_at": "2026-11-11T13:53:10.711931+00:00",
+      "finished_at": "2026-11-11T14:22:16.559983+00:00",
+      "check_outcomes": [
+        {
+          "label": "authority_epoch_1_keeps_only_current_sealed_bundle_issuer_key_and_eleven_signers",
+          "passed": true
+        },
+        {
+          "label": "authority_epoch_2_keeps_only_current_sealed_bundle_issuer_key_and_eleven_signers",
+          "passed": true
+        },
+        {
+          "label": "authority_epoch_3_keeps_only_current_sealed_bundle_issuer_key_and_eleven_signers",
+          "passed": true
+        },
+        {
+          "label": "active_leaves_renew_before_paused_transport_ceremony",
+          "passed": true
+        },
+        {
+          "label": "old_database_client_authenticates_before_transport_rotation",
+          "passed": true
+        },
+        {
+          "label": "live_scheduler_lease_blocks_start_stop_purge_ticks_and_preflight",
+          "passed": true
+        },
+        {
+          "label": "status_during_live_scheduler_reads_signed_journal_without_writing_inputs",
+          "passed": true
+        },
+        {
+          "label": "pending_transport_blocks_ordinary_start_and_new_coordinator_resumes_same_plan",
+          "passed": true
+        },
+        {
+          "label": "actual_host_process_kill_and_resume_at_stopped",
+          "passed": true
+        },
+        {
+          "label": "actual_host_process_kill_and_resume_at_installed",
+          "passed": true
+        },
+        {
+          "label": "actual_host_process_kill_and_resume_at_resuming",
+          "passed": true
+        },
+        {
+          "label": "actual_host_process_kill_and_resume_at_idle",
+          "passed": true
+        },
+        {
+          "label": "timer_rotates_db_root_server_and_both_client_private_keys_with_live_mtls_barrier",
+          "passed": true
+        },
+        {
+          "label": "old_db_client_denied_under_current_server_trust_after_root_rotation",
+          "passed": true
+        },
+        {
+          "label": "transport_rotation_preserves_exact_consumed_nonce_and_revocation_table_rows",
+          "passed": true
+        },
+        {
+          "label": "workload_ca_epoch_leaf_identities_and_retired_collector_unchanged_by_db_rotation",
+          "passed": true
+        },
+        {
+          "label": "active_leaves_renew_before_paused_transport_ceremony",
+          "passed": true
+        },
+        {
+          "label": "second_timed_transport_rotation_chains_to_first_without_resealing_anchor",
+          "passed": true
+        },
+        {
+          "label": "normal_down_up_preserves_rotated_db_trust_and_signed_transport_epoch",
+          "passed": true
+        },
+        {
+          "label": "tampered_transport_signed_history_refuses_all_services_before_start",
+          "passed": true
+        }
+      ],
+      "failure": "database_backup_acceptance_failed",
+      "failure_detail": {
+        "reason": "validation_failure",
+        "frames": [
+          {
+            "file": "scripts/test_database_backup_runtime.py",
+            "line": 272
+          },
+          {
+            "file": "scripts/test_database_backup_runtime.py",
+            "line": 198
+          },
+          {
+            "file": "scripts/test_database_transport_runtime.py",
+            "line": 248
+          },
+          {
+            "file": "scripts/test_continuous_mtls_runtime.py",
+            "line": 115
+          }
+        ]
+      },
+      "source": "tmp\\week4-ca-retest\\runtime\\c02\\ca-transport-retest-20261111-02\\verification.json",
+      "sha256": "bbde7cca09176e53079ad201fe35f9f3a819d2fa6563e0e2b16ad5739f41d034"
+    },
+    {
+      "attempt": "third_experimental_epoch_zero_removed",
+      "completed": false,
+      "checks": 7,
+      "cleanup": {
+        "containers": 0,
+        "volumes": 0,
+        "networks": 0
+      },
+      "started_at": "2026-11-11T14:25:19.167187+00:00",
+      "finished_at": "2026-11-11T14:38:15.841733+00:00",
+      "check_outcomes": [
+        {
+          "label": "active_leaves_renew_before_paused_transport_ceremony",
+          "passed": true
+        },
+        {
+          "label": "old_database_client_authenticates_before_transport_rotation",
+          "passed": true
+        },
+        {
+          "label": "live_scheduler_lease_blocks_start_stop_purge_ticks_and_preflight",
+          "passed": true
+        },
+        {
+          "label": "status_during_live_scheduler_reads_signed_journal_without_writing_inputs",
+          "passed": true
+        },
+        {
+          "label": "pending_transport_blocks_ordinary_start_and_new_coordinator_resumes_same_plan",
+          "passed": true
+        },
+        {
+          "label": "actual_host_process_kill_and_resume_at_stopped",
+          "passed": true
+        },
+        {
+          "label": "actual_host_process_kill_and_resume_at_installed",
+          "passed": true
+        }
+      ],
+      "failure": "database_backup_acceptance_failed",
+      "failure_detail": {
+        "reason": "validation_failure",
+        "frames": [
+          {
+            "file": "scripts/test_database_backup_runtime.py",
+            "line": 280
+          },
+          {
+            "file": "scripts/test_database_backup_runtime.py",
+            "line": 202
+          },
+          {
+            "file": "scripts/test_database_transport_runtime.py",
+            "line": 231
+          },
+          {
+            "file": "scripts/test_database_transport_runtime.py",
+            "line": 122
+          },
+          {
+            "file": "scripts/test_database_transport_runtime.py",
+            "line": 151
+          }
+        ]
+      },
+      "source": "tmp\\week4-ca-retest\\runtime\\c02\\ca-transport-retest-20261111-03\\verification.json",
+      "sha256": "6ad1c49c12b579123d1e33e69c7e37fc19042492f21c19a9eedce5b1eb944a93"
+    },
+    {
+      "attempt": "fourth_bootstrap_health_timeout",
+      "completed": false,
+      "checks": 0,
+      "cleanup": {
+        "containers": 0,
+        "volumes": 0,
+        "networks": 0
+      },
+      "started_at": "2026-11-11T14:40:23.228721+00:00",
+      "finished_at": "2026-11-11T14:46:56.000440+00:00",
+      "check_outcomes": [],
+      "failure": "database_backup_acceptance_failed",
+      "failure_detail": {
+        "reason": "operation_failure",
+        "frames": [
+          {
+            "file": "scripts/continuous_mtls_runtime.py",
+            "line": 277
+          },
+          {
+            "file": "scripts/persistent_authority_runtime.py",
+            "line": 271
+          },
+          {
+            "file": "scripts/authority_mtls_runtime.py",
+            "line": 210
+          },
+          {
+            "file": "scripts/continuous_mtls_runtime.py",
+            "line": 321
+          },
+          {
+            "file": "scripts/authority_mtls_runtime.py",
+            "line": 201
+          },
+          {
+            "file": "scripts/persistent_authority_runtime.py",
+            "line": 277
+          },
+          {
+            "file": "scripts/continuous_mtls_runtime.py",
+            "line": 305
+          },
+          {
+            "file": "scripts/continuous_mtls_runtime.py",
+            "line": 34
+          }
+        ]
+      },
+      "source": "tmp\\week4-ca-retest\\runtime\\c02\\ca-transport-retest-20261111-04\\verification.json",
+      "sha256": "019df3aead38a9cd993674b0a1251112c6fe29408c54b9d7b4ae5027daa96e1f"
+    },
+    {
+      "attempt": "fifth_maintenance_row_comparison_failed",
+      "completed": false,
+      "checks": 17,
+      "cleanup": {
+        "containers": 0,
+        "volumes": 0,
+        "networks": 0
+      },
+      "started_at": "2026-11-11T14:48:37.816681+00:00",
+      "finished_at": "2026-11-11T15:13:43.175473+00:00",
+      "check_outcomes": [
+        {
+          "label": "authority_epoch_1_keeps_only_current_sealed_bundle_issuer_key_and_eleven_signers",
+          "passed": true
+        },
+        {
+          "label": "authority_epoch_2_keeps_only_current_sealed_bundle_issuer_key_and_eleven_signers",
+          "passed": true
+        },
+        {
+          "label": "authority_epoch_3_keeps_only_current_sealed_bundle_issuer_key_and_eleven_signers",
+          "passed": true
+        },
+        {
+          "label": "active_leaves_renew_before_paused_transport_ceremony",
+          "passed": true
+        },
+        {
+          "label": "old_database_client_authenticates_before_transport_rotation",
+          "passed": true
+        },
+        {
+          "label": "live_scheduler_lease_blocks_start_stop_purge_ticks_and_preflight",
+          "passed": true
+        },
+        {
+          "label": "status_during_live_scheduler_reads_signed_journal_without_writing_inputs",
+          "passed": true
+        },
+        {
+          "label": "pending_transport_blocks_ordinary_start_and_new_coordinator_resumes_same_plan",
+          "passed": true
+        },
+        {
+          "label": "actual_host_process_kill_and_resume_at_stopped",
+          "passed": true
+        },
+        {
+          "label": "actual_host_process_kill_and_resume_at_installed",
+          "passed": true
+        },
+        {
+          "label": "actual_host_process_kill_and_resume_at_resuming",
+          "passed": true
+        },
+        {
+          "label": "actual_host_process_kill_and_resume_at_idle",
+          "passed": true
+        },
+        {
+          "label": "timer_rotates_db_root_server_and_both_client_private_keys_with_live_mtls_barrier",
+          "passed": true
+        },
+        {
+          "label": "old_db_client_denied_under_current_server_trust_after_root_rotation",
+          "passed": true
+        },
+        {
+          "label": "transport_rotation_preserves_exact_consumed_nonce_and_revocation_table_rows",
+          "passed": true
+        },
+        {
+          "label": "workload_ca_epoch_leaf_identities_and_retired_collector_unchanged_by_db_rotation",
+          "passed": true
+        },
+        {
+          "label": "active_leaves_renew_before_paused_transport_ceremony",
+          "passed": true
+        }
+      ],
+      "failure": "database_backup_acceptance_failed",
+      "failure_detail": {
+        "reason": "validation_failure",
+        "frames": [
+          {
+            "file": "scripts/test_database_backup_runtime.py",
+            "line": 272
+          },
+          {
+            "file": "scripts/test_database_backup_runtime.py",
+            "line": 198
+          },
+          {
+            "file": "scripts/test_database_transport_runtime.py",
+            "line": 263
+          },
+          {
+            "file": "scripts/test_continuous_mtls_runtime.py",
+            "line": 115
+          }
+        ]
+      },
+      "source": "tmp\\week4-ca-retest\\runtime\\c02\\ca-transport-retest-20261111-05\\verification.json",
+      "sha256": "5e4f3dcdaf32a660c747c9f1173b6e497262857df32cef98a2b72673997e261e"
+    },
+    {
+      "attempt": "sixth_targeted_db_backup",
+      "completed": true,
+      "checks": 25,
+      "cleanup": {
+        "containers": 0,
+        "volumes": 0,
+        "networks": 0
+      },
+      "started_at": "2026-11-11T15:33:30.249104+00:00",
+      "finished_at": "2026-11-11T15:59:56.528741+00:00",
+      "check_outcomes": [
+        {
+          "label": "active_leaves_renew_before_paused_transport_ceremony",
+          "passed": true
+        },
+        {
+          "label": "old_database_client_authenticates_before_transport_rotation",
+          "passed": true
+        },
+        {
+          "label": "timer_rotates_db_root_server_and_both_client_private_keys_with_live_mtls_barrier",
+          "passed": true
+        },
+        {
+          "label": "old_db_client_denied_under_current_server_trust_after_root_rotation",
+          "passed": true
+        },
+        {
+          "label": "transport_rotation_preserves_exact_consumed_nonce_and_revocation_table_rows",
+          "passed": true
+        },
+        {
+          "label": "workload_ca_epoch_leaf_identities_and_retired_collector_unchanged_by_db_rotation",
+          "passed": true
+        },
+        {
+          "label": "active_leaves_renew_before_paused_transport_ceremony",
+          "passed": true
+        },
+        {
+          "label": "preparation_retains_every_prior_consumed_nonce_and_revocation_row",
+          "passed": true
+        },
+        {
+          "label": "second_timed_transport_rotation_chains_to_first_without_resealing_anchor",
+          "passed": true
+        },
+        {
+          "label": "normal_down_up_preserves_rotated_db_trust_and_signed_transport_epoch",
+          "passed": true
+        },
+        {
+          "label": "tampered_transport_signed_history_refuses_all_services_before_start",
+          "passed": true
+        },
+        {
+          "label": "post_rotation_restart_and_tamper_recovery_retain_original_security_state",
+          "passed": true
+        },
+        {
+          "label": "active_leaves_renew_before_backup_without_reissuing_retired_collector",
+          "passed": true
+        },
+        {
+          "label": "expired_retired_identity_without_pins_passes_integrity_only",
+          "passed": true
+        },
+        {
+          "label": "expired_active_identity_still_refuses_admission",
+          "passed": true
+        },
+        {
+          "label": "backup_ciphertext_and_key_volumes_are_separate_and_absent_from_online_services",
+          "passed": true
+        },
+        {
+          "label": "backup_actual_process_kill_after_encrypted_publish_before_ack",
+          "passed": true
+        },
+        {
+          "label": "pending_backup_blocks_normal_start_stop_rotation_but_allows_observation",
+          "passed": true
+        },
+        {
+          "label": "tampered_ciphertext_refuses_resume_and_keeps_both_ca_writers_stopped",
+          "passed": true
+        },
+        {
+          "label": "lost_publish_ack_reuses_same_authenticated_archive_and_manifest",
+          "passed": true
+        },
+        {
+          "label": "custom_dump_restores_in_network_none_tmpfs_postgres_and_matches_five_security_tables",
+          "passed": true
+        },
+        {
+          "label": "backup_restore_drill_preserves_live_nonce_revocation_certificates_and_anchor",
+          "passed": true
+        },
+        {
+          "label": "same_ca_db_leaf_objects_and_original_pause_restored_after_live_tls_checks",
+          "passed": true
+        },
+        {
+          "label": "normal_restart_preserves_backup_journal_and_leaves_no_restore_container",
+          "passed": true
+        },
+        {
+          "label": "second_backup_keeps_first_archive_independently_restorable_in_isolation",
+          "passed": true
+        }
+      ],
+      "failure": null,
+      "failure_detail": null,
+      "source": "tmp\\week4-ca-retest\\runtime\\c02\\ca-transport-retest-20261111-06\\verification.json",
+      "sha256": "714b62bf192c66b6ec583baa9e54504102fdf84191759e1fadb4b609863957a7"
+    }
+  ],
+  "final_source_checks": {
+    "completed": true,
+    "focused_pytest_passed": 57,
+    "ruff_scope": "app scripts tests",
+    "stage_exit_codes": {
+      "ruff": 0,
+      "focused": 0,
+      "diff": 0
+    }
+  },
+  "approval_docker_smoke": {
+    "schema": "week4-response-readonly-docker-smoke-1",
+    "passed": true,
+    "image_id": "sha256:bd73a09797f3744d52b2bf990a701aacf198a0e3fc752ce73c98d53a9327c210",
+    "container": "week4-approval-smoke-31d0a127ff",
+    "returncode": 0,
+    "stdout": "{\"created\": true, \"read_back\": true, \"self_approval_denied\": true, \"ledger_in_writable_volume\": true, \"mode\": \"simulation\", \"network\": \"none\"}\n",
+    "stderr": "/usr/local/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n  from starlette.testclient import TestClient as TestClient  # noqa\n"
+  },
+  "fixture_measurement": {
+    "workflow_completed": false,
+    "backup_executed": false,
+    "cleanup": {
+      "containers": 0,
+      "volumes": 0,
+      "networks": 0
+    },
+    "observations": [
+      {
+        "cycle": 1,
+        "rows_before": {
+          "used_ott": 50,
+          "revoked_x509_certs": 29
+        },
+        "rows_after": {
+          "used_ott": 79,
+          "revoked_x509_certs": 110
+        },
+        "added_rows": {
+          "used_ott": 29,
+          "revoked_x509_certs": 81
+        },
+        "removed_rows": {
+          "used_ott": 0,
+          "revoked_x509_certs": 0
+        },
+        "generation_increments": {
+          "serverAuth": 29,
+          "clientAuth": 81
+        },
+        "failure_increments": {
+          "serverAuth": 1,
+          "clientAuth": 0
+        },
+        "before_pending": {
+          "candidates": {},
+          "pending_keys": {}
+        },
+        "after_pending": {
+          "candidates": {},
+          "pending_keys": {
+            "serverAuth": 1
+          }
+        }
+      }
+    ],
+    "source_sha256": "dbbde7112a9a4dbce896269ce9b5c286b27b2e7d7fa519c6d935c934e2917568"
+  },
+  "public_input_sha256": {
+    "zero-trust-llm-secops\\runtime\\c02\\infra-batches\\week4-20261111-final1\\verification.json": "fbb957d0c9cac536cf99594eb4e6d33cd0f5ce9286ac873fc51ac3f94cec7304",
+    "zero-trust-llm-secops\\runtime\\c02\\infra-batches\\week4-20261111-final1\\extended-verification.json": "448f99cb3354cbe56dad97558c90cd801f1acc54d23dc489f2845d09153ae20e",
+    "zero-trust-llm-secops\\runtime\\c02\\infra-batches\\week4-20261111-final1\\infrastructure\\verification.json": "1d1ef28e32ad8909bcd8d5070f08b747ccbad23693d813bfdd0d5b28b4b5338b",
+    "zero-trust-llm-secops\\runtime\\c02\\infra-batches\\week4-20261111-final1\\ca-failure-analysis.json": "d5b3bb2a5c151a40e5ebf73c3d303a254acccb44367bce932f59cfee944ad2d2",
+    "zero-trust-llm-secops\\runtime\\c02\\infra-batches\\week4-20261111-final1\\selection\\verification.json": "bf2f804af6696c0b494cf419c40857ae01c5f16af1c903db9bb1876abca80405",
+    "zero-trust-llm-secops\\runtime\\c02\\infra-batches\\week4-20261111-final1\\app-restore\\verification.json": "95402cf1de23944b3c33d5a25ae17453a2ed402dd6b12ea2ad48a602b292e794",
+    "zero-trust-llm-secops\\runtime\\c03\\week4-20261111-final1\\verification.json": "016f90d4235d49c8021b1338b791ef8766efc9f10a8ec22f677cef97b810583b",
+    "tmp\\week4-ca-retest\\runtime\\c02\\ca-transport-retest-20261111-06\\verification.json": "714b62bf192c66b6ec583baa9e54504102fdf84191759e1fadb4b609863957a7",
+    "tmp\\week4-ca-retest\\runtime\\c02\\approval-docker-smoke.json": "50d02b23999eadb4f5f56bda23241826862189b09a98cb0283e5c59e222ca107",
+    "zero-trust-llm-secops\\runtime\\c02\\infra-batches\\week4-20261111-final1\\final-checks.json": "75614eba41d1e8add6ad02c77811a3afa1eb4a4de5e2043d74031caacc04da42",
+    "tmp\\week4-ca-retest\\runtime\\c02\\fixture-renewal-measurement-20261112\\verification.json": "dbbde7112a9a4dbce896269ce9b5c286b27b2e7d7fa519c6d935c934e2917568"
+  },
+  "final_owned_source_lf_sha256": {
+    "app/config.py": "017fe285b68cedc45d57f4f46e7f199b5f47f8877eb8df828b0a34889e2c8b8e",
+    "app/main.py": "9ef9bc8506933f36ffcdcccb59959fd6a5107fac28cc650b385ebcb7e5c65ad1",
+    "app/response_workflow.py": "62441f91cf60fb57997509381c0da639e6a276701cdc445867003e90a8f3a881",
+    "compose.yaml": "dfa9f5712f1cb1b318bb47d82a55eeba4053293dc86042e8e7a5839b59af3a6b",
+    "scripts/freeze_m7.py": "79de4075a2abe532a5894bc52ddaeff4c55ecc80f2c9b99a406016835bd7e5b1",
+    "scripts/test_week4_batch.py": "9d3db292e03f77f345ce5043370b2168cfda6b567ca894e1bd5a82ef6357f926",
+    "scripts/test_database_backup_runtime.py": "57867d6d7ebff2610677fe991ffa3bd5893f75f32abc7af6e556e645eded1eb6",
+    "scripts/test_database_transport_runtime.py": "469f39b1b8d323ebb727c97ce51b3ac6d104283427f871a23e99853637239df7",
+    "tests/test_response_workflow.py": "3e2fdd42c7866d423faa28e38809dbdbb2c33861a26a1f865ad6b96e16bf9219",
+    "scripts/test_transport_process_recovery.py": "5780c82ea98757050a23ed7a80dbcdb8d7b26f96486ec6e82e890c5d7077f4cc",
+    "scripts/authority_mtls_runtime.py": "8bb869ef2f7a37f5f4eb62a9f780477c9ad9bbcacaf5b17235ecbe0c26281d30",
+    "tests/test_ca_bootstrap_readiness.py": "f1ec7b78e0241644f9f0100ed3e58278cb3d935998d6ca444f246c2c16c177dd",
+    "tests/test_m7_freeze.py": "3b384010aa799bc45045da7cca37a901a3503687e587d177b419144b2696ff3e",
+    "tests/test_transport_fixture_renewal.py": "27431f6398a711a0b0da95d00b7197059bb29e10b4017f6e5759a891429c1207"
+  }
+}

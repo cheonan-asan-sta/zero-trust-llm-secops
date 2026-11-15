@@ -1,0 +1,13 @@
+{
+  "schema": "f1-cloud-training-identity-audit-1",
+  "scope": "Same two fixed TrainOn assets from cloud-intake-protocol.json; no reserved test download or inspection",
+  "purpose": "Determine whether missing AWSService caller linkage can be supported by explicit historical identifiers rather than service-name/IP guesses",
+  "presence_only_fields": ["userIdentity.principalId", "userIdentity.arn", "userIdentity.accountId", "userIdentity.accessKeyId", "userIdentity.credentialId", "userIdentity.invokedBy", "userIdentity.sessionContext.sourceIdentity", "userIdentity.sessionContext.signInSessionArn", "userIdentity.sessionContext.sessionIssuer.arn", "userIdentity.onBehalfOf.userId", "userIdentity.onBehalfOf.identityStoreArn", "userIdentity.inScopeOf.sourceArn", "userIdentity.inScopeOf.credentialsIssuedTo", "sharedEventID", "requestID", "recipientAccountId"],
+  "candidate_exact_join_fields": ["userIdentity.principalId", "userIdentity.arn", "userIdentity.accessKeyId", "userIdentity.credentialId", "userIdentity.sessionContext.signInSessionArn", "sharedEventID"],
+  "exclusions": "Do not join on invokedBy, source IP, account alone, labels, attack names, arbitrary strings or nearest timestamps. Never display/export raw identifiers or credentials.",
+  "interpretation": "Field presence and exact co-occurrence are diagnostics only, not current verified identity, permission, physical device or certified causal linkage. Even a unique candidate needs semantic review before adoption.",
+  "sources": ["https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-user-identity.html", "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html"],
+  "classifier_fitted": false,
+  "original_six_domain_goal_replaced": false,
+  "goal_qualified": false
+}

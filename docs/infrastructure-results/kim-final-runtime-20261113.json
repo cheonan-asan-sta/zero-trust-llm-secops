@@ -1,0 +1,55 @@
+{
+  "schema": "c03-final-runtime-images-1",
+  "source_commit": "e8b3e1ebd2685ef69ea8eb5167a52f7793153516",
+  "images": {
+    "application": {
+      "image_id": "sha256:85a0a9f0bd83ab4e5b39c8fdca9d1d41edd7653c3101495a196eb66c3a6be756",
+      "counts": {
+        "grype": 213,
+        "trivy": 213
+      },
+      "scanner_config_digest": "sha256:c13afc9bf84959bf985e1df8038ddd41a847ea3ff720d80a6d50e89461d339fe",
+      "identity_sha256": "45e3a464e53122cf28ee4329307226163699dbee6dfb76adf81f207800daf84e",
+      "summary_sha256": "417bc137e4fc55d0ac282ab1b387a95a1566c61e76adaae67526dddc16a71f74",
+      "review_sha256": "12c14c51e41af3e6fc727f5d4d7db915fb77a2fb8e879d7d83a4b65a5e1b804d"
+    },
+    "nginx": {
+      "image_id": "sha256:b565a9579cdabe43de09a5a278dc95ceee721dae1cacf85247effc4f6630d511",
+      "counts": {
+        "grype": 448,
+        "trivy": 501
+      },
+      "scanner_config_digest": "sha256:303efa6fbe0d78a747e4b4a8713ee57810ef4d0066bb1b556187fcf2e3e5f396",
+      "identity_sha256": "cbb51a1d9206ca64b5d80ea67c29dcb98afc4e6172bf65796d98bae8b2a52383",
+      "summary_sha256": "4506f2c93aa206fc6efed38f7f998da07ccc252e83731c74692f44b640d9e03a",
+      "review_sha256": "f6db733cde22f73512cbc354b81be5919585d3b6c262f166f6daa12f9f257294"
+    }
+  },
+  "database_files": {
+    "trivy/java-db/trivy-java.db": "c7667e7d7d335b7a801b4ed11c1a886d0928eec65bf7e5b973762e8715cf4263",
+    "trivy/java-db/metadata.json": "b89413e782a04ff5067090e60f4fbfb01c3657a0f151bf24af1fc3f372ec131c",
+    "trivy/db/trivy.db": "024e3e42822e93b63a119eae8997d24425a8703b7bb463e5afc1bcec92da2e67",
+    "trivy/db/metadata.json": "25979277d46e1f9df40c3a7c0a1faa8e518d8313fceccafd77fcc9ed5cd2c264",
+    "grype/6/vulnerability.db": "cd4dfc3769652c659887300f7e26735257428474fa7017ddbba0c6fecba29903",
+    "grype/6/import.json": "f7c7ec793611dabb3209b20d2870319337c7851e5f13304979565249f50731aa",
+    "grype/6/last_update_check": "db89836af67e4efbbc1ac11d3350a5a3c3e18b56be88014713febd55c529f134"
+  },
+  "cleanup": {
+    "owned_resources_remaining": 0,
+    "errors": []
+  },
+  "security_gate_passed": false,
+  "production_approved": false,
+  "independent_review_complete": false,
+  "verification_sha256": "d7b1ba9b91d1a6963528e4a12858ab1b5f4bd153347f6832e1d3bf58dbcaf58f",
+  "scope": "Current local execution runtime: application and NGINX only",
+  "repeats": 3,
+  "warmup": 1,
+  "performance_comparison_valid": false,
+  "advisory_suppressions": 0,
+  "ci_run": 43291251304,
+  "ci_jobs_success": 16,
+  "unit_passed": 3452,
+  "docker_passed": 3454,
+  "execution_checks": 22
+}

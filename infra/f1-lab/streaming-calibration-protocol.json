@@ -1,0 +1,64 @@
+{
+  "schema": "bounded-native-calibration-plan-1",
+  "purpose": "Recover the full Fox calibration after ENOSPC without truncation or model changes; first prove existing development feature equivalence.",
+  "final_six_domain_acceptance": false,
+  "reserved_final_scenarios_read": false,
+  "feature_profile": "raw-http-auth-semantics-4",
+  "models": {
+    "ordered_tree": {
+      "path": "runtime/f1/ait-semantic-fit-ordered_tree-russell-20261112/tree-model.json",
+      "sha256": "ad821b2e81514c22dff5499d4674104cb2144463ee02b2990821c205d6bfc841"
+    },
+    "heads": {
+      "path": "runtime/f1/ait-semantic-fit-heads-russell-20261112/model.json",
+      "sha256": "4ebbcb6bb5fce286e80beeedbc18139d566d00998575487a867f129330344075"
+    }
+  },
+  "scenarios": [
+    {
+      "name": "russellmitchell",
+      "role": "previously_observed_training_development",
+      "pairs_directory": "runtime/f1/ait-lds-dev-pairs-20261112",
+      "manifest_sha256": "1fd4067e4254246833deca7f65df8a13a1eada20c7d6d76d5ed8c6589baab762",
+      "reference_preparation": "runtime/f1/ait-semantic-russellmitchell-20261112/preparation.json",
+      "reference_preparation_sha256": "b0fe1025f3cbf1aafe0a130fae6a9e7636a609da4358a1777cb47dc353ddd72e",
+      "reference_profile": "raw-http-auth-semantics-4",
+      "rows": 295243
+    },
+    {
+      "name": "santos",
+      "role": "previously_observed_development",
+      "pairs_directory": "runtime/f1/ait-lds-santos-pairs-20261112",
+      "manifest_sha256": "f51c2482356856848704cc0b47209fb0100db3b4b0982381ff1ab444ed201e01",
+      "reference_preparation": "runtime/f1/semantic-compressed-output-v34-20261112/santos/preparation.json",
+      "reference_preparation_sha256": "a3ceeb5204aaa77c37fa5133efef1ee8c503b45eeff055878167158f8b9f486d",
+      "reference_profile": "raw-http-auth-semantics-4",
+      "rows": 295976
+    },
+    {
+      "name": "fox",
+      "role": "predeclared_calibration_only",
+      "pairs_directory": "runtime/f1/fox-calibration-v34-20261112/pairs",
+      "manifest_sha256": "b25dc0a29dade93be7d28f863ce310cd1bb4838b0d7fa2d9b7c33d478d1c318f",
+      "reference_preparation": "runtime/f1/fox-calibration-v34-20261112/base/preparation.json",
+      "reference_preparation_sha256": "6fe7511a562c068576bfba26cd31d425258dcdcb2a8eb21f2ac13f62fc6a962b",
+      "reference_profile": "base",
+      "rows": 668418
+    }
+  ],
+  "resource_policy": {
+    "sqlite_database_bytes": 4294967296,
+    "sqlite_page_cache_kib": 16384,
+    "output_bytes": 8589934592,
+    "minimum_free_bytes": 5368709120,
+    "http_active_events": 500000,
+    "http_active_groups": 10000,
+    "http_active_events_per_client": 100000,
+    "http_total_requests_truncated": false,
+    "failed_attempt_recovery": "Keep original failed evidence. Use a fresh output directory with unchanged anchors; never append to or certify an incomplete attempt."
+  },
+  "model_selection_or_threshold_changes": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "github_pushes": 0
+}

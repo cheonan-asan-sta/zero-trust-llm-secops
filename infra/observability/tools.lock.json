@@ -1,0 +1,27 @@
+{
+  "as_of": "2026-11-03",
+  "platform": "linux/amd64",
+  "verification": "Official GitHub Release asset SHA256 over HTTPS; no signature/SLSA claim",
+  "tools": [
+    {
+      "name": "prometheus", "repo": "prometheus/prometheus", "tag": "v3.15.1",
+      "assets": [{"name": "prometheus-3.15.1.linux-amd64.tar.gz", "digest": "sha256:6a726885328ad9efebbf36e876ce2fb6225468a71fd1e7ce3ba666d5f4d97a84", "browser_download_url": "https://github.com/prometheus/prometheus/releases/download/v3.15.1/prometheus-3.15.1.linux-amd64.tar.gz"}],
+      "binaries": {"prometheus": "prometheus-3.15.1.linux-amd64/prometheus", "promtool": "prometheus-3.15.1.linux-amd64/promtool"}
+    },
+    {
+      "name": "alertmanager", "repo": "prometheus/alertmanager", "tag": "v0.34.2",
+      "assets": [{"name": "alertmanager-0.34.2.linux-amd64.tar.gz", "digest": "sha256:17ee14acd0f6ba6e25a436ff223d9c17ddd5cf484f543ad12f0932eaa89ba186", "browser_download_url": "https://github.com/prometheus/alertmanager/releases/download/v0.34.2/alertmanager-0.34.2.linux-amd64.tar.gz"}],
+      "binaries": {"alertmanager": "alertmanager-0.34.2.linux-amd64/alertmanager", "amtool": "alertmanager-0.34.2.linux-amd64/amtool"}
+    },
+    {
+      "name": "victoria-metrics", "repo": "VictoriaMetrics/VictoriaMetrics", "tag": "v1.155.0",
+      "assets": [{"name": "victoria-metrics-linux-amd64-v1.155.0.tar.gz", "digest": "sha256:7180e65913d55ab99c0be8f4a3ad17a0fafe5598a21ff6327fecba3190d7b176", "browser_download_url": "https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/v1.155.0/victoria-metrics-linux-amd64-v1.155.0.tar.gz"}],
+      "binaries": {"victoria-metrics-prod": "victoria-metrics-prod"}
+    },
+    {
+      "name": "vmalert", "repo": "VictoriaMetrics/VictoriaMetrics", "tag": "v1.155.0",
+      "assets": [{"name": "vmutils-linux-amd64-v1.155.0.tar.gz", "digest": "sha256:b6181fc16cf19835706ea5d67215eea56c1fe87350fdfd82a5ff803ea2c1a907", "browser_download_url": "https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/v1.155.0/vmutils-linux-amd64-v1.155.0.tar.gz"}],
+      "binaries": {"vmalert-prod": "vmalert-prod"}
+    }
+  ]
+}

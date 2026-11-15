@@ -1,0 +1,1432 @@
+{
+  "schema": "extra-calibration-v6-checkpoint-1",
+  "base_commit": "f9c31a1",
+  "windows": {
+    "tests": 248,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 60.077,
+    "sha256": "4d5a0b256ee86fc19bb40ae8a19192272bbf4efa8cc71cadaaccc5be0da9717c"
+  },
+  "linux": {
+    "schema": "extra-f1-linux-snapshot-1",
+    "completed": true,
+    "owner": "extra-f1-a21335d4b910",
+    "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "tests": [
+      "tests/test_f1_calibration.py",
+      "tests/test_f1_source_registry.py",
+      "tests/test_f1_session_inference.py",
+      "tests/test_f1_confidence.py",
+      "tests/test_f1_temporal_store.py",
+      "tests/test_f1_approval_registry.py",
+      "tests/test_f1_shadow_approvals.py",
+      "tests/test_f1_shadow_detector.py",
+      "tests/test_f1_feature_audit.py",
+      "tests/test_f1_review.py",
+      "tests/test_detection_benchmark.py",
+      "tests/test_f1_provenance.py",
+      "tests/test_f1_session_controls.py"
+    ],
+    "host_mounts": 0,
+    "network": "none",
+    "cloud_calls": 0,
+    "paid_api_calls": 0,
+    "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+    "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+    "source_manifest_sha256": "f64085e5029d82553d53d55f5ef8494da4b9d0ff5d8dc39f4148b253da1b92ef",
+    "source_files": 368,
+    "container_exit_code": 0,
+    "source_verified_before_and_after": true,
+    "remaining_containers": 0,
+    "pytest": {
+      "tests": 248,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 38.521,
+      "sha256": "f79dc0c78b97a227f53be06bb5ee54826fa70798c536877d4e9e491122e4c6eb"
+    }
+  },
+  "experiment": {
+    "group_audit": {
+      "indivisible_components": 31,
+      "cross_fold_family_subject_device_session_projection_overlap": 0,
+      "fold_case_counts": [
+        120,
+        120,
+        120
+      ],
+      "fold_positive_counts": [
+        60,
+        60,
+        60
+      ]
+    },
+    "outer_folds": [
+      {
+        "fold": 0,
+        "training_cases": 240,
+        "evaluation_case_ids": [
+          "credential-geo-burst-00",
+          "credential-geo-burst-01",
+          "credential-geo-burst-02",
+          "credential-geo-burst-03",
+          "credential-geo-burst-04",
+          "credential-geo-burst-05",
+          "credential-geo-burst-06",
+          "credential-geo-burst-07",
+          "credential-geo-burst-08",
+          "credential-geo-burst-09",
+          "device-managed-document-00",
+          "device-managed-document-01",
+          "device-managed-document-02",
+          "device-managed-document-03",
+          "device-managed-document-04",
+          "device-managed-document-05",
+          "device-managed-document-06",
+          "device-managed-document-07",
+          "device-managed-document-08",
+          "device-managed-document-09",
+          "privilege-employee-admin-00",
+          "privilege-employee-admin-01",
+          "privilege-employee-admin-02",
+          "privilege-employee-admin-03",
+          "privilege-employee-admin-04",
+          "privilege-employee-admin-05",
+          "privilege-employee-admin-06",
+          "privilege-employee-admin-07",
+          "privilege-employee-admin-08",
+          "privilege-employee-admin-09",
+          "privilege-approved-emergency-00",
+          "privilege-approved-emergency-01",
+          "privilege-approved-emergency-02",
+          "privilege-approved-emergency-03",
+          "privilege-approved-emergency-04",
+          "privilege-approved-emergency-05",
+          "privilege-approved-emergency-06",
+          "privilege-approved-emergency-07",
+          "privilege-approved-emergency-08",
+          "privilege-approved-emergency-09",
+          "remote-vpn-read-00",
+          "remote-vpn-read-01",
+          "remote-vpn-read-02",
+          "remote-vpn-read-03",
+          "remote-vpn-read-04",
+          "remote-vpn-read-05",
+          "remote-vpn-read-06",
+          "remote-vpn-read-07",
+          "remote-vpn-read-08",
+          "remote-vpn-read-09",
+          "lateral-threshold-fanout-00",
+          "lateral-threshold-fanout-01",
+          "lateral-threshold-fanout-02",
+          "lateral-threshold-fanout-03",
+          "lateral-threshold-fanout-04",
+          "lateral-threshold-fanout-05",
+          "lateral-threshold-fanout-06",
+          "lateral-threshold-fanout-07",
+          "lateral-threshold-fanout-08",
+          "lateral-threshold-fanout-09",
+          "lateral-small-workflow-00",
+          "lateral-small-workflow-01",
+          "lateral-small-workflow-02",
+          "lateral-small-workflow-03",
+          "lateral-small-workflow-04",
+          "lateral-small-workflow-05",
+          "lateral-small-workflow-06",
+          "lateral-small-workflow-07",
+          "lateral-small-workflow-08",
+          "lateral-small-workflow-09",
+          "exfiltration-at-volume-limit-00",
+          "exfiltration-at-volume-limit-01",
+          "exfiltration-at-volume-limit-02",
+          "exfiltration-at-volume-limit-03",
+          "exfiltration-at-volume-limit-04",
+          "exfiltration-at-volume-limit-05",
+          "exfiltration-at-volume-limit-06",
+          "exfiltration-at-volume-limit-07",
+          "exfiltration-at-volume-limit-08",
+          "exfiltration-at-volume-limit-09",
+          "exfiltration-bulk-critical-00",
+          "exfiltration-bulk-critical-01",
+          "exfiltration-bulk-critical-02",
+          "exfiltration-bulk-critical-03",
+          "exfiltration-bulk-critical-04",
+          "exfiltration-bulk-critical-05",
+          "exfiltration-bulk-critical-06",
+          "exfiltration-bulk-critical-07",
+          "exfiltration-bulk-critical-08",
+          "exfiltration-bulk-critical-09",
+          "exfiltration-multiple-critical-00",
+          "exfiltration-multiple-critical-01",
+          "exfiltration-multiple-critical-02",
+          "exfiltration-multiple-critical-03",
+          "exfiltration-multiple-critical-04",
+          "exfiltration-multiple-critical-05",
+          "exfiltration-multiple-critical-06",
+          "exfiltration-multiple-critical-07",
+          "exfiltration-multiple-critical-08",
+          "exfiltration-multiple-critical-09",
+          "exfiltration-small-critical-00",
+          "exfiltration-small-critical-01",
+          "exfiltration-small-critical-02",
+          "exfiltration-small-critical-03",
+          "exfiltration-small-critical-04",
+          "exfiltration-small-critical-05",
+          "exfiltration-small-critical-06",
+          "exfiltration-small-critical-07",
+          "exfiltration-small-critical-08",
+          "exfiltration-small-critical-09",
+          "exfiltration-public-export-00",
+          "exfiltration-public-export-01",
+          "exfiltration-public-export-02",
+          "exfiltration-public-export-03",
+          "exfiltration-public-export-04",
+          "exfiltration-public-export-05",
+          "exfiltration-public-export-06",
+          "exfiltration-public-export-07",
+          "exfiltration-public-export-08",
+          "exfiltration-public-export-09"
+        ],
+        "selected_candidate": "auth-5",
+        "training_scores": [
+          {
+            "confusion": {
+              "tp": 120,
+              "fp": 50,
+              "fn": 0,
+              "tn": 70
+            },
+            "metrics": {
+              "precision": 0.7058823529411765,
+              "recall": 1.0,
+              "f1": 0.8275862068965517,
+              "false_positive_rate": 0.4166666666666667
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 120,
+              "fp": 55,
+              "fn": 0,
+              "tn": 65
+            },
+            "metrics": {
+              "precision": 0.6857142857142857,
+              "recall": 1.0,
+              "f1": 0.8135593220338984,
+              "false_positive_rate": 0.4583333333333333
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 120,
+              "fp": 43,
+              "fn": 0,
+              "tn": 77
+            },
+            "metrics": {
+              "precision": 0.7361963190184049,
+              "recall": 1.0,
+              "f1": 0.8480565371024735,
+              "false_positive_rate": 0.35833333333333334
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 120,
+              "fp": 50,
+              "fn": 0,
+              "tn": 70
+            },
+            "metrics": {
+              "precision": 0.7058823529411765,
+              "recall": 1.0,
+              "f1": 0.8275862068965517,
+              "false_positive_rate": 0.4166666666666667
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 120,
+              "fp": 50,
+              "fn": 0,
+              "tn": 70
+            },
+            "metrics": {
+              "precision": 0.7058823529411765,
+              "recall": 1.0,
+              "f1": 0.8275862068965517,
+              "false_positive_rate": 0.4166666666666667
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 120,
+              "fp": 50,
+              "fn": 0,
+              "tn": 70
+            },
+            "metrics": {
+              "precision": 0.7058823529411765,
+              "recall": 1.0,
+              "f1": 0.8275862068965517,
+              "false_positive_rate": 0.4166666666666667
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 120,
+              "fp": 50,
+              "fn": 0,
+              "tn": 70
+            },
+            "metrics": {
+              "precision": 0.7058823529411765,
+              "recall": 1.0,
+              "f1": 0.8275862068965517,
+              "false_positive_rate": 0.4166666666666667
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          }
+        ],
+        "evaluation": {
+          "confusion": {
+            "tp": 53,
+            "fp": 10,
+            "fn": 7,
+            "tn": 50
+          },
+          "metrics": {
+            "precision": 0.8412698412698413,
+            "recall": 0.8833333333333333,
+            "f1": 0.8617886178861789,
+            "false_positive_rate": 0.16666666666666666
+          },
+          "evaluation_errors": 0,
+          "cases": 120
+        }
+      },
+      {
+        "fold": 1,
+        "training_cases": 240,
+        "evaluation_case_ids": [
+          "credential-local-burst-00",
+          "credential-local-burst-01",
+          "credential-local-burst-02",
+          "credential-local-burst-03",
+          "credential-local-burst-04",
+          "credential-local-burst-05",
+          "credential-local-burst-06",
+          "credential-local-burst-07",
+          "credential-local-burst-08",
+          "credential-local-burst-09",
+          "credential-typing-errors-00",
+          "credential-typing-errors-01",
+          "credential-typing-errors-02",
+          "credential-typing-errors-03",
+          "credential-typing-errors-04",
+          "credential-typing-errors-05",
+          "credential-typing-errors-06",
+          "credential-typing-errors-07",
+          "credential-typing-errors-08",
+          "credential-typing-errors-09",
+          "device-unregistered-document-00",
+          "device-unregistered-document-01",
+          "device-unregistered-document-02",
+          "device-unregistered-document-03",
+          "device-unregistered-document-04",
+          "device-unregistered-document-05",
+          "device-unregistered-document-06",
+          "device-unregistered-document-07",
+          "device-unregistered-document-08",
+          "device-unregistered-document-09",
+          "device-unregistered-login-00",
+          "device-unregistered-login-01",
+          "device-unregistered-login-02",
+          "device-unregistered-login-03",
+          "device-unregistered-login-04",
+          "device-unregistered-login-05",
+          "device-unregistered-login-06",
+          "device-unregistered-login-07",
+          "device-unregistered-login-08",
+          "device-unregistered-login-09",
+          "device-registered-byod-00",
+          "device-registered-byod-01",
+          "device-registered-byod-02",
+          "device-registered-byod-03",
+          "device-registered-byod-04",
+          "device-registered-byod-05",
+          "device-registered-byod-06",
+          "device-registered-byod-07",
+          "device-registered-byod-08",
+          "device-registered-byod-09",
+          "device-approved-enrollment-00",
+          "device-approved-enrollment-01",
+          "device-approved-enrollment-02",
+          "device-approved-enrollment-03",
+          "device-approved-enrollment-04",
+          "device-approved-enrollment-05",
+          "device-approved-enrollment-06",
+          "device-approved-enrollment-07",
+          "device-approved-enrollment-08",
+          "device-approved-enrollment-09",
+          "privilege-analyst-backup-admin-00",
+          "privilege-analyst-backup-admin-01",
+          "privilege-analyst-backup-admin-02",
+          "privilege-analyst-backup-admin-03",
+          "privilege-analyst-backup-admin-04",
+          "privilege-analyst-backup-admin-05",
+          "privilege-analyst-backup-admin-06",
+          "privilege-analyst-backup-admin-07",
+          "privilege-analyst-backup-admin-08",
+          "privilege-analyst-backup-admin-09",
+          "privilege-guest-operator-00",
+          "privilege-guest-operator-01",
+          "privilege-guest-operator-02",
+          "privilege-guest-operator-03",
+          "privilege-guest-operator-04",
+          "privilege-guest-operator-05",
+          "privilege-guest-operator-06",
+          "privilege-guest-operator-07",
+          "privilege-guest-operator-08",
+          "privilege-guest-operator-09",
+          "privilege-administrator-00",
+          "privilege-administrator-01",
+          "privilege-administrator-02",
+          "privilege-administrator-03",
+          "privilege-administrator-04",
+          "privilege-administrator-05",
+          "privilege-administrator-06",
+          "privilege-administrator-07",
+          "privilege-administrator-08",
+          "privilege-administrator-09",
+          "remote-vpn-fanout-00",
+          "remote-vpn-fanout-01",
+          "remote-vpn-fanout-02",
+          "remote-vpn-fanout-03",
+          "remote-vpn-fanout-04",
+          "remote-vpn-fanout-05",
+          "remote-vpn-fanout-06",
+          "remote-vpn-fanout-07",
+          "remote-vpn-fanout-08",
+          "remote-vpn-fanout-09",
+          "lateral-local-admin-workflow-00",
+          "lateral-local-admin-workflow-01",
+          "lateral-local-admin-workflow-02",
+          "lateral-local-admin-workflow-03",
+          "lateral-local-admin-workflow-04",
+          "lateral-local-admin-workflow-05",
+          "lateral-local-admin-workflow-06",
+          "lateral-local-admin-workflow-07",
+          "lateral-local-admin-workflow-08",
+          "lateral-local-admin-workflow-09",
+          "exfiltration-approved-backup-00",
+          "exfiltration-approved-backup-01",
+          "exfiltration-approved-backup-02",
+          "exfiltration-approved-backup-03",
+          "exfiltration-approved-backup-04",
+          "exfiltration-approved-backup-05",
+          "exfiltration-approved-backup-06",
+          "exfiltration-approved-backup-07",
+          "exfiltration-approved-backup-08",
+          "exfiltration-approved-backup-09"
+        ],
+        "selected_candidate": "auth-5",
+        "training_scores": [
+          {
+            "confusion": {
+              "tp": 120,
+              "fp": 40,
+              "fn": 0,
+              "tn": 80
+            },
+            "metrics": {
+              "precision": 0.75,
+              "recall": 1.0,
+              "f1": 0.8571428571428571,
+              "false_positive_rate": 0.3333333333333333
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 120,
+              "fp": 40,
+              "fn": 0,
+              "tn": 80
+            },
+            "metrics": {
+              "precision": 0.75,
+              "recall": 1.0,
+              "f1": 0.8571428571428571,
+              "false_positive_rate": 0.3333333333333333
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 113,
+              "fp": 33,
+              "fn": 7,
+              "tn": 87
+            },
+            "metrics": {
+              "precision": 0.773972602739726,
+              "recall": 0.9416666666666667,
+              "f1": 0.849624060150376,
+              "false_positive_rate": 0.275
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 120,
+              "fp": 40,
+              "fn": 0,
+              "tn": 80
+            },
+            "metrics": {
+              "precision": 0.75,
+              "recall": 1.0,
+              "f1": 0.8571428571428571,
+              "false_positive_rate": 0.3333333333333333
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 120,
+              "fp": 40,
+              "fn": 0,
+              "tn": 80
+            },
+            "metrics": {
+              "precision": 0.75,
+              "recall": 1.0,
+              "f1": 0.8571428571428571,
+              "false_positive_rate": 0.3333333333333333
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 120,
+              "fp": 50,
+              "fn": 0,
+              "tn": 70
+            },
+            "metrics": {
+              "precision": 0.7058823529411765,
+              "recall": 1.0,
+              "f1": 0.8275862068965517,
+              "false_positive_rate": 0.4166666666666667
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 96,
+              "fp": 40,
+              "fn": 24,
+              "tn": 80
+            },
+            "metrics": {
+              "precision": 0.7058823529411765,
+              "recall": 0.8,
+              "f1": 0.75,
+              "false_positive_rate": 0.3333333333333333
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          }
+        ],
+        "evaluation": {
+          "confusion": {
+            "tp": 60,
+            "fp": 20,
+            "fn": 0,
+            "tn": 40
+          },
+          "metrics": {
+            "precision": 0.75,
+            "recall": 1.0,
+            "f1": 0.8571428571428571,
+            "false_positive_rate": 0.3333333333333333
+          },
+          "evaluation_errors": 0,
+          "cases": 120
+        }
+      },
+      {
+        "fold": 2,
+        "training_cases": 240,
+        "evaluation_case_ids": [
+          "credential-mfa-fatigue-00",
+          "credential-mfa-fatigue-01",
+          "credential-mfa-fatigue-02",
+          "credential-mfa-fatigue-03",
+          "credential-mfa-fatigue-04",
+          "credential-mfa-fatigue-05",
+          "credential-mfa-fatigue-06",
+          "credential-mfa-fatigue-07",
+          "credential-mfa-fatigue-08",
+          "credential-mfa-fatigue-09",
+          "credential-travel-success-00",
+          "credential-travel-success-01",
+          "credential-travel-success-02",
+          "credential-travel-success-03",
+          "credential-travel-success-04",
+          "credential-travel-success-05",
+          "credential-travel-success-06",
+          "credential-travel-success-07",
+          "credential-travel-success-08",
+          "credential-travel-success-09",
+          "credential-approved-health-retry-00",
+          "credential-approved-health-retry-01",
+          "credential-approved-health-retry-02",
+          "credential-approved-health-retry-03",
+          "credential-approved-health-retry-04",
+          "credential-approved-health-retry-05",
+          "credential-approved-health-retry-06",
+          "credential-approved-health-retry-07",
+          "credential-approved-health-retry-08",
+          "credential-approved-health-retry-09",
+          "device-unregistered-admin-00",
+          "device-unregistered-admin-01",
+          "device-unregistered-admin-02",
+          "device-unregistered-admin-03",
+          "device-unregistered-admin-04",
+          "device-unregistered-admin-05",
+          "device-unregistered-admin-06",
+          "device-unregistered-admin-07",
+          "device-unregistered-admin-08",
+          "device-unregistered-admin-09",
+          "privilege-employee-read-00",
+          "privilege-employee-read-01",
+          "privilege-employee-read-02",
+          "privilege-employee-read-03",
+          "privilege-employee-read-04",
+          "privilege-employee-read-05",
+          "privilege-employee-read-06",
+          "privilege-employee-read-07",
+          "privilege-employee-read-08",
+          "privilege-employee-read-09",
+          "remote-unapproved-rdp-00",
+          "remote-unapproved-rdp-01",
+          "remote-unapproved-rdp-02",
+          "remote-unapproved-rdp-03",
+          "remote-unapproved-rdp-04",
+          "remote-unapproved-rdp-05",
+          "remote-unapproved-rdp-06",
+          "remote-unapproved-rdp-07",
+          "remote-unapproved-rdp-08",
+          "remote-unapproved-rdp-09",
+          "remote-unverified-mfa-00",
+          "remote-unverified-mfa-01",
+          "remote-unverified-mfa-02",
+          "remote-unverified-mfa-03",
+          "remote-unverified-mfa-04",
+          "remote-unverified-mfa-05",
+          "remote-unverified-mfa-06",
+          "remote-unverified-mfa-07",
+          "remote-unverified-mfa-08",
+          "remote-unverified-mfa-09",
+          "remote-remote-login-00",
+          "remote-remote-login-01",
+          "remote-remote-login-02",
+          "remote-remote-login-03",
+          "remote-remote-login-04",
+          "remote-remote-login-05",
+          "remote-remote-login-06",
+          "remote-remote-login-07",
+          "remote-remote-login-08",
+          "remote-remote-login-09",
+          "remote-approved-support-00",
+          "remote-approved-support-01",
+          "remote-approved-support-02",
+          "remote-approved-support-03",
+          "remote-approved-support-04",
+          "remote-approved-support-05",
+          "remote-approved-support-06",
+          "remote-approved-support-07",
+          "remote-approved-support-08",
+          "remote-approved-support-09",
+          "lateral-vpn-scanning-00",
+          "lateral-vpn-scanning-01",
+          "lateral-vpn-scanning-02",
+          "lateral-vpn-scanning-03",
+          "lateral-vpn-scanning-04",
+          "lateral-vpn-scanning-05",
+          "lateral-vpn-scanning-06",
+          "lateral-vpn-scanning-07",
+          "lateral-vpn-scanning-08",
+          "lateral-vpn-scanning-09",
+          "lateral-compromised-fanout-00",
+          "lateral-compromised-fanout-01",
+          "lateral-compromised-fanout-02",
+          "lateral-compromised-fanout-03",
+          "lateral-compromised-fanout-04",
+          "lateral-compromised-fanout-05",
+          "lateral-compromised-fanout-06",
+          "lateral-compromised-fanout-07",
+          "lateral-compromised-fanout-08",
+          "lateral-compromised-fanout-09",
+          "lateral-approved-deployment-00",
+          "lateral-approved-deployment-01",
+          "lateral-approved-deployment-02",
+          "lateral-approved-deployment-03",
+          "lateral-approved-deployment-04",
+          "lateral-approved-deployment-05",
+          "lateral-approved-deployment-06",
+          "lateral-approved-deployment-07",
+          "lateral-approved-deployment-08",
+          "lateral-approved-deployment-09"
+        ],
+        "selected_candidate": "baseline",
+        "training_scores": [
+          {
+            "confusion": {
+              "tp": 120,
+              "fp": 30,
+              "fn": 0,
+              "tn": 90
+            },
+            "metrics": {
+              "precision": 0.8,
+              "recall": 1.0,
+              "f1": 0.8888888888888888,
+              "false_positive_rate": 0.25
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 120,
+              "fp": 35,
+              "fn": 0,
+              "tn": 85
+            },
+            "metrics": {
+              "precision": 0.7741935483870968,
+              "recall": 1.0,
+              "f1": 0.8727272727272727,
+              "false_positive_rate": 0.2916666666666667
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 113,
+              "fp": 30,
+              "fn": 7,
+              "tn": 90
+            },
+            "metrics": {
+              "precision": 0.7902097902097902,
+              "recall": 0.9416666666666667,
+              "f1": 0.8593155893536122,
+              "false_positive_rate": 0.25
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 120,
+              "fp": 30,
+              "fn": 0,
+              "tn": 90
+            },
+            "metrics": {
+              "precision": 0.8,
+              "recall": 1.0,
+              "f1": 0.8888888888888888,
+              "false_positive_rate": 0.25
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 120,
+              "fp": 30,
+              "fn": 0,
+              "tn": 90
+            },
+            "metrics": {
+              "precision": 0.8,
+              "recall": 1.0,
+              "f1": 0.8888888888888888,
+              "false_positive_rate": 0.25
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 120,
+              "fp": 40,
+              "fn": 0,
+              "tn": 80
+            },
+            "metrics": {
+              "precision": 0.75,
+              "recall": 1.0,
+              "f1": 0.8571428571428571,
+              "false_positive_rate": 0.3333333333333333
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          },
+          {
+            "confusion": {
+              "tp": 96,
+              "fp": 30,
+              "fn": 24,
+              "tn": 90
+            },
+            "metrics": {
+              "precision": 0.7619047619047619,
+              "recall": 0.8,
+              "f1": 0.7804878048780488,
+              "false_positive_rate": 0.25
+            },
+            "evaluation_errors": 0,
+            "cases": 240
+          }
+        ],
+        "evaluation": {
+          "confusion": {
+            "tp": 60,
+            "fp": 30,
+            "fn": 0,
+            "tn": 30
+          },
+          "metrics": {
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "f1": 0.8,
+            "false_positive_rate": 0.5
+          },
+          "evaluation_errors": 0,
+          "cases": 120
+        }
+      }
+    ],
+    "all_development_candidate_scores": [
+      {
+        "candidate": {
+          "id": "baseline",
+          "credential_failures": 3,
+          "resource_fanout": 8,
+          "bulk_download_mb": 500
+        },
+        "confusion": {
+          "tp": 180,
+          "fp": 60,
+          "fn": 0,
+          "tn": 120
+        },
+        "metrics": {
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1": 0.8571428571428571,
+          "false_positive_rate": 0.3333333333333333
+        },
+        "evaluation_errors": 0,
+        "cases": 360
+      },
+      {
+        "candidate": {
+          "id": "auth-2",
+          "credential_failures": 2,
+          "resource_fanout": 8,
+          "bulk_download_mb": 500
+        },
+        "confusion": {
+          "tp": 180,
+          "fp": 65,
+          "fn": 0,
+          "tn": 115
+        },
+        "metrics": {
+          "precision": 0.7346938775510204,
+          "recall": 1.0,
+          "f1": 0.8470588235294118,
+          "false_positive_rate": 0.3611111111111111
+        },
+        "evaluation_errors": 0,
+        "cases": 360
+      },
+      {
+        "candidate": {
+          "id": "auth-5",
+          "credential_failures": 5,
+          "resource_fanout": 8,
+          "bulk_download_mb": 500
+        },
+        "confusion": {
+          "tp": 173,
+          "fp": 53,
+          "fn": 7,
+          "tn": 127
+        },
+        "metrics": {
+          "precision": 0.7654867256637168,
+          "recall": 0.9611111111111111,
+          "f1": 0.8522167487684729,
+          "false_positive_rate": 0.29444444444444445
+        },
+        "evaluation_errors": 0,
+        "cases": 360
+      },
+      {
+        "candidate": {
+          "id": "fanout-6",
+          "credential_failures": 3,
+          "resource_fanout": 6,
+          "bulk_download_mb": 500
+        },
+        "confusion": {
+          "tp": 180,
+          "fp": 60,
+          "fn": 0,
+          "tn": 120
+        },
+        "metrics": {
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1": 0.8571428571428571,
+          "false_positive_rate": 0.3333333333333333
+        },
+        "evaluation_errors": 0,
+        "cases": 360
+      },
+      {
+        "candidate": {
+          "id": "fanout-12",
+          "credential_failures": 3,
+          "resource_fanout": 12,
+          "bulk_download_mb": 500
+        },
+        "confusion": {
+          "tp": 180,
+          "fp": 60,
+          "fn": 0,
+          "tn": 120
+        },
+        "metrics": {
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1": 0.8571428571428571,
+          "false_positive_rate": 0.3333333333333333
+        },
+        "evaluation_errors": 0,
+        "cases": 360
+      },
+      {
+        "candidate": {
+          "id": "download-250",
+          "credential_failures": 3,
+          "resource_fanout": 8,
+          "bulk_download_mb": 250
+        },
+        "confusion": {
+          "tp": 180,
+          "fp": 70,
+          "fn": 0,
+          "tn": 110
+        },
+        "metrics": {
+          "precision": 0.72,
+          "recall": 1.0,
+          "f1": 0.8372093023255814,
+          "false_positive_rate": 0.3888888888888889
+        },
+        "evaluation_errors": 0,
+        "cases": 360
+      },
+      {
+        "candidate": {
+          "id": "download-1000",
+          "credential_failures": 3,
+          "resource_fanout": 8,
+          "bulk_download_mb": 1000
+        },
+        "confusion": {
+          "tp": 156,
+          "fp": 60,
+          "fn": 24,
+          "tn": 120
+        },
+        "metrics": {
+          "precision": 0.7222222222222222,
+          "recall": 0.8666666666666667,
+          "f1": 0.7878787878787878,
+          "false_positive_rate": 0.3333333333333333
+        },
+        "evaluation_errors": 0,
+        "cases": 360
+      }
+    ],
+    "selected_from_all_development": {
+      "id": "auth-5",
+      "credential_failures": 5,
+      "resource_fanout": 8,
+      "bulk_download_mb": 500
+    },
+    "selected_by": "maximize minimum signed margin to four point targets, then F1, then lower FPR, then earlier declared candidate",
+    "no_app_configuration_changes": true,
+    "new_independent_evaluation": false,
+    "independent_review": "pending",
+    "goal_qualified": false,
+    "out_of_fold_score": {
+      "confusion": {
+        "tp": 173,
+        "fp": 60,
+        "fn": 7,
+        "tn": 120
+      },
+      "metrics": {
+        "precision": 0.7424892703862661,
+        "recall": 0.9611111111111111,
+        "f1": 0.837772397094431,
+        "false_positive_rate": 0.3333333333333333
+      },
+      "case_count": 360,
+      "inconclusive_cases": 10,
+      "inconclusive_kept_in_denominator": true,
+      "point_targets_met": false,
+      "gate_passed": false,
+      "statistical_target_supported": false,
+      "family_confidence": {
+        "method": "label-stratified-family-cluster-percentile-bootstrap",
+        "confidence_level": 0.95,
+        "repetitions": 1000,
+        "seed": 20261101,
+        "family_count": 36,
+        "intervals": {
+          "precision": {
+            "lower": 0.6336996336996337,
+            "upper": 0.8963730569948186,
+            "valid_replicates": 1000
+          },
+          "recall": {
+            "lower": 0.8833333333333333,
+            "upper": 1.0,
+            "valid_replicates": 1000
+          },
+          "f1": {
+            "lower": 0.7473002159827213,
+            "upper": 0.9276139410187667,
+            "valid_replicates": 1000
+          },
+          "false_positive_rate": {
+            "lower": 0.1111111111111111,
+            "upper": 0.5555555555555556,
+            "valid_replicates": 1000
+          }
+        },
+        "scope": "Variation among authored families; not a population guarantee or independent-row interval."
+      },
+      "evaluation_errors": 0,
+      "rules": [
+        {
+          "rule_id": "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d",
+          "confusion": {
+            "tp": 23,
+            "fp": 10,
+            "fn": 7,
+            "tn": 320
+          },
+          "metrics": {
+            "precision": 0.696969696969697,
+            "recall": 0.7666666666666667,
+            "f1": 0.7301587301587301,
+            "false_positive_rate": 0.030303030303030304
+          },
+          "positive_families": 3,
+          "point_targets_met": false
+        },
+        {
+          "rule_id": "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e",
+          "confusion": {
+            "tp": 30,
+            "fp": 20,
+            "fn": 0,
+            "tn": 310
+          },
+          "metrics": {
+            "precision": 0.6,
+            "recall": 1.0,
+            "f1": 0.75,
+            "false_positive_rate": 0.06060606060606061
+          },
+          "positive_families": 3,
+          "point_targets_met": false
+        },
+        {
+          "rule_id": "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f",
+          "confusion": {
+            "tp": 30,
+            "fp": 10,
+            "fn": 0,
+            "tn": 320
+          },
+          "metrics": {
+            "precision": 0.75,
+            "recall": 1.0,
+            "f1": 0.8571428571428571,
+            "false_positive_rate": 0.030303030303030304
+          },
+          "positive_families": 3,
+          "point_targets_met": false
+        },
+        {
+          "rule_id": "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+          "confusion": {
+            "tp": 40,
+            "fp": 10,
+            "fn": 0,
+            "tn": 310
+          },
+          "metrics": {
+            "precision": 0.8,
+            "recall": 1.0,
+            "f1": 0.8888888888888888,
+            "false_positive_rate": 0.03125
+          },
+          "positive_families": 4,
+          "point_targets_met": false
+        },
+        {
+          "rule_id": "ce5f6071-8293-4eaf-801b-2c3d4e5f6071",
+          "confusion": {
+            "tp": 30,
+            "fp": 10,
+            "fn": 0,
+            "tn": 320
+          },
+          "metrics": {
+            "precision": 0.75,
+            "recall": 1.0,
+            "f1": 0.8571428571428571,
+            "false_positive_rate": 0.030303030303030304
+          },
+          "positive_families": 3,
+          "point_targets_met": false
+        },
+        {
+          "rule_id": "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6",
+          "confusion": {
+            "tp": 60,
+            "fp": 20,
+            "fn": 0,
+            "tn": 280
+          },
+          "metrics": {
+            "precision": 0.75,
+            "recall": 1.0,
+            "f1": 0.8571428571428571,
+            "false_positive_rate": 0.06666666666666667
+          },
+          "positive_families": 6,
+          "point_targets_met": false
+        }
+      ]
+    },
+    "previously_observed_holdout_diagnostic": {
+      "confusion": {
+        "tp": 160,
+        "fp": 60,
+        "fn": 20,
+        "tn": 120
+      },
+      "metrics": {
+        "precision": 0.7272727272727273,
+        "recall": 0.8888888888888888,
+        "f1": 0.8,
+        "false_positive_rate": 0.3333333333333333
+      },
+      "case_count": 360,
+      "inconclusive_cases": 30,
+      "inconclusive_kept_in_denominator": true,
+      "point_targets_met": false,
+      "gate_passed": false,
+      "statistical_target_supported": false,
+      "family_confidence": {
+        "method": "label-stratified-family-cluster-percentile-bootstrap",
+        "confidence_level": 0.95,
+        "repetitions": 1000,
+        "seed": 20261101,
+        "family_count": 36,
+        "intervals": {
+          "precision": {
+            "lower": 0.6084782608695652,
+            "upper": 0.8823529411764706,
+            "valid_replicates": 1000
+          },
+          "recall": {
+            "lower": 0.7222222222222222,
+            "upper": 1.0,
+            "valid_replicates": 1000
+          },
+          "f1": {
+            "lower": 0.6814393939393939,
+            "upper": 0.9,
+            "valid_replicates": 1000
+          },
+          "false_positive_rate": {
+            "lower": 0.1111111111111111,
+            "upper": 0.5555555555555556,
+            "valid_replicates": 1000
+          }
+        },
+        "scope": "Variation among authored families; not a population guarantee or independent-row interval."
+      },
+      "evaluation_errors": 0,
+      "rules": [
+        {
+          "rule_id": "8a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d",
+          "confusion": {
+            "tp": 30,
+            "fp": 10,
+            "fn": 0,
+            "tn": 320
+          },
+          "metrics": {
+            "precision": 0.75,
+            "recall": 1.0,
+            "f1": 0.8571428571428571,
+            "false_positive_rate": 0.030303030303030304
+          },
+          "positive_families": 3,
+          "point_targets_met": false
+        },
+        {
+          "rule_id": "9b2c3d4e-5f60-4b7c-9d8e-9f0a1b2c3d4e",
+          "confusion": {
+            "tp": 30,
+            "fp": 10,
+            "fn": 0,
+            "tn": 320
+          },
+          "metrics": {
+            "precision": 0.75,
+            "recall": 1.0,
+            "f1": 0.8571428571428571,
+            "false_positive_rate": 0.030303030303030304
+          },
+          "positive_families": 3,
+          "point_targets_met": false
+        },
+        {
+          "rule_id": "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f",
+          "confusion": {
+            "tp": 20,
+            "fp": 0,
+            "fn": 10,
+            "tn": 330
+          },
+          "metrics": {
+            "precision": 1.0,
+            "recall": 0.6666666666666666,
+            "f1": 0.8,
+            "false_positive_rate": 0.0
+          },
+          "positive_families": 3,
+          "point_targets_met": false
+        },
+        {
+          "rule_id": "bd4e5f60-7182-4d9e-bf0a-1b2c3d4e5f60",
+          "confusion": {
+            "tp": 20,
+            "fp": 20,
+            "fn": 10,
+            "tn": 310
+          },
+          "metrics": {
+            "precision": 0.5,
+            "recall": 0.6666666666666666,
+            "f1": 0.5714285714285714,
+            "false_positive_rate": 0.06060606060606061
+          },
+          "positive_families": 3,
+          "point_targets_met": false
+        },
+        {
+          "rule_id": "ce5f6071-8293-4eaf-801b-2c3d4e5f6071",
+          "confusion": {
+            "tp": 20,
+            "fp": 10,
+            "fn": 10,
+            "tn": 320
+          },
+          "metrics": {
+            "precision": 0.6666666666666666,
+            "recall": 0.6666666666666666,
+            "f1": 0.6666666666666666,
+            "false_positive_rate": 0.030303030303030304
+          },
+          "positive_families": 3,
+          "point_targets_met": false
+        },
+        {
+          "rule_id": "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6",
+          "confusion": {
+            "tp": 50,
+            "fp": 40,
+            "fn": 0,
+            "tn": 270
+          },
+          "metrics": {
+            "precision": 0.5555555555555556,
+            "recall": 1.0,
+            "f1": 0.7142857142857143,
+            "false_positive_rate": 0.12903225806451613
+          },
+          "positive_families": 5,
+          "point_targets_met": false
+        }
+      ]
+    },
+    "schema": "f1-calibration-result-1",
+    "source_commit": "f9c31a104d0fae5de161a9582b4d0e75905e5d80",
+    "source_dirty": true,
+    "git_metadata": "available_snapshot_hashes_still_required",
+    "source_files_lf_sha256": {
+      "scripts/calibrate_f1_shadow.py": "cfd7b56648f82d7eaaa5d8353846cb8c5cd85d94aa6543cb57aadc590a23dfec",
+      "scripts/evaluate_f1_shadow.py": "339ef5c2195b2200ab970924174408b2adc40b0362e8e94abd69977aedb45c1a",
+      "scripts/audit_f1_features.py": "a85ea7662bb54bb97dc190f5bbc81804e40a492fe219719bc3fa71c901f077db",
+      "scripts/f1_lab/__init__.py": "62985db032a0261b06546af2b9e839c0790d41d6fe85e44ec2ffb1c423a120b0",
+      "scripts/f1_lab/approvals.py": "165b6340a0b195703c038419fcee8ad7e2c48dbe90039da5844305c60a6a72a1",
+      "scripts/f1_lab/calibration.py": "4a1e06de1a285cfee57a881e2d8eaf8cb6d7c174f8060203995488f5cd8bb178",
+      "scripts/f1_lab/confidence.py": "4c10c7b1d7147197d2ae89ed09f351b7eed99b4ff879b437ab8840b021ca3eb9",
+      "scripts/f1_lab/detector.py": "a39926be118918ca79fd2117fe2b27a638b4635ff18dc8476d579faa62ba393a",
+      "scripts/f1_lab/provenance.py": "4f8a1c095f0fb43c0e303cd805c26a14c34c2fd076a4753a7ac4445cfa512678",
+      "scripts/f1_lab/registry.py": "e1b76dba89e13fdc78e3a35c044a9c43d922123ba399fc9a0324d3c7d74c3e8c",
+      "scripts/f1_lab/session_controls.py": "8568aedb7ff457d76419e311f87f0fb992a8e86d7c0a1ed4519938a448700029",
+      "scripts/f1_lab/session_inference.py": "62a37226e30f0bf75de354bf8b58e52322c76d8eb1ba40b13708e5fdff10bc1f",
+      "scripts/f1_lab/source_registry.py": "f12661135bc0a0fd2999618c7221832b99535c27cdbcd0a3e4a700505c962ffd",
+      "scripts/f1_lab/temporal.py": "b0e50a41a11924bea888d073f9ef9eea03720cdcae2908cf4aa70e576b6a0c4a",
+      "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+      "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+      "app/data/benchmark/cases.jsonl": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f",
+      "app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+      "app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90"
+    },
+    "contract_sha256": "2ac25c2acfef8d4fa89408484ecd0de54d53a8f5595ca1640cdf724939e3a630",
+    "contract": {
+      "schema": "f1-shadow-calibration-1",
+      "input_role": "previously_observed_synthetic_development_only",
+      "outer_folds": 3,
+      "grouping": "connected_family_subject_device_session_and_declared_security_projection",
+      "selection": "maximize minimum signed margin to four point targets, then F1, then lower FPR, then earlier declared candidate",
+      "candidates": [
+        {
+          "id": "baseline",
+          "credential_failures": 3,
+          "resource_fanout": 8,
+          "bulk_download_mb": 500
+        },
+        {
+          "id": "auth-2",
+          "credential_failures": 2,
+          "resource_fanout": 8,
+          "bulk_download_mb": 500
+        },
+        {
+          "id": "auth-5",
+          "credential_failures": 5,
+          "resource_fanout": 8,
+          "bulk_download_mb": 500
+        },
+        {
+          "id": "fanout-6",
+          "credential_failures": 3,
+          "resource_fanout": 6,
+          "bulk_download_mb": 500
+        },
+        {
+          "id": "fanout-12",
+          "credential_failures": 3,
+          "resource_fanout": 12,
+          "bulk_download_mb": 500
+        },
+        {
+          "id": "download-250",
+          "credential_failures": 3,
+          "resource_fanout": 8,
+          "bulk_download_mb": 250
+        },
+        {
+          "id": "download-1000",
+          "credential_failures": 3,
+          "resource_fanout": 8,
+          "bulk_download_mb": 1000
+        }
+      ],
+      "promotion": "none; diagnostic selection only, no app configuration writes",
+      "new_independent_evaluation": false
+    },
+    "started_at_utc": "2026-11-11T18:39:25.434891+00:00",
+    "finished_at_utc": "2026-11-11T18:39:25.896086+00:00",
+    "manifest_sha256": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+    "effects": {
+      "cloud_calls": 0,
+      "paid_api_calls": 0,
+      "app_configuration_writes": 0
+    },
+    "limits": [
+      "Previously observed authored development and holdout, never a new blind dataset.",
+      "Outer folds group identical declared observations as well as family and identity.",
+      "Grouped threshold selection does not acquire missing observations or verify approval authority."
+    ]
+  },
+  "experiment_summary_sha256": "4e299ba9b074b14434e49f7c27e22eabc0bd4b349fa3b1cedbefdbe0861be2e7",
+  "focused_calibration_checks": {
+    "tests": 16,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "seconds": 1.946,
+    "sha256": "86aaaa30566be5cf77981d29e4bb50739bced0f2a694f4d06ee3d657d58c5598"
+  },
+  "source_files_lf_sha256": {
+    "scripts/calibrate_f1_shadow.py": "cfd7b56648f82d7eaaa5d8353846cb8c5cd85d94aa6543cb57aadc590a23dfec",
+    "scripts/f1_lab/calibration.py": "4a1e06de1a285cfee57a881e2d8eaf8cb6d7c174f8060203995488f5cd8bb178",
+    "tests/test_f1_calibration.py": "989a21ba021160bae871d07bcfe2643227fe2e20b7b55a95125bb0aa72185aa7"
+  },
+  "thresholds_promoted": false,
+  "original_app_baseline_changed": false,
+  "new_independent_evaluation": false,
+  "target_achieved": false,
+  "independent_review": "pending",
+  "cloud_calls": 0,
+  "paid_api_calls": 0,
+  "counts_are_separate_overlapping_phases": true
+}

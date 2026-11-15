@@ -1,0 +1,1443 @@
+{
+  "as_of": "2026-11-05",
+  "assisted_execution": "Codex tools; independent teammate review pending",
+  "baseline_commit": "08655e5810359f3b65cb4645a6c083b59b31ff7c",
+  "build_context_filter": {
+    "after_filter": {
+      "app": {
+        "fresh_venv_pip": "26.3",
+        "source_bytecode_counts": {
+          "/app/app": 0,
+          "/app/scripts": 0
+        }
+      },
+      "lambda": {
+        "fresh_venv_pip": "26.3",
+        "source_bytecode_counts": {
+          "/var/task/app": 0
+        }
+      }
+    },
+    "dockerignore_sha256": "66b602d4f6b420101d3d8efe2f1574de4066e68c34a370933fe1728b007d7727",
+    "observed_before_filter": {
+      "app_pyc": 39,
+      "scripts_pyc": 80
+    }
+  },
+  "build_provenance": {
+    "app": {
+      "compiler": "gcc (Debian 14.2.0-19) 14.2.0",
+      "debian_package": {
+        "filename": "libsqlite3-0_3.54.1-0secops1_amd64.deb",
+        "official_debian_build": false,
+        "sha256": "76395f9990ae8fa7cc8dbc34a3aed4354fa43dc264949438fee6bfca1d064a44",
+        "version": "3.54.1-0secops1"
+      },
+      "http_client": {
+        "after_sha256": "a713e5531a886739b3e2be7871c1bb239528f1025f5589f0a0e521c2a922f869",
+        "backport_commit": "1c8d928392cf0b4e84e392eb12f34557c9a0373f",
+        "backport_status_at_review": "open_PR_160772_not_an_upstream_3.12_release",
+        "base_url": "https://github.com/python/cpython/blob/v3.12.16/Lib/http/client.py",
+        "before_sha256": "c2c0694155837d72fc710a4138e5d1e53ae1a652b117a2e23a5b1b0db527a0f9",
+        "merged_main_commit": "2eb2af805c156ca52b316bb4ced5e0ab3971d0ae",
+        "ows_fix_commit": "9f52b443c002cccfb54bda0706a9276b6b4a109d",
+        "patch_sha256": "73bb32ef9b713ad796751bb1e8df5104974255e71e03e3b69d339c53568de701",
+        "upstream_backport_file_sha256": "2590d9284866458cc6d2b7c0b726338867ea6bb849581945562913f035835c67"
+      },
+      "library_path": "/usr/lib/x86_64-linux-gnu/libsqlite3.so.0",
+      "library_sha256": "c3ade12b9d82888fa42554bc2da2c0b50417e8c74ad00ada0b2d3d80de4e97e2",
+      "pip": {
+        "filename": "pip-26.3-py3-none-any.whl",
+        "sha256": "f3b60b20ffaadd4415ed7957212a38ac63fa4c5fa375bd0f4a797777940fad13",
+        "url": "https://files.pythonhosted.org/packages/07/25/ee8c38ae72d66b844ce8eb9711ba905dba21ca1a8a0c960057c41cd23337/pip-26.3-py3-none-any.whl",
+        "version": "26.3"
+      },
+      "profile": "debian",
+      "python": "3.12.16",
+      "schema": "secops-runtime-build-1",
+      "sqlite": {
+        "sha256": "926ef8d3eab93fbf6e06011901273eec076b25594a4e1cdadd50c987f4f6d64e",
+        "sha3_256": "b6ced585c750916b1052667239a12c25a7ff34e7f06e1e6e01ecb0427657d9c4",
+        "source_id": "2026-10-16 14:45:20 555e07ef33f69a0957d24d8e555b702464a131d6f1607f4c3c1e4551e8e6ca76",
+        "url": "https://www.sqlite.org/2026/sqlite-autoconf-3540100.tar.gz",
+        "version": "3.54.1"
+      },
+      "sqlite_compile_defines": [
+        "SQLITE_THREADSAFE=1",
+        "SQLITE_ENABLE_COLUMN_METADATA",
+        "SQLITE_ENABLE_DBSTAT_VTAB",
+        "SQLITE_ENABLE_FTS3",
+        "SQLITE_ENABLE_FTS3_PARENTHESIS",
+        "SQLITE_ENABLE_FTS3_TOKENIZER",
+        "SQLITE_ENABLE_FTS4",
+        "SQLITE_ENABLE_FTS5",
+        "SQLITE_ENABLE_RTREE",
+        "SQLITE_ENABLE_SESSION",
+        "SQLITE_ENABLE_PREUPDATE_HOOK",
+        "SQLITE_ENABLE_UNLOCK_NOTIFY",
+        "SQLITE_ENABLE_MATH_FUNCTIONS",
+        "SQLITE_ENABLE_LOAD_EXTENSION",
+        "SQLITE_SECURE_DELETE",
+        "SQLITE_LIKE_DOESNT_MATCH_BLOBS",
+        "SQLITE_DEFAULT_RECURSIVE_TRIGGERS",
+        "SQLITE_MAX_EXPR_DEPTH=1000"
+      ]
+    },
+    "lambda": {
+      "compiler": "gcc (GCC) 11.5.0 20240719 (Red Hat 11.5.0-5)",
+      "http_client": {
+        "after_sha256": "a713e5531a886739b3e2be7871c1bb239528f1025f5589f0a0e521c2a922f869",
+        "backport_commit": "1c8d928392cf0b4e84e392eb12f34557c9a0373f",
+        "backport_status_at_review": "open_PR_160772_not_an_upstream_3.12_release",
+        "base_url": "https://github.com/python/cpython/blob/v3.12.16/Lib/http/client.py",
+        "before_sha256": "c2c0694155837d72fc710a4138e5d1e53ae1a652b117a2e23a5b1b0db527a0f9",
+        "merged_main_commit": "2eb2af805c156ca52b316bb4ced5e0ab3971d0ae",
+        "ows_fix_commit": "9f52b443c002cccfb54bda0706a9276b6b4a109d",
+        "patch_sha256": "73bb32ef9b713ad796751bb1e8df5104974255e71e03e3b69d339c53568de701",
+        "upstream_backport_file_sha256": "2590d9284866458cc6d2b7c0b726338867ea6bb849581945562913f035835c67"
+      },
+      "library_path": "/var/lang/lib/libsqlite3.so.0",
+      "library_sha256": "ade1970aa3f10ba1b26256487124704fc5b2edb2ad8797f255c29d79af1abc61",
+      "pip": {
+        "filename": "pip-26.3-py3-none-any.whl",
+        "sha256": "f3b60b20ffaadd4415ed7957212a38ac63fa4c5fa375bd0f4a797777940fad13",
+        "url": "https://files.pythonhosted.org/packages/07/25/ee8c38ae72d66b844ce8eb9711ba905dba21ca1a8a0c960057c41cd23337/pip-26.3-py3-none-any.whl",
+        "version": "26.3"
+      },
+      "profile": "lambda",
+      "python": "3.12.16",
+      "schema": "secops-runtime-build-1",
+      "sqlite": {
+        "sha256": "926ef8d3eab93fbf6e06011901273eec076b25594a4e1cdadd50c987f4f6d64e",
+        "sha3_256": "b6ced585c750916b1052667239a12c25a7ff34e7f06e1e6e01ecb0427657d9c4",
+        "source_id": "2026-10-16 14:45:20 555e07ef33f69a0957d24d8e555b702464a131d6f1607f4c3c1e4551e8e6ca76",
+        "url": "https://www.sqlite.org/2026/sqlite-autoconf-3540100.tar.gz",
+        "version": "3.54.1"
+      },
+      "sqlite_compile_defines": [
+        "SQLITE_THREADSAFE=1",
+        "SQLITE_ENABLE_COLUMN_METADATA",
+        "SQLITE_ENABLE_DBSTAT_VTAB",
+        "SQLITE_ENABLE_FTS3",
+        "SQLITE_ENABLE_FTS3_PARENTHESIS",
+        "SQLITE_ENABLE_FTS3_TOKENIZER",
+        "SQLITE_ENABLE_FTS4",
+        "SQLITE_ENABLE_FTS5",
+        "SQLITE_ENABLE_RTREE",
+        "SQLITE_ENABLE_SESSION",
+        "SQLITE_ENABLE_PREUPDATE_HOOK",
+        "SQLITE_ENABLE_UNLOCK_NOTIFY",
+        "SQLITE_ENABLE_MATH_FUNCTIONS",
+        "SQLITE_ENABLE_LOAD_EXTENSION",
+        "SQLITE_SECURE_DELETE",
+        "SQLITE_LIKE_DOESNT_MATCH_BLOBS",
+        "SQLITE_DEFAULT_RECURSIVE_TRIGGERS",
+        "SQLITE_MAX_EXPR_DEPTH=1000"
+      ]
+    }
+  },
+  "candidate_image": {
+    "archive_sha256": "52437162374fff86e78b3fc3f5b63ea8607ce5253a02ad7279671eb3c3f284dc",
+    "id": "sha256:cc32b77d0f4494a6fa3f14f76bf38132556e515c4879d8f8f5e85ae6b926318c",
+    "source_app_scripts_verified": true
+  },
+  "controlled_before_recipe_sha256": "3304dfcfacb02018977fe73250ea321e907fdf02173029cdc36109765d141215",
+  "controlled_before_security": {
+    "checks": {
+      "backup_integrity": true,
+      "backup_rows": true,
+      "ensurepip_security_release": false,
+      "foreign_keys": true,
+      "fts5": true,
+      "http_chunk_extension": true,
+      "http_optional_whitespace": true,
+      "http_reject_chunk_hex_prefix": false,
+      "http_reject_chunk_leading_space": false,
+      "http_reject_chunk_negative": false,
+      "http_reject_chunk_signed": false,
+      "http_reject_chunk_underscore": false,
+      "http_reject_length_hex_prefix": true,
+      "http_reject_length_signed": false,
+      "http_reject_length_underscore": false,
+      "http_valid_chunk": true,
+      "http_valid_content_length": true,
+      "join_using_authorizer": true,
+      "pip_security_release": false,
+      "python_security_release": false,
+      "rtree": true,
+      "sqlite_security_release": false,
+      "wal_mode": true
+    },
+    "http_client_sha256": "c2c0694155837d72fc710a4138e5d1e53ae1a652b117a2e23a5b1b0db527a0f9",
+    "limits": [
+      "Parser tokens and synthetic SQLite files only; no external network or real credentials.",
+      "Version checks are not an exhaustive exploitability or upstream conformance test."
+    ],
+    "passed": false,
+    "pip": "25.0.1",
+    "python": "3.12.15",
+    "schema": "secops-runtime-security-check-1",
+    "sqlite": "3.46.1",
+    "sqlite_compile_options": [
+      "ALLOW_ROWID_IN_VIEW",
+      "ATOMIC_INTRINSICS=1",
+      "COMPILER=gcc-14.2.0",
+      "DEFAULT_AUTOVACUUM",
+      "DEFAULT_CACHE_SIZE=-2000",
+      "DEFAULT_FILE_FORMAT=4",
+      "DEFAULT_JOURNAL_SIZE_LIMIT=-1",
+      "DEFAULT_MMAP_SIZE=0",
+      "DEFAULT_PAGE_SIZE=4096",
+      "DEFAULT_PCACHE_INITSZ=20",
+      "DEFAULT_RECURSIVE_TRIGGERS",
+      "DEFAULT_SECTOR_SIZE=4096",
+      "DEFAULT_SYNCHRONOUS=2",
+      "DEFAULT_WAL_AUTOCHECKPOINT=1000",
+      "DEFAULT_WAL_SYNCHRONOUS=2",
+      "DEFAULT_WORKER_THREADS=0",
+      "DIRECT_OVERFLOW_READ",
+      "ENABLE_COLUMN_METADATA",
+      "ENABLE_DBPAGE_VTAB",
+      "ENABLE_DBSTAT_VTAB",
+      "ENABLE_FTS3",
+      "ENABLE_FTS3_PARENTHESIS",
+      "ENABLE_FTS3_TOKENIZER",
+      "ENABLE_FTS4",
+      "ENABLE_FTS5",
+      "ENABLE_LOAD_EXTENSION",
+      "ENABLE_MATH_FUNCTIONS",
+      "ENABLE_PREUPDATE_HOOK",
+      "ENABLE_RTREE",
+      "ENABLE_SESSION",
+      "ENABLE_STMTVTAB",
+      "ENABLE_UNLOCK_NOTIFY",
+      "ENABLE_UPDATE_DELETE_LIMIT",
+      "HAVE_ISNAN",
+      "LIKE_DOESNT_MATCH_BLOBS",
+      "MALLOC_SOFT_LIMIT=1024",
+      "MAX_ATTACHED=10",
+      "MAX_COLUMN=2000",
+      "MAX_COMPOUND_SELECT=500",
+      "MAX_DEFAULT_PAGE_SIZE=32768",
+      "MAX_EXPR_DEPTH=1000",
+      "MAX_FUNCTION_ARG=127",
+      "MAX_LENGTH=1000000000",
+      "MAX_LIKE_PATTERN_LENGTH=50000",
+      "MAX_MMAP_SIZE=0x7fff0000",
+      "MAX_PAGE_COUNT=0xfffffffe",
+      "MAX_PAGE_SIZE=65536",
+      "MAX_SCHEMA_RETRY=25",
+      "MAX_SQL_LENGTH=1000000000",
+      "MAX_TRIGGER_DEPTH=1000",
+      "MAX_VARIABLE_NUMBER=250000",
+      "MAX_VDBE_OP=250000000",
+      "MAX_WORKER_THREADS=8",
+      "MUTEX_PTHREADS",
+      "SECURE_DELETE",
+      "SOUNDEX",
+      "SYSTEM_MALLOC",
+      "TEMP_STORE=1",
+      "THREADSAFE=1",
+      "USE_URI"
+    ],
+    "sqlite_modules": [
+      "dbstat",
+      "fts3",
+      "fts3tokenize",
+      "fts4",
+      "fts4aux",
+      "fts5",
+      "fts5vocab",
+      "json_each",
+      "json_tree",
+      "rtree",
+      "rtree_i32",
+      "sqlite_dbpage",
+      "sqlite_stmt"
+    ],
+    "sqlite_source_id": "2024-08-13 09:16:08 c9c2ab54ba1f5f46360f1b4f35d849cd3f080e6fc2b6c60e91b16c63f69aalt1"
+  },
+  "controlled_runtime_upgrade": {
+    "checks": {
+      "backup.db:archive_retained": true,
+      "backup.db:chain_retained": true,
+      "backup.db:deny_consumed": true,
+      "backup.db:deny_revoked": true,
+      "backup.db:final_chain": true,
+      "backup.db:pending_once": true,
+      "backup.db:pending_replay_denied": true,
+      "backup.db:sqlite_integrity": true,
+      "backup.db:tenant_boundary": true,
+      "journal.db:archive_retained": true,
+      "journal.db:chain_retained": true,
+      "journal.db:deny_consumed": true,
+      "journal.db:deny_revoked": true,
+      "journal.db:final_chain": true,
+      "journal.db:pending_once": true,
+      "journal.db:pending_replay_denied": true,
+      "journal.db:sqlite_integrity": true,
+      "journal.db:tenant_boundary": true
+    },
+    "limits": "Synthetic fixed-clock DB and SQLite backup compatibility; no production rollback/HA claim.",
+    "new_runtime": {
+      "python": "3.12.16",
+      "sqlite": "3.54.1"
+    },
+    "old_runtime": {
+      "python": "3.12.15",
+      "sqlite": "3.46.1"
+    },
+    "passed": true,
+    "schema": "secops-runtime-upgrade-1"
+  },
+  "earlier_local_attempts": [
+    {
+      "checks_passed": 4,
+      "cleanup_complete": true,
+      "failure": "archived_consumption_marker_missing",
+      "name": "parallel mTLS"
+    },
+    {
+      "checks_passed": 20,
+      "cleanup_complete": true,
+      "failure": "unrelated_subject_still_receives_document_status",
+      "name": "isolated mTLS before timing-fixture correction"
+    },
+    {
+      "checks_passed": 2,
+      "cleanup_complete": true,
+      "failure": "normal_mtls_document_delivery_status",
+      "name": "mTLS while full Linux/scanner running"
+    }
+  ],
+  "fresh_offline_venv": {
+    "app": "pip26.3 verified",
+    "lambda": "{\"source_bytecode_counts\": {\"/var/task/app\": 0}, \"fresh_venv_pip\": \"26.3\"}"
+  },
+  "implementation_lf_sha256": {
+    ".dockerignore": "fcae495a3f4cceefd962edca376d682ce94dff3115e7c32a1eb690c390a93d51",
+    ".gitattributes": "5b2cf47b7db5dffc2735a4683fe47cfa64698e35c937a282d2f2bc829ffec043",
+    "Dockerfile": "1dde008271fcd5da9a4dc35044f76b75976ee152d22adb5fa332e3d97f0e8bff",
+    "Dockerfile.lambda": "c85b72733091437e206bff80fb2568a0075db079323b859732ea41564680228a",
+    "Dockerfile.test": "78f77c769d41706267aa403f4efe7d8b096ab6233fdfed44413f398777047ebe",
+    "infra/runtime/NOTICE.md": "98df8af2f6bb7b0232f1bc4666f644176ddfe88140774455f6f7b09b8fb7110d",
+    "infra/runtime/build_runtime.py": "f12b3ffaac1aa6445f53953f827e800485e15e3acc5fee572151d914ad843885",
+    "infra/runtime/http-client.patch": "73bb32ef9b713ad796751bb1e8df5104974255e71e03e3b69d339c53568de701",
+    "infra/runtime/requirements/build.lock": "013559140df5e368e32008c14145bf79e0b032d7ce06345989d2e222875b9e88",
+    "infra/runtime/requirements/runtime.lock": "f1ea4b9984f15394db8c2f300934ef173245c9addf8bc89e7114d760cdbf8d07",
+    "infra/runtime/requirements/test.lock": "9824d5fb26b94cc0fb9b36a52a70ca98eabc1801d93c11c77b2621cd2930c7ba",
+    "infra/runtime/sources.lock.json": "e5cd2b050b6a87a499ba8920a8d28469a7466aaaf85e6ac4d2e2ae7d5e390b2e",
+    "infra/runtime/verify_security.py": "bf45ca64aca30cabe4f49c37335d21d224bfc475a08a7ee8e95be31acbec58ca",
+    "infra/testing/Dockerfile.runtime-before": "3304dfcfacb02018977fe73250ea321e907fdf02173029cdc36109765d141215",
+    "pyproject.toml": "a71998c113e8cea24811d46050c1ae0aa431e0f8e1f37751e46eeeb7a5f90ed9",
+    "scripts/compare_pep.py": "ccc998b829466c325f94b61d6443aeb9a6ce4f593ce8bd4d5679ee58855b622d",
+    "scripts/continuous_mtls_runtime.py": "14c235cd08b9422d5d9a2fd6fd484e3804284f386f2e6684c2b7b313204b0e94",
+    "scripts/recheck_supply_chain.py": "797651e936d8d21e7eabeb372d7a3c55dead5fa9975a6e57d33b2204d121e7c1",
+    "scripts/test_continuous_mtls_runtime.py": "59f0d2bc42658913f8b4107b0770675915b8cc24552bd2348a8c6e039ca22128",
+    "scripts/verify_runtime_upgrade.py": "3f66af29bb9cd3ac18b4a44891d12bd6b10f72eeff9073d9b3ee4f73ce7d220d",
+    "tests/test_runtime_patches.py": "13b6f971f4f1919551b229bb3826771d541354b1c78d4d49d2eb127e74a2e459"
+  },
+  "lambda_image_id": "sha256:80d8fcc4da082044ec26f45871d417e6aae8cdae6a4a5cf6eb03461a8bf3f1ba",
+  "last_mtls_attempt_before_generic_expiry_control": {
+    "cleanup_complete": true,
+    "core_reason": "GRANT_EXPIRED",
+    "failure": "version200_watchdog_preserves_unrelated_document_status"
+  },
+  "last_serial_attempt_before_watchdog_quiescence": {
+    "checks_passed": 5,
+    "cleanup_complete": true,
+    "failure": "archive_changed_session_history"
+  },
+  "local_mtls_app_and_script_source_matches_candidate": true,
+  "local_mtls_image_matches_candidate": false,
+  "local_mtls_packaging_limit": "Local 41-check mTLS campaign preceded bytecode-cache exclusion; application/scripts unchanged, filtered image focused/native checks pass; exact final image mTLS is rerun in PR and post-merge CI.",
+  "local_validation": {
+    "filtered_image_focused": {
+      "elapsed_seconds": 7.73,
+      "exit_code": 0,
+      "failed": 0,
+      "log_sha256": "168338f7b7efaa6d5e1e6f6d575e3e2b35426de9dc48d36e80845402b612f1c1",
+      "passed": 106,
+      "skipped": 0,
+      "summary": "106 passed in 6.01s",
+      "warnings": 0
+    },
+    "linux_full": {
+      "elapsed_seconds": 417.97,
+      "exit_code": 0,
+      "failed": 0,
+      "log_sha256": "ce251cf61abdada0abe0e9891b505760d10ffc41405b643c4f7f91079358a813",
+      "passed": 1892,
+      "skipped": 0,
+      "summary": "1892 passed, 2 warnings in 414.75s (0:06:54)",
+      "warnings": 2
+    },
+    "mtls": {
+      "checks": [
+        {
+          "label": "nine_hardened_services_and_six_internal_networks",
+          "passed": true,
+          "services": {
+            "app": {
+              "init": true,
+              "network_mode": "kmtls-aa0f3efdda98_core",
+              "published_ports": false,
+              "read_only": true,
+              "restart": "unless-stopped",
+              "uid": "10001:10001"
+            },
+            "bridge": {
+              "init": true,
+              "network_mode": "kmtls-aa0f3efdda98_auth",
+              "published_ports": false,
+              "read_only": true,
+              "restart": "unless-stopped",
+              "uid": "10001:10001"
+            },
+            "collector": {
+              "init": true,
+              "network_mode": "kmtls-aa0f3efdda98_intake",
+              "published_ports": false,
+              "read_only": true,
+              "restart": "unless-stopped",
+              "uid": "10001:10001"
+            },
+            "gateway": {
+              "init": true,
+              "network_mode": "kmtls-aa0f3efdda98_core",
+              "published_ports": false,
+              "read_only": true,
+              "restart": "unless-stopped",
+              "uid": "10001:10001"
+            },
+            "operator": {
+              "init": true,
+              "network_mode": "kmtls-aa0f3efdda98_client",
+              "published_ports": false,
+              "read_only": true,
+              "restart": "unless-stopped",
+              "uid": "10001:10001"
+            },
+            "proxy": {
+              "init": true,
+              "network_mode": "kmtls-aa0f3efdda98_auth",
+              "published_ports": false,
+              "read_only": true,
+              "restart": "unless-stopped",
+              "uid": "10001:10001"
+            },
+            "resource": {
+              "init": true,
+              "network_mode": "kmtls-aa0f3efdda98_consume",
+              "published_ports": false,
+              "read_only": true,
+              "restart": "unless-stopped",
+              "uid": "10001:10001"
+            },
+            "watchdog": {
+              "init": true,
+              "network_mode": "none",
+              "published_ports": false,
+              "read_only": true,
+              "restart": "unless-stopped",
+              "uid": "10001:10001"
+            },
+            "worker": {
+              "init": true,
+              "network_mode": "none",
+              "published_ports": false,
+              "read_only": true,
+              "restart": "unless-stopped",
+              "uid": "10001:10001"
+            }
+          }
+        },
+        {
+          "active_records": 5020,
+          "archived_records": 5000,
+          "generated_audit_rows": 10020,
+          "label": "policy_journal_continues_after_ten_thousand_records",
+          "passed": true,
+          "total_records": 10020
+        },
+        {
+          "label": "normal_mtls_document_delivery",
+          "passed": true,
+          "resource_deliveries": 1,
+          "status": 200,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "label": "archived_consumed_token_denies_document",
+          "passed": true,
+          "resource_deliveries": 0,
+          "status": 403,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "label": "archived_revocation_denies_unconsumed_token",
+          "passed": true,
+          "resource_deliveries": 0,
+          "status": 403,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "label": "journal_restart_preserves_revoked_access_denial",
+          "passed": true,
+          "resource_deliveries": 0,
+          "status": 403,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "archived_records": 10024,
+          "consumed_marker_verified": true,
+          "consumed_reason": "GRANT_EXPIRED",
+          "expiry_watchdog_quiesced_for_snapshot": true,
+          "label": "journal_checkpoint_retains_sessions_consumption_and_revocation_after_restart",
+          "passed": true,
+          "revoked_versions": 2
+        },
+        {
+          "label": "version200_fanout_denies_related_document",
+          "passed": true,
+          "resource_deliveries": 0,
+          "status": 403,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "label": "version200_fanout_preserves_unrelated_document",
+          "passed": true,
+          "resource_deliveries": 1,
+          "status": 200,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "capped_version": 201,
+          "label": "version200_observation_fanout_and_duplicate_preserve_history",
+          "passed": true,
+          "related_version": 2,
+          "synthetic_checkpoint": true
+        },
+        {
+          "label": "archived_security_tail_restart_denies_document",
+          "passed": true,
+          "resource_deliveries": 0,
+          "status": 403,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "label": "archived_security_tail_and_receipt_survive_app_worker_watchdog_restart",
+          "passed": true,
+          "version": 201
+        },
+        {
+          "label": "version200_watchdog_records_expiry_without_input",
+          "passed": true,
+          "synthetic_checkpoint": true,
+          "version": 201
+        },
+        {
+          "label": "version200_watchdog_key_revocation_denies_related_document",
+          "passed": true,
+          "resource_deliveries": 0,
+          "status": 403,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "label": "version200_watchdog_preserves_unrelated_document",
+          "passed": true,
+          "resource_deliveries": 1,
+          "status": 200,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "expired_original_denied": true,
+          "expired_reason": "GRANT_EXPIRED",
+          "fresh_proof_used": true,
+          "label": "version200_control_policy_and_expiry_are_distinct",
+          "original_versions": 1,
+          "passed": true
+        },
+        {
+          "label": "version200_watchdog_key_revocation_and_repeat_are_idempotent",
+          "passed": true,
+          "version": 202
+        },
+        {
+          "after": 1,
+          "before": 0,
+          "exit_signal": "SIGKILL to Python child, not Docker stop",
+          "label": "automatic_restart_collector",
+          "passed": true,
+          "same_container": true
+        },
+        {
+          "after": 1,
+          "before": 0,
+          "exit_signal": "SIGKILL to Python child, not Docker stop",
+          "label": "automatic_restart_worker",
+          "passed": true,
+          "same_container": true
+        },
+        {
+          "acknowledged": 1,
+          "captured": 1,
+          "label": "outage_restart_recovers_persisted_envelope_once",
+          "original_envelope_sha256": "fc037fc9692c6c5e1c9667f363ec4358ad6dff99d02958bfc65e9279ef259edf",
+          "passed": true,
+          "policy_transitions": 1
+        },
+        {
+          "label": "recovered_observation_denies_unconsumed_grant",
+          "passed": true,
+          "resource_deliveries": 0,
+          "status": 403,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "label": "unrelated_subject_still_receives_document",
+          "passed": true,
+          "resource_deliveries": 1,
+          "status": 200,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "expired_original_denied": true,
+          "expired_reason": "GRANT_EXPIRED",
+          "fresh_proof_used": true,
+          "label": "outage_control_policy_and_expiry_are_distinct",
+          "original_versions": 1,
+          "passed": true
+        },
+        {
+          "label": "duplicate_feed_preserves_one_receipt_and_policy_effect",
+          "passed": true
+        },
+        {
+          "archived_records": 2,
+          "label": "server_inbox_archive_preserves_pending_processing_and_lease",
+          "live_records": 2,
+          "passed": true
+        },
+        {
+          "conflict_status": 409,
+          "duplicate_status": 202,
+          "label": "archived_inbox_exact_duplicate_and_valid_conflict_over_mtls",
+          "passed": true
+        },
+        {
+          "label": "inbox_restart_recovers_pending_and_expired_lease_without_reapplying_archive",
+          "passed": true,
+          "recovered": 2
+        },
+        {
+          "label": "server_inbox_maintenance_restart_preserves_revoked_access_denial",
+          "passed": true,
+          "resource_deliveries": 0,
+          "status": 403,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "compacted": 1,
+          "input_generation": 1,
+          "label": "compaction_and_rotation_preserve_pending_and_duplicate_history",
+          "passed": true,
+          "retained_pending": 1
+        },
+        {
+          "acknowledged": 2,
+          "label": "pending_exact_envelope_recovers_over_mtls_after_maintenance",
+          "original_envelope_sha256": "a0d6a94804279b43ee77235b62a345252b69eb94c7ee83218197d5d175876f76",
+          "passed": true
+        },
+        {
+          "label": "compacted_duplicate_skipped_across_input_generation",
+          "passed": true
+        },
+        {
+          "label": "maintenance_restart_preserves_revoked_access_denial",
+          "passed": true,
+          "resource_deliveries": 0,
+          "status": 403,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "after": 1,
+          "before": 0,
+          "exit_signal": "SIGKILL to Python child, not Docker stop",
+          "label": "automatic_restart_watchdog",
+          "passed": true,
+          "same_container": true
+        },
+        {
+          "label": "expired_proof_denies_unconsumed_grant",
+          "passed": true,
+          "resource_deliveries": 0,
+          "status": 403,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "label": "watchdog_restart_records_expiry_without_new_input",
+          "passed": true,
+          "session_versions": 2
+        },
+        {
+          "label": "server_pin_failure_retains_event_and_same_path_profile_recovers",
+          "passed": true
+        },
+        {
+          "label": "revoked_signing_key_denies_unconsumed_grant",
+          "passed": true,
+          "resource_deliveries": 0,
+          "status": 403,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "after": 1,
+          "before": 0,
+          "exit_signal": "SIGKILL to Python child, not Docker stop",
+          "label": "automatic_restart_app",
+          "passed": true,
+          "same_container": true
+        },
+        {
+          "label": "app_restart_preserves_revocation",
+          "passed": true,
+          "resource_deliveries": 0,
+          "status": 403,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "label": "source_key_revocation_visible_through_atomic_registry_replacement",
+          "passed": true
+        },
+        {
+          "label": "collector_worker_watchdog_app_continue_without_reviving_access",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "containers": 0,
+        "networks": 0,
+        "volumes": 0
+      },
+      "completed": true,
+      "configuration_sha256": {
+        "Dockerfile": "896c79f30f531b67fcc0c9f9b0a44162fbe624ae355c273cd2b01c321c7e234e",
+        "infra/mtls/all-hops-nginx.conf": "858533d28040a4d83c6bd58ede75e3efac0f8597f3e2992dfa79976527ad2e0e",
+        "infra/pep/tools.lock.json": "9076cc79d486366d5814014024df6f38ffef7862bbaf008261c39f7249b447e6",
+        "infra/runtime/NOTICE.md": "98df8af2f6bb7b0232f1bc4666f644176ddfe88140774455f6f7b09b8fb7110d",
+        "infra/runtime/build_runtime.py": "f12b3ffaac1aa6445f53953f827e800485e15e3acc5fee572151d914ad843885",
+        "infra/runtime/http-client.patch": "73bb32ef9b713ad796751bb1e8df5104974255e71e03e3b69d339c53568de701",
+        "infra/runtime/requirements/build.lock": "0b2f96a35e79d90d94f57e7cb7af3f97d49f3cc7b8c09d47f63390b223fe32c7",
+        "infra/runtime/requirements/runtime.lock": "a6a277432de8500bdf1f0345334b085c66a7fa83813e3d85a622b87eba62130c",
+        "infra/runtime/requirements/test.lock": "61e7b1c2641db36202832a56ab0b0cd3728e07a7e77c4dab38448ba7161309f8",
+        "infra/runtime/sources.lock.json": "e5cd2b050b6a87a499ba8920a8d28469a7466aaaf85e6ac4d2e2ae7d5e390b2e",
+        "infra/runtime/verify_security.py": "bf45ca64aca30cabe4f49c37335d21d224bfc475a08a7ee8e95be31acbec58ca",
+        "pyproject.toml": "b8bd572be04ec1a6f8bf818645b6ac74458f98fc9561ea453210ab6c23e5475e"
+      },
+      "elapsed_seconds": 910.81,
+      "image_id": "sha256:31b3c11e1270334e888ff4f4520084f7f7408de6973ca3e91e60d9385d079913",
+      "image_source_verified": true,
+      "source_commit": "08655e5810359f3b65cb4645a6c083b59b31ff7c",
+      "source_dirty": true,
+      "source_input_sha256": {
+        "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+        "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+        "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+        "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+        "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+        "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+        "app/config.py": "27abe1679ef3147f9eb28920299c68dbf93932e05bda6035a64d7b0ac1d2fcb2",
+        "app/continuous_signal_models.py": "895b017d7c666923639088281f71ef64386977e381c5b8060c3123d174be34ae",
+        "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+        "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+        "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+        "app/main.py": "c04fb9ff8011a463994a95eed78d577512434500d2e89d0ce424161b9e2fce34",
+        "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+        "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+        "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+        "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+        "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+        "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+        "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+        "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+        "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+        "app/services/collector_spool.py": "e39bb7d21c314251a51733483f00ff529c42f9eee32487431bfba606a5bf457b",
+        "app/services/continuous_signals.py": "05115d837dc2c00b56aafbe8833b047c0cd9fb1854fff20ba7db03db261ca2a3",
+        "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+        "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+        "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+        "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+        "app/services/inbox_archive.py": "39e29b7923df2df40230c031f6e015ffbf7b28400c5689172df9824ad6026522",
+        "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+        "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+        "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+        "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+        "app/services/policy_journal.py": "8299f7210567cb235156dcebed19a8c71b0e980cd52c7386c9cabf8867a5145e",
+        "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+        "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+        "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+        "app/services/signal_inbox.py": "481d3c511025deb2b8b46cdb8f9abeacf780673bd754ac040346f443787877d8",
+        "app/services/trusted_signals.py": "076ac930894e32522813ff39e1c6f317bcd2a6746605f670dde8f807d59492ff",
+        "app/services/zero_trust.py": "e71f5e925be41fe1e2515ad4554b883d029e11cf5a1599a5e84c51b7dc2a8d22",
+        "app/zero_trust_api.py": "556fda2b67c9a20077b65c5f03c121e5deffd4a48d9f651ff1b7409f26b1b491",
+        "app/zero_trust_models.py": "dec2759fcc568ee9e76e758f5a521481ae7d066e1e8bc82530e18945419f5eb1",
+        "scripts/assess_supply_chain.py": "a7019aa6fdc7e9c6ef8f0615ee55bd1a9e42c18549b14e22e55f3199619cd37b",
+        "scripts/authority_custodian.py": "b87fc7ef0be26ecb259510e8df07eae402dae9608b1a2e5bfa3e03b23c6f4693",
+        "scripts/authority_rotation_coordinator.py": "1ab99ef7f9a96c75393209c169d41f82db0a783c4f24bde7df622a7c9c84647b",
+        "scripts/authority_rotation_runtime.py": "e184e49c386ed46d4f3e9214cec95e97a7f56e4e0608711119f2c61b6b76ca26",
+        "scripts/build_detection_benchmark.py": "ed2513a7d2901360c55c22785e0f1eab6b2496c17c4c3660901ccd5da77445bf",
+        "scripts/ca_endpoints.py": "b5c546ce93d86ea90e99de46f78e80e60149f8146605e27160ceb24a9babd057",
+        "scripts/ca_host_recovery.py": "8504ebbdc7431dd3577196bcd54d291d30d4f91000b407e1508077d6f7f0642a",
+        "scripts/ca_recovery_nodes.py": "09780266804b0a47abc748234eba449986be3bd4b712eb65d26c51516715a48d",
+        "scripts/ca_recovery_state.py": "6210dd281a163aec00ebb2ff4d7f94db921031af79a2a05e9d51e29ed1bddd8e",
+        "scripts/certificate_authority.py": "1b3e0d501e74d9bc47442e15b1d2f4201bf4a6fd6d48644d93a70c6592c54f9c",
+        "scripts/certificate_controller.py": "fe5d5058b8edbf3632e6d060c4ad2074d6ea8fd72767524db18da1ea9d70ec32",
+        "scripts/certificate_key_rotation.py": "e648f07caf6d2a7873fb14d91cfd5285f5aec67e1aa086e436e1e5ca9284d319",
+        "scripts/certificate_reload_runner.py": "bbdafeaa210b747c007f666ec4f1beb12ee2b9afe49556fffc7c303751f0a6c9",
+        "scripts/collector_input.py": "129af08fa42d4aaf1cc5ac44475b7b26f66b43981d851da40470f0ab0184e562",
+        "scripts/compare_observability.py": "e7228243d654f4629486b3c8c51dede5594e07cbe52586765252de868bacc5b0",
+        "scripts/compare_pep.py": "42954e1790532378b17572b26f64282844b9c8c806c03d019afd87e2e9036477",
+        "scripts/compare_supply_chain.py": "c1d018310629b5e797b98f6179730b0b677f66b6e444ca75b928bf71c79b9adb",
+        "scripts/continuous_mtls_assets.py": "29c55780ed407201968b276727bafe9be980c5e10640b442be85c3e4876b3015",
+        "scripts/continuous_mtls_runtime.py": "eee3fa4726a8fb08fba10fbbbc80b3bd41a16ccce0051e234e76c4a352687602",
+        "scripts/continuous_signal_collector.py": "8ac1925b946c4fd1b1b56fe43d743793b4f5320de1628f787f533a72be7684a6",
+        "scripts/control_executor.py": "e139a3f73b644a9f9d59de3f5875293065fc41371e8e7ba88dc1bf1046850de8",
+        "scripts/control_mirror.py": "7755a1e838b5b2f92d37d7d05e3de6a2456191ca18ae2b76d9882c86f79f10f3",
+        "scripts/control_plane_ha.py": "1c4c2e10e28fc8ea4a057f809e2ce6d8ea1e2cd09d33771fba817ee8b836ba3f",
+        "scripts/control_store.py": "6fc5ae46bf568adb1202cff86430cabad1025ee555ad5bddecbf0a9a484c524a",
+        "scripts/control_transition.py": "008a42a90391793290d01fa9986b2488828528ca6e7e192ff5c4a0abdbd8c36b",
+        "scripts/evaluate_detection_benchmark.py": "270178af5fe498660a4d1fbb8b4d2f3c287199f4f777ee9e1ed0ca1c57d67d73",
+        "scripts/executor_cluster.py": "dccff8606a63a5d819ba3cf04668ba372c2a87fa2bb645eced2026e709852f4b",
+        "scripts/executor_daemon_recovery.py": "15a083c72ad77b38d1469b15410024855c46fb4cb753014f330cf247a1107904",
+        "scripts/executor_disk.py": "95d97888db2d21746698b0dee9656cbe91655f25d3725c63526a1187585be32d",
+        "scripts/executor_fence.py": "62babd635b6c9001cb38ddf7bc4996b22b3976ad96bb67eb5a9623900d5a2152",
+        "scripts/executor_store.py": "a9919ae315ce055cd39da3731dd13a708a3eba585efe2ac5e35b8cdcce076738",
+        "scripts/executor_transition.py": "79e243cc1242a7ada85932b275ca9710255f71275447307b824f891616ff89f9",
+        "scripts/local_signal_collector.py": "a3ce655c10963a183f46413dc71bdaa3f56c7c85da91abe756a7e6e034cfbb39",
+        "scripts/measure_signal_infrastructure.py": "e57da22be08f5360798dba42e1661ea271dea3907574a35cd4848ea237772d80",
+        "scripts/mtls_fixtures.py": "086155d77391fc36973dfb49442c0609ac0192760a1944774d68cbcbfad665b9",
+        "scripts/mtls_native.py": "e892293b44d86feca35b6e408b21ffc28c684893533632c7fc5c15a72c678e17",
+        "scripts/mtls_transport.py": "5e71999d5eb87354bd1beaf79b62fad5169d7584106deebf60ed3ee53c9b1a56",
+        "scripts/observability_lab.py": "596bf05a9d8d2ffe268e0d61142d9d4d6f5b9fff64012497aa6b542f9eacfcc3",
+        "scripts/pep_lab.py": "b199f1fd9df18e75e564182036e8ef208872bc65f6efd489f058840541263fe8",
+        "scripts/policy_journal.py": "a4527df2e3ecdb8311835c5acdcd93ee6eaeb7889b666861776e03aad0f936e5",
+        "scripts/recheck_supply_chain.py": "797651e936d8d21e7eabeb372d7a3c55dead5fa9975a6e57d33b2204d121e7c1",
+        "scripts/review_supply_chain.py": "9d5425ca6e27aed96e224d79f3ef40af4bb0e20f2eeb9847d7f6f0895fd4efa4",
+        "scripts/service_daemon_recovery.py": "101aa30d6bc7a37b159ed1e62ae0f00f3045ef14f6aada9ade8a94188ee35738",
+        "scripts/service_recovery_store.py": "01e2423150812f56f88cbc82b6f27da0cc2eee68bbe4f62d018068aaaba9c157",
+        "scripts/session_watchdog.py": "a70627cf113d1cf1e13adef8ef6f1b4ffc7bd99ca93c677ab6c099343eea322e",
+        "scripts/signal_inbox.py": "14bb418a0277d64d26238f0733384699019d48d5dcec548c931dcb5d6b5947d7",
+        "scripts/signal_metrics_exporter.py": "182c650db6796e973829afddd8ce239318505021058a5c891c46d074a6b0ff62",
+        "scripts/signal_worker.py": "043a97a59149ac6375a9c0945e7acef9a64f3da0e83b5815fab040cee5194438",
+        "scripts/supply_chain_runtime_probe.py": "be4b52555a5a349817806ee23d72907b2e762f7b46f4fb7d37bb434622c42645",
+        "scripts/test_all_hops_mtls.py": "0e7c44dc5fb4ab1809e4a0a5e377338132991b719061fa4fe97cd47b4e61ce09",
+        "scripts/test_authority_key_rotation.py": "2e7c4dbd442e02421ec8f61d7f2346d8e79fec549601f4e2741ab1721f2dad0c",
+        "scripts/test_ca_high_availability.py": "284c3785291117d71ffa78dd0be6147e6e8e58fb16a63a697d8c519b6b91e4b2",
+        "scripts/test_ca_host_recovery.py": "713709b9db97bd66c0a340a19a8b9c42e30b4b1a668c4bf2367be842a0231044",
+        "scripts/test_certificate_automation.py": "37740d5b589cadbaedc3d530ea8318d5ff4f3a44a07f17f0cd320d1418e6b773",
+        "scripts/test_continuous_mtls_runtime.py": "aa958cfd5a565971a7a47648485e15e8f4b20a926a688d3fb54ae13486fc8c66",
+        "scripts/test_control_plane_ha.py": "47b1579dcc89bd1d2e0a041c53f2ca6cd6de2adaf0ac74ae029d9c02e56c744a",
+        "scripts/test_control_transition.py": "5e0683ea48d454c57322adb1d45b7f3c1881a4ba4d956524d31a7e6529ed3e91",
+        "scripts/test_executor_actor_loss.py": "6b097f646a42c827af3fa665e7647f5a8d92c49339797cfb534bb147a41816f9",
+        "scripts/test_executor_daemon_restart.py": "ab653f1d75d349e66a326da3e02c35157a293d40e0f30da4fab40e30e8f6b94e",
+        "scripts/test_executor_hosts.py": "0a9f791330279db729bddfea016c4484b1558bdbca683003d71f842ee7ac3c4f",
+        "scripts/test_executor_transition.py": "4dde1cb1bbd052616012d89a3d762ee070b4a68d0e3baca91ecebd359bf0b905",
+        "scripts/test_mtls_infrastructure.py": "3724f4c98f0baee127c58d4f961f048d8be97dde9d409ee7137f996845c6b72b",
+        "scripts/test_private_key_rotation.py": "b8fd85194759dff83f7991f2069ebefe1025b853a53ce48b8f846b4c194a788c",
+        "scripts/test_service_daemon_restart.py": "a64a67ca256fd5a0aeb3bef1aa286612235f92e0b4705e0fdc2e5b4cfe6eb125",
+        "scripts/test_signal_compose.py": "5738653d37888e7729528576d2167a0d0e6534543007e83636c2ccc765d3dd5b",
+        "scripts/verify_runtime_upgrade.py": "3f66af29bb9cd3ac18b4a44891d12bd6b10f72eeff9073d9b3ee4f73ce7d220d"
+      }
+    },
+    "new_patch_test_cases": 55,
+    "new_patch_test_cases_windows_native_skips": 2,
+    "windows_focused_and_prior_failures_serial": {
+      "elapsed_seconds": 119.11,
+      "exit_code": 0,
+      "failed": 0,
+      "log_sha256": "87e52cf0cd1d67e4bfc91f3ba14d6342ec6fa3101aab60469a1e05c3ca7d63c7",
+      "passed": 118,
+      "skipped": 2,
+      "summary": "118 passed, 2 skipped, 2 warnings in 115.99s (0:01:55)",
+      "warnings": 2
+    },
+    "windows_full_parallel": {
+      "elapsed_seconds": 1044.39,
+      "exit_code": 1,
+      "failed": 3,
+      "log_sha256": "b34e0de00c9772fb92977599e9d9e6e465e26d40f0caadf49e14871d7023f01f",
+      "passed": 1877,
+      "skipped": 4,
+      "summary": "3 failed, 1877 passed, 4 skipped, 3 warnings in 1039.97s (0:17:19)",
+      "warnings": 3
+    },
+    "windows_full_serial": {
+      "elapsed_seconds": 463.58,
+      "exit_code": 0,
+      "failed": 0,
+      "log_sha256": "50b2735480a39846220606a9e332d9bbc56425d8fffbaaa56e1c5e3f504add67",
+      "passed": 1888,
+      "skipped": 4,
+      "summary": "1888 passed, 4 skipped, 3 warnings in 460.71s (0:07:40)",
+      "warnings": 3
+    }
+  },
+  "local_worktree_dirty": true,
+  "owner": "Chaeheeju infrastructure/container/build",
+  "pip_vendor_scope": {
+    "ensurepip": "26.3",
+    "files": {
+      "pkg_resources/__init__.py": {
+        "present": true,
+        "sha256": "bdb4c9d3faee5201b1423944aacaee16688d3d5ca1dadf6afb3c930d3d39df12"
+      },
+      "setuptools/command/egg_info.py": {
+        "present": false,
+        "sha256": null
+      },
+      "setuptools/package_index.py": {
+        "present": false,
+        "sha256": null
+      },
+      "setuptools/wheel.py": {
+        "present": false,
+        "sha256": null
+      }
+    },
+    "pip": "26.3",
+    "top_level_setuptools_installed": false,
+    "vendor_manifest_sha256": "11885a895536bbc3dbf956f493d775fab0ba0bcde182b8d2549f2cbd2ed9fd76",
+    "vendor_setuptools_entries": [
+      "setuptools==70.3.0"
+    ]
+  },
+  "priority_and_pip_actions": [
+    {
+      "action_status": "local_http_backport_applied_upstream_3_12_PR_open",
+      "advisory_ids": [
+        "CVE-2026-103995"
+      ],
+      "historical_group_id": "C03-0004",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "upstream_version_applied_runtime_verified",
+      "advisory_ids": [
+        "CVE-2026-114583"
+      ],
+      "historical_group_id": "C03-0005",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "upstream_version_applied_runtime_verified",
+      "advisory_ids": [
+        "CVE-2026-115557"
+      ],
+      "historical_group_id": "C03-0006",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "upstream_disputed_not_closed",
+      "advisory_ids": [
+        "CVE-2021-45346"
+      ],
+      "historical_group_id": "C03-0114",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "zipfile_extension_absent_upstream_3_52_fixed_frozen_debian_record_open",
+      "advisory_ids": [
+        "CVE-2025-70873"
+      ],
+      "historical_group_id": "C03-0115",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "upstream_3_54_1_custom_build_applied_distro_scanner_still_reports",
+      "advisory_ids": [
+        "CVE-2026-119371"
+      ],
+      "historical_group_id": "C03-0116",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "upstream_3_54_1_custom_build_applied_distro_scanner_still_reports",
+      "advisory_ids": [
+        "CVE-2026-119372"
+      ],
+      "historical_group_id": "C03-0117",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "upstream_3_54_1_custom_build_applied_distro_scanner_still_reports",
+      "advisory_ids": [
+        "CVE-2026-119373"
+      ],
+      "historical_group_id": "C03-0118",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "upstream_3_54_1_custom_build_applied_distro_scanner_still_reports",
+      "advisory_ids": [
+        "CVE-2026-119374"
+      ],
+      "historical_group_id": "C03-0119",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "upstream_3_54_1_custom_build_applied_distro_scanner_still_reports",
+      "advisory_ids": [
+        "CVE-2026-119375"
+      ],
+      "historical_group_id": "C03-0120",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "upstream_3_54_1_custom_build_applied_distro_scanner_still_reports",
+      "advisory_ids": [
+        "CVE-2026-119376"
+      ],
+      "historical_group_id": "C03-0121",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "upstream_3_54_1_custom_build_applied_distro_scanner_still_reports",
+      "advisory_ids": [
+        "CVE-2026-119377"
+      ],
+      "historical_group_id": "C03-0122",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "upstream_3_54_1_custom_build_applied_distro_scanner_still_reports",
+      "advisory_ids": [
+        "CVE-2026-119378"
+      ],
+      "historical_group_id": "C03-0123",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "upstream_3_54_1_custom_build_applied_distro_scanner_still_reports",
+      "advisory_ids": [
+        "CVE-2026-119379"
+      ],
+      "historical_group_id": "C03-0124",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "upstream_3_54_1_custom_build_applied_distro_scanner_still_reports",
+      "advisory_ids": [
+        "CVE-2026-119591"
+      ],
+      "historical_group_id": "C03-0125",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "upstream_3_54_1_custom_build_applied_distro_scanner_still_reports",
+      "advisory_ids": [
+        "CVE-2026-50812"
+      ],
+      "historical_group_id": "C03-0126",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "upstream_3_54_1_custom_build_applied_distro_scanner_still_reports",
+      "advisory_ids": [
+        "CVE-2026-50813"
+      ],
+      "historical_group_id": "C03-0127",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "installed_and_ensurepip_26_3_hash_locked_install_path",
+      "advisory_ids": [
+        "CVE-2025-8869",
+        "GHSA-4xh5-x5gv-qwph"
+      ],
+      "historical_group_id": "C03-0195",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "installed_and_ensurepip_26_3_hash_locked_install_path",
+      "advisory_ids": [
+        "CVE-2026-3219",
+        "GHSA-58qw-9mgm-455v"
+      ],
+      "historical_group_id": "C03-0196",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "installed_and_ensurepip_26_3_hash_locked_install_path",
+      "advisory_ids": [
+        "CVE-2026-1703",
+        "GHSA-6vgw-5pg2-w6jp"
+      ],
+      "historical_group_id": "C03-0197",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "installed_and_ensurepip_26_3_hash_locked_install_path",
+      "advisory_ids": [
+        "CVE-2026-6357",
+        "GHSA-jp4c-xjxw-mgf9"
+      ],
+      "historical_group_id": "C03-0198",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "installed_and_ensurepip_26_3_hash_locked_install_path",
+      "advisory_ids": [
+        "CVE-2026-13346",
+        "GHSA-qwm4-qh6w-59xr"
+      ],
+      "historical_group_id": "C03-0199",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    },
+    {
+      "action_status": "installed_and_ensurepip_26_3_hash_locked_install_path",
+      "advisory_ids": [
+        "CVE-2026-8643",
+        "GHSA-wf93-45jw-7689"
+      ],
+      "historical_group_id": "C03-0200",
+      "independent_review": "pending",
+      "waiver_or_suppression": false
+    }
+  ],
+  "protected_user_zip_sha256": {
+    "docs.zip": "c64e347071f45725ccf84aa0a8973fa64cabe774b731a7f206a2ec9d05b33ec9",
+    "docs/week03.zip": "fb5890905406b45555d5fd3cc9722d23cd51439a5010ec2ff30bd8d83c1f4e95"
+  },
+  "remaining": [
+    "Independent application input/HTTP/SQL/WAL/changeset and security-state review pending.",
+    "Distro findings and unprioritized Python findings remain; no all-CVE closure.",
+    "HTTP backport and local Debian package require ongoing maintenance, not vendor release approval.",
+    "Lambda OS RPM SQLite and other services/host not covered by application active-library replacement.",
+    "APT/DNF compiler/repository dependencies not fully snapshot-pinned; no bit-identical build claim."
+  ],
+  "runtime_checks": {
+    "app": {
+      "checks": {
+        "backup_integrity": true,
+        "backup_rows": true,
+        "ensurepip_security_release": true,
+        "foreign_keys": true,
+        "fts5": true,
+        "http_chunk_extension": true,
+        "http_optional_whitespace": true,
+        "http_reject_chunk_hex_prefix": true,
+        "http_reject_chunk_leading_space": true,
+        "http_reject_chunk_negative": true,
+        "http_reject_chunk_signed": true,
+        "http_reject_chunk_underscore": true,
+        "http_reject_length_hex_prefix": true,
+        "http_reject_length_signed": true,
+        "http_reject_length_underscore": true,
+        "http_valid_chunk": true,
+        "http_valid_content_length": true,
+        "join_using_authorizer": true,
+        "pip_security_release": true,
+        "python_security_release": true,
+        "rtree": true,
+        "sqlite_security_release": true,
+        "wal_mode": true
+      },
+      "http_client_sha256": "a713e5531a886739b3e2be7871c1bb239528f1025f5589f0a0e521c2a922f869",
+      "limits": [
+        "Parser tokens and synthetic SQLite files only; no external network or real credentials.",
+        "Version checks are not an exhaustive exploitability or upstream conformance test."
+      ],
+      "passed": true,
+      "pip": "26.3",
+      "python": "3.12.16",
+      "schema": "secops-runtime-security-check-1",
+      "sqlite": "3.54.1",
+      "sqlite_compile_options": [
+        "ATOMIC_INTRINSICS=1",
+        "COMPILER=gcc-14.2.0",
+        "DEFAULT_AUTOVACUUM",
+        "DEFAULT_CACHE_SIZE=-2000",
+        "DEFAULT_FILE_FORMAT=4",
+        "DEFAULT_JOURNAL_SIZE_LIMIT=-1",
+        "DEFAULT_MMAP_SIZE=0",
+        "DEFAULT_PAGE_SIZE=4096",
+        "DEFAULT_PCACHE_INITSZ=20",
+        "DEFAULT_RECURSIVE_TRIGGERS",
+        "DEFAULT_SECTOR_SIZE=4096",
+        "DEFAULT_SYNCHRONOUS=2",
+        "DEFAULT_WAL_AUTOCHECKPOINT=1000",
+        "DEFAULT_WAL_SYNCHRONOUS=2",
+        "DEFAULT_WORKER_THREADS=0",
+        "DIRECT_OVERFLOW_READ",
+        "ENABLE_COLUMN_METADATA",
+        "ENABLE_DBSTAT_VTAB",
+        "ENABLE_FTS3",
+        "ENABLE_FTS3_PARENTHESIS",
+        "ENABLE_FTS3_TOKENIZER",
+        "ENABLE_FTS4",
+        "ENABLE_FTS5",
+        "ENABLE_LOAD_EXTENSION",
+        "ENABLE_MATH_FUNCTIONS",
+        "ENABLE_PREUPDATE_HOOK",
+        "ENABLE_RTREE",
+        "ENABLE_SESSION",
+        "ENABLE_UNLOCK_NOTIFY",
+        "LIKE_DOESNT_MATCH_BLOBS",
+        "MALLOC_SOFT_LIMIT=1024",
+        "MAX_ATTACHED=10",
+        "MAX_COLUMN=2000",
+        "MAX_COMPOUND_SELECT=500",
+        "MAX_DEFAULT_PAGE_SIZE=8192",
+        "MAX_EXPR_DEPTH=1000",
+        "MAX_FUNCTION_ARG=1000",
+        "MAX_LENGTH=1000000000",
+        "MAX_LIKE_PATTERN_LENGTH=50000",
+        "MAX_MMAP_SIZE=0x7fff0000",
+        "MAX_PAGE_COUNT=0xfffffffe",
+        "MAX_PAGE_SIZE=65536",
+        "MAX_SCHEMA=10000000",
+        "MAX_SQL_LENGTH=1000000000",
+        "MAX_TRIGGER_DEPTH=1000",
+        "MAX_VARIABLE_NUMBER=32766",
+        "MAX_VDBE_OP=250000000",
+        "MAX_WORKER_THREADS=8",
+        "MUTEX_PTHREADS",
+        "SECURE_DELETE",
+        "SYSTEM_MALLOC",
+        "TEMP_STORE=1",
+        "THREADSAFE=1"
+      ],
+      "sqlite_modules": [
+        "dbstat",
+        "fts3",
+        "fts3tokenize",
+        "fts4",
+        "fts4aux",
+        "fts5",
+        "fts5vocab",
+        "rtree",
+        "rtree_i32"
+      ],
+      "sqlite_source_id": "2026-10-16 14:45:20 555e07ef33f69a0957d24d8e555b702464a131d6f1607f4c3c1e4551e8e6ca76"
+    },
+    "lambda": {
+      "checks": {
+        "backup_integrity": true,
+        "backup_rows": true,
+        "ensurepip_security_release": true,
+        "foreign_keys": true,
+        "fts5": true,
+        "http_chunk_extension": true,
+        "http_optional_whitespace": true,
+        "http_reject_chunk_hex_prefix": true,
+        "http_reject_chunk_leading_space": true,
+        "http_reject_chunk_negative": true,
+        "http_reject_chunk_signed": true,
+        "http_reject_chunk_underscore": true,
+        "http_reject_length_hex_prefix": true,
+        "http_reject_length_signed": true,
+        "http_reject_length_underscore": true,
+        "http_valid_chunk": true,
+        "http_valid_content_length": true,
+        "join_using_authorizer": true,
+        "pip_security_release": true,
+        "python_security_release": true,
+        "rtree": true,
+        "sqlite_security_release": true,
+        "wal_mode": true
+      },
+      "http_client_sha256": "a713e5531a886739b3e2be7871c1bb239528f1025f5589f0a0e521c2a922f869",
+      "limits": [
+        "Parser tokens and synthetic SQLite files only; no external network or real credentials.",
+        "Version checks are not an exhaustive exploitability or upstream conformance test."
+      ],
+      "passed": true,
+      "pip": "26.3",
+      "python": "3.12.16",
+      "schema": "secops-runtime-security-check-1",
+      "sqlite": "3.54.1",
+      "sqlite_compile_options": [
+        "ATOMIC_INTRINSICS=1",
+        "COMPILER=gcc-11.5.0 20240719 (Red Hat 11.5.0-5)",
+        "DEFAULT_AUTOVACUUM",
+        "DEFAULT_CACHE_SIZE=-2000",
+        "DEFAULT_FILE_FORMAT=4",
+        "DEFAULT_JOURNAL_SIZE_LIMIT=-1",
+        "DEFAULT_MMAP_SIZE=0",
+        "DEFAULT_PAGE_SIZE=4096",
+        "DEFAULT_PCACHE_INITSZ=20",
+        "DEFAULT_RECURSIVE_TRIGGERS",
+        "DEFAULT_SECTOR_SIZE=4096",
+        "DEFAULT_SYNCHRONOUS=2",
+        "DEFAULT_WAL_AUTOCHECKPOINT=1000",
+        "DEFAULT_WAL_SYNCHRONOUS=2",
+        "DEFAULT_WORKER_THREADS=0",
+        "DIRECT_OVERFLOW_READ",
+        "ENABLE_COLUMN_METADATA",
+        "ENABLE_DBSTAT_VTAB",
+        "ENABLE_FTS3",
+        "ENABLE_FTS3_PARENTHESIS",
+        "ENABLE_FTS3_TOKENIZER",
+        "ENABLE_FTS4",
+        "ENABLE_FTS5",
+        "ENABLE_LOAD_EXTENSION",
+        "ENABLE_MATH_FUNCTIONS",
+        "ENABLE_PREUPDATE_HOOK",
+        "ENABLE_RTREE",
+        "ENABLE_SESSION",
+        "ENABLE_UNLOCK_NOTIFY",
+        "LIKE_DOESNT_MATCH_BLOBS",
+        "MALLOC_SOFT_LIMIT=1024",
+        "MAX_ATTACHED=10",
+        "MAX_COLUMN=2000",
+        "MAX_COMPOUND_SELECT=500",
+        "MAX_DEFAULT_PAGE_SIZE=8192",
+        "MAX_EXPR_DEPTH=1000",
+        "MAX_FUNCTION_ARG=1000",
+        "MAX_LENGTH=1000000000",
+        "MAX_LIKE_PATTERN_LENGTH=50000",
+        "MAX_MMAP_SIZE=0x7fff0000",
+        "MAX_PAGE_COUNT=0xfffffffe",
+        "MAX_PAGE_SIZE=65536",
+        "MAX_SCHEMA=10000000",
+        "MAX_SQL_LENGTH=1000000000",
+        "MAX_TRIGGER_DEPTH=1000",
+        "MAX_VARIABLE_NUMBER=32766",
+        "MAX_VDBE_OP=250000000",
+        "MAX_WORKER_THREADS=8",
+        "MUTEX_PTHREADS",
+        "SECURE_DELETE",
+        "SYSTEM_MALLOC",
+        "TEMP_STORE=1",
+        "THREADSAFE=1"
+      ],
+      "sqlite_modules": [
+        "dbstat",
+        "fts3",
+        "fts3tokenize",
+        "fts4",
+        "fts4aux",
+        "fts5",
+        "fts5vocab",
+        "rtree",
+        "rtree_i32"
+      ],
+      "sqlite_source_id": "2026-10-16 14:45:20 555e07ef33f69a0957d24d8e555b702464a131d6f1607f4c3c1e4551e8e6ca76"
+    }
+  },
+  "runtime_library_sha256_matches_local_mtls": true,
+  "runtime_lock": {
+    "debian_base": "python@sha256:1148dbb014615300fa7e713b2f94f550c0d1c69780c0805f84f093ceee34dd0b",
+    "debian_base_tag_at_capture": "python:3.12.16-slim-trixie",
+    "ensurepip": {
+      "after_sha256": "5946b1d405e3650a310f4a85b1a48bdf4182f03397e069ff34f9fd7a1422217a",
+      "before_sha256": "90f6c76cd9ef7ed6daa198bb9ef771139683487f1b061211be7aa511831b2028",
+      "maintenance": "Local bundled pip version update; CPython ensurepip algorithm unchanged.",
+      "old_version": "25.0.1",
+      "old_wheel_sha256": "c46efd13b6aa8279f33f2864459c8ce587ea6a1a59ee20de055868d8f7688f7f"
+    },
+    "http_client": {
+      "after_sha256": "a713e5531a886739b3e2be7871c1bb239528f1025f5589f0a0e521c2a922f869",
+      "backport_commit": "1c8d928392cf0b4e84e392eb12f34557c9a0373f",
+      "backport_status_at_review": "open_PR_160772_not_an_upstream_3.12_release",
+      "base_url": "https://github.com/python/cpython/blob/v3.12.16/Lib/http/client.py",
+      "before_sha256": "c2c0694155837d72fc710a4138e5d1e53ae1a652b117a2e23a5b1b0db527a0f9",
+      "merged_main_commit": "2eb2af805c156ca52b316bb4ced5e0ab3971d0ae",
+      "ows_fix_commit": "9f52b443c002cccfb54bda0706a9276b6b4a109d",
+      "patch_sha256": "73bb32ef9b713ad796751bb1e8df5104974255e71e03e3b69d339c53568de701",
+      "upstream_backport_file_sha256": "2590d9284866458cc6d2b7c0b726338867ea6bb849581945562913f035835c67"
+    },
+    "lambda_base": "public.ecr.aws/lambda/python@sha256:6e64b9e33e8dd79ba53dffe424b6c407fc7647b19aae2aa2e4fb5a97373467eb",
+    "lambda_base_tag_at_capture": "public.ecr.aws/lambda/python:3.12",
+    "pip": {
+      "filename": "pip-26.3-py3-none-any.whl",
+      "sha256": "f3b60b20ffaadd4415ed7957212a38ac63fa4c5fa375bd0f4a797777940fad13",
+      "url": "https://files.pythonhosted.org/packages/07/25/ee8c38ae72d66b844ce8eb9711ba905dba21ca1a8a0c960057c41cd23337/pip-26.3-py3-none-any.whl",
+      "version": "26.3"
+    },
+    "platform": "linux/amd64",
+    "python_version": "3.12.16",
+    "schema": "secops-runtime-sources-1",
+    "sqlite": {
+      "sha256": "926ef8d3eab93fbf6e06011901273eec076b25594a4e1cdadd50c987f4f6d64e",
+      "sha3_256": "b6ced585c750916b1052667239a12c25a7ff34e7f06e1e6e01ecb0427657d9c4",
+      "source_id": "2026-10-16 14:45:20 555e07ef33f69a0957d24d8e555b702464a131d6f1607f4c3c1e4551e8e6ca76",
+      "url": "https://www.sqlite.org/2026/sqlite-autoconf-3540100.tar.gz",
+      "version": "3.54.1"
+    },
+    "sqlite_compile_defines": [
+      "SQLITE_THREADSAFE=1",
+      "SQLITE_ENABLE_COLUMN_METADATA",
+      "SQLITE_ENABLE_DBSTAT_VTAB",
+      "SQLITE_ENABLE_FTS3",
+      "SQLITE_ENABLE_FTS3_PARENTHESIS",
+      "SQLITE_ENABLE_FTS3_TOKENIZER",
+      "SQLITE_ENABLE_FTS4",
+      "SQLITE_ENABLE_FTS5",
+      "SQLITE_ENABLE_RTREE",
+      "SQLITE_ENABLE_SESSION",
+      "SQLITE_ENABLE_PREUPDATE_HOOK",
+      "SQLITE_ENABLE_UNLOCK_NOTIFY",
+      "SQLITE_ENABLE_MATH_FUNCTIONS",
+      "SQLITE_ENABLE_LOAD_EXTENSION",
+      "SQLITE_SECURE_DELETE",
+      "SQLITE_LIKE_DOESNT_MATCH_BLOBS",
+      "SQLITE_DEFAULT_RECURSIVE_TRIGGERS",
+      "SQLITE_MAX_EXPR_DEPTH=1000"
+    ]
+  },
+  "schema": "c03-priority-runtime-patches-1",
+  "scope": {
+    "app_policy_detection_changes": false,
+    "aws_deployments": 0,
+    "host_trust_store_changes": 0,
+    "operational_approval": false,
+    "paid_llm_calls": 0,
+    "vulnerability_suppressions": 0
+  },
+  "sqlite_compile_option_changes": {
+    "added": [
+      "MAX_DEFAULT_PAGE_SIZE=8192",
+      "MAX_FUNCTION_ARG=1000",
+      "MAX_SCHEMA=10000000",
+      "MAX_VARIABLE_NUMBER=32766"
+    ],
+    "removed": [
+      "ALLOW_ROWID_IN_VIEW",
+      "ENABLE_DBPAGE_VTAB",
+      "ENABLE_STMTVTAB",
+      "ENABLE_UPDATE_DELETE_LIMIT",
+      "HAVE_ISNAN",
+      "MAX_DEFAULT_PAGE_SIZE=32768",
+      "MAX_FUNCTION_ARG=127",
+      "MAX_SCHEMA_RETRY=25",
+      "MAX_VARIABLE_NUMBER=250000",
+      "SOUNDEX",
+      "USE_URI"
+    ]
+  }
+}

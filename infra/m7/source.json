@@ -1,0 +1,25 @@
+{
+  "schema": "m7-auth-source-1",
+  "name": "IAM Anomaly Detection Dataset 2026",
+  "publisher": "KREONET / KAFE Research",
+  "copyright": "Copyright (c) 2026 KAFE Research",
+  "revision": "5fd5cae2001a6b67cafb952709db37e366cfa276",
+  "source_kind": "publisher_synthetic_authentication_logs",
+  "source_url": "https://raw.githubusercontent.com/KREONET/auth-anomaly-dataset/5fd5cae2001a6b67cafb952709db37e366cfa276/iam_anomaly_2026.jsonl",
+  "bytes": 91592665,
+  "sha256": "445f69377a2e12b4203a68f15cd9a4013fbc7e0ef21c19843969f671b1334a30",
+  "license": "CC-BY-4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "publisher_license_url": "https://github.com/KREONET/auth-anomaly-dataset/blob/5fd5cae2001a6b67cafb952709db37e366cfa276/LICENSE",
+  "publisher_license_sha256": "0add93281bf3e037174813be33128cb4af8691ac06af299dd10af30f64de7873",
+  "acquired_on": "2026-11-09",
+  "source_counts": {
+    "rows": 130767,
+    "sessions": {"benign": 9088, "attack": 9573, "anomaly": 4089}
+  },
+  "pilot": {
+    "sessions_per_label_per_split": 12,
+    "evaluation_start": "2026-03-01T00:00:00+09:00",
+    "evaluation_benign_categories": ["account", "infra", "logout"]
+  }
+}

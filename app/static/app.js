@@ -741,7 +741,7 @@ async function runPublicReplay() {
     renderQualityDetails(quality);
     renderIncidentQualityDetails(incidentQuality);
     $("replayState").textContent = result.expectations_met && quality.gate_passed && incidentQuality.gate_passed
-      ? "탐지·사건 상관분석과 정상 로그 오탐 억제의 정량 품질 기준을 모두 통과했습니다."
+      ? "공개 고정 표본 12건의 회귀 기준을 통과했습니다. 확장 합성 평가와 실제 기업 성능은 별도로 확인해야 합니다."
       : "공개 로그 회귀 기준을 통과하지 못한 항목이 있습니다.";
   } catch (error) {
     $("replayState").textContent = `공개 로그를 재생하지 못했습니다: ${error.message}`;
@@ -764,6 +764,141 @@ async function initialize() {
   }
   await Promise.all([refreshSummary(), refreshCases(), loadAssuranceSummary()]);
 }
+
+const zt = { sessionId: null, event: null, version: 0, token: null, busy: false };
+const ztDecisions = { ALLOW: "허용", STEP_UP: "추가 인증", HOLD: "판단 보류", DENY: "거부" };
+const ztStatuses = { ACTIVE: "활성", STEP_UP_REQUIRED: "재인증 필요", HELD: "보류", REVOKED: "허용 회수" };
+const ztReasons = {
+  POLICY_SATISFIED: "정책 충족", FRESH_MFA_REQUIRED: "MFA 성공 신호 필요",
+  DEVICE_COMPROMISED: "기기 침해", HIGH_RISK: "고위험", SESSION_ALREADY_REVOKED: "회수된 세션",
+  NETWORK_CONTEXT_CHANGED: "접속 맥락 변경", SIGNAL_INCOMPLETE: "신호 불충분",
+  SIGNAL_EXPIRED_OR_FUTURE: "신호 시각 만료 또는 오류", ELEVATED_RISK: "위험 상승",
+  SESSION_NOT_AUTHORIZED: "세션 허용 회수 또는 추가 검증 필요", GRANT_INVALID: "유효한 허용 없음",
+  SCOPE_DENIED: "허용 범위 밖의 접근", POLICY_CHANGED: "정책 변경으로 허용 만료",
+  GRANT_EXPIRED: "허용 유효기간 만료", GRANT_ALREADY_USED: "이미 사용한 허용",
+  SIGNED_MFA_CHALLENGE_REQUIRED: "현재 재인증 요청에 연결된 서명 신호 필요",
+  SIGNAL_SOURCE_REVOKED: "수집기 신뢰 설정 변경 또는 키 만료",
+  SIGNAL_PROOF_EXPIRED: "서명 신호 만료",
+};
+
+async function refreshSignedSessions() {
+  const button = $("ztSignedRefresh");
+  button.disabled = true;
+  try {
+    const [status, sessions] = await Promise.all([
+      request("/zero-trust/signals/status"), request("/zero-trust/sessions"),
+    ]);
+    $("ztSignalStatus").textContent = !status.ok ? "수집기 등록 정보를 읽을 수 없어 서명 접근을 차단합니다."
+      : status.configured ? `공개키 등록 정보 정상 · 등록 수집기 ${status.source_count}개`
+      : "서명 수집기가 설정되지 않았습니다. 로컬 수집기를 설정한 뒤 조회하세요.";
+    const rows = sessions.filter((session) => session.signal_trust === "verified_source");
+    const body = $("ztSignedSessions");
+    body.replaceChildren();
+    rows.forEach((session) => {
+      const row = document.createElement("tr");
+      const challenge = session.challenge_expires_at
+        ? `대기 · ${new Date(session.challenge_expires_at).toLocaleTimeString("ko-KR")}까지` : "대기 요청 없음";
+      [session.session_id, `${session.signal_source_id} / ${session.signal_key_id}`, session.version,
+        `${ztDecisions[session.decision]} · ${ztStatuses[session.status]}`, challenge,
+        session.reason_codes.map((code) => ztReasons[code] || code).join(" · "),
+      ].forEach((value) => { const cell = document.createElement("td"); cell.textContent = value; row.append(cell); });
+      body.append(row);
+    });
+    if (!rows.length) {
+      const row = document.createElement("tr");
+      const cell = document.createElement("td");
+      cell.colSpan = 6;
+      cell.className = "table-empty";
+      cell.textContent = "최근 100개 세션에 서명 수집기 세션이 없습니다.";
+      row.append(cell);
+      body.append(row);
+    }
+  } catch (error) {
+    $("ztSignalStatus").textContent = `서명 세션 조회 실패: ${error.message}`;
+    $("ztSignedSessions").replaceChildren();
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function renderZt(session) {
+  $("ztDecision").textContent = ztDecisions[session.decision];
+  $("ztStatus").textContent = ztStatuses[session.status];
+  $("ztRisk").textContent = session.risk_score;
+  $("ztPolicy").textContent = session.policy_version;
+  const history = await request(`/zero-trust/sessions/${encodeURIComponent(zt.sessionId)}`);
+  $("ztHistory").replaceChildren();
+  history.forEach((item) => {
+    const row = document.createElement("tr");
+    [item.version, item.resource_id, ztDecisions[item.decision], item.risk_score,
+      item.reason_codes.map((code) => ztReasons[code] || code).join(" · "),
+      item.grant_expires_at ? new Date(item.grant_expires_at).toLocaleTimeString("ko-KR") : "없음",
+    ].forEach((value) => { const cell = document.createElement("td"); cell.textContent = value; row.append(cell); });
+    $("ztHistory").append(row);
+  });
+}
+
+async function operateZt(operation) {
+  if (zt.busy) return;
+  zt.busy = true;
+  document.querySelectorAll("#zeroTrustSection button").forEach((button) => { button.disabled = true; });
+  try {
+    if (operation === "access") {
+      // Keep an old capability to demonstrate denial after a session decision changes.
+      const response = await fetch("/zero-trust/protected-access", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: zt.sessionId, resource_id: "zt-demo-documents",
+          action: "READ", grant_token: zt.token || "no-grant-available-000000000000000000" }),
+      });
+      const result = await response.json();
+      $("ztFeedback").textContent = response.ok && result.allowed
+        ? "모의 문서 접근 허용. 이 허용은 한 번 사용됐습니다. 다음 접근은 새 평가가 필요합니다."
+        : `모의 문서 접근 거부 (${response.status}) · ${ztReasons[result.reason_code] || "정책 확인 실패"}`;
+      return;
+    }
+    if (operation === "start") {
+      const generated = await request("/events/simulate", { method: "POST",
+        body: JSON.stringify({ scenario_id: "NORMAL-01", count: 1 }) });
+      zt.event = generated[0];
+      delete zt.event.ground_truth;
+      zt.event.user.role = "employee";
+      zt.event.resource = { resource_id: "zt-demo-documents", resource_type: "document", sensitivity: "internal" };
+      zt.event.auth_context.authentication_result = "success";
+      zt.event.auth_context.mfa = "success";
+      zt.sessionId = `demo-${crypto.randomUUID()}`;
+      zt.version = 0;
+      zt.token = null;
+    } else if (operation === "challenge") {
+      zt.event.auth_context.mfa = "unknown";
+    } else if (operation === "recover") {
+      zt.event.auth_context.mfa = "success";
+    } else if (operation === "compromise") {
+      zt.event.device.security_posture = "compromised";
+    }
+    zt.event.event_id = `signal-${crypto.randomUUID()}`;
+    zt.event.timestamp = new Date().toISOString();
+    const result = await request("/zero-trust/sessions/evaluate", { method: "POST",
+      body: JSON.stringify({ session_id: zt.sessionId, expected_version: zt.version, event: zt.event }) });
+    zt.version = result.session.version;
+    if (result.grant_token) zt.token = result.grant_token;
+    await renderZt(result.session);
+    $("ztFeedback").textContent = `${ztDecisions[result.session.decision]} · ${result.session.reason_codes.map((code) => ztReasons[code] || code).join(" · ")}. 모의 문서 접근으로 집행 결과를 확인하세요.`;
+  } catch (error) {
+    $("ztFeedback").textContent = `세션 처리를 완료하지 못했습니다: ${error.message}`;
+  } finally {
+    zt.busy = false;
+    document.querySelectorAll("#zeroTrustSection button").forEach((button) => {
+      button.disabled = button.id !== "ztStart" && !zt.version;
+    });
+  }
+}
+
+$("ztStart").addEventListener("click", () => operateZt("start"));
+$("ztAccess").addEventListener("click", () => operateZt("access"));
+$("ztChallenge").addEventListener("click", () => operateZt("challenge"));
+$("ztRecover").addEventListener("click", () => operateZt("recover"));
+$("ztCompromise").addEventListener("click", () => operateZt("compromise"));
+$("ztSignedRefresh").addEventListener("click", refreshSignedSessions);
 
 $("analyzeButton").addEventListener("click", runAnalysis);
 $("refreshButton").addEventListener("click", refreshSummary);

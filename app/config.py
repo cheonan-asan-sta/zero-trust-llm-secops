@@ -8,7 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "Zero Trust LLM SecOps"
-    app_version: str = "0.15.0"
+    app_version: str = "0.17.0"
     app_environment: Literal["local", "test", "production"] = "local"
     analyzer_mode: Literal["rule", "openai", "hybrid"] = "rule"
     openai_api_key: SecretStr | None = None
@@ -22,11 +22,22 @@ class Settings(BaseSettings):
     audit_log_path: Path = Path("runtime/audit.jsonl")
     case_log_path: Path = Path("runtime/cases.jsonl")
     outbox_log_path: Path = Path("runtime/integration-outbox.jsonl")
+    zero_trust_db_path: Path = Path("runtime/zero-trust.sqlite3")
+    behavior_context_db_path: Path | None = None
+    # Compatibility for offline legacy fixtures; the application uses behavior_context_db_path.
+    response_workflow_db_path: Path = Path("runtime/response-workflow.sqlite3")
+    trusted_signal_sources_path: Path | None = None
+    signal_inbox_max_pending: int = Field(default=1000, ge=1, le=10000)
+    signal_inbox_max_records: int = Field(default=10000, ge=1, le=100000)
+    signal_inbox_max_attempts: int = Field(default=3, ge=1, le=20)
+    signal_inbox_lease_seconds: float = Field(default=30, gt=0, le=3600)
+    signal_inbox_retry_seconds: float = Field(default=1, gt=0, le=60)
     audit_backend: Literal["jsonl", "dynamodb"] = "jsonl"
     dynamodb_table_name: str = "zero-trust-llm-secops-audit"
     aws_region: str = "ap-northeast-2"
     auth_mode: Literal["disabled", "api_key", "oidc"] = "disabled"
     api_key_sha256: SecretStr | None = None
+    api_key_accounts_path: Path | None = None
     api_key_subject: str = Field(default="service-client", min_length=1, max_length=128)
     api_key_tenant_id: str = Field(default="local", pattern=r"^[a-zA-Z0-9._-]{1,64}$")
     api_key_roles: str = "analyst,responder,viewer"

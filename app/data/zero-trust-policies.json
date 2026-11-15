@@ -1,0 +1,27 @@
+{
+  "version": "zt-policy-2026.10.1",
+  "resources": [
+    {
+      "resource_id": "zt-demo-documents",
+      "resource_type": "document",
+      "sensitivity": "internal",
+      "roles": ["employee", "administrator"],
+      "actions": ["READ"],
+      "require_mfa": true,
+      "require_managed": true,
+      "max_signal_age_seconds": 300,
+      "grant_ttl_seconds": 60
+    },
+    {
+      "resource_id": "zt-demo-vault",
+      "resource_type": "database",
+      "sensitivity": "critical",
+      "roles": ["administrator"],
+      "actions": ["READ", "DOWNLOAD"],
+      "require_mfa": true,
+      "require_managed": true,
+      "max_signal_age_seconds": 120,
+      "grant_ttl_seconds": 30
+    }
+  ]
+}

@@ -64,6 +64,23 @@ def test_review_update_replaces_audit_snapshot_without_double_counting(tmp_path)
     assert restored.recent(1)[0].reviewer == "보안담당자"
 
 
+def test_latest_analysis_uses_timestamp_when_older_analysis_is_saved_last(tmp_path) -> None:
+    event = synthetic_events()[4]
+    assessment = asyncio.run(RuleBasedAnalyzer().analyze(event))
+    newer = AnalysisResult(event_id=event.event_id, analyzer='rule', assessment=assessment,
+        policy_decision=response_preview(assessment, event), latency_ms=1,
+        analyzed_at=datetime(2026, 1, 2, tzinfo=UTC))
+    older = AnalysisResult.model_validate({**newer.model_dump(), 'analysis_id': 'older-analysis',
+                                         'analyzed_at': datetime(2026, 1, 1, tzinfo=UTC)})
+    path = tmp_path / 'audit.jsonl'
+    store = AuditStore(path)
+    asyncio.run(store.save(newer))
+    asyncio.run(store.save(older))
+    for candidate in (store, AuditStore(path)):
+        assert candidate.get(event.event_id).analysis_id == newer.analysis_id
+        assert {record.analysis_id for record in candidate.recent(2)} == {newer.analysis_id, older.analysis_id}
+
+
 def test_audit_store_isolates_tenants(tmp_path) -> None:
     event = synthetic_events()[1]
     assessment = asyncio.run(RuleBasedAnalyzer().analyze(event))

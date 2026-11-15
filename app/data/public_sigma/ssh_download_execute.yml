@@ -1,0 +1,35 @@
+title: SSH Download Followed by Execution Attempt
+id: f9ab79d3-a646-4b90-b48e-9662d805326a
+status: test
+description: Observed download command or transfer followed by execution of the same
+  path in one SSH connection, or an actual download-to-shell pipeline. This indicates
+  attempted behavior, not successful transfer or execution. This is an investigation
+  candidate without verified attack context.
+author: Cheonan-Asan Team
+date: '2026-11-09'
+taxonomy: ocsf
+logsource:
+  category: application
+  product: cowrie
+detection:
+  selection:
+    unmapped.public.source: cowrie
+    unmapped.public.ssh_download_execute: true
+  condition: selection
+falsepositives:
+- Administrator software installation.
+level: medium
+x_secops:
+  lifecycle: approved
+  version: 1.1.0
+  approved_by: reference-rule-test-harness
+  approved_on: '2026-11-09'
+  test_case_ids:
+  - PUBLIC-SSH-02
+  authority: reference_only
+  approval_scope: Offline detector execution acceptance only; grants no enforcement
+    authority.
+  public_detection:
+    feature: ssh_download_execute
+    disposition: investigate
+modified: '2026-11-10'

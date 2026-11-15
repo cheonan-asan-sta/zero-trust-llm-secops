@@ -1,0 +1,59 @@
+{
+  "schema": "c01-local-pilot-1",
+  "as_of": "2026-11-03",
+  "scope": "Real signed local/test M3 intake, viewer-scoped aggregate export, two monitoring stacks, local-only notifications",
+  "baseline_source_commit": "719f069d8dc48a62710dbbcce2d970adc4742f5e",
+  "app_detection_rules_thresholds_policy_changed": false,
+  "cloud_resources": false,
+  "paid_model_calls": false,
+  "candidates": ["Prometheus + Alertmanager", "VictoriaMetrics single-node + vmalert + Alertmanager"],
+  "candidate_budgets": {
+    "prometheus": {"storage_cpu": 1.5, "storage_mib": 512, "alertmanager_cpu": 0.5, "alertmanager_mib": 128},
+    "victoriametrics": {"storage_cpu": 1, "storage_mib": 384, "evaluator_cpu": 0.5, "evaluator_mib": 128,
+                         "alertmanager_cpu": 0.5, "alertmanager_mib": 128}
+  },
+  "configuration": {
+    "scrape_seconds": 1, "scrape_timeout_ms": 800, "upstream_timeout_ms": 500,
+    "evaluation_seconds": 1, "for_seconds": 2, "queue_age_seconds": 3,
+    "retention": "1d", "alertmanager_group_wait_seconds": 0,
+    "alertmanager_group_interval_seconds": 1, "alertmanager_repeat_interval": "1h",
+    "vmalert_query_lookback": "5m", "prometheus_default_query_lookback": "5m",
+    "victoriametrics_search_latency_offset_seconds": 0, "vmalert_eval_delay_seconds": 0,
+    "vm_ingestion_flush": "default; no force_flush during test"
+  },
+  "safety": {
+    "all_networks_internal": true, "all_host_published_ports": false,
+    "worker_network": "none", "exporter_database_access": false,
+    "exporter_upstream_role": "viewer", "input_service_role": "analyst",
+    "separate_scrape_and_notify_tokens": true, "token_storage": "UID 10001 mode 0600 inside ephemeral Docker volumes",
+    "signing_private_keys": "host memory only",
+    "read_only_root": true, "drop_all_capabilities": true, "no_new_privileges": true,
+    "on_upstream_error": "collection_success=0; omit inbox values; no cached healthy response",
+    "unreviewed_permission_grant_or_restore": false,
+    "raw_event_identity_labels": false
+  },
+  "measurement": {
+    "repeats_per_candidate": 3, "order": "alternate starting candidate by repetition",
+    "fault_transition_timeout_seconds": 40, "healthy_settle_seconds": 3,
+    "latency": "host transition completion to first observed local webhook; includes Docker exec probe overhead",
+    "resources": "Docker stats rounded CPU/memory/IO samples of candidate stack only",
+    "disk": "logical file bytes in storage volume at end, not allocated bytes or long-term retention proof",
+    "history_restart_check": "same fixed timestamp before restart; new samples cannot satisfy historical check",
+    "notification_check": "new indices per fault and recovery; same job/instance/fingerprint/startsAt; startup alerts cannot pass"
+  },
+  "required_checks": ["missing/wrong scrape credential rejected", "missing upstream credential rejected",
+    "scrape token rejected by app", "viewer key rejected by collector", "viewer cannot submit",
+    "exporter cannot reach collector network", "normal monitoring settles without active alerts",
+    "pending backlog fires/resolves after worker starts", "upstream loss fires/resolves and emits no stale queue values",
+    "exporter loss fires/resolves", "pre-restart history survives storage/evaluator restart",
+    "accepted signal with subsequently disabled source key fails and notifies"],
+  "not_proven": ["production TLS/mTLS/operator query authorization", "multitenant monitoring service",
+    "HA/backup/RTO/RPO", "high-load or large-cardinality performance", "long-term retention",
+    "perfect alert delivery/no loss across crashes", "independent teammate reproduction", "final tool adoption"],
+  "sources": [
+    "https://prometheus.io/docs/prometheus/latest/configuration/configuration/",
+    "https://prometheus.io/docs/alerting/latest/configuration/",
+    "https://docs.victoriametrics.com/victoriametrics/vmalert/",
+    "https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/"
+  ]
+}

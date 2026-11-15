@@ -1,0 +1,452 @@
+{
+  "schema": "execution-maintenance-diagnostics-1",
+  "completed": true,
+  "base_commit": "c976de7d4300fe86277bb34a3782bd19eaed2483",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "historical_failure_root_cause_confirmed": false,
+  "production_deployed": false,
+  "linux": {
+    "exit_code": 0,
+    "seconds": 689.645,
+    "counts": {
+      "passed": 5528
+    },
+    "log": "runtime/f1/execution-maintenance-batch-v78-20261115/linux.log",
+    "executed": true,
+    "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "source_files": 1057,
+    "source_archive_sha256": "7b0c95144aed9d7f88815a5896348da2fb3a4da3d7e64e7bb8856b52e746431a",
+    "container_exit": 0,
+    "oom_killed": false,
+    "network_mode": "none",
+    "owned_container": "0dc56f82cd3a811294ed4df8b01bb6357d30a6def68ac62353f7d755689fb457",
+    "snapshot_sources_unchanged_after": true,
+    "owned_container_removed": true
+  },
+  "focused_units": {
+    "passed": 90,
+    "failed": 0,
+    "skipped": 0
+  },
+  "runtime": {
+    "source_archive_sha256": "7b0c95144aed9d7f88815a5896348da2fb3a4da3d7e64e7bb8856b52e746431a",
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "host_configuration_changed": false,
+    "original_Dockerfile": true,
+    "completed": true,
+    "exit_code": 0,
+    "seconds": 805.422,
+    "snapshot_sources_unchanged_after": true
+  },
+  "normal_acceptance": {
+    "checks": [
+      {
+        "label": "locked_mtls_runtime_started",
+        "passed": true,
+        "services": 10,
+        "volumes": 28
+      },
+      {
+        "label": "delivery_peer_cannot_approve_mint_or_execute",
+        "passed": true
+      },
+      {
+        "label": "observed_baseline-0",
+        "passed": true,
+        "verdict": "unknown",
+        "reason": "CONTEXT_REQUIRED",
+        "enforcement_eligible": false,
+        "capture_id": "baseline-0",
+        "completed_at": "2026-11-14T15:07:25.217694+00:00"
+      },
+      {
+        "label": "observed_baseline-1",
+        "passed": true,
+        "verdict": "unknown",
+        "reason": "CONTEXT_REQUIRED",
+        "enforcement_eligible": false,
+        "capture_id": "baseline-1",
+        "completed_at": "2026-11-14T15:07:43.353949+00:00"
+      },
+      {
+        "label": "observed_baseline-2",
+        "passed": true,
+        "verdict": "unknown",
+        "reason": "CONTEXT_REQUIRED",
+        "enforcement_eligible": false,
+        "capture_id": "baseline-2",
+        "completed_at": "2026-11-14T15:08:01.819736+00:00"
+      },
+      {
+        "label": "observed_approved-normal",
+        "passed": true,
+        "verdict": "normal",
+        "reason": "APPROVED_BASELINE_MATCH",
+        "enforcement_eligible": false,
+        "capture_id": "approved-normal",
+        "completed_at": "2026-11-14T15:08:30.830656+00:00"
+      },
+      {
+        "label": "observed_wrong-actor",
+        "passed": true,
+        "verdict": "threat",
+        "reason": "EXECUTION_SCOPE_MISMATCH",
+        "enforcement_eligible": false,
+        "capture_id": "wrong-actor",
+        "completed_at": "2026-11-14T15:08:49.014657+00:00"
+      },
+      {
+        "label": "observed_wrong-destination",
+        "passed": true,
+        "verdict": "threat",
+        "reason": "EXECUTION_SCOPE_MISMATCH",
+        "enforcement_eligible": false,
+        "capture_id": "wrong-destination",
+        "completed_at": "2026-11-14T15:09:06.636012+00:00"
+      },
+      {
+        "label": "observed_missing-actor",
+        "passed": true,
+        "verdict": "unknown",
+        "reason": "EXECUTION_EVIDENCE_INCOMPLETE",
+        "enforcement_eligible": false,
+        "capture_id": "missing-actor",
+        "completed_at": "2026-11-14T15:09:25.001944+00:00"
+      },
+      {
+        "label": "duplicate_input_preserves_single_envelope",
+        "passed": true,
+        "envelope_sha256": "1f0ed1e7350ec61024dfaf2bcf059793b66b020206bea1a2951b78447a46df8b"
+      },
+      {
+        "label": "automatic_restart_execution-observer",
+        "passed": true,
+        "same_container": true,
+        "before": 0,
+        "after": 1,
+        "exit_signal": "SIGKILL to Python child, not Docker stop"
+      },
+      {
+        "label": "observed_outage-restart",
+        "passed": true,
+        "verdict": "normal",
+        "reason": "APPROVED_BASELINE_MATCH",
+        "enforcement_eligible": false,
+        "capture_id": "outage-restart",
+        "completed_at": "2026-11-14T15:10:24.507674+00:00"
+      },
+      {
+        "label": "core_outage_and_sigkill_resume_durable_delivery",
+        "passed": true
+      },
+      {
+        "label": "tampered_capture_rejected_before_execution",
+        "passed": true
+      },
+      {
+        "label": "two_isolated_reviewer_identities_require_quorum_before_simulation",
+        "passed": true,
+        "reviewers": [
+          "runtime-reviewer-a",
+          "runtime-reviewer-b"
+        ],
+        "effect_applied": false,
+        "human_independent_review": false
+      },
+      {
+        "label": "trusted_adverse_related_403",
+        "passed": true,
+        "status": 403,
+        "resource_deliveries": 0,
+        "tls_version": "TLSv1.3"
+      },
+      {
+        "label": "trusted_adverse_unrelated_200",
+        "passed": true,
+        "status": 200,
+        "resource_deliveries": 1,
+        "tls_version": "TLSv1.3"
+      },
+      {
+        "label": "trusted_signal_enforcement_timing",
+        "passed": true,
+        "event_id": "execution-adverse",
+        "sent_at": "2026-11-14T15:11:23.601401+00:00",
+        "observed_at": "2026-11-14T15:12:00.323147+00:00"
+      },
+      {
+        "label": "after_archive_related_403",
+        "passed": true,
+        "status": 403,
+        "resource_deliveries": 0,
+        "tls_version": "TLSv1.3"
+      },
+      {
+        "label": "after_archive_unrelated_200",
+        "passed": true,
+        "status": 200,
+        "resource_deliveries": 1,
+        "tls_version": "TLSv1.3"
+      },
+      {
+        "label": "terminal_spool_and_input_rotation_preserve_original_history",
+        "passed": true,
+        "compacted": 9,
+        "retired_inputs": 10,
+        "server_archived": 30
+      },
+      {
+        "label": "restore_interruption_keeps_observer_stopped",
+        "passed": true,
+        "exit_code": 73
+      },
+      {
+        "label": "restored_old_token_403",
+        "passed": true,
+        "status": 403,
+        "resource_deliveries": 0,
+        "tls_version": "TLSv1.3"
+      },
+      {
+        "label": "restored_fresh_token_200",
+        "passed": true,
+        "status": 200,
+        "resource_deliveries": 1,
+        "tls_version": "TLSv1.3"
+      },
+      {
+        "label": "full_restore_preserves_context_and_delivery_history",
+        "passed": true
+      }
+    ],
+    "maintenance": [
+      {
+        "operation": "observer_archive",
+        "completed": true,
+        "exit_code": 0,
+        "receipt": {
+          "schema_version": "execution-maintenance-1",
+          "operation": "observer_archive",
+          "completed": true,
+          "compacted": 9,
+          "retired_inputs": 10,
+          "archived_records": null,
+          "issue": null
+        },
+        "issue": null
+      },
+      {
+        "operation": "server_archive",
+        "completed": true,
+        "exit_code": 0,
+        "receipt": {
+          "schema_version": "execution-maintenance-1",
+          "operation": "server_archive",
+          "completed": true,
+          "compacted": null,
+          "retired_inputs": null,
+          "archived_records": 30,
+          "issue": null
+        },
+        "issue": null
+      }
+    ],
+    "cleanup": {
+      "project": "kmtls-e175ccc5d406",
+      "stopped": true,
+      "purged": true
+    },
+    "source_commit": "c976de7d4300fe86277bb34a3782bd19eaed2483",
+    "source_dirty": true,
+    "image_source_verified": true,
+    "release_image_payload_verified": true,
+    "image_id": "sha256:174ec11de9460eaff534144747fff02b8ea5343d12c8d8bc22caeed55a71dda5"
+  },
+  "prior_failure_and_single_reexecution": {
+    "completed": true,
+    "repository": "cheonan-asan-sta/zero-trust-llm-secops",
+    "run": 43605333964,
+    "head": "c976de7d4300fe86277bb34a3782bd19eaed2483",
+    "initial_attempt": 1,
+    "initial_failed_jobs": [
+      "runtime (execution-mtls)",
+      "test"
+    ],
+    "root_cause_confirmed": false,
+    "known_stage": "After trusted_signal_enforcement_timing and before terminal_spool_and_input_rotation_preserve_original_history; includes observer compact. Exact failing child and cause unconfirmed.",
+    "error_code": "runtime_command_failed_2",
+    "code_changed_in_execution_path": false,
+    "possible_lock_contention_not_confirmed": true,
+    "automatic_retry_loop": false,
+    "reexecution_requests": 1,
+    "request": "gh run rerun --failed, once after inspection",
+    "initial_log_sha256": "242129017c29b679496d502943b6ce2ac194fd581df2d689860ea0882f56a9f6",
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "final_attempt": 2,
+    "final_16_checks_passed": true,
+    "timestamp_verified_retained_executions": [
+      "runtime (application)",
+      "runtime (rekey)",
+      "runtime (authority-ha)",
+      "runtime (database-recovery)",
+      "runtime (response-mtls)",
+      "unit",
+      "runtime (selection)",
+      "lambda",
+      "runtime (database-transport)",
+      "runtime (application-mtls)",
+      "runtime (monitored)",
+      "docker",
+      "runtime (database-backup)",
+      "runtime (authority)"
+    ],
+    "timestamp_verified_reexecuted_jobs": [
+      "runtime (execution-mtls)",
+      "test"
+    ]
+  },
+  "legacy_regression": {
+    "aws_calls": 0,
+    "completed": true,
+    "goal_qualified": false,
+    "native_actor_command_evidence_added_to_legacy": 0,
+    "paid_api_calls": 0,
+    "population": 1681815,
+    "scenarios": {
+      "fox": {
+        "after_decision_sha256": "29e3e42b17e13d9f4ce8f785b2c1121ee52aa9a6ebbd323c5328e38644929832",
+        "before_decision_sha256": "29e3e42b17e13d9f4ce8f785b2c1121ee52aa9a6ebbd323c5328e38644929832",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 668418,
+        "predictions_sha256": "3a95e16120e53c888203f0d25d57526b0c614deeaa1e86b43ed98694976702cc",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.998765742394729,
+          "f1": 0.9990965864106885,
+          "false_positive_rate": 0.0006145584161411404,
+          "fn": 695,
+          "fp": 130,
+          "inference_errors": 0,
+          "population": 668418,
+          "precision": 0.9997151115776464,
+          "recall": 0.9984788261352991,
+          "tn": 211404,
+          "tp": 456189
+        }
+      },
+      "harrison_observed": {
+        "after_decision_sha256": "de38509b07982c34ab69e57eb7df9ebb0517674d06cd1329d594c93c503be1c9",
+        "before_decision_sha256": "de38509b07982c34ab69e57eb7df9ebb0517674d06cd1329d594c93c503be1c9",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 422178,
+        "predictions_sha256": "c7e557b7d8e137cedc35649505ad389d06c593fe9f53e09caccf10d28220a9e0",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9993983580385525,
+          "f1": 0.9996953318603709,
+          "false_positive_rate": 0.046012832263978,
+          "fn": 3,
+          "fp": 251,
+          "inference_errors": 0,
+          "population": 422178,
+          "precision": 0.9993980396718237,
+          "recall": 0.9999928009733084,
+          "tn": 5204,
+          "tp": 416720
+        }
+      },
+      "russellmitchell": {
+        "after_decision_sha256": "2c4aecb63800cb85dfc8a6685f03b17d53c2f88e727b47c415eac6c1d2d70276",
+        "before_decision_sha256": "2c4aecb63800cb85dfc8a6685f03b17d53c2f88e727b47c415eac6c1d2d70276",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 295243,
+        "predictions_sha256": "2ee9ee30497a6a4a48c12461e0c6ce76dcdc3392db71f04caf3f7f92383dfaf4",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9963386092134275,
+          "f1": 0.991198000211704,
+          "false_positive_rate": 0.0003642113111178716,
+          "fn": 996,
+          "fp": 85,
+          "inference_errors": 0,
+          "population": 295243,
+          "precision": 0.9986054371544355,
+          "recall": 0.9838996476027286,
+          "tn": 233296,
+          "tp": 60866
+        }
+      },
+      "santos": {
+        "after_decision_sha256": "90fd3e70c751fe8da7fd2fbc26fd70688c07f8989ded90e48af67f7a4662d99a",
+        "before_decision_sha256": "90fd3e70c751fe8da7fd2fbc26fd70688c07f8989ded90e48af67f7a4662d99a",
+        "changed_decisions": 0,
+        "introduced_fp": 0,
+        "labels_reopened": false,
+        "lost_tp": 0,
+        "new_tp": 0,
+        "population": 295976,
+        "predictions_sha256": "92dc1b9932ffd57562e29454ea81c25f70b071406d6aed89587e5dada6c7a220",
+        "removed_fp": 0,
+        "retained_metrics": {
+          "accuracy": 0.9966010757628997,
+          "f1": 0.9892837359921599,
+          "false_positive_rate": 0.00029765615886794125,
+          "fn": 932,
+          "fp": 74,
+          "inference_errors": 0,
+          "population": 295976,
+          "precision": 0.9984089101034208,
+          "recall": 0.9803238541600693,
+          "tn": 248535,
+          "tp": 46435
+        }
+      }
+    },
+    "schema": "extra-shared-execution-legacy-regression-1",
+    "scope": "prior observed-development decision regression only; no new ground truth",
+    "source_prior_sha256": "35ec2a206d0a3a475d37dfb38b9459044291aee79cfea9adbbcae8da7b428ee4"
+  },
+  "controlled_lock_scope": "Linux flock fixture exercises real constructor and compaction lock contention; original feed and status stay unchanged; compact/retire succeeds after releasing the lock. This does not identify the historical CI cause.",
+  "bounds": {
+    "input_bytes": 1024,
+    "admitted_report_bytes": 32768,
+    "command_timeout_seconds": 30,
+    "automatic_retries": 0,
+    "compaction_limit": 1000
+  },
+  "limits": [
+    "Strict receipt admission is not a hard subprocess stdout memory quota.",
+    "Docker CLI timeout does not guarantee remote exec cancellation.",
+    "No new retry or busy-wait was added. Genuine contention remains a failed acceptance.",
+    "Long soak and real systemd resource accounting/enforcement remain incomplete."
+  ],
+  "source_sha256": {
+    "scripts/execution_maintenance_probe.py": "c50ea23f7438fae191e138d7d2c0a1ada6ba30dd72670310b66b6f8bad3a8ccb",
+    "scripts/test_execution_mtls_runtime.py": "ec99f4097eeb29afbb9caeb1d4cf78132ef65690323b741ba497f3d520571a76",
+    "tests/test_execution_maintenance_probe.py": "e0e7dfc089f317f72db07b1f683a5e4f9ab6e91882b8f834d71090fbfd243a25"
+  },
+  "artifact_sha256": {
+    "tests.json": "bef81c96eb2ab6898486b438e3fce252715b55110a97c0ac4aef5bc51a3c902e",
+    "linux.xml": "c14ecfc35da6bbe4f03eb9bb7b77cc788121d02b15026c132eda1977c1d4f7d3",
+    "diagnostic-units.xml": "c05ce07b75a89bc5c926246b739b89621158cc898854b52f244775c499e12774",
+    "source-manifest.json": "310214167fdd8bf92c638786777ebd61477e6fbe4cceaaf917b6737b63e08008",
+    "runtime-tests.json": "ceae45c1d932a10d77984e757f918fde820642c3f981e55cd2c601e6d488ed9b",
+    "legacy-regression/run.json": "a2d03c97bbd4bb19b8ba9fe478599953379639e33df4230ee145d3fa27cf1be0"
+  },
+  "verification_sha256": "7437aff0676ca1e7e00e1368e740587c2667d4ada2e62cf3949458eb70972d48"
+}

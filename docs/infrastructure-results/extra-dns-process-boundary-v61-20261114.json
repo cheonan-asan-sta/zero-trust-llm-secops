@@ -1,0 +1,175 @@
+{
+  "schema": "extra-dns-process-boundary-1",
+  "completed": true,
+  "production_policy_changed": false,
+  "goal_qualified": false,
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "feature_comparison": {
+    "completed": true,
+    "scope": "observed_development_feature_comparison",
+    "source_sha256": "79619eb22408580c98953e50ace594ce88b09695f2b906b5d7b1315da0e33f67",
+    "plan_sha256": "20a76a5241df894fbc349a0a6ccc5532bdbe6bdcf7064139a5756600b1c60ae0",
+    "scenarios": {
+      "russellmitchell": {
+        "population": 275900,
+        "feature_rows_changed": 51,
+        "existing_observation_errors": 0,
+        "raw_sha256": "3b26c8774eab02ea72c46e7c3eead9e7a3601c6f169ce83b3bd4cafd7674888b",
+        "previous_inputs_sha256": "79ada3adad50eaf5bcf70ff355ac9b82c9926d3e78d2d71d1e6c68bc6037441f"
+      },
+      "santos": {
+        "population": 275667,
+        "feature_rows_changed": 29,
+        "existing_observation_errors": 0,
+        "raw_sha256": "2cee0cab1e1e4cd2b2ed43b93ec2044e9f8c7343ab1fe6d832d0372d5a1654b9",
+        "previous_inputs_sha256": "c3c1981a41ac718aada012dc74f7a177d364a5f9d184602e644e154863ff5f53"
+      },
+      "fox": {
+        "population": 240582,
+        "feature_rows_changed": 71,
+        "existing_observation_errors": 0,
+        "raw_sha256": "6068d052ebd72bdea61616bf2dd15ab403b8cea236c265e890d38906fc7a26d6",
+        "previous_inputs_sha256": "2da1bba061b37cbaea6a0f9d8793efb70548d292acc5ebe69eb3a02d99a3b295"
+      }
+    },
+    "labels_opened": false,
+    "classifier_changed": false,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "seconds": 90.844
+  },
+  "frozen_rejected_candidate_comparison": {
+    "aws_calls": 0,
+    "baseline_changed": false,
+    "completed": true,
+    "dns_source_sha256": "79619eb22408580c98953e50ace594ce88b09695f2b906b5d7b1315da0e33f67",
+    "model_retrained": false,
+    "model_sha256": "33ee418eb02c02fe8cbb8ed2b636cca067beeac53e1cf8fd8c57e971ba970fde",
+    "paid_api_calls": 0,
+    "production_adopted": false,
+    "scenarios": {
+      "fox": {
+        "after_candidate_metrics": {
+          "accuracy": 0.9981004397668986,
+          "f1": 0.9948558628530263,
+          "false_positive_rate": 0.0002449204518782337,
+          "fn": 409,
+          "fp": 48,
+          "inference_errors": 0,
+          "population": 240582,
+          "precision": 0.9989149845159249,
+          "recall": 0.9908295964125561,
+          "tn": 195934,
+          "tp": 44191
+        },
+        "before_candidate_metrics": {
+          "accuracy": 0.9981004397668986,
+          "f1": 0.9948558628530263,
+          "false_positive_rate": 0.0002449204518782337,
+          "fn": 409,
+          "fp": 48,
+          "inference_errors": 0,
+          "population": 240582,
+          "precision": 0.9989149845159249,
+          "recall": 0.9908295964125561,
+          "tn": 195934,
+          "tp": 44191
+        },
+        "feature_rows_changed": 71,
+        "population": 240582,
+        "predicted_changes_sha256": "48112c45a7a52a05dedeef01149ec4aed103eeaa578745f459149b54caa0cf82",
+        "prediction_rows_changed": 0,
+        "truth_sha256": "1b4194f61dab2969962f88f90bc3798fa3d25019af9163e8d92263b9582eef47"
+      },
+      "russellmitchell": {
+        "after_candidate_metrics": {
+          "accuracy": 0.9973794853207684,
+          "f1": 0.9932654601004126,
+          "false_positive_rate": 2.2536226984878192e-05,
+          "fn": 718,
+          "fp": 5,
+          "inference_errors": 0,
+          "population": 275900,
+          "precision": 0.9999062300738907,
+          "recall": 0.9867123160914222,
+          "tn": 221860,
+          "tp": 53317
+        },
+        "before_candidate_metrics": {
+          "accuracy": 0.9973794853207684,
+          "f1": 0.9932654601004126,
+          "false_positive_rate": 2.2536226984878192e-05,
+          "fn": 718,
+          "fp": 5,
+          "inference_errors": 0,
+          "population": 275900,
+          "precision": 0.9999062300738907,
+          "recall": 0.9867123160914222,
+          "tn": 221860,
+          "tp": 53317
+        },
+        "feature_rows_changed": 51,
+        "population": 275900,
+        "predicted_changes_sha256": "5bed51666cb0f1d848121940fd17f6d499509b74e51a6611c6f58a7ab25fabb4",
+        "prediction_rows_changed": 0,
+        "truth_sha256": "c886fca1bca8f43fad4275046ed401911468316694b7bd912299053e8079e42f"
+      },
+      "santos": {
+        "after_candidate_metrics": {
+          "accuracy": 0.9971414786681032,
+          "f1": 0.9899191485006652,
+          "false_positive_rate": 0.0002201142054088833,
+          "fn": 736,
+          "fp": 52,
+          "inference_errors": 0,
+          "population": 275667,
+          "precision": 0.9986577874141759,
+          "recall": 0.9813321158626287,
+          "tn": 236189,
+          "tp": 38690
+        },
+        "before_candidate_metrics": {
+          "accuracy": 0.9971414786681032,
+          "f1": 0.9899191485006652,
+          "false_positive_rate": 0.0002201142054088833,
+          "fn": 736,
+          "fp": 52,
+          "inference_errors": 0,
+          "population": 275667,
+          "precision": 0.9986577874141759,
+          "recall": 0.9813321158626287,
+          "tn": 236189,
+          "tp": 38690
+        },
+        "feature_rows_changed": 29,
+        "population": 275667,
+        "predicted_changes_sha256": "7e1a476566c7c68ef0e32556b92fe3ca86a8442009b66bd0e995e407882332ea",
+        "prediction_rows_changed": 0,
+        "truth_sha256": "20d09b12052be4fcb5ac7781bd986c5d0fe1a5bc9cae445668da0ab1868134dc"
+      }
+    },
+    "scope": "observed_development_frozen_rejected_candidate_diagnostic"
+  },
+  "validation": {
+    "windows_focused_passed": 58,
+    "linux": {
+      "exit_code": 0,
+      "seconds": 13.75,
+      "counts": {
+        "passed": 152
+      },
+      "log": "runtime/f1/dns-boundary-tests-v61-20261114/linux.log",
+      "executed": true,
+      "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+      "source_files": 945,
+      "source_archive_sha256": "58586b7564bb79f20be3fc95dcafd70fc752ae6bf8dd0f7e8b9bde5ad03d4e95",
+      "container_exit": 0,
+      "oom_killed": false,
+      "network_mode": "none",
+      "owned_container": "4eb0dfcf49fcc833fdfa815b46590ae65c4507331805b941c022c32e2809ac3e",
+      "snapshot_sources_unchanged_after": true,
+      "owned_container_removed": true
+    }
+  }
+}

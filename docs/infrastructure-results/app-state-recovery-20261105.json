@@ -1,0 +1,63 @@
+{
+  "base_git_head": "a1f60463a1d42f7f55a397cf2e937af930375359",
+  "checks": {
+    "audit_descendant_restart_admitted": true,
+    "changed_source_backup_refused": true,
+    "fixed_clock_old_grants_denied": true,
+    "image_source_matches": true,
+    "network_isolated_no_ports": true,
+    "old_backup_refused": true,
+    "original_database_destroyed": true,
+    "public_trust_is_readonly": true,
+    "real_authenticated_http_denies_old_grants": true,
+    "running_source_refused": true,
+    "tampered_admission_exits_before_serving": true,
+    "tampered_admission_reports_expected_denial": true,
+    "tampered_backup_refused": true,
+    "unfenced_control_still_allows": true,
+    "workload_has_no_control_keys": true
+  },
+  "cleanup": {
+    "containers": 0,
+    "volumes": 0
+  },
+  "execution": "Chaeheeju / Codex tools; local Docker; rule analyzer; synthetic data",
+  "finished_at": "2026-11-05T13:38:49.198171+00:00",
+  "image_id": "sha256:561fa493574f74961bbafb6ce8c71d024359f9b96547b7c43973fb83ed56ed7d",
+  "local_regression": {
+    "limitations": "Two existing warnings; exact final PR and post-merge runs are recorded in the PR.",
+    "linux": {
+      "passed": 1940,
+      "seconds": 467.84,
+      "warnings": 2
+    },
+    "new_recovery_cases": 48
+  },
+  "passed": true,
+  "result": {
+    "backup_bytes_plaintext": 49152,
+    "fenced_sessions": 3,
+    "rpo_at_stopped_checkpoint_records": 0,
+    "rpo_scope": "Only the fully stopped, witnessed lab writer boundary; no online RPO promise.",
+    "source_records": 18
+  },
+  "schema": "app-maintenance-recovery-1",
+  "seconds": {
+    "backup": 2.4695,
+    "checkpoint": 2.5179,
+    "initialize": 2.4251,
+    "restore": 2.4331,
+    "restore_to_http_ready": 11.033
+  },
+  "source": {
+    "application": "577d99405074d2a016b9bca37375b4078f4c45a4ee698b245a2f70f86ac23088",
+    "scripts": {
+      "scripts/app_recovery_fixture.py": "edf14f711c974a7cb33457b716ea48dbe9299833b38fdc15706863874ec10274",
+      "scripts/app_state_recovery.py": "86ca4708c833b6a5b8eb45fa9fa2886eab6e4f217cf4aaefe00b6683719cb742",
+      "scripts/serve_recovered_app.py": "81f863b865faec9776ceefca45ff6e9fb8f0b859d1b721bd486e0eab8a839b7e",
+      "scripts/test_app_recovery_runtime.py": "d5360faf7fa3c9a7c3cc18a635306d810c61b1ffce31670d96678a94104d125c"
+    }
+  },
+  "source_dirty": true,
+  "started_at": "2026-11-05T13:37:40.026952+00:00"
+}

@@ -1006,6 +1006,8 @@ class RuleDetectionQuality(StrictModel):
 
 
 class DetectionQualityReport(StrictModel):
+    evaluation_scope: Literal["public_fixture_regression"] = "public_fixture_regression"
+    expanded_benchmark_endpoint: str = "/evaluation/detection-benchmark"
     evaluation_version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
     manifest_digest_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     ruleset_digest_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")

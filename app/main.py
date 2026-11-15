@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 from functools import lru_cache
 from pathlib import Path
 from time import perf_counter
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import FileResponse, JSONResponse
@@ -14,7 +14,9 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from app.analyzers import HybridAnalyzer, OpenAIAnalyzer, RuleBasedAnalyzer
 from app.analyzers.base import Analyzer
+from app.behavior_context_api import behavior_context_router
 from app.config import get_settings
+from app.dashboard_api import router as dashboard_router
 from app.middleware import RequestBodyLimitMiddleware, RequestContextMiddleware
 from app.models import (
     AnalysisResult,
@@ -58,10 +60,13 @@ from app.models import (
     SigmaRuleSummary,
     SimulationRequest,
 )
+from app.response_api import response_router
 from app.scenarios import SCENARIOS, generate_events, get_scenario
 from app.security import Principal, Role, require_roles
 from app.services.assurance import get_assurance_registry
 from app.services.audit import create_audit_store
+from app.services.behavior_context import BehaviorContextService
+from app.services.behavior_context_store import BehaviorContextStore
 from app.services.cases import (
     ALLOWED_TRANSITIONS,
     CaseConflictError,
@@ -70,7 +75,9 @@ from app.services.cases import (
     InvalidCaseTransitionError,
     create_case_store,
 )
+from app.services.continuous_signals import ContinuousSignalService
 from app.services.correlation import get_correlation_engine
+from app.services.detection_benchmark import BenchmarkUnavailable, get_detection_benchmark
 from app.services.detection_quality import get_detection_quality_service
 from app.services.evaluation import run_evaluation
 from app.services.incident_quality import get_incident_quality_service
@@ -84,9 +91,15 @@ from app.services.integration_outbox import (
 )
 from app.services.ocsf import get_ocsf_normalizer
 from app.services.policy import enforce_assessment_safety, response_preview
+from app.services.public_detection import PublicSession, evaluate_public_session
 from app.services.public_replay import get_public_replay_service
+from app.services.response_actions import ResponseService
 from app.services.scenario_evaluator import evaluate_scenarios
 from app.services.sigma import get_sigma_engine
+from app.services.signal_inbox import SignalInbox
+from app.services.trusted_signals import SignalVerifier
+from app.services.zero_trust import ZeroTrustOperations
+from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
 
 settings = get_settings()
 static_dir = Path(__file__).parent / "static"
@@ -102,6 +115,7 @@ app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.allowed_host_li
 app.add_middleware(RequestBodyLimitMiddleware, max_bytes=settings.api_max_body_bytes)
 app.add_middleware(RequestContextMiddleware)
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
+app.include_router(dashboard_router)
 audit_store = create_audit_store(settings)
 case_store = create_case_store(settings)
 integration_outbox_store = create_integration_outbox_store(settings)
@@ -115,6 +129,37 @@ public_replay_service = get_public_replay_service()
 detection_quality_service = get_detection_quality_service()
 incident_quality_service = get_incident_quality_service()
 analysis_capacity = asyncio.Semaphore(settings.analysis_max_concurrency)
+zero_trust_operations = (
+    ZeroTrustOperations(settings.zero_trust_db_path,
+                        signal_verifier=SignalVerifier(settings.trusted_signal_sources_path))
+    if settings.app_environment != "production" else None
+)
+continuous_signal_service = (
+    ContinuousSignalService(zero_trust_operations, SignalInbox(
+        settings.zero_trust_db_path,
+        max_pending=settings.signal_inbox_max_pending,
+        max_records=settings.signal_inbox_max_records,
+        max_attempts=settings.signal_inbox_max_attempts,
+        lease_seconds=settings.signal_inbox_lease_seconds,
+        retry_seconds=settings.signal_inbox_retry_seconds,
+    )) if zero_trust_operations else None
+)
+app.include_router(zero_trust_router(zero_trust_operations, continuous_signal_service))
+install_zero_trust_error_handlers(app)
+behavior_context_service = (
+    BehaviorContextService(BehaviorContextStore(
+        settings.behavior_context_db_path or settings.zero_trust_db_path.with_name(
+            settings.zero_trust_db_path.stem + "-behavior-context.sqlite3",
+        ),
+    ), zero_trust_operations)
+    if zero_trust_operations else None
+)
+app.include_router(behavior_context_router(behavior_context_service))
+response_service = (
+    ResponseService(behavior_context_service.store, zero_trust_operations)
+    if behavior_context_service else None
+)
+app.include_router(response_router(response_service))
 
 ViewerPrincipal = Annotated[Principal, Depends(require_roles(Role.VIEWER))]
 AnalystPrincipal = Annotated[Principal, Depends(require_roles(Role.ANALYST))]
@@ -161,6 +206,15 @@ def liveness() -> dict:
 
 @app.get("/health/ready")
 def readiness() -> Response:
+    zero_trust_integrity = (
+        zero_trust_operations.integrity() if zero_trust_operations else {"ok": True, "enabled": False}
+    )
+    inbox_integrity = (
+        continuous_signal_service.inbox.integrity()
+        if continuous_signal_service else {"ok": True, "enabled": False}
+    )
+    context_integrity = (behavior_context_service.readiness() if behavior_context_service
+                         else {"ok": True, "enabled": False})
     integrity = audit_store.integrity()
     case_integrity = case_store.integrity()
     outbox_integrity = integration_outbox_store.integrity()
@@ -177,6 +231,9 @@ def readiness() -> Response:
     )
     ready = (
         integrity["ok"]
+        and zero_trust_integrity["ok"]
+        and inbox_integrity["ok"]
+        and context_integrity["ok"]
         and case_integrity["ok"]
         and outbox_integrity["ok"]
         and assurance.valid
@@ -189,6 +246,8 @@ def readiness() -> Response:
     )
     payload = {
         "status": "ready" if ready else "degraded",
+        "signal_inbox": inbox_integrity,
+        "behavior_context": context_integrity,
         "audit": integrity,
         "case_management": {
             **case_integrity,
@@ -204,6 +263,7 @@ def readiness() -> Response:
             "data_schema": "OCSF 1.9.0 Incident Finding",
             "external_delivery_enabled": False,
         },
+        "zero_trust_operations": zero_trust_integrity,
         "assurance": {
             "valid": assurance.valid,
             "registry_version": assurance.registry_version,
@@ -333,6 +393,12 @@ def evaluate_detections(event: SecurityEvent, _: AnalystPrincipal) -> DetectionP
 @app.get("/detections/rules", response_model=list[SigmaRuleSummary])
 def detection_rules(_: ViewerPrincipal) -> list[SigmaRuleSummary]:
     return sigma_engine.summaries()
+
+
+@app.post("/detections/public/evaluate")
+def evaluate_public_behavior(session: PublicSession, _: AnalystPrincipal) -> dict:
+    """Return reference detections; public observations cannot authorize access changes."""
+    return evaluate_public_session(session)
 
 
 @app.post("/incidents/correlate", response_model=CorrelationResult)
@@ -547,6 +613,17 @@ def incident_quality(principal: ViewerPrincipal) -> IncidentQualityReport:
     if not public_replay_service.valid or not sigma_engine.valid:
         raise HTTPException(status_code=503, detail="Incident quality inputs failed validation")
     return incident_quality_service.evaluate(principal.tenant_id)
+
+
+@app.get("/evaluation/detection-benchmark")
+def detection_benchmark(
+    _: ViewerPrincipal,
+    split: Literal["development", "holdout"] = "holdout",
+) -> dict:
+    try:
+        return get_detection_benchmark().evaluate(split)
+    except BenchmarkUnavailable as exc:
+        raise HTTPException(status_code=503, detail="Detection benchmark inputs failed validation") from exc
 
 
 @app.post("/scenarios/evaluate", response_model=EventScenarioEvaluation)

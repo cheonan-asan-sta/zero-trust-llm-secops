@@ -1,0 +1,40 @@
+{
+  "schema": "authority-rotation-contract-1",
+  "scope": "opt-in local software root/intermediate/all registered JWK authority rotation; trusted host and network-isolated custodian",
+  "reused_checks_per_trial": 174,
+  "authority_checks_per_trial": 23,
+  "expected_checks": [
+    "root_custodian_is_network_isolated_without_socket",
+    "online_ca_and_leaf_controller_do_not_mount_root_vault",
+    "tampered_root_rotation_manifest_rejected",
+    "root_retirement_before_leaf_migration_rejected",
+    "custodian_restart_reuses_same_prepared_authority_keys",
+    "coordinator_process_restart_resumes_staged_trust",
+    "ca_outage_holds_rotation_without_retiring_old_trust",
+    "valid_protected_access_continues_during_ca_rotation_outage",
+    "root_intermediate_and_all_jwk_keys_rotate_by_timer",
+    "all_active_leaf_identities_and_native_servers_migrate",
+    "fresh_tokens_signed_by_every_old_jwk_are_rejected",
+    "protected_access_after_root_and_jwk_rotation",
+    "retired_root_fails_real_tls_validation",
+    "intermediate_timer_changes_issuer_without_replacing_root",
+    "jwk_timer_changes_signers_without_replacing_ca_keys",
+    "all_registered_jwk_public_keys_change_with_scopes_preserved",
+    "three_authority_epochs_finish_with_current_leaf_certificates",
+    "old_encrypted_root_issuer_jwk_bundles_are_removed",
+    "retired_online_issuer_and_signer_key_files_removed",
+    "protected_access_after_independent_authority_timers",
+    "authority_prometheus_scrapes_with_renewed_credentials",
+    "authority_new_alert_episode_delivered_after_renewal",
+    "authority_same_alert_episode_resolved_after_renewal"
+  ],
+  "publication": "leaf pause/ack; old-root-signed sequential manifest; overlapping service trust; quiescent JWK/CA activation; all-leaf issuer migration; TLS/reload receipts; remove old trust; deny all old JWKs; retire owned old secret files",
+  "limits": [
+    "software encrypted vault and its high-entropy password share a local volume; not HSM or physical air gap",
+    "trusted host coordinator controls Docker and can run the custodian; no root vault/socket on online CA or leaf controller",
+    "root manifest sequence assumes intact local state; no distributed consensus or storage rollback resistance",
+    "issuer-only rotation does not actively revoke a stolen old intermediate; root retirement/pins/expiry differ from CRL/OCSP",
+    "brief CA restart/issuance pause and failed in-flight requests are possible; no HA or zero-downtime SLA",
+    "unlink is not physical/memory/backup erasure; no production deployment or independent team reproduction"
+  ]
+}

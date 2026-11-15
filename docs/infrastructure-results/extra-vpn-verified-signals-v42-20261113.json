@@ -1,0 +1,1546 @@
+{
+  "schema": "extra-vpn-verified-signals-evidence-1",
+  "date": "2026-11-13",
+  "scope": "opt-in local verified-signal bridge and authored functional controls",
+  "implementation_complete": true,
+  "production_adopted": false,
+  "goal_qualified": false,
+  "historical_public_log_fp_reduction_achieved": false,
+  "automatic_enforcement_allowed": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "github_pushes": 0,
+  "models_refitted": false,
+  "original_labels_changed": false,
+  "final_run": {
+    "receipt": {
+      "path": "runtime/f1/vpn-verified-signals-v42b-20261113/run.json",
+      "bytes": 35893,
+      "sha256": "eb1b47402e80b87ef0d4df39b168ca94a14e5750ac45e02e6ac33c26d3935b7d"
+    },
+    "report": {
+      "aws_sdk_calls": 0,
+      "completed": true,
+      "controls": {
+        "after": {
+          "accuracy": 1.0,
+          "f1": 1.0,
+          "false_positive_rate": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 49,
+          "precision": 1.0,
+          "recall": 1.0,
+          "tn": 20,
+          "tp": 29
+        },
+        "before": {
+          "accuracy": 0.5918367346938775,
+          "f1": 0.7435897435897436,
+          "false_positive_rate": 1.0,
+          "fn": 0,
+          "fp": 20,
+          "inference_errors": 0,
+          "population": 49,
+          "precision": 0.5918367346938775,
+          "recall": 1.0,
+          "tn": 0,
+          "tp": 29
+        },
+        "controls": [
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "e8349a57cf17fbd9ad6244636d40faaeb7bc74ce9eb1dae776f7d86eda94ec8c",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 1,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "7d33e30a33dc1c3051ce47c44d2a4834d7a7ddfb5f95342c81218b492b50ea18"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "da8f8d868808cb853fa9a38eeecda2bd14b6ebc57eeb5606a030a1a1cb694218",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 2,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "01cca317012b3015d8949ee98bef4d21086aacdba640b84a4670abb95dbc77d2"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "5efb4d90f953fdc689e4c24c336a13c02e597814307f2cec40d3c74d891fb4a4",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 3,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "2ee641ea4fa447510ad795f27790cf95d7e37f1e62c371a774d7ccedf2e02095"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "8889e7971f8f4fbf4b404d404d249e5425079c28a7f1da057942162bdd6f0d1d",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 4,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "d5df664ee20b2f7b674dc549eba0e13f50cc8248c76b2bb24ea43487e39e4d65"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "3b0ddfd1cc5e4428a5c93cba50b4e49753b0589d2da6053e1c20558d842abbc1",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 5,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "3a6d21b863e675784ee87edc5ce5f61c6102420fc034bacdad8629f877c39e1c"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "ec3577aa4879f77466f9d67d96a512f5b19715c1ad454495cd3f1591cfc130bd",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 6,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "1d10d7545e112f540f4be77859fafc1eb8d576d4e0f5ee4e82a8edff0d2eb578"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "450af3d164e46b9ec4bfa4829bf842fb5ed1de967e10cbc0bde5bddd37909e0c",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 7,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "010c7a4592fdfb84fd1a9ee40c97071789f2ac947b31f9fd0c52de707f276cfe"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "bf4ebdc96e0ae7fad2d43fd08c6d5f6384c0e0765569d91e92d3761537a3bc6b",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 8,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "55f704f60a718916676ac0839158d2a8d0cfc502665000626d0ec6763ce8e399"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "3a4ccf8099ea9d2f2f136f942b7db78ee2cfc7f1bdf0e2c5043cdf8289e714f9",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 9,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "664a1b1bc924c49de048faf95c0a0636706cff7db566a8051c9605bb35850e22"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "a759e3dd32cb48af568c74d05ec73ccdb42bb934bbadef9f12ecc65685343c28",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 10,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "3a14723d16cd07f7b1f88effddbf02f8d1b4f2a0c107da4fff49979a247a92c2"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "c61ee948c3799f49efc02dda55c20d2bfe5b8a0740fe4bc9ffdacbb38a84c7af",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 11,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "3cf88e10fbdfdbfdc1bdd0d601b56ce8e0f24597016a5e3b22cb4626ab75a996"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "ef884e5c4856f017514a05b0ea273a9d010be3d68f71b8c8de5cc8b4aee866fc",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 12,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "b987984668cd919c365ce439475503d95c0104753b211bd1971f94075b46ca2d"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "abe837d6328755c2022a5435bc33bdcaef42eccbd4582423d3df33e35c016e8a",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 13,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "e1200fd03185febef7d359d763c3d96003fc676b2301be66dad4f152af14bea9"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "6a145e06129ea47a517bc7bbd5cd9893f1801a806d9c4b6af22dbb69a7eb3b4e",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 14,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "43fe4a449833d6ffe46037bdae52f04235939e3a8430f1e79a2daecb216bda59"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "fc6965f72b4d9a88fb4f2fdc6df83fc69be996ce8755a5d6cad00c0f772c5a1d",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 15,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "4dcfcf00ec77408064ec7073eed5356661c2dd019b9108611dad26c61e5cb12d"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "fcc759a0d4f30042a0e82d2449a816cc31a872020b210311f1b4562c3b120768",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 16,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "68be20443fb9c527e931f831874aa2caf1d5de33db7ef5c1bd75247c558d0a49"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "21b6b00613bc2d9676e8853c947a2676078938f7d2c41e5457d3ebb99521b32d",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 17,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "07ad773cfcde068c818cf2b127431bf61c637387fe9034a8f024f9bc71ecf78f"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "37dbdcc27451b63890d9c62032a06a6237274eb24ae449e8c8b1fe67522fa949",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 18,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "5651baa522b8a048228f1d187521f5f962fcd44f6d6aded7c828ae828be25f34"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "40a4c1e2030812f8e93c8c6b807ed0d458c70b3503a2632ba3629218ca38aa9f",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 19,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "f4052469bb1dbc80ed3a9bce65c6cc34a6c5844f97b46f22148039e938afab15"
+          },
+          {
+            "after": {
+              "alert": false,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "2fc2d2bf15895245374fa2f8731e487356dae933eb44b0a7ace64b99f2801ef1",
+              "evidence_state": "approved",
+              "reason": "vpn_verified_healthy_authorized_request",
+              "review": false,
+              "score": 0.7516714422158549
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 20,
+            "family": "healthy-authorized",
+            "malicious": false,
+            "raw_line_sha256": "ee7b8193541851d114aeb1d7b270ad9deb371de3a2574a66e187215d26f7b533"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "bfc6be2889ff0e70f7d456cc92aec97fffba30f3ca3c904b7cc3a2b0215b1342",
+              "evidence_state": "adverse",
+              "reason": "vpn_verified_device_or_permission_risk",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 21,
+            "family": "compromised-device",
+            "malicious": true,
+            "raw_line_sha256": "5946c7deb0b4b8a193e4757703f031a4c896bed45835b0f545d58a7ba6805d37"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "4dfb1d252d558bf9c5741bd7252c70ee6db42bc4f741eb98c0ce848887391e13",
+              "evidence_state": "adverse",
+              "reason": "vpn_verified_device_or_permission_risk",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 22,
+            "family": "at-risk-device",
+            "malicious": true,
+            "raw_line_sha256": "bb639e56de5b7a2b3554f019bad71d68750f6ccc8aae9f63151d615abf3d8142"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "36982d0bc6b88b312c11391db8db0890151bdce2785a49ce65cbb53b8504c372",
+              "evidence_state": "adverse",
+              "reason": "vpn_verified_device_or_permission_risk",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 23,
+            "family": "unknown-device",
+            "malicious": true,
+            "raw_line_sha256": "9ff7fcebac527208a8b5f4243712621260cdbc921019f53fdddf14f4e0204f07"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "8fce89328e9b23fc16da720c43615909b7f9362184b6f8c7f6149211fd75f0c4",
+              "evidence_state": "adverse",
+              "reason": "vpn_verified_device_or_permission_risk",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 24,
+            "family": "unmanaged-device",
+            "malicious": true,
+            "raw_line_sha256": "1733cef445ed8caa225032ba9e68c3de8e3678aa1e0e70cf5db486867fb38311"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "7745e5945c036793d8ba2961bd3081778ad60234df45bdbb8ac46bed021d65b7",
+              "evidence_state": "adverse",
+              "reason": "vpn_verified_device_or_permission_risk",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 25,
+            "family": "inactive-user",
+            "malicious": true,
+            "raw_line_sha256": "e4dee381ae074c02f7f89640471d7612e9ac1ec3fdf8f126a62c5276e285949c"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "0042e2d6a751d8f98a056fd7b850b71c67f8d67f4fa67cd36adc1677bcc6e897",
+              "evidence_state": "adverse",
+              "reason": "vpn_verified_device_or_permission_risk",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 26,
+            "family": "failed-mfa",
+            "malicious": true,
+            "raw_line_sha256": "5c544816e8f7f219012f434366b79fddcfd6207011d68e41ffe5173542f24a78"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "95d29d84767dc8b0e122eefb0f47fee0553defb79dac104f2a32147eb27b15ec",
+              "evidence_state": "adverse",
+              "reason": "vpn_verified_device_or_permission_risk",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 27,
+            "family": "unknown-mfa",
+            "malicious": true,
+            "raw_line_sha256": "2af8069eb4e15a35373ea0f3f9886382f882b13d5227073bc7b077e9deda53d6"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "61c8f86b49432b7330210c68b55c5a97c93ccb78b3378d1ab0538c143a69a869",
+              "evidence_state": "adverse",
+              "reason": "vpn_verified_device_or_permission_risk",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 28,
+            "family": "failed-auth",
+            "malicious": true,
+            "raw_line_sha256": "65f033768b98179cc7ade9f2621597a9f6821ff4c00b18773e3b9bec334f1165"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "29721cf39e147e7fe516a34e459322b60f1fec582c94aec3bb7a1d5631b8e1b1",
+              "evidence_state": "adverse",
+              "reason": "vpn_verified_device_or_permission_risk",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 29,
+            "family": "unknown-auth",
+            "malicious": true,
+            "raw_line_sha256": "a188bd5394a57d5df974779cec1fd8d6ab991f724fc9a18ea3212ba2df219be8"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": null,
+              "evidence_state": "unavailable",
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 30,
+            "family": "unapproved-role",
+            "malicious": true,
+            "raw_line_sha256": "6c933665ca36895d79f0322acb004849842d964896793ccf7dbf0953ddd27e94"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "da7699cfae2b8d725bdc7b45a94074f21d2ed3faa016400c78a1f531b803c650",
+              "evidence_state": "adverse",
+              "reason": "vpn_verified_device_or_permission_risk",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 31,
+            "family": "anomalous-location",
+            "malicious": true,
+            "raw_line_sha256": "143e06aaa011843d8ac29035d925c61fd7c4d937767ee6a3765369e32e83c7a7"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": "ed207d6be8483bdfeaf3af6a39d618f56fb4eddddda247746a3cbecbc2b543d9",
+              "evidence_state": "adverse",
+              "reason": "vpn_verified_device_or_permission_risk",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 32,
+            "family": "unapproved-new-device",
+            "malicious": true,
+            "raw_line_sha256": "a484f02e404c36273cdce697a5d9ba9d13f44ab8be9eb0b6add7e3af8aa1e277"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": null,
+              "evidence_state": "unavailable",
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 33,
+            "family": "missing-permission",
+            "malicious": true,
+            "raw_line_sha256": "efbd43b582a149aee5622f80ecba13bbb9d795f11fdc7e1f3dc28f4c7fbecbe6"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": null,
+              "evidence_state": "unavailable",
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 34,
+            "family": "missing-evidence",
+            "malicious": true,
+            "raw_line_sha256": "13872d170062eb8a1e52542e4ec2973aab89661b58483c53fa7526158597284c"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": null,
+              "evidence_state": "unavailable",
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 35,
+            "family": "forged-gateway",
+            "malicious": true,
+            "raw_line_sha256": "d7e87b9d7cca590b2ea12822b6a103a4b4cac850e5bc69ab4e7f1c4a4320ab1d"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": null,
+              "evidence_state": "unavailable",
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 36,
+            "family": "forged-posture",
+            "malicious": true,
+            "raw_line_sha256": "30a14a4ef4047833cce6c5ff9e67f2670ea8419fbace9cd8f376e553a6955cd0"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": null,
+              "evidence_state": "unavailable",
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 37,
+            "family": "forged-permission",
+            "malicious": true,
+            "raw_line_sha256": "619df4b49b5d56d35cdbd51534df1eeb1ea5264016b86f7fbea2d5c3822eb88a"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": null,
+              "evidence_state": "unavailable",
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 38,
+            "family": "cross-request-proof",
+            "malicious": true,
+            "raw_line_sha256": "1304fe9f4acc1fc5cb3c0f7445d5487b81935d06627c9b9577082588f45be96d"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": null,
+              "evidence_state": "unavailable",
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 39,
+            "family": "stale-posture",
+            "malicious": true,
+            "raw_line_sha256": "578e86b1ddf6de9f1ecd268879d7828463037627be9b3b07aea88200960de1d4"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "evidence_sha256": null,
+              "evidence_state": "unavailable",
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.7516714422158549,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 40,
+            "family": "future-posture",
+            "malicious": true,
+            "raw_line_sha256": "96d1fbfaa8ce82535bb0887516d884ad726c3c2a5fc6224484537915426ab6d6"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.4567614625652931,
+              "evidence_sha256": "b52a9c194a5e85fca31500b58441e6277ee26cee91ec6b2adad59836a6a1b2e0",
+              "evidence_state": "approved",
+              "reason": "vpn_independent_security_signal",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.4567614625652931,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 41,
+            "family": "raw-auth-failure",
+            "malicious": true,
+            "raw_line_sha256": "9ed6f6043c8f050a5454ce191b531a0b18e5114051b5c34141bd7c2bf6a910fa"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.47541379726954214,
+              "evidence_sha256": "2d29a0ee6969308509adc5b34642e7ec4abbc23effb2d1dc241661918f63162c",
+              "evidence_state": "approved",
+              "reason": "vpn_independent_security_signal",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.47541379726954214,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 42,
+            "family": "raw-tls-failure",
+            "malicious": true,
+            "raw_line_sha256": "c5a5d5b53453fc2eececae849b74e8bc99f73263f052a1a11c562e8ac4300a24"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.47541379726954214,
+              "evidence_sha256": "a841fe3cbfec84ad9eb1b787ce9e415a465060d6797c145e1271cd008366798e",
+              "evidence_state": "approved",
+              "reason": "vpn_independent_security_signal",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.47541379726954214,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 43,
+            "family": "raw-path-traversal",
+            "malicious": true,
+            "raw_line_sha256": "80cf7f96fbdf7d8d6dd3ba36841539b336d7ec0baaf1f5019778a83c0e8c3507"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.47541379726954214,
+              "evidence_sha256": "80a9910e6ea99385caed4ff2d28eef154fe9bc2bc0db276529b15b71050a061c",
+              "evidence_state": "approved",
+              "reason": "vpn_independent_security_signal",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.47541379726954214,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 44,
+            "family": "raw-command",
+            "malicious": true,
+            "raw_line_sha256": "95be7ab23264236ee65cd45eab36418db09d2c7c7cc8147dbf22fbde7ea93583"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.47541379726954214,
+              "evidence_sha256": "e69aad4cffb15e68fce433a8568fd949562b84079b71bc46e4a43840975f969c",
+              "evidence_state": "approved",
+              "reason": "vpn_independent_security_signal",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.47541379726954214,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 45,
+            "family": "raw-scanner",
+            "malicious": true,
+            "raw_line_sha256": "337729799ddc0eea76a368e0a89dbfaed60d57d959e912eebe5c87cbbc537d5d"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.47541379726954214,
+              "evidence_sha256": "2caddd293d2ba46a16e0134a76e6adfc35b402d1c5d80679f4ff4eae4ee02bda",
+              "evidence_state": "approved",
+              "reason": "vpn_independent_security_signal",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.47541379726954214,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 46,
+            "family": "raw-sensitive-file",
+            "malicious": true,
+            "raw_line_sha256": "4cfb3c21cd881b855ef3071e589c58e8291ae6dbdd84ea383a10178e1cbd84e0"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.47541379726954214,
+              "evidence_sha256": "c626065121e2e8bb9dc5a0bedc9b013f42b9a479b98e507ff4b642b09b88bbd1",
+              "evidence_state": "approved",
+              "reason": "vpn_independent_security_signal",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.47541379726954214,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 47,
+            "family": "raw-privilege-tool",
+            "malicious": true,
+            "raw_line_sha256": "5f42f618dc0e932de9d7e3cef61f7a9a070bf688de135d91afa445089c93964e"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.47541379726954214,
+              "evidence_sha256": "c00f1016fccc69e7275baf40baebfdc499fc33dc953512db85034d1c1c4dc6f4",
+              "evidence_state": "approved",
+              "reason": "vpn_independent_security_signal",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.47541379726954214,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 48,
+            "family": "raw-service-stop",
+            "malicious": true,
+            "raw_line_sha256": "7444764c78814af6a749d60c64ddd96c3116d2c8b795decb520cb666861d6f07"
+          },
+          {
+            "after": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.47541379726954214,
+              "evidence_sha256": "0e267c702ba1fad49cdcb9c3f614415d047d4b4afdaaa3139a816c9393ede164",
+              "evidence_state": "approved",
+              "reason": "vpn_independent_security_signal",
+              "review": true,
+              "score": 1.0
+            },
+            "before": {
+              "alert": true,
+              "automatic_enforcement_allowed": false,
+              "baseline_score": 0.47541379726954214,
+              "reason": "vpn_history_risk_review",
+              "review": true,
+              "score": 0.9899371069182389
+            },
+            "control_id": 49,
+            "family": "raw-access-denied",
+            "malicious": true,
+            "raw_line_sha256": "ecd9bd3fa0edbb55b780b9f2e78c38a101d71437273d64121bba966ec4cff94b"
+          }
+        ],
+        "introduced_fp": 0,
+        "lost_baseline_tp": 0,
+        "private_keys_persisted": false,
+        "public_configuration": [
+          {
+            "bytes": 1273,
+            "path": "runtime/f1/vpn-verified-signals-v42b-20261113/public-controls/sources.json",
+            "sha256": "683d7757964430cb4462c44ded98f7e096aefa9178a39a8874ea7445a349391f"
+          },
+          {
+            "bytes": 568,
+            "path": "runtime/f1/vpn-verified-signals-v42b-20261113/public-controls/approvals.json",
+            "sha256": "685ead3062022ab8428f91bfcf1136de9dc18a36505e801ec5528dcb5b5a3432"
+          },
+          {
+            "bytes": 293,
+            "path": "runtime/f1/vpn-verified-signals-v42b-20261113/public-controls/policies.json",
+            "sha256": "827cf9a91ad9a7a612193430a9a3ca971ea124f1052a71898a1c7cf6430ff464"
+          },
+          {
+            "bytes": 357,
+            "path": "runtime/f1/vpn-verified-signals-v42b-20261113/public-controls/enrollments.json",
+            "sha256": "dacfefc7d7e59152a49ec956fb5eb20b29b5b7239fc0f513dbbc48d4f9a95af1"
+          }
+        ],
+        "scope": "authored prospective functional controls; not independent performance evaluation"
+      },
+      "elapsed_seconds": 23.248,
+      "ended_at": "2026-11-13T05:48:10.148699+00:00",
+      "github_pushes": 0,
+      "goal_qualified": false,
+      "history": {
+        "fox": {
+          "after": {
+            "accuracy": 0.9879435539114947,
+            "f1": 0.3888888888888889,
+            "false_positive_rate": 0.012102874432677761,
+            "fn": 0,
+            "fp": 88,
+            "inference_errors": 0,
+            "population": 7299,
+            "precision": 0.2413793103448276,
+            "recall": 1.0,
+            "tn": 7183,
+            "tp": 28
+          },
+          "after_sha256": "161f1bc6666257cfdbadd118622b46e1dee9016c5f08b882af71161ebfc74dd4",
+          "before": {
+            "accuracy": 0.9879435539114947,
+            "f1": 0.3888888888888889,
+            "false_positive_rate": 0.012102874432677761,
+            "fn": 0,
+            "fp": 88,
+            "inference_errors": 0,
+            "population": 7299,
+            "precision": 0.2413793103448276,
+            "recall": 1.0,
+            "tn": 7183,
+            "tp": 28
+          },
+          "before_sha256": "161f1bc6666257cfdbadd118622b46e1dee9016c5f08b882af71161ebfc74dd4",
+          "evidence_coverage": 0,
+          "label_sha256": "fe4be45bee7b25f59d3433585fdf8bfdb5733b583a2494b5f0beaa1b27a49fe7",
+          "note": "Historical logs have no authenticated device/authorization evidence; no enrichment invented.",
+          "population": 7299,
+          "raw_sha256": "dc8357ad1a2a4ce9e8963f1eb5eaccdfc106d32de5ae720d052956cedc618722",
+          "time_errors": 0
+        },
+        "russellmitchell": {
+          "after": {
+            "accuracy": 0.9891638071157667,
+            "f1": 0.4827586206896552,
+            "false_positive_rate": 0.010891268832819023,
+            "fn": 0,
+            "fp": 60,
+            "inference_errors": 0,
+            "population": 5537,
+            "precision": 0.3181818181818182,
+            "recall": 1.0,
+            "tn": 5449,
+            "tp": 28
+          },
+          "after_sha256": "d0372ba86fe59498a3a521d5f1501387307d77fc01bac3d22e1183f8928fcf9d",
+          "before": {
+            "accuracy": 0.9891638071157667,
+            "f1": 0.4827586206896552,
+            "false_positive_rate": 0.010891268832819023,
+            "fn": 0,
+            "fp": 60,
+            "inference_errors": 0,
+            "population": 5537,
+            "precision": 0.3181818181818182,
+            "recall": 1.0,
+            "tn": 5449,
+            "tp": 28
+          },
+          "before_sha256": "d0372ba86fe59498a3a521d5f1501387307d77fc01bac3d22e1183f8928fcf9d",
+          "evidence_coverage": 0,
+          "label_sha256": "24a46d40bf7e6ca91ee9f25f499ab1f709e881271d6944173e157f607c0d8e0d",
+          "note": "Historical logs have no authenticated device/authorization evidence; no enrichment invented.",
+          "population": 5537,
+          "raw_sha256": "08042e1ad03874326960ef3eef91a50305009cb2e7afe88827750dd839701bb1",
+          "time_errors": 0
+        },
+        "santos": {
+          "after": {
+            "accuracy": 0.9893276414087513,
+            "f1": 0.4827586206896552,
+            "false_positive_rate": 0.010725777618877368,
+            "fn": 0,
+            "fp": 60,
+            "inference_errors": 0,
+            "population": 5622,
+            "precision": 0.3181818181818182,
+            "recall": 1.0,
+            "tn": 5534,
+            "tp": 28
+          },
+          "after_sha256": "b0535829a2fe919b4430c173eff889bbeee74956b2510659b52150c1fd40b258",
+          "before": {
+            "accuracy": 0.9893276414087513,
+            "f1": 0.4827586206896552,
+            "false_positive_rate": 0.010725777618877368,
+            "fn": 0,
+            "fp": 60,
+            "inference_errors": 0,
+            "population": 5622,
+            "precision": 0.3181818181818182,
+            "recall": 1.0,
+            "tn": 5534,
+            "tp": 28
+          },
+          "before_sha256": "b0535829a2fe919b4430c173eff889bbeee74956b2510659b52150c1fd40b258",
+          "evidence_coverage": 0,
+          "label_sha256": "7b00e3ce62fa975aa5a86af11fd2a74378b0142979f1bd6c16d0091b60d40a20",
+          "note": "Historical logs have no authenticated device/authorization evidence; no enrichment invented.",
+          "population": 5622,
+          "raw_sha256": "f39a169c2ab4165b9848635c6e729a004bddb315f1f2f277f0341baf662e9ba7",
+          "time_errors": 0
+        }
+      },
+      "labels_changed": false,
+      "models_refitted": false,
+      "paid_api_calls": 0,
+      "plan": {
+        "bytes": 2685,
+        "path": "infra/f1-lab/operation-refinement-protocol.json",
+        "sha256": "f7fd853011b6eb6d3fa07d95146e6c8e774bf13395fb027c16961eb6813ce629"
+      },
+      "prior": {
+        "bytes": 27186,
+        "path": "runtime/f1/operation-retention-v40b-20261113/run.json",
+        "sha256": "2dbdf7b50cc652aa3140ff7afece6640e4b52d353d6c4e201ca21964c427ae82"
+      },
+      "production_adopted": false,
+      "schema": "extra-vpn-verified-signals-1",
+      "sources": {
+        "app/services/trusted_signals.py": {
+          "bytes": 11017,
+          "path": "app/services/trusted_signals.py",
+          "sha256": "18a720a0ecee0f65a75215e66795eb6e29a0049b556a692999f2c6ca5e82a43a"
+        },
+        "scripts/f1_lab/approvals.py": {
+          "bytes": 9326,
+          "path": "scripts/f1_lab/approvals.py",
+          "sha256": "165b6340a0b195703c038419fcee8ad7e2c48dbe90039da5844305c60a6a72a1"
+        },
+        "scripts/f1_lab/registry.py": {
+          "bytes": 4520,
+          "path": "scripts/f1_lab/registry.py",
+          "sha256": "e1b76dba89e13fdc78e3a35c044a9c43d922123ba399fc9a0324d3c7d74c3e8c"
+        },
+        "scripts/f1_lab/resource_policy.py": {
+          "bytes": 5441,
+          "path": "scripts/f1_lab/resource_policy.py",
+          "sha256": "35edb7c67a572bd00f00bb6cda153a32acaeb262f93f8f6c13f5c717d752a0e1"
+        },
+        "scripts/f1_lab/source_registry.py": {
+          "bytes": 2040,
+          "path": "scripts/f1_lab/source_registry.py",
+          "sha256": "f12661135bc0a0fd2999618c7221832b99535c27cdbcd0a3e4a700505c962ffd"
+        },
+        "scripts/f1_lab/vpn_enrollment.py": {
+          "bytes": 3021,
+          "path": "scripts/f1_lab/vpn_enrollment.py",
+          "sha256": "54ceebc11875fb625d0a866d642ec67cce9f90cbe5505cc833c99d429960c7ee"
+        },
+        "scripts/f1_lab/vpn_signal_controls.py": {
+          "bytes": 10454,
+          "path": "scripts/f1_lab/vpn_signal_controls.py",
+          "sha256": "b49eb7c006a9a51d7dd87b5677f1dca79143f65904b8c548d683cd5adbb3ffbc"
+        },
+        "scripts/f1_lab/vpn_verified_signals.py": {
+          "bytes": 18040,
+          "path": "scripts/f1_lab/vpn_verified_signals.py",
+          "sha256": "7322b6f868b5a083094343f0e567f68f678d8e258252764c772f420be15ca15c"
+        },
+        "scripts/run_vpn_verified_signals.py": {
+          "bytes": 12402,
+          "path": "scripts/run_vpn_verified_signals.py",
+          "sha256": "b9fb81b89b1100253428ada1ef8ec5c1c57625f83b9f3c92aac4b14af21228e1"
+        }
+      },
+      "started_at": "2026-11-13T05:47:46.895657+00:00"
+    }
+  },
+  "initial_run": {
+    "receipt": {
+      "path": "runtime/f1/vpn-verified-signals-v42-20261113/run.json",
+      "bytes": 29075,
+      "sha256": "33d285adf988e93300bc1097b878ea3699833b9adb93b3b0e0563cdf2cf48207"
+    },
+    "note": "Initial 46 controls before certificate enrollment integration and independent guard expansion; preserved."
+  },
+  "tests": {
+    "initial_full": {
+      "receipt": {
+        "path": "runtime/f1/vpn-verified-tests-v42-20261113/tests.json",
+        "bytes": 1091,
+        "sha256": "19406a7e3b230a7ea3b0fec58496b98f45c95aa8deb1cc096f9400eb77c36422"
+      },
+      "report": {
+        "schema": "extra-local-stream-validation-tests-1",
+        "started_at": "2026-11-13T05:31:53.240028+00:00",
+        "paid_api_calls": 0,
+        "aws_sdk_calls": 0,
+        "github_pushes": 0,
+        "windows": {
+          "exit_code": 0,
+          "seconds": 199.064,
+          "counts": {
+            "passed": 826
+          },
+          "log": "runtime/f1/vpn-verified-tests-v42-20261113/windows.log"
+        },
+        "linux": {
+          "exit_code": 0,
+          "seconds": 610.121,
+          "counts": {
+            "passed": 3646
+          },
+          "log": "runtime/f1/vpn-verified-tests-v42-20261113/linux.log",
+          "executed": true,
+          "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+          "source_files": 713,
+          "source_archive_sha256": "e8934f1f7f46bc16fed61aead760edf6e3b87d43e6c091114ffa3c75309aaf78",
+          "container_exit": 0,
+          "oom_killed": false,
+          "network_mode": "none",
+          "owned_container": "f0dae8d61d25a56c56b2a2d4182c63f5895c7c6bc784934a4771b06813d77d41",
+          "snapshot_sources_unchanged_after": true,
+          "owned_container_removed": true
+        },
+        "ended_at": "2026-11-13T05:45:43.584464+00:00"
+      }
+    },
+    "final_related": {
+      "receipt": {
+        "path": "runtime/f1/vpn-verified-tests-v42b-20261113/tests.json",
+        "bytes": 1090,
+        "sha256": "a4e307a29f663728fea8a8bd11387944bb773eeeafdafdf05c5d39938a64e46b"
+      },
+      "report": {
+        "schema": "extra-local-stream-validation-tests-1",
+        "started_at": "2026-11-13T05:47:45.209462+00:00",
+        "paid_api_calls": 0,
+        "aws_sdk_calls": 0,
+        "github_pushes": 0,
+        "windows": {
+          "exit_code": 0,
+          "seconds": 34.495,
+          "counts": {
+            "passed": 280
+          },
+          "log": "runtime/f1/vpn-verified-tests-v42b-20261113/windows.log"
+        },
+        "linux": {
+          "exit_code": 0,
+          "seconds": 15.011,
+          "counts": {
+            "passed": 280
+          },
+          "log": "runtime/f1/vpn-verified-tests-v42b-20261113/linux.log",
+          "executed": true,
+          "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+          "source_files": 715,
+          "source_archive_sha256": "f46bfa8fa70f8943ee6e53c73410f7ceeea654d8882e90fceba11ad5b3cd0d0d",
+          "container_exit": 0,
+          "oom_killed": false,
+          "network_mode": "none",
+          "owned_container": "71356eacb793d86c1ba31fbe938ca37ab8b2334f1138788c08c1e9f51d176807",
+          "snapshot_sources_unchanged_after": true,
+          "owned_container_removed": true
+        },
+        "ended_at": "2026-11-13T05:48:43.092579+00:00"
+      }
+    },
+    "note": "Different snapshots with overlapping cases. Enrollment binding, three extra raw guards and evidence metadata were finalized after the initial full run and checked by the final related suite."
+  },
+  "verification": {
+    "final_code_matches_final_linux_snapshot": true,
+    "original_app_and_benchmark_unchanged": true,
+    "legacy_models_and_code_unchanged": true,
+    "no_private_keys_persisted": true,
+    "owned_test_containers_removed": true,
+    "reserved_harrison_wilson_bodies_read": false,
+    "documentation_updated_after_tests": true
+  },
+  "limits": [
+    "Historical VPN rows have no authenticated device/permission evidence; all 18458 scores and alerts stay unchanged.",
+    "Functional controls are authored, not independent held-out detection evidence or goal attainment.",
+    "Positive control labels mean review/alert is required by the test policy, not independently established malicious behavior.",
+    "No live VPN gateway TLS-exporter/enrollment collector or real MDM/hardware attestation acceptance was performed.",
+    "Signatures prove configured origin and integrity, not the truth of a compromised issuer.",
+    "Transient challenge/adverse state is local in-process; no distributed HA or durable incident state is claimed.",
+    "No production access grants, revocations, or automatic blocking are executed."
+  ]
+}

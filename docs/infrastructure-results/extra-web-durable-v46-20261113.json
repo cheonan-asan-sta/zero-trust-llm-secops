@@ -1,0 +1,303 @@
+{
+  "schema": "extra-web-durable-evidence-1",
+  "base_extra_commit": "1c651ef17b02dcd2d5849895f8f9f7d6ba6e629f",
+  "scope": "local persistence and recovery of authored web verification decisions; not operational collector acceptance",
+  "protocol": {
+    "path": "infra/f1-lab/web-durable-controls-protocol.json",
+    "sha256": "46a71febf12658007c6303160b9d0674de74591de1645205e7c55140c7822bfd"
+  },
+  "functional_run": {
+    "receipt": {
+      "path": "runtime/f1/web-durable-controls-v46-20261113/run.json",
+      "sha256": "32f8ca229d2cff0de298a216e73bbfb51a63ceda04e9bf373ecd95a9c8e85e69"
+    },
+    "report": {
+      "schema": "extra-web-durable-controls-1",
+      "completed": true,
+      "scope": "authored local durability controls only; not malicious ground truth",
+      "plan": {
+        "path": "infra/f1-lab/web-durable-controls-protocol.json",
+        "bytes": 1166,
+        "sha256": "46a71febf12658007c6303160b9d0674de74591de1645205e7c55140c7822bfd"
+      },
+      "sources": {
+        "scripts/f1_lab/web_evidence_ledger.py": {
+          "path": "scripts/f1_lab/web_evidence_ledger.py",
+          "bytes": 20181,
+          "sha256": "7c152de7c5d794116e2f47997a02573717c0e9d40a2401ded0e24044bb52951d"
+        },
+        "scripts/f1_lab/web_durable_risk.py": {
+          "path": "scripts/f1_lab/web_durable_risk.py",
+          "bytes": 4639,
+          "sha256": "a2cb5ca3f252f4bcebdf404dfd5f6e7d2078d1131c85f0992dd108a22afe71af"
+        },
+        "scripts/run_web_durable_controls.py": {
+          "path": "scripts/run_web_durable_controls.py",
+          "bytes": 7655,
+          "sha256": "2ef78af7433b58882d6ebbccc531fb5c3e59b971fed3fd4c36df211d36edf65f"
+        },
+        "scripts/f1_lab/web_verified_context.py": {
+          "path": "scripts/f1_lab/web_verified_context.py",
+          "bytes": 16342,
+          "sha256": "e39ab1fb95ce95ebf5b280badc025268c2a8eae468fa9e2e1485a267be59349e"
+        },
+        "scripts/f1_lab/web_residual.py": {
+          "path": "scripts/f1_lab/web_residual.py",
+          "bytes": 9861,
+          "sha256": "d6963cfe866eea1ab3c0d135a0df776c7ab6ef0d4efccd9d4bedbb6edfc700cd"
+        }
+      },
+      "cases": [
+        {
+          "case": "verified_adverse_committed",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "exact_retry_deduplicated",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "later_consistent_proof_keeps_adverse",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "later_missing_proof_keeps_adverse",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "reopened_ledger_and_empty_bridge_retain_risk",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "baseline_review_is_not_verified_adverse",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "expired_unfinished_attempt_is_uncertain_review",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "other_owner_cannot_read_case",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "same_request_id_body_conflict_rejected",
+          "expected_outcome_passed": true
+        },
+        {
+          "case": "unrelated_interruption_cannot_clear_completed_adverse",
+          "expected_outcome_passed": true
+        }
+      ],
+      "actual_server_observations_collected": 0,
+      "new_independent_final_cases": 0,
+      "detection_f1_measured": false,
+      "raw_native_data_replayed": false,
+      "automatic_enforcement_allowed": false,
+      "automatic_resolution_allowed": false,
+      "ed25519_private_keys_persisted": false,
+      "local_witness_hmac_key_persisted": true,
+      "witness_key_published": false,
+      "paid_api_calls": 0,
+      "aws_sdk_calls": 0,
+      "github_pushes": 0,
+      "goal_qualified": false,
+      "summary": {
+        "cases": 10,
+        "expected_outcomes_passed": 10,
+        "original_request_attempts": 3,
+        "original_request_events": 6,
+        "verified_adverse_retained": true,
+        "uncertain_request": {
+          "schema": "zt-web-ledger-summary-1",
+          "request_key": "b0e0352f462f525e5944642427e395b68003dc667bda59ad911909a86b899683",
+          "request_sha256": "9ad8e9c8b892523c48d03c2ebfaa9d27dceb9371e9ab78ddf30c4404d5eaca5b",
+          "case_id": "3c7b444f6e01a8bb1ee201f155a9dd13ff0c37857f36d385be76e85670777b84",
+          "score": 0.02,
+          "alert": false,
+          "review": true,
+          "verified_adverse": false,
+          "interrupted": true,
+          "pending_attempts": 0,
+          "attempts": 1,
+          "events": 2,
+          "journal_head_sha256": "26f24d054cdc36d86873f902e7682a20e927bcd86a5a452eb5e0834de52fb6a2",
+          "automatic_resolution_allowed": false
+        }
+      },
+      "public_checkpoint": {
+        "configuration": "901b2ddfc262332253f94a4c5196ea124a6b2e5fa147b7f68b352397033bbcab",
+        "hash": "26f24d054cdc36d86873f902e7682a20e927bcd86a5a452eb5e0834de52fb6a2",
+        "last_now": "2026-11-13T09:00:31+00:00",
+        "seq": 10,
+        "store_id": "7da4e3ef5fd1a2f633c88d08dd91bde4"
+      },
+      "database": {
+        "path": "runtime/f1/web-durable-controls-v46-20261113/events.sqlite",
+        "bytes": 20480,
+        "sha256": "ee7f3c46c0c588a2851c65393dd35d28f8291a3f7534362675892672fcbc2707"
+      }
+    }
+  },
+  "validation": {
+    "test_receipt": {
+      "path": "runtime/f1/web-durable-tests-v46-20261113/tests.json",
+      "sha256": "801fafef404358a48dedf2fd3279c36edcbf6fa51d20f22f807b270296e8fd5f"
+    },
+    "report": {
+      "schema": "extra-local-stream-validation-tests-1",
+      "started_at": "2026-11-13T12:27:47.853786+00:00",
+      "paid_api_calls": 0,
+      "aws_sdk_calls": 0,
+      "github_pushes": 0,
+      "windows": {
+        "exit_code": 0,
+        "seconds": 45.245,
+        "counts": {
+          "passed": 357
+        },
+        "log": "runtime/f1/web-durable-tests-v46-20261113/windows.log"
+      },
+      "linux": {
+        "exit_code": 0,
+        "seconds": 18.082,
+        "counts": {
+          "passed": 357
+        },
+        "log": "runtime/f1/web-durable-tests-v46-20261113/linux.log",
+        "executed": true,
+        "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+        "source_files": 742,
+        "source_archive_sha256": "2353922b098ad3419301da83fcc81b790f4caedfaae8385f51ca5151fbf69d2d",
+        "container_exit": 0,
+        "oom_killed": false,
+        "network_mode": "none",
+        "owned_container": "2e59616f5ccb1be3764e7aaf25a770b750a59d278c5b7e7e632737741a96d4b8",
+        "snapshot_sources_unchanged_after": true,
+        "owned_container_removed": true
+      },
+      "ended_at": "2026-11-13T12:29:20.662852+00:00"
+    },
+    "source_manifest": {
+      "path": "runtime/f1/web-durable-tests-v46-20261113/source-manifest.json",
+      "sha256": "bb0163b08dcd7508195d18fd8d49931032a85daa2570c342fb8cdcbd98696da4"
+    },
+    "code_fingerprints": [
+      {
+        "path": "scripts/f1_lab/web_evidence_ledger.py",
+        "sha256": "7c152de7c5d794116e2f47997a02573717c0e9d40a2401ded0e24044bb52951d"
+      },
+      {
+        "path": "scripts/f1_lab/web_durable_risk.py",
+        "sha256": "a2cb5ca3f252f4bcebdf404dfd5f6e7d2078d1131c85f0992dd108a22afe71af"
+      },
+      {
+        "path": "scripts/run_web_durable_controls.py",
+        "sha256": "2ef78af7433b58882d6ebbccc531fb5c3e59b971fed3fd4c36df211d36edf65f"
+      },
+      {
+        "path": "tests/test_f1_web_evidence_ledger.py",
+        "sha256": "fb39842759426af8cc8b3c5123df2f35a649c9786a5df83ccf36382fe7312877"
+      },
+      {
+        "path": "infra/f1-lab/web-durable-controls-protocol.json",
+        "sha256": "46a71febf12658007c6303160b9d0674de74591de1645205e7c55140c7822bfd"
+      }
+    ],
+    "current_code_matches_linux_snapshot": true,
+    "new_tests_included": 41,
+    "actual_process_exit_boundary_cases": 8,
+    "distinct_process_dedup_test_passed": true,
+    "ruff_exit_code": 0,
+    "full_app_regression_repeated": false
+  },
+  "durability_contract": {
+    "ack_after_completed_journal_publication": true,
+    "intent_committed_before_proof_verification": true,
+    "sqlite_synchronous": "FULL",
+    "hash_chain_and_local_hmac_witness": true,
+    "default_capacity_events": 2000,
+    "pending_completion_slots_reserved": true,
+    "same_request_retries_deduplicated": true,
+    "prior_alert_review_and_max_score_preserved": true,
+    "expired_unfinished_attempts": "explicit uncertain review",
+    "storage_failure_returns_normal_or_grant": false,
+    "automatic_resolution_or_deletion": false
+  },
+  "privacy": {
+    "journal_fields": "opaque request/owner/case/nonce/evidence hashes, decisions, states and times",
+    "plaintext_body_raw_nonce_or_signed_bundle_stored": false,
+    "ed25519_private_keys_persisted": false,
+    "local_witness_hmac_secret_persisted": true,
+    "witness_key_published": false,
+    "hashing_is_not_anonymization": true
+  },
+  "limits": [
+    "No host HA, remote WORM or full-machine/disk loss acceptance.",
+    "Coordinated rollback/forgery of database, witness and secret key is outside this local guarantee.",
+    "An unacknowledged verification result lost before result commit remains uncertain, not reconstructed adverse.",
+    "Source proof retention, protected external checkpoints, coherent backup/restore and authorized review closure are pending."
+  ],
+  "preservation": {
+    "protected_paths_unchanged": [
+      "app",
+      "scripts/app_state_recovery.py",
+      "scripts/authority_mtls_runtime.py",
+      "scripts/f1_lab/web_verified_context.py",
+      "scripts/f1_lab/web_residual.py",
+      "scripts/run_web_residual.py",
+      "scripts/f1_lab/temporal.py"
+    ],
+    "earlier_public_evidence_byte_identical": [
+      {
+        "path": "docs/infrastructure-results/extra-web-context-v45-20261113.json",
+        "sha256": "70dace7f917c93895831a60ada26e97de83754b653ae378de2f4faeb11b5a672"
+      },
+      {
+        "path": "docs/infrastructure-results/extra-web-residual-v44-20261113.json",
+        "sha256": "d361bb8f7583c7defd8c815999d6518a6d3a4ae84ef20d0fe519ceb7609a956f"
+      }
+    ],
+    "original_models": {
+      "web": {
+        "path": "runtime/f1/web-refinement-v39-20261112-02/model.json",
+        "sha256": "21318fa61f830ae1d03d47de1a01acf2c40ae19ebaf769923e3d575613f74f38"
+      },
+      "heads": {
+        "path": "runtime/f1/ait-semantic-fit-heads-russell-20261112/model.json",
+        "sha256": "4ebbcb6bb5fce286e80beeedbc18139d566d00998575487a867f129330344075"
+      },
+      "vpn": {
+        "path": "runtime/f1/vpn-feature-ablation-v32-20261112/vpn-history-model.json",
+        "sha256": "c1ff27423e63ba607a80fc7dd891ff473baccd7f11853fb3eaba10e9e37b48b6"
+      }
+    },
+    "benchmark_cases": {
+      "path": "app/data/benchmark/cases.jsonl",
+      "sha256": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f"
+    },
+    "benchmark_manifest": {
+      "path": "app/data/benchmark/manifest.json",
+      "sha256": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90"
+    },
+    "user_archives_modified": false
+  },
+  "boundaries": {
+    "actual_server_observations_collected": 0,
+    "new_independent_final_cases": 0,
+    "new_f1_evaluations": 0,
+    "native_physical_rows_replayed": 0,
+    "last_web_fn_fp_not_remeasured": {
+      "fn": 30,
+      "fp": 19
+    },
+    "paid_api_calls": 0,
+    "aws_sdk_calls": 0,
+    "new_downloads": 0,
+    "github_pushes": 0,
+    "pr_merges": 0,
+    "reserved_bodies_or_labels_opened": 0,
+    "automatic_enforcement_allowed": false,
+    "goal_qualified": false
+  }
+}

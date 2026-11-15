@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="천안아산역 팀의 제로 트러스트 LLM 보안 관제 시뮬레이터" />
+    <title>분석 워크벤치 | 천안아산역</title>
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <header class="station-header">
+      <div class="header-rail" aria-hidden="true"></div>
+      <div class="header-inner">
+        <div class="brand-block">
+          <a class="eyebrow" href="/">← 관제 대시보드로 돌아가기</a>
+          <strong>ZERO TRUST SECURITY LINE</strong>
+        </div>
+        <div class="station-sign" aria-label="팀 이름 천안아산역">
+          <span class="station-code">ZT 01</span>
+          <span class="station-name">천안아산역</span>
+          <span class="station-en">CHEONAN·ASAN</span>
+        </div>
+        <div class="system-state">
+          <span id="healthDot" class="health-dot"></span>
+          <span id="healthText">시스템 확인 중</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero shell">
+        <div>
+          <p class="section-kicker">SECURITY OPERATIONS CONTROL</p>
+          <h1>접근 요청마다 검증하고<br /><span>세션 위험에 따라 통제</span></h1>
+          <p class="hero-copy">
+            사용자·기기·자원 정책을 확인하고 새 이벤트마다 세션의 위험을 다시 판단합니다.
+            허용의 범위와 시간을 제한하고 위험이 바뀌면 다음 접근을 거부하는 로컬 제로 트러스트 운영 시뮬레이션입니다.
+          </p>
+        </div>
+        <ol class="route-map" aria-label="분석 단계">
+          <li><span>01</span><strong>이벤트 수집</strong><small>합성 보안 로그</small></li>
+          <li><span>02</span><strong>OCSF 정규화</strong><small>원본·매핑 해시</small></li>
+          <li><span>03</span><strong>위험 분석</strong><small>Sigma·규칙·LLM</small></li>
+          <li><span>04</span><strong>사고 판단</strong><small>상관분석·사람 검토</small></li>
+        </ol>
+      </section>
+
+      <section class="summary-section shell" id="zeroTrustSection">
+        <div class="section-heading-row">
+          <div><p class="section-kicker">ZERO TRUST OPERATIONS</p><h2>지속 세션 검증과 접근 통제</h2></div>
+          <button id="ztStart" class="secondary-button" type="button">정상 세션 시작</button>
+        </div>
+        <p class="evaluation-state">아래 버튼은 서명 없는 모의 신호로 정책을 평가합니다. 허용은 자원·행위·시간에 묶이며, 업무 자원 집행도 이 로컬 시연 안에서만 동작합니다.</p>
+        <div class="metric-grid">
+          <article><span>접근 판단</span><strong id="ztDecision">대기</strong></article>
+          <article><span>세션 상태</span><strong id="ztStatus">-</strong></article>
+          <article><span>위험 점수</span><strong id="ztRisk">-</strong></article>
+          <article><span>정책 버전</span><strong id="ztPolicy">-</strong></article>
+        </div>
+        <div class="zt-actions">
+          <button id="ztAccess" class="secondary-button" type="button" disabled>모의 문서 접근</button>
+          <button id="ztChallenge" class="secondary-button" type="button" disabled>MFA 미확인 재평가</button>
+          <button id="ztRecover" class="secondary-button" type="button" disabled>MFA 성공 재평가</button>
+          <button id="ztCompromise" class="secondary-button" type="button" disabled>기기 침해 재평가</button>
+        </div>
+        <p id="ztFeedback" class="evaluation-state" aria-live="polite">정상 세션을 시작한 뒤 접근을 시험하고, 신호를 바꿔 재평가해 보세요.</p>
+        <div class="history-wrap"><table>
+          <thead><tr><th>버전</th><th>자원</th><th>판단</th><th>위험</th><th>판단 근거</th><th>허용 만료</th></tr></thead>
+          <tbody id="ztHistory"><tr><td colspan="6" class="table-empty">아직 평가한 세션이 없습니다.</td></tr></tbody>
+        </table></div>
+      </section>
+
+      <section class="summary-section shell" id="trustedSignalsSection">
+        <div class="section-heading-row">
+          <div><p class="section-kicker">VERIFIED SIGNAL SOURCE</p><h2>서명 수집기 세션</h2></div>
+          <button id="ztSignedRefresh" class="secondary-button" type="button">서명 세션 조회</button>
+        </div>
+        <p class="evaluation-state">별도 로컬 수집기가 보낸 신호의 출처와 재인증 상태를 조회합니다. 서명은 출처와 무결성을 확인하며, 실제 사용자 인증이나 기기 안전성을 보증하지 않습니다.</p>
+        <p id="ztSignalStatus" class="evaluation-state" aria-live="polite">서명 세션 조회를 누르면 수집기 등록 상태와 최근 세션을 확인할 수 있습니다.</p>
+        <div class="history-wrap"><table>
+          <thead><tr><th>세션</th><th>수집기 / 키</th><th>버전</th><th>판단</th><th>재인증</th><th>판단 근거</th></tr></thead>
+          <tbody id="ztSignedSessions"><tr><td colspan="6" class="table-empty">아직 조회하지 않았습니다.</td></tr></tbody>
+        </table></div>
+      </section>
+
+      <section class="workspace shell">
+        <div class="panel scenarios-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">SCENARIO BOARD</p>
+              <h2>시나리오 선택</h2>
+            </div>
+            <span id="scenarioCount" class="count-badge">0개</span>
+          </div>
+          <div id="scenarioGrid" class="scenario-grid" aria-live="polite"></div>
+        </div>
+
+        <aside class="panel control-panel">
+          <p class="section-kicker">DEPARTURE INFORMATION</p>
+          <div id="selectedScenario" class="selected-scenario">
+            <span class="empty-code">--</span>
+            <h2>시나리오를 선택하세요</h2>
+            <p>왼쪽 목록에서 분석할 합성 이벤트를 고를 수 있습니다.</p>
+          </div>
+          <button id="analyzeButton" class="primary-button" type="button" disabled>
+            <span>선택 시나리오 분석</span>
+            <span aria-hidden="true">→</span>
+          </button>
+          <p id="runState" class="run-state" aria-live="polite">
+            실제 계정이나 시스템에는 어떠한 조치도 수행하지 않습니다.
+          </p>
+        </aside>
+      </section>
+
+      <section id="resultSection" class="result-section shell" aria-live="polite">
+        <div class="section-heading-row">
+          <div>
+            <p class="section-kicker">LATEST ARRIVAL</p>
+            <h2>최근 분석 결과</h2>
+          </div>
+          <span id="resultAnalyzer" class="outline-badge">대기 중</span>
+        </div>
+
+        <div id="resultEmpty" class="result-empty">
+          <span class="pulse-ring" aria-hidden="true"></span>
+          <p>시나리오를 실행하면 위험 판단과 대응 미리보기가 이곳에 표시됩니다.</p>
+        </div>
+
+        <div id="resultContent" class="result-content" hidden>
+          <article id="riskCard" class="risk-card">
+            <p>RISK SCORE</p>
+            <div class="score-line">
+              <strong id="riskScore">0</strong><span>/100</span>
+            </div>
+            <div class="score-track"><span id="scoreBar"></span></div>
+            <span id="riskLevel" class="risk-level">LOW</span>
+          </article>
+
+          <article class="assessment-card">
+            <div class="assessment-title">
+              <div>
+                <p class="card-label">판단 유형</p>
+                <h3 id="violationType">-</h3>
+              </div>
+              <span id="confidence">신뢰도 -</span>
+            </div>
+            <p id="rationale" class="rationale"></p>
+            <div>
+              <p class="card-label">판단 근거</p>
+              <div id="evidenceList" class="evidence-list"></div>
+            </div>
+            <div class="detection-proof">
+              <div class="detection-proof-heading">
+                <p class="card-label">표준 탐지 근거</p>
+                <span id="pipelineVersion">OCSF · SIGMA</span>
+              </div>
+              <div id="detectionMatches" class="detection-list"></div>
+              <small id="detectionDigest">규칙 버전과 입력 해시를 확인하고 있습니다.</small>
+            </div>
+          </article>
+
+          <article class="decision-card">
+            <p class="card-label">대응 미리보기</p>
+            <h3 id="recommendedAction">-</h3>
+            <p id="decisionReason"></p>
+            <div class="decision-meta">
+              <span id="reviewState">검토 상태</span>
+              <span id="latency">응답 시간</span>
+            </div>
+            <div id="decisionControls" class="control-list" aria-label="적용된 안전 통제"></div>
+            <div id="reviewWorkflow" class="review-workflow" hidden>
+              <div class="review-heading">
+                <span>ANALYST REVIEW</span>
+                <strong id="reviewStatusBadge">검토 대기</strong>
+              </div>
+              <label>
+                담당자
+                <input id="reviewerInput" type="text" maxlength="64" placeholder="담당자 이름" />
+              </label>
+              <label>
+                검토 메모
+                <textarea id="reviewNoteInput" maxlength="500" rows="3" placeholder="판단 근거와 후속 조치를 기록하세요"></textarea>
+              </label>
+              <div class="review-actions">
+                <button type="button" data-review-status="IN_REVIEW">검토 시작</button>
+                <button type="button" data-review-status="RESOLVED">해결 완료</button>
+                <button type="button" data-review-status="DISMISSED">오탐 처리</button>
+              </div>
+              <p id="reviewFeedback" class="review-feedback" aria-live="polite"></p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="summary-section shell assurance-section">
+        <div class="section-heading-row">
+          <div>
+            <p class="section-kicker">ASSURANCE REGISTER</p>
+            <h2>보안 통제 준비도</h2>
+          </div>
+          <span id="assuranceRegistryVersion" class="outline-badge">불러오는 중</span>
+        </div>
+        <p id="assuranceState" class="evaluation-state">
+          공공·기업 보안 기준과 현재 구현·시험 증거를 교차 확인하고 있습니다.
+        </p>
+        <div class="metric-grid assurance-grid">
+          <article><span>가중 구현률</span><strong id="assuranceRate">-</strong></article>
+          <article><span>구현 완료</span><strong id="implementedControls">-</strong></article>
+          <article><span>부분 구현</span><strong id="partialControls">-</strong></article>
+          <article><span>구현 예정</span><strong id="plannedControls">-</strong></article>
+          <article><span>연결된 증적</span><strong id="assuranceEvidence">-</strong></article>
+          <article><span>검토 기한 초과</span><strong id="overdueControls">-</strong></article>
+        </div>
+        <div id="assuranceDomains" class="assurance-domains" aria-label="통제 영역별 개수"></div>
+        <p class="assurance-notice">
+          구현률은 인증이나 규정 준수 선언이 아닙니다. 완료 통제는 코드·구성 및 자동 시험 증거가 모두 있을 때만 집계합니다.
+        </p>
+      </section>
+
+      <section class="summary-section shell replay-section">
+        <div class="section-heading-row">
+          <div>
+            <p class="section-kicker">PUBLIC LOG REPLAY</p>
+            <h2>공개 로그 회귀 검증</h2>
+          </div>
+          <button id="replayButton" class="secondary-button" type="button">
+            공개 로그 12건 재생
+          </button>
+        </div>
+        <p id="replayState" class="evaluation-state">
+          고정된 Splunk RDP·AWS 인증 실패 로그와 Microsoft Sentinel 정상 로그를 오프라인으로 재생합니다.
+        </p>
+        <div id="replayGrid" class="metric-grid replay-grid" hidden>
+          <article><span>데이터셋</span><strong id="replayDatasetCount">-</strong></article>
+          <article><span>재생 이벤트</span><strong id="replayEventCount">-</strong></article>
+          <article><span>탐지 결과</span><strong id="replayFindingCount">-</strong></article>
+          <article><span>연결된 사고</span><strong id="replayIncidentCount">-</strong></article>
+          <article><span>기대 결과</span><strong id="replayExpectation">-</strong></article>
+        </div>
+        <div id="replayDetails" class="evaluation-details" hidden>
+          <div class="history-wrap">
+            <table>
+              <thead>
+                <tr><th>공급자</th><th>구분</th><th>이벤트</th><th>탐지</th><th>사고</th><th>시간창</th><th>그래프</th><th>판정</th></tr>
+              </thead>
+              <tbody id="replayBody"></tbody>
+            </table>
+          </div>
+          <p class="assurance-notice">
+            원본 커밋과 SHA-256이 고정된 공개 시험 자료만 사용하며 외부 시스템에는 연결하지 않습니다.
+          </p>
+        </div>
+        <div id="qualityDetails" class="evaluation-details" hidden>
+          <div class="diagnostic-heading">
+            <strong>공개 고정 표본 12건 탐지 품질 게이트</strong>
+            <span id="qualityFingerprint">-</span>
+          </div>
+          <div class="metric-grid quality-grid">
+            <article><span>Precision</span><strong id="qualityPrecision">-</strong></article>
+            <article><span>Recall</span><strong id="qualityRecall">-</strong></article>
+            <article><span>F1</span><strong id="qualityF1">-</strong></article>
+            <article><span>오탐률</span><strong id="qualityFpr">-</strong></article>
+            <article><span>파싱 성공률</span><strong id="qualityParseRate">-</strong></article>
+            <article><span>OCSF 매핑률</span><strong id="qualityMappingRate">-</strong></article>
+            <article><span>공개 표본 규칙</span><strong id="qualityRuleCoverage">-</strong></article>
+            <article><span>품질 판정</span><strong id="qualityGate">-</strong></article>
+          </div>
+          <div class="history-wrap">
+            <table>
+              <thead>
+                <tr><th>규칙</th><th>공격 표본</th><th>Precision</th><th>Recall</th><th>F1</th><th>오탐률</th><th>판정</th></tr>
+              </thead>
+              <tbody id="qualityRuleBody"></tbody>
+            </table>
+          </div>
+          <p class="assurance-notice">
+            공개 양성 표본이 없는 규칙은 통과로 간주하지 않고 ‘표본 없음’으로 별도 표시합니다.
+          </p>
+          <div id="incidentQualityDetails" class="detection-proof" hidden>
+            <div class="diagnostic-heading">
+              <strong>사건 품질 게이트</strong>
+              <span id="incidentQualityFingerprint">-</span>
+            </div>
+            <div class="metric-grid quality-grid">
+              <article><span>사건 Precision</span><strong id="incidentPrecision">-</strong></article>
+              <article><span>사건 Recall</span><strong id="incidentRecall">-</strong></article>
+              <article><span>사건 F1</span><strong id="incidentF1">-</strong></article>
+              <article><span>잘못 묶인 비율</span><strong id="incidentFpr">-</strong></article>
+              <article><span>시간창 정확도</span><strong id="incidentWindowAccuracy">-</strong></article>
+              <article><span>그래프 정확도</span><strong id="incidentGraphAccuracy">-</strong></article>
+              <article><span>중복 제거 정확도</span><strong id="incidentDedupAccuracy">-</strong></article>
+              <article><span>양성·음성 표본</span><strong id="incidentSupport">-</strong></article>
+              <article><span>사건 품질 판정</span><strong id="incidentQualityGate">-</strong></article>
+            </div>
+            <div class="history-wrap">
+              <table>
+                <thead>
+                  <tr><th>데이터셋</th><th>기대 사고</th><th>관측 사고</th><th>시간창</th><th>그래프</th><th>중복 제거</th><th>판정</th></tr>
+                </thead>
+                <tbody id="incidentQualityBody"></tbody>
+              </table>
+            </div>
+            <p class="assurance-notice">
+              사건 지표는 현재 공개 데이터셋 3개 기준의 1차 회귀 결과이며 실제 조직 로그의 운영 성능을 의미하지 않습니다.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="summary-section shell case-section">
+        <div class="section-heading-row">
+          <div>
+            <p class="section-kicker">INCIDENT CASE MANAGEMENT</p>
+            <h2>사고 케이스</h2>
+          </div>
+          <button id="caseCreateButton" class="secondary-button" type="button">
+            합성 공격 케이스 생성
+          </button>
+        </div>
+        <p id="caseState" class="evaluation-state">
+          상관분석된 사고를 사람 검토가 필요한 케이스로 보존합니다. 실제 차단 조치는 실행하지 않습니다.
+        </p>
+        <div class="metric-grid case-metrics">
+          <article><span>전체 케이스</span><strong id="caseTotal">0</strong></article>
+          <article><span>진행 중</span><strong id="caseOpen">0</strong></article>
+          <article><span>미배정</span><strong id="caseUnassigned">0</strong></article>
+          <article><span>최근 케이스</span><strong id="caseLatest">-</strong></article>
+        </div>
+        <div class="history-wrap">
+          <table>
+            <thead>
+              <tr><th>갱신 시각</th><th>케이스</th><th>심각도</th><th>상태</th><th>담당자</th><th>버전</th></tr>
+            </thead>
+            <tbody id="caseBody">
+              <tr><td colspan="6" class="table-empty">케이스를 불러오는 중입니다.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="assurance-notice">
+          신규→분류→조사→봉쇄→해결→종결 순서를 강제하며 모든 변경은 증거 지문과 함께 해시 체인에 기록됩니다.
+        </p>
+        <div class="evaluation-details" id="outboxDetails">
+          <div class="diagnostic-heading">
+            <strong>SIEM·ITSM 연동 아웃박스</strong>
+            <span>CloudEvents 1.0 · 외부 전송 비활성화</span>
+          </div>
+          <div class="metric-grid outbox-metrics">
+            <article><span>전송 대기</span><strong id="outboxPending">0</strong></article>
+            <article><span>재시도 예약</span><strong id="outboxRetry">0</strong></article>
+            <article><span>전달 완료</span><strong id="outboxDelivered">0</strong></article>
+            <article><span>실패 보관</span><strong id="outboxDeadLetter">0</strong></article>
+            <article><span>지금 처리 가능</span><strong id="outboxDue">0</strong></article>
+          </div>
+          <div class="history-wrap">
+            <table>
+              <thead>
+                <tr><th>발생 시각</th><th>이벤트</th><th>케이스 버전</th><th>상태</th><th>시도</th><th>다음 시도</th></tr>
+              </thead>
+              <tbody id="outboxBody">
+                <tr><td colspan="6" class="table-empty">연동 이벤트를 불러오는 중입니다.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="summary-section shell evaluation-section">
+        <div class="section-heading-row">
+          <div>
+            <p class="section-kicker">QUALITY CHECKPOINT</p>
+            <h2>반복 평가</h2>
+          </div>
+          <button id="evaluationButton" class="secondary-button" type="button">
+            40개 안정성 평가
+          </button>
+        </div>
+        <p id="evaluationState" class="evaluation-state">
+          8개 시나리오를 5회 반복해 정확도, 오류율, 처리량, 응답시간을 확인합니다.
+        </p>
+        <div id="evaluationGrid" class="metric-grid evaluation-grid" hidden>
+          <article><span>위험도 정확도</span><strong id="riskAccuracy">-</strong></article>
+          <article><span>대응 정확도</span><strong id="actionAccuracy">-</strong></article>
+          <article><span>위협 F1</span><strong id="threatF1">-</strong></article>
+          <article><span>JSON 유효율</span><strong id="jsonValidity">-</strong></article>
+          <article><span>오류율</span><strong id="evaluationErrorRate">-</strong></article>
+          <article><span>처리량</span><strong id="evaluationThroughput">-</strong></article>
+          <article><span>P50 응답</span><strong id="evaluationP50">-</strong></article>
+          <article><span>P95 응답</span><strong id="evaluationP95">-</strong></article>
+          <article><span>목표 판정</span><strong id="targetResult">-</strong></article>
+        </div>
+        <div id="evaluationDetails" class="evaluation-details" hidden>
+          <div class="diagnostic-heading">
+            <strong>시나리오별 진단</strong>
+            <span id="evaluationDuration">-</span>
+          </div>
+          <div class="history-wrap">
+            <table>
+              <thead>
+                <tr><th>시나리오</th><th>표본</th><th>위험도 정확도</th><th>대응 정확도</th><th>오류</th><th>P95</th></tr>
+              </thead>
+              <tbody id="evaluationBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="summary-section shell">
+        <div class="section-heading-row">
+          <div>
+            <p class="section-kicker">OPERATION LOG</p>
+            <h2>분석 현황</h2>
+          </div>
+          <button id="refreshButton" class="text-button" type="button">새로고침</button>
+        </div>
+        <div class="metric-grid operation-metrics">
+          <article><span>누적 분석</span><strong id="totalAnalyses">0</strong></article>
+          <article><span>고위험 이상</span><strong id="highRiskCount">0</strong></article>
+          <article><span>검토 진행</span><strong id="pendingReviewCount">0</strong></article>
+          <article><span>AI 교차분석</span><strong id="openaiCount">0</strong></article>
+          <article><span>최근 이벤트</span><strong id="latestEvent">-</strong></article>
+          <article><span>평균 응답</span><strong id="averageLatency">0ms</strong></article>
+          <article><span>P95 응답</span><strong id="p95Latency">0ms</strong></article>
+        </div>
+        <div class="history-wrap">
+          <table>
+            <thead>
+              <tr><th>시각</th><th>이벤트</th><th>분석기</th><th>위험도</th><th>대응</th><th>검토</th><th></th></tr>
+            </thead>
+            <tbody id="historyBody">
+              <tr><td colspan="7" class="table-empty">기록을 불러오는 중입니다.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="shell">
+      <span>천안아산역 · Zero Trust LLM SecOps</span>
+      <span id="footerVersion">SIMULATION ONLY</span>
+    </footer>
+  </body>
+</html>

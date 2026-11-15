@@ -1,0 +1,36 @@
+[Unit]
+Description=SecOps advisory signed capture freshness for %i
+
+[Service]
+Type=oneshot
+User=secops-collector
+Group=secops-collector
+WorkingDirectory=/opt/secops
+Environment=PYTHONDONTWRITEBYTECODE=1
+EnvironmentFile=/etc/secops/collector.conf
+# No credential provider or collection dependency: run even during collection failure.
+ExecStart=/opt/secops/.venv/bin/python -m scripts.service_capture_status --observe-worker-security --tenant ${TENANT_ID} --server ${SERVER_ID} --unit %i.service --source ${RUNTIME_SOURCE_ID} --key-id ${RUNTIME_KEY_ID} --capture /var/lib/secops-evidence/%i/latest.json --registry /etc/secops/service-registry.json --registry-sha256 ${SERVICE_REGISTRY_SHA256} --ledger /var/lib/secops-capture-health/%i.sqlite3
+StateDirectory=secops-capture-health
+StateDirectoryMode=0700
+ReadOnlyPaths=-/var/lib/secops-evidence
+UMask=0077
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+RestrictNamespaces=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+MemoryMax=256M
+TasksMax=16
+TimeoutStartSec=15

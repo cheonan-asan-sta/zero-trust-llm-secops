@@ -1,0 +1,51 @@
+{
+  "schema": "extra-native-line-truth-v17-1",
+  "recorded_at": "2026-11-12T03:08:58.296018+00:00",
+  "tests": {
+    "windows": {
+      "path": "runtime/f1/extra-native-pair-final-20261112.xml",
+      "sha256": "3a7e932f7f1bf2e4b18f6f60d4baedb5c4a43216fb3cc7dd45fc61f511c433c7",
+      "passed": 97
+    },
+    "linux": {
+      "path": "runtime/f1/extra-linux-public-native-20261112-03/checks.xml",
+      "sha256": "fb1b71fa44d6a6d4d63546442d6aa17808cd768b5bdf30d28d44017ab0bd453a",
+      "passed": 97
+    }
+  },
+  "new_binary_metrics": null,
+  "goal_qualified": false,
+  "truth_index_used_on_publisher_raw_data": false,
+  "coverage_source": "explicit assertion of publisher trimmed paired-file contract; timestamp audit not performed",
+  "missing_label_file_normal_default": false,
+  "ambiguous_exact_content_truth": null,
+  "reserved_final_bodies_read": 0,
+  "original_labels_changed": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "linux": {
+    "schema": "extra-f1-linux-snapshot-1",
+    "completed": true,
+    "owner": "extra-f1-aa6ab079253b",
+    "image": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "tests": [
+      "tests/test_f1_public_sources.py",
+      "tests/test_f1_bounded_zip.py",
+      "tests/test_f1_native_jsonl.py",
+      "tests/test_f1_native_preparation.py",
+      "tests/test_f1_line_truth.py"
+    ],
+    "host_mounts": 0,
+    "network": "none",
+    "cloud_calls": 0,
+    "paid_api_calls": 0,
+    "source_modes": "uid/gid10001; files0644 or shebang0755; directories0755",
+    "engine": "9f674bac-8bc8-4d5d-8659-72268144a2d0",
+    "source_manifest_sha256": "0531567180054765b107a82908edc7dd059eb371414078a9d303fe73e2c66426",
+    "source_files": 398,
+    "container_exit_code": 0,
+    "source_verified_before_and_after": true,
+    "remaining_containers": 0
+  },
+  "baseline_app_diff_empty": true
+}

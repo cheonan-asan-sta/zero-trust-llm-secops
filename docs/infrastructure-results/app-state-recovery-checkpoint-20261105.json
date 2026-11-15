@@ -1,0 +1,65 @@
+{
+  "base_git_head": "abf40d3792d763c0a63d6bdb6ad3765f891d1486",
+  "checks": {
+    "audit_descendant_restart_admitted": true,
+    "changed_source_backup_refused": true,
+    "checkpoint_write_failure_injected": true,
+    "fixed_clock_old_grants_denied": true,
+    "image_source_matches": true,
+    "incomplete_checkpoint_refuses_backup": true,
+    "incomplete_checkpoint_refuses_old_restore": true,
+    "network_isolated_no_ports": true,
+    "old_backup_refused": true,
+    "original_database_destroyed": true,
+    "public_trust_is_readonly": true,
+    "real_authenticated_http_denies_old_grants": true,
+    "running_source_refused": true,
+    "tampered_admission_exits_before_serving": true,
+    "tampered_admission_reports_expected_denial": true,
+    "tampered_backup_refused": true,
+    "unfenced_control_still_allows": true,
+    "workload_has_no_control_keys": true
+  },
+  "cleanup": {
+    "containers": 0,
+    "volumes": 0
+  },
+  "execution": "Chaeheeju / Codex tools; local Docker; rule analyzer; synthetic data",
+  "finished_at": "2026-11-05T14:23:37.173063+00:00",
+  "image_id": "sha256:d49dc008f49a18575dc623a196e07b2f3e7572422e8743ebb7e3b382d7734f5f",
+  "local_regression": {
+    "final_full_regression": "Exact follow-up PR and final merged-head CI records",
+    "focused_windows": {
+      "passed": 51,
+      "seconds": 83.1
+    },
+    "previous_full_regression": "app-state-recovery-20261105.json; initial implementation only"
+  },
+  "passed": true,
+  "result": {
+    "backup_bytes_plaintext": 49152,
+    "fenced_sessions": 3,
+    "rpo_at_stopped_checkpoint_records": 0,
+    "rpo_scope": "Only the fully stopped, witnessed lab writer boundary; no online RPO promise.",
+    "source_records": 18
+  },
+  "schema": "app-maintenance-recovery-1",
+  "seconds": {
+    "backup": 2.9436,
+    "checkpoint": 2.7858,
+    "initialize": 2.3396,
+    "restore": 2.5752,
+    "restore_to_http_ready": 11.7072
+  },
+  "source": {
+    "application": "577d99405074d2a016b9bca37375b4078f4c45a4ee698b245a2f70f86ac23088",
+    "scripts": {
+      "scripts/app_recovery_fixture.py": "edf14f711c974a7cb33457b716ea48dbe9299833b38fdc15706863874ec10274",
+      "scripts/app_state_recovery.py": "a5e6fcf49c9a066bc66f9cdede98e10ca6bd52b67b56252a086aa09786890192",
+      "scripts/serve_recovered_app.py": "81f863b865faec9776ceefca45ff6e9fb8f0b859d1b721bd486e0eab8a839b7e",
+      "scripts/test_app_recovery_runtime.py": "bde0bc6093ace34a28779dbc9235c21e8860b0e813224f108c39c5016dc5bc4f"
+    }
+  },
+  "source_dirty": true,
+  "started_at": "2026-11-05T14:22:11.664361+00:00"
+}

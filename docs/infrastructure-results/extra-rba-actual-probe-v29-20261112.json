@@ -1,0 +1,234 @@
+{
+  "schema": "extra-rba-actual-probe-v29-1",
+  "recorded_at": "2026-11-12T06:03:02.335783+00:00",
+  "branch": "extra",
+  "prior_commit": "8ef410f5e59a0082713b41c984df2ee97e58599c",
+  "first_acquisition": {
+    "path": "runtime/f1/public-rba-20261112/acquisition.json",
+    "bytes": 1244,
+    "sha256": "2c130c8059bae5a39ccad41a0d3ccdda1c2984370e6f2bd8ca952131c071950a",
+    "archive_extracted": false,
+    "asset": {
+      "asset_id": "rba-login-v1",
+      "bytes": 1093700330,
+      "data_role": "publisher_synthesized_login_research_with_external_incident_labels",
+      "filename": "rba-dataset.zip",
+      "license_id": "cc-by-4.0",
+      "publisher_md5": "cc1b1078b3929650e6c08678caffcc57",
+      "record_id": 6782156,
+      "record_version": "v1.0.0",
+      "reference": "https://zenodo.org/records/6782156"
+    },
+    "aws_sdk_calls": 0,
+    "bytes_received": 1069547520,
+    "code_executed_from_asset": false,
+    "completed": false,
+    "elapsed_seconds": 3611.219,
+    "ended_at": "2026-11-12T05:56:54.802180+00:00",
+    "failure_code": "public_asset_transfer_bound",
+    "failure_type": "ValueError",
+    "goal_qualified": false,
+    "local_sha256_kind": "local immutable follow-up anchor; not a publisher signature",
+    "paid_api_calls": 0,
+    "publisher_checksum_kind": "MD5; not a publisher digital signature",
+    "publisher_metadata_sha256": "dad2a651462246cdcb89ff13aa7b4190f3a24064eb39741e2cf16c4948a9a813",
+    "purpose": "research",
+    "range_retries": 2,
+    "ranged_transfer": true,
+    "resumed_prefix_bytes": 0,
+    "schema": "f1-public-asset-acquisition-1",
+    "started_at": "2026-11-12T04:56:43.537478+00:00"
+  },
+  "resumed_acquisition": {
+    "path": "runtime/f1/public-rba-20261112-02/acquisition.json",
+    "bytes": 1523,
+    "sha256": "177d64c1e6f77b9a23c07c9b2e68d196b6053f55acf42869a51460b9a560b229",
+    "archive_extracted": false,
+    "asset": {
+      "asset_id": "rba-login-v1",
+      "bytes": 1093700330,
+      "data_role": "publisher_synthesized_login_research_with_external_incident_labels",
+      "filename": "rba-dataset.zip",
+      "license_id": "cc-by-4.0",
+      "publisher_md5": "cc1b1078b3929650e6c08678caffcc57",
+      "record_id": 6782156,
+      "record_version": "v1.0.0",
+      "reference": "https://zenodo.org/records/6782156"
+    },
+    "aws_sdk_calls": 0,
+    "bytes_received": 1093700330,
+    "code_executed_from_asset": false,
+    "completed": true,
+    "elapsed_seconds": 79.625,
+    "ended_at": "2026-11-12T05:58:37.498829+00:00",
+    "goal_qualified": false,
+    "local_sha256": "ca1d974e97aebfb30878a613f4ca5c793860a98ba2acb5185c9bc610d7432a33",
+    "local_sha256_kind": "local immutable follow-up anchor; not a publisher signature",
+    "paid_api_calls": 0,
+    "prefix_publisher_verified": false,
+    "prior_acquisition_sha256": "2c130c8059bae5a39ccad41a0d3ccdda1c2984370e6f2bd8ca952131c071950a",
+    "publisher_checksum_kind": "MD5; not a publisher digital signature",
+    "publisher_md5_verified": true,
+    "publisher_metadata_sha256": "dad2a651462246cdcb89ff13aa7b4190f3a24064eb39741e2cf16c4948a9a813",
+    "purpose": "research",
+    "range_retries": 0,
+    "ranged_transfer": true,
+    "resumed_prefix_bytes": 1069547520,
+    "resumed_prefix_sha256": "e1a38d275acd2a506fb20c9d1116e3371b59f2156e7f98fe802c81fcf177dc1d",
+    "schema": "f1-public-asset-acquisition-1",
+    "started_at": "2026-11-12T05:57:17.880150+00:00"
+  },
+  "first_prefix_preserved_sha256": "e1a38d275acd2a506fb20c9d1116e3371b59f2156e7f98fe802c81fcf177dc1d",
+  "tool_terminal_observations": {
+    "34025": {
+      "exit_code": 1
+    },
+    "4416": {
+      "exit_code": 0
+    }
+  },
+  "archive_validation": {
+    "path": "runtime/f1/rba-zip-inspection-20261112/validation.json",
+    "bytes": 490,
+    "sha256": "64edc644bd7a245dfb809174310dfd3f2da77ab838dd3905d2cf65816de5c7c7",
+    "schema": "rba-completed-archive-validation-1",
+    "completed": true,
+    "acquisition_sha256": "177d64c1e6f77b9a23c07c9b2e68d196b6053f55acf42869a51460b9a560b229",
+    "prior_failure_preserved": true,
+    "independent_full_file_md5_verified": true,
+    "archive_sha256": "ca1d974e97aebfb30878a613f4ca5c793860a98ba2acb5185c9bc610d7432a33",
+    "inventory_sha256": "ddaced4354a68238669d39e3c7cf629f98d2b54eee8ba223df02bed128ccc781",
+    "member_bodies_read": 0,
+    "goal_qualified": false
+  },
+  "zip_inventory": {
+    "path": "runtime/f1/rba-zip-inspection-20261112/inventory.json",
+    "bytes": 3997,
+    "sha256": "ddaced4354a68238669d39e3c7cf629f98d2b54eee8ba223df02bed128ccc781"
+  },
+  "actual_probe": {
+    "path": "runtime/f1/rba-schema-probe-20261112/probe.json",
+    "bytes": 8251,
+    "sha256": "a3fd499deae8427f5558b57b06f45ad1af34ec9219b1041ed874b63364044f40",
+    "archive_member": {
+      "archive_name": "rba-dataset.csv",
+      "bounded_read_eligible": false,
+      "bytes": 9052907531,
+      "compressed_bytes": 1091167086,
+      "compression": 8,
+      "crc32": "864184c1",
+      "encrypted": false,
+      "kind": "regular",
+      "name": "rba-dataset.csv"
+    },
+    "archive_sha256": "ca1d974e97aebfb30878a613f4ca5c793860a98ba2acb5185c9bc610d7432a33",
+    "aws_sdk_calls": 0,
+    "binary_truth_contract_selected": false,
+    "case_values_displayed": 0,
+    "classifier_fitted": false,
+    "completed": true,
+    "decompressor_prefetch_may_exceed_prefix": true,
+    "development_records_parsed": 128,
+    "final_partition_certified": false,
+    "full_csv_crc_verification_claimed": false,
+    "goal_qualified": false,
+    "header": [
+      "index",
+      "Login Timestamp",
+      "User ID",
+      "Round-Trip Time [ms]",
+      "IP Address",
+      "Country",
+      "Region",
+      "City",
+      "ASN",
+      "User Agent String",
+      "Browser Name and Version",
+      "OS Name and Version",
+      "Device Type",
+      "Login Successful",
+      "Is Attack IP",
+      "Is Account Takeover"
+    ],
+    "later_csv_records_parsed": 0,
+    "literal_boolean_states": {
+      "Is Account Takeover": {
+        "false": 128
+      },
+      "Is Attack IP": {
+        "false": 119,
+        "true": 9
+      },
+      "Login Successful": {
+        "false": 63,
+        "true": 65
+      }
+    },
+    "missing_by_field": {
+      "ASN": 0,
+      "Browser Name and Version": 0,
+      "City": 0,
+      "Country": 0,
+      "Device Type": 0,
+      "IP Address": 0,
+      "Is Account Takeover": 0,
+      "Is Attack IP": 0,
+      "Login Successful": 0,
+      "Login Timestamp": 0,
+      "OS Name and Version": 0,
+      "Region": 0,
+      "Round-Trip Time [ms]": 122,
+      "User Agent String": 0,
+      "User ID": 0,
+      "index": 0
+    },
+    "original_six_domain_goal_replaced": false,
+    "paid_api_calls": 0,
+    "prefix_bytes_returned_to_csv_parser": 37393,
+    "prefix_physical_lines": 129,
+    "prefix_sha256": "b3a5750370c126fa381784e136431de4b994555bf76ecc1d791c126eb4d79fd5",
+    "probe_disposition": "Development only; these users cannot be reported as unseen-user final data",
+    "schema": "f1-rba-development-probe-1",
+    "timestamp_shapes": {
+      "iso_timezone_missing": 128
+    },
+    "whole_csv_requested_or_extracted": false,
+    "development_probe_user_references_count": 81
+  },
+  "prefix_user_references_held_in_runtime_only": true,
+  "intake_protocol": {
+    "path": "infra/f1-lab/rba-intake-protocol.json",
+    "bytes": 2021,
+    "sha256": "247550c61f1fd7e7ba64f7d9dda9cdf01ec92e4f9d33bc617ec5b50d104558fc"
+  },
+  "asset_contract": {
+    "path": "infra/f1-lab/public-assets-rba.json",
+    "bytes": 473,
+    "sha256": "66ded784335c8df62c01c36ec95a9b230356565ddd6d9ab66e27d52cc7e7ac2a"
+  },
+  "pytest_rerun": false,
+  "source_code_unchanged_since_probe_tests_commit": "ecead2c",
+  "reused_test_evidence": {
+    "path": "docs/infrastructure-results/extra-rba-probe-reader-v27-20261112.json",
+    "bytes": 4408,
+    "sha256": "56c4ad5a6b1b675981cc724c91b488a86297f44f367abbaf74b419402f7bf714"
+  },
+  "baseline_app_diff_empty": true,
+  "current_owned_f1_containers": 0,
+  "interrupted_soak_cleanup": {
+    "path": "docs/infrastructure-results/extra-interrupted-cleanup-v15-20261112.json",
+    "bytes": 3897,
+    "sha256": "956dc5c53ff011b57145be7cae9868743864adbc8674113f37a9e7dff5197b73"
+  },
+  "labels_changed": false,
+  "reserved_ait_final_bodies_read": 0,
+  "cloud_test_archive_downloaded": false,
+  "rba_records_after_probe_parsed": 0,
+  "classifier_fitted": false,
+  "binary_truth_contract_selected": false,
+  "original_six_domain_goal_replaced": false,
+  "independent_final_metrics": null,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "goal_qualified": false
+}

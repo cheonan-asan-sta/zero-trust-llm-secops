@@ -1,0 +1,4907 @@
+{
+  "schema": "extra-resumed-streaming-calibration-v37-v38-1",
+  "recorded_at": "2026-11-12T11:05:43.097616+00:00",
+  "branch": "extra",
+  "prior_commit": "0ec426e9fe6f705d3c7d3db15fa0e2d369d041ca",
+  "resumed_user_instruction": {
+    "path": "runtime/f1/resumed-work-20261112.json",
+    "bytes": 556,
+    "sha256": "04ccd197a34f9b09c7777e2fa7ec4055e70c93eef10a66dd17d50e22e460d6e3"
+  },
+  "streaming_run": {
+    "artifact": {
+      "path": "runtime/f1/streaming-calibration-v37-20261112/run.json",
+      "bytes": 32051,
+      "sha256": "15d042957ff2484c94d8b5c298ee1be1ff62150f64d7bb4d4eaf46e83afd7bb1"
+    },
+    "aws_sdk_calls": 0,
+    "completed": true,
+    "elapsed_seconds": 1044.218,
+    "ended_at": "2026-11-12T10:53:53.355857+00:00",
+    "free_after": 115569590272,
+    "free_before": 119108939776,
+    "github_pushes": 0,
+    "goal_qualified": false,
+    "independent_final_metrics": null,
+    "labels_changed": false,
+    "models_refitted": false,
+    "original_six_domain_goal_replaced": false,
+    "paid_api_calls": 0,
+    "plan": {
+      "bytes": 2968,
+      "path": "infra/f1-lab/streaming-calibration-protocol.json",
+      "sha256": "674d426e8caf4f565f5183d59a0070c9749103d392166bf760c261252035926d"
+    },
+    "scenarios": {
+      "fox": {
+        "completed": true,
+        "evaluations": {
+          "heads": {
+            "metrics": {
+              "accuracy": 0.9961595887603266,
+              "f1": 0.9971942135436307,
+              "false_positive_rate": 0.00873145688163605,
+              "fn": 720,
+              "fp": 1847,
+              "inference_errors": 0,
+              "population": 668418,
+              "precision": 0.9959673457624381,
+              "recall": 0.9984241076509573,
+              "tn": 209687,
+              "tp": 456164
+            },
+            "model_unchanged": true,
+            "per_pair": [
+              {
+                "metrics": {
+                  "accuracy": 0.9443207126948775,
+                  "f1": 0.038461538461538464,
+                  "false_positive_rate": 0.0546875,
+                  "fn": 1,
+                  "fp": 49,
+                  "inference_errors": 0,
+                  "population": 898,
+                  "precision": 0.02,
+                  "recall": 0.5,
+                  "tn": 847,
+                  "tp": 1
+                },
+                "raw_member": "gather/internal_share/logs/audit/audit.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9971485813568762,
+                  "f1": 0.9922499887026074,
+                  "false_positive_rate": 5.102509414129869e-06,
+                  "fn": 685,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 240582,
+                  "precision": 0.9999772292558521,
+                  "recall": 0.9846412556053812,
+                  "tn": 195981,
+                  "tp": 43915
+                },
+                "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9877622377622378,
+                  "f1": 0.7741935483870968,
+                  "false_positive_rate": 0.0125,
+                  "fn": 0,
+                  "fp": 7,
+                  "inference_errors": 0,
+                  "population": 572,
+                  "precision": 0.631578947368421,
+                  "recall": 1.0,
+                  "tn": 553,
+                  "tp": 12
+                },
+                "raw_member": "gather/intranet_server/logs/auth.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9955156950672646,
+                  "f1": 0.9977528089887641,
+                  "false_positive_rate": 1.0,
+                  "fn": 4,
+                  "fp": 2,
+                  "inference_errors": 0,
+                  "population": 1338,
+                  "precision": 0.9985007496251874,
+                  "recall": 0.9970059880239521,
+                  "tn": 0,
+                  "tp": 1332
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-error.log.1"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9988157569710502,
+                  "f1": 0.9994052245368596,
+                  "false_positive_rate": 0.23209995194617972,
+                  "fn": 6,
+                  "fp": 483,
+                  "inference_errors": 0,
+                  "population": 412922,
+                  "precision": 0.9988257260805509,
+                  "recall": 0.9999853958100579,
+                  "tn": 1598,
+                  "tp": 410835
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.8915829580879806,
+                  "f1": 0.08211143695014662,
+                  "false_positive_rate": 0.10739191073919108,
+                  "fn": 5,
+                  "fp": 308,
+                  "inference_errors": 0,
+                  "population": 2887,
+                  "precision": 0.043478260869565216,
+                  "recall": 0.7368421052631579,
+                  "tn": 2560,
+                  "tp": 14
+                },
+                "raw_member": "gather/intranet_server/logs/audit/audit.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.8610768598438142,
+                  "f1": 0.01744186046511628,
+                  "false_positive_rate": 0.1368450006876633,
+                  "fn": 19,
+                  "fp": 995,
+                  "inference_errors": 0,
+                  "population": 7299,
+                  "precision": 0.008964143426294821,
+                  "recall": 0.32142857142857145,
+                  "tn": 6276,
+                  "tp": 9
+                },
+                "raw_member": "gather/vpn/logs/openvpn.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9989583333333333,
+                  "f1": 0.9787234042553191,
+                  "false_positive_rate": 0.0010672358591248667,
+                  "fn": 0,
+                  "fp": 2,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.9583333333333334,
+                  "recall": 1.0,
+                  "tn": 1872,
+                  "tp": 46
+                },
+                "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-18-system.cpu.log"
+              }
+            ],
+            "receipt": {
+              "bytes": 3395,
+              "path": "runtime/f1/streaming-calibration-v37-20261112/fox-heads/evaluation.json",
+              "sha256": "6678b6b0eef10ac4de239290c60c26ded0cfd726c30048ea17f463bd1c4b4049"
+            },
+            "seconds": 87.438
+          },
+          "ordered_tree": {
+            "metrics": {
+              "accuracy": 0.6271434940411539,
+              "f1": 0.6250206880779496,
+              "false_positive_rate": 0.0002127317594334717,
+              "fn": 249179,
+              "fp": 45,
+              "inference_errors": 0,
+              "population": 668418,
+              "precision": 0.999783393501805,
+              "recall": 0.45461211160819814,
+              "tn": 211489,
+              "tp": 207705
+            },
+            "model_unchanged": true,
+            "per_pair": [
+              {
+                "metrics": {
+                  "accuracy": 0.9888641425389755,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.008928571428571428,
+                  "fn": 2,
+                  "fp": 8,
+                  "inference_errors": 0,
+                  "population": 898,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "tn": 888,
+                  "tp": 0
+                },
+                "raw_member": "gather/internal_share/logs/audit/audit.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9971277984221596,
+                  "f1": 0.992193942680268,
+                  "false_positive_rate": 3.061505648477921e-05,
+                  "fn": 685,
+                  "fp": 6,
+                  "inference_errors": 0,
+                  "population": 240582,
+                  "precision": 0.9998633910885454,
+                  "recall": 0.9846412556053812,
+                  "tn": 195976,
+                  "tp": 43915
+                },
+                "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.993006993006993,
+                  "f1": 0.8181818181818182,
+                  "false_positive_rate": 0.0017857142857142857,
+                  "fn": 3,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 572,
+                  "precision": 0.9,
+                  "recall": 0.75,
+                  "tn": 559,
+                  "tp": 9
+                },
+                "raw_member": "gather/intranet_server/logs/auth.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9267563527653214,
+                  "f1": 0.9619565217391305,
+                  "false_positive_rate": 0.5,
+                  "fn": 97,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 1338,
+                  "precision": 0.9991935483870967,
+                  "recall": 0.9273952095808383,
+                  "tn": 1,
+                  "tp": 1239
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-error.log.1"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.39853047306755274,
+                  "f1": 0.566806901507699,
+                  "false_positive_rate": 0.0004805382027871216,
+                  "fn": 248359,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 412922,
+                  "precision": 0.9999938455099918,
+                  "recall": 0.39548633169523,
+                  "tn": 2080,
+                  "tp": 162482
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9892622099064773,
+                  "f1": 0.4745762711864407,
+                  "false_positive_rate": 0.00906555090655509,
+                  "fn": 5,
+                  "fp": 26,
+                  "inference_errors": 0,
+                  "population": 2887,
+                  "precision": 0.35,
+                  "recall": 0.7368421052631579,
+                  "tn": 2842,
+                  "tp": 14
+                },
+                "raw_member": "gather/intranet_server/logs/audit/audit.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9961638580627483,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.0,
+                  "fn": 28,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 7299,
+                  "precision": null,
+                  "recall": 0.0,
+                  "tn": 7271,
+                  "tp": 0
+                },
+                "raw_member": "gather/vpn/logs/openvpn.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9989583333333333,
+                  "f1": 0.9787234042553191,
+                  "false_positive_rate": 0.0010672358591248667,
+                  "fn": 0,
+                  "fp": 2,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.9583333333333334,
+                  "recall": 1.0,
+                  "tn": 1872,
+                  "tp": 46
+                },
+                "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-18-system.cpu.log"
+              }
+            ],
+            "receipt": {
+              "bytes": 3317,
+              "path": "runtime/f1/streaming-calibration-v37-20261112/fox-ordered_tree/evaluation.json",
+              "sha256": "bc31031c52926e54426013d0d71e3418c2858b7525b774be71b77edaaf7f1117"
+            },
+            "seconds": 89.758
+          }
+        },
+        "preparation": {
+          "bytes": 8734,
+          "path": "runtime/f1/streaming-calibration-v37-20261112/fox/preparation.json",
+          "sha256": "d03d22bd2aa708364dd1853ec45af22728e5be5b1451f26dde5e9fe5b2adb28b"
+        },
+        "preparation_seconds": 452.598,
+        "reference_inputs_identical": true,
+        "role": "predeclared_calibration_only",
+        "rows": 668418,
+        "streaming": {
+          "base_input_materialized": false,
+          "base_inputs": {
+            "bytes": 509996520,
+            "sha256": "08e2443f15430eaee6bc91c6115adc4378bc0389497eccbd17cf1c9f5984486a"
+          },
+          "limits": {
+            "active_http_events": 500000,
+            "database_bytes": 4294967296,
+            "min_free_bytes": 5368709120,
+            "output_bytes": 8589934592
+          },
+          "observations_extracted_once_per_source": true,
+          "output_bytes": 1787481728,
+          "recovery": "retain failed attempt; rerun with the same anchors in a fresh directory",
+          "schema": "bounded-native-context-1",
+          "sources": [
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 3706880,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "audit_login_uid_assigned": 528,
+                "audit_login_uid_available": 890,
+                "audit_session_assigned": 528,
+                "audit_session_available": 890,
+                "audit_uid_available": 890,
+                "audit_uid_is_zero": 890,
+                "auth_success": 754,
+                "auth_target_root_observed": 660,
+                "cron": 660,
+                "service_start": 52,
+                "service_stop": 42,
+                "session_close": 132,
+                "session_open": 132
+              },
+              "raw_member": "gather/internal_share/logs/audit/audit.log",
+              "requests": 0,
+              "rows": 898
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 987910144,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "dns_negative_reply": 16251,
+                "dns_non_hostname_chars": 43761,
+                "scanner_agent": 8
+              },
+              "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+              "requests": 0,
+              "rows": 240582
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 572,
+              "database_bytes": 2371584,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "audit_interactive": 3,
+                "auth_new_session_notice": 2,
+                "auth_subject_context_available": 569,
+                "auth_subject_prior_privilege_tool": 9,
+                "auth_success": 1,
+                "auth_target_root_observed": 560,
+                "cron": 553,
+                "privilege_tool": 7,
+                "sensitive_file": 1,
+                "session_close": 280,
+                "session_open": 282,
+                "su_observed": 3,
+                "web_working_directory": 3
+              },
+              "raw_member": "gather/intranet_server/logs/auth.log",
+              "requests": 0,
+              "rows": 572
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 5513216,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "cron": 2,
+                "http_forbidden": 551
+              },
+              "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-error.log.1",
+              "requests": 0,
+              "rows": 1338
+            },
+            {
+              "active_http_peak": 22748,
+              "auth_rows": 0,
+              "database_bytes": 1792798720,
+              "http_group_peak": 4,
+              "http_processed": 412904,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "cron": 196,
+                "dns_non_hostname_chars": 91,
+                "http_query_base64_shape": 7,
+                "http_semantic_available": 412904,
+                "http_window_available": 412904,
+                "scanner_agent": 4770,
+                "uploaded_script": 26
+              },
+              "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2",
+              "requests": 412904,
+              "rows": 412922
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 11870208,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "audit_hex_command": 5,
+                "audit_interactive": 32,
+                "audit_login_uid_assigned": 1527,
+                "audit_login_uid_available": 2879,
+                "audit_session_assigned": 1527,
+                "audit_session_available": 2879,
+                "audit_uid_available": 2879,
+                "audit_uid_is_zero": 2870,
+                "auth_success": 2496,
+                "auth_target_root_observed": 1880,
+                "cron": 1860,
+                "decoded_sensitive_file": 1,
+                "privilege_tool": 24,
+                "service_start": 294,
+                "service_stop": 282,
+                "session_close": 379,
+                "session_open": 385,
+                "web_working_directory": 2
+              },
+              "raw_member": "gather/intranet_server/logs/audit/audit.log",
+              "requests": 0,
+              "rows": 2887
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 29982720,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "tls_failure": 6
+              },
+              "raw_member": "gather/vpn/logs/openvpn.log",
+              "requests": 0,
+              "rows": 7299
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 7901184,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "cpu_available": 1920
+              },
+              "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-18-system.cpu.log",
+              "requests": 0,
+              "rows": 1920
+            }
+          ]
+        },
+        "truth_and_references_identical": true
+      },
+      "russellmitchell": {
+        "completed": true,
+        "evaluations": {
+          "heads": {
+            "metrics": {
+              "accuracy": 0.9919659399206755,
+              "f1": 0.98088576585869,
+              "false_positive_rate": 0.005878799045337881,
+              "fn": 1000,
+              "fp": 1372,
+              "inference_errors": 0,
+              "population": 295243,
+              "precision": 0.9779541729601182,
+              "recall": 0.9838349875529404,
+              "tn": 232009,
+              "tp": 60862
+            },
+            "model_unchanged": true,
+            "per_pair": [
+              {
+                "metrics": {
+                  "accuracy": 0.9385245901639344,
+                  "f1": 0.0425531914893617,
+                  "false_positive_rate": 0.06027397260273973,
+                  "fn": 1,
+                  "fp": 44,
+                  "inference_errors": 0,
+                  "population": 732,
+                  "precision": 0.022222222222222223,
+                  "recall": 0.5,
+                  "tn": 686,
+                  "tp": 1
+                },
+                "raw_member": "gather/internal_share/logs/audit/audit.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9963863718738674,
+                  "f1": 0.9906927679913369,
+                  "false_positive_rate": 0.00010817388952741532,
+                  "fn": 973,
+                  "fp": 24,
+                  "inference_errors": 0,
+                  "population": 275900,
+                  "precision": 0.9995479034020269,
+                  "recall": 0.9819931525862866,
+                  "tn": 221841,
+                  "tp": 53062
+                },
+                "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9742647058823529,
+                  "f1": 0.6956521739130435,
+                  "false_positive_rate": 0.026515151515151516,
+                  "fn": 0,
+                  "fp": 7,
+                  "inference_errors": 0,
+                  "population": 272,
+                  "precision": 0.5333333333333333,
+                  "recall": 1.0,
+                  "tn": 257,
+                  "tp": 8
+                },
+                "raw_member": "gather/intranet_server/logs/auth.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 1.0,
+                  "f1": 1.0,
+                  "false_positive_rate": null,
+                  "fn": 0,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 36,
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "tn": 0,
+                  "tp": 36
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.999179366940211,
+                  "f1": 0.9995449522199831,
+                  "false_positive_rate": 0.0,
+                  "fn": 7,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 8530,
+                  "precision": 1.0,
+                  "recall": 0.999090318388564,
+                  "tn": 835,
+                  "tp": 7688
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.8959412780656304,
+                  "f1": 0.0694980694980695,
+                  "false_positive_rate": 0.10446467273515388,
+                  "fn": 0,
+                  "fp": 241,
+                  "inference_errors": 0,
+                  "population": 2316,
+                  "precision": 0.036,
+                  "recall": 1.0,
+                  "tn": 2066,
+                  "tp": 9
+                },
+                "raw_member": "gather/intranet_server/logs/audit/audit.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.8060321473722232,
+                  "f1": 0.016483516483516484,
+                  "false_positive_rate": 0.19150481031040117,
+                  "fn": 19,
+                  "fp": 1055,
+                  "inference_errors": 0,
+                  "population": 5537,
+                  "precision": 0.008458646616541353,
+                  "recall": 0.32142857142857145,
+                  "tn": 4454,
+                  "tp": 9
+                },
+                "raw_member": "gather/vpn/logs/openvpn.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9994791666666667,
+                  "f1": 0.98989898989899,
+                  "false_positive_rate": 0.0005344735435595938,
+                  "fn": 0,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.98,
+                  "recall": 1.0,
+                  "tn": 1870,
+                  "tp": 49
+                },
+                "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.cpu.log"
+              }
+            ],
+            "receipt": {
+              "bytes": 3294,
+              "path": "runtime/f1/streaming-calibration-v37-20261112/russellmitchell-heads/evaluation.json",
+              "sha256": "72821eebd4a06c988200572ef7ba588ddcefd6956e157675ca8b8b6700385afb"
+            },
+            "seconds": 33.774
+          },
+          "ordered_tree": {
+            "metrics": {
+              "accuracy": 0.9964097370640456,
+              "f1": 0.991365265558814,
+              "false_positive_rate": 0.00020567226980773928,
+              "fn": 1012,
+              "fp": 48,
+              "inference_errors": 0,
+              "population": 295243,
+              "precision": 0.9992117967749351,
+              "recall": 0.9836410074035757,
+              "tn": 233333,
+              "tp": 60850
+            },
+            "model_unchanged": true,
+            "per_pair": [
+              {
+                "metrics": {
+                  "accuracy": 0.9863387978142076,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.010958904109589041,
+                  "fn": 2,
+                  "fp": 8,
+                  "inference_errors": 0,
+                  "population": 732,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "tn": 722,
+                  "tp": 0
+                },
+                "raw_member": "gather/internal_share/logs/audit/audit.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9963863718738674,
+                  "f1": 0.9906927679913369,
+                  "false_positive_rate": 0.00010817388952741532,
+                  "fn": 973,
+                  "fp": 24,
+                  "inference_errors": 0,
+                  "population": 275900,
+                  "precision": 0.9995479034020269,
+                  "recall": 0.9819931525862866,
+                  "tn": 221841,
+                  "tp": 53062
+                },
+                "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9779411764705882,
+                  "f1": 0.625,
+                  "false_positive_rate": 0.011363636363636364,
+                  "fn": 3,
+                  "fp": 3,
+                  "inference_errors": 0,
+                  "population": 272,
+                  "precision": 0.625,
+                  "recall": 0.625,
+                  "tn": 261,
+                  "tp": 5
+                },
+                "raw_member": "gather/intranet_server/logs/auth.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9444444444444444,
+                  "f1": 0.9714285714285714,
+                  "false_positive_rate": null,
+                  "fn": 2,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 36,
+                  "precision": 1.0,
+                  "recall": 0.9444444444444444,
+                  "tn": 0,
+                  "tp": 34
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9994138335287222,
+                  "f1": 0.9996750503671931,
+                  "false_positive_rate": 0.0011976047904191617,
+                  "fn": 4,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 8530,
+                  "precision": 0.999869994799792,
+                  "recall": 0.9994801819363223,
+                  "tn": 834,
+                  "tp": 7691
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9952504317789291,
+                  "f1": 0.6206896551724138,
+                  "false_positive_rate": 0.004768097095795405,
+                  "fn": 0,
+                  "fp": 11,
+                  "inference_errors": 0,
+                  "population": 2316,
+                  "precision": 0.45,
+                  "recall": 1.0,
+                  "tn": 2296,
+                  "tp": 9
+                },
+                "raw_member": "gather/intranet_server/logs/audit/audit.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9949431099873578,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.0,
+                  "fn": 28,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 5537,
+                  "precision": null,
+                  "recall": 0.0,
+                  "tn": 5509,
+                  "tp": 0
+                },
+                "raw_member": "gather/vpn/logs/openvpn.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9994791666666667,
+                  "f1": 0.98989898989899,
+                  "false_positive_rate": 0.0005344735435595938,
+                  "fn": 0,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.98,
+                  "recall": 1.0,
+                  "tn": 1870,
+                  "tp": 49
+                },
+                "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.cpu.log"
+              }
+            ],
+            "receipt": {
+              "bytes": 3256,
+              "path": "runtime/f1/streaming-calibration-v37-20261112/russellmitchell-ordered_tree/evaluation.json",
+              "sha256": "9e287a2c6f9982b86968cd3f1a78d3e126b7aaaec5159bb51fc4d1b9eede0f72"
+            },
+            "seconds": 34.214
+          }
+        },
+        "preparation": {
+          "bytes": 8725,
+          "path": "runtime/f1/streaming-calibration-v37-20261112/russellmitchell/preparation.json",
+          "sha256": "0091ab22f3ffe3ee12773c7a7d6dfe127e78750faf6dbe4aca2550e39b2f3683"
+        },
+        "preparation_seconds": 123.176,
+        "reference_inputs_identical": true,
+        "role": "previously_observed_training_development",
+        "rows": 295243,
+        "streaming": {
+          "base_input_materialized": false,
+          "base_inputs": {
+            "bytes": 225702101,
+            "sha256": "b999e6621b25a716f4176f2ed4620e683003d96476cc947bcace1aa685a1ed5a"
+          },
+          "limits": {
+            "active_http_events": 500000,
+            "database_bytes": 4294967296,
+            "min_free_bytes": 5368709120,
+            "output_bytes": 8589934592
+          },
+          "observations_extracted_once_per_source": true,
+          "output_bytes": 786686227,
+          "recovery": "retain failed attempt; rerun with the same anchors in a fresh directory",
+          "schema": "bounded-native-context-1",
+          "sources": [
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 3026944,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "audit_login_uid_assigned": 424,
+                "audit_login_uid_available": 724,
+                "audit_session_assigned": 424,
+                "audit_session_available": 724,
+                "audit_uid_available": 724,
+                "audit_uid_is_zero": 724,
+                "auth_success": 614,
+                "auth_target_root_observed": 530,
+                "cron": 530,
+                "service_start": 47,
+                "service_stop": 37,
+                "session_close": 106,
+                "session_open": 106
+              },
+              "raw_member": "gather/internal_share/logs/audit/audit.log",
+              "requests": 0,
+              "rows": 732
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 1132941312,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "dns_negative_reply": 35065,
+                "dns_non_hostname_chars": 52328,
+                "scanner_agent": 8
+              },
+              "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+              "requests": 0,
+              "rows": 275900
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 272,
+              "database_bytes": 1134592,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "audit_interactive": 2,
+                "auth_new_session_notice": 2,
+                "auth_subject_context_available": 269,
+                "auth_subject_prior_privilege_tool": 7,
+                "auth_success": 1,
+                "auth_target_root_observed": 261,
+                "cron": 257,
+                "privilege_tool": 4,
+                "sensitive_file": 1,
+                "session_close": 131,
+                "session_open": 132,
+                "su_observed": 3,
+                "web_working_directory": 2
+              },
+              "raw_member": "gather/intranet_server/logs/auth.log",
+              "requests": 0,
+              "rows": 272
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 167936,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "cron": 1,
+                "http_forbidden": 7
+              },
+              "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2",
+              "requests": 0,
+              "rows": 36
+            },
+            {
+              "active_http_peak": 7654,
+              "auth_rows": 0,
+              "database_bytes": 36962304,
+              "http_group_peak": 4,
+              "http_processed": 8516,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "cron": 19,
+                "dns_non_hostname_chars": 1,
+                "http_query_base64_shape": 7,
+                "http_semantic_available": 8516,
+                "http_window_available": 8516,
+                "scanner_agent": 3192,
+                "uploaded_script": 34
+              },
+              "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2",
+              "requests": 8516,
+              "rows": 8530
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 9527296,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "audit_hex_command": 1,
+                "audit_interactive": 12,
+                "audit_login_uid_assigned": 1216,
+                "audit_login_uid_available": 2308,
+                "audit_session_assigned": 1216,
+                "audit_session_available": 2308,
+                "audit_uid_available": 2308,
+                "audit_uid_is_zero": 2303,
+                "auth_success": 2000,
+                "auth_target_root_observed": 1494,
+                "cron": 1490,
+                "decoded_sensitive_file": 1,
+                "privilege_tool": 8,
+                "service_start": 241,
+                "service_stop": 230,
+                "session_close": 302,
+                "session_open": 306,
+                "web_working_directory": 1
+              },
+              "raw_member": "gather/intranet_server/logs/audit/audit.log",
+              "requests": 0,
+              "rows": 2316
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 22749184,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "tls_failure": 6
+              },
+              "raw_member": "gather/vpn/logs/openvpn.log",
+              "requests": 0,
+              "rows": 5537
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 7901184,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "cpu_available": 1920
+              },
+              "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.cpu.log",
+              "requests": 0,
+              "rows": 1920
+            }
+          ]
+        },
+        "truth_and_references_identical": true
+      },
+      "santos": {
+        "completed": true,
+        "evaluations": {
+          "heads": {
+            "metrics": {
+              "accuracy": 0.9915330972781576,
+              "f1": 0.9737085064417307,
+              "false_positive_rate": 0.006210555530974341,
+              "fn": 962,
+              "fp": 1544,
+              "inference_errors": 0,
+              "population": 295976,
+              "precision": 0.9677991198982252,
+              "recall": 0.9796905018261659,
+              "tn": 247065,
+              "tp": 46405
+            },
+            "model_unchanged": true,
+            "per_pair": [
+              {
+                "metrics": {
+                  "accuracy": 0.9409340659340659,
+                  "f1": 0.044444444444444446,
+                  "false_positive_rate": 0.05785123966942149,
+                  "fn": 1,
+                  "fp": 42,
+                  "inference_errors": 0,
+                  "population": 728,
+                  "precision": 0.023255813953488372,
+                  "recall": 0.5,
+                  "tn": 684,
+                  "tp": 1
+                },
+                "raw_member": "gather/internal_share/logs/audit/audit.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9966517573739331,
+                  "f1": 0.9881567973311093,
+                  "false_positive_rate": 1.2698896465897114e-05,
+                  "fn": 920,
+                  "fp": 3,
+                  "inference_errors": 0,
+                  "population": 275667,
+                  "precision": 0.9999220961333715,
+                  "recall": 0.9766651448282859,
+                  "tn": 236238,
+                  "tp": 38506
+                },
+                "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9962962962962963,
+                  "f1": 0.96,
+                  "false_positive_rate": 0.003875968992248062,
+                  "fn": 0,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 270,
+                  "precision": 0.9230769230769231,
+                  "recall": 1.0,
+                  "tn": 257,
+                  "tp": 12
+                },
+                "raw_member": "gather/intranet_server/logs/auth.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9859437751004017,
+                  "f1": 0.9915216421240518,
+                  "false_positive_rate": 0.06954436450839328,
+                  "fn": 17,
+                  "fp": 116,
+                  "inference_errors": 0,
+                  "population": 9462,
+                  "precision": 0.9853034334220195,
+                  "recall": 0.997818835001283,
+                  "tn": 1552,
+                  "tp": 7777
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9545454545454546,
+                  "f1": 0.9767441860465116,
+                  "false_positive_rate": 1.0,
+                  "fn": 0,
+                  "fp": 2,
+                  "inference_errors": 0,
+                  "population": 44,
+                  "precision": 0.9545454545454546,
+                  "recall": 1.0,
+                  "tn": 0,
+                  "tp": 42
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.8974812196199735,
+                  "f1": 0.1076923076923077,
+                  "false_positive_rate": 0.10115864527629234,
+                  "fn": 5,
+                  "fp": 227,
+                  "inference_errors": 0,
+                  "population": 2263,
+                  "precision": 0.058091286307053944,
+                  "recall": 0.7368421052631579,
+                  "tn": 2017,
+                  "tp": 14
+                },
+                "raw_member": "gather/intranet_server/logs/audit/audit.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.7917111348274636,
+                  "f1": 0.015138772077375946,
+                  "false_positive_rate": 0.20593493028244547,
+                  "fn": 19,
+                  "fp": 1152,
+                  "inference_errors": 0,
+                  "population": 5622,
+                  "precision": 0.007751937984496124,
+                  "recall": 0.32142857142857145,
+                  "tn": 4442,
+                  "tp": 9
+                },
+                "raw_member": "gather/vpn/logs/openvpn.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9994791666666667,
+                  "f1": 0.9887640449438202,
+                  "false_positive_rate": 0.0005330490405117271,
+                  "fn": 0,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.9777777777777777,
+                  "recall": 1.0,
+                  "tn": 1875,
+                  "tp": 44
+                },
+                "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log"
+              }
+            ],
+            "receipt": {
+              "bytes": 3379,
+              "path": "runtime/f1/streaming-calibration-v37-20261112/santos-heads/evaluation.json",
+              "sha256": "e2d5e2eba6711935c2d7dba9e1321a219b2209ff012df3e4a073392121b2b535"
+            },
+            "seconds": 36.899
+          },
+          "ordered_tree": {
+            "metrics": {
+              "accuracy": 0.9966787847663324,
+              "f1": 0.9895183562052824,
+              "false_positive_rate": 6.435808840387918e-05,
+              "fn": 967,
+              "fp": 16,
+              "inference_errors": 0,
+              "population": 295976,
+              "precision": 0.9996552912788693,
+              "recall": 0.9795849431038487,
+              "tn": 248593,
+              "tp": 46400
+            },
+            "model_unchanged": true,
+            "per_pair": [
+              {
+                "metrics": {
+                  "accuracy": 0.9862637362637363,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.011019283746556474,
+                  "fn": 2,
+                  "fp": 8,
+                  "inference_errors": 0,
+                  "population": 728,
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "tn": 718,
+                  "tp": 0
+                },
+                "raw_member": "gather/internal_share/logs/audit/audit.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9966445022436491,
+                  "f1": 0.9881314394960031,
+                  "false_positive_rate": 2.1164827443161856e-05,
+                  "fn": 920,
+                  "fp": 5,
+                  "inference_errors": 0,
+                  "population": 275667,
+                  "precision": 0.9998701669652826,
+                  "recall": 0.9766651448282859,
+                  "tn": 236236,
+                  "tp": 38506
+                },
+                "raw_member": "gather/inet-firewall/logs/dnsmasq.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9888888888888889,
+                  "f1": 0.8571428571428571,
+                  "false_positive_rate": 0.0,
+                  "fn": 3,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 270,
+                  "precision": 1.0,
+                  "recall": 0.75,
+                  "tn": 258,
+                  "tp": 9
+                },
+                "raw_member": "gather/intranet_server/logs/auth.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.999154512787994,
+                  "f1": 0.9994865870876652,
+                  "false_positive_rate": 0.0005995203836930455,
+                  "fn": 7,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 9462,
+                  "precision": 0.9998715973292245,
+                  "recall": 0.9991018732358224,
+                  "tn": 1667,
+                  "tp": 7787
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9318181818181818,
+                  "f1": 0.963855421686747,
+                  "false_positive_rate": 0.5,
+                  "fn": 2,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 44,
+                  "precision": 0.975609756097561,
+                  "recall": 0.9523809523809523,
+                  "tn": 1,
+                  "tp": 40
+                },
+                "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9977905435262925,
+                  "f1": 0.8484848484848485,
+                  "false_positive_rate": 0.0,
+                  "fn": 5,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 2263,
+                  "precision": 1.0,
+                  "recall": 0.7368421052631579,
+                  "tn": 2244,
+                  "tp": 14
+                },
+                "raw_member": "gather/intranet_server/logs/audit/audit.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9950195659907506,
+                  "f1": 0.0,
+                  "false_positive_rate": 0.0,
+                  "fn": 28,
+                  "fp": 0,
+                  "inference_errors": 0,
+                  "population": 5622,
+                  "precision": null,
+                  "recall": 0.0,
+                  "tn": 5594,
+                  "tp": 0
+                },
+                "raw_member": "gather/vpn/logs/openvpn.log"
+              },
+              {
+                "metrics": {
+                  "accuracy": 0.9994791666666667,
+                  "f1": 0.9887640449438202,
+                  "false_positive_rate": 0.0005330490405117271,
+                  "fn": 0,
+                  "fp": 1,
+                  "inference_errors": 0,
+                  "population": 1920,
+                  "precision": 0.9777777777777777,
+                  "recall": 1.0,
+                  "tn": 1875,
+                  "tp": 44
+                },
+                "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log"
+              }
+            ],
+            "receipt": {
+              "bytes": 3242,
+              "path": "runtime/f1/streaming-calibration-v37-20261112/santos-ordered_tree/evaluation.json",
+              "sha256": "080795388972b967b57c8534f47a047834b0511905c01b812330c04a4ddaf297"
+            },
+            "seconds": 38.03
+          }
+        },
+        "preparation": {
+          "bytes": 8687,
+          "path": "runtime/f1/streaming-calibration-v37-20261112/santos/preparation.json",
+          "sha256": "b6e960ddc26eff3c4251ba08319c0af45697b3ee4aabdd96ba50d09e154d4f9a"
+        },
+        "preparation_seconds": 148.172,
+        "reference_inputs_identical": true,
+        "role": "previously_observed_development",
+        "rows": 295976,
+        "streaming": {
+          "base_input_materialized": false,
+          "base_inputs": {
+            "bytes": 226288307,
+            "sha256": "14c2d0ac10f027edec89d05ba42a404eaffda8b2787af5e78cb0d581d2ac1c02"
+          },
+          "limits": {
+            "active_http_events": 500000,
+            "database_bytes": 4294967296,
+            "min_free_bytes": 5368709120,
+            "output_bytes": 8589934592
+          },
+          "observations_extracted_once_per_source": true,
+          "output_bytes": 788105221,
+          "recovery": "retain failed attempt; rerun with the same anchors in a fresh directory",
+          "schema": "bounded-native-context-1",
+          "sources": [
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 3010560,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "audit_login_uid_assigned": 424,
+                "audit_login_uid_available": 720,
+                "audit_session_assigned": 424,
+                "audit_session_available": 720,
+                "audit_uid_available": 720,
+                "audit_uid_is_zero": 720,
+                "auth_success": 610,
+                "auth_target_root_observed": 530,
+                "cron": 530,
+                "service_start": 45,
+                "service_stop": 35,
+                "session_close": 106,
+                "session_open": 106
+              },
+              "raw_member": "gather/internal_share/logs/audit/audit.log",
+              "requests": 0,
+              "rows": 728
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 1131982848,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "dns_negative_reply": 19038,
+                "dns_non_hostname_chars": 38402,
+                "scanner_agent": 8
+              },
+              "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+              "requests": 0,
+              "rows": 275667
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 270,
+              "database_bytes": 1126400,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "audit_interactive": 3,
+                "auth_new_session_notice": 1,
+                "auth_subject_context_available": 268,
+                "auth_subject_prior_privilege_tool": 9,
+                "auth_subject_prior_sensitive_or_shell": 1,
+                "auth_target_root_observed": 264,
+                "cron": 257,
+                "privilege_tool": 7,
+                "sensitive_file": 1,
+                "session_close": 131,
+                "session_open": 132,
+                "su_observed": 3,
+                "web_working_directory": 3
+              },
+              "raw_member": "gather/intranet_server/logs/auth.log",
+              "requests": 0,
+              "rows": 270
+            },
+            {
+              "active_http_peak": 7757,
+              "auth_rows": 0,
+              "database_bytes": 40996864,
+              "http_group_peak": 5,
+              "http_processed": 9441,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "cron": 18,
+                "dns_non_hostname_chars": 1,
+                "http_query_base64_shape": 7,
+                "http_semantic_available": 9441,
+                "http_window_available": 9441,
+                "scanner_agent": 3291,
+                "uploaded_script": 36
+              },
+              "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log",
+              "requests": 9441,
+              "rows": 9462
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 200704,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "cron": 1,
+                "http_forbidden": 7
+              },
+              "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+              "requests": 0,
+              "rows": 44
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 9310208,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "audit_hex_command": 2,
+                "audit_interactive": 14,
+                "audit_login_uid_assigned": 1194,
+                "audit_login_uid_available": 2263,
+                "audit_session_assigned": 1194,
+                "audit_session_available": 2263,
+                "audit_uid_available": 2263,
+                "audit_uid_is_zero": 2257,
+                "auth_success": 1964,
+                "auth_target_root_observed": 1498,
+                "cron": 1490,
+                "decoded_sensitive_file": 1,
+                "privilege_tool": 12,
+                "service_start": 230,
+                "service_stop": 227,
+                "session_close": 300,
+                "session_open": 302,
+                "web_working_directory": 2
+              },
+              "raw_member": "gather/intranet_server/logs/audit/audit.log",
+              "requests": 0,
+              "rows": 2263
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 23101440,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "tls_failure": 10
+              },
+              "raw_member": "gather/vpn/logs/openvpn.log",
+              "requests": 0,
+              "rows": 5622
+            },
+            {
+              "active_http_peak": 0,
+              "auth_rows": 0,
+              "database_bytes": 7901184,
+              "http_group_peak": 0,
+              "http_processed": 0,
+              "ordering_plan": [
+                "SCAN http USING INDEX http_time"
+              ],
+              "positive_feature_counts": {
+                "cpu_available": 1920
+              },
+              "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log",
+              "requests": 0,
+              "rows": 1920
+            }
+          ]
+        },
+        "truth_and_references_identical": true
+      }
+    },
+    "schema": "extra-bounded-native-calibration-1",
+    "sources": {
+      "scripts/evaluate_native_tree.py": {
+        "bytes": 4159,
+        "path": "scripts/evaluate_native_tree.py",
+        "sha256": "35a08ca022785d6f9dbf030729c4c3e363aa845ff8bc4b619b13a4126bceb1c9"
+      },
+      "scripts/f1_lab/raw_context.py": {
+        "bytes": 6513,
+        "path": "scripts/f1_lab/raw_context.py",
+        "sha256": "0e8f48c25f5160969be9b63acb9a393700f2a36650649a2236ab38b2343397be"
+      },
+      "scripts/f1_lab/raw_observations.py": {
+        "bytes": 7513,
+        "path": "scripts/f1_lab/raw_observations.py",
+        "sha256": "54213e5c09da92055b43bf1786896c9e079ab5776aeb5686725ce5c90e1c65bc"
+      },
+      "scripts/f1_lab/raw_semantics.py": {
+        "bytes": 11693,
+        "path": "scripts/f1_lab/raw_semantics.py",
+        "sha256": "ba0cd6b9c8f25edaa858f3c729c0897a79c0f5a1f22612be9a52d64cdcb820b8"
+      },
+      "scripts/f1_lab/streaming_context.py": {
+        "bytes": 4348,
+        "path": "scripts/f1_lab/streaming_context.py",
+        "sha256": "a08989bbb1c4d75fa4d6352a063e96a1ad81fca98ebb9758b28a74565b7d57fa"
+      },
+      "scripts/prepare_native_stream.py": {
+        "bytes": 17447,
+        "path": "scripts/prepare_native_stream.py",
+        "sha256": "8206074073e12061944dc89096c23fe25700b54fcaebbdcdbc043b9f022cf054"
+      },
+      "scripts/run_native_stream_validation.py": {
+        "bytes": 6784,
+        "path": "scripts/run_native_stream_validation.py",
+        "sha256": "9d8142ed9b066de61adf3aa41b4e9403846c429e551342810177cc2221332e92"
+      }
+    },
+    "started_at": "2026-11-12T10:36:29.137448+00:00",
+    "threshold_changed": false
+  },
+  "ordered_score_diagnostic": {
+    "artifact": {
+      "path": "runtime/f1/score-diagnostic-v38-fox-20261112/diagnostic.json",
+      "bytes": 98270,
+      "sha256": "143aab753f797f564ccc73d8ddfbcd408ab16482939d96400def8f1738c7df8e"
+    },
+    "completed": true,
+    "metrics": {
+      "0.0001": {
+        "accuracy": 0.4863109611051767,
+        "f1": 0.5479911904363841,
+        "false_positive_rate": 0.4472567057777946,
+        "fn": 248749,
+        "fp": 94610,
+        "inference_errors": 0,
+        "population": 668418,
+        "precision": 0.687492774447142,
+        "recall": 0.45555326953887637,
+        "tn": 116924,
+        "tp": 208135
+      },
+      "0.001": {
+        "accuracy": 0.4863109611051767,
+        "f1": 0.5479911904363841,
+        "false_positive_rate": 0.4472567057777946,
+        "fn": 248749,
+        "fp": 94610,
+        "inference_errors": 0,
+        "population": 668418,
+        "precision": 0.687492774447142,
+        "recall": 0.45555326953887637,
+        "tn": 116924,
+        "tp": 208135
+      },
+      "0.01": {
+        "accuracy": 0.5511596037210249,
+        "f1": 0.5811529800372199,
+        "false_positive_rate": 0.24234402034661096,
+        "fn": 248749,
+        "fp": 51264,
+        "inference_errors": 0,
+        "population": 668418,
+        "precision": 0.8023739490129106,
+        "recall": 0.45555326953887637,
+        "tn": 160270,
+        "tp": 208135
+      },
+      "0.025": {
+        "accuracy": 0.6087732526652484,
+        "f1": 0.6139875148904638,
+        "false_positive_rate": 0.05952234628948538,
+        "fn": 248912,
+        "fp": 12591,
+        "inference_errors": 0,
+        "population": 668418,
+        "precision": 0.9429142693924185,
+        "recall": 0.45519650502096815,
+        "tn": 198943,
+        "tp": 207972
+      },
+      "0.05": {
+        "accuracy": 0.615119580861078,
+        "f1": 0.6178120919232181,
+        "false_positive_rate": 0.039284464908714435,
+        "fn": 248951,
+        "fp": 8310,
+        "inference_errors": 0,
+        "population": 668418,
+        "precision": 0.9615710103910878,
+        "recall": 0.455111144185395,
+        "tn": 203224,
+        "tp": 207933
+      },
+      "0.1": {
+        "accuracy": 0.6178095144056563,
+        "f1": 0.6194633581748279,
+        "false_positive_rate": 0.030770467158943715,
+        "fn": 248954,
+        "fp": 6509,
+        "inference_errors": 0,
+        "population": 668418,
+        "precision": 0.9696463796231096,
+        "recall": 0.455104577967274,
+        "tn": 205025,
+        "tp": 207930
+      },
+      "0.25": {
+        "accuracy": 0.627028296664662,
+        "f1": 0.6250543315601317,
+        "false_positive_rate": 0.0010211124452806641,
+        "fn": 249085,
+        "fp": 216,
+        "inference_errors": 0,
+        "population": 668418,
+        "precision": 0.9989616133451914,
+        "recall": 0.45481785310932316,
+        "tn": 211318,
+        "tp": 207799
+      },
+      "0.5": {
+        "accuracy": 0.6271434940411539,
+        "f1": 0.6250206880779496,
+        "false_positive_rate": 0.0002127317594334717,
+        "fn": 249179,
+        "fp": 45,
+        "inference_errors": 0,
+        "population": 668418,
+        "precision": 0.999783393501805,
+        "recall": 0.45461211160819814,
+        "tn": 211489,
+        "tp": 207705
+      },
+      "0.75": {
+        "accuracy": 0.6271434940411539,
+        "f1": 0.6250206880779496,
+        "false_positive_rate": 0.0002127317594334717,
+        "fn": 249179,
+        "fp": 45,
+        "inference_errors": 0,
+        "population": 668418,
+        "precision": 0.999783393501805,
+        "recall": 0.45461211160819814,
+        "tn": 211489,
+        "tp": 207705
+      },
+      "0.9": {
+        "accuracy": 0.6271419979713293,
+        "f1": 0.6250016927398763,
+        "false_positive_rate": 0.00014182117295564778,
+        "fn": 249195,
+        "fp": 30,
+        "inference_errors": 0,
+        "population": 668418,
+        "precision": 0.999855574116956,
+        "recall": 0.4545770917782194,
+        "tn": 211504,
+        "tp": 207689
+      }
+    },
+    "unique_vectors": 985,
+    "largest_missed_vectors": [
+      {
+        "feature_sha256": "91e634d21da237458897db3347989edfc15359011fee266f961d80d616cf9768",
+        "probability": 0.0,
+        "classes": [
+          0,
+          118627
+        ]
+      },
+      {
+        "feature_sha256": "f20141bc10d3a20ba9044cb0e890d18a5d48cc5d7c39651fe1e5542b1314e71e",
+        "probability": 0.0,
+        "classes": [
+          0,
+          103291
+        ]
+      },
+      {
+        "feature_sha256": "3096e392c99a676b8a825d226d24d1d566fc4d35d53acbbc00e7382041dccdd3",
+        "probability": 0.0,
+        "classes": [
+          0,
+          18723
+        ]
+      },
+      {
+        "feature_sha256": "2bca74972120d496becbed5889e079bf0f95e18e645623eeeeb215ad9b97bde9",
+        "probability": 0.0,
+        "classes": [
+          0,
+          2130
+        ]
+      },
+      {
+        "feature_sha256": "0445096a0d1e5266015fc8c1632e897e448306aa810eed176f6052d85a4e1060",
+        "probability": 0.0,
+        "classes": [
+          0,
+          1836
+        ]
+      }
+    ],
+    "threshold_selected": null,
+    "goal_qualified": false
+  },
+  "heads_score_diagnostic": {
+    "artifact": {
+      "path": "runtime/f1/heads-score-diagnostic-v38b-20261112/run.json",
+      "bytes": 81617,
+      "sha256": "1b63f1d6872c902ac55d858f57e15b87c5876508285db37b5ceefff749e9f963"
+    },
+    "schema": "extra-heads-score-calibration-diagnostic-1",
+    "completed": true,
+    "started_at": "2026-11-12T10:58:49.695720+00:00",
+    "thresholds_declared_before_score_scan": [
+      0.5,
+      0.75,
+      0.9,
+      0.95,
+      0.99
+    ],
+    "source_sha256": "24ae59808f15325b7f24f13add86f5a66452b3bd7132d2a576d3eaf8b341b108",
+    "reason": "Fox full-population F1 passes globally at 0.5 but HTTP/VPN/audit normal-traffic FPR fails; compare same fixed thresholds on all three observed scenarios",
+    "scenarios": {
+      "russellmitchell": {
+        "diagnostic": "runtime\\f1\\heads-score-diagnostic-v38b-20261112\\russellmitchell\\diagnostic.json",
+        "sha256": "f8d5d8dbf31cdf129b5bff0ee32fd742855c61d6cfc521a8ccba556581c06384",
+        "metrics": {
+          "0.5": {
+            "tp": 60862,
+            "fp": 1372,
+            "fn": 1000,
+            "tn": 232009,
+            "inference_errors": 0,
+            "population": 295243,
+            "precision": 0.9779541729601182,
+            "recall": 0.9838349875529404,
+            "f1": 0.98088576585869,
+            "false_positive_rate": 0.005878799045337881,
+            "accuracy": 0.9919659399206755
+          },
+          "0.75": {
+            "tp": 60855,
+            "fp": 246,
+            "fn": 1007,
+            "tn": 233135,
+            "inference_errors": 0,
+            "population": 295243,
+            "precision": 0.9959738793145775,
+            "recall": 0.983721832465811,
+            "f1": 0.9898099428283305,
+            "false_positive_rate": 0.0010540703827646638,
+            "accuracy": 0.9957560382464614
+          },
+          "0.9": {
+            "tp": 60836,
+            "fp": 32,
+            "fn": 1026,
+            "tn": 233349,
+            "inference_errors": 0,
+            "population": 295243,
+            "precision": 0.9994742721955707,
+            "recall": 0.9834146972293168,
+            "f1": 0.9913794508270186,
+            "false_positive_rate": 0.00013711484653849284,
+            "accuracy": 0.9964165111450568
+          },
+          "0.95": {
+            "tp": 60833,
+            "fp": 25,
+            "fn": 1029,
+            "tn": 233356,
+            "inference_errors": 0,
+            "population": 295243,
+            "precision": 0.9995892076637418,
+            "recall": 0.9833662021919757,
+            "f1": 0.9914113428943937,
+            "false_positive_rate": 0.00010712097385819754,
+            "accuracy": 0.9964300593070793
+          },
+          "0.99": {
+            "tp": 60789,
+            "fp": 20,
+            "fn": 1073,
+            "tn": 233361,
+            "inference_errors": 0,
+            "population": 295243,
+            "precision": 0.9996711013172392,
+            "recall": 0.9826549416443051,
+            "f1": 0.9910899886688785,
+            "false_positive_rate": 8.569677908655803e-05,
+            "accuracy": 0.9962979647273602
+          }
+        },
+        "seconds": 56.98115680000046,
+        "per_pair": [
+          {
+            "raw_member": "gather/internal_share/logs/audit/audit.log",
+            "metrics": {
+              "0.5": {
+                "tp": 1,
+                "fp": 44,
+                "fn": 1,
+                "tn": 686,
+                "inference_errors": 0,
+                "population": 732,
+                "precision": 0.022222222222222223,
+                "recall": 0.5,
+                "f1": 0.0425531914893617,
+                "false_positive_rate": 0.06027397260273973,
+                "accuracy": 0.9385245901639344
+              },
+              "0.75": {
+                "tp": 0,
+                "fp": 8,
+                "fn": 2,
+                "tn": 722,
+                "inference_errors": 0,
+                "population": 732,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.010958904109589041,
+                "accuracy": 0.9863387978142076
+              },
+              "0.9": {
+                "tp": 0,
+                "fp": 8,
+                "fn": 2,
+                "tn": 722,
+                "inference_errors": 0,
+                "population": 732,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.010958904109589041,
+                "accuracy": 0.9863387978142076
+              },
+              "0.95": {
+                "tp": 0,
+                "fp": 8,
+                "fn": 2,
+                "tn": 722,
+                "inference_errors": 0,
+                "population": 732,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.010958904109589041,
+                "accuracy": 0.9863387978142076
+              },
+              "0.99": {
+                "tp": 0,
+                "fp": 8,
+                "fn": 2,
+                "tn": 722,
+                "inference_errors": 0,
+                "population": 732,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.010958904109589041,
+                "accuracy": 0.9863387978142076
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 640,
+                "attack": 0
+              },
+              {
+                "score": "0.48899320168339272",
+                "normal": 46,
+                "attack": 1
+              },
+              {
+                "score": "0.50798722044728439",
+                "normal": 36,
+                "attack": 1
+              },
+              {
+                "score": "0.9927024821162802",
+                "normal": 8,
+                "attack": 0
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+            "metrics": {
+              "0.5": {
+                "tp": 53062,
+                "fp": 24,
+                "fn": 973,
+                "tn": 221841,
+                "inference_errors": 0,
+                "population": 275900,
+                "precision": 0.9995479034020269,
+                "recall": 0.9819931525862866,
+                "f1": 0.9906927679913369,
+                "false_positive_rate": 0.00010817388952741532,
+                "accuracy": 0.9963863718738674
+              },
+              "0.75": {
+                "tp": 53062,
+                "fp": 24,
+                "fn": 973,
+                "tn": 221841,
+                "inference_errors": 0,
+                "population": 275900,
+                "precision": 0.9995479034020269,
+                "recall": 0.9819931525862866,
+                "f1": 0.9906927679913369,
+                "false_positive_rate": 0.00010817388952741532,
+                "accuracy": 0.9963863718738674
+              },
+              "0.9": {
+                "tp": 53046,
+                "fp": 5,
+                "fn": 989,
+                "tn": 221860,
+                "inference_errors": 0,
+                "population": 275900,
+                "precision": 0.9999057510697253,
+                "recall": 0.9816970482094939,
+                "f1": 0.9907177408811609,
+                "false_positive_rate": 2.2536226984878192e-05,
+                "accuracy": 0.9963972453787604
+              },
+              "0.95": {
+                "tp": 53046,
+                "fp": 5,
+                "fn": 989,
+                "tn": 221860,
+                "inference_errors": 0,
+                "population": 275900,
+                "precision": 0.9999057510697253,
+                "recall": 0.9816970482094939,
+                "f1": 0.9907177408811609,
+                "false_positive_rate": 2.2536226984878192e-05,
+                "accuracy": 0.9963972453787604
+              },
+              "0.99": {
+                "tp": 53002,
+                "fp": 0,
+                "fn": 1033,
+                "tn": 221865,
+                "inference_errors": 0,
+                "population": 275900,
+                "precision": 1.0,
+                "recall": 0.9808827611733136,
+                "f1": 0.9903491316086961,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9962558898151505
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 124078,
+                "attack": 0
+              },
+              {
+                "score": "0.0011772492828513673",
+                "normal": 33121,
+                "attack": 10
+              },
+              {
+                "score": "0.0081742143337584453",
+                "normal": 4263,
+                "attack": 9
+              },
+              {
+                "score": "0.011978269337634774",
+                "normal": 644,
+                "attack": 2
+              },
+              {
+                "score": "0.019675851868608603",
+                "normal": 1167,
+                "attack": 6
+              },
+              {
+                "score": "0.027445463604024466",
+                "normal": 415,
+                "attack": 3
+              },
+              {
+                "score": "0.037182130117823689",
+                "normal": 21026,
+                "attack": 208
+              },
+              {
+                "score": "0.047523254895290454",
+                "normal": 6181,
+                "attack": 79
+              },
+              {
+                "score": "0.055369570119356275",
+                "normal": 3330,
+                "attack": 50
+              },
+              {
+                "score": "0.072253422648770688",
+                "normal": 12431,
+                "attack": 248
+              },
+              {
+                "score": "0.1599656185674935",
+                "normal": 1476,
+                "attack": 72
+              },
+              {
+                "score": "0.2044471634829125",
+                "normal": 1276,
+                "attack": 84
+              },
+              {
+                "score": "0.24018485621893859",
+                "normal": 1025,
+                "attack": 83
+              },
+              {
+                "score": "0.28077025172174147",
+                "normal": 30,
+                "attack": 3
+              },
+              {
+                "score": "0.43348235577754601",
+                "normal": 11378,
+                "attack": 116
+              },
+              {
+                "score": "0.76675728834381807",
+                "normal": 19,
+                "attack": 16
+              },
+              {
+                "score": "0.9717139492791067",
+                "normal": 5,
+                "attack": 44
+              },
+              {
+                "score": "1",
+                "normal": 0,
+                "attack": 53002
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/auth.log",
+            "metrics": {
+              "0.5": {
+                "tp": 8,
+                "fp": 7,
+                "fn": 0,
+                "tn": 257,
+                "inference_errors": 0,
+                "population": 272,
+                "precision": 0.5333333333333333,
+                "recall": 1.0,
+                "f1": 0.6956521739130435,
+                "false_positive_rate": 0.026515151515151516,
+                "accuracy": 0.9742647058823529
+              },
+              "0.75": {
+                "tp": 8,
+                "fp": 7,
+                "fn": 0,
+                "tn": 257,
+                "inference_errors": 0,
+                "population": 272,
+                "precision": 0.5333333333333333,
+                "recall": 1.0,
+                "f1": 0.6956521739130435,
+                "false_positive_rate": 0.026515151515151516,
+                "accuracy": 0.9742647058823529
+              },
+              "0.9": {
+                "tp": 8,
+                "fp": 7,
+                "fn": 0,
+                "tn": 257,
+                "inference_errors": 0,
+                "population": 272,
+                "precision": 0.5333333333333333,
+                "recall": 1.0,
+                "f1": 0.6956521739130435,
+                "false_positive_rate": 0.026515151515151516,
+                "accuracy": 0.9742647058823529
+              },
+              "0.95": {
+                "tp": 5,
+                "fp": 0,
+                "fn": 3,
+                "tn": 264,
+                "inference_errors": 0,
+                "population": 272,
+                "precision": 1.0,
+                "recall": 0.625,
+                "f1": 0.7692307692307693,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9889705882352942
+              },
+              "0.99": {
+                "tp": 5,
+                "fp": 0,
+                "fn": 3,
+                "tn": 264,
+                "inference_errors": 0,
+                "population": 272,
+                "precision": 1.0,
+                "recall": 0.625,
+                "f1": 0.7692307692307693,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9889705882352942
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 257,
+                "attack": 0
+              },
+              {
+                "score": "0.9339622641509433",
+                "normal": 7,
+                "attack": 3
+              },
+              {
+                "score": "1",
+                "normal": 0,
+                "attack": 5
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2",
+            "metrics": {
+              "0.5": {
+                "tp": 36,
+                "fp": 0,
+                "fn": 0,
+                "tn": 0,
+                "inference_errors": 0,
+                "population": 36,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "false_positive_rate": null,
+                "accuracy": 1.0
+              },
+              "0.75": {
+                "tp": 36,
+                "fp": 0,
+                "fn": 0,
+                "tn": 0,
+                "inference_errors": 0,
+                "population": 36,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "false_positive_rate": null,
+                "accuracy": 1.0
+              },
+              "0.9": {
+                "tp": 36,
+                "fp": 0,
+                "fn": 0,
+                "tn": 0,
+                "inference_errors": 0,
+                "population": 36,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "false_positive_rate": null,
+                "accuracy": 1.0
+              },
+              "0.95": {
+                "tp": 36,
+                "fp": 0,
+                "fn": 0,
+                "tn": 0,
+                "inference_errors": 0,
+                "population": 36,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "false_positive_rate": null,
+                "accuracy": 1.0
+              },
+              "0.99": {
+                "tp": 36,
+                "fp": 0,
+                "fn": 0,
+                "tn": 0,
+                "inference_errors": 0,
+                "population": 36,
+                "precision": 1.0,
+                "recall": 1.0,
+                "f1": 1.0,
+                "false_positive_rate": null,
+                "accuracy": 1.0
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0.9927024821162802",
+                "normal": 0,
+                "attack": 29
+              },
+              {
+                "score": "1",
+                "normal": 0,
+                "attack": 7
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2",
+            "metrics": {
+              "0.5": {
+                "tp": 7688,
+                "fp": 0,
+                "fn": 7,
+                "tn": 835,
+                "inference_errors": 0,
+                "population": 8530,
+                "precision": 1.0,
+                "recall": 0.999090318388564,
+                "f1": 0.9995449522199831,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.999179366940211
+              },
+              "0.75": {
+                "tp": 7688,
+                "fp": 0,
+                "fn": 7,
+                "tn": 835,
+                "inference_errors": 0,
+                "population": 8530,
+                "precision": 1.0,
+                "recall": 0.999090318388564,
+                "f1": 0.9995449522199831,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.999179366940211
+              },
+              "0.9": {
+                "tp": 7688,
+                "fp": 0,
+                "fn": 7,
+                "tn": 835,
+                "inference_errors": 0,
+                "population": 8530,
+                "precision": 1.0,
+                "recall": 0.999090318388564,
+                "f1": 0.9995449522199831,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.999179366940211
+              },
+              "0.95": {
+                "tp": 7688,
+                "fp": 0,
+                "fn": 7,
+                "tn": 835,
+                "inference_errors": 0,
+                "population": 8530,
+                "precision": 1.0,
+                "recall": 0.999090318388564,
+                "f1": 0.9995449522199831,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.999179366940211
+              },
+              "0.99": {
+                "tp": 7688,
+                "fp": 0,
+                "fn": 7,
+                "tn": 835,
+                "inference_errors": 0,
+                "population": 8530,
+                "precision": 1.0,
+                "recall": 0.999090318388564,
+                "f1": 0.9995449522199831,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.999179366940211
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 823,
+                "attack": 0
+              },
+              {
+                "score": "0.013161058655680416",
+                "normal": 8,
+                "attack": 1
+              },
+              {
+                "score": "0.06640514417438427",
+                "normal": 3,
+                "attack": 2
+              },
+              {
+                "score": "0.29911649512706079",
+                "normal": 1,
+                "attack": 4
+              },
+              {
+                "score": "1",
+                "normal": 0,
+                "attack": 7688
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/audit/audit.log",
+            "metrics": {
+              "0.5": {
+                "tp": 9,
+                "fp": 241,
+                "fn": 0,
+                "tn": 2066,
+                "inference_errors": 0,
+                "population": 2316,
+                "precision": 0.036,
+                "recall": 1.0,
+                "f1": 0.0694980694980695,
+                "false_positive_rate": 0.10446467273515388,
+                "accuracy": 0.8959412780656304
+              },
+              "0.75": {
+                "tp": 9,
+                "fp": 11,
+                "fn": 0,
+                "tn": 2296,
+                "inference_errors": 0,
+                "population": 2316,
+                "precision": 0.45,
+                "recall": 1.0,
+                "f1": 0.6206896551724138,
+                "false_positive_rate": 0.004768097095795405,
+                "accuracy": 0.9952504317789291
+              },
+              "0.9": {
+                "tp": 9,
+                "fp": 11,
+                "fn": 0,
+                "tn": 2296,
+                "inference_errors": 0,
+                "population": 2316,
+                "precision": 0.45,
+                "recall": 1.0,
+                "f1": 0.6206896551724138,
+                "false_positive_rate": 0.004768097095795405,
+                "accuracy": 0.9952504317789291
+              },
+              "0.95": {
+                "tp": 9,
+                "fp": 11,
+                "fn": 0,
+                "tn": 2296,
+                "inference_errors": 0,
+                "population": 2316,
+                "precision": 0.45,
+                "recall": 1.0,
+                "f1": 0.6206896551724138,
+                "false_positive_rate": 0.004768097095795405,
+                "accuracy": 0.9952504317789291
+              },
+              "0.99": {
+                "tp": 9,
+                "fp": 11,
+                "fn": 0,
+                "tn": 2296,
+                "inference_errors": 0,
+                "population": 2316,
+                "precision": 0.45,
+                "recall": 1.0,
+                "f1": 0.6206896551724138,
+                "false_positive_rate": 0.004768097095795405,
+                "accuracy": 0.9952504317789291
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 1825,
+                "attack": 0
+              },
+              {
+                "score": "0.48899320168339272",
+                "normal": 241,
+                "attack": 0
+              },
+              {
+                "score": "0.50798722044728439",
+                "normal": 230,
+                "attack": 0
+              },
+              {
+                "score": "0.9927024821162802",
+                "normal": 8,
+                "attack": 0
+              },
+              {
+                "score": "0.99727655360237688",
+                "normal": 3,
+                "attack": 4
+              },
+              {
+                "score": "1",
+                "normal": 0,
+                "attack": 5
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/vpn/logs/openvpn.log",
+            "metrics": {
+              "0.5": {
+                "tp": 9,
+                "fp": 1055,
+                "fn": 19,
+                "tn": 4454,
+                "inference_errors": 0,
+                "population": 5537,
+                "precision": 0.008458646616541353,
+                "recall": 0.32142857142857145,
+                "f1": 0.016483516483516484,
+                "false_positive_rate": 0.19150481031040117,
+                "accuracy": 0.8060321473722232
+              },
+              "0.75": {
+                "tp": 3,
+                "fp": 195,
+                "fn": 25,
+                "tn": 5314,
+                "inference_errors": 0,
+                "population": 5537,
+                "precision": 0.015151515151515152,
+                "recall": 0.10714285714285714,
+                "f1": 0.02654867256637168,
+                "false_positive_rate": 0.03539662370666183,
+                "accuracy": 0.9602672927578111
+              },
+              "0.9": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 28,
+                "tn": 5509,
+                "inference_errors": 0,
+                "population": 5537,
+                "precision": null,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9949431099873578
+              },
+              "0.95": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 28,
+                "tn": 5509,
+                "inference_errors": 0,
+                "population": 5537,
+                "precision": null,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9949431099873578
+              },
+              "0.99": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 28,
+                "tn": 5509,
+                "inference_errors": 0,
+                "population": 5537,
+                "precision": null,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9949431099873578
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 178,
+                "attack": 0
+              },
+              {
+                "score": "0.4567614625652931",
+                "normal": 1872,
+                "attack": 8
+              },
+              {
+                "score": "0.45782431646305993",
+                "normal": 233,
+                "attack": 1
+              },
+              {
+                "score": "0.47541379726954214",
+                "normal": 2171,
+                "attack": 10
+              },
+              {
+                "score": "0.5785346728742955",
+                "normal": 860,
+                "attack": 6
+              },
+              {
+                "score": "0.75167144221585491",
+                "normal": 195,
+                "attack": 3
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.cpu.log",
+            "metrics": {
+              "0.5": {
+                "tp": 49,
+                "fp": 1,
+                "fn": 0,
+                "tn": 1870,
+                "inference_errors": 0,
+                "population": 1920,
+                "precision": 0.98,
+                "recall": 1.0,
+                "f1": 0.98989898989899,
+                "false_positive_rate": 0.0005344735435595938,
+                "accuracy": 0.9994791666666667
+              },
+              "0.75": {
+                "tp": 49,
+                "fp": 1,
+                "fn": 0,
+                "tn": 1870,
+                "inference_errors": 0,
+                "population": 1920,
+                "precision": 0.98,
+                "recall": 1.0,
+                "f1": 0.98989898989899,
+                "false_positive_rate": 0.0005344735435595938,
+                "accuracy": 0.9994791666666667
+              },
+              "0.9": {
+                "tp": 49,
+                "fp": 1,
+                "fn": 0,
+                "tn": 1870,
+                "inference_errors": 0,
+                "population": 1920,
+                "precision": 0.98,
+                "recall": 1.0,
+                "f1": 0.98989898989899,
+                "false_positive_rate": 0.0005344735435595938,
+                "accuracy": 0.9994791666666667
+              },
+              "0.95": {
+                "tp": 49,
+                "fp": 1,
+                "fn": 0,
+                "tn": 1870,
+                "inference_errors": 0,
+                "population": 1920,
+                "precision": 0.98,
+                "recall": 1.0,
+                "f1": 0.98989898989899,
+                "false_positive_rate": 0.0005344735435595938,
+                "accuracy": 0.9994791666666667
+              },
+              "0.99": {
+                "tp": 49,
+                "fp": 1,
+                "fn": 0,
+                "tn": 1870,
+                "inference_errors": 0,
+                "population": 1920,
+                "precision": 0.98,
+                "recall": 1.0,
+                "f1": 0.98989898989899,
+                "false_positive_rate": 0.0005344735435595938,
+                "accuracy": 0.9994791666666667
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 1870,
+                "attack": 0
+              },
+              {
+                "score": "0.99946581196581197",
+                "normal": 1,
+                "attack": 49
+              }
+            ]
+          }
+        ],
+        "model_unchanged": true,
+        "unchanged_0_5_metrics": true,
+        "unique_vectors": 640
+      },
+      "santos": {
+        "diagnostic": "runtime\\f1\\heads-score-diagnostic-v38b-20261112\\santos\\diagnostic.json",
+        "sha256": "cf432ffaa1ea9271fd8d0f50c6a5ee71017dc13f653373137e84bcd9d2125ff5",
+        "metrics": {
+          "0.5": {
+            "tp": 46405,
+            "fp": 1544,
+            "fn": 962,
+            "tn": 247065,
+            "inference_errors": 0,
+            "population": 295976,
+            "precision": 0.9677991198982252,
+            "recall": 0.9796905018261659,
+            "f1": 0.9737085064417307,
+            "false_positive_rate": 0.006210555530974341,
+            "accuracy": 0.9915330972781576
+          },
+          "0.75": {
+            "tp": 46398,
+            "fp": 359,
+            "fn": 969,
+            "tn": 248250,
+            "inference_errors": 0,
+            "population": 295976,
+            "precision": 0.9923220052612443,
+            "recall": 0.9795427196149218,
+            "f1": 0.9858909523607157,
+            "false_positive_rate": 0.0014440346085620392,
+            "accuracy": 0.9955131497148417
+          },
+          "0.9": {
+            "tp": 46395,
+            "fp": 131,
+            "fn": 972,
+            "tn": 248478,
+            "inference_errors": 0,
+            "population": 295976,
+            "precision": 0.9971843700296609,
+            "recall": 0.9794793843815315,
+            "f1": 0.9882525853897521,
+            "false_positive_rate": 0.0005269318488067608,
+            "accuracy": 0.9962733464875531
+          },
+          "0.95": {
+            "tp": 46392,
+            "fp": 130,
+            "fn": 975,
+            "tn": 248479,
+            "inference_errors": 0,
+            "population": 295976,
+            "precision": 0.9972056231460384,
+            "recall": 0.9794160491481411,
+            "f1": 0.9882307831588365,
+            "false_positive_rate": 0.0005229094682815184,
+            "accuracy": 0.9962665891829067
+          },
+          "0.99": {
+            "tp": 46392,
+            "fp": 127,
+            "fn": 975,
+            "tn": 248482,
+            "inference_errors": 0,
+            "population": 295976,
+            "precision": 0.9972699327156646,
+            "recall": 0.9794160491481411,
+            "f1": 0.9882623607353599,
+            "false_positive_rate": 0.0005108423267057911,
+            "accuracy": 0.9962767251398762
+          }
+        },
+        "seconds": 62.80205920000299,
+        "per_pair": [
+          {
+            "raw_member": "gather/internal_share/logs/audit/audit.log",
+            "metrics": {
+              "0.5": {
+                "tp": 1,
+                "fp": 42,
+                "fn": 1,
+                "tn": 684,
+                "inference_errors": 0,
+                "population": 728,
+                "precision": 0.023255813953488372,
+                "recall": 0.5,
+                "f1": 0.044444444444444446,
+                "false_positive_rate": 0.05785123966942149,
+                "accuracy": 0.9409340659340659
+              },
+              "0.75": {
+                "tp": 0,
+                "fp": 8,
+                "fn": 2,
+                "tn": 718,
+                "inference_errors": 0,
+                "population": 728,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.011019283746556474,
+                "accuracy": 0.9862637362637363
+              },
+              "0.9": {
+                "tp": 0,
+                "fp": 8,
+                "fn": 2,
+                "tn": 718,
+                "inference_errors": 0,
+                "population": 728,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.011019283746556474,
+                "accuracy": 0.9862637362637363
+              },
+              "0.95": {
+                "tp": 0,
+                "fp": 8,
+                "fn": 2,
+                "tn": 718,
+                "inference_errors": 0,
+                "population": 728,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.011019283746556474,
+                "accuracy": 0.9862637362637363
+              },
+              "0.99": {
+                "tp": 0,
+                "fp": 8,
+                "fn": 2,
+                "tn": 718,
+                "inference_errors": 0,
+                "population": 728,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.011019283746556474,
+                "accuracy": 0.9862637362637363
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 640,
+                "attack": 0
+              },
+              {
+                "score": "0.48899320168339272",
+                "normal": 44,
+                "attack": 1
+              },
+              {
+                "score": "0.50798722044728439",
+                "normal": 34,
+                "attack": 1
+              },
+              {
+                "score": "0.9927024821162802",
+                "normal": 8,
+                "attack": 0
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+            "metrics": {
+              "0.5": {
+                "tp": 38506,
+                "fp": 3,
+                "fn": 920,
+                "tn": 236238,
+                "inference_errors": 0,
+                "population": 275667,
+                "precision": 0.9999220961333715,
+                "recall": 0.9766651448282859,
+                "f1": 0.9881567973311093,
+                "false_positive_rate": 1.2698896465897114e-05,
+                "accuracy": 0.9966517573739331
+              },
+              "0.75": {
+                "tp": 38506,
+                "fp": 3,
+                "fn": 920,
+                "tn": 236238,
+                "inference_errors": 0,
+                "population": 275667,
+                "precision": 0.9999220961333715,
+                "recall": 0.9766651448282859,
+                "f1": 0.9881567973311093,
+                "false_positive_rate": 1.2698896465897114e-05,
+                "accuracy": 0.9966517573739331
+              },
+              "0.9": {
+                "tp": 38506,
+                "fp": 3,
+                "fn": 920,
+                "tn": 236238,
+                "inference_errors": 0,
+                "population": 275667,
+                "precision": 0.9999220961333715,
+                "recall": 0.9766651448282859,
+                "f1": 0.9881567973311093,
+                "false_positive_rate": 1.2698896465897114e-05,
+                "accuracy": 0.9966517573739331
+              },
+              "0.95": {
+                "tp": 38506,
+                "fp": 3,
+                "fn": 920,
+                "tn": 236238,
+                "inference_errors": 0,
+                "population": 275667,
+                "precision": 0.9999220961333715,
+                "recall": 0.9766651448282859,
+                "f1": 0.9881567973311093,
+                "false_positive_rate": 1.2698896465897114e-05,
+                "accuracy": 0.9966517573739331
+              },
+              "0.99": {
+                "tp": 38506,
+                "fp": 0,
+                "fn": 920,
+                "tn": 236241,
+                "inference_errors": 0,
+                "population": 275667,
+                "precision": 1.0,
+                "recall": 0.9766651448282859,
+                "f1": 0.9881948365241493,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.996662640069359
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 139918,
+                "attack": 573
+              },
+              {
+                "score": "0.0011772492828513673",
+                "normal": 48368,
+                "attack": 5
+              },
+              {
+                "score": "0.0081742143337584453",
+                "normal": 7081,
+                "attack": 9
+              },
+              {
+                "score": "0.011978269337634774",
+                "normal": 1088,
+                "attack": 1
+              },
+              {
+                "score": "0.019675851868608603",
+                "normal": 2973,
+                "attack": 6
+              },
+              {
+                "score": "0.027445463604024466",
+                "normal": 486,
+                "attack": 2
+              },
+              {
+                "score": "0.037182130117823689",
+                "normal": 7008,
+                "attack": 0
+              },
+              {
+                "score": "0.047523254895290454",
+                "normal": 1315,
+                "attack": 1
+              },
+              {
+                "score": "0.055369570119356275",
+                "normal": 886,
+                "attack": 0
+              },
+              {
+                "score": "0.072253422648770688",
+                "normal": 743,
+                "attack": 2
+              },
+              {
+                "score": "0.1599656185674935",
+                "normal": 2961,
+                "attack": 41
+              },
+              {
+                "score": "0.2044471634829125",
+                "normal": 2773,
+                "attack": 67
+              },
+              {
+                "score": "0.24018485621893859",
+                "normal": 2211,
+                "attack": 48
+              },
+              {
+                "score": "0.28077025172174147",
+                "normal": 155,
+                "attack": 63
+              },
+              {
+                "score": "0.43348235577754601",
+                "normal": 18272,
+                "attack": 102
+              },
+              {
+                "score": "0.9717139492791067",
+                "normal": 3,
+                "attack": 0
+              },
+              {
+                "score": "1",
+                "normal": 0,
+                "attack": 38506
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/auth.log",
+            "metrics": {
+              "0.5": {
+                "tp": 12,
+                "fp": 1,
+                "fn": 0,
+                "tn": 257,
+                "inference_errors": 0,
+                "population": 270,
+                "precision": 0.9230769230769231,
+                "recall": 1.0,
+                "f1": 0.96,
+                "false_positive_rate": 0.003875968992248062,
+                "accuracy": 0.9962962962962963
+              },
+              "0.75": {
+                "tp": 12,
+                "fp": 1,
+                "fn": 0,
+                "tn": 257,
+                "inference_errors": 0,
+                "population": 270,
+                "precision": 0.9230769230769231,
+                "recall": 1.0,
+                "f1": 0.96,
+                "false_positive_rate": 0.003875968992248062,
+                "accuracy": 0.9962962962962963
+              },
+              "0.9": {
+                "tp": 12,
+                "fp": 1,
+                "fn": 0,
+                "tn": 257,
+                "inference_errors": 0,
+                "population": 270,
+                "precision": 0.9230769230769231,
+                "recall": 1.0,
+                "f1": 0.96,
+                "false_positive_rate": 0.003875968992248062,
+                "accuracy": 0.9962962962962963
+              },
+              "0.95": {
+                "tp": 9,
+                "fp": 0,
+                "fn": 3,
+                "tn": 258,
+                "inference_errors": 0,
+                "population": 270,
+                "precision": 1.0,
+                "recall": 0.75,
+                "f1": 0.8571428571428571,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9888888888888889
+              },
+              "0.99": {
+                "tp": 9,
+                "fp": 0,
+                "fn": 3,
+                "tn": 258,
+                "inference_errors": 0,
+                "population": 270,
+                "precision": 1.0,
+                "recall": 0.75,
+                "f1": 0.8571428571428571,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9888888888888889
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 257,
+                "attack": 0
+              },
+              {
+                "score": "0.9339622641509433",
+                "normal": 1,
+                "attack": 3
+              },
+              {
+                "score": "1",
+                "normal": 0,
+                "attack": 9
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log",
+            "metrics": {
+              "0.5": {
+                "tp": 7777,
+                "fp": 116,
+                "fn": 17,
+                "tn": 1552,
+                "inference_errors": 0,
+                "population": 9462,
+                "precision": 0.9853034334220195,
+                "recall": 0.997818835001283,
+                "f1": 0.9915216421240518,
+                "false_positive_rate": 0.06954436450839328,
+                "accuracy": 0.9859437751004017
+              },
+              "0.75": {
+                "tp": 7777,
+                "fp": 116,
+                "fn": 17,
+                "tn": 1552,
+                "inference_errors": 0,
+                "population": 9462,
+                "precision": 0.9853034334220195,
+                "recall": 0.997818835001283,
+                "f1": 0.9915216421240518,
+                "false_positive_rate": 0.06954436450839328,
+                "accuracy": 0.9859437751004017
+              },
+              "0.9": {
+                "tp": 7777,
+                "fp": 116,
+                "fn": 17,
+                "tn": 1552,
+                "inference_errors": 0,
+                "population": 9462,
+                "precision": 0.9853034334220195,
+                "recall": 0.997818835001283,
+                "f1": 0.9915216421240518,
+                "false_positive_rate": 0.06954436450839328,
+                "accuracy": 0.9859437751004017
+              },
+              "0.95": {
+                "tp": 7777,
+                "fp": 116,
+                "fn": 17,
+                "tn": 1552,
+                "inference_errors": 0,
+                "population": 9462,
+                "precision": 0.9853034334220195,
+                "recall": 0.997818835001283,
+                "f1": 0.9915216421240518,
+                "false_positive_rate": 0.06954436450839328,
+                "accuracy": 0.9859437751004017
+              },
+              "0.99": {
+                "tp": 7777,
+                "fp": 116,
+                "fn": 17,
+                "tn": 1552,
+                "inference_errors": 0,
+                "population": 9462,
+                "precision": 0.9853034334220195,
+                "recall": 0.997818835001283,
+                "f1": 0.9915216421240518,
+                "false_positive_rate": 0.06954436450839328,
+                "accuracy": 0.9859437751004017
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 1529,
+                "attack": 0
+              },
+              {
+                "score": "0.013161058655680416",
+                "normal": 21,
+                "attack": 1
+              },
+              {
+                "score": "0.06640514417438427",
+                "normal": 1,
+                "attack": 2
+              },
+              {
+                "score": "0.29911649512706079",
+                "normal": 1,
+                "attack": 14
+              },
+              {
+                "score": "1",
+                "normal": 116,
+                "attack": 7777
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+            "metrics": {
+              "0.5": {
+                "tp": 42,
+                "fp": 2,
+                "fn": 0,
+                "tn": 0,
+                "inference_errors": 0,
+                "population": 44,
+                "precision": 0.9545454545454546,
+                "recall": 1.0,
+                "f1": 0.9767441860465116,
+                "false_positive_rate": 1.0,
+                "accuracy": 0.9545454545454546
+              },
+              "0.75": {
+                "tp": 42,
+                "fp": 2,
+                "fn": 0,
+                "tn": 0,
+                "inference_errors": 0,
+                "population": 44,
+                "precision": 0.9545454545454546,
+                "recall": 1.0,
+                "f1": 0.9767441860465116,
+                "false_positive_rate": 1.0,
+                "accuracy": 0.9545454545454546
+              },
+              "0.9": {
+                "tp": 42,
+                "fp": 2,
+                "fn": 0,
+                "tn": 0,
+                "inference_errors": 0,
+                "population": 44,
+                "precision": 0.9545454545454546,
+                "recall": 1.0,
+                "f1": 0.9767441860465116,
+                "false_positive_rate": 1.0,
+                "accuracy": 0.9545454545454546
+              },
+              "0.95": {
+                "tp": 42,
+                "fp": 2,
+                "fn": 0,
+                "tn": 0,
+                "inference_errors": 0,
+                "population": 44,
+                "precision": 0.9545454545454546,
+                "recall": 1.0,
+                "f1": 0.9767441860465116,
+                "false_positive_rate": 1.0,
+                "accuracy": 0.9545454545454546
+              },
+              "0.99": {
+                "tp": 42,
+                "fp": 2,
+                "fn": 0,
+                "tn": 0,
+                "inference_errors": 0,
+                "population": 44,
+                "precision": 0.9545454545454546,
+                "recall": 1.0,
+                "f1": 0.9767441860465116,
+                "false_positive_rate": 1.0,
+                "accuracy": 0.9545454545454546
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0.9927024821162802",
+                "normal": 2,
+                "attack": 35
+              },
+              {
+                "score": "1",
+                "normal": 0,
+                "attack": 7
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/audit/audit.log",
+            "metrics": {
+              "0.5": {
+                "tp": 14,
+                "fp": 227,
+                "fn": 5,
+                "tn": 2017,
+                "inference_errors": 0,
+                "population": 2263,
+                "precision": 0.058091286307053944,
+                "recall": 0.7368421052631579,
+                "f1": 0.1076923076923077,
+                "false_positive_rate": 0.10115864527629234,
+                "accuracy": 0.8974812196199735
+              },
+              "0.75": {
+                "tp": 14,
+                "fp": 0,
+                "fn": 5,
+                "tn": 2244,
+                "inference_errors": 0,
+                "population": 2263,
+                "precision": 1.0,
+                "recall": 0.7368421052631579,
+                "f1": 0.8484848484848485,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9977905435262925
+              },
+              "0.9": {
+                "tp": 14,
+                "fp": 0,
+                "fn": 5,
+                "tn": 2244,
+                "inference_errors": 0,
+                "population": 2263,
+                "precision": 1.0,
+                "recall": 0.7368421052631579,
+                "f1": 0.8484848484848485,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9977905435262925
+              },
+              "0.95": {
+                "tp": 14,
+                "fp": 0,
+                "fn": 5,
+                "tn": 2244,
+                "inference_errors": 0,
+                "population": 2263,
+                "precision": 1.0,
+                "recall": 0.7368421052631579,
+                "f1": 0.8484848484848485,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9977905435262925
+              },
+              "0.99": {
+                "tp": 14,
+                "fp": 0,
+                "fn": 5,
+                "tn": 2244,
+                "inference_errors": 0,
+                "population": 2263,
+                "precision": 1.0,
+                "recall": 0.7368421052631579,
+                "f1": 0.8484848484848485,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9977905435262925
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 1788,
+                "attack": 4
+              },
+              {
+                "score": "0.48899320168339272",
+                "normal": 229,
+                "attack": 1
+              },
+              {
+                "score": "0.50798722044728439",
+                "normal": 227,
+                "attack": 0
+              },
+              {
+                "score": "0.99727655360237688",
+                "normal": 0,
+                "attack": 8
+              },
+              {
+                "score": "1",
+                "normal": 0,
+                "attack": 6
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/vpn/logs/openvpn.log",
+            "metrics": {
+              "0.5": {
+                "tp": 9,
+                "fp": 1152,
+                "fn": 19,
+                "tn": 4442,
+                "inference_errors": 0,
+                "population": 5622,
+                "precision": 0.007751937984496124,
+                "recall": 0.32142857142857145,
+                "f1": 0.015138772077375946,
+                "false_positive_rate": 0.20593493028244547,
+                "accuracy": 0.7917111348274636
+              },
+              "0.75": {
+                "tp": 3,
+                "fp": 228,
+                "fn": 25,
+                "tn": 5366,
+                "inference_errors": 0,
+                "population": 5622,
+                "precision": 0.012987012987012988,
+                "recall": 0.10714285714285714,
+                "f1": 0.023166023166023165,
+                "false_positive_rate": 0.040757954951734,
+                "accuracy": 0.9549982212735681
+              },
+              "0.9": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 28,
+                "tn": 5594,
+                "inference_errors": 0,
+                "population": 5622,
+                "precision": null,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9950195659907506
+              },
+              "0.95": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 28,
+                "tn": 5594,
+                "inference_errors": 0,
+                "population": 5622,
+                "precision": null,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9950195659907506
+              },
+              "0.99": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 28,
+                "tn": 5594,
+                "inference_errors": 0,
+                "population": 5622,
+                "precision": null,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9950195659907506
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 246,
+                "attack": 1
+              },
+              {
+                "score": "0.4567614625652931",
+                "normal": 1864,
+                "attack": 8
+              },
+              {
+                "score": "0.45782431646305993",
+                "normal": 156,
+                "attack": 0
+              },
+              {
+                "score": "0.47541379726954214",
+                "normal": 2176,
+                "attack": 10
+              },
+              {
+                "score": "0.5785346728742955",
+                "normal": 924,
+                "attack": 6
+              },
+              {
+                "score": "0.75167144221585491",
+                "normal": 228,
+                "attack": 3
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log",
+            "metrics": {
+              "0.5": {
+                "tp": 44,
+                "fp": 1,
+                "fn": 0,
+                "tn": 1875,
+                "inference_errors": 0,
+                "population": 1920,
+                "precision": 0.9777777777777777,
+                "recall": 1.0,
+                "f1": 0.9887640449438202,
+                "false_positive_rate": 0.0005330490405117271,
+                "accuracy": 0.9994791666666667
+              },
+              "0.75": {
+                "tp": 44,
+                "fp": 1,
+                "fn": 0,
+                "tn": 1875,
+                "inference_errors": 0,
+                "population": 1920,
+                "precision": 0.9777777777777777,
+                "recall": 1.0,
+                "f1": 0.9887640449438202,
+                "false_positive_rate": 0.0005330490405117271,
+                "accuracy": 0.9994791666666667
+              },
+              "0.9": {
+                "tp": 44,
+                "fp": 1,
+                "fn": 0,
+                "tn": 1875,
+                "inference_errors": 0,
+                "population": 1920,
+                "precision": 0.9777777777777777,
+                "recall": 1.0,
+                "f1": 0.9887640449438202,
+                "false_positive_rate": 0.0005330490405117271,
+                "accuracy": 0.9994791666666667
+              },
+              "0.95": {
+                "tp": 44,
+                "fp": 1,
+                "fn": 0,
+                "tn": 1875,
+                "inference_errors": 0,
+                "population": 1920,
+                "precision": 0.9777777777777777,
+                "recall": 1.0,
+                "f1": 0.9887640449438202,
+                "false_positive_rate": 0.0005330490405117271,
+                "accuracy": 0.9994791666666667
+              },
+              "0.99": {
+                "tp": 44,
+                "fp": 1,
+                "fn": 0,
+                "tn": 1875,
+                "inference_errors": 0,
+                "population": 1920,
+                "precision": 0.9777777777777777,
+                "recall": 1.0,
+                "f1": 0.9887640449438202,
+                "false_positive_rate": 0.0005330490405117271,
+                "accuracy": 0.9994791666666667
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 1875,
+                "attack": 0
+              },
+              {
+                "score": "0.99946581196581197",
+                "normal": 1,
+                "attack": 44
+              }
+            ]
+          }
+        ],
+        "model_unchanged": true,
+        "unchanged_0_5_metrics": true,
+        "unique_vectors": 759
+      },
+      "fox": {
+        "diagnostic": "runtime\\f1\\heads-score-diagnostic-v38b-20261112\\fox\\diagnostic.json",
+        "sha256": "8690703b5dd121f510ae28d0767d19652fee9340d15fe46b29b869d4aa2e1646",
+        "metrics": {
+          "0.5": {
+            "tp": 456164,
+            "fp": 1847,
+            "fn": 720,
+            "tn": 209687,
+            "inference_errors": 0,
+            "population": 668418,
+            "precision": 0.9959673457624381,
+            "recall": 0.9984241076509573,
+            "f1": 0.9971942135436307,
+            "false_positive_rate": 0.00873145688163605,
+            "accuracy": 0.9961595887603266
+          },
+          "0.75": {
+            "tp": 456157,
+            "fp": 640,
+            "fn": 727,
+            "tn": 210894,
+            "inference_errors": 0,
+            "population": 668418,
+            "precision": 0.9985989400105517,
+            "recall": 0.9984087864753417,
+            "f1": 0.9985038541898102,
+            "false_positive_rate": 0.003025518356387153,
+            "accuracy": 0.9979548725498116
+          },
+          "0.9": {
+            "tp": 456153,
+            "fp": 529,
+            "fn": 731,
+            "tn": 211005,
+            "inference_errors": 0,
+            "population": 668418,
+            "precision": 0.9988416447330966,
+            "recall": 0.998400031517847,
+            "f1": 0.9986207893025791,
+            "false_positive_rate": 0.002500780016451256,
+            "accuracy": 0.9981149520210407
+          },
+          "0.95": {
+            "tp": 456150,
+            "fp": 522,
+            "fn": 734,
+            "tn": 211012,
+            "inference_errors": 0,
+            "population": 668418,
+            "precision": 0.9988569476560858,
+            "recall": 0.998393465299726,
+            "f1": 0.9986251526999987,
+            "false_positive_rate": 0.0024676884094282717,
+            "accuracy": 0.998120936300339
+          },
+          "0.99": {
+            "tp": 456149,
+            "fp": 521,
+            "fn": 735,
+            "tn": 211013,
+            "inference_errors": 0,
+            "population": 668418,
+            "precision": 0.9988591324150918,
+            "recall": 0.9983912765603523,
+            "f1": 0.9986251496901114,
+            "false_positive_rate": 0.002462961036996417,
+            "accuracy": 0.998120936300339
+          }
+        },
+        "seconds": 136.39266069999576,
+        "per_pair": [
+          {
+            "raw_member": "gather/internal_share/logs/audit/audit.log",
+            "metrics": {
+              "0.5": {
+                "tp": 1,
+                "fp": 49,
+                "fn": 1,
+                "tn": 847,
+                "inference_errors": 0,
+                "population": 898,
+                "precision": 0.02,
+                "recall": 0.5,
+                "f1": 0.038461538461538464,
+                "false_positive_rate": 0.0546875,
+                "accuracy": 0.9443207126948775
+              },
+              "0.75": {
+                "tp": 0,
+                "fp": 8,
+                "fn": 2,
+                "tn": 888,
+                "inference_errors": 0,
+                "population": 898,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.008928571428571428,
+                "accuracy": 0.9888641425389755
+              },
+              "0.9": {
+                "tp": 0,
+                "fp": 8,
+                "fn": 2,
+                "tn": 888,
+                "inference_errors": 0,
+                "population": 898,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.008928571428571428,
+                "accuracy": 0.9888641425389755
+              },
+              "0.95": {
+                "tp": 0,
+                "fp": 8,
+                "fn": 2,
+                "tn": 888,
+                "inference_errors": 0,
+                "population": 898,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.008928571428571428,
+                "accuracy": 0.9888641425389755
+              },
+              "0.99": {
+                "tp": 0,
+                "fp": 8,
+                "fn": 2,
+                "tn": 888,
+                "inference_errors": 0,
+                "population": 898,
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.008928571428571428,
+                "accuracy": 0.9888641425389755
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 796,
+                "attack": 0
+              },
+              {
+                "score": "0.48899320168339272",
+                "normal": 51,
+                "attack": 1
+              },
+              {
+                "score": "0.50798722044728439",
+                "normal": 41,
+                "attack": 1
+              },
+              {
+                "score": "0.9927024821162802",
+                "normal": 8,
+                "attack": 0
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+            "metrics": {
+              "0.5": {
+                "tp": 43915,
+                "fp": 1,
+                "fn": 685,
+                "tn": 195981,
+                "inference_errors": 0,
+                "population": 240582,
+                "precision": 0.9999772292558521,
+                "recall": 0.9846412556053812,
+                "f1": 0.9922499887026074,
+                "false_positive_rate": 5.102509414129869e-06,
+                "accuracy": 0.9971485813568762
+              },
+              "0.75": {
+                "tp": 43915,
+                "fp": 1,
+                "fn": 685,
+                "tn": 195981,
+                "inference_errors": 0,
+                "population": 240582,
+                "precision": 0.9999772292558521,
+                "recall": 0.9846412556053812,
+                "f1": 0.9922499887026074,
+                "false_positive_rate": 5.102509414129869e-06,
+                "accuracy": 0.9971485813568762
+              },
+              "0.9": {
+                "tp": 43914,
+                "fp": 1,
+                "fn": 686,
+                "tn": 195981,
+                "inference_errors": 0,
+                "population": 240582,
+                "precision": 0.9999772287373335,
+                "recall": 0.9846188340807175,
+                "f1": 0.992238603626504,
+                "false_positive_rate": 5.102509414129869e-06,
+                "accuracy": 0.9971444247699329
+              },
+              "0.95": {
+                "tp": 43914,
+                "fp": 1,
+                "fn": 686,
+                "tn": 195981,
+                "inference_errors": 0,
+                "population": 240582,
+                "precision": 0.9999772287373335,
+                "recall": 0.9846188340807175,
+                "f1": 0.992238603626504,
+                "false_positive_rate": 5.102509414129869e-06,
+                "accuracy": 0.9971444247699329
+              },
+              "0.99": {
+                "tp": 43913,
+                "fp": 0,
+                "fn": 687,
+                "tn": 195982,
+                "inference_errors": 0,
+                "population": 240582,
+                "precision": 1.0,
+                "recall": 0.9845964125560538,
+                "f1": 0.9922384282534769,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9971444247699329
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 118999,
+                "attack": 394
+              },
+              {
+                "score": "0.0011772492828513673",
+                "normal": 42350,
+                "attack": 0
+              },
+              {
+                "score": "0.0081742143337584453",
+                "normal": 5847,
+                "attack": 9
+              },
+              {
+                "score": "0.011978269337634774",
+                "normal": 996,
+                "attack": 0
+              },
+              {
+                "score": "0.019675851868608603",
+                "normal": 2116,
+                "attack": 6
+              },
+              {
+                "score": "0.027445463604024466",
+                "normal": 901,
+                "attack": 10
+              },
+              {
+                "score": "0.037182130117823689",
+                "normal": 4070,
+                "attack": 39
+              },
+              {
+                "score": "0.047523254895290454",
+                "normal": 1171,
+                "attack": 0
+              },
+              {
+                "score": "0.055369570119356275",
+                "normal": 211,
+                "attack": 0
+              },
+              {
+                "score": "0.072253422648770688",
+                "normal": 593,
+                "attack": 2
+              },
+              {
+                "score": "0.1599656185674935",
+                "normal": 1426,
+                "attack": 15
+              },
+              {
+                "score": "0.2044471634829125",
+                "normal": 2049,
+                "attack": 54
+              },
+              {
+                "score": "0.24018485621893859",
+                "normal": 1917,
+                "attack": 52
+              },
+              {
+                "score": "0.28077025172174147",
+                "normal": 120,
+                "attack": 72
+              },
+              {
+                "score": "0.43348235577754601",
+                "normal": 13215,
+                "attack": 32
+              },
+              {
+                "score": "0.76675728834381807",
+                "normal": 0,
+                "attack": 1
+              },
+              {
+                "score": "0.9717139492791067",
+                "normal": 1,
+                "attack": 1
+              },
+              {
+                "score": "1",
+                "normal": 0,
+                "attack": 43913
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/auth.log",
+            "metrics": {
+              "0.5": {
+                "tp": 12,
+                "fp": 7,
+                "fn": 0,
+                "tn": 553,
+                "inference_errors": 0,
+                "population": 572,
+                "precision": 0.631578947368421,
+                "recall": 1.0,
+                "f1": 0.7741935483870968,
+                "false_positive_rate": 0.0125,
+                "accuracy": 0.9877622377622378
+              },
+              "0.75": {
+                "tp": 12,
+                "fp": 7,
+                "fn": 0,
+                "tn": 553,
+                "inference_errors": 0,
+                "population": 572,
+                "precision": 0.631578947368421,
+                "recall": 1.0,
+                "f1": 0.7741935483870968,
+                "false_positive_rate": 0.0125,
+                "accuracy": 0.9877622377622378
+              },
+              "0.9": {
+                "tp": 12,
+                "fp": 7,
+                "fn": 0,
+                "tn": 553,
+                "inference_errors": 0,
+                "population": 572,
+                "precision": 0.631578947368421,
+                "recall": 1.0,
+                "f1": 0.7741935483870968,
+                "false_positive_rate": 0.0125,
+                "accuracy": 0.9877622377622378
+              },
+              "0.95": {
+                "tp": 9,
+                "fp": 0,
+                "fn": 3,
+                "tn": 560,
+                "inference_errors": 0,
+                "population": 572,
+                "precision": 1.0,
+                "recall": 0.75,
+                "f1": 0.8571428571428571,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9947552447552448
+              },
+              "0.99": {
+                "tp": 9,
+                "fp": 0,
+                "fn": 3,
+                "tn": 560,
+                "inference_errors": 0,
+                "population": 572,
+                "precision": 1.0,
+                "recall": 0.75,
+                "f1": 0.8571428571428571,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9947552447552448
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 553,
+                "attack": 0
+              },
+              {
+                "score": "0.9339622641509433",
+                "normal": 7,
+                "attack": 3
+              },
+              {
+                "score": "1",
+                "normal": 0,
+                "attack": 9
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-error.log.1",
+            "metrics": {
+              "0.5": {
+                "tp": 1332,
+                "fp": 2,
+                "fn": 4,
+                "tn": 0,
+                "inference_errors": 0,
+                "population": 1338,
+                "precision": 0.9985007496251874,
+                "recall": 0.9970059880239521,
+                "f1": 0.9977528089887641,
+                "false_positive_rate": 1.0,
+                "accuracy": 0.9955156950672646
+              },
+              "0.75": {
+                "tp": 1332,
+                "fp": 2,
+                "fn": 4,
+                "tn": 0,
+                "inference_errors": 0,
+                "population": 1338,
+                "precision": 0.9985007496251874,
+                "recall": 0.9970059880239521,
+                "f1": 0.9977528089887641,
+                "false_positive_rate": 1.0,
+                "accuracy": 0.9955156950672646
+              },
+              "0.9": {
+                "tp": 1332,
+                "fp": 2,
+                "fn": 4,
+                "tn": 0,
+                "inference_errors": 0,
+                "population": 1338,
+                "precision": 0.9985007496251874,
+                "recall": 0.9970059880239521,
+                "f1": 0.9977528089887641,
+                "false_positive_rate": 1.0,
+                "accuracy": 0.9955156950672646
+              },
+              "0.95": {
+                "tp": 1332,
+                "fp": 2,
+                "fn": 4,
+                "tn": 0,
+                "inference_errors": 0,
+                "population": 1338,
+                "precision": 0.9985007496251874,
+                "recall": 0.9970059880239521,
+                "f1": 0.9977528089887641,
+                "false_positive_rate": 1.0,
+                "accuracy": 0.9955156950672646
+              },
+              "0.99": {
+                "tp": 1332,
+                "fp": 2,
+                "fn": 4,
+                "tn": 0,
+                "inference_errors": 0,
+                "population": 1338,
+                "precision": 0.9985007496251874,
+                "recall": 0.9970059880239521,
+                "f1": 0.9977528089887641,
+                "false_positive_rate": 1.0,
+                "accuracy": 0.9955156950672646
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0.43348235577754601",
+                "normal": 0,
+                "attack": 4
+              },
+              {
+                "score": "0.9927024821162802",
+                "normal": 2,
+                "attack": 781
+              },
+              {
+                "score": "1",
+                "normal": 0,
+                "attack": 551
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2",
+            "metrics": {
+              "0.5": {
+                "tp": 410835,
+                "fp": 483,
+                "fn": 6,
+                "tn": 1598,
+                "inference_errors": 0,
+                "population": 412922,
+                "precision": 0.9988257260805509,
+                "recall": 0.9999853958100579,
+                "f1": 0.9994052245368596,
+                "false_positive_rate": 0.23209995194617972,
+                "accuracy": 0.9988157569710502
+              },
+              "0.75": {
+                "tp": 410835,
+                "fp": 483,
+                "fn": 6,
+                "tn": 1598,
+                "inference_errors": 0,
+                "population": 412922,
+                "precision": 0.9988257260805509,
+                "recall": 0.9999853958100579,
+                "f1": 0.9994052245368596,
+                "false_positive_rate": 0.23209995194617972,
+                "accuracy": 0.9988157569710502
+              },
+              "0.9": {
+                "tp": 410835,
+                "fp": 483,
+                "fn": 6,
+                "tn": 1598,
+                "inference_errors": 0,
+                "population": 412922,
+                "precision": 0.9988257260805509,
+                "recall": 0.9999853958100579,
+                "f1": 0.9994052245368596,
+                "false_positive_rate": 0.23209995194617972,
+                "accuracy": 0.9988157569710502
+              },
+              "0.95": {
+                "tp": 410835,
+                "fp": 483,
+                "fn": 6,
+                "tn": 1598,
+                "inference_errors": 0,
+                "population": 412922,
+                "precision": 0.9988257260805509,
+                "recall": 0.9999853958100579,
+                "f1": 0.9994052245368596,
+                "false_positive_rate": 0.23209995194617972,
+                "accuracy": 0.9988157569710502
+              },
+              "0.99": {
+                "tp": 410835,
+                "fp": 483,
+                "fn": 6,
+                "tn": 1598,
+                "inference_errors": 0,
+                "population": 412922,
+                "precision": 0.9988257260805509,
+                "recall": 0.9999853958100579,
+                "f1": 0.9994052245368596,
+                "false_positive_rate": 0.23209995194617972,
+                "accuracy": 0.9988157569710502
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 1573,
+                "attack": 0
+              },
+              {
+                "score": "0.013161058655680416",
+                "normal": 22,
+                "attack": 0
+              },
+              {
+                "score": "0.06640514417438427",
+                "normal": 2,
+                "attack": 2
+              },
+              {
+                "score": "0.29911649512706079",
+                "normal": 1,
+                "attack": 4
+              },
+              {
+                "score": "1",
+                "normal": 483,
+                "attack": 410835
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/audit/audit.log",
+            "metrics": {
+              "0.5": {
+                "tp": 14,
+                "fp": 308,
+                "fn": 5,
+                "tn": 2560,
+                "inference_errors": 0,
+                "population": 2887,
+                "precision": 0.043478260869565216,
+                "recall": 0.7368421052631579,
+                "f1": 0.08211143695014662,
+                "false_positive_rate": 0.10739191073919108,
+                "accuracy": 0.8915829580879806
+              },
+              "0.75": {
+                "tp": 14,
+                "fp": 26,
+                "fn": 5,
+                "tn": 2842,
+                "inference_errors": 0,
+                "population": 2887,
+                "precision": 0.35,
+                "recall": 0.7368421052631579,
+                "f1": 0.4745762711864407,
+                "false_positive_rate": 0.00906555090655509,
+                "accuracy": 0.9892622099064773
+              },
+              "0.9": {
+                "tp": 14,
+                "fp": 26,
+                "fn": 5,
+                "tn": 2842,
+                "inference_errors": 0,
+                "population": 2887,
+                "precision": 0.35,
+                "recall": 0.7368421052631579,
+                "f1": 0.4745762711864407,
+                "false_positive_rate": 0.00906555090655509,
+                "accuracy": 0.9892622099064773
+              },
+              "0.95": {
+                "tp": 14,
+                "fp": 26,
+                "fn": 5,
+                "tn": 2842,
+                "inference_errors": 0,
+                "population": 2887,
+                "precision": 0.35,
+                "recall": 0.7368421052631579,
+                "f1": 0.4745762711864407,
+                "false_positive_rate": 0.00906555090655509,
+                "accuracy": 0.9892622099064773
+              },
+              "0.99": {
+                "tp": 14,
+                "fp": 26,
+                "fn": 5,
+                "tn": 2842,
+                "inference_errors": 0,
+                "population": 2887,
+                "precision": 0.35,
+                "recall": 0.7368421052631579,
+                "f1": 0.4745762711864407,
+                "false_positive_rate": 0.00906555090655509,
+                "accuracy": 0.9892622099064773
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 2267,
+                "attack": 4
+              },
+              {
+                "score": "0.48899320168339272",
+                "normal": 293,
+                "attack": 1
+              },
+              {
+                "score": "0.50798722044728439",
+                "normal": 282,
+                "attack": 0
+              },
+              {
+                "score": "0.9927024821162802",
+                "normal": 8,
+                "attack": 0
+              },
+              {
+                "score": "0.99727655360237688",
+                "normal": 15,
+                "attack": 8
+              },
+              {
+                "score": "1",
+                "normal": 3,
+                "attack": 6
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/vpn/logs/openvpn.log",
+            "metrics": {
+              "0.5": {
+                "tp": 9,
+                "fp": 995,
+                "fn": 19,
+                "tn": 6276,
+                "inference_errors": 0,
+                "population": 7299,
+                "precision": 0.008964143426294821,
+                "recall": 0.32142857142857145,
+                "f1": 0.01744186046511628,
+                "false_positive_rate": 0.1368450006876633,
+                "accuracy": 0.8610768598438142
+              },
+              "0.75": {
+                "tp": 3,
+                "fp": 111,
+                "fn": 25,
+                "tn": 7160,
+                "inference_errors": 0,
+                "population": 7299,
+                "precision": 0.02631578947368421,
+                "recall": 0.10714285714285714,
+                "f1": 0.04225352112676056,
+                "false_positive_rate": 0.015266125704854904,
+                "accuracy": 0.9813673105904919
+              },
+              "0.9": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 28,
+                "tn": 7271,
+                "inference_errors": 0,
+                "population": 7299,
+                "precision": null,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9961638580627483
+              },
+              "0.95": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 28,
+                "tn": 7271,
+                "inference_errors": 0,
+                "population": 7299,
+                "precision": null,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9961638580627483
+              },
+              "0.99": {
+                "tp": 0,
+                "fp": 0,
+                "fn": 28,
+                "tn": 7271,
+                "inference_errors": 0,
+                "population": 7299,
+                "precision": null,
+                "recall": 0.0,
+                "f1": 0.0,
+                "false_positive_rate": 0.0,
+                "accuracy": 0.9961638580627483
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 300,
+                "attack": 0
+              },
+              {
+                "score": "0.4567614625652931",
+                "normal": 2640,
+                "attack": 8
+              },
+              {
+                "score": "0.45782431646305993",
+                "normal": 329,
+                "attack": 1
+              },
+              {
+                "score": "0.47541379726954214",
+                "normal": 3007,
+                "attack": 10
+              },
+              {
+                "score": "0.5785346728742955",
+                "normal": 884,
+                "attack": 6
+              },
+              {
+                "score": "0.75167144221585491",
+                "normal": 111,
+                "attack": 3
+              }
+            ]
+          },
+          {
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-18-system.cpu.log",
+            "metrics": {
+              "0.5": {
+                "tp": 46,
+                "fp": 2,
+                "fn": 0,
+                "tn": 1872,
+                "inference_errors": 0,
+                "population": 1920,
+                "precision": 0.9583333333333334,
+                "recall": 1.0,
+                "f1": 0.9787234042553191,
+                "false_positive_rate": 0.0010672358591248667,
+                "accuracy": 0.9989583333333333
+              },
+              "0.75": {
+                "tp": 46,
+                "fp": 2,
+                "fn": 0,
+                "tn": 1872,
+                "inference_errors": 0,
+                "population": 1920,
+                "precision": 0.9583333333333334,
+                "recall": 1.0,
+                "f1": 0.9787234042553191,
+                "false_positive_rate": 0.0010672358591248667,
+                "accuracy": 0.9989583333333333
+              },
+              "0.9": {
+                "tp": 46,
+                "fp": 2,
+                "fn": 0,
+                "tn": 1872,
+                "inference_errors": 0,
+                "population": 1920,
+                "precision": 0.9583333333333334,
+                "recall": 1.0,
+                "f1": 0.9787234042553191,
+                "false_positive_rate": 0.0010672358591248667,
+                "accuracy": 0.9989583333333333
+              },
+              "0.95": {
+                "tp": 46,
+                "fp": 2,
+                "fn": 0,
+                "tn": 1872,
+                "inference_errors": 0,
+                "population": 1920,
+                "precision": 0.9583333333333334,
+                "recall": 1.0,
+                "f1": 0.9787234042553191,
+                "false_positive_rate": 0.0010672358591248667,
+                "accuracy": 0.9989583333333333
+              },
+              "0.99": {
+                "tp": 46,
+                "fp": 2,
+                "fn": 0,
+                "tn": 1872,
+                "inference_errors": 0,
+                "population": 1920,
+                "precision": 0.9583333333333334,
+                "recall": 1.0,
+                "f1": 0.9787234042553191,
+                "false_positive_rate": 0.0010672358591248667,
+                "accuracy": 0.9989583333333333
+              }
+            },
+            "score_class_mass": [
+              {
+                "score": "0",
+                "normal": 1872,
+                "attack": 0
+              },
+              {
+                "score": "0.99946581196581197",
+                "normal": 2,
+                "attack": 46
+              }
+            ]
+          }
+        ],
+        "model_unchanged": true,
+        "unchanged_0_5_metrics": true,
+        "unique_vectors": 985
+      }
+    },
+    "selected_threshold": null,
+    "goal_qualified": false,
+    "paid_api_calls": 0,
+    "aws_sdk_calls": 0,
+    "github_pushes": 0,
+    "elapsed_seconds": 256.1971185000002,
+    "ended_at": "2026-11-12T11:03:05.894175+00:00"
+  },
+  "calibration_point_checks_only": {
+    "russellmitchell": {
+      "global_point_targets": {
+        "0.5": true,
+        "0.75": true,
+        "0.9": true,
+        "0.95": true,
+        "0.99": true
+      },
+      "source_point_failures": {
+        "0.5": [
+          "공유 서버 감사",
+          "인증",
+          "웹 오류",
+          "인트라넷 감사",
+          "VPN"
+        ],
+        "0.75": [
+          "공유 서버 감사",
+          "인증",
+          "웹 오류",
+          "인트라넷 감사",
+          "VPN"
+        ],
+        "0.9": [
+          "공유 서버 감사",
+          "인증",
+          "웹 오류",
+          "인트라넷 감사",
+          "VPN"
+        ],
+        "0.95": [
+          "공유 서버 감사",
+          "인증",
+          "웹 오류",
+          "인트라넷 감사",
+          "VPN"
+        ],
+        "0.99": [
+          "공유 서버 감사",
+          "인증",
+          "웹 오류",
+          "인트라넷 감사",
+          "VPN"
+        ]
+      }
+    },
+    "santos": {
+      "global_point_targets": {
+        "0.5": true,
+        "0.75": true,
+        "0.9": true,
+        "0.95": true,
+        "0.99": true
+      },
+      "source_point_failures": {
+        "0.5": [
+          "공유 서버 감사",
+          "인증",
+          "웹 접근",
+          "웹 오류",
+          "인트라넷 감사",
+          "VPN"
+        ],
+        "0.75": [
+          "공유 서버 감사",
+          "인증",
+          "웹 접근",
+          "웹 오류",
+          "인트라넷 감사",
+          "VPN"
+        ],
+        "0.9": [
+          "공유 서버 감사",
+          "인증",
+          "웹 접근",
+          "웹 오류",
+          "인트라넷 감사",
+          "VPN"
+        ],
+        "0.95": [
+          "공유 서버 감사",
+          "인증",
+          "웹 접근",
+          "웹 오류",
+          "인트라넷 감사",
+          "VPN"
+        ],
+        "0.99": [
+          "공유 서버 감사",
+          "인증",
+          "웹 접근",
+          "웹 오류",
+          "인트라넷 감사",
+          "VPN"
+        ]
+      }
+    },
+    "fox": {
+      "global_point_targets": {
+        "0.5": true,
+        "0.75": true,
+        "0.9": true,
+        "0.95": true,
+        "0.99": true
+      },
+      "source_point_failures": {
+        "0.5": [
+          "공유 서버 감사",
+          "인증",
+          "웹 오류",
+          "웹 접근",
+          "인트라넷 감사",
+          "VPN"
+        ],
+        "0.75": [
+          "공유 서버 감사",
+          "인증",
+          "웹 오류",
+          "웹 접근",
+          "인트라넷 감사",
+          "VPN"
+        ],
+        "0.9": [
+          "공유 서버 감사",
+          "인증",
+          "웹 오류",
+          "웹 접근",
+          "인트라넷 감사",
+          "VPN"
+        ],
+        "0.95": [
+          "공유 서버 감사",
+          "인증",
+          "웹 오류",
+          "웹 접근",
+          "인트라넷 감사",
+          "VPN"
+        ],
+        "0.99": [
+          "공유 서버 감사",
+          "인증",
+          "웹 오류",
+          "웹 접근",
+          "인트라넷 감사",
+          "VPN"
+        ]
+      }
+    }
+  },
+  "tests": {
+    "initial": {
+      "artifact": {
+        "path": "runtime/f1/stream-tests-v37-20261112/tests.json",
+        "bytes": 1099,
+        "sha256": "d088257b2a1f7ccd2a038992814bb7c2322644178662d4be5c2dd684c969dfbd"
+      },
+      "schema": "extra-local-stream-validation-tests-1",
+      "started_at": "2026-11-12T10:38:09.076264+00:00",
+      "paid_api_calls": 0,
+      "aws_sdk_calls": 0,
+      "github_pushes": 0,
+      "windows": {
+        "exit_code": 0,
+        "seconds": 173.443,
+        "counts": {
+          "passed": 635
+        },
+        "log": "runtime/f1/stream-tests-v37-20261112/windows.log"
+      },
+      "linux": {
+        "exit_code": 1,
+        "seconds": 442.864,
+        "counts": {
+          "failed": 5,
+          "passed": 3450
+        },
+        "log": "runtime/f1/stream-tests-v37-20261112/linux.log",
+        "executed": true,
+        "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+        "source_files": 684,
+        "source_archive_sha256": "d87a8b530edb5bb88889389309b15cc623202c2c6e2e01ce0ca88f0af2940ed8",
+        "container_exit": 1,
+        "oom_killed": false,
+        "network_mode": "none",
+        "owned_container": "c420d77b66981638dda380897e286cbc2210b374eef94ca24b0dd13c6ad7aa11",
+        "snapshot_sources_unchanged_after": true,
+        "owned_container_removed": true
+      },
+      "ended_at": "2026-11-12T10:48:42.198091+00:00"
+    },
+    "fixed_stream": {
+      "artifact": {
+        "path": "runtime/f1/stream-tests-v37-20261112-02/tests.json",
+        "bytes": 1082,
+        "sha256": "7884732fdd3720c00faa2361688aab85992f03a652a564d0950441d0e17741a5"
+      },
+      "schema": "extra-local-stream-validation-tests-1",
+      "started_at": "2026-11-12T10:49:13.460016+00:00",
+      "paid_api_calls": 0,
+      "aws_sdk_calls": 0,
+      "github_pushes": 0,
+      "windows": {
+        "exit_code": 0,
+        "seconds": 6.779,
+        "counts": {
+          "passed": 15
+        },
+        "log": "runtime/f1/stream-tests-v37-20261112-02/windows.log"
+      },
+      "linux": {
+        "exit_code": 0,
+        "seconds": 443.322,
+        "counts": {
+          "passed": 3455
+        },
+        "log": "runtime/f1/stream-tests-v37-20261112-02/linux.log",
+        "executed": true,
+        "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+        "source_files": 684,
+        "source_archive_sha256": "79abf87185be7051982ee8b64e4cbd44703bf4b94a34dc9cc6dedcb576820169",
+        "container_exit": 0,
+        "oom_killed": false,
+        "network_mode": "none",
+        "owned_container": "8836b663c3a12245ea6ac8fb7095d9d3c6fd058bb74df8a967c64be0f33a550a",
+        "snapshot_sources_unchanged_after": true,
+        "owned_container_removed": true
+      },
+      "ended_at": "2026-11-12T10:56:49.776285+00:00"
+    },
+    "diagnostic_original": {
+      "artifact": {
+        "path": "runtime/f1/stream-tests-v38-20261112/tests.json",
+        "bytes": 1072,
+        "sha256": "5043065626ffcf91243651b5925d085a4d60f3f5d0ef01392c26b47122f88543"
+      },
+      "schema": "extra-local-stream-validation-tests-1",
+      "started_at": "2026-11-12T10:55:33.517971+00:00",
+      "paid_api_calls": 0,
+      "aws_sdk_calls": 0,
+      "github_pushes": 0,
+      "windows": {
+        "exit_code": 0,
+        "seconds": 4.426,
+        "counts": {
+          "passed": 10
+        },
+        "log": "runtime/f1/stream-tests-v38-20261112/windows.log"
+      },
+      "linux": {
+        "exit_code": 0,
+        "seconds": 4.013,
+        "counts": {
+          "passed": 10
+        },
+        "log": "runtime/f1/stream-tests-v38-20261112/linux.log",
+        "executed": true,
+        "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+        "source_files": 686,
+        "source_archive_sha256": "062a303fa80e7e5998c36c543d94cc89d969ba03f80a8d4ab3327fda58a1e92c",
+        "container_exit": 0,
+        "oom_killed": false,
+        "network_mode": "none",
+        "owned_container": "354a1aa4188fa327c80a4773a613061be510032af944d8942720d5875a901715",
+        "snapshot_sources_unchanged_after": true,
+        "owned_container_removed": true
+      },
+      "ended_at": "2026-11-12T10:55:48.041655+00:00"
+    },
+    "diagnostic_heads": {
+      "artifact": {
+        "path": "runtime/f1/stream-tests-v38b-20261112/tests.json",
+        "bytes": 1074,
+        "sha256": "ae0d82e208d241f9f66ae9aea162fd113210fc55b01f2173f5dceedf3be8b31b"
+      },
+      "schema": "extra-local-stream-validation-tests-1",
+      "started_at": "2026-11-12T10:58:59.838495+00:00",
+      "paid_api_calls": 0,
+      "aws_sdk_calls": 0,
+      "github_pushes": 0,
+      "windows": {
+        "exit_code": 0,
+        "seconds": 2.383,
+        "counts": {
+          "passed": 12
+        },
+        "log": "runtime/f1/stream-tests-v38b-20261112/windows.log"
+      },
+      "linux": {
+        "exit_code": 0,
+        "seconds": 3.918,
+        "counts": {
+          "passed": 12
+        },
+        "log": "runtime/f1/stream-tests-v38b-20261112/linux.log",
+        "executed": true,
+        "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+        "source_files": 686,
+        "source_archive_sha256": "3cdd8eac58370f0640e7f7a75c748a67daf999d1ad17dcb1f3c07769d666c01a",
+        "container_exit": 0,
+        "oom_killed": false,
+        "network_mode": "none",
+        "owned_container": "1b5103bea56ba5eeff081e3293de8e3afd00ba98f1d64679e329755c7e57b685",
+        "snapshot_sources_unchanged_after": true,
+        "owned_container_removed": true
+      },
+      "ended_at": "2026-11-12T10:59:12.401805+00:00"
+    },
+    "diagnostic_final_cli": {
+      "artifact": {
+        "path": "runtime/f1/stream-tests-v38c-20261112/tests.json",
+        "bytes": 1074,
+        "sha256": "05a2145f912f61de6cf700e3b1f78ceaa777f72a0089f8166bf62dcd5301411e"
+      },
+      "schema": "extra-local-stream-validation-tests-1",
+      "started_at": "2026-11-12T11:03:37.505909+00:00",
+      "paid_api_calls": 0,
+      "aws_sdk_calls": 0,
+      "github_pushes": 0,
+      "windows": {
+        "exit_code": 0,
+        "seconds": 2.225,
+        "counts": {
+          "passed": 13
+        },
+        "log": "runtime/f1/stream-tests-v38c-20261112/windows.log"
+      },
+      "linux": {
+        "exit_code": 0,
+        "seconds": 4.339,
+        "counts": {
+          "passed": 13
+        },
+        "log": "runtime/f1/stream-tests-v38c-20261112/linux.log",
+        "executed": true,
+        "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+        "source_files": 686,
+        "source_archive_sha256": "aac8b6a617cb15ad4f76c1b1f60b7d5d9158e05cbf47633924b9bc98b3a94161",
+        "container_exit": 0,
+        "oom_killed": false,
+        "network_mode": "none",
+        "owned_container": "372a10160e78ff02fc50c5921e0d4a14d3acd335710eebd6ee66305cc52aa7bf",
+        "snapshot_sources_unchanged_after": true,
+        "owned_container_removed": true
+      },
+      "ended_at": "2026-11-12T11:03:51.367199+00:00"
+    }
+  },
+  "final_source_files": {
+    "scripts/f1_lab/streaming_context.py": {
+      "path": "scripts/f1_lab/streaming_context.py",
+      "bytes": 4348,
+      "sha256": "a08989bbb1c4d75fa4d6352a063e96a1ad81fca98ebb9758b28a74565b7d57fa"
+    },
+    "scripts/prepare_native_stream.py": {
+      "path": "scripts/prepare_native_stream.py",
+      "bytes": 17447,
+      "sha256": "8206074073e12061944dc89096c23fe25700b54fcaebbdcdbc043b9f022cf054"
+    },
+    "scripts/run_native_stream_validation.py": {
+      "path": "scripts/run_native_stream_validation.py",
+      "bytes": 6784,
+      "sha256": "9d8142ed9b066de61adf3aa41b4e9403846c429e551342810177cc2221332e92"
+    },
+    "scripts/diagnose_native_scores.py": {
+      "path": "scripts/diagnose_native_scores.py",
+      "bytes": 7745,
+      "sha256": "65264a304707e59fc604de9620015bc81f10f6d95b0bd1edb6136574d9c47470"
+    },
+    "tests/test_f1_streaming_context.py": {
+      "path": "tests/test_f1_streaming_context.py",
+      "bytes": 3164,
+      "sha256": "7c50ca600f1fcc067bcd9b86afba47c951d9a222c8a2eb563dffb40355bad13e"
+    },
+    "tests/test_f1_native_stream.py": {
+      "path": "tests/test_f1_native_stream.py",
+      "bytes": 7923,
+      "sha256": "392b6ccafc552665a9d03dfe87466eea51687bd8e5d18d5de22a10efd9bebc16"
+    },
+    "tests/test_f1_score_diagnostic.py": {
+      "path": "tests/test_f1_score_diagnostic.py",
+      "bytes": 7487,
+      "sha256": "02c0f482463d228e838184e7c286946ec410f86c9d89d8b2cb76b95496b6c3ee"
+    },
+    "infra/f1-lab/streaming-calibration-protocol.json": {
+      "path": "infra/f1-lab/streaming-calibration-protocol.json",
+      "bytes": 2968,
+      "sha256": "674d426e8caf4f565f5183d59a0070c9749103d392166bf760c261252035926d"
+    }
+  },
+  "previous_failed_fox_attempt_preserved": {
+    "receipt": {
+      "path": "runtime/f1/fox-calibration-v34-20261112/calibration.json",
+      "bytes": 1292,
+      "sha256": "c4298e76284d96f52d278f272714733b963f32d75197fc8793dac23a2894083c"
+    },
+    "partial": {
+      "path": "runtime/f1/fox-calibration-v34-20261112/semantic/inputs.jsonl.part",
+      "bytes": 436009259,
+      "sha256": "aff8bf28c2ff4f257f6377a6ed1f65c3426d3e1ff054e3396859c62c831d60ad"
+    }
+  },
+  "original_app_and_benchmark_unchanged_from_9c67889": true,
+  "original_six_domain_goal_replaced": false,
+  "independent_final_metrics": null,
+  "goal_qualified": false,
+  "model_or_threshold_adopted": false,
+  "remaining_owned_test_containers": 0,
+  "free_disk_bytes": 115516985344,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "github_pushes": 0,
+  "final_code_snapshot_verification": {
+    "full_v37_code_files_unchanged": 461,
+    "latest_diagnostic_code_files_unchanged": 463,
+    "only_added_code_vs_full_suite": [
+      "scripts/diagnose_native_scores.py",
+      "tests/test_f1_score_diagnostic.py"
+    ],
+    "final_diagnose_function_ast_matches_heads_score_run": true,
+    "heads_score_run_implementation_sha256": "24ae59808f15325b7f24f13add86f5a66452b3bd7132d2a576d3eaf8b341b108",
+    "current_cli_module_sha256": "65264a304707e59fc604de9620015bc81f10f6d95b0bd1edb6136574d9c47470",
+    "new_document_links_resolve": true
+  }
+}

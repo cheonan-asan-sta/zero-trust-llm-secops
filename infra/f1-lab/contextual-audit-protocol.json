@@ -1,0 +1,20 @@
+{
+  "schema": "f1-contextual-audit-protocol-1",
+  "source_intake_protocol": "contextual-intake-protocol.json",
+  "csv_sha256": "cce55ca294323909a5ea8f99e97d581ebae74d9964999d58e0f466a21747cc1d",
+  "development_probe_data_records": 128,
+  "mechanical_audit": "Parse all records for hashed linkage, label availability and declared field/schema counts only. Do not display later bodies or labels by case, train a model or compute classifier metrics.",
+  "identity_edges": ["nonempty User", "UserContext.claims.name", "SessionId", "UserContext.claims.SessionId"],
+  "excluded_identity_placeholders": ["", "anonymous", "unknown", "none", "null", "-", "n/a", "00000000-0000-0000-0000-000000000000"],
+  "profile_edges": "Exact hash of stable browser fields ua/platform/deviceType/screen/colorDepth/canvas/cores/memory, with at least three meaningful values. This is profile equivalence, not verified physical-device identity.",
+  "request_template_edges": "Exact method, normalized URL and request JSON after only explicit volatile ID/time normalization; not arbitrary shared HTTP paths or JSON schema alone. This is a conservative diagnostic for repeated generation patterns.",
+  "reported_strategies": ["identity", "identity_plus_profile", "identity_plus_profile_plus_request_template"],
+  "probe_taint": "All records in a component containing any of the first128 observed development records are development-tainted. Do not relabel them as final.",
+  "unlinked_rows": "Report missing linkage separately; do not call singleton rows independent trials by default.",
+  "labels": "Explicit top-level boolean Suspicious/suspicious only; absent/nonboolean/conflicting aliases are unknown. Never default non-JSON telemetry to normal.",
+  "field_presence": "Field/type presence is an unverified historical observation, not current authenticated authority or usable role/posture/approval policy.",
+  "final_partition_certified": false,
+  "final_candidate_selected": false,
+  "original_six_domain_goal_replaced": false,
+  "goal_qualified": false
+}

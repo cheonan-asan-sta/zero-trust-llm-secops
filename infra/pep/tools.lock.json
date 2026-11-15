@@ -1,0 +1,8 @@
+{
+  "schema": "c02-tools-1",
+  "platform": "linux/amd64",
+  "tools": {
+    "nginx": {"version": "1.30.6", "image": "nginx@sha256:b565a9579cdabe43de09a5a278dc95ceee721dae1cacf85247effc4f6630d511"},
+    "envoy": {"version": "1.40.2", "image": "envoyproxy/envoy@sha256:49d3e8b6246d1a804acffaebe42f2799edc77b77a37a97709ef742af90b6d223"}
+  }
+}

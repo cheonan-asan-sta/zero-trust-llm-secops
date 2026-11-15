@@ -1,0 +1,890 @@
+{
+  "schema": "extra-semantic-ablation-and-source-review-v35-1",
+  "recorded_at": "2026-11-12T07:54:34.618122+00:00",
+  "branch": "extra",
+  "prior_commit": "dd46d67ae40ad30c41440e135f3045d6ff112d80",
+  "component_ablation": {
+    "artifact": {
+      "path": "runtime/f1/semantic-component-ablation-v35-20261112/ablation.json",
+      "bytes": 14487,
+      "sha256": "de98953df726345088320a7bba34d810eb769c3bb61222f681b43bba512a1b8b"
+    },
+    "schema": "extra-semantic-component-ablation-result-1",
+    "completed": true,
+    "protocol_sha256": "3002e43f3d734a07eaf5224e7299f81d57e0c03006d76450c6b3c6edf484071c",
+    "models": {
+      "no_new_fields": {
+        "path": "runtime/f1/semantic-component-ablation-v35-20261112/no_new_fields-model.json",
+        "sha256": "47d0861d867464a3d57ac3bd3de0b590b84618e75baf06660f7a604c7eb9a49f"
+      },
+      "http_only": {
+        "path": "runtime/f1/semantic-component-ablation-v35-20261112/http_only-model.json",
+        "sha256": "d596d3692e1e658363c06167758580d629bd0cbd6cc8ef9a18a1cfceb88eb535"
+      },
+      "auth_audit_only": {
+        "path": "runtime/f1/semantic-component-ablation-v35-20261112/auth_audit_only-model.json",
+        "sha256": "4690133c0b37071a1d618e7f9e552eebaf2a258441a069e58ed093b59a645874"
+      }
+    },
+    "metrics": {
+      "no_new_fields": {
+        "metrics": {
+          "tp": 46378,
+          "fp": 127,
+          "fn": 989,
+          "tn": 248482,
+          "inference_errors": 0,
+          "population": 295976,
+          "precision": 0.9972691108482958,
+          "recall": 0.9791204847256528,
+          "f1": 0.9881114709391512,
+          "false_positive_rate": 0.0005108423267057911,
+          "accuracy": 0.9962294240073519
+        },
+        "per_pair": [
+          {
+            "raw_member": "gather/internal_share/logs/audit/audit.log",
+            "metrics": {
+              "tp": 0,
+              "fp": 8,
+              "fn": 2,
+              "tn": 718,
+              "inference_errors": 0,
+              "population": 728,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "false_positive_rate": 0.011019283746556474,
+              "accuracy": 0.9862637362637363
+            }
+          },
+          {
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+            "metrics": {
+              "tp": 38506,
+              "fp": 5,
+              "fn": 920,
+              "tn": 236236,
+              "inference_errors": 0,
+              "population": 275667,
+              "precision": 0.9998701669652826,
+              "recall": 0.9766651448282859,
+              "f1": 0.9881314394960031,
+              "false_positive_rate": 2.1164827443161856e-05,
+              "accuracy": 0.9966445022436491
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/auth.log",
+            "metrics": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 10,
+              "tn": 258,
+              "inference_errors": 0,
+              "population": 270,
+              "precision": 1.0,
+              "recall": 0.16666666666666666,
+              "f1": 0.2857142857142857,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9629629629629629
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log",
+            "metrics": {
+              "tp": 7772,
+              "fp": 112,
+              "fn": 22,
+              "tn": 1556,
+              "inference_errors": 0,
+              "population": 9462,
+              "precision": 0.9857940131912735,
+              "recall": 0.9971773158840134,
+              "f1": 0.9914529914529915,
+              "false_positive_rate": 0.0671462829736211,
+              "accuracy": 0.9858380891989008
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+            "metrics": {
+              "tp": 40,
+              "fp": 1,
+              "fn": 2,
+              "tn": 1,
+              "inference_errors": 0,
+              "population": 44,
+              "precision": 0.975609756097561,
+              "recall": 0.9523809523809523,
+              "f1": 0.963855421686747,
+              "false_positive_rate": 0.5,
+              "accuracy": 0.9318181818181818
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/audit/audit.log",
+            "metrics": {
+              "tp": 14,
+              "fp": 0,
+              "fn": 5,
+              "tn": 2244,
+              "inference_errors": 0,
+              "population": 2263,
+              "precision": 1.0,
+              "recall": 0.7368421052631579,
+              "f1": 0.8484848484848485,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9977905435262925
+            }
+          },
+          {
+            "raw_member": "gather/vpn/logs/openvpn.log",
+            "metrics": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 28,
+              "tn": 5594,
+              "inference_errors": 0,
+              "population": 5622,
+              "precision": null,
+              "recall": 0.0,
+              "f1": 0.0,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9950195659907506
+            }
+          },
+          {
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log",
+            "metrics": {
+              "tp": 44,
+              "fp": 1,
+              "fn": 0,
+              "tn": 1875,
+              "inference_errors": 0,
+              "population": 1920,
+              "precision": 0.9777777777777777,
+              "recall": 1.0,
+              "f1": 0.9887640449438202,
+              "false_positive_rate": 0.0005330490405117271,
+              "accuracy": 0.9994791666666667
+            }
+          }
+        ]
+      },
+      "http_only": {
+        "metrics": {
+          "tp": 46393,
+          "fp": 16,
+          "fn": 974,
+          "tn": 248593,
+          "inference_errors": 0,
+          "population": 295976,
+          "precision": 0.9996552392854834,
+          "recall": 0.9794371608926046,
+          "f1": 0.9894429278280157,
+          "false_positive_rate": 6.435808840387918e-05,
+          "accuracy": 0.9966551342000702
+        },
+        "per_pair": [
+          {
+            "raw_member": "gather/internal_share/logs/audit/audit.log",
+            "metrics": {
+              "tp": 0,
+              "fp": 8,
+              "fn": 2,
+              "tn": 718,
+              "inference_errors": 0,
+              "population": 728,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "false_positive_rate": 0.011019283746556474,
+              "accuracy": 0.9862637362637363
+            }
+          },
+          {
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+            "metrics": {
+              "tp": 38506,
+              "fp": 5,
+              "fn": 920,
+              "tn": 236236,
+              "inference_errors": 0,
+              "population": 275667,
+              "precision": 0.9998701669652826,
+              "recall": 0.9766651448282859,
+              "f1": 0.9881314394960031,
+              "false_positive_rate": 2.1164827443161856e-05,
+              "accuracy": 0.9966445022436491
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/auth.log",
+            "metrics": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 10,
+              "tn": 258,
+              "inference_errors": 0,
+              "population": 270,
+              "precision": 1.0,
+              "recall": 0.16666666666666666,
+              "f1": 0.2857142857142857,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9629629629629629
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log",
+            "metrics": {
+              "tp": 7787,
+              "fp": 1,
+              "fn": 7,
+              "tn": 1667,
+              "inference_errors": 0,
+              "population": 9462,
+              "precision": 0.9998715973292245,
+              "recall": 0.9991018732358224,
+              "f1": 0.9994865870876652,
+              "false_positive_rate": 0.0005995203836930455,
+              "accuracy": 0.999154512787994
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+            "metrics": {
+              "tp": 40,
+              "fp": 1,
+              "fn": 2,
+              "tn": 1,
+              "inference_errors": 0,
+              "population": 44,
+              "precision": 0.975609756097561,
+              "recall": 0.9523809523809523,
+              "f1": 0.963855421686747,
+              "false_positive_rate": 0.5,
+              "accuracy": 0.9318181818181818
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/audit/audit.log",
+            "metrics": {
+              "tp": 14,
+              "fp": 0,
+              "fn": 5,
+              "tn": 2244,
+              "inference_errors": 0,
+              "population": 2263,
+              "precision": 1.0,
+              "recall": 0.7368421052631579,
+              "f1": 0.8484848484848485,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9977905435262925
+            }
+          },
+          {
+            "raw_member": "gather/vpn/logs/openvpn.log",
+            "metrics": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 28,
+              "tn": 5594,
+              "inference_errors": 0,
+              "population": 5622,
+              "precision": null,
+              "recall": 0.0,
+              "f1": 0.0,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9950195659907506
+            }
+          },
+          {
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log",
+            "metrics": {
+              "tp": 44,
+              "fp": 1,
+              "fn": 0,
+              "tn": 1875,
+              "inference_errors": 0,
+              "population": 1920,
+              "precision": 0.9777777777777777,
+              "recall": 1.0,
+              "f1": 0.9887640449438202,
+              "false_positive_rate": 0.0005330490405117271,
+              "accuracy": 0.9994791666666667
+            }
+          }
+        ]
+      },
+      "auth_audit_only": {
+        "metrics": {
+          "tp": 46385,
+          "fp": 127,
+          "fn": 982,
+          "tn": 248482,
+          "inference_errors": 0,
+          "population": 295976,
+          "precision": 0.9972695218438252,
+          "recall": 0.979268266936897,
+          "f1": 0.9881869214627339,
+          "false_positive_rate": 0.0005108423267057911,
+          "accuracy": 0.9962530745736141
+        },
+        "per_pair": [
+          {
+            "raw_member": "gather/internal_share/logs/audit/audit.log",
+            "metrics": {
+              "tp": 0,
+              "fp": 8,
+              "fn": 2,
+              "tn": 718,
+              "inference_errors": 0,
+              "population": 728,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "false_positive_rate": 0.011019283746556474,
+              "accuracy": 0.9862637362637363
+            }
+          },
+          {
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+            "metrics": {
+              "tp": 38506,
+              "fp": 5,
+              "fn": 920,
+              "tn": 236236,
+              "inference_errors": 0,
+              "population": 275667,
+              "precision": 0.9998701669652826,
+              "recall": 0.9766651448282859,
+              "f1": 0.9881314394960031,
+              "false_positive_rate": 2.1164827443161856e-05,
+              "accuracy": 0.9966445022436491
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/auth.log",
+            "metrics": {
+              "tp": 9,
+              "fp": 0,
+              "fn": 3,
+              "tn": 258,
+              "inference_errors": 0,
+              "population": 270,
+              "precision": 1.0,
+              "recall": 0.75,
+              "f1": 0.8571428571428571,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9888888888888889
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log",
+            "metrics": {
+              "tp": 7772,
+              "fp": 112,
+              "fn": 22,
+              "tn": 1556,
+              "inference_errors": 0,
+              "population": 9462,
+              "precision": 0.9857940131912735,
+              "recall": 0.9971773158840134,
+              "f1": 0.9914529914529915,
+              "false_positive_rate": 0.0671462829736211,
+              "accuracy": 0.9858380891989008
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+            "metrics": {
+              "tp": 40,
+              "fp": 1,
+              "fn": 2,
+              "tn": 1,
+              "inference_errors": 0,
+              "population": 44,
+              "precision": 0.975609756097561,
+              "recall": 0.9523809523809523,
+              "f1": 0.963855421686747,
+              "false_positive_rate": 0.5,
+              "accuracy": 0.9318181818181818
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/audit/audit.log",
+            "metrics": {
+              "tp": 14,
+              "fp": 0,
+              "fn": 5,
+              "tn": 2244,
+              "inference_errors": 0,
+              "population": 2263,
+              "precision": 1.0,
+              "recall": 0.7368421052631579,
+              "f1": 0.8484848484848485,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9977905435262925
+            }
+          },
+          {
+            "raw_member": "gather/vpn/logs/openvpn.log",
+            "metrics": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 28,
+              "tn": 5594,
+              "inference_errors": 0,
+              "population": 5622,
+              "precision": null,
+              "recall": 0.0,
+              "f1": 0.0,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9950195659907506
+            }
+          },
+          {
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log",
+            "metrics": {
+              "tp": 44,
+              "fp": 1,
+              "fn": 0,
+              "tn": 1875,
+              "inference_errors": 0,
+              "population": 1920,
+              "precision": 0.9777777777777777,
+              "recall": 1.0,
+              "f1": 0.9887640449438202,
+              "false_positive_rate": 0.0005330490405117271,
+              "accuracy": 0.9994791666666667
+            }
+          }
+        ]
+      }
+    },
+    "goal_qualified": false,
+    "training_rows": 295243,
+    "no_new_fields_reproduces_old_tree_root_exactly": true,
+    "no_new_fields_reproduces_prior_santos_confusion_exactly": true
+  },
+  "auth_subcomponents": {
+    "artifact": {
+      "path": "runtime/f1/semantic-auth-ablation-v35b-20261112/ablation.json",
+      "bytes": 9645,
+      "sha256": "d37023aa0515122888e8d13f41a3da4389e82cc723c009be7625cb5e1c2dbf79"
+    },
+    "schema": "extra-auth-component-ablation-result-1",
+    "completed": true,
+    "protocol_sha256": "ba7c47ff573bb40882e8bc6d46efd9bc70f5086a199ee1ac0373da17d1e39fd1",
+    "models": {
+      "auth_static_only": {
+        "path": "runtime/f1/semantic-auth-ablation-v35b-20261112/auth_static_only-model.json",
+        "sha256": "99a1dd08fd6802c4660d4fa56a5c7cfd8a5509f3edac5373aa1ed62fd8ba7729"
+      },
+      "auth_history_only": {
+        "path": "runtime/f1/semantic-auth-ablation-v35b-20261112/auth_history_only-model.json",
+        "sha256": "136bdaa6a689c5ec6a8190e05a14250f5810cea6be3ff35fd302eafae1980ebd"
+      }
+    },
+    "metrics": {
+      "auth_static_only": {
+        "metrics": {
+          "tp": 46378,
+          "fp": 127,
+          "fn": 989,
+          "tn": 248482,
+          "inference_errors": 0,
+          "population": 295976,
+          "precision": 0.9972691108482958,
+          "recall": 0.9791204847256528,
+          "f1": 0.9881114709391512,
+          "false_positive_rate": 0.0005108423267057911,
+          "accuracy": 0.9962294240073519
+        },
+        "per_pair": [
+          {
+            "raw_member": "gather/internal_share/logs/audit/audit.log",
+            "metrics": {
+              "tp": 0,
+              "fp": 8,
+              "fn": 2,
+              "tn": 718,
+              "inference_errors": 0,
+              "population": 728,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "false_positive_rate": 0.011019283746556474,
+              "accuracy": 0.9862637362637363
+            }
+          },
+          {
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+            "metrics": {
+              "tp": 38506,
+              "fp": 5,
+              "fn": 920,
+              "tn": 236236,
+              "inference_errors": 0,
+              "population": 275667,
+              "precision": 0.9998701669652826,
+              "recall": 0.9766651448282859,
+              "f1": 0.9881314394960031,
+              "false_positive_rate": 2.1164827443161856e-05,
+              "accuracy": 0.9966445022436491
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/auth.log",
+            "metrics": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 10,
+              "tn": 258,
+              "inference_errors": 0,
+              "population": 270,
+              "precision": 1.0,
+              "recall": 0.16666666666666666,
+              "f1": 0.2857142857142857,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9629629629629629
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log",
+            "metrics": {
+              "tp": 7772,
+              "fp": 112,
+              "fn": 22,
+              "tn": 1556,
+              "inference_errors": 0,
+              "population": 9462,
+              "precision": 0.9857940131912735,
+              "recall": 0.9971773158840134,
+              "f1": 0.9914529914529915,
+              "false_positive_rate": 0.0671462829736211,
+              "accuracy": 0.9858380891989008
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+            "metrics": {
+              "tp": 40,
+              "fp": 1,
+              "fn": 2,
+              "tn": 1,
+              "inference_errors": 0,
+              "population": 44,
+              "precision": 0.975609756097561,
+              "recall": 0.9523809523809523,
+              "f1": 0.963855421686747,
+              "false_positive_rate": 0.5,
+              "accuracy": 0.9318181818181818
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/audit/audit.log",
+            "metrics": {
+              "tp": 14,
+              "fp": 0,
+              "fn": 5,
+              "tn": 2244,
+              "inference_errors": 0,
+              "population": 2263,
+              "precision": 1.0,
+              "recall": 0.7368421052631579,
+              "f1": 0.8484848484848485,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9977905435262925
+            }
+          },
+          {
+            "raw_member": "gather/vpn/logs/openvpn.log",
+            "metrics": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 28,
+              "tn": 5594,
+              "inference_errors": 0,
+              "population": 5622,
+              "precision": null,
+              "recall": 0.0,
+              "f1": 0.0,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9950195659907506
+            }
+          },
+          {
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log",
+            "metrics": {
+              "tp": 44,
+              "fp": 1,
+              "fn": 0,
+              "tn": 1875,
+              "inference_errors": 0,
+              "population": 1920,
+              "precision": 0.9777777777777777,
+              "recall": 1.0,
+              "f1": 0.9887640449438202,
+              "false_positive_rate": 0.0005330490405117271,
+              "accuracy": 0.9994791666666667
+            }
+          }
+        ]
+      },
+      "auth_history_only": {
+        "metrics": {
+          "tp": 46385,
+          "fp": 127,
+          "fn": 982,
+          "tn": 248482,
+          "inference_errors": 0,
+          "population": 295976,
+          "precision": 0.9972695218438252,
+          "recall": 0.979268266936897,
+          "f1": 0.9881869214627339,
+          "false_positive_rate": 0.0005108423267057911,
+          "accuracy": 0.9962530745736141
+        },
+        "per_pair": [
+          {
+            "raw_member": "gather/internal_share/logs/audit/audit.log",
+            "metrics": {
+              "tp": 0,
+              "fp": 8,
+              "fn": 2,
+              "tn": 718,
+              "inference_errors": 0,
+              "population": 728,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "false_positive_rate": 0.011019283746556474,
+              "accuracy": 0.9862637362637363
+            }
+          },
+          {
+            "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+            "metrics": {
+              "tp": 38506,
+              "fp": 5,
+              "fn": 920,
+              "tn": 236236,
+              "inference_errors": 0,
+              "population": 275667,
+              "precision": 0.9998701669652826,
+              "recall": 0.9766651448282859,
+              "f1": 0.9881314394960031,
+              "false_positive_rate": 2.1164827443161856e-05,
+              "accuracy": 0.9966445022436491
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/auth.log",
+            "metrics": {
+              "tp": 9,
+              "fp": 0,
+              "fn": 3,
+              "tn": 258,
+              "inference_errors": 0,
+              "population": 270,
+              "precision": 1.0,
+              "recall": 0.75,
+              "f1": 0.8571428571428571,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9888888888888889
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log",
+            "metrics": {
+              "tp": 7772,
+              "fp": 112,
+              "fn": 22,
+              "tn": 1556,
+              "inference_errors": 0,
+              "population": 9462,
+              "precision": 0.9857940131912735,
+              "recall": 0.9971773158840134,
+              "f1": 0.9914529914529915,
+              "false_positive_rate": 0.0671462829736211,
+              "accuracy": 0.9858380891989008
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+            "metrics": {
+              "tp": 40,
+              "fp": 1,
+              "fn": 2,
+              "tn": 1,
+              "inference_errors": 0,
+              "population": 44,
+              "precision": 0.975609756097561,
+              "recall": 0.9523809523809523,
+              "f1": 0.963855421686747,
+              "false_positive_rate": 0.5,
+              "accuracy": 0.9318181818181818
+            }
+          },
+          {
+            "raw_member": "gather/intranet_server/logs/audit/audit.log",
+            "metrics": {
+              "tp": 14,
+              "fp": 0,
+              "fn": 5,
+              "tn": 2244,
+              "inference_errors": 0,
+              "population": 2263,
+              "precision": 1.0,
+              "recall": 0.7368421052631579,
+              "f1": 0.8484848484848485,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9977905435262925
+            }
+          },
+          {
+            "raw_member": "gather/vpn/logs/openvpn.log",
+            "metrics": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 28,
+              "tn": 5594,
+              "inference_errors": 0,
+              "population": 5622,
+              "precision": null,
+              "recall": 0.0,
+              "f1": 0.0,
+              "false_positive_rate": 0.0,
+              "accuracy": 0.9950195659907506
+            }
+          },
+          {
+            "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log",
+            "metrics": {
+              "tp": 44,
+              "fp": 1,
+              "fn": 0,
+              "tn": 1875,
+              "inference_errors": 0,
+              "population": 1920,
+              "precision": 0.9777777777777777,
+              "recall": 1.0,
+              "f1": 0.9887640449438202,
+              "false_positive_rate": 0.0005330490405117271,
+              "accuracy": 0.9994791666666667
+            }
+          }
+        ]
+      }
+    },
+    "goal_qualified": false
+  },
+  "combined_reference": {
+    "artifact": {
+      "path": "runtime/f1/semantic-candidate-v34-20261112-02/run.json",
+      "bytes": 12969,
+      "sha256": "cbe7c8ee01164204def0f28f0697add5758b9fc2f7674049148c51c908613b8d"
+    },
+    "metrics": {
+      "tp": 46400,
+      "fp": 16,
+      "fn": 967,
+      "tn": 248593,
+      "inference_errors": 0,
+      "population": 295976,
+      "precision": 0.9996552912788693,
+      "recall": 0.9795849431038487,
+      "f1": 0.9895183562052824,
+      "false_positive_rate": 6.435808840387918e-05,
+      "accuracy": 0.9966787847663324
+    }
+  },
+  "optc_publisher_review": {
+    "artifact": {
+      "path": "runtime/f1/optc-schema-review-20261112/review.json",
+      "bytes": 1396,
+      "sha256": "e03619cb60c5028c2b005c15c722e65a97c0c8dde27e7468a1986a4c76bcc38d"
+    },
+    "schema": "extra-optc-schema-review-1",
+    "completed": true,
+    "recorded_at": "2026-11-12T07:49:52.746224+00:00",
+    "repository": "https://github.com/FiveDirections/OpTC-data",
+    "commit": "5b108604f11f767aa11ea79ff827595f3fad15fd",
+    "files": [
+      {
+        "name": "README.md",
+        "url": "https://raw.githubusercontent.com/FiveDirections/OpTC-data/5b108604f11f767aa11ea79ff827595f3fad15fd/README.md",
+        "bytes": 4681,
+        "sha256": "bbbeca5d5a861ffc765a6d42ddd19cb84acb93861226b4b93887bb950e121074"
+      },
+      {
+        "name": "ecar.md",
+        "url": "https://raw.githubusercontent.com/FiveDirections/OpTC-data/5b108604f11f767aa11ea79ff827595f3fad15fd/ecar.md",
+        "bytes": 2336,
+        "sha256": "1df4539c49963cc49b783580033fe1ec68bbae68434abf29da83c47b5d26d16b"
+      },
+      {
+        "name": "errata.md",
+        "url": "https://raw.githubusercontent.com/FiveDirections/OpTC-data/5b108604f11f767aa11ea79ff827595f3fad15fd/errata.md",
+        "bytes": 722,
+        "sha256": "4044970eae0db4f67055fa2c0e5bb99824628c13d991fcef01dcc5ec06e8d062"
+      }
+    ],
+    "scope": "publisher README/schema/errata only; documentation example considered observed development material",
+    "raw_dataset_downloaded": false,
+    "red_team_ground_truth_pdf_read": false,
+    "classifier_fitted": false,
+    "policy_health_or_approval_fields_invented": false,
+    "goal_qualified": false
+  },
+  "completed_semantic_storage": {
+    "artifact": {
+      "path": "runtime/f1/semantic-lzx-storage-20261112.json",
+      "bytes": 853,
+      "sha256": "fd79451b25df6f077d665fdab1e9c4aea53e5004d94b3bf361e7420ea2fac68b"
+    },
+    "schema": "extra-semantic-lzx-storage-1",
+    "completed": true,
+    "files": [
+      {
+        "path": "runtime/f1/ait-semantic-russellmitchell-20261112/inputs.jsonl",
+        "sha256": "7b5459d2ecef2bd3dc2b76c3aef832c8980b70e16ada7f3551d536722620492a",
+        "logical_bytes": 659354199
+      },
+      {
+        "path": "runtime/f1/semantic-compressed-output-v34-20261112/santos/inputs.jsonl",
+        "sha256": "a04b8ef199e0c9a89547a19ca8ebe22692707a2b7a74f17e101aa3b8349105a2",
+        "logical_bytes": 661013617
+      },
+      {
+        "path": "runtime/f1/ait-semantic-santos-20261112/inputs.jsonl.part",
+        "sha256": "a04b8ef199e0c9a89547a19ca8ebe22692707a2b7a74f17e101aa3b8349105a2",
+        "logical_bytes": 661013617
+      }
+    ],
+    "free_before": 1372545024,
+    "failed_data_retained": true,
+    "files_deleted": 0,
+    "free_after": 2733957120
+  },
+  "same_training_population": 295243,
+  "same_observed_development_comparison_population": 295976,
+  "no_per_file_result_cherry_picking": true,
+  "source_code_changed": false,
+  "tests_rerun": false,
+  "previous_related_tests": {
+    "windows": 287,
+    "linux": 287,
+    "source_commit": "dd46d67"
+  },
+  "reserved_ait_final_bodies_read": 0,
+  "fox_is_calibration_not_final": true,
+  "new_independent_final_metrics": null,
+  "original_six_domain_goal_replaced": false,
+  "paid_api_calls": 0,
+  "aws_sdk_calls": 0,
+  "github_pushes": 0,
+  "goal_qualified": false
+}

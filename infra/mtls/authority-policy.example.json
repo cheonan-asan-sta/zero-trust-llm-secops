@@ -1,0 +1,6 @@
+{
+  "periods": {"root": 31536000, "issuer": 2592000, "jwk": 86400},
+  "root_days": 730,
+  "issuer_days": 90,
+  "expiry_margin_seconds": 86400
+}

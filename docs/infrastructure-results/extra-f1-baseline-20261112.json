@@ -1,0 +1,500 @@
+{
+  "schema": "extra-f1-baseline-review-result-1",
+  "branch": "extra",
+  "base_commit": "9c678896fb1186e18c609963610c2b1ba517d3a6",
+  "source_dirty_during_run": true,
+  "freeze_sha256": "801992ad587f3cc77bb857bfda0b3bfd0d857cc87e6aa1d2f479bfc10f8dfb7a",
+  "source_files_lf_sha256": {
+    "app/data/benchmark/cases.jsonl": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f",
+    "app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+    "app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+    "app/data/sigma/credential_anomaly.yml": "27ee3ff5ce6eb25bdffeb5d25a59998b21c799fcff48768204be57f2974b4086",
+    "app/data/sigma/data_exfiltration.yml": "e378a7df56ac30a3c5568d42e86be53bfd43ce88489ae500c84d16e8ee8466e7",
+    "app/data/sigma/lateral_movement.yml": "cd13987a9a7ae36d57f718a2b9a87cb0fb224e5a78380311dec8edcd78dfe0c8",
+    "app/data/sigma/privilege_escalation.yml": "337b23a4ba5bed1081828f30d771f777628d8bdd88ee1298a776e7f3f21eb880",
+    "app/data/sigma/remote_desktop_logon.yml": "35a4a4fbe7ae16484a16a4287e6287239697648018be40dd4e9c33e04b0c61ee",
+    "app/data/sigma/unmanaged_device_access.yml": "b0c3ef8498458e9d687c32ca554147de44db7cdf84857eacf4224050b8122004",
+    "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+    "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+    "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+    "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+    "scripts/build_detection_benchmark.py": "ed2513a7d2901360c55c22785e0f1eab6b2496c17c4c3660901ccd5da77445bf",
+    "scripts/prepare_f1_review.py": "f07ad3571c01c56400197412ec0ec1def5992e72536622fc98406dcfe7f08edd"
+  },
+  "frozen_files_sha256": {
+    "development.json": "42a423d79b0168537820316e95ec1d884d4918a4de4049488b87d21b816d7177",
+    "evidence.jsonl": "1ba0644a1c4ea2acb382245cc695a21ffff70cf06cf927c8959e1fc1a0f062a0",
+    "holdout.json": "0511e4f196fd91faaf08c68ee906e0b842dcb64efc8d97f4d001639854106cf6",
+    "review-index.json": "171c17567d0e5d6eb7a06218012ff1394ab84aa39927682bac4bab89eef30b5f",
+    "source/app/data/benchmark/cases.jsonl": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f",
+    "source/app/data/benchmark/families.json": "c649bcdefe169738b4992ca07df5737f8f3ba96ea88169238642e8aeccf0d601",
+    "source/app/data/benchmark/manifest.json": "878a0f4de8d832177717d8bb2c3ced218a216b994df72d96b3bf4ddeca688b90",
+    "source/app/data/sigma/credential_anomaly.yml": "27ee3ff5ce6eb25bdffeb5d25a59998b21c799fcff48768204be57f2974b4086",
+    "source/app/data/sigma/data_exfiltration.yml": "e378a7df56ac30a3c5568d42e86be53bfd43ce88489ae500c84d16e8ee8466e7",
+    "source/app/data/sigma/lateral_movement.yml": "cd13987a9a7ae36d57f718a2b9a87cb0fb224e5a78380311dec8edcd78dfe0c8",
+    "source/app/data/sigma/privilege_escalation.yml": "337b23a4ba5bed1081828f30d771f777628d8bdd88ee1298a776e7f3f21eb880",
+    "source/app/data/sigma/remote_desktop_logon.yml": "35a4a4fbe7ae16484a16a4287e6287239697648018be40dd4e9c33e04b0c61ee",
+    "source/app/data/sigma/unmanaged_device_access.yml": "b0c3ef8498458e9d687c32ca554147de44db7cdf84857eacf4224050b8122004",
+    "source/app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+    "source/app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+    "source/app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+    "source/app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+    "source/scripts/build_detection_benchmark.py": "ed2513a7d2901360c55c22785e0f1eab6b2496c17c4c3660901ccd5da77445bf",
+    "source/scripts/prepare_f1_review.py": "f07ad3571c01c56400197412ec0ec1def5992e72536622fc98406dcfe7f08edd"
+  },
+  "environment": {
+    "pydantic": "2.13.5",
+    "python": "3.12.9",
+    "pyyaml": "6.0.3"
+  },
+  "detector_changed": false,
+  "labels_changed": false,
+  "thresholds_changed": false,
+  "actual_evaluation_cases": 720,
+  "metric_unit": "authored_synthetic_event",
+  "new_blind_evaluation": false,
+  "evidence_cases": 220,
+  "evidence_outcomes": {
+    "FP": 100,
+    "FN": 100,
+    "TP": 20
+  },
+  "true_positive_cases_with_rule_mismatch": 20,
+  "cases_missing_an_expected_rule": 120,
+  "cases_with_an_unexpected_rule": 100,
+  "review_index": [
+    {
+      "case_ids": [
+        "credential-approved-health-retry-00",
+        "credential-approved-health-retry-01",
+        "credential-approved-health-retry-02",
+        "credential-approved-health-retry-03",
+        "credential-approved-health-retry-04",
+        "credential-approved-health-retry-05",
+        "credential-approved-health-retry-06",
+        "credential-approved-health-retry-07",
+        "credential-approved-health-retry-08",
+        "credential-approved-health-retry-09"
+      ],
+      "family_id": "credential-approved-health-retry",
+      "split": "development"
+    },
+    {
+      "case_ids": [
+        "credential-authorized-drill-00",
+        "credential-authorized-drill-01",
+        "credential-authorized-drill-02",
+        "credential-authorized-drill-03",
+        "credential-authorized-drill-04",
+        "credential-authorized-drill-05",
+        "credential-authorized-drill-06",
+        "credential-authorized-drill-07",
+        "credential-authorized-drill-08",
+        "credential-authorized-drill-09"
+      ],
+      "family_id": "credential-authorized-drill",
+      "split": "holdout"
+    },
+    {
+      "case_ids": [
+        "credential-distributed-slow-00",
+        "credential-distributed-slow-01",
+        "credential-distributed-slow-02",
+        "credential-distributed-slow-03",
+        "credential-distributed-slow-04",
+        "credential-distributed-slow-05",
+        "credential-distributed-slow-06",
+        "credential-distributed-slow-07",
+        "credential-distributed-slow-08",
+        "credential-distributed-slow-09"
+      ],
+      "family_id": "credential-distributed-slow",
+      "split": "holdout"
+    },
+    {
+      "case_ids": [
+        "credential-stolen-success-00",
+        "credential-stolen-success-01",
+        "credential-stolen-success-02",
+        "credential-stolen-success-03",
+        "credential-stolen-success-04",
+        "credential-stolen-success-05",
+        "credential-stolen-success-06",
+        "credential-stolen-success-07",
+        "credential-stolen-success-08",
+        "credential-stolen-success-09"
+      ],
+      "family_id": "credential-stolen-success",
+      "split": "holdout"
+    },
+    {
+      "case_ids": [
+        "device-approved-enrollment-00",
+        "device-approved-enrollment-01",
+        "device-approved-enrollment-02",
+        "device-approved-enrollment-03",
+        "device-approved-enrollment-04",
+        "device-approved-enrollment-05",
+        "device-approved-enrollment-06",
+        "device-approved-enrollment-07",
+        "device-approved-enrollment-08",
+        "device-approved-enrollment-09"
+      ],
+      "family_id": "device-approved-enrollment",
+      "split": "development"
+    },
+    {
+      "case_ids": [
+        "device-managed-compromise-00",
+        "device-managed-compromise-01",
+        "device-managed-compromise-02",
+        "device-managed-compromise-03",
+        "device-managed-compromise-04",
+        "device-managed-compromise-05",
+        "device-managed-compromise-06",
+        "device-managed-compromise-07",
+        "device-managed-compromise-08",
+        "device-managed-compromise-09"
+      ],
+      "family_id": "device-managed-compromise",
+      "split": "holdout"
+    },
+    {
+      "case_ids": [
+        "device-unmanaged-at-risk-00",
+        "device-unmanaged-at-risk-01",
+        "device-unmanaged-at-risk-02",
+        "device-unmanaged-at-risk-03",
+        "device-unmanaged-at-risk-04",
+        "device-unmanaged-at-risk-05",
+        "device-unmanaged-at-risk-06",
+        "device-unmanaged-at-risk-07",
+        "device-unmanaged-at-risk-08",
+        "device-unmanaged-at-risk-09"
+      ],
+      "family_id": "device-unmanaged-at-risk",
+      "split": "holdout"
+    },
+    {
+      "case_ids": [
+        "device-unregistered-login-00",
+        "device-unregistered-login-01",
+        "device-unregistered-login-02",
+        "device-unregistered-login-03",
+        "device-unregistered-login-04",
+        "device-unregistered-login-05",
+        "device-unregistered-login-06",
+        "device-unregistered-login-07",
+        "device-unregistered-login-08",
+        "device-unregistered-login-09"
+      ],
+      "family_id": "device-unregistered-login",
+      "split": "development"
+    },
+    {
+      "case_ids": [
+        "exfiltration-high-sensitivity-export-00",
+        "exfiltration-high-sensitivity-export-01",
+        "exfiltration-high-sensitivity-export-02",
+        "exfiltration-high-sensitivity-export-03",
+        "exfiltration-high-sensitivity-export-04",
+        "exfiltration-high-sensitivity-export-05",
+        "exfiltration-high-sensitivity-export-06",
+        "exfiltration-high-sensitivity-export-07",
+        "exfiltration-high-sensitivity-export-08",
+        "exfiltration-high-sensitivity-export-09"
+      ],
+      "family_id": "exfiltration-high-sensitivity-export",
+      "split": "holdout"
+    },
+    {
+      "case_ids": [
+        "exfiltration-low-and-slow-00",
+        "exfiltration-low-and-slow-01",
+        "exfiltration-low-and-slow-02",
+        "exfiltration-low-and-slow-03",
+        "exfiltration-low-and-slow-04",
+        "exfiltration-low-and-slow-05",
+        "exfiltration-low-and-slow-06",
+        "exfiltration-low-and-slow-07",
+        "exfiltration-low-and-slow-08",
+        "exfiltration-low-and-slow-09"
+      ],
+      "family_id": "exfiltration-low-and-slow",
+      "split": "holdout"
+    },
+    {
+      "case_ids": [
+        "lateral-api-traversal-00",
+        "lateral-api-traversal-01",
+        "lateral-api-traversal-02",
+        "lateral-api-traversal-03",
+        "lateral-api-traversal-04",
+        "lateral-api-traversal-05",
+        "lateral-api-traversal-06",
+        "lateral-api-traversal-07",
+        "lateral-api-traversal-08",
+        "lateral-api-traversal-09"
+      ],
+      "family_id": "lateral-api-traversal",
+      "split": "holdout"
+    },
+    {
+      "case_ids": [
+        "lateral-approved-deployment-00",
+        "lateral-approved-deployment-01",
+        "lateral-approved-deployment-02",
+        "lateral-approved-deployment-03",
+        "lateral-approved-deployment-04",
+        "lateral-approved-deployment-05",
+        "lateral-approved-deployment-06",
+        "lateral-approved-deployment-07",
+        "lateral-approved-deployment-08",
+        "lateral-approved-deployment-09"
+      ],
+      "family_id": "lateral-approved-deployment",
+      "split": "development"
+    },
+    {
+      "case_ids": [
+        "lateral-below-resource-limit-00",
+        "lateral-below-resource-limit-01",
+        "lateral-below-resource-limit-02",
+        "lateral-below-resource-limit-03",
+        "lateral-below-resource-limit-04",
+        "lateral-below-resource-limit-05",
+        "lateral-below-resource-limit-06",
+        "lateral-below-resource-limit-07",
+        "lateral-below-resource-limit-08",
+        "lateral-below-resource-limit-09"
+      ],
+      "family_id": "lateral-below-resource-limit",
+      "split": "holdout"
+    },
+    {
+      "case_ids": [
+        "lateral-fleet-deployment-00",
+        "lateral-fleet-deployment-01",
+        "lateral-fleet-deployment-02",
+        "lateral-fleet-deployment-03",
+        "lateral-fleet-deployment-04",
+        "lateral-fleet-deployment-05",
+        "lateral-fleet-deployment-06",
+        "lateral-fleet-deployment-07",
+        "lateral-fleet-deployment-08",
+        "lateral-fleet-deployment-09"
+      ],
+      "family_id": "lateral-fleet-deployment",
+      "split": "holdout"
+    },
+    {
+      "case_ids": [
+        "lateral-incident-response-00",
+        "lateral-incident-response-01",
+        "lateral-incident-response-02",
+        "lateral-incident-response-03",
+        "lateral-incident-response-04",
+        "lateral-incident-response-05",
+        "lateral-incident-response-06",
+        "lateral-incident-response-07",
+        "lateral-incident-response-08",
+        "lateral-incident-response-09"
+      ],
+      "family_id": "lateral-incident-response",
+      "split": "holdout"
+    },
+    {
+      "case_ids": [
+        "lateral-slow-fanout-00",
+        "lateral-slow-fanout-01",
+        "lateral-slow-fanout-02",
+        "lateral-slow-fanout-03",
+        "lateral-slow-fanout-04",
+        "lateral-slow-fanout-05",
+        "lateral-slow-fanout-06",
+        "lateral-slow-fanout-07",
+        "lateral-slow-fanout-08",
+        "lateral-slow-fanout-09"
+      ],
+      "family_id": "lateral-slow-fanout",
+      "split": "holdout"
+    },
+    {
+      "case_ids": [
+        "privilege-approved-emergency-00",
+        "privilege-approved-emergency-01",
+        "privilege-approved-emergency-02",
+        "privilege-approved-emergency-03",
+        "privilege-approved-emergency-04",
+        "privilege-approved-emergency-05",
+        "privilege-approved-emergency-06",
+        "privilege-approved-emergency-07",
+        "privilege-approved-emergency-08",
+        "privilege-approved-emergency-09"
+      ],
+      "family_id": "privilege-approved-emergency",
+      "split": "development"
+    },
+    {
+      "case_ids": [
+        "privilege-unauthorized-download-00",
+        "privilege-unauthorized-download-01",
+        "privilege-unauthorized-download-02",
+        "privilege-unauthorized-download-03",
+        "privilege-unauthorized-download-04",
+        "privilege-unauthorized-download-05",
+        "privilege-unauthorized-download-06",
+        "privilege-unauthorized-download-07",
+        "privilege-unauthorized-download-08",
+        "privilege-unauthorized-download-09"
+      ],
+      "family_id": "privilege-unauthorized-download",
+      "split": "holdout"
+    },
+    {
+      "case_ids": [
+        "remote-approved-night-support-00",
+        "remote-approved-night-support-01",
+        "remote-approved-night-support-02",
+        "remote-approved-night-support-03",
+        "remote-approved-night-support-04",
+        "remote-approved-night-support-05",
+        "remote-approved-night-support-06",
+        "remote-approved-night-support-07",
+        "remote-approved-night-support-08",
+        "remote-approved-night-support-09"
+      ],
+      "family_id": "remote-approved-night-support",
+      "split": "holdout"
+    },
+    {
+      "case_ids": [
+        "remote-approved-support-00",
+        "remote-approved-support-01",
+        "remote-approved-support-02",
+        "remote-approved-support-03",
+        "remote-approved-support-04",
+        "remote-approved-support-05",
+        "remote-approved-support-06",
+        "remote-approved-support-07",
+        "remote-approved-support-08",
+        "remote-approved-support-09"
+      ],
+      "family_id": "remote-approved-support",
+      "split": "development"
+    },
+    {
+      "case_ids": [
+        "remote-approved-vpn-maintenance-00",
+        "remote-approved-vpn-maintenance-01",
+        "remote-approved-vpn-maintenance-02",
+        "remote-approved-vpn-maintenance-03",
+        "remote-approved-vpn-maintenance-04",
+        "remote-approved-vpn-maintenance-05",
+        "remote-approved-vpn-maintenance-06",
+        "remote-approved-vpn-maintenance-07",
+        "remote-approved-vpn-maintenance-08",
+        "remote-approved-vpn-maintenance-09"
+      ],
+      "family_id": "remote-approved-vpn-maintenance",
+      "split": "holdout"
+    },
+    {
+      "case_ids": [
+        "remote-misclassified-activity-00",
+        "remote-misclassified-activity-01",
+        "remote-misclassified-activity-02",
+        "remote-misclassified-activity-03",
+        "remote-misclassified-activity-04",
+        "remote-misclassified-activity-05",
+        "remote-misclassified-activity-06",
+        "remote-misclassified-activity-07",
+        "remote-misclassified-activity-08",
+        "remote-misclassified-activity-09"
+      ],
+      "family_id": "remote-misclassified-activity",
+      "split": "holdout"
+    }
+  ],
+  "actual_review_assessment": {
+    "review_families": 22,
+    "reviewed": 0,
+    "pending": 22,
+    "ready_for_team_adjudication": false,
+    "independent_review_verified": false,
+    "label_approval": "pending",
+    "identity_assurance": "self_reported_only",
+    "worksheet_sha256": "0a03df30c599974d99f80ee4871dc634248f06756a33716a1a7c37130f46a638"
+  },
+  "actual_assessment_exit_code": 2,
+  "generator_verified": true,
+  "bundle_create_exit_code": 0,
+  "bundle_verify_exit_code": 0,
+  "quality_targets_met": false,
+  "independent_review": "pending",
+  "F3_detector_improvement": "not_started",
+  "reports": {
+    "development": {
+      "confusion": {
+        "fn": 10,
+        "fp": 50,
+        "tn": 130,
+        "tp": 170
+      },
+      "metrics": {
+        "f1": 0.85,
+        "false_positive_rate": 0.2777777777777778,
+        "precision": 0.7727272727272727,
+        "recall": 0.9444444444444444
+      },
+      "gate_passed": false,
+      "evaluation_error_count": 0,
+      "ruleset_digest_sha256": "7b769a999a252e112e4848cd5026976ee55de4bf853ac49b00d883d36b7a6231",
+      "evaluation_fingerprint_sha256": "48da856334a05d98d8d3286155bef105f96c3f656462a7734073f6c35d2c9cef",
+      "statistical_target_supported": false
+    },
+    "holdout": {
+      "confusion": {
+        "fn": 90,
+        "fp": 50,
+        "tn": 130,
+        "tp": 90
+      },
+      "metrics": {
+        "f1": 0.5625,
+        "false_positive_rate": 0.2777777777777778,
+        "precision": 0.6428571428571429,
+        "recall": 0.5
+      },
+      "gate_passed": false,
+      "evaluation_error_count": 0,
+      "ruleset_digest_sha256": "7b769a999a252e112e4848cd5026976ee55de4bf853ac49b00d883d36b7a6231",
+      "evaluation_fingerprint_sha256": "ed68b3b0c2d9ea5d04cb51eaa51291fa2f13086f25e00601143357080c383b16",
+      "statistical_target_supported": false
+    }
+  },
+  "checks": {
+    "tests": 74,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "junit_seconds": 15.538,
+    "junit_sha256": "28aa3fa86f2297cb91649f6b51ed711b357d01fc9ec8cc60c7af23e8b27ef6a8",
+    "new_tool_tests": 21,
+    "existing_detector_tests": 53,
+    "exit_code": 0,
+    "dependency_warnings": 3,
+    "ruff_exit_code": 0,
+    "diff_check_exit_code": 0
+  },
+  "cloud_calls": 0,
+  "paid_api_calls": 0,
+  "docker_resources_created": 0,
+  "github_remote_write": false,
+  "limits": [
+    "Mechanical trace is not a human root-cause review.",
+    "Original holdout has been observed and is not a new blind evaluation.",
+    "Code snapshots and source_dirty distinguish this run from the clean parent commit.",
+    "Review identities are self-reported; full infrastructure acceptance remains separate."
+  ]
+}

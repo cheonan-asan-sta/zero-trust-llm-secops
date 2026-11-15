@@ -1,0 +1,3684 @@
+{
+  "schema": "m3-infra-measurement-1",
+  "started_at": "2026-11-02T17:14:02.444391+00:00",
+  "image_tag": "zero-trust-llm-secops:m3-infra-10f61d614682",
+  "host": "Windows-11-10.0.26300-SP0",
+  "requested_repeats": 3,
+  "resource_sampling_requested_seconds": 1,
+  "limits": {
+    "cpus_per_service": 1,
+    "memory_bytes_per_service": 268435456,
+    "pids_per_service": 128
+  },
+  "scope": "synthetic functional workload, not throughput/SLO/RTO/RPO evidence",
+  "percentile_method": "nearest rank; small samples do not establish population P95",
+  "resource_units": "rounded Docker CLI display values; Linux memory excludes cache",
+  "status": "passed",
+  "repeats": [
+    {
+      "repeat": 1,
+      "status": "passed",
+      "checks": [
+        {
+          "label": "container_boundaries",
+          "status": "passed",
+          "at": "2026-11-02T17:14:52.423029+00:00"
+        },
+        {
+          "label": "worker_loopback_only",
+          "status": "passed",
+          "at": "2026-11-02T17:14:54.442314+00:00"
+        },
+        {
+          "label": "normal_probe",
+          "status": "passed",
+          "at": "2026-11-02T17:14:54.688056+00:00"
+        },
+        {
+          "label": "related_revoked",
+          "status": "passed",
+          "at": "2026-11-02T17:14:55.469978+00:00"
+        },
+        {
+          "label": "unrelated_preserved",
+          "status": "passed",
+          "at": "2026-11-02T17:14:55.527310+00:00"
+        },
+        {
+          "label": "duplicate_idempotent",
+          "status": "passed",
+          "at": "2026-11-02T17:14:55.585108+00:00"
+        },
+        {
+          "label": "conflicting_payload_rejected",
+          "status": "passed",
+          "at": "2026-11-02T17:14:55.601987+00:00"
+        },
+        {
+          "label": "pending_survives_app_restart",
+          "status": "passed",
+          "at": "2026-11-02T17:15:07.165702+00:00"
+        },
+        {
+          "label": "worker_resumes_pending",
+          "status": "passed",
+          "at": "2026-11-02T17:15:11.795101+00:00"
+        },
+        {
+          "label": "restarts_preserve_receipt_and_versions",
+          "status": "passed",
+          "at": "2026-11-02T17:15:18.938962+00:00"
+        },
+        {
+          "label": "unused_grant_remains_revoked",
+          "status": "passed",
+          "at": "2026-11-02T17:15:18.986086+00:00"
+        },
+        {
+          "label": "unrelated_survives_restarts",
+          "status": "passed",
+          "at": "2026-11-02T17:15:19.033223+00:00"
+        }
+      ],
+      "http": [
+        {
+          "label": "create_m3-normal-probe",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:14:54.565201+00:00",
+          "elapsed_ms": 113.071
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-normal-probe",
+          "status": 200,
+          "at": "2026-11-02T17:14:54.588109+00:00",
+          "elapsed_ms": 23.033
+        },
+        {
+          "label": "access_m3-normal-probe",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 200,
+          "at": "2026-11-02T17:14:54.688056+00:00",
+          "elapsed_ms": 100.462
+        },
+        {
+          "label": "create_m3-first-a",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:14:54.778118+00:00",
+          "elapsed_ms": 86.796
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-a",
+          "status": 200,
+          "at": "2026-11-02T17:14:54.794896+00:00",
+          "elapsed_ms": 16.593
+        },
+        {
+          "label": "create_m3-first-b",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:14:54.884944+00:00",
+          "elapsed_ms": 88.851
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-b",
+          "status": 200,
+          "at": "2026-11-02T17:14:54.901250+00:00",
+          "elapsed_ms": 16.058
+        },
+        {
+          "label": "create_m3-unrelated",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:14:55.019565+00:00",
+          "elapsed_ms": 115.149
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-unrelated",
+          "status": 200,
+          "at": "2026-11-02T17:14:55.052289+00:00",
+          "elapsed_ms": 32.507
+        },
+        {
+          "label": "risk_intake",
+          "method": "POST",
+          "path": "/zero-trust/signals/inbox",
+          "status": 202,
+          "at": "2026-11-02T17:14:55.154592+00:00",
+          "elapsed_ms": 101.445
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-first",
+          "status": 200,
+          "at": "2026-11-02T17:14:55.236604+00:00",
+          "elapsed_ms": 82.195
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-first",
+          "status": 200,
+          "at": "2026-11-02T17:14:55.347288+00:00",
+          "elapsed_ms": 10.512
+        },
+        {
+          "label": "access_m3-first-a",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 403,
+          "at": "2026-11-02T17:14:55.409945+00:00",
+          "elapsed_ms": 62.323
+        },
+        {
+          "label": "access_m3-first-b",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 403,
+          "at": "2026-11-02T17:14:55.469978+00:00",
+          "elapsed_ms": 59.833
+        },
+        {
+          "label": "access_m3-unrelated",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 200,
+          "at": "2026-11-02T17:14:55.527310+00:00",
+          "elapsed_ms": 57.597
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-a",
+          "status": 200,
+          "at": "2026-11-02T17:14:55.538324+00:00",
+          "elapsed_ms": 10.735
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-b",
+          "status": 200,
+          "at": "2026-11-02T17:14:55.549036+00:00",
+          "elapsed_ms": 10.992
+        },
+        {
+          "label": "exact_duplicate",
+          "method": "POST",
+          "path": "/zero-trust/signals/inbox",
+          "status": 202,
+          "at": "2026-11-02T17:14:55.564818+00:00",
+          "elapsed_ms": 15.754
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-a",
+          "status": 200,
+          "at": "2026-11-02T17:14:55.575330+00:00",
+          "elapsed_ms": 10.478
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-b",
+          "status": 200,
+          "at": "2026-11-02T17:14:55.585108+00:00",
+          "elapsed_ms": 9.392
+        },
+        {
+          "label": "changed_payload",
+          "method": "POST",
+          "path": "/zero-trust/signals/inbox",
+          "status": 409,
+          "at": "2026-11-02T17:14:55.601987+00:00",
+          "elapsed_ms": 16.642
+        },
+        {
+          "label": "create_m3-second-a",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:14:58.019346+00:00",
+          "elapsed_ms": 67.481
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-a",
+          "status": 200,
+          "at": "2026-11-02T17:14:58.033331+00:00",
+          "elapsed_ms": 14.109
+        },
+        {
+          "label": "create_m3-second-b",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:14:58.087981+00:00",
+          "elapsed_ms": 53.078
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-b",
+          "status": 200,
+          "at": "2026-11-02T17:14:58.109725+00:00",
+          "elapsed_ms": 21.321
+        },
+        {
+          "label": "create_m3-unrelated-reserved",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:14:58.175665+00:00",
+          "elapsed_ms": 63.611
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-unrelated-reserved",
+          "status": 200,
+          "at": "2026-11-02T17:14:58.188780+00:00",
+          "elapsed_ms": 13.066
+        },
+        {
+          "label": "risk_while_worker_stopped",
+          "method": "POST",
+          "path": "/zero-trust/signals/inbox",
+          "status": 202,
+          "at": "2026-11-02T17:14:58.250122+00:00",
+          "elapsed_ms": 60.769
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:14:58.262431+00:00",
+          "elapsed_ms": 12.401
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:07.153942+00:00",
+          "elapsed_ms": 9.142
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-a",
+          "status": 200,
+          "at": "2026-11-02T17:15:07.165702+00:00",
+          "elapsed_ms": 11.452
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:08.424909+00:00",
+          "elapsed_ms": 8.279
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:08.533936+00:00",
+          "elapsed_ms": 8.509
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:08.642993+00:00",
+          "elapsed_ms": 9.064
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:08.752424+00:00",
+          "elapsed_ms": 8.899
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:08.862817+00:00",
+          "elapsed_ms": 9.911
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:08.973587+00:00",
+          "elapsed_ms": 9.981
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:09.087164+00:00",
+          "elapsed_ms": 13.208
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:09.198064+00:00",
+          "elapsed_ms": 10.781
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:09.308397+00:00",
+          "elapsed_ms": 9.78
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:09.419225+00:00",
+          "elapsed_ms": 10.305
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:09.528954+00:00",
+          "elapsed_ms": 9.807
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:09.638430+00:00",
+          "elapsed_ms": 9.149
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:09.749396+00:00",
+          "elapsed_ms": 10.298
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:09.859981+00:00",
+          "elapsed_ms": 10.614
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:09.969906+00:00",
+          "elapsed_ms": 9.323
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:10.098734+00:00",
+          "elapsed_ms": 27.289
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:10.207817+00:00",
+          "elapsed_ms": 8.409
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:10.316149+00:00",
+          "elapsed_ms": 8.037
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:10.424554+00:00",
+          "elapsed_ms": 8.239
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:10.532910+00:00",
+          "elapsed_ms": 7.92
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:10.641531+00:00",
+          "elapsed_ms": 8.261
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:10.750134+00:00",
+          "elapsed_ms": 9.009
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:10.858626+00:00",
+          "elapsed_ms": 7.321
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:10.967359+00:00",
+          "elapsed_ms": 8.166
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:11.095760+00:00",
+          "elapsed_ms": 28.16
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:11.205386+00:00",
+          "elapsed_ms": 9.531
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:11.315064+00:00",
+          "elapsed_ms": 8.947
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:11.423005+00:00",
+          "elapsed_ms": 7.286
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:11.531923+00:00",
+          "elapsed_ms": 8.356
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:11.640657+00:00",
+          "elapsed_ms": 8.373
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:11.759151+00:00",
+          "elapsed_ms": 18.025
+        },
+        {
+          "label": "access_m3-second-a",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 403,
+          "at": "2026-11-02T17:15:11.795101+00:00",
+          "elapsed_ms": 36.146
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-a",
+          "status": 200,
+          "at": "2026-11-02T17:15:11.805535+00:00",
+          "elapsed_ms": 10.004
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-b",
+          "status": 200,
+          "at": "2026-11-02T17:15:11.813937+00:00",
+          "elapsed_ms": 8.514
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-a",
+          "status": 200,
+          "at": "2026-11-02T17:15:11.822635+00:00",
+          "elapsed_ms": 8.772
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-b",
+          "status": 200,
+          "at": "2026-11-02T17:15:11.831328+00:00",
+          "elapsed_ms": 8.745
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-unrelated-reserved",
+          "status": 200,
+          "at": "2026-11-02T17:15:11.839982+00:00",
+          "elapsed_ms": 8.659
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:18.878954+00:00",
+          "elapsed_ms": 11.959
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-a",
+          "status": 200,
+          "at": "2026-11-02T17:15:18.889825+00:00",
+          "elapsed_ms": 11.298
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-b",
+          "status": 200,
+          "at": "2026-11-02T17:15:18.902056+00:00",
+          "elapsed_ms": 11.622
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-a",
+          "status": 200,
+          "at": "2026-11-02T17:15:18.911897+00:00",
+          "elapsed_ms": 10.015
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-b",
+          "status": 200,
+          "at": "2026-11-02T17:15:18.921855+00:00",
+          "elapsed_ms": 9.783
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-unrelated-reserved",
+          "status": 200,
+          "at": "2026-11-02T17:15:18.930385+00:00",
+          "elapsed_ms": 8.94
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:18.938962+00:00",
+          "elapsed_ms": 8.381
+        },
+        {
+          "label": "access_m3-second-b",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 403,
+          "at": "2026-11-02T17:15:18.986086+00:00",
+          "elapsed_ms": 46.818
+        },
+        {
+          "label": "access_m3-unrelated-reserved",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 200,
+          "at": "2026-11-02T17:15:19.033223+00:00",
+          "elapsed_ms": 47.235
+        }
+      ],
+      "sessions": {
+        "m3-normal-probe": {
+          "session_id": "m3-normal-probe",
+          "version": 1,
+          "decision": "ALLOW",
+          "status": "ACTIVE",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 1
+        },
+        "m3-first-a": {
+          "session_id": "m3-first-a",
+          "version": 2,
+          "decision": "DENY",
+          "status": "REVOKED",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 2
+        },
+        "m3-first-b": {
+          "session_id": "m3-first-b",
+          "version": 2,
+          "decision": "DENY",
+          "status": "REVOKED",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 2
+        },
+        "m3-unrelated": {
+          "session_id": "m3-unrelated",
+          "version": 1,
+          "decision": "ALLOW",
+          "status": "ACTIVE",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 1
+        },
+        "m3-second-a": {
+          "session_id": "m3-second-a",
+          "version": 2,
+          "decision": "DENY",
+          "status": "REVOKED",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 2
+        },
+        "m3-second-b": {
+          "session_id": "m3-second-b",
+          "version": 2,
+          "decision": "DENY",
+          "status": "REVOKED",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 2
+        },
+        "m3-unrelated-reserved": {
+          "session_id": "m3-unrelated-reserved",
+          "version": 1,
+          "decision": "ALLOW",
+          "status": "ACTIVE",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 1
+        }
+      },
+      "receipts": {
+        "first_completed": {
+          "event_id": "m3-risk-first",
+          "state": "completed",
+          "received_at": "2026-11-02T17:14:55.095743+00:00",
+          "completed_at": "2026-11-02T17:14:55.279625+00:00",
+          "attempts": 1,
+          "last_error": null,
+          "result": {
+            "matched_sessions": 2,
+            "changed_sessions": 2,
+            "stale": false,
+            "duplicate": false
+          }
+        },
+        "before_app_restart": {
+          "event_id": "m3-risk-second",
+          "state": "pending",
+          "received_at": "2026-11-02T17:14:58.205420+00:00",
+          "completed_at": null,
+          "attempts": 0,
+          "last_error": null,
+          "result": null
+        },
+        "resumed_completed": {
+          "event_id": "m3-risk-second",
+          "state": "completed",
+          "received_at": "2026-11-02T17:14:58.205420+00:00",
+          "completed_at": "2026-11-02T17:15:11.726172+00:00",
+          "attempts": 1,
+          "last_error": null,
+          "result": {
+            "matched_sessions": 2,
+            "changed_sessions": 2,
+            "stale": false,
+            "duplicate": false
+          }
+        },
+        "after_both_restart": {
+          "event_id": "m3-risk-second",
+          "state": "completed",
+          "received_at": "2026-11-02T17:14:58.205420+00:00",
+          "completed_at": "2026-11-02T17:15:11.726172+00:00",
+          "attempts": 1,
+          "last_error": null,
+          "result": {
+            "matched_sessions": 2,
+            "changed_sessions": 2,
+            "stale": false,
+            "duplicate": false
+          }
+        }
+      },
+      "denial_latency": [
+        {
+          "group": "normal_worker",
+          "at": "2026-11-02T17:14:55.409945+00:00",
+          "client_post_start_to_first_confirmed_denial_ms": 356.852
+        },
+        {
+          "group": "worker_outage",
+          "at": "2026-11-02T17:15:11.795101+00:00",
+          "client_post_start_to_first_confirmed_denial_ms": 13604.511
+        }
+      ],
+      "started_at": "2026-11-02T17:14:05.985797+00:00",
+      "project": "secops-m3check-infra-107b4346e151",
+      "image_build_ms": 32636.617,
+      "image_id": "sha256:cd2f29d713759ec78fae1cdbd9114d795afcaeeeee350307d66dbbdc9372bf24",
+      "compose_start_to_first_live_ms": 8514.387,
+      "container_security": [
+        {
+          "service": "app",
+          "network_mode": "secops-m3check-infra-107b4346e151_default",
+          "read_only_rootfs": true,
+          "user": "secops",
+          "cap_drop": [
+            "ALL"
+          ],
+          "security_options": [
+            "no-new-privileges:true"
+          ],
+          "nano_cpus": 1000000000,
+          "memory_limit_bytes": 268435456,
+          "published_ports": {
+            "8000/tcp": [
+              {
+                "HostIp": "127.0.0.1",
+                "HostPort": "65264"
+              }
+            ]
+          },
+          "mounts": [
+            {
+              "destination": "/data",
+              "writable": true,
+              "type": "volume"
+            },
+            {
+              "destination": "/signals/sources.json",
+              "writable": false,
+              "type": "bind"
+            }
+          ]
+        },
+        {
+          "service": "signal-worker",
+          "network_mode": "none",
+          "read_only_rootfs": true,
+          "user": "secops",
+          "cap_drop": [
+            "ALL"
+          ],
+          "security_options": [
+            "no-new-privileges:true"
+          ],
+          "nano_cpus": 1000000000,
+          "memory_limit_bytes": 268435456,
+          "published_ports": {},
+          "mounts": [
+            {
+              "destination": "/data",
+              "writable": true,
+              "type": "volume"
+            },
+            {
+              "destination": "/signals/sources.json",
+              "writable": false,
+              "type": "bind"
+            }
+          ]
+        }
+      ],
+      "container_probes": {
+        "app": {
+          "uid": 10001,
+          "registry_readable": true,
+          "registry_mode": "0o777",
+          "shared_write": true,
+          "private_keys_absent": true
+        },
+        "signal-worker": {
+          "uid": 10001,
+          "shared_app_write_seen": true,
+          "worker_write": true,
+          "private_keys_absent": true
+        }
+      },
+      "resource_samples": [
+        {
+          "at": "2026-11-02T17:14:51.655246+00:00",
+          "service": "app",
+          "cpu_percent": 32.88,
+          "memory_bytes_estimate": 85679145,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 4420,
+          "network_tx_bytes_estimate": 2610,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 6
+        },
+        {
+          "at": "2026-11-02T17:14:51.656338+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 2.4,
+          "memory_bytes_estimate": 75067556,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:14:55.283670+00:00",
+          "service": "app",
+          "cpu_percent": 10.79,
+          "memory_bytes_estimate": 87304438,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 16400,
+          "network_tx_bytes_estimate": 20800,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 6
+        },
+        {
+          "at": "2026-11-02T17:14:55.283670+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 37.66,
+          "memory_bytes_estimate": 75266785,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:14:58.840384+00:00",
+          "service": "app",
+          "cpu_percent": 28.27,
+          "memory_bytes_estimate": 89537905,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 33800,
+          "network_tx_bytes_estimate": 55100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 6
+        },
+        {
+          "at": "2026-11-02T17:14:58.840384+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 0,
+          "memory_limit_bytes_estimate": 0,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 0
+        },
+        {
+          "at": "2026-11-02T17:15:01.560304+00:00",
+          "service": "app",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 4722786,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 152,
+          "network_tx_bytes_estimate": 42,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:15:01.560884+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 0,
+          "memory_limit_bytes_estimate": 0,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 0
+        },
+        {
+          "at": "2026-11-02T17:15:04.015701+00:00",
+          "service": "app",
+          "cpu_percent": 100.03,
+          "memory_bytes_estimate": 39741030,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 2070,
+          "network_tx_bytes_estimate": 762,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:15:04.015701+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 0,
+          "memory_limit_bytes_estimate": 0,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 0
+        },
+        {
+          "at": "2026-11-02T17:15:06.416604+00:00",
+          "service": "app",
+          "cpu_percent": 106.22,
+          "memory_bytes_estimate": 83330335,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 2960,
+          "network_tx_bytes_estimate": 1410,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 2
+        },
+        {
+          "at": "2026-11-02T17:15:06.416604+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 0,
+          "memory_limit_bytes_estimate": 0,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 0
+        },
+        {
+          "at": "2026-11-02T17:15:08.809937+00:00",
+          "service": "app",
+          "cpu_percent": 1.49,
+          "memory_bytes_estimate": 84777370,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 6750,
+          "network_tx_bytes_estimate": 8960,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 6
+        },
+        {
+          "at": "2026-11-02T17:15:08.809937+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 0,
+          "memory_limit_bytes_estimate": 0,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 0
+        },
+        {
+          "at": "2026-11-02T17:15:12.209118+00:00",
+          "service": "app",
+          "cpu_percent": 6.85,
+          "memory_bytes_estimate": 85091942,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 27100,
+          "network_tx_bytes_estimate": 56000,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 6
+        },
+        {
+          "at": "2026-11-02T17:15:12.209118+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 100.3,
+          "memory_bytes_estimate": 58489569,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:15:14.579345+00:00",
+          "service": "app",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 0,
+          "memory_limit_bytes_estimate": 0,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 0
+        },
+        {
+          "at": "2026-11-02T17:15:14.579345+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 99.58,
+          "memory_bytes_estimate": 27105690,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:15:16.994692+00:00",
+          "service": "app",
+          "cpu_percent": 101.19,
+          "memory_bytes_estimate": 46273659,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 2140,
+          "network_tx_bytes_estimate": 816,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:15:16.994692+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 100.17,
+          "memory_bytes_estimate": 67779953,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:15:19.424567+00:00",
+          "service": "app",
+          "cpu_percent": 82.67,
+          "memory_bytes_estimate": 94413783,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 9010,
+          "network_tx_bytes_estimate": 21100,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-02T17:15:19.425577+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 2.65,
+          "memory_bytes_estimate": 71827456,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        }
+      ],
+      "sampling_errors": [],
+      "cleanup": {
+        "containers_removed": true,
+        "volume_removed": true
+      },
+      "finished_at": "2026-11-02T17:15:22.775617+00:00"
+    },
+    {
+      "repeat": 2,
+      "status": "passed",
+      "checks": [
+        {
+          "label": "container_boundaries",
+          "status": "passed",
+          "at": "2026-11-02T17:15:34.061466+00:00"
+        },
+        {
+          "label": "worker_loopback_only",
+          "status": "passed",
+          "at": "2026-11-02T17:15:34.998078+00:00"
+        },
+        {
+          "label": "normal_probe",
+          "status": "passed",
+          "at": "2026-11-02T17:15:35.082069+00:00"
+        },
+        {
+          "label": "related_revoked",
+          "status": "passed",
+          "at": "2026-11-02T17:15:35.433841+00:00"
+        },
+        {
+          "label": "unrelated_preserved",
+          "status": "passed",
+          "at": "2026-11-02T17:15:35.465402+00:00"
+        },
+        {
+          "label": "duplicate_idempotent",
+          "status": "passed",
+          "at": "2026-11-02T17:15:35.504992+00:00"
+        },
+        {
+          "label": "conflicting_payload_rejected",
+          "status": "passed",
+          "at": "2026-11-02T17:15:35.516042+00:00"
+        },
+        {
+          "label": "pending_survives_app_restart",
+          "status": "passed",
+          "at": "2026-11-02T17:15:43.467589+00:00"
+        },
+        {
+          "label": "worker_resumes_pending",
+          "status": "passed",
+          "at": "2026-11-02T17:15:48.016819+00:00"
+        },
+        {
+          "label": "restarts_preserve_receipt_and_versions",
+          "status": "passed",
+          "at": "2026-11-02T17:15:54.196608+00:00"
+        },
+        {
+          "label": "unused_grant_remains_revoked",
+          "status": "passed",
+          "at": "2026-11-02T17:15:54.229647+00:00"
+        },
+        {
+          "label": "unrelated_survives_restarts",
+          "status": "passed",
+          "at": "2026-11-02T17:15:54.264395+00:00"
+        }
+      ],
+      "http": [
+        {
+          "label": "create_m3-normal-probe",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:15:35.041452+00:00",
+          "elapsed_ms": 42.382
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-normal-probe",
+          "status": 200,
+          "at": "2026-11-02T17:15:35.048708+00:00",
+          "elapsed_ms": 7.286
+        },
+        {
+          "label": "access_m3-normal-probe",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 200,
+          "at": "2026-11-02T17:15:35.082069+00:00",
+          "elapsed_ms": 33.339
+        },
+        {
+          "label": "create_m3-first-a",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:15:35.117429+00:00",
+          "elapsed_ms": 33.913
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-a",
+          "status": 200,
+          "at": "2026-11-02T17:15:35.124666+00:00",
+          "elapsed_ms": 7.05
+        },
+        {
+          "label": "create_m3-first-b",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:15:35.166589+00:00",
+          "elapsed_ms": 40.792
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-b",
+          "status": 200,
+          "at": "2026-11-02T17:15:35.174226+00:00",
+          "elapsed_ms": 7.411
+        },
+        {
+          "label": "create_m3-unrelated",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:15:35.211210+00:00",
+          "elapsed_ms": 35.406
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-unrelated",
+          "status": 200,
+          "at": "2026-11-02T17:15:35.219227+00:00",
+          "elapsed_ms": 8.246
+        },
+        {
+          "label": "risk_intake",
+          "method": "POST",
+          "path": "/zero-trust/signals/inbox",
+          "status": 202,
+          "at": "2026-11-02T17:15:35.256278+00:00",
+          "elapsed_ms": 36.68
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-first",
+          "status": 200,
+          "at": "2026-11-02T17:15:35.264129+00:00",
+          "elapsed_ms": 7.497
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-first",
+          "status": 200,
+          "at": "2026-11-02T17:15:35.372156+00:00",
+          "elapsed_ms": 7.345
+        },
+        {
+          "label": "access_m3-first-a",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 403,
+          "at": "2026-11-02T17:15:35.401483+00:00",
+          "elapsed_ms": 29.825
+        },
+        {
+          "label": "access_m3-first-b",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 403,
+          "at": "2026-11-02T17:15:35.433275+00:00",
+          "elapsed_ms": 31.703
+        },
+        {
+          "label": "access_m3-unrelated",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 200,
+          "at": "2026-11-02T17:15:35.465402+00:00",
+          "elapsed_ms": 31.948
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-a",
+          "status": 200,
+          "at": "2026-11-02T17:15:35.472077+00:00",
+          "elapsed_ms": 6.416
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-b",
+          "status": 200,
+          "at": "2026-11-02T17:15:35.478832+00:00",
+          "elapsed_ms": 7.006
+        },
+        {
+          "label": "exact_duplicate",
+          "method": "POST",
+          "path": "/zero-trust/signals/inbox",
+          "status": 202,
+          "at": "2026-11-02T17:15:35.490064+00:00",
+          "elapsed_ms": 11.262
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-a",
+          "status": 200,
+          "at": "2026-11-02T17:15:35.496879+00:00",
+          "elapsed_ms": 7.442
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-b",
+          "status": 200,
+          "at": "2026-11-02T17:15:35.504992+00:00",
+          "elapsed_ms": 6.978
+        },
+        {
+          "label": "changed_payload",
+          "method": "POST",
+          "path": "/zero-trust/signals/inbox",
+          "status": 409,
+          "at": "2026-11-02T17:15:35.516042+00:00",
+          "elapsed_ms": 12.078
+        },
+        {
+          "label": "create_m3-second-a",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:15:36.801834+00:00",
+          "elapsed_ms": 50.677
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-a",
+          "status": 200,
+          "at": "2026-11-02T17:15:36.809501+00:00",
+          "elapsed_ms": 7.444
+        },
+        {
+          "label": "create_m3-second-b",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:15:36.839512+00:00",
+          "elapsed_ms": 28.947
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-b",
+          "status": 200,
+          "at": "2026-11-02T17:15:36.847379+00:00",
+          "elapsed_ms": 7.92
+        },
+        {
+          "label": "create_m3-unrelated-reserved",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:15:36.900857+00:00",
+          "elapsed_ms": 51.66
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-unrelated-reserved",
+          "status": 200,
+          "at": "2026-11-02T17:15:36.928167+00:00",
+          "elapsed_ms": 27.477
+        },
+        {
+          "label": "risk_while_worker_stopped",
+          "method": "POST",
+          "path": "/zero-trust/signals/inbox",
+          "status": 202,
+          "at": "2026-11-02T17:15:36.955684+00:00",
+          "elapsed_ms": 26.892
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:36.961032+00:00",
+          "elapsed_ms": 5.797
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:43.457543+00:00",
+          "elapsed_ms": 8.398
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-a",
+          "status": 200,
+          "at": "2026-11-02T17:15:43.467589+00:00",
+          "elapsed_ms": 10.208
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:44.601452+00:00",
+          "elapsed_ms": 9.548
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:44.711873+00:00",
+          "elapsed_ms": 9.775
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:44.821123+00:00",
+          "elapsed_ms": 9.338
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:44.946521+00:00",
+          "elapsed_ms": 24.803
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:45.055825+00:00",
+          "elapsed_ms": 8.834
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:45.174425+00:00",
+          "elapsed_ms": 18.558
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:45.283038+00:00",
+          "elapsed_ms": 8.448
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:45.395998+00:00",
+          "elapsed_ms": 11.995
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:45.504569+00:00",
+          "elapsed_ms": 8.868
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:45.613690+00:00",
+          "elapsed_ms": 8.315
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:45.722924+00:00",
+          "elapsed_ms": 8.751
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:45.833087+00:00",
+          "elapsed_ms": 9.773
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:45.943681+00:00",
+          "elapsed_ms": 10.22
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:46.055170+00:00",
+          "elapsed_ms": 10.32
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:46.165198+00:00",
+          "elapsed_ms": 9.803
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:46.275065+00:00",
+          "elapsed_ms": 9.221
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:46.384914+00:00",
+          "elapsed_ms": 9.358
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:46.495675+00:00",
+          "elapsed_ms": 10.331
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:46.605746+00:00",
+          "elapsed_ms": 9.803
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:46.714910+00:00",
+          "elapsed_ms": 8.373
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:46.824168+00:00",
+          "elapsed_ms": 8.369
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:46.932688+00:00",
+          "elapsed_ms": 8.142
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:47.042003+00:00",
+          "elapsed_ms": 9.071
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:47.151891+00:00",
+          "elapsed_ms": 9.654
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:47.261711+00:00",
+          "elapsed_ms": 9.557
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:47.371493+00:00",
+          "elapsed_ms": 8.903
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:47.480313+00:00",
+          "elapsed_ms": 8.741
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:47.591123+00:00",
+          "elapsed_ms": 10.337
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:47.701172+00:00",
+          "elapsed_ms": 9.168
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:47.810235+00:00",
+          "elapsed_ms": 8.841
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:47.974553+00:00",
+          "elapsed_ms": 63.306
+        },
+        {
+          "label": "access_m3-second-a",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 403,
+          "at": "2026-11-02T17:15:48.016819+00:00",
+          "elapsed_ms": 42.298
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-a",
+          "status": 200,
+          "at": "2026-11-02T17:15:48.025074+00:00",
+          "elapsed_ms": 8.289
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-b",
+          "status": 200,
+          "at": "2026-11-02T17:15:48.033414+00:00",
+          "elapsed_ms": 8.654
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-a",
+          "status": 200,
+          "at": "2026-11-02T17:15:48.042166+00:00",
+          "elapsed_ms": 8.296
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-b",
+          "status": 200,
+          "at": "2026-11-02T17:15:48.051997+00:00",
+          "elapsed_ms": 9.898
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-unrelated-reserved",
+          "status": 200,
+          "at": "2026-11-02T17:15:48.062789+00:00",
+          "elapsed_ms": 11.301
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:54.139641+00:00",
+          "elapsed_ms": 10.052
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-a",
+          "status": 200,
+          "at": "2026-11-02T17:15:54.149891+00:00",
+          "elapsed_ms": 10.167
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-b",
+          "status": 200,
+          "at": "2026-11-02T17:15:54.157586+00:00",
+          "elapsed_ms": 7.914
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-a",
+          "status": 200,
+          "at": "2026-11-02T17:15:54.170570+00:00",
+          "elapsed_ms": 12.433
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-b",
+          "status": 200,
+          "at": "2026-11-02T17:15:54.178950+00:00",
+          "elapsed_ms": 8.575
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-unrelated-reserved",
+          "status": 200,
+          "at": "2026-11-02T17:15:54.188054+00:00",
+          "elapsed_ms": 9.079
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:15:54.196608+00:00",
+          "elapsed_ms": 8.446
+        },
+        {
+          "label": "access_m3-second-b",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 403,
+          "at": "2026-11-02T17:15:54.229647+00:00",
+          "elapsed_ms": 33.256
+        },
+        {
+          "label": "access_m3-unrelated-reserved",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 200,
+          "at": "2026-11-02T17:15:54.263868+00:00",
+          "elapsed_ms": 34.22
+        }
+      ],
+      "sessions": {
+        "m3-normal-probe": {
+          "session_id": "m3-normal-probe",
+          "version": 1,
+          "decision": "ALLOW",
+          "status": "ACTIVE",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 1
+        },
+        "m3-first-a": {
+          "session_id": "m3-first-a",
+          "version": 2,
+          "decision": "DENY",
+          "status": "REVOKED",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 2
+        },
+        "m3-first-b": {
+          "session_id": "m3-first-b",
+          "version": 2,
+          "decision": "DENY",
+          "status": "REVOKED",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 2
+        },
+        "m3-unrelated": {
+          "session_id": "m3-unrelated",
+          "version": 1,
+          "decision": "ALLOW",
+          "status": "ACTIVE",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 1
+        },
+        "m3-second-a": {
+          "session_id": "m3-second-a",
+          "version": 2,
+          "decision": "DENY",
+          "status": "REVOKED",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 2
+        },
+        "m3-second-b": {
+          "session_id": "m3-second-b",
+          "version": 2,
+          "decision": "DENY",
+          "status": "REVOKED",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 2
+        },
+        "m3-unrelated-reserved": {
+          "session_id": "m3-unrelated-reserved",
+          "version": 1,
+          "decision": "ALLOW",
+          "status": "ACTIVE",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 1
+        }
+      },
+      "receipts": {
+        "first_completed": {
+          "event_id": "m3-risk-first",
+          "state": "completed",
+          "received_at": "2026-11-02T17:15:35.224218+00:00",
+          "completed_at": "2026-11-02T17:15:35.336806+00:00",
+          "attempts": 1,
+          "last_error": null,
+          "result": {
+            "matched_sessions": 2,
+            "changed_sessions": 2,
+            "stale": false,
+            "duplicate": false
+          }
+        },
+        "before_app_restart": {
+          "event_id": "m3-risk-second",
+          "state": "pending",
+          "received_at": "2026-11-02T17:15:36.934113+00:00",
+          "completed_at": null,
+          "attempts": 0,
+          "last_error": null,
+          "result": null
+        },
+        "resumed_completed": {
+          "event_id": "m3-risk-second",
+          "state": "completed",
+          "received_at": "2026-11-02T17:15:36.934113+00:00",
+          "completed_at": "2026-11-02T17:15:47.940475+00:00",
+          "attempts": 1,
+          "last_error": null,
+          "result": {
+            "matched_sessions": 2,
+            "changed_sessions": 2,
+            "stale": false,
+            "duplicate": false
+          }
+        },
+        "after_both_restart": {
+          "event_id": "m3-risk-second",
+          "state": "completed",
+          "received_at": "2026-11-02T17:15:36.934113+00:00",
+          "completed_at": "2026-11-02T17:15:47.940475+00:00",
+          "attempts": 1,
+          "last_error": null,
+          "result": {
+            "matched_sessions": 2,
+            "changed_sessions": 2,
+            "stale": false,
+            "duplicate": false
+          }
+        }
+      },
+      "denial_latency": [
+        {
+          "group": "normal_worker",
+          "at": "2026-11-02T17:15:35.402077+00:00",
+          "client_post_start_to_first_confirmed_denial_ms": 182.066
+        },
+        {
+          "group": "worker_outage",
+          "at": "2026-11-02T17:15:48.016819+00:00",
+          "client_post_start_to_first_confirmed_denial_ms": 11087.336
+        }
+      ],
+      "started_at": "2026-11-02T17:15:22.782100+00:00",
+      "project": "secops-m3check-infra-56f30e61da87",
+      "image_id": "sha256:cd2f29d713759ec78fae1cdbd9114d795afcaeeeee350307d66dbbdc9372bf24",
+      "compose_start_to_first_live_ms": 7748.675,
+      "container_security": [
+        {
+          "service": "app",
+          "network_mode": "secops-m3check-infra-56f30e61da87_default",
+          "read_only_rootfs": true,
+          "user": "secops",
+          "cap_drop": [
+            "ALL"
+          ],
+          "security_options": [
+            "no-new-privileges:true"
+          ],
+          "nano_cpus": 1000000000,
+          "memory_limit_bytes": 268435456,
+          "published_ports": {
+            "8000/tcp": [
+              {
+                "HostIp": "127.0.0.1",
+                "HostPort": "58501"
+              }
+            ]
+          },
+          "mounts": [
+            {
+              "destination": "/data",
+              "writable": true,
+              "type": "volume"
+            },
+            {
+              "destination": "/signals/sources.json",
+              "writable": false,
+              "type": "bind"
+            }
+          ]
+        },
+        {
+          "service": "signal-worker",
+          "network_mode": "none",
+          "read_only_rootfs": true,
+          "user": "secops",
+          "cap_drop": [
+            "ALL"
+          ],
+          "security_options": [
+            "no-new-privileges:true"
+          ],
+          "nano_cpus": 1000000000,
+          "memory_limit_bytes": 268435456,
+          "published_ports": {},
+          "mounts": [
+            {
+              "destination": "/data",
+              "writable": true,
+              "type": "volume"
+            },
+            {
+              "destination": "/signals/sources.json",
+              "writable": false,
+              "type": "bind"
+            }
+          ]
+        }
+      ],
+      "container_probes": {
+        "app": {
+          "uid": 10001,
+          "registry_readable": true,
+          "registry_mode": "0o777",
+          "shared_write": true,
+          "private_keys_absent": true
+        },
+        "signal-worker": {
+          "uid": 10001,
+          "shared_app_write_seen": true,
+          "worker_write": true,
+          "private_keys_absent": true
+        }
+      },
+      "resource_samples": [
+        {
+          "at": "2026-11-02T17:15:34.517320+00:00",
+          "service": "app",
+          "cpu_percent": 0.16,
+          "memory_bytes_estimate": 85479916,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 4080,
+          "network_tx_bytes_estimate": 2350,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 6
+        },
+        {
+          "at": "2026-11-02T17:15:34.517320+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 1.35,
+          "memory_bytes_estimate": 74973184,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:15:36.840087+00:00",
+          "service": "app",
+          "cpu_percent": 0.16,
+          "memory_bytes_estimate": 88290099,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 24200,
+          "network_tx_bytes_estimate": 40500,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 6
+        },
+        {
+          "at": "2026-11-02T17:15:36.840087+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 0,
+          "memory_limit_bytes_estimate": 0,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 0
+        },
+        {
+          "at": "2026-11-02T17:15:39.397231+00:00",
+          "service": "app",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 8855224,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 348,
+          "network_tx_bytes_estimate": 42,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:15:39.397231+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 0,
+          "memory_limit_bytes_estimate": 0,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 0
+        },
+        {
+          "at": "2026-11-02T17:15:41.808377+00:00",
+          "service": "app",
+          "cpu_percent": 99.46,
+          "memory_bytes_estimate": 43390075,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 2070,
+          "network_tx_bytes_estimate": 762,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:15:41.808377+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 0,
+          "memory_limit_bytes_estimate": 0,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 0
+        },
+        {
+          "at": "2026-11-02T17:15:44.205670+00:00",
+          "service": "app",
+          "cpu_percent": 67.44,
+          "memory_bytes_estimate": 94497669,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 4410,
+          "network_tx_bytes_estimate": 5160,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 7
+        },
+        {
+          "at": "2026-11-02T17:15:44.205670+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 0,
+          "memory_limit_bytes_estimate": 0,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 0
+        },
+        {
+          "at": "2026-11-02T17:15:47.609725+00:00",
+          "service": "app",
+          "cpu_percent": 4.04,
+          "memory_bytes_estimate": 82659246,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 14900,
+          "network_tx_bytes_estimate": 24500,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 6
+        },
+        {
+          "at": "2026-11-02T17:15:47.609725+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 99.94,
+          "memory_bytes_estimate": 62369300,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:15:50.371599+00:00",
+          "service": "app",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 0,
+          "memory_limit_bytes_estimate": 0,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 0
+        },
+        {
+          "at": "2026-11-02T17:15:50.371599+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 19461571,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:15:53.759515+00:00",
+          "service": "app",
+          "cpu_percent": 99.66,
+          "memory_bytes_estimate": 45015368,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 1920,
+          "network_tx_bytes_estimate": 654,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:15:53.760085+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 23.77,
+          "memory_bytes_estimate": 71890371,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        }
+      ],
+      "sampling_errors": [],
+      "cleanup": {
+        "containers_removed": true,
+        "volume_removed": true
+      },
+      "finished_at": "2026-11-02T17:15:57.717798+00:00"
+    },
+    {
+      "repeat": 3,
+      "status": "passed",
+      "checks": [
+        {
+          "label": "container_boundaries",
+          "status": "passed",
+          "at": "2026-11-02T17:16:09.383215+00:00"
+        },
+        {
+          "label": "worker_loopback_only",
+          "status": "passed",
+          "at": "2026-11-02T17:16:10.549165+00:00"
+        },
+        {
+          "label": "normal_probe",
+          "status": "passed",
+          "at": "2026-11-02T17:16:10.639073+00:00"
+        },
+        {
+          "label": "related_revoked",
+          "status": "passed",
+          "at": "2026-11-02T17:16:10.997778+00:00"
+        },
+        {
+          "label": "unrelated_preserved",
+          "status": "passed",
+          "at": "2026-11-02T17:16:11.059452+00:00"
+        },
+        {
+          "label": "duplicate_idempotent",
+          "status": "passed",
+          "at": "2026-11-02T17:16:11.120454+00:00"
+        },
+        {
+          "label": "conflicting_payload_rejected",
+          "status": "passed",
+          "at": "2026-11-02T17:16:11.139258+00:00"
+        },
+        {
+          "label": "pending_survives_app_restart",
+          "status": "passed",
+          "at": "2026-11-02T17:16:18.911852+00:00"
+        },
+        {
+          "label": "worker_resumes_pending",
+          "status": "passed",
+          "at": "2026-11-02T17:16:24.318084+00:00"
+        },
+        {
+          "label": "restarts_preserve_receipt_and_versions",
+          "status": "passed",
+          "at": "2026-11-02T17:16:33.835151+00:00"
+        },
+        {
+          "label": "unused_grant_remains_revoked",
+          "status": "passed",
+          "at": "2026-11-02T17:16:33.873603+00:00"
+        },
+        {
+          "label": "unrelated_survives_restarts",
+          "status": "passed",
+          "at": "2026-11-02T17:16:33.905010+00:00"
+        }
+      ],
+      "http": [
+        {
+          "label": "create_m3-normal-probe",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:16:10.590742+00:00",
+          "elapsed_ms": 39.694
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-normal-probe",
+          "status": 200,
+          "at": "2026-11-02T17:16:10.607116+00:00",
+          "elapsed_ms": 16.274
+        },
+        {
+          "label": "access_m3-normal-probe",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 200,
+          "at": "2026-11-02T17:16:10.639073+00:00",
+          "elapsed_ms": 31.952
+        },
+        {
+          "label": "create_m3-first-a",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:16:10.674342+00:00",
+          "elapsed_ms": 33.714
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-a",
+          "status": 200,
+          "at": "2026-11-02T17:16:10.684537+00:00",
+          "elapsed_ms": 10.317
+        },
+        {
+          "label": "create_m3-first-b",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:16:10.725331+00:00",
+          "elapsed_ms": 38.086
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-b",
+          "status": 200,
+          "at": "2026-11-02T17:16:10.735102+00:00",
+          "elapsed_ms": 9.46
+        },
+        {
+          "label": "create_m3-unrelated",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:16:10.767012+00:00",
+          "elapsed_ms": 30.72
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-unrelated",
+          "status": 200,
+          "at": "2026-11-02T17:16:10.774756+00:00",
+          "elapsed_ms": 7.796
+        },
+        {
+          "label": "risk_intake",
+          "method": "POST",
+          "path": "/zero-trust/signals/inbox",
+          "status": 202,
+          "at": "2026-11-02T17:16:10.806239+00:00",
+          "elapsed_ms": 31.058
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-first",
+          "status": 200,
+          "at": "2026-11-02T17:16:10.834025+00:00",
+          "elapsed_ms": 27.756
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-first",
+          "status": 200,
+          "at": "2026-11-02T17:16:10.943224+00:00",
+          "elapsed_ms": 8.886
+        },
+        {
+          "label": "access_m3-first-a",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 403,
+          "at": "2026-11-02T17:16:10.969519+00:00",
+          "elapsed_ms": 25.917
+        },
+        {
+          "label": "access_m3-first-b",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 403,
+          "at": "2026-11-02T17:16:10.997778+00:00",
+          "elapsed_ms": 28.168
+        },
+        {
+          "label": "access_m3-unrelated",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 200,
+          "at": "2026-11-02T17:16:11.059452+00:00",
+          "elapsed_ms": 62.259
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-a",
+          "status": 200,
+          "at": "2026-11-02T17:16:11.070751+00:00",
+          "elapsed_ms": 11.214
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-b",
+          "status": 200,
+          "at": "2026-11-02T17:16:11.082125+00:00",
+          "elapsed_ms": 10.994
+        },
+        {
+          "label": "exact_duplicate",
+          "method": "POST",
+          "path": "/zero-trust/signals/inbox",
+          "status": 202,
+          "at": "2026-11-02T17:16:11.100019+00:00",
+          "elapsed_ms": 17.92
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-a",
+          "status": 200,
+          "at": "2026-11-02T17:16:11.111108+00:00",
+          "elapsed_ms": 10.869
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-b",
+          "status": 200,
+          "at": "2026-11-02T17:16:11.120454+00:00",
+          "elapsed_ms": 9.578
+        },
+        {
+          "label": "changed_payload",
+          "method": "POST",
+          "path": "/zero-trust/signals/inbox",
+          "status": 409,
+          "at": "2026-11-02T17:16:11.139258+00:00",
+          "elapsed_ms": 17.964
+        },
+        {
+          "label": "create_m3-second-a",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:16:12.895031+00:00",
+          "elapsed_ms": 43.661
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-a",
+          "status": 200,
+          "at": "2026-11-02T17:16:12.903986+00:00",
+          "elapsed_ms": 9.228
+        },
+        {
+          "label": "create_m3-second-b",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:16:12.940116+00:00",
+          "elapsed_ms": 34.183
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-b",
+          "status": 200,
+          "at": "2026-11-02T17:16:12.952569+00:00",
+          "elapsed_ms": 12.17
+        },
+        {
+          "label": "create_m3-unrelated-reserved",
+          "method": "POST",
+          "path": "/zero-trust/signals/evaluate",
+          "status": 200,
+          "at": "2026-11-02T17:16:12.991905+00:00",
+          "elapsed_ms": 38.373
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-unrelated-reserved",
+          "status": 200,
+          "at": "2026-11-02T17:16:13.002675+00:00",
+          "elapsed_ms": 10.566
+        },
+        {
+          "label": "risk_while_worker_stopped",
+          "method": "POST",
+          "path": "/zero-trust/signals/inbox",
+          "status": 202,
+          "at": "2026-11-02T17:16:13.049414+00:00",
+          "elapsed_ms": 46.048
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:13.058529+00:00",
+          "elapsed_ms": 9.073
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:18.901150+00:00",
+          "elapsed_ms": 27.423
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-a",
+          "status": 200,
+          "at": "2026-11-02T17:16:18.911217+00:00",
+          "elapsed_ms": 10.339
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:20.170184+00:00",
+          "elapsed_ms": 10.021
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:20.280234+00:00",
+          "elapsed_ms": 9.304
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:20.396310+00:00",
+          "elapsed_ms": 15.551
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:20.506929+00:00",
+          "elapsed_ms": 9.972
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:20.617086+00:00",
+          "elapsed_ms": 9.76
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:20.738809+00:00",
+          "elapsed_ms": 21.547
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:20.850361+00:00",
+          "elapsed_ms": 11.161
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:20.961622+00:00",
+          "elapsed_ms": 10.632
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:21.078723+00:00",
+          "elapsed_ms": 16.841
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:21.213983+00:00",
+          "elapsed_ms": 34.706
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:21.324937+00:00",
+          "elapsed_ms": 10.398
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:21.434475+00:00",
+          "elapsed_ms": 9.188
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:21.544795+00:00",
+          "elapsed_ms": 10.29
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:21.654435+00:00",
+          "elapsed_ms": 9.102
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:21.769386+00:00",
+          "elapsed_ms": 14.665
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:21.879759+00:00",
+          "elapsed_ms": 10.069
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:21.993805+00:00",
+          "elapsed_ms": 13.65
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:22.105395+00:00",
+          "elapsed_ms": 11.36
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:22.219774+00:00",
+          "elapsed_ms": 13.829
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:22.329642+00:00",
+          "elapsed_ms": 9.424
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:22.438860+00:00",
+          "elapsed_ms": 9.148
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:22.548599+00:00",
+          "elapsed_ms": 9.251
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:22.657591+00:00",
+          "elapsed_ms": 8.834
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:22.768402+00:00",
+          "elapsed_ms": 10.2
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:22.980483+00:00",
+          "elapsed_ms": 112.306
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:23.130555+00:00",
+          "elapsed_ms": 49.513
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:23.331331+00:00",
+          "elapsed_ms": 90.853
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:23.454280+00:00",
+          "elapsed_ms": 22.618
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:23.574045+00:00",
+          "elapsed_ms": 19.199
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:23.686074+00:00",
+          "elapsed_ms": 11.51
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:23.798443+00:00",
+          "elapsed_ms": 12.083
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:23.908734+00:00",
+          "elapsed_ms": 9.875
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:24.019040+00:00",
+          "elapsed_ms": 9.859
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:24.183211+00:00",
+          "elapsed_ms": 63.595
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:24.292431+00:00",
+          "elapsed_ms": 8.641
+        },
+        {
+          "label": "access_m3-second-a",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 403,
+          "at": "2026-11-02T17:16:24.318084+00:00",
+          "elapsed_ms": 25.256
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-a",
+          "status": 200,
+          "at": "2026-11-02T17:16:24.327349+00:00",
+          "elapsed_ms": 9.469
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-b",
+          "status": 200,
+          "at": "2026-11-02T17:16:24.335537+00:00",
+          "elapsed_ms": 7.93
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-a",
+          "status": 200,
+          "at": "2026-11-02T17:16:24.345181+00:00",
+          "elapsed_ms": 9.594
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-b",
+          "status": 200,
+          "at": "2026-11-02T17:16:24.353409+00:00",
+          "elapsed_ms": 8.178
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-unrelated-reserved",
+          "status": 200,
+          "at": "2026-11-02T17:16:24.361600+00:00",
+          "elapsed_ms": 8.514
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:33.786109+00:00",
+          "elapsed_ms": 9.413
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-a",
+          "status": 200,
+          "at": "2026-11-02T17:16:33.794261+00:00",
+          "elapsed_ms": 8.039
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-first-b",
+          "status": 200,
+          "at": "2026-11-02T17:16:33.802625+00:00",
+          "elapsed_ms": 8.393
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-a",
+          "status": 200,
+          "at": "2026-11-02T17:16:33.811296+00:00",
+          "elapsed_ms": 9.533
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-second-b",
+          "status": 200,
+          "at": "2026-11-02T17:16:33.819868+00:00",
+          "elapsed_ms": 8.227
+        },
+        {
+          "label": "session_history",
+          "method": "GET",
+          "path": "/zero-trust/sessions/m3-unrelated-reserved",
+          "status": 200,
+          "at": "2026-11-02T17:16:33.826958+00:00",
+          "elapsed_ms": 6.817
+        },
+        {
+          "label": "receipt",
+          "method": "GET",
+          "path": "/zero-trust/signals/inbox/m3-risk-second",
+          "status": 200,
+          "at": "2026-11-02T17:16:33.834623+00:00",
+          "elapsed_ms": 7.57
+        },
+        {
+          "label": "access_m3-second-b",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 403,
+          "at": "2026-11-02T17:16:33.873603+00:00",
+          "elapsed_ms": 38.897
+        },
+        {
+          "label": "access_m3-unrelated-reserved",
+          "method": "POST",
+          "path": "/zero-trust/protected-access",
+          "status": 200,
+          "at": "2026-11-02T17:16:33.905010+00:00",
+          "elapsed_ms": 31.107
+        }
+      ],
+      "sessions": {
+        "m3-normal-probe": {
+          "session_id": "m3-normal-probe",
+          "version": 1,
+          "decision": "ALLOW",
+          "status": "ACTIVE",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 1
+        },
+        "m3-first-a": {
+          "session_id": "m3-first-a",
+          "version": 2,
+          "decision": "DENY",
+          "status": "REVOKED",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 2
+        },
+        "m3-first-b": {
+          "session_id": "m3-first-b",
+          "version": 2,
+          "decision": "DENY",
+          "status": "REVOKED",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 2
+        },
+        "m3-unrelated": {
+          "session_id": "m3-unrelated",
+          "version": 1,
+          "decision": "ALLOW",
+          "status": "ACTIVE",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 1
+        },
+        "m3-second-a": {
+          "session_id": "m3-second-a",
+          "version": 2,
+          "decision": "DENY",
+          "status": "REVOKED",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 2
+        },
+        "m3-second-b": {
+          "session_id": "m3-second-b",
+          "version": 2,
+          "decision": "DENY",
+          "status": "REVOKED",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 2
+        },
+        "m3-unrelated-reserved": {
+          "session_id": "m3-unrelated-reserved",
+          "version": 1,
+          "decision": "ALLOW",
+          "status": "ACTIVE",
+          "signal_trust": "verified_source",
+          "signal_source_id": "m3check-session",
+          "history_count": 1
+        }
+      },
+      "receipts": {
+        "first_completed": {
+          "event_id": "m3-risk-first",
+          "state": "completed",
+          "received_at": "2026-11-02T17:16:10.780392+00:00",
+          "completed_at": "2026-11-02T17:16:10.861782+00:00",
+          "attempts": 1,
+          "last_error": null,
+          "result": {
+            "matched_sessions": 2,
+            "changed_sessions": 2,
+            "stale": false,
+            "duplicate": false
+          }
+        },
+        "before_app_restart": {
+          "event_id": "m3-risk-second",
+          "state": "pending",
+          "received_at": "2026-11-02T17:16:13.023504+00:00",
+          "completed_at": null,
+          "attempts": 0,
+          "last_error": null,
+          "result": null
+        },
+        "resumed_completed": {
+          "event_id": "m3-risk-second",
+          "state": "completed",
+          "received_at": "2026-11-02T17:16:13.023504+00:00",
+          "completed_at": "2026-11-02T17:16:24.204398+00:00",
+          "attempts": 1,
+          "last_error": null,
+          "result": {
+            "matched_sessions": 2,
+            "changed_sessions": 2,
+            "stale": false,
+            "duplicate": false
+          }
+        },
+        "after_both_restart": {
+          "event_id": "m3-risk-second",
+          "state": "completed",
+          "received_at": "2026-11-02T17:16:13.023504+00:00",
+          "completed_at": "2026-11-02T17:16:24.204398+00:00",
+          "attempts": 1,
+          "last_error": null,
+          "result": {
+            "matched_sessions": 2,
+            "changed_sessions": 2,
+            "stale": false,
+            "duplicate": false
+          }
+        }
+      },
+      "denial_latency": [
+        {
+          "group": "normal_worker",
+          "at": "2026-11-02T17:16:10.969519+00:00",
+          "client_post_start_to_first_confirmed_denial_ms": 194.034
+        },
+        {
+          "group": "worker_outage",
+          "at": "2026-11-02T17:16:24.318084+00:00",
+          "client_post_start_to_first_confirmed_denial_ms": 11313.693
+        }
+      ],
+      "started_at": "2026-11-02T17:15:57.721320+00:00",
+      "project": "secops-m3check-infra-2b05cf5fb355",
+      "image_id": "sha256:cd2f29d713759ec78fae1cdbd9114d795afcaeeeee350307d66dbbdc9372bf24",
+      "compose_start_to_first_live_ms": 7457.239,
+      "container_security": [
+        {
+          "service": "app",
+          "network_mode": "secops-m3check-infra-2b05cf5fb355_default",
+          "read_only_rootfs": true,
+          "user": "secops",
+          "cap_drop": [
+            "ALL"
+          ],
+          "security_options": [
+            "no-new-privileges:true"
+          ],
+          "nano_cpus": 1000000000,
+          "memory_limit_bytes": 268435456,
+          "published_ports": {
+            "8000/tcp": [
+              {
+                "HostIp": "127.0.0.1",
+                "HostPort": "58907"
+              }
+            ]
+          },
+          "mounts": [
+            {
+              "destination": "/data",
+              "writable": true,
+              "type": "volume"
+            },
+            {
+              "destination": "/signals/sources.json",
+              "writable": false,
+              "type": "bind"
+            }
+          ]
+        },
+        {
+          "service": "signal-worker",
+          "network_mode": "none",
+          "read_only_rootfs": true,
+          "user": "secops",
+          "cap_drop": [
+            "ALL"
+          ],
+          "security_options": [
+            "no-new-privileges:true"
+          ],
+          "nano_cpus": 1000000000,
+          "memory_limit_bytes": 268435456,
+          "published_ports": {},
+          "mounts": [
+            {
+              "destination": "/data",
+              "writable": true,
+              "type": "volume"
+            },
+            {
+              "destination": "/signals/sources.json",
+              "writable": false,
+              "type": "bind"
+            }
+          ]
+        }
+      ],
+      "container_probes": {
+        "app": {
+          "uid": 10001,
+          "registry_readable": true,
+          "registry_mode": "0o777",
+          "shared_write": true,
+          "private_keys_absent": true
+        },
+        "signal-worker": {
+          "uid": 10001,
+          "shared_app_write_seen": true,
+          "worker_write": true,
+          "private_keys_absent": true
+        }
+      },
+      "resource_samples": [
+        {
+          "at": "2026-11-02T17:16:09.449153+00:00",
+          "service": "app",
+          "cpu_percent": 0.2,
+          "memory_bytes_estimate": 87629496,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 4080,
+          "network_tx_bytes_estimate": 2350,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 6
+        },
+        {
+          "at": "2026-11-02T17:16:09.449153+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 1.88,
+          "memory_bytes_estimate": 75119985,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:16:12.845694+00:00",
+          "service": "app",
+          "cpu_percent": 9.66,
+          "memory_bytes_estimate": 90387251,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 24200,
+          "network_tx_bytes_estimate": 40600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 6
+        },
+        {
+          "at": "2026-11-02T17:16:12.845694+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 0,
+          "memory_limit_bytes_estimate": 0,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 0
+        },
+        {
+          "at": "2026-11-02T17:16:15.280846+00:00",
+          "service": "app",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 0,
+          "memory_limit_bytes_estimate": 0,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 0
+        },
+        {
+          "at": "2026-11-02T17:16:15.280846+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 0,
+          "memory_limit_bytes_estimate": 0,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 0
+        },
+        {
+          "at": "2026-11-02T17:16:17.647089+00:00",
+          "service": "app",
+          "cpu_percent": 100.6,
+          "memory_bytes_estimate": 47448064,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 1920,
+          "network_tx_bytes_estimate": 654,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:16:17.647089+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 0,
+          "memory_limit_bytes_estimate": 0,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 0
+        },
+        {
+          "at": "2026-11-02T17:16:20.013107+00:00",
+          "service": "app",
+          "cpu_percent": 1.31,
+          "memory_bytes_estimate": 82397102,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 4110,
+          "network_tx_bytes_estimate": 4940,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 6
+        },
+        {
+          "at": "2026-11-02T17:16:20.013107+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 0.0,
+          "memory_bytes_estimate": 0,
+          "memory_limit_bytes_estimate": 0,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 0
+        },
+        {
+          "at": "2026-11-02T17:16:22.489816+00:00",
+          "service": "app",
+          "cpu_percent": 4.37,
+          "memory_bytes_estimate": 82638275,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 16000,
+          "network_tx_bytes_estimate": 27500,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 6
+        },
+        {
+          "at": "2026-11-02T17:16:22.489816+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 100.5,
+          "memory_bytes_estimate": 47164948,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:16:25.955312+00:00",
+          "service": "app",
+          "cpu_percent": 44.33,
+          "memory_bytes_estimate": 83068191,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 28600,
+          "network_tx_bytes_estimate": 59900,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 5
+        },
+        {
+          "at": "2026-11-02T17:16:25.955312+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 28.32,
+          "memory_bytes_estimate": 75172413,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:16:29.805758+00:00",
+          "service": "app",
+          "cpu_percent": 100.01,
+          "memory_bytes_estimate": 29286728,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 1630,
+          "network_tx_bytes_estimate": 600,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:16:29.806273+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 99.02,
+          "memory_bytes_estimate": 35232154,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:16:33.289962+00:00",
+          "service": "app",
+          "cpu_percent": 99.57,
+          "memory_bytes_estimate": 67821896,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 3150,
+          "network_tx_bytes_estimate": 1560,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        },
+        {
+          "at": "2026-11-02T17:16:33.290996+00:00",
+          "service": "signal-worker",
+          "cpu_percent": 48.38,
+          "memory_bytes_estimate": 71848428,
+          "memory_limit_bytes_estimate": 268435456,
+          "network_rx_bytes_estimate": 0,
+          "network_tx_bytes_estimate": 0,
+          "block_read_bytes_estimate": 0,
+          "block_written_bytes_estimate": 0,
+          "pids": 1
+        }
+      ],
+      "sampling_errors": [],
+      "cleanup": {
+        "containers_removed": true,
+        "volume_removed": true
+      },
+      "finished_at": "2026-11-02T17:16:36.774677+00:00"
+    }
+  ],
+  "client_duration_clock": {
+    "name": "perf_counter",
+    "implementation": "QueryPerformanceCounter()",
+    "resolution_seconds": 1e-07,
+    "monotonic": true
+  },
+  "base_commit": "82285c68e2a2c426ba205d36edb8135b11fa6f04",
+  "source_sha256": {
+    "app/__init__.py": "5d11b707f04f3d212f11574be9e5fc1f208f5c5e07c4b9189064a478f544031f",
+    "app/analyzers/__init__.py": "79806074cce9d93442338e8378c44a1767e18df5dc97c03a105d6ed48c743573",
+    "app/analyzers/base.py": "88297534038ea6159b1a222a7bcfe65dcdd84728aaae84bc3e000f3d2e21dd23",
+    "app/analyzers/hybrid.py": "7555f6a8d08996feae6caa986037c7f828858740aa9d63f3f0f7f47a47738882",
+    "app/analyzers/openai_analyzer.py": "83f5041db0118a106492e45d398aadff85e8dbf65c5fcbe7ce3632083840c8cd",
+    "app/analyzers/rule_based.py": "30fdc741e75b6303d97c9b75cb5e66a9550fc64348ed7831d965241f9518acf1",
+    "app/config.py": "27abe1679ef3147f9eb28920299c68dbf93932e05bda6035a64d7b0ac1d2fcb2",
+    "app/continuous_signal_models.py": "895b017d7c666923639088281f71ef64386977e381c5b8060c3123d174be34ae",
+    "app/data/__init__.py": "3875977ad45be55f6deca57e7f1dc444cbc3648381a71659ba492748e6c9681c",
+    "app/data/replay/__init__.py": "94bd5f712cd115d632f44717d78e3a1856a5a25a23497ffc1aa1620502a553cb",
+    "app/data/sigma/__init__.py": "6bd4bdb9b4c00c48a04b66d13caf40de16488ca2541fdccdb5240fb626c75e91",
+    "app/main.py": "c04fb9ff8011a463994a95eed78d577512434500d2e89d0ce424161b9e2fce34",
+    "app/middleware.py": "6c056a2d1c5f0ad2e7cd1073303e96f495a2199c71e23437a270d97f49a91502",
+    "app/models.py": "772b921f53c9afe969952d5291cf353a79a584f96c8536cbdf64c00c63f26968",
+    "app/prompting.py": "70bd8e9b9378fcab842668d99d4ce136a623581d577a94d7a5e59285e3352f80",
+    "app/scenarios.py": "8566a2adbb4b93d993716c2ece288c08982fb8859c465a31cd26d104deb55f14",
+    "app/security.py": "4932ed1d6dde4cf6ce40a6cb8f056710a875369e225bf99886910bfb3bb2529b",
+    "app/services/__init__.py": "5ee368b8b403ddb926e38792d6c660d7a6ec88ea5bd628ded82a91e52931d2f1",
+    "app/services/assurance.py": "665220cf18662e3ad3a5c954914eef21884a24ea1701c18e7a6785ec7a7a92d8",
+    "app/services/audit.py": "4fcab51c7f4d678b129d2ae1326a5b24eb38bc9e58f3bc49e1625d8cb2db88c1",
+    "app/services/cases.py": "0cb8ea38e7e16e148eacb871c8120e7abd04e8ea5fc64b8de0fc74fa864b9559",
+    "app/services/continuous_signals.py": "05115d837dc2c00b56aafbe8833b047c0cd9fb1854fff20ba7db03db261ca2a3",
+    "app/services/correlation.py": "bda60c2db6f302e61606062f2053fd38b3483bc13ada9d4e7ec5668c66ff82e9",
+    "app/services/detection_benchmark.py": "40cebb5c800ab59048c197eae4648ed20282e81fe823fa95a3a37a173068be12",
+    "app/services/detection_quality.py": "c8663cd0942c8f36e7d4859d17dcd500bf40eb7c03e232d09ec5b1237009739c",
+    "app/services/evaluation.py": "048c4baf88f338b8b0cbd6b903c8db293067c286fa49f91a385698bf7508c64b",
+    "app/services/incident_quality.py": "d832f69955e4af33eaa78b838889b6f390daeab52df5fcd55716ef5f586be25e",
+    "app/services/integration_outbox.py": "c94c9d181cad85320939ff6eec77520dcc9be8549a1249896ca6a593660cec08",
+    "app/services/ocsf.py": "df5fbc1d0e731ae35ee8b92e514fe9a17a82b27162b6cc5c28714aa218b5a6bf",
+    "app/services/policy.py": "2ea1cd3bf6b78edde7198883970d0f48dad0d507dd5021adef611da2d94ae918",
+    "app/services/public_replay.py": "65146863b91cae7dcdb8ed76ae8fa6c4a91e74c480cf344a6e269e3b482d903c",
+    "app/services/scenario_evaluator.py": "0fe2ec0aaa2e3038deec89bfe7b17875311aa0002205693fff759a4acdfc7581",
+    "app/services/sigma.py": "2c9c28938bec9f6711539b34da9415849d2df0255204421bcf79e6894aa01f29",
+    "app/services/signal_inbox.py": "03b2d65ded032c5dd3c55434fa538afdc5604e72f54ddce2581e146cf05378b8",
+    "app/services/trusted_signals.py": "1c4908fed64712b1206bca5ae9b0f7175f315a1952e3703d764c9bb2477bb1e0",
+    "app/services/zero_trust.py": "88b40b4932138aa6832e9f6e5f7e5277baa5b1dcf44f0a737a2a6b2ec6ff64b8",
+    "app/zero_trust_api.py": "556fda2b67c9a20077b65c5f03c121e5deffd4a48d9f651ff1b7409f26b1b491",
+    "app/zero_trust_models.py": "1c466b491a923a23ce618e776660193c9bae4bef8a5026e39d8ac310a4ae7992",
+    "Dockerfile": "2278c841e2f77eda77f5ed282abd5f35ddf50f2e3dd2e890c36967804f4db219",
+    "compose.yaml": "2d1dee3524592b96ec82bd124cf8a05a1f2e1209753ef04bf6d92d42808bbe18",
+    "compose.signals.yaml": "f99c4074038467adf1a4c434105a35efe4692333880367f81a853777a462d59e",
+    "scripts/signal_worker.py": "043a97a59149ac6375a9c0945e7acef9a64f3da0e83b5815fab040cee5194438",
+    "scripts/test_signal_compose.py": "5738653d37888e7729528576d2167a0d0e6534543007e83636c2ccc765d3dd5b",
+    "scripts/measure_signal_infrastructure.py": "c11e501b43463f435c24764d38bf9ed110c480c517b982af160f1527798ed8e8"
+  },
+  "engine": {
+    "ServerVersion": "29.8.2",
+    "OSType": "linux",
+    "Architecture": "x86_64",
+    "NCPU": 18,
+    "MemTotal": 8104210432,
+    "OperatingSystem": "Docker Desktop"
+  },
+  "summary": {
+    "http_by_operation": {
+      "POST create_m3-normal-probe HTTP200": {
+        "n": 3,
+        "p50_ms": 42.382,
+        "p95_ms": 113.071,
+        "max_ms": 113.071
+      },
+      "GET session_history HTTP200": {
+        "n": 66,
+        "p50_ms": 9.469,
+        "p95_ms": 21.321,
+        "max_ms": 32.507
+      },
+      "POST access_m3-normal-probe HTTP200": {
+        "n": 3,
+        "p50_ms": 33.339,
+        "p95_ms": 100.462,
+        "max_ms": 100.462
+      },
+      "POST create_m3-first-a HTTP200": {
+        "n": 3,
+        "p50_ms": 33.913,
+        "p95_ms": 86.796,
+        "max_ms": 86.796
+      },
+      "POST create_m3-first-b HTTP200": {
+        "n": 3,
+        "p50_ms": 40.792,
+        "p95_ms": 88.851,
+        "max_ms": 88.851
+      },
+      "POST create_m3-unrelated HTTP200": {
+        "n": 3,
+        "p50_ms": 35.406,
+        "p95_ms": 115.149,
+        "max_ms": 115.149
+      },
+      "POST risk_intake HTTP202": {
+        "n": 3,
+        "p50_ms": 36.68,
+        "p95_ms": 101.445,
+        "max_ms": 101.445
+      },
+      "GET receipt HTTP200": {
+        "n": 115,
+        "p50_ms": 9.76,
+        "p95_ms": 49.513,
+        "max_ms": 112.306
+      },
+      "POST access_m3-first-a HTTP403": {
+        "n": 3,
+        "p50_ms": 29.825,
+        "p95_ms": 62.323,
+        "max_ms": 62.323
+      },
+      "POST access_m3-first-b HTTP403": {
+        "n": 3,
+        "p50_ms": 31.703,
+        "p95_ms": 59.833,
+        "max_ms": 59.833
+      },
+      "POST access_m3-unrelated HTTP200": {
+        "n": 3,
+        "p50_ms": 57.597,
+        "p95_ms": 62.259,
+        "max_ms": 62.259
+      },
+      "POST exact_duplicate HTTP202": {
+        "n": 3,
+        "p50_ms": 15.754,
+        "p95_ms": 17.92,
+        "max_ms": 17.92
+      },
+      "POST changed_payload HTTP409": {
+        "n": 3,
+        "p50_ms": 16.642,
+        "p95_ms": 17.964,
+        "max_ms": 17.964
+      },
+      "POST create_m3-second-a HTTP200": {
+        "n": 3,
+        "p50_ms": 50.677,
+        "p95_ms": 67.481,
+        "max_ms": 67.481
+      },
+      "POST create_m3-second-b HTTP200": {
+        "n": 3,
+        "p50_ms": 34.183,
+        "p95_ms": 53.078,
+        "max_ms": 53.078
+      },
+      "POST create_m3-unrelated-reserved HTTP200": {
+        "n": 3,
+        "p50_ms": 51.66,
+        "p95_ms": 63.611,
+        "max_ms": 63.611
+      },
+      "POST risk_while_worker_stopped HTTP202": {
+        "n": 3,
+        "p50_ms": 46.048,
+        "p95_ms": 60.769,
+        "max_ms": 60.769
+      },
+      "POST access_m3-second-a HTTP403": {
+        "n": 3,
+        "p50_ms": 36.146,
+        "p95_ms": 42.298,
+        "max_ms": 42.298
+      },
+      "POST access_m3-second-b HTTP403": {
+        "n": 3,
+        "p50_ms": 38.897,
+        "p95_ms": 46.818,
+        "max_ms": 46.818
+      },
+      "POST access_m3-unrelated-reserved HTTP200": {
+        "n": 3,
+        "p50_ms": 34.22,
+        "p95_ms": 47.235,
+        "max_ms": 47.235
+      }
+    },
+    "client_post_start_to_denial": {
+      "normal_worker": {
+        "n": 3,
+        "p50_ms": 194.034,
+        "p95_ms": 356.852,
+        "max_ms": 356.852
+      },
+      "worker_outage": {
+        "n": 3,
+        "p50_ms": 11313.693,
+        "p95_ms": 13604.511,
+        "max_ms": 13604.511
+      }
+    },
+    "server_received_to_completed": {
+      "normal_worker": {
+        "n": 3,
+        "p50_ms": 112.588,
+        "p95_ms": 183.882,
+        "max_ms": 183.882
+      },
+      "worker_outage": {
+        "n": 3,
+        "p50_ms": 11180.894,
+        "p95_ms": 13520.752,
+        "max_ms": 13520.752
+      }
+    },
+    "resource_sample_count": 56,
+    "functional_checks_passed": 36
+  },
+  "image_tag_removed": true,
+  "finished_at": "2026-11-02T17:16:37.168328+00:00",
+  "validation": {
+    "windows_pytest": {
+      "passed": 545,
+      "warnings": 3,
+      "seconds": 112.45
+    },
+    "linux_docker_pytest": {
+      "passed": 545,
+      "warnings": 2,
+      "seconds": 28.53
+    },
+    "ruff": "passed",
+    "local_test_image_id": "sha256:864850dc3c67b2124b4fcc426349eee4b8fea8a77acbf5055320043233267aef",
+    "initial_windows_result": {
+      "passed": 522,
+      "failed": 2,
+      "reason": "POSIX public file/directory mode assertions on Windows"
+    },
+    "initial_docker_result": {
+      "ruff": "failed",
+      "pytest": "not run",
+      "reason": "EXE002 from executable bits copied from Windows; module/shebang modes then normalized"
+    },
+    "independent_team_review": "pending"
+  },
+  "source_validation_files_sha256": {
+    "Dockerfile.test": "29d4563c626c393624f45fca66cc7c7d45fe6c6a64f035436c8e11ffb4f821ab",
+    "tests/test_docker_setup.py": "892ff2785ec8c3c6ded2bedd5f0461f5bdace610ed022ac3876fab391f9f0f69",
+    "tests/test_signal_compose_runner.py": "747f9d7246313a0b91850725eafaca917f66e3209ce7d5f0db856fea23149f71",
+    "tests/test_signal_infrastructure_measurement.py": "3ba8f2750c9315f59e0b95c06de4e79cdae11e79118a1e6a4c04e5ccfb3fc995"
+  }
+}

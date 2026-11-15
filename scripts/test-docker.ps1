@@ -13,6 +13,7 @@ if ($PSVersionTable.PSVersion.Major -ge 7) {
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $containerName = "zero-trust-llm-secops-smoke"
 $testImageTag = "${ImageTag}-tests"
+$collectorDirectory = Join-Path ([IO.Path]::GetTempPath()) ("zt-collector-" + [guid]::NewGuid().ToString("N"))
 $existing = docker ps -a --filter "name=^/$containerName$" --format "{{.Names}}"
 if ($existing) {
     throw "A container named $containerName already exists. Remove it before running this test."
@@ -25,7 +26,15 @@ try {
         --file "$projectRoot\Dockerfile.test" `
         --tag $testImageTag `
         $projectRoot
+    if ($LASTEXITCODE -ne 0) { throw "Test image build failed." }
     docker run --rm $testImageTag
+    if ($LASTEXITCODE -ne 0) { throw "Container regression tests failed." }
+    New-Item -ItemType Directory -Path $collectorDirectory | Out-Null
+    docker run --rm `
+        --mount "type=bind,source=$collectorDirectory,target=/collector" `
+        $testImageTag python -m scripts.local_signal_collector init --directory /collector --tenant local
+    if ($LASTEXITCODE -ne 0) { throw "Local collector initialization failed." }
+    $publicRegistry = Join-Path $collectorDirectory "sources.json"
 
     docker build `
         --platform linux/amd64 `
@@ -33,6 +42,7 @@ try {
         --file "$projectRoot\Dockerfile" `
         --tag $ImageTag `
         $projectRoot
+    if ($LASTEXITCODE -ne 0) { throw "API image build failed." }
     docker run `
         --detach `
         --name $containerName `
@@ -44,8 +54,11 @@ try {
         --env ANALYZER_MODE=rule `
         --env CASE_LOG_PATH=/data/cases.jsonl `
         --env OUTBOX_LOG_PATH=/data/integration-outbox.jsonl `
+        --env TRUSTED_SIGNAL_SOURCES_PATH=/collector/sources.json `
+        --mount "type=bind,source=$publicRegistry,target=/collector/sources.json,readonly" `
         --publish "127.0.0.1:${Port}:8000" `
         $ImageTag | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "Local API container failed to start." }
 
     $baseUrl = "http://127.0.0.1:$Port"
     $health = $null
@@ -60,7 +73,7 @@ try {
     if (-not $health -or $health.status -ne "ok" -or $health.analyzer_mode -ne "rule") {
         throw "Container health check did not become ready in rule mode."
     }
-    if ($health.version -ne "0.15.0" -or $health.auth_mode -ne "disabled") {
+    if ($health.version -ne "0.17.0" -or $health.auth_mode -ne "disabled") {
         throw "Container did not start with the expected local security profile."
     }
     $readiness = Invoke-RestMethod -Method Get -Uri "$baseUrl/health/ready" -TimeoutSec 2
@@ -89,6 +102,65 @@ try {
     ) {
         throw "Audit or assurance registry integrity readiness check failed."
     }
+    if (-not $readiness.zero_trust_operations.ok) {
+        throw "Zero Trust operational journal is not ready."
+    }
+    $collectorOutput = docker run --rm `
+        --network "container:$containerName" `
+        --mount "type=bind,source=$collectorDirectory,target=/collector,readonly" `
+        $testImageTag python -m scripts.local_signal_collector demo `
+            --directory /collector --tenant local --base-url http://127.0.0.1:8000
+    if ($LASTEXITCODE -ne 0) { throw "Signed collector end-to-end test failed." }
+    $collectorResult = $collectorOutput | ConvertFrom-Json
+    if ($collectorResult.status -ne "passed" -or -not $collectorResult.signed_source_verified -or
+        -not $collectorResult.unbound_mfa_rejected -or -not $collectorResult.bound_mfa_recovered -or
+        -not $collectorResult.revoked_grant_denied) {
+        throw "Signed source, bound challenge or grant revocation check failed."
+    }
+    $ztEvents = Invoke-RestMethod -Method Post -Uri "$baseUrl/events/simulate" `
+        -ContentType "application/json" -Body '{"scenario_id":"NORMAL-01","count":1}'
+    $ztEvent = $ztEvents[0]
+    $ztEvent.event_id = "docker-zt-allow"
+    $ztEvent.timestamp = [DateTimeOffset]::UtcNow.ToString("o")
+    $ztEvent.user.role = "employee"
+    $ztEvent.auth_context.authentication_result = "success"
+    $ztEvent.auth_context.mfa = "success"
+    $ztEvent.resource.resource_id = "zt-demo-documents"
+    $ztRequest = @{ session_id = "docker-zt-session"; expected_version = 0; event = $ztEvent }
+    $ztAllowed = Invoke-RestMethod -Method Post -Uri "$baseUrl/zero-trust/sessions/evaluate" `
+        -ContentType "application/json" -Body ($ztRequest | ConvertTo-Json -Depth 20)
+    if ($ztAllowed.session.decision -ne "ALLOW" -or -not $ztAllowed.grant_token) {
+        throw "Zero Trust normal session was not authorized."
+    }
+    $ztAccessBody = @{session_id="docker-zt-session"; resource_id="zt-demo-documents";
+        action="READ"; grant_token=$ztAllowed.grant_token} | ConvertTo-Json
+    $ztAccess = Invoke-RestMethod -Method Post -Uri "$baseUrl/zero-trust/protected-access" `
+        -ContentType "application/json" -Body $ztAccessBody
+    if (-not $ztAccess.allowed) { throw "Local PEP did not allow the scoped grant." }
+    $ztEvent.event_id = "docker-zt-refresh"
+    $ztEvent.timestamp = [DateTimeOffset]::UtcNow.ToString("o")
+    $ztRequest.expected_version = 1
+    $ztFresh = Invoke-RestMethod -Method Post -Uri "$baseUrl/zero-trust/sessions/evaluate" `
+        -ContentType "application/json" -Body ($ztRequest | ConvertTo-Json -Depth 20)
+    $ztEvent.event_id = "docker-zt-compromised"
+    $ztEvent.timestamp = [DateTimeOffset]::UtcNow.ToString("o")
+    $ztEvent.device.security_posture = "compromised"
+    $ztRequest.expected_version = 2
+    $ztRevoked = Invoke-RestMethod -Method Post -Uri "$baseUrl/zero-trust/sessions/evaluate" `
+        -ContentType "application/json" -Body ($ztRequest | ConvertTo-Json -Depth 20)
+    if ($ztRevoked.session.status -ne "REVOKED") { throw "Risk change did not revoke the session." }
+    $ztDenied = $false
+    try {
+        Invoke-RestMethod -Method Post -Uri "$baseUrl/zero-trust/protected-access" `
+            -ContentType "application/json" -Body (@{session_id="docker-zt-session";
+                resource_id="zt-demo-documents"; action="READ";
+                grant_token=$ztFresh.grant_token} | ConvertTo-Json) | Out-Null
+    } catch {
+        if ([int]$_.Exception.Response.StatusCode -ne 403) { throw }
+        $ztDenied = $true
+    }
+    if (-not $ztDenied) { throw "PEP accepted a revoked unused grant." }
+
     $headerCheck = Invoke-WebRequest `
         -Method Get `
         -Uri "$baseUrl/health/live" `
@@ -303,6 +375,11 @@ try {
         integration_events = $outboxMetrics.total_events
         integration_delivered = $outboxMetrics.delivered_count
         integration_dead_letter = $outboxMetrics.dead_letter_count
+        zero_trust_revoked_grant_denied = $ztDenied
+        signed_source_verified = $collectorResult.signed_source_verified
+        unbound_mfa_rejected = $collectorResult.unbound_mfa_rejected
+        bound_mfa_recovered = $collectorResult.bound_mfa_recovered
+        signed_revoked_grant_denied = $collectorResult.revoked_grant_denied
         assurance_registry_integrity = $readiness.assurance.valid
         assurance_control_count = $readiness.assurance.total_controls
         ocsf_schema_version = $readiness.normalization.schema_version
@@ -336,5 +413,17 @@ try {
     $created = docker ps -a --filter "name=^/$containerName$" --format "{{.Names}}"
     if ($created -eq $containerName) {
         docker rm --force $containerName | Out-Null
+    }
+    if (Test-Path -LiteralPath $collectorDirectory) {
+        $resolvedCollector = [IO.Path]::GetFullPath($collectorDirectory)
+        $tempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd('\') + '\'
+        if (-not $resolvedCollector.StartsWith($tempRoot, [StringComparison]::OrdinalIgnoreCase) -or
+            (Split-Path -Leaf $resolvedCollector) -notmatch '^zt-collector-[a-f0-9]{32}$') {
+            throw "Refusing collector cleanup outside the generated temporary directory."
+        }
+        foreach ($generatedFile in @("private.pem", "sources.json")) {
+            Remove-Item -LiteralPath (Join-Path $resolvedCollector $generatedFile) -Force -ErrorAction SilentlyContinue
+        }
+        Remove-Item -LiteralPath $resolvedCollector -Force
     }
 }

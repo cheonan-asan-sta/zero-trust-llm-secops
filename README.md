@@ -1,9 +1,370 @@
 # zero-trust-llm-secops
 
+관제 대시보드: [화면 구성과 로컬 시연 안내](docs/dashboard-guide.md).
+`python -m scripts.serve_dashboard_demo --seed`로 기존 평가 기록과 분리된 규칙 기반 시연 환경을
+실행합니다. 새 관제 화면은 `/`, 기존 분석 워크벤치는 `/static/workbench.html`입니다.
+
+2026-11-15 v81: [백업·복구 검증 상태 지표/경보](docs/extra-backup-recovery-status.md). 집중 196개·전체 5,623개·실제 systemd 71조건·관측 23조건 통과. 8시간은 유예하며 운영 활성화와 독립 F1 평가는 별도다.
+
+2026-11-15 v80: [지속 시험 구현·부분 관측·유예](docs/extra-systemd-soak.md). 전체5,583개/사전68조건은 통과했으나 두 장기 실행은 중단됐다.8시간/12시간은 미완료·유예이며 자동 재개하지 않는다.
+
+2026-11-15 v79: [실제 systemd 자원 계측·로컬 제한 검증](docs/extra-systemd-resources.md). 작업자별 현재 invocation·혼합 cgroup을 확인하며 장기/운영 인수는 별도다.
+
+2026-11-15 v78: [실행 mTLS 보관 단계별 안전한 진단](docs/extra-execution-maintenance.md). 과거 CI 원인 미확인·자동 재시도0, 정상 인수와 실제 Linux 잠금 경합을 구분한다.
+
+2026-11-14 v77: [선택 부하의 안전한 오류 진단·실제 장애 인수](docs/extra-selection-diagnostics.md). 집중100개·전체 회귀와 실제 정상37/의도적 장애2조건을 구분하며 과거 CI 원인 미확정·장기 시험 미완료를 유지한다.
+
+2026-11-14 최신: [캡처 보관 DB 암호화 백업·격리 복원 v75](docs/extra-capture-backup.md) — 관련552개·실제 systemd63조건, 원본 DB 부재 복원/캡처6건 바이트 일치·외부 pin 검증. 기존1,681,815행 판정 유지, API/AWS0. 운영 키/백업 저장·일정과 지속 부하는 후속이다.
+
+2026-11-14 최신: [수집 상태·보관 용량 경보 v74](docs/extra-collector-alerts.md) — PR61~67 aitest 병합, 순서 의존 시험은 PR68로 수정. 관련511개·실제 systemd53조건·실제 관측 도구13조건 통과, 기존1,681,815행 판정 유지. 운영 지속 mTLS 마운트/lock 인수는 별도다.
+
+2026-11-14 최신: [수집·보관·신선도 주기 실행 v73](docs/extra-collector-schedule.md) — PR66 CI16개 성공 확인 후 관련388개·실제 systemd43조건 통과. 실제 공백 stale→공급자 복원 후 timer 자동 fresh 회복, 기존1,681,815행 결정 유지. 운영 배포/조직 SSO 인수는 별도다.
+
+2026-11-14 최신: [실행 캡처 무손실 보관·복원 v72](docs/extra-capture-archive.md) — PR65 CI16개 성공 확인 후 관련384개·실제 systemd32조건 통과. 기존1,681,815행 결정 유지. 로컬 보관/복원이며 현재 trust·신선도를 갱신하지 않는다. 작은 시험의 SQLite 오버헤드와 운영 용량 과제도 기록했다.
+
+2026-11-14 최신: [수집키 유효기간·근거 신선도·복구 v71](docs/extra-collector-freshness.md) — PR64 CI16개 성공 후 진행. 관련353개·실제 systemd24조건·기존1,681,815행 결정 유지 검증. 수집 상태를 탐지/인가로 확대하지 않으며 실제 운영/조직 SSO 인수는 남아 있다.
+
+2026-11-14 최신: [systemd 수집기·자격 수명주기 v70](docs/extra-systemd-collector-runtime.md) — 전용 비root 구성·소켓 자격 공급·교체/폐기/종료 인수. 최종316개·실제13조건·기존1,681,815행 결정 유지 검증. 실제 조직 SSO/운영 설치 인수는 남아 있다.
+
+2026-11-14 최신 후속: [systemd 운영 연동·호출 신원 결속 v69](docs/extra-systemd-caller-identity.md) — 실제 WSL systemd15조건·관련281개·기존1,681,815행 결정 유지 검증. 로컬 인증원의 요청 결속을 확인했으며 실제 외부 SSO/사람 로그인 인수는 미완료다. v68의 systemd 미시험 표기는 당시 기록이다.
+
+2026-11-14 후속: [공유 서버 실행 근거 수집·연결 v68](docs/extra-shared-execution-evidence.md) — 실제 Linux 프로세스 관측·서명/별도 권한 결속을 구현했다. 관련233개·제어7조건·기존1,681,815행 결정 유지 확인. 공유 서버 과거 F1 0%는 유지하며 운영 systemd 인수·사람 신원 검증은 미완료다.
+
+2026-11-14 후속: [감사·인증 개발 개선 v67](docs/extra-audit-auth-refinement.md) — 미탐15행 감소·새 FP/TP 손실0. 인증 F1 95.08%/재현율90.625%, 웹 감사 F1 70.77%, 공유 서버 개선 미완료. 무료 로컬 묶음 검증이며 독립 목표 달성은 아니다.
+
+11/14 탐지·평가 후속: [현재 성능과 남은 목표](docs/extra-current-performance.md)를 먼저 읽습니다.
+Wilson 사전 고정 평가455,452행에서 웹 오탐54건 감소·기존 TP 손실0을 확인했지만 VPN F1은21.875%입니다.
+관찰 개발 자료의 후속 스캐너 후보는 미탐7건을 추가로 줄였으며, 원래 여섯 영역의 독립95% 목표는 미완료입니다.
+후보는 오프라인 경보 검토용이고 권한 집행에 연결하지 않았습니다. [Wardbeck 검증](docs/extra-scanner-calibration-transfer.md)은 원래 보정용 자료 역할을 유지합니다.
+아래 날짜별 구현·검증 내용은 당시의 기록이며 최신 수치와 진행 상태는 연결된 현재 문서를 따릅니다.
+
+11/8 후속 [개인키 회차·자원 측정 구간 격리](docs/rekey-and-resource-measurement-isolation.md): PR47 첫 병합 후 개인키12개 중단과 자원 수집2건 실패를 보존한다. 시험은 동일 pending키/정확히1세대 증가를 검사하고, 관측v2는 준비·실제 부하·의도적 장애 구간을 구분한다. 로컬22/37·Linux2577·소유 자원0이며 새 정확한 head/병합 후 CI는 후속 PR을 따른다. C01/C02 로컬 조건부·C03 보류·독립 인수/3주차 전체 미완료는 유지한다.
+
+11/8 3주차 잔여 묶음: [인프라 조건부 선정·현재 mTLS 부하/복구](docs/infrastructure-selection-acceptance.md). 채희주가 동시성1/4/8·3반복의576요청(153허용/423거부), gateway장애3회 전달0·새 grant복구, 인증된 관측·37개 인수와 Linux2560개를 검증했다. 과거 후보 비교 지문과 현재 실행 증거를 연결해 C01/C02는 로컬 조건부, C03는 현재 이미지 재검사/앱 영향 독립 대조 전 보류한다. 운영 승인·대안 후보의 현재 부하 새 비교·팀원 독립 재현·3주차 전체 완료와 구분하며 정확한 head/병합 후 CI는 PR을 따른다.
+
+11/8 구현·검증: [CA DB 복원 체크포인트](docs/database-recovery-checkpoint.md). 채희주 담당 선택 프로필에서 마지막 명시적 보안 체크포인트와 과거 백업을 대조한다. 실제 폐기·복원 전 거부·최신/재시작 복원17개와 최종 Linux2520개를 확인했다. 초기 실패와 보완 소스는 원자료에 구분했다. 운영 복원·실시간 최신 회수 원장·독립 인수는 후속이며 정확한 head/병합 후 CI는 PR 기록을 따른다.
+
+11/7 다음 묶음: [CA 공유 DB 암호화 백업·격리 복원 검증](docs/database-backup-verification.md). 채희주 담당으로 별도 백업/키 볼륨, 작성자 정지·같은 archive 재개, 격리 PostgreSQL 복원과 토큰 소비/폐기/발급/DB anchor 지문 대조를 추가한다. 기존 CA·DB 교체 인수54개에 백업·만료 경계13개를 묶는다. 최종 집중287/백업13/도우미2 검증·정리0을 확인했으며, 이전 전체 묶음의58개 중단과 서로 다른 소스를 원자료에 보존했다. 운영 DB live restore·최신 폐기 witness·전체 PKI/물리 재해 복구·김택희 독립 인수는 후속이며 최종 실행 결과는 해당 문서와 PR 근거를 따른다.
+
+11/7 후속 묶음: [DB 교체 관리 잠금·실제 프로세스 종료 복구](docs/database-transport-process-recovery.md). 채희주가 시작/종료/purge와 교체기의 공통 잠금, 읽기 전용 상태 조회, 네 종료 지점의 같은 후보·고정 객체 재개를 구성·실행·측정한다. 초기 Linux2413/관측75와 CA27 중단·정리0을 보존했다. 비밀값 없는 실패 진단만 추가한 최종 소스의 집중211/신규31·실제 프로세스 종료4회를 포함한 인수54/54·정리0을 별도로 확인했다. 초기 실패 원인 해결로 확대하지 않으며 최종 전체 회귀·정확한 head/병합 후 CI는 PR을 따른다. DB/물리 HA·백업 통합·장기 checkpoint·독립 인수는 후속이다.
+
+11/7 DB 통신 자동 교체 묶음: [독립 전송 root·서버/client 키·중단 재개](docs/database-transport-rotation.md). 채희주가 별도 보관함·서명 계획·고정 객체 정지/게시·실제 DB TLS 검증을 연결한다. 초기 Linux2383/관측75와 마지막 변조 검사46 중단을 보존했다. 예외 분류·실행기 중복 차단·시험 대기를 보완한 최종 소스의 집중229/신규47·Ruff·실제48/48·정리0을 별도 확인했다. 최종 전체 회귀/정확한 head·병합 후 CI는 PR을 따른다. DB/물리 HA·전체 백업 통합·독립 인수는 후속이다.
+
+11/6 착수·11/7 검증 묶음: [DB 전송 PKI 사전 점검·관측 준비·로컬 일괄 검증](docs/infrastructure-preflight-batch.md). 채희주가 만료/신원/키 권한 선검사와 현재 rule 평가 경계·소스/엔진 고정 실행을 구성한다. 집중236/신규59·고정 Ruff·로컬 Docker2340·관측75/75·authority38/38·소유 자원0을 확인했다. 정확한 clean head/병합 후 CI는 PR 기록을 따른다. DB 전송 인증서 자동 교체·DB/물리 HA·팀원 독립 인수는 후속이다.
+
+11/6 기능 묶음: [CA/JWK 교체·CA 프로세스 이중화·병렬 CI](docs/persistent-authority-rotation.md). 채희주가 인프라18서비스·공유 mTLS DB와 서명된 교체/복구 검증을 연결한다. 로컬 집중190/신규91·고정 Ruff·Docker2281·통합35/35·소유 자원0이며 정확한 head/병합 후 CI는 PR을 따른다. DB·물리 호스트 HA와 팀원 독립 인수는 후속이다.
+
+11/6 CA 최초 발급 후속: [준비 상태·발급시각·replay 대조](docs/ca-bootstrap-readiness.md). PR37 병합 전 성공과 병합 후 초기 발급 실패를 구분하며, CA 준비 확인 뒤 grant를 만드는 순서와 현재 시각의 재사용 차단 검사를 보강한다. 최종 실행 결과는 후속 원자료/PR을 따른다.
+
+11/6 후속 [지속 실행 개인키 교체·관측 실패 진단](docs/persistent-key-rotation.md): 기존 leaf 교체를
+업무/관측16서비스에 연결한다. CA/JWK 키·HA 통합과 독립 검토는 후속으로 구분한다.
+
+## 앱 전체 저장 계약과 정비 복원
+
+[선택형 전체 저장 복원](docs/app-storage-recovery.md)은 SQLite·등록과 사건·감사·outbox JSONL을
+같은 정지 경계에서 검증·암호화·복원합니다. 복원 전 세션은 회수하며, 기존 이벤트 ID·전송 상태·
+시도·재시도 시각과 이력을 보존합니다. 누락·변조·부분 복원·승인 경로 불일치는 기동 전에 거부합니다.
+온라인 백업·외부 전송의 exactly-once·팀원 독립 재현의 완료를 뜻하지 않습니다.
+[로컬 mTLS 앱 복원 프로필](docs/app-mtls-recovery.md)은 같은 저장 계약을 기존 mTLS 서비스 구성에서 실행합니다.
+
+11/6 3주차 [CA leaf 통합 인수](docs/ca-runtime-acceptance.md): 기존 지속 실행 관측 경로에
+선택형 CA/제어기를 연결한다. 기본9·관측14서비스를 유지하며 CA 프로필은16서비스다.
+실제 발급·갱신·재적용·CA 장애/재시작·폐기 보존을 인프라 범위에서 검증한다.
+
+## 2026년 11월 6일 3주차 관측 지속 실행 통합
+
+[선택형 관측 프로필](docs/persistent-monitoring.md)에 Prometheus·Alertmanager·조회/exporter·로컬
+시험 수신기를 기존 mTLS 경로와 연결했다. 신원/관측망·저장소를 분리하고 같은 경보의 발생/해제,
+재시작 후 데이터와 설정 고정을 검증한다. 앱 정책·탐지 기준과 자체 대시보드 계획은 유지한다.
+
+## 2026년 11월 6일 3주차 실행 환경 고정
+
+[지속 실행 환경 고정](docs/runtime-release-lock.md): 9개 서비스 mTLS 경로의 소스·정책·빌드 입력·
+실행 구조와 앱/NGINX image ID를 묶어 검증한다. 재시작 때 불일치를 거부하고 기존 키·상태를
+재사용한다. C01 관측 통합·전체 저장 계약·도구 최종 선정과 독립 검토는 후속이다.
+
+## 2026년 11월 5일 3주차 I4 앱 보안 DB 복구
+
+[앱 상태 백업·복구](docs/app-state-recovery.md): 채희주 담당의 남은 3주차 정비 복구 경로를 추가했다.
+정지한 기록자의 최신 증거·암호화 백업·별도 복원·기존 세션 전부 회수·서명된 기동 승인을 검증한다.
+로컬 Docker 실험 18개 검사를 통과했으며 상세 결과·재현·3주차 잔여와 독립 검토 조건은 연결 문서에 둔다.
+
+## 2026년 11월 5일 우선 취약점 패치
+
+[C03 런타임 패치](docs/supply-chain-priority-patches.md): 채희주 인프라 범위에서 앱·테스트·Lambda
+이미지의 Python 3.12.16·SQLite 3.54.1·pip 26.3과 HTTP 로컬 backport, wheel 해시 lock을 적용했다.
+로컬 런타임·권한 상태/백업 보존·회귀·동일 DB 검사 결과와 남은 위험은 연결 문서에 둔다.
+아래 영향 검토는 패치 이전의 과거 이미지 기록이며, 이번 변경을 전면 취약점 해결·운영 승인으로 해석하지 않는다.
+
+## 2026년 11월 5일 공급망 실제 영향 조건 검토
+
+[인프라 영향 검토](docs/supply-chain-impact-review.md)는 과거 고정 앱 이미지의 200항목을 공식 공급자
+자료·실제 설치/실행 파일·제한된 로컬 probe 3회에 대조합니다. Python TLS/HTTP/tar·SQLite 17항목을
+우선 검증 대상으로 정리했습니다. 특정 pip 전제 2개 완화와 남은 조건을 구분하며 수정·억제·실제 악용 확인은 0입니다.
+현재 배포 이미지의 새 검사나 앱 담당의 독립 도달성 검토를 완료한 것으로 표시하지 않습니다.
+
+## 2026년 11월 5일 공급망 검사 차이 재분석
+
+[C03 검토 도구](docs/supply-chain-findings-review.md)는 보관한 입력 27개의 지문과 반복/대조군을
+검증해 같은 ID 180건·직접 alias 6건·한쪽 전용 14건과 심각도 차이 78건을 재현합니다.
+200개 항목은 모두 실제 영향 미검토입니다. 과거 이미지의 오프라인 재분석이며 새 스캔·취약점 해결·도구 선정과 구분합니다.
+
+## 2026년 11월 5일 후속 CA·DB·leaf 데몬 복구
+
+[서비스 복구](docs/service-daemon-recovery.md)는 사전 식별 기록에 고정한 CA/DB 호스트·게이트웨이·leaf·worker를
+같은 Docker 저장소에서 명시적으로 재개합니다. 최신 보안 checkpoint·DB 역할/동기 복제를 확인한 뒤 접속을
+열고, 중단 후 재시도에서도 새 토큰 소비·폐기를 보존합니다. 실행 방법·로컬 검증 범위·한계는 연결 문서를 따릅니다.
+실제 부모 재시작 **3회·서비스 검사 10개**, 전체 **Windows 1,749 통과·2 건너뜀/Linux 1,751 통과**와 Ruff를 확인했습니다.
+시험 자원 정리를 확인했으며 AWS·유료 LLM 호출은 없습니다.
+
+## 일반 평가 상한 이후의 보안 전이
+
+일반 세션 평가는 최대 버전 200을 유지하고, 이후 위험 강화·만료 점검·회수만 최대 204까지 기록합니다.
+새 grant·자동 정상화 없이 반복·동시 처리를 제어하며 [전이·CAS·저장과 검증 범위](docs/session-security-transitions.md)를 따릅니다.
+
+## 서버 inbox 영수증 보관 이관
+
+완료·실패 영수증을 같은 SQLite DB의 압축 archive로 옮겨 hot 공간을 확보하고, 원래 영수증과 중복·충돌 검사를 보존합니다.
+pending·processing은 이관하지 않으며 archive·byte 한도가 차면 새 접수를 거부합니다.
+[상태·수동 이관·코드 정렬과 권한 검증](docs/server-inbox-maintenance.md)을 확인합니다.
+
+## 정책 저널 보관 이관
+
+활성 정책 저널의 오래된 행을 같은 SQLite DB의 압축 segment로 옮기고, 모든 읽기에서 전체 이력과 체인을 검증합니다.
+세션·회수·허용 소비·관측 중복 표식을 보존하며 서버 inbox·세션 버전과 전체 보관 한도는 유지합니다.
+[상태 조회·수동 이관·자동 이관과 복구 경계](docs/policy-journal-maintenance.md)를 확인합니다.
+
+## 2026년 11월 4일 후속 부모 Docker 데몬 재시작 복구
+
+[부모 데몬 복구](docs/parent-docker-recovery.md)는 장애 전에 보관한 Engine ID/anchor를 대조하고,
+같은 데이터 영역의 정지한 전환을 `recover-daemon`으로 이어갑니다. 완료 단계는 양 기록·owner·고정
+worker를 먼저 확인해 정지한 worker만 시작하며 새 보안 상태를 되복제하지 않습니다. 살아 있는 미완료
+실행기나 사본 충돌은 거부합니다. 실제 격리 데몬 실험·회귀·한계는 연결 문서에 기록합니다.
+실제 데몬 재시작 **12회·16개 검사**, 전체 **Windows 1,381 통과·2 건너뜀/Linux 1,383 통과**와 Ruff를 확인했습니다.
+일시정지·생존 작업 거부, 완료 후 합성 상태 보존을 검증했고 시험 자원을 정리했습니다. AWS·유료 LLM 호출은 없습니다.
+동료 수집기 PR #21을 보존 결합한 최신 회귀는 **Windows 1,465 통과·2 건너뜀/Linux 1,467 통과**와 Ruff 통과입니다.
+기존 데몬 실험 이미지와 최신 결합 입력을 구분해 기록했으며, 데몬 핵심 코드 8개는 동일합니다.
+
+## 2026년 11월 4일 후속 전환 실행기 컨테이너 유실 복구
+
+[컨테이너 유실 복구](docs/actor-container-recovery.md)는 기존 실행기 ID의 실제 부재, 남은 전환 기록과
+상대 사본·owner·예약 자원의 일치를 확인한 뒤 `recover-takeover`로 같은 작업을 이어갑니다.
+전환 ID/epoch는 유지하고 이전 실행기 ID 이력을 남깁니다. 완료 상태는 다시 복제하지 않아 이후의
+토큰 소비를 보존합니다. 기존 `resume-takeover`의 같은 컨테이너 재시작과 구분합니다.
+검증 수치와 자원 정리 결과는 연결 문서의 공개 원자료에 기록합니다. 같은 PC/부모 Docker/생존 저장소 조건입니다.
+동료 상시 mTLS PR #19를 보존한 결합 회귀는 **Windows 1,354 통과·2 건너뜀/Linux 1,356 통과**와 Ruff 통과입니다.
+새 CA 환경의 **43개 통합 검사·컨테이너 실제 삭제 16회**에서 같은 전환 재개와 새 토큰 소비 보존을 확인했고,
+시험 전용 자원을 정리했습니다. AWS·유료 LLM 호출 없이 로컬에서 검증했습니다.
+
+## mTLS 기반 로컬 지속 실행
+
+app·수집기·worker·watchdog와 기존 보호 자원 경로를 별도 Docker 프로젝트의 9개 서비스로 실행합니다.
+공유 정책 DB와 전용 수집기 spool을 보존하고, 외부 공개 포트 없이 내부 mTLS 경로를 사용합니다.
+[실행·상태·종료·장애 검증과 정적 인증서 수명](docs/continuous-mtls-runtime.md)을 확인합니다.
+이 프로필의 임시 CA는 정적이며 C04 자동 갱신·교체 통합은 후속 범위입니다.
+
+## 2026년 11월 4일 후속 관리 호스트 전환 실행기 재개
+
+[전환 실행기 중단 복구](docs/executor-transition-recovery.md)는 같은 고정 컨테이너의 PID 1을 다시 시작해
+부분 복제·owner 설치·실행기 생성을 이어갑니다. 미완료 전환은 일반 관리 작업을 막고, 완료 후 재실행은
+새 상태를 복제 전 시점으로 되돌리지 않습니다. 같은 PC/생존 journal/고정 actor가 남는 명시적 재개입니다.
+새 CA 환경에서 operator **30개**·실행기 **15개**·관리 저장소 제거 **2개** 검사와 실제 actor 종료 **16회**를
+검증했습니다. 별도 사전 검사는 8+14개이며, Windows 1,152 통과·2 건너뜀/Linux 1,154 통과와 Ruff를 확인했습니다.
+완료 후 새 토큰 소비를 보존했고 시험 프로젝트 자원을 정리했습니다. 동료 수집기 PR #16을 보존해 합친 뒤
+결합 회귀도 **Windows 1,223 통과·2 건너뜀/Linux 1,225 통과**했습니다. 캠페인과 결합 결과를 구분해 기록합니다.
+동료의 세션 재검증 PR #17까지 합친 최신 결합 회귀는 **Windows 1,275 통과·2 건너뜀/Linux 1,277 통과**입니다.
+동료 앱 변경과 CA 캠페인 당시 이미지/지문을 구분해 보존했습니다.
+
+## 로컬 관측의 지속 수집
+
+[GuardDuty EventBridge 로컬 입력](docs/guardduty-eventbridge-local.md)은 서명된 경보의 계정·주체·자원을 검증한 뒤 기존 Inbox와 worker에 연결합니다.
+
+로컬 JSONL의 새 관측을 별도 프로세스가 계속 읽고 SQLite 커서·서명 봉투·접수 확인 상태를 보존합니다.
+identity/device 권한을 나누어 기존 M3 수신 API로 전달하며, 재시작·응답 유실에는 저장한 입력을 재전송합니다.
+수집기의 202 접수 확인과 서버 worker의 정책 완료는 구분합니다.
+접수 확인된 본문은 중복 방지 이력으로 정리하고 완전히 포착한 입력을 회전하며, pending과 중복 이력은 자동 삭제하지 않습니다.
+[초기화·공개키 등록·실행·상태 조회와 제한](docs/continuous-signal-collector.md)을 따릅니다.
+
+## 주기적 세션 재검증
+
+별도 watchdog가 요청 없이도 서명 증명 만료를 보류하고, 출처·키 폐기와 등록 변경을 회수 상태로 기록합니다.
+새 허용이나 자동 정상화를 만들지 않으며, 같은 DB·공개 등록을 쓰는 local/test 프로세스로 실행합니다.
+[실행 명령·상태 전이·감사와 운영 한계](docs/periodic-session-revalidation.md)를 따릅니다.
+
+## 2026년 11월 4일 후속 관리 호스트·전환 기록 이중화
+
+[관리 실행 호스트 이중화](docs/executor-host-high-availability.md)는 신뢰된 실행기 두 개와 별도
+journal/owner 저장소를 구성합니다. 대기 우선 저장, 이전 실행기 정지 확인, 새 실행 epoch와 생존 기록
+기반 재개를 연결합니다. Windows 캐시 없이 공개 anchor와 지정한 생존 볼륨으로 복원합니다.
+같은 PC의 로컬 Docker 장애 시험이며 물리 호스트 HA·자동 선출과 구분합니다.
+새 CA 클러스터의 실행기 검사 **15개·관리 저장소 제거 2개**, 별도 사전 실험 **8개**를 통과했습니다.
+호스트 전환 2회·옛 실행 저장소 4개/관리 볼륨 18개 삭제 후 같은 키 계획·새 토큰 소비/폐기를 보존했습니다.
+Windows 전체 **1,087 통과·1 건너뜀**, Linux 전체 **1,088 통과**와 Ruff를 확인했고, 시험 전용 자원을 정리했습니다.
+
+## 2026년 11월 4일 후속 관리 전환 중단 복구
+
+[관리 전환 재개](docs/control-transition-recovery.md)는 전환 도중 조정기 프로세스가 종료돼도 기록한
+대상·단계·객체를 확인하고 같은 전환을 이어갑니다. 미완료 전환 중 일반 관리 작업은 차단하며,
+접속 재개 이후에는 새 토큰 소비/폐기 상태를 초기화하지 않습니다. 살아 있는 호스트와 로컬 journal이
+필요한 명시적 재개이며 물리 호스트 HA·자동 선출과 구분합니다.
+새 클러스터의 **35개** 검사(기존 관리 20·중단 복구 15), 실제 강제 종료 **9회**, Windows 전체
+**1019 통과·1 건너뜀**, Linux 전체 **1020 통과**와 Ruff를 확인했습니다. 접속 재개 뒤 새 토큰의
+소비가 완료 재실행 후에도 보존됐습니다. 전용 시험 자원·이미지 태그를 정리했고 AWS·유료 모델은 호출하지 않았습니다.
+
+## 2026년 11월 4일 후속 관리 영역 이중화
+
+[관리 영역 이중화](docs/control-plane-high-availability.md)는 키 보관함·조정기·갱신 상태·관문 journal·
+백업을 별도 볼륨 두 묶음에 보존합니다. 활성 관리자를 정지/확인하고 준비된 동일 키 교체 계획을 대기
+사본에서 이어갑니다. 미완료 작업은 전환을 거부하며, 같은 PC의 로컬 명시적 이전이라는 범위를 유지합니다.
+물리 호스트/관리 Docker 데몬 전체 HA·자동 선출·무중단 운영 완료를 뜻하지 않습니다.
+새 클러스터의 **20개** 통합 검사, Windows 전체 **961 통과·1 건너뜀**, Linux 전체 **962 통과**와
+Ruff를 확인했습니다. 관리 사본 전환 2회·이전 볼륨 18개 삭제·미만료 소비/폐기 거부·백업 인증을
+검증했으며 시험 전용 자원과 이미지 태그를 정리했습니다. 비용이 드는 AWS·모델 API는 호출하지 않았습니다.
+
 LLM 기반 지능형 제로 트러스트 보안 오퍼레이션 및 자동화 프레임워크의 시연용 웹 애플리케이션입니다.
 합성·공개 보안 이벤트를 정규화·탐지·상관분석하고, 실제 시스템을 변경하지 않는 대응 미리보기를 반환합니다.
 
+다른 AI 또는 개발자가 작업을 이어갈 때는 [프로젝트 인수인계서](AI_HANDOFF.md)에서 현재 브랜치, 폴더별 역할, 안전 원칙, 검증 절차를 먼저 확인합니다.
+
+## 2026년 11월 4일 CA DB·서비스 호스트 복구
+
+[공유 DB·호스트 이중화와 복원](docs/ca-db-host-recovery.md)은 별도 로컬 프로필에서 CA/DB를
+독립 Docker 엔진 두 개에 나누고 PostgreSQL 동기 복제, 정지 확인 후 승격, 새 저장소 재가입,
+암호화 백업과 최신 토큰 소비·인증서 폐기 체크포인트 대조를 연결합니다.
+물리 PC·관리 영역 전체 손실과 앱 서버 전체의 이중화는 후속이며, AWS·유료 모델을 호출하지 않습니다.
+
+새 클러스터의 **33개** 통합 검사와 Windows/Linux 전체 **각 917건**을 통과했습니다.
+봉쇄·새 저장소 재가입·writer-stop seal 뒤 두 host 손실의 복원과 양 CA의 정상/거부 대조를 확인했습니다.
+복원 관측은 이미지 적재를 포함해 약 330초이며, 조건·예비 실패·운영 한계는 위 문서를 따릅니다.
+
+## 2026년 11월 3일 후속 CA 프로세스 고가용성
+
+[CA 프로세스 고가용성](docs/ca-high-availability.md)은 두 CA와 공유 PostgreSQL, 관리 클라이언트의
+연결 장애 전환을 연결합니다. DB에는 별도 노드별 mTLS·서버 이름 검증·최소 권한·SERIALIZABLE 격리를
+적용합니다. 모든 CA의 새 issuer/JWK·구 키 거부를 확인해야 자동 키 교체가 완료됩니다.
+한 Docker 호스트의 CA 프로세스 장애 대응이며 DB/호스트 이중화·무중단 키 교체와 구분합니다.
+
+```powershell
+.venv\Scripts\python.exe -m scripts.test_ca_high_availability --repeats 2 --directory runtime/c02/c04/ha-reproduce
+```
+
+새 CA/DB 2회·총 **444개** 통합 검사와 Windows/Linux 전체 **각 870건**을 통과했습니다.
+모든 노드의 구 JWK 요청 792개 거부와 실제 부분 배포 중단 복구도 확인했습니다.
+HA 가속 canary는 정적/자동 모두 90초이며 이전 30초 실패·재현 조건·운영 한계는
+[검증 기록](docs/ca-high-availability.md#검증-기록)에 구분했습니다. 시험 자원은 정리했습니다.
+
+## 2026년 11월 3일 후속 CA·발급 JWK 키 자동 교체
+
+[CA·JWK 자동 교체](docs/authority-key-rotation.md)는 네트워크 없는 관리 작업과 암호화 보관함을 사용해
+루트·중간 CA·등록 발급 JWK 키를 별도 타이머로 교체합니다. 신뢰 겹침 배포·발급 pause·새 CA로 leaf
+이행·실제 TLS 확인·구 JWK 거부·구 파일 정리를 연결합니다. HSM·물리적 air gap·운영 HA와 구분합니다.
+
+```powershell
+.venv\Scripts\python.exe -m scripts.test_authority_key_rotation --directory runtime/c02/c04/authority-reproduce --repeats 2
+```
+
+새 CA/상태 2회·총 **394개** 통합 검사, Windows/Linux 전체 **각 818건**과 Ruff를 통과했습니다.
+회당 활성 신원 48개·서버 14개를 이행하고 JWK 66개를 각 epoch에 교체했습니다. 별도 루트1→루트2
+반복과 새 TLS의 구 루트 거부/현재 루트 200 대조도 통과했으며, [원자료·초기 실패·한계](docs/authority-key-rotation.md)를 남겼습니다.
+
+## 2026년 11월 3일 후속 서비스 개인키 자동 교체
+
+[개인키 자동 교체](docs/private-key-rotation.md)는 새 키·인증서 세대를 준비하고 profile/config 전환·
+실제 TLS 확인·구 pin/serial 폐기·구 파일 정리를 연결합니다. 관리용 mTLS 키도 대상이며 CA와 등록 JWK
+서명키 교체는 별도입니다. 기존 동일 키 인증서 갱신 경로를 보존합니다.
+
+```powershell
+.venv\Scripts\python.exe -m scripts.test_private_key_rotation --directory runtime/c02/c04/rekey-reproduce --repeats 2
+```
+
+새 CA/상태로 2회·총 **348개** 통합 검사, Windows/Linux 전체 **각 766건**과 Ruff를 통과했습니다.
+회당 활성 신원 48개가 세 차례 이상 키를 교체하고 서버 14개가 새 TLS 인증서를 제공했습니다.
+실험 자원은 정리했으며 [원자료·초기 실패·운영 한계](docs/private-key-rotation.md)를 함께 기록했습니다.
+
+## 2026년 11월 3일 후속 인증서 자동 발급·갱신
+
+[인증서 수명 자동화](docs/certificate-automation.md)는 선택한 mTLS 경로에 로컬 step-ca·타이머·지문 배포·
+서비스 재적용을 연결합니다. clientAuth 자체 갱신과 서버별 별도 신원으로 제한한 serverAuth 재발급을
+구분하며, 만료/폐기/CA 장애에 권한을 자동 복원하지 않습니다. 기존 수동/HTTP 비교 구성은 보존합니다.
+
+```powershell
+.venv\Scripts\python.exe -m scripts.test_certificate_automation --directory runtime/c02/c04/reproduce --repeats 2
+```
+
+실제 결과·초기 실패·키/운영 범위와 [C04 선정 근거](docs/technology-decisions/C04-certificate-lifecycle.md)를 확인합니다.
+새 CA로 2회·총 306개 통합 검사와 Windows/Linux 전체 각각 739건을 통과했습니다. 활성 신원 50개의
+자동 발급/갱신과 서버 14개의 새 TLS 인증서를 확인했고, 시험 자원은 정리했습니다.
+
+## 2026년 11월 3일 후속 전체 통신 mTLS
+
+[선택한 로컬 운영 경로 전체 mTLS](docs/all-hops-mtls.md)는 프록시·core·문서 자원·수집기와
+Prometheus/Alertmanager 관측 경로, 관리 조회까지 암호화·상호 인증합니다. core도 TLS를 직접 받으며
+평문 gateway backend나 관리 포트를 남기지 않습니다. 기존 사용자/API 키·서명·grant 판단은 유지합니다.
+
+```powershell
+.venv\Scripts\python.exe -m scripts.test_all_hops_mtls --directory runtime/c02/all-hops/reproduce --repeats 3
+```
+
+기존 `compose.yaml`과 C01/C02 후보 비교 명령은 **HTTP 재현 기준선**입니다. 해당 실행을 mTLS 적용
+상태로 오해하지 않도록 구분합니다. 위 보안 프로필의 실제 결과·조건·운영 과제는 연결 문서를 확인합니다.
+Windows/Linux Docker 각각 전체 687건과 통합 반복 검사 460개(그래프 기준 3회 + 실제 수집기 최종 1회)를
+통과했습니다. 실제 위험 관찰의 mTLS 접수→network=none worker 처리→다음 문서 접근 거부를 확인했습니다.
+
+## 2026년 11월 3일 후속 HTTP 접근 집행
+
+후속 [I2 서비스 mTLS](docs/i2-service-mtls.md)는 이 흐름의 PEP→인가 API 경계에 인증서·서비스별 경로·
+기존 API 키 검사를 함께 적용합니다. 인증서 교체/폐기와 TLS 실패 시 우회 없는 거부를 로컬에서 시험합니다.
+전체 hop 암호화나 운영 CA 배포 완료를 뜻하지 않습니다.
+
+[C02 비교](docs/technology-decisions/C02-http-pep.md)는 기존 단일 사용 grant API와 위험 신호 worker를
+재사용해 NGINX/Envoy와 별도 합성 문서 서버를 연결합니다. 직접 접근·헤더 위조·회수·재사용·장애 때
+실제 문서가 전달되지 않는지 검증합니다. 로컬 시험이며 운영 채택·TLS·실제 신원 연동·독립 재현은 후속입니다.
+
+## 2026년 11월 3일 후속 관측·경보
+
+[C01 비교](docs/technology-decisions/C01-observability.md)에 기존 viewer 요약 API를 재사용한
+읽기 전용 exporter와 공통 경보, Prometheus/Alertmanager 및 VictoriaMetrics/vmalert/Alertmanager의
+격리 실행기를 추가했습니다. 지연된 신호·수집 실패·수집기 중단·처리 실패와 복구를 로컬에서 확인합니다.
+앱 탐지/정책은 보존하며 경보의 운영 채택·독립 재현은 후속입니다.
+
+## 2026년 11월 3일 후속 공급망 비교·모델 계약
+
+PR #2를 `aitest`에 병합하고 `feature/chaeheeju-c03-supply-chain`에서
+[C03 로컬 공급망 비교](docs/technology-decisions/C03-supply-chain.md)와
+[M6/C10 후보·평가 계약 초안](docs/m6-evaluation-contract.md)을 추가했습니다.
+고정 출처·서명/지문의 두 검사 구성을 같은 이미지에서 비교하며, 새 모델은 실제 호출하지 않았습니다.
+도구의 운영 채택·독립 재현·모델 성능 검증은 후속 작업입니다. 기존 탐지 기준선은 보존합니다.
+[M7 공개 인증 로그 파일럿](docs/m7-authentication-pilot.md)은 개발 및 평가 세션, 출처, 라벨과 분할 검증 명령을 제공합니다.
+
+## 2026년 11월 3일 인프라 재현·측정
+
+희주 담당 변경은 `feature/chaeheeju-m3-infra-validation`에서 진행하며
+`aitest`를 대상으로 PR 기록을 남깁니다. [담당자 브랜치·PR 절차](docs/contribution-workflow.md)를 따릅니다.
+기존 M3 기능을 재사용해 Windows 파일 권한 검사 차이를 보완하고 시험 개인키를 메모리에서만
+사용합니다. worker의 네트워크를 제거하고 같은 자원 제한에서 반복 실행·자원·지연 원자료를
+남기는 [인프라 측정 실행기](docs/m3-infrastructure-measurement.md)를 추가했습니다.
+실제 결과·표본 수·제한은 해당 기록을 확인합니다. 탐지 규칙과 개선 전 품질 결과는 유지합니다.
+
+## 2026년 11월 2일 로컬 개발 변경
+
+`feature/m3-durable-signals`에서 김택희의 이번 주 M3/I1 최소 경로를 구현했습니다.
+관찰 종류별 수집기 권한을 검사하고 SQLite에 저장한 뒤 접수하며, 별도 worker가 같은
+사용자 또는 기기에 연결된 세션의 허용을 제한·회수합니다. 중복·실패·재시작과 마지막
+처리 시도의 완료 기록 유실을 복구하고, 무관한 세션은 유지합니다. 정상 관찰이 새 허용이나
+MFA 성공을 증명하지 않으며 위험 제한 해제는 별도 검토 대상으로 남습니다.
+
+입력·오류 예시, 지표, 실행 방법과 M6/M7 평가 계약은
+[지속 신호 수신·처리 명세](docs/m3-durable-signals.md)에 있습니다.
+[검증 결과](docs/m3-validation-results.md): Python 3.12·3.14에서 각각 전체 518건 통과,
+Ruff·Compose 구성 검사 통과. 이후 실제 Docker 앱·worker의 회수·중복·재시작 통합 검사
+11개와 Linux 컨테이너의 전체 524건을 검증했습니다. 실행 환경·재현 명령·원자료는
+[Docker 검증 기록](docs/m3-docker-validation.md)에 있습니다.
+이 변경은 `71cbfc0`을 기반으로 로컬에서 구현·검증했습니다. 실제 IdP/EDR 연동과 AWS 배포는 후속 작업입니다.
+아래 v0.17 설명과 이전 인수인계 기록의 상시 수신 미구현 표기는 이 변경 전의 기준선입니다.
+
 ## 현재 구현 범위
+
+v0.17은 지속 세션 검증과 로컬 모의 자원 집행에 Ed25519 수집기 서명 검증과 재인증 요청 결합을 추가합니다. 등록된 출처·사용자·기기·역할·키·유효기간을 검증하고, 현재 재인증 요청에 연결된 새 서명이 있어야 허용을 복구합니다. 수집기 설정 변경·키 폐기와 위험 변화는 다음 접근에서 기존 허용을 거부합니다. 대시보드에서 서명 세션의 출처와 재인증 상태를 조회할 수 있습니다. 설정·시연·검증·한계는 [제로 트러스트 운영 구현 명세](docs/zero-trust-operations.md)에 정리했습니다. 서명은 실제 IdP 인증이나 EDR 증명을 대신하지 않으므로 새 경로는 `local`·`test`에서만 제공하며 `production`에서는 비활성화됩니다.
 
 - 제로 트러스트 판단에 필요한 공통 이벤트 모델
 - 정상 3건과 위협 5건으로 구성된 합성 이벤트
@@ -256,3 +617,5 @@ scripts/           대상 계정 검증이 포함된 AWS 배포 스크립트
 - [OCSF 1.9.0 Incident Finding](https://github.com/ocsf/ocsf-schema/blob/v1.9.0/events/findings/incident_finding.json)
 - [Splunk Attack Data](https://github.com/splunk/attack_data)
 - [Microsoft Sentinel Sample Data](https://github.com/Azure/Azure-Sentinel/tree/master/Sample%20Data)
+
+캡처 부하·용량·장애 검증과 실제 측정/장기 시험 경계는 [v76 문서](docs/extra-capture-load.md)를 따른다.

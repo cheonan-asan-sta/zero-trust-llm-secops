@@ -1,0 +1,33 @@
+{
+  "schema": "f1-web-capture-controls-1",
+  "scope": "local TCP HTTP capture integration only; no independent attack labels",
+  "production_enabled": false,
+  "v47_receipt": {
+    "path": "runtime/f1/web-backup-controls-v47-20261113/run.json",
+    "sha256": "2d32fcd6d0b10782d7045357e81c2bb0b1bf89cc63afae610240f0f1c409fdf5"
+  },
+  "operation_plan": {
+    "path": "infra/f1-lab/operation-refinement-protocol.json",
+    "sha256": "f7fd853011b6eb6d3fa07d95146e6c8e774bf13395fb027c16961eb6813ce629"
+  },
+  "stateless_run": {
+    "path": "runtime/f1/operation-refinement-v40-20261113/run.json",
+    "sha256": "87136d908635bfcb891c7ed4c1373db24be93185358e21b92c961f685674da2c"
+  },
+  "contract": {
+    "transport": "127.0.0.1 TCP; temporary listener; no environment proxy",
+    "request_id": "server-generated random UUID-style hex; client IDs ignored",
+    "body": "actual complete ASGI bytes, max1MiB/1024chunks/5seconds; partial hash never treated as complete",
+    "identity": "existing API-key verifier and server-owned local service session; no external IdP/MFA",
+    "runtime": "fixed Python checksum child; no client command execution",
+    "observations": "signed authentication/authorization/runtime roles from trusted server hooks",
+    "audit": "private single-process receipt spool plus checkpointed durable risk ledger"
+  },
+  "limits": [
+    "Same-process signing roles do not prove independent sensor isolation or hardware attestation.",
+    "Receipt capture occurs at ASGI response start; it does not prove client delivery or undo prior handler execution.",
+    "Only eligible encoded-command projections enter the existing v45-v47 path; other receipts remain unbound/unsupported.",
+    "Local service sessions are not end-user OIDC sessions or real MFA; actual production collectors and independent F1 evaluation remain pending.",
+    "Temporary demonstration recovery keys are not retained for operational backup reuse."
+  ]
+}

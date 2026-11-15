@@ -1,0 +1,19 @@
+name: Locked Python environment
+description: Install approved wheel hashes and project without dependency resolution
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+        cache: pip
+        cache-dependency-path: |
+          infra/runtime/requirements/build.lock
+          infra/runtime/requirements/test.lock
+    - name: Install project
+      shell: bash
+      run: |
+        python -m pip install --only-binary=:all: --require-hashes -r infra/runtime/requirements/build.lock
+        python -m pip install --only-binary=:all: --require-hashes -r infra/runtime/requirements/test.lock
+        python -m pip install --no-index --no-deps --no-build-isolation .
+        python -m pip check

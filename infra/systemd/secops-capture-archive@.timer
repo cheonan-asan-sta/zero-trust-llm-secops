@@ -1,0 +1,14 @@
+[Unit]
+Description=SecOps periodic lossless capture compaction for %i
+
+[Timer]
+# The matching service uses --apply. Inspect CLI preview before opting in.
+OnActiveSec=30s
+OnUnitInactiveSec=1min
+AccuracySec=5s
+RandomizedDelaySec=5s
+Persistent=no
+Unit=secops-capture-archive@%i.service
+
+[Install]
+WantedBy=timers.target

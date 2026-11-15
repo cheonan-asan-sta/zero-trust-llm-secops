@@ -1,4 +1,5 @@
 from hashlib import sha256
+from uuid import uuid4
 
 from fastapi.testclient import TestClient
 
@@ -104,6 +105,15 @@ def test_dashboard_is_available() -> None:
     assert response.status_code == 200
     assert "천안아산역" in response.text
     assert "Zero Trust SecOps" in response.text
+    assert "로그 탐색" in response.text
+    assert "세션과 접근" in response.text
+    assert "/static/dashboard.js" in response.text
+    assert "/static/workbench.html" in response.text
+
+
+def test_analysis_workbench_is_preserved() -> None:
+    response = client.get("/static/workbench.html")
+    assert response.status_code == 200
     assert "AI 교차분석" in response.text
     assert "ANALYST REVIEW" in response.text
     assert "보안 통제 준비도" in response.text
@@ -194,6 +204,9 @@ def test_high_risk_result_can_be_reviewed_and_resolved() -> None:
         "/events/simulate",
         json={"scenario_id": "ZT-S05", "count": 1},
     ).json()[0]
+    # This case tests review transitions, independently of earlier analyses of
+    # the same synthetic event and their timestamp-based latest selection.
+    event['event_id'] = 'review-' + uuid4().hex
     analysis = client.post("/analysis", json=event).json()
 
     started = client.patch(
@@ -213,6 +226,7 @@ def test_high_risk_result_can_be_reviewed_and_resolved() -> None:
         },
     )
     assert resolved.status_code == 200
+    assert resolved.json()['analysis_id'] == analysis['analysis_id']
     assert resolved.json()["review_status"] == "RESOLVED"
     assert resolved.json()["review_updated_at"] is not None
 

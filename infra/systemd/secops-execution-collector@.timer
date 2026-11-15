@@ -1,0 +1,15 @@
+[Unit]
+Description=SecOps periodic signed execution evidence for %i
+
+[Timer]
+# Opt in after reviewing the account, public trust pin and credential provider.
+# Monotonic scheduling collects new observations; it never fabricates missed runs.
+OnActiveSec=2s
+OnUnitInactiveSec=10s
+AccuracySec=1s
+RandomizedDelaySec=1s
+Persistent=no
+Unit=secops-execution-collector@%i.service
+
+[Install]
+WantedBy=timers.target
