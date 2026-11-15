@@ -31,7 +31,8 @@ def public_failure(error):
         'authority_child_retired_jwk_still_authorized', 'authority_child_authority_migration_incomplete',
         'authority_child_authority_requires_leaf_quiescence', 'authority_child_authority_replica_unhealthy',
         'transport_candidate_not_ready', 'transport_database_anchor_changed',
-        'transport_ca_not_ready', 'transport_live_database_identity_failed'}
+        'transport_ca_not_ready', 'transport_live_database_identity_failed',
+        'database_transport_preflight_failed'}
     reason = str(error) if str(error) in allowed else failure_reason(error)
     frames = []
     for frame in traceback.extract_tb(error.__traceback__):
@@ -39,6 +40,15 @@ def public_failure(error):
         if path.is_relative_to(ROOT / 'scripts') and path.is_file():
             frames.append({'file': path.relative_to(ROOT).as_posix(), 'line': frame.lineno})
     result = {'reason': reason, 'frames': frames[-8:]}
+    if isinstance(error, subprocess.TimeoutExpired):
+        result['reason'] = 'runtime_command_timeout'
+        value = error.timeout
+        result['command_timeout_seconds'] = value if type(value) in {int, float} and 0 < value <= 900 else None
+    elif isinstance(error, RuntimeFailure):
+        match = re.fullmatch(r'runtime_command_failed_(-?\d{1,3})', str(error))
+        if match and -255 <= int(match[1]) <= 255:
+            result['reason'] = 'runtime_command_failed'
+            result['cli_exit_code'] = int(match[1])
     if isinstance(error, VerificationFailure):
         safe = VerificationFailure(error.diagnostic.get('reason'),
             exit_code=error.diagnostic.get('cli_exit_code'), child=error.diagnostic.get('child_reason'),
