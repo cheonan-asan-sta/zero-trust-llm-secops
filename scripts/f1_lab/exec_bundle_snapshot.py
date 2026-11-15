@@ -231,6 +231,7 @@ def take_snapshot(journal, broker, operations, scope, worker_directories):
 
 def validate_snapshot(raw, scope, service_pin, caller_pin, *, now=None):
     require(type(raw) is bytes and 0 < len(raw) <= MAX_BODY, 'exec_bundle_snapshot_bytes')
+    real_clock = now is None
     now = datetime.now(UTC) if now is None else now
     value = decode(raw)
     require(type(value) is dict and set(value) == {'schema', 'scope', 'created_at', 'service_pin',
@@ -288,8 +289,9 @@ def validate_snapshot(raw, scope, service_pin, caller_pin, *, now=None):
             worker_present += 1
         verified.append((rid, intent_raw, capture_raw, worker_raw))
     ids = [r[0] for r in verified]
-    require(ids == sorted(set(ids)) and service_pin.current(now) == service
-            and caller_pin.current(now) == caller, 'exec_bundle_snapshot_final_binding')
+    checked_at = datetime.now(UTC) if real_clock else now
+    require(ids == sorted(set(ids)) and checked_at >= now and service_pin.current(checked_at) == service
+            and caller_pin.current(checked_at) == caller, 'exec_bundle_snapshot_final_binding')
     return value, verified, app_raw, broker_raw, {'intents': len(ids), 'sealed': sealed,
         'indeterminate': unknown, 'worker_artifacts': worker_present, 'app_entries': len(entries),
         'broker_requests': len(rows), 'snapshot_sha256': sha(raw),

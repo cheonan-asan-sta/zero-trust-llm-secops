@@ -148,6 +148,7 @@ def handler(
     backup_profile=None,
     outbox_profile=None,
     recovery_profile=None,
+    bundle_profile=None,
 ):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *_):
@@ -187,6 +188,10 @@ def handler(
                 from scripts.f1_lab.exec_recovery_status import metrics as recovery_metrics
 
                 body += recovery_metrics(recovery_profile).encode()
+            if bundle_profile is not None:
+                from scripts.f1_lab.exec_bundle_status import metrics as bundle_metrics
+
+                body += bundle_metrics(bundle_profile).encode()
             self.send_response(200)
             self.send_header("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
             self.send_header("Cache-Control", "no-store")
@@ -209,6 +214,7 @@ def main():
     parser.add_argument("--backup-recovery-profile", type=Path)
     parser.add_argument("--exec-outbox-profile", type=Path)
     parser.add_argument("--exec-recovery-profile", type=Path)
+    parser.add_argument("--exec-bundle-profile", type=Path)
     args = parser.parse_args()
     token = args.token_file.read_text(encoding="utf-8").strip()
     key = os.environ.get("C01_UPSTREAM_API_KEY", "")
@@ -234,6 +240,11 @@ def main():
         from scripts.f1_lab.exec_recovery_status import load_profile as recovery_profile_loader
 
         recovery_profile = recovery_profile_loader(args.exec_recovery_profile)
+    bundle_profile = None
+    if args.exec_bundle_profile:
+        from scripts.f1_lab.exec_bundle_status import load_profile as bundle_profile_loader
+
+        bundle_profile = bundle_profile_loader(args.exec_bundle_profile)
     service = handler(
         validate_upstream(args.upstream),
         key,
@@ -243,6 +254,7 @@ def main():
         backup_profile,
         outbox_profile,
         recovery_profile,
+        bundle_profile,
     )
     if args.server_tls_profile:
         from scripts.mtls_native import NativeServer

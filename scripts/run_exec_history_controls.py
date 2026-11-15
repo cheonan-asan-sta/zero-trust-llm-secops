@@ -176,7 +176,8 @@ def setup_app(directory, unit, *, executable_sha256="a" * 64, command_sha256="b"
 
 
 def run(directory, *, retention=False, outbox_recovery=False, intent_recovery=False,
-        recovery_observability=False, coherent_backup=False):
+        recovery_observability=False, coherent_backup=False, bundle_observability=False):
+    coherent_backup = coherent_backup or bundle_observability
     recovery_observability = recovery_observability or coherent_backup
     intent_recovery = intent_recovery or recovery_observability
     outbox_recovery = outbox_recovery or intent_recovery
@@ -211,6 +212,7 @@ def run(directory, *, retention=False, outbox_recovery=False, intent_recovery=Fa
         "exec_intent_recovery_tested": intent_recovery,
         "exec_recovery_observability_tested": recovery_observability,
         "exec_coherent_backup_tested": coherent_backup,
+        "exec_bundle_observability_tested": bundle_observability,
         "cases": [],
     }
 
@@ -370,6 +372,7 @@ StandardError=journal
                 intent_recovery=intent_recovery,
                 recovery_observability=recovery_observability,
                 coherent_backup=coherent_backup,
+                bundle_observability=bundle_observability,
             )
         report["completed"] = True
     except Exception:
@@ -406,11 +409,12 @@ def main():
     parser.add_argument("--outbox-recovery", action="store_true")
     parser.add_argument("--recovery-observability", action="store_true")
     parser.add_argument("--coherent-backup", action="store_true")
+    parser.add_argument("--bundle-observability", action="store_true")
     parser.add_argument("--intent-recovery", action="store_true")
     args = parser.parse_args()
     result = run(args.directory, retention=args.retention, outbox_recovery=args.outbox_recovery,
                  intent_recovery=args.intent_recovery,recovery_observability=args.recovery_observability,
-                 coherent_backup=args.coherent_backup)
+                 coherent_backup=args.coherent_backup,bundle_observability=args.bundle_observability)
     print(json.dumps({"completed": result["completed"], "cases": len(result["cases"])}))
 
 

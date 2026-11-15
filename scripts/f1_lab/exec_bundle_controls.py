@@ -10,7 +10,7 @@ from scripts.f1_lab.exec_bundle_backup import ExecutionRecoveryBundle
 from scripts.f1_lab.native_jsonl import require
 
 
-def run(lab, launcher, private, root, journal, scope, output, check):
+def run(lab, launcher, private, root, journal, scope, output, check, *, bundle_observability=False):
     from scripts.f1_lab.capture_backup import sha
 
     for path in (lab.operations.path, lab.broker.path):
@@ -62,6 +62,13 @@ def run(lab, launcher, private, root, journal, scope, output, check):
             'exec_bundle_native_no_live_replacement')
     check('restore_never_follows_original_worker_path_or_recreates_live_app_broker_or_intent_stores')
     check('restored_consumed_or_unknown_execution_is_not_refunded_reissued_or_promoted')
+    observer = None
+    if bundle_observability:
+        from scripts.f1_lab.exec_bundle_observability_controls import BundleObserver
+
+        observer = BundleObserver(lab,private,package,review,pins/'checkpoint.json',
+            saved['checkpoint_sha256'],restored['receipt_sha256'],scope,output,check)
+        observer.frame('verified')
     try:
         manager.restore(package, reviews/'wrong-key', pins/'checkpoint.json',
                         saved['checkpoint_sha256'], secrets.token_bytes(32), 'owned-recovery-1')
@@ -74,6 +81,8 @@ def run(lab, launcher, private, root, journal, scope, output, check):
     original = payload.read_bytes()
     try:
         payload.write_bytes(bytes([original[0] ^ 1])+original[1:])
+        if observer is not None:
+            observer.frame('unavailable',damaged=True)
         try:
             manager.restore(package, reviews/'damaged', pins/'checkpoint.json',
                             saved['checkpoint_sha256'], key, 'owned-recovery-1')
@@ -87,6 +96,9 @@ def run(lab, launcher, private, root, journal, scope, output, check):
     require(manager.verify_review(review, restored['receipt_sha256'], pins/'checkpoint.json',
                                    saved['checkpoint_sha256'])['completed'], 'exec_bundle_native_recheck')
     check('keyless_review_recheck_retains_original_state_after_encrypted_package_damage_and_repair')
+    if observer is not None:
+        observer.frame('repaired')
+        observer.finish()
     (output/'bundle-controls.json').write_text(json.dumps({
         'completed': True, 'actual_total_execs': 6, 'additional_backup_execs': 0,
         'intent_backed_execs': 5, 'first_manual_exec_outside_intent_bundle': 1,
