@@ -5,6 +5,7 @@ import base64
 import hashlib
 import json
 import os
+import pwd
 import re
 import shutil
 import subprocess
@@ -93,8 +94,20 @@ def run(directory):
     def collect(instance, expected=True):
         unit = collector_prefix+'@'+instance+'.service'
         result = command('start', unit)
+        launch = {'instance': instance, 'exit_code': result.returncode}
+        status = command('show', '--property=Result,ExecMainCode,ExecMainStatus,ActiveState,SubState', '--', unit)
+        fields = {}
+        if status.returncode == 0 and len(status.stdout) <= 4096:
+            for line in status.stdout.decode().splitlines():
+                name, separator, value = line.partition('=')
+                if (separator and name in {'Result', 'ExecMainCode', 'ExecMainStatus', 'ActiveState', 'SubState'}
+                        and re.fullmatch('[a-zA-Z0-9_-]{1,64}', value)):
+                    fields[name] = value
+        launch['manager_status'] = fields
+        launches.append(launch)
+        save()  # Preserve startup status even when Python could not emit a receipt.
         row = messages(unit)
-        launches.append({'instance': instance, 'exit_code': result.returncode, 'report': row})
+        launch['report'] = row
         save()
         require(row['completed'] is expected and (result.returncode == 0) is expected, 'pam_controls_collect_result')
         if expected:
@@ -135,8 +148,10 @@ def run(directory):
     require(bool(re.fullmatch(r'[A-Za-z0-9_/:.-]{1,2048}', py_path)), 'pam_controls_dependency_path')
 
     def base(user):
+        require(user in {'nobody', 'daemon'}, 'pam_controls_fixture_account')
+        account = pwd.getpwnam(user)
         return ('[Unit]\nDescription=Owned PAM controls\n[Service]\nType=oneshot\n'
-            +f'User={user}\nGroup={user}\nWorkingDirectory={source}\n'
+            +f'User={account.pw_uid}\nGroup={account.pw_gid}\nWorkingDirectory={source}\n'
             +f'Environment=PYTHONPATH={py_path}\nEnvironment=PYTHONDONTWRITEBYTECODE=1\n'
             +'NoNewPrivileges=yes\nCapabilityBoundingSet=\nAmbientCapabilities=\nPrivateNetwork=yes\n'
             +'RestrictAddressFamilies=AF_UNIX\nPrivateTmp=yes\nPrivateDevices=yes\nProtectSystem=strict\n'
