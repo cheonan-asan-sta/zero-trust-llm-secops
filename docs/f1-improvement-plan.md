@@ -1,5 +1,7 @@
 # 탐지 F1 목표 달성 실험 계획
 
+2026-11-16 v87 [감사·인증 추가 멤버 평가](extra-audit-member-transfer.md): 고정8,908행에서 Wilson FP8감소·Wardbeck유지, 새 FP/TP 손실0. 웹 감사 F1 65.45%/67.92%, 공유 감사0%, 인증 재현율91.67%로 목표 미달이다. 부분 노출된 같은 생성 계열이며 Wardbeck 보정 역할 유지. 집중171·전체5,887통과·AWS/유료 API0·장기 soak유예.
+
 2026-11-16 v85 관측 개발 비교: [명시적 AppArmor 변경 생략 문맥](extra-apparmor-noop-review.md)으로 웹 감사 FP37→21·F1 70.77%→80.70%, FN1 유지. 전체1,681,815행에서 추가 FP/기존 TP 손실0. 집중133·전체5,849개 통과. 공유 감사 FP24/FN6·인증 FP0/FN3 유지, 독립 여섯 영역 목표는 미달이다. PR77은 CI17개 통과 후 aitest에 병합됐다. AWS/유료 API0·장기 soak 유예.
 
 2026-11-14 후속: [병합본 잔여 오류와 출처 분리 평가 v49](extra-postmerge-detection-evaluation.md).
