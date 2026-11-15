@@ -62,6 +62,7 @@ def run(
     reporting=False,
     backups=False,
     load_seconds=0,
+    soak_profile=None,
 ):
     require(not archival or freshness, "archive_fixture_requires_freshness")
     require(not scheduling or archival, "schedule_fixture_requires_archive")
@@ -72,6 +73,11 @@ def run(
         "load_duration",
     )
     require(not load_seconds or backups, "load_fixture_requires_backups")
+    from scripts.f1_lab.native_soak import SoakProfile
+
+    require(soak_profile is None or (type(soak_profile) is SoakProfile and backups and not load_seconds),
+            "soak_fixture_configuration")
+    measurement_seconds = soak_profile.seconds if soak_profile else load_seconds
     require(os.name == "posix" and os.geteuid() == 0, "collector_runtime_root_required")
     require(Path("/proc/1/comm").read_text().strip() == "systemd", "collector_runtime_systemd")
     source = Path(__file__).resolve().parents[1]
@@ -102,7 +108,7 @@ def run(
     captures = []
     report = {
         "schema": "extra-capture-load-runtime-1"
-        if load_seconds
+        if measurement_seconds
         else "extra-capture-backup-runtime-1"
         if backups
         else "extra-collector-alert-runtime-1"
@@ -128,8 +134,8 @@ def run(
     expected_caps = (1 << 19) | (1 << 2)  # SYS_PTRACE, DAC_READ_SEARCH
     executable = executable_hash(Path("/usr/bin/python3"))
     fixture_script = (
-        FIXTURE.replace("time.sleep(90)", "time.sleep(" + str(load_seconds + 300) + ")")
-        if load_seconds
+        FIXTURE.replace("time.sleep(90)", "time.sleep(" + str(measurement_seconds + 300) + ")")
+        if measurement_seconds
         else FIXTURE.replace("time.sleep(90)", "time.sleep(180)")
         if scheduling
         else FIXTURE
@@ -187,9 +193,10 @@ def run(
         ).stdout
         private = active_key[0].private_bytes(Encoding.Raw, PrivateFormat.Raw, NoEncryption())
         require(private not in messages, "collector_key_not_in_journal")
-        (output / ("collector-attempt-" + str(len(report["collector_runs"])) + ".log")).write_bytes(
-            messages
-        )
+        require(len(messages) <= 512 * 1024, "collector_journal_bound")
+        log_name = ("collector-latest-attempt.log" if soak_profile and expected_success
+                    else "collector-attempt-" + str(len(report["collector_runs"])) + ".log")
+        (output / log_name).write_bytes(messages)
         summaries = []
         for line in messages.splitlines():
             row = decode(line)
@@ -279,8 +286,8 @@ def run(
                 "[Service]\nType=exec\nUser=nobody\nPrivateNetwork=yes\nNoNewPrivileges=yes\n"
                 "ProtectSystem=strict\nProtectHome=yes\nMemoryMax=64M\nTasksMax=8\n"
                 + (
-                    "RuntimeMaxSec=" + str(load_seconds + 360) + "\n"
-                    if load_seconds
+                    "RuntimeMaxSec=" + str(measurement_seconds + 360) + "\n"
+                    if measurement_seconds
                     else "RuntimeMaxSec=240\n"
                     if scheduling
                     else "RuntimeMaxSec=120\n"
@@ -557,8 +564,19 @@ def run(
                     report["backup_controls"] = run_backup_controls(
                         source, state_dir / fixture_name, scope, monitor, output, check
                     )
-                if load_seconds:
+                if measurement_seconds:
                     from scripts.f1_lab.capture_load_runtime import run_load_controls
+
+                    def renew_fixture_authority():
+                        nonlocal pin, rotated
+                        at = datetime.now(UTC)
+                        rotated = rotated.model_copy(update={
+                            "issued_at": at, "expires_at": at + timedelta(hours=1),
+                            "authorities": [a.model_copy(update={"issued_at": at, "expires_at": at + timedelta(hours=1)})
+                                            for a in rotated.authorities],
+                        })
+                        pin = configure(rotated)
+                        monitor.registry = pin
 
                     report["load_controls"], active_provider = run_load_controls(
                         source,
@@ -571,9 +589,11 @@ def run(
                         check,
                         collector_unit,
                         target_unit,
-                        load_seconds,
+                        measurement_seconds,
                         active_provider,
                         restore_provider,
+                        soak_profile=soak_profile,
+                        renew_authority=renew_fixture_authority if soak_profile else None,
                     )
                     load_deliveries = report["load_controls"]["credential_deliveries"]
             disabled = rotated.model_copy(

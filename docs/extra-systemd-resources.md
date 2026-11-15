@@ -78,3 +78,6 @@ python -m pytest tests/test_systemd_resources.py tests/test_capture_load.py test
 - [Linux v1 memory 인터페이스](https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v1/memory.html): peak·limit·failcnt 필드의 근거. 이 문서는 오래된 설명이라는 자체 경고가 있어 실제 커널 readback·압력 결과도 함께 검증했다.
 
 채희주 요청에 따른 Codex 보조 구현·실행이며 팀원 독립 검토/운영 승인으로 기록하지 않는다.
+
+
+후속 장기 시도의 통과/부분 관측/중단/유예는 [v80 기록](extra-systemd-soak.md)을 따른다.8시간 연속 시험은 완료하지 않았으며 자동 재개하지 않는다.

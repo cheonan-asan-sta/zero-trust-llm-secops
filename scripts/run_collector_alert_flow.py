@@ -21,6 +21,7 @@ from urllib.request import ProxyHandler, Request, build_opener
 
 import yaml
 
+from scripts.f1_lab import backup_recovery_status as backup_status
 from scripts.f1_lab.capture_archive import ArchiveScope
 from scripts.f1_lab.collector_status_bridge import COUNTERS, metrics, publish, report, scope_hash
 from scripts.f1_lab.native_jsonl import require
@@ -53,7 +54,7 @@ def wait_for(fn, seconds=30):
     raise ValueError("collector_alert_flow_timeout")
 
 
-def run(directory):
+def run(directory, *, backup_recovery=False):
     output = Path(directory)
     output.mkdir(parents=True, exist_ok=False)
     checks = []
@@ -127,10 +128,27 @@ def run(directory):
                 "health_file": str(root / "health.json"),
                 "archive_file": str(root / "archive.json"),
             }
+            backup_profile = None
+            if backup_recovery:
+                modes["backup"] = "verified"
+                backup_profile = {"scope_sha256": scope_hash(scope), "status_file": str(root / "backup.json"),
+                                  "max_snapshot_age_seconds": 120, "max_restore_age_seconds": 60}
 
             def update():
                 now = datetime.now(UTC)
                 with lock:
+                    if backup_profile and modes["backup"] != "stopped":
+                        if modes["backup"] == "unavailable":
+                            value = backup_status.report(scope)
+                        else:
+                            old_snapshot = modes["backup"] == "old_snapshot"
+                            old_restore = modes["backup"] == "old_restore"
+                            snapshot = now - timedelta(seconds=121 if old_snapshot else 62 if old_restore else 2)
+                            restored = now - timedelta(seconds=61 if old_restore else 1)
+                            value = backup_status.report(scope, {"snapshot_at": snapshot.isoformat(),
+                                "backup_at": snapshot.isoformat(), "restored_at": restored.isoformat(),
+                                "records": 2, "raw_bytes": 2048}, now=now)
+                        backup_status.publish(backup_profile["status_file"], value)
                     if modes["health"] != "stopped":
                         observed = now - timedelta(seconds=31 if modes["health"] == "stale" else 1)
                         value = report(
@@ -167,7 +185,7 @@ def run(directory):
             inbox = serve(Inbox)
             sink = serve(receiver(notify))
             url = f"http://127.0.0.1:{inbox}/zero-trust/signals/inbox"
-            exporter = serve(handler(url, "local-fixture", token, collector_profile=profile))
+            exporter = serve(handler(url, "local-fixture", token, collector_profile=profile, backup_profile=backup_profile))
             legacy = serve(handler(url, "local-fixture", token))
             am_port, prom_port = 19093, 19090
             scrape = root / "scrape.token"
@@ -380,6 +398,31 @@ def run(directory):
                     for v in [token, notify, scope.tenant_id, scope.server_id, scope.unit]
                 ),
             )
+            if backup_profile:
+                check("default_exporter_has_no_backup_metrics_or_alerts",
+                      not query('secops_capture_backup_bridge_enabled{job="zt-signals-legacy"}')
+                      and not query('ALERTS{job="zt-signals-legacy",alertname=~"C01CaptureBackup.*"}'))
+                check("normal_backup_recovery_has_no_backup_alert",
+                      not query('ALERTS{alertstate="firing",alertname=~"C01CaptureBackup.*"}'))
+                for mode in ("old_snapshot", "old_restore", "unavailable"):
+                    name = "C01CaptureBackupVerificationUnavailable" if mode == "unavailable" else "C01CaptureBackupRecoveryOverdue"
+                    offset = len(events())
+                    with lock: modes["backup"] = mode
+                    firing = wait_for(lambda name=name, offset=offset: notification(name, "firing", offset))
+                    check(mode + "_backup_condition_reaches_real_receiver",
+                          bool(query("secops_collector_observation_fresh == 1")))
+                    with lock: modes["backup"] = "verified"
+                    wait_for(lambda name=name, offset=offset, firing=firing: notification(name, "resolved", offset, firing))
+                    check(mode + "_backup_recovery_resolves_same_episode")
+                offset = len(events())
+                with lock: modes["backup"] = "stopped"
+                wait_for(lambda: query('secops_capture_backup_status_success == 0'), seconds=backup_status.REPORT_TTL + 10)
+                firing = wait_for(lambda: notification("C01CaptureBackupVerificationUnavailable", "firing", offset))
+                check("stopped_backup_reporter_expires_after_real_180_seconds_without_cached_counts",
+                      not query('secops_capture_backup_records{job="zt-signals"}'))
+                with lock: modes["backup"] = "verified"
+                wait_for(lambda: notification(firing["alertname"], "resolved", offset, firing))
+                check("backup_reporter_restart_resolves_same_episode")
             require(all(p.poll() is None for p in processes), "monitoring_processes_survived")
             result = {
                 "completed": True,
@@ -391,6 +434,7 @@ def run(directory):
                 "aws_calls": 0,
                 "independent_detection_evaluation": False,
                 "production_mTLS_flow_tested_here": False,
+                "backup_recovery_aggregate_fixture_tested": backup_recovery,
                 "network_boundary": "single isolated container network namespace, loopback only",
             }
     finally:
@@ -418,7 +462,9 @@ def run(directory):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--directory", required=True)
-    run(parser.parse_args().directory)
+    parser.add_argument("--backup-recovery", action="store_true")
+    args = parser.parse_args()
+    run(args.directory, backup_recovery=args.backup_recovery)
 
 
 if __name__ == "__main__":

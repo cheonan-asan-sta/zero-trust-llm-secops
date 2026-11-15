@@ -251,6 +251,14 @@ def run_backup_controls(source, root, scope, monitor, output, check):
                 (root / "archive.sqlite3").read_bytes() == database
                 and (root / "latest.json").read_bytes() == latest,
             )
+            from scripts.f1_lab.backup_recovery_status_runtime import (
+                run_controls as recovery_controls,
+            )
+
+            report["recovery_status_controls"] = recovery_controls(
+                source, scope, package, backed["manifest_sha256"], checkpoint, cp_pin[0],
+                review_dir / "restored", restored["receipt_sha256"], config_dir, output, check,
+            )
             check(
                 "only_root_manager_receives_separate_recovery_credential",
                 provider.delivered + replacement.delivered == 3
