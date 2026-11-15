@@ -1,5 +1,7 @@
 # zero-trust-llm-secops
 
+2026-11-16 v90 로컬 통합 인수: [복구 묶음 키 없는 관측](docs/extra-exec-bundle-status.md). 집중542·전체6,070·실제systemd67·실제경보9조건통과. 별도capability0 worker·손상/수리·원래시각/확인불가1유지·실제만료확인. 기존1,681,815건판정동일·새FP/TP손실0·AWS/유료API0·장기soak유예·독립목표미달.
+
 2026-11-16 v89 로컬 인수: [실행 복구 상태의 암호화 묶음](docs/extra-exec-coherent-backup.md). 집중489·전체6,017·실제systemd62·복구관측10조건통과. 실제6exec 중intent5건(완성4/확인불가1)과앱·브로커를선택원본유실후격리복원. 기존1,681,815건판정동일·새FP/TP손실0. AWS/유료API0·장기soak유예·독립목표미달.
 
 2026-11-16 v88 로컬 통합 인수: [실행 불확실·원본 미게시 경보](docs/extra-exec-recovery-observability.md). 집중448·전체5,976·실제 systemd53·실제 관측10조건 통과. 실제6exec에서 과거 cold유실까지 미게시1→2→1→0, 확인불가1은 계속pending. 기존1,681,815건 판정동일·새FP/TP손실0. AWS/유료API0·장기soak유예·독립목표미달.
