@@ -1,0 +1,11 @@
+[Unit]
+Description=SecOps scoped PAM journal observation schedule for %i
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec=30s
+AccuracySec=1s
+Unit=secops-pam-journal@%i.service
+
+[Install]
+WantedBy=timers.target

@@ -10,7 +10,7 @@ CREDENTIALS_ROOT = Path("/run/credentials")
 
 
 def read_systemd_key(*, credential_name="runtime-key"):
-    require(credential_name in {"runtime-key", "capture-backup-key"}, "credential_fixed_name")
+    require(credential_name in {"runtime-key", "capture-backup-key", "auth-journal-key"}, "credential_fixed_name")
     require(os.name == "posix" and hasattr(os, "O_NOFOLLOW"), "credential_linux_file_required")
     supplied = os.environ.get("CREDENTIALS_DIRECTORY", "")
     directory = Path(supplied)

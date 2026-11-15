@@ -116,7 +116,7 @@ class ServiceAuthority(Window):
     tenant_id: Identifier
     source_id: Identifier
     key_id: Identifier
-    kind: Literal["runtime", "authorization"]
+    kind: Literal["runtime", "authorization", "authentication"]
     mode: Mode
     server_id: Identifier
     units: list[Unit] = Field(min_length=1, max_length=100)
