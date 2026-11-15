@@ -1,0 +1,38 @@
+flowchart TB
+  UI["운영자 대시보드<br/>54개 API 작업과 관리자 실행 메뉴"]
+  AUTH["API 키 / OIDC<br/>테넌트, 역할, 입력과 현재 버전 검증"]
+  UI --> AUTH
+  subgraph APP["현재 연결한 FastAPI 앱과 관련 프로세스"]
+    ANALYSIS["정규화, 규칙, 상관분석<br/>사고와 전송 이력"]
+    AI["OpenAI / Hybrid 설정 시 AI 분석<br/>위험도, 근거, 대응 제안"]
+    INBOX["서명과 출처 검증 → Inbox"]
+    WORKER["worker: 신호 처리<br/>watchdog: 만료와 키 폐기 점검"]
+    SESSION["세션 정책과 토큰 검증<br/>보호 자원 접근 200 / 403"]
+    CONTEXT["관측과 실행 증거<br/>정상 기준선, 작업 승인, 조사 후보"]
+    RESPONSE["별도 고위험 대응 요청<br/>서로 다른 두 검토자 승인<br/>모의 대응 실행"]
+    STORE["감사 로그, 사고와 Outbox<br/>SQLite 세션, Inbox, 문맥과 승인 이력"]
+    ANALYSIS -. "설정된 분석 모드" .-> AI
+    ANALYSIS --> STORE
+    AI --> STORE
+    INBOX --> WORKER --> SESSION --> STORE
+    CONTEXT --> STORE
+    RESPONSE --> STORE
+  end
+  SOURCES["신원, 기기, 세션 증명<br/>GuardDuty 로컬 입력 어댑터"] --> INBOX
+  AUTH --> ANALYSIS
+  AUTH --> INBOX
+  AUTH --> CONTEXT
+  AUTH --> RESPONSE
+  subgraph OPS["서버에서 명시적으로 활성화한 로컬 관리자 작업"]
+    JOB["작업 API → SQLite 접수<br/>UUID 중복 방지와 실행 잠금"]
+    CHILD["허용된 별도 실행 프로세스"]
+    M6["M6 동일 입력 모델 비교<br/>모의 실행 / 키와 비용 설정 후 실호출"]
+    DOCKER["별도 mTLS Docker 환경<br/>앱, worker, 수집기, watchdog<br/>시작, 정지, 복원, 장애 검증"]
+    RECOVERY["기록자 정지 → 백업 → 격리 복원<br/>승인된 사본 재기동<br/>이력 보존과 기존 토큰 거부 검증"]
+    JOB --> CHILD
+    CHILD --> M6
+    CHILD --> DOCKER --> RECOVERY
+  end
+  AUTH -. "로컬 관리자 인증과 서버 설정" .-> JOB
+  NOTE["Docker 검증 환경은 현재 조회 앱과 저장소를 공유하지 않음<br/>외부 계정과 기기 조치는 모의 실행"]
+  DOCKER --- NOTE

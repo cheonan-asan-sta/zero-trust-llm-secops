@@ -50,6 +50,11 @@ class Settings(BaseSettings):
     api_max_body_bytes: int = Field(default=1_048_576, ge=1024, le=10_485_760)
     analysis_max_concurrency: int = Field(default=8, ge=1, le=100)
     analysis_queue_timeout_seconds: float = Field(default=0.25, ge=0.01, le=10)
+    # Host-only control plane. Disabled unless an operator selects a private root.
+    dashboard_operations_directory: Path | None = None
+    dashboard_operations_tenant: str = "local"
+    dashboard_m7_paired_directory: Path | None = None
+    dashboard_live_max_usd: float = Field(default=0, ge=0, le=50, allow_inf_nan=False)
 
     model_config = SettingsConfigDict(
         env_file=".env.local",
