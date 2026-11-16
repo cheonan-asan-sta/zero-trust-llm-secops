@@ -1,6 +1,8 @@
 # 채희주 개인 실행 계획
 
-**최신 v104 근거 적용 판정:** [공유 감사·인증·VPN 판정 개선](../extra-evidence-risk-refinement.md). Linux526건·실제 systemd18조건 통과. 로컬 정책 제어6시나리오에서 불필요 경보2→0·명시적 폐기 미탐3→0. 점수는 fixture이며 독립 공격 탐지 F1에 합산하지 않는다. v103 대비 기존1,681,815행 판정 동일·새FP/TP손실0·목표 미달. push·새CI·병합 보류.
+**최신 v105 실제 인증 미탐 개선:** [명령/PAM 원문 문맥](../extra-sensitive-auth-context.md). 기존1,681,815행에서 미탐3건 회수·새FP/TP손실0. 관측 인증32양성/1,082정상에서 P/R/F1 각각100%, FPR/FNR0%, R/S/F 각 자료도 충족. Linux348건 통과. 공유/웹 감사·VPN 및 원래6영역 독립 목표는 미달/미인수이며 목표 active·push/새CI/병합 보류.
+
+**직전 v104 근거 적용 판정:** [공유 감사·인증·VPN 판정 개선](../extra-evidence-risk-refinement.md). Linux526건·실제 systemd18조건 통과. 로컬 정책 제어6시나리오에서 불필요 경보2→0·명시적 폐기 미탐3→0. 점수는 fixture이며 독립 공격 탐지 F1에 합산하지 않는다. v103 대비 기존1,681,815행 판정 동일·새FP/TP손실0·목표 미달. push·새CI·병합 보류.
 
 **직전 v103 로컬 수집·연결:** [실행 주체·PAM 호출 신원·VPN 기기 결속](../extra-live-evidence-ingress.md). Linux 집중485건·실제 systemd/PAM/OIDC11조건 통과. v102 대비 기존1,681,815행 판정 동일·새FP/기존TP손실0. 과거 로그의 미상 근거를 소급 생성하지 않아 탐지 목표는 계속 미달이다. 기관 SSO/MDM·실제 VPN hook·새 독립 평가는 별도이며 push·새CI·병합은 보류한다.
 
