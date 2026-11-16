@@ -32,7 +32,7 @@ def stage(catalog_path,pin,output):
         prep=decode(Path(scenarios[name]['preparation']).read_bytes())
         require(index<len(prep['pairs']) and prep['pairs'][index]['raw_member'].endswith('/internal_share/logs/audit/audit.log')
             and prep['pairs'][index]['raw_sha256']==spec['raw_source_sha256'],'journal_support_audit_binding')
-        match=re.fullmatch(r'gather/internal_share/logs/journal/([a-f0-9]{32})/[^/]{1,255}[.]journal',spec['member'])
+        match=re.fullmatch(r'gather/internal_share/logs/journal/([a-f0-9]{32})/[^/]{1,255}[.]journal~?',spec['member'])
         require(match is not None and spec['hostname']=='internal-share' and re.fullmatch('[a-f0-9]{64}',spec['archive_sha256']),
             'journal_support_host')
         path=Path(spec['path']);binary=Path(spec['binary_path'])
