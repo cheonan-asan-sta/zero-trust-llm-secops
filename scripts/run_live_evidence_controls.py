@@ -15,6 +15,14 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 
 from scripts.f1_lab.collector_freshness import CollectorScope
+from scripts.f1_lab.execution_risk_evidence import (
+    CallerRiskPolicy,
+    PinnedCallerRiskPolicy,
+    add_identity_uncertainty,
+    pam_evidence,
+    refine_execution,
+    service_evidence,
+)
 from scripts.f1_lab.live_execution_context import (
     ExecutionPolicy,
     ExecutionRule,
@@ -42,7 +50,7 @@ from scripts.run_shared_execution_controls import sign_policy
 from scripts.run_systemd_caller_controls import setup_broker, token_for
 
 
-def run(directory):
+def run(directory, *, risk_refinement=False):
     require(os.name == 'posix' and os.geteuid() == 0
             and Path('/proc/1/comm').read_text().strip() == 'systemd', 'live_controls_native_systemd')
     output = Path(directory)
@@ -154,6 +162,49 @@ def run(directory):
         check('missing_record_cannot_join_by_adjacent_pid', collect_pam_context(capture, scope, broker.joiner,
             event, proofs, cursor_sha256='f'*64).state == 'unavailable')
 
+        if risk_refinement:
+            report['risk_controls'] = []
+            report['detector_scores_are_fixture_inputs'] = True
+
+            def caller_risk(revoked, version):
+                moment = datetime.now(UTC)
+                value = CallerRiskPolicy(version=version, authentication_registry_sha256=broker.registry.sha256,
+                    issued_at=moment, expires_at=moment+timedelta(minutes=5), revoked_caller_refs=revoked)
+                path = output/'caller-risk.json'
+                path.write_bytes(canonical(value.model_dump(mode='json')))
+                return PinnedCallerRiskPolicy(path, hashlib.sha256(path.read_bytes()).hexdigest(),
+                                              minimum_version=version)
+
+            def evidence(kind, selected):
+                supplied = {'caller_registry': broker.registry, 'request': request,
+                            'receipt': receipt, 'risk_policy': selected}
+                if kind == 'audit-share':
+                    return service_evidence(broker.joiner, event, proofs, **supplied)
+                return pam_evidence(capture, scope, broker.joiner, event, proofs,
+                                    cursor_sha256=opened[0].cursor_sha256, **supplied)
+
+            active = caller_risk([], 1)
+            for kind in ('audit-share', 'auth'):
+                prior = add_identity_uncertainty(before, event, kind=kind, uncertainty_score=.98)
+                resolved = refine_execution(prior, evidence(kind, active))
+                check(kind+'_verified_identity_removes_only_attributed_supplemental_alert',
+                      prior.alert and not resolved.alert and resolved.review and not resolved.automatic_enforcement_allowed)
+                report['risk_controls'].append({'kind': kind, 'case': 'authorized_identity_uncertainty',
+                    'expected_policy_alert': False, 'before': prior.alert, 'after': resolved.alert})
+                threat = add_identity_uncertainty(OperationDecision(.99, .99, True, True, 'independent_threat'),
+                                                  event, kind=kind, uncertainty_score=.98)
+                check(kind+'_independent_threat_is_never_cleared', refine_execution(threat, evidence(kind, active)).alert)
+            revoked = caller_risk([receipt.caller_ref_sha256], 2)
+            for kind in ('audit-share', 'auth'):
+                prior = add_identity_uncertainty(before, event, kind=kind, uncertainty_score=.1)
+                result = refine_execution(prior, evidence(kind, revoked))
+                check(kind+'_current_verified_caller_revocation_adds_alert', not prior.alert and result.alert)
+                report['risk_controls'].append({'kind': kind, 'case': 'explicit_current_caller_revocation',
+                    'expected_policy_alert': True, 'before': prior.alert, 'after': result.alert})
+            revoked.path.write_bytes(b'{}')
+            prior = add_identity_uncertainty(before, event, kind='audit-share', uncertainty_score=.98)
+            check('tampered_risk_policy_cannot_clear_context_alert', refine_execution(prior, evidence('audit-share', revoked)) is prior)
+
         def ingress(selected):
             return collect_service(broker.joiner, selected, keys['runtime'], keys['authorization'],
                 tenant_id=rule.tenant_id, server_id=rule.server_id, unit=unit, runtime_source_id='local-proc',
@@ -201,8 +252,9 @@ def run(directory):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--directory', required=True)
+    parser.add_argument('--risk-refinement', action='store_true')
     args = parser.parse_args()
-    report = run(args.directory)
+    report = run(args.directory, risk_refinement=args.risk_refinement)
     print(json.dumps({k: report[k] for k in ('completed', 'cases', 'owned_units_removed', 'owned_processes_stopped')}))
     return 0 if report['completed'] and report['owned_units_removed'] and report['owned_processes_stopped'] else 2
 

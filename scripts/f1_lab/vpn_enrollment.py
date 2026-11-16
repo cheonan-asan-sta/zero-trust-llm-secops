@@ -1,6 +1,7 @@
 """Externally pinned certificate enrollment; no identity inferred from VPN names."""
 
 import hashlib
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Literal
@@ -28,6 +29,12 @@ class EnrollmentRegistry(StrictModel):
     bindings: list[Enrollment] = Field(max_length=1000)
 
 
+@dataclass(frozen=True)
+class EnrollmentAssessment:
+    state: str
+    registry_sha256: str
+
+
 class PinnedVPNEnrollments:
     def __init__(self, path, expected_sha256, *, minimum_version=1):
         require(isinstance(expected_sha256, str) and len(expected_sha256) == 64
@@ -35,7 +42,7 @@ class PinnedVPNEnrollments:
                 and type(minimum_version) is int and minimum_version >= 1, 'vpn_enrollment_pin')
         self.path, self.expected_sha256, self.minimum_version = Path(path), expected_sha256, minimum_version
 
-    def verify(self, request, *, now):
+    def assess(self, request, *, now):
         require(isinstance(now, datetime) and now.tzinfo is not None and now.utcoffset() is not None,
                 'vpn_enrollment_clock')
         require(self.path.is_file() and not self.path.is_symlink() and self.path.stat().st_size <= 256000,
@@ -56,6 +63,11 @@ class PinnedVPNEnrollments:
             identities.add(key)
             if key == (request.tenant_id, request.gateway_id, request.client_certificate_sha256):
                 match = binding
-        require(match is not None and match.enabled and match.user_id == request.user_id
-                and match.device_id == request.device_id, 'vpn_enrollment_identity')
-        return self.expected_sha256
+        state = ('unavailable' if match is None or match.user_id != request.user_id
+                 or match.device_id != request.device_id else 'active' if match.enabled else 'revoked')
+        return EnrollmentAssessment(state, self.expected_sha256)
+
+    def verify(self, request, *, now):
+        result = self.assess(request, now=now)
+        require(result.state == 'active', 'vpn_enrollment_identity')
+        return result.registry_sha256

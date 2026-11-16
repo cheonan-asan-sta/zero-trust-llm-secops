@@ -125,7 +125,7 @@ def test_actual_tls_alone_cannot_supply_device_or_permission_authority(tmp_path,
     if mode == 'policy_changed':
         (c.directory/'policies.json').write_bytes(b'{}')
     result = VerifiedVPNRisk(baseline, c.bridge).decide(**arguments(row))
-    assert result.alert and result.evidence_state == 'unavailable'
+    assert result.alert and result.evidence_state == ('adverse' if mode == 'revoked' else 'unavailable')
 
 
 def test_optional_or_absent_peer_authentication_is_not_evidence(tmp_path):

@@ -244,7 +244,17 @@ class VPNTrustBridge:
                 require(posture.observation.kind == 'device' and posture.observation.subject_id == request.device_id
                         and timedelta(0) <= now-posture.observed_at <= timedelta(seconds=30)
                         and timedelta(0) <= now-event.timestamp <= timedelta(seconds=30), 'vpn_posture_binding')
-                enrollment_sha = self.enrollments.verify(request, now=now)
+                enrollment = self.enrollments.assess(request, now=now)
+                if enrollment.state == 'revoked':
+                    require(self.signals._sources() == sources
+                            and self.enrollments.assess(request, now=now) == enrollment,
+                            'vpn_revocation_changed')
+                    require(key in self.adverse or len(self.adverse) < self.capacity, 'vpn_adverse_capacity')
+                    self.adverse[key] = now+timedelta(seconds=60)
+                    evidence_sha = hashlib.sha256(canonical([payload_sha(bundle), enrollment.registry_sha256])).hexdigest()
+                    return VPNFacts('adverse', 'vpn_verified_certificate_enrollment_revoked', evidence_sha)
+                require(enrollment.state == 'active', 'vpn_enrollment_identity')
+                enrollment_sha = enrollment.registry_sha256
                 policy = self.policies.resolve(event, request.tenant_id, now=now)
                 unhealthy = (not event.user.active or event.auth_context.authentication_result != 'success'
                     or event.auth_context.mfa != 'success' or event.auth_context.failed_attempts > 0
