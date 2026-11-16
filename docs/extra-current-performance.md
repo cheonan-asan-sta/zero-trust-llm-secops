@@ -1,5 +1,7 @@
 # 현재 성능과 남은 목표 — 2026-11-16
 
+**v123 로컬 개선(2026-11-17):** [native 관측·첫 source 서비스 흐름](extra-shared-native-dns-review.md). 공유 TP2→4·FN4→2·FP0 유지·F1 50→80%, 추가FP/기존TP손실0·원래1,681,815행·Linux1109건. R의 같은 학습 사건 2행이며 native-capture 오프라인 profile·사람/명령/실제 앱 수신은 미확인. VPN F1 80% 유지·원래6영역 독립 인수 미완료·소비된Harrison/Wilson 예약 재사용 금지·전체목표 active.
+
 **v122 실제 검증·정리 완료(2026-11-17):** [원본 PCAP 321만 기록·초기 로그 66/66 진단 연결·Docker 정리](extra-vpn-packet-data-review.md). 헤더 특징은 정상65/위협1에서 같아 후보 미채택·탐지 지표 v117 유지. 오래된 프로젝트 이미지10·관련 캐시38(2.715GB) 삭제, 현 시험/최신 역할 image·volume14·타 프로젝트 컨테이너 보존·재사용 확인. 전체 목표 active.
 
 **v121 개발·수집 진행(2026-11-17):** [예측기 미승인 초기 frame 진단·캡처 품질](extra-vpn-frame-diagnostic.md). Linux 964건. VPN native 4,159행에서 initial 중복 0, 통계에서 kernel drop 최대 22,396 발견. 시각/완전성 가정으로 예측기에 넣지 않음·지표 v117 유지. 현재 검증 뒤 프로젝트 Docker 정리 요청 대기(삭제 0)·목표 active.

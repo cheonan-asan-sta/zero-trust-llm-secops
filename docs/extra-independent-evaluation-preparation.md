@@ -138,3 +138,7 @@ Linux 소스721파일이 실행 전후 동일했고 컨테이너 exit0·OOM fals
 기존 전체 앱3646개 회귀를 이번에 다시 실행한 것은 아니다.
 단위 테스트는 기존 기준선 재현용 fixture를 실행하지만, **준비 작업 자체의 모델 추론·새 성능 평가·학습은0**이다.
 유료 API·AWS 호출·새 다운로드·GitHub push·PR/브랜치 병합도0이다.
+
+## v123 현재 source 노출 재검사
+
+위 예약/노출 상태는 v43 당시 이력이다. 현재는 [v123 결과](extra-shared-native-dns-review.md)와 [갱신 대장](../infra/f1-lab/observed-source-exposure-v123.json)을 따른다. 기존 payload/pattern 항목을 보존하고 8개 canonical testbed의 소비 근거와 알려진 source SHA55개를 기록했다. Harrison/Wilson은 이미 관측/채점 또는 학습됐으므로 새 최종 source로 재사용하지 않는다. ID/동일 지문 거부4개는 metadata 제어군이고 새 독립 사례0이다. 원래 프로토콜과 6영역/5축은 변경하지 않았다.
