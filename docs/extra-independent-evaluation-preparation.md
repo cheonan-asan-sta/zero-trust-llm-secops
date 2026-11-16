@@ -162,3 +162,8 @@ Linux 소스721파일이 실행 전후 동일했고 컨테이너 exit0·OOM fals
 ## v127 기존 training VPN 호스트의 추가 native 자료
 
 [VPN journal 조사](extra-vpn-native-clock-review.md)에서39개 파일의 지문을 확인하고 [v127 대장](../infra/f1-lab/observed-source-exposure-v127.json)에 추가했다. 기존 ID/payload/pattern·역할을 보존했다. 서비스 시작 기록은 있었으나 원래 접속 메시지 복사본은0이며 새 정상 지지·독립 사례·모델/판정 변경0이다. 원래6영역/5축·지표 목표·독립 계획 지문을 유지했다.
+
+
+## v128 원래 독립 인수 요구 재검사
+
+[목표 근거 감사](extra-target-evidence-gap-v128.md)에서 기존720개 authored 개발 메타데이터와 현재v127 노출 대장을 원래 프로토콜로 재검사했다. 최종 자료0·후보 동결 없음·세 분할/source/label/지지 미확인이다. DEDALE 고정 라벨링 README는 Auditbeat/Winlogbeat 프로세스 생애를 설명하지만 현재syslog와 직접 정답 대응·6영역/5축 인수를 입증하지 않는다. 원래6영역·목표·프로토콜 지문을 유지한다. 추가 근거 확보 전 자동 조정 반복과 CI/push/병합은 보류한다.

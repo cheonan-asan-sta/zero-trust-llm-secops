@@ -1,3 +1,5 @@
+> 2026-11-17 v128: 목표 미달과 재개 조건을 요구사항별 감사했다. 공유 감사/VPN F1 80%·원래6영역 최종 지지0. DEDALE 고정 README만으로 syslog의 정답 대응/과거 AIT 신원/독립6영역을 증명하지 못한다. 같은 필수 근거 공백이 최근3턴 반복돼 추가 근거 전 자동 개선 반복 보류·CI/push/병합 금지 유지. [감사와 재개 조건](../extra-target-evidence-gap-v128.md)
+
 > 2026-11-17 v127: 기존 training4곳의 VPN native39파일·journal15,747/text5,868기록을 조사했으나 접속 메시지 복사본0으로 미채택. 모델/정답/예측/새 시험0·공유 감사/VPN F1 80% 유지·목표 전 CI/push/병합 보류. [출처·시각 근거](../extra-vpn-native-clock-review.md)
 
 > 2026-11-17 v126: DEDALE syslog125MB·게시 MD5·첫128행의 중첩 압축/형식 검증과 관련 Windows/Linux120건을 완료했다. 새46건·정답/학습/예측0·새 독립 인수0이며 F1 공유 감사/VPN80% 유지. Docker 소유 컨테이너 제거·목표 전 CI/push/병합 보류. [수집 근거](../extra-dedale-native-intake.md)
