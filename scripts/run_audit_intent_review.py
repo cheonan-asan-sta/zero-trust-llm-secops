@@ -1,0 +1,115 @@
+"""Frozen learned intent head replay; labels never enter this command."""
+
+import argparse
+import hashlib
+import json
+import re
+from pathlib import Path
+
+from scripts.f1_lab.audit_intent_context import AuditIntentReview
+from scripts.f1_lab.audit_intent_head import IntentHead
+from scripts.f1_lab.native_jsonl import MAX_ROW, decode, require
+from scripts.f1_lab.operation_context import canonical
+from scripts.f1_lab.operation_refinement import OperationDecision
+from scripts.f1_lab.transfer_evaluation import sha
+from scripts.run_audit_auth_review import signals
+
+
+def observations(raw_directory,preparation):
+    # This reuses the exact physical source/hash/timezone validation, but not
+    # risk decisions or labels, from the existing audit observation reader.
+    signals(raw_directory,preparation)
+    result={}
+    for index,pair in enumerate(preparation['pairs']):
+        if not pair['raw_member'].endswith('/logs/audit/audit.log'):
+            continue
+        path=Path(raw_directory)/f'pair-{index}-raw.source'
+        require(sha(path)==pair['raw_sha256'],'intent_raw_pin')
+        reviewer=AuditIntentReview(pair['raw_sha256'])
+        n=0
+        with path.open('rb') as stream:
+            for n,body in enumerate(stream,1):
+                require(len(body)<=MAX_ROW and n<=100000,'intent_raw_bound')
+                try:line=body.decode('utf8')
+                except UnicodeError:line=''
+                stamp=re.search(r'\bmsg=audit\((\d+(?:\.\d+)?):',line)
+                observation=reviewer.observe(n,line,float(stamp[1]) if stamp else None,
+                                             source_sha256=pair['raw_sha256'])
+                if observation.eligible:result[index,n]=(observation,line)
+        require(n==pair['rows'] and sha(path)==pair['raw_sha256'],'intent_raw_population')
+    return result
+
+
+def predict(head,preparation,raw_directory,baseline,baseline_sha256,output):
+    require(sha(baseline)==baseline_sha256,'intent_baseline_pin')
+    selected=observations(raw_directory,preparation)
+    output=Path(output)
+    require(not output.exists() and not output.with_suffix('.part').exists(),'intent_fresh_output')
+    source=ordinal=count=errors=changed=0
+    with Path(baseline).open('rb') as old,output.with_suffix('.part').open('xb') as target:
+        while body:=old.readline(MAX_ROW+1):
+            require(len(body)<=MAX_ROW and source<len(preparation['pairs']),'intent_prediction_bound')
+            ordinal+=1;pair=preparation['pairs'][source];prior=decode(body)
+            case=hashlib.sha256((pair['raw_sha256']+':'+str(ordinal)).encode()).hexdigest()
+            require(prior['case_id']==case and prior['source_index']==source,'intent_case_order')
+            before=prior['after'] if prior['error'] is None else None
+            after,score,reason=before,prior['after_score'],prior['reason']
+            if prior['error'] is None and (source,ordinal) in selected:
+                require(type(before) is bool,'intent_baseline_decision')
+                observation,line=selected[source,ordinal]
+                previous=OperationDecision(prior['before_score'],score,before,before,reason)
+                decision=head.refine(previous,observation,source_sha256=pair['raw_sha256'],ordinal=ordinal,raw=line)
+                after,score,reason=decision.alert,decision.score,decision.reason
+            changed+=before!=after;errors+=prior['error'] is not None
+            target.write(canonical({'case_id':case,'source_index':source,'before':before,'after':after,
+                'before_score':prior['after_score'],'after_score':score,'reason':reason,'error':prior['error']})+b'\n')
+            count+=1
+            if ordinal==pair['rows']:source,ordinal=source+1,0
+    require(source==len(preparation['pairs']) and ordinal==0 and sha(baseline)==baseline_sha256,
+            'intent_previous_population_or_drift')
+    output.with_suffix('.part').rename(output)
+    return {'population':count,'inference_errors':errors,'changed_alerts':changed,
+            'predictions_sha256':sha(output),'validation_labels_opened':False}
+
+
+def run(plan_path,pin,model_path,model_pin,output):
+    require(sha(plan_path)==pin,'intent_plan_pin')
+    plan=decode(Path(plan_path).read_bytes())
+    require(plan['schema']=='ordered-audit-replay-1' and plan['scope']=='observed_development_only'
+            and plan['goal_qualified'] is False and sha(plan['baseline'])==plan['baseline_sha256'],
+            'intent_plan_scope')
+    baseline=decode(Path(plan['baseline']).read_bytes())
+    require(baseline['completed'] is True and baseline['goal_qualified'] is False
+            and len(plan['scenarios'])==len(baseline['scenarios']),'intent_baseline_scope')
+    head=IntentHead.load(model_path,model_pin)
+    output=Path(output);output.mkdir(parents=True,exist_ok=False);(output/'prediction').mkdir()
+    report={'schema':'learned-audit-intent-prediction-1','completed':False,'goal_qualified':False,
+        'new_independent_evaluation':False,'validation_labels_opened':False,
+        'frozen_training_parameters_available':True,'model_sha256':model_pin,
+        'scenarios':{},'aws_calls':0,'paid_api_calls':0}
+    for spec in plan['scenarios']:
+        name=spec['name']
+        require(name not in report['scenarios'] and sha(spec['preparation'])==spec['preparation_sha256'],
+                'intent_preparation_pin')
+        prepared=decode(Path(spec['preparation']).read_bytes())
+        require(prepared['completed'] is True and prepared['inputs_contain_truth'] is False,'intent_preparation_scope')
+        before=baseline['scenarios'][name]
+        row=predict(head,prepared,spec['raw'],spec['prediction'],before['prediction']['predictions_sha256'],
+                    output/'prediction'/(name+'-predictions.jsonl'))
+        require(row['population']==before['population'],'intent_complete_population')
+        report['scenarios'][name]=row
+        (output/'prediction-seal.json').write_bytes(canonical(report)+b'\n')
+    report['completed']=True
+    (output/'prediction-seal.json').write_bytes(canonical(report)+b'\n')
+    return report
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    for name in ('plan','sha256','model','model-sha256','output'):parser.add_argument('--'+name,required=True)
+    a=parser.parse_args();report=run(a.plan,a.sha256,a.model,a.model_sha256,a.output)
+    print(json.dumps({'completed':report['completed'],'scenarios':len(report['scenarios']),'goal_qualified':False}))
+    return 0
+
+
+if __name__=='__main__':raise SystemExit(main())
