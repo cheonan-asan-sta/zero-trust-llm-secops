@@ -16,6 +16,7 @@ from scripts.f1_lab.operation_refinement import OperationDecision
 from scripts.f1_lab.ordered_audit_login import OrderedAuditReview
 from scripts.f1_lab.sensitive_auth_context import SensitiveAuthReview
 from scripts.f1_lab.transfer_evaluation import sha
+from scripts.f1_lab.web_firewall_context import WebFirewallReview
 from scripts.run_audit_auth_review import signals
 
 
@@ -46,12 +47,30 @@ def observations(raw_directory,preparation,*,with_apparmor_causality=False):
 
 
 def predict(head,preparation,raw_directory,baseline,baseline_sha256,output,*,with_risk_observations=False,
-            with_apparmor_causality=False):
+            with_apparmor_causality=False,with_network_audit_context=False):
     require(type(with_risk_observations) is bool,'intent_risk_option')
+    require(type(with_network_audit_context) is bool,'intent_network_option')
     require(sha(baseline)==baseline_sha256,'intent_baseline_pin')
     selected=observations(raw_directory,preparation,with_apparmor_causality=with_apparmor_causality)
     observed=(signals(raw_directory,preparation,review_factory=OrderedAuditReview,
         auth_review_factory=SensitiveAuthReview)[0] if with_risk_observations else {})
+    if with_network_audit_context:
+        for index,pair in enumerate(preparation['pairs']):
+            if not pair['raw_member'].endswith('/logs/audit/audit.log'):continue
+            reader=WebFirewallReview(pair['raw_sha256']);path=Path(raw_directory)/f'pair-{index}-raw.source'
+            digest=hashlib.sha256();size=count=0
+            with path.open('rb') as stream:
+                for ordinal,body in enumerate(stream,1):
+                    require(len(body)<=MAX_ROW and ordinal<=100000,'intent_network_bound')
+                    digest.update(body);size+=len(body);count=ordinal
+                    require(size<=64*1024**2,'intent_network_bytes')
+                    try:line=body.decode('utf8')
+                    except UnicodeError:line=''
+                    stamp=re.search(r'\bmsg=audit\((\d+(?:\.\d+)?):',line)
+                    reason=reader.observe(ordinal,line,float(stamp[1]) if stamp else None,source_sha256=pair['raw_sha256'])
+                    if reason:observed.setdefault((index,ordinal),reason)
+            require(count==pair['rows'] and digest.hexdigest()==pair['raw_sha256']
+                and sha(path)==pair['raw_sha256'],'intent_network_source_or_population')
     output=Path(output)
     require(not output.exists() and not output.with_suffix('.part').exists(),'intent_fresh_output')
     source=ordinal=count=errors=changed=0
@@ -83,7 +102,8 @@ def predict(head,preparation,raw_directory,baseline,baseline_sha256,output,*,wit
             'predictions_sha256':sha(output),'validation_labels_opened':False}
 
 
-def run(plan_path,pin,model_path,model_pin,output,*,with_risk_observations=False,with_apparmor_causality=False):
+def run(plan_path,pin,model_path,model_pin,output,*,with_risk_observations=False,with_apparmor_causality=False,
+        with_network_audit_context=False):
     require(sha(plan_path)==pin,'intent_plan_pin')
     plan=decode(Path(plan_path).read_bytes())
     require(plan['schema']=='ordered-audit-replay-1' and plan['scope']=='observed_development_only'
@@ -99,6 +119,7 @@ def run(plan_path,pin,model_path,model_pin,output,*,with_risk_observations=False
         'frozen_training_parameters_available':True,'model_sha256':model_pin,
         'with_v102_v105_risk_observations':with_risk_observations,
         'with_apparmor_causality':with_apparmor_causality,
+        'with_network_audit_context':with_network_audit_context,
         'scenarios':{},'aws_calls':0,'paid_api_calls':0}
     for spec in plan['scenarios']:
         name=spec['name']
@@ -109,7 +130,7 @@ def run(plan_path,pin,model_path,model_pin,output,*,with_risk_observations=False
         before=baseline['scenarios'][name]
         row=predict(head,prepared,spec['raw'],spec['prediction'],before['prediction']['predictions_sha256'],
                     output/'prediction'/(name+'-predictions.jsonl'),with_risk_observations=with_risk_observations,
-                    with_apparmor_causality=with_apparmor_causality)
+                    with_apparmor_causality=with_apparmor_causality,with_network_audit_context=with_network_audit_context)
         require(row['population']==before['population'],'intent_complete_population')
         report['scenarios'][name]=row
         (output/'prediction-seal.json').write_bytes(canonical(report)+b'\n')
@@ -123,8 +144,10 @@ def main():
     for name in ('plan','sha256','model','model-sha256','output'):parser.add_argument('--'+name,required=True)
     parser.add_argument('--with-risk-observations',action='store_true')
     parser.add_argument('--with-apparmor-causality',action='store_true')
+    parser.add_argument('--with-network-audit-context',action='store_true')
     a=parser.parse_args();report=run(a.plan,a.sha256,a.model,a.model_sha256,a.output,
-        with_risk_observations=a.with_risk_observations,with_apparmor_causality=a.with_apparmor_causality)
+        with_risk_observations=a.with_risk_observations,with_apparmor_causality=a.with_apparmor_causality,
+        with_network_audit_context=a.with_network_audit_context)
     print(json.dumps({'completed':report['completed'],'scenarios':len(report['scenarios']),'goal_qualified':False}))
     return 0
 

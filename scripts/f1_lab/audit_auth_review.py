@@ -230,6 +230,7 @@ def refine(previous, reason):
             "sudo_sensitive_command_cooccurs_with_root_pam_open",
             "sudo_webpath_root_recon_cooccurs_with_pam_open",
             "sudo_webpath_identity_read_cooccurs_with_root_pam_open",
+            "web_storage_firewall_request_cooccurs_with_netfilter_event",
         },
         "audit_auth_reason",
     )

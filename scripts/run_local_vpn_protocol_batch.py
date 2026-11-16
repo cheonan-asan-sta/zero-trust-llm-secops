@@ -32,7 +32,8 @@ shutil.copytree('/inputs/raw','/tmp/raw')
 if PIPELINE=='apparmor-causal':
  args=[sys.executable,'-m','scripts.run_audit_intent_review','--plan','/inputs/plan.json',
   '--sha256','PLAN','--model','/inputs/models/head.json','--model-sha256','HEAD',
-  '--output','/tmp/prediction-run','--with-apparmor-causality']
+  '--output','/tmp/prediction-run','--with-apparmor-causality',
+  *(['--with-network-audit-context'] if NETWORK else [])]
 else:
  args=[sys.executable,'-m','scripts.run_vpn_protocol_review','--plan','/inputs/plan.json',
  '--sha256','PLAN','--model','/inputs/models/head.json','--model-sha256','HEAD',
@@ -49,8 +50,9 @@ def command(args,timeout=1800):
     return subprocess.run(args,capture_output=True,text=True,encoding='utf8',errors='replace',timeout=timeout,check=False)
 
 
-def run(package,stage_pin,image,*,with_attack_evidence=False):
+def run(package,stage_pin,image,*,with_attack_evidence=False,with_network_audit_context=False):
     require(type(with_attack_evidence) is bool,'protocol_attack_option')
+    require(type(with_network_audit_context) is bool,'protocol_network_option')
     package=Path(package).resolve();inputs=package/'inputs';results=package/'results'
     require(sha(package/'stage.json')==stage_pin and re.fullmatch(r'sha256:[a-f0-9]{64}',image),'protocol_package_pin')
     stage=decode((package/'stage.json').read_bytes())
@@ -69,13 +71,15 @@ def run(package,stage_pin,image,*,with_attack_evidence=False):
     require(inspect.returncode==0 and json.loads(inspect.stdout)[0]['Id']==image,'protocol_image_not_cached')
     profile=stage.get('profile','vpn')
     require(profile in {'vpn','apparmor-causal'} and (profile=='vpn' or not with_attack_evidence),'protocol_execution_profile')
-    program=BOOTSTRAP.replace('PLAN',stage['plan_sha256']).replace('HEAD',stage['model_sha256']).replace('LEGACY',stage['legacy_models_sha256'] or '').replace('ATTACK',str(with_attack_evidence)).replace('PIPELINE',repr(profile))
+    require(not with_network_audit_context or profile=='apparmor-causal','protocol_network_profile')
+    program=BOOTSTRAP.replace('PLAN',stage['plan_sha256']).replace('HEAD',stage['model_sha256']).replace('LEGACY',stage['legacy_models_sha256'] or '').replace('ATTACK',str(with_attack_evidence)).replace('PIPELINE',repr(profile)).replace('NETWORK',str(with_network_audit_context))
     owner='zt-vpn-protocol-v109-'+uuid.uuid4().hex[:12];cid=None
     report={'completed':False,'stage_sha256':stage_pin,'goal_qualified':False,'new_independent_evaluation':False,
         'aws_calls':0,'paid_api_calls':0,'image':image,'validation_labels_in_predictor':False,
         'frozen_training_parameters_available':True}
     report['with_attack_evidence']=with_attack_evidence
     report['profile']=profile
+    report['with_network_audit_context']=with_network_audit_context
     try:
         created=command(['docker','create','--pull=never','--name',owner,'--label','secops.f1.owner='+owner,
             '--network','none','--read-only','--user','10001:10001','--cap-drop','ALL',
@@ -119,7 +123,9 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('package','stage-sha256','image'):parser.add_argument('--'+name,required=True)
     parser.add_argument('--with-attack-evidence',action='store_true')
-    a=parser.parse_args();r=run(a.package,a.stage_sha256,a.image,with_attack_evidence=a.with_attack_evidence)
+    parser.add_argument('--with-network-audit-context',action='store_true')
+    a=parser.parse_args();r=run(a.package,a.stage_sha256,a.image,with_attack_evidence=a.with_attack_evidence,
+        with_network_audit_context=a.with_network_audit_context)
     print(json.dumps({'completed':r['completed'],'owned_container_removed':r['owned_container_removed'],'goal_qualified':False}));return 0
 
 
