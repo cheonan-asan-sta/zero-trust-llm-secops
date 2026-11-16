@@ -1,6 +1,8 @@
 # 현재 성능과 남은 목표 — 2026-11-16
 
-**최신 v113:** [실제 정상 SSH·sudo 감사 학습](extra-native-audit-normal-review.md). 웹 감사 FP 15→0·TP 47/FN 0 유지·F1 100%, 별도 Wilson/Wardbeck FP 각 10→0. 원래 1,681,815행·새 FP/기존 TP 손실 0·Linux 732건. 추가 실제 정상 169행은 학습 전용으로 분모에 미합산. 공유 감사·VPN·원래 6영역 독립 목표는 미완료이며 목표 active·push/새 CI/병합 보류.
+**최신 v114:** [VPN 제어 메시지 관측](extra-vpn-control-review.md). VPN FP 48→42·TP 84/FN 0 유지·F1 80%, 별도 Harrison/Shaw/Wheeler FP 각 2건 감소. 원래 1,681,815행 유지·새 FP/기존 TP 손실 0·Linux 776건. 인증·웹 감사 관측 100% 유지. 공유 감사·VPN·원래 6영역 독립 목표는 미완료·목표 active·push/새 CI/병합 보류.
+
+**직전 v113:** [실제 정상 SSH·sudo 감사 학습](extra-native-audit-normal-review.md). 웹 감사 FP 15→0·TP 47/FN 0 유지·F1 100%, 별도 Wilson/Wardbeck FP 각 10→0. 원래 1,681,815행·새 FP/기존 TP 손실 0·Linux 732건. 추가 실제 정상 169행은 학습 전용으로 분모에 미합산. 공유 감사·VPN·원래 6영역 독립 목표는 미완료이며 목표 active·push/새 CI/병합 보류.
 
 **직전 v112:** [웹 방화벽 요청·netfilter 동시 관측](extra-web-firewall-review.md). 별도 학습 Wilson 웹 감사 FN3→0·TP19→22·FP10 유지·F1 81.48%. 원래1,681,815행 유지·전체 새FP/TP손실0·Linux693건. 사람/부모 프로세스 인과 증명 아님·전체 목표 active·push/새CI/병합 보류.
 
