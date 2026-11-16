@@ -9,7 +9,15 @@ from scripts.f1_lab.transfer_evaluation import sha
 from scripts.f1_lab.vpn_control_review import ControlHead, phase
 from scripts.f1_lab.vpn_protocol_review import ProtocolReview
 from scripts.run_vpn_protocol_review import predict, run
-from tests.test_vpn_protocol_review import MODELS, SOURCE, START, FixedLegacy, line, observe, trained
+from tests.test_vpn_protocol_review import (
+    MODELS,
+    SOURCE,
+    START,
+    FixedLegacy,
+    line,
+    observe,
+    trained,
+)
 
 BASE='c'*64
 REQUEST="PUSH: Received control message: 'PUSH_REQUEST'"
