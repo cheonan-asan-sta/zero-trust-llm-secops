@@ -2,6 +2,7 @@
 
 import hashlib
 from datetime import UTC, datetime, timedelta
+from types import SimpleNamespace
 
 import pytest
 
@@ -143,7 +144,8 @@ def test_pam_uses_same_verified_caller_and_current_revocation_policy(live, tmp_p
         selected, _ = policy(tmp_path, broker.registry, revoked=[receipt.caller_ref_sha256])
     context = PamExecutionContext('consistent','b'*64,'local_oidc',receipt.caller_ref_sha256)
     monkeypatch.setattr(risk,'collect_pam_context',lambda *args,**kwargs:context)
-    facts = risk.pam_evidence(object(),object(),broker.joiner,event,proofs,cursor_sha256='c'*64,
+    capture = SimpleNamespace(expires_at=request.expires_at)
+    facts = risk.pam_evidence(capture,object(),broker.joiner,event,proofs,cursor_sha256='c'*64,
         caller_registry=broker.registry,request=request,receipt=receipt,risk_policy=selected)
     assert facts.state == ('adverse' if revoked else 'approved')
 
