@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1350" viewBox="0 0 1800 1350">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#56718c"/></marker></defs><style>text{font-family:'Apple SD Gothic Neo','Malgun Gothic',Arial,sans-serif;fill:#233447}.title{font-size:38px;font-weight:700}.heading{font-size:24px;font-weight:700}.body{font-size:19px}.small{font-size:17px;fill:#586c7e}.white{fill:white}.muted{fill:#5b6c7d}</style>
+<rect x="0" y="0" width="1800" height="1350" rx="8" fill="#f4f6f9" stroke="#f4f6f9" stroke-width="2"/>
+<text x="60" y="68" class="title">대시보드 운영 연결 구조</text>
+<text x="60" y="106" class="small">main eaa8178 기반 구현  |  2026.11.16  |  연결된 기능과 실행 경계</text>
+<rect x="60" y="144" width="1680" height="132" rx="8" fill="#203950" stroke="#203950" stroke-width="2"/>
+<text x="88" y="186" class="heading" style="fill:#ffffff">운영자 대시보드</text>
+<text x="88" y="222" class="body" style="fill:#edf3f9">로그와 세션  /  분석과 평가  /  사고와 전송  /  신호와 기준선  /  작업 승인과 대응  /  보안 통제</text>
+<text x="88" y="252" class="small" style="fill:#cbdbe9">기존 54개 API 작업 연결  +  관리자용 Docker 제어와 M6 비교 실행</text>
+<path d="M900 276 L900 310" fill="none" stroke="#56718c" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="60" y="312" width="1680" height="88" rx="8" fill="#e7eef6" stroke="#adc0d3" stroke-width="2"/>
+<text x="90" y="349" class="heading">공통 요청 경계</text>
+<text x="340" y="348" class="body">API 키 또는 OIDC  →  테넌트와 역할 확인  →  입력 검증  →  대상과 버전 확인</text>
+<text x="340" y="378" class="small">변경 작업은 확인 후 실행  |  권한 부족, 타 테넌트, 버전 충돌은 거부</text>
+<path d="M610 400 L610 442" fill="none" stroke="#56718c" stroke-width="2.5" marker-end="url(#arrow)"/>
+<path d="M1460 400 L1460 442" fill="none" stroke="#56718c" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="60" y="444" width="1080" height="710" rx="8" fill="#ffffff" stroke="#a7b9cb" stroke-width="2"/>
+<text x="86" y="486" class="heading">현재 연결한 FastAPI 앱</text>
+<text x="86" y="515" class="small">화면은 기존 API를 호출하며, 판단과 집행은 서버가 수행</text>
+<rect x="86" y="540" width="324" height="490" rx="8" fill="#f8fafc" stroke="#d3dee8" stroke-width="2"/>
+<rect x="438" y="540" width="324" height="490" rx="8" fill="#f8fafc" stroke="#d3dee8" stroke-width="2"/>
+<rect x="790" y="540" width="324" height="490" rx="8" fill="#f8fafc" stroke="#d3dee8" stroke-width="2"/>
+<text x="108" y="578" class="heading">분석과 운영</text>
+<text x="108" y="617" class="body">이벤트와 공개 로그 입력</text>
+<text x="108" y="648" class="body">정규화, 규칙, 상관분석</text>
+<text x="108" y="679" class="body">사고 생성과 전송 이력 관리</text>
+<rect x="106" y="716" width="284" height="140" rx="8" fill="#edf3f9" stroke="#a9bed1" stroke-width="2"/>
+<text x="122" y="747" class="heading">규칙과 AI 분석</text>
+<text x="122" y="781" class="body">기본: 규칙 분석</text>
+<text x="122" y="810" class="body">설정 후: OpenAI / Hybrid</text>
+<text x="122" y="839" class="body">위험도, 근거, 대응 제안</text>
+<path d="M248 858 L248 895" fill="none" stroke="#56718c" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="108" y="924" class="small">출력 검증과 정책 안전장치</text>
+<text x="108" y="953" class="small">분석 결과와 검토 이력 저장</text>
+<text x="108" y="982" class="small">AI가 접근 토큰을 발급하지 않음</text>
+<text x="460" y="578" class="heading">지속 검증과 접근</text>
+<text x="460" y="617" class="body">신원, 기기, 세션 증명</text>
+<text x="460" y="648" class="body">GuardDuty 로컬 입력 어댑터</text>
+<path d="M600 665 L600 697" fill="none" stroke="#56718c" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="460" y="727" class="body">서명, 출처, 테넌트 검증</text>
+<text x="460" y="758" class="body">Inbox → worker → 세션 상태</text>
+<rect x="458" y="795" width="284" height="78" rx="8" fill="#edf2f7" stroke="#c9d6e3" stroke-width="2"/>
+<text x="475" y="825" class="body">watchdog 주기 점검</text>
+<text x="475" y="854" class="small">증명 만료와 키 폐기 반영</text>
+<path d="M600 876 L600 904" fill="none" stroke="#56718c" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="460" y="934" class="body">접근 정책과 토큰 검증</text>
+<text x="460" y="965" class="heading">보호 자원 접근 200 / 403</text>
+<text x="460" y="1006" class="small">worker와 watchdog는 별도 실행</text>
+<text x="812" y="578" class="heading">증거와 승인</text>
+<text x="812" y="617" class="body">서명된 관측과 실행 증거</text>
+<text x="812" y="648" class="body">정상 기준선과 작업 승인</text>
+<text x="812" y="679" class="body">조사 후보와 근거 확인</text>
+<path d="M810 718H1092" stroke="#d3dee8" stroke-width="2"/>
+<text x="812" y="757" class="body">고위험 대응의 별도 승인</text>
+<text x="812" y="795" class="body">요청자 외 검토자 두 명</text>
+<text x="812" y="826" class="body">요청 내용과 현재 버전 확인</text>
+<path d="M950 839 L950 877" fill="none" stroke="#56718c" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="810" y="886" width="284" height="90" rx="8" fill="#f0f2f4" stroke="#b9c2cc" stroke-width="2"/>
+<text x="830" y="922" class="body">승인된 대응 모의 실행</text>
+<text x="830" y="953" class="small">외부 계정과 기기에 실제 조치 없음</text>
+<path d="M248 1030 L248 1060" fill="none" stroke="#56718c" stroke-width="2.5" marker-end="url(#arrow)"/>
+<path d="M600 1030 L600 1060" fill="none" stroke="#56718c" stroke-width="2.5" marker-end="url(#arrow)"/>
+<path d="M952 1030 L952 1060" fill="none" stroke="#56718c" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="86" y="1064" width="1028" height="66" rx="8" fill="#e7eef5" stroke="#b5c6d7" stroke-width="2"/>
+<text x="110" y="1105" class="body">감사 로그와 사고 / Outbox 기록    |    SQLite: 세션, Inbox, 행위 문맥, 승인 이력</text>
+<rect x="1180" y="444" width="560" height="710" rx="8" fill="#f7f9fc" stroke="#a7b9cb" stroke-width="2"/>
+<text x="1206" y="486" class="heading">인증된 로컬 관리자 작업</text>
+<text x="1206" y="515" class="small">서버에서 허용한 명령만 실행</text>
+<rect x="1206" y="540" width="508" height="120" rx="8" fill="#ffffff" stroke="#c9d6e3" stroke-width="2"/>
+<text x="1230" y="575" class="body">작업 API → SQLite 접수 → 별도 프로세스</text>
+<text x="1230" y="608" class="small">UUID 중복 방지, 실행 잠금, 중단과 결과 이력</text>
+<text x="1230" y="637" class="small">임의 명령과 파일 경로를 브라우저에서 지정하지 않음</text>
+<path d="M1460 660 L1460 687" fill="none" stroke="#56718c" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="1206" y="691" width="508" height="131" rx="8" fill="#fff8e9" stroke="#d9b875" stroke-width="2" stroke-dasharray="8 6"/>
+<text x="1230" y="730" class="heading">M6 모델 비교</text>
+<text x="1230" y="767" class="body">같은 입력으로 모의 비교 또는 실제 모델 평가</text>
+<text x="1230" y="798" class="body">실호출은 서버의 키와 비용 상한 설정 후 실행</text>
+<path d="M1714 600 H1728 V838 H1460 V846" fill="none" stroke="#56718c" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="1206" y="850" width="508" height="280" rx="8" fill="#edf3f9" stroke="#a9bed1" stroke-width="2"/>
+<text x="1230" y="889" class="heading">별도 mTLS Docker 검증 환경</text>
+<text x="1230" y="929" class="small">앱, worker, 수집기, watchdog, 실행 증거 수집기</text>
+<text x="1230" y="960" class="small">시작 / 상태 / 자료를 보존하는 정지 / 복원</text>
+<path d="M1230 980H1688" stroke="#b9c9d8" stroke-width="2"/>
+<text x="1230" y="1012" class="body">기록자 정지 → 백업 → 격리 복원</text>
+<text x="1230" y="1043" class="body">승인된 사본 재기동 → 이력과 접근 검증</text>
+<text x="1230" y="1090" class="small">현재 조회 앱과 저장소를 공유하지 않음</text>
+<rect x="60" y="1183" width="1680" height="112" rx="8" fill="#ffffff" stroke="#d3dee8" stroke-width="2"/>
+<text x="84" y="1218" class="heading">구현 범위와 검증</text>
+<text x="320" y="1217" class="small">실선: 구현된 처리 경로  |  점선 상자: 서버 설정 후 사용  |  외부 대응: 모의 실행</text>
+<text x="84" y="1254" class="body">GuardDuty는 로컬 입력 경로를 사용한다. AI 분석, 세션 접근 집행, 대응 승인과 모델 평가는 서로 다른 경로다.</text>
+<text x="84" y="1281" class="small">로컬 검증: 브라우저 181개 통과, mTLS Docker 25개 통과. 실제 모델 호출과 실제 AWS 조치는 수행하지 않음.</text>
+</svg>

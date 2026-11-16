@@ -3,11 +3,19 @@
   "use strict";
   const $ = (id) => document.getElementById(id);
   const pages = {
-    overview: ["관제 개요", "운영 현황", "분석 기록과 세션 상태"],
-    logs: ["로그 탐색", "분석 로그", "최근 100건의 판단 근거와 대응 제안"],
+    overview: ["관제 개요", "관제 개요", "분석 현황 및 접근 통제"],
+    logs: ["로그 탐색", "로그 탐색", "이벤트 검색 및 분석 상세"],
     sessions: ["세션과 접근", "세션 상태", "접근 판단과 버전별 변경 이력"],
     evidence: ["증거와 승인", "이력 및 승인", "행위 문맥과 대응 요청의 처리 기록"],
-    demo: ["시연 시나리오", "접근 테스트", "합성 신호로 정상 접근, 토큰 재사용, 회수 후 거부를 확인합니다."],
+    demo: ["시연 시나리오", "접근 테스트", "정상 접근 / 허용 재사용 / 세션 회수"],
+    analysis: ["분석 및 탐지", "분석 및 탐지", "이벤트 분석, 정규화 및 탐지 규칙"],
+    evaluation: ["평가 및 공개 로그", "평가 및 공개 로그", "재생 자료와 평가 조건을 확인한 뒤 실행합니다."],
+    cases: ["사고 및 전송 관리", "사고 및 전송 관리", "사고 처리 이력과 외부 연계 전송 기록"],
+    context: ["기준선 및 작업 승인", "기준선 및 작업 승인", "검증된 수집 기록과 실제 실행 증거 대조"],
+    signals: ["신호 입력 및 세션 제어", "신호 입력 및 세션 제어", "서명 검증, 접수 영수증 및 접근 제어"],
+    responses: ["대응 요청 및 승인", "대응 요청 및 승인", "요청자 외 검토자 두 명의 승인 후 모의 실행"],
+    assurance: ["보안 통제 점검", "보안 통제 점검", "구현 근거와 현재 서버 준비 상태"],
+    operations: ["실행 환경 및 모델 비교", "실행 환경 및 모델 비교", "관리자에게 허용된 로컬 실행 작업"],
   };
   const tones = {
     LOW: "teal",
@@ -20,10 +28,10 @@
     DENY: "red"
   };
   const colors = {
-    LOW: "#83ad96",
-    MEDIUM: "#c4a364",
-    HIGH: "#cf8a6a",
-    CRITICAL: "#d97078"
+    CRITICAL: "#ae3038",
+    HIGH: "#c16b43",
+    MEDIUM: "#c29a42",
+    LOW: "#7b9d8a"
   };
   const reviews = {
     PENDING: "검토 대기",
@@ -127,21 +135,25 @@
   }
   async function request(path, {
     body,
-    allowDenied = false
+    allowDenied = false,
+    method,
+    timeoutMs = 12000,
+    operation = false
   } = {}) {
     const epoch = state.epoch;
     const controller = new AbortController();
     state.controllers.add(controller);
-    const timeout = setTimeout(() => controller.abort(), 12000);
+    const timeout = setTimeout(() => controller.abort(), Math.min(timeoutMs, 120000));
     const headers = {
       Accept: "application/json"
     };
     if (state.credentialType === "api_key" && state.credential) headers["X-API-Key"] = state.credential;
     if (state.credentialType === "bearer" && state.credential) headers.Authorization = `Bearer ${state.credential}`;
     if (body !== undefined) headers["Content-Type"] = "application/json";
+    if (operation) headers["X-Dashboard-Action"] = "1";
     try {
       const response = await fetch(path, {
-        method: body === undefined ? "GET" : "POST",
+        method: method || (body === undefined ? "GET" : "POST"),
         headers,
         body: body === undefined ? undefined : JSON.stringify(body),
         signal: controller.signal,
@@ -149,9 +161,15 @@
         redirect: "error"
       });
       if (epoch !== state.epoch) throw new DOMException("Connection changed", "AbortError");
-      if (!response.ok && !(allowDenied && response.status === 403)) throw Object.assign(new Error("Request failed"), {
-        status: response.status
-      });
+      if (!response.ok && !(allowDenied && response.status === 403)) {
+        let detail = "";
+        try {
+          const problem = (await response.json()).detail;
+          detail = typeof problem === "string" ? problem : Array.isArray(problem) ? problem.map((item) =>
+            (item.loc || []).join(".") + ": " + item.msg).join(" / ") : "";
+        } catch { /* HTTP status still identifies an invalid error response. */ }
+        throw Object.assign(new Error("Request failed"), {status: response.status, detail: detail.slice(0, 1000)});
+      }
       let data;
       try {
         data = await response.json();
@@ -279,6 +297,7 @@
           ["승인", `${item.approved_by.length} / ${item.required_approvals}`]
         ]), detailsList("요청 사유", [item.reason]), detailsList("검토 이력", item.reviews.map((review) => `${review.subject} / ${date(review.approved_at, true)} / ${review.reason}`)), node("p", "서로 다른 검토자 2명의 승인이 필요합니다. 실행 결과는 로컬 모의 대응입니다.", "scope-note"));
       }
+      window.dashboardOperations?.detailActions(type, item, body);
       body.append(rawPanel(item));
     } catch (error) {
       if (epoch === state.epoch && sequence === state.detailSequence) $("detailBody").replaceChildren(empty(errorLabel(error)));
@@ -301,6 +320,22 @@
     target.replaceChildren(row);
   }
 
+  function timestampCell(value) {
+    const stamp = new Date(value);
+    const cell = node("td", null, "mono event-time");
+    if (!value || Number.isNaN(stamp.getTime())) {
+      cell.textContent = "—";
+      return cell;
+    }
+    const time = node("time", date(value));
+    time.dateTime = stamp.toISOString();
+    cell.title = date(value, true);
+    cell.append(time, node("span", stamp.toLocaleDateString("ko-KR", {
+      year: "numeric", month: "2-digit", day: "2-digit"
+    }), "event-date"));
+    return cell;
+  }
+
   function renderLogRows(id, rows) {
     const target = $(id);
     target.replaceChildren();
@@ -316,7 +351,7 @@
       action.append(node("span", actions[record.policy_decision.action] || record.policy_decision.action), node("span", reviews[record.review_status] || record.review_status, "event-id"));
       const detail = node("td");
       detail.append(rowButton(record, "log"));
-      row.append(risk, event, node("td", record.analyzer, "mono"), action, node("td", date(record.analyzed_at, true), "mono"), detail);
+      row.append(risk, event, node("td", record.analyzer, "mono"), action, timestampCell(record.analyzed_at), detail);
       target.append(row);
     });
   }
@@ -414,13 +449,13 @@
         x2: 635,
         y1: y(level),
         y2: y(level),
-        stroke: "#233040",
+        stroke: "#e1e6ec",
         "stroke-dasharray": "3 6"
       }));
       const label = svg("text", {
         x: 20,
         y: y(level) + 4,
-        fill: "#8e9db2",
+        fill: "#687583",
         "font-size": 10,
         "text-anchor": "end"
       });
@@ -430,14 +465,14 @@
     const points = (key) => buckets.map((b, i) => `${x(i)},${y(b[key])}`).join(" ");
     chart.append(svg("polygon", {
       points: `42,168 ${points("total")} 625,168`,
-      fill: "#8cb5d4",
+      fill: "#547ca5",
       opacity: ".08"
     }));
     ["total", "risk"].forEach((key) => {
       chart.append(svg("polyline", {
         points: points(key),
         fill: "none",
-        stroke: key === "total" ? "#8cb5d4" : "#ce827b",
+        stroke: key === "total" ? "#547ca5" : "#b5353b",
         "stroke-width": 2.2,
         "stroke-linejoin": "round"
       }));
@@ -446,7 +481,7 @@
           cx: x(i),
           cy: y(b[key]),
           r: 3,
-          fill: key === "total" ? "#8cb5d4" : "#ce827b"
+          fill: key === "total" ? "#547ca5" : "#b5353b"
         });
         const title = svg("title");
         title.textContent = `${date(b.time)} ${key === "total" ? "전체" : "고위험"} ${b[key]}건`;
@@ -458,7 +493,7 @@
       const label = svg("text", {
         x: x(i),
         y: 196,
-        fill: "#8e9db2",
+        fill: "#687583",
         "font-size": 10,
         "text-anchor": "middle"
       });
@@ -479,7 +514,7 @@
     text("metricRisk", metrics ? num((metrics.risk_counts.HIGH || 0) + (metrics.risk_counts.CRITICAL || 0)) : "—");
     text("metricReview", num(metrics?.pending_review_count));
     text("latencyMetric", metrics ? `누적 평균 응답 ${metrics.average_latency_ms.toFixed(2)} ms` : "평균 응답 —");
-    text("donutTotal", num(metrics?.total_analyses));
+    text("riskTotal", num(metrics?.total_analyses));
     $("riskLegend").replaceChildren();
     let current = 0;
     const segments = [];
@@ -496,7 +531,7 @@
       row.append(name, node("strong", metrics ? `${num(count)}건` : "—"));
       $("riskLegend").append(row);
     });
-    $("riskDonut").style.background = metrics?.total_analyses ? `conic-gradient(${segments.join(",")})` : "#233040";
+    $("riskBar").style.background = metrics?.total_analyses ? `linear-gradient(to right,${segments.join(",")})` : "#e9edf1";
   }
 
   function renderPipeline() {
@@ -569,6 +604,7 @@
     renderPipeline();
     renderEvidence();
     updateDemoButtons();
+    window.dashboardOperations?.sync();
   }
   async function refresh() {
     if (state.busy) return;
@@ -633,6 +669,7 @@
       else link.removeAttribute("aria-current");
     });
     document.title = `${name} | 천안아산역`;
+    window.dashboardOperations?.navigate(state.page);
     if (state.page === "evidence") {
       if (state.busy) state.refreshRequested = true;
       else refresh();
@@ -650,6 +687,7 @@
     state.refreshRequested = false;
     state.pageNumber = 1;
     state.demo = {};
+    window.dashboardOperations?.reset();
     state.detailSequence++;
     $("detailDialog").close();
     $("detailBody").replaceChildren();
@@ -806,6 +844,8 @@
   $("demoAccess").addEventListener("click", () => runDemo("access"));
   $("demoCompromise").addEventListener("click", () => runDemo("compromise"));
   const tick = () => text("clock", `${new Date().toLocaleDateString("ko-KR")} ${date(Date.now())}`);
+  window.dashboardContext = {request, node, redact, rawPanel, refresh, notify, errorLabel,
+    get state() { return {epoch: state.epoch, page: state.page, data: state.data}; }};
   tick();
   setInterval(tick, 1000);
   navigate();

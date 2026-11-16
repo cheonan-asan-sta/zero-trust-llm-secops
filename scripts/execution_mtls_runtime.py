@@ -38,6 +38,8 @@ SCOPE = {'source': 'cloudtrail', 'user_id': USER, 'device_id': DEVICES[0],
 def definition(project, image, nginx):
     spec = compose_spec(project, image, nginx)
     service = copy.deepcopy(spec['services']['collector'])
+    # The resident observer and authenticated diagnostic process share this cgroup.
+    service.update(mem_limit='384m', memswap_limit='384m')
     service.update(entrypoint=['python', '-m', 'scripts.execution_mtls_runtime', 'serve'],
                    volumes=['execution-state:/observer/state', 'execution-input:/observer/input',
                             'execution-tls:/tls:ro', 'execution-auth:/auth:ro'], networks={'core': {}},
