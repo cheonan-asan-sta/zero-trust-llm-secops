@@ -1,6 +1,8 @@
 # 채희주 개인 실행 계획
 
-**최신 v111:** [공유 감사 실행 관측 기반 오탐 개선](../extra-apparmor-causal-review.md). FP24→3·별도 Wilson/Wardbeck 각8→1, 전체 새FP/TP손실0·Linux644건. 공유 감사 FN6/F1 0%는 그대로다. VPN/인증/웹 감사 기존 성능 유지·전체 목표 active·push/새CI/병합 보류.
+**최신 v112:** [웹 방화벽 요청·netfilter 동시 관측](../extra-web-firewall-review.md). 별도 학습 Wilson 웹 감사 FN3→0·TP19→22·FP10 유지·F1 81.48%. 원래1,681,815행 유지·전체 새FP/TP손실0·Linux693건. 사람/부모 프로세스 인과 증명 아님·전체 목표 active·push/새CI/병합 보류.
+
+**직전 v111:** [공유 감사 실행 관측 기반 오탐 개선](../extra-apparmor-causal-review.md). FP24→3·별도 Wilson/Wardbeck 각8→1, 전체 새FP/TP손실0·Linux644건. 공유 감사 FN6/F1 0%는 그대로다. VPN/인증/웹 감사 기존 성능 유지·전체 목표 active·push/새CI/병합 보류.
 
 **직전 v110:** [VPN 공격 근거의 인과적 유지](../extra-vpn-attack-evidence.md). 별도 학습 Wheeler FN28→9·TP28→47·FP38 유지. 기존1,681,815행 판정 유지·전체 새FP/TP손실0·Linux606건. 학습 결과이며 독립 목표는 미달/미완료. 목표 active·push/새CI/병합 보류.
 
