@@ -1,5 +1,7 @@
 # 성능 개선·로컬 평가를 CI보다 먼저 수행
 
+**v119 개발·수집 진행:** [고정 원본 수집기·초기 프레임 추출](extra-packet-source-acquisition.md). Linux 908건 통과. 실제 원본 다운로드는 별도 실행 중이며 checksum/실제 로그 연결/적합/성능 재평가는 미완료. 탐지 수치는 v117 유지·목표 active·유료 호출/CI/병합 보류.
+
 **v118 추가 조사·성능 유지:** [연결 이력 3후보 제외·공개 패킷 형식 확인](extra-vpn-lifecycle-and-packet-review.md). 학습 자료의 오탐/미탐 감소 모두 0이라 채택하지 않았다. PCAP 일부는 확인했으나 전체 checksum/사건 당시 연결 미검증으로 학습·채점에 미사용. 확정 성능과 마지막 Linux 855건은 v117·전체 목표 active.
 
 **최신 v117:** [현재 AppArmor 상태 알림의 공유 감사 오탐 개선](extra-apparmor-status-review.md). 공유 FP 3→0·TP 2/FN 4 유지·F1 50%, 별도 Wilson/Wardbeck FP 각 1→0·FN 2씩 유지. 원래 1,681,815행·새 FP/기존 TP 손실 0·Linux 855건. 미확인 호출자와 검토 필요 유지·LLM 새 품질 평가 없음·전체 목표 active·push/새 CI/병합/유료 호출 보류. 아래 기록은 해당 버전 당시 결과다.

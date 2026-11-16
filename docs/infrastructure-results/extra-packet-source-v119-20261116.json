@@ -1,0 +1,298 @@
+{
+  "schema": "packet-source-development-checkpoint-1",
+  "completed": true,
+  "date": "2026-11-16",
+  "completion_scope": "implementation and functional tests only; dataset acquisition and performance integration incomplete",
+  "source_commit": "9c94db580d3b4d3ff4a09ee2a9ea42aad1e16b8f",
+  "functional_source_sha256": "5a1d0aa82ccd83f38bdcae0cf60996c7aff0fa87b17abdf6114694b208ba7a96",
+  "linux_focused": {
+    "passed": 908,
+    "new_acquisition_tests": 22,
+    "new_pcap_tests": 31,
+    "failed": 0,
+    "skipped": 0,
+    "ruff_RUF100_passed": true,
+    "junit_sha256": "e0864890e7e7b78e6dc6934623fd86f9743d545be59459ac8bcc5799797d948f"
+  },
+  "owned_test_container_removed": true,
+  "old_detector_code_bytes_unchanged": true,
+  "original_population": 1681815,
+  "performance_reference": "docs/infrastructure-results/extra-apparmor-status-v117-20261116.json",
+  "performance_reference_sha256": "91f499bf28b0aa07cb5b772dba5f4b1ab6fb185ec8225d5625a0416428f08137",
+  "kinds_RSF": {
+    "audit-share": {
+      "before": {
+        "tp": 2,
+        "fp": 3,
+        "fn": 4,
+        "tn": 2349,
+        "inference_errors": 0,
+        "population": 2358,
+        "precision": 0.4,
+        "recall": 0.3333333333333333,
+        "f1": 0.36363636363636365,
+        "false_positive_rate": 0.0012755102040816326,
+        "accuracy": 0.9970313825275657
+      },
+      "after": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 4,
+        "tn": 2352,
+        "inference_errors": 0,
+        "population": 2358,
+        "precision": 1.0,
+        "recall": 0.3333333333333333,
+        "f1": 0.5,
+        "false_positive_rate": 0.0,
+        "accuracy": 0.998303647158609
+      }
+    },
+    "dns": {
+      "before": {
+        "tp": 135466,
+        "fp": 9,
+        "fn": 2595,
+        "tn": 654079,
+        "inference_errors": 0,
+        "population": 792149,
+        "precision": 0.9999335670787969,
+        "recall": 0.9812039605681546,
+        "f1": 0.990480229293402,
+        "false_positive_rate": 1.3759616443047419e-05,
+        "accuracy": 0.9967127396487278
+      },
+      "after": {
+        "tp": 135466,
+        "fp": 9,
+        "fn": 2595,
+        "tn": 654079,
+        "inference_errors": 0,
+        "population": 792149,
+        "precision": 0.9999335670787969,
+        "recall": 0.9812039605681546,
+        "f1": 0.990480229293402,
+        "false_positive_rate": 1.3759616443047419e-05,
+        "accuracy": 0.9967127396487278
+      }
+    },
+    "auth": {
+      "before": {
+        "tp": 32,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1082,
+        "inference_errors": 0,
+        "population": 1114,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      },
+      "after": {
+        "tp": 32,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1082,
+        "inference_errors": 0,
+        "population": 1114,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      }
+    },
+    "web-error": {
+      "before": {
+        "tp": 1414,
+        "fp": 0,
+        "fn": 0,
+        "tn": 4,
+        "inference_errors": 0,
+        "population": 1418,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      },
+      "after": {
+        "tp": 1414,
+        "fp": 0,
+        "fn": 0,
+        "tn": 4,
+        "inference_errors": 0,
+        "population": 1418,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      }
+    },
+    "web-access": {
+      "before": {
+        "tp": 426312,
+        "fp": 7,
+        "fn": 18,
+        "tn": 4577,
+        "inference_errors": 0,
+        "population": 430914,
+        "precision": 0.9999835803705676,
+        "recall": 0.9999577791851383,
+        "f1": 0.9999706796114227,
+        "false_positive_rate": 0.0015270506108202443,
+        "accuracy": 0.9999419837833071
+      },
+      "after": {
+        "tp": 426312,
+        "fp": 7,
+        "fn": 18,
+        "tn": 4577,
+        "inference_errors": 0,
+        "population": 430914,
+        "precision": 0.9999835803705676,
+        "recall": 0.9999577791851383,
+        "f1": 0.9999706796114227,
+        "false_positive_rate": 0.0015270506108202443,
+        "accuracy": 0.9999419837833071
+      }
+    },
+    "audit-web": {
+      "before": {
+        "tp": 47,
+        "fp": 0,
+        "fn": 0,
+        "tn": 7419,
+        "inference_errors": 0,
+        "population": 7466,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      },
+      "after": {
+        "tp": 47,
+        "fp": 0,
+        "fn": 0,
+        "tn": 7419,
+        "inference_errors": 0,
+        "population": 7466,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      }
+    },
+    "vpn": {
+      "before": {
+        "tp": 84,
+        "fp": 42,
+        "fn": 0,
+        "tn": 18332,
+        "inference_errors": 0,
+        "population": 18458,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8,
+        "false_positive_rate": 0.002285838685098509,
+        "accuracy": 0.9977245638747426
+      },
+      "after": {
+        "tp": 84,
+        "fp": 42,
+        "fn": 0,
+        "tn": 18332,
+        "inference_errors": 0,
+        "population": 18458,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8,
+        "false_positive_rate": 0.002285838685098509,
+        "accuracy": 0.9977245638747426
+      }
+    },
+    "cpu": {
+      "before": {
+        "tp": 139,
+        "fp": 4,
+        "fn": 0,
+        "tn": 5617,
+        "inference_errors": 0,
+        "population": 5760,
+        "precision": 0.972027972027972,
+        "recall": 1.0,
+        "f1": 0.9858156028368794,
+        "false_positive_rate": 0.0007116171499733144,
+        "accuracy": 0.9993055555555556
+      },
+      "after": {
+        "tp": 139,
+        "fp": 4,
+        "fn": 0,
+        "tn": 5617,
+        "inference_errors": 0,
+        "population": 5760,
+        "precision": 0.972027972027972,
+        "recall": 1.0,
+        "f1": 0.9858156028368794,
+        "false_positive_rate": 0.0007116171499733144,
+        "accuracy": 0.9993055555555556
+      }
+    }
+  },
+  "full_performance_replay_repeated": false,
+  "new_detection_quality_gain_measured": false,
+  "acquisition_at_checkpoint": {
+    "status": "running; live exec handle polled separately",
+    "at": "2026-11-16T14:10:08.761959+00:00",
+    "recipe_sha256": "2a253b04dcb634c91798c9d5f0d1a728b33947fc5df2cfca46035ad282a6afc8",
+    "publisher_metadata_sha256": "5b804c6dddcfadfb6d016c66fca23d30419bcdcc0a474056fa40f8b48ee1d2c2",
+    "progress_snapshot": {
+      "bytes_received": 335544320,
+      "completed_ranges": 20,
+      "elapsed_seconds": 536.56,
+      "expected_bytes": 7132670599,
+      "total_ranges": 426
+    },
+    "full_checksum_verified": false,
+    "complete_archive_available": false,
+    "reference": "https://zenodo.org/records/19483937",
+    "purpose": "noncommercial_research",
+    "role": "training",
+    "existing_general_acquirer_2GiB_limit_changed": false,
+    "new_recipe_scope": "one fixed full archive; <=8GiB; <=4 workers; <=3h per invocation"
+  },
+  "pcap_reader": {
+    "classic_pcap_only": true,
+    "ethernet_ipv4_unfragmented_udp_only": true,
+    "openvpn_bare_v2_client_initial_only": true,
+    "max_source_bytes": 2147483648,
+    "source_SHA_checked_at_EOF_and_again_before_publication": true,
+    "packet_ordinals_and_integer_capture_times_preserved": true,
+    "capture_time_is_approximate": true,
+    "raw_ids_are_join_material_not_features": true,
+    "full_real_dataset_reader_run_complete": false,
+    "log_to_frame_join_implemented": false,
+    "human_or_device_identity_verified": false,
+    "IP_UDP_checksum_or_packet_authentication_verified": false,
+    "model_fit_or_policy_action_implemented": false
+  },
+  "goal_status": "active",
+  "goal_qualified": false,
+  "new_independent_evaluation": false,
+  "original_six_domains_qualified": false,
+  "labels_changed": false,
+  "target_thresholds_changed": false,
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "llm_provider_calls": 0,
+  "new_ci_started": false,
+  "push_performed": false,
+  "merge_performed": false,
+  "long_soak_started": false
+}
