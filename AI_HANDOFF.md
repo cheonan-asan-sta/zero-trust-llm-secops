@@ -1,6 +1,8 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
-**최신 v110:** [VPN 공격 근거의 인과적 유지](docs/extra-vpn-attack-evidence.md). 별도 학습 Wheeler FN28→9·TP28→47·FP38 유지. 기존1,681,815행 판정 유지·전체 새FP/TP손실0·Linux606건. 학습 결과이며 독립 목표는 미달/미완료. 목표 active·push/새CI/병합 보류.
+**최신 v111:** [공유 감사 실행 관측 기반 오탐 개선](docs/extra-apparmor-causal-review.md). FP24→3·별도 Wilson/Wardbeck 각8→1, 전체 새FP/TP손실0·Linux644건. 공유 감사 FN6/F1 0%는 그대로다. VPN/인증/웹 감사 기존 성능 유지·전체 목표 active·push/새CI/병합 보류.
+
+**직전 v110:** [VPN 공격 근거의 인과적 유지](docs/extra-vpn-attack-evidence.md). 별도 학습 Wheeler FN28→9·TP28→47·FP38 유지. 기존1,681,815행 판정 유지·전체 새FP/TP손실0·Linux606건. 학습 결과이며 독립 목표는 미달/미완료. 목표 active·push/새CI/병합 보류.
 
 **직전 v109:** [VPN 추가 연결 문맥](docs/extra-vpn-protocol-refinement.md). 기존1,681,815행에서 VPN FP208→48·F1 44.68%→77.78%, 기존TP84/FN0 유지·새FP/TP손실0. Linux579건. 이미지 내 프로젝트 자료 차단 후9개 묶음 예측 지문 동일 확인. 인증 개선 유지, 공유/웹 감사·VPN·독립 목표는 아직 미달. 목표 active·push/새CI/병합 보류.
 
