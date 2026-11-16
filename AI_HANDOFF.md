@@ -1,6 +1,8 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
-**최신 v105 실제 인증 미탐 개선:** [명령/PAM 원문 문맥](docs/extra-sensitive-auth-context.md). 기존1,681,815행에서 미탐3건 회수·새FP/TP손실0. 관측 인증32양성/1,082정상에서 P/R/F1 각각100%, FPR/FNR0%, R/S/F 각 자료도 충족. Linux348건 통과. 공유/웹 감사·VPN 및 원래6영역 독립 목표는 미달/미인수이며 목표 active·push/새CI/병합 보류.
+**최신 v106 웹 감사 개선:** [프로세스 역할·로그인 흐름](docs/extra-audit-intent-context.md). 기존1,681,815행에서 FP6건 감소·새FP/기존TP손실0. 웹 감사 FP21→15·F1 81.74%→86.24%, 인증100% 유지. Linux372건 통과. 모델은R/S/Wilson 학습·Fox/Wardbeck 비학습 보정이며 새 독립 인수가 아니다. 전체 목표 active·push/새CI/병합 보류.
+
+**직전 v105 실제 인증 미탐 개선:** [명령/PAM 원문 문맥](docs/extra-sensitive-auth-context.md). 기존1,681,815행에서 미탐3건 회수·새FP/TP손실0. 관측 인증32양성/1,082정상에서 P/R/F1 각각100%, FPR/FNR0%, R/S/F 각 자료도 충족. Linux348건 통과. 공유/웹 감사·VPN 및 원래6영역 독립 목표는 미달/미인수이며 목표 active·push/새CI/병합 보류.
 
 **직전 v104 근거 적용 판정:** [공유 감사·인증·VPN 판정 개선](docs/extra-evidence-risk-refinement.md). Linux526건·실제 systemd18조건 통과. 로컬 정책 제어6시나리오에서 불필요 경보2→0·명시적 폐기 미탐3→0. 점수는 fixture이며 독립 공격 탐지 F1에 합산하지 않는다. v103 대비 기존1,681,815행 판정 동일·새FP/TP손실0·목표 미달. push·새CI·병합 보류.
 
