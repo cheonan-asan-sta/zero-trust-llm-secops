@@ -1,5 +1,7 @@
 # 성능 개선·로컬 평가를 CI보다 먼저 수행
 
+**v118 추가 조사·성능 유지:** [연결 이력 3후보 제외·공개 패킷 형식 확인](extra-vpn-lifecycle-and-packet-review.md). 학습 자료의 오탐/미탐 감소 모두 0이라 채택하지 않았다. PCAP 일부는 확인했으나 전체 checksum/사건 당시 연결 미검증으로 학습·채점에 미사용. 확정 성능과 마지막 Linux 855건은 v117·전체 목표 active.
+
 **최신 v117:** [현재 AppArmor 상태 알림의 공유 감사 오탐 개선](extra-apparmor-status-review.md). 공유 FP 3→0·TP 2/FN 4 유지·F1 50%, 별도 Wilson/Wardbeck FP 각 1→0·FN 2씩 유지. 원래 1,681,815행·새 FP/기존 TP 손실 0·Linux 855건. 미확인 호출자와 검토 필요 유지·LLM 새 품질 평가 없음·전체 목표 active·push/새 CI/병합/유료 호출 보류. 아래 기록은 해당 버전 당시 결과다.
 
 **v116 검토·미채택:** [주소/DNS 오탐 실패·작업 간격 지지 부족·LLM 지표 구분](extra-residual-candidate-review.md). 새 탐지 후보는 적용하지 않았고 확정 성능은 v115다. 실제 LLM 품질을 새로 개선/측정한 것으로 보고하지 않는다. 목표 active·유료 호출/CI/병합 보류.

@@ -1,0 +1,929 @@
+{
+  "schema": "vpn-lifecycle-and-packet-source-review-1",
+  "completed": true,
+  "date": "2026-11-16",
+  "candidate_adopted": false,
+  "performance_reference": "docs/infrastructure-results/extra-apparmor-status-v117-20261116.json",
+  "performance_reference_sha256": "91f499bf28b0aa07cb5b772dba5f4b1ab6fb185ec8225d5625a0416428f08137",
+  "kinds_RSF": {
+    "audit-share": {
+      "before": {
+        "tp": 2,
+        "fp": 3,
+        "fn": 4,
+        "tn": 2349,
+        "inference_errors": 0,
+        "population": 2358,
+        "precision": 0.4,
+        "recall": 0.3333333333333333,
+        "f1": 0.36363636363636365,
+        "false_positive_rate": 0.0012755102040816326,
+        "accuracy": 0.9970313825275657
+      },
+      "after": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 4,
+        "tn": 2352,
+        "inference_errors": 0,
+        "population": 2358,
+        "precision": 1.0,
+        "recall": 0.3333333333333333,
+        "f1": 0.5,
+        "false_positive_rate": 0.0,
+        "accuracy": 0.998303647158609
+      }
+    },
+    "dns": {
+      "before": {
+        "tp": 135466,
+        "fp": 9,
+        "fn": 2595,
+        "tn": 654079,
+        "inference_errors": 0,
+        "population": 792149,
+        "precision": 0.9999335670787969,
+        "recall": 0.9812039605681546,
+        "f1": 0.990480229293402,
+        "false_positive_rate": 1.3759616443047419e-05,
+        "accuracy": 0.9967127396487278
+      },
+      "after": {
+        "tp": 135466,
+        "fp": 9,
+        "fn": 2595,
+        "tn": 654079,
+        "inference_errors": 0,
+        "population": 792149,
+        "precision": 0.9999335670787969,
+        "recall": 0.9812039605681546,
+        "f1": 0.990480229293402,
+        "false_positive_rate": 1.3759616443047419e-05,
+        "accuracy": 0.9967127396487278
+      }
+    },
+    "auth": {
+      "before": {
+        "tp": 32,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1082,
+        "inference_errors": 0,
+        "population": 1114,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      },
+      "after": {
+        "tp": 32,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1082,
+        "inference_errors": 0,
+        "population": 1114,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      }
+    },
+    "web-error": {
+      "before": {
+        "tp": 1414,
+        "fp": 0,
+        "fn": 0,
+        "tn": 4,
+        "inference_errors": 0,
+        "population": 1418,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      },
+      "after": {
+        "tp": 1414,
+        "fp": 0,
+        "fn": 0,
+        "tn": 4,
+        "inference_errors": 0,
+        "population": 1418,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      }
+    },
+    "web-access": {
+      "before": {
+        "tp": 426312,
+        "fp": 7,
+        "fn": 18,
+        "tn": 4577,
+        "inference_errors": 0,
+        "population": 430914,
+        "precision": 0.9999835803705676,
+        "recall": 0.9999577791851383,
+        "f1": 0.9999706796114227,
+        "false_positive_rate": 0.0015270506108202443,
+        "accuracy": 0.9999419837833071
+      },
+      "after": {
+        "tp": 426312,
+        "fp": 7,
+        "fn": 18,
+        "tn": 4577,
+        "inference_errors": 0,
+        "population": 430914,
+        "precision": 0.9999835803705676,
+        "recall": 0.9999577791851383,
+        "f1": 0.9999706796114227,
+        "false_positive_rate": 0.0015270506108202443,
+        "accuracy": 0.9999419837833071
+      }
+    },
+    "audit-web": {
+      "before": {
+        "tp": 47,
+        "fp": 0,
+        "fn": 0,
+        "tn": 7419,
+        "inference_errors": 0,
+        "population": 7466,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      },
+      "after": {
+        "tp": 47,
+        "fp": 0,
+        "fn": 0,
+        "tn": 7419,
+        "inference_errors": 0,
+        "population": 7466,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      }
+    },
+    "vpn": {
+      "before": {
+        "tp": 84,
+        "fp": 42,
+        "fn": 0,
+        "tn": 18332,
+        "inference_errors": 0,
+        "population": 18458,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8,
+        "false_positive_rate": 0.002285838685098509,
+        "accuracy": 0.9977245638747426
+      },
+      "after": {
+        "tp": 84,
+        "fp": 42,
+        "fn": 0,
+        "tn": 18332,
+        "inference_errors": 0,
+        "population": 18458,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8,
+        "false_positive_rate": 0.002285838685098509,
+        "accuracy": 0.9977245638747426
+      }
+    },
+    "cpu": {
+      "before": {
+        "tp": 139,
+        "fp": 4,
+        "fn": 0,
+        "tn": 5617,
+        "inference_errors": 0,
+        "population": 5760,
+        "precision": 0.972027972027972,
+        "recall": 1.0,
+        "f1": 0.9858156028368794,
+        "false_positive_rate": 0.0007116171499733144,
+        "accuracy": 0.9993055555555556
+      },
+      "after": {
+        "tp": 139,
+        "fp": 4,
+        "fn": 0,
+        "tn": 5617,
+        "inference_errors": 0,
+        "population": 5760,
+        "precision": 0.972027972027972,
+        "recall": 1.0,
+        "f1": 0.9858156028368794,
+        "false_positive_rate": 0.0007116171499733144,
+        "accuracy": 0.9993055555555556
+      }
+    }
+  },
+  "original_population": 1681815,
+  "new_functional_suite_run": false,
+  "last_confirmed_functional_suite": {
+    "version": "v117",
+    "passed": 855,
+    "repeated_for_v118": false
+  },
+  "probe_protocol": {
+    "any_attack_veto_for_lowering": true,
+    "any_normal_veto_for_raising": true,
+    "future_rows_used": false,
+    "gap_boundaries": [
+      1,
+      60,
+      300,
+      3600,
+      86400
+    ],
+    "goal_qualified": false,
+    "minimum_attack_support": 5,
+    "minimum_normal_support": 5,
+    "new_independent_evaluation": false,
+    "peer_history_ttl": 86400,
+    "raw_ids_or_peer_claims_or_absolute_time_or_source_elapsed_learned": false,
+    "role": "training_only",
+    "training_plan_sha256": "4c1607c5d54baa88b299ea7c7150c2e24825a78cadbf605413dd2ede70347962",
+    "variants": [
+      "protocol_lifecycle",
+      "handshake_lifecycle",
+      "lifecycle_without_ages"
+    ]
+  },
+  "probe_protocol_sha256": "a2854fb366fe5f5eb83005f97a159c5282827d872ecaafbf1a1955e5f4026afb",
+  "probe_report_sha256": "cf75fe015c766e4594e6cdc2658746878dd58d959b0b9f12accc44e99633639e",
+  "probe_models_sha256": "cc8d690abf2c4a1db4d1e8acd341e6ffcc605fb3c76424d0376c000237a1c5fa",
+  "probe_script_sha256": "7806d6acb5d27a92e5a8a7b24ce1d7cd609a7588ee98a1bb9fae02fce2ad3683",
+  "training_results": {
+    "handshake_lifecycle": {
+      "russellmitchell": {
+        "changed_rows": [],
+        "changes": {
+          "introduced_fp": 0,
+          "lost_tp": 0,
+          "new_tp": 0,
+          "removed_fp": 0
+        }
+      },
+      "santos": {
+        "changed_rows": [],
+        "changes": {
+          "introduced_fp": 0,
+          "lost_tp": 0,
+          "new_tp": 0,
+          "removed_fp": 0
+        }
+      },
+      "shaw_training": {
+        "changed_rows": [],
+        "changes": {
+          "introduced_fp": 0,
+          "lost_tp": 0,
+          "new_tp": 0,
+          "removed_fp": 0
+        }
+      },
+      "wheeler_training": {
+        "changed_rows": [],
+        "changes": {
+          "introduced_fp": 0,
+          "lost_tp": 0,
+          "new_tp": 0,
+          "removed_fp": 0
+        }
+      }
+    },
+    "lifecycle_without_ages": {
+      "russellmitchell": {
+        "changed_rows": [],
+        "changes": {
+          "introduced_fp": 0,
+          "lost_tp": 0,
+          "new_tp": 0,
+          "removed_fp": 0
+        }
+      },
+      "santos": {
+        "changed_rows": [],
+        "changes": {
+          "introduced_fp": 0,
+          "lost_tp": 0,
+          "new_tp": 0,
+          "removed_fp": 0
+        }
+      },
+      "shaw_training": {
+        "changed_rows": [],
+        "changes": {
+          "introduced_fp": 0,
+          "lost_tp": 0,
+          "new_tp": 0,
+          "removed_fp": 0
+        }
+      },
+      "wheeler_training": {
+        "changed_rows": [],
+        "changes": {
+          "introduced_fp": 0,
+          "lost_tp": 0,
+          "new_tp": 0,
+          "removed_fp": 0
+        }
+      }
+    },
+    "protocol_lifecycle": {
+      "russellmitchell": {
+        "changed_rows": [],
+        "changes": {
+          "introduced_fp": 0,
+          "lost_tp": 0,
+          "new_tp": 0,
+          "removed_fp": 0
+        }
+      },
+      "santos": {
+        "changed_rows": [],
+        "changes": {
+          "introduced_fp": 0,
+          "lost_tp": 0,
+          "new_tp": 0,
+          "removed_fp": 0
+        }
+      },
+      "shaw_training": {
+        "changed_rows": [],
+        "changes": {
+          "introduced_fp": 0,
+          "lost_tp": 0,
+          "new_tp": 0,
+          "removed_fp": 0
+        }
+      },
+      "wheeler_training": {
+        "changed_rows": [],
+        "changes": {
+          "introduced_fp": 0,
+          "lost_tp": 0,
+          "new_tp": 0,
+          "removed_fp": 0
+        }
+      }
+    }
+  },
+  "collision_summary": {
+    "handshake_lifecycle": {
+      "russellmitchell": {
+        "false_positive_limits": {
+          "attack_veto": 12
+        },
+        "collision_witnesses": [
+          {
+            "case_id": "59b26b5b8a66a662bd5f89a8b8325527c9aaea1b1f76c88e3859266a48381f36",
+            "phase": "initial",
+            "normal": 14,
+            "attack": 4,
+            "cell": "bbed8b8518377c76127182e380663a502c3bfe5e85ae925313b8117f04535b69"
+          },
+          {
+            "case_id": "2804793b7abcab831db61327dea972378edca453709c69f1c4f3ee4af7aecc24",
+            "phase": "issuer",
+            "normal": 453,
+            "attack": 5,
+            "cell": "85fbcfc1ac08c24182dcd6c61f54be979d0e3b115982f7b5fecf78684e432b33"
+          }
+        ]
+      },
+      "santos": {
+        "false_positive_limits": {
+          "attack_veto": 12
+        },
+        "collision_witnesses": [
+          {
+            "case_id": "717bc8eb6ca7d26321a5a7adbdf6aa16f7193e0675bd40f0e54eec054ee35122",
+            "phase": "initial",
+            "normal": 14,
+            "attack": 4,
+            "cell": "bbed8b8518377c76127182e380663a502c3bfe5e85ae925313b8117f04535b69"
+          },
+          {
+            "case_id": "ee6bfc6d6f2f8897317c4141f6d89c100438a9ca919fd9f71272769f5951e699",
+            "phase": "issuer",
+            "normal": 453,
+            "attack": 5,
+            "cell": "85fbcfc1ac08c24182dcd6c61f54be979d0e3b115982f7b5fecf78684e432b33"
+          }
+        ]
+      },
+      "shaw_training": {
+        "false_positive_limits": {
+          "attack_veto": 24
+        },
+        "collision_witnesses": [
+          {
+            "case_id": "33a1babf1b5fa431aff55aefb1ba57a1346a972b1af9cbe02912f16399afb2f3",
+            "phase": "initial",
+            "normal": 14,
+            "attack": 4,
+            "cell": "bbed8b8518377c76127182e380663a502c3bfe5e85ae925313b8117f04535b69"
+          },
+          {
+            "case_id": "4d02f8def28a9804d0ec311dc8cef6d35a3d9ee22343ca12147445410faf2260",
+            "phase": "issuer",
+            "normal": 453,
+            "attack": 5,
+            "cell": "85fbcfc1ac08c24182dcd6c61f54be979d0e3b115982f7b5fecf78684e432b33"
+          }
+        ]
+      },
+      "wheeler_training": {
+        "false_positive_limits": {
+          "attack_veto": 36
+        },
+        "collision_witnesses": [
+          {
+            "case_id": "278a710b2839df25cfe7c820bee0829288503c9e1979852116a6704e8c87a0bd",
+            "phase": "initial",
+            "normal": 14,
+            "attack": 4,
+            "cell": "bbed8b8518377c76127182e380663a502c3bfe5e85ae925313b8117f04535b69"
+          },
+          {
+            "case_id": "8ea8aebc6d28fc687cad76b700094be1e1654cd3118f08842d3579153ae60103",
+            "phase": "issuer",
+            "normal": 453,
+            "attack": 5,
+            "cell": "85fbcfc1ac08c24182dcd6c61f54be979d0e3b115982f7b5fecf78684e432b33"
+          }
+        ]
+      }
+    },
+    "lifecycle_without_ages": {
+      "russellmitchell": {
+        "false_positive_limits": {
+          "attack_veto": 12
+        },
+        "collision_witnesses": [
+          {
+            "case_id": "59b26b5b8a66a662bd5f89a8b8325527c9aaea1b1f76c88e3859266a48381f36",
+            "phase": "initial",
+            "normal": 14,
+            "attack": 4,
+            "cell": "d7c80f6e83cab04b7ec10ccaf2c30056470058161bb0caee129e95e84e16e574"
+          },
+          {
+            "case_id": "2804793b7abcab831db61327dea972378edca453709c69f1c4f3ee4af7aecc24",
+            "phase": "issuer",
+            "normal": 468,
+            "attack": 5,
+            "cell": "5f1b3b5c707b6cbda83d55cebcd2456fbac603463a22a5d0f08ae79977bf70cb"
+          }
+        ]
+      },
+      "santos": {
+        "false_positive_limits": {
+          "attack_veto": 12
+        },
+        "collision_witnesses": [
+          {
+            "case_id": "717bc8eb6ca7d26321a5a7adbdf6aa16f7193e0675bd40f0e54eec054ee35122",
+            "phase": "initial",
+            "normal": 14,
+            "attack": 4,
+            "cell": "d7c80f6e83cab04b7ec10ccaf2c30056470058161bb0caee129e95e84e16e574"
+          },
+          {
+            "case_id": "ee6bfc6d6f2f8897317c4141f6d89c100438a9ca919fd9f71272769f5951e699",
+            "phase": "issuer",
+            "normal": 468,
+            "attack": 5,
+            "cell": "5f1b3b5c707b6cbda83d55cebcd2456fbac603463a22a5d0f08ae79977bf70cb"
+          }
+        ]
+      },
+      "shaw_training": {
+        "false_positive_limits": {
+          "attack_veto": 24
+        },
+        "collision_witnesses": [
+          {
+            "case_id": "33a1babf1b5fa431aff55aefb1ba57a1346a972b1af9cbe02912f16399afb2f3",
+            "phase": "initial",
+            "normal": 14,
+            "attack": 4,
+            "cell": "d7c80f6e83cab04b7ec10ccaf2c30056470058161bb0caee129e95e84e16e574"
+          },
+          {
+            "case_id": "4d02f8def28a9804d0ec311dc8cef6d35a3d9ee22343ca12147445410faf2260",
+            "phase": "issuer",
+            "normal": 468,
+            "attack": 5,
+            "cell": "5f1b3b5c707b6cbda83d55cebcd2456fbac603463a22a5d0f08ae79977bf70cb"
+          }
+        ]
+      },
+      "wheeler_training": {
+        "false_positive_limits": {
+          "attack_veto": 36
+        },
+        "collision_witnesses": [
+          {
+            "case_id": "278a710b2839df25cfe7c820bee0829288503c9e1979852116a6704e8c87a0bd",
+            "phase": "initial",
+            "normal": 14,
+            "attack": 4,
+            "cell": "d7c80f6e83cab04b7ec10ccaf2c30056470058161bb0caee129e95e84e16e574"
+          },
+          {
+            "case_id": "8ea8aebc6d28fc687cad76b700094be1e1654cd3118f08842d3579153ae60103",
+            "phase": "issuer",
+            "normal": 468,
+            "attack": 5,
+            "cell": "5f1b3b5c707b6cbda83d55cebcd2456fbac603463a22a5d0f08ae79977bf70cb"
+          }
+        ]
+      }
+    },
+    "protocol_lifecycle": {
+      "russellmitchell": {
+        "false_positive_limits": {
+          "attack_veto": 12
+        },
+        "collision_witnesses": [
+          {
+            "case_id": "59b26b5b8a66a662bd5f89a8b8325527c9aaea1b1f76c88e3859266a48381f36",
+            "phase": "initial",
+            "normal": 14,
+            "attack": 4,
+            "cell": "698937377e4deb801147f45c7b765a396d846ef8e7097747e8fdb23bd11cc823"
+          },
+          {
+            "case_id": "2804793b7abcab831db61327dea972378edca453709c69f1c4f3ee4af7aecc24",
+            "phase": "issuer",
+            "normal": 14,
+            "attack": 4,
+            "cell": "0d6e968181894f3346a9b8216af1909266856e22ac401e18f953a360a9a27529"
+          }
+        ]
+      },
+      "santos": {
+        "false_positive_limits": {
+          "attack_veto": 12
+        },
+        "collision_witnesses": [
+          {
+            "case_id": "717bc8eb6ca7d26321a5a7adbdf6aa16f7193e0675bd40f0e54eec054ee35122",
+            "phase": "initial",
+            "normal": 14,
+            "attack": 4,
+            "cell": "698937377e4deb801147f45c7b765a396d846ef8e7097747e8fdb23bd11cc823"
+          },
+          {
+            "case_id": "ee6bfc6d6f2f8897317c4141f6d89c100438a9ca919fd9f71272769f5951e699",
+            "phase": "issuer",
+            "normal": 14,
+            "attack": 4,
+            "cell": "0d6e968181894f3346a9b8216af1909266856e22ac401e18f953a360a9a27529"
+          }
+        ]
+      },
+      "shaw_training": {
+        "false_positive_limits": {
+          "attack_veto": 24
+        },
+        "collision_witnesses": [
+          {
+            "case_id": "33a1babf1b5fa431aff55aefb1ba57a1346a972b1af9cbe02912f16399afb2f3",
+            "phase": "initial",
+            "normal": 14,
+            "attack": 4,
+            "cell": "698937377e4deb801147f45c7b765a396d846ef8e7097747e8fdb23bd11cc823"
+          },
+          {
+            "case_id": "4d02f8def28a9804d0ec311dc8cef6d35a3d9ee22343ca12147445410faf2260",
+            "phase": "issuer",
+            "normal": 14,
+            "attack": 4,
+            "cell": "0d6e968181894f3346a9b8216af1909266856e22ac401e18f953a360a9a27529"
+          }
+        ]
+      },
+      "wheeler_training": {
+        "false_positive_limits": {
+          "attack_veto": 36
+        },
+        "collision_witnesses": [
+          {
+            "case_id": "278a710b2839df25cfe7c820bee0829288503c9e1979852116a6704e8c87a0bd",
+            "phase": "initial",
+            "normal": 14,
+            "attack": 4,
+            "cell": "698937377e4deb801147f45c7b765a396d846ef8e7097747e8fdb23bd11cc823"
+          },
+          {
+            "case_id": "8ea8aebc6d28fc687cad76b700094be1e1654cd3118f08842d3579153ae60103",
+            "phase": "issuer",
+            "normal": 14,
+            "attack": 4,
+            "cell": "0d6e968181894f3346a9b8216af1909266856e22ac401e18f953a360a9a27529"
+          }
+        ]
+      }
+    }
+  },
+  "packet_source_inventory": {
+    "reference": "https://zenodo.org/records/19483937",
+    "archive_bytes": 7132670599,
+    "publisher_md5": "78e9b7d169b438f03816019b52ab3ff7",
+    "full_publisher_checksum_verified": false,
+    "index_report_sha256": "17056875e1ba24755a718df2323052b6c037d643ce1a0449b52045d4b6cc7f24",
+    "entries_sha256": "808de9f4f8366e794b430ad668f89897f5f5bbe8fcfbb2a2c4a5a2f9afae39d9",
+    "all_members_sha256": "41a1f0eb505ffdf0c435c2d9ad4f3094391ece689698d8c1a05b53be34f40188",
+    "vpn_members": [
+      {
+        "bytes": 1033920708,
+        "compressed_bytes": 942225156,
+        "compression": 8,
+        "crc32": "fd2e904c",
+        "member": "gather/vpn/logs/suricata/log.pcap.1642684648",
+        "offset": 4948090348
+      },
+      {
+        "bytes": 435024588,
+        "compressed_bytes": 367450182,
+        "compression": 8,
+        "crc32": "e4785e0a",
+        "member": "gather/vpn/logs/suricata/log.pcap.1642964618",
+        "offset": 5890315606
+      }
+    ],
+    "full_archive_downloaded": false,
+    "bodies_used_for_model_or_metrics": false,
+    "network_bytes_including_both_inventory_passes": 4597860
+  },
+  "packet_preview": {
+    "report_sha256": "7ac870656a18ec52a5fe7dfea422be0913d8a27045458de78be18ab25b949f76",
+    "network_bytes": 1179648,
+    "complete_prefix_packets": 1820,
+    "members": [
+      {
+        "first_time": 1642684648.344563,
+        "last_time": 1642686434.857686,
+        "link_type": 1,
+        "member": "gather/vpn/logs/suricata/log.pcap.1642684648",
+        "pcap_packets_complete": 1267,
+        "prefix_bytes": 594718,
+        "prefix_sha256": "5334cc7b8d2e47f8233213a12e52c6d9150d09b2d844d73efec31d7d3419c91d",
+        "protocols": {
+          "17": 795,
+          "6": 450
+        },
+        "samples": [
+          {
+            "opcode_unverified": 7,
+            "payload_bytes": 14,
+            "protocol": 17,
+            "time": 1642686412.548798,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 8,
+            "payload_bytes": 26,
+            "protocol": 17,
+            "time": 1642686412.551479,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 5,
+            "payload_bytes": 22,
+            "protocol": 17,
+            "time": 1642686412.553061,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 4,
+            "payload_bytes": 287,
+            "protocol": 17,
+            "time": 1642686412.553107,
+            "tls_record_markers": [
+              14
+            ]
+          },
+          {
+            "opcode_unverified": 4,
+            "payload_bytes": 1200,
+            "protocol": 17,
+            "time": 1642686412.567022,
+            "tls_record_markers": [
+              26,
+              159,
+              187,
+              419
+            ]
+          },
+          {
+            "opcode_unverified": 4,
+            "payload_bytes": 1188,
+            "protocol": 17,
+            "time": 1642686412.567163,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 4,
+            "payload_bytes": 1188,
+            "protocol": 17,
+            "time": 1642686412.567318,
+            "tls_record_markers": [
+              1075
+            ]
+          },
+          {
+            "opcode_unverified": 4,
+            "payload_bytes": 517,
+            "protocol": 17,
+            "time": 1642686412.567395,
+            "tls_record_markers": [
+              443
+            ]
+          },
+          {
+            "opcode_unverified": 5,
+            "payload_bytes": 22,
+            "protocol": 17,
+            "time": 1642686412.568321,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 5,
+            "payload_bytes": 22,
+            "protocol": 17,
+            "time": 1642686412.568351,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 5,
+            "payload_bytes": 22,
+            "protocol": 17,
+            "time": 1642686412.569003,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 4,
+            "payload_bytes": 1200,
+            "protocol": 17,
+            "time": 1642686412.582135,
+            "tls_record_markers": [
+              32
+            ]
+          }
+        ],
+        "vpn_port_counts": {
+          "(17, 'client_to_server', 4)": 18,
+          "(17, 'client_to_server', 5)": 21,
+          "(17, 'client_to_server', 7)": 3,
+          "(17, 'client_to_server', 9)": 265,
+          "(17, 'server_to_client', 4)": 21,
+          "(17, 'server_to_client', 5)": 12,
+          "(17, 'server_to_client', 8)": 3,
+          "(17, 'server_to_client', 9)": 336
+        }
+      },
+      {
+        "first_time": 1642964618.894245,
+        "last_time": 1642964619.112694,
+        "link_type": 1,
+        "member": "gather/vpn/logs/suricata/log.pcap.1642964618",
+        "pcap_packets_complete": 553,
+        "prefix_bytes": 550025,
+        "prefix_sha256": "0b8f3627c2e11cddc680ade1ae461a7afd3b9a6cfd1d518d1f254cd1069e4922",
+        "protocols": {
+          "17": 291,
+          "6": 262
+        },
+        "samples": [
+          {
+            "opcode_unverified": 9,
+            "payload_bytes": 1384,
+            "protocol": 17,
+            "time": 1642964618.894245,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 9,
+            "payload_bytes": 1384,
+            "protocol": 17,
+            "time": 1642964618.894338,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 9,
+            "payload_bytes": 104,
+            "protocol": 17,
+            "time": 1642964618.894394,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 9,
+            "payload_bytes": 104,
+            "protocol": 17,
+            "time": 1642964618.894406,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 9,
+            "payload_bytes": 104,
+            "protocol": 17,
+            "time": 1642964618.894485,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 9,
+            "payload_bytes": 1384,
+            "protocol": 17,
+            "time": 1642964618.894631,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 9,
+            "payload_bytes": 1384,
+            "protocol": 17,
+            "time": 1642964618.894672,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 9,
+            "payload_bytes": 1384,
+            "protocol": 17,
+            "time": 1642964618.894722,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 9,
+            "payload_bytes": 1384,
+            "protocol": 17,
+            "time": 1642964618.894749,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 9,
+            "payload_bytes": 584,
+            "protocol": 17,
+            "time": 1642964618.894771,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 9,
+            "payload_bytes": 104,
+            "protocol": 17,
+            "time": 1642964618.894897,
+            "tls_record_markers": []
+          },
+          {
+            "opcode_unverified": 9,
+            "payload_bytes": 104,
+            "protocol": 17,
+            "time": 1642964618.894923,
+            "tls_record_markers": []
+          }
+        ],
+        "vpn_port_counts": {
+          "(17, 'client_to_server', 9)": 84,
+          "(17, 'server_to_client', 9)": 207
+        }
+      }
+    ],
+    "member_crc_verified": false,
+    "full_publisher_checksum_verified": false,
+    "source_timezone_or_event_order_verified": false,
+    "tls_marker_is_verified_clienthello": false,
+    "preview_only": true
+  },
+  "labels_changed": false,
+  "target_thresholds_changed": false,
+  "original_population_changed": false,
+  "no_future_leaf_or_identity_backfill": true,
+  "models_or_production_detector_changed": false,
+  "new_independent_evaluation": false,
+  "original_six_domains_qualified": false,
+  "goal_qualified": false,
+  "goal_status": "active",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "llm_provider_calls": 0,
+  "push_performed": false,
+  "new_ci_started": false,
+  "merge_performed": false,
+  "long_soak_started": false
+}
