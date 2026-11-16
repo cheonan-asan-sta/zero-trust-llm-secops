@@ -1,0 +1,45 @@
+{
+  "any_attack_veto": true,
+  "at": "2026-11-16T18:00:15.184105+00:00",
+  "automatic_enforcement_allowed": false,
+  "baseline": "native-dns-batch-v124 sealed AFTER predictions; all original rows/errors/labels preserved",
+  "current_independent_denials_high_base_and_failure_window_preserved": true,
+  "excluded_client_simulator_logs": "R remote_employee state machine logs reviewed separately for telemetry gaps; no simulator state,transition,seed,run,vpn_cmd,stdout or employee-source presence used in the fitted head or prediction.",
+  "frozen_before_new_validation_projection_or_prediction": true,
+  "goal_qualified": false,
+  "head_sha256": "23f6f643e6f02dd844896bae321a4d35bd14203fdc4aad13fd5fb03f7d1586a1",
+  "new_independent_evaluation": false,
+  "no_paid_calls_or_AWS_or_newCI_or_push_or_merge_before_goal": true,
+  "normal_only_minimum_support": 5,
+  "not_fitted_observed": [
+    "fox",
+    "harrison",
+    "wilson",
+    "wardbeck"
+  ],
+  "primary_format_sources": [
+    "https://github.com/OpenVPN/openvpn/blob/v2.4.4/src/openvpn/ssl_verify.c",
+    "https://github.com/OpenVPN/openvpn/blob/v2.4.4/src/openvpn/ssl_verify_openssl.c"
+  ],
+  "producer_binary_identity_verified": false,
+  "qualification": "Four message-template sequence variants zero gain. Full issuer phase variants zero gain. Relation-only exploratory head reduced Wheeler FP5 in resubstitution and leave-one-source-out; deploy only a frozen server-verification-stage advisory after full replay. No general identity or CA trust claim.",
+  "raw_subject_endpoint_CN_or_hash_not_learned": true,
+  "reported_subject_relation_not_identity": true,
+  "review_retained": true,
+  "schema": "frozen-vpn-issuer-advisory-contract-1",
+  "source_code_sha256": {
+    "scripts/f1_lab/vpn_issuer_review.py": "eb84510a11d58e36c4877fe3dfb1c35f8691e8d3c45b561dd34048613dd6c4d2",
+    "scripts/fit_vpn_issuer_review.py": "f1dab2d68063fb3a958cc19c5033552ed79d17d9527341a646a6f83ce043025a",
+    "scripts/run_local_vpn_protocol_batch.py": "0c85f9bb98c02a39341158af952677b69b8e612e49c404e984d1fd8a05ae9227",
+    "scripts/run_vpn_protocol_review.py": "0e045fd94e1db7581cf432e1e22a282167cc49a44bc9de4b4a2449d170131b8b",
+    "scripts/stage_vpn_issuer_replay.py": "ce09dff268845640aa899ab54ded9ebef2f5408747d1fea134d5e59e8d40aae2",
+    "tests/test_vpn_issuer_review.py": "ec6a5cab90aa96e846b12e72f2d25966c0d585d0448a88e1c363950f8df1b44c",
+    "tests/test_vpn_issuer_stage.py": "e226d437652f22422d6dcba8e039e6a9813bf20fc427578f0c6bb455bec6a492"
+  },
+  "training_sources": [
+    "russellmitchell",
+    "santos",
+    "shaw",
+    "wheeler"
+  ]
+}
