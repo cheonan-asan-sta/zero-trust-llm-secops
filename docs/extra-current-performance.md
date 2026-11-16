@@ -1,5 +1,7 @@
 # 현재 성능과 남은 목표 — 2026-11-16
 
+**v120 개발·수집 진행:** [PCAP CRC/SHA·원문 일치 검증과 공유 journal 공백](extra-packet-member-verification.md). Linux 929건 통과·실제 원본 수집/적합/성능 재평가는 미완료. 공유 FN 4의 사건 전 60초 journal 0행, 뒤늦은 echo는 판정에 소급하지 않음. 확정 탐지 지표 v117 유지·목표 active.
+
 **v119 개발·수집 진행:** [고정 원본 수집기·초기 프레임 추출](extra-packet-source-acquisition.md). Linux 908건 통과. 실제 원본 다운로드는 별도 실행 중이며 checksum/실제 로그 연결/적합/성능 재평가는 미완료. 탐지 수치는 v117 유지·목표 active·유료 호출/CI/병합 보류.
 
 **v118 추가 조사·성능 유지:** [연결 이력 3후보 제외·공개 패킷 형식 확인](extra-vpn-lifecycle-and-packet-review.md). 학습 자료의 오탐/미탐 감소 모두 0이라 채택하지 않았다. PCAP 일부는 확인했으나 전체 checksum/사건 당시 연결 미검증으로 학습·채점에 미사용. 확정 성능과 마지막 Linux 855건은 v117·전체 목표 active.

@@ -1,5 +1,7 @@
 # 패킷 원본 수집·초기 관측 시험과 실행 — v119
 
+**후속 v120:** [member 전체 검증·기존 VPN 원문 일치](extra-packet-member-verification.md)를 추가했다. 최신 Linux 관련 묶음은 929건이며 아래 908건은 v119 당시 결과다. 실제 원본 intake와 성능 평가는 아직 미완료다.
+
 [구현 범위와 미완료 항목](extra-packet-source-acquisition.md)을 함께 읽는다. 이 절차는 공개 원본 확보이며 탐지 F1 시험이나 새 독립 성능 인수가 아니다. 대용량 다운로드가 포함되므로 먼저 여유 공간과 기존 실행의 실제 상태를 확인한다. 이미 진행 중인 같은 작업을 중복 시작하지 않는다.
 
 ```text
@@ -32,3 +34,15 @@ python -m scripts.extract_vpn_initial_frames --source runtime/f1/verified-member
 ```
 
 예시 member와 SHA는 자동 생성되지 않으며 실제 검증된 자료로 바꿔야 한다. 일부 prefix를 전체 PCAP로 대체하지 않는다. 출력은 새 파일이어야 한다. 미지원 형식은 추측하지 않는다. capture timestamp는 근사 값이며 source/시간/SID 연결과 실제 검증된 기기 상태는 별도의 문제다. 이 CLI는 모델 적합·원래 로그 행 연결·권한 발급·자동 집행을 하지 않는다.
+
+
+## v120: 원본 검증 완료 후 member intake
+
+진행 중인 수집을 중복 시작하지 않는다. acquisition.json의 완료와 전체 checksum이 확인된 뒤 실제 원래 VPN source와 receipt SHA를 지정한다. 예시 경로/지문은 자동 생성되지 않는다.
+
+```text
+python -m pytest tests/test_f1_packet_members.py -q
+python -m scripts.prepare_vpn_packet_members --acquisition runtime/f1/packet-acquisition-new/acquisition.json --acquisition-sha256 VERIFIED_ACQUISITION_SHA256 --archive runtime/f1/packet-acquisition-new/russellmitchell.zip --vpn-raw runtime/f1/original-pairs/pair-6-raw.source --vpn-raw-sha256 VERIFIED_ORIGINAL_VPN_SHA256 --output runtime/f1/packet-members-new
+```
+
+새 focused 시험은 21건이다. 이 CLI는 archive의 전체 SHA/게시 MD5와 원래 VPN 로그 바이트를 다시 확인하며, 지정된 PCAP 두 개만 고정 이름으로 복사해 CRC/SHA/초기 관측을 검증한다. 기존 일반 ZIP reader의 2GiB 경계는 유지한다. 최종 run.json의 completed=true와 지문을 확인하기 전에는 일부 출력 파일을 소비하지 않는다. 실제 로그 행 연결·적합·탐지 점수/권한 동작은 아직 포함하지 않는다.
