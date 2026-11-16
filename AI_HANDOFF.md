@@ -1,3 +1,5 @@
+> 2026-11-17 팀 통합 준비: 별도 `feature/chaeheeju-team-llm-integration-prep`에서 `51bb483` + `origin/main d2370c2` 로컬 후보 `5b5708b` 구성. 팀원 branch는 main에 이미 포함돼 중복 병합하지 않았다. Windows fcntl 시작 호환 수정·POSIX jobs fail-closed 유지. Linux7399/skip2·Windows130/skip20·브라우저46/135·Ruff 통과. 작업 중 원본에서 관측한 후속 미커밋 LLM WIP는 보존했으며 후보에 포함하지 않았다. 원래 성능 목표 미완료·기본 rule/legacy/review_all=false·push/PR/새 CI/실제 main·aitest 병합 보류. [SHA·충돌·검증·인수 조건](docs/team-llm-integration-prep-20261117.md)
+
 > 2026-11-17 LLM 실제 개선: 사용자 유료 호출 승인으로 168회 비교·사용량 추정 $0.365284·기능60건 통과. 정책+근거 schema·전체 교차 검토 옵션 구현. 12건 F1 71.43→85.71%지만 24건 FP5→6으로 기본 전환 미승인. 합성 개발 평가이며 native/독립95% 목표는 미완료·CI/push/병합 보류. [전체 실험과 적용 범위](docs/llm-grounded-improvement-20261117.md)
 
 > 2026-11-17 v128: 목표 미달과 재개 조건을 요구사항별 감사했다. 공유 감사/VPN F1 80%·원래6영역 최종 지지0. DEDALE 고정 README만으로 syslog의 정답 대응/과거 AIT 신원/독립6영역을 증명하지 못한다. 같은 필수 근거 공백이 최근3턴 반복돼 추가 근거 전 자동 개선 반복 보류·CI/push/병합 금지 유지. [감사와 재개 조건](docs/extra-target-evidence-gap-v128.md)
