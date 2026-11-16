@@ -101,3 +101,10 @@ README 안의 설치/실행 예시는 조사 대상이며 이 프로젝트에 �
 
 [요구사항별 감사 JSON](infrastructure-results/extra-target-evidence-gap-v128-20261117.json) ·
 [원래 독립 평가 계획](extra-independent-evaluation-preparation.md)
+
+
+## 재개 후 세 차례 점검 — v129–v131
+
+목표 재개 후에는 이전 차단 횟수를 재사용하지 않고 새로 세 차례 점검했다. 인증서 DN 형식 누락 가설을 실제 training leaf1,489행으로 대조했지만 전부 기존 파서가 읽고 있었다. 원래4곳의 입력과 원격aitest에도 확인 범위에서 새 변경이 없었고, 다음 점검에서는 Python497파일·원래 프로토콜·최종 실제 score·단계별지지 모델의 지문이 같았다. 현재 정상 완화 가능한 지원 셀0·공유 감사/VPN F1각80%·원래6영역 독립 최종 지지0이 유지된다.
+
+세 번째 점검에서도 같은 필수 근거 공백을 확인했고 현재 검증한 입력에서 적용할 유효한 다음 코드 변경을 찾지 못했다. 추가 인과적 근거/독립 자료가 확보되기 전에는 차단 상태로 다시 전환한다. 원래 목표와 위 재개 조건을 유지하며 새 테스트·Docker·유료 호출·CI·병합을 시작하지 않았다. [재개 감사 JSON](infrastructure-results/extra-target-evidence-gap-v131-20261117.json)에 새3턴의 근거를 기록했다.
