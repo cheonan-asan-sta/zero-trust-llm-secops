@@ -6,11 +6,14 @@ import json
 import re
 from pathlib import Path
 
+from scripts.f1_lab.audit_auth_review import refine as add_observed_risk
 from scripts.f1_lab.audit_intent_context import AuditIntentReview
 from scripts.f1_lab.audit_intent_head import IntentHead
 from scripts.f1_lab.native_jsonl import MAX_ROW, decode, require
 from scripts.f1_lab.operation_context import canonical
 from scripts.f1_lab.operation_refinement import OperationDecision
+from scripts.f1_lab.ordered_audit_login import OrderedAuditReview
+from scripts.f1_lab.sensitive_auth_context import SensitiveAuthReview
 from scripts.f1_lab.transfer_evaluation import sha
 from scripts.run_audit_auth_review import signals
 
@@ -40,9 +43,12 @@ def observations(raw_directory,preparation):
     return result
 
 
-def predict(head,preparation,raw_directory,baseline,baseline_sha256,output):
+def predict(head,preparation,raw_directory,baseline,baseline_sha256,output,*,with_risk_observations=False):
+    require(type(with_risk_observations) is bool,'intent_risk_option')
     require(sha(baseline)==baseline_sha256,'intent_baseline_pin')
     selected=observations(raw_directory,preparation)
+    observed=(signals(raw_directory,preparation,review_factory=OrderedAuditReview,
+        auth_review_factory=SensitiveAuthReview)[0] if with_risk_observations else {})
     output=Path(output)
     require(not output.exists() and not output.with_suffix('.part').exists(),'intent_fresh_output')
     source=ordinal=count=errors=changed=0
@@ -54,11 +60,13 @@ def predict(head,preparation,raw_directory,baseline,baseline_sha256,output):
             require(prior['case_id']==case and prior['source_index']==source,'intent_case_order')
             before=prior['after'] if prior['error'] is None else None
             after,score,reason=before,prior['after_score'],prior['reason']
-            if prior['error'] is None and (source,ordinal) in selected:
+            if prior['error'] is None:
                 require(type(before) is bool,'intent_baseline_decision')
-                observation,line=selected[source,ordinal]
                 previous=OperationDecision(prior['before_score'],score,before,before,reason)
-                decision=head.refine(previous,observation,source_sha256=pair['raw_sha256'],ordinal=ordinal,raw=line)
+                decision=add_observed_risk(previous,observed.get((source,ordinal)))
+                if (source,ordinal) in selected:
+                    observation,line=selected[source,ordinal]
+                    decision=head.refine(decision,observation,source_sha256=pair['raw_sha256'],ordinal=ordinal,raw=line)
                 after,score,reason=decision.alert,decision.score,decision.reason
             changed+=before!=after;errors+=prior['error'] is not None
             target.write(canonical({'case_id':case,'source_index':source,'before':before,'after':after,
@@ -72,7 +80,7 @@ def predict(head,preparation,raw_directory,baseline,baseline_sha256,output):
             'predictions_sha256':sha(output),'validation_labels_opened':False}
 
 
-def run(plan_path,pin,model_path,model_pin,output):
+def run(plan_path,pin,model_path,model_pin,output,*,with_risk_observations=False):
     require(sha(plan_path)==pin,'intent_plan_pin')
     plan=decode(Path(plan_path).read_bytes())
     require(plan['schema']=='ordered-audit-replay-1' and plan['scope']=='observed_development_only'
@@ -86,6 +94,7 @@ def run(plan_path,pin,model_path,model_pin,output):
     report={'schema':'learned-audit-intent-prediction-1','completed':False,'goal_qualified':False,
         'new_independent_evaluation':False,'validation_labels_opened':False,
         'frozen_training_parameters_available':True,'model_sha256':model_pin,
+        'with_v102_v105_risk_observations':with_risk_observations,
         'scenarios':{},'aws_calls':0,'paid_api_calls':0}
     for spec in plan['scenarios']:
         name=spec['name']
@@ -95,7 +104,7 @@ def run(plan_path,pin,model_path,model_pin,output):
         require(prepared['completed'] is True and prepared['inputs_contain_truth'] is False,'intent_preparation_scope')
         before=baseline['scenarios'][name]
         row=predict(head,prepared,spec['raw'],spec['prediction'],before['prediction']['predictions_sha256'],
-                    output/'prediction'/(name+'-predictions.jsonl'))
+                    output/'prediction'/(name+'-predictions.jsonl'),with_risk_observations=with_risk_observations)
         require(row['population']==before['population'],'intent_complete_population')
         report['scenarios'][name]=row
         (output/'prediction-seal.json').write_bytes(canonical(report)+b'\n')
@@ -107,7 +116,9 @@ def run(plan_path,pin,model_path,model_pin,output):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('plan','sha256','model','model-sha256','output'):parser.add_argument('--'+name,required=True)
-    a=parser.parse_args();report=run(a.plan,a.sha256,a.model,a.model_sha256,a.output)
+    parser.add_argument('--with-risk-observations',action='store_true')
+    a=parser.parse_args();report=run(a.plan,a.sha256,a.model,a.model_sha256,a.output,
+        with_risk_observations=a.with_risk_observations)
     print(json.dumps({'completed':report['completed'],'scenarios':len(report['scenarios']),'goal_qualified':False}))
     return 0
 

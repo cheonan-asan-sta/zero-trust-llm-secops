@@ -177,3 +177,32 @@ def test_training_rejects_misaligned_truth_and_raw_drift(tmp_path):
     (raw/'pair-0-raw.source').write_text('tampered',encoding='utf8')
     with pytest.raises(ValueError,match='audit_auth_raw_hash'):
         fit(tmp_path/'plan.json',sha(tmp_path/'plan.json'),tmp_path/'drift-fit')
+
+
+def test_uniform_chain_applies_source_bound_auth_risk_before_learned_review(tmp_path):
+    _prep,_raw,_plan,_rows,sha,dump=packet(tmp_path)
+    result=fit(tmp_path/'plan.json',sha(tmp_path/'plan.json'),tmp_path/'fit')
+    head=IntentHead.load(tmp_path/'fit/model.json',result['model_sha256'])
+    raw=tmp_path/'auth-raw';raw.mkdir()
+    command='Jan 24 04:38:06 host sudo: arbitrary-user : TTY=pts/8 ; PWD=/tmp/cache ; USER=root ; COMMAND=/bin/cat /etc/shadow\n'
+    opened='Jan 24 04:38:06 host sudo: pam_unix(sudo:session): session opened for user root by (uid=0)\n'
+    source=raw/'pair-0-raw.source';source.write_bytes((command+opened).encode())
+    pin=sha(source);member='gather/web/logs/auth.log'
+    manifest={'completed':True,'timestamp_basis':
+        'naive dataset bounds interpreted as UTC only after explicit per-host timezone UTC check',
+        'pairs':[{'provenance':{'raw_member':member,'raw_sha256':pin,
+            'simulation_start':1642982400,'simulation_end':1643068800}}]}
+    dump(raw/'audit.json',manifest)
+    prep={'completed':True,'inputs_contain_truth':False,'source_manifest_sha256':sha(raw/'audit.json'),
+        'pairs':[{'raw_member':member,'raw_sha256':pin,'rows':2}]}
+    baseline=tmp_path/'auth-baseline.jsonl'
+    baseline.write_text(''.join(json.dumps({'case_id':hashlib.sha256((pin+':'+str(i)).encode()).hexdigest(),
+        'source_index':0,'before':False,'after':False,'before_score':.1,'after_score':.1,
+        'reason':'unchanged','error':None})+'\n' for i in (1,2)),encoding='utf8')
+    for option,expected in [(False,False),(True,True)]:
+        path=tmp_path/f'auth-{option}.jsonl'
+        result=predict(head,prep,raw,baseline,sha(baseline),path,with_risk_observations=option)
+        rows=[json.loads(r) for r in path.read_text().splitlines()]
+        assert result['population']==2 and rows[0]['after'] is False
+        assert rows[1]['after'] is expected
+        if option:assert 'cooccurs' in rows[1]['reason']
