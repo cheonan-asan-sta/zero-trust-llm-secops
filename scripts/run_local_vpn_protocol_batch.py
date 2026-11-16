@@ -33,6 +33,10 @@ if PIPELINE=='journal-service':
  args=[sys.executable,'-m','scripts.run_journal_service_review','--plan','/inputs/plan.json',
   '--sha256','PLAN','--journal-catalog','/inputs/journal-catalog.json','--journal-catalog-sha256','JOURNAL',
   '--output','/tmp/prediction-run']
+elif PIPELINE=='shared-dns-native':
+ args=[sys.executable,'-m','scripts.run_shared_dns_native_review','--plan','/inputs/plan.json',
+  '--sha256','PLAN','--native-catalog','/inputs/native-dns-catalog.json','--native-catalog-sha256','DNS_CATALOG',
+  '--output','/tmp/prediction-run']
 elif PIPELINE in {'apparmor-causal','audit-native-normal','apparmor-status'}:
  args=[sys.executable,'-m','scripts.run_audit_intent_review','--plan','/inputs/plan.json',
   '--sha256','PLAN','--model','/inputs/models/head.json','--model-sha256','HEAD',
@@ -67,7 +71,7 @@ def run(package,stage_pin,image,*,with_attack_evidence=False,with_network_audit_
     require(sha(package/'stage.json')==stage_pin and re.fullmatch(r'sha256:[a-f0-9]{64}',image),'protocol_package_pin')
     stage=decode((package/'stage.json').read_bytes())
     require(stage['completed'] is True and stage['validation_labels_or_aggregates_staged'] is False
-        and (stage['frozen_training_parameters_staged'] is True or stage.get('profile')=='journal-service'
+        and (stage['frozen_training_parameters_staged'] is True or stage.get('profile') in {'journal-service','shared-dns-native'}
              and stage['frozen_training_parameters_staged'] is False),'protocol_package_scope')
     require(not (package/'execution.json').exists() and results.is_dir() and not list(results.iterdir()),
         'protocol_package_already_run')
@@ -81,17 +85,19 @@ def run(package,stage_pin,image,*,with_attack_evidence=False,with_network_audit_
     inspect=command(['docker','image','inspect',image],30)
     require(inspect.returncode==0 and json.loads(inspect.stdout)[0]['Id']==image,'protocol_image_not_cached')
     profile=stage.get('profile','vpn')
-    require(profile in {'vpn','vpn-control','apparmor-causal','audit-native-normal','journal-service','apparmor-status'}
+    require(profile in {'vpn','vpn-control','apparmor-causal','audit-native-normal','journal-service','apparmor-status','shared-dns-native'}
         and (profile in {'vpn','vpn-control'} or not with_attack_evidence),'protocol_execution_profile')
     require(not with_network_audit_context or profile in {'apparmor-causal','audit-native-normal'},'protocol_network_profile')
     extra=stage.get('supplemental_model_sha256')
     control=stage.get('control_model_sha256')
     journal=stage.get('journal_catalog_sha256')
+    native=stage.get('native_catalog_sha256')
+    require(profile!='shared-dns-native' or type(native) is str and re.fullmatch('[a-f0-9]{64}',native),'native_dns_catalog_pin')
     require(profile!='journal-service' or type(journal) is str and re.fullmatch('[a-f0-9]{64}',journal),'journal_catalog_pin')
     require(profile!='vpn-control' or type(control) is str and re.fullmatch('[a-f0-9]{64}',control),'control_model_pin')
     require(profile!='audit-native-normal' or type(extra) is str and re.fullmatch('[a-f0-9]{64}',extra),
         'protocol_supplemental_model_pin')
-    program=BOOTSTRAP.replace('PLAN',stage['plan_sha256']).replace('HEAD',stage['model_sha256'] or '').replace('LEGACY',stage['legacy_models_sha256'] or '').replace('ATTACK',str(with_attack_evidence)).replace('PIPELINE',repr(profile)).replace('NETWORK',str(with_network_audit_context)).replace('SUPPLEMENTAL',extra or '').replace('CONTROL',control or '').replace('JOURNAL',journal or '')
+    program=BOOTSTRAP.replace('PLAN',stage['plan_sha256']).replace('HEAD',stage['model_sha256'] or '').replace('LEGACY',stage['legacy_models_sha256'] or '').replace('ATTACK',str(with_attack_evidence)).replace('PIPELINE',repr(profile)).replace('NETWORK',str(with_network_audit_context)).replace('SUPPLEMENTAL',extra or '').replace('CONTROL',control or '').replace('JOURNAL',journal or '').replace('DNS_CATALOG',native or '')
     owner='zt-vpn-protocol-v109-'+uuid.uuid4().hex[:12];cid=None
     report={'completed':False,'stage_sha256':stage_pin,'goal_qualified':False,'new_independent_evaluation':False,
         'aws_calls':0,'paid_api_calls':0,'image':image,'validation_labels_in_predictor':False,
@@ -102,6 +108,7 @@ def run(package,stage_pin,image,*,with_attack_evidence=False,with_network_audit_
     report['supplemental_model_sha256']=extra
     report['control_model_sha256']=control
     report['journal_catalog_sha256']=journal
+    report['native_catalog_sha256']=native
     try:
         created=command(['docker','create','--pull=never','--name',owner,'--label','secops.f1.owner='+owner,
             '--network','none','--read-only','--user','10001:10001','--cap-drop','ALL',
