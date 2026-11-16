@@ -1,5 +1,7 @@
 # 목표 수치까지의 현재 개선 상태
 
+**v122 실제 검증·정리 완료(2026-11-17):** [원본 PCAP 321만 기록·초기 로그 66/66 진단 연결·Docker 정리](extra-vpn-packet-data-review.md). 헤더 특징은 정상65/위협1에서 같아 후보 미채택·탐지 지표 v117 유지. 오래된 프로젝트 이미지10·관련 캐시38(2.715GB) 삭제, 현 시험/최신 역할 image·volume14·타 프로젝트 컨테이너 보존·재사용 확인. 전체 목표 active.
+
 **v121 개발·수집 진행(2026-11-17):** [예측기 미승인 초기 frame 진단·캡처 품질](extra-vpn-frame-diagnostic.md). Linux 964건. VPN native 4,159행에서 initial 중복 0, 통계에서 kernel drop 최대 22,396 발견. 시각/완전성 가정으로 예측기에 넣지 않음·지표 v117 유지. 현재 검증 뒤 프로젝트 Docker 정리 요청 대기(삭제 0)·목표 active.
 
 **v120 개발·수집 진행:** [PCAP CRC/SHA·원문 일치 검증과 공유 journal 공백](extra-packet-member-verification.md). Linux 929건 통과·실제 원본 수집/적합/성능 재평가는 미완료. 공유 FN 4의 사건 전 60초 journal 0행, 뒤늦은 echo는 판정에 소급하지 않음. 확정 탐지 지표 v117 유지·목표 active.

@@ -58,3 +58,7 @@ python -m scripts.link_vpn_initial_frames --preparation runtime/f1/original/prep
 ```
 
 새 focused 시험은 35건이다. 예시 입력 파일/지문은 자동 생성되지 않으며 실제 완료한 intake와 기존 원문의 정확한 준비 지문이 필요하다. endpoint/SID와 기록된 시각 범위의 후보 일치만 조사한다. 출력 links.jsonl은 예측 파일이 아니며 모든 원래 VPN 행·오류·시각 역행을 보존한다. matched 비율을 탐지 정확도로 보고하지 않는다. 각 행과 report는 admitted_to_predictor=false·temporal_availability_proven=false다. 실제 이용 가능성 근거가 없는데 flag만 바꾸어 예측기/학습에 넣지 않는다.
+
+## 실제 실행 v122와 Docker 정리
+
+전체 checksum/실제 member intake/diagnostic 연결이 완료된 결과는 [v122](extra-vpn-packet-data-review.md)와 [집계 JSON](infrastructure-results/extra-wire-data-cleanup-v122-20261117.json)을 따른다. 기존 명령의 외부 acquisition pin은 `674b9d1183bd9c528a18f3ddd1f1af61f202c9db93850b6edd67281537891490`, intake pin은 `70802f633f09bb9cc060ae76b61d25ba3bb3eae0ae3cabf11548a3d622f88d3e`다. 출력은 새 디렉터리를 사용하고 원래 bytes·CRC/SHA·UTC/준비 manifest를 다시 확인한다. 정답 없는 진단 후 기존 R training 정답만 별도 검토했고 모든 예측기 승인 플래그는 false로 유지했다. Docker 정리는 이번 로컬 상태의 소유권/ID/사용 참조를 대조한 일회성 실행이며, 오래된 삭제 ID를 다른 머신에 그대로 재실행하지 않는다.
