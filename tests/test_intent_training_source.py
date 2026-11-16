@@ -11,13 +11,14 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def packet(tmp_path,*,zone='UTC',outside=False,unpaired=False):
+def packet(tmp_path,*,zone='UTC',outside=False,unpaired=False,audit_only=False):
     archive=tmp_path/'example_no-pcaps.zip'
     sources={'gather/share/logs/audit/audit.log':'first\nsecond\n',
         'gather/web/logs/audit/audit.log':'third\nfourth\n','gather/web/logs/auth.log':'fifth\n'}
     with zipfile.ZipFile(archive,'w') as package:
         for member,text in sources.items():
             package.writestr(member,text)
+            if audit_only and member.endswith('/auth.log'):continue
             mirror=member.replace('gather/','labels/',1)
             package.writestr(mirror,json.dumps({'line':99 if outside else 1,'labels':['attack']})+'\n'
                 if member.endswith('audit.log') else '')
@@ -49,6 +50,15 @@ def test_training_intake_keeps_all_exact_paired_rows_and_never_labels_unpaired_n
     assert not list((tmp_path/'prepared/raw').glob('*labels*'))
     assert all(r['zip_crc_verified_at_eof'] for r in result['copied'].values())
     assert (tmp_path/'prepared/training-access.jsonl').is_file()
+
+
+def test_training_accepts_audit_only_labels_without_inventing_auth_normality(tmp_path):
+    path,_=packet(tmp_path,audit_only=True)
+    result=prepare(path,sha(path),tmp_path/'prepared')
+    assert result['completed'] and result['population']==4 and len(result['pairs'])==2
+    assert len(result['excluded_unpaired'])==1
+    assert result['excluded_unpaired'][0]['raw_member'].endswith('/auth.log')
+    assert result['unpaired_assumed_benign'] is False
 
 
 @pytest.mark.parametrize('mode',['role','zone','label_bounds','archive_drift'])

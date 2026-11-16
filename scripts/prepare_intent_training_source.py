@@ -36,7 +36,10 @@ def prepare(plan_path, pin, output):
             and archive.stat().st_size==asset['bytes'],'intent_intake_publisher')
     pin_archive=acquisition['local_sha256']
     inventory=inspect(archive,pin_archive)
-    selected,excluded=select_pairs(inventory['entries'],[])
+    # Training may have only audit or only auth annotations. Every included
+    # file still requires its exact label mirror; legacy transfer keeps its
+    # default requirement for both kinds.
+    selected,excluded=select_pairs(inventory['entries'],[],require_full_kinds=False)
     out=Path(output);out.mkdir(parents=True,exist_ok=False);raw=out/'raw';raw.mkdir()
     labels=out/'labels';labels.mkdir()
     report={'completed':False,'role':'training','goal_qualified':False,'new_independent_evaluation':False,
