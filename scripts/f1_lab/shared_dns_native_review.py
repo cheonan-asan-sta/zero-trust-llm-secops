@@ -99,7 +99,7 @@ class SharedDnsNativeReview:
         self.ordinal, self.last, self.disabled = 0, None, False
         self.seen, self.active = set(), {}
 
-    def observe(self, ordinal, line, *, source_sha256):
+    def _service_time(self, ordinal, line, *, source_sha256):
         require(type(ordinal) is int and ordinal > 0 and type(line) is str and len(line.encode()) <= MAX_ROW,
                 'shared_dns_current_row')
         if self.disabled:
@@ -136,6 +136,12 @@ class SharedDnsNativeReview:
             novel = prior is not None and prior[1] and 0 <= current - prior[0] <= WINDOW_US
         self.seen.add(key)
         if not novel or not manager_success:
+            return None
+        return current
+
+    def observe(self, ordinal, line, *, source_sha256):
+        current = self._service_time(ordinal, line, source_sha256=source_sha256)
+        if current is None:
             return None
         left = bisect.bisect_left(self.times, max(0, current - WINDOW_US))
         right = bisect.bisect_left(self.times, current)

@@ -7,7 +7,8 @@ from pathlib import Path
 
 from scripts.f1_lab.native_jsonl import MAX_ROW, decode, require
 from scripts.f1_lab.operation_context import canonical
-from scripts.f1_lab.shared_dns_native_review import REASON, SharedDnsNativeReview
+from scripts.f1_lab.shared_dns_native_review import REASON
+from scripts.f1_lab.shared_dns_transaction_review import open_review
 from scripts.f1_lab.transfer_evaluation import sha
 
 
@@ -27,7 +28,7 @@ def predict(prep, raw, baseline, pin, output, members):
         with path.open('r', encoding='utf8', newline='') as stream:
             lines = stream.readlines()
         require(len(lines) == pair['rows'], 'native_dns_raw_population')
-        reader = SharedDnsNativeReview(pair['raw_sha256'], lines, member['path'], member['sha256'])
+        reader = open_review(pair['raw_sha256'], lines, member['path'], member['sha256'])
         for ordinal, line in enumerate(lines, 1):
             evidence = reader.observe(ordinal, line, source_sha256=pair['raw_sha256'])
             if evidence:
