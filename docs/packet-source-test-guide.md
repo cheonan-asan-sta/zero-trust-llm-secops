@@ -1,5 +1,7 @@
 # 패킷 원본 수집·초기 관측 시험과 실행 — v119
 
+**후속 v121:** [시각 미승인 진단 연결·source 품질 조사](extra-vpn-frame-diagnostic.md)를 추가했다. 최신 관련 Linux 묶음은 964건이며 실제 source 수집/진단 실행/적합/성능 재평가는 미완료다. 아래 버전별 건수는 당시 기록이다.
+
 **후속 v120:** [member 전체 검증·기존 VPN 원문 일치](extra-packet-member-verification.md)를 추가했다. 최신 Linux 관련 묶음은 929건이며 아래 908건은 v119 당시 결과다. 실제 원본 intake와 성능 평가는 아직 미완료다.
 
 [구현 범위와 미완료 항목](extra-packet-source-acquisition.md)을 함께 읽는다. 이 절차는 공개 원본 확보이며 탐지 F1 시험이나 새 독립 성능 인수가 아니다. 대용량 다운로드가 포함되므로 먼저 여유 공간과 기존 실행의 실제 상태를 확인한다. 이미 진행 중인 같은 작업을 중복 시작하지 않는다.
@@ -46,3 +48,13 @@ python -m scripts.prepare_vpn_packet_members --acquisition runtime/f1/packet-acq
 ```
 
 새 focused 시험은 21건이다. 이 CLI는 archive의 전체 SHA/게시 MD5와 원래 VPN 로그 바이트를 다시 확인하며, 지정된 PCAP 두 개만 고정 이름으로 복사해 CRC/SHA/초기 관측을 검증한다. 기존 일반 ZIP reader의 2GiB 경계는 유지한다. 최종 run.json의 completed=true와 지문을 확인하기 전에는 일부 출력 파일을 소비하지 않는다. 실제 로그 행 연결·적합·탐지 점수/권한 동작은 아직 포함하지 않는다.
+
+
+## v121: 검증된 intake와 원래 VPN 행의 진단 연결
+
+```text
+python -m pytest tests/test_f1_vpn_initial_frame_link.py -q
+python -m scripts.link_vpn_initial_frames --preparation runtime/f1/original/preparation.json --preparation-sha256 VERIFIED_PREPARATION_SHA256 --raw runtime/f1/original-pairs --intake runtime/f1/packet-members-new/run.json --intake-sha256 VERIFIED_INTAKE_SHA256 --output runtime/f1/wire-links-new
+```
+
+새 focused 시험은 35건이다. 예시 입력 파일/지문은 자동 생성되지 않으며 실제 완료한 intake와 기존 원문의 정확한 준비 지문이 필요하다. endpoint/SID와 기록된 시각 범위의 후보 일치만 조사한다. 출력 links.jsonl은 예측 파일이 아니며 모든 원래 VPN 행·오류·시각 역행을 보존한다. matched 비율을 탐지 정확도로 보고하지 않는다. 각 행과 report는 admitted_to_predictor=false·temporal_availability_proven=false다. 실제 이용 가능성 근거가 없는데 flag만 바꾸어 예측기/학습에 넣지 않는다.

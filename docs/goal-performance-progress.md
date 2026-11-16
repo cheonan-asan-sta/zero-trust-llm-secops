@@ -1,5 +1,7 @@
 # 목표 수치까지의 현재 개선 상태
 
+**v121 개발·수집 진행(2026-11-17):** [예측기 미승인 초기 frame 진단·캡처 품질](extra-vpn-frame-diagnostic.md). Linux 964건. VPN native 4,159행에서 initial 중복 0, 통계에서 kernel drop 최대 22,396 발견. 시각/완전성 가정으로 예측기에 넣지 않음·지표 v117 유지. 현재 검증 뒤 프로젝트 Docker 정리 요청 대기(삭제 0)·목표 active.
+
 **v120 개발·수집 진행:** [PCAP CRC/SHA·원문 일치 검증과 공유 journal 공백](extra-packet-member-verification.md). Linux 929건 통과·실제 원본 수집/적합/성능 재평가는 미완료. 공유 FN 4의 사건 전 60초 journal 0행, 뒤늦은 echo는 판정에 소급하지 않음. 확정 탐지 지표 v117 유지·목표 active.
 
 **v119 개발·수집 진행:** [고정 원본 수집기·초기 프레임 추출](extra-packet-source-acquisition.md). Linux 908건 통과. 실제 원본 다운로드는 별도 실행 중이며 checksum/실제 로그 연결/적합/성능 재평가는 미완료. 탐지 수치는 v117 유지·목표 active·유료 호출/CI/병합 보류.
