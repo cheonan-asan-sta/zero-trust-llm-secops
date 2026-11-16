@@ -51,6 +51,14 @@ def test_high_confidence_rule_result_skips_llm() -> None:
     assert assessment.recommended_action == RecommendedAction.ALLOW
 
 
+def test_opt_in_review_all_calls_llm_even_for_confident_rule() -> None:
+    event = _event("NORMAL-01")
+    llm = FakeLLM(RuleBasedAnalyzer().assess(event))
+    analyzer = HybridAnalyzer(Settings(hybrid_review_all=True), llm=llm)
+    result = asyncio.run(analyzer.analyze(event))
+    assert llm.calls == 1 and result.violation_type == ViolationType.NORMAL
+
+
 def test_low_confidence_case_uses_llm_and_merges_conservatively() -> None:
     llm = FakeLLM(
         SecurityAssessment(
