@@ -1,20 +1,22 @@
 # 목표 수치까지의 현재 개선 상태
 
-2026-11-16 · 목표 active · 무료 로컬 · 목표 전 push/새CI/병합 보류
+2026-11-16 · 목표 active · 무료 로컬 · 목표 전 push·새 CI·병합 보류
 
-최신 [v112 웹 감사 동시 관측](extra-web-firewall-review.md): 별도 **학습 Wilson** 웹 감사 FN3→0·TP19→22·FP10 유지·F1 74.51%→81.48%. 원래1,681,815행은 v111 판정 유지·전체 새FP/기존TP손실0·Linux693건. 새 독립 평가/전체95% 목표 달성은 아니다.
+최신 [v113 실제 정상 audit 학습](extra-native-audit-normal-review.md): 웹 감사 FP 15→0·TP 47/FN 0 유지·F1 86.24%→100%. 별도 Wilson/Wardbeck 웹 감사 FP도 각각 10→0·기존 TP/FN 유지. 원래 1,681,815행 유지·전체 새 FP/기존 TP 손실 0·Linux 732건 통과다. 새로 수집한 169행은 실제 8회 허용 SSH/sudo 세션의 정상 학습용이며 성능 분모에 추가하지 않았다. 새 독립 평가나 전체 목표 달성은 아니다.
 
-아래는 현재 R/S/F 종류별 수치다. 원래6개 보안 영역의 독립 인수를 로그 종류로 대체하지 않는다.
+아래는 현재 R/S/F 종류별 수치다. 원래 6개 보안 영역의 독립 인수를 로그 종류로 대체하지 않는다.
 
-| 종류 | TP | FP | FN | 정밀도 | 재현율 | F1 | FPR | FNR |
+| 종류 | TP | FP | FN | 정밀도 | 재현율 | F1 | 오탐률 | 미탐률 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | 인증 | 32 | 0 | 0 | 100.0000% | 100.0000% | 100.0000% | 0.0000% | 0.0000% |
 | 공유 감사 | 0 | 3 | 6 | 0.0000% | 0.0000% | 0.0000% | 0.1276% | 100.0000% |
-| 웹 감사 | 47 | 15 | 0 | 75.8065% | 100.0000% | 86.2385% | 0.2022% | 0.0000% |
+| 웹 감사 | 47 | 0 | 0 | 100.0000% | 100.0000% | 100.0000% | 0.0000% | 0.0000% |
 | VPN | 84 | 48 | 0 | 63.6364% | 100.0000% | 77.7778% | 0.2612% | 0.0000% |
 
-직전 [v111 공유 감사 오탐](extra-apparmor-causal-review.md)은 FP24→3, 별도 Wilson/Wardbeck 각8→1로 줄였고 FN6/F1 0%는 그대로다. [v109 VPN 오탐](extra-vpn-protocol-refinement.md)은 FP208→48·F1 77.78%, [v110 학습 Wheeler 미탐](extra-vpn-attack-evidence.md)은 FN28→9·F1 66.67%로 개선했다. 이번에도 유지했다. 별도 Wilson/Wardbeck 인증도 기존 결과를 유지한다.
+이번에 관측 웹 감사가 인증과 함께 목표 수치를 충족했다. 공유 감사와 VPN은 미달이다. VPN은 오탐률이 0.27% 미만이어도 위협 표본이 적어 정밀도 63.64%·F1 77.78%이며 완료로 처리하지 않는다. 공유 감사 TP 0/FN 6은 변화 없다.
 
-목표 간격: 공유 감사 FN6→0·FP3→0, 웹 감사 FP15→2 이하, VPN FP48→4 이하가 필요하다. 별도 Wilson 웹 감사 FP10·Wheeler 학습 VPN FN9와 원래6개 보안 영역의 독립 인수가 남는다. 이후 수집된 근거나 설정을 과거 사건에 소급하거나 원본·라벨·분모·목표를 고치지 않는다.
+목표 간격은 현재 양성 수 기준 공유 감사 FN 6→0·FP 3→0, VPN FP 48→4 이하가 필요하다. 별도 Wheeler 학습 VPN FN 9·Harrison 별도 VPN FP 38과 원래 6개 보안 영역의 새 독립 인수도 남는다. 수집 이후의 근거나 정책을 과거 사건에 소급하거나 원본·라벨·분모·목표를 고치지 않는다. 전체 완료 시간은 남은 근거 확보와 실제 회귀 검증에 따라 달라진다.
 
-[최신 구현·검증·한계](extra-web-firewall-review.md) · [웹 감사 시험 근거·실행 방법](web-firewall-test-guide.md) · [AppArmor 재현](apparmor-causal-test-guide.md) · [VPN 재현](vpn-protocol-test-guide.md)
+직전 [v112 방화벽 관측](extra-web-firewall-review.md)은 Wilson 웹 감사 FN 3→0, [v111 AppArmor 문맥](extra-apparmor-causal-review.md)은 공유 FP 24→3, [v109 VPN 문맥](extra-vpn-protocol-refinement.md)은 VPN FP 208→48, [v110 학습 공격 근거](extra-vpn-attack-evidence.md)는 Wheeler FN 28→9로 개선했다. 이번에도 모두 보존했다.
+
+[최신 구현·검증·남은 문제](extra-native-audit-normal-review.md) · [시험·재현 가이드](native-audit-normal-test-guide.md) · [결과 JSON](infrastructure-results/extra-native-audit-v113-20261116.json)

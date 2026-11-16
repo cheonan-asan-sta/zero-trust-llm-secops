@@ -1,0 +1,273 @@
+{
+  "completed": true,
+  "owner": "zt-native-audit-v113-8494cb39bf50",
+  "image": "sha256:11c5c248f99fa682459679d00d1641f4036f98802b09a687aaa870d688099775",
+  "recipe_pins": {
+    "collect_guest.py": "1b34d26493661b903d1d19163f984922ff2c8b0e1343f66af24cd6f1df5a915d",
+    "guest_control.py": "1d129f18767a2590cfe86db515f0462b5b8657833942ffc2b5b638ff2e8de40b",
+    "normal_operation.py": "6173259b1a131dbb19faf097ea24281583d5d4343ad9e3e47927c07be6cb9978"
+  },
+  "guest_image_sha256": "04e8f2461a16a44e78a370284471f29616cdd9baf1893df25807b71f985b6c94",
+  "host_configuration_changed": false,
+  "goal_qualified": false,
+  "new_independent_evaluation": false,
+  "aws_calls": 0,
+  "paid_api_calls": 0,
+  "owned_container": "894ea6e52e4e55ac463c8609328b3bc0746e7472118205b85acf0f30ff1123d5",
+  "network_disconnected_before_collection": true,
+  "container_exit": 0,
+  "oom_killed": false,
+  "guest": {
+    "completed": true,
+    "owner": "zt-native-audit-v113-8494cb39bf50",
+    "role": "controlled_normal_training",
+    "goal_qualified": false,
+    "aws_calls": 0,
+    "paid_api_calls": 0,
+    "host_configuration_changed": false,
+    "sessions": [
+      {
+        "number": 1,
+        "ssh_exit": 0,
+        "stdout_sha256": "35fd2697d5b20d65298ffccb0d5a8f33acd6a259fe9ac1c8251e8eaa69ad0589",
+        "operation": {
+          "uid": 1000,
+          "loginuid": "1000",
+          "sessionid": "53",
+          "tty": "/dev/pts/0",
+          "command": [
+            "/usr/bin/sudo",
+            "-n",
+            "/usr/bin/tail",
+            "/var/log/syslog"
+          ],
+          "exit_code": 0,
+          "stdout_sha256": "eed0c3e44495cb098d0a6f6f7ba044c28742f101d39c9b0fc7e07970df673f59",
+          "stderr_bytes": 0
+        }
+      },
+      {
+        "number": 2,
+        "ssh_exit": 0,
+        "stdout_sha256": "5843e0c04c71d55993fcd4986e06f925d9f1be211088953f99389170253805c1",
+        "operation": {
+          "uid": 1000,
+          "loginuid": "1000",
+          "sessionid": "55",
+          "tty": "/dev/pts/0",
+          "command": [
+            "/usr/bin/sudo",
+            "-n",
+            "/usr/bin/tail",
+            "/var/log/syslog"
+          ],
+          "exit_code": 0,
+          "stdout_sha256": "7021f9a1bbbdf94a29b5138c3e06a86591e872971454c039d5b3399eb7d17be4",
+          "stderr_bytes": 0
+        }
+      },
+      {
+        "number": 3,
+        "ssh_exit": 0,
+        "stdout_sha256": "a5fc73bda482935e538c093019857f0d152556fb81b4fb916a3f8096610b6c24",
+        "operation": {
+          "uid": 1000,
+          "loginuid": "1000",
+          "sessionid": "56",
+          "tty": "/dev/pts/0",
+          "command": [
+            "/usr/bin/sudo",
+            "-n",
+            "/usr/bin/tail",
+            "/var/log/syslog"
+          ],
+          "exit_code": 0,
+          "stdout_sha256": "92dd3a43315364732f9a4e894f6aa34c53ce9f1bdfafa41f0fa38cdb0e54047d",
+          "stderr_bytes": 0
+        }
+      },
+      {
+        "number": 4,
+        "ssh_exit": 0,
+        "stdout_sha256": "8bf2c6259ff0d4d65d138e5ddb4ab8d8463bbfc24d7022011ccb713ee4d7e865",
+        "operation": {
+          "uid": 1000,
+          "loginuid": "1000",
+          "sessionid": "57",
+          "tty": "/dev/pts/0",
+          "command": [
+            "/usr/bin/sudo",
+            "-n",
+            "/usr/bin/tail",
+            "/var/log/syslog"
+          ],
+          "exit_code": 0,
+          "stdout_sha256": "cb5d38bd97dbd00841123c34aa491077eb75b86fd70fd21eed5f41bf8b216a2a",
+          "stderr_bytes": 0
+        }
+      },
+      {
+        "number": 5,
+        "ssh_exit": 0,
+        "stdout_sha256": "9e509cc0486921eee9207f2cdb83518d5b9e13880708bd5bacb5be60f1f6280f",
+        "operation": {
+          "uid": 1000,
+          "loginuid": "1000",
+          "sessionid": "58",
+          "tty": "/dev/pts/0",
+          "command": [
+            "/usr/bin/sudo",
+            "-n",
+            "/usr/bin/tail",
+            "/var/log/syslog"
+          ],
+          "exit_code": 0,
+          "stdout_sha256": "30586d68345be6d1968e6c2d459694c6fc764e3ef3b97f1ea42c0352094a6250",
+          "stderr_bytes": 0
+        }
+      },
+      {
+        "number": 6,
+        "ssh_exit": 0,
+        "stdout_sha256": "4bf58fe8ce5516607de7640fd9611ca961fbd230b9915ceb333bd7c5f67a958d",
+        "operation": {
+          "uid": 1000,
+          "loginuid": "1000",
+          "sessionid": "59",
+          "tty": "/dev/pts/0",
+          "command": [
+            "/usr/bin/sudo",
+            "-n",
+            "/usr/bin/tail",
+            "/var/log/syslog"
+          ],
+          "exit_code": 0,
+          "stdout_sha256": "9c9b84e0b06eaf33139ee11eddf0c0254dde43820f5133520a3068c6f92b4a9c",
+          "stderr_bytes": 0
+        }
+      },
+      {
+        "number": 7,
+        "ssh_exit": 0,
+        "stdout_sha256": "aac94cff61e75c35362a722459c29e152e5628e6e625fc9dc1b787610d958801",
+        "operation": {
+          "uid": 1000,
+          "loginuid": "1000",
+          "sessionid": "60",
+          "tty": "/dev/pts/0",
+          "command": [
+            "/usr/bin/sudo",
+            "-n",
+            "/usr/bin/tail",
+            "/var/log/syslog"
+          ],
+          "exit_code": 0,
+          "stdout_sha256": "fe4d047e4a05f167aebf0835c1b5fb76fc872448d470dca2d927e9d623ef5e8c",
+          "stderr_bytes": 0
+        }
+      },
+      {
+        "number": 8,
+        "ssh_exit": 0,
+        "stdout_sha256": "beb633ad7b1e6bbc2f46d489b7fea7aa5b191bc73083b7c43ffad88a441ba036",
+        "operation": {
+          "uid": 1000,
+          "loginuid": "1000",
+          "sessionid": "61",
+          "tty": "/dev/pts/0",
+          "command": [
+            "/usr/bin/sudo",
+            "-n",
+            "/usr/bin/tail",
+            "/var/log/syslog"
+          ],
+          "exit_code": 0,
+          "stdout_sha256": "7d9b95e1ad16ba9798f162183bd562b14b2b874dc4eca7a5da73259ce18fba97",
+          "stderr_bytes": 0
+        }
+      }
+    ],
+    "guest_before_isolation": {
+      "kernel": "6.8.0-147-generic",
+      "hostname": "zt-native-normal",
+      "boot_id": "c651cfc0-1f2e-4766-b3a0-d5c166259781",
+      "timezone": "UTC",
+      "audit": {
+        "enabled": "1",
+        "failure": "1",
+        "pid": "3781",
+        "rate_limit": "0",
+        "backlog_limit": "8192",
+        "lost": "0",
+        "backlog": "0",
+        "backlog_wait_time": "60000",
+        "backlog_wait_time_actual": "0",
+        "loginuid_immutable": "0 unlocked"
+      },
+      "ready": true,
+      "policy_sha256": "44a0b71dce4fb363ca76eb200d4ea569a6880ffca40d9e6abefe199cd59f791b",
+      "utc": 1794828304.6847146
+    },
+    "outer_networks_after_disconnect": {},
+    "outer_interfaces": [
+      "lo"
+    ],
+    "guest_collection_begin": {
+      "begun": true,
+      "status": {
+        "kernel": "6.8.0-147-generic",
+        "hostname": "zt-native-normal",
+        "boot_id": "c651cfc0-1f2e-4766-b3a0-d5c166259781",
+        "timezone": "UTC",
+        "audit": {
+          "enabled": "1",
+          "failure": "1",
+          "pid": "3781",
+          "rate_limit": "0",
+          "backlog_limit": "8192",
+          "lost": "0",
+          "backlog": "0",
+          "backlog_wait_time": "60000",
+          "backlog_wait_time_actual": "0",
+          "loginuid_immutable": "0 unlocked"
+        },
+        "ready": true,
+        "policy_sha256": "44a0b71dce4fb363ca76eb200d4ea569a6880ffca40d9e6abefe199cd59f791b",
+        "utc": 1794828309.1543565
+      }
+    },
+    "capture": {
+      "status": {
+        "kernel": "6.8.0-147-generic",
+        "hostname": "zt-native-normal",
+        "boot_id": "c651cfc0-1f2e-4766-b3a0-d5c166259781",
+        "timezone": "UTC",
+        "audit": {
+          "enabled": "1",
+          "failure": "1",
+          "pid": "3781",
+          "rate_limit": "0",
+          "backlog_limit": "8192",
+          "lost": "0",
+          "backlog": "0",
+          "backlog_wait_time": "60000",
+          "backlog_wait_time_actual": "0",
+          "loginuid_immutable": "0 unlocked"
+        },
+        "ready": true,
+        "policy_sha256": "44a0b71dce4fb363ca76eb200d4ea569a6880ffca40d9e6abefe199cd59f791b",
+        "utc": 1794828335.416315
+      },
+      "capture_utc": 1794828335.41635,
+      "bytes": 45441,
+      "sha256": "57ef199346b1b92a8bdd183c17294f577bd5476fd5f324f59f611e7acd73481a",
+      "source_inode": 262291,
+      "source_mtime_ns": 1794828334642563566,
+      "complete_file_snapshot": true
+    },
+    "owned_qemu_exited": true
+  },
+  "recipe_unchanged": true,
+  "guest_base_unchanged": true,
+  "owned_container_removed": true
+}
