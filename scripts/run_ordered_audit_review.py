@@ -10,7 +10,7 @@ from scripts.f1_lab.transfer_evaluation import sha
 from scripts.run_audit_auth_review import SCENARIOS, predict
 
 
-def run(plan_path, expected_sha256, output):
+def run(plan_path, expected_sha256, output, *, auth_review_factory=None):
     require(sha(plan_path) == expected_sha256, 'ordered_plan_pin')
     plan = decode(Path(plan_path).read_bytes())
     require(type(plan) is dict and set(plan) == {'schema', 'scope', 'goal_qualified',
@@ -37,7 +37,8 @@ def run(plan_path, expected_sha256, output):
                 'ordered_preparation_scope')
         expected = baseline['scenarios'][spec['name']]['prediction']['predictions_sha256']
         result = predict(None, preparation, spec['raw'], spec['prediction'], expected,
-            output/'prediction'/(spec['name']+'-predictions.jsonl'), review_factory=OrderedAuditReview)
+            output/'prediction'/(spec['name']+'-predictions.jsonl'), review_factory=OrderedAuditReview,
+            auth_review_factory=auth_review_factory)
         require(result['population'] == baseline['scenarios'][spec['name']]['population']
                 and result['inference_errors'] == 0 and not result['labels_opened_by_predictor'],
                 'ordered_prediction_population')
