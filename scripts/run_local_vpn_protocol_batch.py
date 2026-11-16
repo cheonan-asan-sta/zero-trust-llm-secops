@@ -29,7 +29,11 @@ Path('/results/image-scope.json').write_text(json.dumps({'completed':True,
  'code_origin':importlib.util.find_spec('app').origin,'staged_documents_or_tests':False}))
 shutil.copytree('/inputs/baseline','/tmp/baseline')
 shutil.copytree('/inputs/raw','/tmp/raw')
-if PIPELINE in {'apparmor-causal','audit-native-normal'}:
+if PIPELINE=='journal-service':
+ args=[sys.executable,'-m','scripts.run_journal_service_review','--plan','/inputs/plan.json',
+  '--sha256','PLAN','--journal-catalog','/inputs/journal-catalog.json','--journal-catalog-sha256','JOURNAL',
+  '--output','/tmp/prediction-run']
+elif PIPELINE in {'apparmor-causal','audit-native-normal'}:
  args=[sys.executable,'-m','scripts.run_audit_intent_review','--plan','/inputs/plan.json',
   '--sha256','PLAN','--model','/inputs/models/head.json','--model-sha256','HEAD',
   '--output','/tmp/prediction-run','--with-apparmor-causality',
@@ -75,15 +79,17 @@ def run(package,stage_pin,image,*,with_attack_evidence=False,with_network_audit_
     inspect=command(['docker','image','inspect',image],30)
     require(inspect.returncode==0 and json.loads(inspect.stdout)[0]['Id']==image,'protocol_image_not_cached')
     profile=stage.get('profile','vpn')
-    require(profile in {'vpn','vpn-control','apparmor-causal','audit-native-normal'}
+    require(profile in {'vpn','vpn-control','apparmor-causal','audit-native-normal','journal-service'}
         and (profile in {'vpn','vpn-control'} or not with_attack_evidence),'protocol_execution_profile')
     require(not with_network_audit_context or profile in {'apparmor-causal','audit-native-normal'},'protocol_network_profile')
     extra=stage.get('supplemental_model_sha256')
     control=stage.get('control_model_sha256')
+    journal=stage.get('journal_catalog_sha256')
+    require(profile!='journal-service' or type(journal) is str and re.fullmatch('[a-f0-9]{64}',journal),'journal_catalog_pin')
     require(profile!='vpn-control' or type(control) is str and re.fullmatch('[a-f0-9]{64}',control),'control_model_pin')
     require(profile!='audit-native-normal' or type(extra) is str and re.fullmatch('[a-f0-9]{64}',extra),
         'protocol_supplemental_model_pin')
-    program=BOOTSTRAP.replace('PLAN',stage['plan_sha256']).replace('HEAD',stage['model_sha256']).replace('LEGACY',stage['legacy_models_sha256'] or '').replace('ATTACK',str(with_attack_evidence)).replace('PIPELINE',repr(profile)).replace('NETWORK',str(with_network_audit_context)).replace('SUPPLEMENTAL',extra or '').replace('CONTROL',control or '')
+    program=BOOTSTRAP.replace('PLAN',stage['plan_sha256']).replace('HEAD',stage['model_sha256'] or '').replace('LEGACY',stage['legacy_models_sha256'] or '').replace('ATTACK',str(with_attack_evidence)).replace('PIPELINE',repr(profile)).replace('NETWORK',str(with_network_audit_context)).replace('SUPPLEMENTAL',extra or '').replace('CONTROL',control or '').replace('JOURNAL',journal or '')
     owner='zt-vpn-protocol-v109-'+uuid.uuid4().hex[:12];cid=None
     report={'completed':False,'stage_sha256':stage_pin,'goal_qualified':False,'new_independent_evaluation':False,
         'aws_calls':0,'paid_api_calls':0,'image':image,'validation_labels_in_predictor':False,
@@ -93,6 +99,7 @@ def run(package,stage_pin,image,*,with_attack_evidence=False,with_network_audit_
     report['with_network_audit_context']=with_network_audit_context
     report['supplemental_model_sha256']=extra
     report['control_model_sha256']=control
+    report['journal_catalog_sha256']=journal
     try:
         created=command(['docker','create','--pull=never','--name',owner,'--label','secops.f1.owner='+owner,
             '--network','none','--read-only','--user','10001:10001','--cap-drop','ALL',
