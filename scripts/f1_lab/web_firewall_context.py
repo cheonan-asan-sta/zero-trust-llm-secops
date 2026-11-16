@@ -10,7 +10,7 @@ import re
 import shlex
 from pathlib import PurePosixPath
 
-from scripts.f1_lab.audit_auth_review import field, number
+from scripts.f1_lab.audit_auth_review import field, number, original_audit_record
 from scripts.f1_lab.native_jsonl import MAX_ROW, require
 from scripts.f1_lab.ordered_audit_login import KEY
 
@@ -64,10 +64,11 @@ class WebFirewallReview:
         require(type(ordinal) is int and ordinal>0 and type(line) is str and len(line.encode())<=MAX_ROW,
             'firewall_context_row')
         if self.disabled:return None
-        match=KEY.fullmatch(line.rstrip('\r\n'))
+        original=original_audit_record(line).rstrip('\r\n')
+        match=KEY.fullmatch(original)
         if (source_sha256!=self.source or ordinal!=self.ordinal+1 or type(moment) not in {int,float}
                 or not math.isfinite(moment) or match is None
-                or re.search(r'[\x00-\x1f\x7f]',line.rstrip('\r\n')) or float(match['stamp'])!=moment):
+                or re.search(r'[\x00-\x1f\x7f]',original) or float(match['stamp'])!=moment):
             self.disabled=True;self.clear();return None
         serial=int(match['serial']);current=(moment,serial);kind=match['kind'];body=match['body']
         if not 0<serial<2**64 or self.last is not None and (

@@ -4,10 +4,12 @@ from dataclasses import replace
 
 import pytest
 
+from scripts.f1_lab.audit_auth_review import field, number
 from scripts.f1_lab.audit_intent_context import AuditIntentReview, command_intent
 from scripts.f1_lab.audit_intent_head import IntentHead
 from scripts.f1_lab.operation_refinement import OperationDecision
 from scripts.run_audit_intent_review import predict
+from scripts.run_audit_intent_review import run as replay
 from scripts.train_audit_intent import fit
 
 SHA='a'*64
@@ -228,3 +230,82 @@ def test_uniform_chain_applies_source_bound_auth_risk_before_learned_review(tmp_
         assert result['population']==2 and rows[0]['after'] is False
         assert rows[1]['after'] is expected
         if option:assert 'cooccurs' in rows[1]['reason']
+
+
+def test_optional_supplemental_head_keeps_primary_review_errors_and_current_denials(tmp_path):
+    from scripts.f1_lab.audit_intent_context import IntentObservation
+    prep,raw,_plan,gold,pin,_dump=packet(tmp_path)
+    fitted=fit(tmp_path/'plan.json',pin(tmp_path/'plan.json'),tmp_path/'fit')
+    learned=IntentHead.load(tmp_path/'fit/model.json',fitted['model_sha256'])
+    primary=IntentHead()
+    unused=IntentObservation('a'*64,1,'b'*64,('unrelated',)*6,True)
+    for _ in range(5):primary.add(unused,False)
+    model=tmp_path/'primary.json';digest=primary.save(model);primary=IntentHead.load(model,digest)
+    previous=[{'case_id':r['case_id'],'source_index':0,'before':True,'after':True,'before_score':.99,
+        'after_score':.99,'reason':'unchanged','error':'previous-error' if i==0 else None} for i,r in enumerate(gold)]
+    previous[-1]['reason']='signed_execution_policy_violation'
+    baseline=tmp_path/'previous.jsonl';baseline.write_text(''.join(json.dumps(r)+'\n' for r in previous),encoding='utf8')
+    for enabled,changes in [(False,0),(True,4)]:
+        out=tmp_path/f'supplemental-{enabled}.jsonl'
+        result=predict(primary,prep,raw,baseline,pin(baseline),out,with_apparmor_causality=True,
+            supplemental_head=learned if enabled else None)
+        actual=[json.loads(r) for r in out.read_text().splitlines()]
+        assert result['population']==25 and result['inference_errors']==1 and result['changed_alerts']==changes
+        assert [r['case_id'] for r in actual]==[r['case_id'] for r in previous]
+        assert actual[0]['after'] is None and actual[0]['error']=='previous-error'
+        assert actual[-1]['after'] is True and actual[-1]['reason']=='signed_execution_policy_violation'
+    with pytest.raises(ValueError,match='intent_supplemental_scope'):
+        predict(primary,prep,raw,baseline,pin(baseline),tmp_path/'bad-scope.jsonl',supplemental_head=learned)
+
+
+@pytest.mark.parametrize('model,pin',[(None,'a'*64),('unused',None)])
+def test_supplemental_model_requires_paired_pin_before_opening_plan(model,pin):
+    with pytest.raises(ValueError,match='intent_supplemental_pair'):
+        replay('not-opened','unused','unused','unused','unused',supplemental_model=model,supplemental_model_pin=pin)
+
+
+def test_enriched_display_aliases_never_override_raw_numeric_or_result_fields():
+    body='pid=42 uid=1001 auid=4294967295 msg=\'acct="caller" res=failed\'\x1dUID="root" AUID="root" acct="root" res=success'
+    assert number(body,'uid')==1001 and number(body,'auid') is None
+    assert field(body,'acct')=='caller' and field(body,'res')=='failed'
+
+
+@pytest.mark.parametrize('raw',['uid=1001 uid=0','msg=\'acct="broken"','not a key-value record'])
+def test_enrichment_cannot_rescue_an_invalid_original_record(raw):
+    assert field(raw+'\x1dUID="root"','uid') is None
+
+
+def test_enriched_login_uses_same_original_observations_and_full_line_hash():
+    base=sequence();enriched=[r.rstrip('\n')+'\x1dUID="root" AUID="display-only"\n' for r in base]
+    old=feed(AuditIntentReview(SHA),base)[-1];new=feed(AuditIntentReview(SHA),enriched)[-1]
+    assert old.eligible and new.eligible and old.key==new.key
+    assert new.line_sha256==hashlib.sha256(enriched[-1].encode()).hexdigest()
+    assert new.line_sha256!=old.line_sha256
+
+
+@pytest.mark.parametrize('uid',[0,1001])
+def test_supported_sudo_versions_keep_real_uid_but_learn_confirmed_target_phase(uid):
+    reader=AuditIntentReview(SHA);feed(reader,sequence())
+    request=diagnostic_command().replace('terminal=pts/0','exe="/usr/bin/sudo" terminal=pts/0')
+    current=feed(reader,[request],start=6,when=101.)[0]
+    assert current.eligible and current.key[2]=='command_request' and current.key[3]=='nonroot'
+    for index,kind in enumerate(['CRED_REFR','USER_START','USER_END','CRED_DISP'],7):
+        body=f'pid=51 uid={uid} auid=1001 ses=10 msg=\'acct="root" exe="/usr/bin/sudo" terminal=/dev/pts/0 res=success\''
+        line=row(kind,body,when=101.,serial=index).rstrip('\n')+'\x1dUID="display-only"\n'
+        observation=feed(reader,[line],start=index,when=101.)[0]
+        assert observation.eligible and observation.key[3]=='root_target_session'
+        assert number(body,'uid')==uid
+        assert observation.line_sha256==hashlib.sha256(line.encode()).hexdigest()
+
+
+@pytest.mark.parametrize('exe',['/tmp/sudo','/bin/sh','/usr/local/bin/sudo'])
+def test_explicit_nonstandard_executable_is_not_normalized_into_a_sudo_request(exe):
+    reader=AuditIntentReview(SHA);feed(reader,sequence())
+    request=diagnostic_command().replace('terminal=pts/0',f'exe="{exe}" terminal=pts/0')
+    assert not feed(reader,[request],start=6,when=101.)[0].eligible
+
+
+def test_sudo_phase_rejects_unrelated_real_uid_even_when_display_alias_says_root():
+    reader=AuditIntentReview(SHA);feed(reader,sequence());feed(reader,[diagnostic_command()],start=6,when=101.)
+    line=row('CRED_REFR','pid=51 uid=2002 auid=1001 ses=10 msg=\'acct="root" exe="/usr/bin/sudo" terminal=/dev/pts/0 res=success\'',when=101.)
+    assert not feed(reader,[line.rstrip('\n')+'\x1dUID="root"\n'],start=7,when=101.)[0].eligible

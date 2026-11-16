@@ -45,6 +45,11 @@ def test_same_source_request_pam_and_later_netfilter_observations_add_review_onl
     assert refine(already,REASON) is already
 
 
+def test_enriched_aliases_do_not_change_raw_request_and_pam_context():
+    lines=[r.rstrip('\n')+'\x1dUID="display-only" AUID="unknown"\n' for r in sequence()]
+    assert feed(WebFirewallReview(SOURCE),lines)==[None,None,None,REASON,REASON,REASON]
+
+
 @pytest.mark.parametrize('omit',[0,1,2,3])
 def test_missing_request_pam_stage_or_netfilter_record_cannot_seed(omit):
     rows=sequence();rows.pop(omit)

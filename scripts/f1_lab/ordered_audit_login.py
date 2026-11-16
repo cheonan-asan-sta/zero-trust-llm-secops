@@ -8,7 +8,7 @@ authenticated person, process lifetime proof, grant or policy approval.
 import re
 from decimal import Decimal
 
-from scripts.f1_lab.audit_auth_review import AuditReview, field, number
+from scripts.f1_lab.audit_auth_review import AuditReview, field, number, original_audit_record
 from scripts.f1_lab.native_jsonl import require
 
 KEY = re.compile(r'^type=(?P<kind>[A-Z_]{1,32}) msg=audit\((?P<stamp>\d{1,12}(?:\.\d{1,9})?):(?P<serial>\d{1,20})\): (?P<body>[^\r\n]{1,8192})$')
@@ -27,7 +27,7 @@ class OrderedAuditReview(AuditReview):
     def observe(self, line, time, *, source_sha256):
         require(source_sha256 == self.source_sha256, 'ordered_audit_source_changed')
         reason = super().observe(line, time)
-        match = KEY.fullmatch(line.rstrip('\r\n'))
+        match = KEY.fullmatch(original_audit_record(line).rstrip('\r\n'))
         if match is None or time is None or float(match['stamp']) != time:
             self.ordered_available = False
             self.process_order.clear()

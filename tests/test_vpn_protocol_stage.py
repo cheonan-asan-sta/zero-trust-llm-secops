@@ -53,7 +53,8 @@ def test_staging_strips_label_aggregates_adjacent_truth_and_noncode_artifacts(tm
     assert report['frozen_training_parameters_staged'] is True
 
 
-def test_audit_profile_stages_only_audit_auth_raw_and_its_frozen_head(tmp_path):
+@pytest.mark.parametrize('profile',['apparmor-causal','audit-native-normal'])
+def test_audit_profile_stages_only_audit_auth_raw_and_its_frozen_head(tmp_path,profile):
     path,catalog,baseline,dump=fixture(tmp_path);spec=catalog['scenarios'][0]
     raw=tmp_path/'raw';audit=raw/'pair-1-raw.source';audit.write_bytes(b'audit-observation\n')
     member='gather/share/logs/audit/audit.log';digest=sha(audit)
@@ -69,11 +70,13 @@ def test_audit_profile_stages_only_audit_auth_raw_and_its_frozen_head(tmp_path):
     with baseline.open('a',encoding='utf8') as stream:stream.write(json.dumps(row)+'\n')
     spec.update(preparation_sha256=sha(tmp_path/'preparation.json'),baseline_sha256=sha(baseline),population=2)
     dump(path,catalog)
-    out=tmp_path/'audit-package';report=stage(path,sha(path),out,profile='apparmor-causal')
-    assert report['completed'] and report['profile']=='apparmor-causal' and report['legacy_models_sha256'] is None
+    out=tmp_path/'audit-package';report=stage(path,sha(path),out,profile=profile)
+    assert report['completed'] and report['profile']==profile and report['legacy_models_sha256'] is None
     assert (out/'inputs/raw/arbitrary/pair-1-raw.source').read_bytes()==audit.read_bytes()
     assert not (out/'inputs/raw/arbitrary/pair-0-raw.source').exists()
-    assert {p.name for p in (out/'inputs/models').iterdir()}=={'head.json'}
+    expected={'head.json'} if profile=='apparmor-causal' else {'head.json','supplemental.json'}
+    assert {p.name for p in (out/'inputs/models').iterdir()}==expected
+    if profile=='audit-native-normal':assert report['supplemental_model_sha256']==sha(out/'inputs/models/supplemental.json')
 
 
 @pytest.mark.parametrize('fault',['extra_truth_field','name_escape','pin','population'])

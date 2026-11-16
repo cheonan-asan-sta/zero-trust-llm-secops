@@ -66,7 +66,15 @@ def caller_events(records):
     return tuple(events)
 
 
+def original_audit_record(value):
+    """Semantic view only. Callers retain/hash the complete original bytes."""
+    return value.partition('\x1d')[0]
+
+
 def field(body, name):
+    # auditd ENRICHED appends display translations after ASCII GS. Numeric
+    # original fields remain authoritative; aliases are never identity facts.
+    body=original_audit_record(body)
     try:
         outer = shlex.split(body)
         if len(outer) > 128:
@@ -142,7 +150,7 @@ class AuditReview:
             for key in list(mapping):
                 if mapping[key][-1] < time - WINDOW:
                     del mapping[key]
-        match = AUDIT.fullmatch(line.rstrip("\r\n"))
+        match = AUDIT.fullmatch(original_audit_record(line).rstrip("\r\n"))
         if not match:
             return None
         body, kind = match["body"], match["kind"]

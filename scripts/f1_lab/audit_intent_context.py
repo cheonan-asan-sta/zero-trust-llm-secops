@@ -2,6 +2,8 @@
 
 No names, IDs, addresses or absolute times are learned features. UID is the
 event-generating process UID; a login target and loginuid remain separate.
+Matched sudo phases use the requested root-target role as a learned feature,
+without changing the raw UID. Modern sudo may retain the caller's real UID.
 """
 
 import hashlib
@@ -10,7 +12,7 @@ import re
 import shlex
 from dataclasses import dataclass
 
-from scripts.f1_lab.audit_auth_review import AUDIT, field, number
+from scripts.f1_lab.audit_auth_review import AUDIT, field, number, original_audit_record
 from scripts.f1_lab.native_jsonl import MAX_ROW, require
 from scripts.f1_lab.raw_observations import raw_features
 
@@ -19,6 +21,7 @@ SUDO = {'/usr/bin/sudo', '/bin/sudo'}
 HARD = ('auth_failure','tls_failure','sensitive_file','sql_injection','path_traversal',
         'shell_payload','command_parameter','uploaded_script','scanner_agent')
 PHASES = {'USER_CMD','CRED_REFR','USER_START','USER_END','CRED_DISP'}
+PROFILE='causal-audit-operation-role-2'
 
 
 def command_intent(value):
@@ -85,7 +88,7 @@ class AuditIntentReview:
                 if moment-mapping[key][-1]>ttl:
                     del mapping[key]
             require(len(mapping)<10000,'intent_capacity')
-        match=AUDIT.fullmatch(line.rstrip('\r\n'))
+        match=AUDIT.fullmatch(original_audit_record(line).rstrip('\r\n'))
         if match is None:
             return empty
         body,kind=match['body'],match['kind']
@@ -105,8 +108,9 @@ class AuditIntentReview:
         session=(auid,ses)
         valid_session=auid is not None and auid>0 and ses is not None
         intent,decoded=command_intent(field(body,'cmd')) if kind=='USER_CMD' else ('unknown','')
-        flags=raw_features(line+' '+decoded)
-        secret=bool(re.search(r'/etc/(?:gshadow|security/opasswd)(?:[\s\x27\"]|$)',line+' '+decoded))
+        raw_record=original_audit_record(line)
+        flags=raw_features(raw_record+' '+decoded)
+        secret=bool(re.search(r'/etc/(?:gshadow|security/opasswd)(?:[\s\x27\"]|$)',raw_record+' '+decoded))
         hazard=secret or any(flags[k] for k in HARD) or exe in {'/bin/su','/usr/bin/su'}
         address=field(body,'addr')
         address_key=(hashlib.sha256(address.encode()).hexdigest()
@@ -145,13 +149,13 @@ class AuditIntentReview:
         terminal=tty(field(body,'terminal'))
         if (kind=='USER_CMD' and success and pid and uid==auid and valid_session
                 and logged_session and terminal==logged_session[1] and not blocked
-                and intent=='operational_log_read'):
+                and intent=='operational_log_read' and exe in {None,*SUDO}):
             scope='diagnostic_sudo_flow'
             self.commands[pid]=(session,terminal,moment)
         elif kind in PHASES-{'USER_CMD'}:
             pending=self.commands.get(pid)
             if (pending and pending[0]==session and terminal==pending[1] and success
-                    and account=='root' and exe in SUDO and uid==0 and not blocked):
+                    and account=='root' and exe in SUDO and uid in {0,auid} and not blocked):
                 scope='diagnostic_sudo_flow'
             elif pid in self.commands:
                 del self.commands[pid]
@@ -163,7 +167,10 @@ class AuditIntentReview:
             # earlier lifecycle stages, even if its numeric PID is reused.
             for state in (self.authentication,self.assignments,self.starts,self.commands):
                 state.pop(pid,None)
-        key=(scope or 'unknown',kind,'sshd' if exe in SSHD else 'sudo' if exe in SUDO else 'none',
-             'root' if uid==0 else 'nonroot' if uid is not None else 'unset',
+        program='command_request' if scope=='diagnostic_sudo_flow' and kind=='USER_CMD' else (
+            'sshd' if exe in SSHD else 'sudo' if exe in SUDO else 'none')
+        process_role='root_target_session' if scope=='diagnostic_sudo_flow' and kind!='USER_CMD' else (
+            'root' if uid==0 else 'nonroot' if uid is not None else 'unset')
+        key=(scope or 'unknown',kind,program,process_role,
              'nonroot' if valid_session else 'unset','success' if success else 'other')
         return IntentObservation(self.source,ordinal,empty.line_sha256,key,bool(scope and not blocked))

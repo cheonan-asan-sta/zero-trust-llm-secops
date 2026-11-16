@@ -47,11 +47,14 @@ def observations(raw_directory,preparation,*,with_apparmor_causality=False):
 
 
 def predict(head,preparation,raw_directory,baseline,baseline_sha256,output,*,with_risk_observations=False,
-            with_apparmor_causality=False,with_network_audit_context=False):
+            with_apparmor_causality=False,with_network_audit_context=False,supplemental_head=None):
     require(type(with_risk_observations) is bool,'intent_risk_option')
     require(type(with_network_audit_context) is bool,'intent_network_option')
     require(sha(baseline)==baseline_sha256,'intent_baseline_pin')
     selected=observations(raw_directory,preparation,with_apparmor_causality=with_apparmor_causality)
+    require(supplemental_head is None or isinstance(supplemental_head,IntentHead)
+        and supplemental_head.frozen and with_apparmor_causality,'intent_supplemental_scope')
+    supplemental=observations(raw_directory,preparation) if supplemental_head is not None else {}
     observed=(signals(raw_directory,preparation,review_factory=OrderedAuditReview,
         auth_review_factory=SensitiveAuthReview)[0] if with_risk_observations else {})
     if with_network_audit_context:
@@ -89,6 +92,9 @@ def predict(head,preparation,raw_directory,baseline,baseline_sha256,output,*,wit
                 if (source,ordinal) in selected:
                     observation,line=selected[source,ordinal]
                     decision=head.refine(decision,observation,source_sha256=pair['raw_sha256'],ordinal=ordinal,raw=line)
+                if (source,ordinal) in supplemental:
+                    observation,line=supplemental[source,ordinal]
+                    decision=supplemental_head.refine(decision,observation,source_sha256=pair['raw_sha256'],ordinal=ordinal,raw=line)
                 after,score,reason=decision.alert,decision.score,decision.reason
             changed+=before!=after;errors+=prior['error'] is not None
             target.write(canonical({'case_id':case,'source_index':source,'before':before,'after':after,
@@ -103,7 +109,8 @@ def predict(head,preparation,raw_directory,baseline,baseline_sha256,output,*,wit
 
 
 def run(plan_path,pin,model_path,model_pin,output,*,with_risk_observations=False,with_apparmor_causality=False,
-        with_network_audit_context=False):
+        with_network_audit_context=False,supplemental_model=None,supplemental_model_pin=None):
+    require((supplemental_model is None)==(supplemental_model_pin is None),'intent_supplemental_pair')
     require(sha(plan_path)==pin,'intent_plan_pin')
     plan=decode(Path(plan_path).read_bytes())
     require(plan['schema']=='ordered-audit-replay-1' and plan['scope']=='observed_development_only'
@@ -113,6 +120,7 @@ def run(plan_path,pin,model_path,model_pin,output,*,with_risk_observations=False
     require(baseline['completed'] is True and baseline['goal_qualified'] is False
             and len(plan['scenarios'])==len(baseline['scenarios']),'intent_baseline_scope')
     head=IntentHead.load(model_path,model_pin)
+    supplemental_head=(IntentHead.load(supplemental_model,supplemental_model_pin) if supplemental_model is not None else None)
     output=Path(output);output.mkdir(parents=True,exist_ok=False);(output/'prediction').mkdir()
     report={'schema':'learned-audit-intent-prediction-1','completed':False,'goal_qualified':False,
         'new_independent_evaluation':False,'validation_labels_opened':False,
@@ -120,6 +128,7 @@ def run(plan_path,pin,model_path,model_pin,output,*,with_risk_observations=False
         'with_v102_v105_risk_observations':with_risk_observations,
         'with_apparmor_causality':with_apparmor_causality,
         'with_network_audit_context':with_network_audit_context,
+        'supplemental_intent_model_sha256':supplemental_model_pin,
         'scenarios':{},'aws_calls':0,'paid_api_calls':0}
     for spec in plan['scenarios']:
         name=spec['name']
@@ -130,7 +139,8 @@ def run(plan_path,pin,model_path,model_pin,output,*,with_risk_observations=False
         before=baseline['scenarios'][name]
         row=predict(head,prepared,spec['raw'],spec['prediction'],before['prediction']['predictions_sha256'],
                     output/'prediction'/(name+'-predictions.jsonl'),with_risk_observations=with_risk_observations,
-                    with_apparmor_causality=with_apparmor_causality,with_network_audit_context=with_network_audit_context)
+                    with_apparmor_causality=with_apparmor_causality,with_network_audit_context=with_network_audit_context,
+                    supplemental_head=supplemental_head)
         require(row['population']==before['population'],'intent_complete_population')
         report['scenarios'][name]=row
         (output/'prediction-seal.json').write_bytes(canonical(report)+b'\n')
@@ -145,9 +155,12 @@ def main():
     parser.add_argument('--with-risk-observations',action='store_true')
     parser.add_argument('--with-apparmor-causality',action='store_true')
     parser.add_argument('--with-network-audit-context',action='store_true')
+    parser.add_argument('--supplemental-intent-model')
+    parser.add_argument('--supplemental-intent-model-sha256')
     a=parser.parse_args();report=run(a.plan,a.sha256,a.model,a.model_sha256,a.output,
         with_risk_observations=a.with_risk_observations,with_apparmor_causality=a.with_apparmor_causality,
-        with_network_audit_context=a.with_network_audit_context)
+        with_network_audit_context=a.with_network_audit_context,supplemental_model=a.supplemental_intent_model,
+        supplemental_model_pin=a.supplemental_intent_model_sha256)
     print(json.dumps({'completed':report['completed'],'scenarios':len(report['scenarios']),'goal_qualified':False}))
     return 0
 

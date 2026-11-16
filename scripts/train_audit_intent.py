@@ -5,6 +5,8 @@ import hashlib
 import json
 from pathlib import Path
 
+from scripts.f1_lab.apparmor_causal_intent import PROFILE as APPARMOR_PROFILE
+from scripts.f1_lab.audit_intent_context import PROFILE as INTENT_PROFILE
 from scripts.f1_lab.audit_intent_head import IntentHead
 from scripts.f1_lab.native_jsonl import MAX_ROW, decode, require
 from scripts.f1_lab.operation_context import canonical
@@ -50,6 +52,7 @@ def fit(plan_path, pin, output,*,with_apparmor_causality=False):
         'training_label_counts_in_model':True,'new_independent_evaluation':False,'goal_qualified':False,
         'minimum_support':model.minimum_support,'aws_calls':0,'paid_api_calls':0}
     report['with_apparmor_causality']=with_apparmor_causality
+    report['feature_profile']=APPARMOR_PROFILE if with_apparmor_causality else INTENT_PROFILE
     (out/'training-provenance.json').write_bytes(canonical(report)+b'\n')
     return report
 

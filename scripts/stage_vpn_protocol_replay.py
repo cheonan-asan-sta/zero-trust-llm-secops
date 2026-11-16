@@ -8,6 +8,7 @@ import shutil
 import tarfile
 from pathlib import Path
 
+from scripts.f1_lab.audit_intent_context import PROFILE as INTENT_PROFILE
 from scripts.f1_lab.native_jsonl import MAX_ROW, decode, require
 from scripts.f1_lab.operation_context import canonical
 from scripts.f1_lab.transfer_evaluation import sha
@@ -17,7 +18,7 @@ PREDICTION_FIELDS={'case_id','source_index','before','after','before_score','aft
 
 
 def stage(catalog_path,pin,output,*,profile='vpn'):
-    require(profile in {'vpn','apparmor-causal'},'protocol_stage_profile')
+    require(profile in {'vpn','apparmor-causal','audit-native-normal'},'protocol_stage_profile')
     require(sha(catalog_path)==pin,'protocol_catalog_pin')
     catalog=decode(Path(catalog_path).read_bytes())
     require(catalog['schema']=='vpn-protocol-replay-catalog-1' and catalog['goal_qualified'] is False
@@ -69,13 +70,18 @@ def stage(catalog_path,pin,output,*,profile='vpn'):
             'projected_raw_manifest_sha256':sha(folder/'audit.json'),'original_prediction_sha256':sha(before)})
     (inputs/'baseline.json').write_bytes(canonical(baseline)+b'\n')
     plan['baseline_sha256']=sha(inputs/'baseline.json');(inputs/'plan.json').write_bytes(canonical(plan)+b'\n')
-    directory='frozen-vpn-protocol-v109' if profile=='vpn' else 'frozen-apparmor-causal-v111'
+    directory={'vpn':'frozen-vpn-protocol-v109','apparmor-causal':'frozen-apparmor-causal-v111',
+        'audit-native-normal':'frozen-audit-native-normal-v113'}[profile]
     bundle_dir=ROOT/'infra/f1-lab'/directory;bundle=decode((bundle_dir/'bundle.json').read_bytes())
+    if profile=='audit-native-normal':require(bundle['feature_profile']==INTENT_PROFILE,'protocol_intent_feature_profile')
     model_files=('web.json','heads.json','vpn.json','policy.json','legacy.json','head.json') if profile=='vpn' else ('head.json',)
+    if profile=='audit-native-normal':model_files+=('supplemental.json',)
     for name in model_files:
         shutil.copyfile(bundle_dir/name,inputs/'models'/name)
     require(sha(inputs/'models/head.json')==bundle['head']['sha256'],'protocol_bundle_copy_pin')
     if profile=='vpn':require(sha(inputs/'models/legacy.json')==bundle['legacy']['sha256'],'protocol_bundle_copy_pin')
+    if profile=='audit-native-normal':
+        require(sha(inputs/'models/supplemental.json')==bundle['supplemental']['sha256'],'protocol_bundle_copy_pin')
     source_manifest=[]
     with tarfile.open(inputs/'code.tar','w') as archive:
         for directory in ('app','scripts'):
@@ -90,6 +96,7 @@ def stage(catalog_path,pin,output,*,profile='vpn'):
     report={'completed':True,'catalog_sha256':pin,'plan_sha256':sha(inputs/'plan.json'),
         'model_sha256':bundle['head']['sha256'],'legacy_models_sha256':bundle['legacy']['sha256'] if profile=='vpn' else None,
         'profile':profile,
+        'supplemental_model_sha256':bundle['supplemental']['sha256'] if profile=='audit-native-normal' else None,
         'source_archive_sha256':sha(inputs/'code.tar'),'source_manifest_sha256':sha(out/'source-manifest.json'),
         'projection_provenance_sha256':sha(out/'projection-provenance.json'),
         'source_pins':[{'path':str(p),'sha256':value} for p,value in original.items()],
@@ -102,7 +109,7 @@ def stage(catalog_path,pin,output,*,profile='vpn'):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('catalog','sha256','output'):parser.add_argument('--'+name,required=True)
-    parser.add_argument('--profile',choices=('vpn','apparmor-causal'),default='vpn')
+    parser.add_argument('--profile',choices=('vpn','apparmor-causal','audit-native-normal'),default='vpn')
     a=parser.parse_args();r=stage(a.catalog,a.sha256,a.output,profile=a.profile)
     print(json.dumps({'completed':r['completed'],'scenarios':r['scenarios'],'goal_qualified':False}));return 0
 

@@ -1,0 +1,113 @@
+{
+  "schema": "native-normal-audit-intent-bundle-1",
+  "head": {
+    "path": "head.json",
+    "sha256": "c9a11114dd64c6fda46d5db63eef0fce17dcfda0084204f76272c9edd5866638"
+  },
+  "supplemental": {
+    "path": "supplemental.json",
+    "sha256": "71f9d3758587e01c2d406acd8f8b43e332053e1f75b6980f5a5654db9ba37f80"
+  },
+  "training_provenance": {
+    "completed": true,
+    "model_sha256": "71f9d3758587e01c2d406acd8f8b43e332053e1f75b6980f5a5654db9ba37f80",
+    "training_plan_sha256": "b432e7726c60855f8fdc14a170f5b4f1bbbcaa3f48d9bfa4aed92c2ea3b26977",
+    "training": [
+      {
+        "name": "russellmitchell",
+        "role": "training",
+        "population": 295243,
+        "eligible": 3,
+        "preparation_sha256": "0091ab22f3ffe3ee12773c7a7d6dfe127e78750faf6dbe4aca2550e39b2f3683",
+        "truth_sha256": "2e569fc8a2678d06ac62fec7152bf070969e4db9fe123da5301cafd617cd5a43"
+      },
+      {
+        "name": "santos",
+        "role": "training",
+        "population": 295976,
+        "eligible": 0,
+        "preparation_sha256": "b6e960ddc26eff3c4251ba08319c0af45697b3ee4aabdd96ba50d09e154d4f9a",
+        "truth_sha256": "21f65f66a93489950507764cfae096752120d376d57d49e8c8b2d7e885b7c989"
+      },
+      {
+        "name": "wilson",
+        "role": "training",
+        "population": 4967,
+        "eligible": 15,
+        "preparation_sha256": "0da1e376737b700b445d119984a53f637501ee4ad4c4e4be1444a438c6000513",
+        "truth_sha256": "e4e888e740d81632a343d3ac214f0d6421bf920366ff57d781c5825da3195e2b"
+      },
+      {
+        "name": "shaw",
+        "role": "training",
+        "population": 4463,
+        "eligible": 2,
+        "preparation_sha256": "86817a2ace0950abe8edb42a544643b8968fa388d4aa0456c1e2873f65d5fe27",
+        "truth_sha256": "09af225d34ebede481a9c1d9c79108e61ae504c7e824df0f9164a6b9ee1560d5"
+      },
+      {
+        "name": "wheeler",
+        "role": "training",
+        "population": 3862,
+        "eligible": 1,
+        "preparation_sha256": "58c42772bf3c8cbc7a3a185da2c17cf104c476edd5fe1bdeaec0902c7513eebc",
+        "truth_sha256": "4077cabaf764e15df562909c8e1853b0c2e6320693eeecbf49a92dc0484b81af"
+      },
+      {
+        "name": "owned_native_normal",
+        "role": "training",
+        "population": 169,
+        "eligible": 48,
+        "preparation_sha256": "8d2a7a69460caa782ef7bf5623748785d85d11b4a32b9e40e2bd54769a5f5af8",
+        "truth_sha256": "48aa419d4e48d00d1e9cf8522184adfba636802e30893450b058b44bd5f880aa"
+      }
+    ],
+    "training_label_counts_in_model": true,
+    "new_independent_evaluation": false,
+    "goal_qualified": false,
+    "minimum_support": 5,
+    "aws_calls": 0,
+    "paid_api_calls": 0,
+    "with_apparmor_causality": false
+  },
+  "controlled_native_training": {
+    "completed": true,
+    "role": "controlled_normal_training",
+    "source_kind": "real_kernel_audit_from_owned_guest",
+    "normal_label_basis": "predeclared isolated authorized operations; not an independently adjudicated real incident",
+    "execution_sha256": "4354e58df9309542b911168d8b820a21f5fde7416e627b338191e7834d2f4195",
+    "source_sha256": "57ef199346b1b92a8bdd183c17294f577bd5476fd5f324f59f611e7acd73481a",
+    "population": 169,
+    "successful_sessions": 8,
+    "native_bytes_modified": false,
+    "unpaired_public_logs_assumed_benign": false,
+    "preparation_sha256": "8d2a7a69460caa782ef7bf5623748785d85d11b4a32b9e40e2bd54769a5f5af8",
+    "truth_sha256": "48aa419d4e48d00d1e9cf8522184adfba636802e30893450b058b44bd5f880aa",
+    "new_independent_evaluation": false,
+    "original_evaluation_population_changed": false,
+    "goal_qualified": false,
+    "aws_calls": 0,
+    "paid_api_calls": 0
+  },
+  "source_image": {
+    "url": "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img",
+    "checksum_url": "https://cloud-images.ubuntu.com/noble/current/SHA256SUMS",
+    "expected_sha256": "04e8f2461a16a44e78a370284471f29616cdd9baf1893df25807b71f985b6c94",
+    "maximum_bytes": 838860800,
+    "publisher": "Ubuntu cloud images",
+    "publisher_build": "20261017",
+    "role": "local_controlled_normal_training_guest",
+    "new_independent_evaluation": false,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "completed": true,
+    "bytes": 621284352,
+    "sha256": "04e8f2461a16a44e78a370284471f29616cdd9baf1893df25807b71f985b6c94",
+    "publisher_checksum_matched": true,
+    "publisher_signature_verified": false
+  },
+  "goal_qualified": false,
+  "new_independent_evaluation": false,
+  "automatic_enforcement_allowed": false,
+  "feature_profile": "causal-audit-operation-role-2"
+}

@@ -29,11 +29,14 @@ Path('/results/image-scope.json').write_text(json.dumps({'completed':True,
  'code_origin':importlib.util.find_spec('app').origin,'staged_documents_or_tests':False}))
 shutil.copytree('/inputs/baseline','/tmp/baseline')
 shutil.copytree('/inputs/raw','/tmp/raw')
-if PIPELINE=='apparmor-causal':
+if PIPELINE in {'apparmor-causal','audit-native-normal'}:
  args=[sys.executable,'-m','scripts.run_audit_intent_review','--plan','/inputs/plan.json',
   '--sha256','PLAN','--model','/inputs/models/head.json','--model-sha256','HEAD',
   '--output','/tmp/prediction-run','--with-apparmor-causality',
   *(['--with-network-audit-context'] if NETWORK else [])]
+ if PIPELINE=='audit-native-normal':
+  args+=['--supplemental-intent-model','/inputs/models/supplemental.json',
+   '--supplemental-intent-model-sha256','SUPPLEMENTAL']
 else:
  args=[sys.executable,'-m','scripts.run_vpn_protocol_review','--plan','/inputs/plan.json',
  '--sha256','PLAN','--model','/inputs/models/head.json','--model-sha256','HEAD',
@@ -70,9 +73,12 @@ def run(package,stage_pin,image,*,with_attack_evidence=False,with_network_audit_
     inspect=command(['docker','image','inspect',image],30)
     require(inspect.returncode==0 and json.loads(inspect.stdout)[0]['Id']==image,'protocol_image_not_cached')
     profile=stage.get('profile','vpn')
-    require(profile in {'vpn','apparmor-causal'} and (profile=='vpn' or not with_attack_evidence),'protocol_execution_profile')
-    require(not with_network_audit_context or profile=='apparmor-causal','protocol_network_profile')
-    program=BOOTSTRAP.replace('PLAN',stage['plan_sha256']).replace('HEAD',stage['model_sha256']).replace('LEGACY',stage['legacy_models_sha256'] or '').replace('ATTACK',str(with_attack_evidence)).replace('PIPELINE',repr(profile)).replace('NETWORK',str(with_network_audit_context))
+    require(profile in {'vpn','apparmor-causal','audit-native-normal'} and (profile=='vpn' or not with_attack_evidence),'protocol_execution_profile')
+    require(not with_network_audit_context or profile in {'apparmor-causal','audit-native-normal'},'protocol_network_profile')
+    extra=stage.get('supplemental_model_sha256')
+    require(profile!='audit-native-normal' or type(extra) is str and re.fullmatch('[a-f0-9]{64}',extra),
+        'protocol_supplemental_model_pin')
+    program=BOOTSTRAP.replace('PLAN',stage['plan_sha256']).replace('HEAD',stage['model_sha256']).replace('LEGACY',stage['legacy_models_sha256'] or '').replace('ATTACK',str(with_attack_evidence)).replace('PIPELINE',repr(profile)).replace('NETWORK',str(with_network_audit_context)).replace('SUPPLEMENTAL',extra or '')
     owner='zt-vpn-protocol-v109-'+uuid.uuid4().hex[:12];cid=None
     report={'completed':False,'stage_sha256':stage_pin,'goal_qualified':False,'new_independent_evaluation':False,
         'aws_calls':0,'paid_api_calls':0,'image':image,'validation_labels_in_predictor':False,
@@ -80,6 +86,7 @@ def run(package,stage_pin,image,*,with_attack_evidence=False,with_network_audit_
     report['with_attack_evidence']=with_attack_evidence
     report['profile']=profile
     report['with_network_audit_context']=with_network_audit_context
+    report['supplemental_model_sha256']=extra
     try:
         created=command(['docker','create','--pull=never','--name',owner,'--label','secops.f1.owner='+owner,
             '--network','none','--read-only','--user','10001:10001','--cap-drop','ALL',

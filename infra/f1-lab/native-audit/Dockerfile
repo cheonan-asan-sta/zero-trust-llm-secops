@@ -4,6 +4,7 @@ USER root
 RUN apt-get update && apt-get install -y --no-install-recommends \
     qemu-system-x86 qemu-utils cloud-image-utils openssh-client ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+RUN useradd --uid 10001 --user-group --no-create-home --home-dir /tmp --shell /bin/false zt-native-parent
 USER 10001:10001
 ENV PYTHONDONTWRITEBYTECODE=1 AWS_EC2_METADATA_DISABLED=true
 WORKDIR /tmp

@@ -7,6 +7,7 @@ import shlex
 from dataclasses import dataclass
 from pathlib import PurePosixPath
 
+from scripts.f1_lab.audit_auth_review import original_audit_record
 from scripts.f1_lab.native_jsonl import MAX_ROW, require
 from scripts.f1_lab.operation_context import canonical
 from scripts.f1_lab.operation_refinement import OperationDecision
@@ -39,7 +40,7 @@ def fields(body):
 def parsed(line):
     if not isinstance(line, str) or len(line.encode('utf8')) > MAX_ROW:
         return None
-    line = line.removesuffix('\n').removesuffix('\r')
+    line = original_audit_record(line).removesuffix('\n').removesuffix('\r')
     if re.search(r'[\x00-\x1f\x7f]', line):
         return None
     match = EVENT.fullmatch(line)
