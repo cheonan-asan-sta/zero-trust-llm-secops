@@ -26,6 +26,14 @@ def collect_connection(channel, *, tenant_id, gateway_id, session_id, session_ve
     require(isinstance(channel, ssl.SSLSocket) and channel.server_side
             and channel.context.verify_mode == ssl.CERT_REQUIRED
             and channel.version() in {'TLSv1.2', 'TLSv1.3'}, 'vpn_verified_tls_server')
+    # Python 3.12 exposes tls-unique, not RFC 9266 tls-exporter. Never label
+    # OpenSSL's TLS 1.3 Finished bytes a standards-defined channel binding.
+    # Restrict this optional adapter to fresh ECDHE TLS 1.2 without tickets or
+    # renegotiation; a TLS 1.3 exporter-capable native gateway is separate work.
+    require(channel.version() == 'TLSv1.2' and not channel.session_reused
+            and channel.cipher()[0].startswith('ECDHE-')
+            and channel.context.options & ssl.OP_NO_RENEGOTIATION
+            and channel.context.options & ssl.OP_NO_TICKET, 'vpn_channel_binding_protocol')
     peer = channel.getpeername()
     certificate = channel.getpeercert(binary_form=True)
     binding = channel.get_channel_binding('tls-unique')

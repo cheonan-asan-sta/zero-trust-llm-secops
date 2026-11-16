@@ -22,7 +22,8 @@ CLAIMS = {'tenant_id': 'vpn-lab', 'gateway_id': 'gateway-local', 'session_id': '
               'session_version': 0, 'user_id': 'vpn-user', 'device_id': 'vpn-device', 'resource_id': 'vpn-resource'}
 
 
-def connected(tmp_path, callback, *, verify=True, with_certificate=True):
+def connected(tmp_path, callback, *, verify=True, with_certificate=True,
+              tls13=False, tickets=False, renegotiation=False):
     ca = authority()
     ca_text = ca[1].public_bytes(Encoding.PEM).decode()
     server_leaf, client_leaf = leaf(ca, 'gateway', server=True), leaf(ca, 'vpn-device')
@@ -30,7 +31,12 @@ def connected(tmp_path, callback, *, verify=True, with_certificate=True):
     for name, material, purpose in [('server', server_leaf, ssl.Purpose.CLIENT_AUTH),
                                      ('client', client_leaf, ssl.Purpose.SERVER_AUTH)]:
         context = ssl.create_default_context(purpose, cadata=ca_text)
-        context.minimum_version = ssl.TLSVersion.TLSv1_2
+        context.minimum_version = ssl.TLSVersion.TLSv1_3 if tls13 else ssl.TLSVersion.TLSv1_2
+        context.maximum_version = context.minimum_version
+        if not tickets:
+            context.options |= ssl.OP_NO_TICKET
+        if not renegotiation:
+            context.options |= ssl.OP_NO_RENEGOTIATION
         context.verify_mode = ssl.CERT_REQUIRED if (verify or name == 'client') else ssl.CERT_NONE
         cert, key = tmp_path/(name+'.crt'), tmp_path/(name+'.key')
         cert.write_text(material['cert'], encoding='ascii')
@@ -155,3 +161,9 @@ def test_new_tls_connection_cannot_reuse_previously_bound_signal_bundle(tmp_path
     result = c.bridge.check(challenge.nonce, row['evidence'], two.raw_line, row['principal'],
                             now=two.connection.observed_at)
     assert result.state == 'unavailable'
+
+
+@pytest.mark.parametrize('options', [{'tls13': True}, {'tickets': True}, {'renegotiation': True}])
+def test_unsupported_or_ambiguous_channel_binding_is_rejected(tmp_path, options):
+    with pytest.raises(ValueError, match='vpn_channel_binding_protocol'):
+        connected(tmp_path, lambda tls: collect_connection(tls, **CLAIMS), **options)
