@@ -1,3 +1,5 @@
+> 2026-11-17 v125: 단계별 최소지지5를 분리하고 관련 Linux1,244건 검증. issuer 초안의 pooled24=각단계4여서 미채택, H/W 각5행 감소를 최종 수치로 쓰지 않는다. 공유 감사·VPN F1은80% 유지, 목표 미달·CI/push/병합 보류. [최신 근거](docs/extra-vpn-issuer-relation-review.md)
+
 > 2026-11-17 v124: native DNS 요청·응답 근거와 Linux1,190건 검증. 추가 TP/FP/TP손실0, 공유 감사·VPN F1은80%로 동일하다. 전체 목표 미달, push/새 CI/병합/유료/AWS 보류. [최신 검토](docs/extra-shared-dns-transaction-review.md)
 
 # 다른 AI 작업자를 위한 프로젝트 인수인계서

@@ -147,3 +147,8 @@ Linux 소스721파일이 실행 전후 동일했고 컨테이너 exit0·OOM fals
 ## 2026-11-17 v124 추가 native 근거 노출
 
 [v124 대장](../infra/f1-lab/observed-source-exposure-v124.json)은 source ID/payload/pattern을 보존하고 R/F native SHA를 추가해55→61을 기록했다. 같은 소비 source의 추가 modality이며 새 독립 source가 아니다. Fox 비학습 역할을 유지했고 9개 전체 판정은 같다. 원래6영역·5축·source/label 심사와 최종 후보 동결은 미완료다. [근거](extra-shared-dns-transaction-review.md).
+
+
+## v125 지지 단위·source 노출 감사
+
+정상 지지를 인증 단계 사이에 합산한 issuer 초안은 미채택이다. 최종 단계별지지4<5이며 새 독립 평가 성공이 아니다. [v125 노출 대장](../infra/f1-lab/observed-source-exposure-v125.json)은 읽은 client runtime wrapper3개의 지문을 추가해61→64로 기록했다. 시뮬레이터 상태·stdout은 모델에 사용하지 않았고 source ID/payload/pattern을 보존했다. 기존8개 source의 추가 modality이며 원래6영역·5축·source/label 심사는 미완료다. [최신 근거](extra-vpn-issuer-relation-review.md).
