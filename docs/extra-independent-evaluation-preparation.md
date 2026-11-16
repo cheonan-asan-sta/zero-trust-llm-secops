@@ -157,3 +157,8 @@ Linux 소스721파일이 실행 전후 동일했고 컨테이너 exit0·OOM fals
 ## v126 별도 native source 형식 조사
 
 [DEDALE 수집](extra-dedale-native-intake.md)은 고정 syslog ZIP·첫 member의128행을 개발 probe로 읽은 작업이다. 원래1,681,815행에 더하거나 새 독립 최종 사례로 세지 않는다. [v126 대장](../infra/f1-lab/observed-source-exposure-v126.json)은 기존 ID/payload/pattern을 보존하며 DEDALE canonical source를 관측 개발용으로 추가한다. 정답·시뮬레이터 본문0, 사람/권한/기기 신뢰와 라벨 의미·5축 분리는 미확인이다. 원래 프로토콜·6영역·분할·95%/5% 목표는 변경하지 않았다.
+
+
+## v127 기존 training VPN 호스트의 추가 native 자료
+
+[VPN journal 조사](extra-vpn-native-clock-review.md)에서39개 파일의 지문을 확인하고 [v127 대장](../infra/f1-lab/observed-source-exposure-v127.json)에 추가했다. 기존 ID/payload/pattern·역할을 보존했다. 서비스 시작 기록은 있었으나 원래 접속 메시지 복사본은0이며 새 정상 지지·독립 사례·모델/판정 변경0이다. 원래6영역/5축·지표 목표·독립 계획 지문을 유지했다.

@@ -1,3 +1,5 @@
+> 2026-11-17 v127: 기존 training4곳의 VPN native39파일·journal15,747/text5,868기록을 조사했으나 접속 메시지 복사본0으로 미채택. 모델/정답/예측/새 시험0·공유 감사/VPN F1 80% 유지·목표 전 CI/push/병합 보류. [출처·시각 근거](extra-vpn-native-clock-review.md)
+
 > 2026-11-17 v126: DEDALE syslog125MB·게시 MD5·첫128행의 중첩 압축/형식 검증과 관련 Windows/Linux120건을 완료했다. 새46건·정답/학습/예측0·새 독립 인수0이며 F1 공유 감사/VPN80% 유지. Docker 소유 컨테이너 제거·목표 전 CI/push/병합 보류. [수집 근거](extra-dedale-native-intake.md)
 
 # 목표 수치까지의 현재 개선 상태
