@@ -2,21 +2,19 @@
 
 2026-11-16 · 목표 active · 무료 로컬 · 목표 전 push·새 CI·병합 보류
 
-최신 [v114 VPN 제어 관측](extra-vpn-control-review.md): VPN FP 48→42·TP 84/FN 0 유지, F1 77.78%→80.00%. 별도 Harrison/Shaw/Wheeler VPN도 FP 각 2건 감소. 원래 1,681,815행 유지·전체 새 FP/기존 TP 손실 0·Linux 776건 통과다. 이미 관측한 개발/보정 자료의 비교이며 새 독립 평가나 전체 목표 달성은 아니다.
+최신 [v115 journal 실행 관측](extra-journal-service-review.md): 공유 감사 TP 0→2·FN 6→4·FP 3 유지·F1 0%→36.36%. 같은 Santos 학습 사건의 시작/종료 2행이며 독립 공격 2건이나 새 독립 평가는 아니다. 원래 1,681,815행 유지·전체 새 FP/기존 TP 손실 0·Linux 820건 통과다. 인증·웹 감사 관측 100%와 VPN F1 80%는 유지했다.
 
 아래는 현재 R/S/F 종류별 수치다. 원래 6개 보안 영역의 독립 인수를 로그 종류로 대체하지 않는다.
 
 | 종류 | TP | FP | FN | 정밀도 | 재현율 | F1 | 오탐률 | 미탐률 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | 인증 | 32 | 0 | 0 | 100.0000% | 100.0000% | 100.0000% | 0.0000% | 0.0000% |
-| 공유 감사 | 0 | 3 | 6 | 0.0000% | 0.0000% | 0.0000% | 0.1276% | 100.0000% |
+| 공유 감사 | 2 | 3 | 4 | 40.0000% | 33.3333% | 36.3636% | 0.1276% | 66.6667% |
 | 웹 감사 | 47 | 0 | 0 | 100.0000% | 100.0000% | 100.0000% | 0.0000% | 0.0000% |
 | VPN | 84 | 42 | 0 | 66.6667% | 100.0000% | 80.0000% | 0.2286% | 0.0000% |
 
-인증·웹 감사는 관측 목표를 유지했다. 공유 감사와 VPN은 미달이다. VPN은 오탐률이 0.23% 미만이어도 위협 표본이 적어 정밀도 66.67%·F1 80%이며 완료로 처리하지 않는다. 공유 감사 TP 0/FN 6도 변화 없다.
+공유 감사는 TP 2/FP 3/FN 4로 여전히 미달이다. 현재 양성 6행에서는 재현율 95%를 위해 FN 0, 정밀도 95%를 위해 FP 0이 필요하다. VPN은 TP 84를 유지할 때 FP 42→4 이하가 필요하다. 별도 Wheeler 학습 VPN FN 9·Harrison VPN FP 36과 원래 6영역 새 독립 인수도 남는다. 과거 자료에 없는 신원·실행·기기/권한은 미확인으로 유지한다.
 
-현재 양성 수 기준 공유 감사 FN 6→0·FP 3→0, VPN FP 42→4 이하가 필요하다. 별도 Wheeler 학습 VPN FN 9, Harrison 별도 VPN FP 36과 원래 6개 보안 영역의 새 독립 인수도 남는다. 과거 신원·실행·권한 근거가 없는 부분은 확인 불가로 유지한다. 전체 완료 시간은 남은 근거 확보와 실제 회귀 검증에 달려 있다.
+직전 [v114 VPN 제어](extra-vpn-control-review.md)는 VPN FP 48→42·F1 80%, [v113 실제 정상 audit 학습](extra-native-audit-normal-review.md)은 웹 감사 FP 15→0·F1 100%로 개선했다. 이 결과와 v112 Wilson 웹 감사 FN 3→0, v111 공유 FP 24→3, v110 Wheeler 학습 VPN FN 28→9를 보존했다. 전체 완료 시각은 추가 근거 확보와 실제 검증 결과에 달려 있어 확정하지 않는다.
 
-직전 [v113 실제 정상 audit 학습](extra-native-audit-normal-review.md)은 웹 감사 FP 15→0·F1 100%, [v112 방화벽 관측](extra-web-firewall-review.md)은 Wilson 웹 감사 FN 3→0, [v111 AppArmor 문맥](extra-apparmor-causal-review.md)은 공유 FP 24→3으로 개선했다. [v109 VPN 문맥](extra-vpn-protocol-refinement.md)의 FP 208→48과 [v110 학습 공격 근거](extra-vpn-attack-evidence.md)의 Wheeler FN 28→9도 보존했다.
-
-[최신 구현·검증·남은 문제](extra-vpn-control-review.md) · [시험·재현 가이드](vpn-control-test-guide.md) · [결과 JSON](infrastructure-results/extra-vpn-control-v114-20261116.json)
+[최신 구현·검증·남은 문제](extra-journal-service-review.md) · [시험·재현](journal-service-test-guide.md) · [결과 JSON](infrastructure-results/extra-journal-service-v115-20261116.json)

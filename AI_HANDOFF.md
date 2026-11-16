@@ -1,6 +1,8 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
-**최신 v114:** [VPN 제어 메시지 관측](docs/extra-vpn-control-review.md). VPN FP 48→42·TP 84/FN 0 유지·F1 80%, 별도 Harrison/Shaw/Wheeler FP 각 2건 감소. 원래 1,681,815행 유지·새 FP/기존 TP 손실 0·Linux 776건. 인증·웹 감사 관측 100% 유지. 공유 감사·VPN·원래 6영역 독립 목표는 미완료·목표 active·push/새 CI/병합 보류.
+**최신 v115:** [앞선 journal 실행 관측](docs/extra-journal-service-review.md). 공유 감사 TP 0→2·FN 6→4·FP 3 유지·F1 36.36%. 같은 학습 사건의 audit 2행, 사람/현재 invocation/유출 성공 검증은 아님. 원래 1,681,815행·새 FP/기존 TP 손실 0·Linux 820건. 인증·웹 감사 100%·VPN F1 80% 유지·전체 목표 active·push/새 CI/병합 보류.
+
+**직전 v114:** [VPN 제어 메시지 관측](docs/extra-vpn-control-review.md). VPN FP 48→42·TP 84/FN 0 유지·F1 80%, 별도 Harrison/Shaw/Wheeler FP 각 2건 감소. 원래 1,681,815행 유지·새 FP/기존 TP 손실 0·Linux 776건. 인증·웹 감사 관측 100% 유지. 공유 감사·VPN·원래 6영역 독립 목표는 미완료·목표 active·push/새 CI/병합 보류.
 
 **직전 v113:** [실제 정상 SSH·sudo 감사 학습](docs/extra-native-audit-normal-review.md). 웹 감사 FP 15→0·TP 47/FN 0 유지·F1 100%, 별도 Wilson/Wardbeck FP 각 10→0. 원래 1,681,815행·새 FP/기존 TP 손실 0·Linux 732건. 추가 실제 정상 169행은 학습 전용으로 분모에 미합산. 공유 감사·VPN·원래 6영역 독립 목표는 미완료이며 목표 active·push/새 CI/병합 보류.
 
