@@ -142,3 +142,8 @@ Linux 소스721파일이 실행 전후 동일했고 컨테이너 exit0·OOM fals
 ## v123 현재 source 노출 재검사
 
 위 예약/노출 상태는 v43 당시 이력이다. 현재는 [v123 결과](extra-shared-native-dns-review.md)와 [갱신 대장](../infra/f1-lab/observed-source-exposure-v123.json)을 따른다. 기존 payload/pattern 항목을 보존하고 8개 canonical testbed의 소비 근거와 알려진 source SHA55개를 기록했다. Harrison/Wilson은 이미 관측/채점 또는 학습됐으므로 새 최종 source로 재사용하지 않는다. ID/동일 지문 거부4개는 metadata 제어군이고 새 독립 사례0이다. 원래 프로토콜과 6영역/5축은 변경하지 않았다.
+
+
+## 2026-11-17 v124 추가 native 근거 노출
+
+[v124 대장](../infra/f1-lab/observed-source-exposure-v124.json)은 source ID/payload/pattern을 보존하고 R/F native SHA를 추가해55→61을 기록했다. 같은 소비 source의 추가 modality이며 새 독립 source가 아니다. Fox 비학습 역할을 유지했고 9개 전체 판정은 같다. 원래6영역·5축·source/label 심사와 최종 후보 동결은 미완료다. [근거](extra-shared-dns-transaction-review.md).

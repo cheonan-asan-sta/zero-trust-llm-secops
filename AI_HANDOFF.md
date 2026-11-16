@@ -1,3 +1,5 @@
+> 2026-11-17 v124: native DNS 요청·응답 근거와 Linux1,190건 검증. 추가 TP/FP/TP손실0, 공유 감사·VPN F1은80%로 동일하다. 전체 목표 미달, push/새 CI/병합/유료/AWS 보류. [최신 검토](docs/extra-shared-dns-transaction-review.md)
+
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
 **v123 로컬 개선(2026-11-17):** [native 관측·첫 source 서비스 흐름](docs/extra-shared-native-dns-review.md). 공유 TP2→4·FN4→2·FP0 유지·F1 50→80%, 추가FP/기존TP손실0·원래1,681,815행·Linux1109건. R의 같은 학습 사건 2행이며 native-capture 오프라인 profile·사람/명령/실제 앱 수신은 미확인. VPN F1 80% 유지·원래6영역 독립 인수 미완료·소비된Harrison/Wilson 예약 재사용 금지·전체목표 active.

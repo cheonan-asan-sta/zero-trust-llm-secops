@@ -27,3 +27,17 @@ stage에서 원래 capture/queries/stats/observations 4개 파일과 완성 repo
 예측 성공·입력/코드 불변·image mask·소유 container 제거·봉인을 확인한 뒤에만 원래 9개 자료의 정답과 source 순서·case ID·분모·오류를 대조한다. primary 4개 자료는 1,681,815행이고 나머지 5개는 별도다. before가 v117 after와 같고 introduced_fp/lost_tp가 0이며 오류 행이 분모에 남는지 검사한다. 현재 local gate와 goal_qualified는 false다. 실패/미완료를 성공으로 세거나 조건을 완화하고 초기 시점에 나중 TLS/인증서를 넣지 않는다.
 
 최종 score SHA는 `1ea913be4b32f0cb639c15659afcc6e5b2464634b97fbc4da121d0c58ff9be5c`. 로컬 runtime은 `runtime/f1/native-dns-batch-v123-20261117`. 이미 관측한 개발 source 비교이며 원래 6영역의 새 독립 평가가 아니다.
+
+
+## v124: 별도 DNS transaction profile
+
+최신 결과는 [v124 검토](extra-shared-dns-transaction-review.md)를 따른다. 고정 R training/Fox observed_nontraining_calibration 각각의 실제 archive/acquisition/preparation/raw와 SHA를 준다. 성공한 출력은 덮어쓰지 않는다.
+
+```powershell
+.venv\Scripts\python.exe -m pytest tests/test_dns_transaction_sources.py tests/test_shared_dns_transactions.py tests/test_shared_dns_native_review.py tests/test_shared_dns_stage.py tests/test_f1_packet_members.py -q
+.venv\Scripts\python.exe -m scripts.prepare_shared_dns_transactions --scenario fox --acquisition <fox-acquisition.json> --acquisition-sha256 <actual-SHA256> --archive <verified-fox_no-pcaps.zip> --preparation <original-fox-preparation.json> --preparation-sha256 <actual-SHA256> --raw <original-fox-pairs-directory> --output runtime/f1/fox-dns-transactions-fresh
+```
+
+R은 `--scenario russellmitchell`과 R 고정 원본을 사용한다. 위 v123과 같은 shared_dns_support 구조로 두 성공 intake와 실제 SHA를 넣는다. 9개 자료를 모두 유지하며 이번 before는 **v123 봉인 예측의 after**다. v123 catalog 안의 옛 v117 경로를 그대로 쓰지 않는다. stage/run 명령과 cached image는 위와 같다. typed observation만 전달하고 EVE/stats 원문·labels·docs/tests·학습 집계는 제공하지 않는다.
+
+prediction-seal completed·원래 case/order/errors/population·소유 container 제거·원본 pin을 확인한 뒤에만 기존 truth로 before/after를 채점한다. 추가 FP/TP손실이 있으면 채택하지 않는다. 실제1190건 중 새81건은 기능 시험이며 F1에 합산하지 않는다. 이번 판정은 전부 v123과 같고 원래6영역의 새 독립 인수는 미완료다. 실제 paired_score_sha256과 JUnit은 공개 JSON을 따른다.
