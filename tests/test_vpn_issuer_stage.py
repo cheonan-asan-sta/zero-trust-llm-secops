@@ -25,7 +25,7 @@ def test_issuer_profile_stages_only_frozen_parameters_not_training_or_client_sim
     assert all(sha(out / 'inputs' / name) == pin for name, pin in report['input_pins'].items())
 
 
-@pytest.mark.parametrize('fault', ['authority', 'minimum', 'dependency', 'nontraining', 'source_duplicate', 'provenance_pin'])
+@pytest.mark.parametrize('fault', ['authority', 'minimum', 'dependency', 'nontraining', 'source_duplicate', 'provenance_pin', 'phase_pool'])
 def test_bundle_with_changed_parameters_training_role_or_provenance_cannot_be_staged(tmp_path, monkeypatch, fault):
     original = Path(staging.ROOT) / 'infra/f1-lab/frozen-vpn-issuer-v125'
     local_root = tmp_path / 'local-root'
@@ -40,6 +40,7 @@ def test_bundle_with_changed_parameters_training_role_or_provenance_cannot_be_st
     if fault == 'dependency': head['dependencies']['protocol_model_sha256'] = 'd' * 64
     if fault == 'nontraining': provenance['training'][0]['role'] = 'observed_nontraining_calibration'
     if fault == 'source_duplicate': provenance['training'][1]['source_sha256'] = provenance['training'][0]['source_sha256']
+    if fault == 'phase_pool': provenance['support_separate_by_phase'] = False
     (target / 'head.json').write_text(json.dumps(head), encoding='utf8')
     (target / 'training-provenance.json').write_text(json.dumps(provenance), encoding='utf8')
     bundle['head']['sha256'] = sha(target / 'head.json')

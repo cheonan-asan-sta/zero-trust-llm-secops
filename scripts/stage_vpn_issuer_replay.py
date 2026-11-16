@@ -40,6 +40,7 @@ def stage(catalog_path, pin, output):
             and provenance['dependencies'] == dependencies and provenance['minimum_normal_support'] == 5
             and provenance['any_attack_veto'] is True and provenance['validation_labels_opened'] is False
             and provenance['parameters_frozen_before_validation'] is True and provenance['goal_qualified'] is False
+            and provenance['support_separate_by_phase'] is True
             and provenance['models_fit_only_original_declared_training'] is True
             and len(provenance['training']) == 4 and {s['name'] for s in provenance['training']} ==
                 {'russellmitchell', 'santos', 'shaw', 'wheeler'}

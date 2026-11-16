@@ -100,6 +100,7 @@ def fit(plan_path, pin, protocol_path, protocol_pin, control_path, control_pin, 
         'head_sha256': model_pin, 'dependencies': dependencies, 'training': provenance,
         'training_plan_sha256': pin, 'observations_sealed_before_labels': True,
         'minimum_normal_support': 5, 'any_attack_veto': True, 'reported_subjects_are_not_identity_or_authority': True,
+        'support_separate_by_phase': True,
         'models_fit_only_original_declared_training': True, 'validation_labels_opened': False,
         'parameters_frozen_before_validation': True, 'goal_qualified': False, 'new_independent_evaluation': False,
         'aws_calls': 0, 'paid_api_calls': 0}

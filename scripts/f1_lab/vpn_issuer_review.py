@@ -19,13 +19,14 @@ from scripts.f1_lab.operation_refinement import OperationDecision
 from scripts.f1_lab.vpn_context import PREFIX, endpoint
 from scripts.f1_lab.vpn_protocol_review import ProtocolObservation
 
-PROFILE = 'causal-vpn-reported-issuer-relations-1'
-SCHEMA = 'vpn-reported-issuer-advisory-head-1'
+PROFILE = 'causal-vpn-reported-issuer-relations-2'
+SCHEMA = 'vpn-reported-issuer-advisory-head-2'
 REASONS = {'vpn_history_risk_review', 'vpn_strict_past_risk_retained'}
 FIELDS = ('reported_issuer_present', 'reported_issuer_subject_seen_before',
           'other_issuer_subject_previously_observed')
 VERIFY = re.compile(r'VERIFY OK: depth=(0|[1-9]\d?), ([^\r\n]{1,1024})')
 SUBJECT_FIELD = re.compile(r'(C|ST|L|O|OU|CN|emailAddress)=([^,=\r\n]{1,256})')
+PHASES = frozenset({'issuer', 'leaf', 'ku', 'eku', 'eku_validation', 'eku_purpose'})
 
 
 def verified_subject(body):
@@ -40,20 +41,32 @@ def verified_subject(body):
     return int(match[1]), tuple((field[1], field[2]) for field in fields)
 
 
-def server_verification_stage(body):
-    if verified_subject(body) is not None:
-        return True
-    if body in {'VERIFY KU OK', 'VERIFY EKU OK', 'Validating certificate extended key usage'}:
-        return True
-    return re.fullmatch(r'\+\+ Certificate has EKU \(str\) TLS Web (Client|Server) Authentication, '
-                        r'expects TLS Web (Client|Server) Authentication', body) is not None
+def verification_phase(body):
+    subject = verified_subject(body)
+    if subject is not None:
+        return {0: 'leaf', 1: 'issuer'}.get(subject[0])
+    phase = {'VERIFY KU OK': 'ku', 'VERIFY EKU OK': 'eku',
+             'Validating certificate extended key usage': 'eku_validation'}.get(body)
+    if phase is not None:
+        return phase
+    purpose = re.fullmatch(r'\+\+ Certificate has EKU \(str\) TLS Web (Client|Server) Authentication, '
+                           r'expects TLS Web (Client|Server) Authentication', body)
+    return 'eku_purpose' if purpose is not None and purpose[1] == purpose[2] else None
 
 
-def feature_pin(features):
+def feature_pin(features, phase):
     require(type(features) is dict and set(features) == set(FIELDS)
             and all(type(features[k]) is bool for k in FIELDS)
-            and features['reported_issuer_present'] is True, 'issuer_feature_fields')
-    return hashlib.sha256(canonical({'profile': PROFILE, **features})).hexdigest()
+            and features['reported_issuer_present'] is True and type(phase) is str and phase in PHASES,
+            'issuer_feature_fields')
+    # Support is NEVER pooled across issuer, KU, EKU or leaf phases.
+    return hashlib.sha256(canonical({'profile': PROFILE, 'phase': phase, **features})).hexdigest()
+
+
+def phase_projection_valid(phase, pin):
+    return (type(phase) is str and phase in PHASES and type(pin) is str and
+            pin in {feature_pin(dict(zip(FIELDS, (True, *bits), strict=True)), phase)
+                    for bits in itertools.product((False, True), repeat=2)})
 
 
 @dataclass(frozen=True)
@@ -62,6 +75,7 @@ class IssuerObservation:
     ordinal: int
     line_sha256: str
     projection_sha256: str
+    phase: str
     protected: bool
     human_or_device_identity_verified: bool = False
     authority_verified: bool = False
@@ -120,10 +134,11 @@ class IssuerRelationReview:
             self.active[connection] = current
             self.known[key] = moment
         require(len(self.known) <= 10000 and len(self.active) <= 10000, 'issuer_capacity')
-        if current is None or not server_verification_stage(body):
+        phase = verification_phase(body)
+        if current is None or phase is None:
             return None
         return IssuerObservation(self.source, ordinal, hashlib.sha256(line.encode()).hexdigest(),
-                                 feature_pin(current[0]), protocol_observation.protected)
+                                 feature_pin(current[0], phase), phase, protocol_observation.protected)
 
 
 class IssuerHead:
@@ -139,6 +154,7 @@ class IssuerHead:
         if observation is None:
             return
         require(isinstance(observation, IssuerObservation), 'issuer_observation_type')
+        require(phase_projection_valid(observation.phase, observation.projection_sha256), 'issuer_phase_support_binding')
         counts = self.rows.setdefault(observation.projection_sha256, [0, 0])
         counts[int(malicious)] += 1
 
@@ -147,7 +163,7 @@ class IssuerHead:
         self.frozen = True
         value = {'schema': SCHEMA, 'profile': PROFILE, 'minimum_support': 5, 'rows': self.rows,
             'dependencies': self.dependencies, 'automatic_enforcement_allowed': False,
-            'review_retained': True, 'identity_or_authority_verified': False}
+            'review_retained': True, 'identity_or_authority_verified': False, 'support_separate_by_phase': True}
         Path(path).write_bytes(canonical(value) + b'\n')
         return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
@@ -159,15 +175,17 @@ class IssuerHead:
             body = stream.read(65537)
         require(len(body) <= 65536 and hashlib.sha256(body).hexdigest() == pin, 'issuer_model_pin')
         value = decode(body)
-        valid = {feature_pin(dict(zip(FIELDS, (True, *bits), strict=True)))
-                 for bits in itertools.product((False, True), repeat=2)}
+        valid = {feature_pin(dict(zip(FIELDS, (True, *bits), strict=True)), phase)
+                 for bits in itertools.product((False, True), repeat=2) for phase in PHASES}
         require(type(value) is dict and set(value) == {'schema', 'profile', 'minimum_support', 'rows',
-                'dependencies', 'automatic_enforcement_allowed', 'review_retained', 'identity_or_authority_verified'}
+                'dependencies', 'automatic_enforcement_allowed', 'review_retained', 'identity_or_authority_verified',
+                'support_separate_by_phase'}
                 and value['schema'] == SCHEMA and value['profile'] == PROFILE
                 and type(value['minimum_support']) is int and value['minimum_support'] == 5
                 and value['dependencies'] == dependencies and value['automatic_enforcement_allowed'] is False
                 and value['review_retained'] is True and value['identity_or_authority_verified'] is False
-                and type(value['rows']) is dict and 0 < len(value['rows']) <= 4
+                and value['support_separate_by_phase'] is True
+                and type(value['rows']) is dict and 0 < len(value['rows']) <= 24
                 and set(value['rows']) <= valid, 'issuer_model_scope')
         for counts in value['rows'].values():
             require(type(counts) is list and len(counts) == 2
@@ -184,9 +202,13 @@ class IssuerHead:
                         for v in (previous.baseline_score, previous.score)), 'issuer_previous_values')
         if observation is None:
             return previous
+        prefix = PREFIX.match(raw)
         require(isinstance(observation, IssuerObservation) and observation.source_sha256 == source_sha256
                 and observation.ordinal == ordinal and observation.line_sha256 == hashlib.sha256(raw.encode()).hexdigest()
-                and observation.human_or_device_identity_verified is False and observation.authority_verified is False,
+                and observation.human_or_device_identity_verified is False and observation.authority_verified is False
+                and type(observation.protected) is bool and prefix is not None
+                and phase_projection_valid(observation.phase, observation.projection_sha256)
+                and observation.phase == verification_phase(raw[prefix.end():].rstrip('\r\n')),
                 'issuer_current_binding')
         if (observation.protected or previous.baseline_score >= .95 or previous.reason not in REASONS
                 or not previous.alert):

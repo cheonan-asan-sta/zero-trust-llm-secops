@@ -47,17 +47,17 @@ def test_only_relationship_flags_enter_features_not_literal_subject_peer_or_sour
     review = IssuerRelationReview(source)
     observation = apply(review, issuer(subject), peer=peer)
     expected = dict(zip(FIELDS, (True, False, False), strict=True))
-    assert observation.projection_sha256 == feature_pin(expected)
+    assert observation.projection_sha256 == feature_pin(expected, 'issuer')
     assert observation.human_or_device_identity_verified is False and observation.authority_verified is False
     repeated = apply(review, issuer(subject), ordinal=2, moment=START + 1, peer=peer)
-    assert repeated.projection_sha256 == feature_pin(dict(zip(FIELDS, (True, True, False), strict=True)))
+    assert repeated.projection_sha256 == feature_pin(dict(zip(FIELDS, (True, True, False), strict=True)), 'issuer')
 
 
 def test_new_subject_relationship_is_distinct_from_previously_seen_subject():
     review = IssuerRelationReview(SOURCE)
     apply(review, issuer('old'))
     new = apply(review, issuer('new'), ordinal=2, moment=START + 1)
-    assert new.projection_sha256 == feature_pin(dict(zip(FIELDS, (True, False, True), strict=True)))
+    assert new.projection_sha256 == feature_pin(dict(zip(FIELDS, (True, False, True), strict=True)), 'issuer')
 
 
 @pytest.mark.parametrize('body', ['VERIFY OK: depth=1, CN=x, CN=y', 'VERIFY OK: depth=1, X=x, CN=y',
@@ -98,7 +98,7 @@ def test_subject_join_history_has_a_bounded_lifetime(age, seen):
     review = IssuerRelationReview(SOURCE)
     apply(review, issuer())
     observation = apply(review, issuer(), ordinal=2, moment=START + age)
-    assert observation.projection_sha256 == feature_pin(dict(zip(FIELDS, (True, seen, False), strict=True)))
+    assert observation.projection_sha256 == feature_pin(dict(zip(FIELDS, (True, seen, False), strict=True)), 'issuer')
 
 
 def test_global_startup_rows_advance_sequence_and_restart_clears_old_state():
@@ -158,12 +158,12 @@ def test_current_failures_denials_high_risk_and_unsupported_cells_are_preserved(
     if fault == 'protected': observation = replace(observation, protected=True)
     if fault == 'high_base': previous = replace(previous, baseline_score=.95)
     if fault == 'denial': previous = replace(previous, reason='independent_current_denial')
-    if fault == 'unseen': observation = replace(observation, projection_sha256='d' * 64)
+    if fault == 'unseen': observation = replace(observation, projection_sha256=feature_pin(dict(zip(FIELDS, (True, True, False), strict=True)), 'issuer'))
     if fault == 'missing': observation = None
     assert model.refine(previous, observation, source_sha256=SOURCE, ordinal=1, raw=raw) is previous
 
 
-@pytest.mark.parametrize('fault', ['authority', 'support', 'dependencies', 'unknown_feature', 'boolean_count'])
+@pytest.mark.parametrize('fault', ['authority', 'support', 'dependencies', 'unknown_feature', 'boolean_count', 'phase_pool'])
 def test_resigned_model_cannot_change_profile_minimum_dependencies_or_claim_authority(tmp_path, fault):
     head(tmp_path, 5)
     path = tmp_path / 'head.json'
@@ -173,6 +173,7 @@ def test_resigned_model_cannot_change_profile_minimum_dependencies_or_claim_auth
     if fault == 'dependencies': value['dependencies']['protocol_model_sha256'] = 'e' * 64
     if fault == 'unknown_feature': value['rows'] = {'e' * 64: [5, 0]}
     if fault == 'boolean_count': next(iter(value['rows'].values()))[0] = True
+    if fault == 'phase_pool': value['support_separate_by_phase'] = False
     path.write_text(json.dumps(value), encoding='utf8')
     with pytest.raises(ValueError):
         IssuerHead.load(path, hashlib.sha256(path.read_bytes()).hexdigest(), DEPENDENCIES)
@@ -188,3 +189,39 @@ def test_native_protocol_failure_window_is_inherited_and_never_shortened(age, pr
         observation = protocol.observe(ordinal, raw, moment, source_sha256=SOURCE)
         last = review.observe(ordinal, raw, moment, observation, source_sha256=SOURCE)
     assert last is not None and last.protected is protected
+
+
+def test_six_different_verification_phases_never_pool_their_support_to_reach_five(tmp_path):
+    bodies = [issuer(), 'VERIFY KU OK', 'Validating certificate extended key usage',
+              '++ Certificate has EKU (str) TLS Web Client Authentication, expects TLS Web Client Authentication',
+              'VERIFY EKU OK', 'VERIFY OK: depth=0, CN=leaf']
+    review = IssuerRelationReview(SOURCE)
+    observations = [apply(review, body, ordinal=n) for n, body in enumerate(bodies, 1)]
+    assert len({value.phase for value in observations}) == 6
+    model = IssuerHead(DEPENDENCIES)
+    for observation in observations: model.add(observation, False)
+    pin = model.save(tmp_path / 'head.json')
+    loaded = IssuerHead.load(tmp_path / 'head.json', pin, DEPENDENCIES)
+    prior = OperationDecision(.4, .98, True, True, 'vpn_history_risk_review')
+    for n, (body, observation) in enumerate(zip(bodies, observations, strict=True), 1):
+        assert loaded.rows[observation.projection_sha256] == [1, 0]
+        assert loaded.refine(prior, observation, source_sha256=SOURCE, ordinal=n, raw=line(body)) is prior
+
+
+def test_a_forged_cross_phase_projection_cannot_borrow_issuer_support_for_ku(tmp_path):
+    model, root, _raw = head(tmp_path, 5)
+    review = IssuerRelationReview(SOURCE)
+    apply(review, issuer())
+    ku = apply(review, 'VERIFY KU OK', ordinal=2)
+    assert ku.projection_sha256 != root.projection_sha256
+    forged = replace(ku, projection_sha256=root.projection_sha256)
+    with pytest.raises(ValueError, match='binding'):
+        model.refine(OperationDecision(.4, .98, True, True, 'vpn_history_risk_review'), forged,
+                     source_sha256=SOURCE, ordinal=2, raw=line('VERIFY KU OK'))
+
+
+def test_wrong_eku_purpose_cannot_be_lowered_as_a_supported_verification_stage():
+    review = IssuerRelationReview(SOURCE)
+    apply(review, issuer())
+    assert apply(review, '++ Certificate has EKU (str) TLS Web Server Authentication, expects TLS Web Client Authentication',
+                 ordinal=2) is None
