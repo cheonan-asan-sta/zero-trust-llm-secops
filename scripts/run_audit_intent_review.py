@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 
 from scripts.f1_lab.apparmor_causal_intent import AppArmorCausalReview
+from scripts.f1_lab.apparmor_status_notice import AppArmorStatusReview
 from scripts.f1_lab.audit_auth_review import refine as add_observed_risk
 from scripts.f1_lab.audit_intent_context import AuditIntentReview
 from scripts.f1_lab.audit_intent_head import IntentHead
@@ -20,8 +21,10 @@ from scripts.f1_lab.web_firewall_context import WebFirewallReview
 from scripts.run_audit_auth_review import signals
 
 
-def observations(raw_directory,preparation,*,with_apparmor_causality=False):
+def observations(raw_directory,preparation,*,with_apparmor_causality=False,with_apparmor_status=False):
     require(type(with_apparmor_causality) is bool,'intent_apparmor_option')
+    require(type(with_apparmor_status) is bool and not (with_apparmor_status and with_apparmor_causality),
+            'intent_apparmor_status_option')
     # This reuses the exact physical source/hash/timezone validation, but not
     # risk decisions or labels, from the existing audit observation reader.
     signals(raw_directory,preparation)
@@ -31,7 +34,8 @@ def observations(raw_directory,preparation,*,with_apparmor_causality=False):
             continue
         path=Path(raw_directory)/f'pair-{index}-raw.source'
         require(sha(path)==pair['raw_sha256'],'intent_raw_pin')
-        reviewer=(AppArmorCausalReview if with_apparmor_causality else AuditIntentReview)(pair['raw_sha256'])
+        factory=AppArmorStatusReview if with_apparmor_status else AppArmorCausalReview if with_apparmor_causality else AuditIntentReview
+        reviewer=factory(pair['raw_sha256'])
         n=0
         with path.open('rb') as stream:
             for n,body in enumerate(stream,1):
@@ -47,11 +51,13 @@ def observations(raw_directory,preparation,*,with_apparmor_causality=False):
 
 
 def predict(head,preparation,raw_directory,baseline,baseline_sha256,output,*,with_risk_observations=False,
-            with_apparmor_causality=False,with_network_audit_context=False,supplemental_head=None):
+            with_apparmor_causality=False,with_network_audit_context=False,supplemental_head=None,
+            with_apparmor_status=False):
     require(type(with_risk_observations) is bool,'intent_risk_option')
     require(type(with_network_audit_context) is bool,'intent_network_option')
     require(sha(baseline)==baseline_sha256,'intent_baseline_pin')
-    selected=observations(raw_directory,preparation,with_apparmor_causality=with_apparmor_causality)
+    selected=observations(raw_directory,preparation,with_apparmor_causality=with_apparmor_causality,
+                          with_apparmor_status=with_apparmor_status)
     require(supplemental_head is None or isinstance(supplemental_head,IntentHead)
         and supplemental_head.frozen and with_apparmor_causality,'intent_supplemental_scope')
     supplemental=observations(raw_directory,preparation) if supplemental_head is not None else {}
@@ -89,7 +95,7 @@ def predict(head,preparation,raw_directory,baseline,baseline_sha256,output,*,wit
                 require(type(before) is bool,'intent_baseline_decision')
                 previous=OperationDecision(prior['before_score'],score,before,before,reason)
                 decision=add_observed_risk(previous,observed.get((source,ordinal)))
-                if (source,ordinal) in selected:
+                if (source,ordinal) in selected and (not with_apparmor_status or decision.alert):
                     observation,line=selected[source,ordinal]
                     decision=head.refine(decision,observation,source_sha256=pair['raw_sha256'],ordinal=ordinal,raw=line)
                 if (source,ordinal) in supplemental:
@@ -109,7 +115,8 @@ def predict(head,preparation,raw_directory,baseline,baseline_sha256,output,*,wit
 
 
 def run(plan_path,pin,model_path,model_pin,output,*,with_risk_observations=False,with_apparmor_causality=False,
-        with_network_audit_context=False,supplemental_model=None,supplemental_model_pin=None):
+        with_network_audit_context=False,supplemental_model=None,supplemental_model_pin=None,
+        with_apparmor_status=False):
     require((supplemental_model is None)==(supplemental_model_pin is None),'intent_supplemental_pair')
     require(sha(plan_path)==pin,'intent_plan_pin')
     plan=decode(Path(plan_path).read_bytes())
@@ -127,6 +134,7 @@ def run(plan_path,pin,model_path,model_pin,output,*,with_risk_observations=False
         'frozen_training_parameters_available':True,'model_sha256':model_pin,
         'with_v102_v105_risk_observations':with_risk_observations,
         'with_apparmor_causality':with_apparmor_causality,
+        'with_apparmor_status':with_apparmor_status,
         'with_network_audit_context':with_network_audit_context,
         'supplemental_intent_model_sha256':supplemental_model_pin,
         'scenarios':{},'aws_calls':0,'paid_api_calls':0}
@@ -140,7 +148,7 @@ def run(plan_path,pin,model_path,model_pin,output,*,with_risk_observations=False
         row=predict(head,prepared,spec['raw'],spec['prediction'],before['prediction']['predictions_sha256'],
                     output/'prediction'/(name+'-predictions.jsonl'),with_risk_observations=with_risk_observations,
                     with_apparmor_causality=with_apparmor_causality,with_network_audit_context=with_network_audit_context,
-                    supplemental_head=supplemental_head)
+                    supplemental_head=supplemental_head,with_apparmor_status=with_apparmor_status)
         require(row['population']==before['population'],'intent_complete_population')
         report['scenarios'][name]=row
         (output/'prediction-seal.json').write_bytes(canonical(report)+b'\n')
@@ -154,13 +162,14 @@ def main():
     for name in ('plan','sha256','model','model-sha256','output'):parser.add_argument('--'+name,required=True)
     parser.add_argument('--with-risk-observations',action='store_true')
     parser.add_argument('--with-apparmor-causality',action='store_true')
+    parser.add_argument('--with-apparmor-status',action='store_true')
     parser.add_argument('--with-network-audit-context',action='store_true')
     parser.add_argument('--supplemental-intent-model')
     parser.add_argument('--supplemental-intent-model-sha256')
     a=parser.parse_args();report=run(a.plan,a.sha256,a.model,a.model_sha256,a.output,
         with_risk_observations=a.with_risk_observations,with_apparmor_causality=a.with_apparmor_causality,
         with_network_audit_context=a.with_network_audit_context,supplemental_model=a.supplemental_intent_model,
-        supplemental_model_pin=a.supplemental_intent_model_sha256)
+        supplemental_model_pin=a.supplemental_intent_model_sha256,with_apparmor_status=a.with_apparmor_status)
     print(json.dumps({'completed':report['completed'],'scenarios':len(report['scenarios']),'goal_qualified':False}))
     return 0
 

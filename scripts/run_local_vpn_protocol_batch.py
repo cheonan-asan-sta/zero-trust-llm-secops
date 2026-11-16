@@ -33,10 +33,11 @@ if PIPELINE=='journal-service':
  args=[sys.executable,'-m','scripts.run_journal_service_review','--plan','/inputs/plan.json',
   '--sha256','PLAN','--journal-catalog','/inputs/journal-catalog.json','--journal-catalog-sha256','JOURNAL',
   '--output','/tmp/prediction-run']
-elif PIPELINE in {'apparmor-causal','audit-native-normal'}:
+elif PIPELINE in {'apparmor-causal','audit-native-normal','apparmor-status'}:
  args=[sys.executable,'-m','scripts.run_audit_intent_review','--plan','/inputs/plan.json',
   '--sha256','PLAN','--model','/inputs/models/head.json','--model-sha256','HEAD',
-  '--output','/tmp/prediction-run','--with-apparmor-causality',
+  '--output','/tmp/prediction-run',
+  '--with-apparmor-status' if PIPELINE=='apparmor-status' else '--with-apparmor-causality',
   *(['--with-network-audit-context'] if NETWORK else [])]
  if PIPELINE=='audit-native-normal':
   args+=['--supplemental-intent-model','/inputs/models/supplemental.json',
@@ -80,7 +81,7 @@ def run(package,stage_pin,image,*,with_attack_evidence=False,with_network_audit_
     inspect=command(['docker','image','inspect',image],30)
     require(inspect.returncode==0 and json.loads(inspect.stdout)[0]['Id']==image,'protocol_image_not_cached')
     profile=stage.get('profile','vpn')
-    require(profile in {'vpn','vpn-control','apparmor-causal','audit-native-normal','journal-service'}
+    require(profile in {'vpn','vpn-control','apparmor-causal','audit-native-normal','journal-service','apparmor-status'}
         and (profile in {'vpn','vpn-control'} or not with_attack_evidence),'protocol_execution_profile')
     require(not with_network_audit_context or profile in {'apparmor-causal','audit-native-normal'},'protocol_network_profile')
     extra=stage.get('supplemental_model_sha256')

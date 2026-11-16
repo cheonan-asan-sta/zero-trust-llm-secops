@@ -8,6 +8,7 @@ import shutil
 import tarfile
 from pathlib import Path
 
+from scripts.f1_lab.apparmor_status_notice import PROFILE as STATUS_PROFILE
 from scripts.f1_lab.audit_intent_context import PROFILE as INTENT_PROFILE
 from scripts.f1_lab.native_jsonl import MAX_ROW, decode, require
 from scripts.f1_lab.operation_context import canonical
@@ -18,7 +19,7 @@ PREDICTION_FIELDS={'case_id','source_index','before','after','before_score','aft
 
 
 def stage(catalog_path,pin,output,*,profile='vpn'):
-    require(profile in {'vpn','vpn-control','apparmor-causal','audit-native-normal'},'protocol_stage_profile')
+    require(profile in {'vpn','vpn-control','apparmor-causal','audit-native-normal','apparmor-status'},'protocol_stage_profile')
     require(sha(catalog_path)==pin,'protocol_catalog_pin')
     catalog=decode(Path(catalog_path).read_bytes())
     require(catalog['schema']=='vpn-protocol-replay-catalog-1' and catalog['goal_qualified'] is False
@@ -71,9 +72,10 @@ def stage(catalog_path,pin,output,*,profile='vpn'):
     (inputs/'baseline.json').write_bytes(canonical(baseline)+b'\n')
     plan['baseline_sha256']=sha(inputs/'baseline.json');(inputs/'plan.json').write_bytes(canonical(plan)+b'\n')
     directory={'vpn':'frozen-vpn-protocol-v109','vpn-control':'frozen-vpn-control-v114','apparmor-causal':'frozen-apparmor-causal-v111',
-        'audit-native-normal':'frozen-audit-native-normal-v113'}[profile]
+        'audit-native-normal':'frozen-audit-native-normal-v113','apparmor-status':'frozen-apparmor-status-v117'}[profile]
     bundle_dir=ROOT/'infra/f1-lab'/directory;bundle=decode((bundle_dir/'bundle.json').read_bytes())
     if profile=='audit-native-normal':require(bundle['feature_profile']==INTENT_PROFILE,'protocol_intent_feature_profile')
+    if profile=='apparmor-status':require(bundle['feature_profile']==STATUS_PROFILE,'protocol_status_feature_profile')
     model_files=('web.json','heads.json','vpn.json','policy.json','legacy.json','head.json') if profile in {'vpn','vpn-control'} else ('head.json',)
     if profile=='audit-native-normal':model_files+=('supplemental.json',)
     if profile=='vpn-control':model_files+=('control.json',)
@@ -112,7 +114,7 @@ def stage(catalog_path,pin,output,*,profile='vpn'):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('catalog','sha256','output'):parser.add_argument('--'+name,required=True)
-    parser.add_argument('--profile',choices=('vpn','vpn-control','apparmor-causal','audit-native-normal'),default='vpn')
+    parser.add_argument('--profile',choices=('vpn','vpn-control','apparmor-causal','audit-native-normal','apparmor-status'),default='vpn')
     a=parser.parse_args();r=stage(a.catalog,a.sha256,a.output,profile=a.profile)
     print(json.dumps({'completed':r['completed'],'scenarios':r['scenarios'],'goal_qualified':False}));return 0
 
