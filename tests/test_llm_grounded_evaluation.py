@@ -1,15 +1,69 @@
 import asyncio
+import hashlib
+import json
 from pathlib import Path
 
 import pytest
 
 from scripts.evaluate_llm_grounded import (
+    baseline_messages,
     include_unattempted,
     metrics,
     reservation,
     run,
     select_cases,
 )
+
+
+def frozen_baseline(tmp_path):
+    cases = tmp_path / "cases.jsonl"
+    cases.write_bytes(b"unchanged development cases")
+    payload = (
+        json.dumps(
+            {
+                "id": "a",
+                "arm": "grounded",
+                "messages": [{"role": "user", "content": "observations only"}],
+            }
+        ).encode()
+        + b"\n"
+    )
+    (tmp_path / "inputs.jsonl").write_bytes(payload)
+    (tmp_path / "plan.json").write_text(
+        json.dumps(
+            {
+                "model": "fixed-model",
+                "cases_sha256": hashlib.sha256(cases.read_bytes()).hexdigest(),
+                "input_sha256": hashlib.sha256(payload).hexdigest(),
+                "source_pins": {},
+            }
+        )
+    )
+    return cases
+
+
+def test_baseline_replay_reads_only_pinned_inputs_not_truth_or_predictions(tmp_path):
+    cases = frozen_baseline(tmp_path)
+    messages, pins = baseline_messages(tmp_path, cases, "fixed-model")
+    assert messages == {"a": [{"role": "user", "content": "observations only"}]}
+    assert (
+        pins["inputs_sha256"]
+        == hashlib.sha256((tmp_path / "inputs.jsonl").read_bytes()).hexdigest()
+    )
+
+
+@pytest.mark.parametrize("change", ["input", "cases", "model"])
+def test_baseline_replay_rejects_modified_inputs_population_or_model(tmp_path, change):
+    cases = frozen_baseline(tmp_path)
+    model = "fixed-model"
+    if change == "input":
+        (tmp_path / "inputs.jsonl").write_bytes(b"changed")
+    elif change == "cases":
+        cases.write_bytes(b"changed")
+    else:
+        model = "different-model"
+    with pytest.raises(ValueError, match="baseline_provenance"):
+        baseline_messages(tmp_path, cases, model)
 
 
 def test_budget_stop_retains_unattempted_cases_as_unknown():
@@ -71,6 +125,7 @@ def test_fixed_maximum_requests_cannot_exhaust_five_dollars_even_across_three_pi
         {"max_budget": 6},
         {"llm_arms": ()},
         {"llm_arms": ("bad",)},
+        {"reasoning_effort": "extreme"},
     ],
 )
 def test_bad_provider_or_budget_options_stop_before_credentials_or_network(tmp_path, options):

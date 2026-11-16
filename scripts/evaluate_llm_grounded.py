@@ -115,6 +115,29 @@ def include_unattempted(rows, requests, truth):
     ]
 
 
+def baseline_messages(directory, cases_path, model):
+    """Replay frozen grounded inputs without reading their labels or predictions."""
+    directory = Path(directory)
+    plan = json.loads((directory / "plan.json").read_bytes())
+    payload = (directory / "inputs.jsonl").read_bytes()
+    if (
+        plan["model"] != model
+        or plan["cases_sha256"] != hashlib.sha256(Path(cases_path).read_bytes()).hexdigest()
+        or plan["input_sha256"] != hashlib.sha256(payload).hexdigest()
+    ):
+        raise ValueError("baseline_provenance")
+    rows = [json.loads(line) for line in payload.splitlines()]
+    grounded = [r for r in rows if r["arm"] == "grounded"]
+    if len({r["id"] for r in grounded}) != len(grounded):
+        raise ValueError("baseline_duplicate")
+    return {r["id"]: r["messages"] for r in grounded}, {
+        "plan_sha256": hashlib.sha256((directory / "plan.json").read_bytes()).hexdigest(),
+        "inputs_sha256": hashlib.sha256(payload).hexdigest(),
+        "source_pins": plan["source_pins"],
+        "grounded_output_schema": "current grounded schema and validator; frozen input messages only",
+    }
+
+
 async def run(
     directory,
     key_file=None,
@@ -123,19 +146,23 @@ async def run(
     model=MODEL,
     llm_arms=("legacy", "grounded"),
     max_budget=5,
+    baseline_directory=None,
+    reasoning_effort=None,
 ):
     if (
         model not in {MODEL, "gpt-6.1-sol"}
         or not llm_arms
-        or not set(llm_arms) <= {"legacy", "grounded"}
+        or not set(llm_arms) <= {"legacy", "grounded", "baseline"}
+        or ("baseline" in llm_arms and baseline_directory is None)
         or not 0 < max_budget <= 5
+        or reasoning_effort not in {None, "none", "low"}
     ):
         raise ValueError("evaluation_options")
     input_rate, output_rate = (
         (INPUT_RATE, OUTPUT_RATE) if model == MODEL else (2 / 1_000_000, 10 / 1_000_000)
     )
-    output_limit = OUTPUT_LIMIT if model == MODEL else 2400
-    effort = "none" if model == MODEL else "low"
+    effort = reasoning_effort or ("none" if model == MODEL else "low")
+    output_limit = OUTPUT_LIMIT if model == MODEL and effort == "none" else 2400
     directory = Path(directory)
     if directory.exists():
         raise ValueError("output_exists")
@@ -146,6 +173,14 @@ async def run(
         raise ValueError("missing_credential")
     cases_path = ROOT / "app/data/benchmark/cases.jsonl"
     cases = select_cases(cases_path, family_offset, families_per_group)
+    replay, replay_pins = (
+        ({}, None)
+        if baseline_directory is None
+        else baseline_messages(baseline_directory, cases_path, model)
+    )
+    expected_ids = {hashlib.sha256(c.case_id.encode()).hexdigest() for c in cases}
+    if "baseline" in llm_arms and set(replay) != expected_ids:
+        raise ValueError("baseline_cohort")
     directory.mkdir(parents=True)
     (directory / "private").mkdir()
     requests, truth = [], {}
@@ -155,12 +190,19 @@ async def run(
         truth[identity] = case.threat
         for arm in llm_arms:
             messages = (
-                [
-                    {"role": "system", "content": SYSTEM_INSTRUCTIONS},
-                    *build_analysis_input(event, 1),
-                ]
-                if arm == "legacy"
-                else [{"role": "system", "content": GROUNDED_INSTRUCTIONS}, *grounded_input(event)]
+                replay[identity]
+                if arm == "baseline"
+                else (
+                    [
+                        {"role": "system", "content": SYSTEM_INSTRUCTIONS},
+                        *build_analysis_input(event, 1),
+                    ]
+                    if arm == "legacy"
+                    else [
+                        {"role": "system", "content": GROUNDED_INSTRUCTIONS},
+                        *grounded_input(event),
+                    ]
+                )
             )
             requests.append({"id": identity, "arm": arm, "messages": messages, "event": event})
     # Alternate arm ordering to avoid consistently privileging one arm by ordering/cache effects.
@@ -202,6 +244,7 @@ async def run(
         ),
         "input_rate_per_million": input_rate * 1_000_000,
         "output_rate_per_million": output_rate * 1_000_000,
+        "baseline_replay": replay_pins,
     }
     plan["source_pins"] = {
         p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest()
@@ -256,7 +299,7 @@ async def run(
                     input=request["messages"],
                     text_format=(
                         grounded_output_type(request["event"])
-                        if request["arm"] == "grounded"
+                        if request["arm"] in {"grounded", "baseline"}
                         else SecurityAssessment
                     ),
                 )
@@ -269,7 +312,7 @@ async def run(
                 if a is None:
                     raise ValueError("missing_structured_output")
                 row["raw_assessment"] = a.model_dump(mode="json")
-                if request["arm"] == "grounded":
+                if request["arm"] in {"grounded", "baseline"}:
                     a = validate_grounded(a, request["event"])
                 row.update(prediction=prediction(a), assessment=a.model_dump(mode="json"))
             except Exception as error:  # noqa: BLE001 -- retain safe failure codes, never provider text/secrets
@@ -336,6 +379,12 @@ if __name__ == "__main__":
     parser.add_argument("--families-per-group", type=int, default=2)
     parser.add_argument("--model", default=MODEL, choices=[MODEL, "gpt-6.1-sol"])
     parser.add_argument("--grounded-only", action="store_true")
+    parser.add_argument("--reasoning-effort", choices=["none", "low"])
+    parser.add_argument(
+        "--baseline-directory",
+        type=Path,
+        help="Frozen prior grounded run to replay beside this candidate",
+    )
     parser.add_argument("--max-budget", type=float, default=5)
     args = parser.parse_args()
     try:
@@ -346,8 +395,14 @@ if __name__ == "__main__":
                 args.family_offset,
                 args.families_per_group,
                 args.model,
-                ("grounded",) if args.grounded_only else ("legacy", "grounded"),
+                ("grounded",)
+                if args.grounded_only
+                else (
+                    ("baseline", "grounded") if args.baseline_directory else ("legacy", "grounded")
+                ),
                 args.max_budget,
+                args.baseline_directory,
+                args.reasoning_effort,
             )
         )
         if not report["completed"]:
