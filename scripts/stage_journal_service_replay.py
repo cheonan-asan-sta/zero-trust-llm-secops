@@ -57,7 +57,8 @@ def stage(catalog_path,pin,output):
     # The base stager supplies audit/auth bytes; this pipeline has no model.
     (inputs/'models/head.json').unlink()
     require(all(sha(p['path'])==p['sha256'] for p in report['source_pins']),'journal_support_source_drift')
-    report.update(completed=True,profile='journal-service',model_sha256=None,journal_catalog_sha256=sha(inputs/'journal-catalog.json'),
+    report.update(completed=True,profile='journal-service',model_sha256=None,frozen_training_parameters_staged=False,
+        journal_catalog_sha256=sha(inputs/'journal-catalog.json'),
         input_pins={p.relative_to(inputs).as_posix():sha(p) for p in inputs.rglob('*') if p.is_file()})
     (out/'stage.json').write_bytes(canonical(report)+b'\n');return report
 

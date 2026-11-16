@@ -66,7 +66,8 @@ def run(package,stage_pin,image,*,with_attack_evidence=False,with_network_audit_
     require(sha(package/'stage.json')==stage_pin and re.fullmatch(r'sha256:[a-f0-9]{64}',image),'protocol_package_pin')
     stage=decode((package/'stage.json').read_bytes())
     require(stage['completed'] is True and stage['validation_labels_or_aggregates_staged'] is False
-        and stage['frozen_training_parameters_staged'] is True,'protocol_package_scope')
+        and (stage['frozen_training_parameters_staged'] is True or stage.get('profile')=='journal-service'
+             and stage['frozen_training_parameters_staged'] is False),'protocol_package_scope')
     require(not (package/'execution.json').exists() and results.is_dir() and not list(results.iterdir()),
         'protocol_package_already_run')
     require(sha(package/'source-manifest.json')==stage['source_manifest_sha256']
@@ -93,7 +94,7 @@ def run(package,stage_pin,image,*,with_attack_evidence=False,with_network_audit_
     owner='zt-vpn-protocol-v109-'+uuid.uuid4().hex[:12];cid=None
     report={'completed':False,'stage_sha256':stage_pin,'goal_qualified':False,'new_independent_evaluation':False,
         'aws_calls':0,'paid_api_calls':0,'image':image,'validation_labels_in_predictor':False,
-        'frozen_training_parameters_available':True}
+        'frozen_training_parameters_available':stage['frozen_training_parameters_staged']}
     report['with_attack_evidence']=with_attack_evidence
     report['profile']=profile
     report['with_network_audit_context']=with_network_audit_context

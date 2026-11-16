@@ -32,6 +32,7 @@ def test_journal_stage_projects_only_required_fields_and_retains_original_proven
     if recovery:value['journal_support'][0]['member']=value['journal_support'][0]['member'].replace('system.journal','system@recovered.journal~')
     dump(path,value);out=tmp_path/'package';report=stage(path,sha(path),out)
     assert report['completed'] and report['profile']=='journal-service' and report['model_sha256'] is None
+    assert report['frozen_training_parameters_staged'] is False
     projected=json.loads((out/'inputs/journal/member-0.jsonl').read_bytes())
     assert set(projected)=={'MESSAGE','_BOOT_ID'}
     assert projected['MESSAGE']=='original journal message'

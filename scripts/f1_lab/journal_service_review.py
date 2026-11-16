@@ -104,6 +104,7 @@ class JournalServiceReview:
         self.times=[r[0] for r in self.entries]
 
     def observe(self,ordinal,line,*,source_sha256):
+        require(type(ordinal) is int and ordinal>0 and type(line) is str and len(line.encode())<=MAX_ROW,'journal_observation_row')
         m=KEY.fullmatch(original_audit_record(line).rstrip('\r\n'))
         current=micros(m['stamp']) if m else None
         if self.disabled:return None
