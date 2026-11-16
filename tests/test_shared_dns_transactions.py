@@ -1,10 +1,12 @@
 import hashlib
 import json
 import zipfile
+from dataclasses import replace
 
 import pytest
 
 from scripts import prepare_shared_dns_transactions as intake
+from scripts import prepare_vpn_packet_members as packet_reader
 from scripts import stage_shared_dns_replay as staging
 from scripts.f1_lab.dns_transaction_fence import PROFILE
 from scripts.f1_lab.shared_dns_transaction_review import SharedDnsTransactionReview, open_review
@@ -130,6 +132,20 @@ def test_intake_opens_only_native_allowlist_and_keeps_roles_without_labels_or_pc
     assert result['projection']['dns_udp_transactions'] == 3 and result['producer']['profile'] == PROFILE
     assert result['historical_application_receipt_proven'] is False and result['new_independent_evaluation'] is False
     assert opened == [intake.AUDIT, intake.FACTS, intake.RUNTIME, intake.EVE]
+
+
+def test_transaction_intake_size_is_explicit_and_old_packet_reader_stays_fixed(lab, tmp_path, monkeypatch):
+    monkeypatch.setattr(packet_reader, 'ASSET', replace(packet_reader.ASSET, bytes=lab.archive.stat().st_size + 100))
+    with lab.archive.open('rb') as source, pytest.raises(ValueError, match='packet_archive_size'):
+        packet_reader.index_bound(source)
+    result = run(lab, tmp_path)
+    assert result['completed'] is True
+
+
+@pytest.mark.parametrize('bad', [True, 1.0, '1', -1, 9 * 1024**3])
+def test_explicit_index_size_remains_a_bounded_integer(lab, bad):
+    with lab.archive.open('rb') as source, pytest.raises(ValueError, match='packet_archive_size'):
+        packet_reader.index_bound(source, expected_bytes=bad)
 
 
 @pytest.mark.parametrize('fault', ['audit', 'timezone', 'worker', 'counter', 'missing_counter'])

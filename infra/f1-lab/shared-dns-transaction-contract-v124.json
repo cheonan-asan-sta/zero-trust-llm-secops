@@ -10,7 +10,7 @@
     "treat Fox as new independent evaluation",
     "CI/push/merge/paid API/AWS before targets"
   ],
-  "frozen_at": "2026-11-16T17:18:40.809057+00:00",
+  "frozen_at": "2026-11-16T17:23:06.994200+00:00",
   "goal_qualified": false,
   "historical_application_receipt_proven": false,
   "new_independent_evaluation": false,
@@ -44,7 +44,7 @@
       "url": "https://github.com/OISF/suricata/blob/suricata-6.0.4/src/output-json.c"
     }
   ],
-  "qualification_revision": 2,
+  "qualification_revision": 4,
   "revision_before_fox_native_member_read": true,
   "schema": "frozen-shared-dns-transaction-contract-1",
   "source_code_sha256": {
@@ -52,11 +52,12 @@
     "scripts/f1_lab/dns_transaction_projection.py": "143ea5099257c95461e3e37fc2260f11b2e5796d836d193a658d83615553da2b",
     "scripts/f1_lab/shared_dns_native_review.py": "03f4024d81f64a254af9a3a392a81a159d800cfd8a19cfd37d7616b3ac5a79cd",
     "scripts/f1_lab/shared_dns_transaction_review.py": "210220b63dcd6aeea17faccb0904e95f2a3ffd9031a8fea00ff558bc82e0f279",
-    "scripts/prepare_shared_dns_transactions.py": "cacc9e2531f9b1d5b81b24a38e69ab1dcf13912094236320442502cb9e195cc6",
+    "scripts/prepare_shared_dns_transactions.py": "3f28df84792883de680825771e5815c5918f599fe74d79d2b91be9642467a68b",
+    "scripts/prepare_vpn_packet_members.py": "23dc3a320171368aebebb2cdb83bb6d47abd73b2b4126114c64006a56e0bbe6d",
     "scripts/run_shared_dns_native_review.py": "132e6b80f429c56adde0556c0c5da608d628e6b765796275b1557533eb655fa4",
     "scripts/stage_shared_dns_replay.py": "6905f4d1911517352ae75dd81fde3f73c823f0ae58ffeede2bf7726cc992eae2",
     "tests/test_dns_transaction_sources.py": "cc30addc49bd5fe8ae93fd21cd923d0bdcc2d874fb24a70a66a7679fa20e467e",
-    "tests/test_shared_dns_transactions.py": "1564568f495de972aafefcbe72fcbd184244680cce4798909153c2e251037b00"
+    "tests/test_shared_dns_transactions.py": "3257eb70248e65da27e5a052deeea21ac571e7ea44d9f977e642f11c4ce59763"
   },
   "source_contract": [
     "single reported AF_PACKET worker, explicit UTC, fully publisher-MD5-verified complete archive and native EVE CRC+SHA",

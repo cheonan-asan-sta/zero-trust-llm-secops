@@ -42,11 +42,16 @@ def fingerprints(path):
     return strong.hexdigest(), publisher.hexdigest()
 
 
-def index_bound(stream):
-    """Bound the index before ZipFile allocates it; only the fixed asset size."""
+def index_bound(stream, *, expected_bytes=None):
+    """Bound allocation against a pinned size; old callers retain the fixed asset.
+
+    Another independently pinned intake can supply its own explicit size. This
+    does not change the existing training acquisition or general ZIP limits.
+    """
+    expected_bytes = ASSET.bytes if expected_bytes is None else expected_bytes
     stream.seek(0, 2)
     size = stream.tell()
-    require(size == ASSET.bytes <= MAXIMUM and size >= 22, 'packet_archive_size')
+    require(type(expected_bytes) is int and size == expected_bytes <= MAXIMUM and size >= 22, 'packet_archive_size')
     start = max(0, size - 65557)
     stream.seek(start)
     tail = stream.read(65557)

@@ -97,7 +97,7 @@ def run(scenario, acquisition, acquisition_pin, archive, preparation, preparatio
         'paid_api_calls': 0, 'aws_calls': 0}
     try:
         with archive.open('rb') as stream:
-            count, boundary = index_bound(stream)
+            count, boundary = index_bound(stream, expected_bytes=spec['asset']['bytes'])
             stream.seek(0)
             with zipfile.ZipFile(stream) as package:
                 infos = package.infolist()
