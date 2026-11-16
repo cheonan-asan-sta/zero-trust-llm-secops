@@ -1,3 +1,5 @@
+> 2026-11-17 v126: DEDALE syslog125MB·게시 MD5·첫128행의 중첩 압축/형식 검증과 관련 Windows/Linux120건을 완료했다. 새46건·정답/학습/예측0·새 독립 인수0이며 F1 공유 감사/VPN80% 유지. Docker 소유 컨테이너 제거·목표 전 CI/push/병합 보류. [수집 근거](docs/extra-dedale-native-intake.md)
+
 > 2026-11-17 v125: 단계별 최소지지5를 분리하고 관련 Linux1,244건 검증. issuer 초안의 pooled24=각단계4여서 미채택, H/W 각5행 감소를 최종 수치로 쓰지 않는다. 공유 감사·VPN F1은80% 유지, 목표 미달·CI/push/병합 보류. [최신 근거](docs/extra-vpn-issuer-relation-review.md)
 
 > 2026-11-17 v124: native DNS 요청·응답 근거와 Linux1,190건 검증. 추가 TP/FP/TP손실0, 공유 감사·VPN F1은80%로 동일하다. 전체 목표 미달, push/새 CI/병합/유료/AWS 보류. [최신 검토](docs/extra-shared-dns-transaction-review.md)

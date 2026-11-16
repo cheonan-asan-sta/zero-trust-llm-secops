@@ -152,3 +152,8 @@ Linux 소스721파일이 실행 전후 동일했고 컨테이너 exit0·OOM fals
 ## v125 지지 단위·source 노출 감사
 
 정상 지지를 인증 단계 사이에 합산한 issuer 초안은 미채택이다. 최종 단계별지지4<5이며 새 독립 평가 성공이 아니다. [v125 노출 대장](../infra/f1-lab/observed-source-exposure-v125.json)은 읽은 client runtime wrapper3개의 지문을 추가해61→64로 기록했다. 시뮬레이터 상태·stdout은 모델에 사용하지 않았고 source ID/payload/pattern을 보존했다. 기존8개 source의 추가 modality이며 원래6영역·5축·source/label 심사는 미완료다. [최신 근거](extra-vpn-issuer-relation-review.md).
+
+
+## v126 별도 native source 형식 조사
+
+[DEDALE 수집](extra-dedale-native-intake.md)은 고정 syslog ZIP·첫 member의128행을 개발 probe로 읽은 작업이다. 원래1,681,815행에 더하거나 새 독립 최종 사례로 세지 않는다. [v126 대장](../infra/f1-lab/observed-source-exposure-v126.json)은 기존 ID/payload/pattern을 보존하며 DEDALE canonical source를 관측 개발용으로 추가한다. 정답·시뮬레이터 본문0, 사람/권한/기기 신뢰와 라벨 의미·5축 분리는 미확인이다. 원래 프로토콜·6영역·분할·95%/5% 목표는 변경하지 않았다.
