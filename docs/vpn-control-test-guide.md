@@ -12,6 +12,8 @@ python -m pytest tests/test_vpn_control_review.py tests/test_vpn_protocol_review
 
 가중치·실행 코드·시험은 [동결 묶음](../infra/f1-lab/frozen-vpn-control-v114/), [학습기](../scripts/train_vpn_control.py), [판정기](../scripts/run_vpn_protocol_review.py), [staging](../scripts/stage_vpn_protocol_replay.py)에 포함했다. 이번 버전은 로컬 커밋만 했고 아직 GitHub에 게시하지 않았다. 저장소 clone만으로 큰 원본/정답·v113 기준선 예측을 얻을 수는 없다.
 
+모델 묶음 JSON은 `.gitattributes`로 바이트를 보존한다. Windows 줄바꿈 변환으로 지문이 달라지지 않도록 Git blob과 로컬 파일의 SHA가 같음을 확인했다. 값이 같더라도 파일을 다시 포맷하면 공개한 원래 지문과 달라질 수 있다.
+
 전체 성능 재현에는 정확히 짝지어진 AIT 원본·정답, preparation 지문, v113 봉인 기준선, 준비된 Python 3.12 의존성과 캐시 이미지가 필요하다. [공통 catalog/실행 가이드](vpn-protocol-test-guide.md)를 따라 실제 파일 경로로 catalog를 구성한다. 예측기에는 원문·최소 metadata·기준선·동결 계수·코드만 제공하고 정답은 봉인/컨테이너 제거 뒤 채점한다.
 
 ```powershell
