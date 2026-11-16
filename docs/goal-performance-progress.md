@@ -1,22 +1,24 @@
 # 목표 수치까지의 현재 개선 상태
 
-**v116 추가 검토:** [잔여 후보 제외·LLM 지표 구분](extra-residual-candidate-review.md). 주소·DNS 후보는 새 오탐 29행으로 제외했고 서비스 간격 후보는 지지 조건을 충족하지 못했다. 적용 모델과 아래 v115 수치는 유지했다. 최근 탐지 F1은 LLM 자체의 품질 평가가 아니다.
+2026-11-16 · 목표 active · 무료 로컬 · 목표 전 push·새 CI·병합·유료 호출 보류
 
-2026-11-16 · 목표 active · 무료 로컬 · 목표 전 push·새 CI·병합 보류
-
-최신 [v115 journal 실행 관측](extra-journal-service-review.md): 공유 감사 TP 0→2·FN 6→4·FP 3 유지·F1 0%→36.36%. 같은 Santos 학습 사건의 시작/종료 2행이며 독립 공격 2건이나 새 독립 평가는 아니다. 원래 1,681,815행 유지·전체 새 FP/기존 TP 손실 0·Linux 820건 통과다. 인증·웹 감사 관측 100%와 VPN F1 80%는 유지했다.
+최신 [v117 AppArmor 현재 상태 알림](extra-apparmor-status-review.md): 공유 감사 **FP 3→0·TP 2/FN 4 유지·F1 36.36%→50%**. 별도 Wilson/Wardbeck FP도 각각 1→0이며 FN 2씩은 남는다. 원래 1,681,815행 유지·전체 새 FP/기존 TP 손실 0·Linux 855건 통과다. 인증·웹 감사 관측 100%와 VPN F1 80%는 유지했다. 현재 기록의 미확인 호출자를 인증 완료로 바꾸지 않았고, 경보를 낮춰도 검토를 유지한다.
 
 아래는 현재 R/S/F 종류별 수치다. 원래 6개 보안 영역의 독립 인수를 로그 종류로 대체하지 않는다.
 
 | 종류 | TP | FP | FN | 정밀도 | 재현율 | F1 | 오탐률 | 미탐률 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | 인증 | 32 | 0 | 0 | 100.0000% | 100.0000% | 100.0000% | 0.0000% | 0.0000% |
-| 공유 감사 | 2 | 3 | 4 | 40.0000% | 33.3333% | 36.3636% | 0.1276% | 66.6667% |
+| 공유 감사 | 2 | 0 | 4 | 100.0000% | 33.3333% | 50.0000% | 0.0000% | 66.6667% |
 | 웹 감사 | 47 | 0 | 0 | 100.0000% | 100.0000% | 100.0000% | 0.0000% | 0.0000% |
 | VPN | 84 | 42 | 0 | 66.6667% | 100.0000% | 80.0000% | 0.2286% | 0.0000% |
 
-공유 감사는 TP 2/FP 3/FN 4로 여전히 미달이다. 현재 양성 6행에서는 재현율 95%를 위해 FN 0, 정밀도 95%를 위해 FP 0이 필요하다. VPN은 TP 84를 유지할 때 FP 42→4 이하가 필요하다. 별도 Wheeler 학습 VPN FN 9·Harrison VPN FP 36과 원래 6영역 새 독립 인수도 남는다. 과거 자료에 없는 신원·실행·기기/권한은 미확인으로 유지한다.
+공유 감사는 TP 2/FP 0/FN 4로 여전히 미달이다. 현재 양성 6행에서는 재현율 95%를 위해 FN 0이 필요하다. VPN은 TP 84를 유지할 때 FP 42→4 이하가 필요하다. 별도 Wheeler 학습 VPN FN 9·Harrison VPN FP 36과 원래 6영역 새 독립 인수도 남는다. 과거 자료에 없는 신원·실행·기기/권한은 미확인으로 유지한다.
 
-직전 [v114 VPN 제어](extra-vpn-control-review.md)는 VPN FP 48→42·F1 80%, [v113 실제 정상 audit 학습](extra-native-audit-normal-review.md)은 웹 감사 FP 15→0·F1 100%로 개선했다. 이 결과와 v112 Wilson 웹 감사 FN 3→0, v111 공유 FP 24→3, v110 Wheeler 학습 VPN FN 28→9를 보존했다. 전체 완료 시각은 추가 근거 확보와 실제 검증 결과에 달려 있어 확정하지 않는다.
+최근 F1 개선은 규칙·경량 분류기·근거 연결의 탐지 결과다. **LLM 자체의 새 품질 향상을 측정한 것이 아니며 실제 LLM 호출 0**이다. [v116 후보 제외·LLM 지표 구분](extra-residual-candidate-review.md)에서 과거 합성 8건 시험의 한계와 별도 LLM 평가 항목을 확인할 수 있다. v116 주소/DNS 후보의 새 오탐 29행과 지지 부족 서비스 간격 후보는 채택하지 않았다.
 
-[최신 구현·검증·남은 문제](extra-journal-service-review.md) · [시험·재현](journal-service-test-guide.md) · [결과 JSON](infrastructure-results/extra-journal-service-v115-20261116.json)
+직전 [v115 journal 실행 관측](extra-journal-service-review.md)은 Santos의 같은 사건 시작/종료 2행을 회수했다. [v114 VPN 제어](extra-vpn-control-review.md)는 VPN FP 48→42·F1 80%, [v113 실제 정상 audit 학습](extra-native-audit-normal-review.md)은 웹 감사 FP 15→0·F1 100%로 개선했다. v112 Wilson 웹 감사 FN 3→0, v111 공유 FP 24→3, v110 Wheeler 학습 VPN FN 28→9도 보존했다.
+
+v115에서 한 번 발생한 시간 의존 fixture 오류는 이번에 재현되지 않았지만 원인은 미확정이다. 원래 6영역의 새 독립 인수·장기 soak도 미완료다. 전체 완료 시각은 추가 근거 확보와 실제 검증 결과에 달려 있어 확정하지 않는다.
+
+[최신 구현·검증·남은 문제](extra-apparmor-status-review.md) · [시험·재현](apparmor-status-test-guide.md) · [결과 JSON](infrastructure-results/extra-apparmor-status-v117-20261116.json)

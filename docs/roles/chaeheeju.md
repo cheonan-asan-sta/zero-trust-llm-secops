@@ -1,5 +1,7 @@
 # 채희주 개인 실행 계획
 
+**최신 v117:** [현재 AppArmor 상태 알림의 공유 감사 오탐 개선](../extra-apparmor-status-review.md). 공유 FP 3→0·TP 2/FN 4 유지·F1 50%, 별도 Wilson/Wardbeck FP 각 1→0·FN 2씩 유지. 원래 1,681,815행·새 FP/기존 TP 손실 0·Linux 855건. 미확인 호출자와 검토 필요 유지·LLM 새 품질 평가 없음·전체 목표 active·push/새 CI/병합/유료 호출 보류. 아래 기록은 해당 버전 당시 결과다.
+
 **v116 검토·미채택:** [주소/DNS 오탐 실패·작업 간격 지지 부족·LLM 지표 구분](../extra-residual-candidate-review.md). 새 탐지 후보는 적용하지 않았고 확정 성능은 v115다. 실제 LLM 품질을 새로 개선/측정한 것으로 보고하지 않는다. 목표 active·유료 호출/CI/병합 보류.
 
 **최신 v115:** [앞선 journal 실행 관측](../extra-journal-service-review.md). 공유 감사 TP 0→2·FN 6→4·FP 3 유지·F1 36.36%. 같은 학습 사건의 audit 2행, 사람/현재 invocation/유출 성공 검증은 아님. 원래 1,681,815행·새 FP/기존 TP 손실 0·Linux 820건. 인증·웹 감사 100%·VPN F1 80% 유지·전체 목표 active·push/새 CI/병합 보류.
