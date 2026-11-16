@@ -4,7 +4,12 @@ import pytest
 
 from scripts.f1_lab.audit_auth_review import refine
 from scripts.f1_lab.operation_refinement import OperationDecision
-from scripts.f1_lab.sensitive_auth_context import REASON, RECON_REASON, SensitiveAuthReview
+from scripts.f1_lab.sensitive_auth_context import (
+    IDENTITY_REASON,
+    REASON,
+    RECON_REASON,
+    SensitiveAuthReview,
+)
 
 SHA = 'a'*64
 NOW = datetime(2025,1,24,4,38,6,tzinfo=UTC).timestamp()
@@ -94,6 +99,32 @@ def test_recursive_root_recon_from_web_upload_path_is_observed_risk_not_identity
     ('/var/www/site/uploads/../public','/bin/ls -laR /root/'),
     ('/var/www/site/uploads','/bin/ls -laR /root/; echo x')])
 def test_recon_requires_both_web_path_shape_and_direct_protected_recursive_request(pwd,command):
+    o=SensitiveAuthReview(SHA)
+    observe(o,1,CMD.replace('/tmp/cache',pwd).replace('/bin/cat /etc/shadow',command))
+    assert observe(o,2,OPEN) is None
+
+
+@pytest.mark.parametrize('root',['/var/www/site/uploads/2025/01','/srv/www/app/cache',
+    '/usr/share/nginx/html/content/tmp'])
+@pytest.mark.parametrize('target',['/etc/passwd','/etc/group'])
+def test_root_identity_enumeration_from_web_storage_adds_review_only(root,target):
+    o=SensitiveAuthReview(SHA)
+    command=CMD.replace('/tmp/cache',root).replace('/bin/cat /etc/shadow','/bin/cat '+target)
+    observe(o,1,command)
+    reason=observe(o,2,OPEN)
+    assert reason==IDENTITY_REASON
+    result=refine(OperationDecision(.1,.1,False,False,'unchanged'),reason)
+    assert result.alert and result.review and not result.automatic_enforcement_allowed
+
+
+@pytest.mark.parametrize('pwd,command',[('/home/admin','/bin/cat /etc/passwd'),
+    ('/tmp/cache','/bin/cat /etc/passwd'),('/var/www/site/public','/bin/cat /etc/passwd'),
+    ('/var/www/site/uploads-backup','/bin/cat /etc/passwd'),
+    ('/var/www/site/uploads/../public','/bin/cat /etc/passwd'),
+    ('/var/www/site/uploads','/bin/cat /etc/passwd.old'),
+    ('/var/www/site/uploads','/bin/cat /etc/passwd; id'),
+    ('/var/www/site/uploads','/bin/cat /etc/passwd > /tmp/out')])
+def test_identity_read_requires_exact_file_direct_command_and_web_storage_shape(pwd,command):
     o=SensitiveAuthReview(SHA)
     observe(o,1,CMD.replace('/tmp/cache',pwd).replace('/bin/cat /etc/shadow',command))
     assert observe(o,2,OPEN) is None

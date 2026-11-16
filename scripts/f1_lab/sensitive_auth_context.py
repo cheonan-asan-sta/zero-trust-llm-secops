@@ -10,6 +10,7 @@ from scripts.f1_lab.native_jsonl import MAX_ROW, require
 
 REASON = 'sudo_sensitive_command_cooccurs_with_root_pam_open'
 RECON_REASON = 'sudo_webpath_root_recon_cooccurs_with_pam_open'
+IDENTITY_REASON = 'sudo_webpath_identity_read_cooccurs_with_root_pam_open'
 PREFIX = re.compile(r'^(?P<month>[A-Z][a-z]{2})\s+(?P<day>\d{1,2}) '
     r'(?P<hour>\d{2}):(?P<minute>\d{2}):(?P<second>\d{2}) '
     r'(?P<host>[^\s]{1,255}) sudo(?:\[(?P<pid>[1-9]\d{0,9})\])?: (?P<body>[^\r\n]{1,8192})$')
@@ -33,22 +34,33 @@ def sensitive_read(body):
     return bool(2 <= len(args) <= 16 and args[0] in READERS and any(arg in FILES for arg in args[1:]))
 
 
-def webpath_root_recon(body):
+def webpath_arguments(body):
     match = COMMAND.fullmatch(body.lstrip(' '))
     if match is None or re.search(r'[;&|<>`$\x00]', match['command']):
-        return False
+        return None
     pwd = match['pwd']
     if (not pwd.startswith(('/var/www/','/srv/www/','/usr/share/nginx/html/'))
             or '..' in PurePosixPath(pwd).parts
             or not re.search(r'/(?:uploads|cache|tmp)(?:/|$)',pwd)):
-        return False
+        return None
     try:
         args = shlex.split(match['command'])
     except ValueError:
-        return False
+        return None
+    return args
+
+
+def webpath_root_recon(body):
+    args=webpath_arguments(body)
+    if args is None:return False
     return bool(3 <= len(args) <= 16 and args[0] in {'ls','/bin/ls','/usr/bin/ls'}
         and any(a in {'/root','/root/'} for a in args[1:])
         and any(a == '--recursive' or re.fullmatch(r'-[A-Za-z]{1,16}',a) and 'R' in a for a in args[1:]))
+
+
+def webpath_identity_read(body):
+    args=webpath_arguments(body)
+    return bool(args and len(args)==2 and args[0] in READERS and args[1] in {'/etc/passwd','/etc/group'})
 
 
 class SensitiveAuthReview:
@@ -95,7 +107,8 @@ class SensitiveAuthReview:
         if pid is not None and pid >= 4294967295:
             return None
         reason = (REASON if sensitive_read(match['body']) else RECON_REASON
-                  if webpath_root_recon(match['body']) else None)
+                  if webpath_root_recon(match['body']) else IDENTITY_REASON
+                  if webpath_identity_read(match['body']) else None)
         if reason:
             self.pending = (moment, match['host'], pid, reason)
         elif old is not None and OPEN.fullmatch(match['body']):
