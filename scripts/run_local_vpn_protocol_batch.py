@@ -29,11 +29,16 @@ Path('/results/image-scope.json').write_text(json.dumps({'completed':True,
  'code_origin':importlib.util.find_spec('app').origin,'staged_documents_or_tests':False}))
 shutil.copytree('/inputs/baseline','/tmp/baseline')
 shutil.copytree('/inputs/raw','/tmp/raw')
-r=subprocess.run([sys.executable,'-m','scripts.run_vpn_protocol_review','--plan','/inputs/plan.json',
+if PIPELINE=='apparmor-causal':
+ args=[sys.executable,'-m','scripts.run_audit_intent_review','--plan','/inputs/plan.json',
+  '--sha256','PLAN','--model','/inputs/models/head.json','--model-sha256','HEAD',
+  '--output','/tmp/prediction-run','--with-apparmor-causality']
+else:
+ args=[sys.executable,'-m','scripts.run_vpn_protocol_review','--plan','/inputs/plan.json',
  '--sha256','PLAN','--model','/inputs/models/head.json','--model-sha256','HEAD',
  '--legacy-models','/inputs/models/legacy.json','--legacy-models-sha256','LEGACY','--output','/tmp/prediction-run',
- *(['--with-attack-evidence'] if ATTACK else [])],
- cwd='/work',capture_output=True,text=True)
+ *(['--with-attack-evidence'] if ATTACK else [])]
+r=subprocess.run(args,cwd='/work',capture_output=True,text=True)
 Path('/results/predict.log').write_text(r.stdout+'\\n'+r.stderr)
 if r.returncode==0:shutil.copytree('/tmp/prediction-run','/results/prediction-run')
 sys.exit(r.returncode)
@@ -62,12 +67,15 @@ def run(package,stage_pin,image,*,with_attack_evidence=False):
     require(inventory()==stage['input_pins'],'protocol_package_inventory')
     inspect=command(['docker','image','inspect',image],30)
     require(inspect.returncode==0 and json.loads(inspect.stdout)[0]['Id']==image,'protocol_image_not_cached')
-    program=BOOTSTRAP.replace('PLAN',stage['plan_sha256']).replace('HEAD',stage['model_sha256']).replace('LEGACY',stage['legacy_models_sha256']).replace('ATTACK',str(with_attack_evidence))
+    profile=stage.get('profile','vpn')
+    require(profile in {'vpn','apparmor-causal'} and (profile=='vpn' or not with_attack_evidence),'protocol_execution_profile')
+    program=BOOTSTRAP.replace('PLAN',stage['plan_sha256']).replace('HEAD',stage['model_sha256']).replace('LEGACY',stage['legacy_models_sha256'] or '').replace('ATTACK',str(with_attack_evidence)).replace('PIPELINE',repr(profile))
     owner='zt-vpn-protocol-v109-'+uuid.uuid4().hex[:12];cid=None
     report={'completed':False,'stage_sha256':stage_pin,'goal_qualified':False,'new_independent_evaluation':False,
         'aws_calls':0,'paid_api_calls':0,'image':image,'validation_labels_in_predictor':False,
         'frozen_training_parameters_available':True}
     report['with_attack_evidence']=with_attack_evidence
+    report['profile']=profile
     try:
         created=command(['docker','create','--pull=never','--name',owner,'--label','secops.f1.owner='+owner,
             '--network','none','--read-only','--user','10001:10001','--cap-drop','ALL',

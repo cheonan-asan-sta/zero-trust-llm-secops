@@ -12,7 +12,8 @@ from scripts.f1_lab.transfer_evaluation import sha
 from scripts.run_audit_intent_review import observations
 
 
-def fit(plan_path, pin, output):
+def fit(plan_path, pin, output,*,with_apparmor_causality=False):
+    require(type(with_apparmor_causality) is bool,'intent_apparmor_option')
     require(sha(plan_path)==pin, 'intent_training_plan_pin')
     plan=decode(Path(plan_path).read_bytes())
     require(plan['schema']=='audit-intent-training-plan-1' and plan['goal_qualified'] is False
@@ -28,7 +29,7 @@ def fit(plan_path, pin, output):
         require(sha(spec['preparation'])==spec['preparation_sha256']
                 and sha(spec['truth'])==spec['truth_sha256'],'intent_training_input_pin')
         preparation=decode(Path(spec['preparation']).read_bytes())
-        selected=observations(spec['raw'],preparation)
+        selected=observations(spec['raw'],preparation,with_apparmor_causality=with_apparmor_causality)
         source=ordinal=count=eligible=0
         with Path(spec['truth']).open('rb') as truth:
             while body:=truth.readline(MAX_ROW+1):
@@ -48,6 +49,7 @@ def fit(plan_path, pin, output):
     report={'completed':True,'model_sha256':model_pin,'training_plan_sha256':pin,'training':provenance,
         'training_label_counts_in_model':True,'new_independent_evaluation':False,'goal_qualified':False,
         'minimum_support':model.minimum_support,'aws_calls':0,'paid_api_calls':0}
+    report['with_apparmor_causality']=with_apparmor_causality
     (out/'training-provenance.json').write_bytes(canonical(report)+b'\n')
     return report
 
@@ -55,7 +57,8 @@ def fit(plan_path, pin, output):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('plan','sha256','output'):parser.add_argument('--'+name,required=True)
-    a=parser.parse_args();print(json.dumps(fit(a.plan,a.sha256,a.output)))
+    parser.add_argument('--with-apparmor-causality',action='store_true')
+    a=parser.parse_args();print(json.dumps(fit(a.plan,a.sha256,a.output,with_apparmor_causality=a.with_apparmor_causality)))
     return 0
 
 

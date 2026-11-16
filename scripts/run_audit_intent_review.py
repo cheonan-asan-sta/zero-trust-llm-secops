@@ -6,6 +6,7 @@ import json
 import re
 from pathlib import Path
 
+from scripts.f1_lab.apparmor_causal_intent import AppArmorCausalReview
 from scripts.f1_lab.audit_auth_review import refine as add_observed_risk
 from scripts.f1_lab.audit_intent_context import AuditIntentReview
 from scripts.f1_lab.audit_intent_head import IntentHead
@@ -18,7 +19,8 @@ from scripts.f1_lab.transfer_evaluation import sha
 from scripts.run_audit_auth_review import signals
 
 
-def observations(raw_directory,preparation):
+def observations(raw_directory,preparation,*,with_apparmor_causality=False):
+    require(type(with_apparmor_causality) is bool,'intent_apparmor_option')
     # This reuses the exact physical source/hash/timezone validation, but not
     # risk decisions or labels, from the existing audit observation reader.
     signals(raw_directory,preparation)
@@ -28,7 +30,7 @@ def observations(raw_directory,preparation):
             continue
         path=Path(raw_directory)/f'pair-{index}-raw.source'
         require(sha(path)==pair['raw_sha256'],'intent_raw_pin')
-        reviewer=AuditIntentReview(pair['raw_sha256'])
+        reviewer=(AppArmorCausalReview if with_apparmor_causality else AuditIntentReview)(pair['raw_sha256'])
         n=0
         with path.open('rb') as stream:
             for n,body in enumerate(stream,1):
@@ -43,10 +45,11 @@ def observations(raw_directory,preparation):
     return result
 
 
-def predict(head,preparation,raw_directory,baseline,baseline_sha256,output,*,with_risk_observations=False):
+def predict(head,preparation,raw_directory,baseline,baseline_sha256,output,*,with_risk_observations=False,
+            with_apparmor_causality=False):
     require(type(with_risk_observations) is bool,'intent_risk_option')
     require(sha(baseline)==baseline_sha256,'intent_baseline_pin')
-    selected=observations(raw_directory,preparation)
+    selected=observations(raw_directory,preparation,with_apparmor_causality=with_apparmor_causality)
     observed=(signals(raw_directory,preparation,review_factory=OrderedAuditReview,
         auth_review_factory=SensitiveAuthReview)[0] if with_risk_observations else {})
     output=Path(output)
@@ -80,7 +83,7 @@ def predict(head,preparation,raw_directory,baseline,baseline_sha256,output,*,wit
             'predictions_sha256':sha(output),'validation_labels_opened':False}
 
 
-def run(plan_path,pin,model_path,model_pin,output,*,with_risk_observations=False):
+def run(plan_path,pin,model_path,model_pin,output,*,with_risk_observations=False,with_apparmor_causality=False):
     require(sha(plan_path)==pin,'intent_plan_pin')
     plan=decode(Path(plan_path).read_bytes())
     require(plan['schema']=='ordered-audit-replay-1' and plan['scope']=='observed_development_only'
@@ -95,6 +98,7 @@ def run(plan_path,pin,model_path,model_pin,output,*,with_risk_observations=False
         'new_independent_evaluation':False,'validation_labels_opened':False,
         'frozen_training_parameters_available':True,'model_sha256':model_pin,
         'with_v102_v105_risk_observations':with_risk_observations,
+        'with_apparmor_causality':with_apparmor_causality,
         'scenarios':{},'aws_calls':0,'paid_api_calls':0}
     for spec in plan['scenarios']:
         name=spec['name']
@@ -104,7 +108,8 @@ def run(plan_path,pin,model_path,model_pin,output,*,with_risk_observations=False
         require(prepared['completed'] is True and prepared['inputs_contain_truth'] is False,'intent_preparation_scope')
         before=baseline['scenarios'][name]
         row=predict(head,prepared,spec['raw'],spec['prediction'],before['prediction']['predictions_sha256'],
-                    output/'prediction'/(name+'-predictions.jsonl'),with_risk_observations=with_risk_observations)
+                    output/'prediction'/(name+'-predictions.jsonl'),with_risk_observations=with_risk_observations,
+                    with_apparmor_causality=with_apparmor_causality)
         require(row['population']==before['population'],'intent_complete_population')
         report['scenarios'][name]=row
         (output/'prediction-seal.json').write_bytes(canonical(report)+b'\n')
@@ -117,8 +122,9 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('plan','sha256','model','model-sha256','output'):parser.add_argument('--'+name,required=True)
     parser.add_argument('--with-risk-observations',action='store_true')
+    parser.add_argument('--with-apparmor-causality',action='store_true')
     a=parser.parse_args();report=run(a.plan,a.sha256,a.model,a.model_sha256,a.output,
-        with_risk_observations=a.with_risk_observations)
+        with_risk_observations=a.with_risk_observations,with_apparmor_causality=a.with_apparmor_causality)
     print(json.dumps({'completed':report['completed'],'scenarios':len(report['scenarios']),'goal_qualified':False}))
     return 0
 

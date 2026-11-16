@@ -1,0 +1,65 @@
+{
+  "schema": "apparmor-causal-frozen-bundle-1",
+  "profile": "apparmor-causal-parser-observations-1",
+  "head": {
+    "path": "head.json",
+    "sha256": "c9a11114dd64c6fda46d5db63eef0fce17dcfda0084204f76272c9edd5866638"
+  },
+  "training_provenance": {
+    "aws_calls": 0,
+    "completed": true,
+    "goal_qualified": false,
+    "minimum_support": 5,
+    "model_sha256": "c9a11114dd64c6fda46d5db63eef0fce17dcfda0084204f76272c9edd5866638",
+    "new_independent_evaluation": false,
+    "paid_api_calls": 0,
+    "training": [
+      {
+        "eligible": 14,
+        "name": "russellmitchell",
+        "population": 295243,
+        "preparation_sha256": "0091ab22f3ffe3ee12773c7a7d6dfe127e78750faf6dbe4aca2550e39b2f3683",
+        "role": "training",
+        "truth_sha256": "2e569fc8a2678d06ac62fec7152bf070969e4db9fe123da5301cafd617cd5a43"
+      },
+      {
+        "eligible": 7,
+        "name": "santos",
+        "population": 295976,
+        "preparation_sha256": "b6e960ddc26eff3c4251ba08319c0af45697b3ee4aabdd96ba50d09e154d4f9a",
+        "role": "training",
+        "truth_sha256": "21f65f66a93489950507764cfae096752120d376d57d49e8c8b2d7e885b7c989"
+      },
+      {
+        "eligible": 14,
+        "name": "wilson",
+        "population": 4967,
+        "preparation_sha256": "0da1e376737b700b445d119984a53f637501ee4ad4c4e4be1444a438c6000513",
+        "role": "training",
+        "truth_sha256": "e4e888e740d81632a343d3ac214f0d6421bf920366ff57d781c5825da3195e2b"
+      },
+      {
+        "eligible": 7,
+        "name": "shaw",
+        "population": 4463,
+        "preparation_sha256": "86817a2ace0950abe8edb42a544643b8968fa388d4aa0456c1e2873f65d5fe27",
+        "role": "training",
+        "truth_sha256": "09af225d34ebede481a9c1d9c79108e61ae504c7e824df0f9164a6b9ee1560d5"
+      },
+      {
+        "eligible": 14,
+        "name": "wheeler",
+        "population": 3862,
+        "preparation_sha256": "58c42772bf3c8cbc7a3a185da2c17cf104c476edd5fe1bdeaec0902c7513eebc",
+        "role": "training",
+        "truth_sha256": "4077cabaf764e15df562909c8e1853b0c2e6320693eeecbf49a92dc0484b81af"
+      }
+    ],
+    "training_label_counts_in_model": true,
+    "training_plan_sha256": "68f7fb0e7a72b187e5ae3b7566be122d6ff9afdb8f43ddd4e327f21b2cbf8405",
+    "with_apparmor_causality": true
+  },
+  "goal_qualified": false,
+  "new_independent_evaluation": false,
+  "automatic_enforcement_allowed": false
+}

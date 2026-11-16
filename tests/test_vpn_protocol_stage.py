@@ -53,6 +53,29 @@ def test_staging_strips_label_aggregates_adjacent_truth_and_noncode_artifacts(tm
     assert report['frozen_training_parameters_staged'] is True
 
 
+def test_audit_profile_stages_only_audit_auth_raw_and_its_frozen_head(tmp_path):
+    path,catalog,baseline,dump=fixture(tmp_path);spec=catalog['scenarios'][0]
+    raw=tmp_path/'raw';audit=raw/'pair-1-raw.source';audit.write_bytes(b'audit-observation\n')
+    member='gather/share/logs/audit/audit.log';digest=sha(audit)
+    manifest=json.loads((raw/'audit.json').read_bytes())
+    manifest['pairs'].append({'provenance':{'raw_member':member,'raw_sha256':digest,
+        'simulation_start':1735689600,'simulation_end':1735776000,'label_member':'excluded'}})
+    dump(raw/'audit.json',manifest)
+    prep=json.loads((tmp_path/'preparation.json').read_bytes())
+    prep['source_manifest_sha256']=sha(raw/'audit.json')
+    prep['pairs'].append({'raw_member':member,'raw_sha256':digest,'rows':1})
+    dump(tmp_path/'preparation.json',prep)
+    row=json.loads(baseline.read_bytes());row.update(case_id=hashlib.sha256((digest+':1').encode()).hexdigest(),source_index=1)
+    with baseline.open('a',encoding='utf8') as stream:stream.write(json.dumps(row)+'\n')
+    spec.update(preparation_sha256=sha(tmp_path/'preparation.json'),baseline_sha256=sha(baseline),population=2)
+    dump(path,catalog)
+    out=tmp_path/'audit-package';report=stage(path,sha(path),out,profile='apparmor-causal')
+    assert report['completed'] and report['profile']=='apparmor-causal' and report['legacy_models_sha256'] is None
+    assert (out/'inputs/raw/arbitrary/pair-1-raw.source').read_bytes()==audit.read_bytes()
+    assert not (out/'inputs/raw/arbitrary/pair-0-raw.source').exists()
+    assert {p.name for p in (out/'inputs/models').iterdir()}=={'head.json'}
+
+
 @pytest.mark.parametrize('fault',['extra_truth_field','name_escape','pin','population'])
 def test_staging_rejects_label_in_prediction_unsafe_names_bad_pins_and_changed_population(tmp_path,fault):
     path,catalog,baseline,dump=fixture(tmp_path)

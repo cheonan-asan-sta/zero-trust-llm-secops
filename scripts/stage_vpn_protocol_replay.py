@@ -16,7 +16,8 @@ ROOT=Path(__file__).resolve().parents[1]
 PREDICTION_FIELDS={'case_id','source_index','before','after','before_score','after_score','reason','error'}
 
 
-def stage(catalog_path,pin,output):
+def stage(catalog_path,pin,output,*,profile='vpn'):
+    require(profile in {'vpn','apparmor-causal'},'protocol_stage_profile')
     require(sha(catalog_path)==pin,'protocol_catalog_pin')
     catalog=decode(Path(catalog_path).read_bytes())
     require(catalog['schema']=='vpn-protocol-replay-catalog-1' and catalog['goal_qualified'] is False
@@ -55,7 +56,8 @@ def stage(catalog_path,pin,output):
             and sha(destination)==spec['baseline_sha256'],'protocol_catalog_population')
         original[prep_path]=sha(prep_path);original[manifest_path]=sha(manifest_path);original[before]=sha(before)
         for index,pair in enumerate(prep['pairs']):
-            if pair['raw_member'].endswith('/openvpn.log'):
+            suffixes=('/openvpn.log',) if profile=='vpn' else ('/logs/audit/audit.log','/logs/auth.log')
+            if pair['raw_member'].endswith(suffixes):
                 path=raw/f'pair-{index}-raw.source';require(sha(path,64*1024**2)==pair['raw_sha256'],'protocol_stage_raw_pin')
                 original[path]=sha(path);shutil.copyfile(path,folder/path.name)
                 require(sha(folder/path.name)==pair['raw_sha256'],'protocol_stage_copy_pin')
@@ -67,11 +69,13 @@ def stage(catalog_path,pin,output):
             'projected_raw_manifest_sha256':sha(folder/'audit.json'),'original_prediction_sha256':sha(before)})
     (inputs/'baseline.json').write_bytes(canonical(baseline)+b'\n')
     plan['baseline_sha256']=sha(inputs/'baseline.json');(inputs/'plan.json').write_bytes(canonical(plan)+b'\n')
-    bundle_dir=ROOT/'infra/f1-lab/frozen-vpn-protocol-v109';bundle=decode((bundle_dir/'bundle.json').read_bytes())
-    for name in ('web.json','heads.json','vpn.json','policy.json','legacy.json','head.json'):
+    directory='frozen-vpn-protocol-v109' if profile=='vpn' else 'frozen-apparmor-causal-v111'
+    bundle_dir=ROOT/'infra/f1-lab'/directory;bundle=decode((bundle_dir/'bundle.json').read_bytes())
+    model_files=('web.json','heads.json','vpn.json','policy.json','legacy.json','head.json') if profile=='vpn' else ('head.json',)
+    for name in model_files:
         shutil.copyfile(bundle_dir/name,inputs/'models'/name)
-    require(sha(inputs/'models/head.json')==bundle['head']['sha256']
-        and sha(inputs/'models/legacy.json')==bundle['legacy']['sha256'],'protocol_bundle_copy_pin')
+    require(sha(inputs/'models/head.json')==bundle['head']['sha256'],'protocol_bundle_copy_pin')
+    if profile=='vpn':require(sha(inputs/'models/legacy.json')==bundle['legacy']['sha256'],'protocol_bundle_copy_pin')
     source_manifest=[]
     with tarfile.open(inputs/'code.tar','w') as archive:
         for directory in ('app','scripts'):
@@ -84,7 +88,8 @@ def stage(catalog_path,pin,output):
     (out/'projection-provenance.json').write_bytes(canonical(projection)+b'\n')
     require(all(sha(p)==value for p,value in original.items()),'protocol_stage_source_drift')
     report={'completed':True,'catalog_sha256':pin,'plan_sha256':sha(inputs/'plan.json'),
-        'model_sha256':bundle['head']['sha256'],'legacy_models_sha256':bundle['legacy']['sha256'],
+        'model_sha256':bundle['head']['sha256'],'legacy_models_sha256':bundle['legacy']['sha256'] if profile=='vpn' else None,
+        'profile':profile,
         'source_archive_sha256':sha(inputs/'code.tar'),'source_manifest_sha256':sha(out/'source-manifest.json'),
         'projection_provenance_sha256':sha(out/'projection-provenance.json'),
         'source_pins':[{'path':str(p),'sha256':value} for p,value in original.items()],
@@ -97,7 +102,8 @@ def stage(catalog_path,pin,output):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('catalog','sha256','output'):parser.add_argument('--'+name,required=True)
-    a=parser.parse_args();r=stage(a.catalog,a.sha256,a.output)
+    parser.add_argument('--profile',choices=('vpn','apparmor-causal'),default='vpn')
+    a=parser.parse_args();r=stage(a.catalog,a.sha256,a.output,profile=a.profile)
     print(json.dumps({'completed':r['completed'],'scenarios':r['scenarios'],'goal_qualified':False}));return 0
 
 
