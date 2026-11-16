@@ -121,6 +121,16 @@ def test_changed_raw_line_cannot_reuse_original_source_pin(tmp_path):
     assert r.disabled and r.observe(3,lines[2],source_sha256=pin) is None
 
 
+def test_future_duplicate_cannot_remove_preceding_native_boot_anchor(tmp_path):
+    _,_,lines,member=packet(tmp_path)
+    extended=[*lines,lines[0]]
+    pin=hashlib.sha256(''.join(extended).encode()).hexdigest()
+    r=JournalServiceReview(pin,extended,[member])
+    first=[r.observe(n,line,source_sha256=pin) for n,line in enumerate(extended[:3],1)]
+    assert first[0] is None and first[1] and first[2]
+    assert r.observe(4,extended[3],source_sha256=pin) is None and r.disabled
+
+
 def test_sidecar_tamper_is_rejected_before_or_after_observation(tmp_path):
     r,pin,lines,m=packet(tmp_path)
     path=tmp_path/'journal.jsonl';path.write_text('changed',encoding='utf8')

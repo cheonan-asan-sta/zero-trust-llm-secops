@@ -77,7 +77,7 @@ class JournalServiceReview:
             m=KEY.fullmatch(original_audit_record(line).rstrip('\r\n'))
             if m:
                 key=(micros(m['stamp']),m['serial'],m['kind']+' '+m['body'])
-                lookup[key]=ordinal if key not in lookup else None
+                lookup.setdefault(key,[]).append(ordinal)
         self.pins=[]
         for member in members:
             path=member['path'];pin=member['sha256'];machine=member['machine_id'];hostname=member['hostname']
@@ -97,7 +97,7 @@ class JournalServiceReview:
                         origin=row.get('_SOURCE_REALTIME_TIMESTAMP');serial=row.get('_AUDIT_ID');message=row.get('MESSAGE')
                         if type(origin) is str and origin.isdigit() and type(serial) is str and type(message) is str:
                             anchor=lookup.get((int(origin),serial,message))
-                            if anchor:self.anchors.append((available,anchor,boot))
+                            if anchor:self.anchors.append((available,tuple(anchor),boot))
         self.entries.sort(key=lambda r:(r[0],r[1],r[3]['journal_sha256'],r[3]['journal_ordinal']))
         self.anchors.sort()
         require(len(self.entries)<=200000,'journal_total_records')
@@ -142,7 +142,11 @@ class JournalServiceReview:
         if (not unit or UNIT.fullmatch(unit+'.service') is None or number(body,'pid')!=1 or number(body,'uid')!=0
                 or field(body,'comm')!='systemd' or field(body,'exe') not in {'/lib/systemd/systemd','/usr/lib/systemd/systemd'}
                 or field(body,'res')!='success'):return None
-        anchors=[(prior,boot) for available,prior,boot in self.anchors if available<=current and self.boot_floor<prior<ordinal]
+        anchors=[]
+        for available,positions,boot in self.anchors:
+            if available>current:continue
+            prior=[p for p in positions if self.boot_floor<p<ordinal]
+            if len(prior)==1:anchors.append((prior[0],boot))
         if not anchors:return None
         highest=max(p for p,_ in anchors);boots={boot for p,boot in anchors if p==highest}
         if len(boots)!=1:return None
