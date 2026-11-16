@@ -1,5 +1,7 @@
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
 
+**v116 검토·미채택:** [주소/DNS 오탐 실패·작업 간격 지지 부족·LLM 지표 구분](docs/extra-residual-candidate-review.md). 새 탐지 후보는 적용하지 않았고 확정 성능은 v115다. 실제 LLM 품질을 새로 개선/측정한 것으로 보고하지 않는다. 목표 active·유료 호출/CI/병합 보류.
+
 **최신 v115:** [앞선 journal 실행 관측](docs/extra-journal-service-review.md). 공유 감사 TP 0→2·FN 6→4·FP 3 유지·F1 36.36%. 같은 학습 사건의 audit 2행, 사람/현재 invocation/유출 성공 검증은 아님. 원래 1,681,815행·새 FP/기존 TP 손실 0·Linux 820건. 인증·웹 감사 100%·VPN F1 80% 유지·전체 목표 active·push/새 CI/병합 보류.
 
 **직전 v114:** [VPN 제어 메시지 관측](docs/extra-vpn-control-review.md). VPN FP 48→42·TP 84/FN 0 유지·F1 80%, 별도 Harrison/Shaw/Wheeler FP 각 2건 감소. 원래 1,681,815행 유지·새 FP/기존 TP 손실 0·Linux 776건. 인증·웹 감사 관측 100% 유지. 공유 감사·VPN·원래 6영역 독립 목표는 미완료·목표 active·push/새 CI/병합 보류.

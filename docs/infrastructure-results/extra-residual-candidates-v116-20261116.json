@@ -1,0 +1,445 @@
+{
+  "schema": "residual-candidate-review-1",
+  "date": "2026-11-16",
+  "completed": true,
+  "base_commit": "b7040282d33eefd5d943599db6be1e07899b5559",
+  "latest_verified_performance": "extra-journal-service-v115-20261116",
+  "latest_verified_paired_score_sha256": "dc7d3b6485da543437c8cfccb5f34639da4dcf17008bb5fd9d654109354795fc",
+  "original_population": 1681815,
+  "accepted_detector_change": false,
+  "models_refitted_for_deployment": false,
+  "source_code_restored_byte_exactly": true,
+  "new_full_replay_or_functional_suite_run": false,
+  "latest_verified_linux_test_count": 820,
+  "latest_verified_test_count_is_not_a_new_v116_run": true,
+  "dns_candidate": {
+    "role": "training_exploration",
+    "adopted": false,
+    "new_tp": 2,
+    "new_fp": 29,
+    "lost_tp": 0,
+    "per_source_changes": {
+      "russellmitchell": {
+        "new_tp": 2,
+        "introduced_fp": 21,
+        "lost_tp": 0,
+        "removed_fp": 0
+      },
+      "santos": {
+        "new_tp": 0,
+        "introduced_fp": 8,
+        "lost_tp": 0,
+        "removed_fp": 0
+      }
+    },
+    "scoring_sha256": "2c0b5ad01f8d60213bf81ee91180c0505fd204e83993ba20d4eb025512541299",
+    "saved_candidate_manifest": [
+      {
+        "path": "scripts/run_journal_service_review.py",
+        "sha256": "3dd176f6d844b76790c88e80787223d454772c9863700ef855c7e88e93125898"
+      },
+      {
+        "path": "scripts/run_local_vpn_protocol_batch.py",
+        "sha256": "5f0b4e67cf0c2499c1301adf3de71535fafc84c683eda198f4fa92a3d15e50ba"
+      },
+      {
+        "path": "scripts/f1_lab/dns_service_review.py",
+        "sha256": "fc6022f86523cea846e7caf889d7acca0ece7c00995b152641ac30bf6a5b8a20"
+      },
+      {
+        "path": "scripts/stage_dns_service_replay.py",
+        "sha256": "a8d68869f633625b2617c194fa5b5ff5ea921c3e8dc09b1bd9eff98791b6a035"
+      }
+    ],
+    "source_capture_scope": "saved rejected code; one equivalent regex alias spelling changed after initial probe; not an immutable full qualification run",
+    "historical_ip_is_current_ownership": false,
+    "cross_host_clock_alignment_verified": false,
+    "reason": "same-host-address DNS coincidence promoted unrelated normal service events"
+  },
+  "job_gap_candidate": {
+    "role": "training_exploration",
+    "adopted": false,
+    "heads_created": 0,
+    "training": [
+      "russellmitchell",
+      "santos",
+      "wilson",
+      "shaw",
+      "wheeler"
+    ],
+    "minimum_normal_support": 5,
+    "minimum_attack_support": 5,
+    "normal_veto_preserved": true,
+    "phases_pooled": false,
+    "training_groups": {
+      "SERVICE_START:False": {
+        "attack": 0,
+        "attack_above": 0,
+        "attack_gaps_us": [],
+        "normal": 167,
+        "threshold_us": 166041707332
+      },
+      "SERVICE_START:True": {
+        "attack": 5,
+        "attack_above": 0,
+        "attack_gaps_us": [
+          237324560373,
+          318270701265,
+          326613344758,
+          349332095898,
+          368883734950
+        ],
+        "normal": 56,
+        "threshold_us": 405658576638
+      },
+      "SERVICE_STOP:False": {
+        "attack": 0,
+        "attack_above": 0,
+        "attack_gaps_us": [],
+        "normal": 131,
+        "threshold_us": 89261582907
+      },
+      "SERVICE_STOP:True": {
+        "attack": 5,
+        "attack_above": 0,
+        "attack_gaps_us": [
+          237324560373,
+          318270701265,
+          326613344758,
+          349332095898,
+          368883734950
+        ],
+        "normal": 56,
+        "threshold_us": 405658576638
+      }
+    },
+    "scoring_sha256": "7489ff4d527282877b07e347d6b420c36c64e401690957954408eab7e04df02e",
+    "protocol_sha256": "de1ba673b18b5da0ae95d1592374256fa951cc185b022b46fb7de6c58256de8f",
+    "reason": "zero attacks above the largest normal gap; support gate not met"
+  },
+  "process_inventory": {
+    "role": "training_support_diagnostic",
+    "per_source": {
+      "russellmitchell": {
+        "files": [
+          {
+            "member": "gather/monitoring/logs/logstash/internal-share/2022-01-20-system.process.log",
+            "sha256": "dced648de5c769632e65f77f36a9105d6279f94a21466a6498640f9fbfa66525"
+          }
+        ],
+        "records": 10,
+        "matching_cgroup_rows": 0,
+        "interesting_commands": 0,
+        "earlier_5s_rows": 0,
+        "earlier_60s_rows": 0
+      },
+      "santos": {
+        "files": [
+          {
+            "member": "gather/monitoring/logs/logstash/internal-share/2022-01-13-system.process.log",
+            "sha256": "2f2e2f7fe29fd7685d04b92c429e50cc67e67a71567dd6caa0a749f940e84d7c"
+          }
+        ],
+        "records": 10,
+        "matching_cgroup_rows": 0,
+        "interesting_commands": 0,
+        "earlier_5s_rows": 0,
+        "earlier_60s_rows": 0
+      },
+      "shaw": {
+        "files": [
+          {
+            "member": "gather/monitoring/logs/logstash/internal-share/2022-01-24-system.process.log",
+            "sha256": "3058b3a85cf7787347ee3c874e87f139569ec20bc3aba7dc68718b8040c7a148"
+          }
+        ],
+        "records": 10,
+        "matching_cgroup_rows": 0,
+        "interesting_commands": 0,
+        "earlier_5s_rows": 0,
+        "earlier_60s_rows": 0
+      },
+      "wheeler": {
+        "files": [
+          {
+            "member": "gather/monitoring/logs/logstash/internal-share/2022-01-25-system.process.log",
+            "sha256": "d7bb721b19be4c5e490e6c9b4e9b3d3362ed773a500c832cbfcf85f401e10a42"
+          }
+        ],
+        "records": 10,
+        "matching_cgroup_rows": 0,
+        "interesting_commands": 0,
+        "earlier_5s_rows": 0,
+        "earlier_60s_rows": 0
+      }
+    },
+    "report_sha256": "d23c5a44420e6e0841cd8c2831b475aa92d4048b2c7d423a9e890f5c7aa48edc",
+    "no_relevant_event_time_process_snapshot_found": true
+  },
+  "additional_wilson_support": {
+    "role": "already_declared_training",
+    "sources": 29,
+    "decoded_records": 10075,
+    "archive_sha256": "e7a6e0d3d7ac3cde9354ada2e593dd0e3d9c50007adae426f9f5979e2d697c20",
+    "report_sha256": "f32ee41e0a3b289794b09a41bd42ab9c4b0e086eb8f5f941b0aa017de27b66ca",
+    "unchanged_v115_journal_rule_signals": 0,
+    "fresh_holdout_claimed": false
+  },
+  "llm_quality": {
+    "new_provider_calls": 0,
+    "new_measured_provider_quality_gain": false,
+    "current_detection_F1_is_provider_LLM_F1": false,
+    "historical_documented_sample": {
+      "source": "docs/week11/README.md",
+      "cases": 8,
+      "repetitions": 1,
+      "risk_accuracy": 0.75,
+      "response_accuracy": 0.625,
+      "json_valid_rate": 1.0,
+      "mean_latency_seconds_approx": 4.2,
+      "p95_latency_seconds_approx": 5.73,
+      "scope": "historical document only; not a current rerun, not a general performance claim"
+    },
+    "M6_contract_actual_new_model_comparison_complete": false
+  },
+  "current_kinds_RSF": {
+    "audit-share": {
+      "before": {
+        "tp": 0,
+        "fp": 3,
+        "fn": 6,
+        "tn": 2349,
+        "inference_errors": 0,
+        "population": 2358,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "false_positive_rate": 0.0012755102040816326,
+        "accuracy": 0.9961832061068703
+      },
+      "after": {
+        "tp": 2,
+        "fp": 3,
+        "fn": 4,
+        "tn": 2349,
+        "inference_errors": 0,
+        "population": 2358,
+        "precision": 0.4,
+        "recall": 0.3333333333333333,
+        "f1": 0.36363636363636365,
+        "false_positive_rate": 0.0012755102040816326,
+        "accuracy": 0.9970313825275657
+      }
+    },
+    "dns": {
+      "before": {
+        "tp": 135466,
+        "fp": 9,
+        "fn": 2595,
+        "tn": 654079,
+        "inference_errors": 0,
+        "population": 792149,
+        "precision": 0.9999335670787969,
+        "recall": 0.9812039605681546,
+        "f1": 0.990480229293402,
+        "false_positive_rate": 1.3759616443047419e-05,
+        "accuracy": 0.9967127396487278
+      },
+      "after": {
+        "tp": 135466,
+        "fp": 9,
+        "fn": 2595,
+        "tn": 654079,
+        "inference_errors": 0,
+        "population": 792149,
+        "precision": 0.9999335670787969,
+        "recall": 0.9812039605681546,
+        "f1": 0.990480229293402,
+        "false_positive_rate": 1.3759616443047419e-05,
+        "accuracy": 0.9967127396487278
+      }
+    },
+    "auth": {
+      "before": {
+        "tp": 32,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1082,
+        "inference_errors": 0,
+        "population": 1114,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      },
+      "after": {
+        "tp": 32,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1082,
+        "inference_errors": 0,
+        "population": 1114,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      }
+    },
+    "web-error": {
+      "before": {
+        "tp": 1414,
+        "fp": 0,
+        "fn": 0,
+        "tn": 4,
+        "inference_errors": 0,
+        "population": 1418,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      },
+      "after": {
+        "tp": 1414,
+        "fp": 0,
+        "fn": 0,
+        "tn": 4,
+        "inference_errors": 0,
+        "population": 1418,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      }
+    },
+    "web-access": {
+      "before": {
+        "tp": 426312,
+        "fp": 7,
+        "fn": 18,
+        "tn": 4577,
+        "inference_errors": 0,
+        "population": 430914,
+        "precision": 0.9999835803705676,
+        "recall": 0.9999577791851383,
+        "f1": 0.9999706796114227,
+        "false_positive_rate": 0.0015270506108202443,
+        "accuracy": 0.9999419837833071
+      },
+      "after": {
+        "tp": 426312,
+        "fp": 7,
+        "fn": 18,
+        "tn": 4577,
+        "inference_errors": 0,
+        "population": 430914,
+        "precision": 0.9999835803705676,
+        "recall": 0.9999577791851383,
+        "f1": 0.9999706796114227,
+        "false_positive_rate": 0.0015270506108202443,
+        "accuracy": 0.9999419837833071
+      }
+    },
+    "audit-web": {
+      "before": {
+        "tp": 47,
+        "fp": 0,
+        "fn": 0,
+        "tn": 7419,
+        "inference_errors": 0,
+        "population": 7466,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      },
+      "after": {
+        "tp": 47,
+        "fp": 0,
+        "fn": 0,
+        "tn": 7419,
+        "inference_errors": 0,
+        "population": 7466,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      }
+    },
+    "vpn": {
+      "before": {
+        "tp": 84,
+        "fp": 42,
+        "fn": 0,
+        "tn": 18332,
+        "inference_errors": 0,
+        "population": 18458,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8,
+        "false_positive_rate": 0.002285838685098509,
+        "accuracy": 0.9977245638747426
+      },
+      "after": {
+        "tp": 84,
+        "fp": 42,
+        "fn": 0,
+        "tn": 18332,
+        "inference_errors": 0,
+        "population": 18458,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8,
+        "false_positive_rate": 0.002285838685098509,
+        "accuracy": 0.9977245638747426
+      }
+    },
+    "cpu": {
+      "before": {
+        "tp": 139,
+        "fp": 4,
+        "fn": 0,
+        "tn": 5617,
+        "inference_errors": 0,
+        "population": 5760,
+        "precision": 0.972027972027972,
+        "recall": 1.0,
+        "f1": 0.9858156028368794,
+        "false_positive_rate": 0.0007116171499733144,
+        "accuracy": 0.9993055555555556
+      },
+      "after": {
+        "tp": 139,
+        "fp": 4,
+        "fn": 0,
+        "tn": 5617,
+        "inference_errors": 0,
+        "population": 5760,
+        "precision": 0.972027972027972,
+        "recall": 1.0,
+        "f1": 0.9858156028368794,
+        "false_positive_rate": 0.0007116171499733144,
+        "accuracy": 0.9993055555555556
+      }
+    }
+  },
+  "labels_changed": false,
+  "target_thresholds_changed": false,
+  "original_population_changed": false,
+  "policy_fixtures_added_to_F1": false,
+  "new_independent_evaluation": false,
+  "original_six_domains_qualified": false,
+  "goal_qualified": false,
+  "goal_status": "active",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "push_performed": false,
+  "new_ci_started": false,
+  "merge_performed": false,
+  "long_soak_started": false
+}
