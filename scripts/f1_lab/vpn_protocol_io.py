@@ -18,7 +18,11 @@ def legacy(path,pin):
         and set(value['models'])=={'web','heads','vpn','policy'},'protocol_legacy_manifest')
     models=value['models']
     for spec in models.values():
-        require(set(spec)=={'path','sha256'} and sha(spec['path'])==spec['sha256'],'protocol_legacy_weight_pin')
+        require(set(spec)=={'path','sha256'},'protocol_legacy_weight_schema')
+        location=Path(spec['path'])
+        if not location.is_absolute():location=Path(path).resolve().parent/location
+        require(sha(location)==spec['sha256'],'protocol_legacy_weight_pin')
+        spec['path']=str(location)
     identity=hashlib.sha256(canonical({k:v['sha256'] for k,v in models.items()})).hexdigest()
     base=load_operation_refinement(models['policy']['path'],models['policy']['sha256'],
         models['web']['path'],models['web']['sha256'],models['heads']['path'],models['heads']['sha256'],

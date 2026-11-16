@@ -1,13 +1,16 @@
 import hashlib
 import json
+import shutil
 from dataclasses import replace
 from datetime import UTC, datetime
+from pathlib import Path
 
 import pytest
 
 from scripts.f1_lab.operation_refinement import OperationDecision
 from scripts.f1_lab.transfer_evaluation import sha
 from scripts.f1_lab.vpn_protocol_head import ProtocolHead
+from scripts.f1_lab.vpn_protocol_io import legacy
 from scripts.f1_lab.vpn_protocol_review import ProtocolReview
 from scripts.run_vpn_protocol_review import predict
 from scripts.train_vpn_protocol import fit
@@ -232,3 +235,16 @@ def test_training_rejects_wrong_role_misaligned_labels_and_raw_drift(tmp_path,mo
     if fault=='raw_hash':(raw/'pair-0-raw.source').write_text('tampered',encoding='utf8')
     dump(tmp_path/'plan.json',plan)
     with pytest.raises((ValueError,KeyError)):fit(tmp_path/'plan.json',sha(tmp_path/'plan.json'),tmp_path/'rejected')
+
+
+def test_checked_in_reproduction_bundle_loads_after_relocation_and_rejects_changed_weight(tmp_path):
+    original=Path(__file__).resolve().parents[1]/'infra/f1-lab/frozen-vpn-protocol-v109'
+    folder=tmp_path/'relocated';shutil.copytree(original,folder)
+    bundle=json.loads((folder/'bundle.json').read_bytes())
+    _,identity=legacy(folder/bundle['legacy']['path'],bundle['legacy']['sha256'])
+    assert identity==bundle['legacy_identity_sha256']
+    head=ProtocolHead.load(folder/bundle['head']['path'],bundle['head']['sha256'],identity)
+    assert head.frozen and head.rows
+    with (folder/'vpn.json').open('ab') as stream:stream.write(b' ')
+    with pytest.raises(ValueError,match='protocol_legacy_weight_pin'):
+        legacy(folder/bundle['legacy']['path'],bundle['legacy']['sha256'])

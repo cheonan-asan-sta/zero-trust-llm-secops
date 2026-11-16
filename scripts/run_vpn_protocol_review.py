@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 
 from scripts.f1_lab.native_jsonl import MAX_ROW, decode, require
@@ -65,7 +66,8 @@ def run(plan_path,pin,model_path,model_pin,legacy_path,legacy_pin,output):
         'validation_labels_opened':False,'frozen_training_parameters_available':True,'model_sha256':model_pin,
         'legacy_identity_sha256':identity,'scenarios':{},'aws_calls':0,'paid_api_calls':0}
     for spec in plan['scenarios']:
-        name=spec['name'];require(name not in report['scenarios'] and sha(spec['preparation'])==spec['preparation_sha256'],
+        name=spec['name'];require(type(name) is str and re.fullmatch('[a-z0-9_-]{1,64}',name)
+            and name not in report['scenarios'] and sha(spec['preparation'])==spec['preparation_sha256'],
             'protocol_preparation_pin')
         prep=decode(Path(spec['preparation']).read_bytes())
         require(prep['completed'] is True and prep['inputs_contain_truth'] is False,'protocol_preparation_scope')
