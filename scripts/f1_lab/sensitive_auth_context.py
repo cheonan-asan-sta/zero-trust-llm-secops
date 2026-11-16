@@ -4,15 +4,17 @@ import math
 import re
 import shlex
 from datetime import UTC, datetime
+from pathlib import PurePosixPath
 
 from scripts.f1_lab.native_jsonl import MAX_ROW, require
 
 REASON = 'sudo_sensitive_command_cooccurs_with_root_pam_open'
+RECON_REASON = 'sudo_webpath_root_recon_cooccurs_with_pam_open'
 PREFIX = re.compile(r'^(?P<month>[A-Z][a-z]{2})\s+(?P<day>\d{1,2}) '
     r'(?P<hour>\d{2}):(?P<minute>\d{2}):(?P<second>\d{2}) '
     r'(?P<host>[^\s]{1,255}) sudo(?:\[(?P<pid>[1-9]\d{0,9})\])?: (?P<body>[^\r\n]{1,8192})$')
 COMMAND = re.compile(r'[A-Za-z_][A-Za-z0-9_.-]{0,63}\$?\s+: TTY=[^;\r\n]{1,128} ; '
-    r'PWD=[^;\r\n]{1,2048} ; USER=root ; COMMAND=(?P<command>[^\r\n]{1,4096})$')
+    r'PWD=(?P<pwd>[^;\r\n]{1,2048}) ; USER=root ; COMMAND=(?P<command>[^\r\n]{1,4096})$')
 OPEN = re.compile(r'pam_unix\(sudo:session\): session opened for user root(?:\(uid=0\))? '
     r'by (?:[A-Za-z_][A-Za-z0-9_.-]{0,63}\$?)?\(uid=\d{1,10}\)$')
 FILES = frozenset({'/etc/shadow', '/etc/gshadow', '/etc/security/opasswd'})
@@ -29,6 +31,24 @@ def sensitive_read(body):
     except ValueError:
         return False
     return bool(2 <= len(args) <= 16 and args[0] in READERS and any(arg in FILES for arg in args[1:]))
+
+
+def webpath_root_recon(body):
+    match = COMMAND.fullmatch(body.lstrip(' '))
+    if match is None or re.search(r'[;&|<>`$\x00]', match['command']):
+        return False
+    pwd = match['pwd']
+    if (not pwd.startswith(('/var/www/','/srv/www/','/usr/share/nginx/html/'))
+            or '..' in PurePosixPath(pwd).parts
+            or not re.search(r'/(?:uploads|cache|tmp)(?:/|$)',pwd)):
+        return False
+    try:
+        args = shlex.split(match['command'])
+    except ValueError:
+        return False
+    return bool(3 <= len(args) <= 16 and args[0] in {'ls','/bin/ls','/usr/bin/ls'}
+        and any(a in {'/root','/root/'} for a in args[1:])
+        and any(a == '--recursive' or re.fullmatch(r'-[A-Za-z]{1,16}',a) and 'R' in a for a in args[1:]))
 
 
 class SensitiveAuthReview:
@@ -74,11 +94,13 @@ class SensitiveAuthReview:
         pid = int(match['pid']) if match['pid'] is not None else None
         if pid is not None and pid >= 4294967295:
             return None
-        if sensitive_read(match['body']):
-            self.pending = (moment, match['host'], pid)
+        reason = (REASON if sensitive_read(match['body']) else RECON_REASON
+                  if webpath_root_recon(match['body']) else None)
+        if reason:
+            self.pending = (moment, match['host'], pid, reason)
         elif old is not None and OPEN.fullmatch(match['body']):
-            before, host, old_pid = old
+            before, host, old_pid, reason = old
             if (0 <= moment-before <= 1 and host == match['host']
                     and (pid is None or old_pid is None or pid == old_pid)):
-                return REASON
+                return reason
         return None

@@ -4,7 +4,7 @@ import pytest
 
 from scripts.f1_lab.audit_auth_review import refine
 from scripts.f1_lab.operation_refinement import OperationDecision
-from scripts.f1_lab.sensitive_auth_context import REASON, SensitiveAuthReview
+from scripts.f1_lab.sensitive_auth_context import REASON, RECON_REASON, SensitiveAuthReview
 
 SHA = 'a'*64
 NOW = datetime(2025,1,24,4,38,6,tzinfo=UTC).timestamp()
@@ -79,3 +79,21 @@ def test_second_pam_does_not_reuse_consumed_command_and_prior_alert_is_preserved
     assert reason==REASON and observe(o,3,OPEN) is None
     before=OperationDecision(.99,.99,True,True,'independent')
     assert refine(before,reason) is before
+
+
+def test_recursive_root_recon_from_web_upload_path_is_observed_risk_not_identity():
+    o=SensitiveAuthReview(SHA)
+    line=CMD.replace('/tmp/cache','/var/www/unrelated/app/uploads/images').replace('/bin/cat /etc/shadow','/bin/ls -laR /root/')
+    observe(o,1,line)
+    assert observe(o,2,OPEN)==RECON_REASON
+
+
+@pytest.mark.parametrize('pwd,command', [('/home/admin','/bin/ls -laR /root/'),
+    ('/tmp/cache','/bin/ls -laR /root/'),('/var/www/site/public','/bin/ls -laR /root/'),
+    ('/var/www/site/uploads','/bin/ls -la /root/'),('/var/www/site/uploads','/bin/ls -laR /tmp/'),
+    ('/var/www/site/uploads/../public','/bin/ls -laR /root/'),
+    ('/var/www/site/uploads','/bin/ls -laR /root/; echo x')])
+def test_recon_requires_both_web_path_shape_and_direct_protected_recursive_request(pwd,command):
+    o=SensitiveAuthReview(SHA)
+    observe(o,1,CMD.replace('/tmp/cache',pwd).replace('/bin/cat /etc/shadow',command))
+    assert observe(o,2,OPEN) is None

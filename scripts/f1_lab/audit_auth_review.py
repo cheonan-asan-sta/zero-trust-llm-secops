@@ -228,6 +228,7 @@ def refine(previous, reason):
             "web_service_su_followed_by_process_login",
             "web_service_su_followed_by_user_manager",
             "sudo_sensitive_command_cooccurs_with_root_pam_open",
+            "sudo_webpath_root_recon_cooccurs_with_pam_open",
         },
         "audit_auth_reason",
     )
