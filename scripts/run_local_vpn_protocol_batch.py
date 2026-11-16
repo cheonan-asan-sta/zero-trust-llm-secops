@@ -42,6 +42,8 @@ else:
  '--sha256','PLAN','--model','/inputs/models/head.json','--model-sha256','HEAD',
  '--legacy-models','/inputs/models/legacy.json','--legacy-models-sha256','LEGACY','--output','/tmp/prediction-run',
  *(['--with-attack-evidence'] if ATTACK else [])]
+ if PIPELINE=='vpn-control':
+  args+=['--control-model','/inputs/models/control.json','--control-model-sha256','CONTROL']
 r=subprocess.run(args,cwd='/work',capture_output=True,text=True)
 Path('/results/predict.log').write_text(r.stdout+'\\n'+r.stderr)
 if r.returncode==0:shutil.copytree('/tmp/prediction-run','/results/prediction-run')
@@ -73,12 +75,15 @@ def run(package,stage_pin,image,*,with_attack_evidence=False,with_network_audit_
     inspect=command(['docker','image','inspect',image],30)
     require(inspect.returncode==0 and json.loads(inspect.stdout)[0]['Id']==image,'protocol_image_not_cached')
     profile=stage.get('profile','vpn')
-    require(profile in {'vpn','apparmor-causal','audit-native-normal'} and (profile=='vpn' or not with_attack_evidence),'protocol_execution_profile')
+    require(profile in {'vpn','vpn-control','apparmor-causal','audit-native-normal'}
+        and (profile in {'vpn','vpn-control'} or not with_attack_evidence),'protocol_execution_profile')
     require(not with_network_audit_context or profile in {'apparmor-causal','audit-native-normal'},'protocol_network_profile')
     extra=stage.get('supplemental_model_sha256')
+    control=stage.get('control_model_sha256')
+    require(profile!='vpn-control' or type(control) is str and re.fullmatch('[a-f0-9]{64}',control),'control_model_pin')
     require(profile!='audit-native-normal' or type(extra) is str and re.fullmatch('[a-f0-9]{64}',extra),
         'protocol_supplemental_model_pin')
-    program=BOOTSTRAP.replace('PLAN',stage['plan_sha256']).replace('HEAD',stage['model_sha256']).replace('LEGACY',stage['legacy_models_sha256'] or '').replace('ATTACK',str(with_attack_evidence)).replace('PIPELINE',repr(profile)).replace('NETWORK',str(with_network_audit_context)).replace('SUPPLEMENTAL',extra or '')
+    program=BOOTSTRAP.replace('PLAN',stage['plan_sha256']).replace('HEAD',stage['model_sha256']).replace('LEGACY',stage['legacy_models_sha256'] or '').replace('ATTACK',str(with_attack_evidence)).replace('PIPELINE',repr(profile)).replace('NETWORK',str(with_network_audit_context)).replace('SUPPLEMENTAL',extra or '').replace('CONTROL',control or '')
     owner='zt-vpn-protocol-v109-'+uuid.uuid4().hex[:12];cid=None
     report={'completed':False,'stage_sha256':stage_pin,'goal_qualified':False,'new_independent_evaluation':False,
         'aws_calls':0,'paid_api_calls':0,'image':image,'validation_labels_in_predictor':False,
@@ -87,6 +92,7 @@ def run(package,stage_pin,image,*,with_attack_evidence=False,with_network_audit_
     report['profile']=profile
     report['with_network_audit_context']=with_network_audit_context
     report['supplemental_model_sha256']=extra
+    report['control_model_sha256']=control
     try:
         created=command(['docker','create','--pull=never','--name',owner,'--label','secops.f1.owner='+owner,
             '--network','none','--read-only','--user','10001:10001','--cap-drop','ALL',

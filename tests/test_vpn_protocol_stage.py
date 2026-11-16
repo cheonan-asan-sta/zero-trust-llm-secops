@@ -53,6 +53,16 @@ def test_staging_strips_label_aggregates_adjacent_truth_and_noncode_artifacts(tm
     assert report['frozen_training_parameters_staged'] is True
 
 
+def test_control_profile_adds_only_pinned_head_to_vpn_package(tmp_path):
+    path,_,_,_=fixture(tmp_path);out=tmp_path/'control-package'
+    report=stage(path,sha(path),out,profile='vpn-control')
+    assert report['profile']=='vpn-control' and report['control_model_sha256']==sha(out/'inputs/models/control.json')
+    assert {p.name for p in (out/'inputs/models').iterdir()}=={
+        'web.json','heads.json','vpn.json','policy.json','legacy.json','head.json','control.json'}
+    assert not list((out/'inputs').rglob('*truth*'))
+    assert not list((out/'inputs').rglob('audit-native.source'))
+
+
 @pytest.mark.parametrize('profile',['apparmor-causal','audit-native-normal'])
 def test_audit_profile_stages_only_audit_auth_raw_and_its_frozen_head(tmp_path,profile):
     path,catalog,baseline,dump=fixture(tmp_path);spec=catalog['scenarios'][0]

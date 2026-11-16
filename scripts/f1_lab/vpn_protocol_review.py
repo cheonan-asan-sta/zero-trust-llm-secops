@@ -15,6 +15,7 @@ from scripts.f1_lab.operation_context import canonical, core_features
 from scripts.f1_lab.raw_observations import raw_features
 from scripts.f1_lab.raw_semantics import semantic_observations
 from scripts.f1_lab.vpn_context import PREFIX, endpoint
+from scripts.f1_lab.vpn_control_review import ControlObservation, observe_control
 from scripts.f1_lab.vpn_precision_audit import informational_declaration, signature
 from scripts.f1_lab.vpn_risk_retention import retained_contexts
 
@@ -38,6 +39,7 @@ class ProtocolObservation:
     projection_sha256: str
     available: bool
     protected: bool
+    control: ControlObservation | None = None
 
 
 class ProtocolReview:
@@ -100,9 +102,10 @@ class ProtocolReview:
             'current_leaf_other_peer':bool(lookup and any(p!=peer for p in lookup[0])),
             'reported_platform':os_name if os_match else current['platform'],
             'reported_version_major':version[1] if version else current['version']}
+        protected=bool(bad or ('connection',connection) in self.adverse or ('peer',peer) in self.adverse
+                 or self.unbound_adverse is not None)
         observed=ProtocolObservation(self.source,ordinal,digest,hashlib.sha256(canonical(features)).hexdigest(),True,
-            bool(bad or ('connection',connection) in self.adverse or ('peer',peer) in self.adverse
-                 or self.unbound_adverse is not None))
+            protected,observe_control(self.source,ordinal,line,features,protected))
         # Query the preceding state before publishing this row. A current
         # certificate/claim is visible only as a current observation above.
         if initial:current['initial']=True

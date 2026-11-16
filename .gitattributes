@@ -17,6 +17,7 @@ infra/m7/pilot/manifest.json text eol=lf
 infra/f1-lab/** text eol=lf
 # Keep historical model bytes (including one CRLF artifact) at their pinned SHA.
 infra/f1-lab/frozen-vpn-protocol-v109/*.json -text whitespace=cr-at-eol
+infra/f1-lab/frozen-vpn-control-v114/vpn.json -text whitespace=cr-at-eol
 # Native audit records include the auditd GS separator and byte-exact anchors.
 infra/f1-lab/native-audit/captured-v113/audit-native.source -text -diff
 infra/f1-lab/native-audit/captured-v113/truth.jsonl -text
