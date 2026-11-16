@@ -1,6 +1,8 @@
 # 4주차 잔여 작업과 직접 확인할 일
 
-**최신 v103 로컬 수집·연결:** [실행 주체·PAM 호출 신원·VPN 기기 결속](extra-live-evidence-ingress.md). Linux 집중485건·실제 systemd/PAM/OIDC11조건 통과. v102 대비 기존1,681,815행 판정 동일·새FP/기존TP손실0. 과거 로그의 미상 근거를 소급 생성하지 않아 탐지 목표는 계속 미달이다. 기관 SSO/MDM·실제 VPN hook·새 독립 평가는 별도이며 push·새CI·병합은 보류한다.
+**최신 v104 근거 적용 판정:** [공유 감사·인증·VPN 판정 개선](extra-evidence-risk-refinement.md). Linux526건·실제 systemd18조건 통과. 로컬 정책 제어6시나리오에서 불필요 경보2→0·명시적 폐기 미탐3→0. 점수는 fixture이며 독립 공격 탐지 F1에 합산하지 않는다. v103 대비 기존1,681,815행 판정 동일·새FP/TP손실0·목표 미달. push·새CI·병합 보류.
+
+**직전 v103 로컬 수집·연결:** [실행 주체·PAM 호출 신원·VPN 기기 결속](extra-live-evidence-ingress.md). Linux 집중485건·실제 systemd/PAM/OIDC11조건 통과. v102 대비 기존1,681,815행 판정 동일·새FP/기존TP손실0. 과거 로그의 미상 근거를 소급 생성하지 않아 탐지 목표는 계속 미달이다. 기관 SSO/MDM·실제 VPN hook·새 독립 평가는 별도이며 push·새CI·병합은 보류한다.
 
 **직전 v102 로컬 개선:** [같은 소스 audit 사건 순서 보강](extra-ordered-audit-review.md). 기존1,681,815행에서 웹 감사 FN1→0·F1 80.70%→81.74%, 새FP/기존TP손실0. Linux 묶음339건 통과. 공유 감사·인증·VPN은 유지됐으며 목표 미달·새 독립 평가 아님. 추가 push·CI·병합 없이 로컬 후보로 보존한다.
 
