@@ -71,7 +71,8 @@ class AuditIntentReview:
             return empty
         self.ordinal=ordinal
         if moment is None:
-            self.commands.clear()
+            for state in (self.authentication,self.assignments,self.starts,self.sessions,self.commands):
+                state.clear()
             return empty
         require(type(moment) in {int,float} and math.isfinite(moment),'intent_time')
         if self.time is not None and moment<self.time:
@@ -105,7 +106,8 @@ class AuditIntentReview:
         valid_session=auid is not None and auid>0 and ses is not None
         intent,decoded=command_intent(field(body,'cmd')) if kind=='USER_CMD' else ('unknown','')
         flags=raw_features(line+' '+decoded)
-        hazard=any(flags[k] for k in HARD) or exe in {'/bin/su','/usr/bin/su'}
+        secret=bool(re.search(r'/etc/(?:gshadow|security/opasswd)(?:[\s\x27\"]|$)',line+' '+decoded))
+        hazard=secret or any(flags[k] for k in HARD) or exe in {'/bin/su','/usr/bin/su'}
         address=field(body,'addr')
         address_key=(hashlib.sha256(address.encode()).hexdigest()
                      if address and address not in {'?','(none)'} and len(address)<=255 else None)
@@ -157,6 +159,10 @@ class AuditIntentReview:
             self.commands.pop(pid,None)
         if kind=='USER_END' and logged_session and logged_session[0]==pid and exe in SSHD:
             self.sessions.pop(session,None)
+            # A closed SSH process cannot establish another login using its
+            # earlier lifecycle stages, even if its numeric PID is reused.
+            for state in (self.authentication,self.assignments,self.starts,self.commands):
+                state.pop(pid,None)
         key=(scope or 'unknown',kind,'sshd' if exe in SSHD else 'sudo' if exe in SUDO else 'none',
              'root' if uid==0 else 'nonroot' if uid is not None else 'unset',
              'nonroot' if valid_session else 'unset','success' if success else 'other')

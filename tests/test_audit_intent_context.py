@@ -64,6 +64,28 @@ def test_known_failed_auth_same_remote_address_is_retained_across_pids():
     assert not feed(r,sequence(),start=2)[-1].eligible
 
 
+@pytest.mark.parametrize('secret',['/etc/gshadow','/etc/security/opasswd'])
+def test_credential_store_read_observation_blocks_later_same_loginuid(secret):
+    r=AuditIntentReview(SHA)
+    command=('cat '+secret).encode().hex()
+    prior=row('USER_CMD',f"pid=80 uid=1001 auid=1001 ses=9 msg='cmd={command} terminal=pts/9 res=success'")
+    feed(r,[prior])
+    assert not feed(r,sequence(),start=2)[-1].eligible
+
+
+def test_closed_ssh_process_cannot_reopen_with_stale_lifecycle_stages():
+    r=AuditIntentReview(SHA);feed(r,sequence())
+    closed=row('USER_END','pid=42 uid=0 auid=1001 ses=10 msg=\'acct="unrelated-user" exe="/usr/sbin/sshd" res=success\'')
+    feed(r,[closed],start=6)
+    assert not feed(r,[sequence()[-1]],start=7)[-1].eligible
+
+
+def test_missing_time_clears_partial_login_lifecycle():
+    r=AuditIntentReview(SHA);feed(r,sequence()[:4])
+    r.observe(5,'unavailable record\n',None,source_sha256=SHA)
+    assert not feed(r,[sequence()[-1]],start=6)[-1].eligible
+
+
 def test_source_switch_regression_and_reboot_do_not_reuse_context():
     r=AuditIntentReview(SHA);feed(r,sequence()[:4])
     assert not r.observe(5,sequence()[-1],100.,source_sha256='b'*64).eligible
