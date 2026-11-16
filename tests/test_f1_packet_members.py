@@ -4,6 +4,7 @@ import json
 import struct
 import zipfile
 from dataclasses import asdict, replace
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -151,3 +152,17 @@ def test_bounded_zip64_index_without_relaxing_generic_reader(lab, monkeypatch):
     monkeypatch.setattr(intake, 'ASSET', replace(intake.ASSET, bytes=len(body)))
     assert intake.index_bound(io.BytesIO(body)) == (1, 20)
     assert bounded_zip.MAX_ARCHIVE == 2 * 1024**3
+
+
+def test_source_growth_between_stat_and_hash_is_bounded(lab, monkeypatch):
+    body = lab.archive.read_bytes() + b'changed after size check'
+    original = Path.open
+
+    def growing(path, *args, **kwargs):
+        if path == lab.archive:
+            return io.BytesIO(body)
+        return original(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, 'open', growing)
+    with pytest.raises(ValueError, match='packet_archive_read_bound'):
+        intake.fingerprints(lab.archive)

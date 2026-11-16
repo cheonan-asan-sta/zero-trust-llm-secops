@@ -31,10 +31,14 @@ def fingerprints(path):
     require(path.is_file() and not path.is_symlink() and path.stat().st_size == ASSET.bytes <= MAXIMUM,
             'packet_archive_file')
     strong, publisher = hashlib.sha256(), hashlib.md5(usedforsecurity=False)
+    total = 0
     with path.open('rb') as stream:
-        while body := stream.read(1024**2):
+        while body := stream.read(min(1024**2, ASSET.bytes - total + 1)):
+            total += len(body)
+            require(total <= ASSET.bytes, 'packet_archive_read_bound')
             strong.update(body)
             publisher.update(body)
+    require(total == ASSET.bytes, 'packet_archive_complete_read')
     return strong.hexdigest(), publisher.hexdigest()
 
 
