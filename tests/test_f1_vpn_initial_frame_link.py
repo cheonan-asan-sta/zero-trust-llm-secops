@@ -169,3 +169,18 @@ def test_raw_clock_regression_is_reported_without_reordering_or_admission(tmp_pa
     assert result['raw_time_regressions'] == 1 and rows[1]['raw_time_regressed'] is True
     assert [r['ordinal'] for r in rows] == [1, 2, 3]
     assert not result['admitted_to_predictor'] and all(not r['admitted_to_predictor'] for r in rows)
+
+
+def test_manifest_mutation_during_join_cannot_publish_completed_links(tmp_path, monkeypatch):
+    raw, prep, intake, _ = fixture(tmp_path)
+    original = FrameIndex.match
+
+    def mutate(index, text, moment):
+        (raw / 'audit.json').write_bytes(b'changed UTC/provenance manifest')
+        return original(index, text, moment)
+
+    monkeypatch.setattr(FrameIndex, 'match', mutate)
+    with pytest.raises(ValueError, match='wire_link_source_drift'):
+        run(prep, sha(prep), raw, intake, sha(intake), tmp_path / 'drift')
+    assert not (tmp_path / 'drift/links.jsonl').exists()
+    assert not (tmp_path / 'drift/run.json').exists()

@@ -86,11 +86,16 @@ def run(preparation, preparation_pin, raw, intake, intake_pin, output):
                 'source_index': source, 'ordinal': ordinal, 'raw_row_sha256': hashlib.sha256(body).hexdigest(),
                 'raw_time_regressed': regressed, **row}) + b'\n')
     require(sha(raw_source) == raw_pin and sha(preparation) == preparation_pin
+            and sha(Path(raw) / 'audit.json') == prep['source_manifest_sha256']
             and all(sha(p, maximum) == pin for p, (pin, maximum) in pins.items()), 'wire_link_source_drift')
     target.with_suffix('.part').rename(target)
     report = {'schema': 'diagnostic-vpn-frame-links-1', 'completed': True, 'population': len(inputs),
         'raw_time_errors': errors, 'raw_time_regressions': regressions,
         'source_sha256': raw_pin, 'links_sha256': sha(target), 'counts': dict(stats),
+        'preparation_sha256': preparation_pin, 'intake_sha256': intake_pin,
+        'raw_manifest_sha256': prep['source_manifest_sha256'],
+        'frame_input_pins': [{'path': str(p), 'sha256': pin, 'maximum_bytes': maximum}
+                             for p, (pin, maximum) in pins.items()],
         'diagnostic_only': True, 'temporal_availability_proven': False, 'admitted_to_predictor': False,
         'validation_labels_opened': False, 'model_fit_or_prediction_performed': False,
         'goal_qualified': False, 'new_independent_evaluation': False, 'aws_calls': 0, 'paid_api_calls': 0}
