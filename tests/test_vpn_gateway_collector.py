@@ -134,3 +134,24 @@ def test_submitted_socket_like_objects_and_naive_time_are_rejected(tmp_path):
         collect_connection(SimpleNamespace(server_side=True), **CLAIMS)
     with pytest.raises(ValueError, match='vpn_gateway_time'):
         connected(tmp_path, lambda tls: collect_connection(tls, **CLAIMS, now=datetime.now(UTC).replace(tzinfo=None)))
+
+
+def test_new_tls_connection_cannot_reuse_previously_bound_signal_bundle(tmp_path):
+    first = tmp_path/'first'
+    second = tmp_path/'second'
+    first.mkdir()
+    second.mkdir()
+    one, _ = connected(first, lambda tls: collect_connection(tls, **CLAIMS))
+    two, _ = connected(second, lambda tls: collect_connection(tls, **CLAIMS))
+    assert one.connection.tls_channel_sha256 != two.connection.tls_channel_sha256
+    baseline = RiskRetention(OperationRefinement(SimpleNamespace(probability=lambda _: 0.),
+        SimpleNamespace(profile=PROFILE, probability=lambda _: .98)))
+    c = VPNControls(tmp_path/'control', baseline, now=one.connection.observed_at)
+    c.enrollment_registry['bindings'][0]['client_certificate_sha256'] = one.connection.client_certificate_sha256
+    c.write()
+    c.enrollments.expected_sha256 = sha(c.directory/'enrollments.json')
+    row = c.build(gateway_observation=one)
+    challenge = c.bridge.issue(two.connection, row['principal'], now=two.connection.observed_at)
+    result = c.bridge.check(challenge.nonce, row['evidence'], two.raw_line, row['principal'],
+                            now=two.connection.observed_at)
+    assert result.state == 'unavailable'
