@@ -12,9 +12,21 @@ from scripts.f1_lab.operation_context import canonical
 from scripts.f1_lab.transfer_evaluation import sha
 
 ROOT=Path(__file__).resolve().parents[1]
-BOOTSTRAP="""import shutil,subprocess,sys,tarfile
+IMAGE_MASKS=('/workspace','/usr/local/lib/python3.12/site-packages/app',
+    '/usr/local/lib/python3.12/site-packages/zero_trust_llm_secops-0.17.0.dist-info')
+BOOTSTRAP="""import importlib.util,json,shutil,subprocess,sys,sysconfig,tarfile
 from pathlib import Path
+purelib=Path(sysconfig.get_path('purelib'))
+assert str(purelib)=='/usr/local/lib/python3.12/site-packages'
+masked=[Path('/workspace'),purelib/'app',purelib/'zero_trust_llm_secops-0.17.0.dist-info']
+assert all(p.is_dir() and not list(p.iterdir()) for p in masked)
+assert all(not list(p.iterdir()) for p in purelib.glob('zero_trust_llm_secops*.dist-info'))
 tarfile.open('/inputs/code.tar').extractall('/work',filter='data')
+assert importlib.util.find_spec('app').origin.startswith('/work/app/')
+assert not Path('/work/docs').exists() and not Path('/work/tests').exists()
+Path('/results/image-scope.json').write_text(json.dumps({'completed':True,
+ 'masked_project_paths':[str(p) for p in masked],'masked_paths_empty':True,
+ 'code_origin':importlib.util.find_spec('app').origin,'staged_documents_or_tests':False}))
 shutil.copytree('/inputs/baseline','/tmp/baseline')
 shutil.copytree('/inputs/raw','/tmp/raw')
 r=subprocess.run([sys.executable,'-m','scripts.run_vpn_protocol_review','--plan','/inputs/plan.json',
@@ -58,6 +70,7 @@ def run(package,stage_pin,image):
             '--network','none','--read-only','--user','10001:10001','--cap-drop','ALL',
             '--security-opt','no-new-privileges:true','--memory','2g','--cpus','2','--pids-limit','128',
             '--tmpfs','/work:rw,nosuid,nodev,size=512m,mode=1777','--tmpfs','/tmp:rw,nosuid,nodev,size=1g,mode=1777',
+            *[argument for path in IMAGE_MASKS for argument in ('--tmpfs',path+':ro,nosuid,nodev,size=1m,mode=0555')],
             '--mount','type=bind,source='+str(inputs)+',target=/inputs,readonly',
             '--mount','type=bind,source='+str(results)+',target=/results','--workdir','/work',
             '--env','PYTHONDONTWRITEBYTECODE=1','--env','AWS_EC2_METADATA_DISABLED=true',
@@ -67,12 +80,18 @@ def run(package,stage_pin,image):
         state=json.loads(command(['docker','inspect',cid],30).stdout)[0]
         require(state['Id']==cid and state['Config']['Labels']['secops.f1.owner']==owner,'protocol_container_owner')
         source=decode((package/'source-manifest.json').read_bytes())
+        scope=decode((results/'image-scope.json').read_bytes())
+        require(scope['completed'] is True and scope['masked_paths_empty'] is True
+            and scope['staged_documents_or_tests'] is False
+            and set(scope['masked_project_paths'])==set(IMAGE_MASKS),'protocol_image_project_scope')
         report.update(exit_code=execution.returncode,container_exit=state['State']['ExitCode'],oom_killed=state['State']['OOMKilled'],
             network_mode=state['HostConfig']['NetworkMode'],user=state['Config']['User'],read_only_root=state['HostConfig']['ReadonlyRootfs'],
             source_files_unchanged_after=({p.relative_to(ROOT).as_posix():sha(p) for name in ('app','scripts')
                 for p in (ROOT/name).rglob('*.py')}=={r['path']:r['sha256'] for r in source}),
             original_inputs_unchanged_after=all(sha(p['path'])==p['sha256'] for p in stage['source_pins']),
             staged_inputs_unchanged_after=inventory()==stage['input_pins'])
+        report['image_project_paths_masked']=True
+        report['image_scope_sha256']=sha(results/'image-scope.json')
         report['completed']=(execution.returncode==state['State']['ExitCode']==0 and not report['oom_killed']
             and all(report[k] for k in ('source_files_unchanged_after','original_inputs_unchanged_after','staged_inputs_unchanged_after')))
     finally:
