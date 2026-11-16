@@ -1,8 +1,10 @@
 # VPN 개선 테스트 케이스·근거·재현 방법
 
-2026-11-16 · v109 · 채희주 담당 · 무료 로컬 연구 평가
+2026-11-16 · v110 · 채희주 담당 · 무료 로컬 연구 평가
 
 기존 테스트와 방법은 GitHub `aitest`에 있고, 이 최신 개선 묶음은 목표 충족 전 push/새 CI/병합 보류 조건에 따라 로컬 브랜치에 저장한다. **구성 요소 시험 통과와 실제 탐지 성능 평가는 구분한다.** 원래6개 보안 영역의 독립 인수는 이 VPN 시험으로 대체하지 않는다.
+
+최신 [v110 공격 근거 연결](extra-vpn-attack-evidence.md)은 동결 모델을 재학습하지 않고 공격 전용 셀과60초 인과적 유지를 명시적 옵션으로 추가했다. 기본 실행과 v109 결과는 보존한다.
 
 ## 어떤 테스트이고 왜 필요한가
 
@@ -11,23 +13,24 @@
 | 관측 문맥 | 과거/현재 순서, 미래 기록 미사용, 재접속·idle 만료 | 뒤쪽 인증서 정보를 앞선 패킷에 붙여 성능을 부풀리지 않음 |
 | 출처 결속 | 원본 SHA·물리 행·시각·순서, 다른 source/peer/port | 다른 로그나 다른 연결의 근거가 섞이는 것을 방지 |
 | 명시적 위험 | 인증/TLS/인증서 오류, 과거 오류 뒤 성공·포트 변경 | 성공 응답이나 정상 학습 셀로 실제 실패 근거를 지우지 않음 |
+| 공격 근거 유지 | 공격 지지5/정상1건 veto, 같은 연결60초, 성공/유지로 기간 연장 금지 | 새 위험을 근거가 있는 연결과 시간에만 적용함 |
 | 모델 경계 | 최소 정상 지지5, 학습 공격1건 veto, 기본 탐지·권한 폐기 보존 | 정상 비율이 높아도 기존 위협 탐지와 현재 정책을 우선함 |
 | 파일·모델 무결성 | 고정 모델/의존 모델 SHA, 경로 이동, 변조 거부 | 다른 모델을 같은 실험으로 보고하지 않음 |
 | 모집단 | 정상·위협·기존 오류·비VPN행의 수와 순서 유지 | 오류/미상을 제거하거나 새 정상 행을 더해 F1을 높이지 않음 |
 | 입력 분리 | 준비/원본 메타데이터 필드 허용 목록, 예측 내 정답 필드 거부 | 평가 정답·정상/위협 집계가 예측 입력으로 들어가지 않음 |
 | 이미지 분리 | 이미지에 내장된 프로젝트 문서·테스트·설치 사본 차단 | 새 mount만 제외하고 이미지 안의 이전 자료를 놓치는 것을 방지 |
 
-새 경계 시험은 [판정·학습·원본/모델 결속](../tests/test_vpn_protocol_review.py)과 [평가 입력 분리](../tests/test_vpn_protocol_stage.py)에 있다. 시험 fixture는 경계 동작 검사용이며 아래 탐지 F1에 합산하지 않는다.
+[공격 근거의 새 경계 시험27건](../tests/test_vpn_attack_evidence.py)과 기존 시험을 함께 실행한다. 기존 경계 시험은 [판정·학습·원본/모델 결속](../tests/test_vpn_protocol_review.py)과 [평가 입력 분리](../tests/test_vpn_protocol_stage.py)에 있다. 시험 fixture는 경계 동작 검사용이며 아래 탐지 F1에 합산하지 않는다.
 
 ## 빠른 구성 요소 시험
 
 저장소 루트에서 개발 의존성이 준비된 Python으로 실행한다. 이 명령은 외부 LLM/AWS를 호출하지 않는다.
 
 ```text
-python -m pytest tests/test_vpn_protocol_review.py tests/test_vpn_protocol_stage.py tests/test_f1_vpn_context.py tests/test_f1_vpn_risk_retention.py tests/test_f1_vpn_precision_audit.py -q
+python -m pytest tests/test_vpn_attack_evidence.py tests/test_vpn_protocol_review.py tests/test_vpn_protocol_stage.py tests/test_f1_vpn_context.py tests/test_f1_vpn_risk_retention.py tests/test_f1_vpn_precision_audit.py -q
 ```
 
-이번 전체 관련 묶음은 기존 감사/인증/기기/평가 회귀까지 포함한579건이다. 전체 실행의 실제 JUnit과 소스 지문은 [최종 결과 문서](extra-vpn-protocol-refinement.md)를 따른다. 빠른 시험만 실행한 결과를579건 전체 재현이나 정밀도·재현율·F1 재현으로 보고하지 않는다.
+최신 v110 전체 관련 묶음은 기존 감사/인증/기기/평가 회귀까지 포함한606건이다. 전체 실행의 실제 JUnit과 소스 지문은 [최신 결과 문서](extra-vpn-attack-evidence.md)를 따른다. 빠른 시험만 실행한 결과를606건 전체 재현이나 정밀도·재현율·F1 재현으로 보고하지 않는다.
 
 ## 성능 평가 데이터의 근거
 
@@ -72,8 +75,10 @@ PowerShell 예시다. 실행 폴더는 새 이름을 사용한다.
 $vpnCatalogSha = (Get-FileHash -Algorithm SHA256 -LiteralPath 'runtime/f1/replay-catalog.json').Hash.ToLowerInvariant()
 python -m scripts.stage_vpn_protocol_replay --catalog runtime/f1/replay-catalog.json --sha256 $vpnCatalogSha --output runtime/f1/vpn-replay-01
 $vpnStageSha = (Get-FileHash -Algorithm SHA256 -LiteralPath 'runtime/f1/vpn-replay-01/stage.json').Hash.ToLowerInvariant()
-python -m scripts.run_local_vpn_protocol_batch --package runtime/f1/vpn-replay-01 --stage-sha256 $vpnStageSha --image sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4
+python -m scripts.run_local_vpn_protocol_batch --package runtime/f1/vpn-replay-01 --stage-sha256 $vpnStageSha --image sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4 --with-attack-evidence
 ```
+
+위 명령은 v110 공격 근거 옵션을 명시한다. 옵션을 생략하면 v109 정상 보정만 실행한다. 전후 비교 기준선은 직전 v109b의 봉인된 예측이며 예전 v108 결과와 혼동하지 않는다.
 
 [실행기](../scripts/run_local_vpn_protocol_batch.py)는 이미 로컬에 있는 이미지 ID만 사용하며 자동 pull/build를 하지 않는다. 위 digest는 이번 검증에 사용한 캐시 이미지다. 다른 환경에는 동일한 테스트 의존성과 지원하는 Python3.12 이미지가 준비돼 있어야 한다. 저장소의 [테스트 이미지 정의](../Dockerfile.test)를 참고할 수 있으며, 다른 이미지/의존성을 사용한 결과는 그 지문을 별도로 기록한다. CPU2·메모리2GiB·network none·UID10001·capability 제거·읽기 전용 root로 실행한다.
 

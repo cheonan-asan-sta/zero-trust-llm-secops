@@ -1,6 +1,8 @@
 # 성능 개선·로컬 평가를 CI보다 먼저 수행
 
-**최신 v109:** [VPN 추가 연결 문맥](extra-vpn-protocol-refinement.md). 기존1,681,815행에서 VPN FP208→48·F1 44.68%→77.78%, 기존TP84/FN0 유지·새FP/TP손실0. Linux579건. 이미지 내 프로젝트 자료 차단 후9개 묶음 예측 지문 동일 확인. 인증 개선 유지, 공유/웹 감사·VPN·독립 목표는 아직 미달. 목표 active·push/새CI/병합 보류.
+**최신 v110:** [VPN 공격 근거의 인과적 유지](extra-vpn-attack-evidence.md). 별도 학습 Wheeler FN28→9·TP28→47·FP38 유지. 기존1,681,815행 판정 유지·전체 새FP/TP손실0·Linux606건. 학습 결과이며 독립 목표는 미달/미완료. 목표 active·push/새CI/병합 보류.
+
+**직전 v109:** [VPN 추가 연결 문맥](extra-vpn-protocol-refinement.md). 기존1,681,815행에서 VPN FP208→48·F1 44.68%→77.78%, 기존TP84/FN0 유지·새FP/TP손실0. Linux579건. 이미지 내 프로젝트 자료 차단 후9개 묶음 예측 지문 동일 확인. 인증 개선 유지, 공유/웹 감사·VPN·독립 목표는 아직 미달. 목표 active·push/새CI/병합 보류.
 
 **직전 v108:** [웹 저장 경로의 root 계정 조회 문맥](extra-webpath-identity-read.md). Linux489건·기존1,681,815행 판정 유지. 별도8,908행 Wilson 인증FN1→0·새FP/TP손실0. 관측5개자료 인증 P/R/F1 각각100%이며 새 독립 평가가 아니다. 웹 감사 F1 86.24%·공유 감사·VPN 및 원래6영역 독립 목표는 미달/미인수다. 목표 active·push/새CI/병합 보류.
 
