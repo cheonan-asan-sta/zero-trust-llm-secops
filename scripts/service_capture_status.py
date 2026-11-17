@@ -8,6 +8,8 @@ from pathlib import Path
 
 from scripts.f1_lab.collector_freshness import CollectorMonitor, CollectorScope
 from scripts.f1_lab.collector_security import current_security_status
+from scripts.f1_lab.native_jsonl import require
+from scripts.f1_lab.service_caller_identity import PinnedCallerRegistry
 from scripts.f1_lab.shared_execution_evidence import PinnedServiceRegistry
 
 
@@ -26,11 +28,28 @@ def main():
     ):
         parser.add_argument("--" + name, required=True)
     parser.add_argument("--observe-worker-security", action="store_true")
+    parser.add_argument("--alternate-key-id", action="append", default=[])
+    parser.add_argument("--caller-registry", type=Path)
+    parser.add_argument("--caller-registry-sha256")
+    parser.add_argument("--caller-environment", choices=("oidc", "local_oidc"), default="oidc")
     parser.add_argument(
         "--status-output", type=Path, help="Optional public aggregate status snapshot"
     )
     args = parser.parse_args()
     try:
+        require(
+            (args.caller_registry is None) == (args.caller_registry_sha256 is None),
+            "collector_caller_pin_pair",
+        )
+        caller = (
+            PinnedCallerRegistry(
+                args.caller_registry,
+                args.caller_registry_sha256,
+                expected_environment=args.caller_environment,
+            )
+            if args.caller_registry
+            else None
+        )
         scope = CollectorScope(
             tenant_id=args.tenant,
             server_id=args.server,
@@ -39,7 +58,11 @@ def main():
             key_id=args.key_id,
         )
         monitor = CollectorMonitor(
-            scope, PinnedServiceRegistry(args.registry, args.registry_sha256), Path(args.ledger)
+            scope,
+            PinnedServiceRegistry(args.registry, args.registry_sha256),
+            Path(args.ledger),
+            caller_registry=caller,
+            alternate_key_ids=args.alternate_key_id,
         )
         result = monitor.check(Path(args.capture))
         body = asdict(result)
@@ -56,7 +79,11 @@ def main():
             from scripts.f1_lab.collector_status_bridge import health_report, publish
 
             publish(
-                args.status_output, health_report(scope, result, args.capture, monitor.registry)
+                args.status_output,
+                health_report(
+                    scope, result, args.capture, monitor.registry, caller_registry=caller,
+                    alternate_key_ids=monitor.alternate_key_ids,
+                ),
             )
     except (ValueError, OSError, sqlite3.Error):
         body = {

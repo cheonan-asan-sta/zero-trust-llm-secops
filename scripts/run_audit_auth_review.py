@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SCENARIOS = ["russellmitchell", "santos", "fox", "harrison_observed"]
 
 
-def signals(raw_directory, preparation):
+def signals(raw_directory, preparation, *, review_factory=None, auth_review_factory=None):
     """Only exact auth/audit siblings in one physical host namespace may link."""
     raw_directory = Path(raw_directory)
     require(
@@ -72,14 +72,22 @@ def signals(raw_directory, preparation):
         events = caller_events(auth)
         if "auth" in group:
             index = group["auth"]
+            auth_sha = preparation['pairs'][index]['raw_sha256']
+            auth_review = None if auth_review_factory is None else auth_review_factory(auth_sha)
             for ordinal, (time, line) in enumerate(auth, 1):
                 if time is not None and su_transition(line):
                     observed[(index, ordinal)] = "web_service_account_su"
+                if auth_review is not None:
+                    reason = auth_review.observe(ordinal, line, time, source_sha256=auth_sha)
+                    if reason:
+                        observed.setdefault((index, ordinal), reason)
         if "audit" in group:
             index = group["audit"]
-            review = AuditReview(events)
+            source_sha = preparation['pairs'][index]['raw_sha256']
+            review = AuditReview(events) if review_factory is None else review_factory(events, source_sha)
             for ordinal, (time, line) in enumerate(records[index], 1):
-                reason = review.observe(line, time)
+                reason = (review.observe(line, time) if review_factory is None else
+                          review.observe(line, time, source_sha256=source_sha))
                 if reason:
                     observed[(index, ordinal)] = reason
     require(all(sha(p) == expected for p, expected in pins.items()), "audit_auth_raw_changed")
@@ -91,9 +99,11 @@ def signals(raw_directory, preparation):
     }
 
 
-def predict(prepared, preparation, raw_directory, baseline, baseline_hash, output):
+def predict(prepared, preparation, raw_directory, baseline, baseline_hash, output, *, review_factory=None,
+            auth_review_factory=None):
     require(sha(baseline) == baseline_hash, "audit_auth_baseline_hash")
-    selected, evidence = signals(raw_directory, preparation)
+    selected, evidence = signals(raw_directory, preparation, review_factory=review_factory,
+                                 auth_review_factory=auth_review_factory)
     output = Path(output)
     require(
         not output.exists() and not output.with_suffix(".part").exists(), "audit_auth_fresh_output"

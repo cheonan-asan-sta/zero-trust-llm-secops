@@ -1,8 +1,34 @@
 # zero-trust-llm-secops
 
+
+현재 PAM 관측의 외부 체크포인트·암호화 사본·격리 복원·키 없는 손상 상태 검증은 [추가 보존·복구 결과](docs/extra-pam-observation-backup.md)를 확인한다. 전체6,380·집중158건, 실제 systemd67/10/23·별도 Docker6조건을 통과했으며 탐지 목표는 아직 미달이다. 실제 PAM 운영 백업/경보 배포·원격 witness·독립 성능 인수는 별도다.
+
+
+**최신 판정 — 2026-11-16:** [현재 구현·검증·남은 작업](docs/infrastructure-current-state-20261116.md). 고정 로컬 전체6,332·집중475개와 실제 systemd/DB 인수 결과를 연결했다. 탐지 독립 목표는 미달·장기 soak는 유예다. 아래의 이전 날짜 수치/상태는 작성 당시 누적 기록이며 최신 판정은 연결한 문서를 따른다.
+
+2026-11-16 v91 로컬 통합 인수: [수집기 키 공급자 이중화](docs/extra-collector-provider-ha.md). 집중240·전체6,122·실제systemd10조건통과. 별도사전승인키·정확한unit/MainPID검사·장애전환·잘못된키우회거부·기존시각/순서유지. 기존1,681,815건판정동일·새FP/TP손실0·AWS/유료API0·장기soak유예·독립목표미달.
+
+2026-11-16 v90 로컬 통합 인수: [복구 묶음 키 없는 관측](docs/extra-exec-bundle-status.md). 집중542·전체6,070·실제systemd67·실제경보9조건통과. 별도capability0 worker·손상/수리·원래시각/확인불가1유지·실제만료확인. 기존1,681,815건판정동일·새FP/TP손실0·AWS/유료API0·장기soak유예·독립목표미달.
+
+2026-11-16 v89 로컬 인수: [실행 복구 상태의 암호화 묶음](docs/extra-exec-coherent-backup.md). 집중489·전체6,017·실제systemd62·복구관측10조건통과. 실제6exec 중intent5건(완성4/확인불가1)과앱·브로커를선택원본유실후격리복원. 기존1,681,815건판정동일·새FP/TP손실0. AWS/유료API0·장기soak유예·독립목표미달.
+
+2026-11-16 v88 로컬 통합 인수: [실행 불확실·원본 미게시 경보](docs/extra-exec-recovery-observability.md). 집중448·전체5,976·실제 systemd53·실제 관측10조건 통과. 실제6exec에서 과거 cold유실까지 미게시1→2→1→0, 확인불가1은 계속pending. 기존1,681,815건 판정동일·새FP/TP손실0. AWS/유료API0·장기soak유예·독립목표미달.
+
+2026-11-16 v87 [감사·인증 추가 멤버 평가](docs/extra-audit-member-transfer.md): 고정8,908행에서 Wilson FP8감소·Wardbeck유지, 새 FP/TP 손실0. 웹 감사 F1 65.45%/67.92%, 공유 감사0%, 인증 재현율91.67%로 목표 미달이다. 부분 노출된 같은 생성 계열이며 Wardbeck 보정 역할 유지. 집중171·전체5,887통과·AWS/유료 API0·장기 soak유예.
+
+2026-11-16 v86 로컬 통합 인수: [실행 intent·중단 후 원본 대조](docs/extra-exec-intent-reconciliation.md). 집중378·전체5,868·실제 systemd44조건 통과. 실제6건 중 브로커 종료2건에서 봉인 전 indeterminate 보존·완성 원본 동일 bytes 재게시·명령/권한 재발급0을 확인했다. v85의1,681,815건 결정 동일, 새 독립 성능이 아니다. PR78 병합, AWS/유료 API0·장기 soak 유예.
+
+2026-11-16 v85 관측 개발 비교: [명시적 AppArmor 변경 생략 문맥](docs/extra-apparmor-noop-review.md)으로 웹 감사 FP37→21·F1 70.77%→80.70%, FN1 유지. 전체1,681,815행에서 추가 FP/기존 TP 손실0. 집중133·전체5,849개 통과. 공유 감사 FP24/FN6·인증 FP0/FN3 유지, 독립 여섯 영역 목표는 미달이다. PR77은 CI17개 통과 후 aitest에 병합됐다. AWS/유료 API0·장기 soak 유예.
+
+2026-11-16 v84 최신 aitest 통합·로컬 인수 완료: [outbox 경보·전체 암호화 백업·복원 후 정리](docs/extra-exec-outbox-recovery.md). 집중331·전체5,770·실제 systemd36조건·실제 관측8조건 통과. 실제 실행4건 전체 byte 동일 복원, 게시3건만 정리·미게시1건 보존. 기존1,681,815건 결정 동일·추가 FP/기존 TP 손실0, 독립 F1 개선은 아니다. 팀원 PR59 대시보드 보존. AWS/유료 API0·8시간 soak 유예. 게시/CI/병합은 후속 PR 기록을 따른다.
+
 관제 대시보드: [화면 구성과 로컬 시연 안내](docs/dashboard-guide.md).
 `python -m scripts.serve_dashboard_demo --seed`로 기존 평가 기록과 분리된 규칙 기반 시연 환경을
 실행합니다. 새 관제 화면은 `/`, 기존 분석 워크벤치는 `/static/workbench.html`입니다.
+
+2026-11-15 v83 로컬 완료·미병합: [실행 근거 보관·암호화 백업·복원·경보 연결](docs/extra-exec-evidence-retention.md). 집중456개·전체5,712개·실제 systemd/ptrace24조건·관측29조건 통과. 실제 실행3건에서 콜드2건을 byte 동일 복원하고 실제 복원 집계를 경보로 연결했다. 기존1,681,815건 판정 동일·새 FP/TP 손실0, 독립 F1 개선은 아니다. AWS/유료 API0, 8시간 유예. v82의 보관 연결 후속은 이 결과로 갱신한다.
+
+2026-11-15 v82 로컬 완료·미병합: [실행 당시 이력·신원·앱 정책 연결](docs/extra-exec-history-app-binding.md). 집중 308개·전체 5,672개·실제 systemd/ptrace11조건 통과, 기존 1,681,815건 판정 동일·새 FP/TP 손실0. 관리 경로의 초기 exec만 수집하며 호스트 전체 감사·조직 SSO·독립 F1 완료가 아니다. AWS/유료 API0, 8시간은 계속 유예한다.
 
 2026-11-15 v81: [백업·복구 검증 상태 지표/경보](docs/extra-backup-recovery-status.md). 집중 196개·전체 5,623개·실제 systemd 71조건·관측 23조건 통과. 8시간은 유예하며 운영 활성화와 독립 F1 평가는 별도다.
 

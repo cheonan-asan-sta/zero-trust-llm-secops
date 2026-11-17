@@ -1,0 +1,289 @@
+{
+  "schema": "execution-maintenance-quiesce-acceptance-1",
+  "completed": true,
+  "goal_qualified": false,
+  "independent_detection_evaluation": false,
+  "aws_calls": 0,
+  "paid_api_calls": 0,
+  "long_soak_deferred_by_user": true,
+  "qualification_code_commit": "fdd9dd0608c2f17981a67fcf4a8fe72f541fa895",
+  "failed_previous_pr83_head": "e68f0a9a95b82d84eb08e8dc68007e39458e4b9b",
+  "failed_ci_run": 43743937515,
+  "failed_ci_job": 132902976685,
+  "failure": {
+    "operation": "observer_archive",
+    "phase": "observer_init",
+    "category": "collector_busy"
+  },
+  "fix": "Keep the nonblocking collector lock. Stop the owned observer; one fixed offline network-none maintenance job; resume only after complete typed receipt, zero exit and verified owned-job removal. No retries.",
+  "focused_tests": {
+    "exit_code": 0,
+    "seconds": 24.296,
+    "counts": {
+      "passed": 70
+    },
+    "log": "runtime/f1/execution-maintenance-v89-ci-fix-20261116/linux.log",
+    "executed": true,
+    "image_id": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "source_files": 1165,
+    "source_archive_sha256": "11b2070dbe397b3d119820aad9a2937393274b2fed8952a6313df600bd8b61d5",
+    "container_exit": 0,
+    "oom_killed": false,
+    "network_mode": "none",
+    "owned_container": "14610f66bc0cf3d1f7c1b6c51a0ac8bea8f919a0079713de004b6b64b4b6d460",
+    "snapshot_sources_unchanged_after": true,
+    "owned_container_removed": true
+  },
+  "new_quiescence_tests": 18,
+  "docker_checks_passed": 25,
+  "checks": [
+    {
+      "label": "locked_mtls_runtime_started",
+      "passed": true,
+      "services": 10,
+      "volumes": 28
+    },
+    {
+      "label": "delivery_peer_cannot_approve_mint_or_execute",
+      "passed": true
+    },
+    {
+      "label": "observed_baseline-0",
+      "passed": true,
+      "verdict": "unknown",
+      "reason": "CONTEXT_REQUIRED",
+      "enforcement_eligible": false,
+      "capture_id": "baseline-0",
+      "completed_at": "2026-11-15T18:35:26.440025+00:00"
+    },
+    {
+      "label": "observed_baseline-1",
+      "passed": true,
+      "verdict": "unknown",
+      "reason": "CONTEXT_REQUIRED",
+      "enforcement_eligible": false,
+      "capture_id": "baseline-1",
+      "completed_at": "2026-11-15T18:35:45.835067+00:00"
+    },
+    {
+      "label": "observed_baseline-2",
+      "passed": true,
+      "verdict": "unknown",
+      "reason": "CONTEXT_REQUIRED",
+      "enforcement_eligible": false,
+      "capture_id": "baseline-2",
+      "completed_at": "2026-11-15T18:36:05.257280+00:00"
+    },
+    {
+      "label": "observed_approved-normal",
+      "passed": true,
+      "verdict": "normal",
+      "reason": "APPROVED_BASELINE_MATCH",
+      "enforcement_eligible": false,
+      "capture_id": "approved-normal",
+      "completed_at": "2026-11-15T18:36:34.952001+00:00"
+    },
+    {
+      "label": "observed_wrong-actor",
+      "passed": true,
+      "verdict": "threat",
+      "reason": "EXECUTION_SCOPE_MISMATCH",
+      "enforcement_eligible": false,
+      "capture_id": "wrong-actor",
+      "completed_at": "2026-11-15T18:36:56.043256+00:00"
+    },
+    {
+      "label": "observed_wrong-destination",
+      "passed": true,
+      "verdict": "threat",
+      "reason": "EXECUTION_SCOPE_MISMATCH",
+      "enforcement_eligible": false,
+      "capture_id": "wrong-destination",
+      "completed_at": "2026-11-15T18:37:18.722507+00:00"
+    },
+    {
+      "label": "observed_missing-actor",
+      "passed": true,
+      "verdict": "unknown",
+      "reason": "EXECUTION_EVIDENCE_INCOMPLETE",
+      "enforcement_eligible": false,
+      "capture_id": "missing-actor",
+      "completed_at": "2026-11-15T18:37:38.744104+00:00"
+    },
+    {
+      "label": "duplicate_input_preserves_single_envelope",
+      "passed": true,
+      "envelope_sha256": "e442e6e4bdb67748b9147a883aaea19b68462c3d843f1d5dedcd7cd75da90db9"
+    },
+    {
+      "label": "automatic_restart_execution-observer",
+      "passed": true,
+      "same_container": true,
+      "before": 0,
+      "after": 1,
+      "exit_signal": "SIGKILL to Python child, not Docker stop"
+    },
+    {
+      "label": "observed_outage-restart",
+      "passed": true,
+      "verdict": "normal",
+      "reason": "APPROVED_BASELINE_MATCH",
+      "enforcement_eligible": false,
+      "capture_id": "outage-restart",
+      "completed_at": "2026-11-15T18:38:41.441525+00:00"
+    },
+    {
+      "label": "core_outage_and_sigkill_resume_durable_delivery",
+      "passed": true
+    },
+    {
+      "label": "tampered_capture_rejected_before_execution",
+      "passed": true
+    },
+    {
+      "label": "two_isolated_reviewer_identities_require_quorum_before_simulation",
+      "passed": true,
+      "reviewers": [
+        "runtime-reviewer-a",
+        "runtime-reviewer-b"
+      ],
+      "effect_applied": false,
+      "human_independent_review": false
+    },
+    {
+      "label": "trusted_adverse_related_403",
+      "passed": true,
+      "status": 403,
+      "resource_deliveries": 0,
+      "tls_version": "TLSv1.3"
+    },
+    {
+      "label": "trusted_adverse_unrelated_200",
+      "passed": true,
+      "status": 200,
+      "resource_deliveries": 1,
+      "tls_version": "TLSv1.3"
+    },
+    {
+      "label": "trusted_signal_enforcement_timing",
+      "passed": true,
+      "event_id": "execution-adverse",
+      "sent_at": "2026-11-15T18:39:50.381169+00:00",
+      "observed_at": "2026-11-15T18:40:31.470922+00:00"
+    },
+    {
+      "label": "after_archive_related_403",
+      "passed": true,
+      "status": 403,
+      "resource_deliveries": 0,
+      "tls_version": "TLSv1.3"
+    },
+    {
+      "label": "after_archive_unrelated_200",
+      "passed": true,
+      "status": 200,
+      "resource_deliveries": 1,
+      "tls_version": "TLSv1.3"
+    },
+    {
+      "label": "terminal_spool_and_input_rotation_preserve_original_history",
+      "passed": true,
+      "compacted": 9,
+      "retired_inputs": 10,
+      "server_archived": 30
+    },
+    {
+      "label": "restore_interruption_keeps_observer_stopped",
+      "passed": true,
+      "exit_code": 73
+    },
+    {
+      "label": "restored_old_token_403",
+      "passed": true,
+      "status": 403,
+      "resource_deliveries": 0,
+      "tls_version": "TLSv1.3"
+    },
+    {
+      "label": "restored_fresh_token_200",
+      "passed": true,
+      "status": 200,
+      "resource_deliveries": 1,
+      "tls_version": "TLSv1.3"
+    },
+    {
+      "label": "full_restore_preserves_context_and_delivery_history",
+      "passed": true
+    }
+  ],
+  "maintenance": [
+    {
+      "operation": "observer_archive",
+      "completed": true,
+      "exit_code": 0,
+      "receipt": {
+        "schema_version": "execution-maintenance-1",
+        "operation": "observer_archive",
+        "completed": true,
+        "compacted": 9,
+        "retired_inputs": 10,
+        "archived_records": null,
+        "issue": null
+      },
+      "issue": null,
+      "coordination": {
+        "observer_stopped": true,
+        "job_started": true,
+        "job_removed": true,
+        "observer_restarted": true,
+        "network": "none"
+      }
+    },
+    {
+      "operation": "server_archive",
+      "completed": true,
+      "exit_code": 0,
+      "receipt": {
+        "schema_version": "execution-maintenance-1",
+        "operation": "server_archive",
+        "completed": true,
+        "compacted": null,
+        "retired_inputs": null,
+        "archived_records": 30,
+        "issue": null
+      },
+      "issue": null
+    }
+  ],
+  "cleanup": {
+    "project": "kmtls-d530e025a177",
+    "stopped": true,
+    "purged": true
+  },
+  "started_at": "2026-11-15T18:30:35.681035+00:00",
+  "finished_at": "2026-11-15T18:46:15.006414+00:00",
+  "runtime_release_sha256": "83a2423909847b1772a006030f9a133b426280e802611d0f3393fdb044d464ea",
+  "image_id": "sha256:325440fd809a0fbe3b503f8cc498b1597b4b21d40dddda76aa857d64b187abe2",
+  "verification_file_sha256": "ea6e71dbd07461d402e36852b9da5ba8d5f0bd861530ef1d7845f0e8b84300e4",
+  "source_dirty": false,
+  "changed_existing_code_files_since_original_v89": [
+    "scripts/execution_maintenance_probe.py",
+    "scripts/test_execution_mtls_runtime.py"
+  ],
+  "new_code_file": "tests/test_execution_maintenance_quiesce.py",
+  "app_and_f1_models_protocols_unchanged": true,
+  "original_v89_qualification": {
+    "source_archive_sha256": "4a9f8e206466243a4e15a626d1f79eb8c2f96023383fc6c3019d7140a369b226",
+    "full_passed": 6017,
+    "focused_passed": 489,
+    "applies_to_original_frozen_archive_only": true
+  },
+  "new_full_suite_on_this_head": "Not claimed here. New-head PR CI and subsequent integrated source qualifications are separate.",
+  "boundaries": [
+    "Local test acceptance coordination, not production maintenance scheduling.",
+    "A failed/partial maintenance remains failed and leaves observer stopped; no counter reset/retry.",
+    "Ownership labels, pinned release/image, stopped writer, unused writable volumes, fixed command and typed receipt remain required.",
+    "Separate simulated reviewer identities are not independent human approval.",
+    "No physical-host disaster, organization SSO or new independent F1 claim."
+  ]
+}

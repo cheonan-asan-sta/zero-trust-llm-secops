@@ -172,6 +172,11 @@ Docker 검증의 각 통과 항목, 보관 정리와 복원 결과, 테스트 �
 
 ## 검증 재현
 
+호스트 작업 실행기는 POSIX 소유권·0700 디렉터리·프로세스 파일 잠금을 요구한다.
+Windows에서는 일반 API와 대시보드를 사용할 수 있지만 호스트 작업은 비활성화된다.
+Linux/WSL에서 별도 비공개 작업 디렉터리를 설정해야 작업 실행을 사용할 수 있다.
+LLM 분석 설정과 호스트 작업 설정은 별개이며 기본 분석기는 계속 `rule`이다.
+
 ```bash
 .venv/bin/python -m ruff check .
 .venv/bin/python -m pytest -q

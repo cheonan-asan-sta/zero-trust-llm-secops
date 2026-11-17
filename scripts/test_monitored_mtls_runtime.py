@@ -282,6 +282,7 @@ print(json.dumps({'status':status,'denied':status in (0,403)}))
     def run(self):
         super().run()
         self.report["completed"] = False
+        self.report["operation_stage"] = "monitoring_checks"
         self.clear_baseline('C01SignalProcessingFailed')
         floor = self.begin_episode()
         worker = self.runtime.container("worker")

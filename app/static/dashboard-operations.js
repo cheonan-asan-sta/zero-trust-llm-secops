@@ -516,7 +516,7 @@
     try {
       capabilities = await request("/dashboard/jobs/capabilities");
       if (epoch !== current().epoch || ticket !== sequence) return;
-      if (!capabilities.enabled) { message("서버의 DASHBOARD_OPERATIONS_DIRECTORY 설정이 필요합니다.",true); return; }
+      if (!capabilities.enabled) { message("호스트 작업을 사용할 수 없습니다. 서버 실행 환경과 관리자 설정을 확인하세요.",true); return; }
       const form = node("form",null,"operation-form");
       const actionLabel = node("label",null,"operation-field"), action = node("select");
       action.id="jobAction";

@@ -1,0 +1,18 @@
+{
+  "schema_version": "dedale-nested-decoding-amendment-1",
+  "original_contract_sha256": "e6f51d86426ef401fb58ec4fda7adc5e40bb4cd62fe97234a82e7c2dfe9135fa",
+  "archive_sha256": "d7b94d9c6df0dbe22ac31ccc0898471d05d4bc5bc290dc4c224c757c1c373ea7",
+  "member": "daily_syslog/D10_H0_2025-01-01T00_syslog_F217.jsonl.bz2",
+  "compressed_member_sha256": "ec0cab8cd6f59f94323e47d0a5fa83b2c3bc853ffcb281539b5930b7fb862bac",
+  "compressed_member_bytes": 84856,
+  "reason": "The first ZIP member is itself bzip2 compressed. The original probe's 128 binary line parse failures are acquisition-layer errors, not malformed native JSON events.",
+  "selection_unchanged": true,
+  "decode": "exactly one complete bzip2 stream, no concatenated stream or trailing bytes",
+  "maximum_decoded_bytes": 536870912,
+  "maximum_observed_physical_lines": 128,
+  "maximum_physical_line_bytes": 2097152,
+  "role": "development_schema_probe_only",
+  "ground_truth_and_simulator_bodies_excluded": true,
+  "model_training_prediction_or_metric_change": false,
+  "independent_final_qualification": false
+}

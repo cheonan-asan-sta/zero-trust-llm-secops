@@ -215,7 +215,7 @@ def test_verification_helper_cannot_mount_vault_or_database_data(monkeypatch):
     value.state = {'project': 'kmtls-012345abcdef', 'authority_image_id': 'sha256:' + 'a' * 64,
                    'transport_anchor': {}, 'volumes': {v: 'owned-' + v for v in t.FILES}}
     monkeypatch.setattr(value, 'verify_owned_volumes', lambda: None)
-    monkeypatch.setattr(value, 'transport_journal', dict)
+    monkeypatch.setattr(value, 'transport_journal', lambda: {'epoch': 0, 'phase': 'idle', 'plan': None})
 
     def command(argv, **kwargs):
         assert argv[argv.index('--network') + 1] == 'none' and argv.count('--mount') == 3
@@ -223,7 +223,7 @@ def test_verification_helper_cannot_mount_vault_or_database_data(monkeypatch):
         assert not any('/vault' in word or '/pgdata' in word or 'docker.sock' in word for word in argv)
         return '{"verified":true}'
 
-    monkeypatch.setattr(runtime, 'command', command)
+    monkeypatch.setattr(runtime.transport_verification, 'verify', lambda argv, **kwargs: json.loads(command(argv, **kwargs)))
     assert value.transport_job('verify')['verified']
 
 
@@ -309,7 +309,7 @@ def helper_runtime(monkeypatch, project='kmtls-012345abcdef'):
                    'volumes': {v: project + '-' + v for v in (*t.FILES, runtime.VAULT)}}
     value._transport_active = True
     monkeypatch.setattr(value, 'verify_owned_volumes', lambda: None)
-    monkeypatch.setattr(value, 'transport_journal', dict)
+    monkeypatch.setattr(value, 'transport_journal', lambda: {'epoch': 0, 'phase': 'idle', 'plan': None})
     return value
 
 
@@ -346,6 +346,7 @@ def test_helper_fence_is_project_scoped_and_public_verification_has_no_vault_nam
         return '{"verified":true}'
 
     monkeypatch.setattr(runtime, 'command', command)
+    monkeypatch.setattr(runtime.transport_verification, 'verify', lambda argv, **kwargs: json.loads(command(argv, **kwargs)))
     first.transport_job('prepare')
     second.transport_job('prepare')
     first.transport_job('verify')

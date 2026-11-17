@@ -10,7 +10,13 @@ from pydantic import Field
 from app.config import get_settings
 from app.models import StrictModel
 from app.security import Principal, Role, require_roles
-from app.services.dashboard_jobs import ACTIONS, JobConflict, JobStore, JobUnavailable
+from app.services.dashboard_jobs import (
+    ACTIONS,
+    JobConflict,
+    JobStore,
+    JobUnavailable,
+    host_jobs_supported,
+)
 
 router = APIRouter(prefix="/dashboard/jobs", tags=["dashboard-operations"])
 Admin = Annotated[Principal, Depends(require_roles(Role.ADMIN))]
@@ -47,10 +53,11 @@ def store(settings):
 def capabilities(principal: Admin):
     settings = configuration(principal)
     paired = settings.dashboard_m7_paired_directory
-    return {"enabled": settings.dashboard_operations_directory is not None,
+    enabled = host_jobs_supported() and settings.dashboard_operations_directory is not None
+    return {"enabled": enabled,
             "max_live_usd": settings.dashboard_live_max_usd,
             "actions": [{"id": action, "title": title, "available": bool(
-                settings.dashboard_operations_directory is not None
+                enabled
                 and (action not in {"m6-plan", "m6-live"} or (paired and paired.is_dir()))
                 and (action != "m6-live" or settings.dashboard_live_max_usd > 0)
             )} for action, title in ACTIONS.items()]}

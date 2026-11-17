@@ -4,6 +4,12 @@ import boto3
 from openai import AsyncOpenAI
 
 from app.config import Settings
+from app.grounded_prompting import (
+    GROUNDED_INSTRUCTIONS,
+    grounded_input,
+    grounded_output_type,
+    validate_grounded,
+)
 from app.models import SecurityAssessment, SecurityEvent
 from app.prompting import build_analysis_input
 
@@ -26,6 +32,7 @@ class OpenAIAnalyzer:
     def __init__(self, settings: Settings) -> None:
         api_key = _resolve_api_key(settings)
         self._model = settings.openai_model
+        self._prompt_mode = settings.openai_prompt_mode
         self._few_shot_count = settings.openai_few_shot_count
         self._reasoning_effort = settings.openai_reasoning_effort
         self._max_output_tokens = settings.openai_max_output_tokens
@@ -39,14 +46,33 @@ class OpenAIAnalyzer:
             text={"verbosity": "low"},
             max_output_tokens=self._max_output_tokens,
             input=[
-                {"role": "system", "content": SYSTEM_INSTRUCTIONS},
-                *build_analysis_input(event, self._few_shot_count),
+                {
+                    "role": "system",
+                    "content": (
+                        GROUNDED_INSTRUCTIONS
+                        if self._prompt_mode == "grounded"
+                        else SYSTEM_INSTRUCTIONS
+                    ),
+                },
+                *(
+                    grounded_input(event)
+                    if self._prompt_mode == "grounded"
+                    else build_analysis_input(event, self._few_shot_count)
+                ),
             ],
-            text_format=SecurityAssessment,
+            text_format=(
+                grounded_output_type(event)
+                if self._prompt_mode == "grounded"
+                else SecurityAssessment
+            ),
         )
         if response.output_parsed is None:
             raise RuntimeError("The model did not return a structured assessment")
-        return response.output_parsed
+        return (
+            validate_grounded(response.output_parsed, event)
+            if self._prompt_mode == "grounded"
+            else response.output_parsed
+        )
 
 
 def _resolve_api_key(settings: Settings) -> str:

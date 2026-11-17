@@ -23,11 +23,12 @@ class HybridAnalyzer:
         self._rule = RuleBasedAnalyzer()
         self._llm = llm or OpenAIAnalyzer(settings)
         self._confidence_threshold = settings.hybrid_confidence_threshold
+        self._review_all = settings.hybrid_review_all
         self._llm_timeout_seconds = settings.hybrid_llm_timeout_seconds
 
     async def analyze(self, event: SecurityEvent) -> SecurityAssessment:
         baseline = self._rule.assess(event)
-        if baseline.confidence >= self._confidence_threshold:
+        if not self._review_all and baseline.confidence >= self._confidence_threshold:
             return baseline
 
         try:

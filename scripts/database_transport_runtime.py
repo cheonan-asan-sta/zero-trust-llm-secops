@@ -14,6 +14,7 @@ from scripts import persistent_authority_assets as assets
 from scripts import persistent_authority_control as control
 from scripts import rekey_runtime_assets as rekey
 from scripts import runtime_release as release
+from scripts import transport_verification
 from scripts.authority_rotation_coordinator import Coordinator, lease
 from scripts.certificate_controller import LifecycleError, save
 from scripts.continuous_mtls_runtime import ROOT, RuntimeFailure, command
@@ -120,6 +121,8 @@ class TransportRuntime(PersistentAuthorityRuntime):
         super().verify_authority_public_assets()
         try:
             self.transport_job('verify')
+        except transport_verification.VerificationFailure:
+            raise
         except RuntimeFailure:
             raise RuntimeFailure('database_transport_preflight_failed') from None
 
@@ -155,9 +158,15 @@ class TransportRuntime(PersistentAuthorityRuntime):
             argv += ['--mount', f"type=volume,src={self.state['volumes'][volume]},dst=/transport/{volume}" + (',readonly' if readonly else '')]
         if not readonly:
             argv += ['--mount', f"type=volume,src={self.state['volumes'][VAULT]},dst=/vault"]
-        result = json.loads(command([*argv, '--entrypoint', 'python', '-i', self.state['authority_image_id'],
-                '-m', 'scripts.database_transport_custodian'], payload=json.dumps({'operation': operation,
-                'anchor': self.state['transport_anchor'], 'journal': self.transport_journal()}), timeout=20))
+        journal = self.transport_journal()
+        invocation = [*argv, '--entrypoint', 'python', '-i', self.state['authority_image_id'],
+                      '-m', 'scripts.database_transport_custodian']
+        payload = json.dumps({'operation': operation, 'anchor': self.state['transport_anchor'], 'journal': journal})
+        if readonly:
+            return transport_verification.verify(invocation, payload=payload, epoch=journal['epoch'],
+                pending=journal.get('plan') is not None, partial=journal['phase'] == 'stopped',
+                image=self.state['authority_image_id'])
+        result = json.loads(command(invocation, payload=payload, timeout=20))
         if result.get('verified') is False:
             raise RuntimeFailure('database_transport_ceremony_failed')
         return result

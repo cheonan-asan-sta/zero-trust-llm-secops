@@ -1,0 +1,375 @@
+{
+  "schema": "packet-member-verification-development-checkpoint-1",
+  "completed": true,
+  "date": "2026-11-16",
+  "completion_scope": "member verification implementation and functional tests only; live source collection and real-data integration pending",
+  "source_commit": "9e2bae682692a74d4ece64ca758f6e4c607a61cc",
+  "functional_source_sha256": "b4fc72af76ecc9e9b54182bea5c42de512129b139a850b0d59799d7730fd5e66",
+  "linux_focused": {
+    "passed": 929,
+    "new_member_verification_tests": 21,
+    "failed": 0,
+    "skipped": 0,
+    "ruff_RUF100_passed": true,
+    "junit_sha256": "2b0d030dfbe7e95949ffe62964660a93de061aeb9fb1c862a10e80085c810b97"
+  },
+  "owned_test_container_removed": true,
+  "old_detector_code_bytes_unchanged": true,
+  "original_population": 1681815,
+  "performance_reference": "docs/infrastructure-results/extra-apparmor-status-v117-20261116.json",
+  "performance_reference_sha256": "91f499bf28b0aa07cb5b772dba5f4b1ab6fb185ec8225d5625a0416428f08137",
+  "kinds_RSF": {
+    "audit-share": {
+      "before": {
+        "tp": 2,
+        "fp": 3,
+        "fn": 4,
+        "tn": 2349,
+        "inference_errors": 0,
+        "population": 2358,
+        "precision": 0.4,
+        "recall": 0.3333333333333333,
+        "f1": 0.36363636363636365,
+        "false_positive_rate": 0.0012755102040816326,
+        "accuracy": 0.9970313825275657
+      },
+      "after": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 4,
+        "tn": 2352,
+        "inference_errors": 0,
+        "population": 2358,
+        "precision": 1.0,
+        "recall": 0.3333333333333333,
+        "f1": 0.5,
+        "false_positive_rate": 0.0,
+        "accuracy": 0.998303647158609
+      }
+    },
+    "dns": {
+      "before": {
+        "tp": 135466,
+        "fp": 9,
+        "fn": 2595,
+        "tn": 654079,
+        "inference_errors": 0,
+        "population": 792149,
+        "precision": 0.9999335670787969,
+        "recall": 0.9812039605681546,
+        "f1": 0.990480229293402,
+        "false_positive_rate": 1.3759616443047419e-05,
+        "accuracy": 0.9967127396487278
+      },
+      "after": {
+        "tp": 135466,
+        "fp": 9,
+        "fn": 2595,
+        "tn": 654079,
+        "inference_errors": 0,
+        "population": 792149,
+        "precision": 0.9999335670787969,
+        "recall": 0.9812039605681546,
+        "f1": 0.990480229293402,
+        "false_positive_rate": 1.3759616443047419e-05,
+        "accuracy": 0.9967127396487278
+      }
+    },
+    "auth": {
+      "before": {
+        "tp": 32,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1082,
+        "inference_errors": 0,
+        "population": 1114,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      },
+      "after": {
+        "tp": 32,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1082,
+        "inference_errors": 0,
+        "population": 1114,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      }
+    },
+    "web-error": {
+      "before": {
+        "tp": 1414,
+        "fp": 0,
+        "fn": 0,
+        "tn": 4,
+        "inference_errors": 0,
+        "population": 1418,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      },
+      "after": {
+        "tp": 1414,
+        "fp": 0,
+        "fn": 0,
+        "tn": 4,
+        "inference_errors": 0,
+        "population": 1418,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      }
+    },
+    "web-access": {
+      "before": {
+        "tp": 426312,
+        "fp": 7,
+        "fn": 18,
+        "tn": 4577,
+        "inference_errors": 0,
+        "population": 430914,
+        "precision": 0.9999835803705676,
+        "recall": 0.9999577791851383,
+        "f1": 0.9999706796114227,
+        "false_positive_rate": 0.0015270506108202443,
+        "accuracy": 0.9999419837833071
+      },
+      "after": {
+        "tp": 426312,
+        "fp": 7,
+        "fn": 18,
+        "tn": 4577,
+        "inference_errors": 0,
+        "population": 430914,
+        "precision": 0.9999835803705676,
+        "recall": 0.9999577791851383,
+        "f1": 0.9999706796114227,
+        "false_positive_rate": 0.0015270506108202443,
+        "accuracy": 0.9999419837833071
+      }
+    },
+    "audit-web": {
+      "before": {
+        "tp": 47,
+        "fp": 0,
+        "fn": 0,
+        "tn": 7419,
+        "inference_errors": 0,
+        "population": 7466,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      },
+      "after": {
+        "tp": 47,
+        "fp": 0,
+        "fn": 0,
+        "tn": 7419,
+        "inference_errors": 0,
+        "population": 7466,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      }
+    },
+    "vpn": {
+      "before": {
+        "tp": 84,
+        "fp": 42,
+        "fn": 0,
+        "tn": 18332,
+        "inference_errors": 0,
+        "population": 18458,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8,
+        "false_positive_rate": 0.002285838685098509,
+        "accuracy": 0.9977245638747426
+      },
+      "after": {
+        "tp": 84,
+        "fp": 42,
+        "fn": 0,
+        "tn": 18332,
+        "inference_errors": 0,
+        "population": 18458,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8,
+        "false_positive_rate": 0.002285838685098509,
+        "accuracy": 0.9977245638747426
+      }
+    },
+    "cpu": {
+      "before": {
+        "tp": 139,
+        "fp": 4,
+        "fn": 0,
+        "tn": 5617,
+        "inference_errors": 0,
+        "population": 5760,
+        "precision": 0.972027972027972,
+        "recall": 1.0,
+        "f1": 0.9858156028368794,
+        "false_positive_rate": 0.0007116171499733144,
+        "accuracy": 0.9993055555555556
+      },
+      "after": {
+        "tp": 139,
+        "fp": 4,
+        "fn": 0,
+        "tn": 5617,
+        "inference_errors": 0,
+        "population": 5760,
+        "precision": 0.972027972027972,
+        "recall": 1.0,
+        "f1": 0.9858156028368794,
+        "false_positive_rate": 0.0007116171499733144,
+        "accuracy": 0.9993055555555556
+      }
+    }
+  },
+  "full_performance_replay_repeated": false,
+  "new_detection_quality_gain_measured": false,
+  "acquisition_at_checkpoint": {
+    "status": "running; same live exec handle polled separately",
+    "at": "2026-11-16T14:26:15.744024+00:00",
+    "recipe_sha256": "2a253b04dcb634c91798c9d5f0d1a728b33947fc5df2cfca46035ad282a6afc8",
+    "progress_snapshot": {
+      "bytes_received": 1543503872,
+      "completed_ranges": 92,
+      "elapsed_seconds": 1493.72,
+      "expected_bytes": 7132670599,
+      "total_ranges": 426
+    },
+    "complete_archive_available": false,
+    "full_checksum_verified": false,
+    "real_member_intake_completed": false
+  },
+  "member_intake_implementation": {
+    "fixed_training_archive_only": true,
+    "archive_SHA_and_publisher_MD5_rechecked": true,
+    "acquisition_receipt_external_SHA_required": true,
+    "same_VPN_raw_bytes_required": true,
+    "only_selected_two_PCAP_and_one_VPN_log_opened": true,
+    "full_CRC_and_SHA_for_each_copied_member": true,
+    "bounded_ZIP64_index": true,
+    "generic_2GiB_archive_limit_changed": false,
+    "partial_pipeline_never_marked_complete": true,
+    "real_dataset_execution_complete": false,
+    "concurrent_source_growth_read_bound_verified": true
+  },
+  "shared_journal_coverage": {
+    "scope": "already observed error analysis; not fitting or independent validation",
+    "diagnostic_report_sha256": "49a18324a72218f6304aa63af083589e4d160ffd96becbedfa889f4011d2b04d",
+    "verified_summary_sha256": "4f598121b8e6917778d5ee9c809619af44b0b8970ff0c2164cb31352a63aab68",
+    "sources": {
+      "fox": {
+        "missing_rows": 2,
+        "prior_60s_journal_rows": [
+          0,
+          0
+        ],
+        "after_deltas_us": [
+          [
+            5441,
+            9007
+          ],
+          [
+            5441,
+            9007
+          ]
+        ],
+        "after_exact_audit_ordinals": [
+          [
+            [
+              467
+            ],
+            [
+              468
+            ]
+          ],
+          [
+            [
+              467
+            ],
+            [
+              468
+            ]
+          ]
+        ]
+      },
+      "russellmitchell": {
+        "missing_rows": 2,
+        "prior_60s_journal_rows": [
+          0,
+          0
+        ],
+        "after_deltas_us": [
+          [
+            4130,
+            22978
+          ],
+          [
+            4130,
+            22978
+          ]
+        ],
+        "after_exact_audit_ordinals": [
+          [
+            [
+              667
+            ],
+            [
+              668
+            ]
+          ],
+          [
+            [
+              667
+            ],
+            [
+              668
+            ]
+          ]
+        ]
+      }
+    },
+    "post_event_rows_match_original_audit_identity": true,
+    "future_observations_used_for_prediction": false,
+    "classifier_changes": 0
+  },
+  "goal_status": "active",
+  "goal_qualified": false,
+  "new_independent_evaluation": false,
+  "original_six_domains_qualified": false,
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "llm_provider_calls": 0,
+  "new_ci_started": false,
+  "push_performed": false,
+  "merge_performed": false,
+  "long_soak_started": false,
+  "labels_changed": false,
+  "target_thresholds_changed": false,
+  "prior_v120_functional_snapshot": {
+    "source_commit": "df589636b153abd815518e61eb50ffeb8b6372f7",
+    "passed": 928,
+    "scope": "before bounded concurrent-growth hardening; all passed; retained in private runtime"
+  }
+}

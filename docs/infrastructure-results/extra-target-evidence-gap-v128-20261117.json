@@ -1,0 +1,529 @@
+{
+  "schema": "target-and-source-evidence-gap-audit-1",
+  "at": "2026-11-16T19:22:39.584821+00:00",
+  "objective": "공유 감사·웹 감사·인증·VPN의 실제 미달 탐지 성능을 개선하고, 원래 6개 보안 영역의 별도 독립 인수 조건을 유지하면서 정밀도·재현율·F1 각각 95% 이상 및 오탐률·미탐률 각각 5% 이하를 검증한다. 원문·라벨·모집단·목표를 바꾸거나 로컬 정책 fixture의 통과율을 탐지 F1에 합산하지 않는다. 무료 로컬 테스트와 문서 갱신으로 진행하고 목표 충족 전 push·새 CI·병합·유료 호출·AWS 배포는 하지 않는다.",
+  "goal_qualified": false,
+  "objective_achieved": false,
+  "objective_or_success_criteria_redefined": false,
+  "requirement_audit": [
+    {
+      "requirement": "precision/recall/F1 >= .95 and FPR/FNR <= .05 in required original log kinds",
+      "status": "contradicted_by_current_metrics",
+      "evidence": "unchanged corrected v125 score, audit-share and VPN fail"
+    },
+    {
+      "requirement": "original six-domain independent acceptance",
+      "status": "incomplete",
+      "evidence": "current preparation recheck has final case support0 in all six domains"
+    },
+    {
+      "requirement": "five disjoint axes, source/label adjudication, sufficient normal/threat support and candidate freeze",
+      "status": "missing_required_evidence",
+      "evidence": "no final-reserved cases; current source observations cannot be relabeled unseen"
+    },
+    {
+      "requirement": "retain raw labels, original case population, ordering and targets",
+      "status": "preserved",
+      "evidence": "1681815 population and immutable original protocol; score change flags false"
+    },
+    {
+      "requirement": "no new FP or lost existing TP",
+      "status": "preserved_no_new_decisions",
+      "evidence": "last corrected comparison newFP/lostTP0; 497 current Python bytes unchanged since v126"
+    },
+    {
+      "requirement": "do not add policy fixture passes or unrelated new source to detection F1",
+      "status": "preserved",
+      "evidence": "DEDALE128 is development schema probe, new native labels/training/predictions0"
+    },
+    {
+      "requirement": "free local tests and documentation",
+      "status": "bounded_work_completed",
+      "evidence": "v125 relatedLinux1244; v126 relatedWindows/Linux120; current metadata recheck only"
+    },
+    {
+      "requirement": "no push/newCI/merge/paid calls/AWS before qualification",
+      "status": "preserved",
+      "evidence": "current task only local reads/docs and public metadata GETs; all restricted actions0"
+    }
+  ],
+  "original_protocol_sha256": "259bbb3c4192899c3513a2af4b848208be9c4deb0edb2dbe3f0f0a1a136b7d78",
+  "latest_actual_score_sha256": "390d54332f7dd989455f13dc4fea1e9d070a9d7c2fda2343eae7b80bc1091fc8",
+  "latest_actual_score_path": "runtime/f1/vpn-issuer-phase-batch-v125-20261117/run.json",
+  "latest_observed_log_kind_metric_gate": {
+    "schema": "local-metric-gate-1",
+    "track": "observed_log_kinds",
+    "completed": true,
+    "local_metric_gate_passed": false,
+    "goal_qualified": false,
+    "independent_evaluation_verified": false,
+    "ci_or_merge_started": false,
+    "scope": "necessary metric condition only; label provenance, candidate binding, independent evaluation and runtime acceptance remain separate",
+    "targets": {
+      "precision": 0.95,
+      "recall": 0.95,
+      "f1": 0.95,
+      "false_positive_rate": 0.05,
+      "false_negative_rate": 0.05
+    },
+    "rows": [
+      {
+        "name": "audit-share",
+        "population": 2358,
+        "positive_support": 6,
+        "negative_support": 2352,
+        "counts": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "tn": 2352,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 1.0,
+          "recall": 0.6666666666666666,
+          "f1": 0.8,
+          "false_positive_rate": 0.0,
+          "false_negative_rate": 0.3333333333333333
+        },
+        "metric_targets_met": false,
+        "failed_conditions": [
+          "recall",
+          "f1",
+          "false_negative_rate"
+        ]
+      },
+      {
+        "name": "audit-web",
+        "population": 7466,
+        "positive_support": 47,
+        "negative_support": 7419,
+        "counts": {
+          "tp": 47,
+          "fp": 0,
+          "fn": 0,
+          "tn": 7419,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_positive_rate": 0.0,
+          "false_negative_rate": 0.0
+        },
+        "metric_targets_met": true,
+        "failed_conditions": []
+      },
+      {
+        "name": "auth",
+        "population": 1114,
+        "positive_support": 32,
+        "negative_support": 1082,
+        "counts": {
+          "tp": 32,
+          "fp": 0,
+          "fn": 0,
+          "tn": 1082,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_positive_rate": 0.0,
+          "false_negative_rate": 0.0
+        },
+        "metric_targets_met": true,
+        "failed_conditions": []
+      },
+      {
+        "name": "vpn",
+        "population": 18458,
+        "positive_support": 84,
+        "negative_support": 18374,
+        "counts": {
+          "tp": 84,
+          "fp": 42,
+          "fn": 0,
+          "tn": 18332,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 0.6666666666666666,
+          "recall": 1.0,
+          "f1": 0.8,
+          "false_positive_rate": 0.002285838685098509,
+          "false_negative_rate": 0.0
+        },
+        "metric_targets_met": false,
+        "failed_conditions": [
+          "precision",
+          "f1"
+        ]
+      },
+      {
+        "name": "cpu",
+        "population": 5760,
+        "positive_support": 139,
+        "negative_support": 5621,
+        "counts": {
+          "tp": 139,
+          "fp": 4,
+          "fn": 0,
+          "tn": 5617,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 0.972027972027972,
+          "recall": 1.0,
+          "f1": 0.9858156028368794,
+          "false_positive_rate": 0.0007116171499733144,
+          "false_negative_rate": 0.0
+        },
+        "metric_targets_met": true,
+        "failed_conditions": []
+      },
+      {
+        "name": "dns",
+        "population": 792149,
+        "positive_support": 138061,
+        "negative_support": 654088,
+        "counts": {
+          "tp": 135466,
+          "fp": 9,
+          "fn": 2595,
+          "tn": 654079,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 0.9999335670787969,
+          "recall": 0.9812039605681546,
+          "f1": 0.990480229293402,
+          "false_positive_rate": 1.3759616443047419e-05,
+          "false_negative_rate": 0.018796039431845345
+        },
+        "metric_targets_met": true,
+        "failed_conditions": []
+      },
+      {
+        "name": "web-access",
+        "population": 430914,
+        "positive_support": 426330,
+        "negative_support": 4584,
+        "counts": {
+          "tp": 426312,
+          "fp": 7,
+          "fn": 18,
+          "tn": 4577,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 0.9999835803705676,
+          "recall": 0.9999577791851383,
+          "f1": 0.9999706796114227,
+          "false_positive_rate": 0.0015270506108202443,
+          "false_negative_rate": 4.222081486172683e-05
+        },
+        "metric_targets_met": true,
+        "failed_conditions": []
+      },
+      {
+        "name": "web-error",
+        "population": 1418,
+        "positive_support": 1414,
+        "negative_support": 4,
+        "counts": {
+          "tp": 1414,
+          "fp": 0,
+          "fn": 0,
+          "tn": 4,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_positive_rate": 0.0,
+          "false_negative_rate": 0.0
+        },
+        "metric_targets_met": true,
+        "failed_conditions": []
+      }
+    ]
+  },
+  "original_population": 1681815,
+  "new_detection_or_threshold_change": false,
+  "latest_495_existing_model_related_python_files_unchanged": true,
+  "current497_python_bytes_unchanged_since_v126": true,
+  "separate_H_W_rejected_pooled_FP31_not_adopted": true,
+  "readiness_summary": {
+    "schema": "f1-independent-preparation-report-1",
+    "cases_preserved": 720,
+    "metric_units_separated": true,
+    "components": 67,
+    "components_crossing_splits": 0,
+    "largest_component_cases": 20,
+    "missing_group_metadata": {
+      "session": 0,
+      "subject": 0,
+      "device": 0,
+      "family": 0,
+      "pattern": 0
+    },
+    "support": {
+      "development": {
+        "event_detection": {
+          "cases": 720,
+          "known_labels": {
+            "threat": 360,
+            "normal": 360
+          },
+          "sealed_labels_unread": 0,
+          "domain_case_support": {
+            "credential": 120,
+            "device": 120,
+            "privilege": 120,
+            "lateral": 120,
+            "exfiltration": 120,
+            "remote": 120
+          }
+        },
+        "session_any_alert": {
+          "cases": 0,
+          "known_labels": {},
+          "sealed_labels_unread": 0,
+          "domain_case_support": {
+            "credential": 0,
+            "device": 0,
+            "privilege": 0,
+            "lateral": 0,
+            "exfiltration": 0,
+            "remote": 0
+          }
+        },
+        "policy_control": {
+          "cases": 0,
+          "known_labels": {},
+          "sealed_labels_unread": 0,
+          "domain_case_support": {
+            "credential": 0,
+            "device": 0,
+            "privilege": 0,
+            "lateral": 0,
+            "exfiltration": 0,
+            "remote": 0
+          }
+        }
+      },
+      "calibration": {
+        "event_detection": {
+          "cases": 0,
+          "known_labels": {},
+          "sealed_labels_unread": 0,
+          "domain_case_support": {
+            "credential": 0,
+            "device": 0,
+            "privilege": 0,
+            "lateral": 0,
+            "exfiltration": 0,
+            "remote": 0
+          }
+        },
+        "session_any_alert": {
+          "cases": 0,
+          "known_labels": {},
+          "sealed_labels_unread": 0,
+          "domain_case_support": {
+            "credential": 0,
+            "device": 0,
+            "privilege": 0,
+            "lateral": 0,
+            "exfiltration": 0,
+            "remote": 0
+          }
+        },
+        "policy_control": {
+          "cases": 0,
+          "known_labels": {},
+          "sealed_labels_unread": 0,
+          "domain_case_support": {
+            "credential": 0,
+            "device": 0,
+            "privilege": 0,
+            "lateral": 0,
+            "exfiltration": 0,
+            "remote": 0
+          }
+        }
+      },
+      "final_reserved": {
+        "event_detection": {
+          "cases": 0,
+          "known_labels": {},
+          "sealed_labels_unread": 0,
+          "domain_case_support": {
+            "credential": 0,
+            "device": 0,
+            "privilege": 0,
+            "lateral": 0,
+            "exfiltration": 0,
+            "remote": 0
+          }
+        },
+        "session_any_alert": {
+          "cases": 0,
+          "known_labels": {},
+          "sealed_labels_unread": 0,
+          "domain_case_support": {
+            "credential": 0,
+            "device": 0,
+            "privilege": 0,
+            "lateral": 0,
+            "exfiltration": 0,
+            "remote": 0
+          }
+        },
+        "policy_control": {
+          "cases": 0,
+          "known_labels": {},
+          "sealed_labels_unread": 0,
+          "domain_case_support": {
+            "credential": 0,
+            "device": 0,
+            "privilege": 0,
+            "lateral": 0,
+            "exfiltration": 0,
+            "remote": 0
+          }
+        }
+      }
+    },
+    "forward_time_contract_passed": true,
+    "observed_cases": 720,
+    "final_case_blockers": {},
+    "structural_blockers": [
+      "three_populated_splits_required",
+      "no_final_cases_acquired"
+    ],
+    "metadata_structure_ready": false,
+    "evaluation_blockers": [
+      "three_populated_splits_required",
+      "no_final_cases_acquired",
+      "candidate_not_frozen",
+      "source_and_label_adjudication_pending",
+      "final_class_support_unverified"
+    ],
+    "candidate_frozen": false,
+    "independent_review_verified": false,
+    "final_evaluation_ready": false,
+    "goal_qualified": false,
+    "model_inference_runs": 0,
+    "labels_changed": false,
+    "cases_dropped": 0,
+    "final_observation_bodies_opened": 0,
+    "final_label_bodies_opened": 0
+  },
+  "readiness_recheck_sha256": "6e8d70b41bc57f8a772fb3d2b456a49cbe78b3703088c0172c408d23d8f78ddc",
+  "existing720_authored_metadata_including_existing_labels_reread": true,
+  "new_native_truth_or_observation_bodies_read_this_turn": 0,
+  "dedale_methods": {
+    "published_commit": "f148722eb5908fc17841dc3c8be1591c5c3e59a6",
+    "methodology_readme_receipts": [
+      {
+        "url": "https://gitlab.inria.fr/mlanvin/dedale_labeling/-/raw/f148722eb5908fc17841dc3c8be1591c5c3e59a6/system_log_labeling/README.md",
+        "path": "system_log_labeling-README.md",
+        "bytes": 3394,
+        "sha256": "3e683eae4e913f3e84f623e2b19e8b8357f07face435ca3d1e490bc33eddf338",
+        "TLS_and_hostname_verified": true,
+        "content_scope": "methodology README, not native truth bodies"
+      },
+      {
+        "url": "https://gitlab.inria.fr/mlanvin/dedale_labeling/-/raw/f148722eb5908fc17841dc3c8be1591c5c3e59a6/network_log_labeling/README.md",
+        "path": "network_log_labeling-README.md",
+        "bytes": 1154,
+        "sha256": "ae2c62ba6caf26470fed7661c5a1154602c65f55e68c28a8f1af80276c1e1aac",
+        "TLS_and_hostname_verified": true,
+        "content_scope": "methodology README, not native truth bodies"
+      }
+    ],
+    "code_readme_license": "GPLv3; not the dataset CC BY4.0 license",
+    "native_code_copied_built_or_executed": false,
+    "system_methodology_describes": "Auditbeat/Winlogbeat process ground truth, PID lifetime precision",
+    "direct_syslog_ground_truth_correspondence_verified": false,
+    "pid_only_join_or_missing_label_as_normal_accepted": false,
+    "source_page_label_description": "publisher indexed page describes benign/malicious/attack-related; no automatic binary collapse",
+    "system_numeric_label_mapping_assumed_from_network": false,
+    "publisher_download_page_direct_HTML_obtained": false,
+    "publisher_download_page_failure": "incomplete local certificate chain, not used to relax TLS checks",
+    "GitLab_READMEs_certificate_and_hostname_verified": true,
+    "TLS_verification_disabled": false,
+    "index_page_reference": "https://dedale.inria.fr/download.html",
+    "scope_of_negative_findings": "current128 syslog rows plus publisher methodology, not the whole corpus"
+  },
+  "source_ledger_unchanged": {
+    "path": "infra/f1-lab/observed-source-exposure-v127.json",
+    "sha256": "75099adb01138de84e0b0d7c895874077c593a532875f3ef815c785a1e58cbc4",
+    "source_ids": 23,
+    "source_hashes": 114,
+    "payloads": 897,
+    "patterns": 601
+  },
+  "blocker_recurrence_audit": {
+    "equivalent_condition": "missing admissible discriminating evidence for fixed original rows and original independent acceptance",
+    "consecutive_goal_turns": [
+      {
+        "goal_turn": "v126",
+        "checkpoint_path": "runtime/f1/v126-active-development-checkpoint.json",
+        "checkpoint_sha256": "7ea0e91909e83c6588ecd882d1f2e43413466516d781c05440bb71c91434cb03",
+        "kind": "real partial progress while mandatory evidence gap remained",
+        "same_required_evidence_unavailable": true,
+        "accepted_F1_shared_and_vpn": 0.8,
+        "remaining_condition": "admissible causal evidence for original ambiguous rows and original six-domain independent acceptance"
+      },
+      {
+        "goal_turn": "v127",
+        "checkpoint_path": "runtime/f1/v127-active-development-checkpoint.json",
+        "checkpoint_sha256": "19803c845be1cfe18f2e5144e253b8c0d36c2124824e0e36e0a8ba2a738b9b5f",
+        "kind": "real partial progress while mandatory evidence gap remained",
+        "same_required_evidence_unavailable": true,
+        "accepted_F1_shared_and_vpn": 0.8,
+        "remaining_condition": "admissible causal evidence for original ambiguous rows and original six-domain independent acceptance"
+      },
+      {
+        "goal_turn": "v128",
+        "kind": "publisher-methodology and actual current readiness audit",
+        "same_required_evidence_unavailable": true,
+        "accepted_F1_shared_and_vpn": 0.8,
+        "remaining_condition": "DEDALE metadata cannot retroactively identify original AIT rows or prove six-domain final acceptance"
+      }
+    ],
+    "count": 3,
+    "reason_is_not_difficulty_time_budget_or_missing_reviewer_alone": true,
+    "not_a_universal_model_or_public_data_impossibility_claim": true,
+    "why_no_known_effective_next_code_action": "No validated extra input is available for the unresolved original cases. Repeating existing projections or joining an unrelated source cannot supply missing historical facts; changing labels/population/support/causal availability violates the objective.",
+    "status_recommendation": "blocked; objective remains unmet and intact until new admissible evidence or validated distinguishing input becomes available"
+  },
+  "resume_conditions": [
+    "admissible original-case/time-linked execution/caller/device/permission evidence or a validated new distinguishing causal feature",
+    "original six-domain independently reviewable observations/labels and five-axis/time/source grouping evidence",
+    "freeze intake/roles and evaluate locally before any restricted action"
+  ],
+  "paid_calls": 0,
+  "AWS_calls": 0,
+  "pushes": 0,
+  "new_CI_runs": 0,
+  "merges": 0,
+  "new_pytest_or_Docker_runs_this_turn": 0,
+  "eight_hour_soak_runs": 0,
+  "no_active_owned_jobs": true,
+  "docker_cleanup_previous_v122_completed": true
+}

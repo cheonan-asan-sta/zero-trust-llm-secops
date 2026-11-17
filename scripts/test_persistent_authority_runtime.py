@@ -47,9 +47,19 @@ class Checks(AuthorityChecks):
 
     def ready(self, *, issuance=False):
         def healthy():
-            if self.runtime.sql('SELECT 1;') != '1':
+            try:
+                if self.runtime.sql('SELECT 1;') != '1':
+                    return False
+                status = self.runtime.authority_health()
+            except subprocess.TimeoutExpired:
+                # Both probes are read-only. Keep the original45s readiness
+                # deadline and real positive control instead of treating one
+                # busy Docker response as a final failed recovery. Mutating
+                # operations, trust failures and ownership errors still raise.
+                self.report['transient_readiness_probe_timeouts'] = min(100,
+                    self.report.get('transient_readiness_probe_timeouts', 0)+1)
+                self.save()
                 return False
-            status = self.runtime.authority_health()
             if status.get('healthy'):
                 self._ca_floor = status['server_time']
                 return True

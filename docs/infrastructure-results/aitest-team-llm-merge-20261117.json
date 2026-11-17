@@ -1,0 +1,49 @@
+{
+  "schema": "aitest-team-llm-merge-submission-1",
+  "date": "2026-11-17",
+  "authorization": "User explicitly requested merging team and current work into aitest despite previously deferred performance gate. Does not claim performance target reached or authorize main/production deployment.",
+  "refs": {
+    "origin/main": "d2370c2a493cfa584ad005420abe172cef913c7b",
+    "origin/aitest": "b3abad3871be881e5978dc4f677d7714880c4f82",
+    "origin/feature/kim-dashboard-refinement": "57c77c2ba8af144ab9beffe47dbb2bc7ac1094a3",
+    "ef09475": "ef094756d438968d2f012a5c0687042fb78fcff2",
+    "e9544e2": "e9544e2a70ce4bf7e6c722706f8bb2e0e7255689",
+    "HEAD": "f8034032baf40213e9c9a2edfff0e081b77e7230"
+  },
+  "conflicts": [
+    "AI_HANDOFF.md concurrent top notices, both preserved with current authorization above historical records"
+  ],
+  "validation": {
+    "windows": {
+      "tests": "257",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "20",
+      "time": "32.120",
+      "passed": 237,
+      "sha256": "7f6ad02c10912f1b6080a5f40139fbdddeddedc6b848d7712c205e6c45ffc299"
+    },
+    "linux": {
+      "tests": "257",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "14.936",
+      "passed": 257,
+      "sha256": "08be761bdf5c7cb4b5a204fc08b4e1ed828919f73f889daeb6b76e781c05d972"
+    }
+  },
+  "ruff_scope": ".",
+  "ruff_passed": true,
+  "source_tar_sha256": "9a1b153fa3ddc65524f197e4be9193726a7b7e259c942746a3d9564394448f49",
+  "ci_policy": "Require all17 CI checks on exact PR head before merging; execution recorded by GitHub PR, not asserted by local tests.",
+  "native_labels_population_unchanged": true,
+  "default_analyzer": "rule",
+  "default_prompt": "legacy",
+  "default_review_all": false,
+  "new_paid_LLM_calls": 0,
+  "AWS_deployed": false,
+  "local_Docker_runtime_test": false,
+  "main_merge": false,
+  "LLM_reference": "ef09475: two24-case runs FP1 FN2 F186.9565%, priorFP6 FN2; separate12 FP0 FN0; development only, not original native F1 update"
+}

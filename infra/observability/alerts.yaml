@@ -47,3 +47,53 @@ groups:
         for: 2s
         labels:
           severity: warning
+      - alert: C01ExecOutboxUnavailable
+        expr: secops_exec_outbox_bridge_enabled == 1 and on(job,instance) secops_exec_outbox_status_success == 0
+        for: 2s
+        labels:
+          severity: critical
+      - alert: C01ExecOutboxPendingOverdue
+        expr: secops_exec_outbox_bridge_enabled == 1 and on(job,instance) secops_exec_outbox_status_success == 1 and on(job,instance) secops_exec_outbox_pending_overdue == 1
+        for: 2s
+        labels:
+          severity: critical
+      - alert: C01ExecOutboxCapacityPressure
+        expr: secops_exec_outbox_bridge_enabled == 1 and on(job,instance) secops_exec_outbox_status_success == 1 and on(job,instance) secops_exec_outbox_capacity_pressure == 1
+        for: 2s
+        labels:
+          severity: warning
+      - alert: C01ExecRecoveryUnavailable
+        expr: secops_exec_recovery_bridge_enabled == 1 and on(job,instance) secops_exec_recovery_status_success == 0
+        for: 2s
+        labels:
+          severity: critical
+      - alert: C01ExecRecoveryIndeterminateOverdue
+        expr: secops_exec_recovery_bridge_enabled == 1 and on(job,instance) secops_exec_recovery_status_success == 1 and on(job,instance) secops_exec_recovery_indeterminate_overdue == 1
+        for: 2s
+        labels:
+          severity: critical
+      - alert: C01ExecRecoveryPublicationOverdue
+        expr: secops_exec_recovery_bridge_enabled == 1 and on(job,instance) secops_exec_recovery_status_success == 1 and on(job,instance) secops_exec_recovery_unpublished_overdue == 1
+        for: 2s
+        labels:
+          severity: critical
+      - alert: C01ExecRecoveryCapacityPressure
+        expr: secops_exec_recovery_bridge_enabled == 1 and on(job,instance) secops_exec_recovery_status_success == 1 and on(job,instance) secops_exec_recovery_capacity_pressure == 1
+        for: 2s
+        labels:
+          severity: warning
+      - alert: C01ExecBundleVerificationUnavailable
+        expr: secops_exec_bundle_bridge_enabled == 1 and on(job,instance) secops_exec_bundle_status_success == 0
+        for: 2s
+        labels:
+          severity: critical
+      - alert: C01ExecBundleRecoveryOverdue
+        expr: secops_exec_bundle_bridge_enabled == 1 and on(job,instance) secops_exec_bundle_status_success == 1 and on(job,instance) secops_exec_bundle_recovery_recent == 0
+        for: 2s
+        labels:
+          severity: warning
+      - alert: C01ExecBundleIndeterminateRetained
+        expr: secops_exec_bundle_bridge_enabled == 1 and on(job,instance) secops_exec_bundle_status_success == 1 and on(job,instance) secops_exec_bundle_indeterminate_retained == 1
+        for: 2s
+        labels:
+          severity: warning

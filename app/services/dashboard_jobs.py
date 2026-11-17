@@ -1,6 +1,5 @@
 """Durable, opt-in host jobs. Browsers never choose commands or filesystem paths."""
 
-import fcntl
 import hashlib
 import json
 import os
@@ -13,6 +12,11 @@ import tempfile
 import time
 from contextlib import contextmanager
 from pathlib import Path
+
+try:
+    import fcntl
+except ImportError:  # The application can serve read/analysis APIs on Windows.
+    fcntl = None
 
 ROOT = Path(__file__).resolve().parents[2]
 ACTIONS = {
@@ -35,7 +39,14 @@ class JobUnavailable(ValueError):
     pass
 
 
+def host_jobs_supported():
+    # Do not substitute weaker ACL or process-lock semantics on other platforms.
+    return os.name == "posix" and fcntl is not None and hasattr(os, "O_NOFOLLOW")
+
+
 def private_root(directory):
+    if not host_jobs_supported():
+        raise JobUnavailable("operations_posix_host_required")
     path = Path(directory).absolute()
     if any(p.is_symlink() for p in (path, *path.parents)):
         raise JobUnavailable("operations_symlink_forbidden")

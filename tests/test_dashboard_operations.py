@@ -17,7 +17,7 @@ from app.config import Settings
 from app.dashboard_catalog import OPERATIONS, catalog
 from app.dashboard_jobs_api import JobRequest, router
 from app.security import Principal, Role
-from app.services.dashboard_jobs import JobConflict, JobStore, JobUnavailable
+from app.services.dashboard_jobs import JobConflict, JobStore, JobUnavailable, host_jobs_supported
 
 
 def body(action="m6-mock", **extra):
@@ -30,6 +30,8 @@ ADMIN = Principal("operator", "tenant-a", frozenset({Role.ADMIN}), "api_key")
 
 @pytest.fixture
 def jobs(tmp_path):
+    if not host_jobs_supported():
+        pytest.skip("Host jobs require POSIX ownership and process locks")
     return JobStore(tmp_path.resolve() / "operations")
 
 
@@ -50,6 +52,7 @@ def test_catalog_covers_business_writes_and_matches_actual_contracts():
 
 
 @pytest.mark.parametrize("role,status", [("viewer", 403), ("responder", 403), ("admin", 202)])
+@pytest.mark.skipif(not host_jobs_supported(), reason="POSIX host jobs")
 def test_host_jobs_require_server_bound_admin_and_deduplicate(tmp_path, monkeypatch, role, status):
     key = "synthetic-operations-key"
     settings = Settings(_env_file=None, auth_mode="api_key", app_environment="test",
@@ -90,6 +93,7 @@ def test_host_jobs_require_server_bound_admin_and_deduplicate(tmp_path, monkeypa
     assert client.get("/dashboard/jobs", headers=headers).status_code == 403
 
 
+@pytest.mark.skipif(not host_jobs_supported(), reason="POSIX host jobs")
 def test_disabled_host_control_and_live_budget_are_not_browser_overrides(tmp_path, monkeypatch):
     from app.security import get_principal
 

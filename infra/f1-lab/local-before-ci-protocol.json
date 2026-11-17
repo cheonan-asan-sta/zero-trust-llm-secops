@@ -1,0 +1,47 @@
+{
+  "schema": "local-before-ci-protocol-1",
+  "as_of": "2026-11-16",
+  "status": "local_only_targets_unmet",
+  "source_instruction": "Improve measured performance locally before additional push, CI or merge.",
+  "sequence": [
+    "collect_missing_observable_evidence_and_develop_candidate_locally",
+    "freeze_candidate_and_inputs_then_predict_without_truth",
+    "seal_predictions_then_score_all_original_normal_and_threat_rows",
+    "check_each_required_population_without_pooled_average_masking",
+    "validate_original_six_domain_independence_and_review_evidence",
+    "complete_local_monitored_runtime_acceptance_and_update_documents",
+    "push_and_run_ci_only_after_the_required_local_gates_pass",
+    "merge_own_pr_into_aitest_only_after_all_required_ci_checks_pass"
+  ],
+  "targets": {
+    "precision_min": 0.95,
+    "recall_min": 0.95,
+    "f1_min": 0.95,
+    "false_positive_rate_max": 0.05,
+    "false_negative_rate_max": 0.05
+  },
+  "constraints": {
+    "new_false_positives": 0,
+    "lost_existing_true_positives": 0,
+    "inference_errors": 0,
+    "do_not_remove_unknown_or_failed_rows": true,
+    "do_not_change_labels_or_original_populations_to_meet_targets": true,
+    "do_not_tune_on_reserved_final_truth": true,
+    "observed_log_kinds_do_not_replace_original_security_domains": true,
+    "synthetic_controls_are_not_independent_detection_performance": true,
+    "aggregate_gate_is_necessary_not_independent_qualification": true
+  },
+  "current": {
+    "pr88": "draft_open_existing_17_ci_checks_passed_no_merge",
+    "additional_push_ci_merge": "held_while_local_targets_unmet",
+    "local_monitored_root_cause_investigation": "may_continue_without_push_or_ci",
+    "original_postmerge_monitored_failure_root_cause": "unconfirmed",
+    "performance_goals_met": false,
+    "new_independent_evaluation_complete": false
+  },
+  "budget": {
+    "aws_calls": 0,
+    "paid_api_calls": 0,
+    "long_soak": "deferred_by_user"
+  }
+}

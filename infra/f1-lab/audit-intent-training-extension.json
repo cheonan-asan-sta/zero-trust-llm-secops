@@ -1,0 +1,45 @@
+{
+  "schema": "audit-intent-training-extension-protocol-1",
+  "scope": "noncommercial development training, not independent final evaluation",
+  "publisher": "https://zenodo.org/records/19483937",
+  "publisher_version": "v2_1",
+  "license_id": "cc-by-nc-sa-4.0",
+  "additional_training_sources": [
+    {
+      "name": "shaw",
+      "filename": "shaw_no-pcaps.zip",
+      "bytes": 1319137852,
+      "publisher_md5": "f890a1f52bc9f893b44254ad86118e39",
+      "simulation_start_utc": "2022-01-25T00:00:00+00:00",
+      "simulation_end_utc": "2022-01-31T00:00:00+00:00",
+      "role": "training"
+    },
+    {
+      "name": "wheeler",
+      "filename": "wheeler_no-pcaps.zip",
+      "bytes": 767673839,
+      "publisher_md5": "774a146275a22707ee78bcb4574aca23",
+      "simulation_start_utc": "2022-01-26T00:00:00+00:00",
+      "simulation_end_utc": "2022-01-31T00:00:00+00:00",
+      "role": "training"
+    }
+  ],
+  "existing_fitting_sources": ["russellmitchell", "santos", "wilson"],
+  "not_fitted_observed_sources": ["fox", "wardbeck", "harrison_observed"],
+  "historical_split_proposal_retained": true,
+  "wilson_exposure_update": "explicitly consumed for training in v106; old transfer freeze remains historical",
+  "selection": "all exact mirrored /logs/auth.log and /logs/audit/audit.log pairs; no outcome-based selection",
+  "unpaired_assumed_normal": false,
+  "maximum_source_rows": 100000,
+  "maximum_source_bytes": 67108864,
+  "maximum_total_rows_per_source_archive": 200000,
+  "minimum_support": 5,
+  "training_attack_veto": "any attack in a categorical cell prevents lowering, regardless of normal count",
+  "target_test_population_changed": false,
+  "target_labels_changed": false,
+  "target_thresholds_changed": false,
+  "target_metric_fixtures_added": false,
+  "new_independent_evaluation": false,
+  "automatic_enforcement_allowed": false,
+  "goal_qualified": false
+}

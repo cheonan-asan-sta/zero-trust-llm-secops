@@ -1,4 +1,95 @@
+> 2026-11-17 사용자 요청으로 팀원 대시보드+최신 LLM ef09475의 aitest 실제 통합을 진행한다. 기존 성능 목표 전 병합 보류는 이번 aitest 통합에 한해 해제됐다. 성능 목표 달성/운영 배포 승인은 아니며 main과 기본 rule/legacy/review_all=false는 유지한다. [통합 승인·검증 기록](docs/aitest-team-llm-merge-20261117.md) 아래는 각 작업 당시의 기록이다.
+
+> 2026-11-17 팀 통합 준비: 별도 `feature/chaeheeju-team-llm-integration-prep`에서 `51bb483` + `origin/main d2370c2` 로컬 후보 `5b5708b` 구성. 팀원 branch는 main에 이미 포함돼 중복 병합하지 않았다. Windows fcntl 시작 호환 수정·POSIX jobs fail-closed 유지. Linux7399/skip2·Windows130/skip20·브라우저46/135·Ruff 통과. 작업 중 원본에서 관측한 후속 미커밋 LLM WIP는 보존했으며 후보에 포함하지 않았다. 원래 성능 목표 미완료·기본 rule/legacy/review_all=false·push/PR/새 CI/실제 main·aitest 병합 보류. [SHA·충돌·검증·인수 조건](docs/team-llm-integration-prep-20261117.md)
+> 2026-11-17 LLM 오탐 후속: 24건 반복2회 모두 FP6→1·FN2 유지·기존 TP 손실/새 FP0, F1 71.43→86.96%. 별도12건 FP2→0·FN0. 추가240 API/$0.801756 추정·기능85건 통과. 개발 평가이며 native/독립95% 목표와 별도·기본 전환/CI/push/병합 보류. [최신 결과·실패 실험](docs/llm-fp-recall-review-20261117.md) 아래는 이전 시점 기록이다.
+
+> 2026-11-17 LLM 실제 개선: 사용자 유료 호출 승인으로 168회 비교·사용량 추정 $0.365284·기능60건 통과. 정책+근거 schema·전체 교차 검토 옵션 구현. 12건 F1 71.43→85.71%지만 24건 FP5→6으로 기본 전환 미승인. 합성 개발 평가이며 native/독립95% 목표는 미완료·CI/push/병합 보류. [전체 실험과 적용 범위](docs/llm-grounded-improvement-20261117.md)
+
+> 2026-11-17 v128: 목표 미달과 재개 조건을 요구사항별 감사했다. 공유 감사/VPN F1 80%·원래6영역 최종 지지0. DEDALE 고정 README만으로 syslog의 정답 대응/과거 AIT 신원/독립6영역을 증명하지 못한다. 같은 필수 근거 공백이 최근3턴 반복돼 추가 근거 전 자동 개선 반복 보류·CI/push/병합 금지 유지. [감사와 재개 조건](docs/extra-target-evidence-gap-v128.md)
+
+> 2026-11-17 v127: 기존 training4곳의 VPN native39파일·journal15,747/text5,868기록을 조사했으나 접속 메시지 복사본0으로 미채택. 모델/정답/예측/새 시험0·공유 감사/VPN F1 80% 유지·목표 전 CI/push/병합 보류. [출처·시각 근거](docs/extra-vpn-native-clock-review.md)
+
+> 2026-11-17 v126: DEDALE syslog125MB·게시 MD5·첫128행의 중첩 압축/형식 검증과 관련 Windows/Linux120건을 완료했다. 새46건·정답/학습/예측0·새 독립 인수0이며 F1 공유 감사/VPN80% 유지. Docker 소유 컨테이너 제거·목표 전 CI/push/병합 보류. [수집 근거](docs/extra-dedale-native-intake.md)
+
+> 2026-11-17 v125: 단계별 최소지지5를 분리하고 관련 Linux1,244건 검증. issuer 초안의 pooled24=각단계4여서 미채택, H/W 각5행 감소를 최종 수치로 쓰지 않는다. 공유 감사·VPN F1은80% 유지, 목표 미달·CI/push/병합 보류. [최신 근거](docs/extra-vpn-issuer-relation-review.md)
+
+> 2026-11-17 v124: native DNS 요청·응답 근거와 Linux1,190건 검증. 추가 TP/FP/TP손실0, 공유 감사·VPN F1은80%로 동일하다. 전체 목표 미달, push/새 CI/병합/유료/AWS 보류. [최신 검토](docs/extra-shared-dns-transaction-review.md)
+
 # 다른 AI 작업자를 위한 프로젝트 인수인계서
+
+**v123 로컬 개선(2026-11-17):** [native 관측·첫 source 서비스 흐름](docs/extra-shared-native-dns-review.md). 공유 TP2→4·FN4→2·FP0 유지·F1 50→80%, 추가FP/기존TP손실0·원래1,681,815행·Linux1109건. R의 같은 학습 사건 2행이며 native-capture 오프라인 profile·사람/명령/실제 앱 수신은 미확인. VPN F1 80% 유지·원래6영역 독립 인수 미완료·소비된Harrison/Wilson 예약 재사용 금지·전체목표 active.
+
+**v122 실제 검증·정리 완료(2026-11-17):** [원본 PCAP 321만 기록·초기 로그 66/66 진단 연결·Docker 정리](docs/extra-vpn-packet-data-review.md). 헤더 특징은 정상65/위협1에서 같아 후보 미채택·탐지 지표 v117 유지. 오래된 프로젝트 이미지10·관련 캐시38(2.715GB) 삭제, 현 시험/최신 역할 image·volume14·타 프로젝트 컨테이너 보존·재사용 확인. 전체 목표 active.
+
+**v121 개발·수집 진행(2026-11-17):** [예측기 미승인 초기 frame 진단·캡처 품질](docs/extra-vpn-frame-diagnostic.md). Linux 964건. VPN native 4,159행에서 initial 중복 0, 통계에서 kernel drop 최대 22,396 발견. 시각/완전성 가정으로 예측기에 넣지 않음·지표 v117 유지. 현재 검증 뒤 프로젝트 Docker 정리 요청 대기(삭제 0)·목표 active.
+
+**v120 개발·수집 진행:** [PCAP CRC/SHA·원문 일치 검증과 공유 journal 공백](docs/extra-packet-member-verification.md). Linux 929건 통과·실제 원본 수집/적합/성능 재평가는 미완료. 공유 FN 4의 사건 전 60초 journal 0행, 뒤늦은 echo는 판정에 소급하지 않음. 확정 탐지 지표 v117 유지·목표 active.
+
+**v119 개발·수집 진행:** [고정 원본 수집기·초기 프레임 추출](docs/extra-packet-source-acquisition.md). Linux 908건 통과. 실제 원본 다운로드는 별도 실행 중이며 checksum/실제 로그 연결/적합/성능 재평가는 미완료. 탐지 수치는 v117 유지·목표 active·유료 호출/CI/병합 보류.
+
+**v118 추가 조사·성능 유지:** [연결 이력 3후보 제외·공개 패킷 형식 확인](docs/extra-vpn-lifecycle-and-packet-review.md). 학습 자료의 오탐/미탐 감소 모두 0이라 채택하지 않았다. PCAP 일부는 확인했으나 전체 checksum/사건 당시 연결 미검증으로 학습·채점에 미사용. 확정 성능과 마지막 Linux 855건은 v117·전체 목표 active.
+
+**최신 v117:** [현재 AppArmor 상태 알림의 공유 감사 오탐 개선](docs/extra-apparmor-status-review.md). 공유 FP 3→0·TP 2/FN 4 유지·F1 50%, 별도 Wilson/Wardbeck FP 각 1→0·FN 2씩 유지. 원래 1,681,815행·새 FP/기존 TP 손실 0·Linux 855건. 미확인 호출자와 검토 필요 유지·LLM 새 품질 평가 없음·전체 목표 active·push/새 CI/병합/유료 호출 보류. 아래 기록은 해당 버전 당시 결과다.
+
+**v116 검토·미채택:** [주소/DNS 오탐 실패·작업 간격 지지 부족·LLM 지표 구분](docs/extra-residual-candidate-review.md). 새 탐지 후보는 적용하지 않았고 확정 성능은 v115다. 실제 LLM 품질을 새로 개선/측정한 것으로 보고하지 않는다. 목표 active·유료 호출/CI/병합 보류.
+
+**최신 v115:** [앞선 journal 실행 관측](docs/extra-journal-service-review.md). 공유 감사 TP 0→2·FN 6→4·FP 3 유지·F1 36.36%. 같은 학습 사건의 audit 2행, 사람/현재 invocation/유출 성공 검증은 아님. 원래 1,681,815행·새 FP/기존 TP 손실 0·Linux 820건. 인증·웹 감사 100%·VPN F1 80% 유지·전체 목표 active·push/새 CI/병합 보류.
+
+**직전 v114:** [VPN 제어 메시지 관측](docs/extra-vpn-control-review.md). VPN FP 48→42·TP 84/FN 0 유지·F1 80%, 별도 Harrison/Shaw/Wheeler FP 각 2건 감소. 원래 1,681,815행 유지·새 FP/기존 TP 손실 0·Linux 776건. 인증·웹 감사 관측 100% 유지. 공유 감사·VPN·원래 6영역 독립 목표는 미완료·목표 active·push/새 CI/병합 보류.
+
+**직전 v113:** [실제 정상 SSH·sudo 감사 학습](docs/extra-native-audit-normal-review.md). 웹 감사 FP 15→0·TP 47/FN 0 유지·F1 100%, 별도 Wilson/Wardbeck FP 각 10→0. 원래 1,681,815행·새 FP/기존 TP 손실 0·Linux 732건. 추가 실제 정상 169행은 학습 전용으로 분모에 미합산. 공유 감사·VPN·원래 6영역 독립 목표는 미완료이며 목표 active·push/새 CI/병합 보류.
+
+**직전 v112:** [웹 방화벽 요청·netfilter 동시 관측](docs/extra-web-firewall-review.md). 별도 학습 Wilson 웹 감사 FN3→0·TP19→22·FP10 유지·F1 81.48%. 원래1,681,815행 유지·전체 새FP/TP손실0·Linux693건. 사람/부모 프로세스 인과 증명 아님·전체 목표 active·push/새CI/병합 보류.
+
+**직전 v111:** [공유 감사 실행 관측 기반 오탐 개선](docs/extra-apparmor-causal-review.md). FP24→3·별도 Wilson/Wardbeck 각8→1, 전체 새FP/TP손실0·Linux644건. 공유 감사 FN6/F1 0%는 그대로다. VPN/인증/웹 감사 기존 성능 유지·전체 목표 active·push/새CI/병합 보류.
+
+**직전 v110:** [VPN 공격 근거의 인과적 유지](docs/extra-vpn-attack-evidence.md). 별도 학습 Wheeler FN28→9·TP28→47·FP38 유지. 기존1,681,815행 판정 유지·전체 새FP/TP손실0·Linux606건. 학습 결과이며 독립 목표는 미달/미완료. 목표 active·push/새CI/병합 보류.
+
+**직전 v109:** [VPN 추가 연결 문맥](docs/extra-vpn-protocol-refinement.md). 기존1,681,815행에서 VPN FP208→48·F1 44.68%→77.78%, 기존TP84/FN0 유지·새FP/TP손실0. Linux579건. 이미지 내 프로젝트 자료 차단 후9개 묶음 예측 지문 동일 확인. 인증 개선 유지, 공유/웹 감사·VPN·독립 목표는 아직 미달. 목표 active·push/새CI/병합 보류.
+
+**직전 v108:** [웹 저장 경로의 root 계정 조회 문맥](docs/extra-webpath-identity-read.md). Linux489건·기존1,681,815행 판정 유지. 별도8,908행 Wilson 인증FN1→0·새FP/TP손실0. 관측5개자료 인증 P/R/F1 각각100%이며 새 독립 평가가 아니다. 웹 감사 F1 86.24%·공유 감사·VPN 및 원래6영역 독립 목표는 미달/미인수다. 목표 active·push/새CI/병합 보류.
+
+**직전 v107:** [개발 학습 확장·전이 미탐 회수](docs/extra-audit-training-extension.md). Linux475건·기존1,681,815행 판정 유지. 별도8,908행에서 웹 감사 미탐2·인증 미탐1 회수, 새FP/TP손실0. 추가8,325행은 학습용으로 시험 분모에 합산하지 않았다. R/S/F 인증100%·웹 감사 F1 86.24% 유지지만 Wilson 인증FN1·공유/웹 감사·VPN·원래6영역 독립 목표는 남아 있다. 목표 active·push/새CI/병합 보류.
+
+**직전 v106 웹 감사 개선:** [프로세스 역할·로그인 흐름](docs/extra-audit-intent-context.md). 기존1,681,815행에서 FP6건 감소·새FP/기존TP손실0. 웹 감사 FP21→15·F1 81.74%→86.24%, 인증100% 유지. Linux372건 통과. 모델은R/S/Wilson 학습·Fox/Wardbeck 비학습 보정이며 새 독립 인수가 아니다. 전체 목표 active·push/새CI/병합 보류.
+
+**직전 v105 실제 인증 미탐 개선:** [명령/PAM 원문 문맥](docs/extra-sensitive-auth-context.md). 기존1,681,815행에서 미탐3건 회수·새FP/TP손실0. 관측 인증32양성/1,082정상에서 P/R/F1 각각100%, FPR/FNR0%, R/S/F 각 자료도 충족. Linux348건 통과. 공유/웹 감사·VPN 및 원래6영역 독립 목표는 미달/미인수이며 목표 active·push/새CI/병합 보류.
+
+**직전 v104 근거 적용 판정:** [공유 감사·인증·VPN 판정 개선](docs/extra-evidence-risk-refinement.md). Linux526건·실제 systemd18조건 통과. 로컬 정책 제어6시나리오에서 불필요 경보2→0·명시적 폐기 미탐3→0. 점수는 fixture이며 독립 공격 탐지 F1에 합산하지 않는다. v103 대비 기존1,681,815행 판정 동일·새FP/TP손실0·목표 미달. push·새CI·병합 보류.
+
+**직전 v103 로컬 수집·연결:** [실행 주체·PAM 호출 신원·VPN 기기 결속](docs/extra-live-evidence-ingress.md). Linux 집중485건·실제 systemd/PAM/OIDC11조건 통과. v102 대비 기존1,681,815행 판정 동일·새FP/기존TP손실0. 과거 로그의 미상 근거를 소급 생성하지 않아 탐지 목표는 계속 미달이다. 기관 SSO/MDM·실제 VPN hook·새 독립 평가는 별도이며 push·새CI·병합은 보류한다.
+
+**직전 v102 로컬 개선:** [같은 소스 audit 사건 순서 보강](docs/extra-ordered-audit-review.md). 기존1,681,815행에서 웹 감사 FN1→0·F1 80.70%→81.74%, 새FP/기존TP손실0. Linux 묶음339건 통과. 공유 감사·인증·VPN은 유지됐으며 목표 미달·새 독립 평가 아님. 추가 push·CI·병합 없이 로컬 후보로 보존한다.
+
+
+**2026-11-16 새 게시 순서:** [성능 개선·로컬 목표 확인을 CI보다 먼저](docs/local-performance-before-ci.md). PR88의 기존17개 CI는 성공했지만 미병합 draft로 보존한다. 실제 목표 충족 확인 전 추가 push/CI/병합을 보류하며 로컬 개발·monitored 원인 조사는 이어간다. 집계 숫자·라벨·분모를 목표에 맞춰 바꾸지 않는다.
+
+
+
+현재 PAM 관측의 외부 체크포인트·암호화 사본·격리 복원·키 없는 손상 상태 검증은 [추가 보존·복구 결과](docs/extra-pam-observation-backup.md)를 확인한다. 전체6,380·집중158건, 실제 systemd67/10/23·별도 Docker6조건을 통과했으며 탐지 목표는 아직 미달이다. 실제 PAM 운영 백업/경보 배포·원격 witness·독립 성능 인수는 별도다.
+
+
+**최신 판정 — 2026-11-16:** [현재 구현·검증·남은 작업](docs/infrastructure-current-state-20261116.md). 고정 로컬 전체6,332·집중475개와 실제 systemd/DB 인수 결과를 연결했다. 탐지 독립 목표는 미달·장기 soak는 유예다. 아래의 이전 날짜 수치/상태는 작성 당시 누적 기록이며 최신 판정은 연결한 문서를 따른다.
+
+2026-11-16 v91 로컬 통합 인수: [수집기 키 공급자 이중화](docs/extra-collector-provider-ha.md). 집중240·전체6,122·실제systemd10조건통과. 별도사전승인키·정확한unit/MainPID검사·장애전환·잘못된키우회거부·기존시각/순서유지. 기존1,681,815건판정동일·새FP/TP손실0·AWS/유료API0·장기soak유예·독립목표미달.
+
+2026-11-16 v90 로컬 통합 인수: [복구 묶음 키 없는 관측](docs/extra-exec-bundle-status.md). 집중542·전체6,070·실제systemd67·실제경보9조건통과. 별도capability0 worker·손상/수리·원래시각/확인불가1유지·실제만료확인. 기존1,681,815건판정동일·새FP/TP손실0·AWS/유료API0·장기soak유예·독립목표미달.
+
+2026-11-16 v89 로컬 인수: [실행 복구 상태의 암호화 묶음](docs/extra-exec-coherent-backup.md). 집중489·전체6,017·실제systemd62·복구관측10조건통과. 실제6exec 중intent5건(완성4/확인불가1)과앱·브로커를선택원본유실후격리복원. 기존1,681,815건판정동일·새FP/TP손실0. AWS/유료API0·장기soak유예·독립목표미달.
+
+2026-11-16 v88 로컬 통합 인수: [실행 불확실·원본 미게시 경보](docs/extra-exec-recovery-observability.md). 집중448·전체5,976·실제 systemd53·실제 관측10조건 통과. 실제6exec에서 과거 cold유실까지 미게시1→2→1→0, 확인불가1은 계속pending. 기존1,681,815건 판정동일·새FP/TP손실0. AWS/유료API0·장기soak유예·독립목표미달.
+
+2026-11-16 v87 [감사·인증 추가 멤버 평가](docs/extra-audit-member-transfer.md): 고정8,908행에서 Wilson FP8감소·Wardbeck유지, 새 FP/TP 손실0. 웹 감사 F1 65.45%/67.92%, 공유 감사0%, 인증 재현율91.67%로 목표 미달이다. 부분 노출된 같은 생성 계열이며 Wardbeck 보정 역할 유지. 집중171·전체5,887통과·AWS/유료 API0·장기 soak유예.
+
+2026-11-16 v86 로컬 통합 인수: [실행 intent·중단 후 원본 대조](docs/extra-exec-intent-reconciliation.md). 집중378·전체5,868·실제 systemd44조건 통과. 실제6건 중 브로커 종료2건에서 봉인 전 indeterminate 보존·완성 원본 동일 bytes 재게시·명령/권한 재발급0을 확인했다. v85의1,681,815건 결정 동일, 새 독립 성능이 아니다. PR78 병합, AWS/유료 API0·장기 soak 유예.
+
+2026-11-16 v85 관측 개발 비교: [명시적 AppArmor 변경 생략 문맥](docs/extra-apparmor-noop-review.md)으로 웹 감사 FP37→21·F1 70.77%→80.70%, FN1 유지. 전체1,681,815행에서 추가 FP/기존 TP 손실0. 집중133·전체5,849개 통과. 공유 감사 FP24/FN6·인증 FP0/FN3 유지, 독립 여섯 영역 목표는 미달이다. PR77은 CI17개 통과 후 aitest에 병합됐다. AWS/유료 API0·장기 soak 유예.
+
+2026-11-16 v84 최신 aitest 통합·로컬 인수 완료: [outbox 경보·전체 암호화 백업·복원 후 정리](docs/extra-exec-outbox-recovery.md). 집중331·전체5,770·실제 systemd36조건·실제 관측8조건 통과. 실제 실행4건 전체 byte 동일 복원, 게시3건만 정리·미게시1건 보존. 기존1,681,815건 결정 동일·추가 FP/기존 TP 손실0, 독립 F1 개선은 아니다. 팀원 PR59 대시보드 보존. AWS/유료 API0·8시간 soak 유예. 게시/CI/병합은 후속 PR 기록을 따른다.
+
+2026-11-15 v83 로컬 완료·미병합: [실행 근거 보관·암호화 백업·복원·경보 연결](docs/extra-exec-evidence-retention.md). 집중456개·전체5,712개·실제 systemd/ptrace24조건·관측29조건 통과. 실제 실행3건에서 콜드2건을 byte 동일 복원하고 실제 복원 집계를 경보로 연결했다. 기존1,681,815건 판정 동일·새 FP/TP 손실0, 독립 F1 개선은 아니다. AWS/유료 API0, 8시간 유예. v82의 보관 연결 후속은 이 결과로 갱신한다.
+
+2026-11-15 v82 로컬 완료·미병합: [실행 당시 이력·신원·앱 정책 연결](docs/extra-exec-history-app-binding.md). 집중 308개·전체 5,672개·실제 systemd/ptrace11조건 통과, 기존 1,681,815건 판정 동일·새 FP/TP 손실0. 관리 경로의 초기 exec만 수집하며 호스트 전체 감사·조직 SSO·독립 F1 완료가 아니다. AWS/유료 API0, 8시간은 계속 유예한다.
 
 2026-11-15 v81: [백업·복구 검증 상태 지표/경보](docs/extra-backup-recovery-status.md). 집중 196개·전체 5,623개·실제 systemd 71조건·관측 23조건 통과. 8시간은 유예하며 운영 활성화와 독립 F1 평가는 별도다.
 

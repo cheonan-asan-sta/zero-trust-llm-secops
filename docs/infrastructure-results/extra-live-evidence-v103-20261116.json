@@ -1,0 +1,530 @@
+{
+  "schema": "live-evidence-local-acceptance-1",
+  "completed": true,
+  "date": "2026-11-16",
+  "source_commit": "3a7162c531bc72423d08722c3331e2a114f7933d",
+  "source_archive_sha256": "d088bcb30106a83226f65d99cf7ad00d5b7273a579fe3532e1e0daaa1aef362b",
+  "functional_source_archive_sha256": "c993c54dee51b25fa9660d75f46fda02caddeae07d4cd52f1dd08af8aa517f40",
+  "metadata_projection_sha256": "4e15bc21227c8fb7588e1649f441fd3f9b709085a1f86509ddaa5e32bb8a5c6b",
+  "documents_tests_and_label_derived_aggregates_in_predictor": false,
+  "baseline_v102_report_sha256": "e46fe891faaa41bf158a31e0d4ac3a610e75dc88cd08362c04db21008609a15c",
+  "plan_sha256": "a28dc34a9175b2566ce8ce09443b48f17aa0b32c6fbbc4f53302af0c013e4870",
+  "paired_score_sha256": "6d7459acfd0b50038ec0ca6fbc4e26fd837349b24c6820385fc0f1510b61f9b9",
+  "prediction_seal_sha256": "c0c76d1da94c8836d43a82fc2db21ee6d33629d2014a80bad29e085bc90cc8eb",
+  "goal_qualified": false,
+  "new_independent_evaluation": false,
+  "population": 1681815,
+  "labels_changed": false,
+  "thresholds_changed": false,
+  "models_refitted": false,
+  "predictor_network": "none",
+  "predictor_uid": "10001:10001",
+  "predictor_read_only_root": true,
+  "pinned_inputs_and_outputs_staged_in_tmpfs": true,
+  "labels_mounted_in_predictor": false,
+  "aggregate_label_metrics_mounted_in_predictor": false,
+  "source_and_inputs_unchanged_after": true,
+  "changes_from_v102": {
+    "new_tp": 0,
+    "introduced_fp": 0,
+    "lost_tp": 0,
+    "removed_fp": 0
+  },
+  "kinds_RSF": {
+    "audit-share": {
+      "before": {
+        "tp": 0,
+        "fp": 24,
+        "fn": 6,
+        "tn": 2328,
+        "inference_errors": 0,
+        "population": 2358,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "false_positive_rate": 0.01020408163265306,
+        "accuracy": 0.9872773536895675
+      },
+      "after": {
+        "tp": 0,
+        "fp": 24,
+        "fn": 6,
+        "tn": 2328,
+        "inference_errors": 0,
+        "population": 2358,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "false_positive_rate": 0.01020408163265306,
+        "accuracy": 0.9872773536895675
+      }
+    },
+    "dns": {
+      "before": {
+        "tp": 135466,
+        "fp": 9,
+        "fn": 2595,
+        "tn": 654079,
+        "inference_errors": 0,
+        "population": 792149,
+        "precision": 0.9999335670787969,
+        "recall": 0.9812039605681546,
+        "f1": 0.990480229293402,
+        "false_positive_rate": 1.3759616443047419e-05,
+        "accuracy": 0.9967127396487278
+      },
+      "after": {
+        "tp": 135466,
+        "fp": 9,
+        "fn": 2595,
+        "tn": 654079,
+        "inference_errors": 0,
+        "population": 792149,
+        "precision": 0.9999335670787969,
+        "recall": 0.9812039605681546,
+        "f1": 0.990480229293402,
+        "false_positive_rate": 1.3759616443047419e-05,
+        "accuracy": 0.9967127396487278
+      }
+    },
+    "auth": {
+      "before": {
+        "tp": 29,
+        "fp": 0,
+        "fn": 3,
+        "tn": 1082,
+        "inference_errors": 0,
+        "population": 1114,
+        "precision": 1.0,
+        "recall": 0.90625,
+        "f1": 0.9508196721311475,
+        "false_positive_rate": 0.0,
+        "accuracy": 0.9973070017953322
+      },
+      "after": {
+        "tp": 29,
+        "fp": 0,
+        "fn": 3,
+        "tn": 1082,
+        "inference_errors": 0,
+        "population": 1114,
+        "precision": 1.0,
+        "recall": 0.90625,
+        "f1": 0.9508196721311475,
+        "false_positive_rate": 0.0,
+        "accuracy": 0.9973070017953322
+      }
+    },
+    "web-error": {
+      "before": {
+        "tp": 1414,
+        "fp": 0,
+        "fn": 0,
+        "tn": 4,
+        "inference_errors": 0,
+        "population": 1418,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      },
+      "after": {
+        "tp": 1414,
+        "fp": 0,
+        "fn": 0,
+        "tn": 4,
+        "inference_errors": 0,
+        "population": 1418,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      }
+    },
+    "web-access": {
+      "before": {
+        "tp": 426312,
+        "fp": 7,
+        "fn": 18,
+        "tn": 4577,
+        "inference_errors": 0,
+        "population": 430914,
+        "precision": 0.9999835803705676,
+        "recall": 0.9999577791851383,
+        "f1": 0.9999706796114227,
+        "false_positive_rate": 0.0015270506108202443,
+        "accuracy": 0.9999419837833071
+      },
+      "after": {
+        "tp": 426312,
+        "fp": 7,
+        "fn": 18,
+        "tn": 4577,
+        "inference_errors": 0,
+        "population": 430914,
+        "precision": 0.9999835803705676,
+        "recall": 0.9999577791851383,
+        "f1": 0.9999706796114227,
+        "false_positive_rate": 0.0015270506108202443,
+        "accuracy": 0.9999419837833071
+      }
+    },
+    "audit-web": {
+      "before": {
+        "tp": 47,
+        "fp": 21,
+        "fn": 0,
+        "tn": 7398,
+        "inference_errors": 0,
+        "population": 7466,
+        "precision": 0.6911764705882353,
+        "recall": 1.0,
+        "f1": 0.8173913043478261,
+        "false_positive_rate": 0.0028305701577031944,
+        "accuracy": 0.9971872488615054
+      },
+      "after": {
+        "tp": 47,
+        "fp": 21,
+        "fn": 0,
+        "tn": 7398,
+        "inference_errors": 0,
+        "population": 7466,
+        "precision": 0.6911764705882353,
+        "recall": 1.0,
+        "f1": 0.8173913043478261,
+        "false_positive_rate": 0.0028305701577031944,
+        "accuracy": 0.9971872488615054
+      }
+    },
+    "vpn": {
+      "before": {
+        "tp": 84,
+        "fp": 208,
+        "fn": 0,
+        "tn": 18166,
+        "inference_errors": 0,
+        "population": 18458,
+        "precision": 0.2876712328767123,
+        "recall": 1.0,
+        "f1": 0.44680851063829785,
+        "false_positive_rate": 0.011320343964297376,
+        "accuracy": 0.988731173474916
+      },
+      "after": {
+        "tp": 84,
+        "fp": 208,
+        "fn": 0,
+        "tn": 18166,
+        "inference_errors": 0,
+        "population": 18458,
+        "precision": 0.2876712328767123,
+        "recall": 1.0,
+        "f1": 0.44680851063829785,
+        "false_positive_rate": 0.011320343964297376,
+        "accuracy": 0.988731173474916
+      }
+    },
+    "cpu": {
+      "before": {
+        "tp": 139,
+        "fp": 4,
+        "fn": 0,
+        "tn": 5617,
+        "inference_errors": 0,
+        "population": 5760,
+        "precision": 0.972027972027972,
+        "recall": 1.0,
+        "f1": 0.9858156028368794,
+        "false_positive_rate": 0.0007116171499733144,
+        "accuracy": 0.9993055555555556
+      },
+      "after": {
+        "tp": 139,
+        "fp": 4,
+        "fn": 0,
+        "tn": 5617,
+        "inference_errors": 0,
+        "population": 5760,
+        "precision": 0.972027972027972,
+        "recall": 1.0,
+        "f1": 0.9858156028368794,
+        "false_positive_rate": 0.0007116171499733144,
+        "accuracy": 0.9993055555555556
+      }
+    }
+  },
+  "local_metric_gate": {
+    "schema": "local-metric-gate-1",
+    "track": "observed_log_kinds",
+    "completed": true,
+    "local_metric_gate_passed": false,
+    "goal_qualified": false,
+    "independent_evaluation_verified": false,
+    "ci_or_merge_started": false,
+    "scope": "necessary metric condition only; label provenance, candidate binding, independent evaluation and runtime acceptance remain separate",
+    "targets": {
+      "precision": 0.95,
+      "recall": 0.95,
+      "f1": 0.95,
+      "false_positive_rate": 0.05,
+      "false_negative_rate": 0.05
+    },
+    "rows": [
+      {
+        "name": "audit-share",
+        "population": 2358,
+        "positive_support": 6,
+        "negative_support": 2352,
+        "counts": {
+          "tp": 0,
+          "fp": 24,
+          "fn": 6,
+          "tn": 2328,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "false_positive_rate": 0.01020408163265306,
+          "false_negative_rate": 1.0
+        },
+        "metric_targets_met": false,
+        "failed_conditions": [
+          "precision",
+          "recall",
+          "f1",
+          "false_negative_rate"
+        ]
+      },
+      {
+        "name": "audit-web",
+        "population": 7466,
+        "positive_support": 47,
+        "negative_support": 7419,
+        "counts": {
+          "tp": 47,
+          "fp": 21,
+          "fn": 0,
+          "tn": 7398,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 0.6911764705882353,
+          "recall": 1.0,
+          "f1": 0.8173913043478261,
+          "false_positive_rate": 0.0028305701577031944,
+          "false_negative_rate": 0.0
+        },
+        "metric_targets_met": false,
+        "failed_conditions": [
+          "precision",
+          "f1"
+        ]
+      },
+      {
+        "name": "auth",
+        "population": 1114,
+        "positive_support": 32,
+        "negative_support": 1082,
+        "counts": {
+          "tp": 29,
+          "fp": 0,
+          "fn": 3,
+          "tn": 1082,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 1.0,
+          "recall": 0.90625,
+          "f1": 0.9508196721311475,
+          "false_positive_rate": 0.0,
+          "false_negative_rate": 0.09375
+        },
+        "metric_targets_met": false,
+        "failed_conditions": [
+          "recall",
+          "false_negative_rate"
+        ]
+      },
+      {
+        "name": "vpn",
+        "population": 18458,
+        "positive_support": 84,
+        "negative_support": 18374,
+        "counts": {
+          "tp": 84,
+          "fp": 208,
+          "fn": 0,
+          "tn": 18166,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 0.2876712328767123,
+          "recall": 1.0,
+          "f1": 0.44680851063829785,
+          "false_positive_rate": 0.011320343964297376,
+          "false_negative_rate": 0.0
+        },
+        "metric_targets_met": false,
+        "failed_conditions": [
+          "precision",
+          "f1"
+        ]
+      },
+      {
+        "name": "cpu",
+        "population": 5760,
+        "positive_support": 139,
+        "negative_support": 5621,
+        "counts": {
+          "tp": 139,
+          "fp": 4,
+          "fn": 0,
+          "tn": 5617,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 0.972027972027972,
+          "recall": 1.0,
+          "f1": 0.9858156028368794,
+          "false_positive_rate": 0.0007116171499733144,
+          "false_negative_rate": 0.0
+        },
+        "metric_targets_met": true,
+        "failed_conditions": []
+      },
+      {
+        "name": "dns",
+        "population": 792149,
+        "positive_support": 138061,
+        "negative_support": 654088,
+        "counts": {
+          "tp": 135466,
+          "fp": 9,
+          "fn": 2595,
+          "tn": 654079,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 0.9999335670787969,
+          "recall": 0.9812039605681546,
+          "f1": 0.990480229293402,
+          "false_positive_rate": 1.3759616443047419e-05,
+          "false_negative_rate": 0.018796039431845345
+        },
+        "metric_targets_met": true,
+        "failed_conditions": []
+      },
+      {
+        "name": "web-access",
+        "population": 430914,
+        "positive_support": 426330,
+        "negative_support": 4584,
+        "counts": {
+          "tp": 426312,
+          "fp": 7,
+          "fn": 18,
+          "tn": 4577,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 0.9999835803705676,
+          "recall": 0.9999577791851383,
+          "f1": 0.9999706796114227,
+          "false_positive_rate": 0.0015270506108202443,
+          "false_negative_rate": 4.222081486172683e-05
+        },
+        "metric_targets_met": true,
+        "failed_conditions": []
+      },
+      {
+        "name": "web-error",
+        "population": 1418,
+        "positive_support": 1414,
+        "negative_support": 4,
+        "counts": {
+          "tp": 1414,
+          "fp": 0,
+          "fn": 0,
+          "tn": 4,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_positive_rate": 0.0,
+          "false_negative_rate": 0.0
+        },
+        "metric_targets_met": true,
+        "failed_conditions": []
+      }
+    ]
+  },
+  "linux_focused": {
+    "passed": 485,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "warnings": 1,
+    "warning": "existing malformed numeric datetime rejection control emits Pydantic serializer warning",
+    "junit_sha256": "b8b4f5de9a81402fa9e1c4aaf98b5c8d4b57c7e4851c9d31a3f6e4fdad66d437"
+  },
+  "native": {
+    "conditions": 11,
+    "cases": [
+      "actual_proc_bound_to_request_nonce_and_local_oidc_caller",
+      "actual_sudo_pam_open_record_has_exact_main_pid",
+      "actual_pam_proc_start_boot_invocation_and_caller_join",
+      "allowlisted_context_does_not_remove_review_or_grant_access",
+      "altered_caller_receipt_cannot_join",
+      "missing_record_cannot_join_by_adjacent_pid",
+      "live_command_and_uid_evaluate_actual_pinned_allowlist",
+      "explicit_pinned_policy_replacement_detects_running_denied_command",
+      "exact_pam_execution_denial_adds_review_alert",
+      "shared_execution_denial_adds_alert_without_execution",
+      "current_authentication_authority_revocation_rejects_old_capture"
+    ],
+    "receipt_sha256": "ddec9c92df493f62626c54564160692637464597d52293e66cbd0b9c045ae4ae",
+    "dependencies_sha256": "c2c0b3a3b8b31e69a532a23554d0fa74b5dbe3423cbc6ba305b6aef7dab59cef",
+    "organization_identity_tested": false,
+    "fixture_controller_holds_multiple_authority_keys": true,
+    "owned_units_removed": true,
+    "owned_processes_stopped": true,
+    "owned_source_removed": true
+  },
+  "tls_adapter": {
+    "scope": "local authenticated gateway metadata only; no OpenVPN plugin deployed",
+    "accepted": "fresh ECDHE TLS1.2, tickets and renegotiation disabled",
+    "tls13_binding_accepted": false,
+    "production_mtls_configuration_changed": false,
+    "device_health_identity_approval_signals": "independent signed local fixtures, not organizational MDM/SSO"
+  },
+  "aws_calls": 0,
+  "paid_api_calls": 0,
+  "new_ci_started": false,
+  "push_performed": false,
+  "merge_performed": false,
+  "long_soak_started": false,
+  "original_six_domains_independent_acceptance_completed": false,
+  "owned_container_removed": true,
+  "remaining": [
+    "existing deficient detection metrics",
+    "organizational SSO and device-posture authorities",
+    "native VPN gateway hook with TLS exporter",
+    "new independent labeled evaluation",
+    "deferred long soak"
+  ]
+}

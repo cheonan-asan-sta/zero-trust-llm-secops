@@ -5,6 +5,7 @@ the production mTLS deployment. All peers are in one isolated network namespace.
 """
 
 import argparse
+import hashlib
 import json
 import secrets
 import subprocess
@@ -23,7 +24,14 @@ import yaml
 
 from scripts.f1_lab import backup_recovery_status as backup_status
 from scripts.f1_lab.capture_archive import ArchiveScope
-from scripts.f1_lab.collector_status_bridge import COUNTERS, metrics, publish, report, scope_hash
+from scripts.f1_lab.collector_status_bridge import (
+    COUNTERS,
+    metrics,
+    publish,
+    read_public,
+    report,
+    scope_hash,
+)
 from scripts.f1_lab.native_jsonl import require
 from scripts.observability_lab import receiver
 from scripts.signal_metrics_exporter import handler
@@ -54,7 +62,7 @@ def wait_for(fn, seconds=30):
     raise ValueError("collector_alert_flow_timeout")
 
 
-def run(directory, *, backup_recovery=False):
+def run(directory, *, backup_recovery=False, managed_backup_reports=None):
     output = Path(directory)
     output.mkdir(parents=True, exist_ok=False)
     checks = []
@@ -69,6 +77,24 @@ def run(directory, *, backup_recovery=False):
     notify = secrets.token_urlsafe(32)
     versions = {}
     source = Path(__file__).resolve().parents[1]
+    managed = {}
+    if managed_backup_reports is not None:
+        require(backup_recovery, "managed_reports_require_backup_bridge")
+        for name in ("verified", "unavailable", "recovered"):
+            path = Path(managed_backup_reports) / ("backup-" + name + ".json")
+            value = read_public(path)
+            backup_status.validate(value, value["scope_sha256"])
+            require(
+                value["state"] == ("unavailable" if name == "unavailable" else "verified"),
+                "managed_report_state",
+            )
+            managed[name] = value
+        require(
+            len({v["scope_sha256"] for v in managed.values()}) == 1
+            and managed["verified"]["values"] == managed["recovered"]["values"]
+            and managed["verified"]["values"]["records"] == 2,
+            "managed_report_binding",
+        )
 
     def check(name, condition=True):
         require(condition, "collector_alert_flow_" + name)
@@ -131,23 +157,41 @@ def run(directory, *, backup_recovery=False):
             backup_profile = None
             if backup_recovery:
                 modes["backup"] = "verified"
-                backup_profile = {"scope_sha256": scope_hash(scope), "status_file": str(root / "backup.json"),
-                                  "max_snapshot_age_seconds": 120, "max_restore_age_seconds": 60}
+                backup_profile = {
+                    "scope_sha256": scope_hash(scope),
+                    "status_file": str(root / "backup.json"),
+                    "max_snapshot_age_seconds": 120,
+                    "max_restore_age_seconds": 60,
+                }
 
             def update():
                 now = datetime.now(UTC)
                 with lock:
                     if backup_profile and modes["backup"] != "stopped":
-                        if modes["backup"] == "unavailable":
+                        if modes["backup"].startswith("managed_"):
+                            # Byte-equivalent report values, including original checked_at.
+                            # The bridge does not pretend it can reverify a private DB.
+                            value = managed[modes["backup"].removeprefix("managed_")]
+                        elif modes["backup"] == "unavailable":
                             value = backup_status.report(scope)
                         else:
                             old_snapshot = modes["backup"] == "old_snapshot"
                             old_restore = modes["backup"] == "old_restore"
-                            snapshot = now - timedelta(seconds=121 if old_snapshot else 62 if old_restore else 2)
+                            snapshot = now - timedelta(
+                                seconds=121 if old_snapshot else 62 if old_restore else 2
+                            )
                             restored = now - timedelta(seconds=61 if old_restore else 1)
-                            value = backup_status.report(scope, {"snapshot_at": snapshot.isoformat(),
-                                "backup_at": snapshot.isoformat(), "restored_at": restored.isoformat(),
-                                "records": 2, "raw_bytes": 2048}, now=now)
+                            value = backup_status.report(
+                                scope,
+                                {
+                                    "snapshot_at": snapshot.isoformat(),
+                                    "backup_at": snapshot.isoformat(),
+                                    "restored_at": restored.isoformat(),
+                                    "records": 2,
+                                    "raw_bytes": 2048,
+                                },
+                                now=now,
+                            )
                         backup_status.publish(backup_profile["status_file"], value)
                     if modes["health"] != "stopped":
                         observed = now - timedelta(seconds=31 if modes["health"] == "stale" else 1)
@@ -185,7 +229,15 @@ def run(directory, *, backup_recovery=False):
             inbox = serve(Inbox)
             sink = serve(receiver(notify))
             url = f"http://127.0.0.1:{inbox}/zero-trust/signals/inbox"
-            exporter = serve(handler(url, "local-fixture", token, collector_profile=profile, backup_profile=backup_profile))
+            exporter = serve(
+                handler(
+                    url,
+                    "local-fixture",
+                    token,
+                    collector_profile=profile,
+                    backup_profile=backup_profile,
+                )
+            )
             legacy = serve(handler(url, "local-fixture", token))
             am_port, prom_port = 19093, 19090
             scrape = root / "scrape.token"
@@ -319,6 +371,65 @@ def run(directory, *, backup_recovery=False):
                 not query('ALERTS{alertstate="firing",alertname=~"C01Collector.*"}'),
             )
 
+            if managed:
+                with lock:
+                    backup_profile.update(
+                        scope_sha256=managed["verified"]["scope_sha256"],
+                        max_snapshot_age_seconds=86400,
+                        max_restore_age_seconds=86400,
+                        status_file=str(root / "managed-backup.json"),
+                    )
+                    modes["backup"] = "managed_verified"
+                wait_for(
+                    lambda: (
+                        Path(backup_profile["status_file"]).is_file()
+                        and read_public(backup_profile["status_file"]) == managed["verified"]
+                        and query("secops_capture_backup_status_success == 1")
+                        and query("secops_capture_backup_records == 2")
+                    )
+                )
+                check("actual_managed_exec_backup_report_reaches_authenticated_prometheus")
+                offset = len(events())
+                with lock:
+                    modes["backup"] = "managed_unavailable"
+                firing = wait_for(
+                    lambda: notification(
+                        "C01CaptureBackupVerificationUnavailable", "firing", offset
+                    )
+                )
+                check("actual_ciphertext_damage_status_reaches_alertmanager_receiver")
+                with lock:
+                    modes["backup"] = "managed_recovered"
+                wait_for(lambda: notification(firing["alertname"], "resolved", offset, firing))
+                check("actual_recovery_report_resolves_same_backup_alert_episode")
+                offset = len(events())
+                with lock:
+                    backup_profile["max_restore_age_seconds"] = 60
+                firing = wait_for(
+                    lambda: notification("C01CaptureBackupRecoveryOverdue", "firing", offset),
+                    seconds=80,
+                )
+                check("actual_original_restore_age_exceeds_60_seconds_without_timestamp_rewrite")
+                with lock:
+                    backup_profile["max_restore_age_seconds"] = 86400
+                wait_for(lambda: notification(firing["alertname"], "resolved", offset, firing))
+                check("explicit_age_policy_change_resolves_actual_age_alert_without_new_restore")
+                check(
+                    "managed_recovery_monitoring_keeps_original_times_and_counts",
+                    read_public(backup_profile["status_file"])["values"]
+                    == managed["verified"]["values"],
+                )
+                # Subsequent broad failure injection remains a separate aggregate fixture.
+                with lock:
+                    backup_profile.update(
+                        scope_sha256=scope_hash(scope),
+                        max_snapshot_age_seconds=120,
+                        max_restore_age_seconds=60,
+                    )
+                    modes["backup"] = "verified"
+                    # Scope changes are confined to this test's profile: create a new file.
+                    backup_profile["status_file"] = str(root / "fixture-backup.json")
+
             offset = len(events())
             with lock:
                 modes["health"] = "stale"
@@ -399,28 +510,59 @@ def run(directory, *, backup_recovery=False):
                 ),
             )
             if backup_profile:
-                check("default_exporter_has_no_backup_metrics_or_alerts",
-                      not query('secops_capture_backup_bridge_enabled{job="zt-signals-legacy"}')
-                      and not query('ALERTS{job="zt-signals-legacy",alertname=~"C01CaptureBackup.*"}'))
-                check("normal_backup_recovery_has_no_backup_alert",
-                      not query('ALERTS{alertstate="firing",alertname=~"C01CaptureBackup.*"}'))
+                check(
+                    "default_exporter_has_no_backup_metrics_or_alerts",
+                    not query('secops_capture_backup_bridge_enabled{job="zt-signals-legacy"}')
+                    and not query(
+                        'ALERTS{job="zt-signals-legacy",alertname=~"C01CaptureBackup.*"}'
+                    ),
+                )
+                check(
+                    "normal_backup_recovery_has_no_backup_alert",
+                    not query('ALERTS{alertstate="firing",alertname=~"C01CaptureBackup.*"}'),
+                )
                 for mode in ("old_snapshot", "old_restore", "unavailable"):
-                    name = "C01CaptureBackupVerificationUnavailable" if mode == "unavailable" else "C01CaptureBackupRecoveryOverdue"
+                    name = (
+                        "C01CaptureBackupVerificationUnavailable"
+                        if mode == "unavailable"
+                        else "C01CaptureBackupRecoveryOverdue"
+                    )
                     offset = len(events())
-                    with lock: modes["backup"] = mode
-                    firing = wait_for(lambda name=name, offset=offset: notification(name, "firing", offset))
-                    check(mode + "_backup_condition_reaches_real_receiver",
-                          bool(query("secops_collector_observation_fresh == 1")))
-                    with lock: modes["backup"] = "verified"
-                    wait_for(lambda name=name, offset=offset, firing=firing: notification(name, "resolved", offset, firing))
+                    with lock:
+                        modes["backup"] = mode
+                    firing = wait_for(
+                        lambda name=name, offset=offset: notification(name, "firing", offset)
+                    )
+                    check(
+                        mode + "_backup_condition_reaches_real_receiver",
+                        bool(query("secops_collector_observation_fresh == 1")),
+                    )
+                    with lock:
+                        modes["backup"] = "verified"
+                    wait_for(
+                        lambda name=name, offset=offset, firing=firing: notification(
+                            name, "resolved", offset, firing
+                        )
+                    )
                     check(mode + "_backup_recovery_resolves_same_episode")
                 offset = len(events())
-                with lock: modes["backup"] = "stopped"
-                wait_for(lambda: query('secops_capture_backup_status_success == 0'), seconds=backup_status.REPORT_TTL + 10)
-                firing = wait_for(lambda: notification("C01CaptureBackupVerificationUnavailable", "firing", offset))
-                check("stopped_backup_reporter_expires_after_real_180_seconds_without_cached_counts",
-                      not query('secops_capture_backup_records{job="zt-signals"}'))
-                with lock: modes["backup"] = "verified"
+                with lock:
+                    modes["backup"] = "stopped"
+                wait_for(
+                    lambda: query("secops_capture_backup_status_success == 0"),
+                    seconds=backup_status.REPORT_TTL + 10,
+                )
+                firing = wait_for(
+                    lambda: notification(
+                        "C01CaptureBackupVerificationUnavailable", "firing", offset
+                    )
+                )
+                check(
+                    "stopped_backup_reporter_expires_after_real_180_seconds_without_cached_counts",
+                    not query('secops_capture_backup_records{job="zt-signals"}'),
+                )
+                with lock:
+                    modes["backup"] = "verified"
                 wait_for(lambda: notification(firing["alertname"], "resolved", offset, firing))
                 check("backup_reporter_restart_resolves_same_episode")
             require(all(p.poll() is None for p in processes), "monitoring_processes_survived")
@@ -435,6 +577,11 @@ def run(directory, *, backup_recovery=False):
                 "independent_detection_evaluation": False,
                 "production_mTLS_flow_tested_here": False,
                 "backup_recovery_aggregate_fixture_tested": backup_recovery,
+                "actual_managed_exec_recovery_reports_tested": bool(managed),
+                "managed_report_sha256": {
+                    name: hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
+                    for name, value in managed.items()
+                },
                 "network_boundary": "single isolated container network namespace, loopback only",
             }
     finally:
@@ -463,8 +610,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--directory", required=True)
     parser.add_argument("--backup-recovery", action="store_true")
+    parser.add_argument("--managed-backup-reports", type=Path)
     args = parser.parse_args()
-    run(args.directory, backup_recovery=args.backup_recovery)
+    run(
+        args.directory,
+        backup_recovery=args.backup_recovery,
+        managed_backup_reports=args.managed_backup_reports,
+    )
 
 
 if __name__ == "__main__":

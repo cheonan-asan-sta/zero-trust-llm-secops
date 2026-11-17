@@ -13,6 +13,7 @@ from app.security import Principal, Role
 from app.services.trusted_signals import canonical_observation, canonical_signal
 from app.zero_trust_models import SignedSessionSignal
 from scripts.f1_lab.approvals import ApprovalContext, sign
+from scripts.f1_lab.native_jsonl import require
 from scripts.f1_lab.operation_context import canonical, core_features
 from scripts.f1_lab.raw_semantics import semantic_observations
 from scripts.f1_lab.registry import PinnedApprovalVerifier
@@ -92,10 +93,13 @@ class VPNControls:
 
     def build(self, *, now=None, index=1, session='vpn-session', raw_message=None,
               device='healthy', managed=True, active=True, role='employee', mfa='success',
-              authentication='success', approval=True, event_changes=None):
+              authentication='success', approval=True, event_changes=None, gateway_observation=None):
         now = self.now if now is None else now
         message = raw_message or 'TLS: Initial packet from client'
         raw = now.strftime('%Y-%m-%d %H:%M:%S')+' 192.0.2.10:1194 '+message+'\n'
+        if gateway_observation is not None:
+            raw = gateway_observation.raw_line
+            now = gateway_observation.connection.observed_at
         source_sha = hashlib.sha256(raw.encode()).hexdigest()
         context = next(iter(retained_contexts([(1, now.timestamp(), raw)], source_sha, self.baseline.vpn_model).values()))
         features = {**core_features(raw), **semantic_observations(raw)}
@@ -116,6 +120,12 @@ class VPNControls:
             session_version=0, user_id='vpn-user', device_id='vpn-device', resource_id='vpn-resource',
             peer_ip='192.0.2.10', peer_port=1194, client_certificate_sha256='c'*64,
             tls_channel_sha256='d'*64, raw_line_sha256=hashlib.sha256(raw.encode()).hexdigest(), observed_at=now)
+        if gateway_observation is not None:
+            connection = gateway_observation.connection
+            require(connection.session_id == session, 'vpn_control_session_binding')
+            data = event.model_dump()
+            data['network']['ip'] = str(connection.peer_ip)
+            event = SecurityEvent.model_validate(data)
         challenge = self.bridge.issue(connection, OPERATOR, now=now)
         identity = SignedSessionSignal(tenant_id='vpn-lab', source_id='identity', key_id='key-1',
             session_id=session, expected_version=0, event=event, issued_at=now,

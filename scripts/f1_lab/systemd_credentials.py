@@ -14,6 +14,13 @@ from pathlib import Path
 
 from scripts.f1_lab.native_jsonl import require
 
+SAFE_PEER_REJECTIONS = {'native_source_'+code for code in (
+    'credential_peer_uid', 'credential_peer_service', 'credential_peer_pid', 'credential_peer_kernel_identity',
+    'credential_peer_process_bound', 'credential_peer_process_identity', 'credential_peer_process_start',
+    'credential_peer_manager', 'credential_peer_manager_shape', 'credential_peer_service_identity',
+    'credential_peer_service_pid', 'credential_peer_service_state', 'credential_peer_service_invocation',
+    'credential_peer_service_group', 'credential_peer_cgroup', 'credential_peer_reuse')}
+
 
 def peer_uid(connection):
     require(hasattr(socket, "SO_PEERCRED"), "credential_linux_peer_required")
@@ -30,7 +37,8 @@ class CredentialSocket:
     backup, automatic key issuer, or general secret retrieval API.
     """
 
-    def __init__(self, path, key_supplier, *, allowed_uid=0, maximum_connections=32):
+    def __init__(self, path, key_supplier, *, allowed_uid=0, maximum_connections=32,
+                 peer_validator=None):
         require(
             type(allowed_uid) is int
             and 0 <= allowed_uid < 4294967295
@@ -40,8 +48,12 @@ class CredentialSocket:
         )
         self.path, self.supplier = Path(path), key_supplier
         self.allowed_uid, self.maximum = allowed_uid, maximum_connections
+        require(peer_validator is None or callable(peer_validator), 'credential_peer_validator')
+        self.peer_validator = peer_validator
         self.stopped = threading.Event()
         self.delivered = self.rejected = 0
+        self.last_rejection_code = None
+        self.last_rejection_phase = None
         self.sock = self.thread = None
         self.identity = None
 
@@ -87,15 +99,23 @@ class CredentialSocket:
                     break
                 attempts += 1
                 with connection:
+                    phase = 'peer_uid'
                     try:
                         connection.settimeout(2)
                         require(peer_uid(connection) == self.allowed_uid, "credential_peer_uid")
+                        phase = 'peer_service'
+                        if self.peer_validator is not None:
+                            require(self.peer_validator(connection) is True, 'credential_peer_service')
+                        phase = 'supplier'
                         key = self.supplier()
                         require(type(key) is bytes and len(key) == 32, "credential_raw_key_size")
+                        phase = 'delivery'
                         connection.sendall(key)
                         self.delivered += 1
-                    except (OSError, ValueError, TypeError, RuntimeError):
+                    except (OSError, ValueError, TypeError, RuntimeError) as error:
                         self.rejected += 1
+                        self.last_rejection_phase = phase
+                        self.last_rejection_code = str(error) if type(error) is ValueError and str(error) in SAFE_PEER_REJECTIONS else None
         finally:
             # An exhausted adapter must refuse new connections, not leave a
             # listening socket with no reader until the consumer times out.

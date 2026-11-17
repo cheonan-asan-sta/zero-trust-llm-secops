@@ -20,11 +20,10 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
 from app.models import StrictModel
+from scripts.f1_lab.managed_exec_capture import ManagedExecCapture, capture_parts, verify_managed
 from scripts.f1_lab.native_jsonl import decode, require
 from scripts.f1_lab.shared_execution_evidence import (
     PinnedServiceRegistry,
-    ServiceEvent,
-    ServiceProof,
     Unit,
     digest,
     proof_bytes,
@@ -75,23 +74,32 @@ class CaptureStatus:
     observed_at: datetime | None = None
 
 
-def inspect_capture(payload, scope, pinned, *, now=None):
+def alternate_keys(scope, values):
+    require(type(values) in {list, tuple} and len(values) <= 1, 'collector_alternate_key_count')
+    for value in values:
+        require(type(value) is str and value != scope.key_id, 'collector_alternate_key_identity')
+        CollectorScope.model_validate({**scope.model_dump(), 'key_id': value})
+    return tuple(values)
+
+
+def inspect_capture(payload, scope, pinned, *, now=None, caller_registry=None, alternate_key_ids=()):
     now = datetime.now(UTC) if now is None else now
     stage = "envelope"
     try:
         Window.aware(now)
         scope = CollectorScope.model_validate(scope.model_dump())
+        allowed = alternate_keys(scope, alternate_key_ids)
         require(isinstance(pinned, PinnedServiceRegistry), "collector_registry_type")
-        require(
-            type(payload) is dict
-            and set(payload) == {"schema", "event", "runtime_proof", "authorization_proof_included"}
-            and payload["schema"] == "zt-service-capture-1"
-            and payload["authorization_proof_included"] is False,
-            "collector_envelope",
-        )
-        event = ServiceEvent.model_validate(payload["event"])
-        proof = ServiceProof.model_validate(payload["runtime_proof"])
+        event, proof = capture_parts(payload)
+        if payload.get("schema_version") == "zt-managed-exec-capture-1":
+            stage = "managed_seal"
+            verify_managed(
+                ManagedExecCapture.model_validate(payload), pinned, caller_registry, now=now
+            )
         stage = "binding"
+        if proof.key_id != scope.key_id:
+            require(proof.key_id in allowed, 'collector_unconfigured_alternate_key')
+            scope = scope.model_copy(update={'key_id': proof.key_id})
         require(
             (event.tenant_id, event.server_id, event.unit, event.mode)
             == (scope.tenant_id, scope.server_id, scope.unit, "systemd")
@@ -196,8 +204,10 @@ def atomic_capture(path, body):
 class CollectorMonitor:
     """Bounded advisory state; no detection score, grant or response side effect."""
 
-    def __init__(self, scope, registry, ledger, *, capacity=1000):
+    def __init__(self, scope, registry, ledger, *, capacity=1000, caller_registry=None,
+                 alternate_key_ids=()):
         self.scope = CollectorScope.model_validate(scope.model_dump())
+        self.alternate_key_ids = alternate_keys(self.scope, alternate_key_ids)
         require(
             isinstance(registry, PinnedServiceRegistry)
             and type(capacity) is int
@@ -205,6 +215,7 @@ class CollectorMonitor:
             "collector_monitor_configuration",
         )
         self.registry, self.path, self.capacity = registry, Path(ledger), capacity
+        self.caller_registry = caller_registry
         require(self.path.parent.is_dir(), "collector_monitor_parent")
         with self.connect() as con:
             con.execute(
@@ -238,7 +249,12 @@ class CollectorMonitor:
                 )
                 try:
                     result = inspect_capture(
-                        read_capture(capture), self.scope, self.registry, now=now
+                        read_capture(capture),
+                        self.scope,
+                        self.registry,
+                        now=now,
+                        caller_registry=self.caller_registry,
+                        alternate_key_ids=self.alternate_key_ids,
                     )
                 except (ValueError, OSError, RecursionError):
                     return CaptureStatus("unavailable", "capture_file_unavailable")

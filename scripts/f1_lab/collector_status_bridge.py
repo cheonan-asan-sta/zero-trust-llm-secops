@@ -145,12 +145,13 @@ def report(kind, scope, state, *, checked_at=None, observed_at=None, expires_at=
     return value
 
 
-def health_report(scope, result, capture, pinned):
+def health_report(scope, result, capture, pinned, *, caller_registry=None, alternate_key_ids=()):
     now = datetime.now(UTC)
     if result.state == "unavailable":
         return report("health", scope, "unavailable", checked_at=now)
     payload = read_capture(capture)
-    current = inspect_capture(payload, scope, pinned, now=now)
+    current = inspect_capture(payload, scope, pinned, now=now, caller_registry=caller_registry,
+                              alternate_key_ids=alternate_key_ids)
     require(
         current.state in {"fresh", "stale"}
         and current.event_sha256 == result.event_sha256
