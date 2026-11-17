@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     case_log_path: Path = Path("runtime/cases.jsonl")
     outbox_log_path: Path = Path("runtime/integration-outbox.jsonl")
     zero_trust_db_path: Path = Path("runtime/zero-trust.sqlite3")
+    zero_trust_policy_path: Path | None = None
     behavior_context_db_path: Path | None = None
     # Compatibility for offline legacy fixtures; the application uses behavior_context_db_path.
     response_workflow_db_path: Path = Path("runtime/response-workflow.sqlite3")

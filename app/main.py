@@ -96,11 +96,13 @@ from app.services.public_detection import PublicSession, evaluate_public_session
 from app.services.public_replay import get_public_replay_service
 from app.services.response_actions import ResponseService
 from app.services.scenario_evaluator import evaluate_scenarios
+from app.services.session_analysis_evidence import VerifiedSessionContext, collect_session_evidence
 from app.services.sigma import get_sigma_engine
 from app.services.signal_inbox import SignalInbox
 from app.services.trusted_signals import SignalVerifier
-from app.services.zero_trust import ZeroTrustOperations
+from app.services.zero_trust import POLICY_PATH, ZeroTrustOperations
 from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
+from app.zero_trust_models import SignedSessionSignal
 
 settings = get_settings()
 static_dir = Path(__file__).parent / "static"
@@ -133,6 +135,7 @@ incident_quality_service = get_incident_quality_service()
 analysis_capacity = asyncio.Semaphore(settings.analysis_max_concurrency)
 zero_trust_operations = (
     ZeroTrustOperations(settings.zero_trust_db_path,
+                        policy_path=settings.zero_trust_policy_path or POLICY_PATH,
                         signal_verifier=SignalVerifier(settings.trusted_signal_sources_path))
     if settings.app_environment != "production" else None
 )
@@ -696,11 +699,65 @@ async def analyze_batch(
     )
 
 
+@app.post("/analysis/verified-session", response_model=AnalysisResult)
+async def analyze_verified_session(
+    signal: SignedSessionSignal,
+    request: Request,
+    principal: AnalystPrincipal,
+) -> AnalysisResult:
+    if zero_trust_operations is None:
+        raise HTTPException(404, "Local verified-session analysis is disabled in production")
+    # Verification errors are handled by existing signal/session handlers; never call the LLM.
+    context = collect_session_evidence(zero_trust_operations, signal, principal)
+    try:
+        analyzer = get_analyzer()
+    except ValueError as exc:
+        raise HTTPException(503, "Verified-session analysis provider is not configured") from exc
+    if get_settings().openai_prompt_mode != "grounded" or not callable(
+        getattr(analyzer, "analyze_with_evidence", None)
+    ):
+        raise HTTPException(
+            503, "Configure grounded OpenAI or hybrid analysis for verified sessions"
+        )
+
+    class BoundSessionAnalyzer:
+        name = analyzer.name
+
+        async def analyze(self, event):
+            result = await analyzer.analyze_with_evidence(event, context)
+            # Source/key withdrawal, policy changes or revocation during a paid call
+            # must not publish a result as if the original snapshot were still current.
+            fresh = collect_session_evidence(zero_trust_operations, signal, principal)
+            before, after = context.for_event(event), fresh.for_event(event)
+            before.pop("collected_at")
+            after.pop("collected_at")
+            if before != after:
+                raise ValueError("verified session context changed during analysis")
+            return result
+
+    try:
+        return await _analyze_event(
+            signal.event,
+            BoundSessionAnalyzer(),
+            principal,
+            request.state.request_id,
+            verification_context=context,
+        )
+    except AnalysisCapacityExceeded as exc:
+        raise HTTPException(
+            429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from exc
+    except Exception as exc:
+        # Provider failures and expiring snapshots do not yield a successful analysis.
+        raise HTTPException(502, "Verified-session analysis could not be completed") from exc
+
+
 async def _analyze_event(
     event: SecurityEvent,
     analyzer: Analyzer,
     principal: Principal,
     request_id: str,
+    verification_context: VerifiedSessionContext | None = None,
 ) -> AnalysisResult:
     try:
         await asyncio.wait_for(
@@ -714,6 +771,9 @@ async def _analyze_event(
         normalized = ocsf_normalizer.normalize(event)
         detection = sigma_engine.evaluate(normalized)
         assessment = await analyzer.analyze(event)
+        if verification_context is not None:
+            assessment = assessment.model_copy(update={"requires_human_review": True})
+        snapshot = verification_context.for_event(event) if verification_context is not None else None
         safe_assessment = enforce_assessment_safety(assessment, event)
         decision = response_preview(safe_assessment, event)
         result = AnalysisResult(
@@ -723,6 +783,7 @@ async def _analyze_event(
             policy_decision=decision,
             normalized_event=normalized,
             detection=detection,
+            verification_context=snapshot,
             latency_ms=round((perf_counter() - started) * 1000, 2),
             tenant_id=principal.tenant_id,
             actor_id=principal.subject,

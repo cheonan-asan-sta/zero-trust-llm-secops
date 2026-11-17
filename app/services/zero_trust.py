@@ -235,6 +235,25 @@ class ZeroTrustOperations:
                 raise SessionMissing(session_id)
             return history
 
+    def analysis_history(self, session_id: str, principal: Principal) -> tuple[list[SessionDecision], bool]:
+        """Read the validated session history and current grant consumption atomically.
+
+        This read never exposes a grant hash/token and never consumes or issues access.
+        """
+        with self._transaction() as (_, entries, _):
+            history = [SessionDecision.model_validate(entry["session"]) for entry in entries
+                       if entry["kind"] == "decision"
+                       and entry["session"]["tenant_id"] == principal.tenant_id
+                       and entry["session"]["session_id"] == session_id]
+            if not history:
+                raise SessionMissing(session_id)
+            latest = self._latest(entries, principal.tenant_id, session_id)
+            grant_hash = latest.get("grant_hash")
+            consumed = bool(grant_hash and any(
+                e["kind"] == "access" and e.get("allowed") and e.get("grant_hash") == grant_hash
+                for e in entries))
+            return history, consumed
+
     def revalidate_sessions(self, *, now: datetime | None = None) -> dict[str, int]:
         """Persist proof expiry and withdrawn authority even with an empty inbox.
 

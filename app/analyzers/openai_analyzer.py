@@ -6,12 +6,14 @@ from openai import AsyncOpenAI
 from app.config import Settings
 from app.grounded_prompting import (
     GROUNDED_INSTRUCTIONS,
+    VERIFIED_SESSION_INSTRUCTIONS,
     grounded_input,
     grounded_output_type,
     validate_grounded,
 )
 from app.models import SecurityAssessment, SecurityEvent
 from app.prompting import build_analysis_input
+from app.services.session_analysis_evidence import VerifiedSessionContext
 
 SYSTEM_INSTRUCTIONS = """
 You are a Zero Trust security event analysis assistant.
@@ -39,6 +41,18 @@ class OpenAIAnalyzer:
         self._client = AsyncOpenAI(api_key=api_key, timeout=30, max_retries=2)
 
     async def analyze(self, event: SecurityEvent) -> SecurityAssessment:
+        return await self._analyze(event)
+
+    async def analyze_with_evidence(
+        self, event: SecurityEvent, context: VerifiedSessionContext
+    ) -> SecurityAssessment:
+        if self._prompt_mode != "grounded":
+            raise ValueError("verified session analysis requires grounded mode")
+        return await self._analyze(event, context)
+
+    async def _analyze(
+        self, event: SecurityEvent, context: VerifiedSessionContext | None = None
+    ) -> SecurityAssessment:
         response = await self._client.responses.parse(
             model=self._model,
             store=False,
@@ -50,18 +64,19 @@ class OpenAIAnalyzer:
                     "role": "system",
                     "content": (
                         GROUNDED_INSTRUCTIONS
+                        + ("\n" + VERIFIED_SESSION_INSTRUCTIONS if context else "")
                         if self._prompt_mode == "grounded"
                         else SYSTEM_INSTRUCTIONS
                     ),
                 },
                 *(
-                    grounded_input(event)
+                    grounded_input(event, context)
                     if self._prompt_mode == "grounded"
                     else build_analysis_input(event, self._few_shot_count)
                 ),
             ],
             text_format=(
-                grounded_output_type(event)
+                grounded_output_type(event, context)
                 if self._prompt_mode == "grounded"
                 else SecurityAssessment
             ),
@@ -69,7 +84,7 @@ class OpenAIAnalyzer:
         if response.output_parsed is None:
             raise RuntimeError("The model did not return a structured assessment")
         return (
-            validate_grounded(response.output_parsed, event)
+            validate_grounded(response.output_parsed, event, context)
             if self._prompt_mode == "grounded"
             else response.output_parsed
         )

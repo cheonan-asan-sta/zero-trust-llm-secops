@@ -56,6 +56,7 @@
   const violations = {
     NORMAL: "정상 활동",
     CREDENTIAL_ANOMALY: "인증 이상",
+    ACCESS_POLICY_VIOLATION: "접근 정책 위반",
     UNMANAGED_DEVICE: "미관리 기기",
     PRIVILEGE_ESCALATION: "권한 상승",
     LATERAL_MOVEMENT: "내부 이동",

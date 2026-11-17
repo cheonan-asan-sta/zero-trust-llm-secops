@@ -3,7 +3,14 @@ from enum import Enum
 from typing import Annotated, Literal, Self
 from uuid import uuid4
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    field_validator,
+    model_serializer,
+    model_validator,
+)
 
 
 class StrictModel(BaseModel):
@@ -24,6 +31,7 @@ class ViolationType(str, Enum):
     PRIVILEGE_ESCALATION = "PRIVILEGE_ESCALATION"
     LATERAL_MOVEMENT = "LATERAL_MOVEMENT"
     DATA_EXFILTRATION = "DATA_EXFILTRATION"
+    ACCESS_POLICY_VIOLATION = "ACCESS_POLICY_VIOLATION"
     UNKNOWN = "UNKNOWN"
 
 
@@ -1123,6 +1131,7 @@ class AnalysisResult(StrictModel):
     policy_decision: PolicyDecision
     normalized_event: NormalizedSecurityEvent | None = None
     detection: SigmaDetectionResult | None = None
+    verification_context: dict[str, object] | None = None
     latency_ms: float = Field(ge=0)
     analyzed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     tenant_id: str = Field(default="local", pattern=r"^[a-zA-Z0-9._-]{1,64}$")
@@ -1132,6 +1141,13 @@ class AnalysisResult(StrictModel):
     reviewer: str | None = Field(default=None, min_length=2, max_length=64)
     review_note: str | None = Field(default=None, min_length=3, max_length=500)
     review_updated_at: datetime | None = None
+
+    @model_serializer(mode="wrap")
+    def omit_absent_verification_context(self, handler):
+        value = handler(self)
+        if self.verification_context is None:
+            value.pop("verification_context", None)
+        return value
 
     @model_validator(mode="before")
     @classmethod

@@ -7,6 +7,7 @@ from app.analyzers.openai_analyzer import OpenAIAnalyzer
 from app.analyzers.rule_based import RuleBasedAnalyzer
 from app.config import Settings
 from app.models import RiskLevel, SecurityAssessment, SecurityEvent, ViolationType
+from app.services.session_analysis_evidence import VerifiedSessionContext
 
 _RISK_ORDER = {
     RiskLevel.LOW: 0,
@@ -27,13 +28,33 @@ class HybridAnalyzer:
         self._llm_timeout_seconds = settings.hybrid_llm_timeout_seconds
 
     async def analyze(self, event: SecurityEvent) -> SecurityAssessment:
+        return await self._analyze(event)
+
+    async def analyze_with_evidence(
+        self, event: SecurityEvent, context: VerifiedSessionContext
+    ) -> SecurityAssessment:
+        # This explicit endpoint requests contextual LLM review even for confident rules.
+        context.for_event(event)
+        return await self._analyze(event, context)
+
+    async def _analyze(
+        self, event: SecurityEvent, context: VerifiedSessionContext | None = None
+    ) -> SecurityAssessment:
         baseline = self._rule.assess(event)
-        if not self._review_all and baseline.confidence >= self._confidence_threshold:
+        if (
+            context is None
+            and not self._review_all
+            and baseline.confidence >= self._confidence_threshold
+        ):
             return baseline
 
         try:
             llm_assessment = await asyncio.wait_for(
-                self._llm.analyze(event),
+                (
+                    self._llm.analyze_with_evidence(event, context)
+                    if context is not None
+                    else self._llm.analyze(event)
+                ),
                 timeout=self._llm_timeout_seconds,
             )
         except (TimeoutError, OpenAIError, RuntimeError, TypeError, ValueError):

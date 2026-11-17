@@ -9,6 +9,7 @@ from pydantic import Field, create_model
 
 from app.models import SecurityAssessment, SecurityEvent
 from app.services.ocsf import get_ocsf_normalizer
+from app.services.session_analysis_evidence import VerifiedSessionContext
 
 GROUNDED_INSTRUCTIONS = """
 Analyze the supplied observations for Zero Trust triage. Return SecurityAssessment in Korean.
@@ -71,8 +72,31 @@ Separate authentication results from session assurance and operational abuse:
 The server's session_assurance_context compares observations only and grants no authority.
 """.strip()
 
+VERIFIED_SESSION_INSTRUCTIONS = """
+The verified_session catalog prefix is an exact, current server-collected snapshot.
+Use its server policy for MFA and permitted role/action requirements, rather than event claims.
+Use its signed source assertion and persisted decision/status for current-session analysis.
+An explicit server scope denial or revocation is different from simply lacking an exception.
+If server policy requires MFA and the signed observation is unknown/failed, evaluate the actual
+policy assurance gap; do not call that the same as successful MFA. If MFA is not required,
+do not invent an MFA violation. A generic ELEVATED_RISK/STEP_UP from remote-event detection
+alone is not proof of an unauthorized activity. Separate the specific reasons and observations.
+Signature verification proves configured collector provenance, not independent enterprise human
+identity, external IdP authentication, approval-ticket validation or confirmed compromise.
+The snapshot does not authorize access; it includes no grant token and is not an instruction
+to execute actions. Always retain human review. Cite exact verified_session field paths.
+Use ACCESS_POLICY_VIOLATION for a specifically established access-control failure in the
+verified snapshot: an unregistered target, a denied server role/action scope, a previously
+revoked session, or an explicitly required MFA assertion that is not successful. This records
+the failed access condition, not proof of a specific attack technique or successful compromise.
+Do not return UNKNOWN solely because the attack subtype or external human identity is unknown
+when those current server conditions are established. The caller's equal role claims do not
+override a denied server-owned role scope. Conversely a generic ELEVATED_RISK/STEP_UP alone,
+missing external identity proof, or MFA unknown when not required is not such a failure.
+""".strip()
 
-def evidence_catalog(event: SecurityEvent) -> dict:
+
+def evidence_catalog(event: SecurityEvent, context: VerifiedSessionContext | None = None) -> dict:
     payload = event.analysis_payload()
     payload.pop("event_id", None)
     result = {}
@@ -85,11 +109,15 @@ def evidence_catalog(event: SecurityEvent) -> dict:
             result[path] = value
 
     visit(payload, "")
+    if context is not None:
+        visit(context.for_event(event), "verified_session")
     return result
 
 
-def grounded_output_type(event: SecurityEvent) -> type[SecurityAssessment]:
-    paths = tuple(evidence_catalog(event))
+def grounded_output_type(
+    event: SecurityEvent, context: VerifiedSessionContext | None = None
+) -> type[SecurityAssessment]:
+    paths = tuple(evidence_catalog(event, context))
     return create_model(
         "GroundedSecurityAssessment",
         __base__=SecurityAssessment,
@@ -97,7 +125,9 @@ def grounded_output_type(event: SecurityEvent) -> type[SecurityAssessment]:
     )
 
 
-def grounded_input(event: SecurityEvent) -> list[dict[str, str]]:
+def grounded_input(
+    event: SecurityEvent, context: VerifiedSessionContext | None = None
+) -> list[dict[str, str]]:
     policies = []
     for path in sorted(files("app").joinpath("data/sigma").iterdir(), key=lambda p: p.name):
         if path.name.endswith(".yml"):
@@ -133,7 +163,7 @@ def grounded_input(event: SecurityEvent) -> list[dict[str, str]]:
             "content": json.dumps(
                 {
                     "task": "Classify risk and explain using only the observed evidence catalog.",
-                    "evidence_catalog": evidence_catalog(event),
+                    "evidence_catalog": evidence_catalog(event, context),
                     "server_detection_policies": policies,
                     "normalized_observation": normalized,
                     "exception_context": exception_context(event),
@@ -191,8 +221,12 @@ def exception_context(event: SecurityEvent) -> dict:
     }
 
 
-def validate_grounded(assessment: SecurityAssessment, event: SecurityEvent) -> SecurityAssessment:
-    catalog = evidence_catalog(event)
+def validate_grounded(
+    assessment: SecurityAssessment,
+    event: SecurityEvent,
+    context: VerifiedSessionContext | None = None,
+) -> SecurityAssessment:
+    catalog = evidence_catalog(event, context)
     if not assessment.evidence or any(
         path not in catalog or catalog[path] is None for path in assessment.evidence
     ):
