@@ -4,6 +4,7 @@ from app.models import (
     RiskLevel,
     SecurityAssessment,
     SecurityEvent,
+    VerifiedReviewControls,
 )
 
 ALLOWED_ACTIONS = set(RecommendedAction)
@@ -13,6 +14,78 @@ _RISK_ORDER = {
     RiskLevel.HIGH: 2,
     RiskLevel.CRITICAL: 3,
 }
+
+
+def enforce_verified_review_safety(assessment: SecurityAssessment, snapshot: dict):
+    """Restrict an ALLOW recommendation, never manufacture a threat classification.
+
+    The snapshot is collected by the server, not accepted from a client. This
+    advisory guard issues no grant and leaves PE/PA/PEP authorization separate.
+    """
+
+    def group(name):
+        value = snapshot.get(name)
+        return value if isinstance(value, dict) else {}
+
+    signal, caller, policy, session = (
+        group(name) for name in ("signal", "caller", "policy", "session")
+    )
+    reasons = []
+    if not (
+        snapshot.get("not_an_access_grant") is True
+        and signal.get("signature_verified") is True
+        and caller.get("session_operator_binding_verified") is True
+    ):
+        reasons.append("verified_provenance_incomplete")
+    if (
+        not all(
+            policy.get(key) is True
+            for key in ("resource_registered", "role_permitted", "action_permitted")
+        )
+        or type(policy.get("mfa_required")) is not bool
+        or (policy.get("mfa_required") is True and signal.get("mfa_observation") != "success")
+    ):
+        reasons.append("server_policy_requirements_not_satisfied")
+    if not (
+        session.get("decision") == "ALLOW"
+        and session.get("status") == "ACTIVE"
+        and session.get("approval_currently_usable") is True
+        and session.get("challenge_pending") is False
+    ):
+        reasons.append("current_session_not_usable")
+    if "execution" in snapshot:
+        execution = group("execution")
+        comparisons = execution.get("exact_field_comparisons")
+        if not (
+            execution.get("observation_status") == "complete"
+            and execution.get("session_revision_bound") is True
+            and execution.get("capture_signature_verified") is True
+            and execution.get("comparison_scope_complete") is True
+            and isinstance(comparisons, list)
+            and 0 < len(comparisons) <= 8
+            and any(
+                isinstance(item, dict) and item.get("one_coherent_policy_matches") is True
+                for item in comparisons
+            )
+        ):
+            reasons.append("execution_scope_not_proven")
+    before = assessment.recommended_action
+    after = (
+        RecommendedAction.HOLD_FOR_REVIEW
+        if reasons and before == RecommendedAction.ALLOW
+        else before
+    )
+    result = assessment.model_copy(
+        update={"recommended_action": after, "requires_human_review": True}
+    )
+    controls = VerifiedReviewControls(
+        action_before_guard=before,
+        action_after_guard=after,
+        action_adjusted=before != after,
+        allow_recommendation_supported=not reasons,
+        restrictions=reasons,
+    )
+    return result, controls
 
 
 def enforce_assessment_safety(
@@ -53,9 +126,7 @@ def enforce_assessment_safety(
             event.resource.required_role and event.user.role != event.resource.required_role
         )
         context_requires_review = (
-            not event.user.active
-            or event.device.security_posture == "compromised"
-            or role_mismatch
+            not event.user.active or event.device.security_posture == "compromised" or role_mismatch
         )
         if context_requires_review:
             review = True

@@ -34,17 +34,22 @@ from scripts.evaluate_llm_grounded import (
 
 def load_source(source):
     source = Path(source)
-    plan = json.loads((source / "plan.json").read_bytes())
+    plan_bytes = (source / "plan.json").read_bytes()
+    plan = json.loads(plan_bytes)
     report = json.loads((source / "report.json").read_bytes())
     payload = (source / "private/inputs.jsonl").read_bytes()
     if (
         not report["completed"]
         or plan["model"] != MODEL
+        or hashlib.sha256(plan_bytes).hexdigest() != report.get("plan_sha256")
+        or report.get("attempts") != 360
+        or report.get("unattempted") != 0
         or hashlib.sha256(payload).hexdigest() != plan["inputs_sha256"]
     ):
         raise ValueError("source_provenance")
     rows = [json.loads(x) for x in (source / "private/predictions.jsonl").read_bytes().splitlines()]
-    messages = {r["id"]: r["messages"] for r in map(json.loads, payload.splitlines())}
+    input_rows = [json.loads(raw) for raw in payload.splitlines()]
+    messages = {r["id"]: r["messages"] for r in input_rows}
     cases_path = Path(__file__).resolve().parents[1] / "app/data/benchmark/cases.jsonl"
     if hashlib.sha256(cases_path.read_bytes()).hexdigest() != plan["cases_sha256"]:
         raise ValueError("source_population_changed")
@@ -53,6 +58,8 @@ def load_source(source):
     }
     if (
         len(rows) != 360
+        or len(input_rows) != 360
+        or len(messages) != 360
         or len({r["id"] for r in rows}) != 360
         or set(cases) != set(messages)
         or {r["id"] for r in rows} != set(cases)
@@ -61,10 +68,24 @@ def load_source(source):
     for row in rows:
         if row["truth"] is not cases[row["id"]].threat:
             raise ValueError("source_label_changed")
+        if (row.get("domain"), row.get("family_id")) != (
+            cases[row["id"]].domain,
+            cases[row["id"]].family_id,
+        ):
+            raise ValueError("source_case_metadata_changed")
+        if row.get("error") is not None and row["prediction"] is not None:
+            raise ValueError("source_error_has_prediction")
+    # Validate prediction types and reconstruct the original aggregate instead of
+    # trusting a manually edited summary. Unknown/errors retain their denominator.
+    compare_rows(rows, rows)
+    if metrics(rows) != report.get("metrics"):
+        raise ValueError("source_metrics_changed")
     eligible = [
         r
         for r in rows
         if r.get("error_code") == "response_not_completed"
+        and r.get("prediction") is None
+        and r.get("error") is not None
         and r.get("response_diagnostics", {}).get("status") == "incomplete"
         and r.get("response_diagnostics", {}).get("incomplete_reason") == "max_output_tokens"
     ]
@@ -186,7 +207,10 @@ async def run(source, directory, key_file, *, max_budget=0.08):
                     fatal = type(error).__name__
             write_json(directory / "receipts.json", receipts)
             if identity not in replacements:
-                replacements[identity] = original | {"first_attempt": original, "actual_retry": receipt}
+                replacements[identity] = original | {
+                    "first_attempt": original,
+                    "actual_retry": receipt,
+                }
             if fatal:
                 break
     candidate = [replacements.get(r["id"], r) for r in rows]

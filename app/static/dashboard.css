@@ -173,7 +173,7 @@ td small { display: block; font-size: 10px; color: var(--muted); }
 .pagination>div { display: flex; gap: 6px; }
 dialog { color: var(--text); background: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 0; max-height: calc(100dvh - 32px); box-shadow: 0 10px 40px #18232f26; }
 dialog::backdrop { background: #14223333; }
-.detail-dialog { position: fixed; inset: 0 0 0 auto; margin: 0; height: 100dvh; max-height: 100dvh; width: 540px; max-width: 100vw; border-radius: 0; border: 0; border-left: 1px solid #cad3dd; }
+.detail-dialog { position: fixed; inset: 0 0 0 auto; margin: 0; height: 100dvh; max-height: 100dvh; width: 540px; max-width: 100vw; border-radius: 0; border: 0; border-left: 1px solid #cad3dd; scroll-padding-top: 76px; }
 .detail-heading { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 20px; background: #fff; border-bottom: 1px solid var(--line); z-index: 1; }
 .detail-heading h2 { font-size: 15px; }
 .icon-button { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; background: #fff; border: 1px solid var(--line); border-radius: 3px; color: #526171; font-size: 21px; }
@@ -189,6 +189,20 @@ dialog::backdrop { background: #14223333; }
 .detail-body>section { margin: 22px 0; }
 .evidence-list { padding-left: 18px; font-size: 12px; color: #435261; }
 .evidence-list li { margin-bottom: 8px; overflow-wrap: anywhere; }
+.analysis-evidence { border-top: 1px solid var(--line); padding-top: 18px; }
+.analysis-evidence h3 { font-size: 14px; }
+.analysis-evidence h4 { font-size: 12px; margin: 22px 0 10px; }
+.analysis-evidence p { max-width: 72ch; line-height: 1.7; }
+.analysis-evidence .evidence-warning { color: #874e0c; }
+.analysis-evidence .detail-grid { padding: 0; border: 0; background: none; margin: 14px 0 18px; }
+.analysis-evidence .detail-grid dl:first-child { grid-column: auto; }
+.analysis-evidence .detail-grid dl:first-child dd { font-family: inherit; font-size: 12px; }
+.analysis-evidence .detail-grid dd { font-size: 12px; }
+.analysis-evidence .detail-grid dt { font-size: 11px; color: #526171; }
+.evidence-citations { margin: 14px 0; }
+.evidence-citations>div { margin: 12px 0; }
+.evidence-citations dt { color: #435261; font: 11px/1.5 ui-monospace, monospace; overflow-wrap: anywhere; }
+.evidence-citations dd { margin: 4px 0 0; color: var(--text); overflow-wrap: anywhere; font-size: 12px; }
 details { margin-top: 18px; color: var(--muted); font-size: 12px; }
 summary { cursor: pointer; }
 pre { padding: 14px; border: 1px solid var(--line); border-radius: 3px; background: #f6f8fa; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 11px; max-height: 360px; overflow: auto; }

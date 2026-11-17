@@ -11,7 +11,7 @@ from scripts import bounded_llm_requests as bounded
 from scripts import evaluate_evidence_review_llm as evaluation
 
 
-@pytest.mark.parametrize("suite", ["execution", "session"])
+@pytest.mark.parametrize("suite", ["execution", "session", "grounding"])
 def test_actual_oidc_paired_runner_reads_tools_and_retains_complete_denominators(
     tmp_path, monkeypatch, suite
 ):
@@ -30,7 +30,7 @@ def test_actual_oidc_paired_runner_reads_tools_and_retains_complete_denominators
                     ResponseFunctionToolCall(
                         type="function_call",
                         name="read_bound_execution_evidence"
-                        if suite == "execution"
+                        if suite != "session"
                         else "read_current_session_history",
                         arguments="{}",
                         call_id="local-call",
@@ -66,7 +66,9 @@ def test_actual_oidc_paired_runner_reads_tools_and_retains_complete_denominators
         stop_at=(datetime.now(UTC) + timedelta(minutes=5)).isoformat(),
         suite=suite,
     )
-    assert result["completed"] and result["attempts"] == len(calls) == 36
+    assert result["completed"] and result["attempts"] == len(calls) == (
+        18 if suite == "grounding" else 36
+    )
     assert result["real_loopback_jwks_fetches"] >= 1
     assert result["principal_injected"] is False and result["all_state_reads_unchanged"]
     assert all(r["snapshot_audited"] and r["trace_audited"] for r in result["rows"])
@@ -75,6 +77,14 @@ def test_actual_oidc_paired_runner_reads_tools_and_retains_complete_denominators
         for r in result["rows"]
         if r["arm"] == "agent"
     )
+    if suite == "grounding":
+        assert "metrics" not in result and "comparison" not in result
+        assert result["binary_detection_metrics_computed"] is False
+        assert all(row["truth"] is None for row in result["rows"])
+        assert all(
+            checks["no_unsupported_specific_violation"] == 6
+            for checks in result["grounding_checks"].values()
+        )
     for path in (tmp_path / "run").rglob("*.json*"):
         assert "Bearer " not in path.read_text(encoding="utf-8")
 

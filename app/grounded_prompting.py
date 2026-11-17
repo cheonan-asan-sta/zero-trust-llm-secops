@@ -163,6 +163,7 @@ def grounded_input(
     context: VerifiedSessionContext | None = None,
     *,
     include_comparisons=False,
+    download_volume_arithmetic=False,
 ) -> list[dict[str, str]]:
     policies = []
     for path in sorted(files("app").joinpath("data/sigma").iterdir(), key=lambda p: p.name):
@@ -193,6 +194,15 @@ def grounded_input(
     normalized["unmapped"] = {
         k: v for k, v in normalized["unmapped"].items() if k != "source_event_id"
     }
+    if include_comparisons and download_volume_arithmetic:
+        raise ValueError("comparison_experiments_are_mutually_exclusive")
+    download_math = []
+    if download_volume_arithmetic and event.action == "DOWNLOAD":
+        download_math = [
+            row
+            for row in get_sigma_engine().observation_comparisons(normalized)
+            if row["field_expression"].split("|", 1)[0] == "unmapped.behavior.download_volume_mb"
+        ]
     execution = context.for_event(event).get("execution") if context else None
     return [
         {
@@ -220,6 +230,14 @@ def grounded_input(
                     ),
                     "evidence_catalog": evidence_catalog(event, context),
                     "server_detection_policies": policies,
+                    **(
+                        {
+                            "download_volume_arithmetic": download_math,
+                            "download_arithmetic_scope": "Observed numeric volume operands only. This is not a rule hit, exfiltration finding or permission. Evaluate every condition and benign exception; cite original observed fields.",
+                        }
+                        if download_math
+                        else {}
+                    ),
                     **(
                         {
                             "server_observation_comparisons": get_sigma_engine().observation_comparisons(

@@ -59,7 +59,10 @@ def test_one_cached_agent_keeps_simultaneous_evidence_histories_and_receipts_sep
             max_retries=0,
             http_client=httpx.AsyncClient(transport=httpx.MockTransport(handle)),
         )
-        agent = EvidenceReviewAgent(Settings(_env_file=None), client=provider)
+        agent = EvidenceReviewAgent(
+            Settings(_env_file=None, openai_evidence_execution_delivery="on_request"),
+            client=provider,
+        )
         event = synthetic_events()[0]
 
         async def review(marker):

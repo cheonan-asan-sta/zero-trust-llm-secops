@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     openai_incomplete_retries: int = Field(default=0, ge=0, le=1)
     openai_retry_max_output_tokens: int = Field(default=4000, ge=300, le=4000)
     openai_evidence_agent_enabled: bool = False
+    openai_evidence_execution_delivery: Literal["inline", "on_request"] = "inline"
     openai_evidence_review_timeout_seconds: float = Field(default=30.0, ge=1.0, le=90.0)
     hybrid_confidence_threshold: float = Field(default=0.85, ge=0.5, le=1)
     hybrid_review_all: bool = False

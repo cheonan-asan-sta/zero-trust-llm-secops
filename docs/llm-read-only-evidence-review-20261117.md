@@ -15,11 +15,13 @@ sequenceDiagram
     O->>S: 서명된 현재 신호 + 선택적 capture ID
     S->>V: 호출 권한·현재 세션·수집기·scope 검증
     V-->>S: 이벤트 digest·만료에 묶인 근거
-    S->>L: 세션 근거 + 허용 도구 목록
-    L-->>S: 읽기 함수 제안 (인자 {})
-    S->>V: 현재 권한 재검증 + 동일 세션 읽기
-    V-->>S: 실행 근거 또는 최근 8개 결정
-    S->>L: 허용된 근거 경로만 추가
+    S->>L: 세션·기본 실행 근거 + 허용 도구 목록
+    opt 추가 근거가 필요한 경우
+        L-->>S: 읽기 함수 제안 (인자 {})
+        S->>V: 현재 권한 재검증 + 동일 세션 읽기
+        V-->>S: 실행 근거 또는 최근 8개 결정
+        S->>L: 허용된 근거 경로만 추가
+    end
     L-->>S: 구조화된 판단 + 근거 경로
     S->>V: 만료·철회·현재 연결 재검증
     S-->>O: 권고 + snapshot + 호출/조회 이력
@@ -31,22 +33,22 @@ LLM이 제안할 수 있는 함수는 다음 둘뿐이다.
 
 | 함수 | 제공 범위 | 제한 |
 | --- | --- | --- |
-| `read_bound_execution_evidence` | 서버가 미리 검증한 capture의 주체·workload·실행 파일 해시·목적지·검토 정책·정확한 비교 | capture가 있을 때만 등록. 최종 실행 검토 전에 반드시 읽어야 함 |
+| `read_bound_execution_evidence` | 서버가 미리 검증한 capture의 주체·workload·실행 파일 해시·목적지·검토 정책·정확한 비교 | `on_request`에서 capture가 있을 때만 등록. 처음부터 제공하지 않은 실행 근거는 최종 검토 전에 읽어야 함 |
 | `read_current_session_history` | 동일 세션의 최근 8개 결정: 버전·시각·결정·상태·reason code·source trust·enforcement mode | 과거 정책 결정이며 실제 사람·공격의 독립 증거로 간주하지 않음 |
 
 두 함수의 유일한 허용 인자는 빈 객체 `{}`다. 모델이 tenant·user·URL·경로·다른 세션을 선택할 수 없다. URL 방문·shell·파일 읽기·grant 발급·승인 소비·차단 도구는 등록하지 않는다. 같은 근거 그룹의 반복 조회, 여러 도구 동시 제안, 알 수 없는 도구, 새 대상 인자, 보지 않은 근거 인용을 거절한다.
 
 ## 실행 경계와 기존 탐지
 
-한 분석은 최대 **도구 읽기 2회·제공자 요청 3회·총 30초**다. 총 제한은 `OPENAI_EVIDENCE_REVIEW_TIMEOUT_SECONDS`로 1–90초 범위에서 설정하며 각 호출에도 30초 제한을 둔다. SDK HTTP 자동 재시도는0이고 incomplete 자동 재시도도 하지 않는다. 마지막 모델 요청에는 추가 도구 사용을 허용하지 않는다. 입력49,152바이트·도구 결과24,576바이트의 상한을 넘으면 중단한다.
+모델 검토 루프는 최대 **도구 읽기 2회·제공자 요청 3회·기본 30초**다. 검토 제한은 `OPENAI_EVIDENCE_REVIEW_TIMEOUT_SECONDS`로 1–90초 범위에서 설정하며 각 호출에도30초 제한을 둔다. 요청 접수·동시 실행 대기·감사 저장까지 합친 HTTP 전체 응답시간을 보증하는 값은 아니다. SDK HTTP 자동 재시도는0이고 incomplete 자동 재시도도 하지 않는다. 마지막 모델 요청에는 추가 도구 사용을 허용하지 않는다. 입력49,152바이트·도구 결과24,576바이트의 상한을 넘으면 중단한다.
 
 매 제공자 호출·도구 실행 전과 결과 저장 전에 현재 신뢰 상태를 확인한다. source/key 철회·정책 변경·승인 소모·만료·서로 다른 근거가 생기면 결과를 성공 감사로 남기지 않는다. 시간 초과도 취소하고 분석 동시 실행 슬롯을 반환한다. 캐시된 agent 객체를 공유해도 호출별 근거·조회 집합·사용량 기록은 별도다.
 
 hybrid 설정에서는 기존 규칙의 위험·탐지를 낮추지 않는 병합을 그대로 적용한다. LLM 원래 판단은 trace의 `model_assessment_before_rule_merge`로 구분한다. 사람 검토를 강제하고 실제 조치는 기존 PE/PA/PEP 경로에 남긴다. 분석 snapshot은 결과이며 새로운 실행 권한이 아니다. 철회 확인과 감사 저장이 하나의 전역 원자적 트랜잭션이라는 보장은 하지 않는다.
 
-성공 응답의 `llm_trace`에는 호출 수·안전한 응답 상태/토큰·실행한 도구 이름·반환 자료 SHA256/바이트 수·쓰기 도구 부재를 남긴다. 후속 보완으로 요청 모델·호출별 지연·출력 제한도 포함한다. 원본 모델 reasoning·bearer·개인키·grant token·제공자 오류 메시지는 넣지 않는다. 조회하지 않은 실행/이력은 결과 snapshot에도 추가하지 않는다. 기존 일반 분석 응답에서는 `llm_trace=None`을 직렬화하지 않아 예전 감사 JSON 형태를 유지한다.
+성공 응답의 `llm_trace`에는 호출 수·안전한 응답 상태/토큰·실행한 도구 이름·반환 자료 SHA256/바이트 수·쓰기 도구 부재를 남긴다. 요청 모델·호출별 지연·출력 제한·처음부터 제공한 근거와 추가 조회도 구분한다. 원본 모델 reasoning·bearer·개인키·grant token·제공자 오류 메시지는 넣지 않는다. 모델에 제공하지 않은 실행/이력은 결과 snapshot에도 추가하지 않는다. 기존 일반 분석 응답에서는 추가 필드가 없으면 직렬화하지 않아 예전 감사 JSON 형태를 유지한다.
 
-## 실제 API 결과
+## 초기 조회 방식의 실제 API 결과
 
 로컬 실제 JWT 서명·issuer/audience·tenant/역할 검증과 실제 loopback JWKS HTTP 조회를 거쳐 API에 접근했다. principal 주입이나 JWKS fetch 대체는 하지 않았다. 외부 기업 IdP와 실제 사람 MFA의 인수 시험은 아니다. 모든 시나리오는 새 현재 시각의 서명·상태를 발급한 작성형 개발 사례다.
 
@@ -68,15 +70,49 @@ hybrid 설정에서는 기존 규칙의 위험·탐지를 낮추지 않는 병�
 
 [실행 비교 원본·동결 지문·24개 분석 행](infrastructure-results/llm-evidence-review-execution-20261117.json), [세션·MFA 비교 원본](infrastructure-results/llm-evidence-review-session-20261117.json)에 모든 행과 사용량을 보존한다. 두 실행 합계는 실제 제공자 **60회·약 $0.3083325**다. 원래 개발360건 F1 93.41%나 native/독립 인수 지표를 이 소표본100%로 교체하지 않는다.
 
+## 작은 실행 근거를 처음부터 제공한 비교
+
+선택적 agent를 켰을 때의 기본 전달은 `OPENAI_EVIDENCE_EXECUTION_DELIVERY=inline`이다. 작은 검증 실행 묶음을 처음부터 제공하고, 세션 이력은 필요할 때 추가 조회한다. `on_request`는 앞의 명시적 실행 조회를 재현한다. 초기 제공은 `prefetched_evidence`, 실제 도구 호출은 `tools_executed`로 따로 기록해 실행하지 않은 도구를 실행했다고 표시하지 않는다.
+
+| 실행 scope agent 12건 | 초기 on_request | 후속 inline |
+| --- | ---: | ---: |
+| TP/FP/FN/TN |8/0/0/4|8/0/0/4|
+| 실제 제공자 요청 |24|12|
+| 관측 평균 분석 지연 |5,099.66ms|4,344.92ms|
+| 사용량 비용 추정 |$0.112776|$0.074169|
+
+후속 실행에서 함께 비교한 정적 방식은 TP8·FP0·FN0·TN4, 평균3,877.19ms·$0.0708075였다. 새 세션/MFA12종 비교도 두 방식 모두 TP6·FP0·FN0·TN6으로 유지됐다. [inline 실행 원본](infrastructure-results/llm-evidence-review-inline-execution-20261117.json), [inline 세션/MFA 원본](infrastructure-results/llm-evidence-review-inline-session-20261117.json)에 사전 조건과 모든 결과를 남겼다.
+
+같은 시나리오 뜻을 썼지만 새 서명·nonce·시각과 확률적 모델 응답이므로 지연·비용 차이를 독립 인과효과로 확정하지 않는다. 이 표의 요청 수 감소는 실제로 확인한 값이다. 선택적 agent 자체는 여전히 기본 비활성이며 일반 `/analysis`의 기본 모드를 전환하지 않는다.
+
+## 없는 실행 근거를 허용 권고로 바꾸지 않음
+
+실행 보고 없음·주체 누락·목적지 누락·보고 충돌·실행 정책 없는 기존 승인·유효한 검토 정책 없음의6종은 정상/위협 이진 정답이 없는 별도 근거 처리 시험이다. 두 방식12회 실제 API에서 근거 없는 구체 위반은 만들지 않고 사람 검토를 유지했지만, 그중4회는 `ALLOW`를 권고했다. 실제 접근이나 grant를 실행한 결과는 아니었다. [수정 전 모든 응답](infrastructure-results/llm-evidence-grounding-before-guard-20261117.json)을 보존한다.
+
+서버는 `enforce_verified_review_safety`로 source·요청자 연결·정책 요건·현재 세션 승인·실행 scope 근거를 검사한다. 필요한 근거가 충족되지 않은 `ALLOW` 권고만 `HOLD_FOR_REVIEW`로 제한한다. 기존 위협 분류·점수·근거·다른 대응 권고를 바꾸지 않는다. `verified_review_controls`에 안전 점검 전후 권고·제한 사유를 남긴다. 원래12개 응답을 바꾸지 않고 guard를 재생하면4개 모두 검토 대기로 바뀐다. 이는 추가 모델 호출이나 F1 개선이 아니다.
+
+후속 실제 API12회에서도 두 방식 모두6/6 사람 검토·추가 허용 권고0·저장소 불변을 확인했다. 이 실행에서 모델이 낸 허용 권고는2개였고 서버가 모두 제한했다. [후속 실제 응답과 제한 사유](infrastructure-results/llm-evidence-grounding-after-guard-20261117.json)에 남겼다. 두 실행의 모델 변동성을 guard의 분류 성능 향상으로 해석하지 않는다. 사례의 `NORMAL`은 지원되는 공격 근거가 없다는 뜻이며 실행 권한 확인을 뜻하지 않는다.
+
+기존 `policy_decision.allowed`는 **권고 유형이 응답 허용 목록에 속하는지**를 표시한다. 따라서 `HOLD_FOR_REVIEW`에서도true일 수 있다. 보호 자원 접근 허가는 `/zero-trust/protected-access`의 별도 PEP 판단이다. 이 기존 계약을 바꾸지 않고 API 설명과 화면 표현을 명확히 했다.
+
+## 운영 화면과 취소 경합
+
+분석 상세와 작업 결과에 서명·요청자 연결·MFA 요구/관측·대상 사람의 독립 검증 여부·실행 scope 비교·호출 수·사용량·안전 점검 전후 권고를 표시한다. 누락·문자열 boolean·형식 오류를 검증 성공으로 바꾸지 않는다. 인용한 경로의 HTML은 텍스트로 표시하며 bearer·개인키·credential 등 민감 필드를 숨긴다. 근거의 수집·만료 시각을 보여주고 과거 분석 기록을 현재의 접근 허가로 표시하지 않는다.
+
+무료 부하 시험은 실제 로컬 JWT/JWKS·서명·저장소와 모의 제공자 transport를 사용했다. 두 tenant의32개 동시 요청에서4개만 모델 처리에 들어가고28개는429로 제한됐으며 재요청으로 복구됐다. 제공자 처리 중 취소는 감사 성공을 남기지 않고 슬롯을 반환했다. 결과 감사의 tenant 분리·재시작 후 hash chain·세션 journal 불변도 확인했다. 유료 LLM 정확도 시험으로 집계하지 않는다.
+
+JSONL 감사 쓰기를 시작한 뒤의 취소는 별도다. 파일 스레드는 요청 취소만으로 중단되지 않아, 기존 구현은 잠금을 먼저 풀고 다음 쓰기와 겹칠 수 있었다. 이를 실제 hash 계산 경계에서 재현한 뒤, 쓰기가 끝날 때까지 잠금을 유지하고 메모리 반영 후 취소를 전달하도록 고쳤다. 부분 쓰기 실패는 후속 append를 막는다. 이때 기록은 완료된 분석에 대한 감사이며 HTTP 응답이 사용자에게 전달됐다는 뜻이 아니다. 단일 프로세스·한 저장소 인스턴스의 경합 보완이며 다중 프로세스 파일 공유나 전원 단절 내구성을 새로 보증하지 않는다.
+
 ## 로컬 실행과 재현
 
-선택적 API는 `OPENAI_EVIDENCE_AGENT_ENABLED=true`, `OPENAI_PROMPT_MODE=grounded`, `ANALYZER_MODE=openai` 또는 `hybrid`가 필요하다. 예시 기본값은 비활성이고 실제 환경 파일은 변경하지 않는다. 프로덕션에서는 현재 로컬 정책 저장소가 비활성화돼 이 API도404다. 유료 호출 설정을 켜는 것은 운영 인수 완료를 뜻하지 않는다.
+선택적 API는 `OPENAI_EVIDENCE_AGENT_ENABLED=true`, `OPENAI_PROMPT_MODE=grounded`, `ANALYZER_MODE=openai` 또는 `hybrid`가 필요하다. 위 실제 비교는 runner에 고정한 모델·`reasoning_effort=low`·최대 출력2400토큰을 사용했다. 모델 이름은 각 결과의 동결 계획을 따른다. 다른 설정으로 결과가 재현된다고 보증하지 않는다. 예시 기본값은 비활성이고 실제 환경 파일은 변경하지 않는다. 프로덕션에서는 현재 로컬 정책 저장소가 비활성화돼 이 API도404다. 유료 호출 설정을 켜는 것은 운영 인수 완료를 뜻하지 않는다.
 
 ```powershell
 python -m scripts.evaluate_evidence_review_llm `
   --directory runtime/llm/new-evidence-review `
   --key-env-file <기존 로컬 키 환경 파일> `
   --max-budget 0.45 --suite session `
+  --execution-delivery inline `
   --stop-at <미래의 timezone 포함 ISO 시각>
 ```
 
@@ -85,3 +121,11 @@ python -m scripts.evaluate_evidence_review_llm `
 응답의 도구 제안과 `function_call_output`을 연결하고 제공자 reasoning item을 다음 요청에 그대로 전달하는 프로토콜은 [OpenAI 공식 함수 호출 문서](https://developers.openai.com/api/docs/guides/function-calling)를 따른다. SDK 전용 파싱 필드는 다음 API 입력에서 제거하고 reasoning 내용은 trace/public 결과에 복사하지 않는다.
 
 관련 구현은 `app/analyzers/evidence_agent.py`, `app/main.py`, `app/analyzers/structured_response.py`, `app/services/execution_analysis_evidence.py`다. [전체 개선 결과와 미달 항목](llm-operation-evidence-20261117.md)을 함께 본다.
+
+## 최신 무료 회귀와 화면 증거
+
+후속 변경의 Windows 묶음 회귀는 **647통과·12skip·실패/설정 오류0**이다. [JUnit](infrastructure-results/llm-final-windows-20261117.xml)은659개 수집 항목을 포함하며 skip을 통과에 더하지 않는다. 고정된 이전 커밋의 전체 Linux7,596통과 결과와 범위를 구분한다. 최신 고정 소스의 Linux 전체 회귀는 별도 기록한다.
+
+[분석 상세 브라우저57개 검사](infrastructure-results/llm-evidence-dashboard-browser-20261117.json), [운영 작업 브라우저142개 검사](infrastructure-results/llm-evidence-operations-browser-20261117.json)는 모두 통과했다. [1440px 화면](infrastructure-results/llm-evidence-dashboard-1440-20261117.png), [390px 화면](infrastructure-results/llm-evidence-dashboard-390-20261117.png)은 **합성 응답 fixture를 사용한 표시 검증**이다. 실제 유료 응답이나 실제 사람 MFA 성공의 증명 사진이 아니다. 본문·인용 경로·안전 제한·기밀 마스킹, 예전 기록의 누락 필드, 확대/좁은 화면을 검사했다.
+
+Ruff는 app/scripts/tests 전체 통과했다. Impeccable의 정적 검사에는 기존 `.demo-note`의 한쪽 테두리 경고1개가 남아 있다. 이번 변경에서 추가한 스타일이 아니며 정적 JS/CSS 검사가 화면 전체의 접근성을 보증하지 않는다. 실제 화면은 브라우저 검사와 직접 확인을 함께 사용했다.

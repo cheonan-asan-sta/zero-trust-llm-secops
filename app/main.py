@@ -95,7 +95,11 @@ from app.services.integration_outbox import (
     create_integration_outbox_store,
 )
 from app.services.ocsf import get_ocsf_normalizer
-from app.services.policy import enforce_assessment_safety, response_preview
+from app.services.policy import (
+    enforce_assessment_safety,
+    enforce_verified_review_safety,
+    response_preview,
+)
 from app.services.public_detection import PublicSession, evaluate_public_session
 from app.services.public_replay import get_public_replay_service
 from app.services.response_actions import ResponseService
@@ -922,6 +926,11 @@ async def _analyze_event(
         )
         snapshot = selected_context.for_event(event) if selected_context is not None else None
         safe_assessment = enforce_assessment_safety(assessment, event)
+        verified_controls = None
+        if snapshot is not None:
+            safe_assessment, verified_controls = enforce_verified_review_safety(
+                safe_assessment, snapshot
+            )
         decision = response_preview(safe_assessment, event)
         result = AnalysisResult(
             event_id=event.event_id,
@@ -932,6 +941,7 @@ async def _analyze_event(
             detection=detection,
             verification_context=snapshot,
             llm_trace=llm_trace_supplier() if llm_trace_supplier else None,
+            verified_review_controls=verified_controls,
             latency_ms=round((perf_counter() - started) * 1000, 2),
             tenant_id=principal.tenant_id,
             actor_id=principal.subject,

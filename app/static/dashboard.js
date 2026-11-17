@@ -218,7 +218,7 @@
   // Never expose credentials or executable markup received in log fields.
   function redact(value) {
     if (Array.isArray(value)) return value.map(redact);
-    if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, /(?:token|secret|password|authorization|api.?key|signature|cookie)/i.test(key) ? "[REDACTED]" : redact(item)]));
+    if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, /(?:token|secret|password|authorization|api.?key|private.?key|signature|cookie|bearer|credential)/i.test(key) ? "[REDACTED]" : redact(item)]));
     if (typeof value === "string" && state.credential) return value.split(state.credential).join("[REDACTED]");
     return value;
   }
@@ -248,6 +248,108 @@
     return section;
   }
 
+  function analysisEvidence(record) {
+    const object = (value) => value && typeof value === "object" && !Array.isArray(value);
+    const present = (value) => value !== undefined && value !== null;
+    if (!present(record?.verification_context) && !present(record?.llm_trace) && !present(record?.verified_review_controls)) return null;
+    const section = node("section", null, "analysis-evidence");
+    section.setAttribute("aria-label", "분석 시점의 검증 근거와 LLM 조회");
+    section.append(node("h3", "분석 시점의 검증 근거"));
+    const context = record.verification_context;
+    if (!object(context) || context.not_an_access_grant !== true) {
+      section.append(node("p", "연결된 검증 근거의 형식을 확인할 수 없습니다. 원문과 서버 기록을 확인하세요.", "evidence-warning"));
+      return section;
+    }
+    const count = (value, maximum = 10000000) => Number.isSafeInteger(value) && value >= 0 && value <= maximum;
+    const safe = (value) => typeof value === "string" ? redact(value).slice(0, 192) : "미확인";
+    const signal = object(context.signal) ? context.signal : {};
+    const caller = object(context.caller) ? context.caller : {};
+    const policy = object(context.policy) ? context.policy : {};
+    const verified = signal.signature_verified === true && caller.session_operator_binding_verified === true;
+    section.append(node("p", verified ?
+      "수집기 서명과 당시 세션 요청자 연결을 확인한 기록입니다. 현재 접근 허용은 자원 요청에서 별도로 판단합니다." :
+      "서명 또는 요청자 연결의 검증 상태가 불완전합니다. 이 기록으로 접근 권한을 판단하지 마세요.", verified ? "scope-note" : "evidence-warning"));
+    const methods = {oidc: "OIDC", api_key: "API 키", disabled: "인증 비활성"};
+    const mfa = {success: "성공 관측", failed: "실패 관측", unknown: "관측 미확인", not_required: "요구하지 않음 관측"};
+    const values = [
+      ["근거 수집 시각", date(context.collected_at, true)],
+      ["기록된 근거 만료", date(context.valid_until, true)],
+      ["수집기 서명", signal.signature_verified === true ? "검증됨" : "미확인"],
+      ["요청자 인증", `${methods[caller.authentication_method] || "미확인"} / ${caller.session_operator_binding_verified === true ? "세션 요청자와 일치" : "연결 미확인"}`],
+      ["서버의 MFA 요구", policy.mfa_required === true ? "필수" : policy.mfa_required === false ? "요구하지 않음" : "미확인"],
+      ["수집기의 MFA 관측", mfa[signal.mfa_observation] || "미확인"],
+      ["대상 사람의 독립 MFA 검증", caller.event_subject_mfa_independently_verified === true ? "확인됨" : "확인되지 않음"],
+    ];
+    const execution = object(context.execution) ? context.execution : null;
+    if (execution) {
+      const statuses = {complete: "완전한 관측", incomplete: "일부 관측 누락", conflict: "관측 간 충돌", missing: "관측 없음", unavailable: "유효한 관측 없음"};
+      values.push(["실행 관측", statuses[execution.observation_status] || "미확인"]);
+      const comparisons = execution.exact_field_comparisons;
+      const complete = execution.comparison_scope_complete === true && Array.isArray(comparisons) && comparisons.length > 0 && comparisons.length <= 8 && comparisons.every((item) => object(item) && typeof item.one_coherent_policy_matches === "boolean");
+      values.push(["실행 주체·목적지 비교", !complete ? "비교 근거 불완전" : comparisons.some((item) => item.one_coherent_policy_matches) ? "한 정책 안에서 모두 일치" : "한 정책 안에서 모두 일치하지 않음"]);
+    }
+    section.append(fields(values));
+    const trace = record.llm_trace;
+    if (present(trace)) {
+      section.append(node("h4", "LLM 근거 사용"));
+      const receipts = object(trace) && Array.isArray(trace.receipts) ? trace.receipts : [];
+      const validTrace = object(trace) && trace.mode === "bounded_read_only_evidence_review" && count(trace.provider_calls, 3) && trace.provider_calls > 0 && receipts.length === trace.provider_calls;
+      if (!validTrace) {
+        section.append(node("p", "LLM 조회 이력의 형식을 확인할 수 없습니다.", "evidence-warning"));
+      } else {
+        const tools = {read_bound_execution_evidence: "실행 근거", read_current_session_history: "최근 세션 결정"};
+        const reads = Array.isArray(trace.tools_executed) && trace.tools_executed.length <= 2 ? trace.tools_executed.map((name) => tools[name] || "알 수 없는 조회 기록") : ["조회 내역 미확인"];
+        const knownUsage = receipts.every((item) => object(item) && count(item.input_tokens) && count(item.output_tokens));
+        const usage = knownUsage ? `입력 ${num(receipts.reduce((sum, item) => sum + item.input_tokens, 0))} / 출력 ${num(receipts.reduce((sum, item) => sum + item.output_tokens, 0))} 토큰` : "일부 사용량 미확인";
+        section.append(fields([
+          ["제공자 요청", `${trace.provider_calls}회 / 최대 3회`],
+          ["실행 근거 전달", Array.isArray(trace.prefetched_evidence) && trace.prefetched_evidence.includes("execution") ? "처음부터 제공" : reads.includes("실행 근거") ? "LLM 요청 후 제공" : execution ? "전달 방식 미확인" : "연결된 실행 근거 없음"],
+          ["추가 조회", reads.length ? reads.join(", ") : "없음 · 기본 근거 사용"],
+          ["제공자 사용량", usage],
+          ["조치 도구", trace.write_tools_available === false ? "등록되지 않음" : "기록 확인 필요"],
+        ]));
+      }
+    }
+    const guard = record.verified_review_controls;
+    if (present(guard)) {
+      const reasons = {
+        verified_provenance_incomplete: "수집기 서명 또는 요청자 연결 미확인",
+        server_policy_requirements_not_satisfied: "서버의 자원·역할·행위·MFA 요건 미충족",
+        current_session_not_usable: "현재 세션의 미사용 승인을 확인할 수 없음",
+        execution_scope_not_proven: "실행 주체·목적지의 허용 범위를 입증하지 못함",
+      };
+      section.append(node("h4", "서버의 권고 안전 점검"));
+      const validGuard = object(guard) && guard.scope === "verified_review_advisory_only" && typeof guard.action_adjusted === "boolean" && typeof guard.allow_recommendation_supported === "boolean" && Object.hasOwn(actions, guard.action_before_guard) && Object.hasOwn(actions, guard.action_after_guard) && Array.isArray(guard.restrictions) && guard.restrictions.length <= 4 && guard.restrictions.every((reason) => Object.hasOwn(reasons, reason));
+      if (!validGuard) {
+        section.append(node("p", "권고 안전 점검 기록의 형식을 확인할 수 없습니다.", "evidence-warning"));
+      } else {
+        section.append(node("p", guard.action_adjusted ? "서버가 허용 권고를 검토 대기로 제한했습니다." : "서버 점검 후에도 최종 접근 권한은 별도로 검사합니다."));
+        section.append(fields([["안전 점검 전 권고", actions[guard.action_before_guard]], ["안전 점검 후 권고", actions[guard.action_after_guard]]]));
+        if (guard.restrictions.length) section.append(detailsList("검토를 유지하는 사유", guard.restrictions.map((reason) => reasons[reason])));
+      }
+    }
+    const citations = Array.isArray(record.assessment?.evidence) ? record.assessment.evidence.filter((path) => typeof path === "string" && path.startsWith("verified_session.")).slice(0, 20) : [];
+    if (citations.length) {
+      const details = node("details");
+      details.append(node("summary", "LLM이 인용한 검증 근거"));
+      const list = node("dl", null, "evidence-citations");
+      citations.forEach((path) => {
+        let value = context;
+        for (const key of path.split(".").slice(1)) {
+          if (!["__proto__", "prototype", "constructor"].includes(key) && object(value) && Object.hasOwn(value, key)) value = value[key];
+          else { value = undefined; break; }
+        }
+        const row = node("div");
+        const protectedValue = redact({[path]: value})[path];
+        const shown = !present(value) ? "값을 확인할 수 없음" : typeof protectedValue === "object" ? JSON.stringify(protectedValue).slice(0, 192) : safe(String(protectedValue));
+        row.append(node("dt", safe(path)), node("dd", shown));
+        list.append(row);
+      });
+      details.append(list); section.append(details);
+    }
+    return section;
+  }
+
   function openDetail(title) {
     text("detailTitle", title);
     $("detailBody").className = "detail-body";
@@ -274,6 +376,8 @@
           ["테넌트", item.tenant_id]
         ]));
         body.append(detailsList("판단 근거", [item.assessment.rationale, ...item.assessment.evidence]), detailsList("정책과 대응 제안", [item.policy_decision.reason, `제안: ${item.policy_decision.action} / 실행 모드: ${item.policy_decision.mode}`, "이 분석 제안만으로 외부 계정이나 기기를 차단하지 않습니다."]));
+        const evidence = analysisEvidence(item);
+        if (evidence) body.append(evidence);
       } else if (type === "session") {
         body.append(node("p", `${item.length}개 버전의 서버 이력. 허용 유효성과 토큰 소비는 실제 접근 요청에서 별도 검사합니다.`, "scope-note"));
         [...item].reverse().forEach((entry) => {
@@ -845,7 +949,7 @@
   $("demoAccess").addEventListener("click", () => runDemo("access"));
   $("demoCompromise").addEventListener("click", () => runDemo("compromise"));
   const tick = () => text("clock", `${new Date().toLocaleDateString("ko-KR")} ${date(Date.now())}`);
-  window.dashboardContext = {request, node, redact, rawPanel, refresh, notify, errorLabel,
+  window.dashboardContext = {request, node, redact, rawPanel, analysisEvidence, refresh, notify, errorLabel,
     get state() { return {epoch: state.epoch, page: state.page, data: state.data}; }};
   tick();
   setInterval(tick, 1000);

@@ -15,7 +15,12 @@ from datetime import UTC, datetime, timedelta
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
-from app.behavior_context_models import ApprovalCreate, BaselineCreate, SignedBehaviorCapture
+from app.behavior_context_models import (
+    ApprovalCreate,
+    BaselineCreate,
+    ContextRevocation,
+    SignedBehaviorCapture,
+)
 from app.behavior_execution_models import BehaviorScope, SignedExecutionEvidence
 from app.services.behavior_context import BehaviorContextService
 from app.services.behavior_context_store import BehaviorContextStore
@@ -36,6 +41,15 @@ EXECUTION_SCENARIOS = (
     ("path_prefix", True),
     ("extra_destination", True),
     ("mixed_policies", True),
+)
+
+GROUNDING_SCENARIOS = (
+    ("missing_execution", None),
+    ("missing_actor", None),
+    ("missing_destinations", None),
+    ("conflicting_reports", None),
+    ("unresolved_legacy_scope", None),
+    ("no_active_reviewed_policy", None),
 )
 
 
@@ -210,6 +224,14 @@ class LocalExecutionAnalysisLab(LocalSessionAnalysisLab):
             destinations.append(dict(self.secondary_policy["destinations"][0]))
         elif name == "mixed_policies":
             destinations = [dict(d) for d in self.secondary_policy["destinations"]]
+        self.record_execution(signal, capture, actor, destinations)
+        context = collect_session_execution_evidence(
+            self.service, self.behavior, signal, self.principal, capture.capture_id
+        )
+        return signal, capture, context
+
+    def record_execution(self, signal, capture, actor, destinations):
+        """Record observed facts, including explicit missing fields, without policy fill-in."""
         now = datetime.now(UTC)
         evidence = SignedExecutionEvidence(
             tenant_id="local-lab",
@@ -233,7 +255,63 @@ class LocalExecutionAnalysisLab(LocalSessionAnalysisLab):
         )
         evidence = signed(evidence, self.keys["execution"], canonical_execution_evidence)
         self.behavior.accept_execution_evidence(evidence, self.principal)
+        return evidence
+
+    def create_grounding_case(self, name):
+        if name not in dict(GROUNDING_SCENARIOS):
+            raise ValueError("unknown_grounding_scenario")
+        if name == "unresolved_legacy_scope":
+            starts = datetime.now(UTC) + timedelta(seconds=2)
+            self.behavior.create_approval(
+                ApprovalCreate(
+                    approval_id="local-legacy-approval",
+                    baseline_id="local-reviewed-baseline",
+                    valid_from=starts,
+                    valid_until=starts + timedelta(minutes=5),
+                    max_uses=100,
+                    note="Authored development legacy scope with no execution policy",
+                ),
+                self.principal,
+            )
+            while (remaining := (starts - datetime.now(UTC)).total_seconds()) > 0:
+                time.sleep(min(remaining, 0.05))
+        elif name == "no_active_reviewed_policy":
+            for identifier in (
+                "local-reviewed-approval-0",
+                "local-reviewed-approval-1",
+                "local-legacy-approval",
+            ):
+                if identifier == "local-legacy-approval" and not self._has_legacy_approval():
+                    continue
+                self.behavior.revoke(
+                    "approval",
+                    identifier,
+                    ContextRevocation(reason="Withdraw local scope before uncertainty review"),
+                    self.principal,
+                )
+        signal, capture = self.capture()
+        actor = dict(self.primary_policy["actor"])
+        destinations = [dict(item) for item in self.primary_policy["destinations"]]
+        if name == "missing_actor":
+            actor = None
+        elif name == "missing_destinations":
+            destinations = None
+        elif name == "unresolved_legacy_scope":
+            actor["workload_id"] = "unreviewed-workload"
+        if name != "missing_execution":
+            self.record_execution(signal, capture, actor, destinations)
+        if name == "conflicting_reports":
+            self.record_execution(
+                signal, capture, actor | {"workload_id": "conflicting-workload"}, destinations
+            )
         context = collect_session_execution_evidence(
             self.service, self.behavior, signal, self.principal, capture.capture_id
         )
         return signal, capture, context
+
+    def _has_legacy_approval(self):
+        with self.behavior.store.transaction() as transaction:
+            return (
+                transaction.get("approval", self.principal.tenant_id, "local-legacy-approval")
+                is not None
+            )

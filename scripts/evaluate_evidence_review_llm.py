@@ -26,15 +26,32 @@ from scripts.bounded_llm_requests import BoundedRequests
 from scripts.compare_llm_grounded import compare_rows
 from scripts.evaluate_llm_development import write_json
 from scripts.evaluate_llm_grounded import MODEL, metrics, prediction
-from scripts.local_execution_analysis_lab import EXECUTION_SCENARIOS, LocalExecutionAnalysisLab
+from scripts.local_execution_analysis_lab import (
+    EXECUTION_SCENARIOS,
+    GROUNDING_SCENARIOS,
+    LocalExecutionAnalysisLab,
+)
 from scripts.local_oidc_authority import LocalOIDCAuthority
 from scripts.local_session_analysis_lab import SCENARIOS, LocalSessionAnalysisLab
 
 
-def run(directory, key_file, *, max_budget=0.75, stop_at, suite="execution"):
+def run(
+    directory,
+    key_file,
+    *,
+    max_budget=0.75,
+    stop_at,
+    suite="execution",
+    execution_delivery="on_request",
+):
     directory = Path(directory)
     deadline = datetime.fromisoformat(stop_at)
-    if directory.exists() or deadline.tzinfo is None or suite not in {"execution", "session"}:
+    if (
+        directory.exists()
+        or deadline.tzinfo is None
+        or suite not in {"execution", "session", "grounding"}
+        or execution_delivery not in {"inline", "on_request"}
+    ):
         raise ValueError("evaluation_options")
     if get_principal in main.app.dependency_overrides:
         raise ValueError("refusing_principal_override")
@@ -60,19 +77,30 @@ def run(directory, key_file, *, max_budget=0.75, stop_at, suite="execution"):
         "app/analyzers/structured_response.py",
         "app/analyzers/hybrid.py",
         "app/services/session_analysis_evidence.py",
+        "app/services/policy.py",
+        "app/services/audit.py",
         "app/services/execution_analysis_evidence.py",
     ]
-    scenarios = EXECUTION_SCENARIOS if suite == "execution" else SCENARIOS
+    scenarios = {
+        "execution": EXECUTION_SCENARIOS,
+        "session": SCENARIOS,
+        "grounding": GROUNDING_SCENARIOS,
+    }[suite]
     plan = {
         "schema": "bounded-read-only-evidence-review-development-1",
         "scenarios": scenarios,
         "suite": suite,
+        "execution_evidence_delivery": execution_delivery,
         "arms": ["static", "agent"],
         "repetitions": 1,
         "model": MODEL,
         "max_budget_usd": max_budget,
         "stop_at": stop_at,
-        "max_provider_calls": 48,
+        "max_provider_calls": len(scenarios) * 4,
+        "binary_detection_labels": suite != "grounding",
+        "grounding_expected": "No specific execution violation or access approval can be established from absent/conflicting/incomplete policy evidence"
+        if suite == "grounding"
+        else None,
         "SDK_retries": 0,
         "max_calls_per_agent_review": 3,
         "predicate_context": False,
@@ -90,11 +118,13 @@ def run(directory, key_file, *, max_budget=0.75, stop_at, suite="execution"):
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(content)
     write_json(directory / "plan.json", plan)
-    ledger = BoundedRequests(directory, max_budget=max_budget, max_requests=48, deadline=deadline)
-    lab = (LocalExecutionAnalysisLab if suite == "execution" else LocalSessionAnalysisLab)(
+    ledger = BoundedRequests(
+        directory, max_budget=max_budget, max_requests=len(scenarios) * 4, deadline=deadline
+    )
+    lab = (LocalExecutionAnalysisLab if suite != "session" else LocalSessionAnalysisLab)(
         directory / "private" / "authority"
     )
-    if suite == "execution":
+    if suite != "session":
         lab.prepare()
     rows = []
     with LocalOIDCAuthority() as authority:
@@ -112,6 +142,7 @@ def run(directory, key_file, *, max_budget=0.75, stop_at, suite="execution"):
             openai_reasoning_effort="low",
             openai_max_output_tokens=2400,
             openai_evidence_agent_enabled=True,
+            openai_evidence_execution_delivery=execution_delivery,
         )
         adapter, agent = OpenAIAnalyzer(config), EvidenceReviewAgent(config)
         # Static adapter normally has HTTP retries; the paid lab must never retry invisibly.
@@ -135,8 +166,12 @@ def run(directory, key_file, *, max_budget=0.75, stop_at, suite="execution"):
             try:
                 for index, scenario in enumerate(scenarios):
                     name, truth = scenario[:2]
-                    if suite == "execution":
-                        signal, observed, _ = lab.create_execution_case(name)
+                    if suite != "session":
+                        signal, observed, _ = (
+                            lab.create_grounding_case(name)
+                            if suite == "grounding"
+                            else lab.create_execution_case(name)
+                        )
                         params = {"behavior_capture_id": observed.capture_id}
                     else:
                         signal, _ = lab.create(scenario)
@@ -145,7 +180,7 @@ def run(directory, key_file, *, max_budget=0.75, stop_at, suite="execution"):
                     for arm in arms:
                         before = (
                             lab.behavior.store.read(lab.principal.tenant_id)
-                            if suite == "execution"
+                            if suite != "session"
                             else None
                         )
                         journal = lab.service.journal_status()
@@ -167,7 +202,7 @@ def run(directory, key_file, *, max_budget=0.75, stop_at, suite="execution"):
                             "error": None,
                             "http_status": response.status_code,
                             "provider_receipt_indexes": list(range(first, len(ledger.receipts))),
-                            "behavior_store_unchanged": suite != "execution"
+                            "behavior_store_unchanged": suite == "session"
                             or before == lab.behavior.store.read(lab.principal.tenant_id),
                             "session_journal_unchanged": journal == lab.service.journal_status(),
                         }
@@ -228,13 +263,11 @@ def run(directory, key_file, *, max_budget=0.75, stop_at, suite="execution"):
     report = {
         "schema": plan["schema"],
         "suite": suite,
-        "completed": ledger.fatal is None and len(seen) == 24,
+        "completed": ledger.fatal is None and len(seen) == len(scenarios) * 2,
         "fatal": ledger.fatal,
         "attempts": len(ledger.receipts),
         "known_usage_estimated_usd": known,
         "unknown_usage_reserved_usd": unknown,
-        "metrics": {a: metrics(rs) for a, rs in arms.items()},
-        "comparison": compare_rows(arms["static"], arms["agent"]),
         "real_loopback_jwks_fetches": fetches,
         "principal_injected": False,
         "all_state_reads_unchanged": all(
@@ -246,6 +279,45 @@ def run(directory, key_file, *, max_budget=0.75, stop_at, suite="execution"):
         "rows": rows,
         "plan_sha256": hashlib.sha256((directory / "plan.json").read_bytes()).hexdigest(),
     }
+    if suite == "grounding":
+        report["binary_detection_metrics_computed"] = False
+        report["grounding_checks"] = {
+            arm: {
+                "cases": len(part),
+                "http_successes": sum(r.get("http_status") == 200 for r in part),
+                "errors_or_unattempted": sum(r.get("error") is not None for r in part),
+                "no_unsupported_specific_violation": sum(
+                    r.get("response", {}).get("assessment", {}).get("violation_type")
+                    in {"NORMAL", "UNKNOWN"}
+                    for r in part
+                ),
+                "requires_human_review": sum(
+                    r.get("response", {}).get("assessment", {}).get("requires_human_review") is True
+                    for r in part
+                ),
+                "allow_recommendations": sum(
+                    r.get("response", {}).get("assessment", {}).get("recommended_action") == "ALLOW"
+                    for r in part
+                ),
+                "recommendations_adjusted_by_server": sum(
+                    r.get("response", {}).get("verified_review_controls", {}).get("action_adjusted")
+                    is True
+                    for r in part
+                ),
+                "not_an_access_grant": sum(
+                    r.get("response", {}).get("verification_context", {}).get("not_an_access_grant")
+                    is True
+                    for r in part
+                ),
+                "rationale_independently_reviewed": False,
+            }
+            for arm, part in arms.items()
+        }
+    else:
+        report.update(
+            metrics={a: metrics(rs) for a, rs in arms.items()},
+            comparison=compare_rows(arms["static"], arms["agent"]),
+        )
     write_json(directory / "report.json", report)
     return report
 
@@ -256,7 +328,12 @@ if __name__ == "__main__":
     parser.add_argument("--key-env-file", type=Path, required=True)
     parser.add_argument("--max-budget", type=float, default=0.75)
     parser.add_argument("--stop-at", required=True)
-    parser.add_argument("--suite", choices=["execution", "session"], default="execution")
+    parser.add_argument(
+        "--suite", choices=["execution", "session", "grounding"], default="execution"
+    )
+    parser.add_argument(
+        "--execution-delivery", choices=["inline", "on_request"], default="on_request"
+    )
     args = parser.parse_args()
     try:
         report = run(
@@ -265,6 +342,7 @@ if __name__ == "__main__":
             max_budget=args.max_budget,
             stop_at=args.stop_at,
             suite=args.suite,
+            execution_delivery=args.execution_delivery,
         )
         print(json.dumps({k: v for k, v in report.items() if k != "rows"}))
         if not report["completed"]:

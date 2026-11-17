@@ -10,6 +10,7 @@ from openai import AsyncOpenAI
 
 from app import main
 from app.analyzers.evidence_agent import EvidenceReviewAgent
+from app.behavior_context_models import ContextRevocation
 from app.config import Settings
 from app.models import SecurityAssessment
 from app.security import Role, get_principal
@@ -69,6 +70,7 @@ def agent_route(tmp_path, monkeypatch):
             openai_api_key="local-test-placeholder",
             openai_prompt_mode="grounded",
             openai_evidence_agent_enabled=True,
+            openai_evidence_execution_delivery="on_request",
             openai_reasoning_effort="low",
             openai_max_output_tokens=2400,
         )
@@ -292,7 +294,9 @@ def test_viewer_role_cannot_reach_paid_factory(agent_route, monkeypatch):
     viewer = replace(lab.operator, roles=frozenset({Role.VIEWER}))
     with monkeypatch.context() as local_patch:
         local_patch.setitem(main.app.dependency_overrides, get_principal, lambda: viewer)
-        local_patch.setattr(main, "get_evidence_agent", lambda: pytest.fail("paid factory forbidden"))
+        local_patch.setattr(
+            main, "get_evidence_agent", lambda: pytest.fail("paid factory forbidden")
+        )
         assert post(agent_route).status_code == 403
     assert not requests
     audit.save.assert_not_awaited()
@@ -311,3 +315,68 @@ def test_foreign_capture_never_reaches_model_or_discloses_context(agent_route, m
     assert response.status_code == 401 and not requests
     assert foreign.id not in response.text
     audit.save.assert_not_awaited()
+
+
+def test_inline_execution_finishes_in_one_call_without_claiming_a_tool_read(agent_route):
+    _, _, _, audit, requests, responses, config = agent_route
+    config.openai_evidence_execution_delivery = "inline"
+    main.get_evidence_agent().execution_delivery = "inline"
+    responses[:] = [final_response()]
+    response = post(agent_route)
+    assert response.status_code == 200
+    body = response.json()
+    trace = body["llm_trace"]
+    assert trace["provider_calls"] == len(requests) == 1
+    assert trace["tools_executed"] == [] and trace["prefetched_evidence"] == ["execution"]
+    assert trace["execution_evidence_delivery"] == "inline"
+    assert "execution" in body["verification_context"]
+    catalog = json.loads(requests[0]["input"][1]["content"])["evidence_catalog"]
+    assert "verified_session.execution.observed_actor.workload_id" in catalog
+    assert [t["name"] for t in requests[0]["tools"]] == ["read_current_session_history"]
+    assert requests[0]["reasoning"]["effort"] == "low"
+    assert audit.save.call_args.args[0].llm_trace == trace
+
+
+def test_inline_execution_can_still_request_optional_bound_history(agent_route):
+    _, _, _, _, requests, responses, _ = agent_route
+    main.get_evidence_agent().execution_delivery = "inline"
+    responses[:] = [tool_response("read_current_session_history"), final_response()]
+    response = post(agent_route)
+    assert response.status_code == 200
+    trace = response.json()["llm_trace"]
+    assert trace["provider_calls"] == len(requests) == 2
+    assert trace["tools_executed"] == ["read_current_session_history"]
+    assert trace["prefetched_evidence"] == ["execution"]
+    assert "history" in response.json()["verification_context"]
+
+
+def test_model_allow_is_restricted_when_no_current_execution_scope_is_proven(agent_route):
+    lab, _, _, audit, requests, responses, _ = agent_route
+    lab.service.revoke(
+        "approval",
+        "approval-a",
+        ContextRevocation(reason="Withdraw review before test"),
+        lab.operator,
+        now=lab.at(5),
+    )
+    main.get_evidence_agent().execution_delivery = "inline"
+    body = final_response()
+    parsed = json.loads(body["output"][0]["content"][0]["text"])
+    parsed["recommended_action"] = "ALLOW"
+    body["output"][0]["content"][0]["text"] = json.dumps(parsed)
+    responses[:] = [body]
+    before, journal = lab.store.read(lab.operator.tenant_id), lab.operations.journal_status()
+    response = post(agent_route)
+    assert response.status_code == 200 and len(requests) == 1
+    value = response.json()
+    assert value["assessment"]["recommended_action"] == "HOLD_FOR_REVIEW"
+    assert value["assessment"]["violation_type"] == "NORMAL"
+    controls = value["verified_review_controls"]
+    assert controls["action_before_guard"] == "ALLOW" and controls["action_adjusted"]
+    assert "execution_scope_not_proven" in controls["restrictions"]
+    # Legacy allowed means action-allowlist membership, not resource access.
+    assert value["policy_decision"]["action"] == "HOLD_FOR_REVIEW"
+    assert value["policy_decision"]["requires_human_review"] is True
+    assert audit.save.call_args.args[0].verified_review_controls.model_dump(mode="json") == controls
+    assert lab.store.read(lab.operator.tenant_id) == before
+    assert lab.operations.journal_status() == journal

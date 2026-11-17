@@ -254,6 +254,30 @@ def test_execution_query_audits_exact_read_only_server_facts(execution_route):
     assert lab.operations.journal_status() == journal
 
 
+def test_static_verified_analysis_also_restricts_allow_without_execution_scope(execution_route):
+    lab, _, _, analyzer, audit = execution_route
+    lab.service.revoke(
+        "approval",
+        "approval-a",
+        ContextRevocation(reason="Withdraw execution review"),
+        lab.operator,
+        now=lab.at(5),
+    )
+    from app.models import RecommendedAction
+
+    analyzer.analyze_with_evidence.return_value = local_assessment().model_copy(
+        update={"recommended_action": RecommendedAction.ALLOW}
+    )
+    response = post_route(execution_route)
+    assert response.status_code == 200
+    body = response.json()
+    assert body["assessment"]["recommended_action"] == "HOLD_FOR_REVIEW"
+    assert body["assessment"]["violation_type"] == "NORMAL"
+    assert body["verified_review_controls"]["action_before_guard"] == "ALLOW"
+    assert "execution_scope_not_proven" in body["verified_review_controls"]["restrictions"]
+    assert audit.save.call_args.args[0].verified_review_controls.action_adjusted
+
+
 @pytest.mark.parametrize("change", ["approval", "execution_key", "conflicting_report", "quota"])
 def test_changed_execution_authority_during_provider_call_cannot_publish_success(
     execution_route, change

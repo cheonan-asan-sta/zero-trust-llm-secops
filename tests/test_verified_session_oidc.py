@@ -11,9 +11,10 @@ from scripts.local_oidc_authority import LocalOIDCAuthority
 from scripts.local_session_analysis_lab import SCENARIOS, LocalSessionAnalysisLab
 
 
-@pytest.fixture
-def oidc_route(tmp_path, monkeypatch):
+@pytest.fixture(params=["/analysis/verified-session", "/analysis/evidence-review"])
+def oidc_route(tmp_path, monkeypatch, request):
     with LocalOIDCAuthority() as authority:
+        authority.analysis_endpoint = request.param
         config = Settings(
             _env_file=None,
             app_environment="test",
@@ -22,6 +23,8 @@ def oidc_route(tmp_path, monkeypatch):
             oidc_audience=authority.audience,
             oidc_jwks_url=authority.jwks_url,
             openai_prompt_mode="grounded",
+            analyzer_mode="openai",
+            openai_evidence_agent_enabled=True,
         )
         lab = LocalSessionAnalysisLab(tmp_path / "authority")
         signal, _ = lab.create(next(s for s in SCENARIOS if s[0] == "permitted_team"))
@@ -39,12 +42,23 @@ def oidc_route(tmp_path, monkeypatch):
                 requires_human_review=True,
             )
         )
+
+        class NoPaidAgent:
+            async def review(self, event, context, history_getter):
+                assessment = await analyzer.analyze_with_evidence(event, context)
+                return (
+                    assessment,
+                    context,
+                    {"mode": "explicit_test_double_no_provider_calls", "provider_calls": 0},
+                )
+
         audit = Mock()
         audit.save = AsyncMock()
         monkeypatch.setattr(main, "get_settings", lambda: config)
         monkeypatch.setattr(security, "get_settings", lambda: config)
         monkeypatch.setattr(main, "zero_trust_operations", lab.service)
         monkeypatch.setattr(main, "get_analyzer", lambda: analyzer)
+        monkeypatch.setattr(main, "get_evidence_agent", NoPaidAgent)
         monkeypatch.setattr(main, "audit_store", audit)
         assert security.get_principal not in main.app.dependency_overrides
         with TestClient(main.app) as client:
@@ -98,9 +112,9 @@ def test_128_character_subject_is_not_truncated_or_rejected_as_invalid(oidc_rout
 
 
 def post(fixture, token):
-    _, client, signal, _, _ = fixture
+    authority, client, signal, _, _ = fixture
     return client.post(
-        "/analysis/verified-session",
+        authority.analysis_endpoint,
         json=signal.model_dump(mode="json"),
         headers={"Authorization": "Bearer " + token} if token else {},
     )

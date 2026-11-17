@@ -103,6 +103,7 @@ def run(args, directory, report):
             page.locator("#logRows button").first.click()
             expect(page.locator("#detailBody")).to_contain_text("판단 근거")
             expect(page.locator("#detailBody")).to_contain_text("정책과 대응 제안")
+            check("legacy_analysis_does_not_invent_verified_context", page.locator(".analysis-evidence").count() == 0)
             page.screenshot(path=str(args.output_dir / "log-detail.png"), full_page=True)
             page.locator("#closeDetail").click()
             with page.expect_download() as downloaded:
@@ -174,6 +175,152 @@ def run(args, directory, report):
                   and "[REDACTED]" in exported)
             page.unroute(logs_pattern)
             page.unroute("**/results/hostile-fixture")
+
+            # Explicit synthetic response fixtures exercise presentation only.
+            # They are not a paid model evaluation or actual verified OS/person evidence.
+            evidence_record = copy.deepcopy(record)
+            evidence_record["event_id"] = "verified-evidence-fixture"
+            evidence_record["analyzer"] = "openai"
+            evidence_record["verification_context"] = {
+                "not_an_access_grant": True,
+                "collected_at": "2026-11-17T01:00:00+00:00",
+                "valid_until": "2026-11-17T01:00:30+00:00",
+                "signal": {"signature_verified": True, "mfa_observation": "unknown"},
+                "caller": {
+                    "authentication_method": "oidc",
+                    "session_operator_binding_verified": True,
+                    "event_subject_mfa_independently_verified": False,
+                    "bearer": "SYNTHETIC_EVIDENCE_BEARER_MUST_NOT_DISPLAY",
+                },
+                "policy": {"mfa_required": True},
+                "execution": {
+                    "observation_status": "complete",
+                    "comparison_scope_complete": True,
+                    "exact_field_comparisons": [{"one_coherent_policy_matches": False}],
+                    "observed_actor": {
+                        "workload_id": '<img src=x onerror="window.evidenceInjected=true">'
+                    },
+                },
+            }
+            evidence_record["llm_trace"] = {
+                "mode": "bounded_read_only_evidence_review",
+                "provider_calls": 2,
+                "maximum_provider_calls": 3,
+                "tools_executed": ["read_bound_execution_evidence"],
+                "write_tools_available": False,
+                "receipts": [
+                    {"input_tokens": 1000, "output_tokens": 20},
+                    {"input_tokens": 2000, "output_tokens": 30},
+                ],
+            }
+            evidence_record["assessment"]["evidence"] = [
+                "verified_session.execution.observed_actor.workload_id",
+                "verified_session.caller.bearer",
+            ]
+            active_evidence = {"record": evidence_record}
+            page.route(logs_pattern, lambda route: route.fulfill(json=[active_evidence["record"]]))
+            page.route(
+                "**/results/verified-evidence-fixture",
+                lambda route: route.fulfill(json=active_evidence["record"]),
+            )
+
+            def open_evidence():
+                page.locator("#refresh").click()
+                expect(page.locator("#refresh")).to_be_enabled()
+                page.locator("#logRows button").click()
+                return page.locator(".analysis-evidence")
+
+            evidence = open_evidence()
+            expect(evidence).to_contain_text("분석 시점의 검증 근거")
+            expect(evidence).to_contain_text("현재 접근 허용은 자원 요청에서 별도로 판단")
+            expect(evidence).to_contain_text("OIDC / 세션 요청자와 일치")
+            expect(evidence).to_contain_text("대상 사람의 독립 MFA 검증")
+            expect(evidence).to_contain_text("확인되지 않음")
+            expect(evidence).to_contain_text("관측 미확인")
+            expect(evidence).to_contain_text("한 정책 안에서 모두 일치하지 않음")
+            expect(evidence).to_contain_text("2회 / 최대 3회")
+            expect(evidence).to_contain_text("입력 3,000 / 출력 50 토큰")
+            expect(evidence).to_contain_text("LLM 요청 후 제공")
+            check("verified_evidence_distinguishes_caller_mfa_scope_and_advisory_result")
+            evidence.get_by_text("LLM이 인용한 검증 근거", exact=True).click()
+            expect(evidence).to_contain_text("<img src=x")
+            expect(evidence).to_contain_text("[REDACTED]")
+            check(
+                "evidence_citations_never_execute_markup_or_expose_bearer",
+                "SYNTHETIC_EVIDENCE_BEARER" not in page.content()
+                and evidence.locator("img").count() == 0
+                and page.evaluate("() => window.evidenceInjected !== true"),
+            )
+            page.locator("#closeDetail").click()
+
+            inline_record = copy.deepcopy(evidence_record)
+            inline_record["llm_trace"].update(
+                provider_calls=1,
+                tools_executed=[],
+                prefetched_evidence=["execution"],
+                receipts=[{"input_tokens": 1234, "output_tokens": 456}],
+            )
+            inline_record["verified_review_controls"] = {
+                "scope": "verified_review_advisory_only", "action_before_guard": "ALLOW",
+                "action_after_guard": "HOLD_FOR_REVIEW", "action_adjusted": True,
+                "allow_recommendation_supported": False, "restrictions": ["execution_scope_not_proven"],
+            }
+            active_evidence["record"] = inline_record
+            evidence = open_evidence()
+            expect(evidence).to_contain_text("처음부터 제공")
+            expect(evidence).to_contain_text("없음 · 기본 근거 사용")
+            expect(evidence).to_contain_text("1회 / 최대 3회")
+            expect(evidence).to_contain_text("서버가 허용 권고를 검토 대기로 제한했습니다")
+            expect(evidence).to_contain_text("실행 주체·목적지의 허용 범위를 입증하지 못함")
+            check("inline_evidence_does_not_invent_a_tool_read")
+            for width in (390, 768, 1440):
+                page.set_viewport_size({"width": width, "height": 1000 if width > 390 else 844})
+                evidence.scroll_into_view_if_needed()
+                check(
+                    f"evidence_detail_{width}_no_horizontal_overflow",
+                    evidence.evaluate("element => element.scrollWidth <= element.clientWidth"),
+                )
+                if width in (390, 1440):
+                    evidence.evaluate("element => element.scrollIntoView({block: 'start'})")
+                    page.screenshot(path=str(args.output_dir / f"llm-evidence-{width}.png"))
+            page.evaluate("document.body.style.zoom = '2'")
+            check(
+                "evidence_detail_200_percent_zoom_no_horizontal_overflow",
+                evidence.evaluate("element => element.scrollWidth <= element.clientWidth"),
+            )
+            page.evaluate("document.body.style.zoom = ''")
+            page.locator("#closeDetail").click()
+
+            partial_record = copy.deepcopy(inline_record)
+            partial_record["llm_trace"]["receipts"][0]["input_tokens"] = None
+            partial_record["verification_context"]["signal"]["signature_verified"] = "true"
+            partial_record["verification_context"]["policy"]["mfa_required"] = "false"
+            partial_record["verification_context"]["execution"]["comparison_scope_complete"] = False
+            active_evidence["record"] = partial_record
+            evidence = open_evidence()
+            expect(evidence).to_contain_text("서명 또는 요청자 연결의 검증 상태가 불완전")
+            expect(evidence).to_contain_text("일부 사용량 미확인")
+            expect(evidence).to_contain_text("비교 근거 불완전")
+            check("invalid_booleans_missing_tokens_and_incomplete_comparisons_stay_unknown")
+            page.locator("#closeDetail").click()
+
+            malformed_record = copy.deepcopy(inline_record)
+            malformed_record["verification_context"] = []
+            active_evidence["record"] = malformed_record
+            evidence = open_evidence()
+            expect(evidence).to_contain_text("연결된 검증 근거의 형식을 확인할 수 없습니다")
+            expect(page.locator("#detailBody")).to_contain_text("판단 근거")
+            check("malformed_optional_evidence_does_not_hide_the_original_assessment")
+            page.locator("#closeDetail").click()
+            malformed_trace = copy.deepcopy(inline_record)
+            malformed_trace["llm_trace"]["provider_calls"] = "1"
+            active_evidence["record"] = malformed_trace
+            evidence = open_evidence()
+            expect(evidence).to_contain_text("LLM 조회 이력의 형식을 확인할 수 없습니다")
+            check("malformed_optional_trace_never_becomes_verified_usage")
+            page.locator("#closeDetail").click()
+            page.unroute(logs_pattern)
+            page.unroute("**/results/verified-evidence-fixture")
 
             # Explicit failures never look like an empty successful query.
             def failure_reply(status):

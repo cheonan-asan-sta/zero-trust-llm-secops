@@ -42,8 +42,28 @@ class AuditStore:
         async with self._lock:
             if not self._integrity_ok:
                 raise RuntimeError("audit log integrity check failed; refusing to append")
-            await asyncio.to_thread(self._append_jsonl, record)
+            # Cancellation cannot stop an active filesystem thread. Keep the
+            # writer lock until it settles, then publish the same record in
+            # memory before propagating cancellation to the disconnected caller.
+            write = asyncio.get_running_loop().run_in_executor(None, self._append_jsonl, record)
+            cancelled = None
+            while True:
+                try:
+                    await asyncio.shield(write)
+                    break
+                except asyncio.CancelledError as error:
+                    if write.cancelled():
+                        self._integrity_ok = False
+                        raise
+                    cancelled = error
+                except BaseException:
+                    # A failed append may have left a partial line. Do not add
+                    # more records on an unverified chain; preserve it for recovery.
+                    self._integrity_ok = False
+                    raise
             self._upsert(record)
+            if cancelled is not None:
+                raise cancelled
 
     def get(self, event_id: str, tenant_id: str = "local") -> AnalysisResult | None:
         return self._records.get((tenant_id, event_id))
