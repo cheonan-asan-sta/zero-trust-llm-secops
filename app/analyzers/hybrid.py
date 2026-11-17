@@ -72,6 +72,12 @@ class HybridAnalyzer:
         baseline: SecurityAssessment,
         llm_assessment: SecurityAssessment,
     ) -> SecurityAssessment:
+        return self.merge_assessments(baseline, llm_assessment)
+
+    @staticmethod
+    def merge_assessments(
+        baseline: SecurityAssessment, llm_assessment: SecurityAssessment
+    ) -> SecurityAssessment:
         risk_level = max(
             (baseline.risk_level, llm_assessment.risk_level),
             key=lambda level: _RISK_ORDER[level],
@@ -81,7 +87,7 @@ class HybridAnalyzer:
             if baseline.violation_type != ViolationType.NORMAL
             else llm_assessment.violation_type
         )
-        action = self._rule.recommended_action(risk_level, violation)
+        action = RuleBasedAnalyzer.recommended_action(risk_level, violation)
         evidence = list(dict.fromkeys([*baseline.evidence, *llm_assessment.evidence]))[:20]
         return SecurityAssessment(
             risk_score=max(baseline.risk_score, llm_assessment.risk_score),

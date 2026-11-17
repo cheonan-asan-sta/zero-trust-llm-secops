@@ -1,4 +1,5 @@
 import asyncio
+from collections.abc import Callable
 from dataclasses import replace
 from datetime import UTC, datetime
 from functools import lru_cache
@@ -15,6 +16,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from app.analyzers import HybridAnalyzer, OpenAIAnalyzer, RuleBasedAnalyzer
 from app.analyzers.base import Analyzer
+from app.analyzers.evidence_agent import EvidenceReviewAgent
 from app.behavior_context_api import behavior_context_router
 from app.config import get_settings
 from app.dashboard_api import router as dashboard_router
@@ -136,35 +138,49 @@ detection_quality_service = get_detection_quality_service()
 incident_quality_service = get_incident_quality_service()
 analysis_capacity = asyncio.Semaphore(settings.analysis_max_concurrency)
 zero_trust_operations = (
-    ZeroTrustOperations(settings.zero_trust_db_path,
-                        policy_path=settings.zero_trust_policy_path or POLICY_PATH,
-                        signal_verifier=SignalVerifier(settings.trusted_signal_sources_path))
-    if settings.app_environment != "production" else None
+    ZeroTrustOperations(
+        settings.zero_trust_db_path,
+        policy_path=settings.zero_trust_policy_path or POLICY_PATH,
+        signal_verifier=SignalVerifier(settings.trusted_signal_sources_path),
+    )
+    if settings.app_environment != "production"
+    else None
 )
 continuous_signal_service = (
-    ContinuousSignalService(zero_trust_operations, SignalInbox(
-        settings.zero_trust_db_path,
-        max_pending=settings.signal_inbox_max_pending,
-        max_records=settings.signal_inbox_max_records,
-        max_attempts=settings.signal_inbox_max_attempts,
-        lease_seconds=settings.signal_inbox_lease_seconds,
-        retry_seconds=settings.signal_inbox_retry_seconds,
-    )) if zero_trust_operations else None
+    ContinuousSignalService(
+        zero_trust_operations,
+        SignalInbox(
+            settings.zero_trust_db_path,
+            max_pending=settings.signal_inbox_max_pending,
+            max_records=settings.signal_inbox_max_records,
+            max_attempts=settings.signal_inbox_max_attempts,
+            lease_seconds=settings.signal_inbox_lease_seconds,
+            retry_seconds=settings.signal_inbox_retry_seconds,
+        ),
+    )
+    if zero_trust_operations
+    else None
 )
 app.include_router(zero_trust_router(zero_trust_operations, continuous_signal_service))
 install_zero_trust_error_handlers(app)
 behavior_context_service = (
-    BehaviorContextService(BehaviorContextStore(
-        settings.behavior_context_db_path or settings.zero_trust_db_path.with_name(
-            settings.zero_trust_db_path.stem + "-behavior-context.sqlite3",
+    BehaviorContextService(
+        BehaviorContextStore(
+            settings.behavior_context_db_path
+            or settings.zero_trust_db_path.with_name(
+                settings.zero_trust_db_path.stem + "-behavior-context.sqlite3",
+            ),
         ),
-    ), zero_trust_operations)
-    if zero_trust_operations else None
+        zero_trust_operations,
+    )
+    if zero_trust_operations
+    else None
 )
 app.include_router(behavior_context_router(behavior_context_service))
 response_service = (
     ResponseService(behavior_context_service.store, zero_trust_operations)
-    if behavior_context_service else None
+    if behavior_context_service
+    else None
 )
 app.include_router(response_router(response_service))
 
@@ -182,6 +198,11 @@ class AnalysisCapacityExceeded(RuntimeError):
 def get_analyzer() -> Analyzer:
     current = get_settings()
     return build_analyzer(current.analyzer_mode)
+
+
+@lru_cache
+def get_evidence_agent() -> EvidenceReviewAgent:
+    return EvidenceReviewAgent(get_settings())
 
 
 def build_analyzer(mode: str) -> Analyzer:
@@ -214,14 +235,20 @@ def liveness() -> dict:
 @app.get("/health/ready")
 def readiness() -> Response:
     zero_trust_integrity = (
-        zero_trust_operations.integrity() if zero_trust_operations else {"ok": True, "enabled": False}
+        zero_trust_operations.integrity()
+        if zero_trust_operations
+        else {"ok": True, "enabled": False}
     )
     inbox_integrity = (
         continuous_signal_service.inbox.integrity()
-        if continuous_signal_service else {"ok": True, "enabled": False}
+        if continuous_signal_service
+        else {"ok": True, "enabled": False}
     )
-    context_integrity = (behavior_context_service.readiness() if behavior_context_service
-                         else {"ok": True, "enabled": False})
+    context_integrity = (
+        behavior_context_service.readiness()
+        if behavior_context_service
+        else {"ok": True, "enabled": False}
+    )
     integrity = audit_store.integrity()
     case_integrity = case_store.integrity()
     outbox_integrity = integration_outbox_store.integrity()
@@ -338,9 +365,7 @@ def readiness() -> Response:
             "false_positive_rate": (
                 incident_quality.false_positive_rate if incident_quality else None
             ),
-            "window_accuracy": (
-                incident_quality.window_accuracy if incident_quality else None
-            ),
+            "window_accuracy": (incident_quality.window_accuracy if incident_quality else None),
             "graph_structure_accuracy": (
                 incident_quality.graph_structure_accuracy if incident_quality else None
             ),
@@ -348,9 +373,7 @@ def readiness() -> Response:
                 incident_quality.deduplication_accuracy if incident_quality else None
             ),
             "evaluation_fingerprint_sha256": (
-                incident_quality.evaluation_fingerprint_sha256
-                if incident_quality
-                else None
+                incident_quality.evaluation_fingerprint_sha256 if incident_quality else None
             ),
         },
     }
@@ -630,7 +653,9 @@ def detection_benchmark(
     try:
         return get_detection_benchmark().evaluate(split)
     except BenchmarkUnavailable as exc:
-        raise HTTPException(status_code=503, detail="Detection benchmark inputs failed validation") from exc
+        raise HTTPException(
+            status_code=503, detail="Detection benchmark inputs failed validation"
+        ) from exc
 
 
 @app.post("/scenarios/evaluate", response_model=EventScenarioEvaluation)
@@ -701,22 +726,19 @@ async def analyze_batch(
     )
 
 
-@app.post("/analysis/verified-session", response_model=AnalysisResult)
-async def analyze_verified_session(
-    signal: SignedSessionSignal,
-    request: Request,
-    principal: AnalystPrincipal,
-    behavior_capture_id: Annotated[
-        str | None, Query(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
-    ] = None,
-) -> AnalysisResult:
+def _bound_verification_context(signal, principal, behavior_capture_id):
     if zero_trust_operations is None:
         raise HTTPException(404, "Local verified-session analysis is disabled in production")
+
     # Verification errors are handled by existing signal/session handlers; never call the LLM.
     def collect_context():
         if behavior_capture_id is not None:
             return collect_session_execution_evidence(
-                zero_trust_operations, behavior_context_service, signal, principal, behavior_capture_id
+                zero_trust_operations,
+                behavior_context_service,
+                signal,
+                principal,
+                behavior_capture_id,
             )
         return collect_session_evidence(zero_trust_operations, signal, principal)
 
@@ -731,6 +753,19 @@ async def analyze_verified_session(
             raise ValueError("verified session context changed during analysis")
 
     context = replace(context, verify_current=verify_current_context)
+    return context
+
+
+@app.post("/analysis/verified-session", response_model=AnalysisResult)
+async def analyze_verified_session(
+    signal: SignedSessionSignal,
+    request: Request,
+    principal: AnalystPrincipal,
+    behavior_capture_id: Annotated[
+        str | None, Query(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+    ] = None,
+) -> AnalysisResult:
+    context = _bound_verification_context(signal, principal, behavior_capture_id)
     try:
         analyzer = get_analyzer()
     except ValueError as exc:
@@ -749,7 +784,7 @@ async def analyze_verified_session(
             result = await analyzer.analyze_with_evidence(event, context)
             # Source/key withdrawal, policy changes or revocation during a paid call
             # must not publish a result as if the original snapshot were still current.
-            verify_current_context()
+            context.verify_current()
             return result
 
     try:
@@ -769,12 +804,102 @@ async def analyze_verified_session(
         raise HTTPException(502, "Verified-session analysis could not be completed") from exc
 
 
+@app.post("/analysis/evidence-review", response_model=AnalysisResult)
+async def analyze_evidence_review(
+    signal: SignedSessionSignal,
+    request: Request,
+    principal: AnalystPrincipal,
+    behavior_capture_id: Annotated[
+        str | None, Query(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+    ] = None,
+) -> AnalysisResult:
+    current = get_settings()
+    if zero_trust_operations is None:
+        raise HTTPException(404, "Local evidence review is disabled in production")
+    if not (
+        current.openai_evidence_agent_enabled
+        and current.openai_prompt_mode == "grounded"
+        and current.analyzer_mode in {"openai", "hybrid"}
+    ):
+        raise HTTPException(503, "Enable grounded OpenAI evidence review explicitly")
+    context = _bound_verification_context(signal, principal, behavior_capture_id)
+    try:
+        agent = get_evidence_agent()
+    except ValueError as exc:
+        raise HTTPException(503, "Evidence review provider is not configured") from exc
+
+    def history_getter():
+        history, _ = zero_trust_operations.analysis_history(signal.session_id, principal)
+        return {
+            "decisions": [
+                entry.model_dump(
+                    mode="json",
+                    include={
+                        "version",
+                        "evaluated_at",
+                        "decision",
+                        "status",
+                        "reason_codes",
+                        "signal_trust",
+                        "enforcement_mode",
+                    },
+                )
+                for entry in history[-8:]
+            ],
+            "truncated": len(history) > 8,
+            "total_records": len(history),
+            "meaning": "Verified server decision history, not independent proof of human identity or compromise",
+        }
+
+    class BoundAgent:
+        name = "hybrid" if current.analyzer_mode == "hybrid" else "openai"
+        result_context = context
+        trace = None
+
+        async def analyze(self, event):
+            assessment, self.result_context, self.trace = await asyncio.wait_for(
+                agent.review(event, context, history_getter),
+                timeout=current.openai_evidence_review_timeout_seconds,
+            )
+            self.trace["analyzer_mode"] = current.analyzer_mode
+            if current.analyzer_mode == "hybrid":
+                self.trace["model_assessment_before_rule_merge"] = assessment.model_dump(
+                    mode="json"
+                )
+                assessment = HybridAnalyzer.merge_assessments(
+                    RuleBasedAnalyzer().assess(event), assessment
+                )
+                self.trace["rule_baseline_preserved"] = True
+            context.verify_current()
+            return assessment
+
+    bound = BoundAgent()
+    try:
+        return await _analyze_event(
+            signal.event,
+            bound,
+            principal,
+            request.state.request_id,
+            verification_context=context,
+            verification_context_supplier=lambda: bound.result_context,
+            llm_trace_supplier=lambda: bound.trace,
+        )
+    except AnalysisCapacityExceeded as exc:
+        raise HTTPException(
+            429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from exc
+    except Exception as exc:
+        raise HTTPException(502, "Evidence review could not be completed") from exc
+
+
 async def _analyze_event(
     event: SecurityEvent,
     analyzer: Analyzer,
     principal: Principal,
     request_id: str,
     verification_context: VerifiedSessionContext | None = None,
+    verification_context_supplier: Callable[[], VerifiedSessionContext] | None = None,
+    llm_trace_supplier: Callable[[], dict | None] | None = None,
 ) -> AnalysisResult:
     try:
         await asyncio.wait_for(
@@ -790,7 +915,12 @@ async def _analyze_event(
         assessment = await analyzer.analyze(event)
         if verification_context is not None:
             assessment = assessment.model_copy(update={"requires_human_review": True})
-        snapshot = verification_context.for_event(event) if verification_context is not None else None
+        selected_context = (
+            verification_context_supplier()
+            if verification_context_supplier
+            else verification_context
+        )
+        snapshot = selected_context.for_event(event) if selected_context is not None else None
         safe_assessment = enforce_assessment_safety(assessment, event)
         decision = response_preview(safe_assessment, event)
         result = AnalysisResult(
@@ -801,6 +931,7 @@ async def _analyze_event(
             normalized_event=normalized,
             detection=detection,
             verification_context=snapshot,
+            llm_trace=llm_trace_supplier() if llm_trace_supplier else None,
             latency_ms=round((perf_counter() - started) * 1000, 2),
             tenant_id=principal.tenant_id,
             actor_id=principal.subject,

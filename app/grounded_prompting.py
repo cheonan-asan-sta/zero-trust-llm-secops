@@ -10,6 +10,7 @@ from pydantic import Field, create_model
 from app.models import SecurityAssessment, SecurityEvent
 from app.services.ocsf import get_ocsf_normalizer
 from app.services.session_analysis_evidence import VerifiedSessionContext
+from app.services.sigma import get_sigma_engine
 
 GROUNDED_INSTRUCTIONS = """
 Analyze the supplied observations for Zero Trust triage. Return SecurityAssessment in Korean.
@@ -158,7 +159,10 @@ def grounded_output_type(
 
 
 def grounded_input(
-    event: SecurityEvent, context: VerifiedSessionContext | None = None
+    event: SecurityEvent,
+    context: VerifiedSessionContext | None = None,
+    *,
+    include_comparisons=False,
 ) -> list[dict[str, str]]:
     policies = []
     for path in sorted(files("app").joinpath("data/sigma").iterdir(), key=lambda p: p.name):
@@ -216,6 +220,16 @@ def grounded_input(
                     ),
                     "evidence_catalog": evidence_catalog(event, context),
                     "server_detection_policies": policies,
+                    **(
+                        {
+                            "server_observation_comparisons": get_sigma_engine().observation_comparisons(
+                                normalized
+                            ),
+                            "comparison_scope": "Numeric/field-reference calculations only, not a rule hit or attack label. Check complete AND/OR/NOT and benign context; cite original observed fields.",
+                        }
+                        if include_comparisons
+                        else {}
+                    ),
                     "normalized_observation": normalized,
                     "exception_context": exception_context(event),
                     "session_assurance_context": session_assurance_context(event),

@@ -1,4 +1,4 @@
-"""Freeze and score all authored development variants; never read holdout inputs.
+"""Freeze and score authored development variants; never select/send holdout events.
 
 Known usage releases unused per-request reservation. A request without trustworthy
 usage retains its full reservation. A crash leaves the pending request reserved.
@@ -44,7 +44,8 @@ def write_json(path, data):
 
 
 def development_cases(path):
-    # Inspect split first. Holdout event objects are never parsed or sent to a model.
+    # Decode JSON to inspect split first. Holdout events are not validated as
+    # BenchmarkCase objects, transformed for inference, selected, or sent to a model.
     cases = []
     for line in Path(path).read_bytes().splitlines():
         raw = json.loads(line)
@@ -55,7 +56,7 @@ def development_cases(path):
     return sorted(cases, key=lambda c: c.case_id)
 
 
-async def run(directory, key_file=None, *, max_budget=2.0, stop_at=None):
+async def run(directory, key_file=None, *, max_budget=2.0, stop_at=None, predicate_context=False):
     if not math.isfinite(max_budget) or not 0 < max_budget <= 2:
         raise ValueError("evaluation_options")
     directory = Path(directory)
@@ -79,7 +80,10 @@ async def run(directory, key_file=None, *, max_budget=2.0, stop_at=None):
     for case in cases:
         identity = hashlib.sha256(case.case_id.encode()).hexdigest()
         event = case.event.model_copy(update={"event_id": identity, "ground_truth": None})
-        messages = [{"role": "system", "content": GROUNDED_INSTRUCTIONS}, *grounded_input(event)]
+        messages = [
+            {"role": "system", "content": GROUNDED_INSTRUCTIONS},
+            *grounded_input(event, include_comparisons=predicate_context),
+        ]
         requests.append((case, identity, event, messages))
     inputs = b"".join(
         (json.dumps({"id": i, "messages": m}, ensure_ascii=False) + "\n").encode()
@@ -99,6 +103,7 @@ async def run(directory, key_file=None, *, max_budget=2.0, stop_at=None):
         "max_requests": 360,
         "max_budget_usd": max_budget,
         "stop_at": stop_at,
+        "predicate_context": predicate_context,
         "cases_sha256": hashlib.sha256(cases_path.read_bytes()).hexdigest(),
         "inputs_sha256": hashlib.sha256(inputs).hexdigest(),
         "split": "development",
@@ -114,6 +119,8 @@ async def run(directory, key_file=None, *, max_budget=2.0, stop_at=None):
         "scripts/evaluate_llm_grounded.py",
         "app/analyzers/structured_response.py",
         "app/grounded_prompting.py",
+        "app/services/sigma.py",
+        "app/services/ocsf.py",
         "app/models.py",
     ):
         content = (root / file).read_bytes()
@@ -272,10 +279,17 @@ if __name__ == "__main__":
     parser.add_argument("--key-env-file", type=Path)
     parser.add_argument("--max-budget", type=float, default=2)
     parser.add_argument("--stop-at")
+    parser.add_argument("--predicate-context", action="store_true")
     args = parser.parse_args()
     try:
         result = asyncio.run(
-            run(args.directory, args.key_env_file, max_budget=args.max_budget, stop_at=args.stop_at)
+            run(
+                args.directory,
+                args.key_env_file,
+                max_budget=args.max_budget,
+                stop_at=args.stop_at,
+                predicate_context=args.predicate_context,
+            )
         )
         if not result["completed"]:
             raise SystemExit(1)

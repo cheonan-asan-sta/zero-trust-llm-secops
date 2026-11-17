@@ -66,7 +66,7 @@ def _diagnostics(body: object) -> ResponseDiagnostics:
     )
 
 
-async def parse_structured_response(client: AsyncOpenAI, **kwargs):
+async def parse_structured_response(client: AsyncOpenAI, *, allow_tool_calls=False, **kwargs):
     """Return (SDK parsed response, safe diagnostics); preserve SDK HTTP errors.
 
     All diagnostics are local to this invocation, including concurrent invocations.
@@ -89,6 +89,9 @@ async def parse_structured_response(client: AsyncOpenAI, **kwargs):
         response = raw.parse()
     except (ValidationError, ValueError, TypeError):
         raise StructuredResponseFailure("structured_output_invalid", diagnostics) from None
-    if response.output_parsed is None:
+    calls = [item for item in response.output if item.type == "function_call"]
+    if calls and (not allow_tool_calls or len(calls) != 1 or response.output_parsed is not None):
+        raise StructuredResponseFailure("unexpected_tool_output", diagnostics)
+    if response.output_parsed is None and not calls:
         raise StructuredResponseFailure("structured_output_missing", diagnostics)
     return response, diagnostics

@@ -14,6 +14,7 @@ OPERATIONS = [
     ("analysis", "합성 이벤트 생성", "POST", "/events/simulate", "analyst"),
     ("analysis", "이벤트 분석", "POST", "/analysis", "analyst"),
     ("analysis", "검증된 세션·실행 근거 분석", "POST", "/analysis/verified-session", "analyst"),
+    ("analysis", "필요 근거 조회형 LLM 분석", "POST", "/analysis/evidence-review", "analyst"),
     ("analysis", "이벤트 묶음 분석", "POST", "/analysis/batch", "analyst"),
     ("analysis", "이벤트 정규화", "POST", "/events/normalize", "analyst"),
     ("analysis", "탐지 규칙 평가", "POST", "/detections/evaluate", "analyst"),

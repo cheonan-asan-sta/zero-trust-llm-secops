@@ -1132,6 +1132,7 @@ class AnalysisResult(StrictModel):
     normalized_event: NormalizedSecurityEvent | None = None
     detection: SigmaDetectionResult | None = None
     verification_context: dict[str, object] | None = None
+    llm_trace: dict[str, object] | None = None
     latency_ms: float = Field(ge=0)
     analyzed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     tenant_id: str = Field(default="local", pattern=r"^[a-zA-Z0-9._-]{1,64}$")
@@ -1147,6 +1148,8 @@ class AnalysisResult(StrictModel):
         value = handler(self)
         if self.verification_context is None:
             value.pop("verification_context", None)
+        if self.llm_trace is None:
+            value.pop("llm_trace", None)
         return value
 
     @model_validator(mode="before")
