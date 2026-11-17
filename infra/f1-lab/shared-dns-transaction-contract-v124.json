@@ -1,0 +1,74 @@
+{
+  "actor_or_authority_proven": false,
+  "baseline": "sealed native-dns-batch-v123 AFTER predictions, not its old v117 catalog baseline",
+  "before_new_fox_native_member_read": true,
+  "candidate": "existing v123 first-observed source-local successful systemd manager service episode plus strictly prior encoded DNS shape; existing 5s bound; advisory only; no new fitted head or literal unit/IP/domain/time exception",
+  "forbidden": [
+    "labels in prediction package",
+    "future backfill",
+    "count policy fixtures in F1",
+    "treat Fox as new independent evaluation",
+    "CI/push/merge/paid API/AWS before targets"
+  ],
+  "frozen_at": "2026-11-16T17:23:06.994200+00:00",
+  "goal_qualified": false,
+  "historical_application_receipt_proven": false,
+  "new_independent_evaluation": false,
+  "producer_sources": [
+    {
+      "sha256": "27c3926ba3ad33a2290720312558a111f9a8c0a01e3cd87de1b4a1da57407f0b",
+      "url": "https://github.com/OISF/suricata/blob/suricata-6.0.4/src/output-json-dns.c"
+    },
+    {
+      "sha256": "b5f0a7051367520e870241c4994d8786e45d299eec81e6c1e2b525ce17ebce1a",
+      "url": "https://github.com/OISF/suricata/blob/suricata-6.0.4/rust/src/dns/log.rs"
+    },
+    {
+      "sha256": "baf91f8d33046a5b193ecfdf1517af5772966f68f63300348caa4ee1377a7d4a",
+      "url": "https://github.com/OISF/suricata/blob/suricata-6.0.4/rust/src/dns/dns.rs"
+    },
+    {
+      "sha256": "95031f03db9f0051177abf94216d4ad495de6564a78ca35f4c40a353d659741e",
+      "url": "https://github.com/OISF/suricata/blob/suricata-6.0.4/src/app-layer-parser.c"
+    },
+    {
+      "sha256": "20244f493898393f95c6ed23b66f5a1171ae22756e7c0f80d6c94147feb5712b",
+      "url": "https://github.com/OISF/suricata/blob/suricata-6.0.4/src/app-layer.c"
+    },
+    {
+      "sha256": "408bd588a6fedaddef690ec8a193cb4f5542f7e3caa02cd949bc2d7de80b1f39",
+      "url": "https://github.com/OISF/suricata/blob/suricata-6.0.4/src/output-tx.c"
+    },
+    {
+      "sha256": "9d690602c2053d4534b9442ecbe22a6126cdd632ed28dd29c7637773c7617727",
+      "url": "https://github.com/OISF/suricata/blob/suricata-6.0.4/src/output-json.c"
+    }
+  ],
+  "qualification_revision": 4,
+  "revision_before_fox_native_member_read": true,
+  "schema": "frozen-shared-dns-transaction-contract-1",
+  "source_code_sha256": {
+    "scripts/f1_lab/dns_transaction_fence.py": "9f454dff709829df84ac3356c3b1990c1f52f06dc5bc3b04462fc5d12c05b6b1",
+    "scripts/f1_lab/dns_transaction_projection.py": "143ea5099257c95461e3e37fc2260f11b2e5796d836d193a658d83615553da2b",
+    "scripts/f1_lab/shared_dns_native_review.py": "03f4024d81f64a254af9a3a392a81a159d800cfd8a19cfd37d7616b3ac5a79cd",
+    "scripts/f1_lab/shared_dns_transaction_review.py": "210220b63dcd6aeea17faccb0904e95f2a3ffd9031a8fea00ff558bc82e0f279",
+    "scripts/prepare_shared_dns_transactions.py": "3f28df84792883de680825771e5815c5918f599fe74d79d2b91be9642467a68b",
+    "scripts/prepare_vpn_packet_members.py": "23dc3a320171368aebebb2cdb83bb6d47abd73b2b4126114c64006a56e0bbe6d",
+    "scripts/run_shared_dns_native_review.py": "132e6b80f429c56adde0556c0c5da608d628e6b765796275b1557533eb655fa4",
+    "scripts/stage_shared_dns_replay.py": "6905f4d1911517352ae75dd81fde3f73c823f0ae58ffeede2bf7726cc992eae2",
+    "tests/test_dns_transaction_sources.py": "cc30addc49bd5fe8ae93fd21cd923d0bdcc2d874fb24a70a66a7679fa20e467e",
+    "tests/test_shared_dns_transactions.py": "3257eb70248e65da27e5a052deeea21ac571e7ea44d9f977e642f11c4ce59763"
+  },
+  "source_contract": [
+    "single reported AF_PACKET worker, explicit UTC, fully publisher-MD5-verified complete archive and native EVE CRC+SHA",
+    "DNS request and response each allocate one native transaction; v2 response one event; query native transaction ID equals per-flow all-event index",
+    "all UDP DNS query+answer events count toward final dns_udp parser counter; reject query-only prefix, query duplicates/gaps, v1, unsupported TCP, resets, missing counters, nonzero capture drops, wrong terminal packets",
+    "first sufficient transaction sample only; event and sample strictly prior to current audit, both within unchanged 5s window; never app delivery proof",
+    "source-local flow IDs and endpoints join and validate only; no raw IDs or names learned; unsupported serialized name shapes remain unavailable"
+  ],
+  "source_roles": {
+    "fox": "observed_nontraining_calibration",
+    "russellmitchell": "training"
+  },
+  "training_qualification_probe": "R39981 DNS transactions=20012 queries+19969 answers; all supported name shapes; source projection and first-counter bounds coherent; no source role or rule fitted on Fox"
+}

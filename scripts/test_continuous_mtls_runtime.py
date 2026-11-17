@@ -648,7 +648,9 @@ print(json.dumps({'envelopes':[[hashlib.sha256(json.dumps(e,sort_keys=True,separ
 
     def run(self):
         runtime = self.runtime
+        self.report["operation_stage"] = "runtime_start"
         runtime.up()
+        self.report["operation_stage"] = "runtime_checks"
         self.report["project"] = runtime.state["project"]
         self.report["image_id"] = runtime.state["image_id"]
         self.report["source_commit"] = runtime.state["source_commit"]
@@ -828,8 +830,11 @@ def main():
     try:
         checks.run()
     except (RuntimeFailure, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as exc:
+        from scripts.test_transport_process_recovery import public_failure
+
         checks.report["completed"] = False
         checks.report["failure"] = str(exc) if isinstance(exc, RuntimeFailure) else type(exc).__name__
+        checks.report["failure_detail"] = public_failure(exc)
     finally:
         try:
             checks.cleanup()

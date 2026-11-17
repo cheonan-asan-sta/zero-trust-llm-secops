@@ -138,3 +138,32 @@ Linux 소스721파일이 실행 전후 동일했고 컨테이너 exit0·OOM fals
 기존 전체 앱3646개 회귀를 이번에 다시 실행한 것은 아니다.
 단위 테스트는 기존 기준선 재현용 fixture를 실행하지만, **준비 작업 자체의 모델 추론·새 성능 평가·학습은0**이다.
 유료 API·AWS 호출·새 다운로드·GitHub push·PR/브랜치 병합도0이다.
+
+## v123 현재 source 노출 재검사
+
+위 예약/노출 상태는 v43 당시 이력이다. 현재는 [v123 결과](extra-shared-native-dns-review.md)와 [갱신 대장](../infra/f1-lab/observed-source-exposure-v123.json)을 따른다. 기존 payload/pattern 항목을 보존하고 8개 canonical testbed의 소비 근거와 알려진 source SHA55개를 기록했다. Harrison/Wilson은 이미 관측/채점 또는 학습됐으므로 새 최종 source로 재사용하지 않는다. ID/동일 지문 거부4개는 metadata 제어군이고 새 독립 사례0이다. 원래 프로토콜과 6영역/5축은 변경하지 않았다.
+
+
+## 2026-11-17 v124 추가 native 근거 노출
+
+[v124 대장](../infra/f1-lab/observed-source-exposure-v124.json)은 source ID/payload/pattern을 보존하고 R/F native SHA를 추가해55→61을 기록했다. 같은 소비 source의 추가 modality이며 새 독립 source가 아니다. Fox 비학습 역할을 유지했고 9개 전체 판정은 같다. 원래6영역·5축·source/label 심사와 최종 후보 동결은 미완료다. [근거](extra-shared-dns-transaction-review.md).
+
+
+## v125 지지 단위·source 노출 감사
+
+정상 지지를 인증 단계 사이에 합산한 issuer 초안은 미채택이다. 최종 단계별지지4<5이며 새 독립 평가 성공이 아니다. [v125 노출 대장](../infra/f1-lab/observed-source-exposure-v125.json)은 읽은 client runtime wrapper3개의 지문을 추가해61→64로 기록했다. 시뮬레이터 상태·stdout은 모델에 사용하지 않았고 source ID/payload/pattern을 보존했다. 기존8개 source의 추가 modality이며 원래6영역·5축·source/label 심사는 미완료다. [최신 근거](extra-vpn-issuer-relation-review.md).
+
+
+## v126 별도 native source 형식 조사
+
+[DEDALE 수집](extra-dedale-native-intake.md)은 고정 syslog ZIP·첫 member의128행을 개발 probe로 읽은 작업이다. 원래1,681,815행에 더하거나 새 독립 최종 사례로 세지 않는다. [v126 대장](../infra/f1-lab/observed-source-exposure-v126.json)은 기존 ID/payload/pattern을 보존하며 DEDALE canonical source를 관측 개발용으로 추가한다. 정답·시뮬레이터 본문0, 사람/권한/기기 신뢰와 라벨 의미·5축 분리는 미확인이다. 원래 프로토콜·6영역·분할·95%/5% 목표는 변경하지 않았다.
+
+
+## v127 기존 training VPN 호스트의 추가 native 자료
+
+[VPN journal 조사](extra-vpn-native-clock-review.md)에서39개 파일의 지문을 확인하고 [v127 대장](../infra/f1-lab/observed-source-exposure-v127.json)에 추가했다. 기존 ID/payload/pattern·역할을 보존했다. 서비스 시작 기록은 있었으나 원래 접속 메시지 복사본은0이며 새 정상 지지·독립 사례·모델/판정 변경0이다. 원래6영역/5축·지표 목표·독립 계획 지문을 유지했다.
+
+
+## v128 원래 독립 인수 요구 재검사
+
+[목표 근거 감사](extra-target-evidence-gap-v128.md)에서 기존720개 authored 개발 메타데이터와 현재v127 노출 대장을 원래 프로토콜로 재검사했다. 최종 자료0·후보 동결 없음·세 분할/source/label/지지 미확인이다. DEDALE 고정 라벨링 README는 Auditbeat/Winlogbeat 프로세스 생애를 설명하지만 현재syslog와 직접 정답 대응·6영역/5축 인수를 입증하지 않는다. 원래6영역·목표·프로토콜 지문을 유지한다. 추가 근거 확보 전 자동 조정 반복과 CI/push/병합은 보류한다.

@@ -27,6 +27,8 @@ jobs:
           python -m pip check
       - name: Verify dashboard with a synthetic local server
         run: python -m scripts.test_dashboard_browser --output-dir runtime/dashboard-browser
+      - name: Verify authenticated operations and durable mock jobs
+        run: python -m scripts.test_dashboard_operations_browser --output-dir runtime/dashboard-operations-browser
       - name: Save browser evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -36,4 +38,7 @@ jobs:
             runtime/dashboard-browser/report.json
             runtime/dashboard-browser/*.png
             runtime/dashboard-browser/server.log
+            runtime/dashboard-operations-browser/report.json
+            runtime/dashboard-operations-browser/*.png
+            runtime/dashboard-operations-browser/server.log
           retention-days: 7

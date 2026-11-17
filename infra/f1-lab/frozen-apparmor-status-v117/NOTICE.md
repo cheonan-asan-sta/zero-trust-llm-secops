@@ -1,0 +1,1 @@
+AIT-LDS v2.1 derived categorical training parameters. Source: https://zenodo.org/records/19483937 . License: CC BY-NC-SA 4.0. Training roles: Russellmitchell, Santos, Wilson, Shaw, Wheeler. No validation labels or aggregates. Not independent validation, verified caller identity, permission or a proof that a policy replacement is safe.

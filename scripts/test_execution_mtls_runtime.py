@@ -36,6 +36,9 @@ FAILURE_DETAILS = {
     'Authentication configuration is unavailable': 'authentication_unavailable',
     'Verified context state is unavailable': 'context_unavailable',
     'Verified response state is unavailable': 'response_unavailable',
+    'a reviewed baseline cannot be backdated': 'baseline_start_elapsed',
+    'work approval cannot be backdated': 'approval_start_elapsed',
+    'approval must stay within baseline validity': 'approval_window_mismatch',
 }
 
 
@@ -193,14 +196,16 @@ print(json.dumps({'records':[dict(r) for r in c.execute('SELECT evidence_id,stat
         now = datetime.now(UTC)
         self.api('/detections/context/baselines', {
             'baseline_id': 'runtime-baseline', 'capture_ids': ['baseline-' + str(i) for i in range(3)],
-            'valid_from': (now + timedelta(seconds=5)).isoformat(),
-            'valid_until': (now + timedelta(minutes=10)).isoformat(), 'note': 'Reviewed synthetic acceptance samples',
+            # Leave room for cold authenticated probe startup on an emulated host.
+            # The server still rejects any backdated request; no validation is bypassed.
+            'valid_from': (now + timedelta(seconds=60)).isoformat(),
+            'valid_until': (now + timedelta(hours=1)).isoformat(), 'note': 'Reviewed synthetic acceptance samples',
         }, expected=201)
-        start = datetime.now(UTC) + timedelta(seconds=5)
+        start = datetime.now(UTC) + timedelta(seconds=60)
         self.api('/detections/context/approvals', {
             'approval_id': 'runtime-approval', 'baseline_id': 'runtime-baseline', 'max_uses': 10,
             'execution_policy': {'actor': ACTOR, 'destinations': DESTINATIONS},
-            'valid_from': start.isoformat(), 'valid_until': (start + timedelta(minutes=9)).isoformat(),
+            'valid_from': start.isoformat(), 'valid_until': (start + timedelta(minutes=30)).isoformat(),
             'note': 'Exact observed actor and destination, bounded local fixture approval',
         }, expected=201)
         while datetime.now(UTC) <= start + timedelta(seconds=2):

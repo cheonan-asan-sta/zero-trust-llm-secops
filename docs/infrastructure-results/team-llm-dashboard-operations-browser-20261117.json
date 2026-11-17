@@ -1,0 +1,547 @@
+{
+  "schema": "dashboard-operations-browser-1",
+  "synthetic": true,
+  "checks": [
+    {
+      "name": "form_1440_create_response_requests_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_recent_response_requests_get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_get_response_requests__identifier__get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_approve_response_requests__identifier__approvals_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_cancel_response_requests__identifier__cancel_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_execute_response_requests__identifier__execute_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_scenarios_scenarios_get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_scenario_scenarios__scenario_id__get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_simulate_events_simulate_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_analyze_analysis_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_analyze_batch_analysis_batch_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_normalize_event_events_normalize_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_evaluate_detections_detections_evaluate_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_detection_rules_detections_rules_get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_correlate_incidents_incidents_correlate_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_evaluate_public_behavior_detections_public_evaluate_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_preview_response_preview_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_update_review_results__event_id__review_patch",
+      "passed": true
+    },
+    {
+      "name": "form_1440_public_replay_datasets_replay_public_datasets_get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_run_public_replay_replay_public_run_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_run_public_replay_dataset_replay_public__dataset_id__post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_evaluate_event_scenarios_scenarios_evaluate_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_evaluate_evaluation_run_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_detection_quality_evaluation_detection_quality_get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_incident_quality_evaluation_incident_quality_get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_detection_benchmark_evaluation_detection_benchmark_get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_recent_cases_cases_get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_case_detail_cases__case_id__get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_case_metrics_cases_metrics_get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_create_cases_from_events_cases_from_events_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_update_case_cases__case_id__patch",
+      "passed": true
+    },
+    {
+      "name": "form_1440_recent_integration_events_integrations_outbox_get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_integration_event_detail_integrations_outbox__event_id__get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_integration_outbox_metrics_integrations_outbox_metrics_get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_reconcile_integration_outbox_integrations_outbox_reconcile_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_record_integration_attempt_integrations_outbox__event_id__attempt_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_capture_detections_context_captures_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_execution_detections_context_execution_evidence_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_baseline_detections_context_baselines_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_approval_detections_context_approvals_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_evaluate_detections_context_evaluate_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_revoke_baseline_detections_context_baselines__identifier__revoke_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_revoke_approval_detections_context_approvals__identifier__revoke_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_receive_signal_zero_trust_signals_inbox_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_signal_receipt_zero_trust_signals_inbox__event_id__get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_evaluate_signed_zero_trust_signals_evaluate_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_evaluate_zero_trust_sessions_evaluate_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_revoke_zero_trust_sessions__session_id__revoke_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_protected_access_zero_trust_protected_access_post",
+      "passed": true
+    },
+    {
+      "name": "form_1440_policies_zero_trust_policies_get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_assurance_summary_assurance_summary_get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_assurance_controls_assurance_controls_get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_assurance_control_assurance_controls__control_id__get",
+      "passed": true
+    },
+    {
+      "name": "form_1440_readiness_health_ready_get",
+      "passed": true
+    },
+    {
+      "name": "form_390_create_response_requests_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_recent_response_requests_get",
+      "passed": true
+    },
+    {
+      "name": "form_390_get_response_requests__identifier__get",
+      "passed": true
+    },
+    {
+      "name": "form_390_approve_response_requests__identifier__approvals_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_cancel_response_requests__identifier__cancel_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_execute_response_requests__identifier__execute_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_scenarios_scenarios_get",
+      "passed": true
+    },
+    {
+      "name": "form_390_scenario_scenarios__scenario_id__get",
+      "passed": true
+    },
+    {
+      "name": "form_390_simulate_events_simulate_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_analyze_analysis_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_analyze_batch_analysis_batch_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_normalize_event_events_normalize_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_evaluate_detections_detections_evaluate_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_detection_rules_detections_rules_get",
+      "passed": true
+    },
+    {
+      "name": "form_390_correlate_incidents_incidents_correlate_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_evaluate_public_behavior_detections_public_evaluate_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_preview_response_preview_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_update_review_results__event_id__review_patch",
+      "passed": true
+    },
+    {
+      "name": "form_390_public_replay_datasets_replay_public_datasets_get",
+      "passed": true
+    },
+    {
+      "name": "form_390_run_public_replay_replay_public_run_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_run_public_replay_dataset_replay_public__dataset_id__post",
+      "passed": true
+    },
+    {
+      "name": "form_390_evaluate_event_scenarios_scenarios_evaluate_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_evaluate_evaluation_run_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_detection_quality_evaluation_detection_quality_get",
+      "passed": true
+    },
+    {
+      "name": "form_390_incident_quality_evaluation_incident_quality_get",
+      "passed": true
+    },
+    {
+      "name": "form_390_detection_benchmark_evaluation_detection_benchmark_get",
+      "passed": true
+    },
+    {
+      "name": "form_390_recent_cases_cases_get",
+      "passed": true
+    },
+    {
+      "name": "form_390_case_detail_cases__case_id__get",
+      "passed": true
+    },
+    {
+      "name": "form_390_case_metrics_cases_metrics_get",
+      "passed": true
+    },
+    {
+      "name": "form_390_create_cases_from_events_cases_from_events_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_update_case_cases__case_id__patch",
+      "passed": true
+    },
+    {
+      "name": "form_390_recent_integration_events_integrations_outbox_get",
+      "passed": true
+    },
+    {
+      "name": "form_390_integration_event_detail_integrations_outbox__event_id__get",
+      "passed": true
+    },
+    {
+      "name": "form_390_integration_outbox_metrics_integrations_outbox_metrics_get",
+      "passed": true
+    },
+    {
+      "name": "form_390_reconcile_integration_outbox_integrations_outbox_reconcile_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_record_integration_attempt_integrations_outbox__event_id__attempt_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_capture_detections_context_captures_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_execution_detections_context_execution_evidence_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_baseline_detections_context_baselines_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_approval_detections_context_approvals_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_evaluate_detections_context_evaluate_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_revoke_baseline_detections_context_baselines__identifier__revoke_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_revoke_approval_detections_context_approvals__identifier__revoke_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_receive_signal_zero_trust_signals_inbox_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_signal_receipt_zero_trust_signals_inbox__event_id__get",
+      "passed": true
+    },
+    {
+      "name": "form_390_evaluate_signed_zero_trust_signals_evaluate_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_evaluate_zero_trust_sessions_evaluate_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_revoke_zero_trust_sessions__session_id__revoke_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_protected_access_zero_trust_protected_access_post",
+      "passed": true
+    },
+    {
+      "name": "form_390_policies_zero_trust_policies_get",
+      "passed": true
+    },
+    {
+      "name": "form_390_assurance_summary_assurance_summary_get",
+      "passed": true
+    },
+    {
+      "name": "form_390_assurance_controls_assurance_controls_get",
+      "passed": true
+    },
+    {
+      "name": "form_390_assurance_control_assurance_controls__control_id__get",
+      "passed": true
+    },
+    {
+      "name": "form_390_readiness_health_ready_get",
+      "passed": true
+    },
+    {
+      "name": "baseline_start_leaves_review_time",
+      "passed": true
+    },
+    {
+      "name": "backdated_baseline_not_submitted",
+      "passed": true
+    },
+    {
+      "name": "actual_/analysis_110",
+      "passed": true
+    },
+    {
+      "name": "rule_analysis_saved",
+      "passed": true
+    },
+    {
+      "name": "actual_/results/ui-event-572ac845-93bc-4dad-828f-c3338be942ee/review_112",
+      "passed": true
+    },
+    {
+      "name": "actual_/zero-trust/sessions/evaluate_113",
+      "passed": true
+    },
+    {
+      "name": "allow_and_private_grant",
+      "passed": true
+    },
+    {
+      "name": "actual_/response/requests_115",
+      "passed": true
+    },
+    {
+      "name": "requester_cannot_self_approve",
+      "passed": true
+    },
+    {
+      "name": "first_approval_uses_reviewed_version",
+      "passed": true
+    },
+    {
+      "name": "stale_review_rejected",
+      "passed": true
+    },
+    {
+      "name": "actual_/response/requests/ui-a23da4e3-36cb-4c53-98f1-79166ded7a50/approvals_119",
+      "passed": true
+    },
+    {
+      "name": "two_distinct_reviews",
+      "passed": true
+    },
+    {
+      "name": "actual_/response/requests/ui-a23da4e3-36cb-4c53-98f1-79166ded7a50/execute_121",
+      "passed": true
+    },
+    {
+      "name": "simulated_response_no_external_effect",
+      "passed": true
+    },
+    {
+      "name": "actual_/zero-trust/sessions/ui-session-45564b8d-cdc4-41b5-b0c8-45f769da5da4/revoke_123",
+      "passed": true
+    },
+    {
+      "name": "actual_/zero-trust/protected-access_124",
+      "passed": true
+    },
+    {
+      "name": "manual_revoke_denies_unused_token",
+      "passed": true
+    },
+    {
+      "name": "viewer_write_controls_disabled",
+      "passed": true
+    },
+    {
+      "name": "foreign_request_hidden",
+      "passed": true
+    },
+    {
+      "name": "durable_job_accepted",
+      "passed": true
+    },
+    {
+      "name": "real_m6_mock_job_completed",
+      "passed": true
+    },
+    {
+      "name": "same_job_retry_is_not_reexecuted",
+      "passed": true
+    },
+    {
+      "name": "lost_response_retry_recovers_original_job",
+      "passed": true
+    },
+    {
+      "name": "no_credential_persistence",
+      "passed": true
+    },
+    {
+      "name": "no_javascript_errors",
+      "passed": true
+    },
+    {
+      "name": "no_external_network_calls",
+      "passed": true
+    }
+  ],
+  "passed": true
+}

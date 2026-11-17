@@ -1,0 +1,257 @@
+{
+  "schema": "resumed-original-target-blocker-audit-3",
+  "at": "2026-11-16T22:45:06.677569+00:00",
+  "goal_qualified": false,
+  "objective_achieved": false,
+  "objective_or_targets_redefined": false,
+  "fresh_resumed_audit_count": 3,
+  "prior_blocked_cycle_count_not_reused": true,
+  "base_full_requirement_audit": {
+    "path": "docs/infrastructure-results/extra-target-evidence-gap-v128-20261117.json",
+    "sha256": "f5242eb6afe5d1ea90837edd03dd70b8910cdf634379b9dafa927f8e61336e47"
+  },
+  "consecutive_resumed_turns": [
+    {
+      "version": "v129",
+      "sha256": "f6f874e4f644573745ec55fed72ef0804da1402a219b8e0d1eceabd94cdbc7c5",
+      "evidence": "full-DN parser-loss hypothesis disproven on original1489 leaf rows; declared input/remote changes not found"
+    },
+    {
+      "version": "v130",
+      "sha256": "b406abe5ec6007442d3d7473858f14ce4427063dc55c7f272301044525645e06",
+      "evidence": "497 Python hashes, original protocol, actual score and phase-support head unchanged"
+    },
+    {
+      "version": "v131",
+      "evidence": "same actual score, original protocol, ledger and independent readiness; no admitted distinguishing inputs or eligible final package"
+    }
+  ],
+  "same_blocking_condition": "Missing admissible discriminating evidence for remaining fixed original cases plus original-six-domain independent acceptance package",
+  "original_population": 1681815,
+  "latest_actual_score_sha256": "390d54332f7dd989455f13dc4fea1e9d070a9d7c2fda2343eae7b80bc1091fc8",
+  "existing495_model_related_python_unchanged_and497_current_checked_previous_turn": true,
+  "head_sha256": "56de6bc2826943a94c852b1c361963c968e8ee00d7f0929b97789af72756799b",
+  "qualified_normal_lowering_cells": 0,
+  "latest_metric_gate": {
+    "schema": "local-metric-gate-1",
+    "track": "observed_log_kinds",
+    "completed": true,
+    "local_metric_gate_passed": false,
+    "goal_qualified": false,
+    "independent_evaluation_verified": false,
+    "ci_or_merge_started": false,
+    "scope": "necessary metric condition only; label provenance, candidate binding, independent evaluation and runtime acceptance remain separate",
+    "targets": {
+      "precision": 0.95,
+      "recall": 0.95,
+      "f1": 0.95,
+      "false_positive_rate": 0.05,
+      "false_negative_rate": 0.05
+    },
+    "rows": [
+      {
+        "name": "audit-share",
+        "population": 2358,
+        "positive_support": 6,
+        "negative_support": 2352,
+        "counts": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "tn": 2352,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 1.0,
+          "recall": 0.6666666666666666,
+          "f1": 0.8,
+          "false_positive_rate": 0.0,
+          "false_negative_rate": 0.3333333333333333
+        },
+        "metric_targets_met": false,
+        "failed_conditions": [
+          "recall",
+          "f1",
+          "false_negative_rate"
+        ]
+      },
+      {
+        "name": "audit-web",
+        "population": 7466,
+        "positive_support": 47,
+        "negative_support": 7419,
+        "counts": {
+          "tp": 47,
+          "fp": 0,
+          "fn": 0,
+          "tn": 7419,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_positive_rate": 0.0,
+          "false_negative_rate": 0.0
+        },
+        "metric_targets_met": true,
+        "failed_conditions": []
+      },
+      {
+        "name": "auth",
+        "population": 1114,
+        "positive_support": 32,
+        "negative_support": 1082,
+        "counts": {
+          "tp": 32,
+          "fp": 0,
+          "fn": 0,
+          "tn": 1082,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_positive_rate": 0.0,
+          "false_negative_rate": 0.0
+        },
+        "metric_targets_met": true,
+        "failed_conditions": []
+      },
+      {
+        "name": "vpn",
+        "population": 18458,
+        "positive_support": 84,
+        "negative_support": 18374,
+        "counts": {
+          "tp": 84,
+          "fp": 42,
+          "fn": 0,
+          "tn": 18332,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 0.6666666666666666,
+          "recall": 1.0,
+          "f1": 0.8,
+          "false_positive_rate": 0.002285838685098509,
+          "false_negative_rate": 0.0
+        },
+        "metric_targets_met": false,
+        "failed_conditions": [
+          "precision",
+          "f1"
+        ]
+      },
+      {
+        "name": "cpu",
+        "population": 5760,
+        "positive_support": 139,
+        "negative_support": 5621,
+        "counts": {
+          "tp": 139,
+          "fp": 4,
+          "fn": 0,
+          "tn": 5617,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 0.972027972027972,
+          "recall": 1.0,
+          "f1": 0.9858156028368794,
+          "false_positive_rate": 0.0007116171499733144,
+          "false_negative_rate": 0.0
+        },
+        "metric_targets_met": true,
+        "failed_conditions": []
+      },
+      {
+        "name": "dns",
+        "population": 792149,
+        "positive_support": 138061,
+        "negative_support": 654088,
+        "counts": {
+          "tp": 135466,
+          "fp": 9,
+          "fn": 2595,
+          "tn": 654079,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 0.9999335670787969,
+          "recall": 0.9812039605681546,
+          "f1": 0.990480229293402,
+          "false_positive_rate": 1.3759616443047419e-05,
+          "false_negative_rate": 0.018796039431845345
+        },
+        "metric_targets_met": true,
+        "failed_conditions": []
+      },
+      {
+        "name": "web-access",
+        "population": 430914,
+        "positive_support": 426330,
+        "negative_support": 4584,
+        "counts": {
+          "tp": 426312,
+          "fp": 7,
+          "fn": 18,
+          "tn": 4577,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 0.9999835803705676,
+          "recall": 0.9999577791851383,
+          "f1": 0.9999706796114227,
+          "false_positive_rate": 0.0015270506108202443,
+          "false_negative_rate": 4.222081486172683e-05
+        },
+        "metric_targets_met": true,
+        "failed_conditions": []
+      },
+      {
+        "name": "web-error",
+        "population": 1418,
+        "positive_support": 1414,
+        "negative_support": 4,
+        "counts": {
+          "tp": 1414,
+          "fp": 0,
+          "fn": 0,
+          "tn": 4,
+          "inference_errors": 0,
+          "unknown": 0
+        },
+        "metrics": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_positive_rate": 0.0,
+          "false_negative_rate": 0.0
+        },
+        "metric_targets_met": true,
+        "failed_conditions": []
+      }
+    ]
+  },
+  "main_F1_shared_and_vpn": 0.8,
+  "new_independent_final_cases": 0,
+  "source_ledger_unchanged": "infra/f1-lab/observed-source-exposure-v127.json",
+  "no_new_model_parameter_or_label_population_changes": true,
+  "new_pytest_or_Docker_runs": 0,
+  "paid_API_AWS_push_newCI_merge_actions": 0,
+  "current_known_effective_safe_next_code_action": null,
+  "external_change_needed": "Original-case/time-linked causal evidence or a validated distinguishing input, plus original-six-domain independently reviewable label/group support",
+  "not_an_all_possible_models_or_public_sources_impossibility_claim": true,
+  "not_blocked_for_time_budget_difficulty_or_missing_reviewer_alone": true,
+  "goal_status_transition": "blocked warranted after fresh3-turn audit; no completion claim",
+  "no_live_owned_jobs": true
+}

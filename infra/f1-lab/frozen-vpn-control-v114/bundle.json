@@ -1,0 +1,69 @@
+{
+  "goal_qualified": false,
+  "head": {
+    "path": "head.json",
+    "sha256": "61c447942522a179b398e200e0dd50e499721a90f4dca2ffb66f786153312bdd"
+  },
+  "legacy": {
+    "path": "legacy.json",
+    "sha256": "cb4e8ec48b2a7323118ea9d61eb088cbe291081de83ee5917d93c88710631cee"
+  },
+  "legacy_identity_sha256": "97e541852a5bcbe8bc07c4ea8cf304fc4a3819b09c4c697dd52e08d1b88aa3e6",
+  "schema": "vpn-protocol-reproduction-bundle-1",
+  "scope": "noncommercial observed development research; no final independent qualification",
+  "control": {
+    "path": "control.json",
+    "sha256": "7b0c7678d2f0eaf5cf7f45f5aa4093be584d77e82bd3cabca29b703676bbb349"
+  },
+  "training_provenance": {
+    "aws_calls": 0,
+    "base_model_sha256": "61c447942522a179b398e200e0dd50e499721a90f4dca2ffb66f786153312bdd",
+    "client_platform_claims_used_as_features": false,
+    "completed": true,
+    "control_phases_counted_separately": true,
+    "goal_qualified": false,
+    "legacy_identity_sha256": "97e541852a5bcbe8bc07c4ea8cf304fc4a3819b09c4c697dd52e08d1b88aa3e6",
+    "minimum_support": 5,
+    "model_sha256": "7b0c7678d2f0eaf5cf7f45f5aa4093be584d77e82bd3cabca29b703676bbb349",
+    "new_independent_evaluation": false,
+    "paid_api_calls": 0,
+    "training": [
+      {
+        "eligible": 132,
+        "name": "russellmitchell",
+        "population": 295243,
+        "preparation_sha256": "0091ab22f3ffe3ee12773c7a7d6dfe127e78750faf6dbe4aca2550e39b2f3683",
+        "role": "training",
+        "truth_sha256": "2e569fc8a2678d06ac62fec7152bf070969e4db9fe123da5301cafd617cd5a43"
+      },
+      {
+        "eligible": 154,
+        "name": "santos",
+        "population": 295976,
+        "preparation_sha256": "b6e960ddc26eff3c4251ba08319c0af45697b3ee4aabdd96ba50d09e154d4f9a",
+        "role": "training",
+        "truth_sha256": "21f65f66a93489950507764cfae096752120d376d57d49e8c8b2d7e885b7c989"
+      },
+      {
+        "eligible": 210,
+        "name": "shaw",
+        "population": 11361,
+        "preparation_sha256": "595cdc9ffd4d6fe074112681e6795b02d92d8e90787775826468af96dc86cbb6",
+        "role": "training",
+        "truth_sha256": "eab13e7a10372afc0808352b6d94d10f9cbd05309850c25c8e9fc9a107edf2b2"
+      },
+      {
+        "eligible": 450,
+        "name": "wheeler",
+        "population": 13113,
+        "preparation_sha256": "b93497388dc6e57cf1597df98ee87b0c948576e6765fdac6ff37aaf4a8da1810",
+        "role": "training",
+        "truth_sha256": "d84f7f09d43963fae64589b0274755d21250fe3fb95510bfbc5754ebdebeaaec"
+      }
+    ],
+    "training_attack_veto": true,
+    "training_plan_sha256": "4c1607c5d54baa88b299ea7c7150c2e24825a78cadbf605413dd2ede70347962"
+  },
+  "new_independent_evaluation": false,
+  "automatic_enforcement_allowed": false
+}

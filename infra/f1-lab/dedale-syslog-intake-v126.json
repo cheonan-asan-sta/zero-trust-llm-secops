@@ -1,0 +1,55 @@
+{
+  "schema_version": "dedale-syslog-schema-intake-1",
+  "purpose": "bounded development schema and native evidence availability inspection; no performance evaluation",
+  "publisher": "Lanvin, Maxime; Majorczyk, Frederic; Inria / Recherche Data Gouv",
+  "persistent_id": "doi:10.57745/Y5JLDG",
+  "dataset_version": "3.0",
+  "version_release_time": "2026-11-13T10:07:04Z",
+  "metadata_url": "https://entrepot.recherche.data.gouv.fr/api/datasets/:persistentId/?persistentId=doi:10.57745/Y5JLDG",
+  "metadata_sha256": "9e2f5a1371f035ea8d5b6aa32eae82555b8a4d287355261afd95f2fe9174f127",
+  "license": "CC BY 4.0, explicitly stated in version termsOfUse",
+  "file": {
+    "id": 717890,
+    "name": "system_logs_syslog.zip",
+    "bytes": 125537856,
+    "publisher_md5": "8223168b7cf857c40a2f0d84a1eab885",
+    "url": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/717890"
+  },
+  "role": "development_schema_probe_only",
+  "selection": {
+    "rule": "first regular archive member in lexical name order, independent of content or labels",
+    "maximum_observed_physical_lines": 128,
+    "maximum_member_bytes": 536870912,
+    "maximum_physical_line_bytes": 2097152,
+    "maximum_archive_members": 100000,
+    "maximum_declared_uncompressed_archive_bytes": 8589934592,
+    "malformed_or_non_json_lines": "retain and count; do not silently skip or replace"
+  },
+  "integrity": {
+    "complete_archive_before_read": true,
+    "publisher_md5_required": true,
+    "record_local_sha256": true,
+    "selected_member_complete_crc_and_sha256_required": true,
+    "extract_to_filesystem": false,
+    "execute_downloaded_code": false,
+    "overwrite_existing_artifacts": false
+  },
+  "excluded": [
+    "system_logs_labels.zip and all ground-truth bodies",
+    "userbehaviour_logs.zip and simulator / orchestration state",
+    "all other native observation archives",
+    "attack-scenario and labeling-program bodies",
+    "raw user, host, IP, command or absolute timestamp values as learned exceptions"
+  ],
+  "claims": {
+    "no_training_or_prediction": true,
+    "no_native_malicious_or_normal_labels_inferred": true,
+    "logged_principal_is_not_verified_human_or_current_permission": true,
+    "future_or_collection_timestamps_are_not_historical_app_receipt": true,
+    "new_final_cases": 0,
+    "original_population": 1681815,
+    "original_independent_protocol_sha256": "259bbb3c4192899c3513a2af4b848208be9c4deb0edb2dbe3f0f0a1a136b7d78",
+    "existing_source_roles_and_acceptance_targets_unchanged": true,
+    "fixed_metric_results_unchanged": true
+  }
+}

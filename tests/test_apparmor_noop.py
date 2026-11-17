@@ -174,3 +174,11 @@ def test_event_bound_fails_instead_of_partially_suppressing(monkeypatch):
     monkeypatch.setattr(mod, 'MAX_EVENTS', 1)
     with pytest.raises(ValueError, match='apparmor_event_bound'):
         prepared(event() + event(stamp='1700000001.123', serial='72'))
+
+
+def test_enriched_display_aliases_are_ignored_but_complete_source_bytes_remain_bound():
+    rows=[r.rstrip('\n')+'\x1dUID="display-only"\n' for r in event()]
+    body,pin,observed=prepared(rows)
+    assert set(observed)=={2,3}
+    assert observed[2].line_sha256==hashlib.sha256(body[1]).hexdigest()
+    assert pin==hashlib.sha256(b''.join(body)).hexdigest()

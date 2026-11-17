@@ -31,7 +31,8 @@ POLICY = {
 }
 
 
-def select_pairs(entries, prior_pairs):
+def select_pairs(entries, prior_pairs, *, require_full_kinds=True):
+    require(type(require_full_kinds) is bool,'audit_transfer_kind_contract')
     by_name = {e['archive_name']:e for e in entries}
     require(len(by_name) == len(entries), 'audit_transfer_duplicate_member')
     consumed = {p['provenance'][k] for p in prior_pairs for k in ('raw_member','label_member')}
@@ -59,7 +60,8 @@ def select_pairs(entries, prior_pairs):
                 and by_name[label]['bytes'] <= POLICY['maximum_source_bytes'], 'audit_transfer_member_bytes')
         selected.append({'raw_member':name,'label_member':label,'facts_member':facts,'kind':kind,
                          'raw_bytes':by_name[name]['bytes'],'label_bytes':by_name[label]['bytes']})
-    require(0 < len(selected) <= POLICY['maximum_pairs'] and {p['kind'] for p in selected} == {'auth','audit'},
+    require(0 < len(selected) <= POLICY['maximum_pairs']
+            and (not require_full_kinds or {p['kind'] for p in selected} == {'auth','audit'}),
             'audit_transfer_source_coverage')
     return selected,excluded
 

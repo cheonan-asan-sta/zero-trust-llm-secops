@@ -1,0 +1,700 @@
+{
+  "schema": "vpn-native-clock-source-audit-1",
+  "at": "2026-11-16T19:11:29.966146+00:00",
+  "completed_scope": "training-only native journal/syslog/auth/audit coverage inspection",
+  "goal_qualified": false,
+  "performance_improvement_adopted": false,
+  "original_population": 1681815,
+  "original_independent_protocol_sha256": "259bbb3c4192899c3513a2af4b848208be9c4deb0edb2dbe3f0f0a1a136b7d78",
+  "original_domains": [
+    "credential",
+    "device",
+    "privilege",
+    "lateral",
+    "exfiltration",
+    "remote"
+  ],
+  "disjoint_axes": [
+    "session",
+    "subject",
+    "device",
+    "family",
+    "pattern"
+  ],
+  "thresholds_and_labels_and_case_order_unchanged": true,
+  "app_scripts_python_files_unchanged_since_v126": 497,
+  "models_or_predictions_changed": false,
+  "fresh_metrics_replay": false,
+  "carried_main_log_kind_metrics": {
+    "shared_audit": {
+      "TP": 4,
+      "FP": 0,
+      "FN": 2,
+      "F1": 0.8
+    },
+    "vpn": {
+      "TP": 84,
+      "FP": 42,
+      "FN": 0,
+      "F1": 0.8
+    }
+  },
+  "separate_metrics_not_added_to_main": {
+    "harrison_vpn": {
+      "TP": 28,
+      "FP": 36,
+      "FN": 0
+    },
+    "wheeler_training_vpn": {
+      "TP": 47,
+      "FP": 36,
+      "FN": 9
+    }
+  },
+  "accepted_metric_baseline": "v124, corrected v125-phase2 gives identical decisions; never pooled v125 draft FP31",
+  "native_source_audit": {
+    "aws_calls": 0,
+    "completed": true,
+    "goal_qualified": false,
+    "models_or_predictions_changed": false,
+    "new_final_cases": 0,
+    "paid_api_calls": 0,
+    "protocol_sha256": "cb4c22777a7db8e8c71f88fe3067a97494a5c7b910346bdc85c9789d33aa4a2a",
+    "raw_labels_opened": 0,
+    "schema": "training-vpn-native-clock-inspection-result-1",
+    "sources": {
+      "russellmitchell": {
+        "archive_prior_sha256": "2da85d89764afa4ea3aa2b7565d246ccba25681866a516ddd151834089b5ab4c",
+        "archive_stat_unchanged_during_read": true,
+        "copies_not_counted_as_new_support": true,
+        "exact_message_and_same_second_candidate_journal_rows": 0,
+        "exact_message_candidate_journal_rows": 0,
+        "fresh_whole_archive_hash_performed": false,
+        "journal_transports": {
+          "audit": 896,
+          "driver": 7,
+          "journal": 954,
+          "kernel": 566,
+          "stdout": 267,
+          "syslog": 1105
+        },
+        "native_human_authority_or_device_posture_established": false,
+        "original_vpn_member_sha256_matched": "08042e1ad03874326960ef3eef91a50305009cb2e7afe88827750dd839701bb1",
+        "role": "training_only_native_coverage",
+        "selected_members": [
+          {
+            "bytes": 129075,
+            "complete_zip_crc_verified": true,
+            "crc32": "d6434022",
+            "decoded_rows": 726,
+            "member": "gather/vpn/logs/audit/audit.log",
+            "path": "member-0.source",
+            "sha256": "52955b508fd9f29e4fd4ae9f4f433f3872de693462de7a52e80939ea7064fcfc"
+          },
+          {
+            "bytes": 8321,
+            "complete_zip_crc_verified": true,
+            "crc32": "1200e297",
+            "decoded_rows": 92,
+            "member": "gather/vpn/logs/auth.log",
+            "path": "member-1.source",
+            "sha256": "262300c3bf4a4dfc6d50fe59be6da4bb48638f75003c5138f26129188dd816a0"
+          },
+          {
+            "bytes": 11277,
+            "complete_zip_crc_verified": true,
+            "crc32": "8cee73e3",
+            "decoded_rows": 124,
+            "member": "gather/vpn/logs/auth.log.1",
+            "path": "member-2.source",
+            "sha256": "9687d6ef3562505031ad5785dae2df132aa9e4ea7f352f7faae829c589333528"
+          },
+          {
+            "bytes": 8388608,
+            "complete_zip_crc_verified": true,
+            "crc32": "06e8e9bc",
+            "decoded_rows": 3387,
+            "decoded_sha256": "4030a9a14bc549a5f38a324fcfbb915316696213c25f91b77bed427a9a966f59",
+            "member": "gather/vpn/logs/journal/de9f5cd734cb49749b0319cd03e5f8bf/system.journal",
+            "path": "member-3.journal",
+            "sha256": "45a8c8a08d00e90fe9dc1c266cf2c30a3a61e0d35326a450345ee525085e73e5"
+          },
+          {
+            "bytes": 8388608,
+            "complete_zip_crc_verified": true,
+            "crc32": "a92f001d",
+            "decoded_rows": 408,
+            "decoded_sha256": "5ff9a0e55337cd20b6fdda628ae6da906f4f810edc21ab5896f953629d9c4e1f",
+            "member": "gather/vpn/logs/journal/de9f5cd734cb49749b0319cd03e5f8bf/user-1000.journal",
+            "path": "member-4.journal",
+            "sha256": "792dec516f11f135841b1a103f7e228037fadd6c597227df0c935d1451af74d2"
+          },
+          {
+            "bytes": 3019,
+            "complete_zip_crc_verified": true,
+            "crc32": "b89fd9e7",
+            "decoded_rows": 34,
+            "member": "gather/vpn/logs/syslog.1",
+            "path": "member-5.source",
+            "sha256": "5ec01a1f4832a46a13799c7ce659c75724e1e5f737140b615a4b8f6742fe1cf9"
+          },
+          {
+            "bytes": 8077,
+            "complete_zip_crc_verified": true,
+            "crc32": "b2bbdf55",
+            "decoded_rows": 90,
+            "member": "gather/vpn/logs/syslog.2",
+            "path": "member-6.source",
+            "sha256": "a97495c5239d929086f1d09eeddcf41dc40c71f3af9603afead9366988eb2e09"
+          },
+          {
+            "bytes": 4411,
+            "complete_zip_crc_verified": true,
+            "crc32": "2c876ace",
+            "decoded_rows": 47,
+            "member": "gather/vpn/logs/syslog.3",
+            "path": "member-7.source",
+            "sha256": "c39b325b1688447bfa2bc1c0005d30cb5addcc4f49cac9955a6f1fdd4c338dc6"
+          },
+          {
+            "bytes": 17020,
+            "complete_zip_crc_verified": true,
+            "crc32": "b11717b7",
+            "decoded_rows": 193,
+            "member": "gather/vpn/logs/syslog.4",
+            "path": "member-8.source",
+            "sha256": "58a06e749d0785800c2bec56b089da0242c1183dd3ded3660aa57e2e88894397"
+          }
+        ],
+        "totals": {
+          "journal_non_string_message": 1,
+          "journal_rows": 3795,
+          "text_rows": 1306
+        }
+      },
+      "santos": {
+        "archive_prior_sha256": "af69973fbf4edeb6a26f1e4ebeae97b577f0263cec15bda0d987cc470425be5d",
+        "archive_stat_unchanged_during_read": true,
+        "copies_not_counted_as_new_support": true,
+        "exact_message_and_same_second_candidate_journal_rows": 0,
+        "exact_message_candidate_journal_rows": 0,
+        "fresh_whole_archive_hash_performed": false,
+        "journal_transports": {
+          "audit": 856,
+          "driver": 4,
+          "journal": 743,
+          "kernel": 556,
+          "stdout": 268,
+          "syslog": 1204
+        },
+        "native_human_authority_or_device_posture_established": false,
+        "original_vpn_member_sha256_matched": "f39a169c2ab4165b9848635c6e729a004bddb315f1f2f277f0341baf662e9ba7",
+        "role": "training_only_native_coverage",
+        "selected_members": [
+          {
+            "bytes": 125679,
+            "complete_zip_crc_verified": true,
+            "crc32": "9d3bbb1e",
+            "decoded_rows": 710,
+            "member": "gather/vpn/logs/audit/audit.log",
+            "path": "member-0.source",
+            "sha256": "851a793b756bbc7cef35a07b2e0de6d79e8019bea0fef32e1843264ea3390fa7"
+          },
+          {
+            "bytes": 8321,
+            "complete_zip_crc_verified": true,
+            "crc32": "e59826d8",
+            "decoded_rows": 91,
+            "member": "gather/vpn/logs/auth.log",
+            "path": "member-1.source",
+            "sha256": "fff3b405f322755bf73c24bee7cc95b99d5387fc2e669c9e603c82e47016209a"
+          },
+          {
+            "bytes": 11277,
+            "complete_zip_crc_verified": true,
+            "crc32": "a0d1d9f7",
+            "decoded_rows": 124,
+            "member": "gather/vpn/logs/auth.log.1",
+            "path": "member-2.source",
+            "sha256": "34ca239213a7ef30b2182d7c05961c5e41f1622a41dae5ff53f035c1b8626aa1"
+          },
+          {
+            "bytes": 8388608,
+            "complete_zip_crc_verified": true,
+            "crc32": "262c5a54",
+            "decoded_rows": 3383,
+            "decoded_sha256": "682dc596171c7ba2074a89954e14081864e2403bcafa5c1c4cfa9e1ebc160b4c",
+            "member": "gather/vpn/logs/journal/172471a7d2de436cbb2435d99d67e85e/system.journal",
+            "path": "member-3.journal",
+            "sha256": "017bd6ba68d9c5ef6c9381b66755d3e2aa644b2bd273a50e360475df28ae7c3e"
+          },
+          {
+            "bytes": 8388608,
+            "complete_zip_crc_verified": true,
+            "crc32": "73fedd22",
+            "decoded_rows": 248,
+            "decoded_sha256": "2ac84ecc85cfa01b6de71d85f69a3efb5aa64ac8b6e3a3e85fa7770b734f2d7a",
+            "member": "gather/vpn/logs/journal/172471a7d2de436cbb2435d99d67e85e/user-1000.journal",
+            "path": "member-4.journal",
+            "sha256": "1f6fa8dc9ccabd43a03fde8f7e36d40becce4f913b557e0b34acd0cb999368ff"
+          },
+          {
+            "bytes": 6371,
+            "complete_zip_crc_verified": true,
+            "crc32": "f72c555c",
+            "decoded_rows": 71,
+            "member": "gather/vpn/logs/syslog",
+            "path": "member-5.source",
+            "sha256": "2e58cc1ee27d4d1b7082da6c329b70967080f1d85ea84c9c261020bc8d66b216"
+          },
+          {
+            "bytes": 5261,
+            "complete_zip_crc_verified": true,
+            "crc32": "a518696b",
+            "decoded_rows": 59,
+            "member": "gather/vpn/logs/syslog.1",
+            "path": "member-6.source",
+            "sha256": "b1a4b9f92886bbcb1bf2effba9b29b93bc818cc4dd2ac9e6d836dee530129dfc"
+          },
+          {
+            "bytes": 5276,
+            "complete_zip_crc_verified": true,
+            "crc32": "cfcf421e",
+            "decoded_rows": 57,
+            "member": "gather/vpn/logs/syslog.2",
+            "path": "member-7.source",
+            "sha256": "a1e6191c14797102f9587831981a4324db84191a1bbf504bd82026f03ffb215b"
+          },
+          {
+            "bytes": 9423,
+            "complete_zip_crc_verified": true,
+            "crc32": "f29e7f91",
+            "decoded_rows": 109,
+            "member": "gather/vpn/logs/syslog.3",
+            "path": "member-8.source",
+            "sha256": "5fca010fa504bd39311bd804b780df7439ef83254b548767205a17f3987ab6fd"
+          }
+        ],
+        "totals": {
+          "journal_non_string_message": 1,
+          "journal_rows": 3631,
+          "text_rows": 1221
+        }
+      },
+      "shaw": {
+        "archive_prior_sha256": "825ef8ac66cffeb9f799df18621ce7f35a4b3225350d10768ae80305310b8e0b",
+        "archive_stat_unchanged_during_read": true,
+        "copies_not_counted_as_new_support": true,
+        "exact_message_and_same_second_candidate_journal_rows": 0,
+        "exact_message_candidate_journal_rows": 0,
+        "fresh_whole_archive_hash_performed": false,
+        "journal_transports": {
+          "audit": 1154,
+          "driver": 4,
+          "journal": 917,
+          "kernel": 531,
+          "stdout": 277,
+          "syslog": 1236
+        },
+        "native_human_authority_or_device_posture_established": false,
+        "original_vpn_member_sha256_matched": "875913c16b879cce3cab4b22a04c9167af596874bb0250d79fdbc706315bccca",
+        "role": "training_only_native_coverage",
+        "selected_members": [
+          {
+            "bytes": 187210,
+            "complete_zip_crc_verified": true,
+            "crc32": "78f8d6d5",
+            "decoded_rows": 1056,
+            "member": "gather/vpn/logs/audit/audit.log",
+            "path": "member-0.source",
+            "sha256": "557ccb4c2c54bd3f8da31c37d9155757ca8babaa6224002da4196d2ff10aa249"
+          },
+          {
+            "bytes": 3563,
+            "complete_zip_crc_verified": true,
+            "crc32": "084530cf",
+            "decoded_rows": 39,
+            "member": "gather/vpn/logs/auth.log",
+            "path": "member-1.source",
+            "sha256": "6c6e71da58fb5c4191a39b608181e616375db5ce5f563df39326976276096f41"
+          },
+          {
+            "bytes": 25549,
+            "complete_zip_crc_verified": true,
+            "crc32": "43487989",
+            "decoded_rows": 280,
+            "member": "gather/vpn/logs/auth.log.1",
+            "path": "member-2.source",
+            "sha256": "3e1b9eb1252137bc737d8ca36d0b9a6ddfee83b70436fdaeed10b1aea248fa26"
+          },
+          {
+            "bytes": 8388608,
+            "complete_zip_crc_verified": true,
+            "crc32": "8c9680a9",
+            "decoded_rows": 3765,
+            "decoded_sha256": "e332059d1b9ce6968fa90890b901c59cc921b2b96f53719bdf404f8910250bab",
+            "member": "gather/vpn/logs/journal/6705cfc020894655a5ef4eb2205d3a76/system.journal",
+            "path": "member-3.journal",
+            "sha256": "43c7442a313f58537c474b3dc1f0e4ab583c7933646d54ac274997bab0cf277a"
+          },
+          {
+            "bytes": 8388608,
+            "complete_zip_crc_verified": true,
+            "crc32": "3acdab4d",
+            "decoded_rows": 354,
+            "decoded_sha256": "57d2eaa4c8b9240a88f23e21d4fb8c7354ca43ae7704aff051c1c96613072332",
+            "member": "gather/vpn/logs/journal/6705cfc020894655a5ef4eb2205d3a76/user-1000.journal",
+            "path": "member-4.journal",
+            "sha256": "44becc1be3b8cf146730b8154b26d158fcc1a6793b1d23e8b526145ef5284dc3"
+          },
+          {
+            "bytes": 3547,
+            "complete_zip_crc_verified": true,
+            "crc32": "e5c712e4",
+            "decoded_rows": 39,
+            "member": "gather/vpn/logs/syslog.1",
+            "path": "member-5.source",
+            "sha256": "72877f991213f863e911e52287f01d70ce6c07c52981f86affe84d6c829129dd"
+          },
+          {
+            "bytes": 5931,
+            "complete_zip_crc_verified": true,
+            "crc32": "d521cec0",
+            "decoded_rows": 65,
+            "member": "gather/vpn/logs/syslog.2",
+            "path": "member-6.source",
+            "sha256": "f8e92065e73705e1c61ba7be5c7ab7352dc9ef2aa1ad81a40c4c53ad371fa85b"
+          },
+          {
+            "bytes": 4696,
+            "complete_zip_crc_verified": true,
+            "crc32": "ec8acbbe",
+            "decoded_rows": 53,
+            "member": "gather/vpn/logs/syslog.3",
+            "path": "member-7.source",
+            "sha256": "669eb4671c2db314cd678093de8ea718c7b768d28fdd9ca44a4066b6b7dd6d89"
+          },
+          {
+            "bytes": 5119,
+            "complete_zip_crc_verified": true,
+            "crc32": "e609a3f2",
+            "decoded_rows": 57,
+            "member": "gather/vpn/logs/syslog.4",
+            "path": "member-8.source",
+            "sha256": "a736e0dbecd6da631413925991ff1778f7d0808b503972a44649b28fc2b956fa"
+          },
+          {
+            "bytes": 6329,
+            "complete_zip_crc_verified": true,
+            "crc32": "632cd2db",
+            "decoded_rows": 75,
+            "member": "gather/vpn/logs/syslog.5",
+            "path": "member-9.source",
+            "sha256": "e1b53b0aeee99e5d2d18c0b38cd27e1c49ce2b4c8b4f289d2d4a3b0b8716b989"
+          },
+          {
+            "bytes": 9390,
+            "complete_zip_crc_verified": true,
+            "crc32": "11a1ea7c",
+            "decoded_rows": 108,
+            "member": "gather/vpn/logs/syslog.6",
+            "path": "member-10.source",
+            "sha256": "15c12be0394c4e9b4e1297d3c7914894fa14b33ba1c01a87297c809025882dd6"
+          }
+        ],
+        "totals": {
+          "journal_non_string_message": 1,
+          "journal_rows": 4119,
+          "text_rows": 1772
+        }
+      },
+      "wheeler": {
+        "archive_prior_sha256": "01f49e8c66b453fca8d3ebb3e4b35788acef150c8bbfc412085f53e0308aea0d",
+        "archive_stat_unchanged_during_read": true,
+        "copies_not_counted_as_new_support": true,
+        "exact_message_and_same_second_candidate_journal_rows": 0,
+        "exact_message_candidate_journal_rows": 0,
+        "fresh_whole_archive_hash_performed": false,
+        "journal_transports": {
+          "audit": 1026,
+          "driver": 7,
+          "journal": 1066,
+          "kernel": 523,
+          "stdout": 273,
+          "syslog": 1307
+        },
+        "native_human_authority_or_device_posture_established": false,
+        "original_vpn_member_sha256_matched": "899364ee4f1e0d215885bb67adead00f05bdc329b44f7da06191110290dca2f9",
+        "role": "training_only_native_coverage",
+        "selected_members": [
+          {
+            "bytes": 159582,
+            "complete_zip_crc_verified": true,
+            "crc32": "aaea0dc4",
+            "decoded_rows": 900,
+            "member": "gather/vpn/logs/audit/audit.log",
+            "path": "member-0.source",
+            "sha256": "57e39bf205f892242c8ec9828af0e0bc1632fbfa93a1ec991486ae5b768bd7f7"
+          },
+          {
+            "bytes": 3524,
+            "complete_zip_crc_verified": true,
+            "crc32": "3481ddc1",
+            "decoded_rows": 39,
+            "member": "gather/vpn/logs/auth.log",
+            "path": "member-1.source",
+            "sha256": "282fd328b4308a120adb18de2f6bc4fdd3945e3b1cd518dab510b6777ecaff4c"
+          },
+          {
+            "bytes": 20604,
+            "complete_zip_crc_verified": true,
+            "crc32": "c903f642",
+            "decoded_rows": 228,
+            "member": "gather/vpn/logs/auth.log.1",
+            "path": "member-2.source",
+            "sha256": "acd9043fbdf446741511b352b0515ce858e6b22d361433dd0d39b782d1e5b34f"
+          },
+          {
+            "bytes": 8388608,
+            "complete_zip_crc_verified": true,
+            "crc32": "6784011f",
+            "decoded_rows": 3741,
+            "decoded_sha256": "c83cd90f804e47add2e1d5f93857fbc322905d37246d9941a9bee422536cde52",
+            "member": "gather/vpn/logs/journal/70f055bd2e79459c9bea3ef3aac01d83/system.journal",
+            "path": "member-3.journal",
+            "sha256": "ec6edb43f4d632073a875d124ee148f549b95749611252f18fac51fcac719f5d"
+          },
+          {
+            "bytes": 8388608,
+            "complete_zip_crc_verified": true,
+            "crc32": "c5f26a5c",
+            "decoded_rows": 461,
+            "decoded_sha256": "d88a9ff0c926c2c395024bad21236b58b1285b09e1420a151810774dd5024b11",
+            "member": "gather/vpn/logs/journal/70f055bd2e79459c9bea3ef3aac01d83/user-1000.journal",
+            "path": "member-4.journal",
+            "sha256": "df5a41da97071fb7e393be23a8a49a3c146e78a3b8f16b6f17c1cdbf2f42b36e"
+          },
+          {
+            "bytes": 3422,
+            "complete_zip_crc_verified": true,
+            "crc32": "2751ff80",
+            "decoded_rows": 38,
+            "member": "gather/vpn/logs/syslog.1",
+            "path": "member-5.source",
+            "sha256": "b7ce42fb6c0edf46e55bf8f78a52f9010f5c6a7a68084da889dfe61db815ce6d"
+          },
+          {
+            "bytes": 4942,
+            "complete_zip_crc_verified": true,
+            "crc32": "e34fd79c",
+            "decoded_rows": 54,
+            "member": "gather/vpn/logs/syslog.2",
+            "path": "member-6.source",
+            "sha256": "0c4ce85173a1a846cd0f08a7b129bf2bc69dc23cb9feaa1164c11b208d4dd14d"
+          },
+          {
+            "bytes": 4351,
+            "complete_zip_crc_verified": true,
+            "crc32": "19d54f3e",
+            "decoded_rows": 49,
+            "member": "gather/vpn/logs/syslog.3",
+            "path": "member-7.source",
+            "sha256": "458e43f27858754071d0d6e92124c4474f4d4a0edea5877574d669cd6328d2e3"
+          },
+          {
+            "bytes": 4034,
+            "complete_zip_crc_verified": true,
+            "crc32": "53cfa493",
+            "decoded_rows": 44,
+            "member": "gather/vpn/logs/syslog.4",
+            "path": "member-8.source",
+            "sha256": "bc26bcebfddd81cf2e3171faef6248ad2f0e1e9177d8377fd3adc57f67b5aebf"
+          },
+          {
+            "bytes": 18738,
+            "complete_zip_crc_verified": true,
+            "crc32": "64193d25",
+            "decoded_rows": 217,
+            "member": "gather/vpn/logs/syslog.5",
+            "path": "member-9.source",
+            "sha256": "1bea298d3aaf4e80c162c979e96eb2883a14d720846ca19c55f6168d3512d505"
+          }
+        ],
+        "totals": {
+          "journal_non_string_message": 1,
+          "journal_rows": 4202,
+          "text_rows": 1569
+        }
+      }
+    }
+  },
+  "coverage": {
+    "russellmitchell": {
+      "systemd_service_mentions": 3,
+      "actual_openvpn_process_journal_rows": 0,
+      "exact_vpn_message_matches": 0,
+      "same_second_candidates": 0,
+      "text_openvpn_mentions": 0,
+      "audit_reported_openvpn_process_rows": 0
+    },
+    "santos": {
+      "systemd_service_mentions": 3,
+      "actual_openvpn_process_journal_rows": 0,
+      "exact_vpn_message_matches": 0,
+      "same_second_candidates": 0,
+      "text_openvpn_mentions": 0,
+      "audit_reported_openvpn_process_rows": 0
+    },
+    "shaw": {
+      "systemd_service_mentions": 3,
+      "actual_openvpn_process_journal_rows": 0,
+      "exact_vpn_message_matches": 0,
+      "same_second_candidates": 0,
+      "text_openvpn_mentions": 0,
+      "audit_reported_openvpn_process_rows": 0
+    },
+    "wheeler": {
+      "systemd_service_mentions": 3,
+      "actual_openvpn_process_journal_rows": 0,
+      "exact_vpn_message_matches": 0,
+      "same_second_candidates": 0,
+      "text_openvpn_mentions": 0,
+      "audit_reported_openvpn_process_rows": 0
+    }
+  },
+  "member_count": 39,
+  "stored_member_bytes": 67932203,
+  "journal_records": 15747,
+  "text_rows": 5868,
+  "non_string_journal_MESSAGE_rows_retained": 4,
+  "whole_archive_hash_repeated_this_turn": false,
+  "prior_publisher_verified_cache_with_exact_vpn_raw_SHA_and_new_members_CRC_SHA": true,
+  "journal_decoder": "local Ubuntu-24.04 journalctl 255 (255.4-1ubuntu8.18)",
+  "downloaded_code_executed": false,
+  "native_cryptographic_journal_seals_verified": false,
+  "copied_event_rows_not_counted_as_additional_training_support": true,
+  "no_precise_connection_timestamp_or_human_device_authority_created": true,
+  "native_truth_or_simulator_or_private_key_or_attack_rule_bodies_opened": 0,
+  "new_independent_final_cases": 0,
+  "new_model_training_rows": 0,
+  "new_ledger": "infra/f1-lab/observed-source-exposure-v127.json",
+  "new_ledger_sha256": "75099adb01138de84e0b0d7c895874077c593a532875f3ef815c785a1e58cbc4",
+  "source_hashes_before": 67,
+  "source_hashes_after": 114,
+  "old_ids_payloads_patterns_unchanged": true,
+  "actual_pytest_runs_this_turn": 0,
+  "actual_docker_runs_this_turn": 0,
+  "last_functional_tests": "v126 Windows/Linux120 including46new, not rerun or added to old1244",
+  "paid_provider_calls": 0,
+  "AWS_calls": 0,
+  "pushes": 0,
+  "new_CI_runs": 0,
+  "merges": 0,
+  "eight_hour_soak_runs": 0,
+  "image_builds_or_pulls": 0,
+  "owned_containers_created": 0,
+  "conditional_limit": "No matching connection messages found in selected files. Not proof that all other features or external sources are impossible.",
+  "next": [
+    "Stop repeating the same source-local protocol/issuer/port/history projections as if they added missing identity.",
+    "Audit separately acquired DEDALE label and grouping eligibility without adding it to the fixed original population.",
+    "Keep true original-cohort performance and six-domain final qualification unmet until supporting evidence exists."
+  ],
+  "time_coverage": {
+    "russellmitchell": {
+      "vpn_start_us": 1642723751000000,
+      "vpn_end_us": 1643065947000000,
+      "journal_bounds": [
+        {
+          "member": "gather/vpn/logs/journal/de9f5cd734cb49749b0319cd03e5f8bf/system.journal",
+          "decoded_sha256": "4030a9a14bc549a5f38a324fcfbb915316696213c25f91b77bed427a9a966f59",
+          "valid_time_rows": 3387,
+          "earliest_us": 1642677203867268,
+          "latest_us": 1643093898484070,
+          "inside_vpn_period_rows": 1217,
+          "timestamp_regressions_in_export_order": 0
+        },
+        {
+          "member": "gather/vpn/logs/journal/de9f5cd734cb49749b0319cd03e5f8bf/user-1000.journal",
+          "decoded_sha256": "5ff9a0e55337cd20b6fdda628ae6da906f4f810edc21ab5896f953629d9c4e1f",
+          "valid_time_rows": 408,
+          "earliest_us": 1642677565203442,
+          "latest_us": 1643093897662758,
+          "inside_vpn_period_rows": 0,
+          "timestamp_regressions_in_export_order": 0
+        }
+      ]
+    },
+    "santos": {
+      "vpn_start_us": 1642121379000000,
+      "vpn_end_us": 1642462889000000,
+      "journal_bounds": [
+        {
+          "member": "gather/vpn/logs/journal/172471a7d2de436cbb2435d99d67e85e/system.journal",
+          "decoded_sha256": "682dc596171c7ba2074a89954e14081864e2403bcafa5c1c4cfa9e1ebc160b4c",
+          "valid_time_rows": 3383,
+          "earliest_us": 1642070750723105,
+          "latest_us": 1642484669548272,
+          "inside_vpn_period_rows": 1104,
+          "timestamp_regressions_in_export_order": 0
+        },
+        {
+          "member": "gather/vpn/logs/journal/172471a7d2de436cbb2435d99d67e85e/user-1000.journal",
+          "decoded_sha256": "2ac84ecc85cfa01b6de71d85f69a3efb5aa64ac8b6e3a3e85fa7770b734f2d7a",
+          "valid_time_rows": 248,
+          "earliest_us": 1642072572408198,
+          "latest_us": 1642484668778011,
+          "inside_vpn_period_rows": 0,
+          "timestamp_regressions_in_export_order": 0
+        }
+      ]
+    },
+    "shaw": {
+      "vpn_start_us": 1643071442000000,
+      "vpn_end_us": 1643584927000000,
+      "journal_bounds": [
+        {
+          "member": "gather/vpn/logs/journal/6705cfc020894655a5ef4eb2205d3a76/system.journal",
+          "decoded_sha256": "e332059d1b9ce6968fa90890b901c59cc921b2b96f53719bdf404f8910250bab",
+          "valid_time_rows": 3765,
+          "earliest_us": 1643012689854158,
+          "latest_us": 1643615769935015,
+          "inside_vpn_period_rows": 1614,
+          "timestamp_regressions_in_export_order": 0
+        },
+        {
+          "member": "gather/vpn/logs/journal/6705cfc020894655a5ef4eb2205d3a76/user-1000.journal",
+          "decoded_sha256": "57d2eaa4c8b9240a88f23e21d4fb8c7354ca43ae7704aff051c1c96613072332",
+          "valid_time_rows": 354,
+          "earliest_us": 1643013744181260,
+          "latest_us": 1643615768994136,
+          "inside_vpn_period_rows": 0,
+          "timestamp_regressions_in_export_order": 0
+        }
+      ]
+    },
+    "wheeler": {
+      "vpn_start_us": 1643174221000000,
+      "vpn_end_us": 1643583561000000,
+      "journal_bounds": [
+        {
+          "member": "gather/vpn/logs/journal/70f055bd2e79459c9bea3ef3aac01d83/system.journal",
+          "decoded_sha256": "c83cd90f804e47add2e1d5f93857fbc322905d37246d9941a9bee422536cde52",
+          "valid_time_rows": 3741,
+          "earliest_us": 1643102872323638,
+          "latest_us": 1643613769335633,
+          "inside_vpn_period_rows": 1422,
+          "timestamp_regressions_in_export_order": 0
+        },
+        {
+          "member": "gather/vpn/logs/journal/70f055bd2e79459c9bea3ef3aac01d83/user-1000.journal",
+          "decoded_sha256": "d88a9ff0c926c2c395024bad21236b58b1285b09e1420a151810774dd5024b11",
+          "valid_time_rows": 461,
+          "earliest_us": 1643103816783625,
+          "latest_us": 1643613768775882,
+          "inside_vpn_period_rows": 0,
+          "timestamp_regressions_in_export_order": 0
+        }
+      ]
+    }
+  }
+}

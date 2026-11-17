@@ -1,0 +1,433 @@
+{
+  "completed": true,
+  "scope": "additional fixed causal raw protocol projection; no inference changes",
+  "prototype_sha256": "6fed1b8006ab82ebf83fb15e54ded13fa50f5fcd826ba83213e34b63c19fb595",
+  "fitted": false,
+  "goal_qualified": false,
+  "new_independent_evaluation": false,
+  "labels_changed": false,
+  "original_line_population_changed": false,
+  "scenarios": {
+    "russellmitchell": {
+      "population": 5537,
+      "old": {
+        "label_assisted_diagnostic_only": true,
+        "mandatory_fp_if_all_baseline_tp_retained": 56,
+        "fp_in_unmixed_signatures": 4,
+        "mixed_signature_count": 10,
+        "witnesses": [
+          {
+            "signature": "515eb0b632dce29541bdb533430e0c28b2ebe5522db58aeb118ded4a7aa9b259",
+            "attack_case": "11e8eed1cea34c5f730be026f927c007c198174cd108a53c5ece570cc8302348",
+            "normal_case": "ece64dc62286ad8939c922770621071458a8b4174c6324c51d1979c0ac464a8c",
+            "attack_rows": 2,
+            "normal_rows": 6
+          },
+          {
+            "signature": "f591af0c6012097518df087db6c2ab18daac4d3a53052987668dcbcff2ae04e5",
+            "attack_case": "19e18afa2ec61754d0a6aa01c946ade92802e43bd478183277823d9d96adf3f4",
+            "normal_case": "a129778c87decb00ebd93cfd4dc3f9b9556f452227b8c19c7f8459f52764bf80",
+            "attack_rows": 2,
+            "normal_rows": 6
+          },
+          {
+            "signature": "5ab04c0764f0f4efbc7cbb07c82daacc867c2cde19031fae7d86a78ce9fd544e",
+            "attack_case": "49a572e899253086001e7e08876028508f2de983168f2bbef4838fc5343f1d9d",
+            "normal_case": "59b26b5b8a66a662bd5f89a8b8325527c9aaea1b1f76c88e3859266a48381f36",
+            "attack_rows": 1,
+            "normal_rows": 2
+          },
+          {
+            "signature": "1095eb55e095ef67e85bfc53b080b0eca11d9628a8f3c7ae0eb075a6aefbaaca",
+            "attack_case": "09742552f1dccb4bddc71c413d842ea15bb7b2840f09a33c459575ddb4525082",
+            "normal_case": "2804793b7abcab831db61327dea972378edca453709c69f1c4f3ee4af7aecc24",
+            "attack_rows": 1,
+            "normal_rows": 2
+          },
+          {
+            "signature": "33d056ad0454d54ef5eabab0a0068b05348ef60a909aafd58493198768fe65a3",
+            "attack_case": "d638791066a6e8179fa81003787258645524cb43b10d8f534a4ce97d86fae339",
+            "normal_case": "0a8f0a7855da49ff99bb98d94bbe1596fba57f477b0aef0a4eccc74579040dc7",
+            "attack_rows": 3,
+            "normal_rows": 6
+          },
+          {
+            "signature": "4f96c3f92a069b1481b4824c3539436eca9304a3e374edbba09d7d7a016b764d",
+            "attack_case": "326e4c3fd7cde3c9cd568bcb390c825d3be92ffd0415a4b99c674960725c5f91",
+            "normal_case": "9efc485cf11a701f35aa05604cf69249a1f7bf52077fb6570fac42d51d5fe975",
+            "attack_rows": 2,
+            "normal_rows": 4
+          },
+          {
+            "signature": "da3f8672899b335b171710305c4ce66b7e64870b7be365b3d3cb3ff31ef83c5c",
+            "attack_case": "30316782afdef3deb8bf84822fd95a946d5a12aad1d5a4fcc69e8b21a074098e",
+            "normal_case": "36f2623a9346b5d847f78c59b387edda5525402fac611dff07526a7da13263bb",
+            "attack_rows": 10,
+            "normal_rows": 20
+          },
+          {
+            "signature": "8b623881745e0a10ed081e8f6519b5600e63388cb119d029732d8aaf0897478a",
+            "attack_case": "e110d52717c3628fb67d96ab83b8ff91b7578d58894ef806194b7620fc3e111a",
+            "normal_case": "384b306f937e5598d8b1c0f79da70bb5e0879f000c12398468f601b66b708bb1",
+            "attack_rows": 1,
+            "normal_rows": 2
+          },
+          {
+            "signature": "5e3fa2d9a2dedbb4cdc369ea5ca8861ef6bfc460ca69fa9e989a25e38ff933af",
+            "attack_case": "341b7d47483d9ff3306a3d6cd5c20e927434b66a2cf01dcf4ed0c4f277026986",
+            "normal_case": "edfc88323dd7938bc3c8233563c5648b8d3a55a0807293051941767ee2779940",
+            "attack_rows": 1,
+            "normal_rows": 2
+          },
+          {
+            "signature": "11ed67058a529afafa61e7dfe7598a59a84cc6c92f65756793b373333dcf5cb9",
+            "attack_case": "73aabf56c1eb6f06cd9f1928eae20c97a27d1a8b313ff3d0becc9cb43d9d46fa",
+            "normal_case": "317efbd5819feeb19a3f1b8b5b33708ce8efdcc88b8d138a8e0673466acd4621",
+            "attack_rows": 3,
+            "normal_rows": 6
+          }
+        ],
+        "scope": "declared observable projection, not all future models or raw observations"
+      },
+      "with_protocol": {
+        "label_assisted_diagnostic_only": true,
+        "mandatory_fp_if_all_baseline_tp_retained": 12,
+        "fp_in_unmixed_signatures": 48,
+        "mixed_signature_count": 5,
+        "witnesses": [
+          {
+            "signature": "0533e4278ef0d657dd5eb410be37c188a6e7a6a7fa1478226fe1e6c6db92196f",
+            "attack_case": "49a572e899253086001e7e08876028508f2de983168f2bbef4838fc5343f1d9d",
+            "normal_case": "59b26b5b8a66a662bd5f89a8b8325527c9aaea1b1f76c88e3859266a48381f36",
+            "attack_rows": 1,
+            "normal_rows": 2
+          },
+          {
+            "signature": "75a161a2917396088b5fad92e21c5fdba5a0116bf691d2ac6ae73d913322f95a",
+            "attack_case": "09742552f1dccb4bddc71c413d842ea15bb7b2840f09a33c459575ddb4525082",
+            "normal_case": "2804793b7abcab831db61327dea972378edca453709c69f1c4f3ee4af7aecc24",
+            "attack_rows": 1,
+            "normal_rows": 2
+          },
+          {
+            "signature": "c160d4234c79624883edd24bffc0172dc68d17502a9a94e66063b40cf3aa0835",
+            "attack_case": "d638791066a6e8179fa81003787258645524cb43b10d8f534a4ce97d86fae339",
+            "normal_case": "0a8f0a7855da49ff99bb98d94bbe1596fba57f477b0aef0a4eccc74579040dc7",
+            "attack_rows": 1,
+            "normal_rows": 2
+          },
+          {
+            "signature": "4062caa33d89209f4a813909c65e752e54af4fb445844ae294e2a01809a2db62",
+            "attack_case": "326e4c3fd7cde3c9cd568bcb390c825d3be92ffd0415a4b99c674960725c5f91",
+            "normal_case": "9efc485cf11a701f35aa05604cf69249a1f7bf52077fb6570fac42d51d5fe975",
+            "attack_rows": 2,
+            "normal_rows": 4
+          },
+          {
+            "signature": "c9dc01ab047d5053ca1e7cd2319aec1d10f7e8e63ee950fb167e1ded4081ec9e",
+            "attack_case": "77fb3f08655447c825e2b4084fe196e498f9630ca176d48748e5052bf36a9a86",
+            "normal_case": "afd1127d46f4660c19936357e2c7f2befc87df6e44816bfbc488274ab3dd7e98",
+            "attack_rows": 1,
+            "normal_rows": 2
+          }
+        ],
+        "scope": "declared observable projection, not all future models or raw observations"
+      },
+      "raw_sha256": "08042e1ad03874326960ef3eef91a50305009cb2e7afe88827750dd839701bb1",
+      "time_errors": 0
+    },
+    "santos": {
+      "population": 5622,
+      "old": {
+        "label_assisted_diagnostic_only": true,
+        "mandatory_fp_if_all_baseline_tp_retained": 60,
+        "fp_in_unmixed_signatures": 0,
+        "mixed_signature_count": 12,
+        "witnesses": [
+          {
+            "signature": "515eb0b632dce29541bdb533430e0c28b2ebe5522db58aeb118ded4a7aa9b259",
+            "attack_case": "bbea180957d895dbf29feb61c0b33cd74a53f52a03bf9716cd9f0d62a90a58a1",
+            "normal_case": "b6caf01c6ba7aeae1011b3237288c5d4998f4b61321e69292f98f507629fbfc5",
+            "attack_rows": 2,
+            "normal_rows": 6
+          },
+          {
+            "signature": "f591af0c6012097518df087db6c2ab18daac4d3a53052987668dcbcff2ae04e5",
+            "attack_case": "574ba5bbbeb37be36707fd550010771069e8595e6c0641e6fe72e75f9252e6c2",
+            "normal_case": "ef96155d747ea5027b5d69f62c442e1ae5559d820f808c7acf47e720bcdc5dad",
+            "attack_rows": 2,
+            "normal_rows": 6
+          },
+          {
+            "signature": "5ab04c0764f0f4efbc7cbb07c82daacc867c2cde19031fae7d86a78ce9fd544e",
+            "attack_case": "2a9df803343a50adf05e604cf55e37b7ab0b2a75662835cd519432d80ef43950",
+            "normal_case": "717bc8eb6ca7d26321a5a7adbdf6aa16f7193e0675bd40f0e54eec054ee35122",
+            "attack_rows": 1,
+            "normal_rows": 2
+          },
+          {
+            "signature": "1095eb55e095ef67e85bfc53b080b0eca11d9628a8f3c7ae0eb075a6aefbaaca",
+            "attack_case": "bc3460405810f7c2ec818a43b221f79f23d6413d94beb86514eb0ceacb10fc3b",
+            "normal_case": "ee6bfc6d6f2f8897317c4141f6d89c100438a9ca919fd9f71272769f5951e699",
+            "attack_rows": 1,
+            "normal_rows": 2
+          },
+          {
+            "signature": "33d056ad0454d54ef5eabab0a0068b05348ef60a909aafd58493198768fe65a3",
+            "attack_case": "e20a7ff59c0e7a22e1913db625f4a4bc6297758fcf0ee3903dfc6b0d65f4c6b3",
+            "normal_case": "d821ab7ac89be60c402860f9471dc598357da0f686159364b02651198f2b3a95",
+            "attack_rows": 3,
+            "normal_rows": 6
+          },
+          {
+            "signature": "4f96c3f92a069b1481b4824c3539436eca9304a3e374edbba09d7d7a016b764d",
+            "attack_case": "e1f28be9e9362a54635300b84cf716766f4377a5d94f4443263466e91d1a4587",
+            "normal_case": "73947a06c5f5a6a9d23e521eb8e6110e3be931ec459b2f4a935bb5712a9375c7",
+            "attack_rows": 2,
+            "normal_rows": 4
+          },
+          {
+            "signature": "da3f8672899b335b171710305c4ce66b7e64870b7be365b3d3cb3ff31ef83c5c",
+            "attack_case": "4f96d940741998f2090f41e16d832f5e2fef19726338aaf9f90fb95b7af5ffdd",
+            "normal_case": "14beb6050f40b33f14fb97951bfb185192d2e26abf614a4a039294159cbdab91",
+            "attack_rows": 10,
+            "normal_rows": 20
+          },
+          {
+            "signature": "b88ef222cdbd73300ad4ef3515b80f6f9454609cd94a5ea88dcac90d4c8e3ce5",
+            "attack_case": "360cb370431124846aceaa97ee986c20fd5d3bc5ca04e04ca8591330f6a6f9fe",
+            "normal_case": "92ce6cc910d79ec002a4d838b171c03f00db445be13f3fb8909aa481879e81b7",
+            "attack_rows": 1,
+            "normal_rows": 2
+          },
+          {
+            "signature": "5e3fa2d9a2dedbb4cdc369ea5ca8861ef6bfc460ca69fa9e989a25e38ff933af",
+            "attack_case": "b6cbb7b1d1ddca8f77fadd262d6b6482b301c49e72c3e76f0198dd551af226cc",
+            "normal_case": "117a8a39efdfc0573d26dcc5c13731790e6b4f92583f802fa7ab1272023592d6",
+            "attack_rows": 1,
+            "normal_rows": 2
+          },
+          {
+            "signature": "11ed67058a529afafa61e7dfe7598a59a84cc6c92f65756793b373333dcf5cb9",
+            "attack_case": "a3fe34b98f242604ecfcfc63fe08418903956a63be0e2bf6e5b0e3000f12b210",
+            "normal_case": "ea392d3150246ab859e5fb0ac774d4b29c87556a325caa7d00a552121bab5ec2",
+            "attack_rows": 3,
+            "normal_rows": 6
+          },
+          {
+            "signature": "6321e72b086f430e64efc43d21f6c6d33d4a1157eb4dd008b9c733476deb2e6a",
+            "attack_case": "0fcfbea888c42317337b1a73d55cd2633b2afd2af7fe491af9b0ed2414be9665",
+            "normal_case": "0a81e610f1be437b8127e63d6ea77e260e803087d7409841728a168fbbe9fc14",
+            "attack_rows": 1,
+            "normal_rows": 2
+          },
+          {
+            "signature": "e17bf75540d1ee7b69bad76776ea63b313d0da59f905a44bc7953478492a8174",
+            "attack_case": "319011b75aec4d1949683ef325e798b1814432eb5302b2b6eee8ec608c4cc5fa",
+            "normal_case": "6a24b755fc345324fcdc5e03ad188b2432bb37a0f116a321f6ce81bd5da7afbb",
+            "attack_rows": 1,
+            "normal_rows": 2
+          }
+        ],
+        "scope": "declared observable projection, not all future models or raw observations"
+      },
+      "with_protocol": {
+        "label_assisted_diagnostic_only": true,
+        "mandatory_fp_if_all_baseline_tp_retained": 12,
+        "fp_in_unmixed_signatures": 48,
+        "mixed_signature_count": 5,
+        "witnesses": [
+          {
+            "signature": "0533e4278ef0d657dd5eb410be37c188a6e7a6a7fa1478226fe1e6c6db92196f",
+            "attack_case": "2a9df803343a50adf05e604cf55e37b7ab0b2a75662835cd519432d80ef43950",
+            "normal_case": "717bc8eb6ca7d26321a5a7adbdf6aa16f7193e0675bd40f0e54eec054ee35122",
+            "attack_rows": 1,
+            "normal_rows": 2
+          },
+          {
+            "signature": "75a161a2917396088b5fad92e21c5fdba5a0116bf691d2ac6ae73d913322f95a",
+            "attack_case": "bc3460405810f7c2ec818a43b221f79f23d6413d94beb86514eb0ceacb10fc3b",
+            "normal_case": "ee6bfc6d6f2f8897317c4141f6d89c100438a9ca919fd9f71272769f5951e699",
+            "attack_rows": 1,
+            "normal_rows": 2
+          },
+          {
+            "signature": "c160d4234c79624883edd24bffc0172dc68d17502a9a94e66063b40cf3aa0835",
+            "attack_case": "e20a7ff59c0e7a22e1913db625f4a4bc6297758fcf0ee3903dfc6b0d65f4c6b3",
+            "normal_case": "d821ab7ac89be60c402860f9471dc598357da0f686159364b02651198f2b3a95",
+            "attack_rows": 1,
+            "normal_rows": 2
+          },
+          {
+            "signature": "4062caa33d89209f4a813909c65e752e54af4fb445844ae294e2a01809a2db62",
+            "attack_case": "e1f28be9e9362a54635300b84cf716766f4377a5d94f4443263466e91d1a4587",
+            "normal_case": "73947a06c5f5a6a9d23e521eb8e6110e3be931ec459b2f4a935bb5712a9375c7",
+            "attack_rows": 2,
+            "normal_rows": 4
+          },
+          {
+            "signature": "c9dc01ab047d5053ca1e7cd2319aec1d10f7e8e63ee950fb167e1ded4081ec9e",
+            "attack_case": "03c84a030863c660909726e63816fbdbeea542710c02e1a4fd777d008bd10f2a",
+            "normal_case": "ab0710f558dcd3824c846d17d409e7f866f8fd4249dc2bc24d3e2cc57be2b44f",
+            "attack_rows": 1,
+            "normal_rows": 2
+          }
+        ],
+        "scope": "declared observable projection, not all future models or raw observations"
+      },
+      "raw_sha256": "f39a169c2ab4165b9848635c6e729a004bddb315f1f2f277f0341baf662e9ba7",
+      "time_errors": 0
+    },
+    "fox": {
+      "population": 7299,
+      "old": {
+        "label_assisted_diagnostic_only": true,
+        "mandatory_fp_if_all_baseline_tp_retained": 86,
+        "fp_in_unmixed_signatures": 2,
+        "mixed_signature_count": 12,
+        "witnesses": [
+          {
+            "signature": "515eb0b632dce29541bdb533430e0c28b2ebe5522db58aeb118ded4a7aa9b259",
+            "attack_case": "8b484ebfc2b5b0898f3074c1c5f8da2f11700146851e661e44f9cb5c2e0e2f13",
+            "normal_case": "45f379f3f48f45c2758262123d4edd65076b1b296291cd18dd00a16530ac3ea6",
+            "attack_rows": 2,
+            "normal_rows": 8
+          },
+          {
+            "signature": "f591af0c6012097518df087db6c2ab18daac4d3a53052987668dcbcff2ae04e5",
+            "attack_case": "328b274e9262fb48ed9e140b6f9c81b84fa4e20032d9d6093d5a6f27e7593a73",
+            "normal_case": "071cf58790d256fbb0b04611d4bf5df4e6f8decef1f95011964bc1d765121e1d",
+            "attack_rows": 2,
+            "normal_rows": 8
+          },
+          {
+            "signature": "5ab04c0764f0f4efbc7cbb07c82daacc867c2cde19031fae7d86a78ce9fd544e",
+            "attack_case": "944d8ba9e245504a3cfb802464ba56b2147a9e0bc5c95628badeff9afe7bb3e9",
+            "normal_case": "fda06edf0aa373fe2b2e1d6db062b84a36c3a755da0aabb1644e5fd7e534bf98",
+            "attack_rows": 1,
+            "normal_rows": 3
+          },
+          {
+            "signature": "1095eb55e095ef67e85bfc53b080b0eca11d9628a8f3c7ae0eb075a6aefbaaca",
+            "attack_case": "449ce5b363d473a48a594563ef92c2a727892b553af4b198960e9caac95254ca",
+            "normal_case": "b2785d3f363363c6ef4e7aa48cee038ab53b3d7ff911b2c07b298baa3868f85c",
+            "attack_rows": 1,
+            "normal_rows": 3
+          },
+          {
+            "signature": "33d056ad0454d54ef5eabab0a0068b05348ef60a909aafd58493198768fe65a3",
+            "attack_case": "ad7dad0bb4c8b974c8683b0e2cda8cbd5d49af6dad50766bce0f3952499b1537",
+            "normal_case": "e3b9ce057f128374c0cae608a97b2ed5da642525055fa3d50dca7dbd5087d984",
+            "attack_rows": 3,
+            "normal_rows": 9
+          },
+          {
+            "signature": "4f96c3f92a069b1481b4824c3539436eca9304a3e374edbba09d7d7a016b764d",
+            "attack_case": "7752a65edbc9f1aa4da63c1661f2f2e9e7c60703fce6e02aceab57633c2b0fd1",
+            "normal_case": "99a6e817cef31417e4c22f1746a1aa924b543279deea6732bfd0e0b021c51689",
+            "attack_rows": 2,
+            "normal_rows": 6
+          },
+          {
+            "signature": "da3f8672899b335b171710305c4ce66b7e64870b7be365b3d3cb3ff31ef83c5c",
+            "attack_case": "3ec1a0a5516b376b89a33ca47a8f903dc52678e552e2c2f9c5cd397856e889e8",
+            "normal_case": "9d82f2569f94f7f921ab4be8d4a75a0436862712b61b94deba44713151ebbc89",
+            "attack_rows": 10,
+            "normal_rows": 30
+          },
+          {
+            "signature": "8b623881745e0a10ed081e8f6519b5600e63388cb119d029732d8aaf0897478a",
+            "attack_case": "914c116e4f49bb8aec07915581567ffde2559e7a0d88d8c5e2332c32632772c7",
+            "normal_case": "a9fdb65dee36a808ae888965dc3a9894393e968955cccf03774eaee2d9513357",
+            "attack_rows": 1,
+            "normal_rows": 3
+          },
+          {
+            "signature": "5e3fa2d9a2dedbb4cdc369ea5ca8861ef6bfc460ca69fa9e989a25e38ff933af",
+            "attack_case": "436081c56082ff20dc3f468367e6eaa86fd53a4e3d8b53ebd6190b30c48f7be2",
+            "normal_case": "144794025ff2d630dc727b5f9575223a3c1c1af5bbc74a24531ee5c0bbf2260b",
+            "attack_rows": 1,
+            "normal_rows": 3
+          },
+          {
+            "signature": "11ed67058a529afafa61e7dfe7598a59a84cc6c92f65756793b373333dcf5cb9",
+            "attack_case": "1efd3a758dc5a2a66c5f3f4c5a9fa6f4878a74c6c73d7e87ca5d41bdcba7677f",
+            "normal_case": "f909ede470bc33b6c9dd2a8da53d098a00725323ef547b4fdc6a670e82d2bdf3",
+            "attack_rows": 3,
+            "normal_rows": 9
+          },
+          {
+            "signature": "6321e72b086f430e64efc43d21f6c6d33d4a1157eb4dd008b9c733476deb2e6a",
+            "attack_case": "ae1d76453783442284fa75de46009c4a8089a0c61aa7ee4348b842b644763cb3",
+            "normal_case": "a4d83004e39e423e1957521e56e352e89828af0591ae0b9accf9dc862a3892a0",
+            "attack_rows": 1,
+            "normal_rows": 2
+          },
+          {
+            "signature": "e17bf75540d1ee7b69bad76776ea63b313d0da59f905a44bc7953478492a8174",
+            "attack_case": "88db39f8abfed695070a3c9271d69389bdc14a9f3aa286a5c0c2f1281f9bcb82",
+            "normal_case": "78019839ba3d745f1be9b392e5b108c35209def72bb214f7c8f7ea30b4ddee2a",
+            "attack_rows": 1,
+            "normal_rows": 2
+          }
+        ],
+        "scope": "declared observable projection, not all future models or raw observations"
+      },
+      "with_protocol": {
+        "label_assisted_diagnostic_only": true,
+        "mandatory_fp_if_all_baseline_tp_retained": 18,
+        "fp_in_unmixed_signatures": 70,
+        "mixed_signature_count": 5,
+        "witnesses": [
+          {
+            "signature": "0533e4278ef0d657dd5eb410be37c188a6e7a6a7fa1478226fe1e6c6db92196f",
+            "attack_case": "944d8ba9e245504a3cfb802464ba56b2147a9e0bc5c95628badeff9afe7bb3e9",
+            "normal_case": "fda06edf0aa373fe2b2e1d6db062b84a36c3a755da0aabb1644e5fd7e534bf98",
+            "attack_rows": 1,
+            "normal_rows": 3
+          },
+          {
+            "signature": "75a161a2917396088b5fad92e21c5fdba5a0116bf691d2ac6ae73d913322f95a",
+            "attack_case": "449ce5b363d473a48a594563ef92c2a727892b553af4b198960e9caac95254ca",
+            "normal_case": "b2785d3f363363c6ef4e7aa48cee038ab53b3d7ff911b2c07b298baa3868f85c",
+            "attack_rows": 1,
+            "normal_rows": 3
+          },
+          {
+            "signature": "c160d4234c79624883edd24bffc0172dc68d17502a9a94e66063b40cf3aa0835",
+            "attack_case": "ad7dad0bb4c8b974c8683b0e2cda8cbd5d49af6dad50766bce0f3952499b1537",
+            "normal_case": "e3b9ce057f128374c0cae608a97b2ed5da642525055fa3d50dca7dbd5087d984",
+            "attack_rows": 1,
+            "normal_rows": 3
+          },
+          {
+            "signature": "4062caa33d89209f4a813909c65e752e54af4fb445844ae294e2a01809a2db62",
+            "attack_case": "7752a65edbc9f1aa4da63c1661f2f2e9e7c60703fce6e02aceab57633c2b0fd1",
+            "normal_case": "99a6e817cef31417e4c22f1746a1aa924b543279deea6732bfd0e0b021c51689",
+            "attack_rows": 2,
+            "normal_rows": 6
+          },
+          {
+            "signature": "c9dc01ab047d5053ca1e7cd2319aec1d10f7e8e63ee950fb167e1ded4081ec9e",
+            "attack_case": "5437e6fda2055f314f920819bd257cb9559ca4f2aa4dc4d4c66c939781f63338",
+            "normal_case": "8e227dcef316e7b34d5387fbe3f25aa38db433ddc09f497d02ec6ea128e99985",
+            "attack_rows": 1,
+            "normal_rows": 3
+          }
+        ],
+        "scope": "declared observable projection, not all future models or raw observations"
+      },
+      "raw_sha256": "dc8357ad1a2a4ce9e8963f1eb5eaccdfc106d32de5ae720d052956cedc618722",
+      "time_errors": 0
+    }
+  },
+  "aws_calls": 0,
+  "paid_api_calls": 0,
+  "classification_performance_changed": false,
+  "diagnostic_only": true,
+  "prototype_unit_tested": false,
+  "production_adopted": false,
+  "run_sha256": "c8cb04431748dc9518595bcbb6ef9ad79bd1a0369f92b450ef79beaca8cae42c",
+  "projection_contract": "v41 full signature plus current/past source ordinal protocol, certificate subject equality and bounded client claims; no raw identifiers as learned values",
+  "reference": "https://openvpn.net/community-docs/community-articles/openvpn-2-6-manual/"
+}

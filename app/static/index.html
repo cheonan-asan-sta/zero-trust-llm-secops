@@ -11,6 +11,7 @@
   <link href="/static/dashboard.css" rel="stylesheet"/>
   <script defer="" src="/static/dashboard.js">
   </script>
+  <script defer="" src="/static/dashboard-operations.js"></script>
  </head>
  <body>
   <a class="skip-link" href="#content">
@@ -18,13 +19,10 @@
   </a>
   <aside aria-label="주 메뉴" class="sidebar">
    <a class="brand" href="#overview">
-    <span class="brand-mark">
-     ZT
-    </span>
     <span>
      천안아산역
      <small>
-      보안 관제
+      보안 운영 콘솔
      </small>
     </span>
    </a>
@@ -83,9 +81,17 @@
     </a>
    </nav>
    <p class="nav-caption second">
-    도구
+    작업
    </p>
    <nav>
+    <a data-page="analysis" href="#analysis">분석 및 탐지</a>
+    <a data-page="evaluation" href="#evaluation">평가 및 공개 로그</a>
+    <a data-page="cases" href="#cases">사고 및 전송 관리</a>
+    <a data-page="context" href="#context">기준선 및 작업 승인</a>
+    <a data-page="signals" href="#signals">신호 입력 및 세션 제어</a>
+    <a data-page="responses" href="#responses">대응 요청 및 승인</a>
+    <a data-page="assurance" href="#assurance">보안 통제 점검</a>
+    <a data-page="operations" href="#operations">실행 환경 및 모델 비교</a>
     <a data-page="demo" href="#demo">
      <svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewbox="0 0 24 24">
       <path d="M8 4v16l12-8z">
@@ -102,18 +108,13 @@
     </a>
    </nav>
    <button aria-label="연결 및 인증" class="connection-button" id="connectionButton">
-    <span class="avatar">
-     ID
-    </span>
     <span>
      연결 및 인증
      <small id="authLabel">
       확인 중
      </small>
     </span>
-    <span>
-     ⚙
-    </span>
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3" fill="currentColor"/><circle cx="15" cy="17" r="3" fill="currentColor"/></svg>
    </button>
   </aside>
   <div class="app-shell">
@@ -141,19 +142,17 @@
     <div class="page-heading">
      <div>
       <h1 id="pageTitle">
-       운영 현황
+       관제 개요
       </h1>
       <p id="pageDescription">
-       분석 기록과 세션 상태
+       분석 현황 및 접근 통제
       </p>
      </div>
      <div class="heading-actions">
       <button class="button secondary" id="refresh">
+       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 3M4 15l2 3a7 7 0 0 0 12-1"/></svg>
        새로고침
       </button>
-      <a class="button secondary" href="#demo">
-       시연 화면
-      </a>
      </div>
     </div>
     <div class="status-strip">
@@ -206,7 +205,7 @@
         —
        </strong>
        <div class="kpi-caption">
-        최근 조회 세션 기준
+        조회 세션
         <span id="sessionSample">
         </span>
        </div>
@@ -219,11 +218,69 @@
         —
        </strong>
        <div class="kpi-caption">
-        검토가 필요한 분석
+        조치 검토 필요
        </div>
       </article>
      </div>
      <div class="overview-grid">
+      <article class="card wide-card">
+       <div class="card-heading">
+        <div>
+         <h2>
+          최근 보안 이벤트
+         </h2>
+         <p>
+          최신 분석 5건
+         </p>
+        </div>
+        <a class="text-link" href="#logs">
+         전체 로그 보기 →
+        </a>
+       </div>
+       <div class="table-wrap">
+        <table>
+         <thead>
+          <tr>
+           <th>
+            위험도
+           </th>
+           <th>
+            이벤트
+           </th>
+           <th>
+            분석기
+           </th>
+           <th>
+            대응 제안
+           </th>
+           <th>
+            시각
+           </th>
+           <th>
+           </th>
+          </tr>
+         </thead>
+         <tbody id="recentLogs">
+         </tbody>
+        </table>
+       </div>
+      </article>
+      <article class="card distribution-card">
+       <div class="card-heading">
+        <div>
+         <h2>
+          위험도 분포
+         </h2>
+         <p>
+          누적 분석 결과 기준
+         </p>
+        </div>
+       </div>
+       <div class="risk-summary"><strong id="riskTotal">—</strong><span>건 분석</span></div>
+       <div class="risk-bar" id="riskBar" aria-hidden="true"></div>
+       <div class="risk-legend" id="riskLegend">
+       </div>
+      </article>
       <article class="card activity-card">
        <div class="card-heading">
         <div>
@@ -261,74 +318,6 @@
         <span id="latencyMetric">
          평균 응답 —
         </span>
-       </div>
-      </article>
-      <article class="card distribution-card">
-       <div class="card-heading">
-        <div>
-         <h2>
-          위험도 분포
-         </h2>
-         <p>
-          누적 분석 결과 기준
-         </p>
-        </div>
-       </div>
-       <div class="donut-wrap">
-        <div class="donut" id="riskDonut">
-         <div>
-          <strong id="donutTotal">
-           —
-          </strong>
-          <span>
-           전체
-          </span>
-         </div>
-        </div>
-       </div>
-       <div class="risk-legend" id="riskLegend">
-       </div>
-      </article>
-      <article class="card wide-card">
-       <div class="card-heading">
-        <div>
-         <h2>
-          최근 분석 로그
-         </h2>
-         <p>
-          최근 5건
-         </p>
-        </div>
-        <a class="text-link" href="#logs">
-         로그 전체 보기
-        </a>
-       </div>
-       <div class="table-wrap">
-        <table>
-         <thead>
-          <tr>
-           <th>
-            위험도
-           </th>
-           <th>
-            이벤트 / 판단 유형
-           </th>
-           <th>
-            분석기
-           </th>
-           <th>
-            대응 제안
-           </th>
-           <th>
-            시각
-           </th>
-           <th>
-           </th>
-          </tr>
-         </thead>
-         <tbody id="recentLogs">
-         </tbody>
-        </table>
        </div>
       </article>
       <article class="card pipeline-card">
@@ -403,9 +392,7 @@
      <div class="card">
       <div class="filter-bar">
        <label class="search-box">
-        <span>
-         ⌕
-        </span>
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg>
         <input aria-label="로그 검색" id="logSearch" placeholder="이벤트 ID, 근거, 사용자 검색" type="search"/>
        </label>
        <label>
@@ -488,7 +475,7 @@
            위험도
           </th>
           <th>
-           이벤트 / 판단 유형
+           이벤트
           </th>
           <th>
            분석기
@@ -558,7 +545,7 @@
         불러오는 중
        </span>
        <span>
-        ACTIVE 상태여도 토큰 만료 또는 사용 이력에 따라 접근이 거부될 수 있습니다.
+        접근 허용은 토큰의 유효기간과 사용 여부를 함께 검사합니다.
        </span>
       </div>
       <div class="table-wrap">
@@ -606,7 +593,7 @@
          </p>
         </div>
         <span class="pill neutral">
-         조회 전용
+         변경 이력
         </span>
        </div>
        <div class="timeline" id="contextHistory">
@@ -631,7 +618,7 @@
       </article>
      </div>
      <div class="scope-note">
-      이 화면에서는 기록만 조회합니다. 승인과 실행은 권한이 있는 검토자가 기존 API에서 처리합니다.
+      대응 요청의 상세에서 현재 버전을 확인하고 승인, 취소 또는 모의 실행을 진행합니다.
      </div>
     </section>
     <section aria-label="시연 시나리오" data-view="demo" hidden="">
@@ -741,6 +728,7 @@
       </a>
      </div>
     </section>
+    <section id="operationsWorkspace" hidden="" aria-label="작업 공간"></section>
     <footer>
      <span>
       천안아산역

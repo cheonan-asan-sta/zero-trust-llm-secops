@@ -1,5 +1,37 @@
 # 4주차 잔여 작업과 직접 확인할 일
 
+**최신 v115:** [앞선 journal 실행 관측](extra-journal-service-review.md). 공유 감사 TP 0→2·FN 6→4·FP 3 유지·F1 36.36%. 같은 학습 사건의 audit 2행, 사람/현재 invocation/유출 성공 검증은 아님. 원래 1,681,815행·새 FP/기존 TP 손실 0·Linux 820건. 인증·웹 감사 100%·VPN F1 80% 유지·전체 목표 active·push/새 CI/병합 보류.
+
+**직전 v114:** [VPN 제어 메시지 관측](extra-vpn-control-review.md). VPN FP 48→42·TP 84/FN 0 유지·F1 80%, 별도 Harrison/Shaw/Wheeler FP 각 2건 감소. 원래 1,681,815행 유지·새 FP/기존 TP 손실 0·Linux 776건. 인증·웹 감사 관측 100% 유지. 공유 감사·VPN·원래 6영역 독립 목표는 미완료·목표 active·push/새 CI/병합 보류.
+
+**직전 v113:** [실제 정상 SSH·sudo 감사 학습](extra-native-audit-normal-review.md). 웹 감사 FP 15→0·TP 47/FN 0 유지·F1 100%, 별도 Wilson/Wardbeck FP 각 10→0. 원래 1,681,815행·새 FP/기존 TP 손실 0·Linux 732건. 추가 실제 정상 169행은 학습 전용으로 분모에 미합산. 공유 감사·VPN·원래 6영역 독립 목표는 미완료이며 목표 active·push/새 CI/병합 보류.
+
+**직전 v112:** [웹 방화벽 요청·netfilter 동시 관측](extra-web-firewall-review.md). 별도 학습 Wilson 웹 감사 FN3→0·TP19→22·FP10 유지·F1 81.48%. 원래1,681,815행 유지·전체 새FP/TP손실0·Linux693건. 사람/부모 프로세스 인과 증명 아님·전체 목표 active·push/새CI/병합 보류.
+
+**직전 v111:** [공유 감사 실행 관측 기반 오탐 개선](extra-apparmor-causal-review.md). FP24→3·별도 Wilson/Wardbeck 각8→1, 전체 새FP/TP손실0·Linux644건. 공유 감사 FN6/F1 0%는 그대로다. VPN/인증/웹 감사 기존 성능 유지·전체 목표 active·push/새CI/병합 보류.
+
+**직전 v110:** [VPN 공격 근거의 인과적 유지](extra-vpn-attack-evidence.md). 별도 학습 Wheeler FN28→9·TP28→47·FP38 유지. 기존1,681,815행 판정 유지·전체 새FP/TP손실0·Linux606건. 학습 결과이며 독립 목표는 미달/미완료. 목표 active·push/새CI/병합 보류.
+
+**직전 v109:** [VPN 추가 연결 문맥](extra-vpn-protocol-refinement.md). 기존1,681,815행에서 VPN FP208→48·F1 44.68%→77.78%, 기존TP84/FN0 유지·새FP/TP손실0. Linux579건. 이미지 내 프로젝트 자료 차단 후9개 묶음 예측 지문 동일 확인. 인증 개선 유지, 공유/웹 감사·VPN·독립 목표는 아직 미달. 목표 active·push/새CI/병합 보류.
+
+**직전 v108:** [웹 저장 경로의 root 계정 조회 문맥](extra-webpath-identity-read.md). Linux489건·기존1,681,815행 판정 유지. 별도8,908행 Wilson 인증FN1→0·새FP/TP손실0. 관측5개자료 인증 P/R/F1 각각100%이며 새 독립 평가가 아니다. 웹 감사 F1 86.24%·공유 감사·VPN 및 원래6영역 독립 목표는 미달/미인수다. 목표 active·push/새CI/병합 보류.
+
+**직전 v107:** [개발 학습 확장·전이 미탐 회수](extra-audit-training-extension.md). Linux475건·기존1,681,815행 판정 유지. 별도8,908행에서 웹 감사 미탐2·인증 미탐1 회수, 새FP/TP손실0. 추가8,325행은 학습용으로 시험 분모에 합산하지 않았다. R/S/F 인증100%·웹 감사 F1 86.24% 유지지만 Wilson 인증FN1·공유/웹 감사·VPN·원래6영역 독립 목표는 남아 있다. 목표 active·push/새CI/병합 보류.
+
+**직전 v106 웹 감사 개선:** [프로세스 역할·로그인 흐름](extra-audit-intent-context.md). 기존1,681,815행에서 FP6건 감소·새FP/기존TP손실0. 웹 감사 FP21→15·F1 81.74%→86.24%, 인증100% 유지. Linux372건 통과. 모델은R/S/Wilson 학습·Fox/Wardbeck 비학습 보정이며 새 독립 인수가 아니다. 전체 목표 active·push/새CI/병합 보류.
+
+**직전 v105 실제 인증 미탐 개선:** [명령/PAM 원문 문맥](extra-sensitive-auth-context.md). 기존1,681,815행에서 미탐3건 회수·새FP/TP손실0. 관측 인증32양성/1,082정상에서 P/R/F1 각각100%, FPR/FNR0%, R/S/F 각 자료도 충족. Linux348건 통과. 공유/웹 감사·VPN 및 원래6영역 독립 목표는 미달/미인수이며 목표 active·push/새CI/병합 보류.
+
+**직전 v104 근거 적용 판정:** [공유 감사·인증·VPN 판정 개선](extra-evidence-risk-refinement.md). Linux526건·실제 systemd18조건 통과. 로컬 정책 제어6시나리오에서 불필요 경보2→0·명시적 폐기 미탐3→0. 점수는 fixture이며 독립 공격 탐지 F1에 합산하지 않는다. v103 대비 기존1,681,815행 판정 동일·새FP/TP손실0·목표 미달. push·새CI·병합 보류.
+
+**직전 v103 로컬 수집·연결:** [실행 주체·PAM 호출 신원·VPN 기기 결속](extra-live-evidence-ingress.md). Linux 집중485건·실제 systemd/PAM/OIDC11조건 통과. v102 대비 기존1,681,815행 판정 동일·새FP/기존TP손실0. 과거 로그의 미상 근거를 소급 생성하지 않아 탐지 목표는 계속 미달이다. 기관 SSO/MDM·실제 VPN hook·새 독립 평가는 별도이며 push·새CI·병합은 보류한다.
+
+**직전 v102 로컬 개선:** [같은 소스 audit 사건 순서 보강](extra-ordered-audit-review.md). 기존1,681,815행에서 웹 감사 FN1→0·F1 80.70%→81.74%, 새FP/기존TP손실0. Linux 묶음339건 통과. 공유 감사·인증·VPN은 유지됐으며 목표 미달·새 독립 평가 아님. 추가 push·CI·병합 없이 로컬 후보로 보존한다.
+
+
+**2026-11-16 새 게시 순서:** [성능 개선·로컬 목표 확인을 CI보다 먼저](local-performance-before-ci.md). PR88의 기존17개 CI는 성공했지만 미병합 draft로 보존한다. 실제 목표 충족 확인 전 추가 push/CI/병합을 보류하며 로컬 개발·monitored 원인 조사는 이어간다. 집계 숫자·라벨·분모를 목표에 맞춰 바꾸지 않는다.
+
+
 
 현재 PAM 관측의 외부 체크포인트·암호화 사본·격리 복원·키 없는 손상 상태 검증은 [추가 보존·복구 결과](extra-pam-observation-backup.md)를 확인한다. 전체6,380·집중158건, 실제 systemd67/10/23·별도 Docker6조건을 통과했으며 탐지 목표는 아직 미달이다. 실제 PAM 운영 백업/경보 배포·원격 witness·독립 성능 인수는 별도다.
 

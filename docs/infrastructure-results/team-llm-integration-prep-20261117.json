@@ -1,0 +1,472 @@
+{
+  "schema": "team-llm-integration-prep-1",
+  "checked_at_kst": "2026-11-17T08:35:36.306976+09:00",
+  "refs": {
+    "origin/main": "d2370c2a493cfa584ad005420abe172cef913c7b",
+    "origin/aitest": "b3abad3871be881e5978dc4f677d7714880c4f82",
+    "origin/feature/kim-dashboard-refinement": "57c77c2ba8af144ab9beffe47dbb2bc7ac1094a3",
+    "feature/chaeheeju-local-target-gate": "51bb4836bccc2bd436846b758477b3107809f46e",
+    "HEAD": "5b5708b232ea5185b7c697d78b19bd769d38c554"
+  },
+  "local_baseline_refs": {
+    "main": "b1d61563e8fecd47d8386f0183f2224647ad60ed",
+    "aitest": "cea8303ad40350e07d088767d570fb340e89156e"
+  },
+  "relations": [
+    {
+      "left": "origin/main",
+      "right": "origin/aitest",
+      "merge_base": "be25a5c93cc8d60ddde1ea94e185cbba121be23b",
+      "left_right_counts": [
+        4,
+        47
+      ]
+    },
+    {
+      "left": "origin/main",
+      "right": "origin/feature/kim-dashboard-refinement",
+      "merge_base": "57c77c2ba8af144ab9beffe47dbb2bc7ac1094a3",
+      "left_right_counts": [
+        1,
+        0
+      ]
+    },
+    {
+      "left": "origin/main",
+      "right": "feature/chaeheeju-local-target-gate",
+      "merge_base": "be25a5c93cc8d60ddde1ea94e185cbba121be23b",
+      "left_right_counts": [
+        4,
+        123
+      ]
+    },
+    {
+      "left": "origin/main",
+      "right": "HEAD",
+      "merge_base": "d2370c2a493cfa584ad005420abe172cef913c7b",
+      "left_right_counts": [
+        0,
+        124
+      ]
+    },
+    {
+      "left": "origin/aitest",
+      "right": "origin/feature/kim-dashboard-refinement",
+      "merge_base": "be25a5c93cc8d60ddde1ea94e185cbba121be23b",
+      "left_right_counts": [
+        47,
+        3
+      ]
+    },
+    {
+      "left": "origin/aitest",
+      "right": "feature/chaeheeju-local-target-gate",
+      "merge_base": "b3abad3871be881e5978dc4f677d7714880c4f82",
+      "left_right_counts": [
+        0,
+        76
+      ]
+    },
+    {
+      "left": "origin/aitest",
+      "right": "HEAD",
+      "merge_base": "b3abad3871be881e5978dc4f677d7714880c4f82",
+      "left_right_counts": [
+        0,
+        81
+      ]
+    },
+    {
+      "left": "origin/feature/kim-dashboard-refinement",
+      "right": "feature/chaeheeju-local-target-gate",
+      "merge_base": "be25a5c93cc8d60ddde1ea94e185cbba121be23b",
+      "left_right_counts": [
+        3,
+        123
+      ]
+    },
+    {
+      "left": "origin/feature/kim-dashboard-refinement",
+      "right": "HEAD",
+      "merge_base": "57c77c2ba8af144ab9beffe47dbb2bc7ac1094a3",
+      "left_right_counts": [
+        0,
+        125
+      ]
+    },
+    {
+      "left": "feature/chaeheeju-local-target-gate",
+      "right": "HEAD",
+      "merge_base": "51bb4836bccc2bd436846b758477b3107809f46e",
+      "left_right_counts": [
+        0,
+        5
+      ]
+    }
+  ],
+  "source_commit": "51bb4836bccc2bd436846b758477b3107809f46e",
+  "candidate_commit": "5b5708b232ea5185b7c697d78b19bd769d38c554",
+  "merge_tree": {
+    "command": "git merge-tree --write-tree 51bb483 origin/main",
+    "tree": "d6315544fd2faf84948f9cd7275238194560518b",
+    "exit_code": 0,
+    "text_conflicts": []
+  },
+  "overlap_files": [
+    ".env.example",
+    "app/config.py",
+    "scripts/test_execution_mtls_runtime.py"
+  ],
+  "preservation": {
+    "original_runtime_python_data_infra_paths_checked": 679,
+    "unchanged_paths": 674,
+    "unchanged_blob_manifest_sha256": "7f1fa3246513a67bb0edba9fe2642e05a6c0eaa9c1b9c159d478328a85fbcd8f",
+    "changed_existing_paths": [
+      "app/config.py",
+      "app/dashboard_api.py",
+      "app/main.py",
+      "scripts/execution_mtls_runtime.py",
+      "scripts/test_execution_mtls_runtime.py"
+    ],
+    "all_changed_or_added_app_script_infra_paths": [
+      "app/config.py",
+      "app/dashboard_api.py",
+      "app/dashboard_catalog.py",
+      "app/dashboard_jobs_api.py",
+      "app/main.py",
+      "app/services/dashboard_jobs.py",
+      "app/static/dashboard-operations.js",
+      "app/static/dashboard.css",
+      "app/static/dashboard.js",
+      "app/static/index.html",
+      "scripts/dashboard_job.py",
+      "scripts/execution_mtls_runtime.py",
+      "scripts/test_dashboard_operations_browser.py",
+      "scripts/test_execution_mtls_runtime.py"
+    ],
+    "native_replay_rerun": false,
+    "baseline_native_rows": 1681815,
+    "baseline_shared_audit_f1_percent": 80,
+    "baseline_vpn_f1_percent": 80,
+    "independent_95_percent_goal_met": false,
+    "unchanged_tree_pins": {
+      "app/analyzers": {
+        "source": "8c8b336179e215c308a77de86aa21e86bf3560dd",
+        "candidate": "8c8b336179e215c308a77de86aa21e86bf3560dd"
+      },
+      "app/data": {
+        "source": "7bcb0505bc06e2dbe591f92e0c187bd203e555f5",
+        "candidate": "7bcb0505bc06e2dbe591f92e0c187bd203e555f5"
+      },
+      "app/grounded_prompting.py": {
+        "source": "5d1fb378f34c5fbd4efc28d33df345645ea93c4c",
+        "candidate": "5d1fb378f34c5fbd4efc28d33df345645ea93c4c"
+      },
+      "app/models.py": {
+        "source": "f5ee8d510971c79b0c6270c21165720a2c27c3aa",
+        "candidate": "f5ee8d510971c79b0c6270c21165720a2c27c3aa"
+      },
+      "app/security.py": {
+        "source": "ceb74733fff2646d5f496d325912481024fe42e4",
+        "candidate": "ceb74733fff2646d5f496d325912481024fe42e4"
+      },
+      "app/services/zero_trust.py": {
+        "source": "b28445589dcca09a2866c3c6cc9370a5dd4b48bb",
+        "candidate": "b28445589dcca09a2866c3c6cc9370a5dd4b48bb"
+      },
+      "scripts/f1_lab": {
+        "source": "67ea7fa71d77d33da3d15c0a4fc81a3caa542cf8",
+        "candidate": "67ea7fa71d77d33da3d15c0a4fc81a3caa542cf8"
+      },
+      "infra": {
+        "source": "4d183d931cfdea6118ef842344159a4f9fbde2c6",
+        "candidate": "4d183d931cfdea6118ef842344159a4f9fbde2c6"
+      },
+      "app/response_workflow.py": {
+        "source": "40fc9ee0fcf8a451a3ea75ba271deca22d17570a",
+        "candidate": "40fc9ee0fcf8a451a3ea75ba271deca22d17570a"
+      },
+      "app/services/response_actions.py": {
+        "source": "d6307e619ca7e250b4d33692959693f58bdf0987",
+        "candidate": "d6307e619ca7e250b4d33692959693f58bdf0987"
+      },
+      "app/zero_trust_api.py": {
+        "source": "806b944f6695d4983f429e95f637298315c7d798",
+        "candidate": "806b944f6695d4983f429e95f637298315c7d798"
+      },
+      "app/behavior_context_api.py": {
+        "source": "a29683d1ef055e92091702291ef218a1e720958b",
+        "candidate": "a29683d1ef055e92091702291ef218a1e720958b"
+      }
+    },
+    "per_file_working_tree_clean_filter_comparison": {
+      "paths_checked": 679,
+      "changed_existing_paths": [
+        "app/config.py",
+        "app/dashboard_api.py",
+        "app/main.py",
+        "scripts/execution_mtls_runtime.py",
+        "scripts/test_execution_mtls_runtime.py"
+      ]
+    }
+  },
+  "candidate_source_tar_sha256": "67c80ec477d59fba6df8e2d556fe07b37944b9af0cf209fcc8d8625c06de3f71",
+  "execution_constraints": {
+    "paid_llm_requests": 0,
+    "aws_operations": 0,
+    "docker_runtime_operations": 0,
+    "soak_8h": false,
+    "push": false,
+    "pull_request": false,
+    "new_ci": false,
+    "baseline_branch_merges": false
+  },
+  "validation": {
+    "linux_full": {
+      "status": "completed",
+      "source": "git archive 5b5708b, Linux filesystem snapshot",
+      "junit": "team-llm-integration-linux-20261117.xml",
+      "command": "python -m pytest -q --junitxml=<checkout>/docs/infrastructure-results/team-llm-integration-linux-20261117.xml",
+      "python": "3.12.3",
+      "tests": 7401,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2,
+      "passed": 7399,
+      "seconds": 985.545,
+      "skipped_cases": [
+        {
+          "classname": "tests.test_runtime_patches",
+          "name": "test_actual_container_runtime_security_and_provenance",
+          "reason": "patched Linux image only; host runtime unchanged"
+        },
+        {
+          "classname": "tests.test_runtime_patches",
+          "name": "test_new_offline_venv_bootstraps_patched_pip",
+          "reason": "patched Linux image only; host runtime unchanged"
+        }
+      ],
+      "exit_code": 0,
+      "warnings": 5
+    },
+    "windows_focused": {
+      "passed": 130,
+      "skipped": 20,
+      "failed": 0,
+      "python": "3.12.9",
+      "packages": {
+        "pytest": "8.4.2",
+        "fastapi": "0.141.1",
+        "openai": "2.54.0",
+        "cryptography": "50.0.1",
+        "ruff": "0.16.6"
+      },
+      "junit": "team-llm-integration-windows-20261117.xml",
+      "reason_for_skips": "POSIX host command/ownership/locking tests",
+      "test_paths": [
+        "tests/test_dashboard_integration_boundaries.py",
+        "tests/test_dashboard_operations.py",
+        "tests/test_dashboard_identity.py",
+        "tests/test_api.py",
+        "tests/test_grounded_prompting.py",
+        "tests/test_openai_analyzer.py",
+        "tests/test_hybrid_analyzer.py",
+        "tests/test_llm_grounded_evaluation.py",
+        "tests/test_security.py",
+        "tests/zero_trust/test_api_regressions.py"
+      ],
+      "tests": 150,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 11.659,
+      "skipped_cases": [
+        {
+          "classname": "tests.test_dashboard_integration_boundaries",
+          "name": "test_dashboard_command_contracts_keep_explicit_live_boundary[runtime-status-scripts.execution_mtls_runtime-status]",
+          "reason": "POSIX job commands"
+        },
+        {
+          "classname": "tests.test_dashboard_integration_boundaries",
+          "name": "test_dashboard_command_contracts_keep_explicit_live_boundary[runtime-up-scripts.execution_mtls_runtime-up]",
+          "reason": "POSIX job commands"
+        },
+        {
+          "classname": "tests.test_dashboard_integration_boundaries",
+          "name": "test_dashboard_command_contracts_keep_explicit_live_boundary[runtime-down-scripts.execution_mtls_runtime-down]",
+          "reason": "POSIX job commands"
+        },
+        {
+          "classname": "tests.test_dashboard_integration_boundaries",
+          "name": "test_dashboard_command_contracts_keep_explicit_live_boundary[runtime-recover-scripts.execution_mtls_runtime-recover]",
+          "reason": "POSIX job commands"
+        },
+        {
+          "classname": "tests.test_dashboard_integration_boundaries",
+          "name": "test_dashboard_command_contracts_keep_explicit_live_boundary[runtime-verify-scripts.test_execution_mtls_runtime-None]",
+          "reason": "POSIX job commands"
+        },
+        {
+          "classname": "tests.test_dashboard_integration_boundaries",
+          "name": "test_dashboard_command_contracts_keep_explicit_live_boundary[m6-mock-scripts.evaluate_m6-None]",
+          "reason": "POSIX job commands"
+        },
+        {
+          "classname": "tests.test_dashboard_integration_boundaries",
+          "name": "test_dashboard_command_contracts_keep_explicit_live_boundary[m6-plan-scripts.evaluate_m6-None]",
+          "reason": "POSIX job commands"
+        },
+        {
+          "classname": "tests.test_dashboard_integration_boundaries",
+          "name": "test_dashboard_command_contracts_keep_explicit_live_boundary[m6-live-scripts.evaluate_m6-None]",
+          "reason": "POSIX job commands"
+        },
+        {
+          "classname": "tests.test_dashboard_operations",
+          "name": "test_host_jobs_require_server_bound_admin_and_deduplicate[viewer-403]",
+          "reason": "POSIX host jobs"
+        },
+        {
+          "classname": "tests.test_dashboard_operations",
+          "name": "test_host_jobs_require_server_bound_admin_and_deduplicate[responder-403]",
+          "reason": "POSIX host jobs"
+        },
+        {
+          "classname": "tests.test_dashboard_operations",
+          "name": "test_host_jobs_require_server_bound_admin_and_deduplicate[admin-202]",
+          "reason": "POSIX host jobs"
+        },
+        {
+          "classname": "tests.test_dashboard_operations",
+          "name": "test_disabled_host_control_and_live_budget_are_not_browser_overrides",
+          "reason": "POSIX host jobs"
+        },
+        {
+          "classname": "tests.test_dashboard_operations",
+          "name": "test_pending_conflicts_restart_and_tenant_isolation",
+          "reason": "Host jobs require POSIX ownership and process locks"
+        },
+        {
+          "classname": "tests.test_dashboard_operations",
+          "name": "test_real_mock_worker_survives_store_restart_and_does_not_reexecute",
+          "reason": "Host jobs require POSIX ownership and process locks"
+        },
+        {
+          "classname": "tests.test_dashboard_operations",
+          "name": "test_worker_child_retains_exclusive_lock_after_parent_disappears",
+          "reason": "Host jobs require POSIX ownership and process locks"
+        },
+        {
+          "classname": "tests.test_dashboard_operations",
+          "name": "test_launch_failure_and_process_error_are_not_success",
+          "reason": "Host jobs require POSIX ownership and process locks"
+        },
+        {
+          "classname": "tests.test_dashboard_operations",
+          "name": "test_private_store_rejects_foreign_directory_and_symlinks",
+          "reason": "Host jobs require POSIX ownership and process locks"
+        },
+        {
+          "classname": "tests.test_dashboard_operations",
+          "name": "test_fixed_runtime_paths_and_budget_in_worker",
+          "reason": "Host jobs require POSIX ownership and process locks"
+        },
+        {
+          "classname": "tests.test_dashboard_operations",
+          "name": "test_queued_restart_does_not_erase_older_history",
+          "reason": "Host jobs require POSIX ownership and process locks"
+        },
+        {
+          "classname": "tests.test_dashboard_operations",
+          "name": "test_runtime_report_progress_is_redacted_without_replacing_job_state",
+          "reason": "Host jobs require POSIX ownership and process locks"
+        }
+      ],
+      "status": "completed",
+      "exit_code": 0,
+      "warnings": 3
+    },
+    "dashboard_browser": {
+      "passed": true,
+      "checks": 46,
+      "report": "team-llm-dashboard-browser-20261117.json",
+      "command": "python -m scripts.test_dashboard_browser --output-dir runtime/integration/dashboard-browser"
+    },
+    "dashboard_operations_browser": {
+      "passed": true,
+      "checks": 135,
+      "report": "team-llm-dashboard-operations-browser-20261117.json",
+      "command": "python -m scripts.test_dashboard_operations_browser --output-dir runtime/integration/dashboard-operations-browser"
+    },
+    "ruff": {
+      "scope": ".",
+      "version": "0.17.3",
+      "exit_code": 0
+    },
+    "runner_help": {
+      "entrypoints": [
+        "scripts.execution_mtls_runtime",
+        "scripts.test_execution_mtls_runtime",
+        "scripts.evaluate_m6"
+      ],
+      "exit_code": 0
+    },
+    "linux_pip_check": {
+      "exit_code": 0
+    },
+    "incomplete_attempts": [
+      {
+        "kind": "Linux full pytest on Windows mounted source",
+        "outcome": "interrupted by SIGINT because of source read latency",
+        "counted_as_pass": false
+      },
+      {
+        "kind": "Windows install of Linux test.lock",
+        "outcome": "colorama unpinned dependency and uvloop wheel unavailable",
+        "lock_modified": false,
+        "counted_as_validation": false
+      }
+    ],
+    "final_local_state": {
+      "original_worktree_clean_at_start": true,
+      "original_worktree_clean_at_final_check": false,
+      "original_head_preserved": true,
+      "original_worktree_written_by_this_task": false,
+      "new_original_worktree_changes_observed_at_kst": "2026-11-17T08:53:53.460779+09:00",
+      "original_worktree_status_at_check": [
+        "M app/grounded_prompting.py",
+        " M infra/llm-grounded.example.env",
+        " M scripts/evaluate_llm_grounded.py",
+        " M tests/test_grounded_prompting.py",
+        " M tests/test_llm_grounded_evaluation.py",
+        "?? docs/llm-fp-recall-review-20261117.md",
+        "?? scripts/compare_llm_grounded.py",
+        "?? tests/test_llm_grounded_comparison.py"
+      ],
+      "original_worktree_changes_included_in_candidate": false,
+      "baseline_pointers_preserved": {
+        "main": "b1d61563e8fecd47d8386f0183f2224647ad60ed",
+        "aitest": "cea8303ad40350e07d088767d570fb340e89156e",
+        "feature/chaeheeju-local-target-gate": "51bb4836bccc2bd436846b758477b3107809f46e"
+      },
+      "candidate_code_unmodified_after_validation": true,
+      "document_links_checked": true
+    }
+  },
+  "remote_recheck": {
+    "method": "git ls-remote origin refs/heads/main refs/heads/aitest refs/heads/feature/kim-dashboard-refinement",
+    "checked_at_kst": "2026-11-17T08:53:53.460779+09:00",
+    "unchanged": true,
+    "shas": {
+      "origin/main": "d2370c2a493cfa584ad005420abe172cef913c7b",
+      "origin/aitest": "b3abad3871be881e5978dc4f677d7714880c4f82",
+      "origin/feature/kim-dashboard-refinement": "57c77c2ba8af144ab9beffe47dbb2bc7ac1094a3"
+    }
+  },
+  "baseline_pointers_preserved": true,
+  "artifact_sha256": {
+    "team-llm-integration-linux-20261117.xml": "77f363fa6739d588b5f4c8e7fa8c57a26b54867f43371977a6aa804be80195cb",
+    "team-llm-integration-windows-20261117.xml": "6d65fc9ff59e6ba2da0047193f732ae8d2d3c339e39e48ace4d7fa60dfce7061",
+    "team-llm-dashboard-browser-20261117.json": "c9ab3649d58446a82a3d2843bb204e72f91c6ac097702941d5806fcdc15983f7",
+    "team-llm-dashboard-operations-browser-20261117.json": "fee3fba2389b590a489d879f782539e40557c2a450cf5a4837024faf39684635"
+  }
+}

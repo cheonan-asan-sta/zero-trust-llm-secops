@@ -1,0 +1,412 @@
+{
+  "schema": "initial-frame-diagnostic-development-checkpoint-1",
+  "completed": true,
+  "date_local": "2026-11-17",
+  "completion_scope": "diagnostic implementation, functional regression and source-quality investigation only; performance objective remains unmet",
+  "source_commit": "c87f890ec559a94fcae0f5109c78ad92add85590",
+  "functional_source_sha256": "e0e9ff8ee9f9a80383169639806d5e14d8071725ff2bac00f59f2823d460774c",
+  "linux_focused": {
+    "passed": 964,
+    "new_link_tests": 35,
+    "failed": 0,
+    "skipped": 0,
+    "ruff_RUF100_passed": true,
+    "junit_sha256": "d87348537e8ec35847b2454df968e3920101bb7be4015eb5bcad4f88d4ddd475"
+  },
+  "owned_test_container_removed": true,
+  "prior_same_feature_snapshot_passed": 963,
+  "old_detector_code_bytes_unchanged": true,
+  "original_population": 1681815,
+  "performance_reference": "docs/infrastructure-results/extra-apparmor-status-v117-20261116.json",
+  "performance_reference_sha256": "91f499bf28b0aa07cb5b772dba5f4b1ab6fb185ec8225d5625a0416428f08137",
+  "kinds_RSF": {
+    "audit-share": {
+      "before": {
+        "tp": 2,
+        "fp": 3,
+        "fn": 4,
+        "tn": 2349,
+        "inference_errors": 0,
+        "population": 2358,
+        "precision": 0.4,
+        "recall": 0.3333333333333333,
+        "f1": 0.36363636363636365,
+        "false_positive_rate": 0.0012755102040816326,
+        "accuracy": 0.9970313825275657
+      },
+      "after": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 4,
+        "tn": 2352,
+        "inference_errors": 0,
+        "population": 2358,
+        "precision": 1.0,
+        "recall": 0.3333333333333333,
+        "f1": 0.5,
+        "false_positive_rate": 0.0,
+        "accuracy": 0.998303647158609
+      }
+    },
+    "dns": {
+      "before": {
+        "tp": 135466,
+        "fp": 9,
+        "fn": 2595,
+        "tn": 654079,
+        "inference_errors": 0,
+        "population": 792149,
+        "precision": 0.9999335670787969,
+        "recall": 0.9812039605681546,
+        "f1": 0.990480229293402,
+        "false_positive_rate": 1.3759616443047419e-05,
+        "accuracy": 0.9967127396487278
+      },
+      "after": {
+        "tp": 135466,
+        "fp": 9,
+        "fn": 2595,
+        "tn": 654079,
+        "inference_errors": 0,
+        "population": 792149,
+        "precision": 0.9999335670787969,
+        "recall": 0.9812039605681546,
+        "f1": 0.990480229293402,
+        "false_positive_rate": 1.3759616443047419e-05,
+        "accuracy": 0.9967127396487278
+      }
+    },
+    "auth": {
+      "before": {
+        "tp": 32,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1082,
+        "inference_errors": 0,
+        "population": 1114,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      },
+      "after": {
+        "tp": 32,
+        "fp": 0,
+        "fn": 0,
+        "tn": 1082,
+        "inference_errors": 0,
+        "population": 1114,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      }
+    },
+    "web-error": {
+      "before": {
+        "tp": 1414,
+        "fp": 0,
+        "fn": 0,
+        "tn": 4,
+        "inference_errors": 0,
+        "population": 1418,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      },
+      "after": {
+        "tp": 1414,
+        "fp": 0,
+        "fn": 0,
+        "tn": 4,
+        "inference_errors": 0,
+        "population": 1418,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      }
+    },
+    "web-access": {
+      "before": {
+        "tp": 426312,
+        "fp": 7,
+        "fn": 18,
+        "tn": 4577,
+        "inference_errors": 0,
+        "population": 430914,
+        "precision": 0.9999835803705676,
+        "recall": 0.9999577791851383,
+        "f1": 0.9999706796114227,
+        "false_positive_rate": 0.0015270506108202443,
+        "accuracy": 0.9999419837833071
+      },
+      "after": {
+        "tp": 426312,
+        "fp": 7,
+        "fn": 18,
+        "tn": 4577,
+        "inference_errors": 0,
+        "population": 430914,
+        "precision": 0.9999835803705676,
+        "recall": 0.9999577791851383,
+        "f1": 0.9999706796114227,
+        "false_positive_rate": 0.0015270506108202443,
+        "accuracy": 0.9999419837833071
+      }
+    },
+    "audit-web": {
+      "before": {
+        "tp": 47,
+        "fp": 0,
+        "fn": 0,
+        "tn": 7419,
+        "inference_errors": 0,
+        "population": 7466,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      },
+      "after": {
+        "tp": 47,
+        "fp": 0,
+        "fn": 0,
+        "tn": 7419,
+        "inference_errors": 0,
+        "population": 7466,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "accuracy": 1.0
+      }
+    },
+    "vpn": {
+      "before": {
+        "tp": 84,
+        "fp": 42,
+        "fn": 0,
+        "tn": 18332,
+        "inference_errors": 0,
+        "population": 18458,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8,
+        "false_positive_rate": 0.002285838685098509,
+        "accuracy": 0.9977245638747426
+      },
+      "after": {
+        "tp": 84,
+        "fp": 42,
+        "fn": 0,
+        "tn": 18332,
+        "inference_errors": 0,
+        "population": 18458,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1": 0.8,
+        "false_positive_rate": 0.002285838685098509,
+        "accuracy": 0.9977245638747426
+      }
+    },
+    "cpu": {
+      "before": {
+        "tp": 139,
+        "fp": 4,
+        "fn": 0,
+        "tn": 5617,
+        "inference_errors": 0,
+        "population": 5760,
+        "precision": 0.972027972027972,
+        "recall": 1.0,
+        "f1": 0.9858156028368794,
+        "false_positive_rate": 0.0007116171499733144,
+        "accuracy": 0.9993055555555556
+      },
+      "after": {
+        "tp": 139,
+        "fp": 4,
+        "fn": 0,
+        "tn": 5617,
+        "inference_errors": 0,
+        "population": 5760,
+        "precision": 0.972027972027972,
+        "recall": 1.0,
+        "f1": 0.9858156028368794,
+        "false_positive_rate": 0.0007116171499733144,
+        "accuracy": 0.9993055555555556
+      }
+    }
+  },
+  "full_performance_replay_repeated": false,
+  "new_detection_quality_gain_measured": false,
+  "frame_link": {
+    "diagnostic_only": true,
+    "admitted_to_predictor": false,
+    "temporal_availability_proven": false,
+    "human_or_device_identity_verified": false,
+    "uses_reported_endpoint_and_sid": true,
+    "coarse_clock_window_is_not_availability_proof": true,
+    "physical_rows_errors_and_ids_preserved": true,
+    "frame_intake_and_UTC_manifest_pins_rechecked": true,
+    "real_dataset_execution_complete": false,
+    "link_match_rate_is_detection_accuracy": false,
+    "frozen_weights_trained": false
+  },
+  "native_timing_review": {
+    "report_sha256": "168fa2788a62a1b7841e51923749df7c930e71637a6f213e75b23cb755306973",
+    "source_role": "training",
+    "source_archive_sha256": "51a03f51daea0fbbdcfe9b8abe0dbbe10633716f4f98074f861204a162ee1978",
+    "physical_rows": 4159,
+    "initial_messages": 0,
+    "sources": [
+      {
+        "bytes": 8388608,
+        "decoded_sha256": "fd32eb413f4598e8f2a74f92315620d7cb38a8f6728f4727bbda1809890da940",
+        "initial_messages": 0,
+        "member": "gather/vpn/logs/journal/de9f5cd734cb49749b0319cd03e5f8bf/system.journal",
+        "openvpn_source_rows": 0,
+        "openvpn_version_messages": 0,
+        "path": "member-0.journal",
+        "rows": 3387,
+        "sha256": "45a8c8a08d00e90fe9dc1c266cf2c30a3a61e0d35326a450345ee525085e73e5",
+        "zip_crc_verified": true
+      },
+      {
+        "bytes": 8388608,
+        "decoded_sha256": "3a7feed10fe2ca1e116ce2cab2d306415c2f51879bee02765b0e4c512b5aae8d",
+        "initial_messages": 0,
+        "member": "gather/vpn/logs/journal/de9f5cd734cb49749b0319cd03e5f8bf/user-1000.journal",
+        "openvpn_source_rows": 0,
+        "openvpn_version_messages": 0,
+        "path": "member-1.journal",
+        "rows": 408,
+        "sha256": "792dec516f11f135841b1a103f7e228037fadd6c597227df0c935d1451af74d2",
+        "zip_crc_verified": true
+      },
+      {
+        "bytes": 8077,
+        "initial_messages": 0,
+        "member": "gather/vpn/logs/syslog.2",
+        "openvpn_source_rows": 0,
+        "openvpn_version_messages": 0,
+        "path": "member-2.source",
+        "rows": 90,
+        "sha256": "a97495c5239d929086f1d09eeddcf41dc40c71f3af9603afead9366988eb2e09",
+        "zip_crc_verified": true
+      },
+      {
+        "bytes": 17020,
+        "initial_messages": 0,
+        "member": "gather/vpn/logs/syslog.4",
+        "openvpn_source_rows": 0,
+        "openvpn_version_messages": 0,
+        "path": "member-3.source",
+        "rows": 193,
+        "sha256": "58a06e749d0785800c2bec56b089da0242c1183dd3ded3660aa57e2e88894397",
+        "zip_crc_verified": true
+      },
+      {
+        "bytes": 4411,
+        "initial_messages": 0,
+        "member": "gather/vpn/logs/syslog.3",
+        "openvpn_source_rows": 0,
+        "openvpn_version_messages": 0,
+        "path": "member-4.source",
+        "rows": 47,
+        "sha256": "c39b325b1688447bfa2bc1c0005d30cb5addcc4f49cac9955a6f1fdd4c338dc6",
+        "zip_crc_verified": true
+      },
+      {
+        "bytes": 3019,
+        "initial_messages": 0,
+        "member": "gather/vpn/logs/syslog.1",
+        "openvpn_source_rows": 0,
+        "openvpn_version_messages": 0,
+        "path": "member-5.source",
+        "rows": 34,
+        "sha256": "5ec01a1f4832a46a13799c7ce659c75724e1e5f737140b615a4b8f6742fe1cf9",
+        "zip_crc_verified": true
+      }
+    ],
+    "decoder_stderr_bytes": [
+      120,
+      0
+    ],
+    "source_quality_note": "decoded rows from two journals and four syslog files; no native duplicate of target OpenVPN initial message found"
+  },
+  "capture_counter_review": {
+    "report_sha256": "5c66132d6be29c5257c16438ea02db8c128a817754473d500c446907633723bb",
+    "source_role": "training",
+    "member": "gather/vpn/logs/suricata/stats.log",
+    "member_sha256": "6a1f529175baf7c77c902bd89ebf74b98d0e1194f08e6ac917d7e3131f39270e",
+    "member_crc_verified": true,
+    "physical_rows": 3206910,
+    "date_headers": 51143,
+    "counters": {
+      "capture.kernel_drops": {
+        "first": 2859,
+        "last": 22396,
+        "maximum": 22396,
+        "minimum": 2859,
+        "samples": 40591
+      },
+      "capture.kernel_packets": {
+        "first": 3,
+        "last": 3233007,
+        "maximum": 3233007,
+        "minimum": 3,
+        "samples": 51139
+      }
+    },
+    "specific_target_packets_missing_proven": false,
+    "loss_free_capture_assumed": false,
+    "per_event_availability_proven": false,
+    "counter_ratio_reported_as_FPR": false
+  },
+  "acquisition_at_checkpoint": {
+    "status": "running; same live exec handle separately polled",
+    "at": "2026-11-16T15:05:12.419098+00:00",
+    "progress_snapshot": {
+      "bytes_received": 4697620480,
+      "completed_ranges": 280,
+      "elapsed_seconds": 3838.33,
+      "expected_bytes": 7132670599,
+      "total_ranges": 426
+    },
+    "complete_archive_available": false,
+    "full_publisher_checksum_verified": false
+  },
+  "requested_docker_cleanup": {
+    "status": "pending after current packet validation step",
+    "deletions_performed": false,
+    "read_only_plan_sha256": "055cdd0db771f1adc5c9d058f73648aafb9f8e8332250d52ad69428c52b9e874",
+    "confirmed_superseded_project_image_tags": 12,
+    "newest_role_baselines_retained": 6,
+    "current_test_image_preserved": "sha256:f10c45ffbd10707d701d70331a591fcfe2d17a14c4f3a434f7aa16acddd63ea4",
+    "all_14_volumes_preserved": true,
+    "unrelated_container_preserved": true,
+    "no_global_prune": true,
+    "revalidate_exact_tag_ID_ownership_and_container_references_before_deletion": true
+  },
+  "goal_status": "active",
+  "goal_qualified": false,
+  "new_independent_evaluation": false,
+  "original_six_domains_qualified": false,
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "llm_provider_calls": 0,
+  "new_ci_started": false,
+  "push_performed": false,
+  "merge_performed": false,
+  "long_soak_started": false,
+  "labels_changed": false,
+  "target_thresholds_changed": false
+}
