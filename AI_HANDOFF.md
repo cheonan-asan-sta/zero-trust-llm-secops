@@ -1,4 +1,7 @@
+> 2026-11-17 사용자 요청으로 팀원 대시보드+최신 LLM ef09475의 aitest 실제 통합을 진행한다. 기존 성능 목표 전 병합 보류는 이번 aitest 통합에 한해 해제됐다. 성능 목표 달성/운영 배포 승인은 아니며 main과 기본 rule/legacy/review_all=false는 유지한다. [통합 승인·검증 기록](docs/aitest-team-llm-merge-20261117.md) 아래는 각 작업 당시의 기록이다.
+
 > 2026-11-17 팀 통합 준비: 별도 `feature/chaeheeju-team-llm-integration-prep`에서 `51bb483` + `origin/main d2370c2` 로컬 후보 `5b5708b` 구성. 팀원 branch는 main에 이미 포함돼 중복 병합하지 않았다. Windows fcntl 시작 호환 수정·POSIX jobs fail-closed 유지. Linux7399/skip2·Windows130/skip20·브라우저46/135·Ruff 통과. 작업 중 원본에서 관측한 후속 미커밋 LLM WIP는 보존했으며 후보에 포함하지 않았다. 원래 성능 목표 미완료·기본 rule/legacy/review_all=false·push/PR/새 CI/실제 main·aitest 병합 보류. [SHA·충돌·검증·인수 조건](docs/team-llm-integration-prep-20261117.md)
+> 2026-11-17 LLM 오탐 후속: 24건 반복2회 모두 FP6→1·FN2 유지·기존 TP 손실/새 FP0, F1 71.43→86.96%. 별도12건 FP2→0·FN0. 추가240 API/$0.801756 추정·기능85건 통과. 개발 평가이며 native/독립95% 목표와 별도·기본 전환/CI/push/병합 보류. [최신 결과·실패 실험](docs/llm-fp-recall-review-20261117.md) 아래는 이전 시점 기록이다.
 
 > 2026-11-17 LLM 실제 개선: 사용자 유료 호출 승인으로 168회 비교·사용량 추정 $0.365284·기능60건 통과. 정책+근거 schema·전체 교차 검토 옵션 구현. 12건 F1 71.43→85.71%지만 24건 FP5→6으로 기본 전환 미승인. 합성 개발 평가이며 native/독립95% 목표는 미완료·CI/push/병합 보류. [전체 실험과 적용 범위](docs/llm-grounded-improvement-20261117.md)
 
