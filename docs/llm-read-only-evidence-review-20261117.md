@@ -145,7 +145,7 @@ python -m scripts.evaluate_evidence_review_llm `
 
 ## 최신 무료 회귀와 화면 증거
 
-후속 변경의 Windows 묶음 회귀는 **654통과·26skip·실패/설정 오류0**이다. [JUnit](infrastructure-results/llm-caller-final-windows-20261117.xml)은680개 수집 항목을 포함하며 skip을 통과에 더하지 않는다.26개 skip에는 기존12개와 POSIX 계정 파일 규약 때문에 이 OS에서 실행하지 않은 호출 계정 경계14개가 포함된다. 계정 파일/도구 직전 회수의 실제 실행 결과는 앞의 Linux 시험에 따로 남겼다. 이전647/12 회귀와 고정 커밋의 전체 Linux7,596통과 결과도 보존하며 범위를 구분한다. 최신 고정`63c42f3`의 Linux 전체 회귀는 **7,690통과·2skip·실패0**([JUnit](infrastructure-results/llm-review-63c42f3-linux-20261117.xml))이었다.38분02초이며 skip2개는 패치한 Linux 컨테이너 이미지 전용 시험으로 호스트 실행에서는 수행하지 않았다. 이번 결과를 새 컨테이너 이미지 검증이나8시간 soak로 확대하지 않는다.
+최신 고정`47fc624`의 Linux 전체 회귀는 **7,696통과·2skip·실패/설정 오류0**,37분46초([JUnit](infrastructure-results/llm-review-47fc624-linux-20261117.xml))다. Windows 묶음은 **660통과·27skip·실패0**([JUnit](infrastructure-results/llm-audit-ready-windows-20261117.xml))이었다. Windows의687개 수집 항목 중27skip은 기존12개와 POSIX 계정 파일/도구 회수 경계15개다. 이 경계는 Linux에서 실행했다. Linux skip2개는 패치한 컨테이너 이미지 전용 시험으로 호스트 회귀에서는 수행하지 않았다. 새 이미지 검증이나8시간 soak로 확대하지 않는다. 이전 커밋별 결과도 보존하며 OS별 반복을 새 독립 성능 사례로 더하지 않는다.
 
 [분석 상세 브라우저57개 검사](infrastructure-results/llm-evidence-dashboard-browser-20261117.json), [운영 작업 브라우저142개 검사](infrastructure-results/llm-evidence-operations-browser-20261117.json)는 모두 통과했다. [1440px 화면](infrastructure-results/llm-evidence-dashboard-1440-20261117.png), [390px 화면](infrastructure-results/llm-evidence-dashboard-390-20261117.png)은 **합성 응답 fixture를 사용한 표시 검증**이다. 실제 유료 응답이나 실제 사람 MFA 성공의 증명 사진이 아니다. 본문·인용 경로·안전 제한·기밀 마스킹, 예전 기록의 누락 필드, 확대/좁은 화면을 검사했다.
 

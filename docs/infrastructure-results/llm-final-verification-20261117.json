@@ -1,0 +1,49 @@
+{
+  "schema": "continuation-final-verification-1",
+  "source_commit": "47fc624",
+  "linux": {
+    "passed": 7696,
+    "skipped": 2,
+    "failures": 0,
+    "errors": 0,
+    "reported_elapsed_seconds": 2266.9,
+    "skip_scope": "patched container image only; host runtime unchanged"
+  },
+  "windows": {
+    "passed": 660,
+    "skipped": 27,
+    "failures": 0
+  },
+  "browser": {
+    "dashboard_checks": 57,
+    "operations_checks": 142,
+    "fixtures_synthetic": true
+  },
+  "paid_provider_requests": 1071,
+  "known_usage_estimated_usd": 4.87398975,
+  "unknown_usage_reserved_usd": 0,
+  "source_cases_sha256": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f",
+  "original_LLM_development_metrics": {
+    "TP": 163,
+    "FP": 6,
+    "FN": 17,
+    "TN": 174,
+    "precision": 0.9644970414201184,
+    "recall": 0.9055555555555556,
+    "F1": 0.9340974212034384,
+    "FPR": 0.03333333333333333,
+    "unknown_or_error": 6
+  },
+  "goal_qualified": false,
+  "independent_acceptance": false,
+  "original_native_metrics_updated": false,
+  "production_defaults_changed": false,
+  "remote_push_CI_merge_AWS": false,
+  "eight_hour_soak_performed": false,
+  "remaining": [
+    "Live systemd/PAM proof to LLM adapter with original provenance/session binding",
+    "Organization IdP/device/business approval source acceptance and caller delegation",
+    "Independent six-domain evaluation",
+    "Canonical citation paths and independent rationale review"
+  ]
+}

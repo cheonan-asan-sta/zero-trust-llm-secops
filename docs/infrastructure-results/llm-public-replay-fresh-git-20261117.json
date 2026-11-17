@@ -1,0 +1,56 @@
+{
+  "schema": "public-replay-clean-git-checkout-1",
+  "checkout_commit": "47fc6243cf89d4d5b559c877bfea9d12600c7fb7",
+  "no_local_env_files": true,
+  "no_original_private_source_directory": true,
+  "source_kind": "committed_published_results",
+  "regenerated_inputs_sha256": "fce731785e465486b62fbc92236648dd008471d9ef4f9516ac60b8a1a6d84a13",
+  "matches_original_published_input_sha256": true,
+  "all_metrics_and_1080_rows_identical_to_original_private_and_public_replay": true,
+  "canonical_rows_sha256": "d8664fdc6b813c8069f052ffb592cfa7219eb3fd8a8c42489b8c7d3054f7d79d",
+  "fresh_provider_requests": 0,
+  "cases_per_condition": 360,
+  "conditions": [
+    "rule",
+    "hybrid_default",
+    "hybrid_review_all"
+  ],
+  "independent_acceptance": false,
+  "snapshot_reading_is_not_external_attestation": true,
+  "protocol": {
+    "schema": "frozen-hybrid-routing-replay-1",
+    "source_kind": "committed_published_results",
+    "regenerated_inputs_sha256": "fce731785e465486b62fbc92236648dd008471d9ef4f9516ac60b8a1a6d84a13",
+    "source_file_sha256": {
+      "published_results.json": "a39ccae9c8cc3d023b088303f0ef518dd1231ec06e972fdbc2e090f08e4ffe52"
+    },
+    "source_pins": {
+      "scripts/replay_hybrid_development.py": "712701ed0f593fa0cd03191b51ee50a8375e7e5fcf81adef3fbcc24578053a64",
+      "app/analyzers/hybrid.py": "08e69db8d77ba5fdc46b0504261688015a5c4a82fbb151f144a237c0f7cd5796",
+      "app/analyzers/rule_based.py": "9be78ff453f935602a2b13687a81f69ead32667daa396185db2837e008681922",
+      "app/config.py": "9b609f29338a8f57795f34bdaf4230bd69cccd7104507f0fb3eff4d5f31bd8f2",
+      "app/grounded_prompting.py": "6fb8faa5f6cd49508619410503742013a81da3439c2c8327e70fe5fcaa00c2ed",
+      "scripts/retry_incomplete_evaluation.py": "e2425f8110abe67a5d2f1ded183e27e32ac05b04950b3bccbf3359776a85c10b",
+      "scripts/compare_llm_grounded.py": "7f2430542e440777b1ab8e2304da1c1fc01720bbca0af714026e4cbc34a3e377",
+      "scripts/evaluate_llm_grounded.py": "219cb6d85c970f2c23abbca488c88388f685b74a7092fd1b6a32f540e85166de",
+      "docs/infrastructure-results/llm-development360-20261117.json": "a39ccae9c8cc3d023b088303f0ef518dd1231ec06e972fdbc2e090f08e4ffe52"
+    },
+    "cases_sha256": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f",
+    "source_model": "gpt-5.4-mini-2026-03-17",
+    "cases": 360,
+    "variants": [
+      "rule",
+      "hybrid_default",
+      "hybrid_review_all"
+    ],
+    "confidence_threshold": 0.85,
+    "configured_hybrid_timeout_seconds": 2.5,
+    "live_timeouts_or_cancellation_replayed": false,
+    "source_format_failure": "existing hybrid rule fallback; preserve source error separately",
+    "source_UNKNOWN": "pass the actual structured UNKNOWN through the existing merge; never force a label",
+    "development_gate": "no lost TP, no new FP, non-decreasing F1, at least one correction vs standalone frozen LLM",
+    "runtime_adoption": false,
+    "fresh_provider_requests": 0,
+    "independent_acceptance": false
+  }
+}
