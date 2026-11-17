@@ -1,0 +1,116 @@
+{
+  "schema": "same-agent-development-rationale-review-1",
+  "source_report_sha256": "37c0b1b08b898615a7cc8c6c36aafe4364ac291f4df479d20a8c415b9312ee2d",
+  "reviewer_scope": "same implementation agent; not an independent human review or annotation sign-off",
+  "cases_reviewed": 12,
+  "new_provider_calls": 0,
+  "original_responses_modified": false,
+  "automated_semantic_rationale_proof": false,
+  "evidence_array_validation_only_is_machine_enforced": true,
+  "checks": [
+    {
+      "scenario": "role_denied",
+      "arm": "agent",
+      "evidence_array_all_paths_present": true,
+      "human_review_retained": true,
+      "prediction_equals_authored_intent": true
+    },
+    {
+      "scenario": "role_denied",
+      "arm": "static",
+      "evidence_array_all_paths_present": true,
+      "human_review_retained": true,
+      "prediction_equals_authored_intent": true
+    },
+    {
+      "scenario": "action_denied",
+      "arm": "static",
+      "evidence_array_all_paths_present": true,
+      "human_review_retained": true,
+      "prediction_equals_authored_intent": true
+    },
+    {
+      "scenario": "action_denied",
+      "arm": "agent",
+      "evidence_array_all_paths_present": true,
+      "human_review_retained": true,
+      "prediction_equals_authored_intent": true
+    },
+    {
+      "scenario": "required_mfa_unknown",
+      "arm": "agent",
+      "evidence_array_all_paths_present": true,
+      "human_review_retained": true,
+      "prediction_equals_authored_intent": true
+    },
+    {
+      "scenario": "required_mfa_unknown",
+      "arm": "static",
+      "evidence_array_all_paths_present": true,
+      "human_review_retained": true,
+      "prediction_equals_authored_intent": true
+    },
+    {
+      "scenario": "permitted_team",
+      "arm": "static",
+      "evidence_array_all_paths_present": true,
+      "human_review_retained": true,
+      "prediction_equals_authored_intent": true
+    },
+    {
+      "scenario": "permitted_team",
+      "arm": "agent",
+      "evidence_array_all_paths_present": true,
+      "human_review_retained": true,
+      "prediction_equals_authored_intent": true
+    },
+    {
+      "scenario": "mfa_unknown_not_required",
+      "arm": "agent",
+      "evidence_array_all_paths_present": true,
+      "human_review_retained": true,
+      "prediction_equals_authored_intent": true
+    },
+    {
+      "scenario": "mfa_unknown_not_required",
+      "arm": "static",
+      "evidence_array_all_paths_present": true,
+      "human_review_retained": true,
+      "prediction_equals_authored_intent": true
+    },
+    {
+      "scenario": "read_over_vpn",
+      "arm": "static",
+      "evidence_array_all_paths_present": true,
+      "human_review_retained": true,
+      "prediction_equals_authored_intent": true
+    },
+    {
+      "scenario": "read_over_vpn",
+      "arm": "agent",
+      "evidence_array_all_paths_present": true,
+      "human_review_retained": true,
+      "prediction_equals_authored_intent": true
+    }
+  ],
+  "findings": [
+    {
+      "scenario": "read_over_vpn",
+      "arm": "static",
+      "field": "assessment.rationale",
+      "kind": "rationale_uses_non_catalog_path",
+      "observed_path": "unmapped.source_action",
+      "value_present_elsewhere_in_input": "READ",
+      "canonical_catalog_path": "action",
+      "evidence_array_remains_valid": true,
+      "fabricated_fact_demonstrated": false,
+      "classification_changed": false,
+      "follow_up": "Improve canonical path use in model prose, preserving raw outputs and validating effect before any runtime adoption"
+    }
+  ],
+  "limitations": [
+    "Schema validates evidence array paths; free-form Korean rationale has no complete semantic verifier",
+    "This targeted check does not prove absence of hallucinations or generic prompt injection safety",
+    "No labels, classification predictions or original performance denominators were altered"
+  ]
+}

@@ -1,0 +1,377 @@
+{
+  "schema": "partial-experiment-source-snapshots-1",
+  "local_base_main": "96a1570f296018a2ec348327b719f65bc66b6db5",
+  "snapshots": [
+    {
+      "stage": "development360",
+      "plan_sha256": "36539ae06e3056d335b2bb8733dca6b40ef65f3c28d97f5b02bfa31abb5e6426",
+      "source_files": 5,
+      "source_sha256": {
+        "development360/source-snapshot/scripts/evaluate_llm_development.py": "fd17dccb0d49edc399803489fa72f05ee44be43d219a94f5db9709678e48dd46",
+        "development360/source-snapshot/scripts/evaluate_llm_grounded.py": "219cb6d85c970f2c23abbca488c88388f685b74a7092fd1b6a32f540e85166de",
+        "development360/source-snapshot/app/analyzers/structured_response.py": "45020987cc99b21033233d04c5237cdf1767d0bcb0c7be4ba1d6e527b5066d63",
+        "development360/source-snapshot/app/grounded_prompting.py": "9be361863c3949f558f8f3feae1e498c352531f6b37074b9cd5b154f185efe39",
+        "development360/source-snapshot/app/models.py": "6d2db2d9e374d1d40311fb1c0ea37fb0bd2d4b470c6abf0693764e394b746baf"
+      }
+    },
+    {
+      "stage": "development360-predicate",
+      "plan_sha256": "628f7f42e475c117b95efc750a2e91001f4ba09c65e5abdb22a8a77ea6cf8a02",
+      "source_files": 7,
+      "source_sha256": {
+        "development360-predicate/source-snapshot/scripts/evaluate_llm_development.py": "4a8fc3eda726c7223b0ac34970af3821e943fc7a50f7225bdb60d5a97e0a4938",
+        "development360-predicate/source-snapshot/scripts/evaluate_llm_grounded.py": "219cb6d85c970f2c23abbca488c88388f685b74a7092fd1b6a32f540e85166de",
+        "development360-predicate/source-snapshot/app/analyzers/structured_response.py": "45020987cc99b21033233d04c5237cdf1767d0bcb0c7be4ba1d6e527b5066d63",
+        "development360-predicate/source-snapshot/app/grounded_prompting.py": "d730a7f4a5ce8f608e3d7566a793b7088e884729d34dc0af3ae609ef0309b815",
+        "development360-predicate/source-snapshot/app/services/sigma.py": "65559d88e096f9c2f97e2cc5afe18a371be2ff624a6b7af9f195cdcff46bb4ea",
+        "development360-predicate/source-snapshot/app/services/ocsf.py": "3ad353cf890a1b8fe3d5b98f63500f8949f379fd6559f4391bdf67eb22aba843",
+        "development360-predicate/source-snapshot/app/models.py": "6d2db2d9e374d1d40311fb1c0ea37fb0bd2d4b470c6abf0693764e394b746baf"
+      }
+    },
+    {
+      "stage": "download-arithmetic60",
+      "plan_sha256": "69f9d6483f79d3389354908ab7ea70dfff6f4a33d3c4c6e35aeaa2573557ad2d",
+      "source_files": 10,
+      "source_sha256": {
+        "download-arithmetic60/source-snapshot/scripts/evaluate_download_arithmetic_llm.py": "93521918ac132b6a83fcd6237a87749d2433848604f890e452de9c8eb5fd31bd",
+        "download-arithmetic60/source-snapshot/scripts/retry_incomplete_evaluation.py": "c43c9bc2b2c0e3597bdcb7760c21a4efa8f02760037e1f12a778caab2db5f3ce",
+        "download-arithmetic60/source-snapshot/scripts/bounded_llm_requests.py": "dc0ee687bfaa51b3d3c5632b72a7f9baac6468013acdd2162889f8ef911dd7ff",
+        "download-arithmetic60/source-snapshot/scripts/evaluate_llm_grounded.py": "219cb6d85c970f2c23abbca488c88388f685b74a7092fd1b6a32f540e85166de",
+        "download-arithmetic60/source-snapshot/scripts/evaluate_llm_development.py": "272fdcb82778a8f8b49cfbfc9175977aa094f162a919bd03931589dbef68076c",
+        "download-arithmetic60/source-snapshot/app/analyzers/structured_response.py": "4f7ac4ebbad2e0f03861609bad893760fc2cc2d6dfbfb36df12ab9b025d072dc",
+        "download-arithmetic60/source-snapshot/app/grounded_prompting.py": "6fb8faa5f6cd49508619410503742013a81da3439c2c8327e70fe5fcaa00c2ed",
+        "download-arithmetic60/source-snapshot/app/models.py": "0eb336d686a0bfa58a39f0661065d1dc8d8a5a69b11541350e591409bfaa0af5",
+        "download-arithmetic60/source-snapshot/app/services/sigma.py": "65559d88e096f9c2f97e2cc5afe18a371be2ff624a6b7af9f195cdcff46bb4ea",
+        "download-arithmetic60/source-snapshot/app/services/ocsf.py": "3ad353cf890a1b8fe3d5b98f63500f8949f379fd6559f4391bdf67eb22aba843"
+      }
+    },
+    {
+      "stage": "evidence-grounding",
+      "plan_sha256": "d266a744bd162e80dcefdaebf65b7808dfef0122f60f597d61bb6e0c0b1f90df",
+      "source_files": 16,
+      "source_sha256": {
+        "evidence-grounding/source-snapshot/scripts/evaluate_evidence_review_llm.py": "faa617e46e23bcf476896db240ccb0c6d46ceb207482c5da5990c6df79904fe5",
+        "evidence-grounding/source-snapshot/scripts/bounded_llm_requests.py": "dc0ee687bfaa51b3d3c5632b72a7f9baac6468013acdd2162889f8ef911dd7ff",
+        "evidence-grounding/source-snapshot/scripts/local_execution_analysis_lab.py": "35dd76ad62ed2887c0d0dd868244405cd1eef748ee6686d95145e114d8f2bcc0",
+        "evidence-grounding/source-snapshot/scripts/local_oidc_authority.py": "e7626376a0e2e6823486ce97ae570b8b8fc69a9e81569acbb4fc67abe32e35e6",
+        "evidence-grounding/source-snapshot/scripts/local_session_analysis_lab.py": "8c07ac71858eb671b1c94ba8450bbecd73a971fe9ceb8db0d154c15642e40f9d",
+        "evidence-grounding/source-snapshot/app/main.py": "920c5310afbf78240d3c26db94206e47f804c01aa5d160d81c084f9e776da334",
+        "evidence-grounding/source-snapshot/app/models.py": "fd42ae958c6a0058101bc7e97dc7e2c2eb2dc0afab86c69bf1fb6f319361a0c3",
+        "evidence-grounding/source-snapshot/app/security.py": "0863ab539f699506cb3fe00021664e85fc0bbe55e27279b47222584d68b03473",
+        "evidence-grounding/source-snapshot/app/config.py": "9b609f29338a8f57795f34bdaf4230bd69cccd7104507f0fb3eff4d5f31bd8f2",
+        "evidence-grounding/source-snapshot/app/grounded_prompting.py": "d730a7f4a5ce8f608e3d7566a793b7088e884729d34dc0af3ae609ef0309b815",
+        "evidence-grounding/source-snapshot/app/analyzers/evidence_agent.py": "7d83c22615410786ef622be70afdab03b0f47d8fa9b2c03163d67de887e267b7",
+        "evidence-grounding/source-snapshot/app/analyzers/openai_analyzer.py": "d7bdddcb22fc9fca915c19d5217f9e6f340c663edd8787ead12295bb59de93af",
+        "evidence-grounding/source-snapshot/app/analyzers/structured_response.py": "4f7ac4ebbad2e0f03861609bad893760fc2cc2d6dfbfb36df12ab9b025d072dc",
+        "evidence-grounding/source-snapshot/app/analyzers/hybrid.py": "08e69db8d77ba5fdc46b0504261688015a5c4a82fbb151f144a237c0f7cd5796",
+        "evidence-grounding/source-snapshot/app/services/session_analysis_evidence.py": "b49c1c9865a9fea7e24bad1403be1c8c66ccbe94e6c90a41adf2c1a3fbfd2581",
+        "evidence-grounding/source-snapshot/app/services/execution_analysis_evidence.py": "3a46ed220b29e756bcb68444092e6e52f91f9e7f7ea5215858f17b7e14adeb31"
+      }
+    },
+    {
+      "stage": "evidence-grounding-guard",
+      "plan_sha256": "36c2006c8a837ccefce7cc293667e16422df6b07c132c3e5b77e2ff3ee6d145d",
+      "source_files": 18,
+      "source_sha256": {
+        "evidence-grounding-guard/source-snapshot/scripts/evaluate_evidence_review_llm.py": "ef733f10a11fd3dc0f029c27fd35ea882f21443151843627b5b0df1d043450a8",
+        "evidence-grounding-guard/source-snapshot/scripts/bounded_llm_requests.py": "dc0ee687bfaa51b3d3c5632b72a7f9baac6468013acdd2162889f8ef911dd7ff",
+        "evidence-grounding-guard/source-snapshot/scripts/local_execution_analysis_lab.py": "35dd76ad62ed2887c0d0dd868244405cd1eef748ee6686d95145e114d8f2bcc0",
+        "evidence-grounding-guard/source-snapshot/scripts/local_oidc_authority.py": "e7626376a0e2e6823486ce97ae570b8b8fc69a9e81569acbb4fc67abe32e35e6",
+        "evidence-grounding-guard/source-snapshot/scripts/local_session_analysis_lab.py": "8c07ac71858eb671b1c94ba8450bbecd73a971fe9ceb8db0d154c15642e40f9d",
+        "evidence-grounding-guard/source-snapshot/app/main.py": "8f410d28876ea72e5a7962069be5ab9d71f2efe59b286816411d14fc37f2ca6e",
+        "evidence-grounding-guard/source-snapshot/app/models.py": "0eb336d686a0bfa58a39f0661065d1dc8d8a5a69b11541350e591409bfaa0af5",
+        "evidence-grounding-guard/source-snapshot/app/security.py": "0863ab539f699506cb3fe00021664e85fc0bbe55e27279b47222584d68b03473",
+        "evidence-grounding-guard/source-snapshot/app/config.py": "9b609f29338a8f57795f34bdaf4230bd69cccd7104507f0fb3eff4d5f31bd8f2",
+        "evidence-grounding-guard/source-snapshot/app/grounded_prompting.py": "d730a7f4a5ce8f608e3d7566a793b7088e884729d34dc0af3ae609ef0309b815",
+        "evidence-grounding-guard/source-snapshot/app/analyzers/evidence_agent.py": "7d83c22615410786ef622be70afdab03b0f47d8fa9b2c03163d67de887e267b7",
+        "evidence-grounding-guard/source-snapshot/app/analyzers/openai_analyzer.py": "d7bdddcb22fc9fca915c19d5217f9e6f340c663edd8787ead12295bb59de93af",
+        "evidence-grounding-guard/source-snapshot/app/analyzers/structured_response.py": "4f7ac4ebbad2e0f03861609bad893760fc2cc2d6dfbfb36df12ab9b025d072dc",
+        "evidence-grounding-guard/source-snapshot/app/analyzers/hybrid.py": "08e69db8d77ba5fdc46b0504261688015a5c4a82fbb151f144a237c0f7cd5796",
+        "evidence-grounding-guard/source-snapshot/app/services/session_analysis_evidence.py": "b49c1c9865a9fea7e24bad1403be1c8c66ccbe94e6c90a41adf2c1a3fbfd2581",
+        "evidence-grounding-guard/source-snapshot/app/services/policy.py": "718dde3e07a2454cb570ef81972aaf6e8169f791bd0934a52a135232cfb88da4",
+        "evidence-grounding-guard/source-snapshot/app/services/audit.py": "bf7cacfdafbbf2308541928fca72dd6a3f2cf659caa3b9d8c6afcd2ccf0ec083",
+        "evidence-grounding-guard/source-snapshot/app/services/execution_analysis_evidence.py": "3a46ed220b29e756bcb68444092e6e52f91f9e7f7ea5215858f17b7e14adeb31"
+      }
+    },
+    {
+      "stage": "evidence-review-inline-execution",
+      "plan_sha256": "baf1353bd0642c1e21ffbf09c1f40c94bb7e65034a02bc2a645d2f3019fdc5b6",
+      "source_files": 16,
+      "source_sha256": {
+        "evidence-review-inline-execution/source-snapshot/scripts/evaluate_evidence_review_llm.py": "25c269f8cfe58392a2def9fc745611222b6922eaa37ab73662d67d2664379372",
+        "evidence-review-inline-execution/source-snapshot/scripts/bounded_llm_requests.py": "dc0ee687bfaa51b3d3c5632b72a7f9baac6468013acdd2162889f8ef911dd7ff",
+        "evidence-review-inline-execution/source-snapshot/scripts/local_execution_analysis_lab.py": "325c605666f73974a94cebf4dd7831b88aec5ef5c9773209fcc7b605ad0824cf",
+        "evidence-review-inline-execution/source-snapshot/scripts/local_oidc_authority.py": "e7626376a0e2e6823486ce97ae570b8b8fc69a9e81569acbb4fc67abe32e35e6",
+        "evidence-review-inline-execution/source-snapshot/scripts/local_session_analysis_lab.py": "8c07ac71858eb671b1c94ba8450bbecd73a971fe9ceb8db0d154c15642e40f9d",
+        "evidence-review-inline-execution/source-snapshot/app/main.py": "920c5310afbf78240d3c26db94206e47f804c01aa5d160d81c084f9e776da334",
+        "evidence-review-inline-execution/source-snapshot/app/models.py": "fd42ae958c6a0058101bc7e97dc7e2c2eb2dc0afab86c69bf1fb6f319361a0c3",
+        "evidence-review-inline-execution/source-snapshot/app/security.py": "0863ab539f699506cb3fe00021664e85fc0bbe55e27279b47222584d68b03473",
+        "evidence-review-inline-execution/source-snapshot/app/config.py": "9b609f29338a8f57795f34bdaf4230bd69cccd7104507f0fb3eff4d5f31bd8f2",
+        "evidence-review-inline-execution/source-snapshot/app/grounded_prompting.py": "d730a7f4a5ce8f608e3d7566a793b7088e884729d34dc0af3ae609ef0309b815",
+        "evidence-review-inline-execution/source-snapshot/app/analyzers/evidence_agent.py": "7d83c22615410786ef622be70afdab03b0f47d8fa9b2c03163d67de887e267b7",
+        "evidence-review-inline-execution/source-snapshot/app/analyzers/openai_analyzer.py": "d7bdddcb22fc9fca915c19d5217f9e6f340c663edd8787ead12295bb59de93af",
+        "evidence-review-inline-execution/source-snapshot/app/analyzers/structured_response.py": "4f7ac4ebbad2e0f03861609bad893760fc2cc2d6dfbfb36df12ab9b025d072dc",
+        "evidence-review-inline-execution/source-snapshot/app/analyzers/hybrid.py": "08e69db8d77ba5fdc46b0504261688015a5c4a82fbb151f144a237c0f7cd5796",
+        "evidence-review-inline-execution/source-snapshot/app/services/session_analysis_evidence.py": "b49c1c9865a9fea7e24bad1403be1c8c66ccbe94e6c90a41adf2c1a3fbfd2581",
+        "evidence-review-inline-execution/source-snapshot/app/services/execution_analysis_evidence.py": "3a46ed220b29e756bcb68444092e6e52f91f9e7f7ea5215858f17b7e14adeb31"
+      }
+    },
+    {
+      "stage": "evidence-review-inline-session",
+      "plan_sha256": "324825cce00834d5a198a7bb2fec97dda251b8bc3f330ac4b36174ad317970bb",
+      "source_files": 16,
+      "source_sha256": {
+        "evidence-review-inline-session/source-snapshot/scripts/evaluate_evidence_review_llm.py": "25c269f8cfe58392a2def9fc745611222b6922eaa37ab73662d67d2664379372",
+        "evidence-review-inline-session/source-snapshot/scripts/bounded_llm_requests.py": "dc0ee687bfaa51b3d3c5632b72a7f9baac6468013acdd2162889f8ef911dd7ff",
+        "evidence-review-inline-session/source-snapshot/scripts/local_execution_analysis_lab.py": "325c605666f73974a94cebf4dd7831b88aec5ef5c9773209fcc7b605ad0824cf",
+        "evidence-review-inline-session/source-snapshot/scripts/local_oidc_authority.py": "e7626376a0e2e6823486ce97ae570b8b8fc69a9e81569acbb4fc67abe32e35e6",
+        "evidence-review-inline-session/source-snapshot/scripts/local_session_analysis_lab.py": "8c07ac71858eb671b1c94ba8450bbecd73a971fe9ceb8db0d154c15642e40f9d",
+        "evidence-review-inline-session/source-snapshot/app/main.py": "920c5310afbf78240d3c26db94206e47f804c01aa5d160d81c084f9e776da334",
+        "evidence-review-inline-session/source-snapshot/app/models.py": "fd42ae958c6a0058101bc7e97dc7e2c2eb2dc0afab86c69bf1fb6f319361a0c3",
+        "evidence-review-inline-session/source-snapshot/app/security.py": "0863ab539f699506cb3fe00021664e85fc0bbe55e27279b47222584d68b03473",
+        "evidence-review-inline-session/source-snapshot/app/config.py": "9b609f29338a8f57795f34bdaf4230bd69cccd7104507f0fb3eff4d5f31bd8f2",
+        "evidence-review-inline-session/source-snapshot/app/grounded_prompting.py": "d730a7f4a5ce8f608e3d7566a793b7088e884729d34dc0af3ae609ef0309b815",
+        "evidence-review-inline-session/source-snapshot/app/analyzers/evidence_agent.py": "7d83c22615410786ef622be70afdab03b0f47d8fa9b2c03163d67de887e267b7",
+        "evidence-review-inline-session/source-snapshot/app/analyzers/openai_analyzer.py": "d7bdddcb22fc9fca915c19d5217f9e6f340c663edd8787ead12295bb59de93af",
+        "evidence-review-inline-session/source-snapshot/app/analyzers/structured_response.py": "4f7ac4ebbad2e0f03861609bad893760fc2cc2d6dfbfb36df12ab9b025d072dc",
+        "evidence-review-inline-session/source-snapshot/app/analyzers/hybrid.py": "08e69db8d77ba5fdc46b0504261688015a5c4a82fbb151f144a237c0f7cd5796",
+        "evidence-review-inline-session/source-snapshot/app/services/session_analysis_evidence.py": "b49c1c9865a9fea7e24bad1403be1c8c66ccbe94e6c90a41adf2c1a3fbfd2581",
+        "evidence-review-inline-session/source-snapshot/app/services/execution_analysis_evidence.py": "3a46ed220b29e756bcb68444092e6e52f91f9e7f7ea5215858f17b7e14adeb31"
+      }
+    },
+    {
+      "stage": "evidence-review-paired",
+      "plan_sha256": "3ae949bff2b30b1d04348fd708e0d08a08b0ef5873018b714de25dbb2ece2751",
+      "source_files": 15,
+      "source_sha256": {
+        "evidence-review-paired/source-snapshot/scripts/evaluate_evidence_review_llm.py": "dba21d054491a3599a41cef04f88cfba82c7cead372a5230bd6ba1d70e1aa77c",
+        "evidence-review-paired/source-snapshot/scripts/bounded_llm_requests.py": "dc0ee687bfaa51b3d3c5632b72a7f9baac6468013acdd2162889f8ef911dd7ff",
+        "evidence-review-paired/source-snapshot/scripts/local_execution_analysis_lab.py": "325c605666f73974a94cebf4dd7831b88aec5ef5c9773209fcc7b605ad0824cf",
+        "evidence-review-paired/source-snapshot/scripts/local_oidc_authority.py": "e7626376a0e2e6823486ce97ae570b8b8fc69a9e81569acbb4fc67abe32e35e6",
+        "evidence-review-paired/source-snapshot/app/main.py": "3daa7b6adae0f1ed2600b4e8ff3086bf894f9cee85a95b29332ac9a6412b9fa7",
+        "evidence-review-paired/source-snapshot/app/models.py": "fd42ae958c6a0058101bc7e97dc7e2c2eb2dc0afab86c69bf1fb6f319361a0c3",
+        "evidence-review-paired/source-snapshot/app/security.py": "0863ab539f699506cb3fe00021664e85fc0bbe55e27279b47222584d68b03473",
+        "evidence-review-paired/source-snapshot/app/config.py": "76325ac05efbd4c7452174493fd1c767e7740959f6eae96bb6baff7da09a771b",
+        "evidence-review-paired/source-snapshot/app/grounded_prompting.py": "d730a7f4a5ce8f608e3d7566a793b7088e884729d34dc0af3ae609ef0309b815",
+        "evidence-review-paired/source-snapshot/app/analyzers/evidence_agent.py": "3ed83365d641d7926ea4367ef0c83142b90d8c14bc05e1b037b9b4b27463f505",
+        "evidence-review-paired/source-snapshot/app/analyzers/openai_analyzer.py": "4f57626cfa482bb2b1f7a69ab5237529271b74e4c59c2c690eacaa50ec940cb3",
+        "evidence-review-paired/source-snapshot/app/analyzers/structured_response.py": "4f7ac4ebbad2e0f03861609bad893760fc2cc2d6dfbfb36df12ab9b025d072dc",
+        "evidence-review-paired/source-snapshot/app/analyzers/hybrid.py": "08e69db8d77ba5fdc46b0504261688015a5c4a82fbb151f144a237c0f7cd5796",
+        "evidence-review-paired/source-snapshot/app/services/session_analysis_evidence.py": "b49c1c9865a9fea7e24bad1403be1c8c66ccbe94e6c90a41adf2c1a3fbfd2581",
+        "evidence-review-paired/source-snapshot/app/services/execution_analysis_evidence.py": "3a46ed220b29e756bcb68444092e6e52f91f9e7f7ea5215858f17b7e14adeb31"
+      }
+    },
+    {
+      "stage": "evidence-review-session",
+      "plan_sha256": "741e63b9b9c8242eb02961e9843482f8a5ce42b12a58e18baa95072f6d714229",
+      "source_files": 16,
+      "source_sha256": {
+        "evidence-review-session/source-snapshot/scripts/evaluate_evidence_review_llm.py": "7e734361e2605d496ef81abce3f3b2f67c31a39fd35d266278f0aa9ca95fb9d1",
+        "evidence-review-session/source-snapshot/scripts/bounded_llm_requests.py": "dc0ee687bfaa51b3d3c5632b72a7f9baac6468013acdd2162889f8ef911dd7ff",
+        "evidence-review-session/source-snapshot/scripts/local_execution_analysis_lab.py": "325c605666f73974a94cebf4dd7831b88aec5ef5c9773209fcc7b605ad0824cf",
+        "evidence-review-session/source-snapshot/scripts/local_oidc_authority.py": "e7626376a0e2e6823486ce97ae570b8b8fc69a9e81569acbb4fc67abe32e35e6",
+        "evidence-review-session/source-snapshot/scripts/local_session_analysis_lab.py": "8c07ac71858eb671b1c94ba8450bbecd73a971fe9ceb8db0d154c15642e40f9d",
+        "evidence-review-session/source-snapshot/app/main.py": "b86b0f22362d97997858d505e280f1d2d143656533e9478d1635e4d1a0ae321c",
+        "evidence-review-session/source-snapshot/app/models.py": "a55650869ecf973843b3f0b3027a86da43387e175badba36eb57ab398dbd0f4f",
+        "evidence-review-session/source-snapshot/app/security.py": "0863ab539f699506cb3fe00021664e85fc0bbe55e27279b47222584d68b03473",
+        "evidence-review-session/source-snapshot/app/config.py": "bab6d4d85214b59840d87434de185c52fb3814775beb5fab8117aff1552a52e0",
+        "evidence-review-session/source-snapshot/app/grounded_prompting.py": "d730a7f4a5ce8f608e3d7566a793b7088e884729d34dc0af3ae609ef0309b815",
+        "evidence-review-session/source-snapshot/app/analyzers/evidence_agent.py": "e9019877176bcab8b7417d7f26b83f8b1f09cc95a964fef8c9e2a1fabcf151af",
+        "evidence-review-session/source-snapshot/app/analyzers/openai_analyzer.py": "d7bdddcb22fc9fca915c19d5217f9e6f340c663edd8787ead12295bb59de93af",
+        "evidence-review-session/source-snapshot/app/analyzers/structured_response.py": "4f7ac4ebbad2e0f03861609bad893760fc2cc2d6dfbfb36df12ab9b025d072dc",
+        "evidence-review-session/source-snapshot/app/analyzers/hybrid.py": "08e69db8d77ba5fdc46b0504261688015a5c4a82fbb151f144a237c0f7cd5796",
+        "evidence-review-session/source-snapshot/app/services/session_analysis_evidence.py": "b49c1c9865a9fea7e24bad1403be1c8c66ccbe94e6c90a41adf2c1a3fbfd2581",
+        "evidence-review-session/source-snapshot/app/services/execution_analysis_evidence.py": "3a46ed220b29e756bcb68444092e6e52f91f9e7f7ea5215858f17b7e14adeb31"
+      }
+    },
+    {
+      "stage": "execution-paired",
+      "plan_sha256": "bd34cd9a63dc0b4ff0dce9641d245cf11f7225e503de9f976b75289d052d3715",
+      "source_files": 16,
+      "source_sha256": {
+        "execution-paired/source-snapshot/scripts/evaluate_execution_analysis_llm.py": "9e0171a94f00fa16962d5188e47304c253b94ae24fc038c4a376cb8a6897b883",
+        "execution-paired/source-snapshot/scripts/local_execution_analysis_lab.py": "325c605666f73974a94cebf4dd7831b88aec5ef5c9773209fcc7b605ad0824cf",
+        "execution-paired/source-snapshot/scripts/local_oidc_authority.py": "e7626376a0e2e6823486ce97ae570b8b8fc69a9e81569acbb4fc67abe32e35e6",
+        "execution-paired/source-snapshot/app/analyzers/openai_analyzer.py": "d7bdddcb22fc9fca915c19d5217f9e6f340c663edd8787ead12295bb59de93af",
+        "execution-paired/source-snapshot/app/analyzers/structured_response.py": "45020987cc99b21033233d04c5237cdf1767d0bcb0c7be4ba1d6e527b5066d63",
+        "execution-paired/source-snapshot/app/services/execution_analysis_evidence.py": "bb41a430a2378aa966a1a45d2d7bba2a6d150a0808ad5466feecbcfaf1281061",
+        "execution-paired/source-snapshot/app/services/session_analysis_evidence.py": "94518870d1a4eefbb11124197516c587f2d005c6512489aed55c1ee85f8d4d5e",
+        "execution-paired/source-snapshot/app/services/behavior_context.py": "971d1de83ea1465b50b05fbf6eeee5dc4d704ccc6f88d327df56d7d1bea46587",
+        "execution-paired/source-snapshot/app/services/behavior_context_trust.py": "a546d1356bf02889c3c2b2f0ffc231feafd8876ff88dd2c346492a8c4aeeeb9f",
+        "execution-paired/source-snapshot/app/services/behavior_execution.py": "177418cdb014b8ddcbdc4055f09ff38e84403bd1b9f6db3fff251d0721c8ed14",
+        "execution-paired/source-snapshot/app/services/trusted_signals.py": "fd32049117f299818f2573017cc67f74762797aeec2d56f01152ecf8b896d4b2",
+        "execution-paired/source-snapshot/app/grounded_prompting.py": "ba9b871a3dc792501bc4215ada6ee69408bba89de4d1581c5ebf8071dc7f6298",
+        "execution-paired/source-snapshot/app/main.py": "b8d56852e86a60f34573d4b5baeb5c9cff2f568bdf6fd8d1226bfbe0bc5c9eb3",
+        "execution-paired/source-snapshot/app/models.py": "6d2db2d9e374d1d40311fb1c0ea37fb0bd2d4b470c6abf0693764e394b746baf",
+        "execution-paired/source-snapshot/app/config.py": "1e34075b28db1b2f177b51d9080bb61f975bc349243ca02e84b6026a9f84c11e",
+        "execution-paired/source-snapshot/app/security.py": "bc0ebf85cf7746615f170850c73abed76861b3ed99fac7c0eba99a0648e2de83"
+      }
+    },
+    {
+      "stage": "execution-paired-v2",
+      "plan_sha256": "ab372364f4e0ba5eba1da294916d5086f3b7a2097d6f30af57a988b7ab749899",
+      "source_files": 16,
+      "source_sha256": {
+        "execution-paired-v2/source-snapshot/scripts/evaluate_execution_analysis_llm.py": "b0071caca8c42613183f043b16cd17f686c9414b61e8530b29142bfb6f155443",
+        "execution-paired-v2/source-snapshot/scripts/local_execution_analysis_lab.py": "325c605666f73974a94cebf4dd7831b88aec5ef5c9773209fcc7b605ad0824cf",
+        "execution-paired-v2/source-snapshot/scripts/local_oidc_authority.py": "e7626376a0e2e6823486ce97ae570b8b8fc69a9e81569acbb4fc67abe32e35e6",
+        "execution-paired-v2/source-snapshot/app/analyzers/openai_analyzer.py": "d7bdddcb22fc9fca915c19d5217f9e6f340c663edd8787ead12295bb59de93af",
+        "execution-paired-v2/source-snapshot/app/analyzers/structured_response.py": "45020987cc99b21033233d04c5237cdf1767d0bcb0c7be4ba1d6e527b5066d63",
+        "execution-paired-v2/source-snapshot/app/services/execution_analysis_evidence.py": "3a46ed220b29e756bcb68444092e6e52f91f9e7f7ea5215858f17b7e14adeb31",
+        "execution-paired-v2/source-snapshot/app/services/session_analysis_evidence.py": "b49c1c9865a9fea7e24bad1403be1c8c66ccbe94e6c90a41adf2c1a3fbfd2581",
+        "execution-paired-v2/source-snapshot/app/services/behavior_context.py": "971d1de83ea1465b50b05fbf6eeee5dc4d704ccc6f88d327df56d7d1bea46587",
+        "execution-paired-v2/source-snapshot/app/services/behavior_context_trust.py": "a546d1356bf02889c3c2b2f0ffc231feafd8876ff88dd2c346492a8c4aeeeb9f",
+        "execution-paired-v2/source-snapshot/app/services/behavior_execution.py": "177418cdb014b8ddcbdc4055f09ff38e84403bd1b9f6db3fff251d0721c8ed14",
+        "execution-paired-v2/source-snapshot/app/services/trusted_signals.py": "fd32049117f299818f2573017cc67f74762797aeec2d56f01152ecf8b896d4b2",
+        "execution-paired-v2/source-snapshot/app/grounded_prompting.py": "b7f5c2c2a6a044b5d75edfc7031040326e369b5ec653925991f444bb3e4bf4ff",
+        "execution-paired-v2/source-snapshot/app/main.py": "b8d56852e86a60f34573d4b5baeb5c9cff2f568bdf6fd8d1226bfbe0bc5c9eb3",
+        "execution-paired-v2/source-snapshot/app/models.py": "6d2db2d9e374d1d40311fb1c0ea37fb0bd2d4b470c6abf0693764e394b746baf",
+        "execution-paired-v2/source-snapshot/app/config.py": "1e34075b28db1b2f177b51d9080bb61f975bc349243ca02e84b6026a9f84c11e",
+        "execution-paired-v2/source-snapshot/app/security.py": "0863ab539f699506cb3fe00021664e85fc0bbe55e27279b47222584d68b03473"
+      }
+    },
+    {
+      "stage": "structured-paired",
+      "plan_sha256": "bdee25f17ca64f182d9d974399d90292e5a2c337d8a798c12efd520221b0af4e",
+      "source_files": 12,
+      "source_sha256": {
+        "structured-paired/source-snapshot/scripts/evaluate_verified_session_llm.py": "07d09cf5c958c49d3c56b202d75a24932bef6e94cb1dfb7d1900ae0f6f807751",
+        "structured-paired/source-snapshot/scripts/local_session_analysis_lab.py": "8c07ac71858eb671b1c94ba8450bbecd73a971fe9ceb8db0d154c15642e40f9d",
+        "structured-paired/source-snapshot/app/services/session_analysis_evidence.py": "c2b5f67261d2eddf4dcbf9369410e0dae7a855cdad776f8ccc7e8432906d1e33",
+        "structured-paired/source-snapshot/app/grounded_prompting.py": "9be361863c3949f558f8f3feae1e498c352531f6b37074b9cd5b154f185efe39",
+        "structured-paired/source-snapshot/app/analyzers/openai_analyzer.py": "2d794ec1b329db2a308b2bf129993cbf4c389442a2b4563323a19fdf48217f5c",
+        "structured-paired/source-snapshot/app/analyzers/structured_response.py": "45020987cc99b21033233d04c5237cdf1767d0bcb0c7be4ba1d6e527b5066d63",
+        "structured-paired/source-snapshot/app/analyzers/hybrid.py": "2a91a689518370294a40f6284626c7be31be2b90ce2ca01ed8aea6c11453e319",
+        "structured-paired/source-snapshot/app/main.py": "c5fb36d2f10e0c6c2dc918f303d19abe80d23fa024a77d4be27cf38d6c4992b5",
+        "structured-paired/source-snapshot/app/services/zero_trust.py": "e44faba72a713d3aafa583a028e4febf2938c7fd8fa38148a91f8aa9c44aeddc",
+        "structured-paired/source-snapshot/app/services/trusted_signals.py": "fd32049117f299818f2573017cc67f74762797aeec2d56f01152ecf8b896d4b2",
+        "structured-paired/source-snapshot/app/models.py": "6d2db2d9e374d1d40311fb1c0ea37fb0bd2d4b470c6abf0693764e394b746baf",
+        "structured-paired/source-snapshot/app/config.py": "625195619a77e5879456e3b1ab097237b6f02d2b8b1307f540467c0c26da16cb"
+      }
+    },
+    {
+      "stage": "event-text-robustness/trial",
+      "plan_sha256": "b2d943502bb42a849d03ef9985c2234c930820a0ccf5d1298abce94a71743311",
+      "source_files": 18,
+      "source_sha256": {
+        "event-text-robustness/trial/source-snapshot/scripts/evaluate_evidence_review_llm.py": "ef733f10a11fd3dc0f029c27fd35ea882f21443151843627b5b0df1d043450a8",
+        "event-text-robustness/trial/source-snapshot/scripts/bounded_llm_requests.py": "dc0ee687bfaa51b3d3c5632b72a7f9baac6468013acdd2162889f8ef911dd7ff",
+        "event-text-robustness/trial/source-snapshot/scripts/local_execution_analysis_lab.py": "35dd76ad62ed2887c0d0dd868244405cd1eef748ee6686d95145e114d8f2bcc0",
+        "event-text-robustness/trial/source-snapshot/scripts/local_oidc_authority.py": "e7626376a0e2e6823486ce97ae570b8b8fc69a9e81569acbb4fc67abe32e35e6",
+        "event-text-robustness/trial/source-snapshot/scripts/local_session_analysis_lab.py": "8c07ac71858eb671b1c94ba8450bbecd73a971fe9ceb8db0d154c15642e40f9d",
+        "event-text-robustness/trial/source-snapshot/app/main.py": "8f410d28876ea72e5a7962069be5ab9d71f2efe59b286816411d14fc37f2ca6e",
+        "event-text-robustness/trial/source-snapshot/app/models.py": "0eb336d686a0bfa58a39f0661065d1dc8d8a5a69b11541350e591409bfaa0af5",
+        "event-text-robustness/trial/source-snapshot/app/security.py": "0863ab539f699506cb3fe00021664e85fc0bbe55e27279b47222584d68b03473",
+        "event-text-robustness/trial/source-snapshot/app/config.py": "9b609f29338a8f57795f34bdaf4230bd69cccd7104507f0fb3eff4d5f31bd8f2",
+        "event-text-robustness/trial/source-snapshot/app/grounded_prompting.py": "6fb8faa5f6cd49508619410503742013a81da3439c2c8327e70fe5fcaa00c2ed",
+        "event-text-robustness/trial/source-snapshot/app/analyzers/evidence_agent.py": "7d83c22615410786ef622be70afdab03b0f47d8fa9b2c03163d67de887e267b7",
+        "event-text-robustness/trial/source-snapshot/app/analyzers/openai_analyzer.py": "d7bdddcb22fc9fca915c19d5217f9e6f340c663edd8787ead12295bb59de93af",
+        "event-text-robustness/trial/source-snapshot/app/analyzers/structured_response.py": "4f7ac4ebbad2e0f03861609bad893760fc2cc2d6dfbfb36df12ab9b025d072dc",
+        "event-text-robustness/trial/source-snapshot/app/analyzers/hybrid.py": "08e69db8d77ba5fdc46b0504261688015a5c4a82fbb151f144a237c0f7cd5796",
+        "event-text-robustness/trial/source-snapshot/app/services/session_analysis_evidence.py": "b49c1c9865a9fea7e24bad1403be1c8c66ccbe94e6c90a41adf2c1a3fbfd2581",
+        "event-text-robustness/trial/source-snapshot/app/services/policy.py": "718dde3e07a2454cb570ef81972aaf6e8169f791bd0934a52a135232cfb88da4",
+        "event-text-robustness/trial/source-snapshot/app/services/audit.py": "bf7cacfdafbbf2308541928fca72dd6a3f2cf659caa3b9d8c6afcd2ccf0ec083",
+        "event-text-robustness/trial/source-snapshot/app/services/execution_analysis_evidence.py": "3a46ed220b29e756bcb68444092e6e52f91f9e7f7ea5215858f17b7e14adeb31"
+      }
+    }
+  ],
+  "total_pinned_source_files": 181,
+  "no_credentials_or_private_request_bodies": true,
+  "full_repository_or_environment_snapshot": false,
+  "historical_experiment_sources_may_differ_from_final_runtime": true,
+  "limitations": [
+    "Only the source files pinned by each plan are included; other imports require the matching repository baseline and dependencies",
+    "Do not run old candidates as production code",
+    "Historical proof cannot be reused as current authorization",
+    "No private model requests, encrypted reasoning, signing keys or .env included"
+  ],
+  "archive_sha256": "c49297a2b74c3cbf8df348ab2824ff75ee55aa031fd9c1b87f0608575ea9a23a",
+  "archive_bytes": 859287,
+  "archive_entries": 213,
+  "raw_report_files": [
+    {
+      "path": "structured-paired/report.json",
+      "sha256": "2e81c31245ee89afde986838c12a6e5228cafd680b2b2e55ba2e268e2cbefa11",
+      "bytes": 4590
+    },
+    {
+      "path": "oidc-live-smoke/report.json",
+      "sha256": "b44728cd44e1c4a43c3ac202336fb5a409307dfcf04061e18ed09f536423e712",
+      "bytes": 20022
+    },
+    {
+      "path": "development360/report.json",
+      "sha256": "3a617cb03d5e0faa95ffac9469986a191dce128cd977d5f6d2e039dcb2bcf085",
+      "bytes": 2312
+    },
+    {
+      "path": "execution-paired/report.json",
+      "sha256": "834e18719c22abf1679dced66e9a9704c31f66d7c1e7aa3c12c25ee635b96eca",
+      "bytes": 3683
+    },
+    {
+      "path": "execution-paired-v2/report.json",
+      "sha256": "37895c492387ed32b5c4c42eda4463ab1e88579019b18b9587eae847fa381881",
+      "bytes": 4961
+    },
+    {
+      "path": "natural-incomplete-retry/report.json",
+      "sha256": "e50628a7183e58f7f772c533332de398c73f77c03216ccba97be255fb4dc9754",
+      "bytes": 1973
+    },
+    {
+      "path": "development360-predicate/report.json",
+      "sha256": "1c23d921c91cf336aa3007394be42dd25a3cfa79a8ae35a1c592a15aa72f7e8e",
+      "bytes": 2402
+    },
+    {
+      "path": "evidence-review-paired/report.json",
+      "sha256": "f53eaa1fe1a7f781cdc1050a83b39cdbb07f5bf0f2f5e0c417992fce1528c4a7",
+      "bytes": 338934
+    },
+    {
+      "path": "evidence-review-session/report.json",
+      "sha256": "35a0be569f58fd3059c008bf09ed65e461c62ff21716f9737be0eec67c97624c",
+      "bytes": 248537
+    },
+    {
+      "path": "evidence-review-inline-execution/report.json",
+      "sha256": "785556c66ccfea449abab13cdb500d1a7768f2237a0bd3d0facd4800d660a22b",
+      "bytes": 335573
+    },
+    {
+      "path": "evidence-review-inline-session/report.json",
+      "sha256": "797359ebe3f75589253a9fcc4d42c43245e6476826d6fd674de24547ba8e2737",
+      "bytes": 250005
+    },
+    {
+      "path": "evidence-grounding/report.json",
+      "sha256": "5e1c4ceb8ca3e71d0f2ceaf8a4afc29f2bb574e793675a17380028c5cfa92993",
+      "bytes": 151390
+    },
+    {
+      "path": "evidence-grounding-guard/report.json",
+      "sha256": "45b08b8dc9b173c06a4a88be731b06c043cc5ee4e5b6d3498139a4033d2faebd",
+      "bytes": 155708
+    },
+    {
+      "path": "download-arithmetic60/report.json",
+      "sha256": "cce19001bd3ac2288078ab1954120e74dcbc80ef2a377a9e2d6e9ce1e529428b",
+      "bytes": 2365
+    },
+    {
+      "path": "event-text-robustness/trial/report.json",
+      "sha256": "856b2592bc41d20151ae9305e4456de80288d95a3ca2d2b2d386e27d9d08e2a4",
+      "bytes": 131367
+    },
+    {
+      "path": "event-text-robustness/report.json",
+      "sha256": "37c0b1b08b898615a7cc8c6c36aafe4364ac291f4df479d20a8c415b9312ee2d",
+      "bytes": 131601
+    }
+  ],
+  "distinct_source_paths": 31,
+  "source_entries_include_repeated_stage_versions": true,
+  "repository_license_sha256": "aff4c0db527d7213c0a28f1f59ded81a066160aac1a6ec0dbef16b1009aa2899",
+  "repository_license_included": true
+}

@@ -118,6 +118,45 @@ def run(args, directory, report):
             check("rule_analysis_saved", result["event_id"])
             page.screenshot(path=str(args.output_dir / "analysis-operation.png"), full_page=True)
 
+            # Preview only: these signed-body placeholders are never submitted.
+            # The explicit LLM endpoints require a cost acknowledgement even when
+            # the generic server health currently reports the rule analyzer.
+            sample = page.request.post(
+                base + "/events/simulate",
+                headers=headers | {"Content-Type": "application/json"},
+                data=json.dumps({"scenario_id": "NORMAL-01", "count": 1}),
+            ).json()[0]
+            attempted_reviews = []
+            page.on(
+                "request",
+                lambda req: (
+                    attempted_reviews.append(req.url)
+                    if req.method == "POST" and "/analysis/" in req.url
+                    else None
+                ),
+            )
+            for review_path in ("/analysis/verified-session", "/analysis/evidence-review"):
+                operation(page, review_path)
+                fill(
+                    page,
+                    {
+                        "session_id": "preview-session",
+                        "expected_version": 0,
+                        "tenant_id": "tenant-a",
+                        "source_id": "preview-collector",
+                        "key_id": "preview-key",
+                        "event": sample,
+                        "signature": "A" * 86,
+                    },
+                )
+                page.locator("#operationPrepare").click()
+                expect(page.locator("#operationConfirmation")).to_contain_text(
+                    "실제 모델 호출로 비용"
+                )
+                expect(page.locator("#operationExecute")).to_be_disabled()
+                check("explicit_llm_review_cost_acknowledgement_" + review_path)
+            check("llm_review_preview_does_not_submit_or_call_provider", not attempted_reviews)
+
             operation(page, "/results/{event_id}/review", "PATCH")
             page.locator("#op-path-event_id").fill(result["event_id"])
             fill(page, {"status": "RESOLVED", "note": "Checked synthetic event evidence"})

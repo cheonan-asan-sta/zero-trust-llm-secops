@@ -3,6 +3,9 @@ app/data/replay/** text eol=lf
 app/data/benchmark/** text eol=lf
 docs/benchmark-results/** text eol=lf
 docs/infrastructure-results/** text eol=lf
+# Evidence screenshots must preserve their PNG signature and compressed bytes.
+docs/infrastructure-results/*.png binary
+docs/infrastructure-results/*.zip binary
 infra/mtls/nginx-renewal.sh text eol=lf
 infra/mtls/nginx-rekey.sh text eol=lf
 infra/runtime/** text eol=lf

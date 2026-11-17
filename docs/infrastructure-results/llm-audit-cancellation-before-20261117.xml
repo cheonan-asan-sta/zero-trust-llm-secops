@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="3" time="2.536" timestamp="2026-11-17T15:57:35.605549+09:00" hostname="희주"><testcase classname="tests.test_audit_cancellation" name="test_repeated_cancellation_during_append_keeps_writer_lock_and_memory_in_sync" time="0.012"><failure message="assert True is False">tests\test_audit_cancellation.py:72: in test_repeated_cancellation_during_append_keeps_writer_lock_and_memory_in_sync
+    asyncio.run(run())
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_audit_cancellation.py:63: in run
+    assert overlapped is False
+E   assert True is False</failure></testcase><testcase classname="tests.test_audit_cancellation" name="test_failed_partial_append_closes_store_before_any_later_write" time="0.012"><failure message="assert True is False">tests\test_audit_cancellation.py:95: in test_failed_partial_append_closes_store_before_any_later_write
+    asyncio.run(run())
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_audit_cancellation.py:88: in run
+    assert store.integrity()["ok"] is False
+E   assert True is False</failure></testcase><testcase classname="tests.test_audit_cancellation" name="test_cancellation_while_waiting_for_writer_does_not_start_an_append" time="0.012" /></testsuite></testsuites>

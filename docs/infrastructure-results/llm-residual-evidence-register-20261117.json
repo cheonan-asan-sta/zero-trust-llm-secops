@@ -1,0 +1,430 @@
+{
+  "schema": "llm-development-residual-evidence-register-1",
+  "source_population": 360,
+  "source_metrics": {
+    "TP": 163,
+    "FP": 6,
+    "FN": 17,
+    "TN": 174,
+    "unknown_or_error": 6,
+    "precision": 0.9644970414201184,
+    "recall": 0.9055555555555556,
+    "F1": 0.9340974212034384,
+    "FPR": 0.03333333333333333,
+    "FNR": 0.09444444444444444
+  },
+  "cases_sha256": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f",
+  "source_hashes": {
+    "plan.json": "36539ae06e3056d335b2bb8733dca6b40ef65f3c28d97f5b02bfa31abb5e6426",
+    "report.json": "3a617cb03d5e0faa95ffac9469986a191dce128cd977d5f6d2e039dcb2bcf085",
+    "private/predictions.jsonl": "b854b7e3e2015f281f7246f845973a29f7c686f547323f1aaa437abcf5f1d067",
+    "private/inputs.jsonl": "fce731785e465486b62fbc92236648dd008471d9ef4f9516ac60b8a1a6d84a13"
+  },
+  "independent_acceptance": false,
+  "historical_records_modified": false,
+  "historical_missing_proof_backfilled": false,
+  "new_provider_calls": 0,
+  "classification_unchanged": true,
+  "families": [
+    {
+      "family_id": "device-approved-enrollment",
+      "FP": 2,
+      "FN": 0,
+      "unknown_or_error": 0
+    },
+    {
+      "family_id": "exfiltration-small-critical",
+      "FP": 1,
+      "FN": 0,
+      "unknown_or_error": 1
+    },
+    {
+      "family_id": "lateral-approved-deployment",
+      "FP": 3,
+      "FN": 0,
+      "unknown_or_error": 1
+    },
+    {
+      "family_id": "remote-unapproved-rdp",
+      "FP": 0,
+      "FN": 10,
+      "unknown_or_error": 0
+    },
+    {
+      "family_id": "remote-unverified-mfa",
+      "FP": 0,
+      "FN": 7,
+      "unknown_or_error": 4
+    }
+  ],
+  "rows": [
+    {
+      "id": "41954d425da8e66b78703752e932b981ae3bea9cc65ca6817b538ca5d8e5425d",
+      "domain": "device",
+      "family_id": "device-approved-enrollment",
+      "truth": false,
+      "prediction": true,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 3106,
+        "output_tokens": 486,
+        "refusal": false
+      }
+    },
+    {
+      "id": "7274336bc8b03571226b1a88a80648822f975f9c45149f353b2abb85290c0007",
+      "domain": "device",
+      "family_id": "device-approved-enrollment",
+      "truth": false,
+      "prediction": true,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 3128,
+        "output_tokens": 503,
+        "refusal": false
+      }
+    },
+    {
+      "id": "3fba06f600568e673cb363c679c679e2c2d4d32788e701cbea51fcaa86600dc5",
+      "domain": "exfiltration",
+      "family_id": "exfiltration-small-critical",
+      "truth": false,
+      "prediction": null,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2747,
+        "output_tokens": 543,
+        "refusal": false
+      }
+    },
+    {
+      "id": "0c45d157ed75fe023030c6dcfd8d9df5072fc897abc7cf78fdf5225f81421318",
+      "domain": "lateral",
+      "family_id": "lateral-approved-deployment",
+      "truth": false,
+      "prediction": true,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 3111,
+        "output_tokens": 638,
+        "refusal": false
+      }
+    },
+    {
+      "id": "cfe5650f218a3d585d966a96ed73da2d9e669fb7234e51e76ea08ffbabdde0c3",
+      "domain": "lateral",
+      "family_id": "lateral-approved-deployment",
+      "truth": false,
+      "prediction": null,
+      "error": "StructuredResponseFailure",
+      "error_code": "response_not_completed",
+      "response_diagnostics": {
+        "status": "incomplete",
+        "incomplete_reason": "max_output_tokens",
+        "input_tokens": 3144,
+        "output_tokens": 2400,
+        "refusal": false
+      }
+    },
+    {
+      "id": "99cf86a12a87dd4462c4ed3a01fbe831189c7a819546abfc271bb01e63f39e53",
+      "domain": "lateral",
+      "family_id": "lateral-approved-deployment",
+      "truth": false,
+      "prediction": true,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 3144,
+        "output_tokens": 796,
+        "refusal": false
+      }
+    },
+    {
+      "id": "21f43607cbb46e7955f762ea12d9552d0dc94862de890df78b87778711cc1fa6",
+      "domain": "remote",
+      "family_id": "remote-unapproved-rdp",
+      "truth": true,
+      "prediction": false,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2771,
+        "output_tokens": 369,
+        "refusal": false
+      }
+    },
+    {
+      "id": "a793ca7c6c598addb57a76439c1b73d2bae016c0dbdb0e280a27043768df11bf",
+      "domain": "remote",
+      "family_id": "remote-unapproved-rdp",
+      "truth": true,
+      "prediction": false,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2757,
+        "output_tokens": 484,
+        "refusal": false
+      }
+    },
+    {
+      "id": "94abedb7e78284c2ac623b661c482cf7fd6bf66f4bce27c861367c58b3707272",
+      "domain": "remote",
+      "family_id": "remote-unapproved-rdp",
+      "truth": true,
+      "prediction": false,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2750,
+        "output_tokens": 725,
+        "refusal": false
+      }
+    },
+    {
+      "id": "25230b5b0aebd254c56c0703d163d34abef7745f0ceebe916c21320e6a5723dc",
+      "domain": "remote",
+      "family_id": "remote-unapproved-rdp",
+      "truth": true,
+      "prediction": false,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2736,
+        "output_tokens": 424,
+        "refusal": false
+      }
+    },
+    {
+      "id": "0df50e7a0bfcca0d33f3e3a4683595d2128a51e3a9e2829d50e1c3b74e3dbbff",
+      "domain": "remote",
+      "family_id": "remote-unapproved-rdp",
+      "truth": true,
+      "prediction": false,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2757,
+        "output_tokens": 384,
+        "refusal": false
+      }
+    },
+    {
+      "id": "aff7019f254ace6e7c376a8ba39f4a55069e6bf53874d4d4dc424a7a48653ad3",
+      "domain": "remote",
+      "family_id": "remote-unapproved-rdp",
+      "truth": true,
+      "prediction": false,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2764,
+        "output_tokens": 457,
+        "refusal": false
+      }
+    },
+    {
+      "id": "625bbf05615258914b9603a45e2f6ee74d9b374e76b7ee50580e00275387f560",
+      "domain": "remote",
+      "family_id": "remote-unapproved-rdp",
+      "truth": true,
+      "prediction": false,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2743,
+        "output_tokens": 369,
+        "refusal": false
+      }
+    },
+    {
+      "id": "59c2ab9e1edaeed1fc4f6ba17f406ab151e145939d993e46d072ffc3a99389e3",
+      "domain": "remote",
+      "family_id": "remote-unapproved-rdp",
+      "truth": true,
+      "prediction": false,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2736,
+        "output_tokens": 405,
+        "refusal": false
+      }
+    },
+    {
+      "id": "ff46d7eebd41058ae1516c7e2969a269a01f36749265304056937d7c74758931",
+      "domain": "remote",
+      "family_id": "remote-unapproved-rdp",
+      "truth": true,
+      "prediction": false,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2743,
+        "output_tokens": 438,
+        "refusal": false
+      }
+    },
+    {
+      "id": "b21770c9152f3e07c6767ffadd579820e4f3a59b71544acce3d244cb7458e6e6",
+      "domain": "remote",
+      "family_id": "remote-unapproved-rdp",
+      "truth": true,
+      "prediction": false,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2764,
+        "output_tokens": 409,
+        "refusal": false
+      }
+    },
+    {
+      "id": "97e34743e6619cc6b5f0a9526aa0cb8e2f4fc3f7578eb232c59a591d6d086d6f",
+      "domain": "remote",
+      "family_id": "remote-unverified-mfa",
+      "truth": true,
+      "prediction": null,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2757,
+        "output_tokens": 617,
+        "refusal": false
+      }
+    },
+    {
+      "id": "215f6c72428a3cc9a2cbb31155e96146125a72e0acff44fb7b6ca0e7ae2989fc",
+      "domain": "remote",
+      "family_id": "remote-unverified-mfa",
+      "truth": true,
+      "prediction": false,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2757,
+        "output_tokens": 605,
+        "refusal": false
+      }
+    },
+    {
+      "id": "9bfe1f36bec69ef854ca644b03e377ac7ce8853ea2125ab0a255fdbee3981292",
+      "domain": "remote",
+      "family_id": "remote-unverified-mfa",
+      "truth": true,
+      "prediction": null,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2757,
+        "output_tokens": 614,
+        "refusal": false
+      }
+    },
+    {
+      "id": "ff0f7b0a0c6799dc6c31cb01effe57660387b161cb83077fde7a1de54afbd785",
+      "domain": "remote",
+      "family_id": "remote-unverified-mfa",
+      "truth": true,
+      "prediction": false,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2729,
+        "output_tokens": 483,
+        "refusal": false
+      }
+    },
+    {
+      "id": "3438c4c9a71d78d4f1894c9acbaafc3757a52b667165b2af22ee85d6bf5d7dff",
+      "domain": "remote",
+      "family_id": "remote-unverified-mfa",
+      "truth": true,
+      "prediction": false,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2764,
+        "output_tokens": 563,
+        "refusal": false
+      }
+    },
+    {
+      "id": "a36b3d5ccd133a038696bcb941241449e153a76c81279cb2ec539c0b9f79a600",
+      "domain": "remote",
+      "family_id": "remote-unverified-mfa",
+      "truth": true,
+      "prediction": null,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2750,
+        "output_tokens": 855,
+        "refusal": false
+      }
+    },
+    {
+      "id": "01059e8e7f829af29a8bfc5e2929c827c16af9152b52b24869b2c998b241a1ac",
+      "domain": "remote",
+      "family_id": "remote-unverified-mfa",
+      "truth": true,
+      "prediction": null,
+      "error": null,
+      "error_code": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 2757,
+        "output_tokens": 779,
+        "refusal": false
+      }
+    }
+  ]
+}

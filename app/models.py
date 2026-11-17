@@ -3,7 +3,14 @@ from enum import Enum
 from typing import Annotated, Literal, Self
 from uuid import uuid4
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    field_validator,
+    model_serializer,
+    model_validator,
+)
 
 
 class StrictModel(BaseModel):
@@ -24,6 +31,7 @@ class ViolationType(str, Enum):
     PRIVILEGE_ESCALATION = "PRIVILEGE_ESCALATION"
     LATERAL_MOVEMENT = "LATERAL_MOVEMENT"
     DATA_EXFILTRATION = "DATA_EXFILTRATION"
+    ACCESS_POLICY_VIOLATION = "ACCESS_POLICY_VIOLATION"
     UNKNOWN = "UNKNOWN"
 
 
@@ -1108,11 +1116,46 @@ class SecurityAssessment(StrictModel):
 class PolicyDecision(StrictModel):
     mode: Literal["simulation"] = "simulation"
     action: RecommendedAction
-    allowed: bool
+    allowed: bool = Field(
+        description="권고가 응답 허용 목록에 속하는지 여부이며 보호 자원 접근 허가가 아닙니다."
+    )
     requires_human_review: bool
     reason: str
     controls_applied: list[str] = Field(default_factory=list, max_length=20)
     exception_id: str | None = None
+
+
+class VerifiedReviewControls(StrictModel):
+    scope: Literal["verified_review_advisory_only"] = "verified_review_advisory_only"
+    action_before_guard: RecommendedAction
+    action_after_guard: RecommendedAction
+    action_adjusted: bool = Field(strict=True)
+    allow_recommendation_supported: bool = Field(strict=True)
+    restrictions: list[
+        Literal[
+            "verified_provenance_incomplete",
+            "server_policy_requirements_not_satisfied",
+            "current_session_not_usable",
+            "execution_scope_not_proven",
+        ]
+    ] = Field(default_factory=list, max_length=4)
+
+    @model_validator(mode="after")
+    def consistent_recommendation_control(self) -> Self:
+        changed = self.action_before_guard != self.action_after_guard
+        if self.action_adjusted != changed or (
+            changed
+            and (
+                self.action_before_guard != RecommendedAction.ALLOW
+                or self.action_after_guard != RecommendedAction.HOLD_FOR_REVIEW
+            )
+        ):
+            raise ValueError("verified review action transition is inconsistent")
+        if self.allow_recommendation_supported == bool(self.restrictions):
+            raise ValueError("verified review support and restrictions disagree")
+        if len(self.restrictions) != len(set(self.restrictions)):
+            raise ValueError("verified review restrictions must be distinct")
+        return self
 
 
 class AnalysisResult(StrictModel):
@@ -1123,6 +1166,9 @@ class AnalysisResult(StrictModel):
     policy_decision: PolicyDecision
     normalized_event: NormalizedSecurityEvent | None = None
     detection: SigmaDetectionResult | None = None
+    verification_context: dict[str, object] | None = None
+    llm_trace: dict[str, object] | None = None
+    verified_review_controls: VerifiedReviewControls | None = None
     latency_ms: float = Field(ge=0)
     analyzed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     tenant_id: str = Field(default="local", pattern=r"^[a-zA-Z0-9._-]{1,64}$")
@@ -1132,6 +1178,17 @@ class AnalysisResult(StrictModel):
     reviewer: str | None = Field(default=None, min_length=2, max_length=64)
     review_note: str | None = Field(default=None, min_length=3, max_length=500)
     review_updated_at: datetime | None = None
+
+    @model_serializer(mode="wrap")
+    def omit_absent_verification_context(self, handler):
+        value = handler(self)
+        if self.verification_context is None:
+            value.pop("verification_context", None)
+        if self.llm_trace is None:
+            value.pop("llm_trace", None)
+        if self.verified_review_controls is None:
+            value.pop("verified_review_controls", None)
+        return value
 
     @model_validator(mode="before")
     @classmethod

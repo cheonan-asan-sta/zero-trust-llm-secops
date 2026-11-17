@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     openai_few_shot_count: int = Field(default=1, ge=0, le=10)
     openai_reasoning_effort: Literal["none", "low", "medium", "high"] = "none"
     openai_max_output_tokens: int = Field(default=800, ge=300, le=4000)
+    openai_incomplete_retries: int = Field(default=0, ge=0, le=1)
+    openai_retry_max_output_tokens: int = Field(default=4000, ge=300, le=4000)
+    openai_evidence_agent_enabled: bool = False
+    openai_evidence_execution_delivery: Literal["inline", "on_request"] = "inline"
+    openai_evidence_review_timeout_seconds: float = Field(default=30.0, ge=1.0, le=90.0)
     hybrid_confidence_threshold: float = Field(default=0.85, ge=0.5, le=1)
     hybrid_review_all: bool = False
     hybrid_llm_timeout_seconds: float = Field(default=2.5, ge=0.5, le=30)
@@ -25,6 +30,7 @@ class Settings(BaseSettings):
     case_log_path: Path = Path("runtime/cases.jsonl")
     outbox_log_path: Path = Path("runtime/integration-outbox.jsonl")
     zero_trust_db_path: Path = Path("runtime/zero-trust.sqlite3")
+    zero_trust_policy_path: Path | None = None
     behavior_context_db_path: Path | None = None
     # Compatibility for offline legacy fixtures; the application uses behavior_context_db_path.
     response_workflow_db_path: Path = Path("runtime/response-workflow.sqlite3")
@@ -75,13 +81,22 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_enterprise_security(self) -> "Settings":
+        if (
+            self.openai_incomplete_retries
+            and self.openai_retry_max_output_tokens <= self.openai_max_output_tokens
+        ):
+            raise ValueError("incomplete retry output limit must exceed the initial limit")
         if self.app_environment == "production" and self.auth_mode == "disabled":
             raise ValueError("production requires api_key or oidc authentication")
 
         if self.auth_mode == "api_key":
             digest = self.api_key_sha256.get_secret_value() if self.api_key_sha256 else ""
-            if len(digest) != 64 or any(character not in "0123456789abcdefABCDEF" for character in digest):
-                raise ValueError("api_key mode requires API_KEY_SHA256 as a 64-character hex digest")
+            if len(digest) != 64 or any(
+                character not in "0123456789abcdefABCDEF" for character in digest
+            ):
+                raise ValueError(
+                    "api_key mode requires API_KEY_SHA256 as a 64-character hex digest"
+                )
 
         if self.auth_mode == "oidc":
             if not all((self.oidc_issuer, self.oidc_audience, self.oidc_jwks_url)):

@@ -3,7 +3,7 @@
   "use strict";
   const ctx = window.dashboardContext;
   delete window.dashboardContext;
-  const {request, node, redact, rawPanel, errorLabel} = ctx;
+  const {request, node, redact, rawPanel, analysisEvidence, errorLabel} = ctx;
   const current = () => ctx.state;
   const root = document.getElementById("operationsWorkspace");
   const groups = new Set(["analysis", "evaluation", "cases", "context", "signals", "responses", "assurance", "operations"]);
@@ -15,6 +15,7 @@
     status: "처리 상태", review_status: "검토 상태", assignee: "담당자",
     baseline_id: "기준선 ID", approval_id: "작업 승인 ID", capture_ids: "검토한 수집 기록 ID 목록",
     capture_id: "수집 기록 ID", valid_from: "유효 시작", valid_until: "유효 종료",
+    behavior_capture_id: "연결할 실행 수집 기록 ID",
     max_uses: "최대 사용 횟수", execution_policy: "실행 주체와 반출 목적지 조건",
     events: "입력 이벤트 목록", event: "입력 이벤트", policy: "상관분석 조건",
     analyzer: "분석기", concurrency: "동시 실행 수", runs_per_scenario: "시나리오별 반복 수",
@@ -36,7 +37,7 @@
     simulation_only: "모의 실행", effect_applied: "외부 조치 적용", duplicate: "기존 요청 재조회",
     receipt_version: "처리 당시 버전", session_binding: "연결된 세션", subject: "사용자",
     received_at: "접수 시각", completed_at: "완료 시각", reason_codes: "판단 사유",
-    decision: "접근 판단", signal_trust: "신호 검증 방식", evidence: "판단 근거",
+    decision: "접근 판단", signal_trust: "신호 검증 방식", evidence: "판단 근거", allowed: "허용 여부",
     risk_score: "위험 점수", risk_level: "위험도", policy_decision: "대응 제안",
     analyzed_at: "분석 시각", latency_ms: "응답 시간 (ms)", budget: "호출 및 비용 집계",
     precision: "정밀도", recall: "재현율", f1: "F1", false_positive_rate: "오탐률",
@@ -62,6 +63,8 @@
   const label = (key) => names[key] || key;
   const roleLabel = (role) => ({viewer:"조회 사용자",analyst:"분석 담당자",responder:"대응 담당자",admin:"관리자"}[role] || role);
   const hints = {
+    "/analysis/verified-session": "서명된 현재 세션을 서버 정책·이력과 함께 분석합니다. 실행 수집 기록 ID는 같은 세션에 묶인 경우만 선택적으로 연결하세요.",
+    "/analysis/evidence-review": "LLM이 현재 세션의 추가 근거를 읽기 전용으로 요청할 수 있습니다. 최대 제공자 3회 호출이며 분석 제안으로 권한을 변경하지 않습니다.",
     "/detections/context/baselines": "서명된 정상 수집 기록을 3건 이상 지정합니다. 유효 시작 시각은 등록 시각보다 늦어야 합니다.",
     "/detections/context/approvals": "승인 기간은 선택한 기준선의 유효기간 안에 있어야 합니다. 시작 시각을 과거로 지정할 수 없습니다.",
     "/zero-trust/sessions/evaluate": "합성 입력으로 로컬 접근 정책을 검증합니다. 수집기에서 받은 실제 관측은 서명 신호 접수 메뉴를 사용하세요.",
@@ -161,7 +164,7 @@
     inputs.push({key, place, schema, input, required});
     return wrapper;
   }
-  function describeResult(value, depth = 0) {
+  function describeResult(value, depth = 0, parent = "") {
     if (depth > 4) return rawPanel(value, "세부 자료");
     if (Array.isArray(value)) {
       const area = node("div", null, "operation-records");
@@ -169,7 +172,7 @@
       value.slice(0, 100).forEach((entry, index) => {
         const item = node("details", null, "operation-record");
         item.append(node("summary", entry?.title || entry?.request_id || entry?.case_id || entry?.event_id ||
-          entry?.session_id || entry?.model_id || entry?.label || "기록 " + (index + 1)), describeResult(entry, depth + 1));
+          entry?.session_id || entry?.model_id || entry?.label || "기록 " + (index + 1)), describeResult(entry, depth + 1, parent));
         area.append(item);
       });
       return area;
@@ -180,13 +183,14 @@
         if (["request_digest", "input_digest_sha256", "evidence_sha256", "receipt_version"].includes(key)) return;
         if (item !== null && typeof item === "object") {
           const details = node("details");
-          details.append(node("summary", label(key)), describeResult(item, depth + 1));
+          details.append(node("summary", label(key)), describeResult(item, depth + 1, key));
           area.append(details);
         } else {
           const row = node("div");
           const display = item === null ? "—" : typeof item === "boolean" ? (item ? "예" : "아니요") :
             Object.hasOwn(enumNames, item) ? enumNames[item] + " (" + item + ")" : String(item);
-          row.append(node("dt", label(key)), node("dd", display));
+          const title = key === "allowed" && (parent === "policy_decision" || (value.mode === "simulation" && Array.isArray(value.controls_applied))) ? "권고 유형의 허용 목록 검사" : label(key);
+          row.append(node("dt", title), node("dd", display));
           grid.append(row);
         }
       });
@@ -198,7 +202,10 @@
   function showResult(value) {
     resultValue = redact(value);
     const target = document.getElementById("operationResult");
-    target.replaceChildren(describeResult(resultValue), rawPanel(resultValue));
+    const evidence = value?.assessment ? analysisEvidence(value) : null;
+    const displayed = {...resultValue};
+    if (evidence) { delete displayed.verification_context; delete displayed.llm_trace; delete displayed.verified_review_controls; }
+    target.replaceChildren(...(evidence ? [evidence] : []), describeResult(evidence ? displayed : resultValue), rawPanel(resultValue));
     if (value?.grant_token && value?.session) {
       lastGrant = value.grant_token;
       lastSession = value.session;
@@ -314,7 +321,7 @@
         showResult(value); message("조회 완료");
         return;
       }
-      const paid = (command.path.startsWith("/analysis") && current().data.health?.analyzer_mode !== "rule") ||
+      const paid = command.path.startsWith("/analysis/verified-session") || command.path.startsWith("/analysis/evidence-review") || (command.path.startsWith("/analysis") && current().data.health?.analyzer_mode !== "rule") ||
         (command.path === "/evaluation/run" && command.body?.analyzer !== "rule");
       prepared = {...command, epoch, ticket};
       const panel = document.getElementById("operationConfirmation");

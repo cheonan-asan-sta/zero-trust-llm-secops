@@ -1,5 +1,6 @@
 import fnmatch
 import json
+import math
 import re
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -174,6 +175,69 @@ class SigmaEngine:
     def summaries(self) -> list[SigmaRuleSummary]:
         return [rule.summary for rule in self._rules]
 
+    def observation_comparisons(self, event: dict[str, object]) -> list[dict]:
+        """Numeric/field-reference operands only; no selector/rule classification."""
+        result = []
+        for rule in self.approved_rules:
+            for name, selector in rule.detection.items():
+                if name == "condition":
+                    continue
+                mappings = selector if isinstance(selector, list) else [selector]
+                for index, mapping in enumerate(mappings):
+                    for expression, expected in mapping.items():
+                        path, *modifiers = expression.split("|")
+                        numeric = any(m in {"gt", "gte", "lt", "lte"} for m in modifiers)
+                        if not numeric and "fieldref" not in modifiers:
+                            continue
+                        exists, left = _lookup(event, path)
+                        right, right_exists = expected, True
+                        if "fieldref" in modifiers:
+                            references = expected if isinstance(expected, list) else [expected]
+                            resolved = [
+                                _lookup(event, ref) if isinstance(ref, str) else (False, None)
+                                for ref in references
+                            ]
+                            right_exists = all(
+                                found and value is not None for found, value in resolved
+                            )
+                            right = (
+                                [value for _, value in resolved]
+                                if isinstance(expected, list)
+                                else resolved[0][1]
+                            )
+                        available = (
+                            exists and left is not None and right_exists and right is not None
+                        )
+                        if numeric:
+                            operands = right if isinstance(right, list) else [right]
+                            available = (
+                                available
+                                and (
+                                    type(left) is int or type(left) is float and math.isfinite(left)
+                                )
+                                and all(
+                                    type(v) is int or type(v) is float and math.isfinite(v)
+                                    for v in operands
+                                )
+                            )
+                        result.append(
+                            {
+                                "policy_title": rule.summary.title,
+                                "selector": name,
+                                "mapping_index": index,
+                                "field_expression": expression,
+                                "left_observed": left,
+                                "right_reference": expected,
+                                "right_observed": right,
+                                "operands_available": available,
+                                "predicate_result": _match_field(expression, expected, event)
+                                if available
+                                else None,
+                                "scope": "one observed comparison only; combine the full configured condition separately",
+                            }
+                        )
+        return result
+
     def evaluate(self, normalized: NormalizedSecurityEvent) -> SigmaDetectionResult:
         event = normalized.event.model_dump(mode="json", exclude_none=True)
         return self.evaluate_fields(event)
@@ -342,7 +406,9 @@ def _match_selector(selector: object, event: dict[str, object]) -> bool:
 
 
 def _match_mapping(mapping: dict, event: dict[str, object]) -> bool:
-    return all(_match_field(str(expression), expected, event) for expression, expected in mapping.items())
+    return all(
+        _match_field(str(expression), expected, event) for expression, expected in mapping.items()
+    )
 
 
 def _match_field(expression: str, expected: object, event: dict[str, object]) -> bool:

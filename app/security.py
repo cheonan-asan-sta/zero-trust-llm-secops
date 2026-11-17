@@ -1,8 +1,10 @@
 import asyncio
 import hashlib
 import hmac
+import math
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from enum import Enum
 from functools import lru_cache
 from typing import Annotated, Any
@@ -37,6 +39,7 @@ class Principal:
     tenant_id: str
     roles: frozenset[Role]
     auth_method: str
+    authentication_expires_at: datetime | None = field(default=None, repr=False, compare=False)
 
     @property
     def effective_roles(self) -> frozenset[Role]:
@@ -84,6 +87,13 @@ def _api_key_principal(api_key: str | None, settings: Settings) -> Principal:
     if not api_key or len(api_key) > 4096 or settings.api_key_sha256 is None:
         raise _unauthorized()
     actual_digest = hashlib.sha256(api_key.encode("utf-8")).hexdigest()
+    return _api_key_digest_principal(actual_digest, settings)
+
+
+def _api_key_digest_principal(actual_digest: str, settings: Settings) -> Principal:
+    """Resolve server-owned authority without retaining the plaintext credential."""
+    if settings.api_key_sha256 is None:
+        raise _unauthorized()
     expected_digest = settings.api_key_sha256.get_secret_value().lower()
     accounts = []
     if settings.api_key_accounts_path is not None:
@@ -140,6 +150,10 @@ async def _oidc_principal(
         subject = claims["sub"]
         tenant_id = claims[settings.oidc_tenant_claim]
         roles = _parse_roles(claims.get(settings.oidc_roles_claim))
+        expiration = claims["exp"]
+        if type(expiration) not in {int, float} or not math.isfinite(expiration):
+            raise ValueError("OIDC expiration must be a finite NumericDate")
+        authentication_expires_at = datetime.fromtimestamp(expiration, UTC)
     except HTTPException:
         raise
     except PyJWKClientConnectionError as exc:
@@ -147,21 +161,31 @@ async def _oidc_principal(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Identity provider is temporarily unavailable",
         ) from exc
-    except (InvalidTokenError, PyJWKClientError, KeyError, TypeError, ValueError) as exc:
+    except (
+        InvalidTokenError,
+        PyJWKClientError,
+        KeyError,
+        TypeError,
+        ValueError,
+        OverflowError,
+        OSError,
+    ) as exc:
         raise _unauthorized("Invalid identity token") from exc
     # Preserve claim types: coercing null, numbers or booleans creates unintended tenant IDs.
     if (
         not isinstance(subject, str)
         or not subject
+        or len(subject) > 128
         or not isinstance(tenant_id, str)
         or not _TENANT_PATTERN.fullmatch(tenant_id)
     ):
         raise _unauthorized("Token identity claims are invalid")
     return Principal(
-        subject=subject[:128],
+        subject=subject,
         tenant_id=tenant_id,
         roles=roles,
         auth_method="oidc",
+        authentication_expires_at=authentication_expires_at,
     )
 
 
@@ -180,6 +204,19 @@ async def get_principal(
         )
     elif settings.auth_mode == "api_key":
         principal = _api_key_principal(api_key, settings)
+        # Retain only the digest in this request-local closure. Verified analyses
+        # recheck server-owned account changes at every evidence boundary.
+        digest = hashlib.sha256(api_key.encode("utf-8")).hexdigest()
+
+        def revalidate_authority():
+            current = get_settings()
+            if (
+                current.auth_mode != "api_key"
+                or _api_key_digest_principal(digest, current) != principal
+            ):
+                raise _unauthorized("Caller authority changed during analysis")
+
+        request.state.authentication_revalidator = revalidate_authority
     else:
         principal = await _oidc_principal(credentials, settings)
     request.state.principal = principal

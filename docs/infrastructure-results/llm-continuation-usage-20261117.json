@@ -1,0 +1,147 @@
+{
+  "schema": "continuation-paid-usage-reconciliation-1",
+  "period_start_kst": "2026-11-17T12:38:00+09:00",
+  "period_deadline_kst": "2026-11-17T19:00:00+09:00",
+  "prior_task_costs_excluded": true,
+  "provider_invoice_authoritative": true,
+  "uncached_input_usd_per_million": 0.75,
+  "output_usd_per_million": 4.5,
+  "model": "gpt-5.4-mini-2026-03-17",
+  "cached_input_discounts_applied": false,
+  "attempts": 1071,
+  "known_usage_estimated_usd": 4.87398975,
+  "unknown_usage_reserved_usd": 0,
+  "continuation_cap_usd": 5,
+  "remaining_estimated_usd": 0.12601025,
+  "stages": [
+    {
+      "stage": "structured-verified12-paired",
+      "attempts": 48,
+      "known_usage_estimated_usd": 0.22193475,
+      "unknown_usage_reserved_usd": 0,
+      "report_sha256": "2e81c31245ee89afde986838c12a6e5228cafd680b2b2e55ba2e268e2cbefa11",
+      "archive_report_path": "structured-paired/report.json"
+    },
+    {
+      "stage": "oidc-live-smoke",
+      "attempts": 2,
+      "known_usage_estimated_usd": 0.00957525,
+      "unknown_usage_reserved_usd": 0,
+      "report_sha256": "b44728cd44e1c4a43c3ac202336fb5a409307dfcf04061e18ed09f536423e712",
+      "archive_report_path": "oidc-live-smoke/report.json"
+    },
+    {
+      "stage": "development360",
+      "attempts": 360,
+      "known_usage_estimated_usd": 1.472043,
+      "unknown_usage_reserved_usd": 0.0,
+      "report_sha256": "3a617cb03d5e0faa95ffac9469986a191dce128cd977d5f6d2e039dcb2bcf085",
+      "archive_report_path": "development360/report.json"
+    },
+    {
+      "stage": "execution-paired",
+      "attempts": 48,
+      "known_usage_estimated_usd": 0.24900225,
+      "unknown_usage_reserved_usd": 0,
+      "report_sha256": "834e18719c22abf1679dced66e9a9704c31f66d7c1e7aa3c12c25ee635b96eca",
+      "archive_report_path": "execution-paired/report.json"
+    },
+    {
+      "stage": "execution-paired-v2",
+      "attempts": 48,
+      "known_usage_estimated_usd": 0.25891425,
+      "unknown_usage_reserved_usd": 0,
+      "report_sha256": "37895c492387ed32b5c4c42eda4463ab1e88579019b18b9587eae847fa381881",
+      "archive_report_path": "execution-paired-v2/report.json"
+    },
+    {
+      "stage": "natural-incomplete-retry",
+      "attempts": 1,
+      "known_usage_estimated_usd": 0.005616,
+      "unknown_usage_reserved_usd": 0,
+      "report_sha256": "e50628a7183e58f7f772c533332de398c73f77c03216ccba97be255fb4dc9754",
+      "archive_report_path": "natural-incomplete-retry/report.json"
+    },
+    {
+      "stage": "development360-predicate",
+      "attempts": 360,
+      "known_usage_estimated_usd": 1.619262,
+      "unknown_usage_reserved_usd": 0.0,
+      "report_sha256": "1c23d921c91cf336aa3007394be42dd25a3cfa79a8ae35a1c592a15aa72f7e8e",
+      "archive_report_path": "development360-predicate/report.json"
+    },
+    {
+      "stage": "evidence-review-paired",
+      "attempts": 36,
+      "known_usage_estimated_usd": 0.182436,
+      "unknown_usage_reserved_usd": 0,
+      "report_sha256": "f53eaa1fe1a7f781cdc1050a83b39cdbb07f5bf0f2f5e0c417992fce1528c4a7",
+      "archive_report_path": "evidence-review-paired/report.json"
+    },
+    {
+      "stage": "evidence-review-session",
+      "attempts": 24,
+      "known_usage_estimated_usd": 0.1258965,
+      "unknown_usage_reserved_usd": 0,
+      "report_sha256": "35a0be569f58fd3059c008bf09ed65e461c62ff21716f9737be0eec67c97624c",
+      "archive_report_path": "evidence-review-session/report.json"
+    },
+    {
+      "stage": "evidence-review-inline-execution",
+      "attempts": 24,
+      "known_usage_estimated_usd": 0.1449765,
+      "unknown_usage_reserved_usd": 0,
+      "report_sha256": "785556c66ccfea449abab13cdb500d1a7768f2237a0bd3d0facd4800d660a22b",
+      "archive_report_path": "evidence-review-inline-execution/report.json"
+    },
+    {
+      "stage": "evidence-review-inline-session",
+      "attempts": 24,
+      "known_usage_estimated_usd": 0.126552,
+      "unknown_usage_reserved_usd": 0,
+      "report_sha256": "797359ebe3f75589253a9fcc4d42c43245e6476826d6fd674de24547ba8e2737",
+      "archive_report_path": "evidence-review-inline-session/report.json"
+    },
+    {
+      "stage": "evidence-grounding",
+      "attempts": 12,
+      "known_usage_estimated_usd": 0.074709,
+      "unknown_usage_reserved_usd": 0,
+      "report_sha256": "5e1c4ceb8ca3e71d0f2ceaf8a4afc29f2bb574e793675a17380028c5cfa92993",
+      "archive_report_path": "evidence-grounding/report.json"
+    },
+    {
+      "stage": "evidence-grounding-guard",
+      "attempts": 12,
+      "known_usage_estimated_usd": 0.073248,
+      "unknown_usage_reserved_usd": 0,
+      "report_sha256": "45b08b8dc9b173c06a4a88be731b06c043cc5ee4e5b6d3498139a4033d2faebd",
+      "archive_report_path": "evidence-grounding-guard/report.json"
+    },
+    {
+      "stage": "download-arithmetic60",
+      "attempts": 60,
+      "known_usage_estimated_usd": 0.24635925,
+      "unknown_usage_reserved_usd": 0,
+      "report_sha256": "cce19001bd3ac2288078ab1954120e74dcbc80ef2a377a9e2d6e9ce1e529428b",
+      "archive_report_path": "download-arithmetic60/report.json"
+    },
+    {
+      "stage": "event-text-instruction-robustness",
+      "attempts": 12,
+      "known_usage_estimated_usd": 0.063465,
+      "unknown_usage_reserved_usd": 0,
+      "report_sha256": "856b2592bc41d20151ae9305e4456de80288d95a3ca2d2b2d386e27d9d08e2a4",
+      "archive_report_path": "event-text-robustness/trial/report.json"
+    }
+  ],
+  "limitations": [
+    "Usage-based estimate is not an invoice",
+    "Per-run caps do not constitute a tenant-wide or shared application billing limit",
+    "Replaying old predictions creates no additional paid requests",
+    "A new rerun requires a new budget and output folder"
+  ],
+  "pricing_source": "https://developers.openai.com/api/docs/models/gpt-5.4-mini",
+  "pricing_verified_kst": "2026-11-17",
+  "custom_base_url_environment_present_at_review": false
+}

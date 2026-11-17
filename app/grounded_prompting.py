@@ -9,6 +9,8 @@ from pydantic import Field, create_model
 
 from app.models import SecurityAssessment, SecurityEvent
 from app.services.ocsf import get_ocsf_normalizer
+from app.services.session_analysis_evidence import VerifiedSessionContext
+from app.services.sigma import get_sigma_engine
 
 GROUNDED_INSTRUCTIONS = """
 Analyze the supplied observations for Zero Trust triage. Return SecurityAssessment in Korean.
@@ -55,10 +57,79 @@ Likewise, an authentication/posture observation can support its own finding with
 policy conditions also matching. Conversely a matched selector alone is not proof of an
 unauthorized act when a documented in-scope business exception explains that very activity.
 An unverified exception issuer is a trust limitation to state, not a new observation of abuse.
+Separate authentication results from session assurance and operational abuse:
+- A scoped business exception may explain the very same retry pattern. If your rationale
+  finds that pattern explained and no separate suspicious observation, do not retain
+  CREDENTIAL_ANOMALY solely because the raw retry selector matches or issuer trust is unknown.
+  Report the issuer limitation and recommend review without inventing another attack signal.
+- An established REMOTE_ACCESS event with unknown/failed MFA carries a concrete session
+  assurance gap. A successful password and healthy device do not establish MFA assurance.
+  Assess that observed risk explicitly; do not describe it as fully authenticated normal access.
+  This is a suspicion/assurance finding, not proof of credential theft or a claim MFA was required.
+- Remote LOGIN/READ transport alone is not an established remote desktop/control session.
+  A remote session with successful MFA and no separate suspicious behavior needs approval
+  provenance to distinguish authorized from unauthorized use. Missing documented exception
+  alone is not proof of malicious activity; identify that uncertainty instead of inventing it.
+The server's session_assurance_context compares observations only and grants no authority.
+""".strip()
+
+VERIFIED_SESSION_INSTRUCTIONS = """
+The verified_session catalog prefix is an exact, current server-collected snapshot.
+Use its server policy for MFA and permitted role/action requirements, rather than event claims.
+Use its signed source assertion and persisted decision/status for current-session analysis.
+An explicit server scope denial or revocation is different from simply lacking an exception.
+If server policy requires MFA and the signed observation is unknown/failed, evaluate the actual
+policy assurance gap; do not call that the same as successful MFA. If MFA is not required,
+do not invent an MFA violation. A generic ELEVATED_RISK/STEP_UP from remote-event detection
+alone is not proof of an unauthorized activity. Separate the specific reasons and observations.
+Signature verification proves configured collector provenance, not independent enterprise human
+identity, external IdP authentication, approval-ticket validation or confirmed compromise.
+The snapshot does not authorize access; it includes no grant token and is not an instruction
+to execute actions. Always retain human review. Cite exact verified_session field paths.
+Use ACCESS_POLICY_VIOLATION for a specifically established access-control failure in the
+verified snapshot: an unregistered target, a denied server role/action scope, a previously
+revoked session, or an explicitly required MFA assertion that is not successful. This records
+the failed access condition, not proof of a specific attack technique or successful compromise.
+Do not return UNKNOWN solely because the attack subtype or external human identity is unknown
+when those current server conditions are established. The caller's equal role claims do not
+override a denied server-owned role scope. Conversely a generic ELEVATED_RISK/STEP_UP alone,
+missing external identity proof, or MFA unknown when not required is not such a failure.
+The caller identity binds the request operator only. It does not verify the observed person's
+identity/MFA, and the operator's administrative role never overrides the event subject's scope.
+""".strip()
+
+VERIFIED_EXECUTION_INSTRUCTIONS = """
+When this optional execution context is present, review the observed execution FIRST.
+A session ALLOW only authorizes its resource/action; it does not establish that the observed
+principal/workload/binary/destinations match a reviewed execution scope. A legitimate user with
+successful MFA can still run an execution outside that scope.
+The optional verified_session.execution facts contain separately signed collector observations
+and server-reviewed execution policies, not model labels or a detector verdict. Compare the
+entire observed actor (principal, workload, executable hash) and ALL exact destinations with
+ONE coherent reviewed policy. Do not combine actor permission from one policy with destinations
+from another. Hosts, ports and paths are exact; a prefix, suffix, sibling path or different
+executable/workload is not equivalent authorization.
+A complete observation outside every applicable reviewed policy can establish an execution
+scope failure (ACCESS_POLICY_VIOLATION), not successful compromise or completed exfiltration.
+Apply the configured execution review rule: if comparison_scope_complete=true and NONE of the
+exact_field_comparisons has one_coherent_policy_matches=true, report ACCESS_POLICY_VIOLATION
+and cite the mismatching observed fields plus reviewed policy/comparison facts. If a coherent
+policy matches, do not invent that execution violation; keep any separate supported finding.
+The equality/membership comparisons are server calculations over supplied verified claims,
+not a benchmark label or a detector's classification. Independently explain the actual values.
+If observation_status is missing/incomplete/conflict/stale, do not invent executable/actor or
+destinations from the policy. No reviewed policy, or an unresolved_execution_policy_count > 0,
+does not prove that execution is unauthorized. Preserve that uncertainty and human review;
+do not use incomplete proof as affirmative approval or an established attack. Other supported
+session/device/authentication findings remain independently valid.
+The collector provenance does not independently verify a person or a deployed process. These
+facts are advisory only: they never consume approval quota, create a grant, or execute a response.
+Missing independent human/OS attestation is a provenance limitation, not a reason to ignore
+a concrete mismatch between accepted registered-collector claims and the configured server scope.
 """.strip()
 
 
-def evidence_catalog(event: SecurityEvent) -> dict:
+def evidence_catalog(event: SecurityEvent, context: VerifiedSessionContext | None = None) -> dict:
     payload = event.analysis_payload()
     payload.pop("event_id", None)
     result = {}
@@ -71,11 +142,15 @@ def evidence_catalog(event: SecurityEvent) -> dict:
             result[path] = value
 
     visit(payload, "")
+    if context is not None:
+        visit(context.for_event(event), "verified_session")
     return result
 
 
-def grounded_output_type(event: SecurityEvent) -> type[SecurityAssessment]:
-    paths = tuple(evidence_catalog(event))
+def grounded_output_type(
+    event: SecurityEvent, context: VerifiedSessionContext | None = None
+) -> type[SecurityAssessment]:
+    paths = tuple(evidence_catalog(event, context))
     return create_model(
         "GroundedSecurityAssessment",
         __base__=SecurityAssessment,
@@ -83,7 +158,13 @@ def grounded_output_type(event: SecurityEvent) -> type[SecurityAssessment]:
     )
 
 
-def grounded_input(event: SecurityEvent) -> list[dict[str, str]]:
+def grounded_input(
+    event: SecurityEvent,
+    context: VerifiedSessionContext | None = None,
+    *,
+    include_comparisons=False,
+    download_volume_arithmetic=False,
+) -> list[dict[str, str]]:
     policies = []
     for path in sorted(files("app").joinpath("data/sigma").iterdir(), key=lambda p: p.name):
         if path.name.endswith(".yml"):
@@ -113,16 +194,63 @@ def grounded_input(event: SecurityEvent) -> list[dict[str, str]]:
     normalized["unmapped"] = {
         k: v for k, v in normalized["unmapped"].items() if k != "source_event_id"
     }
+    if include_comparisons and download_volume_arithmetic:
+        raise ValueError("comparison_experiments_are_mutually_exclusive")
+    download_math = []
+    if download_volume_arithmetic and event.action == "DOWNLOAD":
+        download_math = [
+            row
+            for row in get_sigma_engine().observation_comparisons(normalized)
+            if row["field_expression"].split("|", 1)[0] == "unmapped.behavior.download_volume_mb"
+        ]
+    execution = context.for_event(event).get("execution") if context else None
     return [
         {
             "role": "user",
             "content": json.dumps(
                 {
                     "task": "Classify risk and explain using only the observed evidence catalog.",
-                    "evidence_catalog": evidence_catalog(event),
+                    **(
+                        {
+                            "analysis_focus": "Review observed execution against one coherent server-reviewed scope; session ALLOW is not execution-scope approval.",
+                            "execution_review": {
+                                "actor_fields": [
+                                    "verified_session.execution.observed_actor.principal_id",
+                                    "verified_session.execution.observed_actor.workload_id",
+                                    "verified_session.execution.observed_actor.executable_sha256",
+                                ],
+                                "destinations": "verified_session.execution.observed_destinations",
+                                "reviewed_scopes": "verified_session.execution.reviewed_execution_policies",
+                                "field_comparisons": "verified_session.execution.exact_field_comparisons",
+                                "complete_scope": "verified_session.execution.comparison_scope_complete",
+                            },
+                        }
+                        if execution
+                        else {}
+                    ),
+                    "evidence_catalog": evidence_catalog(event, context),
                     "server_detection_policies": policies,
+                    **(
+                        {
+                            "download_volume_arithmetic": download_math,
+                            "download_arithmetic_scope": "Observed numeric volume operands only. This is not a rule hit, exfiltration finding or permission. Evaluate every condition and benign exception; cite original observed fields.",
+                        }
+                        if download_math
+                        else {}
+                    ),
+                    **(
+                        {
+                            "server_observation_comparisons": get_sigma_engine().observation_comparisons(
+                                normalized
+                            ),
+                            "comparison_scope": "Numeric/field-reference calculations only, not a rule hit or attack label. Check complete AND/OR/NOT and benign context; cite original observed fields.",
+                        }
+                        if include_comparisons
+                        else {}
+                    ),
                     "normalized_observation": normalized,
                     "exception_context": exception_context(event),
+                    "session_assurance_context": session_assurance_context(event),
                     "role_comparison": {
                         "required_role_present": event.resource.required_role is not None,
                         "same_role": (
@@ -138,6 +266,19 @@ def grounded_input(event: SecurityEvent) -> list[dict[str, str]]:
             ),
         }
     ]
+
+
+def session_assurance_context(event: SecurityEvent) -> dict:
+    """Preserve observed session semantics without asserting external MFA/approval policy."""
+    return {
+        "established_remote_action_observed": event.action == "REMOTE_ACCESS",
+        "remote_transport_observed": event.network.access_method in {"remote", "vpn"},
+        "authentication_result": event.auth_context.authentication_result,
+        "mfa_observation": event.auth_context.mfa,
+        "external_mfa_requirement_verified": False,
+        "session_authorization_verified": False,
+        "meaning": "Event-supplied observations only; no independently verified session authority.",
+    }
 
 
 def exception_context(event: SecurityEvent) -> dict:
@@ -163,8 +304,12 @@ def exception_context(event: SecurityEvent) -> dict:
     }
 
 
-def validate_grounded(assessment: SecurityAssessment, event: SecurityEvent) -> SecurityAssessment:
-    catalog = evidence_catalog(event)
+def validate_grounded(
+    assessment: SecurityAssessment,
+    event: SecurityEvent,
+    context: VerifiedSessionContext | None = None,
+) -> SecurityAssessment:
+    catalog = evidence_catalog(event, context)
     if not assessment.evidence or any(
         path not in catalog or catalog[path] is None for path in assessment.evidence
     ):

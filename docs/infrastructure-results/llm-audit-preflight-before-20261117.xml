@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="3" time="12.060" timestamp="2026-11-17T18:08:23.827056+09:00" hostname="희주"><testcase classname="tests.test_audit_preflight" name="test_known_corrupt_audit_blocks_provider_and_returns_capacity[loaded_corruption]" time="0.029"><failure message="AssertionError: assert 1 == 0&#10; +  where 1 = &lt;AsyncMock name='mock.analyze' id='2598229996224'&gt;.await_count&#10; +    where &lt;AsyncMock name='mock.analyze' id='2598229996224'&gt; = &lt;Mock id='2598230133216'&gt;.analyze">tests\test_audit_preflight.py:42: in test_known_corrupt_audit_blocks_provider_and_returns_capacity
+    assert provider.analyze.await_count == 0
+E   AssertionError: assert 1 == 0
+E    +  where 1 = &lt;AsyncMock name='mock.analyze' id='2598229996224'&gt;.await_count
+E    +    where &lt;AsyncMock name='mock.analyze' id='2598229996224'&gt; = &lt;Mock id='2598230133216'&gt;.analyze</failure></testcase><testcase classname="tests.test_audit_preflight" name="test_known_corrupt_audit_blocks_provider_and_returns_capacity[failed_append]" time="0.026"><failure message="AssertionError: assert 1 == 0&#10; +  where 1 = &lt;AsyncMock name='mock.analyze' id='2598232412176'&gt;.await_count&#10; +    where &lt;AsyncMock name='mock.analyze' id='2598232412176'&gt; = &lt;Mock id='2598232412032'&gt;.analyze">tests\test_audit_preflight.py:42: in test_known_corrupt_audit_blocks_provider_and_returns_capacity
+    assert provider.analyze.await_count == 0
+E   AssertionError: assert 1 == 0
+E    +  where 1 = &lt;AsyncMock name='mock.analyze' id='2598232412176'&gt;.await_count
+E    +    where &lt;AsyncMock name='mock.analyze' id='2598232412176'&gt; = &lt;Mock id='2598232412032'&gt;.analyze</failure></testcase><testcase classname="tests.test_audit_preflight" name="test_healthy_local_audit_keeps_analysis_and_persisted_result" time="0.016" /></testsuite></testsuites>

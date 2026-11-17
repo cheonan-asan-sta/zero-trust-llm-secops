@@ -1,0 +1,133 @@
+{
+  "report": {
+    "schema": "natural-incomplete-bounded-retry-replay-1",
+    "completed": true,
+    "fatal": null,
+    "eligible": 1,
+    "attempts": 1,
+    "source_first_attempt_metrics": {
+      "TP": 163,
+      "FP": 6,
+      "FN": 17,
+      "TN": 174,
+      "unknown_or_error": 6,
+      "precision": 0.9644970414201184,
+      "recall": 0.9055555555555556,
+      "F1": 0.9340974212034384,
+      "FPR": 0.03333333333333333,
+      "FNR": 0.09444444444444444
+    },
+    "replayed_pipeline_metrics": {
+      "TP": 163,
+      "FP": 6,
+      "FN": 17,
+      "TN": 174,
+      "unknown_or_error": 5,
+      "precision": 0.9644970414201184,
+      "recall": 0.9055555555555556,
+      "F1": 0.9340974212034384,
+      "FPR": 0.03333333333333333,
+      "FNR": 0.09444444444444444
+    },
+    "comparison": {
+      "cases": 360,
+      "reference": {
+        "TP": 163,
+        "FP": 6,
+        "FN": 17,
+        "TN": 174,
+        "unknown_or_error": 6,
+        "precision": 0.9644970414201184,
+        "recall": 0.9055555555555556,
+        "F1": 0.9340974212034384,
+        "FPR": 0.03333333333333333,
+        "FNR": 0.09444444444444444
+      },
+      "candidate": {
+        "TP": 163,
+        "FP": 6,
+        "FN": 17,
+        "TN": 174,
+        "unknown_or_error": 5,
+        "precision": 0.9644970414201184,
+        "recall": 0.9055555555555556,
+        "F1": 0.9340974212034384,
+        "FPR": 0.03333333333333333,
+        "FNR": 0.09444444444444444
+      },
+      "lost_TP_ids": [],
+      "new_FP_ids": [],
+      "recovered_TP_ids": [],
+      "corrected_FP_ids": [],
+      "no_lost_detections": true,
+      "FP_reduced": false,
+      "FP_not_increased": true,
+      "no_new_false_positives": true,
+      "scope": "same_cohort_development_only_not_independent_acceptance"
+    },
+    "reserved_upper_usd": 0.033537000000000004,
+    "known_usage_estimated_usd": 0.0056159999999999995,
+    "unknown_usage_attempts": 0,
+    "unknown_usage_reserved_usd": 0,
+    "fresh_360_pipeline_test": false,
+    "source_overwritten": false,
+    "independent_acceptance": false
+  },
+  "plan": {
+    "schema": "natural-incomplete-bounded-retry-replay-1",
+    "model": "gpt-5.4-mini-2026-03-17",
+    "source_plan_sha256": "36539ae06e3056d335b2bb8733dca6b40ef65f3c28d97f5b02bfa31abb5e6426",
+    "source_predictions_sha256": "b854b7e3e2015f281f7246f845973a29f7c686f547323f1aaa437abcf5f1d067",
+    "source_inputs_sha256": "fce731785e465486b62fbc92236648dd008471d9ef4f9516ac60b8a1a6d84a13",
+    "eligible_ids": [
+      "cfe5650f218a3d585d966a96ed73da2d9e669fb7234e51e76ea08ffbabdde0c3"
+    ],
+    "eligibility": "all and only naturally incomplete max_output_tokens responses, regardless of truth",
+    "max_requests": 1,
+    "max_retries_per_case": 1,
+    "SDK_HTTP_retries": 0,
+    "max_output_tokens": 4000,
+    "max_budget_usd": 0.08,
+    "fresh_360_pipeline_test": false,
+    "source_overwritten": false,
+    "independent_acceptance": false
+  },
+  "receipts": [
+    {
+      "id": "cfe5650f218a3d585d966a96ed73da2d9e669fb7234e51e76ea08ffbabdde0c3",
+      "reserved_usd": 0.033537000000000004,
+      "input_tokens": 3144,
+      "output_tokens": 724,
+      "prediction": true,
+      "error": null,
+      "response_diagnostics": {
+        "status": "completed",
+        "incomplete_reason": null,
+        "input_tokens": 3144,
+        "output_tokens": 724,
+        "refusal": false
+      },
+      "assessment": {
+        "risk_score": 78,
+        "risk_level": "HIGH",
+        "violation_type": "LATERAL_MOVEMENT",
+        "rationale": "behavior.distinct_resources_10m=10 및 behavior.request_rate=high가 원격 접근과 결합되어 다수 자원에 대한 দ্রুত한 접근 패턴에 해당합니다. behavior.policy_exception_approved=true와 behavior.policy_exception.scope.resource_ids/behavior.policy_exception.valid_from/behavior.policy_exception.valid_until은 현재 REMOTE_ACCESS 자체의 범위 일치만 뒷받침하지만, 다수 자원 접근 행위까지 명시적으로 덮지는 못합니다. auth_context.mfa=success, device.managed=true, device.security_posture=healthy는 세션 보강 정보일 뿐이며 이 행동 패턴의 이상성을 상쇄하지 않습니다.",
+        "recommended_action": "HOLD_FOR_REVIEW",
+        "confidence": 0.82,
+        "evidence": [
+          "action",
+          "behavior.distinct_resources_10m",
+          "behavior.request_rate",
+          "behavior.policy_exception_approved",
+          "behavior.policy_exception.scope.resource_ids",
+          "behavior.policy_exception.valid_from",
+          "behavior.policy_exception.valid_until",
+          "auth_context.mfa",
+          "device.managed",
+          "device.security_posture"
+        ],
+        "requires_human_review": true
+      }
+    }
+  ]
+}

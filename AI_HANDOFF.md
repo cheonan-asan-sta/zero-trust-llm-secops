@@ -1,3 +1,9 @@
+> 2026-11-17 오후 후속: 개발360건 TP163/FP6/FN17/TN174·F1 93.41%·목표 미달 유지. 전체 수치 후보는 악화, 다운로드60건 후보는 개선0으로 모두 런타임 미채택. 선택적 LLM 근거 조회는 실제 실행/MFA 사례의 탐지 유지·inline으로 agent 요청24→12. 불완전 근거의 ALLOW 권고를 서버에서 HOLD로 제한하고 원래 권고 보존; 분류/F1 변경0. 취소 도중 JSONL 감사 경합·검토 중 호출 계정 변경·감사 후 철회 시 전달 거부도 재현/수정. 로그 지시문6종의 실제12회는 판정 유지. 유료1,071회/$4.87398975추정·미확인0·고정47fc624 Linux7,696/skip2·Windows660/skip27 통과·CI/push/병합/AWS 없음. [모든 결과·한계](docs/llm-operation-evidence-20261117.md) 아래는 이전 시점 기록이다.
+
+> 2026-11-17 검증 근거 연결: 서버 정책·서명·현재 세션/회수·승인 소비를 읽는 /analysis/verified-session 구현. 새 로컬12개×2반복에서 FN4→0, 최종 F1 44.44→92.31/100%(검증 오류1 포함). 과거 TP 유지·FN2 잔여, FP0/1 변동. 실제 API266회·확인 사용량 추정$1.152008+미확인1건 예약$0.028229·Win/Linux 각각442건 통과. 실제 기업SSO/독립95%/배포 완료 아님·기본 모드 유지·로컬만 저장. [검증 방법·모든 결과·한계](docs/llm-verified-session-evidence-20261117.md) 아래는 이전 시점 기록이다.
+
+> 2026-11-17 최신 main96a1570 후속: 채택v1 24건 반복2회 FP1→0·FN2 유지·기존 TP 손실/새 FP0, F1 86.96→90.91%. 별도12건 FP0/FN0 유지. v2는 별도12건 TP손실1로 제외. 추가156 API/$0.606518 추정·Windows94/skip8·Linux102 통과. 원격2건·독립95% 목표는 미해결, 기본 모드 유지·이번 변경은 로컬만 보존. [최신 결과와 미해결 근거](docs/llm-auth-remote-review-20261117.md) 아래는 이전 시점의 기록이다.
+
 > 2026-11-17 사용자 요청으로 팀원 대시보드+최신 LLM ef09475의 aitest 실제 통합을 진행한다. 기존 성능 목표 전 병합 보류는 이번 aitest 통합에 한해 해제됐다. 성능 목표 달성/운영 배포 승인은 아니며 main과 기본 rule/legacy/review_all=false는 유지한다. [통합 승인·검증 기록](docs/aitest-team-llm-merge-20261117.md) 아래는 각 작업 당시의 기록이다.
 
 > 2026-11-17 팀 통합 준비: 별도 `feature/chaeheeju-team-llm-integration-prep`에서 `51bb483` + `origin/main d2370c2` 로컬 후보 `5b5708b` 구성. 팀원 branch는 main에 이미 포함돼 중복 병합하지 않았다. Windows fcntl 시작 호환 수정·POSIX jobs fail-closed 유지. Linux7399/skip2·Windows130/skip20·브라우저46/135·Ruff 통과. 작업 중 원본에서 관측한 후속 미커밋 LLM WIP는 보존했으며 후보에 포함하지 않았다. 원래 성능 목표 미완료·기본 rule/legacy/review_all=false·push/PR/새 CI/실제 main·aitest 병합 보류. [SHA·충돌·검증·인수 조건](docs/team-llm-integration-prep-20261117.md)
