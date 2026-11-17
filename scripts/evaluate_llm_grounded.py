@@ -15,6 +15,7 @@ from openai import AsyncOpenAI
 
 from app.analyzers.openai_analyzer import SYSTEM_INSTRUCTIONS
 from app.analyzers.rule_based import RuleBasedAnalyzer
+from app.analyzers.structured_response import StructuredResponseFailure, parse_structured_response
 from app.grounded_prompting import (
     GROUNDED_INSTRUCTIONS,
     grounded_input,
@@ -251,6 +252,7 @@ async def run(
         for p in (
             "app/grounded_prompting.py",
             "app/analyzers/openai_analyzer.py",
+            "app/analyzers/structured_response.py",
             "scripts/evaluate_llm_grounded.py",
         )
     }
@@ -289,7 +291,8 @@ async def run(
             }
             start = time.monotonic()
             try:
-                response = await client.responses.parse(
+                response, diagnostics = await parse_structured_response(
+                    client,
                     model=model,
                     store=False,
                     service_tier="default",
@@ -305,8 +308,9 @@ async def run(
                 )
                 row.update(
                     resolved_model=response.model,
-                    input_tokens=response.usage.input_tokens,
-                    output_tokens=response.usage.output_tokens,
+                    input_tokens=diagnostics.input_tokens,
+                    output_tokens=diagnostics.output_tokens,
+                    response_diagnostics=diagnostics.as_dict(),
                 )
                 a = response.output_parsed
                 if a is None:
@@ -317,6 +321,13 @@ async def run(
                 row.update(prediction=prediction(a), assessment=a.model_dump(mode="json"))
             except Exception as error:  # noqa: BLE001 -- retain safe failure codes, never provider text/secrets
                 row["error"] = type(error).__name__
+                if isinstance(error, StructuredResponseFailure):
+                    row.update(
+                        error_code=error.code,
+                        response_diagnostics=error.diagnostics.as_dict(),
+                        input_tokens=error.diagnostics.input_tokens,
+                        output_tokens=error.diagnostics.output_tokens,
+                    )
                 if type(error).__name__ in {
                     "AuthenticationError",
                     "PermissionDeniedError",

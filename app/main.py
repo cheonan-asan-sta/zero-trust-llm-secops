@@ -1,11 +1,12 @@
 import asyncio
+from dataclasses import replace
 from datetime import UTC, datetime
 from functools import lru_cache
 from pathlib import Path
 from time import perf_counter
 from typing import Annotated, Literal
 
-from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from fastapi import Depends, FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from mangum import Mangum
@@ -81,6 +82,7 @@ from app.services.correlation import get_correlation_engine
 from app.services.detection_benchmark import BenchmarkUnavailable, get_detection_benchmark
 from app.services.detection_quality import get_detection_quality_service
 from app.services.evaluation import run_evaluation
+from app.services.execution_analysis_evidence import collect_session_execution_evidence
 from app.services.incident_quality import get_incident_quality_service
 from app.services.integration_outbox import (
     IntegrationOutboxService,
@@ -704,11 +706,31 @@ async def analyze_verified_session(
     signal: SignedSessionSignal,
     request: Request,
     principal: AnalystPrincipal,
+    behavior_capture_id: Annotated[
+        str | None, Query(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+    ] = None,
 ) -> AnalysisResult:
     if zero_trust_operations is None:
         raise HTTPException(404, "Local verified-session analysis is disabled in production")
     # Verification errors are handled by existing signal/session handlers; never call the LLM.
-    context = collect_session_evidence(zero_trust_operations, signal, principal)
+    def collect_context():
+        if behavior_capture_id is not None:
+            return collect_session_execution_evidence(
+                zero_trust_operations, behavior_context_service, signal, principal, behavior_capture_id
+            )
+        return collect_session_evidence(zero_trust_operations, signal, principal)
+
+    context = collect_context()
+
+    def verify_current_context():
+        fresh = collect_context()
+        before, after = context.for_event(signal.event), fresh.for_event(signal.event)
+        before.pop("collected_at")
+        after.pop("collected_at")
+        if before != after:
+            raise ValueError("verified session context changed during analysis")
+
+    context = replace(context, verify_current=verify_current_context)
     try:
         analyzer = get_analyzer()
     except ValueError as exc:
@@ -727,12 +749,7 @@ async def analyze_verified_session(
             result = await analyzer.analyze_with_evidence(event, context)
             # Source/key withdrawal, policy changes or revocation during a paid call
             # must not publish a result as if the original snapshot were still current.
-            fresh = collect_session_evidence(zero_trust_operations, signal, principal)
-            before, after = context.for_event(event), fresh.for_event(event)
-            before.pop("collected_at")
-            after.pop("collected_at")
-            if before != after:
-                raise ValueError("verified session context changed during analysis")
+            verify_current_context()
             return result
 
     try:

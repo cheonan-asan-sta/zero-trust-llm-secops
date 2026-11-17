@@ -14,6 +14,7 @@ from pathlib import Path
 from dotenv import dotenv_values
 from openai import AsyncOpenAI
 
+from app.analyzers.structured_response import StructuredResponseFailure, parse_structured_response
 from app.grounded_prompting import (
     GROUNDED_INSTRUCTIONS,
     VERIFIED_SESSION_INSTRUCTIONS,
@@ -85,6 +86,7 @@ async def run(directory, key_file=None, *, max_budget=2.5, repetitions=2):
                 "app/services/session_analysis_evidence.py",
                 "app/grounded_prompting.py",
                 "app/analyzers/openai_analyzer.py",
+                "app/analyzers/structured_response.py",
                 "app/analyzers/hybrid.py",
                 "app/main.py",
                 "app/services/zero_trust.py",
@@ -163,7 +165,8 @@ async def run(directory, key_file=None, *, max_budget=2.5, repetitions=2):
                         attempts += 1
                         row["request_attempted"] = True
                         before = context.for_event(signal.event) if context else None
-                        response = await client.responses.parse(
+                        response, diagnostics = await parse_structured_response(
+                            client,
                             model=MODEL,
                             store=False,
                             service_tier="default",
@@ -175,8 +178,9 @@ async def run(directory, key_file=None, *, max_budget=2.5, repetitions=2):
                         )
                         row.update(
                             resolved_model=response.model,
-                            input_tokens=response.usage.input_tokens,
-                            output_tokens=response.usage.output_tokens,
+                            input_tokens=diagnostics.input_tokens,
+                            output_tokens=diagnostics.output_tokens,
+                            response_diagnostics=diagnostics.as_dict(),
                         )
                         if response.output_parsed is None:
                             raise ValueError("missing_structured_output")
@@ -199,6 +203,13 @@ async def run(directory, key_file=None, *, max_budget=2.5, repetitions=2):
                         )
                     except Exception as exc:  # noqa: BLE001 -- no credential-bearing provider text
                         row["error"] = type(exc).__name__
+                        if isinstance(exc, StructuredResponseFailure):
+                            row.update(
+                                error_code=exc.code,
+                                response_diagnostics=exc.diagnostics.as_dict(),
+                                input_tokens=exc.diagnostics.input_tokens,
+                                output_tokens=exc.diagnostics.output_tokens,
+                            )
                         if type(exc).__name__ in {
                             "AuthenticationError",
                             "PermissionDeniedError",

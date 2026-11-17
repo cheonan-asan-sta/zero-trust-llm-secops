@@ -8,7 +8,8 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass
+from collections.abc import Callable
+from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from typing import TYPE_CHECKING
 
@@ -19,6 +20,8 @@ from app.zero_trust_models import SignedSessionSignal
 
 if TYPE_CHECKING:
     from app.services.zero_trust import ZeroTrustOperations
+
+_TIMESTAMP_TYPE = datetime
 
 
 def event_digest(event: SecurityEvent) -> str:
@@ -36,6 +39,7 @@ class VerifiedSessionContext:
     event_digest_sha256: str
     expires_at: datetime
     facts_json: bytes
+    verify_current: Callable[[], None] | None = field(default=None, repr=False, compare=False)
 
     def for_event(self, event: SecurityEvent, *, now: datetime | None = None) -> dict:
         now = now or datetime.now(UTC)
@@ -60,6 +64,15 @@ def collect_session_evidence(
         or Role.ANALYST not in principal.effective_roles
     ):
         raise SignalRejected("authenticated analyst authority required")
+    caller_expiry = principal.authentication_expires_at
+    if principal.auth_method == "oidc" and caller_expiry is None:
+        raise SignalRejected("OIDC caller expiration evidence required")
+    if caller_expiry is not None and (
+        not isinstance(caller_expiry, _TIMESTAMP_TYPE)
+        or caller_expiry.utcoffset() is None
+        or caller_expiry <= now
+    ):
+        raise SignalRejected("caller authentication expired or invalid")
     # Revalidate Python model_copy bypasses as strictly as HTTP input.
     signal = SignedSessionSignal.model_validate(signal.model_dump(mode="json"))
     proof = service.signal_verifier.verify(signal, principal, now)
@@ -112,11 +125,31 @@ def collect_session_evidence(
     if current.signal_expires_at is None or current.signal_expires_at <= now:
         raise SignalRejected("persisted session proof expired")
     expires = min(expires, current.signal_expires_at)
+    if caller_expiry is not None:
+        expires = min(expires, caller_expiry)
+    approval_usable = bool(
+        current.decision == "ALLOW"
+        and current.status == "ACTIVE"
+        and current.grant_expires_at
+        and current.grant_expires_at > now
+        and current.challenge_id is None
+        and not grant_consumed
+    )
+    # A positive approval assertion must not outlive the grant it describes.
+    # This remains a snapshot, never a token that can be redeemed for access.
+    if approval_usable:
+        expires = min(expires, current.grant_expires_at)
     facts = {
         "scope": "current_local_zero_trust_session_snapshot_not_historical_backfill",
         "collected_at": now.isoformat(),
         "valid_until": expires.isoformat(),
         "tenant_id": principal.tenant_id,
+        "caller": {
+            "authentication_method": principal.auth_method,
+            "session_operator_binding_verified": True,
+            "identity_scope": "request_operator_only_not_event_subject",
+            "event_subject_mfa_independently_verified": False,
+        },
         "policy": {
             "origin": "server_owned_configuration",
             "version": service.policy.version,
@@ -143,18 +176,13 @@ def collect_session_evidence(
             "status": current.status,
             "reason_codes": current.reason_codes,
             "challenge_pending": current.challenge_id is not None,
-            "approval_currently_usable": bool(
-                current.decision == "ALLOW"
-                and current.status == "ACTIVE"
-                and current.grant_expires_at
-                and current.grant_expires_at > now
-                and current.challenge_id is None
-                and not grant_consumed
-            ),
+            "approval_currently_usable": approval_usable,
         },
         "not_an_access_grant": True,
         "external_enterprise_identity_verified": False,
     }
+    if caller_expiry is not None:
+        facts["caller"]["authentication_valid_until"] = caller_expiry.isoformat()
     return VerifiedSessionContext(
         event_digest(signal.event),
         expires,

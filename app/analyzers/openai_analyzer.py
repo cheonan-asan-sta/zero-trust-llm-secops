@@ -1,11 +1,14 @@
 import json
+import logging
 
 import boto3
 from openai import AsyncOpenAI
 
+from app.analyzers.structured_response import StructuredResponseFailure, parse_structured_response
 from app.config import Settings
 from app.grounded_prompting import (
     GROUNDED_INSTRUCTIONS,
+    VERIFIED_EXECUTION_INSTRUCTIONS,
     VERIFIED_SESSION_INSTRUCTIONS,
     grounded_input,
     grounded_output_type,
@@ -14,6 +17,8 @@ from app.grounded_prompting import (
 from app.models import SecurityAssessment, SecurityEvent
 from app.prompting import build_analysis_input
 from app.services.session_analysis_evidence import VerifiedSessionContext
+
+logger = logging.getLogger(__name__)
 
 SYSTEM_INSTRUCTIONS = """
 You are a Zero Trust security event analysis assistant.
@@ -38,7 +43,13 @@ class OpenAIAnalyzer:
         self._few_shot_count = settings.openai_few_shot_count
         self._reasoning_effort = settings.openai_reasoning_effort
         self._max_output_tokens = settings.openai_max_output_tokens
-        self._client = AsyncOpenAI(api_key=api_key, timeout=30, max_retries=2)
+        self._incomplete_retries = settings.openai_incomplete_retries
+        self._retry_max_output_tokens = settings.openai_retry_max_output_tokens
+        self._client = AsyncOpenAI(
+            api_key=api_key,
+            timeout=30,
+            max_retries=0 if settings.openai_incomplete_retries else 2,
+        )
 
     async def analyze(self, event: SecurityEvent) -> SecurityAssessment:
         return await self._analyze(event)
@@ -53,18 +64,58 @@ class OpenAIAnalyzer:
     async def _analyze(
         self, event: SecurityEvent, context: VerifiedSessionContext | None = None
     ) -> SecurityAssessment:
-        response = await self._client.responses.parse(
+        output_limit = self._max_output_tokens
+        for attempt in range(self._incomplete_retries + 1):
+            if context:
+                if context.verify_current:
+                    context.verify_current()
+                context.for_event(event)
+            try:
+                return await self._request_assessment(event, context, output_limit)
+            except StructuredResponseFailure as error:
+                retry = (
+                    attempt < self._incomplete_retries
+                    and error.code == "response_not_completed"
+                    and error.diagnostics.status == "incomplete"
+                    and error.diagnostics.incomplete_reason == "max_output_tokens"
+                )
+                logger.warning(
+                    "LLM structured response rejected: code=%s attempt=%d retry=%s diagnostics=%s",
+                    error.code,
+                    attempt + 1,
+                    retry,
+                    error.diagnostics.as_dict(),
+                )
+                if not retry:
+                    raise
+                output_limit = self._retry_max_output_tokens
+
+    async def _request_assessment(
+        self, event: SecurityEvent, context: VerifiedSessionContext | None, output_limit: int
+    ) -> SecurityAssessment:
+        response, _ = await parse_structured_response(
+            self._client,
             model=self._model,
             store=False,
             reasoning={"effort": self._reasoning_effort},
             text={"verbosity": "low"},
-            max_output_tokens=self._max_output_tokens,
+            max_output_tokens=output_limit,
             input=[
                 {
                     "role": "system",
                     "content": (
                         GROUNDED_INSTRUCTIONS
-                        + ("\n" + VERIFIED_SESSION_INSTRUCTIONS if context else "")
+                        + (
+                            "\n"
+                            + VERIFIED_SESSION_INSTRUCTIONS
+                            + (
+                                "\n" + VERIFIED_EXECUTION_INSTRUCTIONS
+                                if "execution" in context.for_event(event)
+                                else ""
+                            )
+                            if context
+                            else ""
+                        )
                         if self._prompt_mode == "grounded"
                         else SYSTEM_INSTRUCTIONS
                     ),
@@ -81,8 +132,6 @@ class OpenAIAnalyzer:
                 else SecurityAssessment
             ),
         )
-        if response.output_parsed is None:
-            raise RuntimeError("The model did not return a structured assessment")
         return (
             validate_grounded(response.output_parsed, event, context)
             if self._prompt_mode == "grounded"

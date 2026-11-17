@@ -207,23 +207,25 @@ def test_injection_stays_in_data_and_cannot_create_evidence_paths():
 
 
 def test_live_adapter_validates_structured_evidence_and_sends_no_few_shots():
-    with patch("app.analyzers.openai_analyzer.AsyncOpenAI") as constructor:
+    with patch(
+        "app.analyzers.openai_analyzer.parse_structured_response", new_callable=AsyncMock
+    ) as parse:
         response = Mock(output_parsed=assessment(["device.managed"]))
-        constructor.return_value.responses.parse = AsyncMock(return_value=response)
+        parse.return_value = (response, None)
         analyzer = OpenAIAnalyzer(
             Settings(openai_api_key="test-placeholder", openai_prompt_mode="grounded")
         )
         result = asyncio.run(analyzer.analyze(synthetic_events()[0]))
-        kwargs = constructor.return_value.responses.parse.call_args.kwargs
+        kwargs = parse.call_args.kwargs
         assert len(kwargs["input"]) == 2 and kwargs["store"] is False
         assert result.requires_human_review
 
 
 def test_invalid_grounding_falls_back_to_rule_in_hybrid():
-    with patch("app.analyzers.openai_analyzer.AsyncOpenAI") as constructor:
-        constructor.return_value.responses.parse = AsyncMock(
-            return_value=Mock(output_parsed=assessment(["invented.permission"]))
-        )
+    with patch(
+        "app.analyzers.openai_analyzer.parse_structured_response", new_callable=AsyncMock
+    ) as parse:
+        parse.return_value = (Mock(output_parsed=assessment(["invented.permission"])), None)
         llm = OpenAIAnalyzer(
             Settings(openai_api_key="test-placeholder", openai_prompt_mode="grounded")
         )

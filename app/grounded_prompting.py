@@ -93,6 +93,38 @@ Do not return UNKNOWN solely because the attack subtype or external human identi
 when those current server conditions are established. The caller's equal role claims do not
 override a denied server-owned role scope. Conversely a generic ELEVATED_RISK/STEP_UP alone,
 missing external identity proof, or MFA unknown when not required is not such a failure.
+The caller identity binds the request operator only. It does not verify the observed person's
+identity/MFA, and the operator's administrative role never overrides the event subject's scope.
+""".strip()
+
+VERIFIED_EXECUTION_INSTRUCTIONS = """
+When this optional execution context is present, review the observed execution FIRST.
+A session ALLOW only authorizes its resource/action; it does not establish that the observed
+principal/workload/binary/destinations match a reviewed execution scope. A legitimate user with
+successful MFA can still run an execution outside that scope.
+The optional verified_session.execution facts contain separately signed collector observations
+and server-reviewed execution policies, not model labels or a detector verdict. Compare the
+entire observed actor (principal, workload, executable hash) and ALL exact destinations with
+ONE coherent reviewed policy. Do not combine actor permission from one policy with destinations
+from another. Hosts, ports and paths are exact; a prefix, suffix, sibling path or different
+executable/workload is not equivalent authorization.
+A complete observation outside every applicable reviewed policy can establish an execution
+scope failure (ACCESS_POLICY_VIOLATION), not successful compromise or completed exfiltration.
+Apply the configured execution review rule: if comparison_scope_complete=true and NONE of the
+exact_field_comparisons has one_coherent_policy_matches=true, report ACCESS_POLICY_VIOLATION
+and cite the mismatching observed fields plus reviewed policy/comparison facts. If a coherent
+policy matches, do not invent that execution violation; keep any separate supported finding.
+The equality/membership comparisons are server calculations over supplied verified claims,
+not a benchmark label or a detector's classification. Independently explain the actual values.
+If observation_status is missing/incomplete/conflict/stale, do not invent executable/actor or
+destinations from the policy. No reviewed policy, or an unresolved_execution_policy_count > 0,
+does not prove that execution is unauthorized. Preserve that uncertainty and human review;
+do not use incomplete proof as affirmative approval or an established attack. Other supported
+session/device/authentication findings remain independently valid.
+The collector provenance does not independently verify a person or a deployed process. These
+facts are advisory only: they never consume approval quota, create a grant, or execute a response.
+Missing independent human/OS attestation is a provenance limitation, not a reason to ignore
+a concrete mismatch between accepted registered-collector claims and the configured server scope.
 """.strip()
 
 
@@ -157,12 +189,31 @@ def grounded_input(
     normalized["unmapped"] = {
         k: v for k, v in normalized["unmapped"].items() if k != "source_event_id"
     }
+    execution = context.for_event(event).get("execution") if context else None
     return [
         {
             "role": "user",
             "content": json.dumps(
                 {
                     "task": "Classify risk and explain using only the observed evidence catalog.",
+                    **(
+                        {
+                            "analysis_focus": "Review observed execution against one coherent server-reviewed scope; session ALLOW is not execution-scope approval.",
+                            "execution_review": {
+                                "actor_fields": [
+                                    "verified_session.execution.observed_actor.principal_id",
+                                    "verified_session.execution.observed_actor.workload_id",
+                                    "verified_session.execution.observed_actor.executable_sha256",
+                                ],
+                                "destinations": "verified_session.execution.observed_destinations",
+                                "reviewed_scopes": "verified_session.execution.reviewed_execution_policies",
+                                "field_comparisons": "verified_session.execution.exact_field_comparisons",
+                                "complete_scope": "verified_session.execution.comparison_scope_complete",
+                            },
+                        }
+                        if execution
+                        else {}
+                    ),
                     "evidence_catalog": evidence_catalog(event, context),
                     "server_detection_policies": policies,
                     "normalized_observation": normalized,

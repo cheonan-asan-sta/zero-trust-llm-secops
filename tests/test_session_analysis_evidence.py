@@ -1,6 +1,6 @@
 import asyncio
 import json
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
@@ -120,6 +120,98 @@ def test_different_operator_cannot_attach_another_operators_approval(lab):
         collect_session_evidence(lab.service, signal, other)
 
 
+def test_positive_approval_snapshot_expires_with_the_one_time_grant(lab):
+    signal, context = lab.create(scenario("read_over_vpn"))
+    current = lab.service.history(signal.session_id, lab.principal)[-1]
+    assert context.for_event(signal.event)["session"]["approval_currently_usable"]
+    assert context.expires_at == current.grant_expires_at < signal.expires_at
+    context.for_event(signal.event, now=context.expires_at - timedelta(microseconds=1))
+    with pytest.raises(SignalRejected):
+        context.for_event(signal.event, now=context.expires_at)
+
+
+def test_authenticated_operator_is_never_promoted_to_observed_person_mfa(lab):
+    signal, context = lab.create(scenario("role_denied"))
+    caller = context.for_event(signal.event)["caller"]
+    assert caller["session_operator_binding_verified"]
+    assert caller["authentication_method"] == "api_key"
+    assert caller["event_subject_mfa_independently_verified"] is False
+    assert "not_event_subject" in caller["identity_scope"]
+    assert context.for_event(signal.event)["policy"]["role_permitted"] is False
+
+
+def test_oidc_token_expiration_bounds_snapshot_even_before_grant_expiration(lab):
+    signal, _ = lab.create(scenario("read_over_vpn"))
+    now = datetime.now(UTC)
+    expires = now + timedelta(seconds=10)
+    principal = Principal("local-operator", "local-lab", frozenset({Role.ANALYST}), "oidc", expires)
+    context = collect_session_evidence(lab.service, signal, principal, now=now)
+    assert context.expires_at == expires
+    assert (
+        context.for_event(signal.event, now=now)["caller"]["authentication_valid_until"]
+        == expires.isoformat()
+    )
+    with pytest.raises(SignalRejected, match="authentication expired"):
+        collect_session_evidence(lab.service, signal, principal, now=expires)
+
+
+@pytest.mark.parametrize(
+    "expiry", [None, "not-a-date", datetime(2026, 11, 17, tzinfo=UTC).replace(tzinfo=None)]
+)
+def test_oidc_without_valid_expiration_cannot_create_an_authoritative_snapshot(lab, expiry):
+    signal, _ = lab.create(scenario("read_over_vpn"))
+    principal = Principal("local-operator", "local-lab", frozenset({Role.ANALYST}), "oidc", expiry)
+    with pytest.raises(SignalRejected):
+        collect_session_evidence(lab.service, signal, principal)
+
+
+def test_consumption_during_llm_call_rejects_stale_positive_approval(lab, monkeypatch):
+    from app import main
+    from app.zero_trust_models import ProtectedAccessRequest
+
+    original, _ = lab.create(scenario("read_over_vpn"))
+    event = original.event.model_copy(
+        update={"event_id": "concurrent-read", "timestamp": datetime.now(UTC)}
+    )
+    signal = lab.sign(event, "concurrent-read-session")
+    issued = lab.service.evaluate_signed(signal, lab.principal)
+    assert issued.grant_token
+
+    async def consume(event, context):
+        assert context.for_event(event)["session"]["approval_currently_usable"]
+        result = lab.service.access(
+            ProtectedAccessRequest(
+                session_id=signal.session_id,
+                resource_id=event.resource.resource_id,
+                action=event.action,
+                grant_token=issued.grant_token,
+            ),
+            lab.principal,
+        )
+        assert result.allowed
+        return assessment()
+
+    fake = Mock()
+    fake.name = "openai"
+    fake.analyze_with_evidence = AsyncMock(side_effect=consume)
+    audit = Mock()
+    audit.save = AsyncMock()
+    monkeypatch.setattr(main, "zero_trust_operations", lab.service)
+    monkeypatch.setattr(main, "get_analyzer", lambda: fake)
+    monkeypatch.setattr(main, "get_settings", lambda: Settings(openai_prompt_mode="grounded"))
+    monkeypatch.setattr(main, "audit_store", audit)
+    main.app.dependency_overrides[get_principal] = lambda: lab.principal
+    try:
+        response = TestClient(main.app).post(
+            "/analysis/verified-session", json=signal.model_dump(mode="json")
+        )
+        assert response.status_code == 502
+        fake.analyze_with_evidence.assert_awaited_once()
+        audit.save.assert_not_awaited()
+    finally:
+        main.app.dependency_overrides.pop(get_principal, None)
+
+
 def test_ordinary_analysis_keeps_legacy_json_without_null_verification_context():
     from app.main import app
     from app.scenarios import synthetic_events
@@ -228,15 +320,15 @@ def test_only_internal_verified_context_adds_citable_paths(lab):
 
 def test_adapter_includes_verified_instructions_and_never_sends_signed_secrets(lab):
     signal, context = lab.create(scenario("required_mfa_unknown"))
-    with patch("app.analyzers.openai_analyzer.AsyncOpenAI") as constructor:
-        constructor.return_value.responses.parse = AsyncMock(
-            return_value=Mock(output_parsed=assessment())
-        )
+    with patch(
+        "app.analyzers.openai_analyzer.parse_structured_response", new_callable=AsyncMock
+    ) as parse:
+        parse.return_value = (Mock(output_parsed=assessment()), None)
         adapter = OpenAIAnalyzer(
             Settings(openai_api_key="test-placeholder", openai_prompt_mode="grounded")
         )
         result = asyncio.run(adapter.analyze_with_evidence(signal.event, context))
-        kwargs = constructor.return_value.responses.parse.call_args.kwargs
+        kwargs = parse.call_args.kwargs
         assert "exact, current server-collected snapshot" in kwargs["input"][0]["content"]
         assert kwargs["store"] is False and signal.signature not in json.dumps(kwargs["input"])
         assert result.requires_human_review

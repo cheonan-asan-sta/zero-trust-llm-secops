@@ -1,8 +1,10 @@
 import asyncio
 import hashlib
 import hmac
+import math
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from enum import Enum
 from functools import lru_cache
 from typing import Annotated, Any
@@ -37,6 +39,7 @@ class Principal:
     tenant_id: str
     roles: frozenset[Role]
     auth_method: str
+    authentication_expires_at: datetime | None = field(default=None, repr=False, compare=False)
 
     @property
     def effective_roles(self) -> frozenset[Role]:
@@ -140,6 +143,10 @@ async def _oidc_principal(
         subject = claims["sub"]
         tenant_id = claims[settings.oidc_tenant_claim]
         roles = _parse_roles(claims.get(settings.oidc_roles_claim))
+        expiration = claims["exp"]
+        if type(expiration) not in {int, float} or not math.isfinite(expiration):
+            raise ValueError("OIDC expiration must be a finite NumericDate")
+        authentication_expires_at = datetime.fromtimestamp(expiration, UTC)
     except HTTPException:
         raise
     except PyJWKClientConnectionError as exc:
@@ -147,21 +154,31 @@ async def _oidc_principal(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Identity provider is temporarily unavailable",
         ) from exc
-    except (InvalidTokenError, PyJWKClientError, KeyError, TypeError, ValueError) as exc:
+    except (
+        InvalidTokenError,
+        PyJWKClientError,
+        KeyError,
+        TypeError,
+        ValueError,
+        OverflowError,
+        OSError,
+    ) as exc:
         raise _unauthorized("Invalid identity token") from exc
     # Preserve claim types: coercing null, numbers or booleans creates unintended tenant IDs.
     if (
         not isinstance(subject, str)
         or not subject
+        or len(subject) > 128
         or not isinstance(tenant_id, str)
         or not _TENANT_PATTERN.fullmatch(tenant_id)
     ):
         raise _unauthorized("Token identity claims are invalid")
     return Principal(
-        subject=subject[:128],
+        subject=subject,
         tenant_id=tenant_id,
         roles=roles,
         auth_method="oidc",
+        authentication_expires_at=authentication_expires_at,
     )
 
 
