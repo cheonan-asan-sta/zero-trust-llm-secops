@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="6.265" timestamp="2026-11-17T17:00:13.255782+09:00" hostname="localhost"><testcase classname="tests.test_verified_caller_authority" name="test_revocation_after_audit_commit_refuses_delivery_but_preserves_committed_history[/analysis/verified-session]" time="0.079"><failure message="assert 200 == 502&#10; +  where 200 = &lt;Response [200 OK]&gt;.status_code">tests/test_verified_caller_authority.py:188: in test_revocation_after_audit_commit_refuses_delivery_but_preserves_committed_history
+    assert response.status_code == 502
+E   assert 200 == 502
+E    +  where 200 = &lt;Response [200 OK]&gt;.status_code</failure></testcase><testcase classname="tests.test_verified_caller_authority" name="test_revocation_after_audit_commit_refuses_delivery_but_preserves_committed_history[/analysis/evidence-review]" time="0.071"><failure message="assert 200 == 502&#10; +  where 200 = &lt;Response [200 OK]&gt;.status_code">tests/test_verified_caller_authority.py:188: in test_revocation_after_audit_commit_refuses_delivery_but_preserves_committed_history
+    assert response.status_code == 502
+E   assert 200 == 502
+E    +  where 200 = &lt;Response [200 OK]&gt;.status_code</failure></testcase></testsuite></testsuites>

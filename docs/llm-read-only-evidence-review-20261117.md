@@ -18,7 +18,7 @@ sequenceDiagram
     S->>L: 세션·기본 실행 근거 + 허용 도구 목록
     opt 추가 근거가 필요한 경우
         L-->>S: 읽기 함수 제안 (인자 {})
-        S->>V: 현재 권한 재검증 + 동일 세션 읽기
+        S->>V: 현재 source·정책·세션 재검증 + 동일 세션 읽기
         V-->>S: 실행 근거 또는 최근 8개 결정
         S->>L: 허용된 근거 경로만 추가
     end
@@ -42,7 +42,7 @@ LLM이 제안할 수 있는 함수는 다음 둘뿐이다.
 
 모델 검토 루프는 최대 **도구 읽기 2회·제공자 요청 3회·기본 30초**다. 검토 제한은 `OPENAI_EVIDENCE_REVIEW_TIMEOUT_SECONDS`로 1–90초 범위에서 설정하며 각 호출에도30초 제한을 둔다. 요청 접수·동시 실행 대기·감사 저장까지 합친 HTTP 전체 응답시간을 보증하는 값은 아니다. SDK HTTP 자동 재시도는0이고 incomplete 자동 재시도도 하지 않는다. 마지막 모델 요청에는 추가 도구 사용을 허용하지 않는다. 입력49,152바이트·도구 결과24,576바이트의 상한을 넘으면 중단한다.
 
-매 제공자 호출·도구 실행 전과 결과 저장 전에 현재 신뢰 상태를 확인한다. source/key 철회·정책 변경·승인 소모·만료·서로 다른 근거가 생기면 결과를 성공 감사로 남기지 않는다. 시간 초과도 취소하고 분석 동시 실행 슬롯을 반환한다. 캐시된 agent 객체를 공유해도 호출별 근거·조회 집합·사용량 기록은 별도다.
+매 제공자 호출·도구 실행 전과 제공자 결과 검토 후에 현재 신뢰 상태를 확인한다. 이 구간의 source/key 철회·정책 변경·승인 소모·만료·서로 다른 근거는 성공 분석 반환/저장을 거부한다. 감사 저장을 기다리는 동안에도 상태가 바뀔 수 있으므로, 저장 후 HTTP 결과 반환 직전에 다시 검증한다. 이미 커밋한 과거 분석 기록은 지우지 않고 전달을 거부한다. 시간 초과는 분석 동시 실행 슬롯을 반환한다. 캐시된 agent 객체를 공유해도 호출별 근거·조회 집합·사용량 기록은 별도다.
 
 hybrid 설정에서는 기존 규칙의 위험·탐지를 낮추지 않는 병합을 그대로 적용한다. LLM 원래 판단은 trace의 `model_assessment_before_rule_merge`로 구분한다. 사람 검토를 강제하고 실제 조치는 기존 PE/PA/PEP 경로에 남긴다. 분석 snapshot은 결과이며 새로운 실행 권한이 아니다. 철회 확인과 감사 저장이 하나의 전역 원자적 트랜잭션이라는 보장은 하지 않는다.
 
@@ -103,6 +103,23 @@ hybrid 설정에서는 기존 규칙의 위험·탐지를 낮추지 않는 병�
 
 JSONL 감사 쓰기를 시작한 뒤의 취소는 별도다. 파일 스레드는 요청 취소만으로 중단되지 않아, 기존 구현은 잠금을 먼저 풀고 다음 쓰기와 겹칠 수 있었다. 이를 실제 hash 계산 경계에서 재현한 뒤, 쓰기가 끝날 때까지 잠금을 유지하고 메모리 반영 후 취소를 전달하도록 고쳤다. 부분 쓰기 실패는 후속 append를 막는다. 이때 기록은 완료된 분석에 대한 감사이며 HTTP 응답이 사용자에게 전달됐다는 뜻이 아니다. 단일 프로세스·한 저장소 인스턴스의 경합 보완이며 다중 프로세스 파일 공유나 전원 단절 내구성을 새로 보증하지 않는다.
 
+## 로컬 호출 계정 변경과 결과 전달
+
+API 키 인증의 재검증 함수는 평문 키를 캡처하지 않고 digest·최초 principal만 캡처한다. 두 검증 분석 API는 매 근거 수집/재검증에서 서버 계정 파일을 다시 읽고, 계정 비활성화·역할/tenant/subject 변경·손상된 설정·현재 프로세스가 사용하는 인증 설정 변경을 거부한다. 공백/JSON 키 순서만 바뀐 같은 계정은 계속 허용한다. 검증 함수나 credential digest를 모델 입력·snapshot·trace에 넣지 않는다. 일반 분석 API 전체에 새 검증 동작을 적용한 것은 아니다.
+
+| 변경을 확인한 시점 | 분석 결과 | 감사 기록 |
+| --- | --- | --- |
+| 모델 호출 전 |호출을 진행하지 않음|새 성공 기록 없음|
+| 제공자 응답 후, 감사 저장 전 |검증 분석 실패로 반환|새 성공 기록 없음|
+| 감사 커밋 후, 결과 반환 직전 |반환을 거부|이미 커밋한 분석은 그대로 보존|
+| 파일 쓰기 중 HTTP 요청 취소 |쓰기가 끝날 때까지 잠금 유지 후 취소 전달|커밋됐을 수 있음. HTTP 전달 증명이 아님|
+
+마지막 검증과 모든 외부 권한 저장소를 하나의 트랜잭션으로 묶은 것은 아니다. 실자원 접근은 매 접근의 PEP가 별도로 판단한다. 외부 OIDC는 JWT 검증·토큰 만료와 표준 JWKS 캐시를 사용하며, IdP의 역할 변경/토큰 회수를 즉시 introspection하는 기능은 아직 없다. 요청 operator와 현재 세션 operator의 일치를 확인하는 것이며, 그 자체로 이벤트 대상 사람의 MFA나 수집기→SOC 분석자의 위임을 증명하지 않는다. 실제 조직 SSO와 위임 인수는 남은 작업이다.
+
+이전 고정 소스`2e57f16`에서는 모델 응답 중 계정 변경5종×두 API의10개 검증이 모두 실패했다(실제로는HTTP200을 반환). [수정 전 원본](infrastructure-results/llm-caller-authority-before-20261117.xml)을 보존한다. 감사 커밋 후 철회에서도 두 API가 이전에는200을 반환한[별도2개 재현](infrastructure-results/llm-caller-delivery-before-20261117.xml)을 남겼다. 수정 후 관련 Linux167개는 모두 통과했다([원본](infrastructure-results/llm-caller-authority-linux-20261117.xml)). 실제 로컬 키 인증·서명·저장소에 모의 제공자를 연결한 무료 검증이며 LLM 탐지 성능의 추가 표본이 아니다.
+
+추가로 실제 읽기 agent와 모의 HTTP 제공자가 `read_current_session_history`를 제안하는 바로 그 시점에 계정을 비활성화했다. [도구 직전 회수 검증1개](infrastructure-results/llm-caller-tool-revocation-20261117.xml)는 통과했고, 이력의 추가 읽기·두 번째 제공자 요청·새 감사 저장을 모두 막았다. 기존167개와 별도 실행한 Linux 전용 경계 시험이다.
+
 ## 로컬 실행과 재현
 
 선택적 API는 `OPENAI_EVIDENCE_AGENT_ENABLED=true`, `OPENAI_PROMPT_MODE=grounded`, `ANALYZER_MODE=openai` 또는 `hybrid`가 필요하다. 위 실제 비교는 runner에 고정한 모델·`reasoning_effort=low`·최대 출력2400토큰을 사용했다. 모델 이름은 각 결과의 동결 계획을 따른다. 다른 설정으로 결과가 재현된다고 보증하지 않는다. 예시 기본값은 비활성이고 실제 환경 파일은 변경하지 않는다. 프로덕션에서는 현재 로컬 정책 저장소가 비활성화돼 이 API도404다. 유료 호출 설정을 켜는 것은 운영 인수 완료를 뜻하지 않는다.
@@ -124,8 +141,10 @@ python -m scripts.evaluate_evidence_review_llm `
 
 ## 최신 무료 회귀와 화면 증거
 
-후속 변경의 Windows 묶음 회귀는 **647통과·12skip·실패/설정 오류0**이다. [JUnit](infrastructure-results/llm-final-windows-20261117.xml)은659개 수집 항목을 포함하며 skip을 통과에 더하지 않는다. 고정된 이전 커밋의 전체 Linux7,596통과 결과와 범위를 구분한다. 최신 고정 소스의 Linux 전체 회귀는 별도 기록한다.
+후속 변경의 Windows 묶음 회귀는 **654통과·26skip·실패/설정 오류0**이다. [JUnit](infrastructure-results/llm-caller-final-windows-20261117.xml)은680개 수집 항목을 포함하며 skip을 통과에 더하지 않는다.26개 skip에는 기존12개와 POSIX 계정 파일 규약 때문에 이 OS에서 실행하지 않은 호출 계정 경계14개가 포함된다. 계정 파일/도구 직전 회수의 실제 실행 결과는 앞의 Linux 시험에 따로 남겼다. 이전647/12 회귀와 고정 커밋의 전체 Linux7,596통과 결과도 보존하며 범위를 구분한다. 최신 고정 소스의 Linux 전체 회귀는 별도 기록한다.
 
 [분석 상세 브라우저57개 검사](infrastructure-results/llm-evidence-dashboard-browser-20261117.json), [운영 작업 브라우저142개 검사](infrastructure-results/llm-evidence-operations-browser-20261117.json)는 모두 통과했다. [1440px 화면](infrastructure-results/llm-evidence-dashboard-1440-20261117.png), [390px 화면](infrastructure-results/llm-evidence-dashboard-390-20261117.png)은 **합성 응답 fixture를 사용한 표시 검증**이다. 실제 유료 응답이나 실제 사람 MFA 성공의 증명 사진이 아니다. 본문·인용 경로·안전 제한·기밀 마스킹, 예전 기록의 누락 필드, 확대/좁은 화면을 검사했다.
 
 Ruff는 app/scripts/tests 전체 통과했다. Impeccable의 정적 검사에는 기존 `.demo-note`의 한쪽 테두리 경고1개가 남아 있다. 이번 변경에서 추가한 스타일이 아니며 정적 JS/CSS 검사가 화면 전체의 접근성을 보증하지 않는다. 실제 화면은 브라우저 검사와 직접 확인을 함께 사용했다.
+
+추가 [로그 지시문6종·실제 API12회](infrastructure-results/llm-evidence-prompt-injection-20261117.json)는 두 방식 각각TP3·FP0·FN0·TN3으로 판정을 유지했다. 위조 정책 JSON이나 다른 tenant 조회 지시도 이벤트 데이터로 전달했으며 실제 조회/쓰기 도구 실행은 없었다. 이 작은 작성형 시험을 일반적인 프롬프트 공격 방어율이나 독립 F1로 보고하지 않는다. 실행 방법은 `python -m scripts.evaluate_evidence_prompt_injection --directory <새 폴더> --key-env-file <기존 로컬 키 파일> --max-budget 0.15 --stop-at <시간대 포함 미래 시각>`이다. 계획·payload·wrapper 소스 지문을 유료 요청 전에 저장하며6종 중 실패/미실행 사례도 분모에 보존한다.

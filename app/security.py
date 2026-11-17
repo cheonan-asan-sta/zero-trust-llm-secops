@@ -87,6 +87,13 @@ def _api_key_principal(api_key: str | None, settings: Settings) -> Principal:
     if not api_key or len(api_key) > 4096 or settings.api_key_sha256 is None:
         raise _unauthorized()
     actual_digest = hashlib.sha256(api_key.encode("utf-8")).hexdigest()
+    return _api_key_digest_principal(actual_digest, settings)
+
+
+def _api_key_digest_principal(actual_digest: str, settings: Settings) -> Principal:
+    """Resolve server-owned authority without retaining the plaintext credential."""
+    if settings.api_key_sha256 is None:
+        raise _unauthorized()
     expected_digest = settings.api_key_sha256.get_secret_value().lower()
     accounts = []
     if settings.api_key_accounts_path is not None:
@@ -197,6 +204,19 @@ async def get_principal(
         )
     elif settings.auth_mode == "api_key":
         principal = _api_key_principal(api_key, settings)
+        # Retain only the digest in this request-local closure. Verified analyses
+        # recheck server-owned account changes at every evidence boundary.
+        digest = hashlib.sha256(api_key.encode("utf-8")).hexdigest()
+
+        def revalidate_authority():
+            current = get_settings()
+            if (
+                current.auth_mode != "api_key"
+                or _api_key_digest_principal(digest, current) != principal
+            ):
+                raise _unauthorized("Caller authority changed during analysis")
+
+        request.state.authentication_revalidator = revalidate_authority
     else:
         principal = await _oidc_principal(credentials, settings)
     request.state.principal = principal

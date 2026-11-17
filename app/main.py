@@ -730,12 +730,16 @@ async def analyze_batch(
     )
 
 
-def _bound_verification_context(signal, principal, behavior_capture_id):
+def _bound_verification_context(
+    signal, principal, behavior_capture_id, caller_authority_check=None
+):
     if zero_trust_operations is None:
         raise HTTPException(404, "Local verified-session analysis is disabled in production")
 
     # Verification errors are handled by existing signal/session handlers; never call the LLM.
     def collect_context():
+        if caller_authority_check is not None:
+            caller_authority_check()
         if behavior_capture_id is not None:
             return collect_session_execution_evidence(
                 zero_trust_operations,
@@ -769,7 +773,12 @@ async def analyze_verified_session(
         str | None, Query(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
     ] = None,
 ) -> AnalysisResult:
-    context = _bound_verification_context(signal, principal, behavior_capture_id)
+    context = _bound_verification_context(
+        signal,
+        principal,
+        behavior_capture_id,
+        getattr(request.state, "authentication_revalidator", None),
+    )
     try:
         analyzer = get_analyzer()
     except ValueError as exc:
@@ -826,7 +835,12 @@ async def analyze_evidence_review(
         and current.analyzer_mode in {"openai", "hybrid"}
     ):
         raise HTTPException(503, "Enable grounded OpenAI evidence review explicitly")
-    context = _bound_verification_context(signal, principal, behavior_capture_id)
+    context = _bound_verification_context(
+        signal,
+        principal,
+        behavior_capture_id,
+        getattr(request.state, "authentication_revalidator", None),
+    )
     try:
         agent = get_evidence_agent()
     except ValueError as exc:
@@ -948,6 +962,12 @@ async def _analyze_event(
             request_id=request_id,
         )
         await audit_store.save(result)
+        if selected_context is not None:
+            # Audit completion may have awaited another writer. Recheck before
+            # delivery, retaining any committed historical record on rejection.
+            if selected_context.verify_current is not None:
+                selected_context.verify_current()
+            selected_context.for_event(event)
         return result
     finally:
         analysis_capacity.release()
