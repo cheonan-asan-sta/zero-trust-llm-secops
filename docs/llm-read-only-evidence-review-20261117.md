@@ -36,7 +36,7 @@ LLM이 제안할 수 있는 함수는 다음 둘뿐이다.
 | `read_bound_execution_evidence` | 서버가 미리 검증한 capture의 주체·workload·실행 파일 해시·목적지·검토 정책·정확한 비교 | `on_request`에서 capture가 있을 때만 등록. 처음부터 제공하지 않은 실행 근거는 최종 검토 전에 읽어야 함 |
 | `read_current_session_history` | 동일 세션의 최근 8개 결정: 버전·시각·결정·상태·reason code·source trust·enforcement mode | 과거 정책 결정이며 실제 사람·공격의 독립 증거로 간주하지 않음 |
 
-두 함수의 유일한 허용 인자는 빈 객체 `{}`다. 모델이 tenant·user·URL·경로·다른 세션을 선택할 수 없다. URL 방문·shell·파일 읽기·grant 발급·승인 소비·차단 도구는 등록하지 않는다. 같은 근거 그룹의 반복 조회, 여러 도구 동시 제안, 알 수 없는 도구, 새 대상 인자, 보지 않은 근거 인용을 거절한다.
+두 함수의 유일한 허용 인자는 빈 객체 `{}`다. 모델이 tenant·user·URL·경로·다른 세션을 선택할 수 없다. URL 방문·shell·파일 읽기·grant 발급·승인 소비·차단 도구는 등록하지 않는다. 같은 근거 그룹의 반복 조회, 여러 도구 동시 제안, 알 수 없는 도구, 새 대상 인자, `evidence` 배열의 보지 않은 근거 경로를 거절한다. 설명 본문 전체의 의미를 자동 검증하는 기능은 아니다.
 
 ## 실행 경계와 기존 탐지
 
@@ -50,6 +50,10 @@ hybrid 설정에서는 기존 규칙의 위험·탐지를 낮추지 않는 병�
 
 ## 초기 조회 방식의 실제 API 결과
 
+실패 처리도 경로별로 구분한다. `/analysis/verified-session`의 OpenAI 단독은 제공자 실패 시 결과를 거부한다. 같은 경로의 기존 hybrid는 제공자 오류/timeout에 규칙 fallback·사람 검토로 완료할 수 있지만, 현재 권한·근거 재검증은 여전히 통과해야 한다. `/analysis/evidence-review`는 검토 agent가 실패하면 hybrid 설정이어도 성공한 agent 결과로 대체하지 않고 거부한다. 완료된 분석 감사가 반드시 성공한 LLM 검토를 뜻하지 않는다. 유료 비교 runner에서는 정적 어댑터도 SDK 재시도0으로 고정했으며, 일반 런타임의 OpenAI 재시도 설정과는 별개다.
+
+기존 raw hybrid의 별도360건 동결 재생은 F1 78.09%·새 FP95로 미채택이었다. 이 수치는 이 문서의 검증 근거12종이나 원래 native 탐지 결과와 다르다. [재생 범위·timeout의 한계·원본](llm-operation-evidence-20261117.md#기존-규칙hybrid의-무료-동결-재생-비교)을 먼저 확인하며, 단순 hybrid 활성화를 성능 목표 달성으로 설명하지 않는다.
+
 로컬 실제 JWT 서명·issuer/audience·tenant/역할 검증과 실제 loopback JWKS HTTP 조회를 거쳐 API에 접근했다. principal 주입이나 JWKS fetch 대체는 하지 않았다. 외부 기업 IdP와 실제 사람 MFA의 인수 시험은 아니다. 모든 시나리오는 새 현재 시각의 서명·상태를 발급한 작성형 개발 사례다.
 
 | 사례군 | 방식 | TP | FP | FN | TN | 실제 제공자 요청 |
@@ -59,7 +63,7 @@ hybrid 설정에서는 기존 규칙의 위험·탐지를 낮추지 않는 병�
 | 세션·MFA 정책 12종 | 정적 근거 입력 |6|0|0|6|12|
 | 세션·MFA 정책 12종 | 선택적 읽기 agent |6|0|0|6|12|
 
-실행 조회에서는 모든 agent 요청이 실행 근거를 한 번 읽은 뒤 최종 응답했다. 세션·MFA 시험에서는 이미 주어진 정책/신호만으로 판단하여 추가 도구를 쓰지 않았다. 각 비교에서 기존 TP 손실·새 FP0, UNKNOWN/오류0, 감사 snapshot/trace 일치, 세션 journal·행위 저장소 불변을 확인했다. 반복2회나 독립 운영 평가라는 뜻은 아니다.
+실행 조회에서는 모든 agent 요청이 실행 근거를 한 번 읽은 뒤 최종 응답했다. 세션·MFA 시험에서는 이미 주어진 정책/신호만으로 판단하여 추가 도구를 쓰지 않았다. 각 비교에서 기존 TP 손실·새 FP0, UNKNOWN/오류0, 감사 snapshot/trace 일치와 세션 journal 불변을 확인했다. 실행 사례는 행위 저장소 불변도 검사했으며, 세션/MFA 사례에는 행위 저장소를 구성하지 않았다. 반복2회나 독립 운영 평가라는 뜻은 아니다.
 
 | 실행 scope 측정 | 정적 방식 | 도구 조회 방식 |
 | --- | ---: | ---: |
@@ -91,7 +95,7 @@ hybrid 설정에서는 기존 규칙의 위험·탐지를 낮추지 않는 병�
 
 서버는 `enforce_verified_review_safety`로 source·요청자 연결·정책 요건·현재 세션 승인·실행 scope 근거를 검사한다. 필요한 근거가 충족되지 않은 `ALLOW` 권고만 `HOLD_FOR_REVIEW`로 제한한다. 기존 위협 분류·점수·근거·다른 대응 권고를 바꾸지 않는다. `verified_review_controls`에 안전 점검 전후 권고·제한 사유를 남긴다. 원래12개 응답을 바꾸지 않고 guard를 재생하면4개 모두 검토 대기로 바뀐다. 이는 추가 모델 호출이나 F1 개선이 아니다.
 
-후속 실제 API12회에서도 두 방식 모두6/6 사람 검토·추가 허용 권고0·저장소 불변을 확인했다. 이 실행에서 모델이 낸 허용 권고는2개였고 서버가 모두 제한했다. [후속 실제 응답과 제한 사유](infrastructure-results/llm-evidence-grounding-after-guard-20261117.json)에 남겼다. 두 실행의 모델 변동성을 guard의 분류 성능 향상으로 해석하지 않는다. 사례의 `NORMAL`은 지원되는 공격 근거가 없다는 뜻이며 실행 권한 확인을 뜻하지 않는다.
+후속 실제 API12회에서도 두 방식 모두6/6 사람 검토·추가 허용 권고0·세션/행위 저장소 불변을 확인했다. 이 실행에서 모델이 낸 허용 권고는2개였고 서버가 모두 제한했다. [후속 실제 응답과 제한 사유](infrastructure-results/llm-evidence-grounding-after-guard-20261117.json)에 남겼다. 두 실행의 모델 변동성을 guard의 분류 성능 향상으로 해석하지 않는다. 사례의 `NORMAL`은 지원되는 공격 근거가 없다는 뜻이며 실행 권한 확인을 뜻하지 않는다.
 
 기존 `policy_decision.allowed`는 **권고 유형이 응답 허용 목록에 속하는지**를 표시한다. 따라서 `HOLD_FOR_REVIEW`에서도true일 수 있다. 보호 자원 접근 허가는 `/zero-trust/protected-access`의 별도 PEP 판단이다. 이 기존 계약을 바꾸지 않고 API 설명과 화면 표현을 명확히 했다.
 
@@ -141,10 +145,12 @@ python -m scripts.evaluate_evidence_review_llm `
 
 ## 최신 무료 회귀와 화면 증거
 
-후속 변경의 Windows 묶음 회귀는 **654통과·26skip·실패/설정 오류0**이다. [JUnit](infrastructure-results/llm-caller-final-windows-20261117.xml)은680개 수집 항목을 포함하며 skip을 통과에 더하지 않는다.26개 skip에는 기존12개와 POSIX 계정 파일 규약 때문에 이 OS에서 실행하지 않은 호출 계정 경계14개가 포함된다. 계정 파일/도구 직전 회수의 실제 실행 결과는 앞의 Linux 시험에 따로 남겼다. 이전647/12 회귀와 고정 커밋의 전체 Linux7,596통과 결과도 보존하며 범위를 구분한다. 최신 고정 소스의 Linux 전체 회귀는 별도 기록한다.
+후속 변경의 Windows 묶음 회귀는 **654통과·26skip·실패/설정 오류0**이다. [JUnit](infrastructure-results/llm-caller-final-windows-20261117.xml)은680개 수집 항목을 포함하며 skip을 통과에 더하지 않는다.26개 skip에는 기존12개와 POSIX 계정 파일 규약 때문에 이 OS에서 실행하지 않은 호출 계정 경계14개가 포함된다. 계정 파일/도구 직전 회수의 실제 실행 결과는 앞의 Linux 시험에 따로 남겼다. 이전647/12 회귀와 고정 커밋의 전체 Linux7,596통과 결과도 보존하며 범위를 구분한다. 최신 고정`63c42f3`의 Linux 전체 회귀는 **7,690통과·2skip·실패0**([JUnit](infrastructure-results/llm-review-63c42f3-linux-20261117.xml))이었다.38분02초이며 skip2개는 패치한 Linux 컨테이너 이미지 전용 시험으로 호스트 실행에서는 수행하지 않았다. 이번 결과를 새 컨테이너 이미지 검증이나8시간 soak로 확대하지 않는다.
 
 [분석 상세 브라우저57개 검사](infrastructure-results/llm-evidence-dashboard-browser-20261117.json), [운영 작업 브라우저142개 검사](infrastructure-results/llm-evidence-operations-browser-20261117.json)는 모두 통과했다. [1440px 화면](infrastructure-results/llm-evidence-dashboard-1440-20261117.png), [390px 화면](infrastructure-results/llm-evidence-dashboard-390-20261117.png)은 **합성 응답 fixture를 사용한 표시 검증**이다. 실제 유료 응답이나 실제 사람 MFA 성공의 증명 사진이 아니다. 본문·인용 경로·안전 제한·기밀 마스킹, 예전 기록의 누락 필드, 확대/좁은 화면을 검사했다.
 
 Ruff는 app/scripts/tests 전체 통과했다. Impeccable의 정적 검사에는 기존 `.demo-note`의 한쪽 테두리 경고1개가 남아 있다. 이번 변경에서 추가한 스타일이 아니며 정적 JS/CSS 검사가 화면 전체의 접근성을 보증하지 않는다. 실제 화면은 브라우저 검사와 직접 확인을 함께 사용했다.
 
 추가 [로그 지시문6종·실제 API12회](infrastructure-results/llm-evidence-prompt-injection-20261117.json)는 두 방식 각각TP3·FP0·FN0·TN3으로 판정을 유지했다. 위조 정책 JSON이나 다른 tenant 조회 지시도 이벤트 데이터로 전달했으며 실제 조회/쓰기 도구 실행은 없었다. 이 작은 작성형 시험을 일반적인 프롬프트 공격 방어율이나 독립 F1로 보고하지 않는다. 실행 방법은 `python -m scripts.evaluate_evidence_prompt_injection --directory <새 폴더> --key-env-file <기존 로컬 키 파일> --max-budget 0.15 --stop-at <시간대 포함 미래 시각>`이다. 계획·payload·wrapper 소스 지문을 유료 요청 전에 저장하며6종 중 실패/미실행 사례도 분모에 보존한다.
+
+[동일 구현 에이전트의 설명 개발 검토](infrastructure-results/llm-rationale-development-review-20261117.json)에서는 이12개 응답의 `evidence` 배열 경로가 모두 실제 입력 catalog에 있는지 다시 확인했다. 다만 정적 VPN READ 설명1개가 본문에서 catalog의 `action` 대신 정규화 입력의 `unmapped.source_action` 경로를 사용했다. READ라는 값은 실제 입력에 존재해 사실 날조로 판정한 것은 아니지만, 설명 본문의 인용 표준 준수는 부족했다. 원본 설명과 분류를 수정하지 않았다. 구조화 배열 검증을 설명 전체의 사실성/충실도100%로 발표하지 않으며, canonical 경로 사용 개선과 독립적인 설명 심사는 후속 과제다.

@@ -4,6 +4,16 @@
 
 현재 확인한 가장 넓은 LLM 평가는 **기존 합성 개발 데이터360건, 36개 family**다. 정밀도96.45%, 재현율90.56%, F1 93.41%, 보수적 오탐률3.33%로 **전체 목표 미달**이다. 정상 실패와 UNKNOWN도 원래 기준대로 FP/FN에 포함했다. 이전12개 로컬 정책 시나리오의100% 결과로 이 결과를 대체하지 않는다. 원래 native1,681,815행 평가와 별도이며, 그 결과도 갱신하지 않았다.
 
+| 이번에 반영한 부분 | 확인한 변화 | 현재 범위 |
+| --- | --- | --- |
+| 서버 승인·MFA 요구·서명 실행 scope 연결 |관측/정책의 정확한 비교를 LLM이 해석|현재 로컬 검증 분석 경로|
+| 선택적 읽기 agent의 inline 전달 |실행12종의 판정 유지, agent 요청24→12|기능은 기본 비활성. 필요할 때만 명시적 사용|
+| 지원되지 않은 ALLOW 권고 제한 |후속 불완전 근거12회에서 최종ALLOW0|분류를 바꾸지 않는 서버 안전 제한|
+| 감사 쓰기 취소·계정 철회·반환 직전 재검증 |실제 경합/오래된 권한의 결과 전달을 차단|무료 로컬 검증. 외부 SSO 즉시 회수는 미구현|
+| 두 수치 비교 후보 |전체 후보 악화·다운로드 후보 교정0|런타임 미채택, 실패/UNKNOWN 보존|
+
+고정`2e57f16` 전체 Linux는7,668통과·2skip·실패0으로 완료했다([42분35초 원본](infrastructure-results/llm-review-2e57f16-linux-20261117.xml)). 호출 계정/반환 경계까지 반영한 고정`63c42f3`도 **7,690통과·2skip·실패0**으로 완료했다([38분02초 원본](infrastructure-results/llm-review-63c42f3-linux-20261117.xml)). 이전 커밋의 통과를 최신 변경의 전체 검증으로 대신하지 않는다.
+
 ## LLM에 무엇을 추가했나
 
 기존 LLM은 이벤트에 적힌 사용자·기기·접속 방식과 정책 예외 주장만 볼 수 있었다. 그 정보만으로 실제 서버의 승인·MFA 요구·실행 허용 범위를 확정할 수 없는 경우가 있었다. 이번 경로는 서버가 검증한 현재 상태를 읽어 같은 이벤트에 묶어 전달한다.
@@ -13,7 +23,7 @@
 | 서버 접근 정책 | 등록 자원, 허용 역할·행위, MFA·관리 기기 요구 | 과거 이벤트 당시 없던 정책의 소급 적용 |
 | 수집기 서명 | Ed25519, 등록 source/key/tenant/user/device/role, 신선도 | 수집기 주장이 실제 사람/외부 시스템 관측과 일치한다는 독립 보증 |
 | 세션 이력 | 정확한 입력 digest·버전·operator·회수 상태, 일회용 승인 소비 | LLM 응답을 이용한 새 승인 발급 |
-| 호출자 | 실제 OIDC JWT 서명·issuer·audience·역할·tenant·subject, 토큰 만료 | 호출자가 분석 대상 사용자와 같은 사람이라는 단정, 외부 IdP의 즉시 회수 조회 |
+| 호출자 | 실제 OIDC JWT 서명·issuer·audience·역할·tenant·subject·만료, 로컬 API 계정의 현재 권한 재검증 | 호출자가 분석 대상 사용자와 같은 사람이라는 단정, 외부 IdP의 즉시 회수 조회 |
 | 실행 관측 | 별도 실행 수집기가 서명한 principal/workload/실행 파일 해시·목적지 | 서명만으로 운영 OS 프로세스를 독립적으로 측정했다는 주장 |
 | 실행 정책 | 유효한 검토·scope·기간·baseline/profile·할당량을 충족하는 정책 | 서로 다른 두 정책의 허용 항목을 합친 새로운 권한 |
 
@@ -30,16 +40,21 @@ flowchart LR
     E --> F[OpenAI 구조화 분석·허용된 근거 경로]
     F --> G[응답 형식·현재 권한·만료 재검증]
     G --> H[사람 검토가 필요한 권고·감사 저장]
+    H --> K[반환 직전 재검증]
+    K -->|유효| O[권고 반환]
+    K -->|변경| X[전달 거부·커밋 이력 보존]
     I[결정적 PE/PA/PEP] --> J[실제 승인·차단·회수]
 ```
 
 LLM은 구체적인 관측과 정책을 비교하고, 왜 위반 또는 불확실하다고 보는지 설명한다. 실제 접근 권한은 기존 결정적 정책·서명·일회용 grant 검증 경로가 처리한다. hybrid는 기존 규칙 탐지를 낮추지 않는다. LLM 단독 평가에서의 오탐 감소를 hybrid 전체의 오탐 감소로 주장하지 않는다.
 
+서명·만료·tenant·역할·행위·목적지의 정확한 일치는 결정적 코드가 검사한다. LLM의 역할은 이 사실과 이벤트의 여러 신호를 함께 해석해 분류·위험도·한국어 설명·근거 경로·대응 권고를 만들고, 필요할 때 제한된 이력을 조회하는 것이다. 이번 작은 정적/도구 비교에서 추가 탐지 이득은 없었으므로, 도구를 썼다는 이유만으로 규칙이나 정적 입력보다 정확하다고 설명하지 않는다. 주제의 LLM 요소는 실제 구현됐지만 운영 권한의 신뢰 판단을 모델에 위임하지 않는다.
+
 ## 분석 도중 신뢰 상태가 바뀌면
 
 검증 근거는 이벤트 digest에 묶이며, 서명·관측·일회용 승인·OIDC 호출자 토큰 중 관련된 가장 빠른 만료 안에서만 유효하다. OIDC subject를128자로 잘라 다른 신원으로 바꾸던 처리를 제거하고, 길이가 초과하면 거절한다. 만료 값은 유한한 NumericDate로 확인한다. JWT의 NumericDate에는 소수도 허용된다. [RFC7519의 NumericDate 정의](https://www.rfc-editor.org/rfc/rfc7519.html#section-2)
 
-제공자 호출 전과 결과 저장 전에 현재 상태를 다시 확인한다. 선택적 재시도를 켠 경우 두 번째 호출 전에도 같은 검증을 수행한다. 승인 회수·수집기 키 철회·새 충돌 보고서·다른 작업의 승인 소모·호출자 만료로 근거가 달라지면 성공 결과를 감사 저장하지 않는다. 이 조회 자체는 승인 사용 횟수나 grant를 소모하지 않는다.
+제공자 호출 전과 모델 결과 검토 후에 현재 상태를 다시 확인한다. 선택적 재시도를 켠 경우 두 번째 호출 전에도 같은 검증을 수행한다. 모델 검토 중 승인 회수·수집기 키 철회·새 충돌 보고서·다른 작업의 승인 소모·호출자 만료로 근거가 달라지면 성공 결과를 감사 저장하지 않는다. 이 조회 자체는 승인 사용 횟수나 grant를 소모하지 않는다. 감사 저장 이후에도 반환 직전에 재검증하며, 이때 변경을 발견하면 이미 커밋한 과거 기록은 보존하고 결과 전달을 거부한다. 권한 저장소와 감사·HTTP 전달을 하나의 트랜잭션으로 묶은 보장은 아니다.
 
 ## 응답 오류와 재시도
 
@@ -71,7 +86,7 @@ UNKNOWN/오류는 총6건이다. 정상 측은 기기 등록2건·배포2건의 
 - 실행 근거 조회·API·중간 철회 경계19건 통과. 실제 제공자를 흉내 낸 실행 runner 시험2건과 현재 시각의12개 실행 scope 구성 시험도 통과했다. 이 시험들은 유료 LLM 성능으로 집계하지 않는다.
 - 실제 JWT/JWKS와 OpenAI를 연결한 첫2건은 HTTP200·snapshot 감사 저장·세션 이력 불변을 확인했다. 기업 SSO 인수나 실제 사람 MFA 검증은 아니다.
 - 첫48회 정책 비교와 개발360건은 재시도0이다. 개발360건 비용 추정$1.472043, 첫48회$0.22193475, OIDC2회$0.00957525로, 현재 이 세 실행의 추가 합계$1.703553이다. 실행 근거 초기48회는 $0.24900225, 비교 구조/초점 보완48회는 $0.25891425, 자연 발생 incomplete의 단일 추가 호출은 $0.005616이었다. 이 여섯 실행의 추가507회 합계는 $2.2170855이며 사용량 미확인0건이다. 전체 후속 예산 상한은5달러다. 실제 청구는 공급자 청구서가 기준이다.
-- 전체 Linux 진단 실행은 7,499통과·7실패·1설정오류·2skip이었다. Windows와 WSL이 같은 __pycache__를 읽어 Windows 경로가 Linux traceback에 남는 문제를 확인했고, 대시보드 작업 목록에서 이 분석 API가 누락된 점도 고쳤다. Linux bytecode cache를 분리한 후 해당8개 사례는 모두 통과했다. 나머지 복원 실패의 단일 원인을 확정하지는 않는다. 개발 중인 worktree에서 시작한 전체 실행을 최종 고정 소스 전체 통과로 보고하지 않으며, 고정 소스에서 다시 검증한다.
+- 전체 Linux 진단 실행은 7,499통과·7실패·1설정오류·2skip이었다. Windows와 WSL이 같은 __pycache__를 읽어 Windows 경로가 Linux traceback에 남는 문제를 확인했고, 대시보드 작업 목록에서 이 분석 API가 누락된 점도 고쳤다. Linux bytecode cache를 분리한 후 해당8개 사례는 모두 통과했다. 나머지 복원 실패의 단일 원인을 확정하지는 않는다. 개발 중인 worktree에서 시작한 전체 실행을 최종 고정 소스 전체 통과로 보고하지 않으며, 이후 별도 고정 소스 전체 회귀 결과를 함께 기록했다.
 
 현재 기본 rule/legacy/review_all=false와 실제 환경 파일은 유지했다. AWS 배포·유료 인프라·원격 CI·push·병합은 수행하지 않는다.
 
@@ -116,7 +131,7 @@ UNKNOWN/오류는 총6건이다. 정상 측은 기기 등록2건·배포2건의 
 
 후속 inline 방식은 작은 실행 근거를 처음부터 제공하고 이력만 필요할 때 조회한다. 실행12종은 TP8·FP0·FN0·TN4 유지, agent 제공자 요청24→12회·관측 평균5.10→4.34초·비용 추정$0.112776→$0.074169이었다. 새 세션/MFA12종도 두 방식 모두 TP6·FP0·FN0·TN6을 유지했다. 별도 실행 간 시각·서명·모델 변동이 있으므로 지연 차이를 독립 인과효과로 확정하지 않는다. 일반 분석 모드는 전환하지 않는다.
 
-별도의6종 불완전/상충 실행 근거 시험에서는 실제12회 중4회가 사람 검토를 요구하면서도ALLOW를 권고했다. 원본을 보존하고, 서버가 source·정책·현재 세션·실행 scope를 확인해 지원되지 않은ALLOW만HOLD로 제한했다. 분류·점수·근거는 바꾸지 않으며 F1 개선으로 집계하지 않는다. [수정 전 원본](infrastructure-results/llm-evidence-grounding-before-guard-20261117.json), [보완 후 실제12회](infrastructure-results/llm-evidence-grounding-after-guard-20261117.json)에서 후속 최종ALLOW0·사람 검토12/12·저장소 불변을 확인했다. 새 실행에서는 모델의ALLOW2건이 서버 제한 대상이었다. 과거12개 응답을 그대로 재생한 단위 시험에서는 원래4건 모두 제한된다.
+별도의6종 불완전/상충 실행 근거 시험에서는 실제12회 중4회가 사람 검토를 요구하면서도ALLOW를 권고했다. 원본을 보존하고, 서버가 source·정책·현재 세션·실행 scope를 확인해 지원되지 않은ALLOW만HOLD로 제한했다. 분류·점수·근거는 바꾸지 않으며 F1 개선으로 집계하지 않는다. [수정 전 원본](infrastructure-results/llm-evidence-grounding-before-guard-20261117.json), [보완 후 실제12회](infrastructure-results/llm-evidence-grounding-after-guard-20261117.json)에서 후속 최종ALLOW0·사람 검토12/12·세션/행위 저장소 불변을 확인했다. 새 실행에서는 모델의ALLOW2건이 서버 제한 대상이었다. 과거12개 응답을 그대로 재생한 단위 시험에서는 원래4건 모두 제한된다.
 
 `verified_review_controls`에 권고 전후와 제한 사유를 남기고 대시보드에 표시한다. 기존`policy_decision.allowed`는 **권고 유형의 허용 목록 검사**이며 보호 자원 접근 허가가 아니다. 실제 접근 허가는 별도PEP 경로에서 검증한다. 추가 필드가 없는 예전 감사 JSON은 동일한 직렬화를 유지한다.
 
@@ -126,15 +141,34 @@ UNKNOWN/오류는 총6건이다. 정상 측은 기기 등록2건·배포2건의 
 
 해당60건은 원래와 똑같이TP30·FP1·FN0·TN29, F1 98.36%였다. 499MB 사례는500MB 미만임을 모델이 정확히 설명했지만 높은 요청률·중요 문서 접근에 대한UNKNOWN을 유지했다. 이를 정상으로 강제 변환하지 않았다. 추가TP·교정FP0으로 사전 후보 조건에 미달했으므로 런타임에 연결하지 않는다. [60개 새 결과·300개 명시적 재생·동결 지문](infrastructure-results/llm-download-arithmetic-replay-20261117.json)을 보존했다. 원래 전체360건 F1 93.41%·FP6·FN17과 native 목표 미달은 그대로다.
 
-## 취소·부하와 추가 검증
+## 기존 규칙·hybrid의 무료 동결 재생 비교
 
-고정`f0c80dc`의 전체 Linux 검증은 **7,596통과·2skip**([원본](infrastructure-results/llm-evidence-agent-frozen-linux-20261117.xml)), Windows는575통과·12skip이었다. 후속 inline·권고 제한·취소 경합 수정은 새 고정 소스로 다시 검증한다.
+같은360건의 원래 입력·라벨·공개된 LLM 응답과 현재 입력 생성기가 일치하는지 확인한 뒤, 기존 `RuleBasedAnalyzer`와 실제 `HybridAnalyzer.analyze`를 실행했다. hybrid에는 동결 응답만 돌려주는 어댑터를 주입했다. 임계값은 현재 코드 기본값0.85로 고정했고 기본 routing/전부 교차 검토 두 기존 설정을 비교했다. **새 모델 요청0·기존 응답 변경0**이며 모델 응답을 즉시 재생하므로 실제 API·지연·timeout·청구 시험은 아니다.
+
+| 원래360건에 적용한 조건 | TP | FP | FN | TN | F1 | 보수 FPR | 사용한 동결 LLM 응답 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| LLM 단독 원본 |163|6|17|174|93.41%|3.33%|원래 실제 호출360개|
+| 기존 규칙만 재생 |180|100|0|80|78.26%|55.56%|0|
+| 기존 hybrid 기본 routing 재생 |180|101|0|79|78.09%|56.11%|263|
+| 기존 hybrid 전부 교차 검토 재생 |180|101|0|79|78.09%|56.11%|360|
+
+두 hybrid의 정밀도는64.06%·재현율100%다. 원래 LLM보다17개 FN을 회수하지만 새 FP95개가 생겨 사전 조건에 미달한다. 넓은 REMOTE_ACCESS/ADMIN/다자원 접근 등을 위반으로 분류하는 기존 규칙의 양성을 보존하므로, LLM이 정상으로 판단해도 그 오탐을 줄이지 못한다. 이 결과를 이유로 임계값·원본 라벨·기본 모드를 바꾸지 않았다. 기존 탐지를 보존하면서 검증된 정책 근거로 정상 업무를 구분할 설계와 별도 인수가 필요하다.
+
+이 표는 **기존 raw 분석기 층의 작성형 개발 재생**이다. 원래 native F1 실험의 탐지기·1,681,815행 결과나 API의 최종 안전 제한/감사/실제 접근 PEP 결과가 아니다. 원래 LLM의 UNKNOWN/오류6개를 보존했으며, 결합 결과를 규칙이 정한 것을 모델의 불확실성 해소라고 부르지 않는다. 전부 검토 조건은 원래 형식 오류1개에서 기존 hybrid의 규칙 fallback을 재현했다. 새 실제 hybrid 호출이나 독립 성능 인수가 아니다.
+
+원래 SDK360회 관측 지연의 중앙값은3.329초이고353개가 기본 hybrid 제한2.5초를 넘었다. **그 관측을 실제 hybrid timeout353건으로 집계하지 않는다.** 재생은 지연/취소를 모사하지 않으며 실제 요청의 queue·입력 생성·네트워크/제공자 변동도 다를 수 있다. 실제 hybrid 도입은 deadline과 fallback 발생·사용량까지 별도 시험해야 한다.
+
+[동결 프로토콜·세 조건1080개 재생 행·공개본 재현 지문](infrastructure-results/llm-hybrid-routing-replay-20261117.json)을 보존했다.1080행은 동일360건의 세 조건이며 새 독립 사례 수가 아니다. 후속 공개 모드는 저장소의 원래 결과·benchmark·입력 생성기만 사용해 원래360개 입력 SHA를 재구성해 확인한다. 키/비공개 폴더 없이 `python -m scripts.replay_hybrid_development --directory <새 출력 폴더>`로 무료 재현할 수 있다. 원래 비공개 폴더에서 재생한 결과와 세 조건의 모든 분류/행이 일치했다. `--source <원래 development360 폴더>`는 그 원본을 가진 경우의 선택적 추가 확인이다. [공개 모드/원본 보존 검증3개](infrastructure-results/llm-hybrid-replay-public-protocol-20261117.xml)는 전체 고정 회귀 이후 추가한 연구 도구의 별도 검증이다.
+
+## 취소·부하와 추가 검증 결과
+
+고정`f0c80dc`의 전체 Linux 검증은 **7,596통과·2skip**([원본](infrastructure-results/llm-evidence-agent-frozen-linux-20261117.xml)), Windows는575통과·12skip이었다. 후속 inline·권고 제한·취소 경합 수정은 고정`2e57f16`의 Linux7,668통과·2skip으로 확인했다. 호출자/반환 경계의 고정`63c42f3`도7,690통과·2skip·실패0으로 완료했다.
 
 실제 로컬 JWT/JWKS·서명·저장소와 모의 제공자를 사용한32요청 부하 시험에서4개 처리·28개429를 확인했고 재요청·제공자 단계 취소에서 복구했다. 추가로 JSONL 쓰기 도중 취소가 잠금을 먼저 풀어 hash 계산과 다음 쓰기가 겹치는 경합을 재현했다. 쓰기 완료·메모리 반영까지 잠금을 유지하고 부분 쓰기 실패 후 append를 막았다. 같은3개 회귀는 수정 전2실패/1통과에서 모두 통과했고, 관련10개 검증도 통과했다. [수정 전](infrastructure-results/llm-audit-cancellation-before-20261117.xml), [수정 후](infrastructure-results/llm-audit-cancellation-after-20261117.xml) 결과를 함께 보존한다. 단일 저장소 인스턴스의 프로세스 내 경합 보완이며 다중 프로세스 파일 공유나 전원 단절 내구성을 보증하지 않는다.
 
 이 연속 작업의 실제 제공자 합계는 **1,071회·$4.87398975 추정·사용량 미확인0건**이다. 최초 상한$5 안에서 관리했으며 과거 별도 작업을 포함한 프로젝트 전체 청구는 아니다. 로컬 단위/브라우저/모의 제공자 부하 검증은 이 유료 횟수와 분리한다.
 
-후속 최신 Windows 회귀는 **647통과·12skip·실패/설정 오류0**,244.796초였다. [최신 JUnit](infrastructure-results/llm-final-windows-20261117.xml)에659개 수집 항목을 보존한다. 대시보드57개·운영 작업142개 브라우저 검사도 통과했다. [검사 원본·화면의 합성 범위·정적 디자인 경고](llm-read-only-evidence-review-20261117.md#최신-무료-회귀와-화면-증거)를 함께 확인한다. 최신 소스의 고정 Linux 전체 검증은 다음 단계이며 앞선 커밋의 전체 통과로 대신하지 않는다.
+inline·권고 제한·감사 취소까지의 Windows 회귀는 **647통과·12skip·실패/설정 오류0**,244.796초였다. [최신 JUnit](infrastructure-results/llm-final-windows-20261117.xml)에659개 수집 항목을 보존한다. 대시보드57개·운영 작업142개 브라우저 검사도 통과했다. [검사 원본·화면의 합성 범위·정적 디자인 경고](llm-read-only-evidence-review-20261117.md#최신-무료-회귀와-화면-증거)를 함께 확인한다. 이후 호출자/반환 경계의 Windows 묶음은654통과·26skip이었으며, 최신 고정 Linux 전체 회귀와 구분한다.
 
 ## 남은23개 판정과 다음 개발의 기준
 
@@ -158,23 +192,64 @@ UNKNOWN/오류는 총6건이다. 정상 측은 기기 등록2건·배포2건의 
 
 다음 순서는 ① 기존 검증 API에 조직 인증원·기기/업무 승인 근거를 실제 수집원으로 연결, ② 새 현재 사건에서 근거 유무·상충·만료·회수를 비교, ③ 동일 모델/입력 상한의 정적·선택 조회·hybrid를 사전 동결 조건으로 비교, ④ 기존 개발 결과와 출처·시간·주체가 분리된 독립 평가를 인수하는 순서다. 인프라 담당은 수집원 신원·키/보존·실행 근거·실패 시 경보와 복원을 맡고, 조직 issuer/audience/역할 매핑과 실제 사람 MFA의 인수는 운영 인증원 설정이 필요하다. 현재 로컬 인증원 검증을 기업 SSO 인수 완료로 바꾸지 않는다.
 
+기존 [실행 이력·신원·앱 정책 수집](extra-exec-history-app-binding.md)의 `collect_exec_history`/`ServiceEvent`·`ServiceProof` 경로와 이번 `SignedExecutionEvidence` 기반 LLM 경로는 **자료 형식과 신뢰 연결이 다르다**. 이번 실제 API 시험은 `LocalExecutionAnalysisLab`이 작성한 수집 주장이다. 기존 실제 systemd/PAM 시험 결과가 이번 LLM 호출에 자동으로 연결됐다는 뜻은 아니다. 현재 실행 capture의 scope source는cowrie/cloudtrail이고 목적지는https/s3다. host 실행 관측을 그 출처로 이름만 바꿔 넣어 연결 완료로 보고하지 않는다.
+
+내 담당 범위의 다음 구현은 이 사이의 읽기 전용 어댑터다. `ServiceEvidenceJoiner`가 검증한 원래 tenant/server/boot/invocation/PID·실행 파일/명령 digest·source·시각·호출 receipt를 보존하고, 현재 분석 이벤트·세션과의 명시적 연결을 검증해야 한다. PID 재사용·다른 boot/호출·만료·철회·재생·다른 tenant는 분리해 거부한다. 실제 목적지/네트워크 행위를 관측하지 않았다면 unknown으로 남긴다. 새 현재 사건의 end-to-end 인수를 먼저 수행하며 과거 native 로그의 누락 실행 사실을 소급 복구한 것으로 취급하지 않는다. 이는 **후속 미구현 항목**이며 이번 전체 회귀 통과로 완료 처리하지 않는다.
+
 ## 로그 안의 지시문을 넣은 추가 실제 API 검증
 
 역할 거부·행위 거부·필수 MFA 미확인·정상 팀 접근·MFA 비필수·VPN을 통한 정상 READ의6종을 미리 고정했다. 이벤트의 `behavior.event_text`에 권한 상승 지시, 위조 `verification_context` JSON, 다른 tenant/세션 이력 조회 요구, 시스템 메시지처럼 보이는 구분자, MFA 비필수 정책 무시 요구, READ를 REMOTE_ACCESS로 바꾸고 회수하라는 문자열을 각각 넣었다. 서명 전에 실제 이벤트를 구성하고 저장했으며 서버 정책·인증 principal·JWKS·API 처리를 대체하지 않았다.
 
-두 방식12회 실제 제공자 호출에서 각각TP3·FP0·FN0·TN3·UNKNOWN/오류0이었다. 모두 사람 검토를 유지했고 상태 저장소는 바뀌지 않았다. agent6개도 각1회 제공자 호출만 사용했고 추가 조회/쓰기 도구 실행은 없었다. [사전 프로토콜·소스 지문·12개 원본 응답](infrastructure-results/llm-evidence-prompt-injection-20261117.json), 무료 프로토콜 시험은[Windows2개](infrastructure-results/llm-prompt-injection-protocol-20261117.xml)·[Linux2개](infrastructure-results/llm-prompt-injection-protocol-linux-20261117.xml)에 남겼다. 두 OS에서 같은2개를 실행한 것이며 새 독립 성능 사례4개가 아니다. 추가 비용 추정$0.063465이며 위1,071회 합계에 포함돼 있다.
+두 방식12회 실제 제공자 호출에서 각각TP3·FP0·FN0·TN3·UNKNOWN/오류0이었다. 모두 사람 검토를 유지했고 세션 journal은 바뀌지 않았다. 분석 감사 기록은 정상 저장했다. agent6개도 각1회 제공자 호출만 사용했고 추가 조회/쓰기 도구 실행은 없었다. [사전 프로토콜·소스 지문·12개 원본 응답](infrastructure-results/llm-evidence-prompt-injection-20261117.json), 무료 프로토콜 시험은[Windows2개](infrastructure-results/llm-prompt-injection-protocol-20261117.xml)·[Linux2개](infrastructure-results/llm-prompt-injection-protocol-linux-20261117.xml)에 남겼다. 두 OS에서 같은2개를 실행한 것이며 새 독립 성능 사례4개가 아니다. 추가 비용 추정$0.063465이며 위1,071회 합계에 포함돼 있다.
 
 이 결과는 선택한 작성형 로그 지시문6종에 대한 방어 확인이다. 같은 시나리오의 깨끗한 입력을 동시에 새로 호출한 대조군은 없고, 독립적인 프롬프트 공격집·멀티턴/인코딩 공격·실제 조직 로그의 인수도 아니다. 전체360개/과거 native 성능으로 합치거나 일반적인 프롬프트 주입 방어100%라고 선언하지 않는다. 구현은 연구 runner이며 분석기의 지시문/기본 설정은 바꾸지 않았다.
 
+설명도 별도 개발 검토했다.12개 `evidence` 배열은 입력 catalog 경로를 준수했지만, 본문1개가 catalog의 `action` 대신 실제 정규화 입력에 있는 `unmapped.source_action` 경로를 사용했다. 값의 날조를 확인한 사례는 아니지만 canonical 인용은 개선할 부분이다. [검토 원본과 한계](infrastructure-results/llm-rationale-development-review-20261117.json)를 남기며, 동일 구현 에이전트의 검토를 독립 검수나 설명 의미의 자동 검증으로 부르지 않는다. 원래 설명·라벨·분류는 유지한다.
+
 ## 실험 소스 보존과 비용 대조
 
-[소스 묶음](infrastructure-results/llm-frozen-experiment-sources-20261117.zip)에는13개 실험 단계에서 사전에 지문을 남긴 소스181개와 계획, 로그 지시문 실험의 별도 wrapper/프로토콜을 보존했다. [파일별 SHA-256 대장](infrastructure-results/llm-frozen-experiment-sources-20261117.json)과 각 계획의 지문이 모두 일치하며 압축 CRC와 추출 바이트도 확인했다. 실패한 후보의 당시 코드도 포함하므로 현재 런타임과 혼동하지 않는다. Git 줄바꿈 변환으로 원본 지문이 달라지지 않도록 PNG/ZIP은 binary로 보관한다.
+[소스·보고서 묶음](infrastructure-results/llm-frozen-experiment-sources-20261117.zip)에는13개 실험 단계에서 사전에 지문을 남긴 단계별 소스 사본181개(동일 파일의 시점별 버전 포함)와 계획, 로그 지시문 실험의 별도 wrapper/프로토콜,16개 원본 보고서를 보존했다. [파일별 SHA-256 대장](infrastructure-results/llm-frozen-experiment-sources-20261117.json)과 각 계획의 지문이 모두 일치하며 압축 CRC와 추출 바이트도 확인했다. 사용량 대조표의15개 원본 보고서 SHA도 압축 안의 실제 바이트로 확인할 수 있다. 나머지1개 보고서는 로그 지시문 wrapper의 추가 검증 결과다. 실패한 후보의 당시 코드도 포함하므로 현재 런타임과 혼동하지 않는다. Git 줄바꿈 변환으로 원본 지문이 달라지지 않도록 PNG/ZIP은 binary로 보관한다.
 
 이는 **각 계획에 명시한 일부 소스의 원본 묶음**이다. 저장소 전체·잠금된 실행 환경·모든 전이 의존성의 완전한 스냅샷은 아니다. API 키·서명 개인키·환경 파일·비공개 요청·암호화된 reasoning은 포함하지 않는다. 원래 사건의 proof를 현재 권한 증명으로 재사용하지 않으며, 유료 재현은 새 현재 시각의 근거와 새 예산으로 실행한다.
 
 [사용량 대조표](infrastructure-results/llm-continuation-usage-20261117.json)는15개 단계의 저장된 원본 보고서와 호출 수·사용량 추정·미확인 예약을 각각 대조한 결과다. 합계1,071회·$4.87398975·미확인0이며 이전 별도 작업 비용은 제외했다. 입력$0.75/백만·출력$4.50/백만, 캐시 할인 미반영인 해당 실험의 산정 기준이다.2026-11-17에[공식 모델 요금](https://developers.openai.com/api/docs/models/gpt-5.4-mini)과도 대조했다. 실제 청구는 공급자 청구서가 기준이며, 이 장부나 개별 runner의 상한을 조직 전체 API 요금 제한 기능으로 설명하지 않는다.
 
-## 검토 도중 호출자 권한 변경까지 확인
+아래는 저장소 루트에서 실행하는 **무료·읽기 전용** 확인이다. 파일을 추출하거나 묶음 안의 Python을 실행하지 않고, 원본 바이트 지문과 장부 합계만 대조한다. Git에 저장한 대장과 파일의 일치 확인이며 독립 서명·외부 witness·성능 재평가를 뜻하지 않는다.
+
+```python
+import hashlib, json, zipfile
+from decimal import Decimal
+from pathlib import Path
+
+base = Path("docs/infrastructure-results")
+manifest = json.loads((base / "llm-frozen-experiment-sources-20261117.json").read_text(encoding="utf-8"))
+usage = json.loads((base / "llm-continuation-usage-20261117.json").read_text(encoding="utf-8"))
+archive = base / "llm-frozen-experiment-sources-20261117.zip"
+assert hashlib.sha256(archive.read_bytes()).hexdigest() == manifest["archive_sha256"]
+with zipfile.ZipFile(archive) as bundle:
+    assert bundle.testzip() is None
+    for stage in usage["stages"]:
+        raw = bundle.read(stage["archive_report_path"])
+        assert hashlib.sha256(raw).hexdigest() == stage["report_sha256"]
+        report = json.loads(raw)
+        assert report["attempts"] == stage["attempts"]
+        assert Decimal(str(report["known_usage_estimated_usd"])).quantize(Decimal(".00000001")) == Decimal(str(stage["known_usage_estimated_usd"]))
+        assert report.get("unknown_usage_reserved_usd", 0) == stage["unknown_usage_reserved_usd"]
+    for snapshot in manifest["snapshots"]:
+        for name, digest in snapshot["source_sha256"].items():
+            assert hashlib.sha256(bundle.read(name)).hexdigest() == digest
+assert sum(s["attempts"] for s in usage["stages"]) == usage["attempts"] == 1071
+assert sum(Decimal(str(s["known_usage_estimated_usd"])) for s in usage["stages"]) == Decimal("4.87398975")
+print("source/report hashes and usage totals match; no API called")
+```
+
+## 이미 알려진 감사 손상에서 모델 호출 방지
+
+시작 시 JSONL 손상을 발견했거나 직전 append가 실패한 로컬 `AuditStore`는 이미 integrity=false다. 이전 구현은 모델 분석 후 마지막 저장에서야 거부해 불필요한 제공자 호출이 발생할 수 있었다. 두 상태를 실제 파일/쓰기 실패로 구성한 무료 시험은 [수정 전2실패·정상1통과](infrastructure-results/llm-audit-preflight-before-20261117.xml)였다. 모의 제공자가 각1회 호출된 뒤 실패한 결과이며 실제 유료 요청은 아니다.
+
+로컬 감사의 알려진 손상 상태를 모델 호출 전에 확인하도록 보완했다. 두 손상 상태의 제공자 호출0, 정상 상태의 분석/저장 유지, 동시 실행 슬롯 반환을 확인했고 [관련12개](infrastructure-results/llm-audit-preflight-after-20261117.xml)가 통과했다. 디스크를 매번 재검사하거나 다음 쓰기의 성공을 보장하는 기능은 아니다. 원격 DynamoDB 상태 확인·외부 WORM/전원 단절 내구성도 추가하지 않았다. 분류·원래 지표·실제 API 비용은 바꾸지 않았다. 이 마지막 운영 guard 이후의 고정 전체 회귀는 별도 확인한다.
+
+## 호출자 변경 검증 결과
 
 호출자 계정의 비활성화·역할/tenant/subject 변경·계정 파일 손상을 모델 응답 중에 적용하면, 이전 고정 소스는 두 검증 API의10개 경우 모두HTTP200을 반환했다. digest만 유지하는 요청별 재검증으로 이 변경을 현재 서버 계정과 대조하고, 결과를 반환하거나 새 성공 감사로 저장하지 않도록 보완했다. 평문 credential·그 digest·검증 함수는 LLM에 제공하지 않는다.
 

@@ -68,7 +68,7 @@ from app.response_api import response_router
 from app.scenarios import SCENARIOS, generate_events, get_scenario
 from app.security import Principal, Role, require_roles
 from app.services.assurance import get_assurance_registry
-from app.services.audit import create_audit_store
+from app.services.audit import AuditStore, create_audit_store
 from app.services.behavior_context import BehaviorContextService
 from app.services.behavior_context_store import BehaviorContextStore
 from app.services.cases import (
@@ -927,6 +927,10 @@ async def _analyze_event(
     except TimeoutError as exc:
         raise AnalysisCapacityExceeded from exc
     try:
+        # A known local audit failure cannot be repaired by a paid analysis.
+        # This cached integrity state is not a probe of future disk availability.
+        if isinstance(audit_store, AuditStore) and audit_store.integrity().get("ok") is False:
+            raise RuntimeError("audit log integrity check failed; refusing new analysis")
         started = perf_counter()
         normalized = ocsf_normalizer.normalize(event)
         detection = sigma_engine.evaluate(normalized)

@@ -285,7 +285,93 @@
     "Historical proof cannot be reused as current authorization",
     "No private model requests, encrypted reasoning, signing keys or .env included"
   ],
-  "archive_sha256": "ee4af594494a48c4b72a2150cb3f0dbf5df064d7531064262936bc4279b3e9b5",
-  "archive_bytes": 722085,
-  "archive_entries": 196
+  "archive_sha256": "c49297a2b74c3cbf8df348ab2824ff75ee55aa031fd9c1b87f0608575ea9a23a",
+  "archive_bytes": 859287,
+  "archive_entries": 213,
+  "raw_report_files": [
+    {
+      "path": "structured-paired/report.json",
+      "sha256": "2e81c31245ee89afde986838c12a6e5228cafd680b2b2e55ba2e268e2cbefa11",
+      "bytes": 4590
+    },
+    {
+      "path": "oidc-live-smoke/report.json",
+      "sha256": "b44728cd44e1c4a43c3ac202336fb5a409307dfcf04061e18ed09f536423e712",
+      "bytes": 20022
+    },
+    {
+      "path": "development360/report.json",
+      "sha256": "3a617cb03d5e0faa95ffac9469986a191dce128cd977d5f6d2e039dcb2bcf085",
+      "bytes": 2312
+    },
+    {
+      "path": "execution-paired/report.json",
+      "sha256": "834e18719c22abf1679dced66e9a9704c31f66d7c1e7aa3c12c25ee635b96eca",
+      "bytes": 3683
+    },
+    {
+      "path": "execution-paired-v2/report.json",
+      "sha256": "37895c492387ed32b5c4c42eda4463ab1e88579019b18b9587eae847fa381881",
+      "bytes": 4961
+    },
+    {
+      "path": "natural-incomplete-retry/report.json",
+      "sha256": "e50628a7183e58f7f772c533332de398c73f77c03216ccba97be255fb4dc9754",
+      "bytes": 1973
+    },
+    {
+      "path": "development360-predicate/report.json",
+      "sha256": "1c23d921c91cf336aa3007394be42dd25a3cfa79a8ae35a1c592a15aa72f7e8e",
+      "bytes": 2402
+    },
+    {
+      "path": "evidence-review-paired/report.json",
+      "sha256": "f53eaa1fe1a7f781cdc1050a83b39cdbb07f5bf0f2f5e0c417992fce1528c4a7",
+      "bytes": 338934
+    },
+    {
+      "path": "evidence-review-session/report.json",
+      "sha256": "35a0be569f58fd3059c008bf09ed65e461c62ff21716f9737be0eec67c97624c",
+      "bytes": 248537
+    },
+    {
+      "path": "evidence-review-inline-execution/report.json",
+      "sha256": "785556c66ccfea449abab13cdb500d1a7768f2237a0bd3d0facd4800d660a22b",
+      "bytes": 335573
+    },
+    {
+      "path": "evidence-review-inline-session/report.json",
+      "sha256": "797359ebe3f75589253a9fcc4d42c43245e6476826d6fd674de24547ba8e2737",
+      "bytes": 250005
+    },
+    {
+      "path": "evidence-grounding/report.json",
+      "sha256": "5e1c4ceb8ca3e71d0f2ceaf8a4afc29f2bb574e793675a17380028c5cfa92993",
+      "bytes": 151390
+    },
+    {
+      "path": "evidence-grounding-guard/report.json",
+      "sha256": "45b08b8dc9b173c06a4a88be731b06c043cc5ee4e5b6d3498139a4033d2faebd",
+      "bytes": 155708
+    },
+    {
+      "path": "download-arithmetic60/report.json",
+      "sha256": "cce19001bd3ac2288078ab1954120e74dcbc80ef2a377a9e2d6e9ce1e529428b",
+      "bytes": 2365
+    },
+    {
+      "path": "event-text-robustness/trial/report.json",
+      "sha256": "856b2592bc41d20151ae9305e4456de80288d95a3ca2d2b2d386e27d9d08e2a4",
+      "bytes": 131367
+    },
+    {
+      "path": "event-text-robustness/report.json",
+      "sha256": "37c0b1b08b898615a7cc8c6c36aafe4364ac291f4df479d20a8c415b9312ee2d",
+      "bytes": 131601
+    }
+  ],
+  "distinct_source_paths": 31,
+  "source_entries_include_repeated_stage_versions": true,
+  "repository_license_sha256": "aff4c0db527d7213c0a28f1f59ded81a066160aac1a6ec0dbef16b1009aa2899",
+  "repository_license_included": true
 }
