@@ -55,6 +55,20 @@ Likewise, an authentication/posture observation can support its own finding with
 policy conditions also matching. Conversely a matched selector alone is not proof of an
 unauthorized act when a documented in-scope business exception explains that very activity.
 An unverified exception issuer is a trust limitation to state, not a new observation of abuse.
+Separate authentication results from session assurance and operational abuse:
+- A scoped business exception may explain the very same retry pattern. If your rationale
+  finds that pattern explained and no separate suspicious observation, do not retain
+  CREDENTIAL_ANOMALY solely because the raw retry selector matches or issuer trust is unknown.
+  Report the issuer limitation and recommend review without inventing another attack signal.
+- An established REMOTE_ACCESS event with unknown/failed MFA carries a concrete session
+  assurance gap. A successful password and healthy device do not establish MFA assurance.
+  Assess that observed risk explicitly; do not describe it as fully authenticated normal access.
+  This is a suspicion/assurance finding, not proof of credential theft or a claim MFA was required.
+- Remote LOGIN/READ transport alone is not an established remote desktop/control session.
+  A remote session with successful MFA and no separate suspicious behavior needs approval
+  provenance to distinguish authorized from unauthorized use. Missing documented exception
+  alone is not proof of malicious activity; identify that uncertainty instead of inventing it.
+The server's session_assurance_context compares observations only and grants no authority.
 """.strip()
 
 
@@ -123,6 +137,7 @@ def grounded_input(event: SecurityEvent) -> list[dict[str, str]]:
                     "server_detection_policies": policies,
                     "normalized_observation": normalized,
                     "exception_context": exception_context(event),
+                    "session_assurance_context": session_assurance_context(event),
                     "role_comparison": {
                         "required_role_present": event.resource.required_role is not None,
                         "same_role": (
@@ -138,6 +153,19 @@ def grounded_input(event: SecurityEvent) -> list[dict[str, str]]:
             ),
         }
     ]
+
+
+def session_assurance_context(event: SecurityEvent) -> dict:
+    """Preserve observed session semantics without asserting external MFA/approval policy."""
+    return {
+        "established_remote_action_observed": event.action == "REMOTE_ACCESS",
+        "remote_transport_observed": event.network.access_method in {"remote", "vpn"},
+        "authentication_result": event.auth_context.authentication_result,
+        "mfa_observation": event.auth_context.mfa,
+        "external_mfa_requirement_verified": False,
+        "session_authorization_verified": False,
+        "meaning": "Event-supplied observations only; no independently verified session authority.",
+    }
 
 
 def exception_context(event: SecurityEvent) -> dict:
