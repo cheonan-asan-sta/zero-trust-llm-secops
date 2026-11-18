@@ -70,6 +70,7 @@ from app.native_analysis_models import NativeServiceAnalysisRequest
 from app.response_api import response_router
 from app.scenarios import SCENARIOS, generate_events, get_scenario
 from app.security import Principal, Role, require_roles
+from app.services.analysis_authority import bind_analysis_authority
 from app.services.assurance import get_assurance_registry
 from app.services.audit import AuditStore, create_audit_store
 from app.services.audit_paging import (
@@ -1168,7 +1169,11 @@ async def _analyze_event_in_slot(
     started = perf_counter()
     normalized = ocsf_normalizer.normalize(event)
     detection = sigma_engine.evaluate(normalized)
-    assessment = await analyzer.analyze(event)
+    async def revalidate_caller():
+        await _analysis_caller_boundary(principal, caller_authority_check)
+
+    with bind_analysis_authority(revalidate_caller):
+        assessment = await analyzer.analyze(event)
     if verification_context is not None:
         assessment = assessment.model_copy(update={"requires_human_review": True})
     selected_context = (

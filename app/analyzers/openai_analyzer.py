@@ -17,6 +17,7 @@ from app.grounded_prompting import (
 )
 from app.models import SecurityAssessment, SecurityEvent
 from app.prompting import build_analysis_input
+from app.services.analysis_authority import current_analysis_authority
 from app.services.session_analysis_evidence import VerifiedSessionContext
 
 logger = logging.getLogger(__name__)
@@ -92,10 +93,35 @@ class OpenAIAnalyzer:
     async def _request_assessment(
         self, event: SecurityEvent, context: VerifiedSessionContext | None, output_limit: int
     ) -> SecurityAssessment:
-        # SDK transport retries cannot revalidate live evidence between attempts.
-        # Keep their policy invocation-local; ordinary calls retain their settings.
-        client = self._client.with_options(max_retries=0) if context is not None else self._client
-        response, _ = await parse_structured_response(
+        authority = current_analysis_authority()
+        if authority is not None:
+            await authority.revalidate()
+            if context is not None:
+                # The added caller I/O must not make the source check older.
+                await context.revalidate(event)
+        # Neither evidence nor server caller policy can be checked by SDK retries.
+        # Standalone/offline calls retain their own configured retry policy.
+        client = (
+            self._client.with_options(max_retries=0)
+            if context is not None or authority is not None
+            else self._client
+        )
+        try:
+            response, _ = await self._parse_assessment(client, event, context, output_limit)
+        except Exception:
+            if authority is not None:
+                await authority.revalidate()
+            raise
+        if authority is not None:
+            await authority.revalidate()
+        return (
+            validate_grounded(response.output_parsed, event, context)
+            if self._prompt_mode == "grounded"
+            else response.output_parsed
+        )
+
+    async def _parse_assessment(self, client, event, context, output_limit):
+        return await parse_structured_response(
             client,
             model=self._model,
             store=False,
@@ -138,11 +164,6 @@ class OpenAIAnalyzer:
                 if self._prompt_mode == "grounded"
                 else SecurityAssessment
             ),
-        )
-        return (
-            validate_grounded(response.output_parsed, event, context)
-            if self._prompt_mode == "grounded"
-            else response.output_parsed
         )
 
 

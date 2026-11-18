@@ -38,6 +38,6 @@ python -m scripts.run_exec_history_controls --directory <새_결과_폴더> --wo
 
 ## 다음 경계와 남은 한계
 
-이번 일반 분석 검사는 **analyzer 호출 전후의 서버 경계**다. 이미 전송한 모델 요청·완료된 vendor 비용을 취소하지 못하며, ordinary SDK 내부 자동 retry마다 권한을 다시 확인하는 연결은 후속이다. verified context의 기존 SDK retry 제한과 구분한다. 초기 인증 dependency의 I/O admission과 `/evaluation/run` 같은 별도 장기 작업도 별도 검토 대상이다. 모든 API/백그라운드 작업에 같은 신규 경계를 적용했다고 주장하지 않는다.
+이번 일반 분석 검사는 **analyzer 호출 전후의 서버 경계**다. ordinary SDK의 숨은 자동 retry는 [후속 요청별 SDK 경계](extra-caller-sdk-retry-20261119.md)에서 제어했다. 위 수치/지문은 caller 경계 단계의 이력이며 최신은 후속 문서를 본다. 이미 전송한 모델 요청·완료된 vendor 비용을 취소하지 못한다. verified context의 기존 SDK retry 제한과 구분한다. 초기 인증 dependency의 I/O admission과 `/evaluation/run` 같은 별도 장기 작업도 별도 검토 대상이다. 모든 API/백그라운드 작업에 같은 신규 경계를 적용했다고 주장하지 않는다.
 
 권한·감사 DB·외부 source 사이의 원자적 공동 snapshot, 독립 WORM/witness·최신 전체 상태·기업 SSO·다중 호스트·전원 단절·연기한8시간 soak는 미완료다. 모델 판정·평가 원본/정답/예측·F1·오탐/미탐을 변경하거나 재평가하지 않았다.
