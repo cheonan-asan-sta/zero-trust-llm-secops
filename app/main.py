@@ -1,5 +1,6 @@
 import asyncio
 from collections.abc import Callable
+from contextlib import asynccontextmanager
 from dataclasses import replace
 from datetime import UTC, datetime
 from functools import lru_cache
@@ -840,6 +841,18 @@ async def analyze_verified_session(
 async def analyze_native_service(
     selection: NativeServiceAnalysisRequest, request: Request, principal: AnalystPrincipal,
 ) -> AnalysisResult:
+    try:
+        async with _analysis_slot():
+            return await _analyze_native_service_in_slot(selection, request, principal)
+    except AnalysisCapacityExceeded as exc:
+        raise HTTPException(
+            429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from exc
+
+
+async def _analyze_native_service_in_slot(
+    selection: NativeServiceAnalysisRequest, request: Request, principal: AnalystPrincipal,
+) -> AnalysisResult:
     """Analyze only an execution published by the trusted, process-local collector."""
     if zero_trust_operations is None or get_settings().app_environment == "production":
         raise HTTPException(404, "Local native service analysis is disabled in production")
@@ -847,7 +860,8 @@ async def analyze_native_service(
     if registry is None or registry.operations is not zero_trust_operations:
         raise HTTPException(503, "Native service analysis publisher is not configured")
     try:
-        signal, context = registry.resolve(
+        signal, context = await settled_io(
+            registry.resolve,
             selection.execution_ref, principal,
             caller_authority_check=getattr(request.state, "authentication_revalidator", None),
         )
@@ -855,10 +869,14 @@ async def analyze_native_service(
         raise HTTPException(404, "Native execution reference unavailable") from exc
     collected = context
 
-    def verify_serving_context():
+    def assert_serving_stores():
         if native_analysis_registry is not registry or zero_trust_operations is not registry.operations:
             raise SignalRejected("native analysis serving stores changed")
+
+    def verify_serving_context():
+        assert_serving_stores()
         collected.verify_current()
+        assert_serving_stores()
 
     context = replace(context, verify_current=verify_serving_context)
     try:
@@ -875,13 +893,13 @@ async def analyze_native_service(
 
         async def analyze(self, event):
             # Queueing and inference can outlive or withdraw any supporting authority.
-            context.verify_current()
+            await settled_io(context.verify_current)
             result = await analyzer.analyze_with_evidence(event, context)
-            context.verify_current()
+            await settled_io(context.verify_current)
             return result
 
     try:
-        return await _analyze_event(
+        return await _analyze_event_in_slot(
             signal.event, BoundNativeAnalyzer(), principal, request.state.request_id,
             verification_context=context,
         )
@@ -986,6 +1004,22 @@ async def analyze_evidence_review(
         raise HTTPException(502, "Evidence review could not be completed") from exc
 
 
+@asynccontextmanager
+async def _analysis_slot():
+    capacity = analysis_capacity
+    try:
+        await asyncio.wait_for(
+            capacity.acquire(),
+            timeout=settings.analysis_queue_timeout_seconds,
+        )
+    except TimeoutError as exc:
+        raise AnalysisCapacityExceeded from exc
+    try:
+        yield
+    finally:
+        capacity.release()
+
+
 async def _analyze_event(
     event: SecurityEvent,
     analyzer: Analyzer,
@@ -995,64 +1029,71 @@ async def _analyze_event(
     verification_context_supplier: Callable[[], VerifiedSessionContext] | None = None,
     llm_trace_supplier: Callable[[], dict | None] | None = None,
 ) -> AnalysisResult:
-    try:
-        await asyncio.wait_for(
-            analysis_capacity.acquire(),
-            timeout=settings.analysis_queue_timeout_seconds,
+    async with _analysis_slot():
+        return await _analyze_event_in_slot(
+            event, analyzer, principal, request_id, verification_context,
+            verification_context_supplier, llm_trace_supplier,
         )
-    except TimeoutError as exc:
-        raise AnalysisCapacityExceeded from exc
-    try:
-        # Live integrity scans must not block the event loop or release capacity
-        # while an abandoned non-cancellable filesystem thread is still running.
-        if isinstance(audit_store, (AuditStore, SQLiteAuditStore)):
-            integrity = await settled_io(audit_store.integrity)
-            if integrity.get("ok") is False:
-                raise RuntimeError("audit log integrity check failed; refusing new analysis")
-        started = perf_counter()
-        normalized = ocsf_normalizer.normalize(event)
-        detection = sigma_engine.evaluate(normalized)
-        assessment = await analyzer.analyze(event)
-        if verification_context is not None:
-            assessment = assessment.model_copy(update={"requires_human_review": True})
-        selected_context = (
-            verification_context_supplier()
-            if verification_context_supplier
-            else verification_context
+
+
+async def _analyze_event_in_slot(
+    event: SecurityEvent,
+    analyzer: Analyzer,
+    principal: Principal,
+    request_id: str,
+    verification_context: VerifiedSessionContext | None = None,
+    verification_context_supplier: Callable[[], VerifiedSessionContext] | None = None,
+    llm_trace_supplier: Callable[[], dict | None] | None = None,
+) -> AnalysisResult:
+    """Internal pipeline; its caller must hold an analysis slot throughout."""
+    # Live integrity scans must not block the event loop or release capacity
+    # while an abandoned non-cancellable filesystem thread is still running.
+    if isinstance(audit_store, (AuditStore, SQLiteAuditStore)):
+        integrity = await settled_io(audit_store.integrity)
+        if integrity.get("ok") is False:
+            raise RuntimeError("audit log integrity check failed; refusing new analysis")
+    started = perf_counter()
+    normalized = ocsf_normalizer.normalize(event)
+    detection = sigma_engine.evaluate(normalized)
+    assessment = await analyzer.analyze(event)
+    if verification_context is not None:
+        assessment = assessment.model_copy(update={"requires_human_review": True})
+    selected_context = (
+        verification_context_supplier()
+        if verification_context_supplier
+        else verification_context
+    )
+    snapshot = selected_context.for_event(event) if selected_context is not None else None
+    safe_assessment = enforce_assessment_safety(assessment, event)
+    verified_controls = None
+    if snapshot is not None:
+        safe_assessment, verified_controls = enforce_verified_review_safety(
+            safe_assessment, snapshot
         )
-        snapshot = selected_context.for_event(event) if selected_context is not None else None
-        safe_assessment = enforce_assessment_safety(assessment, event)
-        verified_controls = None
-        if snapshot is not None:
-            safe_assessment, verified_controls = enforce_verified_review_safety(
-                safe_assessment, snapshot
-            )
-        decision = response_preview(safe_assessment, event)
-        result = AnalysisResult(
-            event_id=event.event_id,
-            analyzer=analyzer.name,
-            assessment=safe_assessment,
-            policy_decision=decision,
-            normalized_event=normalized,
-            detection=detection,
-            verification_context=snapshot,
-            llm_trace=llm_trace_supplier() if llm_trace_supplier else None,
-            verified_review_controls=verified_controls,
-            latency_ms=round((perf_counter() - started) * 1000, 2),
-            tenant_id=principal.tenant_id,
-            actor_id=principal.subject,
-            request_id=request_id,
-        )
-        await audit_store.save(result)
-        if selected_context is not None:
-            # Audit completion may have awaited another writer. Recheck before
-            # delivery, retaining any committed historical record on rejection.
-            if selected_context.verify_current is not None:
-                selected_context.verify_current()
-            selected_context.for_event(event)
-        return result
-    finally:
-        analysis_capacity.release()
+    decision = response_preview(safe_assessment, event)
+    result = AnalysisResult(
+        event_id=event.event_id,
+        analyzer=analyzer.name,
+        assessment=safe_assessment,
+        policy_decision=decision,
+        normalized_event=normalized,
+        detection=detection,
+        verification_context=snapshot,
+        llm_trace=llm_trace_supplier() if llm_trace_supplier else None,
+        verified_review_controls=verified_controls,
+        latency_ms=round((perf_counter() - started) * 1000, 2),
+        tenant_id=principal.tenant_id,
+        actor_id=principal.subject,
+        request_id=request_id,
+    )
+    await audit_store.save(result)
+    if selected_context is not None:
+        # Audit completion may have awaited another writer. Recheck before
+        # delivery, retaining any committed historical record on rejection.
+        if selected_context.verify_current is not None:
+            await settled_io(selected_context.verify_current)
+        selected_context.for_event(event)
+    return result
 
 
 @app.post("/response/preview", response_model=PolicyDecision)

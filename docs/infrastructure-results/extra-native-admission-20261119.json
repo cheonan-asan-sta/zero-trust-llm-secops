@@ -1,0 +1,101 @@
+{
+  "date": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "pushed": false,
+  "ci_started": false,
+  "merged": false,
+  "model_quality_reevaluated": false,
+  "native_capacity_acquired_before_resolution": true,
+  "asgi_task_cancellation_tested": true,
+  "raw_tcp_disconnect_tested": false,
+  "native_conditions": 41,
+  "before_admission": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "2",
+    "skipped": "0",
+    "tests": "2",
+    "time": "7.102",
+    "timestamp": "2026-11-19T01:19:17.112058+09:00",
+    "hostname": "희주",
+    "xml_sha256": "d84837660759f47ea4dac00721d69af30b037fca78463a945f36af4c560c0216",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\native-admission-before-20261119.xml"
+  },
+  "before_source_swap_guard": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "1",
+    "skipped": "0",
+    "tests": "1",
+    "time": "3.928",
+    "timestamp": "2026-11-19T01:22:56.247119+09:00",
+    "hostname": "희주",
+    "xml_sha256": "d8a109953172a26d088085227251f968e590a67343dfa13fd2b2711a4d34bbcb",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\native-source-swap-before-20261119.xml"
+  },
+  "windows_initial_expanded": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "16",
+    "tests": "144",
+    "time": "57.985",
+    "timestamp": "2026-11-19T01:21:26.828466+09:00",
+    "hostname": "희주",
+    "xml_sha256": "092eb404694b70b5bc97f2d84f5e7bc2850979239edd37464c4e4ee0ec762bfb",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\native-admission-windows-after-20261119.xml"
+  },
+  "linux_initial_expanded": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "207",
+    "time": "82.678",
+    "timestamp": "2026-11-19T01:21:54.667457+09:00",
+    "hostname": "localhost",
+    "xml_sha256": "ea4924be59afd03525a22b69e719aed19a1f0a3fa1df05c4792061bb22a83cca",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\native-admission-linux-after-20261119.xml"
+  },
+  "windows_latest_focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "59",
+    "time": "23.788",
+    "timestamp": "2026-11-19T01:23:47.476802+09:00",
+    "hostname": "희주",
+    "xml_sha256": "bbc455c896c3ea0bd49639eab535cddd8110b5e508b687f5c87fd45e83661c6c",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\native-admission-windows-final-20261119.xml"
+  },
+  "linux_latest_expanded": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "208",
+    "time": "72.855",
+    "timestamp": "2026-11-19T01:23:50.099101+09:00",
+    "hostname": "localhost",
+    "xml_sha256": "024b165209633caed0448bc47e9a148779d019171cf342bc8dec723c52bb18d7",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\native-admission-linux-final-20261119.xml"
+  },
+  "native_source_run_sha256": "c32ec9503a9dd35974b11c9487db3e88c7d4b033f33d626a74afba9a6096f660",
+  "source_files": [
+    {
+      "path": "app/main.py",
+      "sha256": "2d4700c0d28f95b160b3a115ad4e0bb51b177ade7807c830973d36397324101b"
+    },
+    {
+      "path": "tests/test_native_analysis_http.py",
+      "sha256": "8daded347badba2914552fe58365b156b354459e8099d93b0774e113400d7d3c"
+    },
+    {
+      "path": "tests/test_async_audit_io.py",
+      "sha256": "5a95ebab2f8c3472b18a651b8bf195f74cb263f1451d424627c3c3e4020097dc"
+    }
+  ]
+}

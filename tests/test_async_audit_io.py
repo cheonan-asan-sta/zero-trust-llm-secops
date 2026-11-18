@@ -27,6 +27,20 @@ def setup_analysis(tmp_path, monkeypatch):
     return store, event, provider, capacity, actor
 
 
+def test_reconfiguration_releases_original_capacity_not_new_semaphore(tmp_path, monkeypatch):
+    store, event, provider, original, actor = setup_analysis(tmp_path, monkeypatch)
+    replacement = asyncio.Semaphore(0)
+
+    async def infer(_):
+        monkeypatch.setattr(main, "analysis_capacity", replacement)
+        return RuleBasedAnalyzer().assess(event)
+
+    provider.analyze.side_effect = infer
+    asyncio.run(main._analyze_event(event, provider, actor, "capacity-reconfiguration"))
+    assert original._value == 1 and replacement._value == 0
+    assert store.metrics().total_analyses == 1
+
+
 def test_asgi_request_cancellations_keep_bounded_preflight_and_allow_recovery(
     tmp_path, monkeypatch
 ):

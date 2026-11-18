@@ -5,6 +5,8 @@ All provider calls below are explicit local stubs. No real API or AWS is used.
 
 import asyncio
 import hashlib
+import threading
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock
@@ -98,6 +100,85 @@ def test_http_response_and_reloaded_audit_bind_exact_evidence_and_request(api):
     assert api.client.get(f"/results/{payload['event_id']}", headers=api.headers).json() == payload
     assert api.provider.analyze_with_evidence.await_count == 1
     assert journal_state(api.lab) == before and len(api.launches) == 1
+
+
+def test_saturated_native_request_does_not_start_source_collection(api, monkeypatch):
+    resolve = Mock(wraps=api.registry.resolve)
+    monkeypatch.setattr(api.registry, "resolve", resolve)
+    monkeypatch.setattr(main, "analysis_capacity", asyncio.Semaphore(0))
+    assert api.post().status_code == 429
+    resolve.assert_not_called()
+    api.provider.analyze_with_evidence.assert_not_awaited()
+    assert api.audit.metrics().total_analyses == 0
+
+
+def test_serving_store_swap_during_source_check_stops_before_provider(api, monkeypatch):
+    original = api.registry.resolve
+
+    def resolve(*args, **kwargs):
+        signal, context = original(*args, **kwargs)
+
+        def changed_during_check():
+            context.verify_current()
+            monkeypatch.setattr(main, "native_analysis_registry", object())
+
+        return signal, replace(context, verify_current=changed_during_check)
+
+    monkeypatch.setattr(api.registry, "resolve", resolve)
+    assert api.post().status_code == 502
+    api.provider.analyze_with_evidence.assert_not_awaited()
+    assert api.audit.metrics().total_analyses == 0
+
+
+def test_cancelled_native_collection_keeps_capacity_and_event_loop_responsive(api, monkeypatch):
+    import httpx
+
+    capacity = asyncio.Semaphore(1)
+    monkeypatch.setattr(main, "analysis_capacity", capacity)
+    entered, release = threading.Event(), threading.Event()
+    original = api.registry.resolve
+    calls = 0
+
+    def blocked(*args, **kwargs):
+        nonlocal calls
+        calls += 1
+        entered.set()
+        assert release.wait(3)
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(api.registry, "resolve", blocked)
+
+    async def run():
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=main.app), base_url="http://testserver"
+        ) as client:
+
+            async def post():
+                return await client.post(
+                    "/analysis/native-service", json={"execution_ref": api.ref}, headers=api.headers
+                )
+
+            task = asyncio.create_task(post())
+            try:
+                assert await asyncio.to_thread(entered.wait, 2)
+                assert not task.done()
+                assert (await client.get("/health/live")).status_code == 200
+                task.cancel()
+                await asyncio.sleep(0)
+                assert not task.done() and capacity._value == 0
+                assert (await post()).status_code == 429
+                assert calls == 1
+            finally:
+                release.set()
+                results = await asyncio.gather(task, return_exceptions=True)
+            assert isinstance(results[0], asyncio.CancelledError)
+            assert capacity._value == 1
+            api.provider.analyze_with_evidence.assert_not_awaited()
+            assert api.audit.metrics().total_analyses == 0
+            assert (await post()).status_code == 200
+            assert calls == 2 and api.provider.analyze_with_evidence.await_count == 1
+
+    asyncio.run(run())
 
 
 @pytest.mark.parametrize(
@@ -299,7 +380,9 @@ def test_queue_withdrawal_is_rechecked_before_model_call(api, monkeypatch):
 
     gate = SimpleNamespace(acquire=acquire, release=Mock())
     monkeypatch.setattr(main, "analysis_capacity", gate)
-    assert api.post().status_code == 502
+    # Admission now precedes lookup: withdrawal while queued is a missing ref,
+    # rather than a previously resolved context invalidated during inference.
+    assert api.post().status_code == 404
     api.provider.analyze_with_evidence.assert_not_called()
     gate.release.assert_called_once()
     assert not api.audit._path.exists()
@@ -344,9 +427,17 @@ def test_loopback_native_sqlite_backup_restore_and_candidate_review(api, tmp_pat
 
     passed = []
     args = api.args
-    result = run(api.lab, args["request"], SimpleNamespace(session_id=args["signal"].session_id),
-                 args["receipt"], args["event"], args["proofs"], tmp_path, passed.append,
-                 audit_recovery=True)
+    result = run(
+        api.lab,
+        args["request"],
+        SimpleNamespace(session_id=args["signal"].session_id),
+        args["receipt"],
+        args["event"],
+        args["proofs"],
+        tmp_path,
+        passed.append,
+        audit_recovery=True,
+    )
     assert result["audit_writer_scope"] == "shared_sqlite_transaction"
     assert result["provider_stub_invocations"] == 1 and len(passed) == 15
     recovery = result["audit_recovery"]
