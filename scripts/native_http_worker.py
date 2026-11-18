@@ -40,8 +40,17 @@ def main():
         "api_key_sha256",
         "subject",
         "tenant_id",
+        "cursor_key_path",
+        "cursor_key_pin",
     }:
         raise ValueError("worker control fields rejected")
+    if (data["cursor_key_path"] is None) != (data["cursor_key_pin"] is None):
+        raise ValueError("worker cursor key configuration rejected")
+    for name in ("AUDIT_CURSOR_KEY_PATH", "AUDIT_CURSOR_KEY_SHA256"):
+        os.environ.pop(name, None)
+    if data["cursor_key_path"] is not None:
+        os.environ["AUDIT_CURSOR_KEY_PATH"] = data["cursor_key_path"]
+        os.environ["AUDIT_CURSOR_KEY_SHA256"] = data["cursor_key_pin"]
     os.environ.update(
         {
             "APP_ENVIRONMENT": "test",

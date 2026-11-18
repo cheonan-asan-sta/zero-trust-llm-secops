@@ -12,7 +12,7 @@ from test_audit_query_admission import api as api  # noqa: PLC0414
 from app import main, security
 from app.config import Settings
 from app.services.audit import DynamoDBAuditStore
-from app.services.audit_paging import AuditPager
+from app.services.audit_paging import AuditPager, create_audit_pager
 
 
 def test_authenticated_paged_collection_is_not_cacheable(api):
@@ -144,3 +144,26 @@ def test_legacy_literal_event_id_page_remains_readable(api):
     response = api.client.get(f"/results/{event_id}", headers=api.headers)
     assert response.status_code == 200
     assert response.json().get("event_id") == event_id and "items" not in response.json()
+
+
+def test_cursor_key_withdrawal_is_visible_in_readiness_without_disabling_liveness(
+    api, tmp_path, monkeypatch
+):
+    path = tmp_path / "cursor.key"
+    key = b"local-readiness-fixture-key-00000"[:32]
+    path.write_bytes(key)
+    path.chmod(0o600)
+    config = Settings(
+        _env_file=None,
+        audit_cursor_key_path=path,
+        audit_cursor_key_sha256=hashlib.sha256(key).hexdigest(),
+    )
+    monkeypatch.setattr(main, "audit_pager", create_audit_pager(config))
+    before = api.client.get("/health/ready")
+    assert before.json().get("audit_paging", {}).get("ok") is True
+    path.write_bytes(b"invalid-replacement-fixture-00000"[:32])
+    after = api.client.get("/health/ready")
+    assert after.status_code == 503 and after.json()["audit_paging"]["ok"] is False
+    assert "cursor.key" not in after.text and config.audit_cursor_key_sha256 not in after.text
+    assert api.client.get("/audit/results", headers=api.headers).status_code == 503
+    assert api.client.get("/health/live").status_code == 200

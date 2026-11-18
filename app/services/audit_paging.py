@@ -169,12 +169,21 @@ def _jsonl_view(store):
 
 
 class AuditPager:
-    def __init__(self, key_reader=None, *, clock=None):
+    def __init__(self, key_reader=None, *, clock=None, key_mode=None):
+        self._key_mode = key_mode or ("process_local" if key_reader is None else "supplied")
         if key_reader is None:
             ephemeral = secrets.token_bytes(32)
             key_reader = lambda: ephemeral
         self._key_reader = key_reader
         self._clock = clock or time.time
+
+    def readiness(self):
+        try:
+            self._master()
+            ok = True
+        except AuditQueryUnavailable:
+            ok = False
+        return {"ok": ok, "cursor_key_mode": self._key_mode, "cursor_ttl_seconds": TTL_SECONDS}
 
     def _master(self):
         try:
@@ -341,4 +350,4 @@ def create_audit_pager(settings):
         return AuditPager()
     reader = lambda: read_key(path, pin)
     reader()  # A bad configured key must fail startup, never silently use a new key.
-    return AuditPager(reader)
+    return AuditPager(reader, key_mode="pinned_file")

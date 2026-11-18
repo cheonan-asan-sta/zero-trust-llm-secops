@@ -182,7 +182,8 @@ def setup_app(directory, unit, *, executable_sha256="a" * 64, command_sha256="b"
 def run(directory, *, retention=False, outbox_recovery=False, intent_recovery=False,
         recovery_observability=False, coherent_backup=False, bundle_observability=False,
         llm_evidence=False, http_analysis=False, shared_analysis=False, audit_recovery=False,
-        worker_restart=False):
+        worker_restart=False, worker_paging=False):
+    worker_restart = worker_restart or worker_paging
     audit_recovery = audit_recovery or worker_restart
     shared_analysis = shared_analysis or audit_recovery
     http_analysis = http_analysis or shared_analysis
@@ -230,6 +231,7 @@ def run(directory, *, retention=False, outbox_recovery=False, intent_recovery=Fa
         "shared_native_analysis_tested": shared_analysis,
         "native_transactional_audit_recovery_tested": audit_recovery,
         "http_worker_process_restart_tested": worker_restart,
+        "http_cursor_worker_restart_tested": worker_paging,
         "cases": [],
     }
 
@@ -344,6 +346,7 @@ StandardError=journal
 
                 report["worker_restart"] = run_workers(
                     lab, request, access, receipt, event, proofs, shared_config, private, passed,
+                    paging=worker_paging,
                 )
             report["http_analysis"] = run_http(
                 lab, request, access, receipt, event, proofs, private, passed,
@@ -462,13 +465,14 @@ def main():
     parser.add_argument("--shared-analysis", action="store_true")
     parser.add_argument("--audit-recovery", action="store_true")
     parser.add_argument("--worker-restart", action="store_true")
+    parser.add_argument("--worker-paging", action="store_true")
     args = parser.parse_args()
     result = run(args.directory, retention=args.retention, outbox_recovery=args.outbox_recovery,
                  intent_recovery=args.intent_recovery,recovery_observability=args.recovery_observability,
                  coherent_backup=args.coherent_backup,bundle_observability=args.bundle_observability,
                  llm_evidence=args.llm_evidence,http_analysis=args.http_analysis,
                  shared_analysis=args.shared_analysis,audit_recovery=args.audit_recovery,
-                 worker_restart=args.worker_restart)
+                 worker_restart=args.worker_restart,worker_paging=args.worker_paging)
     print(json.dumps({"completed": result["completed"], "cases": len(result["cases"])}))
 
 

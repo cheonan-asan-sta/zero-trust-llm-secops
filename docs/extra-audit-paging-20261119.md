@@ -54,12 +54,12 @@ AUDIT_CURSOR_KEY_SHA256=<파일의 소문자 SHA-256>
 
 최근100건을 넘는125개 기록의 중복 없는 순회·오래된 필터 일치·세 backend의 tenant 격리·다른 tenant 정상 추가·자기 view 변경·SQLite 역사적 검토 상태·prefix 교체·anchor 이후 다른 tenant의 chain 변조를 확인한다. 커서 변조/크기/scope/만료·키 철회·기존 event_id 주소·실제 HTTP 인증/취소/503·실제 별도 reader 프로세스의 고정 키 재개도 시험한다. 초기 HTTP 헤더 중복과 테스트 실행기의 tuple 인자 문제는 수정한 뒤 재검증했다.
 
-신규61개 통과/적용 대상이 아닌2개 제외를 포함해 **Windows 관련165건 통과·2건 제외, Linux 확대275건 통과·2건 제외**. 제외2개는 SQLite에 적용하지 않는 JSONL view 변경 사례다. 최신 XML/소스 지문은 [검증 기록](infrastructure-results/extra-audit-paging-20261119.json)에 기록한다. OS별 중복 사례를 독립 수로 합산하지 않는다. 이번 단계는 새 native systemd 전체 인수를 실행하지 않았고 이전41조건 결과와 구분한다.
+페이지 기능 첫 검증은 신규61개 통과/적용 대상이 아닌2개 제외를 포함해 **Windows 관련165건 통과·2건 제외, Linux 확대275건 통과·2건 제외**다. 제외2개는 SQLite에 적용하지 않는 JSONL view 변경 사례다. 해당 시점의 XML/소스 지문은 [검증 기록](infrastructure-results/extra-audit-paging-20261119.json)에 남긴다. OS별 중복 사례를 독립 수로 합산하지 않는다. 이후 HTTP worker cursor 재개와 현재 key readiness를 추가 검증했다([최신47조건 인수](extra-http-cursor-recovery-20261119.md)).
 
 ```sh
 python -m pytest tests/test_audit_paging.py tests/test_audit_paging_http.py tests/test_audit_query_admission.py tests/test_compact_audit_integrity.py tests/test_sqlite_audit.py tests/test_federated_audit.py -q
 ```
 
-실제 HTTP worker 강제 종료 뒤 **HTTP 커서** 재개는 다음 인수 범위다. 이번 별도 프로세스 재개는 direct reader 호출이며 HTTP worker 재기동과 혼동하지 않는다. JSONL 전역 transaction·전원 단절·다중 호스트·원격 WORM·독립 rollback 방지와 연기한8시간 시험은 미완료다. 새 페이지도 전체 검증을 하므로 HTTP 처리량/최악 메모리 상한을 새로 입증한 것은 아니다.
+첫 별도 프로세스 재개는 direct reader 호출이었다. 후속에서 실제 HTTP worker3개를 강제 종료·재기동해 같은 cursor를 TCP HTTP로 이어 읽고 현재 key 오류가 readiness에도 나타나는 것을 확인했다([재현과 범위](extra-http-cursor-recovery-20261119.md)). JSONL 전역 transaction·전원 단절·다중 호스트·원격 WORM·독립 rollback 방지와 연기한8시간 시험은 미완료다. 새 페이지도 전체 검증을 하므로 HTTP 처리량/최악 메모리 상한을 새로 입증한 것은 아니다.
 
 모델/프롬프트/탐지 판정·평가 원본·정답·예측은 바꾸지 않았고 새 F1/오탐·미탐 평가는 없다.

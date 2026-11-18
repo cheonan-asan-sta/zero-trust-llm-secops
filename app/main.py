@@ -309,6 +309,7 @@ def _readiness_snapshot() -> Response:
         else {"ok": True, "enabled": False}
     )
     integrity = audit_store.integrity()
+    audit_paging_integrity = audit_pager.readiness()
     case_integrity = case_store.integrity()
     outbox_integrity = integration_outbox_store.integrity()
     assurance = assurance_registry.summary()
@@ -324,6 +325,7 @@ def _readiness_snapshot() -> Response:
     )
     ready = (
         integrity["ok"]
+        and audit_paging_integrity["ok"]
         and zero_trust_integrity["ok"]
         and inbox_integrity["ok"]
         and context_integrity["ok"]
@@ -342,6 +344,7 @@ def _readiness_snapshot() -> Response:
         "signal_inbox": inbox_integrity,
         "behavior_context": context_integrity,
         "audit": integrity,
+        "audit_paging": audit_paging_integrity,
         "case_management": {
             **case_integrity,
             "valid": case_integrity["ok"],
