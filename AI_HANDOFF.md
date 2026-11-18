@@ -1,3 +1,5 @@
+> 2026-11-19 runtime checkpoint: SQLite 선택형 path/pin·기존 DB만 RO 시작·매 scan 전후 전체 체인/최소 prefix 확인·commit 전 철회 rollback·복사 snapshot backup에도 유지. 신규26건 포함 Win256/skip3·Linux257/skip2·실제 systemd/HTTP3worker53조건 통과. 정상 구 DB/변조 checkpoint 거부·정확한 상태 복구·유료API/AWS/push/CI/병합0·새 F1 없음·분석 중 변화/backup 게시 경계 후속·목표 active. [설정·검증·한계](docs/extra-runtime-audit-checkpoint-20261119.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-19 checkpoint 단조 갱신: checkpoint-advance 이전 file/pin 필수·동일 read transaction의 prefix 확인·정상 구 DB/다른 chain 거부. readonly checkpoint-status4상태/unsafe exit3. 신규16건 포함Win147/skip1·Linux231/skip2·실제 systemd51조건 통과. source/권한 불변·유료API/AWS/push/CI/병합0·새 F1 없음·선택형 runtime checkpoint guard 후속·목표 active. [명령·시험·한계](docs/extra-audit-checkpoint-progression-20261119.md). 아래는 이전 시점 기록이다.
 
 > 2026-11-19 checkpoint 보관: readonly head/private JSON export·외부 SHA pin load·backup/restore 최소 prefix 연결. 오래된 정상/다른 체인 거부·새 후보만 생성·최신 live/독립보관은 false 명시. 신규32건 포함Win141/skip1·Linux225/skip2·최신 systemd49조건 통과. source/권한 불변·유료API/AWS/push/CI/병합0·새 F1 없음·단조 checkpoint 갱신/상태비교 후속·목표 active. [절차·시험·한계](docs/extra-audit-checkpoint-20261119.md). 아래는 이전 시점 기록이다.

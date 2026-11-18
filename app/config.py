@@ -44,6 +44,8 @@ class Settings(BaseSettings):
     signal_inbox_retry_seconds: float = Field(default=1, gt=0, le=60)
     audit_backend: Literal["jsonl", "dynamodb", "sqlite"] = "jsonl"
     audit_db_path: Path | None = None
+    audit_checkpoint_path: Path | None = None
+    audit_checkpoint_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
     dynamodb_table_name: str = "zero-trust-llm-secops-audit"
     aws_region: str = "ap-northeast-2"
     auth_mode: Literal["disabled", "api_key", "oidc"] = "disabled"
@@ -90,6 +92,10 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_enterprise_security(self) -> "Settings":
+        if (self.audit_checkpoint_path is None) != (self.audit_checkpoint_sha256 is None):
+            raise ValueError("audit checkpoint requires both path and SHA-256 pin")
+        if self.audit_checkpoint_path is not None and self.audit_backend != "sqlite":
+            raise ValueError("runtime audit checkpoint requires sqlite backend")
         if (self.audit_cursor_key_path is None) != (self.audit_cursor_key_sha256 is None):
             raise ValueError("audit cursors require both private key path and SHA-256 pin")
         if (self.native_analysis_shared_config_path is None) != (

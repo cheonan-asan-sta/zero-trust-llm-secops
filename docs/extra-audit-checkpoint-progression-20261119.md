@@ -50,4 +50,4 @@ python -m pytest tests/test_audit_checkpoint_progression.py tests/test_audit_che
 python -m scripts.run_exec_history_controls --directory <새_결과_폴더> --worker-paging
 ```
 
-다음은 선택적으로 설정한 checkpoint를 실행 중인 감사 저장소의 무결성/읽기/쓰기에 연결하는 guard다. 아직 이 명령이 앱 설정을 바꾸거나 자동으로 최신 pin을 승격하지 않는다. 원격 WORM·독립 보관·전원 단절/다중 호스트·연기한8시간 시험은 미완료다. 모델·판정·평가 원본·정답·예측·F1·오탐/미탐을 변경하지 않았다.
+후속 [실행 중 checkpoint guard](extra-runtime-audit-checkpoint-20261119.md)는 별도 선택형 설정으로 연결했다. 이 명령 자체가 앱 설정을 바꾸거나 자동으로 최신 pin을 승격하지는 않는다. 위 51조건은 이 문서 시점의 이력이며 최신 인수 수는 후속 문서를 본다. 원격 WORM·독립 보관·전원 단절/다중 호스트·연기한8시간 시험은 미완료다. 모델·판정·평가 원본·정답·예측·F1·오탐/미탐을 변경하지 않았다.

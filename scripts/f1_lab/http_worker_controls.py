@@ -13,6 +13,7 @@ from pathlib import Path
 import httpx
 
 from app.config import Settings
+from app.services.audit_checkpoint import capture_checkpoint
 from app.services.sqlite_audit import SQLiteAuditStore
 from scripts.f1_lab.native_jsonl import require
 from scripts.f1_lab.service_analysis_evidence import publish_service_analysis
@@ -21,7 +22,16 @@ from scripts.local_process_runtime import direct_python
 
 
 @contextmanager
-def owned_worker(lab, shared_config, audit_path, directory, api_key, *, cursor_config=None):
+def owned_worker(
+    lab,
+    shared_config,
+    audit_path,
+    directory,
+    api_key,
+    *,
+    cursor_config=None,
+    checkpoint_config=None,
+):
     directory = Path(directory).absolute()
     directory.mkdir(parents=True, exist_ok=True, mode=0o700)
     require(
@@ -45,6 +55,10 @@ def owned_worker(lab, shared_config, audit_path, directory, api_key, *, cursor_c
         "tenant_id": lab.principal.tenant_id,
         "cursor_key_path": str(Path(cursor_config[0]).absolute()) if cursor_config else None,
         "cursor_key_pin": cursor_config[1] if cursor_config else None,
+        "checkpoint_path": str(Path(checkpoint_config[0]).absolute())
+        if checkpoint_config
+        else None,
+        "checkpoint_pin": checkpoint_config[1] if checkpoint_config else None,
     }
     control.write_text(json.dumps(value), encoding="utf-8")
     app_settings = {name.upper() for name in Settings.model_fields}
@@ -263,6 +277,7 @@ def _run(
             page_response = client.get("/audit/results", headers=headers, params=query)
             require(page_response.status_code == 200, "owned_http_cursor_first_page")
             page = page_response.json()
+            previous_audit_bytes = audit_path.read_bytes()
             require(
                 page["total_matches"] == 2
                 and page["next_cursor"] is not None
@@ -294,6 +309,7 @@ def _run(
             payload,
             {first_pid, second.pid},
             cursor_config,
+            previous_audit_bytes,
             passed,
         )
     require(
@@ -336,10 +352,19 @@ def _resume_page(
     payload,
     previous_pids,
     cursor_config,
+    previous_audit_bytes,
     passed,
 ):
+    checkpoint_path = directory / "worker-minimum-checkpoint.json"
+    checkpoint_receipt = capture_checkpoint(audit_path, checkpoint_path)
     with owned_worker(
-        lab, shared_config, audit_path, directory / "worker-3", api_key, cursor_config=cursor_config
+        lab,
+        shared_config,
+        audit_path,
+        directory / "worker-3",
+        api_key,
+        cursor_config=cursor_config,
+        checkpoint_config=(checkpoint_path, checkpoint_receipt["checkpoint_sha256"]),
     ) as (third, client, stats):
         require(third.pid not in previous_pids, "owned_cursor_recovery_new_process")
         resumed = client.get(
@@ -384,6 +409,50 @@ def _resume_page(
         passed("http_cursor_current_view_reflects_post_snapshot_review")
         ready = client.get("/health/ready")
         require(ready.json()["audit_paging"]["ok"] is True, "owned_cursor_key_ready")
+        require(
+            ready.json()["audit"]["checkpoint_guard"]["minimum_head_verified"] is True,
+            "owned_runtime_checkpoint_ready",
+        )
+        current_audit_bytes = audit_path.read_bytes()
+        try:
+            audit_path.write_bytes(previous_audit_bytes)
+            require(
+                SQLiteAuditStore.open_existing(audit_path).integrity()["ok"], "owned_valid_old_db"
+            )
+            old_page = client.get(
+                "/audit/results",
+                headers=headers,
+                params={"review_status": "PENDING", "cursor": page["next_cursor"]},
+            )
+            old_ready = client.get("/health/ready")
+            require(
+                old_page.status_code == 503
+                and old_ready.status_code == 503
+                and old_ready.json()["audit"]["checkpoint_guard"]["minimum_head_verified"] is False
+                and client.get("/health/live").status_code == 200,
+                "owned_runtime_checkpoint_blocks_valid_rollback",
+            )
+        finally:
+            audit_path.write_bytes(current_audit_bytes)
+        passed("http_runtime_checkpoint_rejects_valid_old_db_even_for_matching_historical_cursor")
+        checkpoint_bytes = checkpoint_path.read_bytes()
+        try:
+            checkpoint_path.write_bytes(checkpoint_bytes + b" ")
+            changed = client.get("/results", headers=headers)
+            changed_ready = client.get("/health/ready")
+            require(
+                changed.status_code == 503
+                and changed_ready.status_code == 503
+                and changed_ready.json()["audit"]["ok"] is False,
+                "owned_runtime_checkpoint_pin_failure_blocks_reads",
+            )
+        finally:
+            checkpoint_path.write_bytes(checkpoint_bytes)
+        require(
+            client.get("/results", headers=headers).status_code == 200,
+            "owned_runtime_checkpoint_exact_state_recovery",
+        )
+        passed("http_runtime_checkpoint_pin_failure_has_no_fallback_and_exact_state_recovers")
         cursor_config[0].write_bytes(secrets.token_bytes(32))
         blocked = client.get(
             "/audit/results",
@@ -414,4 +483,7 @@ def _resume_page(
         "provider_stub_calls_third": 0,
         "original_scope_and_expiry_preserved": True,
         "key_failure_blocks_pages_and_readiness": True,
+        "runtime_checkpoint_rejects_valid_database_rollback": True,
+        "runtime_checkpoint_pin_failure_blocks_reads": True,
+        "runtime_checkpoint_exact_state_recovery": True,
     }

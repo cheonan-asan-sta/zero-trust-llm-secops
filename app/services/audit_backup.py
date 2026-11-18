@@ -89,7 +89,8 @@ def backup_sqlite(store, destination, key, *, minimum_head=None):
         require(snapshot.stat().st_size <= MAX_DATABASE_BYTES, "backup database too large")
         checked = SQLiteAuditStore.open_existing(snapshot)
         with checked._transaction() as con:
-            seq, head = validate_head(con, checked, minimum_head)
+            # Preserve optional runtime checkpoint constraints on the copied view.
+            seq, head = validate_head(con, store, minimum_head)
         nonce = secrets.token_bytes(12)
         header = {
             "schema": "sqlite-audit-backup-1",
