@@ -1,3 +1,5 @@
+> 2026-11-19 통합 읽기 순서: [extra 개발 현황·종료된 시험·남은 범위](docs/extra-development-status-20261119.md)를 추가하고 최초 HTTP/federation/공동 writer 보고서에 후속 링크를 표시했다. 과거 시점의 미구현 문장을 현재 상태와 구분하며 SQLite 공동 writer와 JSONL 전역 원자성도 구분한다. 전체 코드 회귀는25adf8c 기준 Windows/Linux 실행 중이며 종료된 관련 묶음과 합산하지 않는다. paid/AWS/push/CI/병합0·목표 active. 아래는 이전 시점 기록이다.
+
 > 2026-11-19 Hybrid 주입 소유권: falsey adapter를 None과 구별해 추가 OpenAI 생성 금지·주입 객체 유지·외부 소유 close 금지. 수정 전2실패→신규2건 포함Windows51통과. 전체 Windows/Linux 회귀 진행 중(원본 XML 별도 보관). paid/AWS/push/CI/병합0·새 F1 없음·08:00 KST 목표 active. [검증·한계](docs/extra-hybrid-adapter-ownership-20261119.md). 아래는 이전 시점 기록이다.
 
 > 2026-11-19 cached provider: 공용 analysis admission 안에서 첫 생성 settled_io·생성 전/후 현재 caller·반복 취소 worker settle·analyzer/agent cache lookup+construction 직렬화·실패 cache 금지·취소 후 성공 객체 cache 소유·기존 검증 경로의 slot/503 계약 유지. 변경 전4실패→신규20건 포함Win732/skip20·Linux750/skip2·최신 systemd54조건 통과. SQLite process 쓰기/commit 전후 kill·checkpoint/backup 회귀 확대. paid/AWS/push/CI/병합0·새 F1 없음·08:00 KST 목표 active. [검증·한계](docs/extra-cached-provider-setup-20261119.md). 아래는 이전 시점 기록이다.

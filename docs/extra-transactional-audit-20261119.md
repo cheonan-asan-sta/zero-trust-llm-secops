@@ -1,5 +1,7 @@
 # 선택형 공동 감사 writer
 
+> 11월19일 후속: [compact 전체 체인 검증](extra-compact-audit-integrity-20261119.md), [암호화 페이지](extra-audit-paging-20261119.md), [runtime 최소 checkpoint](extra-runtime-audit-checkpoint-20261119.md), [반환 row 보존](extra-analysis-row-preservation-20261119.md)과 caller/취소 경계를 추가했다. 아래 구현과 최초 수치는 당시 기록이다. 전체 체인 검증 자체를 생략하거나 원격 최신성 증명을 추가한 것은 아니다. [현재 통합 현황](extra-development-status-20261119.md).
+
 > 후속: [기존 자료 검증 이관·암호화 백업·새 경로 복원](extra-audit-transfer-backup-20261119.md)을 추가했다. 아래는 공동 writer를 처음 구현한 단계의 결과이며 이관과 복원 경계는 후속 문서를 기준으로 한다.
 
 2026-11-19 · extra · 오전 08:00 KST까지 이어가는 로컬 개발의 다음 묶음이다. 유료 API/AWS/push/CI/병합은 수행하지 않는다.

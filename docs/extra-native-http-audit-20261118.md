@@ -1,5 +1,7 @@
 # extra 개발: 서비스 실행 근거의 HTTP 분석·감사 연결
 
+> 11월19일 현재 구현은 [통합 현황](extra-development-status-20261119.md)을 먼저 본다. 이 문서의 “통합 조회가 남아 있다”는 최초 HTTP 연결 시점 기록이다. 이후 [검증 통합 조회](extra-audit-federation-20261119.md)와 별도 [SQLite 공동 writer](extra-transactional-audit-20261119.md), 백업/복원·checkpoint·취소 경계를 추가했다.
+
 > 후속 상태: 같은 날 [암호화 공유 참조와 프로세스 재시작 검증](extra-shared-native-analysis-20261118.md)을 추가했다. 아래는 기본 메모리 모드와 `43cf3b1` 시점의 HTTP 연결 결과다. 공유 모드는 명시적 시작 설정으로 선택하며 감사 통합 조회는 아직 남아 있다.
 
 2026-11-18. [내부 실행 근거 연결](extra-native-execution-llm-20261118.md)의 후속 작업이다. 기준은 로컬 extra의 `1bcd2d9`이며 이번 변경도 extra에만 저장한다. 원격 push·CI·main/aitest 병합·AWS 배포를 수행하지 않는다. 발표 자료와 기존 성능 평가 원본은 변경하지 않는다.

@@ -1,5 +1,7 @@
 # 감사 기록 통합 조회 개발 기록
 
+> 후속 현황: [SQLite 공동 writer](extra-transactional-audit-20261119.md), [검증 이관/암호화 복원](extra-audit-transfer-backup-20261119.md), [compact scan](extra-compact-audit-integrity-20261119.md), [페이지 조회](extra-audit-paging-20261119.md)를 추가했다. 아래 남은 항목은 최초 federation 시점 기록이다. JSONL 여러 파일의 전역 원자적 스냅샷은 여전히 보장하지 않으며 공동 트랜잭션은 별도 SQLite backend다. [현재 통합 현황](extra-development-status-20261119.md).
+
 2026-11-19 오전 08:00 KST까지의 로컬 개발 목표. extra 기준이며 push/CI/병합/유료 API/AWS 실행은 하지 않는다. 8시간 연속 시험은 별도 보류 상태를 유지한다.
 
 첫 구현은 공유 native 모드에서 기존 감사 파일과 worker별 파일을 조회 시 다시 검증해 `/results`, 개별 결과, metrics에 통합하는 `FederatedAuditStore`다. 쓰기는 각 프로세스의 기존 파일을 유지한다. tenant 격리, analysis ID 중복 제거, 더 최신의 검토 이력 반영을 지원한다. 서로 다른 분석 내용이 같은 ID를 쓰거나 동일 시각 검토 이력이 충돌하면 조회를 거부한다.
