@@ -11,7 +11,7 @@ from pathlib import Path
 from app.models import AnalysisResult
 from app.services.audit import AuditStore, _summarize
 from app.services.audit_manifest import AuditManifestError, AuditShardManifest
-from app.services.audit_wire import analysis_core_wire, analysis_wire
+from app.services.audit_wire import analysis_core_equal, analysis_values_equal
 from app.services.settled_io import settled_io
 
 
@@ -88,13 +88,13 @@ class FederatedAuditStore(AuditStore):
                 for record in shard._history:
                     previous = versions.get(record.analysis_id)
                     if previous is not None:
-                        if analysis_core_wire(previous) != analysis_core_wire(record):
+                        if not analysis_core_equal(previous, record):
                             raise AuditQueryUnavailable(
                                 "conflicting analysis identity across shards"
                             )
                         left = previous.review_updated_at or previous.analyzed_at
                         right = record.review_updated_at or record.analyzed_at
-                        if left == right and analysis_wire(previous) != analysis_wire(record):
+                        if left == right and not analysis_values_equal(previous, record):
                             raise AuditQueryUnavailable("conflicting audit revisions")
                         if left >= right:
                             continue

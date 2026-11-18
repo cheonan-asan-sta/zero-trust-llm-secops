@@ -10,7 +10,7 @@ from test_sqlite_audit import initial, review
 from app.models import ReviewStatus
 from app.services.audit import _record_hash
 from app.services.federated_audit import AuditQueryUnavailable
-from app.services.sqlite_audit import SQLiteAuditStore
+from app.services.sqlite_audit import AuditReviewConflict, SQLiteAuditStore
 
 
 def later_review(original):
@@ -78,16 +78,31 @@ def test_compact_review_validation_preserves_existing_dictionary_and_numeric_equ
     store = SQLiteAuditStore(tmp_path / "audit.sqlite3")
     first = initial(1).model_copy(update={"verification_context": {"a": 1, "b": [True, "value"]}})
     asyncio.run(store.save(first))
-    # The materialized reader's model equality has always been order-insensitive
-    # and used Python numeric equality. Compact validation must preserve it.
+    # JSON numbers remain numerically equal and property order is irrelevant.
+    # Boolean/numeric substitution is separately rejected by the review tests.
     updated = later_review(first).model_copy(
         update={
-            "verification_context": {"b": [1.0, "value"], "a": 1.0},
+            "verification_context": {"b": [True, "value"], "a": 1.0},
         }
     )
     asyncio.run(store.save_review(updated, first))
     assert summaries(store)[0] == summaries(store)[1]
     assert store.integrity()["ok"] and store.get(first.event_id) == updated
+
+
+def test_compact_review_validation_rejects_nested_boolean_numeric_substitution(tmp_path):
+    store = SQLiteAuditStore(tmp_path / "audit.sqlite3")
+    first = initial(1).model_copy(update={"verification_context": {"a": 1, "b": [True, "value"]}})
+    asyncio.run(store.save(first))
+    before = store.path.read_bytes()
+    changed = later_review(first).model_copy(
+        update={
+            "verification_context": {"b": [1.0, "value"], "a": 1.0},
+        }
+    )
+    with pytest.raises(AuditReviewConflict):
+        asyncio.run(store.save_review(changed, first))
+    assert store.path.read_bytes() == before and store.integrity()["verified_lines"] == 1
 
 
 @pytest.mark.parametrize(

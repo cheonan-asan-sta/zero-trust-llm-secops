@@ -78,14 +78,38 @@ class AuditStore:
                 raise cancelled
 
     def get(self, event_id: str, tenant_id: str = "local") -> AnalysisResult | None:
-        return self._records.get((tenant_id, event_id))
+        _records, latest = self._verified_read_view()
+        return latest.get((tenant_id, event_id))
 
     def recent(self, limit: int = 20, tenant_id: str = "local") -> list[AnalysisResult]:
-        records = [record for record in self._history if record.tenant_id == tenant_id]
+        records = [
+            record for record in self._verified_read_view()[0] if record.tenant_id == tenant_id
+        ]
         return list(reversed(records[-limit:]))
 
     def metrics(self, tenant_id: str = "local") -> MetricsSummary:
-        return _summarize([record for record in self._history if record.tenant_id == tenant_id])
+        return _summarize(
+            [record for record in self._verified_read_view()[0] if record.tenant_id == tenant_id]
+        )
+
+    def _verified_read_view(self):
+        # Rebuild returned models from current disk bytes. A validated prefix
+        # alone cannot make caller-mutated cached Python objects authoritative.
+        latest = {}
+
+        def observe(record, _hashed):
+            key = (record.tenant_id, record.event_id)
+            previous = latest.get(key)
+            if (
+                previous is None
+                or previous.analysis_id == record.analysis_id
+                or record.analyzed_at >= previous.analyzed_at
+            ):
+                latest[key] = record
+
+        with self._disk_lock:
+            records, _metadata = self._check_writer_view(include_records=True, row_observer=observe)
+        return records, latest
 
     def integrity(self) -> dict[str, bool | int | str]:
         return {
@@ -123,17 +147,18 @@ class AuditStore:
             validate_review_transitions=self._local_review_history,
         )
 
-    def _check_writer_view(self):
+    def _check_writer_view(self, *, include_records=False, row_observer=None):
         from app.services.audit_paging import _jsonl_view
         from app.services.federated_audit import AuditQueryUnavailable
 
         metadata = {}
         # Ownership is byte/prefix equality, independent of cross-file review state.
-        _jsonl_view(
+        records = _jsonl_view(
             self,
             allow_legacy_prefix=True,
             metadata=metadata,
             validate_review_transitions=self._local_review_history,
+            row_observer=row_observer,
         )
         if (
             metadata["head"] != self._last_hash
@@ -142,7 +167,7 @@ class AuditStore:
             or metadata["fingerprint"] != self._prefix_hasher.hexdigest()
         ):
             raise AuditQueryUnavailable("owned audit writer differs from its loaded prefix")
-        return metadata
+        return (records, metadata) if include_records else metadata
 
     def writer_integrity(self):
         from app.services.federated_audit import AuditQueryUnavailable

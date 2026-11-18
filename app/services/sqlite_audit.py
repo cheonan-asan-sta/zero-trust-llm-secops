@@ -10,7 +10,12 @@ from pathlib import Path
 
 from app.models import AnalysisResult
 from app.services.audit import _record_hash, _summarize
-from app.services.audit_wire import MUTABLE_REVIEW, analysis_core_wire, analysis_wire  # noqa: F401
+from app.services.audit_wire import (  # noqa: F401
+    MUTABLE_REVIEW,
+    analysis_core_equal,
+    analysis_values_equal,
+    analysis_wire,
+)
 from app.services.federated_audit import AuditQueryUnavailable
 from app.services.settled_io import settled_io
 
@@ -90,7 +95,7 @@ class SQLiteAuditStore:
 
     @staticmethod
     def _review_fits(old, new):
-        if analysis_core_wire(old) != analysis_core_wire(new):
+        if not analysis_core_equal(old, new):
             return False
         return (
             new.review_status.value in TRANSITIONS.get(old.review_status.value, set())
@@ -155,13 +160,13 @@ class SQLiteAuditStore:
                 if (
                     old is None
                     or latest is None
-                    or analysis_wire(old) != analysis_wire(expected)
-                    or analysis_wire(latest) != analysis_wire(expected)
+                    or not analysis_values_equal(old, expected)
+                    or not analysis_values_equal(latest, expected)
                     or not self._review_fits(old, record)
                 ):
                     raise AuditReviewConflict("audit review changed; reload current record")
             elif old is not None:
-                if analysis_wire(old) == analysis_wire(record):
+                if analysis_values_equal(old, record):
                     return
                 raise AuditReviewConflict("review update requires expected current record")
             payload = record.model_dump_json()

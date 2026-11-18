@@ -58,3 +58,5 @@ python -m pytest tests/test_audit_review_preconditions.py tests/test_audit_revie
 ```
 
 최신 native Linux 전체·Windows 관련 확대·systemd 인수는 이 묶음 저장 후 재검증한다. 모델 prompt·판정·평가 원본/정답/예측·기존 F1/오탐/미탐은 갱신하지 않았다. 실제 기업 SSO/online revocation, 독립 witness/WORM, 다중 호스트·전원 단절·미뤄둔8시간 soak는 남아 있다.
+
+후속: [JSONL 현재 source 조회·숫자/불리언 구분](extra-jsonl-query-source-20261119.md)을 추가했다. 위 수치/예정 항목은 당시 기록이다.

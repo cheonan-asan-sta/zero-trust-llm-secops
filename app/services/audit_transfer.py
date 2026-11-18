@@ -10,7 +10,7 @@ from pathlib import Path
 
 from app.models import AnalysisResult
 from app.services.audit import _record_hash
-from app.services.audit_wire import analysis_wire
+from app.services.audit_wire import analysis_values_equal
 from app.services.sqlite_audit import SQLiteAuditStore
 
 
@@ -157,7 +157,7 @@ def migrate_jsonl(base_path, destination, expected_inventory_sha256, *, allow_le
             known, seq, previous, size = store._read(con)
             for record in records:
                 old = known.get(record.analysis_id)
-                if old is not None and analysis_wire(old) == analysis_wire(record):
+                if old is not None and analysis_values_equal(old, record):
                     continue
                 require(
                     (old is None and record.review_updated_at is None)

@@ -165,7 +165,9 @@ def test_fsync_failure_retains_uncertain_bytes_and_closes_the_writer(tmp_path, m
         asyncio.run(store.save(initial(1)))
     before = store._path.read_bytes()
     assert before and store.integrity()["ok"] is False
-    assert store.integrity()["verified_lines"] == 0 and store.metrics().total_analyses == 0
+    assert store.integrity()["verified_lines"] == 0
+    with pytest.raises(AuditQueryUnavailable):
+        store.metrics()
     with pytest.raises(RuntimeError, match="integrity"):
         asyncio.run(store.save(initial(2)))
     assert store._path.read_bytes() == before
@@ -196,7 +198,9 @@ def test_bootstrap_capacity_is_bounded_and_never_repairs(tmp_path, monkeypatch, 
             AuditStore(path, strict_reads=True)
     else:
         store = AuditStore(path)
-        assert not store.integrity()["ok"] and store.recent() == []
+        assert not store.integrity()["ok"]
+        with pytest.raises(AuditQueryUnavailable):
+            store.recent()
     assert path.read_bytes() == before
 
 
