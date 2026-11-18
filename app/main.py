@@ -113,6 +113,7 @@ from app.services.scenario_evaluator import evaluate_scenarios
 from app.services.session_analysis_evidence import VerifiedSessionContext, collect_session_evidence
 from app.services.sigma import get_sigma_engine
 from app.services.signal_inbox import SignalInbox
+from app.services.sqlite_audit import AuditReviewConflict, SQLiteAuditStore
 from app.services.trusted_signals import SignalRejected, SignalVerifier
 from app.services.zero_trust import POLICY_PATH, ZeroTrustOperations
 from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
@@ -208,6 +209,11 @@ class AnalysisCapacityExceeded(RuntimeError):
 @app.exception_handler(AuditQueryUnavailable)
 async def audit_query_unavailable(_request, _error):
     return JSONResponse(status_code=503, content={"detail": "Audit records temporarily unavailable"})
+
+
+@app.exception_handler(AuditReviewConflict)
+async def audit_review_conflict(_request, _error):
+    return JSONResponse(status_code=409, content={"detail": "Audit review changed; reload current record"})
 
 
 @lru_cache
@@ -998,7 +1004,7 @@ async def _analyze_event(
     try:
         # A known local audit failure cannot be repaired by a paid analysis.
         # This cached integrity state is not a probe of future disk availability.
-        if isinstance(audit_store, AuditStore) and audit_store.integrity().get("ok") is False:
+        if isinstance(audit_store, (AuditStore, SQLiteAuditStore)) and audit_store.integrity().get("ok") is False:
             raise RuntimeError("audit log integrity check failed; refusing new analysis")
         started = perf_counter()
         normalized = ocsf_normalizer.normalize(event)
@@ -1156,7 +1162,10 @@ async def update_review(
         review_updated_at=datetime.now(UTC),
     )
     updated = AnalysisResult.model_validate(payload)
-    await audit_store.save(updated)
+    if isinstance(audit_store, SQLiteAuditStore):
+        await audit_store.save_review(updated, record)
+    else:
+        await audit_store.save(updated)
     return updated
 
 

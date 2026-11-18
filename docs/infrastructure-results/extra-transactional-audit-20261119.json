@@ -1,0 +1,80 @@
+{
+  "date": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "merged": false,
+  "ci_started": false,
+  "linux_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "177",
+    "time": "57.238",
+    "timestamp": "2026-11-19T00:20:32.870853+09:00",
+    "hostname": "localhost",
+    "xml_sha256": "4d347d376fb42aa7279efb80b9c08062199d46326271564ea50e72993bc4617b"
+  },
+  "windows_earlier_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "46",
+    "time": "8.697",
+    "timestamp": "2026-11-19T00:19:08.503497+09:00",
+    "hostname": "희주",
+    "xml_sha256": "2708385195ec644fdd85cc6be303a0d9c9a94fffa81276f46d8209c8c6623641"
+  },
+  "windows_latest_focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "20",
+    "time": "6.960",
+    "timestamp": "2026-11-19T00:20:50.167594+09:00",
+    "hostname": "희주",
+    "xml_sha256": "1e912f2a83a0bef2d4e0c5dc9335e110fa9926e37ffa13df2fb339684b750626"
+  },
+  "real_process_writers": 4,
+  "process_kill_tested": [
+    "before_commit",
+    "after_commit"
+  ],
+  "host_reboot_or_power_loss_tested": false,
+  "default_backend_changed": false,
+  "legacy_data_automatically_migrated": false,
+  "model_quality_reevaluated": false,
+  "source_files": [
+    {
+      "path": "app/config.py",
+      "sha256": "464b268072bff35e08c776704d646455d4e9a22f27fa818a9f30549d40b05ee5"
+    },
+    {
+      "path": "app/main.py",
+      "sha256": "cf21201e769966896a010bba0740416f74f1169197f063437bc124227474ed49"
+    },
+    {
+      "path": "app/services/audit.py",
+      "sha256": "3096745e39d34aa4b2a8bfac472e33d8464eeccd389d04167b928bea820ea5b0"
+    },
+    {
+      "path": "app/services/sqlite_audit.py",
+      "sha256": "1631ac488a6973ecc2fe088e913dd78f4069c2a55c229434f1fddbdf874cecf8"
+    },
+    {
+      "path": "tests/test_sqlite_audit.py",
+      "sha256": "55e712eab6202307ad1dadbac299c1e1a4a4ecbfc9907a65aee3c96cae144c72"
+    },
+    {
+      "path": "docs/extra-transactional-audit-20261119.md",
+      "sha256": "4b8644968efb43385174f3a88d7e5264e286cde939d7170afccd3a3b978cf257"
+    },
+    {
+      "path": "AI_HANDOFF.md",
+      "sha256": "04f00c9d70253d63336a4aac76ec8ad20dfd86245a8dd7c18d02c1ae56ff5582"
+    }
+  ]
+}

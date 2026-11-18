@@ -1,3 +1,5 @@
+> 2026-11-19 오전 개발 진행: extra 선택형 SQLite 공동 감사 writer/전역 chain/head 검증·검토 CAS·HTTP409·프로세스 commit 전후 강제종료 복구 추가. Linux 관련177건·Windows 최신 집중20건 통과. 기본 backend 유지·과거 자료 자동 이관 없음·유료API/AWS/push/CI/병합 없음. 오전08:00 목표 active. [구현과 검증](docs/extra-transactional-audit-20261119.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-18 extra 공유 참조 후속: 선택적 AES-256-GCM/로컬 SQLite 참조 저장소와 고정 설정 bootstrap 추가. 원래 만료 내 새 reader 프로세스 재검증·다른 프로세스의 철회 지속·source ledger 초기화부터 읽기 전용. 공유 모드 JSONL은 worker별 파일이며 통합 조회는 다음 작업. Linux744건(신규43건 포함)·Windows102/skip1·실제 systemd/독립 reader/TCP HTTP29조건 통과. 유료API/AWS0·F1 새 평가 없음·push/CI/병합 없음. [구현·설정·검증·남은 범위](docs/extra-shared-native-analysis-20261118.md). 아래는 이전 시점 기록이다.
 
 > 2026-11-18 extra HTTP 후속: 서버가 검증·등록한 실행 참조로 POST /analysis/native-service 분석과 기존 해시 체인 감사를 연결. 동일 호출자/tenant, 모델 전후·감사 저장 후 재검증, 소비된 grant 재발급 방지. Linux698건(신규60건 포함)·Windows신규60건·실제 systemd+TCP HTTP24조건 통과. 유료/API AWS0·새 F1 측정 없음·push/CI/병합 없음. 참조는 프로세스 메모리이며 재시작/다른 worker에서는 소멸. [구현·검증·운영 한계](docs/extra-native-http-audit-20261118.md). 아래는 이전 시점 기록이다.

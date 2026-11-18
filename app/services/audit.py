@@ -238,6 +238,13 @@ class DynamoDBAuditStore:
 
 
 def create_audit_store(settings: Settings) -> AuditRepository:
+    if settings.audit_backend == "sqlite":
+        from app.services.sqlite_audit import SQLiteAuditStore
+
+        path = settings.audit_db_path or settings.audit_log_path.with_suffix(".sqlite3")
+        if path.resolve() in {settings.zero_trust_db_path.resolve(), settings.audit_log_path.resolve()}:
+            raise ValueError("audit database must be separate from policy and JSONL sources")
+        return SQLiteAuditStore(path)
     if settings.audit_backend == "dynamodb":
         return DynamoDBAuditStore(settings.dynamodb_table_name, settings.aws_region)
     path = settings.audit_log_path

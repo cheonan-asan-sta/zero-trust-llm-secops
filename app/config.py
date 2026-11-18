@@ -42,7 +42,8 @@ class Settings(BaseSettings):
     signal_inbox_max_attempts: int = Field(default=3, ge=1, le=20)
     signal_inbox_lease_seconds: float = Field(default=30, gt=0, le=3600)
     signal_inbox_retry_seconds: float = Field(default=1, gt=0, le=60)
-    audit_backend: Literal["jsonl", "dynamodb"] = "jsonl"
+    audit_backend: Literal["jsonl", "dynamodb", "sqlite"] = "jsonl"
+    audit_db_path: Path | None = None
     dynamodb_table_name: str = "zero-trust-llm-secops-audit"
     aws_region: str = "ap-northeast-2"
     auth_mode: Literal["disabled", "api_key", "oidc"] = "disabled"
