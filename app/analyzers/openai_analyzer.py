@@ -68,9 +68,7 @@ class OpenAIAnalyzer:
         output_limit = self._max_output_tokens
         for attempt in range(self._incomplete_retries + 1):
             if context:
-                if context.verify_current:
-                    context.verify_current()
-                context.for_event(event)
+                await context.revalidate(event)
             try:
                 return await self._request_assessment(event, context, output_limit)
             except StructuredResponseFailure as error:

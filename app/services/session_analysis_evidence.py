@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 
 from app.models import SecurityEvent
 from app.security import Principal, Role
+from app.services.settled_io import settled_io
 from app.services.trusted_signals import SignalRejected
 from app.zero_trust_models import SignedSessionSignal
 
@@ -46,6 +47,12 @@ class VerifiedSessionContext:
         if now >= self.expires_at or event_digest(event) != self.event_digest_sha256:
             raise SignalRejected("analysis evidence expired or event binding changed")
         return json.loads(self.facts_json)
+
+    async def revalidate(self, event: SecurityEvent) -> dict:
+        """Settle live source I/O, then check binding/expiry at the current time."""
+        if self.verify_current is not None:
+            await settled_io(self.verify_current)
+        return self.for_event(event)
 
 
 def collect_session_evidence(

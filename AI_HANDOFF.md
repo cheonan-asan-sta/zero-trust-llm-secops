@@ -1,3 +1,5 @@
+> 2026-11-19 SDK 근거 I/O: context.revalidate로 source callback 완료/실패까지 취소 대기·현재 expiry/binding 확인. adapter 최초/재시도·agent 반복/최종·서버 이력 읽기를 보강. 신규8건·Win225/skip15·Linux285·최신 실제 systemd/worker/감사 복원41조건 통과. 유료API/AWS/push/CI/병합0·새 F1 평가 없음·초기 session/agent route 진입 제한과 SDK 자동 재시도 경계 후속·목표 active. [결과·한계](docs/extra-async-evidence-io-20261119.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-19 native 진입 제한: 실행 근거 resolve 전 슬롯 획득·취소 중 source I/O 완료까지 유지·route 검증 offload·source 확인 전후 serving store 동일성 확인. Win최신59건·Linux208건·최신 실제 systemd/HTTP worker 종료 재기동/감사 복원41조건 통과. 대기 중 철회는 조회404·모델0. SDK 내부 동기 callback은 후속 범위·유료API/AWS/push/CI/병합0·목표 active. [구현·검증·한계](docs/extra-native-admission-20261119.md). 아래는 이전 시점 기록이다.
 
 > 2026-11-19 감사 I/O 취소 후속: 동기 무결성 조회의 event loop 정지와 취소 시 조기 슬롯 반환을 재현(변경 전3실패). 시작한 디스크 작업 완료까지 슬롯 유지·SQLite writer/연합 등록 보호. 신규6건·Linux205건·Windows142/skip1 통과. ASGI task 취소이며 TCP단절은 미검증·새 F1 평가 없음·유료API/AWS/push/CI/병합0·오전08:00 목표 active. [구현·결과·한계](docs/extra-async-audit-io-20261119.md). 아래는 이전 시점 기록이다.

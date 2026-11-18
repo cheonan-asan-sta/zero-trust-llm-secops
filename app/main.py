@@ -817,7 +817,7 @@ async def analyze_verified_session(
             result = await analyzer.analyze_with_evidence(event, context)
             # Source/key withdrawal, policy changes or revocation during a paid call
             # must not publish a result as if the original snapshot were still current.
-            context.verify_current()
+            await context.revalidate(event)
             return result
 
     try:
@@ -893,9 +893,9 @@ async def _analyze_native_service_in_slot(
 
         async def analyze(self, event):
             # Queueing and inference can outlive or withdraw any supporting authority.
-            await settled_io(context.verify_current)
+            await context.revalidate(event)
             result = await analyzer.analyze_with_evidence(event, context)
-            await settled_io(context.verify_current)
+            await context.revalidate(event)
             return result
 
     try:
@@ -982,7 +982,7 @@ async def analyze_evidence_review(
                     RuleBasedAnalyzer().assess(event), assessment
                 )
                 self.trace["rule_baseline_preserved"] = True
-            context.verify_current()
+            await context.revalidate(event)
             return assessment
 
     bound = BoundAgent()
@@ -1090,9 +1090,7 @@ async def _analyze_event_in_slot(
     if selected_context is not None:
         # Audit completion may have awaited another writer. Recheck before
         # delivery, retaining any committed historical record on rejection.
-        if selected_context.verify_current is not None:
-            await settled_io(selected_context.verify_current)
-        selected_context.for_event(event)
+        await selected_context.revalidate(event)
     return result
 
 
