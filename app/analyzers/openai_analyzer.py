@@ -92,8 +92,11 @@ class OpenAIAnalyzer:
     async def _request_assessment(
         self, event: SecurityEvent, context: VerifiedSessionContext | None, output_limit: int
     ) -> SecurityAssessment:
+        # SDK transport retries cannot revalidate live evidence between attempts.
+        # Keep their policy invocation-local; ordinary calls retain their settings.
+        client = self._client.with_options(max_retries=0) if context is not None else self._client
         response, _ = await parse_structured_response(
-            self._client,
+            client,
             model=self._model,
             store=False,
             reasoning={"effort": self._reasoning_effort},
