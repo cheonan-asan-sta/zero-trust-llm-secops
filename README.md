@@ -575,6 +575,7 @@ HYBRID_LLM_TIMEOUT_SECONDS=2.5
 | POST | `/response/preview` | 실제 조치 없는 대응 미리보기 |
 | GET | `/metrics` | 누적 분석 현황 요약 |
 | GET | `/results?limit=20` | 최근 분석 결과 목록 |
+| GET | `/audit/results?limit=20` | 검증된 로컬 감사 페이지·tenant 필터·암호화 커서 ([동작·설정·한계](docs/extra-audit-paging-20261119.md)) |
 | GET | `/results/{event_id}` | 최근 분석 결과 조회 |
 | GET | `/internal/metrics` | 관리자 전용 Prometheus 메트릭 |
 

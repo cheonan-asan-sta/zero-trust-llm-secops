@@ -38,6 +38,7 @@ class AuditStore:
         self._integrity_ok = True
         self._verified_lines = 0
         self._legacy_lines = 0
+        self._page_seen_file = path.exists()
         self._load_existing()
 
     async def save(self, record: AnalysisResult) -> None:

@@ -26,6 +26,7 @@ from app.middleware import RequestBodyLimitMiddleware, RequestContextMiddleware
 from app.models import (
     AnalysisResult,
     AssuranceSummary,
+    AuditResultPage,
     BatchAnalysisRequest,
     BatchAnalysisResult,
     ControlRecord,
@@ -71,6 +72,13 @@ from app.scenarios import SCENARIOS, generate_events, get_scenario
 from app.security import Principal, Role, require_roles
 from app.services.assurance import get_assurance_registry
 from app.services.audit import AuditStore, create_audit_store
+from app.services.audit_paging import (
+    AuditCursorExpired,
+    AuditCursorInvalid,
+    AuditPagingUnsupported,
+    AuditSnapshotChanged,
+    create_audit_pager,
+)
 from app.services.behavior_context import BehaviorContextService
 from app.services.behavior_context_store import BehaviorContextStore
 from app.services.cases import (
@@ -138,6 +146,7 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 app.include_router(dashboard_router)
 app.include_router(dashboard_jobs_router)
 audit_store = create_audit_store(settings)
+audit_pager = create_audit_pager(settings)
 case_store = create_case_store(settings)
 integration_outbox_store = create_integration_outbox_store(settings)
 integration_outbox_service = IntegrationOutboxService(integration_outbox_store)
@@ -207,6 +216,22 @@ AdminPrincipal = Annotated[Principal, Depends(require_roles(Role.ADMIN))]
 
 class AnalysisCapacityExceeded(RuntimeError):
     pass
+
+
+@app.exception_handler(AuditCursorInvalid)
+@app.exception_handler(AuditCursorExpired)
+@app.exception_handler(AuditSnapshotChanged)
+@app.exception_handler(AuditPagingUnsupported)
+async def audit_page_error(_request, error):
+    if isinstance(error, AuditPagingUnsupported):
+        status, detail = 501, "Paged reads require a local SQLite or JSONL audit backend"
+    elif isinstance(error, AuditCursorExpired):
+        status, detail = 410, "Audit cursor expired; restart from the first page"
+    elif isinstance(error, AuditSnapshotChanged):
+        status, detail = 409, "Audit snapshot changed; restart from the first page"
+    else:
+        status, detail = 400, "Invalid audit cursor or cursor scope"
+    return JSONResponse(status_code=status, content={"detail": detail})
 
 
 @app.exception_handler(AuditQueryUnavailable)
@@ -1204,8 +1229,12 @@ async def _audit_boundary(store, principal, request):
 
 async def _audit_read_in_slot(store, method, principal, request, *args):
     """Internal: the route holds a query slot across source I/O and authorization."""
+    return await _audit_call_in_slot(store, getattr(store, method), principal, request, *args)
+
+
+async def _audit_call_in_slot(store, operation, principal, request, *args):
     await _audit_boundary(store, principal, request)
-    value = await settled_io(getattr(store, method), *args)
+    value = await settled_io(operation, *args)
     await _audit_boundary(store, principal, request)
     return value
 
@@ -1266,6 +1295,23 @@ async def recent_results(
     if risk_level is not None:
         records = [record for record in records if record.assessment.risk_level == risk_level]
     return records[:safe_limit]
+
+
+@app.get("/audit/results", response_model=AuditResultPage)
+async def paged_results(
+    request: Request,
+    principal: ViewerPrincipal,
+    limit: Annotated[int, Query(ge=1, le=100)] = 20,
+    cursor: Annotated[str | None, Query(min_length=1, max_length=2048, pattern=r"^[A-Za-z0-9_-]+$")] = None,
+    review_status: ReviewStatus | None = None,
+    risk_level: RiskLevel | None = None,
+) -> AuditResultPage:
+    async with _audit_query_slot():
+        store = audit_store
+        return await _audit_call_in_slot(
+            store, audit_pager.page, principal, request,
+            store, principal.tenant_id, limit, cursor, review_status, risk_level,
+        )
 
 
 @app.patch("/results/{event_id}/review", response_model=AnalysisResult)

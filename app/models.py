@@ -1232,6 +1232,17 @@ class AnalysisResult(StrictModel):
         return self
 
 
+class AuditResultPage(StrictModel):
+    items: list[AnalysisResult] = Field(max_length=100)
+    total_matches: int = Field(ge=0)
+    next_cursor: str | None = Field(default=None, max_length=2048)
+    snapshot_id: str = Field(pattern=r"^[a-f0-9]{64}$")
+    snapshot_created_at: datetime
+    snapshot_expires_at: datetime
+    snapshot_mode: Literal["sqlite_prefix", "unchanged_local_view"]
+    historical_audit_snapshot: Literal[True] = True
+
+
 class ReviewUpdateRequest(StrictModel):
     status: ReviewStatus
     reviewer: str | None = Field(default=None, min_length=2, max_length=64)

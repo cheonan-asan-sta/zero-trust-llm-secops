@@ -98,7 +98,7 @@ class SQLiteAuditStore:
             and new.review_updated_at > (old.review_updated_at or old.analyzed_at)
         )
 
-    def _read(self, con, *, retain_records=True):
+    def _read(self, con, *, retain_records=True, row_observer=None):
         """Verify every row; integrity-only scans retain latest row positions.
 
         A review reloads its prior validated row from the same SQLite snapshot,
@@ -126,6 +126,8 @@ class SQLiteAuditStore:
             if old is not None and not self._review_fits(old, record):
                 raise AuditQueryUnavailable("invalid persisted review transition")
             records[record.analysis_id] = record if retain_records else number
+            if row_observer is not None:
+                row_observer(record, number)
             previous, seq = digest, number
         if con.execute("SELECT seq,digest FROM audit_head WHERE id=1").fetchone() != (
             seq,

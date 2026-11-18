@@ -1,3 +1,5 @@
+> 2026-11-19 감사 페이지: GET /audit/results·전체 tenant 필터·AES-GCM/HKDF900초 cursor·고정 private key/pin 선택. SQLite 역사 prefix/현재 전체 검증, JSONL 자기 view 변경409. 기존 event_id=page 호환. 신규61/skip2 포함Win165/skip2·Linux275/skip2 통과·실제 별도 reader 재개 확인. HTTP worker cursor 재개는 다음·유료API/AWS/push/CI/병합0·새 F1 없음·목표 active. [API·키·일관성·한계](docs/extra-audit-paging-20261119.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-19 감사 integrity 메모리: 전체 모델 대신 마지막 검증 행 위치 유지·동일 snapshot에서 이전 review 재조회·전체 체인/전이/모델 동등성 유지. 신규10건 포함Win132·Linux211·최신 실제 systemd/worker/복원41조건 통과. 합성1024행 Python peak98.1%/검토다수95.7% 절감, 검토다수 시간24~31% 증가도 기록. 유료API/AWS/push/CI/병합0·F1 변경 없음·페이지/checkpoint 후속·목표 active. [측정·재현·한계](docs/extra-compact-audit-integrity-20261119.md). 아래는 이전 시점 기록이다.
 
 > 2026-11-19 감사 query 보강: 목록/상세/통계/검토 저장/readiness 공통 제한 기본2·503/Retry-After·취소 I/O settle·고정 store와 API 키/OIDC expiry 재확인. 커밋 후 철회/취소는 이력 보존·성공 전달 거부. 신규21건 포함Win175·Linux242·최신 실제 systemd/worker/복원41조건 통과. 유료API/AWS/push/CI/병합0·F1 변경 없음·대규모 검증 메모리/페이지/checkpoint 후속·목표 active. [설정·시험·한계](docs/extra-audit-query-admission-20261119.md). 아래는 이전 시점 기록이다.

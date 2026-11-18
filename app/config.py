@@ -65,6 +65,8 @@ class Settings(BaseSettings):
     audit_query_queue_timeout_seconds: float = Field(
         default=0.05, ge=0.01, le=2, allow_inf_nan=False
     )
+    audit_cursor_key_path: Path | None = None
+    audit_cursor_key_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
     # Host-only control plane. Disabled unless an operator selects a private root.
     dashboard_operations_directory: Path | None = None
     dashboard_operations_tenant: str = "local"
@@ -88,6 +90,8 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_enterprise_security(self) -> "Settings":
+        if (self.audit_cursor_key_path is None) != (self.audit_cursor_key_sha256 is None):
+            raise ValueError("audit cursors require both private key path and SHA-256 pin")
         if (self.native_analysis_shared_config_path is None) != (
             self.native_analysis_shared_config_sha256 is None
         ):
