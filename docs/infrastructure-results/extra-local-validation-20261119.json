@@ -188,5 +188,8 @@
         "errors": 0
       }
     }
-  }
+  },
+  "closed_at_kst": "2026-11-19T08:00:33+09:00",
+  "closing_reason": "08:00 KST time cap reached; implementation stopped and owned jobs settled",
+  "remaining_work_completed_claimed": false
 }

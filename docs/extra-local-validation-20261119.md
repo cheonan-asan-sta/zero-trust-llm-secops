@@ -65,3 +65,5 @@ python -m scripts.verify_extra_local_validation
 ```
 
 검산기는 XML 변경, 허위 성공 건수, 원래 실패와 무관한 다른 통과 사례, 실패 목록 숨김, 저장소 밖 경로, 중복 testcase로 건수 부풀리기를 거부한다. 정상 원본에서는 과거 실패를 유지하고 `fresh_full_suite_green=false`를 출력한다. [Windows7건](infrastructure-results/local-validation-evidence-checker-20261119.xml)·[Linux7건](infrastructure-results/local-validation-evidence-checker-linux-20261119.xml)으로 검산기의 변경 탐지/거부 동작도 확인했다. 이는 독립 witness·전자서명이나 모델 성능 시험이 아니며, 보고서와 XML을 함께 바꾸는 관리자에 대한 보장은 제공하지 않는다. 이7건은 위 전체 실행에 포함됐다고 합산하지 않는다.
+
+종료 기록: 2026-11-19T08:00:33+09:00 · 오전08:00 시간 상한으로 새 개발을 종료하고 인계 기록을 확정했다. 남은 전체 재실행·UI·외부 신원·독립 witness·장기/다중 호스트 검증·모델 성능 목표는 완료로 바꾸지 않았다.
