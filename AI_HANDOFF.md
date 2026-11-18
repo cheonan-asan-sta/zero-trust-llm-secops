@@ -1,3 +1,5 @@
+> 2026-11-19 checkpoint 단조 갱신: checkpoint-advance 이전 file/pin 필수·동일 read transaction의 prefix 확인·정상 구 DB/다른 chain 거부. readonly checkpoint-status4상태/unsafe exit3. 신규16건 포함Win147/skip1·Linux231/skip2·실제 systemd51조건 통과. source/권한 불변·유료API/AWS/push/CI/병합0·새 F1 없음·선택형 runtime checkpoint guard 후속·목표 active. [명령·시험·한계](docs/extra-audit-checkpoint-progression-20261119.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-19 checkpoint 보관: readonly head/private JSON export·외부 SHA pin load·backup/restore 최소 prefix 연결. 오래된 정상/다른 체인 거부·새 후보만 생성·최신 live/독립보관은 false 명시. 신규32건 포함Win141/skip1·Linux225/skip2·최신 systemd49조건 통과. source/권한 불변·유료API/AWS/push/CI/병합0·새 F1 없음·단조 checkpoint 갱신/상태비교 후속·목표 active. [절차·시험·한계](docs/extra-audit-checkpoint-20261119.md). 아래는 이전 시점 기록이다.
 
 > 2026-11-19 HTTP cursor 인수: 실제 worker3개 kill/wait·고정 private key/pin으로 TCP cursor 재개·PENDING 과거2/현재1 분리·원래 scope/expiry 유지·third 모델0. 키 오류 page/readiness503/live200·시험 key 제거·부모 앱 env/dotenv 격리. 신규5건 포함Win159/skip2·Linux244/skip2·최신 실제 systemd47조건 통과. 유료API/AWS/push/CI/병합0·새 F1 없음·복원 checkpoint 후속·목표 active. [인수·설정·한계](docs/extra-http-cursor-recovery-20261119.md). 아래는 이전 시점 기록이다.

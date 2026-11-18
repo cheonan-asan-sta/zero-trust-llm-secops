@@ -48,4 +48,4 @@ python -m pytest tests/test_audit_checkpoint.py tests/test_audit_transfer.py tes
 python -m scripts.run_exec_history_controls --directory <새_결과_폴더> --worker-paging
 ```
 
-다음은 checkpoint 갱신 시 이전 trusted prefix와의 단조 증가 확인과 운영 상태 비교다. 원격 WORM·독립 보관·전원 단절/다중 호스트·자동 활성화·연기한8시간 시험은 완료로 처리하지 않는다. 모델/프롬프트·탐지·평가 원본·정답·예측·F1·오탐/미탐은 바꾸지 않았다.
+후속으로 [이전 trusted prefix를 유지하는 갱신·운영 상태 비교와51조건 인수](extra-audit-checkpoint-progression-20261119.md)를 추가했다. 위49조건은 checkpoint 파일 보관 작업 시점의 기록이다. 원격 WORM·독립 보관·전원 단절/다중 호스트·자동 활성화·연기한8시간 시험은 완료로 처리하지 않는다. 모델/프롬프트·탐지·평가 원본·정답·예측·F1·오탐/미탐은 바꾸지 않았다.

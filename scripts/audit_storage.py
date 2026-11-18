@@ -7,7 +7,7 @@ import sqlite3
 from cryptography.exceptions import InvalidTag
 
 from app.services.audit_backup import backup_sqlite, read_key, restore_sqlite
-from app.services.audit_checkpoint import capture_checkpoint, load_checkpoint
+from app.services.audit_checkpoint import capture_checkpoint, inspect_checkpoint, load_checkpoint
 from app.services.audit_transfer import AuditTransferError, migrate_jsonl, scan_jsonl
 from app.services.federated_audit import AuditQueryUnavailable
 from app.services.sqlite_audit import SQLiteAuditStore
@@ -27,6 +27,15 @@ def main(argv=None):
     checkpoint = actions.add_parser("checkpoint")
     checkpoint.add_argument("--database", required=True)
     checkpoint.add_argument("--destination", required=True)
+    advance = actions.add_parser("checkpoint-advance")
+    advance.add_argument("--database", required=True)
+    advance.add_argument("--destination", required=True)
+    advance.add_argument("--previous-checkpoint", required=True)
+    advance.add_argument("--previous-checkpoint-sha256", required=True)
+    status = actions.add_parser("checkpoint-status")
+    status.add_argument("--database", required=True)
+    status.add_argument("--checkpoint", required=True)
+    status.add_argument("--checkpoint-sha256", required=True)
     for action in ("backup", "restore"):
         command = actions.add_parser(action)
         command.add_argument("--database" if action == "backup" else "--package", required=True)
@@ -49,6 +58,15 @@ def main(argv=None):
             )
         elif args.action == "checkpoint":
             result = capture_checkpoint(args.database, args.destination)
+        elif args.action == "checkpoint-advance":
+            result = capture_checkpoint(
+                args.database,
+                args.destination,
+                previous_checkpoint=args.previous_checkpoint,
+                previous_checkpoint_sha256=args.previous_checkpoint_sha256,
+            )
+        elif args.action == "checkpoint-status":
+            result = inspect_checkpoint(args.database, args.checkpoint, args.checkpoint_sha256)
         else:
             if (args.minimum_seq is None) != (args.minimum_head is None):
                 parser.error("minimum-seq and minimum-head must be provided together")
@@ -96,6 +114,8 @@ def main(argv=None):
     ):
         parser.exit(1, "Audit operation failed; automatic activation is disabled.\n")
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
+    if args.action == "checkpoint-status" and not result["minimum_head_satisfied"]:
+        parser.exit(3)
 
 
 if __name__ == "__main__":

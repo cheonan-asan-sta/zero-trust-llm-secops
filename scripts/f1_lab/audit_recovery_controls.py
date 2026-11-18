@@ -8,7 +8,7 @@ from unittest.mock import patch
 from cryptography.exceptions import InvalidTag
 
 from app.services.audit_backup import backup_sqlite, restore_sqlite, validate_head
-from app.services.audit_checkpoint import capture_checkpoint, load_checkpoint
+from app.services.audit_checkpoint import capture_checkpoint, inspect_checkpoint, load_checkpoint
 from app.services.audit_transfer import AuditTransferError
 from app.services.sqlite_audit import SQLiteAuditStore
 from scripts.f1_lab.native_jsonl import require
@@ -40,6 +40,12 @@ def run(audit, payload, client, headers, directory, passed, stack):
     require(
         fetched.status_code == 200 and fetched.json() == payload, "native_audit_restored_http_read"
     )
+    baseline_path = directory / "native-audit-baseline.checkpoint.json"
+    baseline_checkpoint = capture_checkpoint(restored.path, baseline_path)
+    require(
+        baseline_checkpoint["head"] == backup["head"],
+        "native_checkpoint_baseline_matches_restored_snapshot",
+    )
     reviewed = client.patch(
         f"/results/{payload['event_id']}/review",
         headers=headers,
@@ -56,7 +62,12 @@ def run(audit, payload, client, headers, directory, passed, stack):
         seq, head = validate_head(con, restored)
     checkpoint_path = directory / "native-audit-current.checkpoint.json"
     candidate_hash = hashlib.sha256(restored.path.read_bytes()).hexdigest()
-    checkpoint = capture_checkpoint(restored.path, checkpoint_path)
+    checkpoint = capture_checkpoint(
+        restored.path,
+        checkpoint_path,
+        previous_checkpoint=baseline_path,
+        previous_checkpoint_sha256=baseline_checkpoint["checkpoint_sha256"],
+    )
     pinned = load_checkpoint(checkpoint_path, checkpoint["checkpoint_sha256"])
     require(
         pinned["head"] == {"seq": seq, "digest": head}
@@ -65,6 +76,33 @@ def run(audit, payload, client, headers, directory, passed, stack):
         "native_checkpoint_capture_preserves_candidate_database",
     )
     passed("native_audit_checkpoint_verified_head_export_is_read_only")
+    require(
+        checkpoint["progression_check"]["monotonic_head_verified"]
+        and checkpoint["progression_check"]["advanced_rows"] == 1,
+        "native_checkpoint_advances_verified_prefix",
+    )
+    passed("native_audit_checkpoint_advances_from_verified_previous_head")
+    try:
+        capture_checkpoint(
+            audit.path,
+            directory / "rejected-lower.checkpoint.json",
+            previous_checkpoint=checkpoint_path,
+            previous_checkpoint_sha256=checkpoint["checkpoint_sha256"],
+        )
+    except AuditTransferError:
+        require(
+            not (directory / "rejected-lower.checkpoint.json").exists(),
+            "native_checkpoint_lower_head_not_published",
+        )
+    else:
+        raise ValueError("valid older audit DB lowered trusted checkpoint")
+    older_status = inspect_checkpoint(audit.path, checkpoint_path, checkpoint["checkpoint_sha256"])
+    require(
+        older_status["status"] == "behind_checkpoint"
+        and older_status["minimum_head_satisfied"] is False,
+        "native_checkpoint_reports_older_source",
+    )
+    passed("native_audit_checkpoint_advance_refuses_valid_older_database")
     tampered_checkpoint = directory / "native-audit-tampered.checkpoint.json"
     tampered_checkpoint.write_bytes(checkpoint_path.read_bytes() + b" ")
     tampered_checkpoint.chmod(0o600)
@@ -119,6 +157,9 @@ def run(audit, payload, client, headers, directory, passed, stack):
             "external_pin_tamper_rejected": True,
             "independent_storage_verified": False,
             "latest_live_state_verified": False,
+            "progression_check": checkpoint["progression_check"],
+            "older_database_advance_rejected": True,
+            "older_database_status": older_status["status"],
         },
         "automatic_activation_allowed": False,
         "test_harness_selected_candidate_for_read_and_review": True,

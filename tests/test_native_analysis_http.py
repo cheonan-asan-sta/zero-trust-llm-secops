@@ -439,7 +439,7 @@ def test_loopback_native_sqlite_backup_restore_and_candidate_review(api, tmp_pat
         audit_recovery=True,
     )
     assert result["audit_writer_scope"] == "shared_sqlite_transaction"
-    assert result["provider_stub_invocations"] == 1 and len(passed) == 17
+    assert result["provider_stub_invocations"] == 1 and len(passed) == 19
     recovery = result["audit_recovery"]
     assert recovery["snapshot_head"]["seq"] == 1 and recovery["candidate_review_head"]["seq"] == 2
     assert recovery["original_database_unchanged"] is True
@@ -449,3 +449,7 @@ def test_loopback_native_sqlite_backup_restore_and_candidate_review(api, tmp_pat
     assert recovery["checkpoint"]["external_pin_tamper_rejected"]
     assert recovery["checkpoint"]["independent_storage_verified"] is False
     assert recovery["checkpoint"]["latest_live_state_verified"] is False
+    assert recovery["checkpoint"]["progression_check"]["monotonic_head_verified"]
+    assert recovery["checkpoint"]["progression_check"]["advanced_rows"] == 1
+    assert recovery["checkpoint"]["older_database_advance_rejected"]
+    assert recovery["checkpoint"]["older_database_status"] == "behind_checkpoint"

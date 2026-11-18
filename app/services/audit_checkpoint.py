@@ -55,23 +55,38 @@ def _validate(document):
     return document
 
 
-def capture_checkpoint(database, destination):
+def _verified_head(store, con, minimum=None):
+    tables = {r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+    require(tables == {"audit_entries", "audit_head"}, "checkpoint audit schema required")
+    return validate_head(con, store, minimum)
+
+
+def _locator(store):
+    return sha(os.path.normcase(str(store.path.absolute())).encode())
+
+
+def capture_checkpoint(
+    database, destination, *, previous_checkpoint=None, previous_checkpoint_sha256=None
+):
     """Never repair/activate a DB or replace an existing output file."""
+    require(
+        (previous_checkpoint is None) == (previous_checkpoint_sha256 is None),
+        "previous checkpoint and external pin required together",
+    )
+    previous = (
+        load_checkpoint(previous_checkpoint, previous_checkpoint_sha256)
+        if previous_checkpoint is not None
+        else None
+    )
     with fresh_stage(destination) as (stage, target):
         store = SQLiteAuditStore.open_existing(database)
         with store._transaction() as con:
-            tables = {
-                r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table'")
-            }
-            require(tables == {"audit_entries", "audit_head"}, "checkpoint audit schema required")
-            seq, digest = validate_head(con, store)
+            seq, digest = _verified_head(store, con, previous["head"] if previous else None)
             document = _validate(
                 {
                     "schema": SCHEMA,
                     "captured_at": datetime.now(UTC).isoformat(),
-                    "source_locator_sha256": sha(
-                        os.path.normcase(str(store.path.absolute())).encode()
-                    ),
+                    "source_locator_sha256": _locator(store),
                     "head": {"seq": seq, "digest": digest},
                 }
             )
@@ -87,7 +102,57 @@ def capture_checkpoint(database, destination):
             "captured_at": document["captured_at"],
             "automatic_activation_allowed": False,
             "independent_storage_verified": False,
+            "progression_check": {
+                "monotonic_head_verified": previous is not None,
+                "previous_checkpoint_sha256": previous_checkpoint_sha256,
+                "previous_head": previous["head"] if previous else None,
+                "previous_checkpoint_has_history": previous is not None
+                and previous["head"]["seq"] > 0,
+                "advanced_rows": seq - previous["head"]["seq"] if previous else None,
+                "latest_live_state_verified": False,
+            },
         }
+
+
+def inspect_checkpoint(database, checkpoint, expected_sha256):
+    """Compare one observed DB snapshot to an explicitly pinned operator minimum."""
+    document = load_checkpoint(checkpoint, expected_sha256)
+    store = SQLiteAuditStore.open_existing(database)
+    minimum = document["head"]
+    with store._transaction() as con:
+        seq, digest = _verified_head(store, con)
+        if seq < minimum["seq"]:
+            status, matches = "behind_checkpoint", False
+        else:
+            prior = (
+                "0" * 64
+                if minimum["seq"] == 0
+                else con.execute(
+                    "SELECT digest FROM audit_entries WHERE seq=?", (minimum["seq"],)
+                ).fetchone()[0]
+            )
+            matches = prior == minimum["digest"]
+            status = (
+                ("at_checkpoint" if seq == minimum["seq"] else "checkpoint_lagging")
+                if matches
+                else "history_conflict"
+            )
+    return {
+        "status": status,
+        "minimum_head_satisfied": matches,
+        "observed_head": {"seq": seq, "digest": digest},
+        "checkpoint_head": minimum,
+        "checkpoint_sha256": expected_sha256,
+        "sequence_delta": seq - minimum["seq"],
+        "uncheckpointed_rows": seq - minimum["seq"] if matches else None,
+        "checkpoint_refresh_recommended": matches and seq > minimum["seq"],
+        "checkpoint_has_history": minimum["seq"] > 0,
+        "source_locator_matches": _locator(store) == document["source_locator_sha256"],
+        "observed_at": datetime.now(UTC).isoformat(),
+        "automatic_activation_allowed": False,
+        "independent_storage_verified": False,
+        "latest_live_state_verified": False,
+    }
 
 
 def load_checkpoint(path, expected_sha256):
