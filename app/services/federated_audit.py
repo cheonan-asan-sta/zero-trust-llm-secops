@@ -2,7 +2,7 @@
 
 Writers retain their process-owned files. A partial append may temporarily reject
 a read; it never turns a corrupt/missing shard into a silently incomplete result.
-Files deleted before discovery require a durable manifest (a later stage).
+Previously announced/discovered files have durable local checkpoints.
 This is not a global atomic snapshot or a shared transactional writer.
 """
 
@@ -10,6 +10,7 @@ from pathlib import Path
 
 from app.models import AnalysisResult
 from app.services.audit import AuditStore, _summarize
+from app.services.audit_manifest import AuditManifestError, AuditShardManifest
 
 
 class AuditQueryUnavailable(RuntimeError):
@@ -23,6 +24,14 @@ class FederatedAuditStore(AuditStore):
     def __init__(self, writer_path: Path, base_path: Path):
         self._base_path = base_path
         super().__init__(writer_path)
+        self._manifest = AuditShardManifest(base_path.with_name(base_path.name + ".shards.sqlite3"))
+
+    async def save(self, record):
+        try:
+            self._manifest.announce(self._path, self.MAX_FILES)
+        except AuditManifestError as error:
+            raise AuditQueryUnavailable("audit manifest registration failed") from error
+        await super().save(record)
 
     def _paths(self):
         base = self._base_path
@@ -40,6 +49,7 @@ class FederatedAuditStore(AuditStore):
             paths = self._paths()
             total, verified, legacy = 0, 0, 0
             versions = {}
+            signatures = {}
             mutable = {"review_status", "reviewer", "review_note", "review_updated_at"}
             for path in paths:
                 if path.is_symlink() or not path.is_file():
@@ -54,8 +64,11 @@ class FederatedAuditStore(AuditStore):
                     stream.read(1)
                 shard = AuditStore(path, strict_reads=True)
                 after = path.stat()
-                if (before.st_size, before.st_mtime_ns) != (after.st_size, after.st_mtime_ns):
+                if (before.st_size, before.st_mtime_ns, before.st_ino) != (
+                    after.st_size, after.st_mtime_ns, after.st_ino
+                ):
                     raise AuditQueryUnavailable("audit shard changed during verification; retry")
+                signatures[path.name] = (after.st_size, after.st_mtime_ns, after.st_ino)
                 info = shard.integrity()
                 if not info["ok"]:
                     raise AuditQueryUnavailable("audit shard integrity failed")
@@ -64,8 +77,12 @@ class FederatedAuditStore(AuditStore):
                 for record in shard._history:
                     previous = versions.get(record.analysis_id)
                     if previous is not None:
-                        if previous.model_dump(exclude=mutable) != record.model_dump(exclude=mutable):
-                            raise AuditQueryUnavailable("conflicting analysis identity across shards")
+                        if previous.model_dump(exclude=mutable) != record.model_dump(
+                            exclude=mutable
+                        ):
+                            raise AuditQueryUnavailable(
+                                "conflicting analysis identity across shards"
+                            )
                         left = previous.review_updated_at or previous.analyzed_at
                         right = record.review_updated_at or record.analyzed_at
                         if left == right and previous != record:
@@ -75,16 +92,27 @@ class FederatedAuditStore(AuditStore):
                     versions[record.analysis_id] = record
             if paths != self._paths():
                 raise AuditQueryUnavailable("audit shard membership changed; retry")
+            self._manifest.checkpoint(paths, signatures, self.MAX_FILES)
             records = sorted(versions.values(), key=lambda r: (r.analyzed_at, r.analysis_id))
-            return records, {"backend": "federated_jsonl_hash_chains", "ok": True,
-                             "shards": len(paths), "verified_lines": verified,
-                             "legacy_lines": legacy}
-        except (OSError, ValueError) as error:
+            return records, {
+                "backend": "federated_jsonl_hash_chains",
+                "ok": True,
+                "shards": len(paths),
+                "verified_lines": verified,
+                "legacy_lines": legacy,
+            }
+        except (OSError, ValueError, AuditManifestError) as error:
             raise AuditQueryUnavailable("audit shards unavailable") from error
 
     def get(self, event_id: str, tenant_id: str = "local") -> AnalysisResult | None:
-        return next((r for r in reversed(self._snapshot()[0])
-                     if r.event_id == event_id and r.tenant_id == tenant_id), None)
+        return next(
+            (
+                r
+                for r in reversed(self._snapshot()[0])
+                if r.event_id == event_id and r.tenant_id == tenant_id
+            ),
+            None,
+        )
 
     def recent(self, limit=20, tenant_id="local"):
         records = [r for r in self._snapshot()[0] if r.tenant_id == tenant_id]
@@ -97,5 +125,9 @@ class FederatedAuditStore(AuditStore):
         try:
             return self._snapshot()[1]
         except AuditQueryUnavailable:
-            return {"backend": "federated_jsonl_hash_chains", "ok": False,
-                    "verified_lines": 0, "legacy_lines": 0}
+            return {
+                "backend": "federated_jsonl_hash_chains",
+                "ok": False,
+                "verified_lines": 0,
+                "legacy_lines": 0,
+            }
