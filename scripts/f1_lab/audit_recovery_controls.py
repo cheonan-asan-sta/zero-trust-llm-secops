@@ -8,6 +8,7 @@ from unittest.mock import patch
 from cryptography.exceptions import InvalidTag
 
 from app.services.audit_backup import backup_sqlite, restore_sqlite, validate_head
+from app.services.audit_checkpoint import capture_checkpoint, load_checkpoint
 from app.services.audit_transfer import AuditTransferError
 from app.services.sqlite_audit import SQLiteAuditStore
 from scripts.f1_lab.native_jsonl import require
@@ -53,13 +54,34 @@ def run(audit, payload, client, headers, directory, passed, stack):
     passed("native_audit_candidate_http_query_and_cas_review_preserve_advisory_assessment")
     with restored._transaction() as con:
         seq, head = validate_head(con, restored)
+    checkpoint_path = directory / "native-audit-current.checkpoint.json"
+    candidate_hash = hashlib.sha256(restored.path.read_bytes()).hexdigest()
+    checkpoint = capture_checkpoint(restored.path, checkpoint_path)
+    pinned = load_checkpoint(checkpoint_path, checkpoint["checkpoint_sha256"])
+    require(
+        pinned["head"] == {"seq": seq, "digest": head}
+        and checkpoint["automatic_activation_allowed"] is False
+        and hashlib.sha256(restored.path.read_bytes()).hexdigest() == candidate_hash,
+        "native_checkpoint_capture_preserves_candidate_database",
+    )
+    passed("native_audit_checkpoint_verified_head_export_is_read_only")
+    tampered_checkpoint = directory / "native-audit-tampered.checkpoint.json"
+    tampered_checkpoint.write_bytes(checkpoint_path.read_bytes() + b" ")
+    tampered_checkpoint.chmod(0o600)
+    try:
+        load_checkpoint(tampered_checkpoint, checkpoint["checkpoint_sha256"])
+    except AuditTransferError as error:
+        require("pin mismatch" in str(error), "native_checkpoint_external_pin_rejection")
+    else:
+        raise ValueError("tampered native audit checkpoint accepted")
+    passed("native_audit_checkpoint_tamper_rejected_by_external_pin")
     try:
         restore_sqlite(
             package,
             directory / "old-candidate.sqlite3",
             backup["backup_sha256"],
             key,
-            minimum_head={"seq": seq, "digest": head},
+            minimum_head=pinned["head"],
         )
     except AuditTransferError:
         require(
@@ -90,6 +112,14 @@ def run(audit, payload, client, headers, directory, passed, stack):
         "backup_sha256": backup["backup_sha256"],
         "snapshot_head": backup["head"],
         "candidate_review_head": {"seq": seq, "digest": head},
+        "checkpoint": {
+            "checkpoint_sha256": checkpoint["checkpoint_sha256"],
+            "head": pinned["head"],
+            "source_unchanged_by_capture": True,
+            "external_pin_tamper_rejected": True,
+            "independent_storage_verified": False,
+            "latest_live_state_verified": False,
+        },
         "automatic_activation_allowed": False,
         "test_harness_selected_candidate_for_read_and_review": True,
         "original_database_unchanged": True,

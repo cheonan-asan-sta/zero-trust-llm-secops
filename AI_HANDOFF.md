@@ -1,3 +1,5 @@
+> 2026-11-19 checkpoint 보관: readonly head/private JSON export·외부 SHA pin load·backup/restore 최소 prefix 연결. 오래된 정상/다른 체인 거부·새 후보만 생성·최신 live/독립보관은 false 명시. 신규32건 포함Win141/skip1·Linux225/skip2·최신 systemd49조건 통과. source/권한 불변·유료API/AWS/push/CI/병합0·새 F1 없음·단조 checkpoint 갱신/상태비교 후속·목표 active. [절차·시험·한계](docs/extra-audit-checkpoint-20261119.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-19 HTTP cursor 인수: 실제 worker3개 kill/wait·고정 private key/pin으로 TCP cursor 재개·PENDING 과거2/현재1 분리·원래 scope/expiry 유지·third 모델0. 키 오류 page/readiness503/live200·시험 key 제거·부모 앱 env/dotenv 격리. 신규5건 포함Win159/skip2·Linux244/skip2·최신 실제 systemd47조건 통과. 유료API/AWS/push/CI/병합0·새 F1 없음·복원 checkpoint 후속·목표 active. [인수·설정·한계](docs/extra-http-cursor-recovery-20261119.md). 아래는 이전 시점 기록이다.
 
 > 2026-11-19 감사 페이지: GET /audit/results·전체 tenant 필터·AES-GCM/HKDF900초 cursor·고정 private key/pin 선택. SQLite 역사 prefix/현재 전체 검증, JSONL 자기 view 변경409. 기존 event_id=page 호환. 신규61/skip2 포함Win165/skip2·Linux275/skip2 통과·실제 별도 reader 재개 확인. HTTP worker cursor 재개는 다음·유료API/AWS/push/CI/병합0·새 F1 없음·목표 active. [API·키·일관성·한계](docs/extra-audit-paging-20261119.md). 아래는 이전 시점 기록이다.

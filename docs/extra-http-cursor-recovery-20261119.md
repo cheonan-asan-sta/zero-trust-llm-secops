@@ -37,4 +37,4 @@ python -m scripts.run_exec_history_controls --directory <새_결과_폴더> --wo
 
 두 번째는 기존 root/systemd/의존성이 준비된 로컬 Linux 인수다. `--worker-paging`은 worker restart·공유 참조·HTTP·LLM 근거 stub·감사 백업/복원을 포함한다. 기존 `--worker-restart`의2-worker/6조건 동작은 유지한다.
 
-127.0.0.1의 TCP HTTP와 실제 API 키를 사용했다. 이 결과는 mTLS 구간·원격망 단절·실제 사람 SSO·호스트 전원 단절/재부팅·다중 호스트·원격 WORM이나 연기한8시간 시험의 증명이 아니다. LLM 탐지 성능을 새로 측정하지 않았고 평가 원본/정답/예측/F1·오탐/미탐은 바꾸지 않았다. 다음은 복원 checkpoint의 운영 보관/인수 연결이다.
+127.0.0.1의 TCP HTTP와 실제 API 키를 사용했다. 이 결과는 mTLS 구간·원격망 단절·실제 사람 SSO·호스트 전원 단절/재부팅·다중 호스트·원격 WORM이나 연기한8시간 시험의 증명이 아니다. LLM 탐지 성능을 새로 측정하지 않았고 평가 원본/정답/예측/F1·오탐/미탐은 바꾸지 않았다. 후속으로 [checkpoint 파일 보관·외부 pin 복원 연결과49조건 인수](extra-audit-checkpoint-20261119.md)를 추가했다. 위47조건은 이 HTTP cursor 작업 당시 기록이다.
