@@ -1,3 +1,5 @@
+> 2026-11-19 평가 자원: bounded job 전체 수명·setup settled_io·취소된 constructor 결과 소유/정리·반복 취소 중 async close settle·정리 후 admin 확인·OpenAI/자체 생성 Hybrid close·주입 adapter/캐시 수명 유지·응답 상세 비공개. 변경 전2실패→신규24건 포함Win623/skip19·Linux640/skip2·최신 systemd54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·batch 반복 취소 후속·08:00 KST 목표 active. [검증·한계](docs/extra-evaluation-runtime-20261119.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-19 평가 API: 사례별 공용 analysis slot·현재 admin 검증·Task-local SDK authority·summary 전달 재검증·fatal/반복 취소 시 sibling settle·포화를 model error로 점수화 금지. 변경 전3실패→신규19건 포함Win599/skip19·Linux616/skip2·최신 systemd54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·evaluation setup/client 종료 후속·08:00 KST 목표 active. [검증·한계](docs/extra-evaluation-authority-20261119.md). 아래는 이전 시점 기록이다.
 
 > 2026-11-19 초기 인증 I/O: 앱별 bounded admission·API key/JWKS settled_io·취소 후 실제 worker 완료까지 lease 유지·포화503/Retry-After·frozen settings·최종 신원 확인·loopback 실제 JWKS 지연/취소 검증. 변경 전2실패→신규30건 포함Win575/skip19·Linux592/skip2·최신 systemd54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·별도 evaluation 경계 후속·08:00 KST 목표 active. [검증·한계](docs/extra-authentication-admission-20261119.md). 아래는 이전 시점 기록이다.

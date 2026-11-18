@@ -2,58 +2,16 @@
 
 import asyncio
 import math
-import threading
 from contextlib import asynccontextmanager
 
 from fastapi import HTTPException
-from starlette.datastructures import State
 
-
-class AuthenticationAdmission:
-    def __init__(self, limit):
-        if type(limit) is not int or not 1 <= limit <= 16:
-            raise ValueError("authentication admission limit rejected")
-        self.limit = limit
-        self._active = 0
-        self._lock = threading.Lock()
-
-    def acquire_nowait(self):
-        with self._lock:
-            if self._active >= self.limit:
-                return False
-            self._active += 1
-            return True
-
-    def release(self):
-        with self._lock:
-            if self._active <= 0:
-                raise RuntimeError("authentication admission release without ownership")
-            self._active -= 1
-
-    def snapshot(self):
-        with self._lock:
-            return {
-                "limit": self.limit,
-                "active": self._active,
-                "available": self.limit - self._active,
-            }
-
-
-_creation_lock = threading.Lock()
-_standalone_state = State()
+from app.services.work_admission import WorkAdmission as AuthenticationAdmission  # noqa: F401
+from app.services.work_admission import admission_for
 
 
 def authentication_admission(request, limit):
-    app = request.scope.get("app")
-    state = app.state if app is not None else _standalone_state
-    with _creation_lock:
-        value = getattr(state, "_authentication_admission", None)
-        if value is None:
-            value = AuthenticationAdmission(limit)
-            state._authentication_admission = value
-        if not isinstance(value, AuthenticationAdmission):
-            raise TypeError("authentication admission owner rejected")
-        return value
+    return admission_for(request, "_authentication_admission", limit)
 
 
 @asynccontextmanager

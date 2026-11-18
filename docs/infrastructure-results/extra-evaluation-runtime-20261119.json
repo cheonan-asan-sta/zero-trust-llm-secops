@@ -1,0 +1,215 @@
+{
+  "schema": "extra-evaluation-runtime-1",
+  "date_kst": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "pushed": false,
+  "ci_started": false,
+  "merged": false,
+  "new_tests": 24,
+  "native_conditions": 54,
+  "native_new_conditions": 0,
+  "before": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "2",
+    "skipped": "0",
+    "tests": "2",
+    "time": "6.247",
+    "timestamp": "2026-11-19T05:49:49.771440+09:00",
+    "hostname": "희주",
+    "passed": 0,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\evaluation-runtime-before-20261119.xml",
+    "xml_sha256": "a63b2a58ff26e133de2d42b6a8ba99d93a7adc5962775e7d3b98276ac4d62b2d",
+    "test_files": [
+      "tests/test_evaluation_runtime.py"
+    ]
+  },
+  "focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "118",
+    "time": "20.552",
+    "timestamp": "2026-11-19T05:54:45.587758+09:00",
+    "hostname": "희주",
+    "passed": 118,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\evaluation-runtime-focused-20261119.xml",
+    "xml_sha256": "3f6bc723a9df3e69539f94d93a090636b9a2c2758fb2a1bee26a6aa5b6f0c654",
+    "test_files": [
+      "tests/test_async_audit_io.py",
+      "tests/test_async_evidence_io.py",
+      "tests/test_authentication_admission.py",
+      "tests/test_caller_sdk_retry.py",
+      "tests/test_evaluation.py",
+      "tests/test_evaluation_authority.py",
+      "tests/test_evaluation_runtime.py",
+      "tests/test_hybrid_analyzer.py"
+    ]
+  },
+  "windows_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "19",
+    "tests": "642",
+    "time": "211.695",
+    "timestamp": "2026-11-19T05:55:40.015265+09:00",
+    "hostname": "희주",
+    "passed": 623,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\evaluation-runtime-windows-20261119.xml",
+    "xml_sha256": "3680abc5676715ec5bb2a1f5f1d3a82bfc3d08d04ca2d8ebc40eb9cca818d512",
+    "test_files": [
+      "tests/test_analysis_audit_binding.py",
+      "tests/test_analysis_caller_boundary.py",
+      "tests/test_analysis_row_preservation.py",
+      "tests/test_analysis_source_admission.py",
+      "tests/test_api.py",
+      "tests/test_api_key_accounts.py",
+      "tests/test_async_audit_io.py",
+      "tests/test_async_evidence_io.py",
+      "tests/test_audit.py",
+      "tests/test_audit_cancellation.py",
+      "tests/test_audit_paging.py",
+      "tests/test_audit_paging_http.py",
+      "tests/test_audit_preflight.py",
+      "tests/test_audit_query_admission.py",
+      "tests/test_authentication_admission.py",
+      "tests/test_caller_sdk_retry.py",
+      "tests/test_evaluation.py",
+      "tests/test_evaluation_authority.py",
+      "tests/test_evaluation_runtime.py",
+      "tests/test_evidence_review_agent.py",
+      "tests/test_federated_audit.py",
+      "tests/test_http_caller_boundary.py",
+      "tests/test_http_worker_restart.py",
+      "tests/test_hybrid_analyzer.py",
+      "tests/test_jsonl_row_preservation.py",
+      "tests/test_jsonl_writer_boundary.py",
+      "tests/test_native_analysis_http.py",
+      "tests/test_openai_analyzer.py",
+      "tests/test_openai_incomplete_retry.py",
+      "tests/test_response_api_key_identity.py",
+      "tests/test_runtime_audit_checkpoint.py",
+      "tests/test_security.py",
+      "tests/test_session_analysis_evidence.py",
+      "tests/test_shared_native_analysis.py",
+      "tests/test_structured_response.py",
+      "tests/test_verified_caller_authority.py",
+      "tests/test_verified_sdk_retry_boundary.py"
+    ]
+  },
+  "linux_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "2",
+    "tests": "642",
+    "time": "222.134",
+    "timestamp": "2026-11-19T05:55:57.078301+09:00",
+    "hostname": "localhost",
+    "passed": 640,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\evaluation-runtime-linux-20261119.xml",
+    "xml_sha256": "349e5057d5e17b6c9f7f63f73cdeb5491c0f7a6ffae36a66134f6a149a65c25c",
+    "test_files": [
+      "tests/test_analysis_audit_binding.py",
+      "tests/test_analysis_caller_boundary.py",
+      "tests/test_analysis_row_preservation.py",
+      "tests/test_analysis_source_admission.py",
+      "tests/test_api.py",
+      "tests/test_api_key_accounts.py",
+      "tests/test_async_audit_io.py",
+      "tests/test_async_evidence_io.py",
+      "tests/test_audit.py",
+      "tests/test_audit_cancellation.py",
+      "tests/test_audit_paging.py",
+      "tests/test_audit_paging_http.py",
+      "tests/test_audit_preflight.py",
+      "tests/test_audit_query_admission.py",
+      "tests/test_authentication_admission.py",
+      "tests/test_caller_sdk_retry.py",
+      "tests/test_evaluation.py",
+      "tests/test_evaluation_authority.py",
+      "tests/test_evaluation_runtime.py",
+      "tests/test_evidence_review_agent.py",
+      "tests/test_federated_audit.py",
+      "tests/test_http_caller_boundary.py",
+      "tests/test_http_worker_restart.py",
+      "tests/test_hybrid_analyzer.py",
+      "tests/test_jsonl_row_preservation.py",
+      "tests/test_jsonl_writer_boundary.py",
+      "tests/test_native_analysis_http.py",
+      "tests/test_openai_analyzer.py",
+      "tests/test_openai_incomplete_retry.py",
+      "tests/test_response_api_key_identity.py",
+      "tests/test_runtime_audit_checkpoint.py",
+      "tests/test_security.py",
+      "tests/test_session_analysis_evidence.py",
+      "tests/test_shared_native_analysis.py",
+      "tests/test_structured_response.py",
+      "tests/test_verified_caller_authority.py",
+      "tests/test_verified_sdk_retry_boundary.py"
+    ]
+  },
+  "native_source_run_sha256": "444b26e181a269c6efbf55865b1d6f16afdbcb0213e8f3cbfab92cfe5806d496",
+  "job_admission_covers_setup_cases_and_cleanup": true,
+  "setup_io_off_event_loop": true,
+  "cancelled_constructor_result_retained_and_closed": true,
+  "owned_async_cleanup_settles_despite_repeated_cancel": true,
+  "summary_authority_rechecked_after_cleanup": true,
+  "injected_hybrid_adapter_ownership_taken": false,
+  "cached_server_adapter_lifetime_changed": false,
+  "runtime_failure_response_exposes_details": false,
+  "model_quality_reevaluated": false,
+  "source_files": [
+    {
+      "path": ".env.example",
+      "sha256": "aefcd80b75cfe09a562bf1fc4415d478274b2121436301798dd7d1152e4c9a2f"
+    },
+    {
+      "path": "app/config.py",
+      "sha256": "071ed483e54f752d3f7890c36ee2d274a6615066840d0a9b9b38b7f8d437b41b"
+    },
+    {
+      "path": "app/main.py",
+      "sha256": "299f80c486918bf04c7124a98c4446c11ccb28e0d8f236e7efccd89981513245"
+    },
+    {
+      "path": "app/services/evaluation_runtime.py",
+      "sha256": "14ab39550f9f4e14a268e9cbed060ec7504e41102e5e890f6a07bcfe2ab157fa"
+    },
+    {
+      "path": "app/services/work_admission.py",
+      "sha256": "d07a2a947e7cae4f39bc297c1c027f729ecae19757044d28056e70ab96bebd49"
+    },
+    {
+      "path": "app/services/authentication_admission.py",
+      "sha256": "fc578e833f36ebb45530da1d3d58c6b90f8a27055de3efc1abb5c5f0d5ab7b76"
+    },
+    {
+      "path": "app/services/settled_io.py",
+      "sha256": "fa51794b5249503e225ed32fd936b6b2c472f9b55a3e08a4dd9ca7ed46084205"
+    },
+    {
+      "path": "app/analyzers/openai_analyzer.py",
+      "sha256": "479190064e415ee16614659a836fa290bffddf35f2641b8b3234e9760ad1c2cd"
+    },
+    {
+      "path": "app/analyzers/hybrid.py",
+      "sha256": "77d70f00f9ed6eea7adeb0bd8785c0ff160839ad140f2961dbd49e6b49415b8b"
+    },
+    {
+      "path": "tests/test_evaluation_runtime.py",
+      "sha256": "f043c42d683a9768aefa2c39fdedb100edca49883e0d118d98c6eb9b4374a3a6"
+    }
+  ],
+  "limits": [
+    "stuck setup/close retains bounded job slot; no force-kill guarantee",
+    "per app/process job admission, not cross-host global admission",
+    "new adapters need async close/ownership contract",
+    "already dispatched requests cannot be recalled/refunded",
+    "no paid API, enterprise SSO/MFA, multi-host, power loss or postponed 8h soak"
+  ]
+}

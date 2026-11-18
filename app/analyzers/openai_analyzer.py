@@ -56,6 +56,10 @@ class OpenAIAnalyzer:
     async def analyze(self, event: SecurityEvent) -> SecurityAssessment:
         return await self._analyze(event)
 
+    async def close(self):
+        """Close a request-owned adapter; cached server adapters retain their lifetime."""
+        await self._client.close()
+
     async def analyze_with_evidence(
         self, event: SecurityEvent, context: VerifiedSessionContext
     ) -> SecurityAssessment:

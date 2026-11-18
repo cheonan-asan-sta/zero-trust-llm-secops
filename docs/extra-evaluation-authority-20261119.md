@@ -33,3 +33,5 @@ python -m pytest tests/test_evaluation_authority.py tests/test_evaluation.py tes
 이 변경은 평가의 **사례 실행과 summary 전달** 경계다. 요청별 analyzer 생성의 동기 설정/secret 조회와 요청 소유 SDK client 종료는 다음 작업이다. 모든 새 plugin/provider를 자동으로 sandbox하지 않는다. root pipeline의 provider stub 시험은 paid API 품질 재평가가 아니다.
 
 새 F1·오탐·미탐 수치를 주장하지 않는다. 평가 원본/정답/기존 결과와 모델 prompt/판정은 그대로다. 실사용자 SSO/online revocation, 독립 witness/WORM, 다중 호스트·전원 단절·8시간 soak는 여전히 별도다.
+
+후속: [평가 client 생성·정리·작업 한도](extra-evaluation-runtime-20261119.md)를 추가했다. 위 수치/남은 범위는 해당 시점 기록이다.

@@ -4,7 +4,12 @@ import asyncio
 
 
 async def settled_io(function, *args, **kwargs):
-    worker = asyncio.create_task(asyncio.to_thread(function, *args, **kwargs))
+    return await settled_awaitable(asyncio.to_thread(function, *args, **kwargs))
+
+
+async def settled_awaitable(awaitable):
+    """Finish owned async cleanup despite repeated cancellation of its caller."""
+    worker = asyncio.ensure_future(awaitable)
     cancelled = None
     while True:
         try:

@@ -68,6 +68,10 @@ class Settings(BaseSettings):
         default=0.05, ge=0.01, le=2, allow_inf_nan=False
     )
     authentication_max_token_chars: int = Field(default=16384, ge=1024, le=131072)
+    evaluation_max_concurrency: int = Field(default=2, ge=1, le=4)
+    evaluation_queue_timeout_seconds: float = Field(
+        default=0.05, ge=0.01, le=2, allow_inf_nan=False
+    )
     analysis_max_concurrency: int = Field(default=8, ge=1, le=100)
     analysis_queue_timeout_seconds: float = Field(default=0.25, ge=0.01, le=10)
     audit_query_max_concurrency: int = Field(default=2, ge=1, le=8)

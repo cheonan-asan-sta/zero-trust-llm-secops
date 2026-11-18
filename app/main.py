@@ -95,6 +95,7 @@ from app.services.correlation import get_correlation_engine
 from app.services.detection_benchmark import BenchmarkUnavailable, get_detection_benchmark
 from app.services.detection_quality import get_detection_quality_service
 from app.services.evaluation import run_evaluation
+from app.services.evaluation_runtime import EvaluationRuntimeUnavailable, evaluation_runtime
 from app.services.execution_analysis_evidence import collect_session_execution_evidence
 from app.services.federated_audit import AuditQueryUnavailable
 from app.services.incident_quality import get_incident_quality_service
@@ -1270,13 +1271,10 @@ async def evaluate(
         if Role.ADMIN not in principal.effective_roles:
             raise HTTPException(403, "Administrator role is required for evaluation")
 
-    try:
-        analyzer = build_analyzer(evaluation_request.analyzer)
-    except ValueError as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
-
     class AuthorizedEvaluationAnalyzer:
-        name = analyzer.name
+        def __init__(self, delegate):
+            self.delegate = delegate
+            self.name = delegate.name
 
         async def analyze(self, event):
             try:
@@ -1284,7 +1282,7 @@ async def evaluate(
                     await revalidate_admin()
                     with bind_analysis_authority(revalidate_admin):
                         try:
-                            assessment = await analyzer.analyze(event)
+                            assessment = await self.delegate.analyze(event)
                         except Exception:
                             await revalidate_admin()
                             raise
@@ -1297,14 +1295,21 @@ async def evaluate(
                 ) from error
 
     try:
-        summary = await run_evaluation(
-            AuthorizedEvaluationAnalyzer(),
-            evaluation_request.runs_per_scenario,
-            evaluation_request.concurrency,
-        )
+        async with evaluation_runtime(
+            request, settings, lambda: build_analyzer(evaluation_request.analyzer), revalidate_admin,
+        ) as analyzer:
+            summary = await run_evaluation(
+                AuthorizedEvaluationAnalyzer(analyzer),
+                evaluation_request.runs_per_scenario,
+                evaluation_request.concurrency,
+            )
+        # Client disposal can await transport I/O. Do not deliver using authority
+        # checked only before that additional wait.
         async with _analysis_slot():
             await revalidate_admin()
         return summary
+    except EvaluationRuntimeUnavailable as error:
+        raise HTTPException(503, "Evaluation runtime is unavailable") from error
     except AnalysisCapacityExceeded as error:
         raise HTTPException(
             429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
