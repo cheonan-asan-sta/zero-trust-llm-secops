@@ -23,7 +23,7 @@ class HybridAnalyzer:
     def __init__(self, settings: Settings, llm: Analyzer | None = None) -> None:
         self._rule = RuleBasedAnalyzer()
         self._owns_llm = llm is None
-        self._llm = llm or OpenAIAnalyzer(settings)
+        self._llm = OpenAIAnalyzer(settings) if llm is None else llm
         self._confidence_threshold = settings.hybrid_confidence_threshold
         self._review_all = settings.hybrid_review_all
         self._llm_timeout_seconds = settings.hybrid_llm_timeout_seconds

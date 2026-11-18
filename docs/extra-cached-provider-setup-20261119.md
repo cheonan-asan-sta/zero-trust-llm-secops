@@ -33,3 +33,5 @@ python -m pytest tests/test_cached_provider_setup.py tests/test_analysis_caller_
 멈춘 factory/thread를 강제 종료하지 않고 bounded slot을 유지한다. HTTP 경로 밖에서 getter를 무제한 호출하는 외부 프로그램까지 admission하는 것은 아니다. 실행 중 공유 client의 설정 교체·graceful drain/shutdown은 별도다. 외부 SSO/MFA·원격 secret manager·유료 모델 품질을 검증한 것은 아니다.
 
 판정 prompt·ground truth·평가 원본/결과와 기존 F1·오탐·미탐은 변경하지 않았다. 독립 witness/WORM·다중 호스트·전원 단절·연기한8시간 soak는 남아 있다.
+
+후속: [Hybrid 주입 adapter 선택·소유권 일치](extra-hybrid-adapter-ownership-20261119.md)를 보강했다. 위 수치는 해당 시점 기록이다.

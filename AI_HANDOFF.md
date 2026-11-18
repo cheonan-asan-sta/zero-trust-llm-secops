@@ -1,3 +1,5 @@
+> 2026-11-19 Hybrid 주입 소유권: falsey adapter를 None과 구별해 추가 OpenAI 생성 금지·주입 객체 유지·외부 소유 close 금지. 수정 전2실패→신규2건 포함Windows51통과. 전체 Windows/Linux 회귀 진행 중(원본 XML 별도 보관). paid/AWS/push/CI/병합0·새 F1 없음·08:00 KST 목표 active. [검증·한계](docs/extra-hybrid-adapter-ownership-20261119.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-19 cached provider: 공용 analysis admission 안에서 첫 생성 settled_io·생성 전/후 현재 caller·반복 취소 worker settle·analyzer/agent cache lookup+construction 직렬화·실패 cache 금지·취소 후 성공 객체 cache 소유·기존 검증 경로의 slot/503 계약 유지. 변경 전4실패→신규20건 포함Win732/skip20·Linux750/skip2·최신 systemd54조건 통과. SQLite process 쓰기/commit 전후 kill·checkpoint/backup 회귀 확대. paid/AWS/push/CI/병합0·새 F1 없음·08:00 KST 목표 active. [검증·한계](docs/extra-cached-provider-setup-20261119.md). 아래는 이전 시점 기록이다.
 
 > 2026-11-19 평가 자원: bounded job 전체 수명·setup settled_io·취소된 constructor 결과 소유/정리·반복 취소 중 async close settle·정리 후 admin 확인·OpenAI/자체 생성 Hybrid close·주입 adapter/캐시 수명 유지·응답 상세 비공개. 변경 전2실패→신규24건 포함Win623/skip19·Linux640/skip2·최신 systemd54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·batch 반복 취소 후속·08:00 KST 목표 active. [검증·한계](docs/extra-evaluation-runtime-20261119.md). 아래는 이전 시점 기록이다.
