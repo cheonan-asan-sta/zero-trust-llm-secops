@@ -337,3 +337,19 @@ def test_loopback_tcp_controls_use_actual_http_auth_and_audit(api, tmp_path):
     )
     assert result["transport"] == "tcp_loopback" and result["audit_verified_lines"] == 1
     assert result["provider_stub_invocations"] == 1 and len(passed) == 9
+
+
+def test_loopback_native_sqlite_backup_restore_and_candidate_review(api, tmp_path):
+    from scripts.f1_lab.service_http_controls import run
+
+    passed = []
+    args = api.args
+    result = run(api.lab, args["request"], SimpleNamespace(session_id=args["signal"].session_id),
+                 args["receipt"], args["event"], args["proofs"], tmp_path, passed.append,
+                 audit_recovery=True)
+    assert result["audit_writer_scope"] == "shared_sqlite_transaction"
+    assert result["provider_stub_invocations"] == 1 and len(passed) == 15
+    recovery = result["audit_recovery"]
+    assert recovery["snapshot_head"]["seq"] == 1 and recovery["candidate_review_head"]["seq"] == 2
+    assert recovery["original_database_unchanged"] is True
+    assert recovery["automatic_activation_allowed"] is False

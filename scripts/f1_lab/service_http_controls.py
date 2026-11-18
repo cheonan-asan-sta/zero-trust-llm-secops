@@ -28,6 +28,7 @@ from app.services.native_analysis_registry import (
     NativeAnalysisRegistry,
     create_native_analysis_registry,
 )
+from app.services.sqlite_audit import SQLiteAuditStore
 from scripts.f1_lab.native_jsonl import require
 from scripts.f1_lab.service_analysis_evidence import publish_service_analysis
 
@@ -53,7 +54,19 @@ def preload(directory):
     return main
 
 
-def run(lab, request, access, receipt, event, proofs, directory, passed, *, shared_config=None):
+def run(
+    lab,
+    request,
+    access,
+    receipt,
+    event,
+    proofs,
+    directory,
+    passed,
+    *,
+    shared_config=None,
+    audit_recovery=False,
+):
     from app import main, security
 
     before = hashlib.sha256(lab.broker.joiner.path.read_bytes()).hexdigest()
@@ -91,7 +104,8 @@ def run(lab, request, access, receipt, event, proofs, directory, passed, *, shar
         api_key_roles="responder",
         openai_prompt_mode="grounded",
         openai_api_key="local-stub-not-a-real-api-key",
-        audit_backend="jsonl",
+        audit_backend="sqlite" if audit_recovery else "jsonl",
+        audit_db_path=Path(directory) / "native-http-audit.sqlite3" if audit_recovery else None,
         audit_log_path=Path(directory) / "native-http-audit.jsonl",
         native_analysis_shared_config_path=shared_config[0] if shared_config else None,
         native_analysis_shared_config_sha256=shared_config[1] if shared_config else None,
@@ -202,7 +216,11 @@ def run(lab, request, access, receipt, event, proofs, directory, passed, *, shar
                     == payload,
                     "native_http_audit_query",
                 )
-            reloaded = AuditStore(audit._path)
+            reloaded = (
+                SQLiteAuditStore.open_existing(audit.path)
+                if audit_recovery
+                else AuditStore(audit._path)
+            )
             require(
                 reloaded.integrity()["ok"]
                 and reloaded.integrity()["verified_lines"] == 1
@@ -213,10 +231,12 @@ def run(lab, request, access, receipt, event, proofs, directory, passed, *, shar
                 "native_http_persisted_audit",
             )
             passed("native_http_hash_chain_audit_reload_equals_response")
-            raw = json.dumps(payload) + audit._path.read_text(encoding="utf-8")
+            raw = json.dumps(payload).encode() + (
+                audit.path.read_bytes() if audit_recovery else audit._path.read_bytes()
+            )
             require(
                 all(
-                    secret not in raw
+                    secret.encode() not in raw
                     for secret in (key, ref, request.nonce, receipt.signature, signal.signature)
                 )
                 and parse.await_count == 1,
@@ -229,10 +249,27 @@ def run(lab, request, access, receipt, event, proofs, directory, passed, *, shar
                 "native_http_read_only",
             )
             passed("native_http_analysis_preserves_execution_ledger_and_app_grant_history")
+            recovery_report = None
+            if audit_recovery:
+                from scripts.f1_lab.audit_recovery_controls import run as run_recovery
+
+                with httpx.Client(base_url=base, timeout=10, trust_env=False) as recovery_client:
+                    recovery_report = run_recovery(
+                        audit, payload, recovery_client, headers, directory, passed, stack
+                    )
+                require(
+                    parse.await_count == 1
+                    and journal_before == lab.operations.journal_status()
+                    and before == hashlib.sha256(lab.broker.joiner.path.read_bytes()).hexdigest(),
+                    "native_recovery_no_model_or_authorization_side_effect",
+                )
             return {
                 "transport": "tcp_loopback",
                 "reference_backend": "encrypted_sqlite" if shared_config else "process_memory",
-                "audit_writer_scope": "per_process_file" if shared_config else "single_process",
+                "audit_writer_scope": "shared_sqlite_transaction"
+                if audit_recovery
+                else ("per_process_file" if shared_config else "single_process"),
+                "audit_recovery": recovery_report,
                 "http_status": response.status_code,
                 "model_provider_stubbed": True,
                 "paid_api_calls": 0,

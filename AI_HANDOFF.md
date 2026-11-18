@@ -1,3 +1,5 @@
+> 2026-11-19 native 감사 복구 인수: 실제 systemd/ptrace→공유 참조→TCP HTTP→SQLite 감사→암호화 백업/복원 후보 조회·검토35조건 통과. Linux 관련197건·Windows49건 통과. 후보 검토 후 원본 DB/권한 이력 불변·오래된/변조 백업 거부. provider는 stub·유료/AWS0·push/CI/병합 없음·오전08:00 목표 active. [검증과 한계](docs/extra-native-audit-recovery-20261119.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-19 감사 이관/백업 후속: 고정 source 목록 해시·원래 검토 이력을 검증해 새 SQLite로 이관. AES-256-GCM 스트리밍 온라인 backup·외부 package/head pin·새 경로 restore·활성화 금지 CLI 추가. 최신 Win/Linux 각각42건(동일22개 신규+20개 writer) 통과·이전 Linux 확대177건. 원본/실사용 DB/설정 보존·유료API/AWS/push/CI/병합 없음·오전08:00 목표 active. [설정·시험·한계](docs/extra-audit-transfer-backup-20261119.md). 아래는 이전 시점 기록이다.
 
 > 2026-11-19 오전 개발 진행: extra 선택형 SQLite 공동 감사 writer/전역 chain/head 검증·검토 CAS·HTTP409·프로세스 commit 전후 강제종료 복구 추가. Linux 관련177건·Windows 최신 집중20건 통과. 기본 backend 유지·과거 자료 자동 이관 없음·유료API/AWS/push/CI/병합 없음. 오전08:00 목표 active. [구현과 검증](docs/extra-transactional-audit-20261119.md). 아래는 이전 시점 기록이다.
