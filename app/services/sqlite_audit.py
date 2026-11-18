@@ -30,6 +30,20 @@ class SQLiteAuditStore:
     MAX_ROWS = 100000
     MAX_BYTES = 256 * 1024 * 1024
 
+    @classmethod
+    def open_existing(cls, path):
+        """Validate an existing audit DB without initializing or repairing its schema."""
+        store = cls.__new__(cls)
+        store.path = Path(path)
+        with store._transaction() as con:
+            tables = {
+                r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table'")
+            }
+            if tables != {"audit_entries", "audit_head"}:
+                raise AuditQueryUnavailable("existing audit schema required")
+            store._read(con)
+        return store
+
     def __init__(self, path):
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -99,7 +113,7 @@ class SQLiteAuditStore:
             record = AnalysisResult.model_validate_json(payload)
             old = records.get(record.analysis_id)
             if old is None and record.review_updated_at is not None:
-                raise AuditReviewConflict("review requires an existing analysis")
+                raise AuditQueryUnavailable("persisted review has no original analysis")
             if old is not None and not self._review_fits(old, record):
                 raise AuditQueryUnavailable("invalid persisted review transition")
             records[record.analysis_id] = record
@@ -121,6 +135,8 @@ class SQLiteAuditStore:
         with self._transaction(write=True) as con:
             records, seq, previous, size = self._read(con)
             old = records.get(record.analysis_id)
+            if old is None and record.review_updated_at is not None:
+                raise AuditReviewConflict("review requires an existing analysis")
             if expected is not None:
                 latest = self._latest(records, record.event_id, record.tenant_id)
                 if old != expected or latest != expected or not self._review_fits(old, record):
