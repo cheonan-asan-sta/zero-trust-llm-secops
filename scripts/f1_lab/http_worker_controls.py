@@ -33,6 +33,8 @@ def owned_worker(
     cursor_config=None,
     checkpoint_config=None,
     audit_mode="sqlite",
+    accounts_path=None,
+    provider_gate=None,
 ):
     require(audit_mode in {"sqlite", "jsonl", "federated_jsonl"}, "owned_http_worker_audit_mode")
     directory = Path(directory).absolute()
@@ -54,6 +56,8 @@ def owned_worker(
         "shared_pin": shared_config[1],
         "audit_db": str(Path(audit_path).absolute()),
         "audit_mode": audit_mode,
+        "accounts_path": str(Path(accounts_path).absolute()) if accounts_path else None,
+        "provider_gate": str(Path(provider_gate).absolute()) if provider_gate else None,
         "api_key_sha256": hashlib.sha256(api_key.encode()).hexdigest(),
         "subject": lab.principal.subject,
         "tenant_id": lab.principal.tenant_id,

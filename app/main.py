@@ -741,13 +741,18 @@ async def analyze(
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
     try:
-        return await _analyze_event(event, analyzer, principal, request.state.request_id)
+        return await _analyze_event(
+            event, analyzer, principal, request.state.request_id,
+            caller_authority_check=getattr(request.state, "authentication_revalidator", None),
+        )
     except AnalysisCapacityExceeded as exc:
         raise HTTPException(
             status_code=429,
             detail="Analysis capacity is temporarily exhausted",
             headers={"Retry-After": "1"},
         ) from exc
+    except HTTPException:
+        raise
     except Exception as exc:
         raise HTTPException(status_code=502, detail="Analysis provider failed") from exc
 
@@ -767,18 +772,33 @@ async def analyze_batch(
 
     async def analyze_with_limit(event: SecurityEvent) -> AnalysisResult:
         async with semaphore:
-            return await _analyze_event(event, analyzer, principal, request.state.request_id)
+            return await _analyze_event(
+                event, analyzer, principal, request.state.request_id,
+                caller_authority_check=getattr(request.state, "authentication_revalidator", None),
+            )
 
     try:
-        results = await asyncio.gather(
-            *(analyze_with_limit(event) for event in batch_request.events)
-        )
+        tasks = [asyncio.create_task(analyze_with_limit(event)) for event in batch_request.events]
+        try:
+            results = await asyncio.gather(*tasks)
+            async with _analysis_slot():
+                await _analysis_caller_boundary(
+                    principal, getattr(request.state, "authentication_revalidator", None)
+                )
+        except BaseException:
+            for task in tasks:
+                if not task.done():
+                    task.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
+            raise
     except AnalysisCapacityExceeded as exc:
         raise HTTPException(
             status_code=429,
             detail="Analysis capacity is temporarily exhausted",
             headers={"Retry-After": "1"},
         ) from exc
+    except HTTPException:
+        raise
     except Exception as exc:
         raise HTTPException(status_code=502, detail="Batch analysis provider failed") from exc
     return BatchAnalysisResult(
@@ -1119,11 +1139,12 @@ async def _analyze_event(
     verification_context: VerifiedSessionContext | None = None,
     verification_context_supplier: Callable[[], VerifiedSessionContext] | None = None,
     llm_trace_supplier: Callable[[], dict | None] | None = None,
+    caller_authority_check: Callable[[], None] | None = None,
 ) -> AnalysisResult:
     async with _analysis_slot():
         return await _analyze_event_in_slot(
             event, analyzer, principal, request_id, verification_context,
-            verification_context_supplier, llm_trace_supplier,
+            verification_context_supplier, llm_trace_supplier, caller_authority_check,
         )
 
 
@@ -1135,12 +1156,15 @@ async def _analyze_event_in_slot(
     verification_context: VerifiedSessionContext | None = None,
     verification_context_supplier: Callable[[], VerifiedSessionContext] | None = None,
     llm_trace_supplier: Callable[[], dict | None] | None = None,
+    caller_authority_check: Callable[[], None] | None = None,
 ) -> AnalysisResult:
     """Internal pipeline; its caller must hold an analysis slot throughout."""
     # Live integrity scans must not block the event loop or release capacity
     # while an abandoned non-cancellable filesystem thread is still running.
     selected_audit_store = audit_store
+    await _analysis_caller_boundary(principal, caller_authority_check)
     await _analysis_audit_boundary(selected_audit_store)
+    await _analysis_caller_boundary(principal, caller_authority_check)
     started = perf_counter()
     normalized = ocsf_normalizer.normalize(event)
     detection = sigma_engine.evaluate(normalized)
@@ -1175,9 +1199,11 @@ async def _analyze_event_in_slot(
         actor_id=principal.subject,
         request_id=request_id,
     )
+    await _analysis_caller_boundary(principal, caller_authority_check)
     if audit_store is not selected_audit_store:
         raise RuntimeError("analysis audit store changed; refusing persistence")
     await selected_audit_store.save(result)
+    await _analysis_caller_boundary(principal, caller_authority_check)
     # A full audit scan may be slow. Revalidate evidence after it, so source
     # withdrawal/expiry during this added I/O cannot bypass the existing check.
     await _analysis_audit_boundary(selected_audit_store, result)
@@ -1185,11 +1211,24 @@ async def _analyze_event_in_slot(
         # Audit completion may have awaited another writer. Recheck before
         # delivery, retaining any committed historical record on rejection.
         await selected_context.revalidate(event)
+    await _analysis_caller_boundary(principal, caller_authority_check)
     # Keep committed history on post-commit withdrawal, but deny delivery from
     # a replaced authority or a database below the configured minimum history.
     if audit_store is not selected_audit_store:
         raise RuntimeError("analysis audit store changed before delivery")
     return result
+
+
+async def _analysis_caller_boundary(principal, check=None):
+    if check is not None:
+        await settled_io(check)
+    expiry = principal.authentication_expires_at
+    if (principal.auth_method == "oidc" and expiry is None) or (
+        expiry is not None and datetime.now(UTC) >= expiry
+    ):
+        raise HTTPException(401, "Caller authentication expired")
+    if Role.ANALYST not in principal.effective_roles:
+        raise HTTPException(403, "Insufficient role for analysis")
 
 
 async def _analysis_audit_boundary(store, expected_result=None):

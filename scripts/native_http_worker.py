@@ -5,6 +5,7 @@ It loads the normal app/PDP/registry/audit factories from fixed test settings.
 """
 
 import argparse
+import asyncio
 import json
 import os
 import socket
@@ -39,6 +40,8 @@ def main():
         "shared_pin",
         "audit_db",
         "audit_mode",
+        "accounts_path",
+        "provider_gate",
         "api_key_sha256",
         "subject",
         "tenant_id",
@@ -50,6 +53,14 @@ def main():
         raise ValueError("worker control fields rejected")
     if data["audit_mode"] not in {"sqlite", "jsonl", "federated_jsonl"}:
         raise ValueError("worker audit mode rejected")
+    os.environ.pop("API_KEY_ACCOUNTS_PATH", None)
+    if data["accounts_path"] is not None:
+        os.environ["API_KEY_ACCOUNTS_PATH"] = data["accounts_path"]
+    gate = Path(data["provider_gate"]).absolute() if data["provider_gate"] is not None else None
+    if gate is not None:
+        if not gate.is_relative_to(path.parent.absolute()) or gate.is_symlink():
+            raise ValueError("worker provider gate must be inside its owned directory")
+        gate.mkdir(parents=True, exist_ok=True, mode=0o700)
     if (data["cursor_key_path"] is None) != (data["cursor_key_pin"] is None):
         raise ValueError("worker cursor key configuration rejected")
     if (data["checkpoint_path"] is None) != (data["checkpoint_pin"] is None):
@@ -105,6 +116,13 @@ def main():
         nonlocal calls
         calls += 1
         atomic_json(data["stats"], {"provider_stub_calls": calls, "paid_api_calls": 0})
+        if gate is not None:
+            atomic_json(gate / "entered.json", {"pid": os.getpid(), "calls": calls})
+            deadline = asyncio.get_running_loop().time() + 8
+            while not (gate / "release").is_file():
+                if asyncio.get_running_loop().time() >= deadline:
+                    raise TimeoutError("owned provider gate was not released")
+                await asyncio.sleep(0.02)
         prompt = next(item for item in reversed(_kwargs["input"]) if item["role"] == "user")
         catalog = json.loads(prompt["content"])["evidence_catalog"]
         native_path = "verified_session.native_execution.process.executable_sha256"

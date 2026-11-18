@@ -46,4 +46,4 @@ python -m scripts.run_exec_history_controls --directory <새_결과_폴더> --wo
 
 file fsync 성공은 host 전원 단절·디렉터리/스토리지 전체 내구성 시험을 대신하지 않는다. flush 실패 bytes는 보존하고 자동 재시도·자동 head 승격·자동 활성화를 하지 않는다. 전체 scan 추가로 행 수에 비례한 I/O가 늘며 SLA/RSS/처리량은 이번 시험의 지표가 아니다.
 
-다음은 일반 분석의 호출 계정 철회/만료 경계를 검토한다. 원격 witness/WORM·실사용자 SSO·다중 호스트·전원 단절·연기한8시간 soak는 미완료다. 모델 판정·평가 원본/정답·F1·오탐/미탐 수치를 변경하거나 재측정하지 않았다.
+일반 분석의 호출 계정 철회/만료 경계는 [후속 구현](extra-analysis-caller-boundary-20261119.md)에 연결했다. 위 수치/소스 지문은 JSONL writer 단계의 이력이며 최신은 후속 문서를 본다. 원격 witness/WORM·실사용자 SSO·다중 호스트·전원 단절·연기한8시간 soak는 미완료다. 모델 판정·평가 원본/정답·F1·오탐/미탐 수치를 변경하거나 재측정하지 않았다.

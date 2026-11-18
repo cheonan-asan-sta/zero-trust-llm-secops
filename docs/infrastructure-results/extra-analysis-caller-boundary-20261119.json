@@ -1,0 +1,131 @@
+{
+  "schema": "extra-analysis-caller-boundary-1",
+  "date_kst": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "pushed": false,
+  "ci_started": false,
+  "merged": false,
+  "new_tests": 41,
+  "new_actual_tcp_process_tests": 1,
+  "native_conditions": 54,
+  "native_new_conditions": 0,
+  "before": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "8",
+    "skipped": "0",
+    "tests": "8",
+    "time": "4.220",
+    "timestamp": "2026-11-19T04:42:32.804177+09:00",
+    "hostname": "희주",
+    "passed": 0,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\analysis-caller-before-20261119.xml",
+    "xml_sha256": "ceeb89ae9ac3152c301231680866b052890991c8194b93b54ef9b7f342cde66a"
+  },
+  "initial_focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "95",
+    "time": "10.717",
+    "timestamp": "2026-11-19T04:48:21.733752+09:00",
+    "hostname": "희주",
+    "passed": 95,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\analysis-caller-focused-20261119.xml",
+    "xml_sha256": "061405998cba41f49122099f4bd5573cea7dd750fa3a0887f0d2637d8af372d9"
+  },
+  "http_focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "1",
+    "time": "7.617",
+    "timestamp": "2026-11-19T04:51:51.136865+09:00",
+    "hostname": "희주",
+    "passed": 1,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\analysis-caller-http-focused-20261119.xml",
+    "xml_sha256": "1a630ea902b0cb5b4ca1d15d9eaaeedee23a96db03a3009c344189543bf0b480"
+  },
+  "windows_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "4",
+    "tests": "476",
+    "time": "177.513",
+    "timestamp": "2026-11-19T04:53:03.911990+09:00",
+    "hostname": "희주",
+    "passed": 472,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\analysis-caller-windows-20261119.xml",
+    "xml_sha256": "1f2722c09f6476da5d260de9b4d53d88a8eff230e7e53ba8330ef2d29041e5cb"
+  },
+  "linux_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "2",
+    "tests": "476",
+    "time": "164.453",
+    "timestamp": "2026-11-19T04:53:09.678815+09:00",
+    "hostname": "localhost",
+    "passed": 474,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\analysis-caller-linux-20261119.xml",
+    "xml_sha256": "107f5c1b607e04640e0dfbf54a9ead34479187a36c7196d7bc27c3fa17cde43f"
+  },
+  "native_source_run_sha256": "7047192311c71dbdcc6547abb92c6b44bc31052b8f32c85fe6d47d0fc2983d1e",
+  "ordinary_and_batch_current_caller_boundaries": true,
+  "queued_withdrawal_blocks_provider": true,
+  "caller_io_settled_inside_analysis_capacity": true,
+  "batch_siblings_cancelled_and_settled_on_failure": true,
+  "postcommit_withdrawal_preserves_audit": true,
+  "known_authentication_errors_preserve_http_status": true,
+  "oidc_expiry_and_loaded_server_scope_checked": true,
+  "oidc_online_revocation_checked": false,
+  "account_file_stable_bounded_cross_platform_read": true,
+  "new_callbacks_retain_plaintext_credential": false,
+  "sdk_internal_retry_authority_revalidated": false,
+  "initial_authentication_io_admission_added": false,
+  "all_long_running_endpoints_covered": false,
+  "model_quality_reevaluated": false,
+  "source_files": [
+    {
+      "path": "app/main.py",
+      "sha256": "c62388d1e6ee50ed7c0eac23782a23068dec792cf2a5be32051ad4b32e6a95c0"
+    },
+    {
+      "path": "app/security.py",
+      "sha256": "f8b1235b0cb7cdbc1b523b57539d150a996000aa654b8159f660ce52d6ace0f3"
+    },
+    {
+      "path": "app/api_key_accounts.py",
+      "sha256": "5d182100ec4d1a8af9e2b8ff2f8a263e0eb4394c203081c059643e6c4dec95d3"
+    },
+    {
+      "path": "scripts/native_http_worker.py",
+      "sha256": "3d9f16752d31ebfefb27df968b18c669d6d4e3f48ae5b03d1d2dda3f1db8d707"
+    },
+    {
+      "path": "scripts/f1_lab/http_worker_controls.py",
+      "sha256": "f472b5ab2f2a86133ecf10b5bfe0a3ccc09572d48f6ab375329b9f48a1c9e3d5"
+    },
+    {
+      "path": "tests/test_analysis_caller_boundary.py",
+      "sha256": "1880f28551254eb0ad553f3b8f170ea742d0f0f00aba4c9f768ffc84f33e2e34"
+    },
+    {
+      "path": "tests/test_http_caller_boundary.py",
+      "sha256": "d32b038e4c6f531fb04eac5c965d18b1f718ad204c39b57169ece807fca07de2"
+    }
+  ],
+  "limits": [
+    "one analyzer invocation may already have sent requests; no refund/cancellation claim",
+    "ordinary SDK internal retries and initial auth I/O admission are follow-up",
+    "OIDC local signed token + loopback JWKS with controlled pipeline clock is not enterprise SSO/MFA",
+    "no atomic joint snapshot of identity/audit/external sources",
+    "no paid model evaluation, multi-host, power loss or postponed 8h soak"
+  ]
+}

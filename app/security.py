@@ -202,10 +202,16 @@ async def get_principal(
             roles=frozenset({Role.ADMIN}),
             auth_method="disabled",
         )
+
+        def revalidate_local_mode():
+            if get_settings().auth_mode != "disabled":
+                raise _unauthorized("Caller authentication policy changed")
+
+        request.state.authentication_revalidator = revalidate_local_mode
     elif settings.auth_mode == "api_key":
         principal = _api_key_principal(api_key, settings)
-        # Retain only the digest in this request-local closure. Verified analyses
-        # recheck server-owned account changes at every evidence boundary.
+        # Retain only the digest in this request-local closure. Analysis/audit
+        # boundaries recheck server-owned account changes without the raw key.
         digest = hashlib.sha256(api_key.encode("utf-8")).hexdigest()
 
         def revalidate_authority():
@@ -219,6 +225,28 @@ async def get_principal(
         request.state.authentication_revalidator = revalidate_authority
     else:
         principal = await _oidc_principal(credentials, settings)
+
+        def oidc_scope(value):
+            return (
+                value.oidc_issuer,
+                value.oidc_audience,
+                value.oidc_jwks_url,
+                value.oidc_roles_claim,
+                value.oidc_tenant_claim,
+            )
+
+        admitted_scope = oidc_scope(settings)
+
+        def revalidate_oidc_scope():
+            current = get_settings()
+            if (
+                current.auth_mode != "oidc"
+                or oidc_scope(current) != admitted_scope
+                or datetime.now(UTC) >= principal.authentication_expires_at
+            ):
+                raise _unauthorized("Caller authentication policy changed or expired")
+
+        request.state.authentication_revalidator = revalidate_oidc_scope
     request.state.principal = principal
     return principal
 
