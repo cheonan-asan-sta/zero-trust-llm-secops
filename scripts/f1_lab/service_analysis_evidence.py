@@ -172,11 +172,45 @@ def collect_service_analysis_evidence(
     return replace(context, verify_current=current)
 
 
+def publish_service_analysis(
+    registry,
+    operations,
+    signal,
+    principal,
+    joiner,
+    caller_registry,
+    request,
+    event,
+    proofs,
+    receipt,
+):
+    """Trusted collector publication; HTTP callers only receive the opaque reference.
+
+    Keeps original signed inputs private and re-collects with the actual HTTP caller.
+    The registry is process-local and must belong to the serving application's PDP.
+    """
+    if registry.operations is not operations:
+        raise SignalRejected("native publisher and HTTP application stores differ")
+    signal = SignedSessionSignal.model_validate(signal.model_dump(mode="json"))
+    request = ServiceRequest.model_validate(request.model_dump(mode="json"))
+    event = ServiceEvent.model_validate(event.model_dump(mode="json"))
+    receipt = CallerReceipt.model_validate(receipt.model_dump(mode="json"))
+    proofs = tuple(ServiceProof.model_validate(p.model_dump(mode="json")) for p in proofs)
+
+    def collect(caller):
+        return collect_service_analysis_evidence(
+            operations, signal, caller, joiner, caller_registry, request, event, proofs, receipt
+        )
+
+    return registry.publish(signal, principal, collect)
+
+
 async def review_service_execution(analyzer, signal, context):
     """Internal advisory entrypoint; no response execution and no paid call of its own.
 
     The injected grounded analyzer may be the existing OpenAI/Hybrid analyzer.
-    A server HTTP route must additionally use its existing audit/delivery path.
+    The HTTP route separately uses app.main's existing audited delivery pipeline;
+    this internal helper does not persist an audit record.
     """
     if context.verify_current is None:
         raise SignalRejected("live native execution evidence revalidation required")

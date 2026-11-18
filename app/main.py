@@ -64,6 +64,7 @@ from app.models import (
     SigmaRuleSummary,
     SimulationRequest,
 )
+from app.native_analysis_models import NativeServiceAnalysisRequest
 from app.response_api import response_router
 from app.scenarios import SCENARIOS, generate_events, get_scenario
 from app.security import Principal, Role, require_roles
@@ -94,6 +95,7 @@ from app.services.integration_outbox import (
     OutboxTerminalStateError,
     create_integration_outbox_store,
 )
+from app.services.native_analysis_registry import NativeAnalysisMissing, NativeAnalysisRegistry
 from app.services.ocsf import get_ocsf_normalizer
 from app.services.policy import (
     enforce_assessment_safety,
@@ -107,7 +109,7 @@ from app.services.scenario_evaluator import evaluate_scenarios
 from app.services.session_analysis_evidence import VerifiedSessionContext, collect_session_evidence
 from app.services.sigma import get_sigma_engine
 from app.services.signal_inbox import SignalInbox
-from app.services.trusted_signals import SignalVerifier
+from app.services.trusted_signals import SignalRejected, SignalVerifier
 from app.services.zero_trust import POLICY_PATH, ZeroTrustOperations
 from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
 from app.zero_trust_models import SignedSessionSignal
@@ -164,6 +166,9 @@ continuous_signal_service = (
     )
     if zero_trust_operations
     else None
+)
+native_analysis_registry = (
+    NativeAnalysisRegistry(zero_trust_operations) if zero_trust_operations is not None else None
 )
 app.include_router(zero_trust_router(zero_trust_operations, continuous_signal_service))
 install_zero_trust_error_handlers(app)
@@ -815,6 +820,63 @@ async def analyze_verified_session(
     except Exception as exc:
         # Provider failures and expiring snapshots do not yield a successful analysis.
         raise HTTPException(502, "Verified-session analysis could not be completed") from exc
+
+
+@app.post("/analysis/native-service", response_model=AnalysisResult)
+async def analyze_native_service(
+    selection: NativeServiceAnalysisRequest, request: Request, principal: AnalystPrincipal,
+) -> AnalysisResult:
+    """Analyze only an execution published by the trusted, process-local collector."""
+    if zero_trust_operations is None or get_settings().app_environment == "production":
+        raise HTTPException(404, "Local native service analysis is disabled in production")
+    registry = native_analysis_registry
+    if registry is None or registry.operations is not zero_trust_operations:
+        raise HTTPException(503, "Native service analysis publisher is not configured")
+    try:
+        signal, context = registry.resolve(
+            selection.execution_ref, principal,
+            caller_authority_check=getattr(request.state, "authentication_revalidator", None),
+        )
+    except NativeAnalysisMissing as exc:
+        raise HTTPException(404, "Native execution reference unavailable") from exc
+    collected = context
+
+    def verify_serving_context():
+        if native_analysis_registry is not registry or zero_trust_operations is not registry.operations:
+            raise SignalRejected("native analysis serving stores changed")
+        collected.verify_current()
+
+    context = replace(context, verify_current=verify_serving_context)
+    try:
+        analyzer = get_analyzer()
+    except ValueError as exc:
+        raise HTTPException(503, "Native service analysis provider is not configured") from exc
+    if get_settings().openai_prompt_mode != "grounded" or not callable(
+        getattr(analyzer, "analyze_with_evidence", None)
+    ):
+        raise HTTPException(503, "Configure grounded OpenAI or hybrid native analysis")
+
+    class BoundNativeAnalyzer:
+        name = analyzer.name
+
+        async def analyze(self, event):
+            # Queueing and inference can outlive or withdraw any supporting authority.
+            context.verify_current()
+            result = await analyzer.analyze_with_evidence(event, context)
+            context.verify_current()
+            return result
+
+    try:
+        return await _analyze_event(
+            signal.event, BoundNativeAnalyzer(), principal, request.state.request_id,
+            verification_context=context,
+        )
+    except AnalysisCapacityExceeded as exc:
+        raise HTTPException(
+            429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from exc
+    except Exception as exc:
+        raise HTTPException(502, "Native service analysis could not be completed") from exc
 
 
 @app.post("/analysis/evidence-review", response_model=AnalysisResult)

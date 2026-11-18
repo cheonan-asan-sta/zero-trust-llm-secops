@@ -1,5 +1,7 @@
 # extra 개발: 실제 서비스 실행 근거와 LLM 분석 연결
 
+> 후속 상태: 같은 날 [HTTP 분석·감사 연결](extra-native-http-audit-20261118.md)을 추가했다. 아래는 내부 어댑터를 먼저 구현한 `1bcd2d9` 시점의 결과와 범위다. 새 HTTP 경로와 현재 남은 작업은 후속 문서를 기준으로 한다.
+
 2026-11-18. 발표와 별개인 후속 개발이다. 기준 main은 PR #91이 병합된 `e058bcac05753a873ca00d68eb0a0533308057a2`다. 기존 extra에 고유 커밋이 없어 전용 worktree에서 최신 main으로 fast-forward했다. 이번 변경은 **로컬 extra**에만 저장한다. 원격 push·CI·main/aitest 병합·AWS 배포는 하지 않는다.
 
 ## 구현

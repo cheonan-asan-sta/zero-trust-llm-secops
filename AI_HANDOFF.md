@@ -1,3 +1,5 @@
+> 2026-11-18 extra HTTP 후속: 서버가 검증·등록한 실행 참조로 POST /analysis/native-service 분석과 기존 해시 체인 감사를 연결. 동일 호출자/tenant, 모델 전후·감사 저장 후 재검증, 소비된 grant 재발급 방지. Linux698건(신규60건 포함)·Windows신규60건·실제 systemd+TCP HTTP24조건 통과. 유료/API AWS0·새 F1 측정 없음·push/CI/병합 없음. 참조는 프로세스 메모리이며 재시작/다른 worker에서는 소멸. [구현·검증·운영 한계](docs/extra-native-http-audit-20261118.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-18 extra 후속: main PR #91(e058bca)에서 분기한 로컬 개발. 실제 systemd 실행·서명된 호출자 영수증·정확한 앱 grant 소비를 읽기 전용으로 연결해 LLM 입력에 추가. Linux 관련 회귀572건(신규45건 포함), 실제 systemd15조건 통과. 유료/AWS0·새 모델 F1 측정 없음·push/CI/병합 없음. [구현·결과·범위](docs/extra-native-execution-llm-20261118.md). 아래는 이전 시점 기록이다.
 
 > 2026-11-17 오후 후속: 개발360건 TP163/FP6/FN17/TN174·F1 93.41%·목표 미달 유지. 전체 수치 후보는 악화, 다운로드60건 후보는 개선0으로 모두 런타임 미채택. 선택적 LLM 근거 조회는 실제 실행/MFA 사례의 탐지 유지·inline으로 agent 요청24→12. 불완전 근거의 ALLOW 권고를 서버에서 HOLD로 제한하고 원래 권고 보존; 분류/F1 변경0. 취소 도중 JSONL 감사 경합·검토 중 호출 계정 변경·감사 후 철회 시 전달 거부도 재현/수정. 로그 지시문6종의 실제12회는 판정 유지. 유료1,071회/$4.87398975추정·미확인0·고정47fc624 Linux7,696/skip2·Windows660/skip27 통과·CI/push/병합/AWS 없음. [모든 결과·한계](docs/llm-operation-evidence-20261117.md) 아래는 이전 시점 기록이다.
