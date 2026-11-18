@@ -55,3 +55,13 @@ python -m pytest tests/test_native_analysis_http.py tests/test_jsonl_query_sourc
 ## 임시 자원 정리
 
 시험 프로세스가 종료된 것을 확인하고, 이번 실행이 소유한 Linux home 아래 두 `--basetemp`의 `tmp` 디렉터리만 제거했다. 약720MiB의 합성 fixture이며 원본 XML·소스·평가 원본/정답/보고서는 보존했다. 실제 systemd unit/private state도 해당 runner가 정리했다. Docker 자원을 새로 만들지 않았고 다른 프로젝트 자원이나 공유 venv는 삭제하지 않았다. WSL 파일 삭제가 Windows 가상디스크를 즉시 축소했다는 뜻은 아니며 별도 compact는 실행하지 않았다.
+
+## 결과 묶음의 로컬 검산
+
+저장소 root에서 다음 명령으로 위 네 XML의 SHA-256·실제 testcase별 건수·실패 노드 목록·재검증 통과 노드와의 대응을 다시 확인할 수 있다. Python 표준 라이브러리만 사용하며 외부 요청이나 결과 수정은 하지 않는다.
+
+```sh
+python -m scripts.verify_extra_local_validation
+```
+
+검산기는 XML 변경, 허위 성공 건수, 원래 실패와 무관한 다른 통과 사례, 실패 목록 숨김, 저장소 밖 경로, 중복 testcase로 건수 부풀리기를 거부한다. 정상 원본에서는 과거 실패를 유지하고 `fresh_full_suite_green=false`를 출력한다. [Windows7건](infrastructure-results/local-validation-evidence-checker-20261119.xml)·[Linux7건](infrastructure-results/local-validation-evidence-checker-linux-20261119.xml)으로 검산기의 변경 탐지/거부 동작도 확인했다. 이는 독립 witness·전자서명이나 모델 성능 시험이 아니며, 보고서와 XML을 함께 바꾸는 관리자에 대한 보장은 제공하지 않는다. 이7건은 위 전체 실행에 포함됐다고 합산하지 않는다.

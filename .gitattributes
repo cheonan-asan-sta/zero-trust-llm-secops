@@ -11,6 +11,8 @@ docs/infrastructure-results/extra-final-full-native-linux-20261119.xml -text whi
 docs/infrastructure-results/jsonl-query-source-windows-20261119.xml -text whitespace=cr-at-eol
 docs/infrastructure-results/http-review-contract-linux-final-20261119.xml -text whitespace=cr-at-eol
 docs/infrastructure-results/jsonl-read-contract-windows-final-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/local-validation-evidence-checker-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/local-validation-evidence-checker-linux-20261119.xml -text whitespace=cr-at-eol
 infra/mtls/nginx-renewal.sh text eol=lf
 infra/mtls/nginx-rekey.sh text eol=lf
 infra/runtime/** text eol=lf

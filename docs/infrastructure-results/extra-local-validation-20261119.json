@@ -138,6 +138,14 @@
     {
       "path": "tests/test_jsonl_query_source.py",
       "sha256": "c33d2160bf97c15d4fa51b06415c22e9fd1b023cdfed0bf07331823afd71cbaf"
+    },
+    {
+      "path": "scripts/verify_extra_local_validation.py",
+      "sha256": "095cb752726d6f536bc64314fc276211df9a628abd1a903c1690effdf45eb4d2"
+    },
+    {
+      "path": "tests/test_local_validation_evidence.py",
+      "sha256": "0b02e98b86ca5d4391b96824f4ee90899d93383a2333f982cde87ef43939586c"
     }
   ],
   "limits": [
@@ -158,5 +166,27 @@
     "docker_resources_created": false,
     "unrelated_data_removed": false,
     "wsl_virtual_disk_compacted": false
+  },
+  "local_bundle_checker": {
+    "command": "python -m scripts.verify_extra_local_validation",
+    "scope": "local report/XML consistency only; not independent witness or fresh full-suite result",
+    "runs": {
+      "windows": {
+        "repository_xml": "docs/infrastructure-results/local-validation-evidence-checker-20261119.xml",
+        "sha256": "ef4b7b9d39e4946b9e27a852816aeda1b5602ba32d1a6c896f1e5d9b705c4ca8",
+        "tests": 7,
+        "passed": 7,
+        "failures": 0,
+        "errors": 0
+      },
+      "linux": {
+        "repository_xml": "docs/infrastructure-results/local-validation-evidence-checker-linux-20261119.xml",
+        "sha256": "f9977b0eed09f9e3fb9c361b56ad10269bc8f6344395cd77b494c2b2b2d36d62",
+        "tests": 7,
+        "passed": 7,
+        "failures": 0,
+        "errors": 0
+      }
+    }
   }
 }
