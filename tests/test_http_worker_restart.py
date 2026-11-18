@@ -166,5 +166,17 @@ def test_actual_http_process_returns_a_preserved_jsonl_analysis(executed, tmp_pa
         disk.verify_saved(record)
         observed = json.loads(stats.read_text(encoding="utf-8"))
         assert observed["provider_stub_calls"] == 1 and observed["paid_api_calls"] == 0
+        filename.write_bytes(b"")
+        blocked = client.post(
+            "/analysis",
+            headers={"X-API-Key": key},
+            json=synthetic_events()[0].model_dump(mode="json"),
+        )
+        assert blocked.status_code == 502
+        assert json.loads(stats.read_text(encoding="utf-8"))["provider_stub_calls"] == 1
+        assert filename.read_bytes() == b""
+        ready = client.get("/health/ready")
+        assert ready.status_code == 503 and ready.json()["audit"]["writer_head_verified"] is False
+        assert client.get("/health/live").status_code == 200
         process.kill()
         assert process.wait(timeout=10) != 0

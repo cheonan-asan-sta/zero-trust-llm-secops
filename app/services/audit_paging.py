@@ -104,14 +104,32 @@ def _file_signature(info):
     return info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns
 
 
-def _jsonl_view(store, *, row_observer=None, allow_legacy_prefix=False):
+def _jsonl_view(
+    store,
+    *,
+    row_observer=None,
+    allow_legacy_prefix=False,
+    metadata=None,
+    validate_review_transitions=True,
+):
     with store._disk_lock:
         return _jsonl_view_locked(
-            store, row_observer=row_observer, allow_legacy_prefix=allow_legacy_prefix
+            store,
+            row_observer=row_observer,
+            allow_legacy_prefix=allow_legacy_prefix,
+            metadata=metadata,
+            validate_review_transitions=validate_review_transitions,
         )
 
 
-def _jsonl_view_locked(store, *, row_observer=None, allow_legacy_prefix=False):
+def _jsonl_view_locked(
+    store,
+    *,
+    row_observer=None,
+    allow_legacy_prefix=False,
+    metadata=None,
+    validate_review_transitions=True,
+):
     if not store._integrity_ok:
         raise AuditQueryUnavailable("local audit writer integrity failed")
     path = store._path
@@ -126,9 +144,24 @@ def _jsonl_view_locked(store, *, row_observer=None, allow_legacy_prefix=False):
             or store._legacy_lines
         ):
             raise AuditQueryUnavailable("required audit file missing")
+        if metadata is not None:
+            metadata.update(
+                head="0" * 64,
+                verified=0,
+                legacy=0,
+                size=0,
+                fingerprint=hashlib.sha256(b"").hexdigest(),
+                signature=None,
+            )
         return []
     try:
-        fd = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_BINARY", 0))
+        fd = os.open(
+            path,
+            os.O_RDONLY
+            | getattr(os, "O_NOFOLLOW", 0)
+            | getattr(os, "O_BINARY", 0)
+            | getattr(os, "O_NONBLOCK", 0),
+        )
         with os.fdopen(fd, "rb") as stream:
             before = os.fstat(stream.fileno())
             if not stat.S_ISREG(before.st_mode) or before.st_size > MAX_JSONL_BYTES:
@@ -138,6 +171,7 @@ def _jsonl_view_locked(store, *, row_observer=None, allow_legacy_prefix=False):
         live = path.lstat()
         if (
             len(raw) > MAX_JSONL_BYTES
+            or len(raw) != before.st_size
             or _file_signature(before) != _file_signature(after)
             or _file_signature(after) != _file_signature(live)
             or not stat.S_ISREG(live.st_mode)
@@ -145,6 +179,7 @@ def _jsonl_view_locked(store, *, row_observer=None, allow_legacy_prefix=False):
             raise AuditQueryUnavailable("audit changed during page verification")
         records, previous, count = {}, "0" * 64, 0
         hashed_seen = False
+        legacy = 0
         for line in raw.splitlines():
             if not line.strip():
                 continue
@@ -157,6 +192,7 @@ def _jsonl_view_locked(store, *, row_observer=None, allow_legacy_prefix=False):
                 # Compatibility only: legacy rows cannot witness a saved row.
                 # A legacy suffix after any hashed row is never accepted here.
                 record = AnalysisResult.model_validate(value)
+                legacy += 1
                 records[record.analysis_id] = record
                 if row_observer is not None:
                     row_observer(record, False)
@@ -175,9 +211,14 @@ def _jsonl_view_locked(store, *, row_observer=None, allow_legacy_prefix=False):
             hashed_seen = True
             record = AnalysisResult.model_validate(decode(value["payload"]))
             old = records.get(record.analysis_id)
-            if old is None and record.review_updated_at is not None:
+            if validate_review_transitions and old is None and record.review_updated_at is not None:
                 raise AuditQueryUnavailable("paged JSONL review lacks original analysis")
-            if old is not None and old != record and not SQLiteAuditStore._review_fits(old, record):
+            if (
+                validate_review_transitions
+                and old is not None
+                and old != record
+                and not SQLiteAuditStore._review_fits(old, record)
+            ):
                 raise AuditQueryUnavailable("paged JSONL review transition rejected")
             records[record.analysis_id] = record
             if row_observer is not None:
@@ -186,6 +227,15 @@ def _jsonl_view_locked(store, *, row_observer=None, allow_legacy_prefix=False):
         if _file_signature(final) != _file_signature(live) or not stat.S_ISREG(final.st_mode):
             raise AuditQueryUnavailable("audit changed during row validation")
         store._page_seen_file = True
+        if metadata is not None:
+            metadata.update(
+                head=previous,
+                verified=count - legacy,
+                legacy=legacy,
+                size=len(raw),
+                fingerprint=hashlib.sha256(raw).hexdigest(),
+                signature=_file_signature(final),
+            )
         return list(records.values())
     except (OSError, ValueError, TypeError, AuditTransferError) as error:
         raise AuditQueryUnavailable("audit page source unavailable") from error

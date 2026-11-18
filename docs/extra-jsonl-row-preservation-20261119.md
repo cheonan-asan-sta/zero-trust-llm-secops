@@ -37,6 +37,6 @@ python -m scripts.run_exec_history_controls --directory <새_결과_폴더> --wo
 
 ## 남은 작업과 한계
 
-plain JSONL의 preflight는 아직 캐시 integrity를 사용한다. 다음은 새 disk 검증을 모델 호출 전·실제 append 전의 writer head 일치 확인까지 연결해, 외부 rollback 후 오래된 캐시 head로 추가 쓰는 경우를 막는 작업이다. 이번 변경만으로 모든 변경을 모델 호출 전에 차단하거나 writer의 캐시를 복구했다고 주장하지 않는다.
+이 문서 시점의 plain JSONL preflight는 캐시 integrity를 사용했다. 후속 [모델 전·append 직전 writer prefix 검증](extra-jsonl-writer-boundary-20261119.md)에서 live 확인을 연결했다. 위 시험 수/지문은 보존 proof 단계의 기록이며 최신 검증은 후속 문서를 본다. 모든 외부 변경을 모델 호출 전에 차단하거나 writer의 캐시를 자동 복구했다고 주장하지 않는다.
 
 JSONL 검증은 bounded file bytes와 최신 행 map을 메모리에 유지하며 SQLite compact scan과 같은 메모리 측정치를 적용하지 않는다. federation은 inventory scan 뒤 자기 writer를 다시 읽으므로 추가 I/O가 있다. SLA/RSS/처리량 측정은 별도다. 외부 변경 후 검사까지의 경쟁 조건, 독립 WORM/witness·최신 전체 상태·다중 호스트·실사용자 SSO·전원 단절·8시간 soak는 미완료다. DynamoDB 원격 검증과 새 F1·오탐/미탐 측정도 하지 않았다.

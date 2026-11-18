@@ -308,7 +308,8 @@ def _readiness_snapshot() -> Response:
         if behavior_context_service
         else {"ok": True, "enabled": False}
     )
-    integrity = audit_store.integrity()
+    integrity = (audit_store.writer_integrity() if isinstance(audit_store, AuditStore)
+                 else audit_store.integrity())
     audit_paging_integrity = audit_pager.readiness()
     case_integrity = case_store.integrity()
     outbox_integrity = integration_outbox_store.integrity()
@@ -1200,7 +1201,9 @@ async def _analysis_audit_boundary(store, expected_result=None):
             await settled_io(store.verify_saved, expected_result)
             integrity = {"ok": True}
         else:
-            integrity = await settled_io(store.integrity)
+            integrity = await settled_io(
+                store.writer_integrity if isinstance(store, AuditStore) else store.integrity
+            )
         if audit_store is not store:
             raise RuntimeError("analysis audit store changed during integrity check")
         if integrity.get("ok") is False:

@@ -21,6 +21,8 @@ class AuditQueryUnavailable(RuntimeError):
 class FederatedAuditStore(AuditStore):
     MAX_FILES = 128
     MAX_BYTES = 128 * 1024 * 1024
+    # Cross-file merge checks identities/revisions; it is not SQLite review CAS.
+    _local_review_history = False
 
     def __init__(self, writer_path: Path, base_path: Path):
         self._base_path = base_path

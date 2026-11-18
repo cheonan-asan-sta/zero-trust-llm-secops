@@ -1,0 +1,116 @@
+{
+  "schema": "extra-jsonl-writer-boundary-1",
+  "date_kst": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "pushed": false,
+  "ci_started": false,
+  "merged": false,
+  "new_tests": 27,
+  "existing_tcp_tests_strengthened": 2,
+  "native_conditions": 54,
+  "native_new_conditions": 0,
+  "before": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "7",
+    "skipped": "0",
+    "tests": "8",
+    "time": "4.447",
+    "timestamp": "2026-11-19T04:23:04.900569+09:00",
+    "hostname": "희주",
+    "passed": 1,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\jsonl-writer-before-20261119.xml",
+    "xml_sha256": "fccb7e9c1b2876d6fc5fb406dd27ecb400a6ed4fd402a907d26dc08dd17f84a0"
+  },
+  "focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "1",
+    "tests": "84",
+    "time": "14.061",
+    "timestamp": "2026-11-19T04:33:44.035449+09:00",
+    "hostname": "희주",
+    "passed": 83,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\jsonl-writer-focused-20261119.xml",
+    "xml_sha256": "46c22a0e956c9806afccc420e1e0e1b4a2f338dfe9137ac2c79aebe927701b47"
+  },
+  "windows_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "4",
+    "tests": "418",
+    "time": "170.703",
+    "timestamp": "2026-11-19T04:35:24.940029+09:00",
+    "hostname": "희주",
+    "passed": 414,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\jsonl-writer-windows-20261119.xml",
+    "xml_sha256": "8214befa7386462d7eb2748a97f3ea86301bcd7ae3ed25244c3f630d3c07810c"
+  },
+  "linux_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "2",
+    "tests": "418",
+    "time": "146.751",
+    "timestamp": "2026-11-19T04:35:30.525452+09:00",
+    "hostname": "localhost",
+    "passed": 416,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\jsonl-writer-linux-20261119.xml",
+    "xml_sha256": "fcea7adf36d836cd1ab488a843fba0c00a60ce7f92c2e1e8ae5c7a31d29c5932"
+  },
+  "native_source_run_sha256": "1d484b1792372ebfdf39f151782143a8ee9a3b77b1c484e5593d6c0c29c69396",
+  "plain_jsonl_model_preflight_live": true,
+  "readiness_writer_head_verified": true,
+  "append_cached_prefix_checked": true,
+  "legacy_bytes_bound_to_loaded_process_prefix": true,
+  "file_descriptor_path_checked_before_and_after_write": true,
+  "file_fsync_before_cache_advance": true,
+  "short_os_writes_completed": true,
+  "append_error_closes_cached_writer": true,
+  "bootstrap_max_bytes": 134217728,
+  "bootstrap_max_rows": 100000,
+  "max_row_bytes": 2097152,
+  "federated_review_scope": "existing global identity/revision merge, not SQLite transactional lifecycle/CAS",
+  "independent_latest_state_verified": false,
+  "atomic_global_shard_snapshot": false,
+  "power_loss_durability_tested": false,
+  "model_quality_reevaluated": false,
+  "source_files": [
+    {
+      "path": "app/main.py",
+      "sha256": "890c8dd6f0136b1ada10c99b2fbc055e13ae8110fa69a022133c2dbc8a89db0a"
+    },
+    {
+      "path": "app/services/audit.py",
+      "sha256": "deb1db1232745808d47cce2181b0d14f9a55ddceadeb90a9045c6855164e5f5f"
+    },
+    {
+      "path": "app/services/audit_paging.py",
+      "sha256": "89313f99072e36de14e6b301535b4ed3fbac01b6cc682046a6fe005ffc8124a7"
+    },
+    {
+      "path": "app/services/federated_audit.py",
+      "sha256": "fb6f463afe616508b916526d127bec74405cca31d0489aa12514d9df6bfb19bf"
+    },
+    {
+      "path": "tests/test_jsonl_writer_boundary.py",
+      "sha256": "c2838ae3510728c17e7714d7595dc4d993e688e321a168e145337e7ec9bab36f"
+    },
+    {
+      "path": "tests/test_http_worker_restart.py",
+      "sha256": "3de5ee68e620dd2d2218d1b8fff95baa5b9728b88e02512e9bba96ef5c4bf53c"
+    }
+  ],
+  "limits": [
+    "prefix trust is relative to loaded process state, not independent anti-rollback attestation",
+    "RLock is per store/process, not a multi-process writer lease",
+    "file fsync does not prove directory/hardware/power-loss durability",
+    "plain integrity() keeps cached semantics; preflight/readiness call writer_integrity()",
+    "no paid model evaluation, multi-host or postponed 8h soak"
+  ]
+}
