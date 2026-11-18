@@ -13,6 +13,7 @@ from pathlib import Path
 import httpx
 
 from app.config import Settings
+from app.scenarios import synthetic_events
 from app.services.audit_checkpoint import capture_checkpoint
 from app.services.sqlite_audit import SQLiteAuditStore
 from scripts.f1_lab.native_jsonl import require
@@ -440,11 +441,19 @@ def _resume_page(
             checkpoint_path.write_bytes(checkpoint_bytes + b" ")
             changed = client.get("/results", headers=headers)
             changed_ready = client.get("/health/ready")
+            blocked_analysis = client.post(
+                "/analysis", headers=headers, json=synthetic_events()[0].model_dump(mode="json")
+            )
             require(
                 changed.status_code == 503
                 and changed_ready.status_code == 503
                 and changed_ready.json()["audit"]["ok"] is False,
                 "owned_runtime_checkpoint_pin_failure_blocks_reads",
+            )
+            require(
+                blocked_analysis.status_code == 502
+                and json.loads(stats.read_text())["provider_stub_calls"] == 0,
+                "owned_runtime_checkpoint_blocks_model_before_analysis",
             )
         finally:
             checkpoint_path.write_bytes(checkpoint_bytes)
@@ -453,6 +462,7 @@ def _resume_page(
             "owned_runtime_checkpoint_exact_state_recovery",
         )
         passed("http_runtime_checkpoint_pin_failure_has_no_fallback_and_exact_state_recovers")
+        passed("http_runtime_checkpoint_failure_blocks_analysis_before_model")
         cursor_config[0].write_bytes(secrets.token_bytes(32))
         blocked = client.get(
             "/audit/results",
@@ -486,4 +496,5 @@ def _resume_page(
         "runtime_checkpoint_rejects_valid_database_rollback": True,
         "runtime_checkpoint_pin_failure_blocks_reads": True,
         "runtime_checkpoint_exact_state_recovery": True,
+        "runtime_checkpoint_failure_model_calls": 0,
     }

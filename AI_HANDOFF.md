@@ -1,3 +1,5 @@
+> 2026-11-19 분석 감사 경계: 선택 store 고정·preflight 전후/저장 전/전달 전 동일성·commit 후 로컬 integrity 재검증·추가 scan 뒤 source 검증 유지·backup 암호화 후 복사본 재검증. 변경 전7실패→신규13건 포함Win223/skip1·Linux224·실제 systemd/HTTP54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·최소 기준 이후 방금 저장한 analysis 자체의 보존 확인 후속·목표 active. [결과·한계](docs/extra-analysis-audit-boundary-20261119.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-19 runtime checkpoint: SQLite 선택형 path/pin·기존 DB만 RO 시작·매 scan 전후 전체 체인/최소 prefix 확인·commit 전 철회 rollback·복사 snapshot backup에도 유지. 신규26건 포함 Win256/skip3·Linux257/skip2·실제 systemd/HTTP3worker53조건 통과. 정상 구 DB/변조 checkpoint 거부·정확한 상태 복구·유료API/AWS/push/CI/병합0·새 F1 없음·분석 중 변화/backup 게시 경계 후속·목표 active. [설정·검증·한계](docs/extra-runtime-audit-checkpoint-20261119.md). 아래는 이전 시점 기록이다.
 
 > 2026-11-19 checkpoint 단조 갱신: checkpoint-advance 이전 file/pin 필수·동일 read transaction의 prefix 확인·정상 구 DB/다른 chain 거부. readonly checkpoint-status4상태/unsafe exit3. 신규16건 포함Win147/skip1·Linux231/skip2·실제 systemd51조건 통과. source/권한 불변·유료API/AWS/push/CI/병합0·새 F1 없음·선택형 runtime checkpoint guard 후속·목표 active. [명령·시험·한계](docs/extra-audit-checkpoint-progression-20261119.md). 아래는 이전 시점 기록이다.

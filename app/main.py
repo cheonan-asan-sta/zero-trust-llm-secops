@@ -1138,10 +1138,8 @@ async def _analyze_event_in_slot(
     """Internal pipeline; its caller must hold an analysis slot throughout."""
     # Live integrity scans must not block the event loop or release capacity
     # while an abandoned non-cancellable filesystem thread is still running.
-    if isinstance(audit_store, (AuditStore, SQLiteAuditStore)):
-        integrity = await settled_io(audit_store.integrity)
-        if integrity.get("ok") is False:
-            raise RuntimeError("audit log integrity check failed; refusing new analysis")
+    selected_audit_store = audit_store
+    await _analysis_audit_boundary(selected_audit_store)
     started = perf_counter()
     normalized = ocsf_normalizer.normalize(event)
     detection = sigma_engine.evaluate(normalized)
@@ -1176,12 +1174,32 @@ async def _analyze_event_in_slot(
         actor_id=principal.subject,
         request_id=request_id,
     )
-    await audit_store.save(result)
+    if audit_store is not selected_audit_store:
+        raise RuntimeError("analysis audit store changed; refusing persistence")
+    await selected_audit_store.save(result)
+    # A full audit scan may be slow. Revalidate evidence after it, so source
+    # withdrawal/expiry during this added I/O cannot bypass the existing check.
+    await _analysis_audit_boundary(selected_audit_store)
     if selected_context is not None:
         # Audit completion may have awaited another writer. Recheck before
         # delivery, retaining any committed historical record on rejection.
         await selected_context.revalidate(event)
+    # Keep committed history on post-commit withdrawal, but deny delivery from
+    # a replaced authority or a database below the configured minimum history.
+    if audit_store is not selected_audit_store:
+        raise RuntimeError("analysis audit store changed before delivery")
     return result
+
+
+async def _analysis_audit_boundary(store):
+    if audit_store is not store:
+        raise RuntimeError("analysis audit store changed")
+    if isinstance(store, (AuditStore, SQLiteAuditStore)):
+        integrity = await settled_io(store.integrity)
+        if audit_store is not store:
+            raise RuntimeError("analysis audit store changed during integrity check")
+        if integrity.get("ok") is False:
+            raise RuntimeError("audit log integrity check failed; refusing analysis delivery")
 
 
 @app.post("/response/preview", response_model=PolicyDecision)

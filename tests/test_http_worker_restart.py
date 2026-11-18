@@ -66,7 +66,7 @@ def test_actual_http_worker_cursor_resume_and_current_key_readiness(executed, tm
     assert result["independent_http_processes"] == 3
     assert result["verified_audit_rows"] == 3 and result["provider_stub_calls"] == 2
     assert result["paid_api_calls"] == result["aws_calls"] == 0
-    assert len(passed) == 14 and result["new_access_grants_issued"] == 0
+    assert len(passed) == 15 and result["new_access_grants_issued"] == 0
     assert result["paging"]["cursor_resumed_over_tcp"]
     assert result["paging"]["original_scope_and_expiry_preserved"]
     assert result["paging"]["key_failure_blocks_pages_and_readiness"]
@@ -76,6 +76,7 @@ def test_actual_http_worker_cursor_resume_and_current_key_readiness(executed, tm
     assert result["paging"]["runtime_checkpoint_rejects_valid_database_rollback"]
     assert result["paging"]["runtime_checkpoint_pin_failure_blocks_reads"]
     assert result["paging"]["runtime_checkpoint_exact_state_recovery"]
+    assert result["paging"]["runtime_checkpoint_failure_model_calls"] == 0
     assert not list(tmp_path.glob("owned-cursor-*.key"))
 
 

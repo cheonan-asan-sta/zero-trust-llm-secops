@@ -112,6 +112,12 @@ def backup_sqlite(store, destination, key, *, minimum_head=None):
                 output.write(encryptor.update(chunk))
             output.write(encryptor.finalize() + encryptor.tag)
         package_sha256 = file_hash(stage)
+        # Encryption/hashing may take time. Revalidate the exact copied view
+        # through the selected store so a runtime anchor withdrawal denies
+        # publication. Current source appends do not redefine this snapshot.
+        with checked._transaction() as con:
+            final_seq, final_head = validate_head(con, store, minimum_head)
+            require((final_seq, final_head) == (seq, head), "backup snapshot changed")
         publish(stage, target)
         return {
             "backup_sha256": package_sha256,
