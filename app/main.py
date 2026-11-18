@@ -1179,7 +1179,7 @@ async def _analyze_event_in_slot(
     await selected_audit_store.save(result)
     # A full audit scan may be slow. Revalidate evidence after it, so source
     # withdrawal/expiry during this added I/O cannot bypass the existing check.
-    await _analysis_audit_boundary(selected_audit_store)
+    await _analysis_audit_boundary(selected_audit_store, result)
     if selected_context is not None:
         # Audit completion may have awaited another writer. Recheck before
         # delivery, retaining any committed historical record on rejection.
@@ -1191,11 +1191,16 @@ async def _analyze_event_in_slot(
     return result
 
 
-async def _analysis_audit_boundary(store):
+async def _analysis_audit_boundary(store, expected_result=None):
     if audit_store is not store:
         raise RuntimeError("analysis audit store changed")
     if isinstance(store, (AuditStore, SQLiteAuditStore)):
-        integrity = await settled_io(store.integrity)
+        if expected_result is not None and isinstance(store, SQLiteAuditStore):
+            # The compact full scan also proves this exact committed row exists.
+            await settled_io(store.verify_saved, expected_result)
+            integrity = {"ok": True}
+        else:
+            integrity = await settled_io(store.integrity)
         if audit_store is not store:
             raise RuntimeError("analysis audit store changed during integrity check")
         if integrity.get("ok") is False:

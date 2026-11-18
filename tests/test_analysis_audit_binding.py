@@ -123,19 +123,15 @@ def test_valid_guarded_analysis_retains_one_model_call_and_one_audit(api, tmp_pa
 
 def test_postcommit_scan_cancellation_keeps_capacity_and_history(tmp_path, monkeypatch):
     store, event, model, capacity, actor = setup_analysis(tmp_path, monkeypatch)
-    original = store.integrity
+    original = store.verify_saved
     entered, release = threading.Event(), threading.Event()
-    calls = 0
 
-    def blocked():
-        nonlocal calls
-        calls += 1
-        if calls == 2:
-            entered.set()
-            assert release.wait(3)
-        return original()
+    def blocked(record):
+        entered.set()
+        assert release.wait(3)
+        return original(record)
 
-    monkeypatch.setattr(store, "integrity", blocked)
+    monkeypatch.setattr(store, "verify_saved", blocked)
 
     async def run():
         task = asyncio.create_task(main._analyze_event(event, model, actor, "postcommit-cancel"))
@@ -157,18 +153,17 @@ def test_postcommit_scan_cancellation_keeps_capacity_and_history(tmp_path, monke
 def test_source_revalidation_stays_after_new_slow_audit_scan(tmp_path, monkeypatch):
     store, event, model, _, actor = setup_analysis(tmp_path, monkeypatch)
     source = {"enabled": True}
-    original = store.integrity
+    original = store.verify_saved
     calls = 0
 
-    def scan_and_withdraw_source():
+    def scan_and_withdraw_source(record):
         nonlocal calls
         calls += 1
-        result = original()
-        if calls == 2:
-            source["enabled"] = False
+        result = original(record)
+        source["enabled"] = False
         return result
 
-    monkeypatch.setattr(store, "integrity", scan_and_withdraw_source)
+    monkeypatch.setattr(store, "verify_saved", scan_and_withdraw_source)
 
     async def revalidate(_):
         if not source["enabled"]:
@@ -185,4 +180,4 @@ def test_source_revalidation_stays_after_new_slow_audit_scan(tmp_path, monkeypat
                 verification_context_supplier=lambda: context,
             )
         )
-    assert calls == 2 and store.metrics().total_analyses == 1
+    assert calls == 1 and store.metrics().total_analyses == 1

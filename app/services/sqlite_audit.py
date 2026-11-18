@@ -4,6 +4,7 @@ Each transaction verifies the chain and durable head. This detects corruption,
 not a privileged attacker restoring/resealing the entire database and head.
 """
 
+import json
 import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
@@ -119,7 +120,9 @@ class SQLiteAuditStore:
             record = AnalysisResult.model_validate_json(payload)
             old = records.get(record.analysis_id)
             if old is not None and not retain_records:
-                prior = con.execute("SELECT payload FROM audit_entries WHERE seq=?", (old,)).fetchone()
+                prior = con.execute(
+                    "SELECT payload FROM audit_entries WHERE seq=?", (old,)
+                ).fetchone()
                 old = AnalysisResult.model_validate_json(prior[0])
             if old is None and record.review_updated_at is not None:
                 raise AuditQueryUnavailable("persisted review has no original analysis")
@@ -171,9 +174,7 @@ class SQLiteAuditStore:
         await settled_io(self._write, record.model_copy(deep=True))
 
     async def save_review(self, record, expected):
-        await settled_io(
-            self._write, record.model_copy(deep=True), expected.model_copy(deep=True)
-        )
+        await settled_io(self._write, record.model_copy(deep=True), expected.model_copy(deep=True))
 
     def _records(self):
         with self._transaction() as con:
@@ -213,3 +214,35 @@ class SQLiteAuditStore:
                 "verified_lines": 0,
                 "legacy_lines": 0,
             }
+
+    def verify_saved(self, expected):
+        """Verify the exact returned row and the entire current chain together.
+
+        Later reviews or analyses may coexist; event-level latest lookup would
+        incorrectly reject a preserved historical result under concurrency.
+        """
+        # Match the persisted/wire JSON contract. LLM trace Any values may
+        # legitimately round-trip tuples to arrays, or mapping keys to strings.
+        expected = AnalysisResult.model_validate_json(expected.model_dump_json())
+
+        def wire(record):
+            return json.dumps(
+                record.model_dump(mode="json"),
+                sort_keys=True,
+                separators=(",", ":"),
+                ensure_ascii=False,
+                allow_nan=False,
+            )
+
+        expected_wire = wire(expected)
+        found = False
+
+        def observe(record, _number):
+            nonlocal found
+            if record.analysis_id == expected.analysis_id and wire(record) == expected_wire:
+                found = True
+
+        with self._transaction() as con:
+            self._read(con, retain_records=False, row_observer=observe)
+            if not found:
+                raise AuditQueryUnavailable("returned analysis is not preserved in audit history")
