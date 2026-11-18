@@ -33,7 +33,9 @@ class Settings(BaseSettings):
     zero_trust_policy_path: Path | None = None
     behavior_context_db_path: Path | None = None
     native_analysis_shared_config_path: Path | None = None
-    native_analysis_shared_config_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
+    native_analysis_shared_config_sha256: str | None = Field(
+        default=None, pattern=r"^[a-f0-9]{64}$"
+    )
     # Compatibility for offline legacy fixtures; the application uses behavior_context_db_path.
     response_workflow_db_path: Path = Path("runtime/response-workflow.sqlite3")
     trusted_signal_sources_path: Path | None = None
@@ -61,6 +63,11 @@ class Settings(BaseSettings):
     oidc_tenant_claim: str = Field(default="tenant_id", min_length=1, max_length=64)
     allowed_hosts: str = "127.0.0.1,localhost,testserver"
     api_max_body_bytes: int = Field(default=1_048_576, ge=1024, le=10_485_760)
+    authentication_max_concurrency: int = Field(default=4, ge=1, le=16)
+    authentication_queue_timeout_seconds: float = Field(
+        default=0.05, ge=0.01, le=2, allow_inf_nan=False
+    )
+    authentication_max_token_chars: int = Field(default=16384, ge=1024, le=131072)
     analysis_max_concurrency: int = Field(default=8, ge=1, le=100)
     analysis_queue_timeout_seconds: float = Field(default=0.25, ge=0.01, le=10)
     audit_query_max_concurrency: int = Field(default=2, ge=1, le=8)

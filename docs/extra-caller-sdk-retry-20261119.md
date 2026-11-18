@@ -40,3 +40,5 @@ python -m scripts.run_exec_history_controls --directory <새_결과_폴더> --wo
 새 guard를 적용한 SDK 경로는 서버 분석의 OpenAIAnalyzer다. EvidenceReviewAgent는 기존의 SDK retries0과 live verified context 정책을 유지하며, 임의의 새 provider나 외부 plugin client를 자동으로 sandbox한 것은 아니다. 새 adapter는 이 호출 권한 계약을 따로 연결해야 한다.
 
 초기 인증 dependency의 I/O admission, 별도 장기 `/evaluation/run`의 호출 범위는 후속이다. OIDC online revocation·실사용자 SSO, 독립 witness/WORM·전체 최신성·다중 호스트·전원 단절·연기한8시간 soak는 미완료다. 모델 prompt/판정·평가 원본/정답/예측·F1·오탐/미탐을 바꾸거나 재평가하지 않았다.
+
+후속: [초기 인증 I/O admission·취소와 실제 JWKS 검증](extra-authentication-admission-20261119.md)을 추가했다. 위 수치는 해당 시점의 기록이다.
