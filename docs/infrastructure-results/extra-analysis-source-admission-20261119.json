@@ -1,0 +1,73 @@
+{
+  "date": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "pushed": false,
+  "ci_started": false,
+  "merged": false,
+  "model_quality_reevaluated": false,
+  "new_tests": 10,
+  "source_collection_held_in_analysis_slot": true,
+  "source_operations_and_capture_store_identity_pinned": true,
+  "raw_tcp_disconnect_tested": false,
+  "native_systemd_rerun_this_phase": false,
+  "before": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "8",
+    "skipped": "0",
+    "tests": "8",
+    "time": "10.201",
+    "timestamp": "2026-11-19T01:41:04.107646+09:00",
+    "hostname": "희주",
+    "xml_sha256": "a0700a243c221ec2a0c3fa7a85d00451f0f57842a153ca4bdf717a5d4cade11c",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\source-admission-before-20261119.xml"
+  },
+  "earlier_focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "8",
+    "time": "3.680",
+    "timestamp": "2026-11-19T01:42:25.641848+09:00",
+    "hostname": "희주",
+    "xml_sha256": "d786e609caeef2716bd391032b490fed615f3b3bea8a3b23a271e9c51b07b71d",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\source-admission-focused-20261119.xml"
+  },
+  "windows_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "15",
+    "tests": "238",
+    "time": "56.689",
+    "timestamp": "2026-11-19T01:43:22.425126+09:00",
+    "hostname": "희주",
+    "xml_sha256": "c3e82a12c51a936c653d9bbc7e241b1a05d5df9729b9fbb343a83fbbb817bc61",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\source-admission-windows-20261119.xml"
+  },
+  "linux_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "285",
+    "time": "113.857",
+    "timestamp": "2026-11-19T01:43:28.650371+09:00",
+    "hostname": "localhost",
+    "xml_sha256": "a3937e9066c8d49b84bffd68173e5a3a86f429c61cfc03df0140b28aecb4950e",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\source-admission-linux-20261119.xml"
+  },
+  "source_files": [
+    {
+      "path": "app/main.py",
+      "sha256": "68bb6efd6c173f29c9ab331752692aad05c1aabc9abe2663c373ea438d71bf95"
+    },
+    {
+      "path": "tests/test_analysis_source_admission.py",
+      "sha256": "d81b30a9289112919e0ad99601ec15e4272afcfa423f0f925c11e36fc66654c4"
+    }
+  ]
+}

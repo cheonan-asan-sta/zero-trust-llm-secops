@@ -753,22 +753,34 @@ async def analyze_batch(
 def _bound_verification_context(
     signal, principal, behavior_capture_id, caller_authority_check=None
 ):
-    if zero_trust_operations is None:
+    operations = zero_trust_operations
+    captures = behavior_context_service
+    if operations is None:
         raise HTTPException(404, "Local verified-session analysis is disabled in production")
+
+    def assert_serving_stores():
+        if zero_trust_operations is not operations or (
+            behavior_capture_id is not None and behavior_context_service is not captures
+        ):
+            raise SignalRejected("verified analysis serving stores changed")
 
     # Verification errors are handled by existing signal/session handlers; never call the LLM.
     def collect_context():
+        assert_serving_stores()
         if caller_authority_check is not None:
             caller_authority_check()
         if behavior_capture_id is not None:
-            return collect_session_execution_evidence(
-                zero_trust_operations,
-                behavior_context_service,
+            collected = collect_session_execution_evidence(
+                operations,
+                captures,
                 signal,
                 principal,
                 behavior_capture_id,
             )
-        return collect_session_evidence(zero_trust_operations, signal, principal)
+        else:
+            collected = collect_session_evidence(operations, signal, principal)
+        assert_serving_stores()
+        return collected
 
     context = collect_context()
 
@@ -793,12 +805,30 @@ async def analyze_verified_session(
         str | None, Query(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
     ] = None,
 ) -> AnalysisResult:
-    context = _bound_verification_context(
+    try:
+        async with _analysis_slot():
+            return await _analyze_verified_session_in_slot(
+                signal, request, principal, behavior_capture_id
+            )
+    except AnalysisCapacityExceeded as exc:
+        raise HTTPException(
+            429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from exc
+
+
+async def _analyze_verified_session_in_slot(
+    signal: SignedSessionSignal, request: Request, principal: Principal, behavior_capture_id: str | None,
+) -> AnalysisResult:
+    operations = zero_trust_operations
+    context = await settled_io(
+        _bound_verification_context,
         signal,
         principal,
         behavior_capture_id,
         getattr(request.state, "authentication_revalidator", None),
     )
+    if zero_trust_operations is not operations:
+        raise SignalRejected("verified analysis serving stores changed")
     try:
         analyzer = get_analyzer()
     except ValueError as exc:
@@ -821,7 +851,7 @@ async def analyze_verified_session(
             return result
 
     try:
-        return await _analyze_event(
+        return await _analyze_event_in_slot(
             signal.event,
             BoundSessionAnalyzer(),
             principal,
@@ -920,6 +950,20 @@ async def analyze_evidence_review(
         str | None, Query(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
     ] = None,
 ) -> AnalysisResult:
+    try:
+        async with _analysis_slot():
+            return await _analyze_evidence_review_in_slot(
+                signal, request, principal, behavior_capture_id
+            )
+    except AnalysisCapacityExceeded as exc:
+        raise HTTPException(
+            429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from exc
+
+
+async def _analyze_evidence_review_in_slot(
+    signal: SignedSessionSignal, request: Request, principal: Principal, behavior_capture_id: str | None,
+) -> AnalysisResult:
     current = get_settings()
     if zero_trust_operations is None:
         raise HTTPException(404, "Local evidence review is disabled in production")
@@ -929,19 +973,27 @@ async def analyze_evidence_review(
         and current.analyzer_mode in {"openai", "hybrid"}
     ):
         raise HTTPException(503, "Enable grounded OpenAI evidence review explicitly")
-    context = _bound_verification_context(
+    operations = zero_trust_operations
+    context = await settled_io(
+        _bound_verification_context,
         signal,
         principal,
         behavior_capture_id,
         getattr(request.state, "authentication_revalidator", None),
     )
+    if zero_trust_operations is not operations:
+        raise SignalRejected("verified analysis serving stores changed")
     try:
         agent = get_evidence_agent()
     except ValueError as exc:
         raise HTTPException(503, "Evidence review provider is not configured") from exc
 
     def history_getter():
-        history, _ = zero_trust_operations.analysis_history(signal.session_id, principal)
+        if zero_trust_operations is not operations:
+            raise SignalRejected("verified analysis serving stores changed")
+        history, _ = operations.analysis_history(signal.session_id, principal)
+        if zero_trust_operations is not operations:
+            raise SignalRejected("verified analysis serving stores changed")
         return {
             "decisions": [
                 entry.model_dump(
@@ -987,7 +1039,7 @@ async def analyze_evidence_review(
 
     bound = BoundAgent()
     try:
-        return await _analyze_event(
+        return await _analyze_event_in_slot(
             signal.event,
             bound,
             principal,
