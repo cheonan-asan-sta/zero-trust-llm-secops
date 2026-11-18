@@ -51,3 +51,7 @@ python -m pytest tests/test_native_analysis_http.py tests/test_jsonl_query_sourc
 ```
 
 첫 명령은 전체 재현용이며 관련 재검증이 새 전체 통과를 대신한다는 뜻이 아니다. POSIX 전용 fixture와 OS별 제외를 구분해서 보고한다.
+
+## 임시 자원 정리
+
+시험 프로세스가 종료된 것을 확인하고, 이번 실행이 소유한 Linux home 아래 두 `--basetemp`의 `tmp` 디렉터리만 제거했다. 약720MiB의 합성 fixture이며 원본 XML·소스·평가 원본/정답/보고서는 보존했다. 실제 systemd unit/private state도 해당 runner가 정리했다. Docker 자원을 새로 만들지 않았고 다른 프로젝트 자원이나 공유 venv는 삭제하지 않았다. WSL 파일 삭제가 Windows 가상디스크를 즉시 축소했다는 뜻은 아니며 별도 compact는 실행하지 않았다.

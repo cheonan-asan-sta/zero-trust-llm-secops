@@ -147,5 +147,16 @@
     "Enterprise SSO/MFA, online revocation and independent WORM witness remain",
     "No multi-host power-loss or real eight-hour soak verification",
     "Historical synthetic development metrics are not independent operational accuracy"
-  ]
+  ],
+  "cleanup": {
+    "owned_pytest_fixture_directories_removed": [
+      "/home/chaehj02/zt-extra-final-run-20261119/tmp",
+      "/home/chaehj02/zt-extra-http-review-final-run-20261119/tmp"
+    ],
+    "fixture_size_before_cleanup_approx_mib": 720,
+    "archived_raw_xml_and_sources_retained": true,
+    "docker_resources_created": false,
+    "unrelated_data_removed": false,
+    "wsl_virtual_disk_compacted": false
+  }
 }
