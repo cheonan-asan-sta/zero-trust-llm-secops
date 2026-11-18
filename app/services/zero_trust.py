@@ -254,6 +254,42 @@ class ZeroTrustOperations:
                 for e in entries))
             return history, consumed
 
+    def analysis_execution_access(self, session_id: str, principal: Principal,
+                                  request_sha256: str, *, expected_version: int) -> dict:
+        """Read the exact current grant's execution consumption, exposing no token/hash.
+
+        A signed broker receipt alone does not establish an application access.
+        This method never consumes, refunds, or issues a grant.
+        """
+        if (not isinstance(request_sha256, str) or len(request_sha256) != 64
+                or any(c not in "0123456789abcdef" for c in request_sha256)
+                or type(expected_version) is not int or expected_version < 1):
+            raise SessionConflict("invalid analysis execution binding")
+        with self._transaction() as (_, entries, _):
+            latest = self._latest(entries, principal.tenant_id, session_id)
+            if latest is None:
+                raise SessionMissing(session_id)
+            current = SessionDecision.model_validate(latest["session"])
+            matches = [e for e in entries if (
+                e["kind"] == "access" and e.get("allowed") is True
+                and e.get("reason_code") == "ACCESS_GRANTED"
+                and e.get("tenant_id") == principal.tenant_id
+                and e.get("operator_id") == principal.subject == current.operator_id
+                and e.get("session_id") == session_id
+                and e.get("session_version") == expected_version == current.version
+                and e.get("resource_id") == current.resource_id
+                and e.get("action") == current.action.value
+                and e.get("execution_request_sha256") == request_sha256
+                and latest.get("grant_hash") is not None
+                and e.get("grant_hash") == latest["grant_hash"]
+            )]
+            if len(matches) != 1:
+                raise SessionConflict("analysis requires exact execution-bound access consumption")
+            entry = matches[0]
+            return {key: entry[key] for key in (
+                "resource_id", "action", "session_version", "recorded_at"
+            )}
+
     def revalidate_sessions(self, *, now: datetime | None = None) -> dict[str, int]:
         """Persist proof expiry and withdrawn authority even with an empty inbox.
 

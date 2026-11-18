@@ -102,6 +102,8 @@ def setup_app(directory, unit, *, executable_sha256="a" * 64, command_sha256="b"
             command_sha256=command_sha256,
         )
 
+    signals = {}
+
     def new_access():
         when = datetime.now(UTC)
         data = synthetic_events()[0].model_dump(mode="json", exclude={"ground_truth"})
@@ -130,6 +132,7 @@ def setup_app(directory, unit, *, executable_sha256="a" * 64, command_sha256="b"
             }
         )
         result = operations.evaluate_signed(signal, principal)
+        signals[signal.session_id] = signal
         require(result.grant_token is not None, "exec_history_fixture_grant")
         return ProtectedAccessRequest(
             session_id=signal.session_id,
@@ -168,6 +171,7 @@ def setup_app(directory, unit, *, executable_sha256="a" * 64, command_sha256="b"
         target=target,
         new_request=new_request,
         new_access=new_access,
+        signals=signals,
         gate=gate,
         permission=permission,
         sources=sources,
@@ -176,7 +180,8 @@ def setup_app(directory, unit, *, executable_sha256="a" * 64, command_sha256="b"
 
 
 def run(directory, *, retention=False, outbox_recovery=False, intent_recovery=False,
-        recovery_observability=False, coherent_backup=False, bundle_observability=False):
+        recovery_observability=False, coherent_backup=False, bundle_observability=False,
+        llm_evidence=False):
     coherent_backup = coherent_backup or bundle_observability
     recovery_observability = recovery_observability or coherent_backup
     intent_recovery = intent_recovery or recovery_observability
@@ -213,6 +218,9 @@ def run(directory, *, retention=False, outbox_recovery=False, intent_recovery=Fa
         "exec_recovery_observability_tested": recovery_observability,
         "exec_coherent_backup_tested": coherent_backup,
         "exec_bundle_observability_tested": bundle_observability,
+        "native_llm_context_tested": llm_evidence,
+        "llm_provider_stubbed": llm_evidence,
+        "model_quality_measured": False,
         "cases": [],
     }
 
@@ -304,6 +312,10 @@ StandardError=journal
             ]
         require(len(linked) == 1 and linked[0]["allowed"], "exec_history_app_history_link")
         passed("app_grant_consumption_history_links_signed_request")
+        if llm_evidence:
+            from scripts.f1_lab.service_analysis_controls import run as run_analysis
+
+            run_analysis(lab, request, access, receipt, event, proofs, passed)
         normal = OperationDecision(0.1, 0.1, False, False, "prior-normal")
         old_alert = OperationDecision(0.9, 0.9, True, True, "prior-alert")
         risk = VerifiedServiceRisk(lab.broker.joiner)
@@ -411,10 +423,12 @@ def main():
     parser.add_argument("--coherent-backup", action="store_true")
     parser.add_argument("--bundle-observability", action="store_true")
     parser.add_argument("--intent-recovery", action="store_true")
+    parser.add_argument("--llm-evidence", action="store_true")
     args = parser.parse_args()
     result = run(args.directory, retention=args.retention, outbox_recovery=args.outbox_recovery,
                  intent_recovery=args.intent_recovery,recovery_observability=args.recovery_observability,
-                 coherent_backup=args.coherent_backup,bundle_observability=args.bundle_observability)
+                 coherent_backup=args.coherent_backup,bundle_observability=args.bundle_observability,
+                 llm_evidence=args.llm_evidence)
     print(json.dumps({"completed": result["completed"], "cases": len(result["cases"])}))
 
 

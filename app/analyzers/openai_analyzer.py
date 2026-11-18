@@ -9,6 +9,7 @@ from app.config import Settings
 from app.grounded_prompting import (
     GROUNDED_INSTRUCTIONS,
     VERIFIED_EXECUTION_INSTRUCTIONS,
+    VERIFIED_NATIVE_EXECUTION_INSTRUCTIONS,
     VERIFIED_SESSION_INSTRUCTIONS,
     grounded_input,
     grounded_output_type,
@@ -111,6 +112,11 @@ class OpenAIAnalyzer:
                             + (
                                 "\n" + VERIFIED_EXECUTION_INSTRUCTIONS
                                 if "execution" in context.for_event(event)
+                                else ""
+                            )
+                            + (
+                                "\n" + VERIFIED_NATIVE_EXECUTION_INSTRUCTIONS
+                                if "native_execution" in context.for_event(event)
                                 else ""
                             )
                             if context

@@ -129,6 +129,24 @@ a concrete mismatch between accepted registered-collector claims and the configu
 """.strip()
 
 
+VERIFIED_NATIVE_EXECUTION_INSTRUCTIONS = """
+The optional verified_session.native_execution facts describe a managed systemd unit's first
+successful exec, joined to signed runtime/authorization observations, a broker-signed caller
+receipt, and the exact application's already-consumed access grant. The caller receipt binds
+the execution request operator only, not the event subject's identity or MFA. local_oidc means
+a local test identity source, not deployed enterprise SSO or independently verified humanity.
+The executable and command hashes identify observed content; do not guess a raw command from
+a hash. No raw commands, tokens, or private keys are supplied. This limited observation does
+not cover later child processes, arbitrary PAM sessions, network destinations, exfiltration,
+or successful compromise. Null destinations mean unavailable, not no network activity.
+These native facts are separate from verified_session.execution's Cowrie/CloudTrail policies.
+Do not translate a systemd unit into a workload or infer HTTPS/S3 destinations to fill gaps.
+An existing consumed grant is historical authorization for that exact request, never permission
+for another execution. Preserve independent supported threat findings and uncertainty; a valid
+signature or command match alone does not establish benign behavior. Always retain human review.
+""".strip()
+
+
 def evidence_catalog(event: SecurityEvent, context: VerifiedSessionContext | None = None) -> dict:
     payload = event.analysis_payload()
     payload.pop("event_id", None)

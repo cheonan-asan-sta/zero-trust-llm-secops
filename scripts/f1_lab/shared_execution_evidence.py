@@ -225,16 +225,33 @@ class ServiceEvidenceJoiner:
             )
 
     @contextmanager
-    def connect(self):
+    def connect(self, *, read_only=False):
         require(not self.path.is_symlink(), "service_ledger_link")
-        connection = sqlite3.connect(self.path, timeout=5)
+        connection = sqlite3.connect(
+            self.path.resolve().as_uri() + "?mode=ro" if read_only else self.path,
+            timeout=5,
+            uri=read_only,
+        )
         try:
+            if read_only:
+                connection.execute("PRAGMA query_only=ON")
             with connection:
                 yield connection
         finally:
             connection.close()
 
     def check(self, event, proofs, *, now=None):
+        return self._check(event, proofs, now=now, record=True)
+
+    def inspect(self, event, proofs, *, now=None):
+        """Reverify an already recorded observation without inserting or advancing clocks.
+
+        An unrecorded, expired, withdrawn, or changed observation is unavailable.
+        This read cannot admit evidence or make a failed dispatch retryable.
+        """
+        return self._check(event, proofs, now=now, record=False)
+
+    def _check(self, event, proofs, *, now, record):
         now = datetime.now(UTC) if now is None else now
         try:
             Window.aware(now)
@@ -328,22 +345,27 @@ class ServiceEvidenceJoiner:
             )
             evidence = digest(sorted(signed, key=lambda v: v["observation"]["kind"]))
             identity = digest([event.tenant_id, event.server_id, event.mode, event.event_id])
-            with self.connect() as con:
-                con.execute("BEGIN IMMEDIATE")
+            with self.connect(read_only=not record) as con:
+                con.execute("BEGIN IMMEDIATE" if record else "BEGIN")
                 clock = con.execute("SELECT observed FROM clock WHERE singleton=1").fetchone()
                 require(
                     clock is None or now >= datetime.fromisoformat(clock[0]),
                     "service_clock_regression",
                 )
-                con.execute(
-                    "INSERT OR REPLACE INTO clock VALUES (1,?)", (now.astimezone(UTC).isoformat(),)
-                )
+                if record:
+                    con.execute(
+                        "INSERT OR REPLACE INTO clock VALUES (1,?)",
+                        (now.astimezone(UTC).isoformat(),),
+                    )
+                else:
+                    require(clock is not None, "service_observation_not_recorded")
                 old = con.execute(
                     "SELECT event,evidence,state FROM observations WHERE identity=?", (identity,)
                 ).fetchone()
                 if old:
                     require(old == (event.sha256, evidence, state), "service_event_collision")
                     return ServiceFacts(state, evidence, True)
+                require(record, "service_observation_not_recorded")
                 require(
                     con.execute("SELECT count(*) FROM observations").fetchone()[0] < self.capacity,
                     "service_ledger_capacity",
