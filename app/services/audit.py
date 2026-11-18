@@ -27,7 +27,8 @@ class AuditRepository(Protocol):
 
 
 class AuditStore:
-    def __init__(self, path: Path) -> None:
+    def __init__(self, path: Path, *, strict_reads: bool = False) -> None:
+        self._strict_reads = strict_reads
         self._path = path
         self._records: dict[tuple[str, str], AnalysisResult] = {}
         self._history: list[AnalysisResult] = []
@@ -88,11 +89,15 @@ class AuditStore:
 
     def _load_existing(self) -> None:
         if not self._path.exists():
+            if self._strict_reads:
+                raise OSError("required audit shard missing")
             return
 
         try:
             lines = self._path.read_text(encoding="utf-8").splitlines()
         except OSError:
+            if self._strict_reads:
+                raise
             return
 
         expected_previous_hash = "0" * 64
@@ -240,6 +245,9 @@ def create_audit_store(settings: Settings) -> AuditRepository:
         # Each local worker owns its hash-chain writer. Sharing native references
         # must not make independent JSONL writers fork the same audit chain.
         path = path.with_name(f"{path.stem}.worker-{os.getpid()}{path.suffix}")
+        from app.services.federated_audit import FederatedAuditStore
+
+        return FederatedAuditStore(path, settings.audit_log_path)
     return AuditStore(path)
 
 

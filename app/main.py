@@ -86,6 +86,7 @@ from app.services.detection_benchmark import BenchmarkUnavailable, get_detection
 from app.services.detection_quality import get_detection_quality_service
 from app.services.evaluation import run_evaluation
 from app.services.execution_analysis_evidence import collect_session_execution_evidence
+from app.services.federated_audit import AuditQueryUnavailable
 from app.services.incident_quality import get_incident_quality_service
 from app.services.integration_outbox import (
     IntegrationOutboxService,
@@ -202,6 +203,11 @@ AdminPrincipal = Annotated[Principal, Depends(require_roles(Role.ADMIN))]
 
 class AnalysisCapacityExceeded(RuntimeError):
     pass
+
+
+@app.exception_handler(AuditQueryUnavailable)
+async def audit_query_unavailable(_request, _error):
+    return JSONResponse(status_code=503, content={"detail": "Audit records temporarily unavailable"})
 
 
 @lru_cache
