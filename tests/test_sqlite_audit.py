@@ -15,6 +15,7 @@ from test_service_analysis_evidence import executed as executed  # noqa: PLC0414
 from app.models import ReviewStatus
 from app.services.federated_audit import AuditQueryUnavailable
 from app.services.sqlite_audit import AuditReviewConflict, SQLiteAuditStore
+from scripts.local_process_runtime import direct_python
 
 
 def initial(index):
@@ -256,7 +257,7 @@ def test_process_kill_before_or_after_commit_recovers_exact_chain(tmp_path, comm
     store = SQLiteAuditStore(path)
     original, pending = initial(1), initial(2)
     asyncio.run(store.save(original))
-    code = """import sys,json,sqlite3,hashlib
+    code = """import sys,json,sqlite3,hashlib,os
 data=json.loads(sys.stdin.readline())
 con=sqlite3.connect(data['path'])
 con.execute('PRAGMA synchronous=FULL')
@@ -267,11 +268,13 @@ digest=hashlib.sha256((head+'.'+payload).encode()).hexdigest()
 con.execute('INSERT INTO audit_entries VALUES (?,?,?,?)',(seq+1,head,digest,payload))
 con.execute('UPDATE audit_head SET seq=?,digest=?',(seq+1,digest))
 if data['commit']: con.commit()
-print('ready',flush=True)
+print(json.dumps({'state':'ready','pid':os.getpid()}),flush=True)
 sys.stdin.readline()
 """
+    executable, environment = direct_python(os.environ)
     child = subprocess.Popen(
-        [sys.executable, "-c", code],
+        [executable, "-c", code],
+        env=environment,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -283,7 +286,7 @@ sys.stdin.readline()
             + "\n"
         )
         child.stdin.flush()
-        assert child.stdout.readline().strip() == "ready"
+        assert json.loads(child.stdout.readline()) == {"state": "ready", "pid": child.pid}
         child.kill()
         child.wait(timeout=10)
     finally:

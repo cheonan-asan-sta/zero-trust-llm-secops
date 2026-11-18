@@ -1,5 +1,7 @@
 # 실제 native 실행과 공동 감사 백업·복원 통합 인수
 
+> 후속: [실제 HTTP worker PID 강제 종료와 새 프로세스 재기동](extra-http-worker-restart-20261119.md)을 추가 인수했다. 아래는 먼저 수행한 thread HTTP 서버 및 감사 복원35조건 단계의 기록이다.
+
 2026-11-19 · extra · 오전08:00 목표의 후속 검증. 로컬 systemd/SQLite/127.0.0.1 TCP를 사용했다. 유료 API·AWS·push·CI·병합·운영 설정 전환은 하지 않았다.
 
 ## 연결된 흐름

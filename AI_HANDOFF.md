@@ -1,3 +1,5 @@
+> 2026-11-19 HTTP worker 종료/재기동: 실제 독립 HTTP 프로세스의 PID를 소유 handle과 대조해 kill/wait하고 새 worker가 같은 SQLite 감사·공유 참조를 재검증. 원래 만료 전 철회 차단·권한/실행 이력 불변·실제 native41조건 통과. Linux 관련199건·최신 Win/Linux각22건. Windows venv PID 보완·provider stub/유료API AWS0·push/CI/병합 없음·오전08:00 목표 active. [인수·설정·한계](docs/extra-http-worker-restart-20261119.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-19 native 감사 복구 인수: 실제 systemd/ptrace→공유 참조→TCP HTTP→SQLite 감사→암호화 백업/복원 후보 조회·검토35조건 통과. Linux 관련197건·Windows49건 통과. 후보 검토 후 원본 DB/권한 이력 불변·오래된/변조 백업 거부. provider는 stub·유료/AWS0·push/CI/병합 없음·오전08:00 목표 active. [검증과 한계](docs/extra-native-audit-recovery-20261119.md). 아래는 이전 시점 기록이다.
 
 > 2026-11-19 감사 이관/백업 후속: 고정 source 목록 해시·원래 검토 이력을 검증해 새 SQLite로 이관. AES-256-GCM 스트리밍 온라인 backup·외부 package/head pin·새 경로 restore·활성화 금지 CLI 추가. 최신 Win/Linux 각각42건(동일22개 신규+20개 writer) 통과·이전 Linux 확대177건. 원본/실사용 DB/설정 보존·유료API/AWS/push/CI/병합 없음·오전08:00 목표 active. [설정·시험·한계](docs/extra-audit-transfer-backup-20261119.md). 아래는 이전 시점 기록이다.
