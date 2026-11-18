@@ -19,6 +19,7 @@ from test_service_analysis_evidence import executed as executed  # noqa: PLC0414
 from app import main, security
 from app.config import Settings
 from app.services.audit import AuditStore
+from app.services.federated_audit import AuditQueryUnavailable
 from app.services.native_analysis_registry import NativeAnalysisRegistry
 from app.zero_trust_models import SessionRevocationRequest
 from scripts.f1_lab.service_analysis_evidence import publish_service_analysis
@@ -350,7 +351,13 @@ def test_failures_return_no_success_and_release_capacity(api, failure, monkeypat
     assert api.provider.analyze_with_evidence.await_count == (
         failure in {"write_error", "provider_error"}
     )
-    assert not api.audit.recent(20, api.lab.principal.tenant_id)
+    if failure in {"corrupt", "write_error"}:
+        # Unavailable/uncertain audit is not evidence of an empty history.
+        with pytest.raises(AuditQueryUnavailable):
+            api.audit.recent(20, api.lab.principal.tenant_id)
+        assert api.audit.integrity()["verified_lines"] == 0
+    else:
+        assert not api.audit.recent(20, api.lab.principal.tenant_id)
     if failure != "queue_full":
         assert main.analysis_capacity._value == 2
 
