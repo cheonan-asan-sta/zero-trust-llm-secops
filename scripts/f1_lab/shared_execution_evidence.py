@@ -201,7 +201,7 @@ class ServiceEvidenceJoiner:
     A copied or restored store is not a production anti-rollback authority.
     """
 
-    def __init__(self, registry, ledger, *, capacity=10000, expected_mode="systemd"):
+    def __init__(self, registry, ledger, *, capacity=10000, expected_mode="systemd", read_only=False):
         require(
             isinstance(registry, PinnedServiceRegistry)
             and type(capacity) is int
@@ -209,6 +209,8 @@ class ServiceEvidenceJoiner:
             "service_joiner_capacity",
         )
         require(expected_mode in {"systemd", "local_process_lab"}, "service_expected_mode")
+        require(type(read_only) is bool, "service_read_only_mode")
+        self.read_only = read_only
         self.registry, self.path, self.capacity, self.mode = (
             registry,
             Path(ledger),
@@ -216,6 +218,11 @@ class ServiceEvidenceJoiner:
             expected_mode,
         )
         require(self.path.parent.is_dir() and not self.path.is_symlink(), "service_ledger_path")
+        if read_only:
+            with self.connect(read_only=True) as con:
+                con.execute("SELECT identity,event,evidence,state FROM observations LIMIT 0")
+                con.execute("SELECT observed FROM clock LIMIT 0")
+            return
         with self.connect() as con:
             con.execute(
                 "CREATE TABLE IF NOT EXISTS observations (identity TEXT PRIMARY KEY, event TEXT NOT NULL, evidence TEXT NOT NULL, state TEXT NOT NULL)"
@@ -226,6 +233,7 @@ class ServiceEvidenceJoiner:
 
     @contextmanager
     def connect(self, *, read_only=False):
+        require(read_only or not self.read_only, "service_read_only_writer_rejected")
         require(not self.path.is_symlink(), "service_ledger_link")
         connection = sqlite3.connect(
             self.path.resolve().as_uri() + "?mode=ro" if read_only else self.path,
@@ -241,6 +249,8 @@ class ServiceEvidenceJoiner:
             connection.close()
 
     def check(self, event, proofs, *, now=None):
+        if self.read_only:
+            return ServiceFacts("unavailable")
         return self._check(event, proofs, now=now, record=True)
 
     def inspect(self, event, proofs, *, now=None):

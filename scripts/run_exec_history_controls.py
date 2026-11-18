@@ -181,7 +181,8 @@ def setup_app(directory, unit, *, executable_sha256="a" * 64, command_sha256="b"
 
 def run(directory, *, retention=False, outbox_recovery=False, intent_recovery=False,
         recovery_observability=False, coherent_backup=False, bundle_observability=False,
-        llm_evidence=False, http_analysis=False):
+        llm_evidence=False, http_analysis=False, shared_analysis=False):
+    http_analysis = http_analysis or shared_analysis
     llm_evidence = llm_evidence or http_analysis
     coherent_backup = coherent_backup or bundle_observability
     recovery_observability = recovery_observability or coherent_backup
@@ -223,6 +224,7 @@ def run(directory, *, retention=False, outbox_recovery=False, intent_recovery=Fa
         "llm_provider_stubbed": llm_evidence,
         "model_quality_measured": False,
         "native_http_analysis_tested": http_analysis,
+        "shared_native_analysis_tested": shared_analysis,
         "cases": [],
     }
 
@@ -325,8 +327,16 @@ StandardError=journal
         if http_analysis:
             from scripts.f1_lab.service_http_controls import run as run_http
 
+            shared_config = None
+            if shared_analysis:
+                from scripts.f1_lab.shared_native_controls import run as run_shared
+
+                shared_config = run_shared(
+                    lab, request, access, receipt, event, proofs, private, passed,
+                )
             report["http_analysis"] = run_http(
                 lab, request, access, receipt, event, proofs, private, passed,
+                shared_config=shared_config,
             )
         normal = OperationDecision(0.1, 0.1, False, False, "prior-normal")
         old_alert = OperationDecision(0.9, 0.9, True, True, "prior-alert")
@@ -437,11 +447,13 @@ def main():
     parser.add_argument("--intent-recovery", action="store_true")
     parser.add_argument("--llm-evidence", action="store_true")
     parser.add_argument("--http-analysis", action="store_true")
+    parser.add_argument("--shared-analysis", action="store_true")
     args = parser.parse_args()
     result = run(args.directory, retention=args.retention, outbox_recovery=args.outbox_recovery,
                  intent_recovery=args.intent_recovery,recovery_observability=args.recovery_observability,
                  coherent_backup=args.coherent_backup,bundle_observability=args.bundle_observability,
-                 llm_evidence=args.llm_evidence,http_analysis=args.http_analysis)
+                 llm_evidence=args.llm_evidence,http_analysis=args.http_analysis,
+                 shared_analysis=args.shared_analysis)
     print(json.dumps({"completed": result["completed"], "cases": len(result["cases"])}))
 
 

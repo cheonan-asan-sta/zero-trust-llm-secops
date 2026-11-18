@@ -23,8 +23,11 @@ import uvicorn
 from app.analyzers.openai_analyzer import OpenAIAnalyzer
 from app.config import Settings
 from app.models import SecurityAssessment
-from app.services.audit import AuditStore
-from app.services.native_analysis_registry import NativeAnalysisRegistry
+from app.services.audit import AuditStore, create_audit_store
+from app.services.native_analysis_registry import (
+    NativeAnalysisRegistry,
+    create_native_analysis_registry,
+)
 from scripts.f1_lab.native_jsonl import require
 from scripts.f1_lab.service_analysis_evidence import publish_service_analysis
 
@@ -50,13 +53,20 @@ def preload(directory):
     return main
 
 
-def run(lab, request, access, receipt, event, proofs, directory, passed):
+def run(lab, request, access, receipt, event, proofs, directory, passed, *, shared_config=None):
     from app import main, security
 
     before = hashlib.sha256(lab.broker.joiner.path.read_bytes()).hexdigest()
     journal_before = lab.operations.journal_status()
     signal = lab.signals[access.session_id]
+    served_operations = lab.operations
     registry = NativeAnalysisRegistry(lab.operations)
+    if shared_config is not None:
+        from scripts.f1_lab.shared_native_controls import new_operations
+        from scripts.f1_lab.shared_service_analysis import open_shared_service_registry
+
+        registry = open_shared_service_registry(lab.operations, *shared_config)
+        served_operations = new_operations(lab)
     ref = publish_service_analysis(
         registry,
         lab.operations,
@@ -69,7 +79,6 @@ def run(lab, request, access, receipt, event, proofs, directory, passed):
         proofs,
         receipt,
     )
-    audit = AuditStore(Path(directory) / "native-http-audit.jsonl")
     key = secrets.token_urlsafe(32)
     config = Settings(
         _env_file=None,
@@ -82,7 +91,14 @@ def run(lab, request, access, receipt, event, proofs, directory, passed):
         api_key_roles="responder",
         openai_prompt_mode="grounded",
         openai_api_key="local-stub-not-a-real-api-key",
+        audit_backend="jsonl",
+        audit_log_path=Path(directory) / "native-http-audit.jsonl",
+        native_analysis_shared_config_path=shared_config[0] if shared_config else None,
+        native_analysis_shared_config_sha256=shared_config[1] if shared_config else None,
     )
+    if shared_config is not None:
+        registry = create_native_analysis_registry(served_operations, config)
+    audit = create_audit_store(config)
     reply = SecurityAssessment(
         risk_score=10,
         risk_level="LOW",
@@ -112,7 +128,7 @@ def run(lab, request, access, receipt, event, proofs, directory, passed):
             for name, value in {
                 "get_settings": lambda: config,
                 "settings": config,
-                "zero_trust_operations": lab.operations,
+                "zero_trust_operations": served_operations,
                 "native_analysis_registry": registry,
                 "audit_store": audit,
                 "get_analyzer": lambda: adapter,
@@ -215,6 +231,8 @@ def run(lab, request, access, receipt, event, proofs, directory, passed):
             passed("native_http_analysis_preserves_execution_ledger_and_app_grant_history")
             return {
                 "transport": "tcp_loopback",
+                "reference_backend": "encrypted_sqlite" if shared_config else "process_memory",
+                "audit_writer_scope": "per_process_file" if shared_config else "single_process",
                 "http_status": response.status_code,
                 "model_provider_stubbed": True,
                 "paid_api_calls": 0,

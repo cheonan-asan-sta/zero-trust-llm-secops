@@ -95,7 +95,10 @@ from app.services.integration_outbox import (
     OutboxTerminalStateError,
     create_integration_outbox_store,
 )
-from app.services.native_analysis_registry import NativeAnalysisMissing, NativeAnalysisRegistry
+from app.services.native_analysis_registry import (
+    NativeAnalysisMissing,
+    create_native_analysis_registry,
+)
 from app.services.ocsf import get_ocsf_normalizer
 from app.services.policy import (
     enforce_assessment_safety,
@@ -167,9 +170,7 @@ continuous_signal_service = (
     if zero_trust_operations
     else None
 )
-native_analysis_registry = (
-    NativeAnalysisRegistry(zero_trust_operations) if zero_trust_operations is not None else None
-)
+native_analysis_registry = create_native_analysis_registry(zero_trust_operations, settings)
 app.include_router(zero_trust_router(zero_trust_operations, continuous_signal_service))
 install_zero_trust_error_handlers(app)
 behavior_context_service = (

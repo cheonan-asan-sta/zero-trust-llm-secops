@@ -187,7 +187,8 @@ def publish_service_analysis(
     """Trusted collector publication; HTTP callers only receive the opaque reference.
 
     Keeps original signed inputs private and re-collects with the actual HTTP caller.
-    The registry is process-local and must belong to the serving application's PDP.
+    Either registry backend must belong to the publishing application's PDP;
+    shared readers rebuild contexts with their own serving PDP and pinned sources.
     """
     if registry.operations is not operations:
         raise SignalRejected("native publisher and HTTP application stores differ")
@@ -196,6 +197,16 @@ def publish_service_analysis(
     event = ServiceEvent.model_validate(event.model_dump(mode="json"))
     receipt = CallerReceipt.model_validate(receipt.model_dump(mode="json"))
     proofs = tuple(ServiceProof.model_validate(p.model_dump(mode="json")) for p in proofs)
+
+    from app.services.shared_native_analysis import SharedNativeAnalysisRegistry
+
+    if isinstance(registry, SharedNativeAnalysisRegistry):
+        from scripts.f1_lab.shared_service_analysis import NativeServiceBundle
+
+        bundle = NativeServiceBundle(
+            signal=signal, request=request, event=event, proofs=list(proofs), receipt=receipt,
+        )
+        return registry.publish_bundle(bundle.model_dump_json().encode(), principal)
 
     def collect(caller):
         return collect_service_analysis_evidence(

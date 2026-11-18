@@ -1,3 +1,5 @@
+> 2026-11-18 extra 공유 참조 후속: 선택적 AES-256-GCM/로컬 SQLite 참조 저장소와 고정 설정 bootstrap 추가. 원래 만료 내 새 reader 프로세스 재검증·다른 프로세스의 철회 지속·source ledger 초기화부터 읽기 전용. 공유 모드 JSONL은 worker별 파일이며 통합 조회는 다음 작업. Linux744건(신규43건 포함)·Windows102/skip1·실제 systemd/독립 reader/TCP HTTP29조건 통과. 유료API/AWS0·F1 새 평가 없음·push/CI/병합 없음. [구현·설정·검증·남은 범위](docs/extra-shared-native-analysis-20261118.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-18 extra HTTP 후속: 서버가 검증·등록한 실행 참조로 POST /analysis/native-service 분석과 기존 해시 체인 감사를 연결. 동일 호출자/tenant, 모델 전후·감사 저장 후 재검증, 소비된 grant 재발급 방지. Linux698건(신규60건 포함)·Windows신규60건·실제 systemd+TCP HTTP24조건 통과. 유료/API AWS0·새 F1 측정 없음·push/CI/병합 없음. 참조는 프로세스 메모리이며 재시작/다른 worker에서는 소멸. [구현·검증·운영 한계](docs/extra-native-http-audit-20261118.md). 아래는 이전 시점 기록이다.
 
 > 2026-11-18 extra 후속: main PR #91(e058bca)에서 분기한 로컬 개발. 실제 systemd 실행·서명된 호출자 영수증·정확한 앱 grant 소비를 읽기 전용으로 연결해 LLM 입력에 추가. Linux 관련 회귀572건(신규45건 포함), 실제 systemd15조건 통과. 유료/AWS0·새 모델 F1 측정 없음·push/CI/병합 없음. [구현·결과·범위](docs/extra-native-execution-llm-20261118.md). 아래는 이전 시점 기록이다.

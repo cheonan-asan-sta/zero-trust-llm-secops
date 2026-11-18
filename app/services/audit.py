@@ -3,6 +3,7 @@ import hashlib
 import hmac
 import json
 import math
+import os
 from pathlib import Path
 from typing import Protocol
 
@@ -234,7 +235,12 @@ class DynamoDBAuditStore:
 def create_audit_store(settings: Settings) -> AuditRepository:
     if settings.audit_backend == "dynamodb":
         return DynamoDBAuditStore(settings.dynamodb_table_name, settings.aws_region)
-    return AuditStore(settings.audit_log_path)
+    path = settings.audit_log_path
+    if settings.native_analysis_shared_config_path is not None and settings.app_environment != "production":
+        # Each local worker owns its hash-chain writer. Sharing native references
+        # must not make independent JSONL writers fork the same audit chain.
+        path = path.with_name(f"{path.stem}.worker-{os.getpid()}{path.suffix}")
+    return AuditStore(path)
 
 
 def _parse_items(items: list[dict], tenant_id: str) -> list[AnalysisResult]:

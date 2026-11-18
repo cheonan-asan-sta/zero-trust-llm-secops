@@ -30,6 +30,7 @@ class _PublishedExecution:
     subject: str
     expires_at: datetime
     collect: Callable[[Principal], VerifiedSessionContext]
+    binding_sha256: str | None = None
 
 
 class NativeAnalysisRegistry:
@@ -98,8 +99,7 @@ class NativeAnalysisRegistry:
         with self._lock:
             self._records.pop(execution_ref, None)
 
-    def resolve(self, execution_ref, principal, *, caller_authority_check=None):
-        self._authenticated(principal)
+    def _load(self, execution_ref, principal):
         with self._lock:
             self._prune(datetime.now(UTC))
             entry = self._records.get(execution_ref)
@@ -109,16 +109,24 @@ class NativeAnalysisRegistry:
             ):
                 # Do not disclose whether another tenant/operator owns the reference.
                 raise NativeAnalysisMissing("native execution reference unavailable")
+            return entry
+
+    def _assert_active(self, execution_ref, entry):
+        with self._lock:
+            if (
+                self._records.get(execution_ref) is not entry
+                or datetime.now(UTC) >= entry.expires_at
+            ):
+                raise SignalRejected("native execution reference expired or withdrawn")
+
+    def resolve(self, execution_ref, principal, *, caller_authority_check=None):
+        self._authenticated(principal)
+        entry = self._load(execution_ref, principal)
 
         def active():
             if caller_authority_check is not None:
                 caller_authority_check()
-            with self._lock:
-                if (
-                    self._records.get(execution_ref) is not entry
-                    or datetime.now(UTC) >= entry.expires_at
-                ):
-                    raise SignalRejected("native execution reference expired or withdrawn")
+            self._assert_active(execution_ref, entry)
 
         active()
         signal = entry.signal.model_copy(deep=True)
@@ -142,3 +150,19 @@ class NativeAnalysisRegistry:
         return signal, replace(
             context, expires_at=expires, facts_json=encoded, verify_current=verify_current
         )
+
+
+def create_native_analysis_registry(operations, settings):
+    if operations is None:
+        return None
+    if settings.native_analysis_shared_config_path is None:
+        return NativeAnalysisRegistry(operations)
+    # The opt-in native collector runtime ships with the source/Docker image.
+    # No dynamic import or path is ever supplied by an HTTP client or stored bundle.
+    from scripts.f1_lab.shared_service_analysis import open_shared_service_registry
+
+    return open_shared_service_registry(
+        operations,
+        settings.native_analysis_shared_config_path,
+        settings.native_analysis_shared_config_sha256,
+    )

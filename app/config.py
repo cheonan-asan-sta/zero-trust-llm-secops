@@ -32,6 +32,8 @@ class Settings(BaseSettings):
     zero_trust_db_path: Path = Path("runtime/zero-trust.sqlite3")
     zero_trust_policy_path: Path | None = None
     behavior_context_db_path: Path | None = None
+    native_analysis_shared_config_path: Path | None = None
+    native_analysis_shared_config_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
     # Compatibility for offline legacy fixtures; the application uses behavior_context_db_path.
     response_workflow_db_path: Path = Path("runtime/response-workflow.sqlite3")
     trusted_signal_sources_path: Path | None = None
@@ -81,6 +83,10 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_enterprise_security(self) -> "Settings":
+        if (self.native_analysis_shared_config_path is None) != (
+            self.native_analysis_shared_config_sha256 is None
+        ):
+            raise ValueError("shared native analysis requires both config path and SHA-256 pin")
         if (
             self.openai_incomplete_retries
             and self.openai_retry_max_output_tokens <= self.openai_max_output_tokens
