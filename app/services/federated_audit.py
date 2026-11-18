@@ -11,6 +11,7 @@ from pathlib import Path
 from app.models import AnalysisResult
 from app.services.audit import AuditStore, _summarize
 from app.services.audit_manifest import AuditManifestError, AuditShardManifest
+from app.services.settled_io import settled_io
 
 
 class AuditQueryUnavailable(RuntimeError):
@@ -28,7 +29,9 @@ class FederatedAuditStore(AuditStore):
 
     async def save(self, record):
         try:
-            self._manifest.announce(self._path, self.MAX_FILES)
+            # A cancelled announcement must leave a valid empty file, not a
+            # permanently registered-but-missing shard that poisons later reads.
+            await settled_io(self._manifest.announce, self._path, self.MAX_FILES, ensure_file=True)
         except AuditManifestError as error:
             raise AuditQueryUnavailable("audit manifest registration failed") from error
         await super().save(record)

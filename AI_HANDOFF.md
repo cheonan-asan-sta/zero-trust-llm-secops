@@ -1,3 +1,5 @@
+> 2026-11-19 감사 I/O 취소 후속: 동기 무결성 조회의 event loop 정지와 취소 시 조기 슬롯 반환을 재현(변경 전3실패). 시작한 디스크 작업 완료까지 슬롯 유지·SQLite writer/연합 등록 보호. 신규6건·Linux205건·Windows142/skip1 통과. ASGI task 취소이며 TCP단절은 미검증·새 F1 평가 없음·유료API/AWS/push/CI/병합0·오전08:00 목표 active. [구현·결과·한계](docs/extra-async-audit-io-20261119.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-19 HTTP worker 종료/재기동: 실제 독립 HTTP 프로세스의 PID를 소유 handle과 대조해 kill/wait하고 새 worker가 같은 SQLite 감사·공유 참조를 재검증. 원래 만료 전 철회 차단·권한/실행 이력 불변·실제 native41조건 통과. Linux 관련199건·최신 Win/Linux각22건. Windows venv PID 보완·provider stub/유료API AWS0·push/CI/병합 없음·오전08:00 목표 active. [인수·설정·한계](docs/extra-http-worker-restart-20261119.md). 아래는 이전 시점 기록이다.
 
 > 2026-11-19 native 감사 복구 인수: 실제 systemd/ptrace→공유 참조→TCP HTTP→SQLite 감사→암호화 백업/복원 후보 조회·검토35조건 통과. Linux 관련197건·Windows49건 통과. 후보 검토 후 원본 DB/권한 이력 불변·오래된/변조 백업 거부. provider는 stub·유료/AWS0·push/CI/병합 없음·오전08:00 목표 active. [검증과 한계](docs/extra-native-audit-recovery-20261119.md). 아래는 이전 시점 기록이다.

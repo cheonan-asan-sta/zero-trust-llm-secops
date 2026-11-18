@@ -4,7 +4,6 @@ Each transaction verifies the chain and durable head. This detects corruption,
 not a privileged attacker restoring/resealing the entire database and head.
 """
 
-import asyncio
 import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
@@ -12,6 +11,7 @@ from pathlib import Path
 from app.models import AnalysisResult
 from app.services.audit import _record_hash, _summarize
 from app.services.federated_audit import AuditQueryUnavailable
+from app.services.settled_io import settled_io
 
 MUTABLE_REVIEW = {"review_status", "reviewer", "review_note", "review_updated_at"}
 TRANSITIONS = {
@@ -157,10 +157,10 @@ class SQLiteAuditStore:
     async def save(self, record):
         # Cancellation does not revoke a committed audit; no mutable in-memory
         # head exists to diverge from the settled filesystem transaction.
-        await asyncio.to_thread(self._write, record.model_copy(deep=True))
+        await settled_io(self._write, record.model_copy(deep=True))
 
     async def save_review(self, record, expected):
-        await asyncio.to_thread(
+        await settled_io(
             self._write, record.model_copy(deep=True), expected.model_copy(deep=True)
         )
 

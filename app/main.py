@@ -111,6 +111,7 @@ from app.services.public_replay import get_public_replay_service
 from app.services.response_actions import ResponseService
 from app.services.scenario_evaluator import evaluate_scenarios
 from app.services.session_analysis_evidence import VerifiedSessionContext, collect_session_evidence
+from app.services.settled_io import settled_io
 from app.services.sigma import get_sigma_engine
 from app.services.signal_inbox import SignalInbox
 from app.services.sqlite_audit import AuditReviewConflict, SQLiteAuditStore
@@ -1002,10 +1003,12 @@ async def _analyze_event(
     except TimeoutError as exc:
         raise AnalysisCapacityExceeded from exc
     try:
-        # A known local audit failure cannot be repaired by a paid analysis.
-        # This cached integrity state is not a probe of future disk availability.
-        if isinstance(audit_store, (AuditStore, SQLiteAuditStore)) and audit_store.integrity().get("ok") is False:
-            raise RuntimeError("audit log integrity check failed; refusing new analysis")
+        # Live integrity scans must not block the event loop or release capacity
+        # while an abandoned non-cancellable filesystem thread is still running.
+        if isinstance(audit_store, (AuditStore, SQLiteAuditStore)):
+            integrity = await settled_io(audit_store.integrity)
+            if integrity.get("ok") is False:
+                raise RuntimeError("audit log integrity check failed; refusing new analysis")
         started = perf_counter()
         normalized = ocsf_normalizer.normalize(event)
         detection = sigma_engine.evaluate(normalized)

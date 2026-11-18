@@ -1,7 +1,9 @@
 """Local durable inventory/checkpoints; not independent rollback attestation."""
 
 import hashlib
+import os
 import sqlite3
+import stat
 from contextlib import contextmanager
 
 
@@ -39,15 +41,28 @@ class AuditShardManifest:
             if connection is not None:
                 connection.close()
 
-    def announce(self, path, capacity):
+    def announce(self, path, capacity, *, ensure_file=False):
         with self.transaction() as con:
-            if con.execute("SELECT 1 FROM shards WHERE name=?", (path.name,)).fetchone():
-                return
-            if con.execute("SELECT count(*) FROM shards").fetchone()[0] >= capacity:
-                raise AuditManifestError("audit manifest capacity exceeded")
-            con.execute(
-                "INSERT INTO shards VALUES (?,0,?)", (path.name, hashlib.sha256(b"").hexdigest())
-            )
+            existing = con.execute("SELECT 1 FROM shards WHERE name=?", (path.name,)).fetchone()
+            if existing is None:
+                if con.execute("SELECT count(*) FROM shards").fetchone()[0] >= capacity:
+                    raise AuditManifestError("audit manifest capacity exceeded")
+                con.execute(
+                    "INSERT INTO shards VALUES (?,0,?)",
+                    (path.name, hashlib.sha256(b"").hexdigest()),
+                )
+            if ensure_file:
+                if path.is_symlink() or (existing is not None and not path.is_file()):
+                    raise AuditManifestError("registered audit writer missing or linked")
+                flags = os.O_WRONLY | os.O_APPEND | getattr(os, "O_NOFOLLOW", 0)
+                if existing is None:
+                    flags |= os.O_CREAT
+                fd = os.open(path, flags, 0o600)
+                try:
+                    if not stat.S_ISREG(os.fstat(fd).st_mode):
+                        raise AuditManifestError("audit writer is not a regular file")
+                finally:
+                    os.close(fd)
 
     def checkpoint(self, paths, signatures, capacity):
         """Advance only fully verified stable files, rejecting lost/truncated prefixes."""
