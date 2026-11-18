@@ -1,0 +1,94 @@
+{
+  "date": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "pushed": false,
+  "ci_started": false,
+  "merged": false,
+  "model_quality_reevaluated": false,
+  "new_tests": 21,
+  "query_review_readiness_share_capacity": true,
+  "current_api_key_and_oidc_expiry_rechecked": true,
+  "native_conditions": 41,
+  "raw_tcp_disconnect_tested": false,
+  "before_valid_requests": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "10",
+    "skipped": "0",
+    "tests": "10",
+    "time": "4.115",
+    "timestamp": "2026-11-19T01:50:02.502609+09:00",
+    "hostname": "희주",
+    "xml_sha256": "48d951b6f24304fe5f9e76b4597d37d0d1c35ff574348bb3e5816e58875b87a5",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\audit-query-before-valid-20261119.xml"
+  },
+  "before_readiness": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "1",
+    "skipped": "0",
+    "tests": "1",
+    "time": "3.663",
+    "timestamp": "2026-11-19T01:53:57.919403+09:00",
+    "hostname": "희주",
+    "xml_sha256": "c68b99bb840d37cf6309af3ad44c65c2b31b4d7424fd49574c56de6fa9775b2f",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\audit-query-ready-before-20261119.xml"
+  },
+  "earlier_focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "20",
+    "time": "4.727",
+    "timestamp": "2026-11-19T01:52:50.443035+09:00",
+    "hostname": "희주",
+    "xml_sha256": "7717d35d234768e87f26d2a42290f2c9e42e223556dc4a226b4197c8201dc9c3",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\audit-query-focused-final-20261119.xml"
+  },
+  "windows_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "175",
+    "time": "40.940",
+    "timestamp": "2026-11-19T01:54:38.074272+09:00",
+    "hostname": "희주",
+    "xml_sha256": "262faaaba36e421fda3f602c2535dd8c7afa208d01dedb2525dae5edc7fdb83f",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\audit-query-windows-20261119.xml"
+  },
+  "linux_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "242",
+    "time": "89.078",
+    "timestamp": "2026-11-19T01:54:43.888163+09:00",
+    "hostname": "localhost",
+    "xml_sha256": "540953bb462c4d817a19b3267e1af34dae92bd6fd40638c5a3b13449e83811fd",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\audit-query-linux-20261119.xml"
+  },
+  "native_source_run_sha256": "dea5b6c2bfb495bea8fd793bd866331ef00fca84e352abf3beae796532ec1874",
+  "source_files": [
+    {
+      "path": "app/main.py",
+      "sha256": "17eddd292ce5dfd1ba4bc049520b7622c270a8288220cabed5bbd38958eead2e"
+    },
+    {
+      "path": "app/config.py",
+      "sha256": "1697c6625990c9da1a8ce0cc2abd1a5d4ce5c667f168f3aa5d571b2393f0e1bd"
+    },
+    {
+      "path": ".env.example",
+      "sha256": "3e5e9cf82fd3e1d4ec4981462ec4ab27abb61555be5f6e44da16271b86975892"
+    },
+    {
+      "path": "tests/test_audit_query_admission.py",
+      "sha256": "dcf4a0a7ebf5aa72aada08bbd41b0f01d8634bca9e1bae89885430baf67884b5"
+    }
+  ]
+}

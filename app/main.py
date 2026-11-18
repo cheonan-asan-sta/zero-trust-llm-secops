@@ -150,6 +150,7 @@ public_replay_service = get_public_replay_service()
 detection_quality_service = get_detection_quality_service()
 incident_quality_service = get_incident_quality_service()
 analysis_capacity = asyncio.Semaphore(settings.analysis_max_concurrency)
+audit_query_capacity = asyncio.Semaphore(settings.audit_query_max_concurrency)
 zero_trust_operations = (
     ZeroTrustOperations(
         settings.zero_trust_db_path,
@@ -257,7 +258,16 @@ def liveness() -> dict:
 
 
 @app.get("/health/ready")
-def readiness() -> Response:
+async def readiness() -> Response:
+    async with _audit_query_slot():
+        store = audit_store
+        response = await settled_io(_readiness_snapshot)
+        if audit_store is not store:
+            raise AuditQueryUnavailable("audit serving store changed")
+        return response
+
+
+def _readiness_snapshot() -> Response:
     zero_trust_integrity = (
         zero_trust_operations.integrity()
         if zero_trust_operations
@@ -1160,9 +1170,50 @@ async def evaluate(request: EvaluationRequest, _: AdminPrincipal) -> EvaluationS
     return await run_evaluation(analyzer, request.runs_per_scenario, request.concurrency)
 
 
+@asynccontextmanager
+async def _audit_query_slot():
+    capacity = audit_query_capacity
+    try:
+        await asyncio.wait_for(
+            capacity.acquire(), timeout=settings.audit_query_queue_timeout_seconds
+        )
+    except TimeoutError as error:
+        raise HTTPException(
+            503, "Audit query capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from error
+    try:
+        yield
+    finally:
+        capacity.release()
+
+
+async def _audit_boundary(store, principal, request):
+    if audit_store is not store:
+        raise AuditQueryUnavailable("audit serving store changed")
+    check = getattr(request.state, "authentication_revalidator", None)
+    if check is not None:
+        await settled_io(check)
+    expiry = principal.authentication_expires_at
+    if (principal.auth_method == "oidc" and expiry is None) or (
+        expiry is not None and datetime.now(UTC) >= expiry
+    ):
+        raise HTTPException(401, "Caller authentication expired")
+    if audit_store is not store:
+        raise AuditQueryUnavailable("audit serving store changed")
+
+
+async def _audit_read_in_slot(store, method, principal, request, *args):
+    """Internal: the route holds a query slot across source I/O and authorization."""
+    await _audit_boundary(store, principal, request)
+    value = await settled_io(getattr(store, method), *args)
+    await _audit_boundary(store, principal, request)
+    return value
+
+
 @app.get("/metrics", response_model=MetricsSummary)
-def metrics(principal: ViewerPrincipal) -> MetricsSummary:
-    return audit_store.metrics(principal.tenant_id)
+async def metrics(request: Request, principal: ViewerPrincipal) -> MetricsSummary:
+    async with _audit_query_slot():
+        return await _audit_read_in_slot(audit_store, "metrics", principal, request, principal.tenant_id)
 
 
 @app.get("/internal/metrics", include_in_schema=False)
@@ -1198,14 +1249,18 @@ def assurance_control(control_id: str, _: AdminPrincipal) -> ControlRecord:
 
 
 @app.get("/results", response_model=list[AnalysisResult])
-def recent_results(
+async def recent_results(
+    request: Request,
     principal: ViewerPrincipal,
     limit: int = 20,
     review_status: ReviewStatus | None = None,
     risk_level: RiskLevel | None = None,
 ) -> list[AnalysisResult]:
     safe_limit = min(max(limit, 1), 100)
-    records = audit_store.recent(100, principal.tenant_id)
+    async with _audit_query_slot():
+        records = await _audit_read_in_slot(
+            audit_store, "recent", principal, request, 100, principal.tenant_id
+        )
     if review_status is not None:
         records = [record for record in records if record.review_status == review_status]
     if risk_level is not None:
@@ -1218,8 +1273,15 @@ async def update_review(
     event_id: str,
     request: ReviewUpdateRequest,
     principal: ResponderPrincipal,
+    http_request: Request,
 ) -> AnalysisResult:
-    record = audit_store.get(event_id, principal.tenant_id)
+    async with _audit_query_slot():
+        return await _update_review_in_slot(event_id, request, principal, http_request)
+
+
+async def _update_review_in_slot(event_id, request, principal, http_request):
+    store = audit_store
+    record = await _audit_read_in_slot(store, "get", principal, http_request, event_id, principal.tenant_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Result not found")
     if record.review_status == ReviewStatus.NOT_REQUIRED:
@@ -1256,16 +1318,22 @@ async def update_review(
         review_updated_at=datetime.now(UTC),
     )
     updated = AnalysisResult.model_validate(payload)
-    if isinstance(audit_store, SQLiteAuditStore):
-        await audit_store.save_review(updated, record)
+    await _audit_boundary(store, principal, http_request)
+    if isinstance(store, SQLiteAuditStore):
+        await store.save_review(updated, record)
     else:
-        await audit_store.save(updated)
+        await store.save(updated)
+    # A committed historical review is retained even if delivery is now denied.
+    await _audit_boundary(store, principal, http_request)
     return updated
 
 
 @app.get("/results/{event_id}", response_model=AnalysisResult)
-def result(event_id: str, principal: ViewerPrincipal) -> AnalysisResult:
-    record = audit_store.get(event_id, principal.tenant_id)
+async def result(event_id: str, request: Request, principal: ViewerPrincipal) -> AnalysisResult:
+    async with _audit_query_slot():
+        record = await _audit_read_in_slot(
+            audit_store, "get", principal, request, event_id, principal.tenant_id
+        )
     if record is None:
         raise HTTPException(status_code=404, detail="Result not found")
     return record
