@@ -4,6 +4,7 @@ import hmac
 import json
 import math
 import os
+import threading
 from pathlib import Path
 from typing import Protocol
 
@@ -34,6 +35,7 @@ class AuditStore:
         self._history: list[AnalysisResult] = []
         self._history_positions: dict[str, int] = {}
         self._lock = asyncio.Lock()
+        self._disk_lock = threading.RLock()
         self._last_hash = "0" * 64
         self._integrity_ok = True
         self._verified_lines = 0
@@ -76,9 +78,7 @@ class AuditStore:
         return list(reversed(records[-limit:]))
 
     def metrics(self, tenant_id: str = "local") -> MetricsSummary:
-        return _summarize(
-            [record for record in self._history if record.tenant_id == tenant_id]
-        )
+        return _summarize([record for record in self._history if record.tenant_id == tenant_id])
 
     def integrity(self) -> dict[str, bool | int | str]:
         return {
@@ -87,6 +87,25 @@ class AuditStore:
             "verified_lines": self._verified_lines,
             "legacy_lines": self._legacy_lines,
         }
+
+    def verify_saved(self, expected):
+        from app.services.audit_paging import _jsonl_view
+        from app.services.audit_wire import analysis_wire
+        from app.services.federated_audit import AuditQueryUnavailable
+
+        expected = AnalysisResult.model_validate_json(expected.model_dump_json())
+        expected_wire = analysis_wire(expected)
+        found = False
+
+        def observe(record, hashed):
+            nonlocal found
+            if hashed and record.analysis_id == expected.analysis_id:
+                found = found or analysis_wire(record) == expected_wire
+
+        # Reopen bounded disk data, never the writer's cached result objects.
+        _jsonl_view(self, row_observer=observe, allow_legacy_prefix=True)
+        if not found:
+            raise AuditQueryUnavailable("returned analysis is not preserved in its writer shard")
 
     def _load_existing(self) -> None:
         if not self._path.exists():
@@ -159,6 +178,10 @@ class AuditStore:
             self._records[record_key] = record
 
     def _append_jsonl(self, record: AnalysisResult) -> None:
+        with self._disk_lock:
+            self._append_jsonl_locked(record)
+
+    def _append_jsonl_locked(self, record: AnalysisResult) -> None:
         self._path.parent.mkdir(parents=True, exist_ok=True)
         payload = record.model_dump_json()
         record_hash = _record_hash(self._last_hash, payload)
@@ -243,7 +266,10 @@ def create_audit_store(settings: Settings) -> AuditRepository:
         from app.services.sqlite_audit import SQLiteAuditStore
 
         path = settings.audit_db_path or settings.audit_log_path.with_suffix(".sqlite3")
-        if path.resolve() in {settings.zero_trust_db_path.resolve(), settings.audit_log_path.resolve()}:
+        if path.resolve() in {
+            settings.zero_trust_db_path.resolve(),
+            settings.audit_log_path.resolve(),
+        }:
             raise ValueError("audit database must be separate from policy and JSONL sources")
         if settings.audit_checkpoint_path is not None:
             from app.services.guarded_sqlite_audit import GuardedSQLiteAuditStore
@@ -255,7 +281,10 @@ def create_audit_store(settings: Settings) -> AuditRepository:
     if settings.audit_backend == "dynamodb":
         return DynamoDBAuditStore(settings.dynamodb_table_name, settings.aws_region)
     path = settings.audit_log_path
-    if settings.native_analysis_shared_config_path is not None and settings.app_environment != "production":
+    if (
+        settings.native_analysis_shared_config_path is not None
+        and settings.app_environment != "production"
+    ):
         # Each local worker owns its hash-chain writer. Sharing native references
         # must not make independent JSONL writers fork the same audit chain.
         path = path.with_name(f"{path.stem}.worker-{os.getpid()}{path.suffix}")

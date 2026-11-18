@@ -8,6 +8,7 @@ import argparse
 import json
 import os
 import socket
+import traceback
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
@@ -37,6 +38,7 @@ def main():
         "shared_config",
         "shared_pin",
         "audit_db",
+        "audit_mode",
         "api_key_sha256",
         "subject",
         "tenant_id",
@@ -46,6 +48,8 @@ def main():
         "checkpoint_pin",
     }:
         raise ValueError("worker control fields rejected")
+    if data["audit_mode"] not in {"sqlite", "jsonl", "federated_jsonl"}:
+        raise ValueError("worker audit mode rejected")
     if (data["cursor_key_path"] is None) != (data["cursor_key_pin"] is None):
         raise ValueError("worker cursor key configuration rejected")
     if (data["checkpoint_path"] is None) != (data["checkpoint_pin"] is None):
@@ -71,9 +75,11 @@ def main():
             "API_KEY_SUBJECT": data["subject"],
             "API_KEY_TENANT_ID": data["tenant_id"],
             "API_KEY_ROLES": "responder",
-            "AUDIT_BACKEND": "sqlite",
+            "AUDIT_BACKEND": "sqlite" if data["audit_mode"] == "sqlite" else "jsonl",
             "AUDIT_DB_PATH": data["audit_db"],
-            "AUDIT_LOG_PATH": str(path.parent / "unused-audit.jsonl"),
+            "AUDIT_LOG_PATH": str(path.parent / "unused-audit.jsonl")
+            if data["audit_mode"] == "sqlite"
+            else data["audit_db"],
             "CASE_LOG_PATH": str(path.parent / "worker-cases.jsonl"),
             "OUTBOX_LOG_PATH": str(path.parent / "worker-outbox.jsonl"),
             "ZERO_TRUST_DB_PATH": data["operations_db"],
@@ -83,6 +89,11 @@ def main():
             "AWS_EC2_METADATA_DISABLED": "true",
         }
     )
+    if data["audit_mode"] == "jsonl":
+        # Explicit ordinary-analysis-only fixture. Shared native bootstrap would
+        # select federation in the normal factory, so disable it for plain JSONL.
+        os.environ.pop("NATIVE_ANALYSIS_SHARED_CONFIG_PATH", None)
+        os.environ.pop("NATIVE_ANALYSIS_SHARED_CONFIG_SHA256", None)
     from app import main as application
     from app.analyzers import openai_analyzer
     from app.models import SecurityAssessment
@@ -94,19 +105,53 @@ def main():
         nonlocal calls
         calls += 1
         atomic_json(data["stats"], {"provider_stub_calls": calls, "paid_api_calls": 0})
+        prompt = next(item for item in reversed(_kwargs["input"]) if item["role"] == "user")
+        catalog = json.loads(prompt["content"])["evidence_catalog"]
+        native_path = "verified_session.native_execution.process.executable_sha256"
+        citation = native_path if catalog.get(native_path) is not None else "device.managed"
+        if catalog.get(citation) is None:
+            raise ValueError("owned provider stub has no supported citation")
         assessment = SecurityAssessment(
             risk_score=10,
             risk_level="LOW",
             violation_type="NORMAL",
             confidence=0.8,
             rationale="독립 테스트 worker가 현재 실행 근거를 읽은 모의 분석입니다.",
-            evidence=["verified_session.native_execution.process.executable_sha256"],
+            evidence=[citation],
             recommended_action="ALLOW",
             requires_human_review=False,
         )
         return SimpleNamespace(output_parsed=assessment), None
 
     openai_analyzer.parse_structured_response = AsyncMock(side_effect=parse)
+    original_pipeline = application._analyze_event
+
+    async def diagnosed_pipeline(*args, **kwargs):
+        try:
+            return await original_pipeline(*args, **kwargs)
+        except Exception as error:
+            # Test-owned failure evidence, never raw exception/request values.
+            atomic_json(
+                data["stats"],
+                {
+                    "provider_stub_calls": calls,
+                    "paid_api_calls": 0,
+                    "failure": {
+                        "type": type(error).__name__,
+                        "frames": [
+                            {
+                                "name": frame.name,
+                                "file": Path(frame.filename).name,
+                                "line": frame.lineno,
+                            }
+                            for frame in traceback.extract_tb(error.__traceback__)[-5:]
+                        ],
+                    },
+                },
+            )
+            raise
+
+    application._analyze_event = diagnosed_pipeline
     import uvicorn
 
     listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

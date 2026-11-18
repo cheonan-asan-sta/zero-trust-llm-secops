@@ -4,13 +4,13 @@ Each transaction verifies the chain and durable head. This detects corruption,
 not a privileged attacker restoring/resealing the entire database and head.
 """
 
-import json
 import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
 
 from app.models import AnalysisResult
 from app.services.audit import _record_hash, _summarize
+from app.services.audit_wire import analysis_wire
 from app.services.federated_audit import AuditQueryUnavailable
 from app.services.settled_io import settled_io
 
@@ -225,21 +225,12 @@ class SQLiteAuditStore:
         # legitimately round-trip tuples to arrays, or mapping keys to strings.
         expected = AnalysisResult.model_validate_json(expected.model_dump_json())
 
-        def wire(record):
-            return json.dumps(
-                record.model_dump(mode="json"),
-                sort_keys=True,
-                separators=(",", ":"),
-                ensure_ascii=False,
-                allow_nan=False,
-            )
-
-        expected_wire = wire(expected)
+        expected_wire = analysis_wire(expected)
         found = False
 
         def observe(record, _number):
             nonlocal found
-            if record.analysis_id == expected.analysis_id and wire(record) == expected_wire:
+            if record.analysis_id == expected.analysis_id and analysis_wire(record) == expected_wire:
                 found = True
 
         with self._transaction() as con:

@@ -27,6 +27,6 @@ python -m scripts.run_exec_history_controls --directory <새_결과_폴더> --wo
 
 ## 남은 범위
 
-현재 새 보존 확인은 **SQLite 분석 응답**에 적용한다. JSONL/federated JSONL의 정확한 행 보존 확인은 다음 작업이고, DynamoDB의 원격 일관성 검증도 이번 무료 로컬 범위에서 수행하지 않았다. 모든 backend가 같은 수준으로 완료됐다고 주장하지 않는다.
+이 문서의 새 보존 확인은 **SQLite 분석 응답**에 적용한다. JSONL/federated JSONL은 [후속 보존 확인](extra-jsonl-row-preservation-20261119.md)으로 연결했다. 위 수치·source 지문은 SQLite 단계의 기록이며 후속과 구분한다. DynamoDB의 원격 일관성 검증은 이번 무료 로컬 범위에서 수행하지 않았다. 모든 backend가 같은 수준으로 완료됐다고 주장하지 않는다.
 
 확인하는 것은 관측한 SQLite snapshot에 그 행이 있다는 사실이다. 검사 후의 외부 변경을 영구 차단하거나 DB·checkpoint·source의 원자적 공동 시점을 제공하지 않는다. 동일 내용을 재작성한 특권 관리자의 행위를 원격 attestation으로 구분하지 않으며, 독립 WORM/witness·최신 상태 전체 증명·다중 호스트·8시간 soak는 미완료다. 모델 판정·평가 원본/정답·F1·오탐/미탐 수치는 변경/재측정하지 않았다.

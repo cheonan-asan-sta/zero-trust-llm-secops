@@ -104,7 +104,14 @@ def _file_signature(info):
     return info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns
 
 
-def _jsonl_view(store):
+def _jsonl_view(store, *, row_observer=None, allow_legacy_prefix=False):
+    with store._disk_lock:
+        return _jsonl_view_locked(
+            store, row_observer=row_observer, allow_legacy_prefix=allow_legacy_prefix
+        )
+
+
+def _jsonl_view_locked(store, *, row_observer=None, allow_legacy_prefix=False):
     if not store._integrity_ok:
         raise AuditQueryUnavailable("local audit writer integrity failed")
     path = store._path
@@ -137,6 +144,7 @@ def _jsonl_view(store):
         ):
             raise AuditQueryUnavailable("audit changed during page verification")
         records, previous, count = {}, "0" * 64, 0
+        hashed_seen = False
         for line in raw.splitlines():
             if not line.strip():
                 continue
@@ -144,6 +152,15 @@ def _jsonl_view(store):
             if count > SQLiteAuditStore.MAX_ROWS or len(line) > 2 * 1024 * 1024:
                 raise AuditQueryUnavailable("audit page row capacity exceeded")
             value = decode(line)
+            hashed = type(value) is dict and value.get("schema_version") == 1
+            if not hashed and allow_legacy_prefix and not hashed_seen:
+                # Compatibility only: legacy rows cannot witness a saved row.
+                # A legacy suffix after any hashed row is never accepted here.
+                record = AnalysisResult.model_validate(value)
+                records[record.analysis_id] = record
+                if row_observer is not None:
+                    row_observer(record, False)
+                continue
             if (
                 type(value) is not dict
                 or set(value) != {"schema_version", "payload", "previous_hash", "record_hash"}
@@ -155,6 +172,7 @@ def _jsonl_view(store):
             ):
                 raise AuditQueryUnavailable("paged JSONL requires verified hash-chain rows")
             previous = value["record_hash"]
+            hashed_seen = True
             record = AnalysisResult.model_validate(decode(value["payload"]))
             old = records.get(record.analysis_id)
             if old is None and record.review_updated_at is not None:
@@ -162,6 +180,11 @@ def _jsonl_view(store):
             if old is not None and old != record and not SQLiteAuditStore._review_fits(old, record):
                 raise AuditQueryUnavailable("paged JSONL review transition rejected")
             records[record.analysis_id] = record
+            if row_observer is not None:
+                row_observer(record, True)
+        final = path.lstat()
+        if _file_signature(final) != _file_signature(live) or not stat.S_ISREG(final.st_mode):
+            raise AuditQueryUnavailable("audit changed during row validation")
         store._page_seen_file = True
         return list(records.values())
     except (OSError, ValueError, TypeError, AuditTransferError) as error:

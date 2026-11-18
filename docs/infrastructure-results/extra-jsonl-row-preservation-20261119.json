@@ -1,0 +1,174 @@
+{
+  "schema": "extra-jsonl-row-preservation-1",
+  "date_kst": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "pushed": false,
+  "ci_started": false,
+  "merged": false,
+  "new_tests": 25,
+  "actual_jsonl_http_process_tests": 2,
+  "native_conditions": 54,
+  "native_new_conditions": 0,
+  "before": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "2",
+    "skipped": "0",
+    "tests": "2",
+    "time": "3.926",
+    "timestamp": "2026-11-19T04:00:30.428353+09:00",
+    "hostname": "희주",
+    "passed": 0,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\jsonl-row-before-20261119.xml",
+    "xml_sha256": "db37609890d76537870bdd096c378cc3a7e16e51aac60565686ad66566c4ffd4"
+  },
+  "worker_fixture_initial": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "2",
+    "skipped": "0",
+    "tests": "8",
+    "time": "41.787",
+    "timestamp": "2026-11-19T04:04:41.073735+09:00",
+    "hostname": "희주",
+    "passed": 6,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\jsonl-row-workers-windows-20261119.xml",
+    "xml_sha256": "5f92d34ecd0cf3fafde30484ec7efb40533223be6007c59290b69878c39a231c"
+  },
+  "worker_fixture_fixed": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "2",
+    "time": "11.502",
+    "timestamp": "2026-11-19T04:06:58.615279+09:00",
+    "hostname": "희주",
+    "passed": 2,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\jsonl-row-workers-focused-20261119.xml",
+    "xml_sha256": "b919d31f6c18b5e5d6052dcd1cbc6175c7cca8146eea1fadf8358db4f7c36906"
+  },
+  "initial_linux_regression": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "1",
+    "skipped": "2",
+    "tests": "389",
+    "time": "145.046",
+    "timestamp": "2026-11-19T04:12:51.447993+09:00",
+    "hostname": "localhost",
+    "passed": 386,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\jsonl-row-linux-20261119.xml",
+    "xml_sha256": "7801a571757abeb67202a09d4f16eb7c428ee5c7b4563faa315626b30d8e26df"
+  },
+  "focused_concurrency": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "44",
+    "time": "7.047",
+    "timestamp": "2026-11-19T04:16:27.158428+09:00",
+    "hostname": "희주",
+    "passed": 44,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\jsonl-row-concurrency-focused-20261119.xml",
+    "xml_sha256": "0a50ff428f473e3f860fd6ceeb0402c98df29c5431a16cece9204ab9ca8dda78"
+  },
+  "windows_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "3",
+    "tests": "391",
+    "time": "132.670",
+    "timestamp": "2026-11-19T04:17:16.628176+09:00",
+    "hostname": "희주",
+    "passed": 388,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\jsonl-row-windows-final-20261119.xml",
+    "xml_sha256": "7b6f83a084d7c4c8367a91ee07bf3d553dc11e61d918d10be46bc860ca1101db"
+  },
+  "linux_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "2",
+    "tests": "391",
+    "time": "143.481",
+    "timestamp": "2026-11-19T04:17:22.329281+09:00",
+    "hostname": "localhost",
+    "passed": 389,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\jsonl-row-linux-final-20261119.xml",
+    "xml_sha256": "e2b46c5050b952c472b574dccee725a06e6f6ce75b2c7321e41b77e8228a3133"
+  },
+  "native_source_run_sha256": "9c3b8bf02b99c225f6f09d3da65822c49b00028e7d0471d3e4b016d3b285cb90",
+  "disk_row_proof_backends": [
+    "sqlite",
+    "guarded_sqlite",
+    "jsonl",
+    "federated_jsonl"
+  ],
+  "jsonl_proof_uses_own_writer_not_cache": true,
+  "other_shard_copy_cannot_replace_own_append": true,
+  "legacy_prefix_compatible": true,
+  "legacy_row_is_witness": false,
+  "legacy_suffix_accepted": false,
+  "cursor_legacy_policy_changed": false,
+  "local_disk_reader_writer_lock": true,
+  "plain_jsonl_preflight_live_checked": false,
+  "append_cached_head_verified": false,
+  "atomic_global_shard_snapshot": false,
+  "latest_live_state_verified": false,
+  "model_quality_reevaluated": false,
+  "source_files": [
+    {
+      "path": "app/main.py",
+      "sha256": "488b55c456a91b2286981b475edacb29c2f9b3f496182d05e21b18340bd25814"
+    },
+    {
+      "path": "app/services/audit.py",
+      "sha256": "d0255005f5704c5b0bd5c114b514d4248c47e111a581dcc1b7bf723791a4b4bc"
+    },
+    {
+      "path": "app/services/audit_wire.py",
+      "sha256": "08d84b557357d27c76ce4b1d98e71f6c758f4d83cd0bfa8d18524921da20be02"
+    },
+    {
+      "path": "app/services/audit_paging.py",
+      "sha256": "ccf54c828c538c7a3bc35a3b48e45fff9bb546a1e1ef0c8e6b8d034e027997fb"
+    },
+    {
+      "path": "app/services/federated_audit.py",
+      "sha256": "563492d61754089b944fd89111ab7266b9b5425837982b5b90dee5118801c2fe"
+    },
+    {
+      "path": "app/services/sqlite_audit.py",
+      "sha256": "0a3ae108dc0fae2ebeb257f0e009016399264bd9f6c87770662e195aa9f1188a"
+    },
+    {
+      "path": "scripts/native_http_worker.py",
+      "sha256": "13e77e3eb0ebd02d6fcaecdd8e2cbf65ad89d943033e415056aa40e5201a352a"
+    },
+    {
+      "path": "scripts/f1_lab/http_worker_controls.py",
+      "sha256": "b35a7883aafce5a475f921d870f56bb14a65f8dc33a2254aaf0dce5f9572841f"
+    },
+    {
+      "path": "tests/test_jsonl_row_preservation.py",
+      "sha256": "d9c3a29621cabbdbc00cc1133336a543c5aeb0e5641be9a3b5ca88685e26d358"
+    },
+    {
+      "path": "tests/test_http_worker_restart.py",
+      "sha256": "1d9f403106ab9b66742cff856b71a0a405bee05767222c46f07901eebb98625a"
+    }
+  ],
+  "limits": [
+    "plain JSONL preflight remains cached; live preflight and append head verification are next",
+    "legacy prefix rows are structurally checked, not independently authenticated",
+    "the RLock is per store/process, not a distributed writer lock",
+    "federation does global inventory then own-file proof, not an atomic global snapshot",
+    "materialized bounded JSONL view is not SQLite compact-memory benchmark",
+    "no DynamoDB remote evaluation, paid model tests or 8h soak"
+  ]
+}

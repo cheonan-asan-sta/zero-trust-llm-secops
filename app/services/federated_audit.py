@@ -46,6 +46,10 @@ class FederatedAuditStore(AuditStore):
         return sorted(paths)
 
     def _snapshot(self):
+        with self._disk_lock:
+            return self._snapshot_locked()
+
+    def _snapshot_locked(self):
         try:
             if not self._integrity_ok:
                 raise AuditQueryUnavailable("local audit writer integrity failed")
@@ -68,7 +72,9 @@ class FederatedAuditStore(AuditStore):
                 shard = AuditStore(path, strict_reads=True)
                 after = path.stat()
                 if (before.st_size, before.st_mtime_ns, before.st_ino) != (
-                    after.st_size, after.st_mtime_ns, after.st_ino
+                    after.st_size,
+                    after.st_mtime_ns,
+                    after.st_ino,
                 ):
                     raise AuditQueryUnavailable("audit shard changed during verification; retry")
                 signatures[path.name] = (after.st_size, after.st_mtime_ns, after.st_ino)
@@ -134,3 +140,10 @@ class FederatedAuditStore(AuditStore):
                 "verified_lines": 0,
                 "legacy_lines": 0,
             }
+
+    def verify_saved(self, expected):
+        # Verify the announced inventory and cross-shard conflicts first, then
+        # witness the exact original hashed row in this process's own writer.
+        # A copy in another shard cannot substitute for a lost local append.
+        self._snapshot()
+        super().verify_saved(expected)

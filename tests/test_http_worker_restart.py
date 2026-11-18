@@ -5,6 +5,8 @@ from types import SimpleNamespace
 import pytest
 from test_service_analysis_evidence import executed as executed  # noqa: PLC0414
 
+from app.scenarios import synthetic_events
+from app.services.audit import AuditStore
 from scripts.f1_lab.http_worker_controls import owned_worker, run
 from scripts.f1_lab.shared_native_controls import configure
 
@@ -136,3 +138,33 @@ def test_worker_rejects_a_dotenv_file_in_its_owned_directory(executed, tmp_path)
     ):
         pytest.fail("test worker must not load a local dotenv file")
     assert not list(directory.glob("*.control.json"))
+
+
+@pytest.mark.parametrize("audit_mode", ["jsonl", "federated_jsonl"])
+def test_actual_http_process_returns_a_preserved_jsonl_analysis(executed, tmp_path, audit_mode):
+    lab, _, _ = executed
+    path, pin, _ = configure(lab, tmp_path / "shared")
+    audit = tmp_path / "audit.jsonl"
+    key = secrets.token_urlsafe(32)
+    with owned_worker(lab, (path, pin), audit, tmp_path / "worker", key, audit_mode=audit_mode) as (
+        process,
+        client,
+        stats,
+    ):
+        response = client.post(
+            "/analysis",
+            headers={"X-API-Key": key},
+            json=synthetic_events()[0].model_dump(mode="json"),
+        )
+        assert response.status_code == 200, (response.text, stats.read_text(encoding="utf-8"))
+        filename = (
+            audit if audit_mode == "jsonl" else audit.with_name(f"audit.worker-{process.pid}.jsonl")
+        )
+        disk = AuditStore(filename, strict_reads=True)
+        record = disk.get(response.json()["event_id"], lab.principal.tenant_id)
+        assert record.analysis_id == response.json()["analysis_id"]
+        disk.verify_saved(record)
+        observed = json.loads(stats.read_text(encoding="utf-8"))
+        assert observed["provider_stub_calls"] == 1 and observed["paid_api_calls"] == 0
+        process.kill()
+        assert process.wait(timeout=10) != 0

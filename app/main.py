@@ -1195,8 +1195,8 @@ async def _analysis_audit_boundary(store, expected_result=None):
     if audit_store is not store:
         raise RuntimeError("analysis audit store changed")
     if isinstance(store, (AuditStore, SQLiteAuditStore)):
-        if expected_result is not None and isinstance(store, SQLiteAuditStore):
-            # The compact full scan also proves this exact committed row exists.
+        if expected_result is not None:
+            # Each local backend verifies the persisted row, not just its cache.
             await settled_io(store.verify_saved, expected_result)
             integrity = {"ok": True}
         else:

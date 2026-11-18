@@ -1,3 +1,5 @@
+> 2026-11-19 JSONL 응답 보존: cached history 대신 bounded disk 전체 체인/원래 hashed 행 확인·federation inventory와 자기 writer 확인·다른 shard 복사본 대체 거부·legacy prefix 호환/witness 제외·parse 뒤 stat 확인. 자기 append/검증 RLock으로 정상 batch 경합 보완. 신규25건 포함Win388/skip3·Linux389/skip2·실제 JSONL HTTP2건·최신 systemd54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·plain JSONL preflight/append head 검증 후속·목표 active. [검증·한계](docs/extra-jsonl-row-preservation-20261119.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-19 SQLite 응답 행 보존: verify_saved가 전체 compact chain과 같은 read transaction에서 반환할 JSON 행을 확인·최소 기준 이상 구 DB라도 방금 행 없으면 거부. 최신 동일 event/검토 공존 허용·wire tuple/key 정상화·bool/number 구분. 신규13건 포함Win289/skip3·Linux290/skip2·최신 실제 systemd54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·JSONL/federated 보존 확인 후속·목표 active. [검증·한계](docs/extra-analysis-row-preservation-20261119.md). 아래는 이전 시점 기록이다.
 
 > 2026-11-19 분석 감사 경계: 선택 store 고정·preflight 전후/저장 전/전달 전 동일성·commit 후 로컬 integrity 재검증·추가 scan 뒤 source 검증 유지·backup 암호화 후 복사본 재검증. 변경 전7실패→신규13건 포함Win223/skip1·Linux224·실제 systemd/HTTP54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·최소 기준 이후 방금 저장한 analysis 자체의 보존 확인 후속·목표 active. [결과·한계](docs/extra-analysis-audit-boundary-20261119.md). 아래는 이전 시점 기록이다.
