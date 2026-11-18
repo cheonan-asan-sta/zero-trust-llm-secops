@@ -173,7 +173,7 @@ def migrate_jsonl(base_path, destination, expected_inventory_sha256, *, allow_le
                 )
                 previous, known[record.analysis_id] = digest, record
             con.execute("UPDATE audit_head SET seq=?,digest=? WHERE id=1", (seq, previous))
-            store._read(con)
+            store._read(con, retain_records=False)
         _, current = scan_jsonl(base_path, allow_legacy=allow_legacy)
         require(current == inventory, "source changed during migration")
         publish(stage, target)

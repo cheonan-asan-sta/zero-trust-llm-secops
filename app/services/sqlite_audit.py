@@ -41,7 +41,7 @@ class SQLiteAuditStore:
             }
             if tables != {"audit_entries", "audit_head"}:
                 raise AuditQueryUnavailable("existing audit schema required")
-            store._read(con)
+            store._read(con, retain_records=False)
         return store
 
     def __init__(self, path):
@@ -60,7 +60,7 @@ class SQLiteAuditStore:
                 "CREATE TABLE IF NOT EXISTS audit_head (id INTEGER PRIMARY KEY CHECK(id=1), seq INTEGER NOT NULL, digest TEXT NOT NULL)"
             )
             con.execute("INSERT OR IGNORE INTO audit_head VALUES (1,0,?)", ("0" * 64,))
-            self._read(con)
+            self._read(con, retain_records=False)
 
     @contextmanager
     def _transaction(self, *, create=False, write=False):
@@ -98,7 +98,13 @@ class SQLiteAuditStore:
             and new.review_updated_at > (old.review_updated_at or old.analyzed_at)
         )
 
-    def _read(self, con):
+    def _read(self, con, *, retain_records=True):
+        """Verify every row; integrity-only scans retain latest row positions.
+
+        A review reloads its prior validated row from the same SQLite snapshot,
+        preserving model equality and transition checks without retaining every
+        complete analysis payload in memory.
+        """
         size, count = con.execute(
             "SELECT coalesce(sum(length(CAST(payload AS BLOB))),0),count(*) FROM audit_entries"
         ).fetchone()
@@ -112,11 +118,14 @@ class SQLiteAuditStore:
                 raise AuditQueryUnavailable("audit chain integrity failed")
             record = AnalysisResult.model_validate_json(payload)
             old = records.get(record.analysis_id)
+            if old is not None and not retain_records:
+                prior = con.execute("SELECT payload FROM audit_entries WHERE seq=?", (old,)).fetchone()
+                old = AnalysisResult.model_validate_json(prior[0])
             if old is None and record.review_updated_at is not None:
                 raise AuditQueryUnavailable("persisted review has no original analysis")
             if old is not None and not self._review_fits(old, record):
                 raise AuditQueryUnavailable("invalid persisted review transition")
-            records[record.analysis_id] = record
+            records[record.analysis_id] = record if retain_records else number
             previous, seq = digest, number
         if con.execute("SELECT seq,digest FROM audit_head WHERE id=1").fetchone() != (
             seq,
@@ -188,7 +197,7 @@ class SQLiteAuditStore:
     def integrity(self):
         try:
             with self._transaction() as con:
-                _, seq, _, _ = self._read(con)
+                _, seq, _, _ = self._read(con, retain_records=False)
             return {
                 "backend": "sqlite_transactional_hash_chain",
                 "ok": True,

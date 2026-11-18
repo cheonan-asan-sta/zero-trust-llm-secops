@@ -49,7 +49,7 @@ def read_key(path, expected_sha256):
 
 
 def validate_head(con, store, minimum_head=None):
-    _, seq, digest, _ = store._read(con)
+    _, seq, digest, _ = store._read(con, retain_records=False)
     if minimum_head is not None:
         require(
             type(minimum_head) is dict
