@@ -1,3 +1,5 @@
+> 2026-11-19 감사 검토 묶음: 정확한 자기 review 행 proof/query slot·canonical JSON core/CAS/이관·SQLite If-Match 선택 지원/strict opt-in·JSONL 조건부 묵시 fallback 금지·catalog/RBAC 정합성. 전역 analysis ID 충돌 거부는 유지하고 legacy unit fixture ID만 고유화. 분석 부하 시험 인증 layer 분리/생산 기본 유지·과대 protocol input 유지/pytest ID 축약. 신규45건 포함Windows76·이전 복원121/skip2·probe35/skip2 통과. 기준 전체 결과의 실패/오류를 보존했고 최신 전체 재검증 예정. paid/AWS/push/CI/병합0·새 F1 없음·08:00 KST 목표 active. [검증·한계](docs/extra-audit-review-boundary-20261119.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-19 통합 읽기 순서: [extra 개발 현황·종료된 시험·남은 범위](docs/extra-development-status-20261119.md)를 추가하고 최초 HTTP/federation/공동 writer 보고서에 후속 링크를 표시했다. 과거 시점의 미구현 문장을 현재 상태와 구분하며 SQLite 공동 writer와 JSONL 전역 원자성도 구분한다. 전체 코드 회귀는25adf8c 기준 Windows/Linux 실행 중이며 종료된 관련 묶음과 합산하지 않는다. paid/AWS/push/CI/병합0·목표 active. 아래는 이전 시점 기록이다.
 
 > 2026-11-19 Hybrid 주입 소유권: falsey adapter를 None과 구별해 추가 OpenAI 생성 금지·주입 객체 유지·외부 소유 close 금지. 수정 전2실패→신규2건 포함Windows51통과. 전체 Windows/Linux 회귀 진행 중(원본 XML 별도 보관). paid/AWS/push/CI/병합0·새 F1 없음·08:00 KST 목표 active. [검증·한계](docs/extra-hybrid-adapter-ownership-20261119.md). 아래는 이전 시점 기록이다.

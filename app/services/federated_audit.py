@@ -11,6 +11,7 @@ from pathlib import Path
 from app.models import AnalysisResult
 from app.services.audit import AuditStore, _summarize
 from app.services.audit_manifest import AuditManifestError, AuditShardManifest
+from app.services.audit_wire import analysis_core_wire, analysis_wire
 from app.services.settled_io import settled_io
 
 
@@ -59,7 +60,6 @@ class FederatedAuditStore(AuditStore):
             total, verified, legacy = 0, 0, 0
             versions = {}
             signatures = {}
-            mutable = {"review_status", "reviewer", "review_note", "review_updated_at"}
             for path in paths:
                 if path.is_symlink() or not path.is_file():
                     raise AuditQueryUnavailable("audit shard is not a regular file")
@@ -88,15 +88,13 @@ class FederatedAuditStore(AuditStore):
                 for record in shard._history:
                     previous = versions.get(record.analysis_id)
                     if previous is not None:
-                        if previous.model_dump(exclude=mutable) != record.model_dump(
-                            exclude=mutable
-                        ):
+                        if analysis_core_wire(previous) != analysis_core_wire(record):
                             raise AuditQueryUnavailable(
                                 "conflicting analysis identity across shards"
                             )
                         left = previous.review_updated_at or previous.analyzed_at
                         right = record.review_updated_at or record.analyzed_at
-                        if left == right and previous != record:
+                        if left == right and analysis_wire(previous) != analysis_wire(record):
                             raise AuditQueryUnavailable("conflicting audit revisions")
                         if left >= right:
                             continue

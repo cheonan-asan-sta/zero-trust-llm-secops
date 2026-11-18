@@ -25,6 +25,7 @@ from app.models import AnalysisResult, AuditResultPage, ReviewStatus, RiskLevel,
 from app.services.audit import AuditStore, _record_hash
 from app.services.audit_backup import read_key
 from app.services.audit_transfer import AuditTransferError, canonical, decode
+from app.services.audit_wire import analysis_wire
 from app.services.federated_audit import AuditQueryUnavailable, FederatedAuditStore
 from app.services.sqlite_audit import SQLiteAuditStore
 
@@ -216,7 +217,7 @@ def _jsonl_view_locked(
             if (
                 validate_review_transitions
                 and old is not None
-                and old != record
+                and analysis_wire(old) != analysis_wire(record)
                 and not SQLiteAuditStore._review_fits(old, record)
             ):
                 raise AuditQueryUnavailable("paged JSONL review transition rejected")

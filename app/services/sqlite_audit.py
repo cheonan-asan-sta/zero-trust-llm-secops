@@ -10,11 +10,10 @@ from pathlib import Path
 
 from app.models import AnalysisResult
 from app.services.audit import _record_hash, _summarize
-from app.services.audit_wire import analysis_wire
+from app.services.audit_wire import MUTABLE_REVIEW, analysis_core_wire, analysis_wire  # noqa: F401
 from app.services.federated_audit import AuditQueryUnavailable
 from app.services.settled_io import settled_io
 
-MUTABLE_REVIEW = {"review_status", "reviewer", "review_note", "review_updated_at"}
 TRANSITIONS = {
     "PENDING": {"IN_REVIEW", "RESOLVED", "DISMISSED"},
     "IN_REVIEW": {"IN_REVIEW", "RESOLVED", "DISMISSED"},
@@ -91,7 +90,7 @@ class SQLiteAuditStore:
 
     @staticmethod
     def _review_fits(old, new):
-        if old.model_dump(exclude=MUTABLE_REVIEW) != new.model_dump(exclude=MUTABLE_REVIEW):
+        if analysis_core_wire(old) != analysis_core_wire(new):
             return False
         return (
             new.review_status.value in TRANSITIONS.get(old.review_status.value, set())
@@ -153,10 +152,16 @@ class SQLiteAuditStore:
                 raise AuditReviewConflict("review requires an existing analysis")
             if expected is not None:
                 latest = self._latest(records, record.event_id, record.tenant_id)
-                if old != expected or latest != expected or not self._review_fits(old, record):
+                if (
+                    old is None
+                    or latest is None
+                    or analysis_wire(old) != analysis_wire(expected)
+                    or analysis_wire(latest) != analysis_wire(expected)
+                    or not self._review_fits(old, record)
+                ):
                     raise AuditReviewConflict("audit review changed; reload current record")
             elif old is not None:
-                if old == record:
+                if analysis_wire(old) == analysis_wire(record):
                     return
                 raise AuditReviewConflict("review update requires expected current record")
             payload = record.model_dump_json()
@@ -230,7 +235,10 @@ class SQLiteAuditStore:
 
         def observe(record, _number):
             nonlocal found
-            if record.analysis_id == expected.analysis_id and analysis_wire(record) == expected_wire:
+            if (
+                record.analysis_id == expected.analysis_id
+                and analysis_wire(record) == expected_wire
+            ):
                 found = True
 
         with self._transaction() as con:

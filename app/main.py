@@ -79,6 +79,11 @@ from app.services.audit_paging import (
     AuditSnapshotChanged,
     create_audit_pager,
 )
+from app.services.audit_review_preconditions import (
+    parse_review_if_match,
+    require_review_match,
+    review_etag,
+)
 from app.services.behavior_context import BehaviorContextService
 from app.services.behavior_context_store import BehaviorContextStore
 from app.services.cached_provider import single_cached_factory
@@ -1456,16 +1461,24 @@ async def update_review(
     request: ReviewUpdateRequest,
     principal: ResponderPrincipal,
     http_request: Request,
+    response: Response,
 ) -> AnalysisResult:
     async with _audit_query_slot():
-        return await _update_review_in_slot(event_id, request, principal, http_request)
+        updated = await _update_review_in_slot(event_id, request, principal, http_request)
+        response.headers["ETag"] = review_etag(updated)
+        return updated
 
 
 async def _update_review_in_slot(event_id, request, principal, http_request):
+    tag = parse_review_if_match(http_request.headers.getlist("if-match"))
     store = audit_store
     record = await _audit_read_in_slot(store, "get", principal, http_request, event_id, principal.tenant_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Result not found")
+    require_review_match(
+        record, tag, required=settings.audit_review_require_if_match,
+        transactional=isinstance(store, SQLiteAuditStore),
+    )
     if record.review_status == ReviewStatus.NOT_REQUIRED:
         raise HTTPException(status_code=409, detail="This result does not require human review")
 
@@ -1501,23 +1514,39 @@ async def _update_review_in_slot(event_id, request, principal, http_request):
     )
     updated = AnalysisResult.model_validate(payload)
     await _audit_boundary(store, principal, http_request)
+    require_review_match(
+        record, tag, required=settings.audit_review_require_if_match,
+        transactional=isinstance(store, SQLiteAuditStore),
+    )
     if isinstance(store, SQLiteAuditStore):
-        await store.save_review(updated, record)
+        try:
+            await store.save_review(updated, record)
+        except AuditReviewConflict as error:
+            if tag is not None:
+                raise HTTPException(412, "Review version changed; reload the current result") from error
+            raise
     else:
         await store.save(updated)
     # A committed historical review is retained even if delivery is now denied.
     await _audit_boundary(store, principal, http_request)
+    if isinstance(store, (AuditStore, SQLiteAuditStore)):
+        await _audit_call_in_slot(
+            store, store.verify_saved, principal, http_request, updated
+        )
     return updated
 
 
 @app.get("/results/{event_id}", response_model=AnalysisResult)
-async def result(event_id: str, request: Request, principal: ViewerPrincipal) -> AnalysisResult:
+async def result(
+    event_id: str, request: Request, principal: ViewerPrincipal, response: Response,
+) -> AnalysisResult:
     async with _audit_query_slot():
         record = await _audit_read_in_slot(
             audit_store, "get", principal, request, event_id, principal.tenant_id
         )
     if record is None:
         raise HTTPException(status_code=404, detail="Result not found")
+    response.headers["ETag"] = review_etag(record)
     return record
 
 
