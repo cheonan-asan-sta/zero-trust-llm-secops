@@ -1260,12 +1260,55 @@ def preview(request: ResponsePreviewRequest, _: AnalystPrincipal) -> PolicyDecis
 
 
 @app.post("/evaluation/run", response_model=EvaluationSummary)
-async def evaluate(request: EvaluationRequest, _: AdminPrincipal) -> EvaluationSummary:
+async def evaluate(
+    evaluation_request: EvaluationRequest, request: Request, principal: AdminPrincipal,
+) -> EvaluationSummary:
+    async def revalidate_admin():
+        await _analysis_caller_boundary(
+            principal, getattr(request.state, "authentication_revalidator", None)
+        )
+        if Role.ADMIN not in principal.effective_roles:
+            raise HTTPException(403, "Administrator role is required for evaluation")
+
     try:
-        analyzer = build_analyzer(request.analyzer)
+        analyzer = build_analyzer(evaluation_request.analyzer)
     except ValueError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
-    return await run_evaluation(analyzer, request.runs_per_scenario, request.concurrency)
+
+    class AuthorizedEvaluationAnalyzer:
+        name = analyzer.name
+
+        async def analyze(self, event):
+            try:
+                async with _analysis_slot():
+                    await revalidate_admin()
+                    with bind_analysis_authority(revalidate_admin):
+                        try:
+                            assessment = await analyzer.analyze(event)
+                        except Exception:
+                            await revalidate_admin()
+                            raise
+                        await revalidate_admin()
+                        return assessment
+            except AnalysisCapacityExceeded as error:
+                # Admission failure is infrastructure, not a scored model error.
+                raise HTTPException(
+                    429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+                ) from error
+
+    try:
+        summary = await run_evaluation(
+            AuthorizedEvaluationAnalyzer(),
+            evaluation_request.runs_per_scenario,
+            evaluation_request.concurrency,
+        )
+        async with _analysis_slot():
+            await revalidate_admin()
+        return summary
+    except AnalysisCapacityExceeded as error:
+        raise HTTPException(
+            429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from error
 
 
 @asynccontextmanager

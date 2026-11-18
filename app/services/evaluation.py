@@ -28,9 +28,7 @@ async def run_evaluation(
 
     for run_number in range(1, runs_per_scenario + 1):
         for source in synthetic_events():
-            event = source.model_copy(
-                update={"event_id": f"{source.event_id}-eval-{run_number}"}
-            )
+            event = source.model_copy(update={"event_id": f"{source.event_id}-eval-{run_number}"})
             truth = event.ground_truth
             if truth is None:  # Synthetic evaluation cases always carry a private label.
                 continue
@@ -95,9 +93,25 @@ async def run_evaluation(
         )
 
     evaluation_started = perf_counter()
-    cases = await asyncio.gather(
-        *(evaluate_case(event, truth) for event, truth in evaluation_inputs)
-    )
+    tasks = [asyncio.create_task(evaluate_case(event, truth)) for event, truth in evaluation_inputs]
+    try:
+        cases = await asyncio.gather(*tasks)
+    except BaseException:
+        for task in tasks:
+            if not task.done():
+                task.cancel()
+        # A case can own non-cancellable authority/source I/O. Repeated caller
+        # cancellation must not detach that cleanup or release its capacity early.
+        cleanup = asyncio.gather(*tasks, return_exceptions=True)
+        cancelled = None
+        while not cleanup.done():
+            try:
+                await asyncio.shield(cleanup)
+            except asyncio.CancelledError as error:
+                cancelled = error
+        if cancelled is not None:
+            raise cancelled
+        raise
     duration_ms = (perf_counter() - evaluation_started) * 1000
 
     total = len(cases)

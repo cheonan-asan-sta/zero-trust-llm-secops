@@ -32,3 +32,5 @@ python -m scripts.run_exec_history_controls --directory <새_결과_폴더> --wo
 멈춘 파일/JWKS thread를 강제 종료하지 않는다. 완료 전까지 bounded slot을 점유해 추가 작업을 제한하는 방식이며 OS 수준의 강제 I/O deadline/복구는 별도다. SDK 요청을 이미 보냈다면 취소/환불을 보장하지 않는다. 동일 JWKS URL에서의 online token revocation이나 실제 사람의 enterprise SSO/MFA는 구현 완료로 계산하지 않는다.
 
 별도 장기 `/evaluation/run`의 관리자 권한 재확인·모델 호출 한도와 취소 후 남은 작업 정리는 다음 점검 범위다. 모델 prompt/판정·평가 원본/정답/결과·기존 F1/오탐/미탐을 바꾸거나 새로 측정하지 않았다. 독립 witness/WORM·다중 호스트·전원 단절·연기한8시간 soak도 남아 있다.
+
+후속: [평가 API 관리자 권한·공용 한도·취소 정리](extra-evaluation-authority-20261119.md)를 추가했다. 위 수치는 해당 시점 기록이다.

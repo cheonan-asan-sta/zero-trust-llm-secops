@@ -1,3 +1,5 @@
+> 2026-11-19 평가 API: 사례별 공용 analysis slot·현재 admin 검증·Task-local SDK authority·summary 전달 재검증·fatal/반복 취소 시 sibling settle·포화를 model error로 점수화 금지. 변경 전3실패→신규19건 포함Win599/skip19·Linux616/skip2·최신 systemd54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·evaluation setup/client 종료 후속·08:00 KST 목표 active. [검증·한계](docs/extra-evaluation-authority-20261119.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-19 초기 인증 I/O: 앱별 bounded admission·API key/JWKS settled_io·취소 후 실제 worker 완료까지 lease 유지·포화503/Retry-After·frozen settings·최종 신원 확인·loopback 실제 JWKS 지연/취소 검증. 변경 전2실패→신규30건 포함Win575/skip19·Linux592/skip2·최신 systemd54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·별도 evaluation 경계 후속·08:00 KST 목표 active. [검증·한계](docs/extra-authentication-admission-20261119.md). 아래는 이전 시점 기록이다.
 
 > 2026-11-19 caller SDK 경계: analyzer 동안 Task-local authority·OpenAI 요청별 SDK retries0·응답/오류 후 caller 확인·명시적 token retry 재검증·공용 client/standalone 설정 유지·owner 종료/취소 시 상속 child guard 닫기. 추가 caller I/O 뒤 verified source refresh. 변경 전7실패→신규20건 포함Win538/skip4·Linux540/skip2·최신 systemd54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·초기 인증 I/O admission/별도 evaluation 경계 후속·목표 active. [검증·한계](docs/extra-caller-sdk-retry-20261119.md). 아래는 이전 시점 기록이다.
