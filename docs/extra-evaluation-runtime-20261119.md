@@ -33,3 +33,5 @@ python -m pytest tests/test_evaluation_runtime.py tests/test_evaluation_authorit
 멈춘 생성/close를 강제로 종료하지 않는다. 실제 종료까지 bounded 작업 한도를 유지하는 방식이다. OS 전역 executor, 다중 프로세스/호스트의 전역 자원 한도나 vendor 요청 환불을 구현하지 않았다. 새로운 provider adapter에는 async close와 ownership 계약을 연결해야 한다.
 
 평가는 기존8개 synthetic 기본 사례와 기존 계산식을 유지한다. 새 성능 평가 자료가 아니며 F1·오탐·미탐 수치를 갱신하지 않는다. 실제 기업 SSO/online revocation, 독립 witness/WORM, 다중 호스트·전원 단절·미뤄둔8시간 soak는 남아 있다. 다음에는 일반 batch의 반복 취소 정리와 감사 조회/응답 경계의 회귀를 확인한다.
+
+후속: [서버 공유 provider의 첫 생성·취소 경계](extra-cached-provider-setup-20261119.md)를 추가했다. 위 수치/남은 범위는 해당 시점 기록이다.

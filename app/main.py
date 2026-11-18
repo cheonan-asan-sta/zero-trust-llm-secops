@@ -3,7 +3,6 @@ from collections.abc import Callable
 from contextlib import asynccontextmanager
 from dataclasses import replace
 from datetime import UTC, datetime
-from functools import lru_cache
 from pathlib import Path
 from time import perf_counter
 from typing import Annotated, Literal
@@ -82,6 +81,7 @@ from app.services.audit_paging import (
 )
 from app.services.behavior_context import BehaviorContextService
 from app.services.behavior_context_store import BehaviorContextStore
+from app.services.cached_provider import single_cached_factory
 from app.services.cases import (
     ALLOWED_TRANSITIONS,
     CaseConflictError,
@@ -246,13 +246,13 @@ async def audit_review_conflict(_request, _error):
     return JSONResponse(status_code=409, content={"detail": "Audit review changed; reload current record"})
 
 
-@lru_cache
+@single_cached_factory
 def get_analyzer() -> Analyzer:
     current = get_settings()
     return build_analyzer(current.analyzer_mode)
 
 
-@lru_cache
+@single_cached_factory
 def get_evidence_agent() -> EvidenceReviewAgent:
     return EvidenceReviewAgent(get_settings())
 
@@ -737,10 +737,7 @@ async def analyze(
     request: Request,
     principal: AnalystPrincipal,
 ) -> AnalysisResult:
-    try:
-        analyzer = get_analyzer()
-    except ValueError as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    analyzer = await _load_analysis_provider(request, principal, get_analyzer)
 
     try:
         return await _analyze_event(
@@ -765,10 +762,7 @@ async def analyze_batch(
     request: Request,
     principal: AnalystPrincipal,
 ) -> BatchAnalysisResult:
-    try:
-        analyzer = get_analyzer()
-    except ValueError as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    analyzer = await _load_analysis_provider(request, principal, get_analyzer)
 
     semaphore = asyncio.Semaphore(3)
 
@@ -890,10 +884,9 @@ async def _analyze_verified_session_in_slot(
     )
     if zero_trust_operations is not operations:
         raise SignalRejected("verified analysis serving stores changed")
-    try:
-        analyzer = get_analyzer()
-    except ValueError as exc:
-        raise HTTPException(503, "Verified-session analysis provider is not configured") from exc
+    analyzer = await _load_analysis_provider_in_slot(
+        request, principal, get_analyzer, "Verified-session analysis provider is not configured"
+    )
     if get_settings().openai_prompt_mode != "grounded" or not callable(
         getattr(analyzer, "analyze_with_evidence", None)
     ):
@@ -970,10 +963,9 @@ async def _analyze_native_service_in_slot(
         assert_serving_stores()
 
     context = replace(context, verify_current=verify_serving_context)
-    try:
-        analyzer = get_analyzer()
-    except ValueError as exc:
-        raise HTTPException(503, "Native service analysis provider is not configured") from exc
+    analyzer = await _load_analysis_provider_in_slot(
+        request, principal, get_analyzer, "Native service analysis provider is not configured"
+    )
     if get_settings().openai_prompt_mode != "grounded" or not callable(
         getattr(analyzer, "analyze_with_evidence", None)
     ):
@@ -1044,10 +1036,9 @@ async def _analyze_evidence_review_in_slot(
     )
     if zero_trust_operations is not operations:
         raise SignalRejected("verified analysis serving stores changed")
-    try:
-        agent = get_evidence_agent()
-    except ValueError as exc:
-        raise HTTPException(503, "Evidence review provider is not configured") from exc
+    agent = await _load_analysis_provider_in_slot(
+        request, principal, get_evidence_agent, "Evidence review provider is not configured"
+    )
 
     def history_getter():
         if zero_trust_operations is not operations:
@@ -1131,6 +1122,30 @@ async def _analysis_slot():
         yield
     finally:
         capacity.release()
+
+
+async def _load_analysis_provider(request, principal, factory):
+    try:
+        async with _analysis_slot():
+            return await _load_analysis_provider_in_slot(request, principal, factory)
+    except AnalysisCapacityExceeded as error:
+        raise HTTPException(
+            429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from error
+
+
+async def _load_analysis_provider_in_slot(
+    request, principal, factory, failure_detail="Analysis provider initialization is unavailable",
+):
+    check = getattr(request.state, "authentication_revalidator", None)
+    await _analysis_caller_boundary(principal, check)
+    try:
+        provider = await settled_io(factory)
+    except Exception as error:
+        await _analysis_caller_boundary(principal, check)
+        raise HTTPException(503, failure_detail) from error
+    await _analysis_caller_boundary(principal, check)
+    return provider
 
 
 async def _analyze_event(
