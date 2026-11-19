@@ -131,6 +131,46 @@
       "sha256": "a267598c6992e92687e67ac865ebcc658879d8e6489011909eb35d3036f19ed0"
     },
     {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/result.json",
+      "sha256": "c5f2504f535fc3fef00f57f989d2c91c93a39d44ebb41933bb0717e41c8c4704"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-0.log",
+      "sha256": "f7a2bff69d31689c98f25c00229ceff07f5dee0930703b58934bc80ee911a249"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-4294967295.log",
+      "sha256": "126cf840ec72d523c91bdfbbb03e9204b09df11f952b1ac8a405b6a5e5386122"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-17.log",
+      "sha256": "ea4633678512e60b9e94a14edf3e6541e3d6ee3fd28d53dd0cbee0f76cbdea37"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-0/report.json",
+      "sha256": "601d655ca71205874e4d771fd155c5d17af56582b97764c5f31222497e2df7e7"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-0/trace.jsonl",
+      "sha256": "513f6d97586bfdef24c66c2e267f58eb1edb635225abb5d7f48eecca4f13061c"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-4294967295/report.json",
+      "sha256": "9f0fd04c45433fbe026863841e473c9485a61f866d1bc928d2d15ff3a05c04a3"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-4294967295/trace.jsonl",
+      "sha256": "9ac5a0e89d6c8d931a1c57a8c8ba9ec9943384d28d07dfec1350bd5cbadd0bd5"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-17/report.json",
+      "sha256": "e1e3ea3e35429844d8a937d68e6f6becddccddeddb119503a2a85ba26cb43eb6"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-17/trace.jsonl",
+      "sha256": "11a32c05aa0e34ff40df230ff63578549f2bd92053b43cfc2fed5ef299e7f433"
+    },
+    {
       "path": "docs/infrastructure-results/witness-boundary-harness-run_seed_matrix_20261120.py.txt",
       "sha256": "1dc42e545c45497d0bc6e3eab27b8ccdc1edca0816461be29f6d365a9a826eaf"
     },
@@ -180,7 +220,7 @@
   "matrix_source_commit": "6033a7b5f7da91c66e0ca00fa7607e4dc7517ff3",
   "matrix_completed": {
     "windows": true,
-    "linux": false
+    "linux": true
   },
   "actual_sequential_4096_drill": "separate_corrected_run_in_progress",
   "paid_api_calls": 0,
