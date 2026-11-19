@@ -355,6 +355,14 @@ def run(args, directory, report):
                     "no_horizontal_overflow_" + name,
                     page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1"),
                 )
+                if name == "mobile":
+                    check(
+                        "mobile_table_scroll_is_contained_and_explained",
+                        page.locator("#workbenchAuditTable").evaluate(
+                            "el => el.scrollWidth > el.clientWidth"
+                        )
+                        and page.locator("#historyScrollHint").is_visible(),
+                    )
                 page.locator("#historyReload").locator("xpath=../..").screenshot(
                     path=str(args.output_dir / ("history-" + name + ".png"))
                 )
