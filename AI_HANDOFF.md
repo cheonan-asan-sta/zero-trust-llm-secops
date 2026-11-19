@@ -1,3 +1,5 @@
+> 2026-11-19 extra: [별도 로컬 감사 검증자·서명 영수증](docs/extra-audit-witness-20261119.md) 완료. 구현64e33a9, Windows65통과/2제외·Linux67통과. [회귀 결과 정리 전 개발 목표](docs/extra-active-development-goal-20261119.md)의 네 구현 항목 완료. 최종 전체 회귀/8h soak·실제 조직 배포/독립 호스트 보관은 미완료. 미업로드·미병합·유료/AWS/Docker 없음. 아래는 이전 시점 기록이다.
+
 > 2026-11-19 extra: [남은 검토 호출자·필수 정책 준비](docs/extra-review-callers-20261119.md) 완료. 구현 ab2dbfc, Windows11통과/2제외·Linux21통과. 최초 실패 보존, 실제 조직 배포 미완료. 지속 목표는 별도 감사 검증자 로컬 구현으로 진행. push/CI/병합/유료/AWS/Docker/전체회귀/8h soak 없음. 아래는 이전 기록이다.
 
 > 활성 목표 진행: 48520ef 공통 collection-view.js로 워크벤치 사례/서명 세션·대시보드 사례/세션4경로 연결. 실제 서명 검증103세션/27사고 순회, 실제 변경409·401/403·키 remap·이전tenant응답 폐기 포함112조건. 기존 review34/read57·Win/Linux72개 pass. [UI근거](docs/extra-collection-pages-ui-20261119.md)·[활성목표](docs/extra-active-development-goal-20261119.md). 다음은 기존 audit review caller2개 harness의 headers 이전/필수정책 준비, 별도 witness 로컬 구현. 캐시형 CaseStore 다중 writer 쓰기 지원을 추가한 것은 아니므로 운영 공유 writer로 배포하지 않는다. paid/AWS/Docker/push/CI/merge/전체회귀결과정리/8h0. 아래는 이전 기록.

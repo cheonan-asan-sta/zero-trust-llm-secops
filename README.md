@@ -1,3 +1,5 @@
+> 2026-11-19 extra: [별도 로컬 감사 검증자·서명 영수증](docs/extra-audit-witness-20261119.md) 완료. 구현64e33a9, Windows65통과/2제외·Linux67통과. [회귀 결과 정리 전 개발 목표](docs/extra-active-development-goal-20261119.md)의 네 구현 항목 완료. 최종 전체 회귀/8h soak·실제 조직 배포/독립 호스트 보관은 미완료. 미업로드·미병합·유료/AWS/Docker 없음. 아래는 이전 시점 기록이다.
+
 > 2026-11-19 extra: [남은 로컬 검토 호출 경로·필수 정책 준비](docs/extra-review-callers-20261119.md) 완료. Windows11통과/2제외·Linux21통과. 실제 조직 배포는 별도이며 [지속 목표](docs/extra-active-development-goal-20261119.md)는 별도 감사 검증자 로컬 개발로 이어진다. 미업로드·미병합.
 
 > 2026-11-19 extra: [워크벤치·대시보드의 세션/사고 페이지](docs/extra-collection-pages-ui-20261119.md) 연결 완료. 실제 브라우저112조건·기존 검토34/조회57조건·관련 Python 양 OS72건 통과. 미업로드·미병합.
