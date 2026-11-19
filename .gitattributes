@@ -89,3 +89,6 @@ docs/infrastructure-results/witness-restore-monitor-* -text whitespace=-blank-at
 docs/infrastructure-results/witness-restore-alert-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
 
 docs/infrastructure-results/witness-clock-boundary-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-restore-resume-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+docs/infrastructure-results/witness-resume-alert-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
