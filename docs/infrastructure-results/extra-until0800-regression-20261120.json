@@ -119,12 +119,36 @@
       "case_outcome_map_sha256": "587fe74242a7e2c6cb845fb759adc4cddef4f24cac32dc73dac29c21e78391c9"
     },
     "windows-full-resource-20261120": {
-      "status": "running",
-      "source_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26"
+      "status": "complete",
+      "source_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26",
+      "source_files": 2498,
+      "exit_code": 0,
+      "source_bytes_unchanged": true,
+      "timed_out": false,
+      "counts": {
+        "tests": 8853,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 613,
+        "passed": 8240
+      },
+      "case_outcome_map_sha256": "98102135635ff9ff414cc1c9ca8ff30c79aad613543e12dfab3ad01be5b99223"
     },
     "linux-full-resource-20261120": {
-      "status": "running",
-      "source_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26"
+      "status": "complete",
+      "source_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26",
+      "source_files": 2498,
+      "exit_code": 0,
+      "source_bytes_unchanged": true,
+      "timed_out": false,
+      "counts": {
+        "tests": 8853,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 5,
+        "passed": 8848
+      },
+      "case_outcome_map_sha256": "587fe74242a7e2c6cb845fb759adc4cddef4f24cac32dc73dac29c21e78391c9"
     }
   },
   "comparisons": [
@@ -270,6 +294,32 @@
         "tests.test_witness_monitor_cadence::test_known_exhaustion_is_urgent_even_during_pending_or_new_row_grace[legacy_pending]",
         "tests.test_witness_monitor_cadence::test_known_exhaustion_is_urgent_even_during_pending_or_new_row_grace[new_rows]"
       ]
+    },
+    {
+      "old": "windows-full-b77-20261120",
+      "new": "windows-full-resource-20261120",
+      "case_id_scheme": [
+        "classname",
+        "name"
+      ],
+      "old_passed": 8240,
+      "missing_old_passed_ids": [],
+      "old_passed_now_not_passed": [],
+      "recovered_failures": [],
+      "new_ids": []
+    },
+    {
+      "old": "linux-full-b77-20261120",
+      "new": "linux-full-resource-20261120",
+      "case_id_scheme": [
+        "classname",
+        "name"
+      ],
+      "old_passed": 8848,
+      "missing_old_passed_ids": [],
+      "old_passed_now_not_passed": [],
+      "recovered_failures": [],
+      "new_ids": []
     }
   ],
   "artifacts": [
@@ -398,6 +448,46 @@
       "sha256": "a327f27c853ba06e99e754b9b01aee721074856a41355be648caf8e70f570314"
     },
     {
+      "path": "docs/infrastructure-results/until0800-windows-full-resource-20261120-completion.json",
+      "sha256": "6f41d38e5b0c988e616313c27479338565ea6093be6dfd24459940db3b2826a9"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-resource-20261120-environment.json",
+      "sha256": "bf9ab921ac78cd0ca3a8745b881a30e3b69cb4b06057cda8cf164682af23bfd5"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-resource-20261120-process.json",
+      "sha256": "0ee5f238f2a2c5fa9b3cf460d6b2827fae7c0a1587df766845c5b8a769599fbc"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-resource-20261120.stdout.log",
+      "sha256": "9e9c0994429eedc9a21661173868dd6f4ba0d5f940245fa3aaa32e802e82c2eb"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-resource-20261120.xml",
+      "sha256": "6c122f128bb9bd219367140846135cf31e43f8d2b59f6192bb13fae6a4fc9e6f"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-resource-20261120-completion.json",
+      "sha256": "7e2a43e33f0fc88dd3c5278f52143888441e2e516026fb612629873968b0578a"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-resource-20261120-environment.json",
+      "sha256": "4b5d46f8c5ae356a74c496d640541ec6c507f1838549cec9dbaab273ee7624fb"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-resource-20261120-process.json",
+      "sha256": "ba8a9b410a4302f889fe2e8fed86b4cb1565b1e7dfbb8d5ac6fa90b9e148041a"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-resource-20261120.stdout.log",
+      "sha256": "dc53fb8973d821fcff0883e38056dcfc2533faf8a8171d023e7c106a6f43ed9b"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-resource-20261120.xml",
+      "sha256": "54761642b0abaf49048de751cbbc270c6e64f304f7be6c001161e690e1c59ede"
+    },
+    {
       "path": "docs/infrastructure-results/until0800-harness-run_frozen_verification_20261120-v1.py.txt",
       "sha256": "4b7495d0dfd821492b9c0738404b756d88daae161008e85fbe9b72348663fd4f"
     },
@@ -500,11 +590,114 @@
     {
       "path": "docs/infrastructure-results/until0800-resource-freeze_resource_linux_20261120.py.txt",
       "sha256": "224081f70a998f1b90ddf827fdc2b5f56c59047c3aaa48fefbeeb2cb8505b27c"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/protocol.json",
+      "sha256": "8374fe61bc2ca81cd295eb2646fd22dc87a9e327b88ec7ca1912a5b5198dcbe4"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/report.json",
+      "sha256": "8339671f4fde38688d38c70fed3da5400d5c7b48d55cff224dc1a8c16ee3d0f7"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/app/analyzers/hybrid.py.txt",
+      "sha256": "9d00c6d8ec42c174e2269072b57164e54023dd31fbc4ccf8e8ff6c5b5cc1fcf2"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/app/analyzers/rule_based.py.txt",
+      "sha256": "9be78ff453f935602a2b13687a81f69ead32667daa396185db2837e008681922"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/app/config.py.txt",
+      "sha256": "a53dfabb0bd7f0d61563c7342759966f775be93de8a1ef4cb3a26effd6488357"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/app/grounded_prompting.py.txt",
+      "sha256": "ad6a03d534c0701a1a111083cc7c297171ba0e078f77f0dae6c9fb76f66fc28a"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/docs/infrastructure-results/llm-development360-20261117.json",
+      "sha256": "a39ccae9c8cc3d023b088303f0ef518dd1231ec06e972fdbc2e090f08e4ffe52"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/scripts/compare_llm_grounded.py.txt",
+      "sha256": "7f2430542e440777b1ab8e2304da1c1fc01720bbca0af714026e4cbc34a3e377"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/scripts/evaluate_llm_grounded.py.txt",
+      "sha256": "219cb6d85c970f2c23abbca488c88388f685b74a7092fd1b6a32f540e85166de"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/scripts/replay_hybrid_development.py.txt",
+      "sha256": "712701ed0f593fa0cd03191b51ee50a8375e7e5fcf81adef3fbcc24578053a64"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/scripts/retry_incomplete_evaluation.py.txt",
+      "sha256": "e2425f8110abe67a5d2f1ded183e27e32ac05b04950b3bccbf3359776a85c10b"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay-until0800-final-frozen-replay-comparison-20261120.json",
+      "sha256": "0cc85037d8effb1017b75a81fe7752b620316da23177044e55a2dbad14b6704e"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay-until0800-final-frozen-replay-20261120.stdout.log",
+      "sha256": "efc0e2493e65709aa3d11d2bf0bcd11bf467c0617e964644943e724664dc8249"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay-until0800-final-frozen-replay-20261120.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay-run_final_frozen_replay_20261120.py.txt",
+      "sha256": "7aa1d7f7dc479f2f3f2b821ed22e1150c289fc56d09628fa48b1df64fc53930d"
     }
   ],
   "current_runtime_paths_changed_since_verified_source": [],
-  "latest_both_platforms_passed": false,
-  "cross_platform_case_mapping": null,
+  "latest_both_platforms_passed": true,
+  "cross_platform_case_mapping": {
+    "same_case_ids": 8853,
+    "passed_both": 8239,
+    "passed_linux_only": 609,
+    "passed_windows_only": 1,
+    "not_passed_on_either": [
+      "tests.test_audit_paging::test_jsonl_own_view_change_requires_explicit_restart[sqlite-append]",
+      "tests.test_audit_paging::test_jsonl_own_view_change_requires_explicit_restart[sqlite-review]",
+      "tests.test_runtime_patches::test_actual_container_runtime_security_and_provenance",
+      "tests.test_runtime_patches::test_new_offline_venv_bootstraps_patched_pip"
+    ],
+    "not_code_coverage": true,
+    "not_detection_metric": true
+  },
+  "final_frozen_replay_comparison": {
+    "schema": "final-frozen-detection-replay-comparison-1",
+    "source_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26",
+    "completed": true,
+    "compared_fields": {
+      "source_metrics": true,
+      "metrics": true,
+      "comparisons": true,
+      "development_gate_passed": true,
+      "rows": true,
+      "fresh_provider_requests": true,
+      "runtime_adoption": true,
+      "historical_metrics_replaced": true,
+      "independent_acceptance": true
+    },
+    "rows_per_variant": {
+      "rule": 360,
+      "hybrid_default": 360,
+      "hybrid_review_all": 360
+    },
+    "baseline_report_sha256": "8339671f4fde38688d38c70fed3da5400d5c7b48d55cff224dc1a8c16ee3d0f7",
+    "final_report_sha256": "8339671f4fde38688d38c70fed3da5400d5c7b48d55cff224dc1a8c16ee3d0f7",
+    "baseline_bytes_unchanged": true,
+    "provider_requests": 0,
+    "independent_acceptance": false,
+    "runtime_adoption": false,
+    "not_new_llm_measurement": true,
+    "protocol_sha256_equal": true,
+    "source_bytes_unchanged": true
+  },
   "existing_passed_ids_retained": true,
   "paid_api_calls": 0,
   "goal_status": "active_until_0800",

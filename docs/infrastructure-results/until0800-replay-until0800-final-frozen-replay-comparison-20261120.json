@@ -1,0 +1,30 @@
+{
+  "schema": "final-frozen-detection-replay-comparison-1",
+  "source_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26",
+  "completed": true,
+  "compared_fields": {
+    "source_metrics": true,
+    "metrics": true,
+    "comparisons": true,
+    "development_gate_passed": true,
+    "rows": true,
+    "fresh_provider_requests": true,
+    "runtime_adoption": true,
+    "historical_metrics_replaced": true,
+    "independent_acceptance": true
+  },
+  "rows_per_variant": {
+    "rule": 360,
+    "hybrid_default": 360,
+    "hybrid_review_all": 360
+  },
+  "baseline_report_sha256": "8339671f4fde38688d38c70fed3da5400d5c7b48d55cff224dc1a8c16ee3d0f7",
+  "final_report_sha256": "8339671f4fde38688d38c70fed3da5400d5c7b48d55cff224dc1a8c16ee3d0f7",
+  "baseline_bytes_unchanged": true,
+  "provider_requests": 0,
+  "independent_acceptance": false,
+  "runtime_adoption": false,
+  "not_new_llm_measurement": true,
+  "protocol_sha256_equal": true,
+  "source_bytes_unchanged": true
+}

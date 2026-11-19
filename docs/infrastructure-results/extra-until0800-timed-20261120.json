@@ -32,16 +32,36 @@
       "sha256": "5ffae8ff8919a102795164b8733d194cb65d731bdd6f49f6fe88c0ed269e755a"
     },
     {
+      "path": "docs/infrastructure-results/until0800-linux-timed-b77-seed21-20261120-completion.json",
+      "sha256": "fdf6226ca1568745b44eac50819c6996d2bdbfb6d613b58aaff1cc7dc431d399"
+    },
+    {
       "path": "docs/infrastructure-results/until0800-linux-timed-b77-seed21-20261120-environment.json",
       "sha256": "06ba40c896f3b2edc56374357f9b47a4592861727a693d97d4197c1c5bb447c5"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-timed-b77-seed21-20261120-launcher-v1.json",
+      "sha256": "5512c3b9bfa5530253809fa53cc071e2cf90a39b9e8572e8f13fd62e3f6a99b2"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-timed-b77-seed21-20261120-launcher.json",
+      "sha256": "51264160528300b9271b83a393496bf65b307099076a7b63cfbda64438459b70"
     },
     {
       "path": "docs/infrastructure-results/until0800-linux-timed-b77-seed21-20261120-process.json",
       "sha256": "2adc8361e223ed24f4af3dc7164d28762dfcb563b3b3205ff43e3b7c041c2e19"
     },
     {
-      "path": "docs/infrastructure-results/until0800-linux-timed-b77-seed21-20261120-launcher.json",
-      "sha256": "51264160528300b9271b83a393496bf65b307099076a7b63cfbda64438459b70"
+      "path": "docs/infrastructure-results/until0800-linux-timed-b77-seed21-20261120.stdout.log",
+      "sha256": "320eebb65ab3bdd98c12b3f634bb0a524e21197e8860bb85eee49ee012b71f20"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-timed-b77-seed21-20261120-sequence/report.json",
+      "sha256": "944d1d72a5ea2e7a697d23498f1ed3d419a3dce4b9e04f36e78bc5f9ec2c44eb"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-timed-b77-seed21-20261120-sequence/trace.jsonl",
+      "sha256": "d3835e38d7e860e3f3d3dfa6f052976e6c81769203d15284ebd66723f5592921"
     },
     {
       "path": "docs/infrastructure-results/until0800-windows-timed-d45-20261120-completion.json",
@@ -68,16 +88,36 @@
       "sha256": "eb6311f7790798a45b39c634411d127a7639b8edfa67324abc22d3c0a21b2824"
     },
     {
+      "path": "docs/infrastructure-results/until0800-windows-timed-b77-seed21-20261120-completion.json",
+      "sha256": "47a9a440d583b56d646e696bc55570598bc453dd5fa7ee9fc70431da70a6f5d6"
+    },
+    {
       "path": "docs/infrastructure-results/until0800-windows-timed-b77-seed21-20261120-environment.json",
       "sha256": "55151aad3f8f9a6a6a499084402f9366647123259e7c3e6b49b602286de73bbb"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-timed-b77-seed21-20261120-launcher-v1.json",
+      "sha256": "bc70ea3b334f787b60fc4377e9cd2345126e08b3b68d3650ac732493563d4496"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-timed-b77-seed21-20261120-launcher.json",
+      "sha256": "498752d6ae2c114eacf0a3f0893344ddee57cdaca97ae1b984efcd3c178fba21"
     },
     {
       "path": "docs/infrastructure-results/until0800-windows-timed-b77-seed21-20261120-process.json",
       "sha256": "f965ca95051e458d05266773edd0150286ae8506ee5adc06996e1a19e9614ec6"
     },
     {
-      "path": "docs/infrastructure-results/until0800-windows-timed-b77-seed21-20261120-launcher.json",
-      "sha256": "498752d6ae2c114eacf0a3f0893344ddee57cdaca97ae1b984efcd3c178fba21"
+      "path": "docs/infrastructure-results/until0800-windows-timed-b77-seed21-20261120.stdout.log",
+      "sha256": "8d58dd54dffe990bcb4231f1335c0e3b85d0e53af1f4bb1521d47fab9c1cd11e"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-timed-b77-seed21-20261120-sequence/report.json",
+      "sha256": "6f9ac469371a4d302881706552a02bf3692903b80c7c73239440aed90847a484"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-timed-b77-seed21-20261120-sequence/trace.jsonl",
+      "sha256": "b1e4a012fa20860f25d491f0d5307b6234ea8ca07c8462f33256f80c817768d6"
     },
     {
       "path": "docs/infrastructure-results/until0800-timed-harness-start_latest_timed_after_d45_20261120.py.txt",
@@ -107,10 +147,18 @@
     },
     {
       "name": "until0800-linux-timed-b77-seed21-20261120",
-      "status": "running",
+      "status": "complete",
       "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+      "source_files": 2241,
+      "exit_code": 0,
+      "source_bytes_unchanged": true,
       "seed": 20261121,
-      "requested_steps": 288,
+      "steps": 288,
+      "completed": true,
+      "source_rows": 97,
+      "observed_rows": 97,
+      "final_state": "healthy",
+      "elapsed_seconds": 6719.418,
       "real_8h_soak": false
     },
     {
@@ -131,10 +179,18 @@
     },
     {
       "name": "until0800-windows-timed-b77-seed21-20261120",
-      "status": "running",
+      "status": "complete",
       "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+      "source_files": 2241,
+      "exit_code": 0,
+      "source_bytes_unchanged": true,
       "seed": 20261121,
-      "requested_steps": 288,
+      "steps": 288,
+      "completed": true,
+      "source_rows": 97,
+      "observed_rows": 97,
+      "final_state": "healthy",
+      "elapsed_seconds": 6818.297,
       "real_8h_soak": false
     }
   ],

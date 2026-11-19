@@ -105,6 +105,18 @@
       "sha256": "6f16f3be63d6a7e6d17fc2253926575e0dfe1e102a3eae7c2e4da1a433498d56"
     },
     {
+      "path": "docs/infrastructure-results/until0800-linux-timed-b77-seed21-20261120-completion.json",
+      "sha256": "fdf6226ca1568745b44eac50819c6996d2bdbfb6d613b58aaff1cc7dc431d399"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-timed-b77-seed21-20261120-sequence/report.json",
+      "sha256": "944d1d72a5ea2e7a697d23498f1ed3d419a3dce4b9e04f36e78bc5f9ec2c44eb"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-timed-b77-seed21-20261120-sequence/trace.jsonl",
+      "sha256": "d3835e38d7e860e3f3d3dfa6f052976e6c81769203d15284ebd66723f5592921"
+    },
+    {
       "path": "docs/infrastructure-results/witness-order-matrix-windows-20261120/result.json",
       "sha256": "d55c1c8b8900075e5ee8c8ac7c59d57ea10faea7c975e5090c504c1b81c89022"
     },
@@ -185,6 +197,18 @@
       "sha256": "326ab77675222fe199b491b2f8b9a3dda3d7643f3bc0db4264ff52fae80ac858"
     },
     {
+      "path": "docs/infrastructure-results/until0800-windows-timed-b77-seed21-20261120-completion.json",
+      "sha256": "47a9a440d583b56d646e696bc55570598bc453dd5fa7ee9fc70431da70a6f5d6"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-timed-b77-seed21-20261120-sequence/report.json",
+      "sha256": "6f9ac469371a4d302881706552a02bf3692903b80c7c73239440aed90847a484"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-timed-b77-seed21-20261120-sequence/trace.jsonl",
+      "sha256": "b1e4a012fa20860f25d491f0d5307b6234ea8ca07c8462f33256f80c817768d6"
+    },
+    {
       "path": "docs/infrastructure-results/witness-order-witness-repeated-inputs-linux-20261120/result.json",
       "sha256": "4e5fca6971cc99957fd0b0701036dc6130869176b01574bbfa232879ef35f84e"
     },
@@ -253,7 +277,10 @@
       "executed_steps": 1728,
       "source_bytes_unchanged": true,
       "batch_input_triples": 484,
-      "combined_verified_input_triples": null
+      "combined_verified_input_triples": 504,
+      "combined_distinct_triples_sha256": "3fca7450538d1340a9bfda3de4676e0bdcbe4da1c9860c9ae64bd305d6612eb0",
+      "baseline_completed_steps": 288,
+      "baseline_verified_distinct_input_triples": 175
     },
     "windows": {
       "batch_status": "complete",
@@ -262,7 +289,10 @@
       "executed_steps": 1728,
       "source_bytes_unchanged": true,
       "batch_input_triples": 484,
-      "combined_verified_input_triples": null
+      "combined_verified_input_triples": 504,
+      "combined_distinct_triples_sha256": "3fca7450538d1340a9bfda3de4676e0bdcbe4da1c9860c9ae64bd305d6612eb0",
+      "baseline_completed_steps": 288,
+      "baseline_verified_distinct_input_triples": 175
     }
   },
   "authored_repeated_inputs": {
