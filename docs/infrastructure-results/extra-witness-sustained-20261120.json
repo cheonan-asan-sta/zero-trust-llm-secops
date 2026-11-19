@@ -1,0 +1,213 @@
+{
+  "schema": "sustained-witness-watch-evidence-1",
+  "implementation_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "source_sha256": {
+    "app/services/audit_witness.py": "8a7d821f0bc6fcce0dc9f2ae1faff3c03f97ad1bad41fc6d8007b930e7685300",
+    "app/services/audit_witness_observer.py": "98adc1f6f77744162d79fed60baa675fdaca5265ccd934cf8aebf0cdf728aec3",
+    "scripts/audit_witness_observer.py": "519e66f70a6c93c4f746662229f033dd58dacc308498ab4a89cc5dccbfce5171",
+    "scripts/f1_lab/witness_observer_status.py": "c2b07cbd204e0602a5647df457cdb6e22be249522cab67303b7dde75fdff4674"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/witness-sustained-run_sustained_witness_watch_20261120-v1.py.txt",
+      "sha256": "44b0a459b6f1aa6ab442b244df416a68464c39e305df4011e47025c678f5340c"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-run_sustained_witness_watch_20261120.py.txt",
+      "sha256": "13064cb58dbe023bd26d4c5904cefd17a555bf58ada1648add71a7f8a151dcff"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-start_sustained_after_preflight_20261120.py.txt",
+      "sha256": "73ebe910d23ba58a7ecfb85776c7bf3610a183e051133e9484524ed51f37188f"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-20261120/owned-processes.json",
+      "sha256": "b2b0ab66f8ddb614a58747acf0921c2b07d14bdd47e56792de9a6ee91a493d93"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-20261120/result.json",
+      "sha256": "079f525e22a21d70cb13402f20f350ce33406d3ef83dbe520989b0588716b8e7"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-20261120/samples.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-20261120/watch-0.log",
+      "sha256": "10cb08357981c918daf9b8650ba0a31aa46fd315d982ad8a8e94256b3240c2c7"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-fixed-20261120/owned-processes.json",
+      "sha256": "e11b17d4fc1932efcd1797c9f36572e48e5e0810c4adadd8a78532937f8d2a4e"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-fixed-20261120/progress.json",
+      "sha256": "11b122c978b3b5f7e2e691cfd9c684485f01bb52eb7c6f24f1ebfa1714888387"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-fixed-20261120/result.json",
+      "sha256": "9cc4eb0c483bd1af6d279524051558f4b58c0dc42fc1b139465e45e2510a20d6"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-fixed-20261120/samples.jsonl",
+      "sha256": "32f83dfea8f2ea622d099380a8b8a1715adc50d2829475d19961282d8bb09b37"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-fixed-20261120/watch-0.log",
+      "sha256": "7db9305fa6563492a14dd9a0300273758ecc0e5bd88c6c201e3169b5f21705f2"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-fixed-20261120/watch-1.log",
+      "sha256": "021bcf8e041264277472e734853a0d4aabe27b745a773e02d72ff01ac7ea90a6"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-fixed-20261120/watch-2.log",
+      "sha256": "f1efa3f11092d78d20b6b5d38e1a743bd589237a5849569a3c2d845baf10ee61"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-20261120-launcher.json",
+      "sha256": "93bf3db977d2214acd9b3193fa5d8a5e737b24152256124ce3a5b7e5c1884cec"
+    }
+  ],
+  "runs": {
+    "initial_preflight": {
+      "schema": "sustained-local-witness-watch-1",
+      "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+      "source_files": 2241,
+      "duration_requested_seconds": 240,
+      "completed": false,
+      "real_8h_soak": false,
+      "independent_storage_verified": false,
+      "detection_metrics_changed": false,
+      "paid_api_calls": 0,
+      "watch_default_interval_seconds": 60,
+      "watch_default_max_age_seconds": 180,
+      "samples": 0,
+      "appended_source_rows": 1,
+      "owned_restarts": [],
+      "processes": [
+        {
+          "pid": 32457,
+          "started_elapsed_seconds": 0.11543665200042597
+        }
+      ],
+      "failure_type": "AssertionError",
+      "failure": "",
+      "elapsed_seconds": 10.13964767700054
+    },
+    "fixed_preflight": {
+      "schema": "sustained-local-witness-watch-1",
+      "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+      "source_files": 2241,
+      "duration_requested_seconds": 240,
+      "completed": true,
+      "real_8h_soak": false,
+      "independent_storage_verified": false,
+      "detection_metrics_changed": false,
+      "paid_api_calls": 0,
+      "watch_default_interval_seconds": 60,
+      "watch_default_max_age_seconds": 180,
+      "samples": 23,
+      "appended_source_rows": 2,
+      "owned_restarts": [
+        {
+          "at_elapsed_seconds": 48.24079045800136,
+          "exit_code": -9,
+          "previous_anchor_count": 1
+        },
+        {
+          "at_elapsed_seconds": 144.4697567330004,
+          "exit_code": -9,
+          "previous_anchor_count": 3
+        }
+      ],
+      "processes": [
+        {
+          "pid": 32474,
+          "started_elapsed_seconds": 0.12203374300042924,
+          "exit_code": -9
+        },
+        {
+          "pid": 32484,
+          "started_elapsed_seconds": 48.25394484000026,
+          "exit_code": -9
+        },
+        {
+          "pid": 32489,
+          "started_elapsed_seconds": 144.48135689599985,
+          "exit_code": -15
+        }
+      ],
+      "last_sample": {
+        "elapsed_seconds": 230.67085595000026,
+        "pid": 32489,
+        "state": "healthy",
+        "anchor_count": 5,
+        "source_rows": 2,
+        "unobserved_rows": 0,
+        "rss_bytes": 71606272,
+        "status_success": true,
+        "action_required": false
+      },
+      "before_final_drain": {
+        "schema": "local-audit-witness-observer-1",
+        "state": "healthy",
+        "healthy": true,
+        "anchor_verified": true,
+        "live_checked": true,
+        "audit_minimum_verified": true,
+        "signing_capability_checked": false,
+        "receipt_sha256": "5e1e8c1ef33f5e600b917167a4e4a5487d1c5856d122171389f2b912b3a0dca1",
+        "age_seconds": 35.248801,
+        "observed_at": "2026-11-19T20:51:01.719394+00:00",
+        "pending_started_at": null,
+        "max_age_seconds": 180,
+        "interval_seconds": 60,
+        "capacity_warning": 16,
+        "pending": false,
+        "anchor_count": 5,
+        "independent_storage_verified": false,
+        "automatic_activation_allowed": false,
+        "unobserved_rows": 0,
+        "remaining_receipts": 4090
+      },
+      "watch_successful_cycles": 5,
+      "final_state": {
+        "schema": "local-audit-witness-observer-1",
+        "state": "healthy",
+        "healthy": true,
+        "anchor_verified": true,
+        "live_checked": true,
+        "audit_minimum_verified": true,
+        "signing_capability_checked": false,
+        "receipt_sha256": "06eea0278336a140356a1d6ad9650dc41acc9d2efd3c01db6d73835c34f83f8c",
+        "age_seconds": 0.021501,
+        "observed_at": "2026-11-19T20:51:36.990728+00:00",
+        "pending_started_at": null,
+        "max_age_seconds": 180,
+        "interval_seconds": 60,
+        "capacity_warning": 16,
+        "pending": false,
+        "anchor_count": 6,
+        "independent_storage_verified": false,
+        "automatic_activation_allowed": false,
+        "unobserved_rows": 0,
+        "remaining_receipts": 4089
+      },
+      "final_drain_explicit": true,
+      "profile_pin_unchanged": true,
+      "private_fixture_removed": true,
+      "mutated_source_files": [],
+      "source_bytes_unchanged": true,
+      "owned_process_inactive": true,
+      "elapsed_seconds": 240.16367500700107
+    },
+    "sustained": {
+      "status": "running",
+      "completed": false
+    }
+  },
+  "paid_api_calls": 0,
+  "real_8h_soak": false,
+  "goal_status": "active_until_0800"
+}
