@@ -1,0 +1,107 @@
+{
+  "schema": "sustained-local-witness-watch-1",
+  "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "source_files": 2241,
+  "duration_requested_seconds": 240,
+  "completed": true,
+  "real_8h_soak": false,
+  "independent_storage_verified": false,
+  "detection_metrics_changed": false,
+  "paid_api_calls": 0,
+  "watch_default_interval_seconds": 60,
+  "watch_default_max_age_seconds": 180,
+  "samples": 23,
+  "appended_source_rows": 2,
+  "owned_restarts": [
+    {
+      "at_elapsed_seconds": 48.244244120000076,
+      "exit_code": -9,
+      "previous_anchor_count": 1
+    },
+    {
+      "at_elapsed_seconds": 144.48693183799878,
+      "exit_code": -9,
+      "previous_anchor_count": 3
+    }
+  ],
+  "processes": [
+    {
+      "pid": 32560,
+      "started_elapsed_seconds": 0.12530479899942293,
+      "exit_code": -9
+    },
+    {
+      "pid": 32574,
+      "started_elapsed_seconds": 48.256813223999416,
+      "exit_code": -9
+    },
+    {
+      "pid": 32588,
+      "started_elapsed_seconds": 144.49878778999846,
+      "exit_code": -15
+    }
+  ],
+  "last_sample": {
+    "elapsed_seconds": 230.6879118429988,
+    "pid": 32588,
+    "state": "healthy",
+    "anchor_count": 5,
+    "source_rows": 2,
+    "unobserved_rows": 0,
+    "rss_bytes": 71827456,
+    "status_success": true,
+    "action_required": false
+  },
+  "before_final_drain": {
+    "schema": "local-audit-witness-observer-1",
+    "state": "healthy",
+    "healthy": true,
+    "anchor_verified": true,
+    "live_checked": true,
+    "audit_minimum_verified": true,
+    "signing_capability_checked": false,
+    "receipt_sha256": "c3fc785fce76ad8f0bc5f71b62bf3419898459cb154490c291f38094f5292264",
+    "age_seconds": 35.194807,
+    "observed_at": "2026-11-19T20:58:57.710093+00:00",
+    "pending_started_at": null,
+    "max_age_seconds": 180,
+    "interval_seconds": 60,
+    "capacity_warning": 16,
+    "pending": false,
+    "anchor_count": 5,
+    "independent_storage_verified": false,
+    "automatic_activation_allowed": false,
+    "unobserved_rows": 0,
+    "remaining_receipts": 4090
+  },
+  "watch_successful_cycles": 5,
+  "final_state": {
+    "schema": "local-audit-witness-observer-1",
+    "state": "healthy",
+    "healthy": true,
+    "anchor_verified": true,
+    "live_checked": true,
+    "audit_minimum_verified": true,
+    "signing_capability_checked": false,
+    "receipt_sha256": "24122eead44fd349d5e039c8d426e897e01c9d2b6364b91b12b64dbba5e20c19",
+    "age_seconds": 0.020294,
+    "observed_at": "2026-11-19T20:59:32.918768+00:00",
+    "pending_started_at": null,
+    "max_age_seconds": 180,
+    "interval_seconds": 60,
+    "capacity_warning": 16,
+    "pending": false,
+    "anchor_count": 6,
+    "independent_storage_verified": false,
+    "automatic_activation_allowed": false,
+    "unobserved_rows": 0,
+    "remaining_receipts": 4089
+  },
+  "final_drain_explicit": true,
+  "profile_pin_unchanged": true,
+  "private_fixture_removed": true,
+  "mutated_source_files": [],
+  "source_bytes_unchanged": true,
+  "owned_process_inactive": true,
+  "elapsed_seconds": 240.51361374799853
+}

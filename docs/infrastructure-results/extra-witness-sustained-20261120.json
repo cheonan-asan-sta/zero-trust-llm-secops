@@ -13,12 +13,20 @@
       "sha256": "44b0a459b6f1aa6ab442b244df416a68464c39e305df4011e47025c678f5340c"
     },
     {
-      "path": "docs/infrastructure-results/witness-sustained-run_sustained_witness_watch_20261120.py.txt",
+      "path": "docs/infrastructure-results/witness-sustained-run_sustained_witness_watch_20261120-v2.py.txt",
       "sha256": "13064cb58dbe023bd26d4c5904cefd17a555bf58ada1648add71a7f8a151dcff"
     },
     {
-      "path": "docs/infrastructure-results/witness-sustained-start_sustained_after_preflight_20261120.py.txt",
+      "path": "docs/infrastructure-results/witness-sustained-run_sustained_witness_watch_20261120.py.txt",
+      "sha256": "453536a088a89d00163e1a0dc35b53781122c5bf6da97fcc5f50ef160473c1ef"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-start_sustained_after_preflight_20261120-v1.py.txt",
       "sha256": "73ebe910d23ba58a7ecfb85776c7bf3610a183e051133e9484524ed51f37188f"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-start_sustained_after_preflight_20261120.py.txt",
+      "sha256": "3220f2cf8795e1c0b7f4719498272d1a517c838cb0e014b80fd81d0aa8cba0a1"
     },
     {
       "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-20261120/owned-processes.json",
@@ -65,8 +73,64 @@
       "sha256": "f1efa3f11092d78d20b6b5d38e1a743bd589237a5849569a3c2d845baf10ee61"
     },
     {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-20261120/owned-processes.json",
+      "sha256": "ae25e2295fea11909f5e44f8981a6435efe1bd1924e4be84d5f66733bf6195a2"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-20261120/progress.json",
+      "sha256": "f21a3f1bf82320918e5c246d5d7db41e7f86a0b9a66c8dac97aff6144607535d"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-20261120/result.json",
+      "sha256": "4635d12ebe2972fb3773dcf5f4427638e7fe6804180ea7231213e95d6b6888bd"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-20261120/samples.jsonl",
+      "sha256": "ed6e56e96d7070d87c53de95ec4647780d83638a1a14d9ac113a3bada0f68416"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-20261120/watch-0.log",
+      "sha256": "9a3be470232f11c0b75b87fd90cbe2d4e13916b9760c054131d0fbde8f464161"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-pending-fixed-20261120/owned-processes.json",
+      "sha256": "5a2a8311faed29b7f5affb787189069ff6254d3f3a4e2aedc82c848e6972e3f6"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-pending-fixed-20261120/progress.json",
+      "sha256": "3beac0123e3411277c4ddaf58f07e317f797695f0050436840df98e81f42d70c"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-pending-fixed-20261120/result.json",
+      "sha256": "483fd3b9d083337f7446ac45a3217b3fc3626ed9507db4086cdf2655eedc550c"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-pending-fixed-20261120/samples.jsonl",
+      "sha256": "814f26736524e166d64b4ddb2b1147c08b4ca10bdf723404250cdb6c053035b3"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-pending-fixed-20261120/watch-0.log",
+      "sha256": "9971a5e6f7ad84ddc1f57cce91ed6561fa19e4f76ac9dd2ade4a127ee4fa5324"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-pending-fixed-20261120/watch-1.log",
+      "sha256": "ee3e137d1c141d2d832675e338087c8143f943feef9f81f289ba07339ae3eb9b"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-preflight-pending-fixed-20261120/watch-2.log",
+      "sha256": "00f12a5f1b8b8b9f82869bc46136aa47eb7d497ffb51687b2403ffbd1a637948"
+    },
+    {
       "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-20261120-launcher.json",
       "sha256": "93bf3db977d2214acd9b3193fa5d8a5e737b24152256124ce3a5b7e5c1884cec"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-pending-fixed-20261120-launcher.json",
+      "sha256": "35ba8ba882c5c063a5424ffa1f189eda0bbbf2910ac26b2e6691bf72d45ab40f"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-20261120.log",
+      "sha256": "8a2363f9356560263d984722c3a132719d7f245f331f5682a62ccd564de11a53"
     }
   ],
   "runs": {
@@ -201,6 +265,151 @@
       "source_bytes_unchanged": true,
       "owned_process_inactive": true,
       "elapsed_seconds": 240.16367500700107
+    },
+    "interrupted_initial_sustained": {
+      "schema": "sustained-local-witness-watch-1",
+      "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+      "source_files": 2241,
+      "duration_requested_seconds": 6000,
+      "completed": false,
+      "real_8h_soak": false,
+      "independent_storage_verified": false,
+      "detection_metrics_changed": false,
+      "paid_api_calls": 0,
+      "watch_default_interval_seconds": 60,
+      "watch_default_max_age_seconds": 180,
+      "samples": 11,
+      "appended_source_rows": 2,
+      "owned_restarts": [],
+      "processes": [
+        {
+          "pid": 32507,
+          "started_elapsed_seconds": 0.11943615400014096
+        }
+      ],
+      "last_sample": {
+        "elapsed_seconds": 110.36201900199922,
+        "pid": 32507,
+        "state": "unobserved",
+        "anchor_count": 2,
+        "source_rows": 2,
+        "unobserved_rows": 1,
+        "rss_bytes": 71610368,
+        "status_success": true,
+        "action_required": false
+      },
+      "failure_type": "KeyError",
+      "failure": "'unobserved_rows'",
+      "owned_process_inactive": true,
+      "private_fixture_removed": true,
+      "elapsed_seconds": 120.42648424199979
+    },
+    "pending_fixed_preflight": {
+      "schema": "sustained-local-witness-watch-1",
+      "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+      "source_files": 2241,
+      "duration_requested_seconds": 240,
+      "completed": true,
+      "real_8h_soak": false,
+      "independent_storage_verified": false,
+      "detection_metrics_changed": false,
+      "paid_api_calls": 0,
+      "watch_default_interval_seconds": 60,
+      "watch_default_max_age_seconds": 180,
+      "samples": 23,
+      "appended_source_rows": 2,
+      "owned_restarts": [
+        {
+          "at_elapsed_seconds": 48.244244120000076,
+          "exit_code": -9,
+          "previous_anchor_count": 1
+        },
+        {
+          "at_elapsed_seconds": 144.48693183799878,
+          "exit_code": -9,
+          "previous_anchor_count": 3
+        }
+      ],
+      "processes": [
+        {
+          "pid": 32560,
+          "started_elapsed_seconds": 0.12530479899942293,
+          "exit_code": -9
+        },
+        {
+          "pid": 32574,
+          "started_elapsed_seconds": 48.256813223999416,
+          "exit_code": -9
+        },
+        {
+          "pid": 32588,
+          "started_elapsed_seconds": 144.49878778999846,
+          "exit_code": -15
+        }
+      ],
+      "last_sample": {
+        "elapsed_seconds": 230.6879118429988,
+        "pid": 32588,
+        "state": "healthy",
+        "anchor_count": 5,
+        "source_rows": 2,
+        "unobserved_rows": 0,
+        "rss_bytes": 71827456,
+        "status_success": true,
+        "action_required": false
+      },
+      "before_final_drain": {
+        "schema": "local-audit-witness-observer-1",
+        "state": "healthy",
+        "healthy": true,
+        "anchor_verified": true,
+        "live_checked": true,
+        "audit_minimum_verified": true,
+        "signing_capability_checked": false,
+        "receipt_sha256": "c3fc785fce76ad8f0bc5f71b62bf3419898459cb154490c291f38094f5292264",
+        "age_seconds": 35.194807,
+        "observed_at": "2026-11-19T20:58:57.710093+00:00",
+        "pending_started_at": null,
+        "max_age_seconds": 180,
+        "interval_seconds": 60,
+        "capacity_warning": 16,
+        "pending": false,
+        "anchor_count": 5,
+        "independent_storage_verified": false,
+        "automatic_activation_allowed": false,
+        "unobserved_rows": 0,
+        "remaining_receipts": 4090
+      },
+      "watch_successful_cycles": 5,
+      "final_state": {
+        "schema": "local-audit-witness-observer-1",
+        "state": "healthy",
+        "healthy": true,
+        "anchor_verified": true,
+        "live_checked": true,
+        "audit_minimum_verified": true,
+        "signing_capability_checked": false,
+        "receipt_sha256": "24122eead44fd349d5e039c8d426e897e01c9d2b6364b91b12b64dbba5e20c19",
+        "age_seconds": 0.020294,
+        "observed_at": "2026-11-19T20:59:32.918768+00:00",
+        "pending_started_at": null,
+        "max_age_seconds": 180,
+        "interval_seconds": 60,
+        "capacity_warning": 16,
+        "pending": false,
+        "anchor_count": 6,
+        "independent_storage_verified": false,
+        "automatic_activation_allowed": false,
+        "unobserved_rows": 0,
+        "remaining_receipts": 4089
+      },
+      "final_drain_explicit": true,
+      "profile_pin_unchanged": true,
+      "private_fixture_removed": true,
+      "mutated_source_files": [],
+      "source_bytes_unchanged": true,
+      "owned_process_inactive": true,
+      "elapsed_seconds": 240.51361374799853
     },
     "sustained": {
       "status": "running",

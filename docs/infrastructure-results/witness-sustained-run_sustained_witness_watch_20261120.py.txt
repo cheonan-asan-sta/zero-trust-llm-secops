@@ -78,7 +78,8 @@ try:
                     status=Path(f'/proc/{process.pid}/status').read_text()
                     rss=next(int(line.split()[1])*1024 for line in status.splitlines() if line.startswith('VmRSS:'))
                     with audit._transaction() as con:source_rows=witness._verified_head(audit,con)[0]
-                    row={'elapsed_seconds':elapsed,'pid':process.pid,'state':state['state'],'anchor_count':state['anchor_count'],'source_rows':source_rows,'unobserved_rows':state['unobserved_rows'],'rss_bytes':rss,'status_success':True,'action_required':False}
+                    if 'unobserved_rows' not in state:assert state['state']=='pending'
+                    row={'elapsed_seconds':elapsed,'pid':process.pid,'state':state['state'],'anchor_count':state['anchor_count'],'source_rows':source_rows,'unobserved_rows':state.get('unobserved_rows'),'rss_bytes':rss,'status_success':True,'action_required':False}
                     samples.write(json.dumps(row)+'\n');samples.flush();result['samples']+=1
                     result['last_sample']=row;next_sample+=10
                     (output/'progress.json').write_text(json.dumps(result,indent=2)+'\n')

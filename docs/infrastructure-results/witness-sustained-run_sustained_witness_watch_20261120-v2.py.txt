@@ -1,0 +1,112 @@
+"""Real default cadence, owned process restarts; never an 8h soak or F1 test."""
+import asyncio
+import hashlib
+import json
+import os
+import subprocess
+import sys
+import tempfile
+import time
+import uuid
+from pathlib import Path
+
+source,output,manifest_path=map(Path,sys.argv[1:4]);duration=int(sys.argv[4])
+assert os.name=='posix' and 240<=duration<=6000
+manifest=json.loads(manifest_path.read_text());assert source.resolve()==Path(manifest['path']).resolve()
+output.mkdir(parents=True,exist_ok=False);sys.path.insert(0,str(source))
+from app.analyzers.rule_based import RuleBasedAnalyzer
+from app.models import AnalysisResult
+from app.scenarios import synthetic_events
+from app.services import audit_witness as witness
+from app.services import audit_witness_observer as observer
+from app.services.policy import response_preview
+from app.services.sqlite_audit import SQLiteAuditStore
+from scripts.f1_lab import witness_observer_status as bridge
+
+def altered():return [p for p,h in manifest['files'].items() if hashlib.sha256((source/p).read_bytes()).hexdigest()!=h]
+assert not altered()
+env=dict(os.environ,AWS_EC2_METADATA_DISABLED='true',PYTHONPATH=str(source),PYTHONPYCACHEPREFIX='/home/chaehj02/.cache/zt-until0800-frozen-bytecode',AWS_SHARED_CREDENTIALS_FILE=str(output/'no-cloud-credentials'),AWS_CONFIG_FILE=str(output/'no-cloud-config'))
+for key in list(env):
+    if key in {'OPENAI_API_KEY','AZURE_OPENAI_API_KEY','ANTHROPIC_API_KEY','C01_UPSTREAM_API_KEY'} or key.startswith(('AWS_ACCESS','AWS_SECRET','AWS_SESSION','AWS_PROFILE','AWS_DEFAULT_PROFILE','AWS_WEB_IDENTITY','AWS_ROLE','AWS_CONTAINER')):env.pop(key,None)
+started=time.monotonic();process=None;stream=None
+result={'schema':'sustained-local-witness-watch-1','source_commit':manifest['source_commit'],'source_files':len(manifest['files']),'duration_requested_seconds':duration,'completed':False,'real_8h_soak':False,'independent_storage_verified':False,'detection_metrics_changed':False,'paid_api_calls':0,'watch_default_interval_seconds':60,'watch_default_max_age_seconds':180,'samples':0,'appended_source_rows':0,'owned_restarts':[],'processes':[]}
+try:
+    with tempfile.TemporaryDirectory(prefix='private-sustained-witness-') as temporary:
+        root=Path(temporary);audit=SQLiteAuditStore(root/'audit.sqlite3');signer=root/'signer';control=root/'control'
+        def append():
+            event=synthetic_events()[0].model_copy(update={'event_id':'sustained-'+uuid.uuid4().hex})
+            assessment=RuleBasedAnalyzer().assess(event)
+            asyncio.run(audit.save(AnalysisResult(event_id=event.event_id,analyzer='rule',assessment=assessment,policy_decision=response_preview(assessment,event),latency_ms=1)))
+            result['appended_source_rows']+=1
+        append();key=witness.initialize(signer,audit.path,'sustained-default-cadence')['public_key_sha256']
+        minimum=witness.observe(signer,audit.path,key,expected_receipt=witness.GENESIS)['receipt_sha256']
+        pin=observer.initialize(control,signer,audit.path,key,expected_receipt=minimum)['profile_sha256']
+        public=root/'status.json';profile={'profile_sha256':pin,'minimum_receipt':minimum,'status_file':str(public)}
+        argv=[sys.executable,'-m','scripts.audit_witness_observer','watch','--directory',str(control),'--profile-sha256',pin,'--minimum-receipt',minimum,'--status-file',str(public)]
+        def start():
+            global process,stream
+            stream=(output/f'watch-{len(result["processes"])}.log').open('wb')
+            process=subprocess.Popen(argv,cwd=source,env=env,stdout=stream,stderr=subprocess.STDOUT)
+            result['processes'].append({'pid':process.pid,'started_elapsed_seconds':time.monotonic()-started})
+            (output/'owned-processes.json').write_text(json.dumps(result['processes'],indent=2)+'\n')
+        def stop(kill=False):
+            global process,stream
+            if process and process.poll() is None:
+                (process.kill if kill else process.terminate)()
+                try:process.wait(timeout=10)
+                except subprocess.TimeoutExpired:process.kill();process.wait(timeout=10)
+            if process:result['processes'][-1]['exit_code']=process.returncode
+            if stream:stream.close();stream=None
+        start();next_append=90;restart_times=[duration/5,3*duration/5];next_sample=10
+        with (output/'samples.jsonl').open('w') as samples:
+            while time.monotonic()-started<duration:
+                elapsed=time.monotonic()-started
+                if (output/'stop.request').exists():raise InterruptedError('owned sustained stop')
+                assert process.poll() is None,'watch exited unexpectedly'
+                if restart_times and elapsed>=restart_times[0]:
+                    before=observer.status(control,pin,minimum_receipt=minimum)
+                    stop(kill=True);assert process.returncode==-9
+                    result['owned_restarts'].append({'at_elapsed_seconds':elapsed,'exit_code':process.returncode,'previous_anchor_count':before['anchor_count']})
+                    restart_times.pop(0);start()
+                if elapsed>=next_append:append();next_append+=180
+                if elapsed>=next_sample:
+                    metrics=bridge.metrics(profile)
+                    assert 'secops_witness_status_success 1\n' in metrics
+                    assert 'secops_witness_observation_action_required 0\n' in metrics
+                    state=observer.status(control,pin,minimum_receipt=minimum)
+                    assert state['state'] in {'healthy','unobserved','pending'}
+                    status=Path(f'/proc/{process.pid}/status').read_text()
+                    rss=next(int(line.split()[1])*1024 for line in status.splitlines() if line.startswith('VmRSS:'))
+                    with audit._transaction() as con:source_rows=witness._verified_head(audit,con)[0]
+                    row={'elapsed_seconds':elapsed,'pid':process.pid,'state':state['state'],'anchor_count':state['anchor_count'],'source_rows':source_rows,'unobserved_rows':state['unobserved_rows'],'rss_bytes':rss,'status_success':True,'action_required':False}
+                    samples.write(json.dumps(row)+'\n');samples.flush();result['samples']+=1
+                    result['last_sample']=row;next_sample+=10
+                    (output/'progress.json').write_text(json.dumps(result,indent=2)+'\n')
+                time.sleep(min(1,max(0,duration-(time.monotonic()-started))))
+        stop()
+        result['before_final_drain']=observer.status(control,pin,minimum_receipt=minimum)
+        observer.cycle(control,pin,minimum_receipt=minimum)
+        final=observer.status(control,pin,minimum_receipt=minimum)
+        with audit._transaction() as con:final_rows=witness._verified_head(audit,con)[0]
+        assert final['state']=='healthy' and final['unobserved_rows']==0 and final_rows==result['appended_source_rows']
+        assert len(result['owned_restarts'])==2 and result['samples']>=duration/10-2
+        logs=[]
+        for path in sorted(output.glob('watch-*.log')):
+            rows=[json.loads(line) for line in path.read_text().splitlines()]
+            assert rows and all(row['cycle_success'] is True for row in rows)
+            logs.extend(rows)
+        assert len(logs)>=duration//60
+        result.update(watch_successful_cycles=len(logs),final_state=final,final_drain_explicit=True,profile_pin_unchanged=observer._load(control,pin)[1] is not None)
+    result['private_fixture_removed']=not root.exists();result['mutated_source_files']=altered();result['source_bytes_unchanged']=not result['mutated_source_files']
+    result['completed']=result['source_bytes_unchanged'] and result['private_fixture_removed']
+except BaseException as error:
+    result['failure_type']=type(error).__name__;result['failure']=str(error)
+    raise
+finally:
+    if process and process.poll() is None:process.kill();process.wait(timeout=10)
+    if stream:stream.close()
+    result['owned_process_inactive']=process is None or process.poll() is not None
+    result['private_fixture_removed']=not root.exists() if 'root' in globals() else True
+    result['elapsed_seconds']=time.monotonic()-started
+    (output/'result.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result))

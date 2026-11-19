@@ -1,0 +1,11 @@
+{"elapsed_seconds": 10.135506542999792, "pid": 32507, "state": "healthy", "anchor_count": 1, "source_rows": 1, "unobserved_rows": 0, "rss_bytes": 71340032, "status_success": true, "action_required": false}
+{"elapsed_seconds": 20.154086169999573, "pid": 32507, "state": "healthy", "anchor_count": 1, "source_rows": 1, "unobserved_rows": 0, "rss_bytes": 71340032, "status_success": true, "action_required": false}
+{"elapsed_seconds": 30.17596699400019, "pid": 32507, "state": "healthy", "anchor_count": 1, "source_rows": 1, "unobserved_rows": 0, "rss_bytes": 71340032, "status_success": true, "action_required": false}
+{"elapsed_seconds": 40.19450950399914, "pid": 32507, "state": "healthy", "anchor_count": 1, "source_rows": 1, "unobserved_rows": 0, "rss_bytes": 71340032, "status_success": true, "action_required": false}
+{"elapsed_seconds": 50.215041764999114, "pid": 32507, "state": "healthy", "anchor_count": 1, "source_rows": 1, "unobserved_rows": 0, "rss_bytes": 71340032, "status_success": true, "action_required": false}
+{"elapsed_seconds": 60.23664137999913, "pid": 32507, "state": "healthy", "anchor_count": 1, "source_rows": 1, "unobserved_rows": 0, "rss_bytes": 71340032, "status_success": true, "action_required": false}
+{"elapsed_seconds": 70.25629566799944, "pid": 32507, "state": "healthy", "anchor_count": 2, "source_rows": 1, "unobserved_rows": 0, "rss_bytes": 71610368, "status_success": true, "action_required": false}
+{"elapsed_seconds": 80.27645208099966, "pid": 32507, "state": "healthy", "anchor_count": 2, "source_rows": 1, "unobserved_rows": 0, "rss_bytes": 71610368, "status_success": true, "action_required": false}
+{"elapsed_seconds": 90.29982546899919, "pid": 32507, "state": "unobserved", "anchor_count": 2, "source_rows": 2, "unobserved_rows": 1, "rss_bytes": 71610368, "status_success": true, "action_required": false}
+{"elapsed_seconds": 100.3408254320002, "pid": 32507, "state": "unobserved", "anchor_count": 2, "source_rows": 2, "unobserved_rows": 1, "rss_bytes": 71610368, "status_success": true, "action_required": false}
+{"elapsed_seconds": 110.36201900199922, "pid": 32507, "state": "unobserved", "anchor_count": 2, "source_rows": 2, "unobserved_rows": 1, "rss_bytes": 71610368, "status_success": true, "action_required": false}
