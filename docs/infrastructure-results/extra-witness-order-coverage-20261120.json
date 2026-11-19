@@ -1,0 +1,124 @@
+{
+  "schema": "witness-selected-input-order-evidence-1",
+  "implementation_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "source_sha256": {
+    "scripts/run_witness_safety_sequence.py": "592d2870ad69ce55cc196ebaba0e80cf8d5fe489789456ef7ccf5f7b1c044222"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/witness-order-witness-order-coverage-plan-20261120.json",
+      "sha256": "f61479c5595fce7f5ca19dbace6c51ebee4d2a68bbad410a17379522308b371d"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-plan_witness_order_coverage_20261120.py.txt",
+      "sha256": "c5abe44586c45ec0c84d7b5806731c525e211a9fc85636343ceb7ca218bf7c49"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-run_witness_order_matrix_20261120.py.txt",
+      "sha256": "9123ec61069b4b2671ec41fdf2e850cb31433debb93a05651de69e64faab41e9"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/result.json",
+      "sha256": "08c636c39b9fad62733ac6b2e3b89937105c50d96ee4c37e04df6ed190eabb27"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/owned-process.json",
+      "sha256": "fddd254a89fd228ba0acdf94dde49b405bdc51607a743f5e80f45c89b9815225"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-38.log",
+      "sha256": "f314f7ef83632faf7e90886eae7333943fee25e7953c85a39d6143bf0f6e1daf"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-44.log",
+      "sha256": "65904cdba5598dbbaffb1fe304c2a836c8d30a2f2c7ea826b9b59c194b0364b9"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-431.log",
+      "sha256": "d1299489fdddee68c34997a4d5ab9034e3dd2f6515a3143418bf67b16e2d21b1"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-906.log",
+      "sha256": "7bcd9389a1bebcf0024500a535c2c162e6f769a229d4e2bf79a71b316ffd25e5"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-1855.log",
+      "sha256": "355d6a579ed541b1e89ce3cdccd0c8ebc4cca04a946829faeb0220a217e0b8cd"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-121.log",
+      "sha256": "beaa5d70b2289d659b6a4a76d3c60b597737b58181f35ca469921edfecf31750"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-38/report.json",
+      "sha256": "5b6f9d78fa06825f474ead437682a6238928a6b5234e0441686b7f1c8206a6df"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-38/trace.jsonl",
+      "sha256": "ac1e5912771d59df2f49c5dc7becc7627d2dd7ecc874ea9c5e3764e565d4da63"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-44/report.json",
+      "sha256": "7c6b00bdb49f99f914269975a5020089a9799851dd1a25550e9bca9b61f326ad"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-44/trace.jsonl",
+      "sha256": "7f2bc799bcd5897069075d857d2ec332e4b37f1c2ef518b12e76faffda70e268"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-431/report.json",
+      "sha256": "72790e3f749bf14cacb235a919d0ea73404ff7024a332c3032b52c4c3c108a6d"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-431/trace.jsonl",
+      "sha256": "7843f40cf9bbc01348bf6255016c6f90dec1a2c7fbc371e77a4601ab087dcf87"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-906/report.json",
+      "sha256": "f6df6d18adb8a32f7e3d67efecdbca5de3c151d5e14c1de559541f17e3e37e02"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-906/trace.jsonl",
+      "sha256": "bea4ca7ed580995e0be25754e13eafc8cb019dd4b75211473198c3aa385396fb"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-1855/report.json",
+      "sha256": "0865e9ed7c7676505efaaf04767df876844ddde243a0458686ac042d7bcdc001"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-1855/trace.jsonl",
+      "sha256": "9a2dd80227aa1e009c6e758db5d8763ac5d9e91da2f9d147e5968bcdad12f3af"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-121/report.json",
+      "sha256": "5a28bd103cf022296af2751bcbbf448e1e9bbb82ed802fc7d98ffc6eb42176de"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-matrix-linux-20261120/seed-121/trace.jsonl",
+      "sha256": "6f16f3be63d6a7e6d17fc2253926575e0dfe1e102a3eae7c2e4da1a433498d56"
+    }
+  ],
+  "results": {
+    "linux": {
+      "batch_status": "complete",
+      "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+      "source_files": 2241,
+      "executed_steps": 1728,
+      "source_bytes_unchanged": true,
+      "batch_input_triples": 484,
+      "combined_verified_input_triples": null
+    },
+    "windows": {
+      "batch_status": "running",
+      "combined_verified_input_triples": null
+    }
+  },
+  "planned_distinct_input_triples": 504,
+  "planned_baseline_triples": 175,
+  "candidate_seeds": 2048,
+  "selection_uses_detection_labels": false,
+  "not_code_branch_coverage": true,
+  "not_independent_detection_cases": true,
+  "paid_api_calls": 0,
+  "goal_status": "active_until_0800"
+}

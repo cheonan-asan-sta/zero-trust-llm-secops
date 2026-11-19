@@ -1,0 +1,51 @@
+"""Select input orders by untested distinct-action triples, never output labels."""
+import ast
+import hashlib
+import itertools
+import json
+import random
+from pathlib import Path
+
+root=Path.cwd();source=Path('/home/chaehj02/witness-verified-source-20261120-b77eceb3')
+# This planner runs on Windows; use the same verified Git-archive source here.
+manifest=json.loads((root/'runtime/extra-until0800-latest-source-20261120.json').read_text(encoding='utf-8'))
+source=Path(manifest['path'])
+path=source/'scripts/run_witness_safety_sequence.py';raw=path.read_bytes()
+assert hashlib.sha256(raw).hexdigest()==manifest['files']['scripts/run_witness_safety_sequence.py']
+tree=ast.parse(raw.decode('utf-8'))
+actions=next(ast.literal_eval(n.value) for n in tree.body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='ACTIONS' for t in n.targets))
+assert len(actions)==9 and len(set(actions))==9
+universe=set(itertools.permutations(actions,3));assert len(universe)==504
+
+def plan(seed):
+    rng=random.Random(seed);sequence=[];covered=set()
+    for _ in range(32):
+        order=list(actions);rng.shuffle(order)
+        sequence.extend(order)
+        covered.update(tuple(order[i:i+3]) for i in range(7))
+        # The real protocol consumes exactly one randint per round's append.
+        rng.randint(1,3)
+    return sequence,covered
+
+baseline_sequence,covered=plan(20261121)
+initial=len(covered)
+prefix_checks=[]
+for surface in ['linux','windows']:
+    path=root/f'runtime/until0800-{surface}-timed-b77-seed21-20261120-sequence/trace.jsonl'
+    data=path.read_bytes();lines=data.splitlines()
+    if not data.endswith(b'\n'):lines=lines[:-1]
+    observed=[json.loads(line)['action'] for line in lines]
+    assert observed==baseline_sequence[:len(observed)]
+    prefix_checks.append({'surface':surface,'executed_steps_at_selection':len(observed),'matches_planned_prefix':True,'trace_snapshot_sha256':hashlib.sha256(data).hexdigest()})
+candidates={seed:plan(seed) for seed in range(2048)}
+selected=[]
+for _ in range(10):
+    if covered==universe:break
+    seed=max(candidates,key=lambda s:(len(candidates[s][1]-covered),-s))
+    sequence,new=candidates.pop(seed);gain=new-covered
+    assert gain
+    covered.update(new)
+    selected.append({'seed':seed,'rounds':32,'requested_steps':288,'new_planned_distinct_triples':len(gain),'planned_total_distinct_triples':len(covered),'action_order_sha256':hashlib.sha256(json.dumps(sequence).encode()).hexdigest()})
+result={'schema':'witness-input-order-coverage-plan-1','source_commit':manifest['source_commit'],'script_sha256':manifest['files']['scripts/run_witness_safety_sequence.py'],'candidate_seeds':2048,'baseline_seed':20261121,'baseline_requested_steps':288,'baseline_planned_distinct_triples':initial,'executed_prefix_checks':prefix_checks,'distinct_input_action_triple_universe':504,'selected':selected,'planned_distinct_triples_after_selection':len(covered),'all_planned_not_executed':True,'not_code_branch_coverage':True,'not_detection_evaluation':True,'paid_api_calls':0}
+(root/'runtime/witness-order-coverage-plan-20261120.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({'planned_baseline_triples':initial,'selected_seeds':[s['seed'] for s in selected],'planned_total':len(covered),'executed_prefixes_match':True,'not_execution_result':True}))

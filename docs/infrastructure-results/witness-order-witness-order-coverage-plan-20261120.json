@@ -1,0 +1,79 @@
+{
+  "schema": "witness-input-order-coverage-plan-1",
+  "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "script_sha256": "592d2870ad69ce55cc196ebaba0e80cf8d5fe489789456ef7ccf5f7b1c044222",
+  "candidate_seeds": 2048,
+  "baseline_seed": 20261121,
+  "baseline_requested_steps": 288,
+  "baseline_planned_distinct_triples": 175,
+  "executed_prefix_checks": [
+    {
+      "surface": "linux",
+      "executed_steps_at_selection": 41,
+      "matches_planned_prefix": true,
+      "trace_snapshot_sha256": "5eb90301403e7d151ebdfacf0d9fb0260da5ace2203dc270fb0dc3c6b4b85b00"
+    },
+    {
+      "surface": "windows",
+      "executed_steps_at_selection": 33,
+      "matches_planned_prefix": true,
+      "trace_snapshot_sha256": "5eb2778ace7bee05f0d957fae4c7ad6293c340f3ac730acf93d97fa93064aaf2"
+    }
+  ],
+  "distinct_input_action_triple_universe": 504,
+  "selected": [
+    {
+      "seed": 38,
+      "rounds": 32,
+      "requested_steps": 288,
+      "new_planned_distinct_triples": 140,
+      "planned_total_distinct_triples": 315,
+      "action_order_sha256": "4c185f3deefe911492666282f7894b078ab381dee17450a72880b5aa4367f76d"
+    },
+    {
+      "seed": 44,
+      "rounds": 32,
+      "requested_steps": 288,
+      "new_planned_distinct_triples": 90,
+      "planned_total_distinct_triples": 405,
+      "action_order_sha256": "d8e53a3e6893c0021b3e171424d5afb9f314d91abb4b23ed5b2964af0969ab23"
+    },
+    {
+      "seed": 431,
+      "rounds": 32,
+      "requested_steps": 288,
+      "new_planned_distinct_triples": 49,
+      "planned_total_distinct_triples": 454,
+      "action_order_sha256": "392986d2f3290c1708c05cb40c86f0ac898cc6b7d7029743581851ef933da4d6"
+    },
+    {
+      "seed": 906,
+      "rounds": 32,
+      "requested_steps": 288,
+      "new_planned_distinct_triples": 31,
+      "planned_total_distinct_triples": 485,
+      "action_order_sha256": "fc20dab0f29004d88f5addfa612562bfc175743c35b93023b98e10c9db8aa410"
+    },
+    {
+      "seed": 1855,
+      "rounds": 32,
+      "requested_steps": 288,
+      "new_planned_distinct_triples": 14,
+      "planned_total_distinct_triples": 499,
+      "action_order_sha256": "a3ce50f9586cb87f2f50e7e5d7d0bb2e7ab7c2432ee1eb36759b6168c30ccada"
+    },
+    {
+      "seed": 121,
+      "rounds": 32,
+      "requested_steps": 288,
+      "new_planned_distinct_triples": 5,
+      "planned_total_distinct_triples": 504,
+      "action_order_sha256": "0a311b0113d722e3bc6f51998a8d9b1663d2cf1398e1daf668aa12ca30a8d59d"
+    }
+  ],
+  "planned_distinct_triples_after_selection": 504,
+  "all_planned_not_executed": true,
+  "not_code_branch_coverage": true,
+  "not_detection_evaluation": true,
+  "paid_api_calls": 0
+}
