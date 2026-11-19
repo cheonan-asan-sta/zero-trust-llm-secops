@@ -49,3 +49,9 @@
 원본·실행기 원문(.py.txt)·소스별 SHA256: [검증 명세](infrastructure-results/extra-witness-boundary-acceptance-20261120.json). 진행 중 전체 목표는 [목표 현황](extra-until-0800-20261120.md), 실제 용량 시험은 [용량 상태](extra-witness-capacity-20261120.md)를 참고한다. 초기 실패/중단 원본을 보존했고 결과 수를 유리하게 합산하지 않았다.
 
 유료 API·AWS·Docker 생성·업로드·CI·병합은 없다. 기존 LLM 개발360건 F1 93.41%는 그대로 목표 미달이다. 이번 시험은 탐지 성능이나 실제 기업SSO·독립 저장소·무기한 운영을 증명하지 않는다.
+
+## 대용량 fixture의 실제 자원 제한 추가 확인
+
+같은b77/추적2241개 파일의 대용량4096 서명 control fixture를 별도 비루트 transient systemd unit에서 다시 실행했다. MemoryMax256MiB·CPUQuota50%·TasksMax8을 실제 자기 cgroup 값으로 확인했고, 8개 검증 조건이 통과했다. 최대 메모리140,496,896bytes(약134MiB), memory limit hit0·OOM kill0·CPU throttled period296이었다. 시스템 전체 메모리 수치를 가져온 것이 아니다. 이 단일 fixture의 결과를 모든 최대 입력의 메모리 상한이나 처리량 보증으로 해석하지 않는다.
+
+기존 계정chaehj02를 사용했으며 새 계정이나/etc 설정을 만들지 않았다. NoNewPrivileges·빈 capability·private network도 사용했지만 전체 운영 sandbox 템플릿을 재현한 시험은 아니므로 그 인수와 구분한다. 앞의 preload4094개+실제 관측 경계 방식 그대로이며 실제 collector4096회로 바꾸어 설명하지 않는다. 원본 harness의 service_memory_limit_verified:false 표기는 최초 도구의 범위를 나타내므로 편집하지 않았고, 별도 cgroup-resources/resource-acceptance 원본에서 추가 확인을 연결했다. 비공개 fixture·소유 transient unit/임시 트리 정리와 제품 소스 불변을 확인했다.

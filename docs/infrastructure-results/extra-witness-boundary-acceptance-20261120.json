@@ -241,6 +241,42 @@
     {
       "path": "docs/infrastructure-results/witness-boundary-harness-run_persistent_witness_loss_20261120.py.txt",
       "sha256": "8d5368d72376988d598f25bca0337ec95ff221cb2a0b957ce277fa03758a4bbc"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-cgroup-linux-20261120/cgroup-resources.json",
+      "sha256": "83fa592585dc71d0c51f66903cac9dd964dc37679feaa957f9968204656d266a"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-cgroup-linux-20261120/keyless-proof.json",
+      "sha256": "7a867f54f28cc6f87b6ed96dd062534daf1f5e2ce64ea40017d8347ee60af1d8"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-cgroup-linux-20261120/ownership.json",
+      "sha256": "535ac4dd4db6c6a3c68efc83aeb2cc913925d3cf6ab890321deb7c61f937ab4f"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-cgroup-linux-20261120/progress.json",
+      "sha256": "6a2f7cfe843af961d6c599da160b33b160a1be8e2524aeaeeeb1ef600fd1dc34"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-cgroup-linux-20261120/resource-acceptance.json",
+      "sha256": "2009e06342daee052a964ba1be71599f3ea36c3ddcab15797c758485aa520659"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-cgroup-linux-20261120/result.json",
+      "sha256": "fc21aba22b63e5617f4ba17800cb4ffe047d439a721632ab3b5d9c30fadcf0ee"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-cgroup-linux-20261120/stderr.log",
+      "sha256": "941bdc385450f18a97eb7e18b3d0b4db6ae5f0c733e80a7a2906a2897da66ad1"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-cgroup-linux-20261120/stdout.log",
+      "sha256": "906f43dc0bdb831b4297ec943a4c263ae07f77443bb56492b13146c6d8b7b847"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-run_large_witness_cgroup_20261120.py.txt",
+      "sha256": "01082bf1d570dbdfc492a450d12020566c45f3dfe9e4458ebd56dce9a8c8b641"
     }
   ],
   "real_default_cadence": {
@@ -283,5 +319,40 @@
     "source_bytes_unchanged": true,
     "private_fixture_removed": true,
     "paid_api_calls": 0
+  },
+  "large_resource_envelope": {
+    "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+    "fixture_checks": 8,
+    "resources": {
+      "before": {
+        "cpu_usage_nsec": 36364000,
+        "cpu_source": "cgroup2_cpu_stat",
+        "memory_peak_bytes": 6770688,
+        "memory_source": "cgroup1_memory_peak",
+        "memory_limit_bytes": 268435456,
+        "cpu_quota_percent": 50.0,
+        "throttled_periods": 0,
+        "memory_limit_hits": 0,
+        "memory_oom_kills": 0,
+        "tasks_limit": 8
+      },
+      "after": {
+        "cpu_usage_nsec": 14835563000,
+        "cpu_source": "cgroup2_cpu_stat",
+        "memory_peak_bytes": 140496896,
+        "memory_source": "cgroup1_memory_peak",
+        "memory_limit_bytes": 268435456,
+        "cpu_quota_percent": 50.0,
+        "throttled_periods": 296,
+        "memory_limit_hits": 0,
+        "memory_oom_kills": 0,
+        "tasks_limit": 8
+      },
+      "harness_exit_code": 0
+    },
+    "source_bytes_unchanged": true,
+    "production_sandbox_tested": false,
+    "owned_unit_inactive": true,
+    "owned_temporary_tree_removed": true
   }
 }
