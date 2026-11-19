@@ -1,5 +1,7 @@
 # 검증된 감사 기록의 tenant별 페이지 조회
 
+> 후속: 자체 대시보드의 API 소비와 같은 snapshot의 이전 페이지 재조회용 `page_cursor`를 [대시보드 페이지 후속](extra-dashboard-paging-20261119.md)에 구현했다. 아래의 UI 미완료 표현과 시험 수치는 초기 API 구현 시점 기록이다.
+
 2026-11-19 · extra · 무료 로컬 개발. 유료 API/AWS/push/CI/병합은 하지 않았다.
 
 ## 새 API

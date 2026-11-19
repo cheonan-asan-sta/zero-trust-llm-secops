@@ -1,4 +1,4 @@
-> 2026-11-19 extra 후속: [대시보드 검토의 조회 버전·호출 신원 연결](docs/extra-dashboard-review-20261119.md), [운영자 검토 CLI·HTTPS/mTLS](docs/extra-operator-review-client-20261119.md). 로컬 구현·검증이며 main/aitest 미병합. legacy workbench·기업 SSO·독립 성능 목표 완료와 구분한다.
+> 2026-11-19 extra 후속: [감사 페이지·동일 조회 기준의 다음/이전·저장 전 신원 확인](docs/extra-dashboard-paging-20261119.md), [대시보드 검토의 조회 버전·신원 연결](docs/extra-dashboard-review-20261119.md), [검토 CLI·HTTPS/mTLS](docs/extra-operator-review-client-20261119.md). 로컬 구현·검증이며 main/aitest 미병합. legacy workbench·기업 SSO·독립 성능 목표 완료와 구분한다.
 
 # zero-trust-llm-secops
 

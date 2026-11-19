@@ -1,0 +1,349 @@
+{
+  "schema": "extra-dashboard-paging-1",
+  "date_kst": "2026-11-19",
+  "branch": "extra",
+  "application_commit": "57b15905a92f69d20d517700e939bb6856e59fae",
+  "browser_fixture_commit": "72610d0d2ee3f97a4d4c0ebcb37a396a52302036",
+  "app_and_pytest_sources_unchanged_after_application_commit": true,
+  "pytest": {
+    "windows": {
+      "tests": 258,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 25,
+      "passed": 233,
+      "time_seconds": 103.937,
+      "artifact": "docs/infrastructure-results/dashboard-paging-final-windows-20261119.xml",
+      "sha256": "a7bd35ea851a71ad0785dfbceea83bbb17081ab3edbf02bad8cee89ca2064a28",
+      "excluded": [
+        {
+          "case": "test_jsonl_own_view_change_requires_explicit_restart[sqlite-append]",
+          "reason": "SQLite prefix stability has a separate test"
+        },
+        {
+          "case": "test_jsonl_own_view_change_requires_explicit_restart[sqlite-review]",
+          "reason": "SQLite prefix stability has a separate test"
+        },
+        {
+          "case": "test_snapshot_symlink_and_fifo_are_rejected_without_read",
+          "reason": "POSIX symlink/FIFO file contract"
+        },
+        {
+          "case": "test_real_operator_cli_reads_then_reviews_once_and_refuses_replay",
+          "reason": "Owned native Linux worker fixture"
+        },
+        {
+          "case": "test_actual_http_review_version_survives_concurrent_writers_and_worker_loss",
+          "reason": "Owned Linux native worker fixture"
+        },
+        {
+          "case": "test_dashboard_command_contracts_keep_explicit_live_boundary[runtime-status-scripts.execution_mtls_runtime-status]",
+          "reason": "POSIX job commands"
+        },
+        {
+          "case": "test_dashboard_command_contracts_keep_explicit_live_boundary[runtime-up-scripts.execution_mtls_runtime-up]",
+          "reason": "POSIX job commands"
+        },
+        {
+          "case": "test_dashboard_command_contracts_keep_explicit_live_boundary[runtime-down-scripts.execution_mtls_runtime-down]",
+          "reason": "POSIX job commands"
+        },
+        {
+          "case": "test_dashboard_command_contracts_keep_explicit_live_boundary[runtime-recover-scripts.execution_mtls_runtime-recover]",
+          "reason": "POSIX job commands"
+        },
+        {
+          "case": "test_dashboard_command_contracts_keep_explicit_live_boundary[runtime-verify-scripts.test_execution_mtls_runtime-None]",
+          "reason": "POSIX job commands"
+        },
+        {
+          "case": "test_dashboard_command_contracts_keep_explicit_live_boundary[m6-mock-scripts.evaluate_m6-None]",
+          "reason": "POSIX job commands"
+        },
+        {
+          "case": "test_dashboard_command_contracts_keep_explicit_live_boundary[m6-plan-scripts.evaluate_m6-None]",
+          "reason": "POSIX job commands"
+        },
+        {
+          "case": "test_dashboard_command_contracts_keep_explicit_live_boundary[m6-live-scripts.evaluate_m6-None]",
+          "reason": "POSIX job commands"
+        },
+        {
+          "case": "test_host_jobs_require_server_bound_admin_and_deduplicate[viewer-403]",
+          "reason": "POSIX host jobs"
+        },
+        {
+          "case": "test_host_jobs_require_server_bound_admin_and_deduplicate[responder-403]",
+          "reason": "POSIX host jobs"
+        },
+        {
+          "case": "test_host_jobs_require_server_bound_admin_and_deduplicate[admin-202]",
+          "reason": "POSIX host jobs"
+        },
+        {
+          "case": "test_disabled_host_control_and_live_budget_are_not_browser_overrides",
+          "reason": "POSIX host jobs"
+        },
+        {
+          "case": "test_pending_conflicts_restart_and_tenant_isolation",
+          "reason": "Host jobs require POSIX ownership and process locks"
+        },
+        {
+          "case": "test_real_mock_worker_survives_store_restart_and_does_not_reexecute",
+          "reason": "Host jobs require POSIX ownership and process locks"
+        },
+        {
+          "case": "test_worker_child_retains_exclusive_lock_after_parent_disappears",
+          "reason": "Host jobs require POSIX ownership and process locks"
+        },
+        {
+          "case": "test_launch_failure_and_process_error_are_not_success",
+          "reason": "Host jobs require POSIX ownership and process locks"
+        },
+        {
+          "case": "test_private_store_rejects_foreign_directory_and_symlinks",
+          "reason": "Host jobs require POSIX ownership and process locks"
+        },
+        {
+          "case": "test_fixed_runtime_paths_and_budget_in_worker",
+          "reason": "Host jobs require POSIX ownership and process locks"
+        },
+        {
+          "case": "test_queued_restart_does_not_erase_older_history",
+          "reason": "Host jobs require POSIX ownership and process locks"
+        },
+        {
+          "case": "test_runtime_report_progress_is_redacted_without_replacing_job_state",
+          "reason": "Host jobs require POSIX ownership and process locks"
+        }
+      ]
+    },
+    "linux": {
+      "tests": 258,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 2,
+      "passed": 256,
+      "time_seconds": 138.977,
+      "artifact": "docs/infrastructure-results/dashboard-paging-final-linux-20261119.xml",
+      "sha256": "cf8c03e1d8fd92225c52b2e6571608ea196c99062bc6ccc4e28ec82395b4d59a",
+      "excluded": [
+        {
+          "case": "test_jsonl_own_view_change_requires_explicit_restart[sqlite-append]",
+          "reason": "SQLite prefix stability has a separate test"
+        },
+        {
+          "case": "test_jsonl_own_view_change_requires_explicit_restart[sqlite-review]",
+          "reason": "SQLite prefix stability has a separate test"
+        }
+      ]
+    }
+  },
+  "new_backend_cases": 7,
+  "browsers": {
+    "paging": {
+      "passed": true,
+      "checks": 38,
+      "artifact": "docs/infrastructure-results/dashboard-paging-browser-20261119.json",
+      "sha256": "e10e3ffccad7f6b728ae36c77c6aaeda066dbb1b2d517c16d9ea76a3f1e9c2a3",
+      "excluded": []
+    },
+    "review_regression": {
+      "passed": true,
+      "checks": 27,
+      "artifact": "docs/infrastructure-results/dashboard-paging-review-browser-20261119.json",
+      "sha256": "24eaa4d982c9cb184623e305ff5951e04fc59fe255931d872d807ef03be135cc",
+      "excluded": []
+    },
+    "readonly_regression": {
+      "passed": true,
+      "checks": 57,
+      "artifact": "docs/infrastructure-results/dashboard-paging-readonly-browser-20261119.json",
+      "sha256": "0a4b20902a065bdf04d07bb2eae738670888190b06f7cc85af2b425a0fa3cff4",
+      "excluded": []
+    },
+    "operations_linux": {
+      "passed": true,
+      "checks": 146,
+      "artifact": "docs/infrastructure-results/dashboard-paging-operations-linux-20261119.json",
+      "sha256": "b5f5e46de29c6d234768f6f8668c09eafeaa432d749e89446788a9a7e8678d55",
+      "excluded": []
+    }
+  },
+  "browser_data": {
+    "synthetic": true,
+    "initial_own_tenant_records": 136,
+    "initial_foreign_tenant_records": 1,
+    "additional_own_rule_analysis": 1,
+    "own_traversed_records": 137,
+    "pages": 12,
+    "maximum_rows_per_page": 12
+  },
+  "behavior": {
+    "new_current_page_cursor": true,
+    "server_filters": [
+      "risk_level",
+      "review_status"
+    ],
+    "page_local_filters": [
+      "search",
+      "analyzer"
+    ],
+    "snapshot_rebased_automatically": false,
+    "automatic_page_error_retry": false,
+    "legacy_recent_fallback": false,
+    "export_current_page_revalidated": true,
+    "export_cursor_or_credential": false,
+    "local_storage_or_session_storage": false
+  },
+  "ui_visual_inspection": {
+    "desktop": [
+      1440,
+      1080
+    ],
+    "mobile": [
+      390,
+      844
+    ],
+    "states": [
+      "verified page",
+      "expired page"
+    ],
+    "horizontal_overflow_checks_passed": true
+  },
+  "impeccable_detect": {
+    "runs": 1,
+    "files": [
+      "app/static/dashboard.js",
+      "app/static/index.html"
+    ],
+    "warnings_present": true,
+    "observed_warning_categories": [
+      "low-contrast",
+      "undersized-ui-text",
+      "em-dash-overuse"
+    ],
+    "incumbent_common_css_changed": false,
+    "full_raw_output_saved": false,
+    "not_full_accessibility_acceptance": true
+  },
+  "development_fixture_note": "An intentional held-identity browser case intermittently timed out. Final fixture waits for interception and only holds the first identity read; subsequent live checks continue. Earlier failures are not counted as passing conditions.",
+  "scope": {
+    "paid_model_calls": 0,
+    "aws_calls": 0,
+    "docker_resources_created": 0,
+    "push": false,
+    "ci": false,
+    "merge": false,
+    "new_full_repository_run": false,
+    "eight_hour_soak": false,
+    "quality_reevaluated": false,
+    "tracked_labels_predictions_modified": false,
+    "legacy_workbench_migrated": false
+  },
+  "historical_synthetic_development_360": {
+    "precision_percent": 96.45,
+    "recall_percent": 90.56,
+    "f1_percent": 93.41,
+    "false_positive_rate_percent": 3.33,
+    "unchanged": true,
+    "independent_goal_qualified": false
+  },
+  "limitations": [
+    "Free text and analyzer filters are page-local, not whole-history search.",
+    "Overview retains legacy recent100 read; not every dashboard list was migrated.",
+    "Cursor paging still verifies full audit chains; no new throughput or enterprise performance claim.",
+    "Ephemeral cursor keys do not survive worker changes; use existing pinned key settings.",
+    "Not independent witness/WORM, enterprise SSO/online revocation, multi-host/power-loss or eight-hour acceptance.",
+    "Incumbent small-text and contrast warnings remain."
+  ],
+  "sources": [
+    {
+      "path": "app/models.py",
+      "sha256": "062312bc15acff326b5364b839dbf574a83d83669e9b3574490622c457270b8f",
+      "normalized_lf_sha256": "aafe4faedc3dffce93557dbd7c7e71d619455afc821f9628f938a76f847aa062"
+    },
+    {
+      "path": "app/services/audit_paging.py",
+      "sha256": "edb3bcb33b5fde81d06692a3b9fb6f3ec2d77b694a454b58369612638b18c82b",
+      "normalized_lf_sha256": "edb3bcb33b5fde81d06692a3b9fb6f3ec2d77b694a454b58369612638b18c82b"
+    },
+    {
+      "path": "app/static/dashboard.js",
+      "sha256": "29c8c5a553343f660fb7c7174a91943d8ac9f92711270862b5c2b0f0aecfdec1",
+      "normalized_lf_sha256": "92f2c31b7607930097c9125759538254025ccab037072a9838b1959b37989613"
+    },
+    {
+      "path": "app/static/index.html",
+      "sha256": "be4d130c3255bf86fb2fcee080a9ad69caa24fb4969ec09bff211dc25c271d5b",
+      "normalized_lf_sha256": "9c1add678487afc226a32fb6f00d0dbccda05ecd4d52453f5c2015293b637472"
+    },
+    {
+      "path": "scripts/test_dashboard_paging_browser.py",
+      "sha256": "29f832c23921f46b70c5df260a63d873b37345e1370bf7d657dff83e1937a8d2",
+      "normalized_lf_sha256": "29f832c23921f46b70c5df260a63d873b37345e1370bf7d657dff83e1937a8d2"
+    },
+    {
+      "path": "scripts/test_dashboard_browser.py",
+      "sha256": "1a5e053ad4cba639c880ab51196106513134855d783885e945e88b2234e4dda8",
+      "normalized_lf_sha256": "37345554d84d2ffa4fe49673d6844d918cf451e64b704efe58695d60ec967102"
+    },
+    {
+      "path": "tests/dashboard_operations_fixture.py",
+      "sha256": "2693d54f5c2408c238cff5d2689d4a140afe2544281f49cfb102e91be073d610",
+      "normalized_lf_sha256": "7222b67259f45e9cfbad45d7850e7f345b0127d2f778466b3246c141f4a385a6"
+    },
+    {
+      "path": "tests/test_audit_paging.py",
+      "sha256": "2e841d2ed6659ddbd540414e38af24663f44a4fbeb3843a30239a8dd98b60c9f",
+      "normalized_lf_sha256": "2e841d2ed6659ddbd540414e38af24663f44a4fbeb3843a30239a8dd98b60c9f"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/dashboard-paging-final-windows-20261119.xml",
+      "sha256": "a7bd35ea851a71ad0785dfbceea83bbb17081ab3edbf02bad8cee89ca2064a28",
+      "bytes": 44107
+    },
+    {
+      "path": "docs/infrastructure-results/dashboard-paging-final-linux-20261119.xml",
+      "sha256": "cf8c03e1d8fd92225c52b2e6571608ea196c99062bc6ccc4e28ec82395b4d59a",
+      "bytes": 38807
+    },
+    {
+      "path": "docs/infrastructure-results/dashboard-paging-browser-20261119.json",
+      "sha256": "e10e3ffccad7f6b728ae36c77c6aaeda066dbb1b2d517c16d9ea76a3f1e9c2a3",
+      "bytes": 10027
+    },
+    {
+      "path": "docs/infrastructure-results/dashboard-paging-review-browser-20261119.json",
+      "sha256": "24eaa4d982c9cb184623e305ff5951e04fc59fe255931d872d807ef03be135cc",
+      "bytes": 3287
+    },
+    {
+      "path": "docs/infrastructure-results/dashboard-paging-readonly-browser-20261119.json",
+      "sha256": "0a4b20902a065bdf04d07bb2eae738670888190b06f7cc85af2b425a0fa3cff4",
+      "bytes": 5322
+    },
+    {
+      "path": "docs/infrastructure-results/dashboard-paging-operations-linux-20261119.json",
+      "sha256": "b5f5e46de29c6d234768f6f8668c09eafeaa432d749e89446788a9a7e8678d55",
+      "bytes": 15032
+    },
+    {
+      "path": "docs/infrastructure-results/dashboard-paging-audit-page-desktop-20261119.png",
+      "sha256": "cdfe2a948487f8b1f83c282c0f35f7cd6d18f3f31d41a761b94b1c40d7f665c0",
+      "bytes": 146862
+    },
+    {
+      "path": "docs/infrastructure-results/dashboard-paging-audit-page-mobile-20261119.png",
+      "sha256": "b09f882bc341942c1f92b1912ce65e47837998d55725fe29317638da3646bb22",
+      "bytes": 87689
+    },
+    {
+      "path": "docs/infrastructure-results/dashboard-paging-audit-expired-20261119.png",
+      "sha256": "8c3e619d6eca201688903bdc6ff06fa653b8c0fc34a6976251227a800b3b89e5",
+      "bytes": 88141
+    }
+  ]
+}

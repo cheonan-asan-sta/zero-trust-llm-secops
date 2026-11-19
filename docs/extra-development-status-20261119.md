@@ -10,9 +10,11 @@
 
 이후 [대시보드 조회 버전·호출 신원 연결](extra-dashboard-review-20261119.md)을 `bef9a97`에 구현했다. 상세에서 연 결과를 그대로 If-Match에 연결하고, 호출자 binding은 서버에서도 검사한다. 신규 브라우저27조건·기존 Linux 운영146조건·조회57조건, 관련 pytest Windows206통과/23제외·Linux229통과다. 확인/충돌의 desktop·mobile 화면과 원본 결과를 보존했다. 브라우저 오류 fixture 보강은 별도 `bd1cb17`이며 app/tests는 동일하다. legacy workbench의 이전과 audit cursor 소비는 남아 있고 strict 기본값은 false다.
 
+최신 후속은 [대시보드 감사 페이지 연결](extra-dashboard-paging-20261119.md)이다. `57b1590`에서 `/audit/results?limit=12`와 현재 페이지 `page_cursor`를 연결해 과거100건 밖의 필터 조회·동일 snapshot 다음/이전·저장 전 신원 재검증을 구현했다. 신규 브라우저38·기존 검토27·조회57·Linux 운영146조건, 관련 pytest Windows233통과/25제외·Linux256통과/2제외다. fixture 후속 `72610d0`은 app/tests를 바꾸지 않았다. 위 문단의 cursor 미완료는 이전 시점이며 지금은 완료했다. 자유 검색·분석기는 현재 페이지 범위이고 legacy workbench/다른 목록의 이전은 남아 있다.
+
 ## 기준과 실행 범위
 
-오전08:00 시점 app 기준은 `3165fc1`이며, 이후 대시보드/서버 검토 연결 기준은 `bef9a97`이다. 오전 당시 로컬의 `origin/main=e058bca`보다35개 commit이 앞섰다는 비교는 그 시점 기록이다. 원격을 새로 조회한 결과가 아니며 이번 작업을 push·CI·main/aitest 병합하지 않았다. 실행은 무료 로컬 Python·WSL·loopback HTTP/systemd다. AWS·유료 모델 API와 미뤄둔 실제8시간 soak는 실행하지 않았다.
+오전08:00 시점 app 기준은 `3165fc1`, 검토 연결은 `bef9a97`, 최신 감사 페이지 연결은 `57b1590`이다. 오전 당시 로컬의 `origin/main=e058bca`보다35개 commit이 앞섰다는 비교는 그 시점 기록이다. 원격을 새로 조회한 결과가 아니며 이번 작업을 push·CI·main/aitest 병합하지 않았다. 실행은 무료 로컬 Python·WSL·loopback HTTP/systemd다. AWS·유료 모델 API와 미뤄둔 실제8시간 soak는 실행하지 않았다.
 
 최신 Linux 전체 실행은 8,411통과·2실패·4제외로 종료됐다. 감사 손상 조회를 빈 목록으로 기대하던 두 테스트를 수정한 뒤 관련 Linux53건·Windows75건이 통과했다. 새 전체 실행을 모두 통과했다고 표현하지 않는다. [원본 결과와 수정 후 재검증](extra-local-validation-20261119.md)을 함께 읽는다.
 
@@ -45,7 +47,7 @@
 |---|---|
 | 전체 회귀 | 전체 실행 종료. 두 기대값 수정 후 관련 재검증 통과. 수정 후 새 전체 실행·Windows 전체 플랫폼 정리는 별도 미실행 |
 | 사람의 오래된 검토 화면 | SQLite 서버·검토 CLI·자체 대시보드의 ETag/If-Match 연결 완료. 대시보드는 신원 binding도 서버와 연결. legacy workbench/다른 client 이전은 남음. strict 기본 false 유지 |
-| 대시보드 페이지 소비 | 새 `/audit/results` API를 자체 대시보드에서 사용하도록 바꾸는 것은 아직 남음. API 구현과 UI 적용을 구분 |
+| 대시보드 전체 검색/다른 목록 | 로그 탐색의 감사 cursor 소비는 완료. 자유 검색·분석기는 현재 페이지 범위. 다른 목록/legacy workbench 이전과 전체 범위 자유 검색 설계는 남음 |
 | 독립 최신성 증명 | checkpoint 파일/DB/pin 전체를 함께 되돌릴 수 있는 관리자에 대한 독립 witness/WORM 미완료. 최소 history 검증을 전체 최신성 보장으로 표현하지 않음 |
 | 실제 기업 신원 | 로컬 signed OIDC/JWKS·key 계정 철회 시험은 완료했지만 외부 기업 SSO/MFA·online token revocation은 미완료 |
 | 다른 장애 종류 | 소유 process kill/restart와 local SQLite 복구 검증은 OS 전원 단절·다중 호스트 장애·네트워크 저장소 내구성 검증을 대체하지 않음 |

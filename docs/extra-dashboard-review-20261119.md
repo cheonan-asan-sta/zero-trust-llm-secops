@@ -1,5 +1,7 @@
 # 대시보드 검토: 조회한 버전과 호출 신원 연결
 
+> 후속: 아래에서 남긴 audit cursor UI 소비는 [감사 페이지 후속 구현](extra-dashboard-paging-20261119.md)에서 완료했다. 검토 보호는 유지했으며 legacy workbench/다른 client 이전과 기업 신원·독립 성능 인수는 계속 남아 있다. 이 문서의 수치는 검토 연결 작업 시점이다.
+
 2026-11-19, 로컬 `extra` 후속. app/server 구현 기준은 `bef9a97`, 브라우저 응답 fixture 후속 보강은 `bd1cb17`이다. 두 commit 사이 app/tests는 동일하다. GitHub push·CI·main/aitest 병합·AWS·유료 모델 API 호출은 하지 않았다.
 
 ## 바뀐 동작
