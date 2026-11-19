@@ -1,0 +1,183 @@
+{
+  "schema": "owned-resource-postrun-read-only-check-1",
+  "completed": true,
+  "recorded_runs": 6,
+  "exact_owned_units_checked": 10,
+  "checks": 16,
+  "results": [
+    {
+      "recorded_run": "witness-large-cgroup-linux-20261120",
+      "recorded_paths": [
+        {
+          "path": "/var/tmp/zt-owned-large-resource-pqs2oyd0",
+          "exists_or_link": false
+        }
+      ],
+      "units": [
+        {
+          "unit": "zt-large-witness-6d058e0034d544359aedc8da1f7c840c.service",
+          "state": {
+            "LoadState": "not-found",
+            "ActiveState": "inactive",
+            "SubState": "dead"
+          },
+          "unit_files_removed": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "recorded_run": "witness-source-scale-cgroup-linux-20261120",
+      "recorded_paths": [
+        {
+          "path": "/var/tmp/zt-owned-large-resource-vqfhwzht",
+          "exists_or_link": false
+        }
+      ],
+      "units": [
+        {
+          "unit": "zt-large-witness-8f74095cec304c5a8b3b6fe80f02ad73.service",
+          "state": {
+            "LoadState": "not-found",
+            "ActiveState": "inactive",
+            "SubState": "dead"
+          },
+          "unit_files_removed": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "recorded_run": "witness-source-scale-cgroup-linux-fixed-20261120",
+      "recorded_paths": [
+        {
+          "path": "/var/tmp/zt-owned-large-resource-q1xpzyh2",
+          "exists_or_link": false
+        }
+      ],
+      "units": [
+        {
+          "unit": "zt-large-witness-9db404bd592a4192be59a8daad4d2bdc.service",
+          "state": {
+            "LoadState": "not-found",
+            "ActiveState": "inactive",
+            "SubState": "dead"
+          },
+          "unit_files_removed": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "recorded_run": "witness-combined-scale-cgroup-linux-20261120",
+      "recorded_paths": [
+        {
+          "path": "/var/tmp/zt-owned-large-resource-atnv83um",
+          "exists_or_link": false
+        }
+      ],
+      "units": [
+        {
+          "unit": "zt-large-witness-85e2a64bfc0e4752bec3ccb2e87a6988.service",
+          "state": {
+            "LoadState": "not-found",
+            "ActiveState": "inactive",
+            "SubState": "dead"
+          },
+          "unit_files_removed": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "recorded_run": "witness-combined-scale-512-cgroup-linux-20261120",
+      "recorded_paths": [
+        {
+          "path": "/var/tmp/zt-owned-large-resource-jp20frce",
+          "exists_or_link": false
+        }
+      ],
+      "units": [
+        {
+          "unit": "zt-large-witness-7e2482336830450b9e31ebd5e0faef8e.service",
+          "state": {
+            "LoadState": "not-found",
+            "ActiveState": "inactive",
+            "SubState": "dead"
+          },
+          "unit_files_removed": true,
+          "passed": true
+        }
+      ]
+    },
+    {
+      "recorded_run": "witness-resource-budget-systemd-linux-20261120",
+      "recorded_paths": [
+        {
+          "path": "/run/ztw-owned-9a201529ffd945828816783fb80f8446",
+          "exists_or_link": false
+        },
+        {
+          "path": "/run/ztw-code-resource-y1mkrt0c",
+          "exists_or_link": false
+        }
+      ],
+      "units": [
+        {
+          "unit": "ztw-9a201529ffd9-collector-probe@lab.service",
+          "state": {
+            "LoadState": "not-found",
+            "ActiveState": "inactive",
+            "SubState": "dead"
+          },
+          "unit_files_removed": true,
+          "passed": true
+        },
+        {
+          "unit": "ztw-9a201529ffd9-restore-probe@lab.service",
+          "state": {
+            "LoadState": "not-found",
+            "ActiveState": "inactive",
+            "SubState": "dead"
+          },
+          "unit_files_removed": true,
+          "passed": true
+        },
+        {
+          "unit": "ztw-9a201529ffd9-collector@lab.service",
+          "state": {
+            "LoadState": "not-found",
+            "ActiveState": "inactive",
+            "SubState": "dead"
+          },
+          "unit_files_removed": true,
+          "passed": true
+        },
+        {
+          "unit": "ztw-9a201529ffd9-restore@lab.service",
+          "state": {
+            "LoadState": "not-found",
+            "ActiveState": "inactive",
+            "SubState": "dead"
+          },
+          "unit_files_removed": true,
+          "passed": true
+        },
+        {
+          "unit": "ztw-9a201529ffd9-restore@lab.timer",
+          "state": {
+            "LoadState": "not-found",
+            "ActiveState": "inactive",
+            "SubState": "dead"
+          },
+          "unit_files_removed": true,
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "resources_created_or_deleted": false,
+  "other_units_enumerated": false,
+  "paid_api_calls": 0,
+  "retained_git_archives_and_evaluation_sources": true
+}
