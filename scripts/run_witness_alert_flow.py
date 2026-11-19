@@ -28,10 +28,12 @@ from app.models import AnalysisResult
 from app.scenarios import synthetic_events
 from app.services import audit_witness as witness
 from app.services import audit_witness_observer as observer
+from app.services import audit_witness_observer_backup as observer_backup
 from app.services.audit_transfer import canonical, require
 from app.services.policy import response_preview
 from app.services.sqlite_audit import SQLiteAuditStore
 from scripts.f1_lab import witness_observer_status as bridge
+from scripts.f1_lab import witness_restore_status as restore_bridge
 from scripts.observability_lab import receiver
 from scripts.run_collector_alert_flow import http, wait_for
 from scripts.signal_metrics_exporter import handler
@@ -135,6 +137,19 @@ def run(directory, tools_directory):
             public = root / "status.json"
             profile = {"schema": bridge.PROFILE_SCHEMA, "profile_sha256": pin,
                        "minimum_receipt": minimum, "status_file": str(public)}
+            observer.cycle(control, pin, minimum_receipt=minimum)
+            recovery_key = secrets.token_bytes(32)
+            package, reviewed = root / "control.aesgcm", root / "reviewed"
+            saved = observer_backup.backup(control, pin, minimum, package, recovery_key)
+            restored = observer_backup.restore(package, reviewed, saved["backup_sha256"],
+                                               pin, minimum, recovery_key)
+            del recovery_key
+            restore_public = root / "restore-status.json"
+            restore_profile = {"schema": restore_bridge.PROFILE_SCHEMA, "profile_sha256": pin,
+                               "minimum_receipt": minimum, "backup_sha256": saved["backup_sha256"],
+                               "restore_receipt_sha256": restored["restore_receipt_sha256"],
+                               "status_file": str(restore_public), "max_backup_age_seconds": 3600,
+                               "max_restore_age_seconds": 3600}
 
             def collect():
                 while not stop.is_set():
@@ -151,6 +166,9 @@ def run(directory, tools_directory):
                     try:
                         bridge.publish(public, bridge.inspect(control, pin, minimum,
                                                               cycle_success=success))
+                        restore_bridge.publish(restore_public, restore_bridge.inspect(
+                            package, reviewed, restore_profile
+                        ))
                     except bridge.ERRORS:
                         failures.append("status_publication_failed")
                     stop.wait(1)
@@ -158,11 +176,12 @@ def run(directory, tools_directory):
             worker = threading.Thread(target=collect, daemon=True)
             worker.start()
             threads.append(worker)
-            wait_for(lambda: public.exists())
+            wait_for(lambda: public.exists() and restore_public.exists())
             upstream = serve(Inbox)
             sink = serve(receiver(notify))
             url = f"http://127.0.0.1:{upstream}/zero-trust/signals/inbox"
-            exporter = serve(handler(url, "local-fixture", scrape, witness_profile=profile))
+            exporter = serve(handler(url, "local-fixture", scrape, witness_profile=profile,
+                                     witness_restore_profile=restore_profile))
             legacy = serve(handler(url, "local-fixture", scrape))
             prom_port, am_port = free_port(), free_port()
             for name, token in (("scrape.secret", scrape), ("notify.secret", notify)):
@@ -216,6 +235,8 @@ def run(directory, tools_directory):
             check("exporter_receiver_authentication", http(f"http://127.0.0.1:{exporter}/metrics")[0]
                   == http(f"http://127.0.0.1:{sink}/events")[0] == 401)
             check("legacy_opt_out", not query('secops_witness_bridge_enabled{job="zt-signals-legacy"}'))
+            check("legacy_restore_opt_out", not query('secops_witness_restore_bridge_enabled{job="zt-signals-legacy"}'))
+            wait_for(lambda: query('secops_witness_restore_status_success{job="zt-signals"} == 1'))
             check("healthy_baseline", not query('ALERTS{alertname=~"C01Witness.*",alertstate="firing"}'))
             episodes = []
 
@@ -267,6 +288,21 @@ def run(directory, tools_directory):
                     'secops_witness_status_success{job="zt-signals"} == 0',
                     corrupt_cache, restore_cache)
             wait_for(lambda: query('secops_witness_observation_healthy{job="zt-signals"} == 1'))
+            held_package = package.read_bytes()
+
+            def corrupt_package():
+                package.write_bytes(held_package + b"fault")
+
+            def restore_package():
+                package.write_bytes(held_package)
+
+            episode("C01WitnessRestoreVerificationUnavailable",
+                    'secops_witness_restore_status_success{job="zt-signals"} == 0',
+                    corrupt_package, restore_package)
+            wait_for(lambda: query('secops_witness_restore_status_success{job="zt-signals"} == 1'))
+            check("restore_time_not_refreshed_by_monitoring",
+                  json.loads(restore_public.read_bytes())["values"]["restore_started_at"]
+                  == json.loads((reviewed / "restore.receipt.json").read_bytes())["started_at"])
             stop.set()
             worker.join(timeout=5)
             check("collector_stopped", not worker.is_alive())

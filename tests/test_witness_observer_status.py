@@ -183,7 +183,7 @@ def test_publisher_active_lease_and_unsafe_parent_fail_before_replacement(tmp_pa
 
 def test_windows_publication_rejects_before_mutation(tmp_path, monkeypatch):
     # Capability check can be tested on Linux without relabeling a POSIX run.
-    monkeypatch.setattr(bridge.os, "name", "nt")
+    monkeypatch.setattr(bridge.status_publication.os, "name", "nt")
     with pytest.raises(AuditTransferError, match="posix_required"):
         bridge.publish(str(tmp_path / "never-created.json"), {})
 

@@ -19,6 +19,12 @@ tests:
   - eval_time: 3s
     alertname: C01WitnessCollectionFailed
     exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessRestoreVerificationUnavailable
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessRestoreReviewOverdue
+    exp_alerts: []
 - name: healthy
   interval: 1s
   input_series:
@@ -43,6 +49,12 @@ tests:
   - eval_time: 3s
     alertname: C01WitnessCollectionFailed
     exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessRestoreVerificationUnavailable
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessRestoreReviewOverdue
+    exp_alerts: []
 - name: read_only_no_cycle_assertion
   interval: 1s
   input_series:
@@ -64,6 +76,12 @@ tests:
     exp_alerts: []
   - eval_time: 3s
     alertname: C01WitnessCollectionFailed
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessRestoreVerificationUnavailable
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessRestoreReviewOverdue
     exp_alerts: []
 - name: cache_missing_or_expired
   interval: 1s
@@ -90,6 +108,12 @@ tests:
     exp_alerts: []
   - eval_time: 3s
     alertname: C01WitnessCollectionFailed
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessRestoreVerificationUnavailable
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessRestoreReviewOverdue
     exp_alerts: []
 - name: stale_observation
   interval: 1s
@@ -118,6 +142,12 @@ tests:
     exp_alerts: []
   - eval_time: 3s
     alertname: C01WitnessCollectionFailed
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessRestoreVerificationUnavailable
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessRestoreReviewOverdue
     exp_alerts: []
 - name: failed_pending_cycle
   interval: 1s
@@ -153,6 +183,12 @@ tests:
         job: zt-signals
         instance: local
         severity: critical
+  - eval_time: 3s
+    alertname: C01WitnessRestoreVerificationUnavailable
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessRestoreReviewOverdue
+    exp_alerts: []
 - name: capacity_pressure
   interval: 1s
   input_series:
@@ -185,6 +221,12 @@ tests:
         state: capacity_pressure
   - eval_time: 3s
     alertname: C01WitnessCollectionFailed
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessRestoreVerificationUnavailable
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessRestoreReviewOverdue
     exp_alerts: []
 - name: capacity_exhausted
   interval: 1s
@@ -219,3 +261,63 @@ tests:
   - eval_time: 3s
     alertname: C01WitnessCollectionFailed
     exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessRestoreVerificationUnavailable
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessRestoreReviewOverdue
+    exp_alerts: []
+- name: restore_verified_recent
+  interval: 1s
+  input_series:
+  - series: secops_witness_restore_bridge_enabled{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_restore_status_success{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_restore_recent{job="zt-signals",instance="local"}
+    values: 1+0x6
+  alert_rule_test:
+  - eval_time: 3s
+    alertname: C01WitnessRestoreVerificationUnavailable
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessRestoreReviewOverdue
+    exp_alerts: []
+- name: restore_invalid
+  interval: 1s
+  input_series:
+  - series: secops_witness_restore_bridge_enabled{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_restore_status_success{job="zt-signals",instance="local"}
+    values: 0+0x6
+  alert_rule_test:
+  - eval_time: 3s
+    alertname: C01WitnessRestoreVerificationUnavailable
+    exp_alerts:
+    - exp_labels:
+        job: zt-signals
+        instance: local
+        severity: critical
+  - eval_time: 3s
+    alertname: C01WitnessRestoreReviewOverdue
+    exp_alerts: []
+- name: restore_old
+  interval: 1s
+  input_series:
+  - series: secops_witness_restore_bridge_enabled{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_restore_status_success{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_restore_recent{job="zt-signals",instance="local"}
+    values: 0+0x6
+  alert_rule_test:
+  - eval_time: 3s
+    alertname: C01WitnessRestoreVerificationUnavailable
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessRestoreReviewOverdue
+    exp_alerts:
+    - exp_labels:
+        job: zt-signals
+        instance: local
+        severity: warning
