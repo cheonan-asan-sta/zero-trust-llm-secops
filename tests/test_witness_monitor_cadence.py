@@ -4,7 +4,7 @@ import asyncio
 import copy
 import json
 import os
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from test_audit_witness import ready
@@ -92,6 +92,31 @@ def test_pending_has_a_cadence_budget_and_failed_cycles_keep_their_own_signal(tm
                             minimum_receipt=profile["minimum_receipt"], now=later)
     value = bridge.report(profile["profile_sha256"], profile["minimum_receipt"], state, now=later)
     assert "observation_action_required 1" in bridge.render_report(profile, value, now=later)
+
+
+@pytest.mark.parametrize("kind", ["legacy_pending", "new_rows"])
+def test_known_exhaustion_is_urgent_even_during_pending_or_new_row_grace(tmp_path, monkeypatch, kind):
+    monkeypatch.setattr(witness, "MAX_RECEIPTS", 2)
+    source, directory, profile, _ = collected(tmp_path)
+    state = observer.status(directory, profile["profile_sha256"], minimum_receipt=profile["minimum_receipt"])
+    assert state["remaining_receipts"] == 0
+    if kind == "legacy_pending":
+        # Exact old-version shape: preserve it as evidence, never drop or
+        # acknowledge it merely to improve the public state/alert.
+        pending = {"observation_id": "a" * 32, "predecessor": state["receipt_sha256"],
+                   "started_at": datetime.now(UTC).isoformat()}
+        raw = observer.canonical(pending).decode()
+        with observer._database(directory, write=True) as con:
+            con.execute("INSERT INTO pending VALUES (1,?,?)", (raw, observer.sha(raw.encode())))
+    else:
+        asyncio.run(source.save(initial(2)))
+    before = (directory / "observer.sqlite3").read_bytes()
+    value = bridge.inspect(directory, profile["profile_sha256"], profile["minimum_receipt"])
+    text = bridge.render_report(profile, value)
+    assert value["values"]["state"] == ("pending" if kind == "legacy_pending" else "unobserved")
+    assert "observation_healthy 0" in text and "observation_action_required 1" in text
+    assert "secops_witness_remaining_receipts 0" in text
+    assert (directory / "observer.sqlite3").read_bytes() == before
 
 
 def test_pressure_is_distinct_from_exhaustion_without_marking_the_observation_healthy(tmp_path, monkeypatch):

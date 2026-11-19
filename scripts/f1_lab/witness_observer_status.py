@@ -160,6 +160,10 @@ def render_report(profile, value, *, now=None):
             age is not None and age > data["max_age_seconds"])
     elif state == "unobserved":
         action_required = age is None or age > data["max_age_seconds"]
+    # No cadence allowance can replenish a verified exhausted signer. Keep old
+    # pending/new-row facts intact while surfacing this terminal condition now.
+    if data["remaining_receipts"] == 0:
+        action_required = True
     rows += ["secops_witness_status_success 1",
              f'secops_witness_observation_healthy {int(state == "healthy")}',
              f"secops_witness_observation_action_required {int(action_required)}",
