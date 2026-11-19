@@ -72,3 +72,5 @@ docs/infrastructure-results/extra-full-ruff-*.json -text whitespace=cr-at-eol
 docs/infrastructure-results/extra-platform-admission-*.xml -text whitespace=-blank-at-eol,cr-at-eol
 docs/infrastructure-results/extra-platform-admission-*.json -text whitespace=cr-at-eol
 docs/infrastructure-results/extra-platform-admission-*.txt -text whitespace=-blank-at-eol,cr-at-eol
+docs/infrastructure-results/witness-operations-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+docs/infrastructure-results/extra-witness-operations-baseline-*.json -text whitespace=cr-at-eol

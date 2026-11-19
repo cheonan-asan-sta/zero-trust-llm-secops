@@ -1,0 +1,57 @@
+{
+  "schema": "witness-operation-recovery-evidence-1",
+  "date": "2026-11-20",
+  "branch": "extra",
+  "implementation_commit": "5b908ad4fdcaaeb7a41998ccfad676f68f59dd74",
+  "source_sha256": {
+    "app/services/audit_witness.py": "570473e39ead2289f42d3c3d4164fee4394dd785fed9139025497773dee4e1f2",
+    "scripts/audit_witness.py": "7ff5a8e576a97990fa8d195d3ae3e992375ad2df08a9c48c5f9fb7b30c28eb12",
+    "tests/test_audit_witness_operations.py": "3a7498d307086def377763e70b6c3bd6fc8a97a5b9d524a3b5e18b9af6f6f143"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/witness-operations-linux-final-20261120.xml",
+      "sha256": "ab5533f1ecf67d225d51e4d864ccf1cf47bfa0feb2facece61eb8ce9bbe8923c",
+      "tests": 82,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-operations-windows-final-20261120.xml",
+      "sha256": "63e8a7092c3db050b9d6b73ce8ffd90c77061d6baafd8c29720347f35183694b",
+      "tests": 82,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-operations-windows-initial-20261120.xml",
+      "sha256": "55b2b7815994ff903d9b5e49c12c97cf28de5eccea2e3ae0457069f46b477177",
+      "tests": 33,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/extra-witness-operations-baseline-20261120.json",
+      "sha256": "258b897568bd763e4e9a906452adfec89ecccaf5f30c91fbae74f1a7d901926e",
+      "purpose": "Summary of frozen-output replay; raw repeated rows retained locally and original public sources remain committed"
+    }
+  ],
+  "new_operation_tests": 15,
+  "full_project_regression_run": false,
+  "same_host_local_only": true,
+  "old_manual_v1_default_preserved": true,
+  "v2_opt_in_operation_id": true,
+  "readers_require_v2_support_before_automated_use": true,
+  "detection_metrics_changed": false,
+  "paid_api_calls": 0,
+  "aws_resources_created": false,
+  "docker_resources_created": false,
+  "github_push_ci_merge": false,
+  "until_0800_goal_complete": false
+}
