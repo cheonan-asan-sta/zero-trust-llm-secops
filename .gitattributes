@@ -104,3 +104,5 @@ docs/infrastructure-results/post-full* -text whitespace=-blank-at-eol,-blank-at-
 docs/infrastructure-results/post-full*/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
 docs/infrastructure-results/until0800-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
 docs/infrastructure-results/witness-systemd*/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-capacity-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol

@@ -1,0 +1,76 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+____ test_full_signer_never_rotates_or_deletes_history_to_keep_collecting _____
+
+tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1502/test_full_signer_never_rotates0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000178978A9BE0>
+
+    def test_full_signer_never_rotates_or_deletes_history_to_keep_collecting(tmp_path, monkeypatch):
+        _source, signer, _key_pin, first, directory, pin = ready(tmp_path)
+        monkeypatch.setattr(witness, "MAX_RECEIPTS", 2)
+        cycle(directory, pin, first)
+        before = (signer / "journal.sqlite3").read_bytes()
+        assert read(directory, pin, first)["state"] == "capacity_exhausted"
+        with pytest.raises(AuditTransferError, match="capacity"):
+            cycle(directory, pin, first)
+        assert (signer / "journal.sqlite3").read_bytes() == before
+        after = read(directory, pin, first)
+>       assert after["state"] == "capacity_exhausted" and after["pending"] is None
+E       AssertionError: assert ('pending' == 'capacity_exhausted'
+E         
+E         - capacity_exhausted
+E         + pending)
+
+tests\test_audit_witness_observer.py:193: AssertionError
+___ test_lost_final_capacity_receipt_recovers_before_rejecting_further_work ___
+
+tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1502/test_lost_final_capacity_recei0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000178978AB4A0>
+
+    def test_lost_final_capacity_receipt_recovers_before_rejecting_further_work(tmp_path, monkeypatch):
+        _source, signer, _key_pin, first, directory, pin = ready(tmp_path)
+        monkeypatch.setattr(witness, "MAX_RECEIPTS", 2)
+        actual = witness.observe
+    
+        def lost(*args, **kwargs):
+            actual(*args, **kwargs)
+            raise OSError("test-owned lost final-capacity response")
+    
+        monkeypatch.setattr(witness, "observe", lost)
+        with pytest.raises(OSError, match="final-capacity"):
+            cycle(directory, pin, first)
+        before = (signer / "journal.sqlite3").read_bytes()
+        assert read(directory, pin, first)["pending"] is not None
+        monkeypatch.setattr(witness, "observe", actual)
+        result = cycle(directory, pin, first)
+        assert result["recovered"] and (signer / "journal.sqlite3").read_bytes() == before
+        assert read(directory, pin, first)["state"] == "capacity_exhausted"
+        with pytest.raises(AuditTransferError, match="capacity"):
+            cycle(directory, pin, first)
+        after = read(directory, pin, first)
+>       assert after["state"] == "capacity_exhausted" and after["pending"] is None
+E       AssertionError: assert ('pending' == 'capacity_exhausted'
+E         
+E         - capacity_exhausted
+E         + pending)
+
+tests\test_audit_witness_observer.py:217: AssertionError
+============================== warnings summary ===============================
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\chaeh\Desktop\�Ķ��б�\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\chaeh\Desktop\�Ķ��б�\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\mangum\adapter.py:65
+  C:\Users\chaeh\Desktop\�Ķ��б�\zero-trust-llm-secops\.venv\Lib\site-packages\mangum\adapter.py:65: DeprecationWarning: There is no current event loop
+    asyncio.get_event_loop()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Users\chaeh\Desktop\�Ķ��б�\tmp\extra-development-20261118\runtime\witness-capacity-pending-windows-initial-20261120.xml -
+=========================== short test summary info ===========================
+FAILED tests/test_audit_witness_observer.py::test_full_signer_never_rotates_or_deletes_history_to_keep_collecting
+FAILED tests/test_audit_witness_observer.py::test_lost_final_capacity_receipt_recovers_before_rejecting_further_work
+2 failed, 17 deselected, 3 warnings in 9.10s
