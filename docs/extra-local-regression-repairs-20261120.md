@@ -25,6 +25,6 @@ Windows의 평가 JSON 동시 저장에서 `os.replace`가 WinError5로 실패�
 | 의도적 잘못된 동기 실행 | 음성 대조군1실패로 검출, 소스 bytes 불변 |
 | 최신 전체 회귀 | 중간 고정8d2df52 소스 시험 진행 중. 이후 추가된6033은 위 묶음/실제 프로세스로 검증했으며 최신 전체 통과는 아직 주장하지 않음 |
 
-최초 공유 충돌·중간 수정의 프로세스 실패·12초 지연 재현 실패·ruff 초기 지적도 원본으로 남겼다. 영구 reader 잠금은 검증된 실패 경계이며 횟수나 대기만 무한히 늘려 숨기지 않았다. 임시 암호/운영 입력을 사용하지 않고 작성한 합성 JSON만 저장했다. source archive 입력·실행기·환경·원본XML·로그·SHA256은 [검증 명세](infrastructure-results/extra-local-regression-repairs-20261120.json)에 있다. 실패한 stress 실행은 completed:false 그대로다.
+최초 공유 충돌·중간 수정의 프로세스 실패·12초 지연 재현 실패·ruff 초기 지적도 원본으로 남겼다. 영구 reader 잠금은 검증된 실패 경계이며 횟수나 대기만 무한히 늘려 숨기지 않았다. 임시 암호/운영 입력을 사용하지 않고 작성한 합성 JSON만 저장했다. source archive 입력·실행기·환경·원본XML·로그·SHA256은 [검증 명세](infrastructure-results/extra-local-regression-repairs-20261120.json)에 있다. 실행기 원문은 재현 시 `.py`로 복사할 수 있는 `.py.txt`로 보관해 제품 소스와 구분했다. 보관 원문의 bytes는 바꾸지 않았다. 실패한 stress 실행은 completed:false 그대로다.
 
 무료·로컬·extra만 사용했으며 CI·업로드·병합은 하지 않았다. 기존 개발360건 LLM F1 93.41%는 그대로 목표 미달이다. 이 변경은 탐지 성능 개선이나 기업/독립 호스트 인수를 의미하지 않는다. 다음은 최신 소스 전체 회귀, 시간 간격 장애 시험의 종료·원본 비교·잔여 실패 확인이다.

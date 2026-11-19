@@ -367,35 +367,35 @@
       "sha256": "c1dc368a3c9944309b6e3bdcb213b6ddf1b33e8b6c2958694a7bfd8a664f13d6"
     },
     {
-      "path": "docs/infrastructure-results/post-full-harness-run_frozen_verification_20261120-v1.py",
+      "path": "docs/infrastructure-results/post-full-harness-run_frozen_verification_20261120-v1.py.txt",
       "sha256": "4b7495d0dfd821492b9c0738404b756d88daae161008e85fbe9b72348663fd4f"
     },
     {
-      "path": "docs/infrastructure-results/post-full-harness-run_frozen_verification_20261120.py",
+      "path": "docs/infrastructure-results/post-full-harness-run_frozen_verification_20261120.py.txt",
       "sha256": "f88625ea46ce67596681f4aaf67ba8245718341462cc647cacd36ef0db92fda2"
     },
     {
-      "path": "docs/infrastructure-results/post-full-harness-run_frozen_followup_20261120.py",
+      "path": "docs/infrastructure-results/post-full-harness-run_frozen_followup_20261120.py.txt",
       "sha256": "d5cb93eda63bfb3b82d957aacaac4558d59ca55f3777d82018eec4f570b565b0"
     },
     {
-      "path": "docs/infrastructure-results/post-full-harness-report_publication_stress_20261120-v1.py",
+      "path": "docs/infrastructure-results/post-full-harness-report_publication_stress_20261120-v1.py.txt",
       "sha256": "2761e9614ef7cccd2fbc402f751eb0edcedbd8a2655b1e404ee04d785e6f6cb6"
     },
     {
-      "path": "docs/infrastructure-results/post-full-harness-report_publication_stress_20261120-v2.py",
+      "path": "docs/infrastructure-results/post-full-harness-report_publication_stress_20261120-v2.py.txt",
       "sha256": "99bac4edff679f144aac438894e23271362f6fd6d9da2688f17d9ccc8434f2a9"
     },
     {
-      "path": "docs/infrastructure-results/post-full-harness-report_publication_stress_20261120.py",
+      "path": "docs/infrastructure-results/post-full-harness-report_publication_stress_20261120.py.txt",
       "sha256": "1375911253b3b3968046c671c685809c8e445df52889bfb4aae497ff425c447b"
     },
     {
-      "path": "docs/infrastructure-results/post-full-harness-async_cancellation_negative_control_20261120.py",
+      "path": "docs/infrastructure-results/post-full-harness-async_cancellation_negative_control_20261120.py.txt",
       "sha256": "fb307278256a71de9a04ff53353845a5eb45563ed2c2e25c9b96fd984365c5ab"
     },
     {
-      "path": "docs/infrastructure-results/post-full-harness-report_mutex_crash_controls_20261120.py",
+      "path": "docs/infrastructure-results/post-full-harness-report_mutex_crash_controls_20261120.py.txt",
       "sha256": "f31a628f06609336e1068f8f1b5d1e73799e2d85837b50904a368b71c8552a40"
     }
   ],
