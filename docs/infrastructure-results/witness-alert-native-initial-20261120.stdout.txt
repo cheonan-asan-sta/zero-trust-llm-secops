@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/chaehj02/extra-platform-full-20261120-8cb3c47e/scripts/run_witness_alert_flow.py", line 291, in <module>
+    main()
+  File "/home/chaehj02/extra-platform-full-20261120-8cb3c47e/scripts/run_witness_alert_flow.py", line 287, in main
+    print(json.dumps(run(args.directory, args.tools_directory), ensure_ascii=False))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/chaehj02/extra-platform-full-20261120-8cb3c47e/scripts/run_witness_alert_flow.py", line 46, in run
+    checks, processes, streams, servers, threads = [], [], [], [], [], []
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: too many values to unpack (expected 5)

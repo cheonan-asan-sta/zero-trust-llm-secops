@@ -77,3 +77,6 @@ docs/infrastructure-results/extra-witness-operations-baseline-*.json -text white
 
 docs/infrastructure-results/witness-observer-*.xml -text whitespace=-blank-at-eol,cr-at-eol
 docs/infrastructure-results/witness-observer-ruff-20261120.json -text whitespace=cr-at-eol
+
+docs/infrastructure-results/witness-monitor-* -text whitespace=-blank-at-eol,cr-at-eol
+docs/infrastructure-results/witness-alert-* -text whitespace=-blank-at-eol,cr-at-eol

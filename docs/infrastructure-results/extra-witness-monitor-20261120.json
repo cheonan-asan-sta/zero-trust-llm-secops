@@ -1,0 +1,108 @@
+{
+  "schema": "witness-monitor-evidence-1",
+  "date": "2026-11-20",
+  "implementation_commit": "beb7144bdafaa1e08483f3b3721ec3239995fc29",
+  "source_sha256": {
+    "app/services/audit_witness_observer.py": "79c2c3045a95b514e499e98a0fd9211ae03f54ac4ef1e93516c92af995f9294d",
+    "scripts/audit_witness_observer.py": "519e66f70a6c93c4f746662229f033dd58dacc308498ab4a89cc5dccbfce5171",
+    "scripts/signal_metrics_exporter.py": "0972f6f6e099c20f06aa98042d43454a70f8874e484c03a96da7bb895a223e58",
+    "scripts/f1_lab/witness_observer_status.py": "9309adc0c89052babbbff2db2c60264802b8215a6b6a58ff7bdc136edf08d050",
+    "scripts/run_witness_alert_flow.py": "e144a6f7cf32b7588d5cf247c8e5e6c5da83b352245f464cebd11738c89cedfb",
+    "tests/test_witness_observer_status.py": "87c3a8d1bd36213452e7e80aa908ac9a6c813731cc1edb82b670a168edabe98a",
+    "infra/observability/alerts.yaml": "a05b42968cb2a15404c3dca19c0891a737ad0465253a27a86408502244d1845b",
+    "infra/observability/witness-alerts.test.yaml": "159b3f2df4dcfd1c7b8aa73fe5cd9819f5f308ad2ee27524f0cfa9cb541c55a2"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/witness-alert-native-fixed-report.json",
+      "sha256": "4dab42589b36a9e50c65f16a7a2d82d221a7954cae4cb23ddbb5952c0725ee99",
+      "purpose": "Real three-fault firing/resolved flow, fixed"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-alert-native-fixed-promtool.txt",
+      "sha256": "0b65a47784cdd4ba339109569ba22cc04f052876cf9546406f045c0a4a057d08",
+      "purpose": "Real three-fault firing/resolved flow, fixed"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-alert-native-final-report.json",
+      "sha256": "f2b7add559ce8cbafd502d7497f118816eb8356d58b187308617ec5e9302a71b",
+      "purpose": "Real three-fault firing/resolved flow, final"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-alert-native-final-promtool.txt",
+      "sha256": "0b65a47784cdd4ba339109569ba22cc04f052876cf9546406f045c0a4a057d08",
+      "purpose": "Real three-fault firing/resolved flow, final"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-alert-native-initial-20261120.stdout.txt",
+      "sha256": "8d8844eb9e057536c166109eb0777280daacebc7a8b2dcf8535de35989dcc6dc"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-alert-rules-final-20261120.txt",
+      "sha256": "8289a4919870ab5b28f5e90a86b4af3cdbd8c244516c02fca90d6e3f289a6711"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-alert-rules-initial-20261120.txt",
+      "sha256": "ab7637dd558b158a6310254b2ea351ebdfd58c9b57f06192aaa31f288b52f6e9"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-monitor-linux-final-20261120.xml",
+      "sha256": "529899656ae3fe6169790a391612cf05a2e6f4ae264a49f03bdb1a49b889e308",
+      "tests": 195,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-monitor-linux-initial-20261120.xml",
+      "sha256": "ec54efa642ab2ff34f3e6f7e55f8395b8c675f38402e166003148ccd7ac8b2c7",
+      "tests": 79,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-monitor-ruff-final-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-monitor-windows-final-20261120.xml",
+      "sha256": "c4c145b7f50cc6b30a8cb42bccf37725383fee701b18179e7b0b1f20aa7e412c",
+      "tests": 195,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 81,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-monitor-windows-fixed-20261120.xml",
+      "sha256": "fbe9b268c51de4005037679a1a37b525244fc338e999a4e194f4f0e32f10a09d",
+      "tests": 79,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 3,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-monitor-windows-initial-20261120.xml",
+      "sha256": "514564a5041b9c1a894f77aa4f70b8ed9a2058d1ae5895902aed39f7635ff8c0",
+      "tests": 79,
+      "failures": 4,
+      "errors": 0,
+      "skipped": 2,
+      "final": false
+    }
+  ],
+  "same_host_local_only": true,
+  "real_8h_soak": false,
+  "detection_metrics_changed": false,
+  "paid_api_calls": 0,
+  "github_push_ci_merge": false,
+  "until_0800_goal_complete": false,
+  "real_alert_flow_checks": 14,
+  "real_alert_episodes": 3,
+  "rule_contract_scenarios": 8,
+  "new_monitor_tests": 33
+}
