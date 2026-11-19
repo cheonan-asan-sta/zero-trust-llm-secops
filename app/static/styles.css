@@ -377,6 +377,7 @@ h1 span { color: var(--blue); }
 .history-status { margin: 14px 0 0; overflow-wrap: anywhere; }
 .history-status[data-error="true"] { color: #99351f; }
 .history-scroll-hint { display: none; }
+.history-filters input { min-height: 44px; min-width: 0; width: min(100%, 320px); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; font: inherit; font-size: 16px; color: var(--ink); }
 #workbenchAuditTable table { min-width: 820px; }
 #workbenchAuditTable th, #workbenchAuditTable td { white-space: nowrap; }
 #workbenchAuditTable td:nth-child(2) { white-space: normal; min-width: 210px; overflow-wrap: anywhere; }

@@ -1449,12 +1449,14 @@ async def paged_results(
     cursor: Annotated[str | None, Query(min_length=1, max_length=2048, pattern=r"^[A-Za-z0-9_-]+$")] = None,
     review_status: ReviewStatus | None = None,
     risk_level: RiskLevel | None = None,
+    q: Annotated[str | None, Query(max_length=256)] = None,
+    analyzer: Annotated[str | None, Query(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_.-]+$")] = None,
 ) -> AuditResultPage:
     async with _audit_query_slot():
         store = audit_store
         return await _audit_call_in_slot(
             store, audit_pager.page, principal, request,
-            store, principal.tenant_id, limit, cursor, review_status, risk_level,
+            store, principal.tenant_id, limit, cursor, review_status, risk_level, q, analyzer,
         )
 
 

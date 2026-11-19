@@ -8,9 +8,11 @@ import base64
 import hashlib
 import hmac
 import os
+import re
 import secrets
 import stat
 import time
+import unicodedata
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
@@ -58,6 +60,8 @@ class _Cursor(StrictModel):
     tenant: str = Field(pattern=r"^[a-zA-Z0-9._-]{1,64}$")
     review_status: ReviewStatus | None
     risk_level: RiskLevel | None
+    q: str | None = Field(default=None, max_length=256)
+    analyzer: str | None = Field(default=None, max_length=64, pattern=r"^[A-Za-z0-9_.-]+$")
     head_seq: int = Field(ge=0, le=100000)
     head_digest: str = Field(pattern=r"^[a-f0-9]{64}$")
     offset: int = Field(ge=0, le=100000)
@@ -87,11 +91,48 @@ def _identity(store):
     return backend, hashlib.sha256(canonical([backend, name])).hexdigest()
 
 
-def _matches(record, tenant, review_status, risk_level):
+def _search_text(value):
+    return unicodedata.normalize("NFKC", value).casefold().strip()
+
+
+def _search_scope(q, analyzer):
+    if q is not None:
+        if not isinstance(q, str) or len(q) > 256:
+            raise AuditCursorInvalid("Audit search must be at most256 characters")
+        q = _search_text(q) or None
+        if q is not None and (
+            len(q) > 256 or len(q.encode("utf-8")) > 512 or any(ord(c) < 32 for c in q)
+        ):
+            raise AuditCursorInvalid("Audit search contains unsupported characters")
+    if analyzer is not None and (
+        not isinstance(analyzer, str) or re.fullmatch(r"[A-Za-z0-9_.-]{1,64}", analyzer) is None
+    ):
+        raise AuditCursorInvalid("Invalid analyzer filter")
+    return q, analyzer
+
+
+def _matches(record, tenant, review_status, risk_level, q=None, analyzer=None):
     return (
         record.tenant_id == tenant
         and (review_status is None or record.review_status == review_status)
         and (risk_level is None or record.assessment.risk_level == risk_level)
+        and (analyzer is None or record.analyzer == analyzer)
+        and (
+            q is None
+            or any(
+                q in _search_text(value)
+                for value in (
+                    record.event_id,
+                    record.analysis_id,
+                    record.actor_id or "",
+                    record.analyzer,
+                    record.assessment.rationale,
+                    *record.assessment.evidence,
+                    record.reviewer or "",
+                    record.review_note or "",
+                )
+            )
+        )
     )
 
 
@@ -299,24 +340,43 @@ class AuditPager:
         )
         return base64.urlsafe_b64encode(raw).decode().rstrip("=")
 
-    def page(self, store, tenant, limit=20, cursor=None, review_status=None, risk_level=None):
+    def page(
+        self,
+        store,
+        tenant,
+        limit=20,
+        cursor=None,
+        review_status=None,
+        risk_level=None,
+        q=None,
+        analyzer=None,
+    ):
         if type(limit) is not int or not 1 <= limit <= 100:
             raise AuditCursorInvalid("Page limit must be between1 and100")
+        q, analyzer = _search_scope(q, analyzer)
         backend, source = _identity(store)
         master = self._master()
         encryption_key, identifier_key = _keys(master)
         state = self._open(cursor, encryption_key) if cursor is not None else None
-        scope = backend, source, tenant, review_status, risk_level
+        scope = backend, source, tenant, review_status, risk_level, q, analyzer
         if (
             state
-            and (state.backend, state.source, state.tenant, state.review_status, state.risk_level)
+            and (
+                state.backend,
+                state.source,
+                state.tenant,
+                state.review_status,
+                state.risk_level,
+                state.q,
+                state.analyzer,
+            )
             != scope
         ):
             raise AuditCursorInvalid("Audit cursor scope changed")
         now = int(self._clock())
         if isinstance(store, SQLiteAuditStore):
             items, total, seq, digest = self._sqlite(
-                store, state, tenant, limit, review_status, risk_level
+                store, state, tenant, limit, review_status, risk_level, q, analyzer
             )
             mode = "sqlite_prefix"
         else:
@@ -337,7 +397,9 @@ class AuditPager:
             ).hexdigest()
             if state and state.head_digest != digest:
                 raise AuditSnapshotChanged("Audit view changed; restart from the first page")
-            matching = [r for r in records if _matches(r, tenant, review_status, risk_level)]
+            matching = [
+                r for r in records if _matches(r, tenant, review_status, risk_level, q, analyzer)
+            ]
             total, seq = len(matching), 0
             offset = state.offset if state else 0
             items = matching[offset : offset + limit]
@@ -349,6 +411,8 @@ class AuditPager:
                 tenant=tenant,
                 review_status=review_status,
                 risk_level=risk_level,
+                q=q,
+                analyzer=analyzer,
                 head_seq=seq,
                 head_digest=digest,
                 offset=0,
@@ -380,7 +444,7 @@ class AuditPager:
         )
 
     @staticmethod
-    def _sqlite(store, state, tenant, limit, review_status, risk_level):
+    def _sqlite(store, state, tenant, limit, review_status, risk_level, q=None, analyzer=None):
         with store._transaction() as con:
             head = con.execute("SELECT seq,digest FROM audit_head WHERE id=1").fetchone()
             if head is None or type(head[0]) is not int or not 0 <= head[0] <= store.MAX_ROWS:
@@ -391,7 +455,7 @@ class AuditPager:
             def observe(record, number):
                 if number > seq or record.tenant_id != tenant:
                     return
-                if _matches(record, tenant, review_status, risk_level):
+                if _matches(record, tenant, review_status, risk_level, q, analyzer):
                     selected[record.analysis_id] = (*_sort_key(record), number)
                 else:
                     selected.pop(record.analysis_id, None)

@@ -510,7 +510,7 @@ function renderHistory(results) {
   });
 }
 
-const historyScope = () => JSON.stringify([$("historyRisk").value, $("historyReview").value]);
+const historyScope = () => JSON.stringify([$("historyRisk").value, $("historyReview").value, $("historySearch").value.trim(), $("historyAnalyzer").value]);
 function historyError(error) {
   if (error.historyCaller || [401, 403].includes(error.status)) return "조회 신원 또는 권한이 변경됐습니다. 연결 및 인증을 다시 적용하세요.";
   if (error.status === 410) return "조회 기준이 만료됐습니다. 최신 목록을 다시 조회하세요.";
@@ -551,7 +551,8 @@ function checkedHistoryPage(page, index, identity) {
         !Object.hasOwn(riskLabels, row.assessment?.risk_level) || !Object.hasOwn(reviewStatusLabels, row.review_status) ||
         !row.policy_decision || !Object.hasOwn(actionLabels, row.policy_decision.action) ||
         ($("historyRisk").value && row.assessment.risk_level !== $("historyRisk").value) ||
-        ($("historyReview").value && row.review_status !== $("historyReview").value)) invalid();
+        ($("historyReview").value && row.review_status !== $("historyReview").value) ||
+        ($("historyAnalyzer").value && row.analyzer !== $("historyAnalyzer").value)) invalid();
     ids.add(row.analysis_id);
   }
   return page;
@@ -576,6 +577,8 @@ async function loadHistoryPage(index = 0, cursor = null) {
     const params = new URLSearchParams({limit: "12"});
     if ($("historyRisk").value) params.set("risk_level", $("historyRisk").value);
     if ($("historyReview").value) params.set("review_status", $("historyReview").value);
+    if ($("historySearch").value.trim()) params.set("q", $("historySearch").value.trim());
+    if ($("historyAnalyzer").value) params.set("analyzer", $("historyAnalyzer").value);
     if (cursor) params.set("cursor", cursor);
     const page = checkedHistoryPage(await request("/audit/results?" + params, options), index, before);
     if (!active()) return;
@@ -1177,6 +1180,15 @@ function bindWorkbenchControls() {
   $("analyzeButton").addEventListener("click", runAnalysis);
   $("refreshButton").addEventListener("click", refreshSummary);
   $("historyReload").addEventListener("click", () => loadHistoryPage());
+  $("historyApply").addEventListener("click", () => loadHistoryPage());
+  ["historySearch", "historyAnalyzer"].forEach((id) => $(id).addEventListener(id === "historySearch" ? "input" : "change", () => {
+    const audit = state.audit;
+    audit.controller?.abort(); clearTimeout(audit.timer); audit.generation++;
+    Object.assign(audit, {page: null, busy: false, cursors: [], identity: null, scope: null, error: null});
+    renderHistoryPage();
+    $("historyStatus").textContent = "검색 조건을 변경했습니다. 전체 기록 검색을 눌러 조회하세요.";
+  }));
+  $("historySearch").addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); loadHistoryPage(); } });
   ["historyRisk", "historyReview"].forEach((id) => $(id).addEventListener("change", () => loadHistoryPage()));
   $("historyPrevious").addEventListener("click", () => {
     const audit = state.audit;

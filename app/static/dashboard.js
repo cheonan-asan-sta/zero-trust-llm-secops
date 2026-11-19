@@ -507,7 +507,7 @@
       (!query || JSON.stringify(redact(record)).toLocaleLowerCase().includes(query)));
   }
 
-  const auditScope = () => JSON.stringify([$("riskFilter").value, $("reviewFilter").value]);
+  const auditScope = () => JSON.stringify([$("riskFilter").value, $("reviewFilter").value, $("auditQuery").value.trim(), $("auditAnalyzer").value]);
   function auditError(error) {
     if (error.status === 410) return "조회가 만료됐습니다. 최신 목록 조회를 눌러 다시 시작하세요.";
     if ([400, 409].includes(error.status)) return "이전 조회를 이어갈 수 없습니다. 최신 목록 조회를 눌러 다시 시작하세요.";
@@ -550,6 +550,8 @@
       const params = new URLSearchParams({limit: "12"});
       if ($("riskFilter").value) params.set("risk_level", $("riskFilter").value);
       if ($("reviewFilter").value) params.set("review_status", $("reviewFilter").value);
+      if ($("auditQuery").value.trim()) params.set("q", $("auditQuery").value.trim());
+      if ($("auditAnalyzer").value) params.set("analyzer", $("auditAnalyzer").value);
       if (cursor) params.set("cursor", cursor);
       const page = checked("audit", await request("/audit/results?" + params, {signal}));
       if (!active()) return false;
@@ -566,7 +568,8 @@
           new Set(page.items.map((record) => record.analysis_id)).size !== page.items.length ||
           !page.items.every((record) => record.tenant_id === before.tenant_id && typeof record.analysis_id === "string" && record.analysis_id.length > 0 &&
             (!$("riskFilter").value || record.assessment.risk_level === $("riskFilter").value) &&
-            (!$("reviewFilter").value || record.review_status === $("reviewFilter").value))) throw invalid();
+            (!$("reviewFilter").value || record.review_status === $("reviewFilter").value) &&
+            (!$("auditAnalyzer").value || record.analyzer === $("auditAnalyzer").value))) throw invalid();
       history[index] = page.page_cursor;
       if (page.next_cursor) history[index + 1] = page.next_cursor;
       audit.cursors = history.slice(0, index + (page.next_cursor ? 2 : 1));
@@ -1034,6 +1037,8 @@
   });
   window.addEventListener("hashchange", navigate);
   ["logSearch", "analyzerFilter"].forEach((id) => $(id).addEventListener(id === "logSearch" ? "input" : "change", renderLogs));
+  $("auditSearchForm").addEventListener("submit", (event) => { event.preventDefault(); loadAuditPage(); });
+  ["auditQuery", "auditAnalyzer"].forEach((id) => $(id).addEventListener(id === "auditQuery" ? "input" : "change", () => { resetAudit(); renderLogs(); }));
   ["riskFilter", "reviewFilter"].forEach((id) => $(id).addEventListener("change", () => loadAuditPage()));
   $("sessionFilter").addEventListener("change", renderSessions);
   $("prevPage").addEventListener("click", () => {
@@ -1062,6 +1067,7 @@
       page_number: audit.index + 1,
       total_matches: audit.page.total_matches,
       filters: {risk_level: $("riskFilter").value, review_status: $("reviewFilter").value,
+        q: $("auditQuery").value.trim(), analyzer: $("auditAnalyzer").value,
         page_search: $("logSearch").value, page_analyzer: $("analyzerFilter").value},
       exported_at: new Date().toISOString(),
       records: redact(filteredLogs())
