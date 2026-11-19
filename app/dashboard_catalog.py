@@ -33,7 +33,7 @@ OPERATIONS = [
     ("evaluation", "탐지 품질 보고서", "GET", "/evaluation/detection-quality", "viewer"),
     ("evaluation", "사고 품질 보고서", "GET", "/evaluation/incident-quality", "viewer"),
     ("evaluation", "탐지 벤치마크", "GET", "/evaluation/detection-benchmark", "viewer"),
-    ("cases", "사고 목록", "GET", "/cases", "viewer"),
+    ("cases", "사고 최근 목록 (호환)", "GET", "/cases", "viewer"),
     ("cases", "사고 상세", "GET", "/cases/{case_id}", "viewer"),
     ("cases", "사고 현황", "GET", "/cases/metrics", "viewer"),
     ("cases", "이벤트로 사고 등록", "POST", "/cases/from-events", "analyst"),

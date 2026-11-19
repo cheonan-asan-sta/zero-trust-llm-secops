@@ -9,6 +9,7 @@
   </title>
   <link href="/static/favicon.svg" rel="icon"/>
   <link href="/static/dashboard.css" rel="stylesheet"/>
+  <script defer="" src="/static/collection-view.js"></script>
   <script defer="" src="/static/dashboard.js">
   </script>
   <script defer="" src="/static/dashboard-operations.js"></script>
@@ -735,6 +736,15 @@
       <a class="button secondary" href="/static/workbench.html">
        워크벤치 열기
       </a>
+     </div>
+    </section>
+    <section data-view="cases" hidden="" aria-label="사고 목록">
+     <div class="card">
+      <div class="card-heading"><h2>사고 목록</h2><span>상세와 상태 변경은 현재 기록을 다시 확인합니다.</span></div>
+      <div class="table-wrap"><table aria-label="조회 시점의 사고 목록">
+       <thead><tr><th>사고</th><th>갱신</th><th>상태</th><th>담당자</th><th>버전</th><th></th></tr></thead>
+       <tbody id="caseRows"></tbody>
+      </table></div>
      </div>
     </section>
     <section id="operationsWorkspace" hidden="" aria-label="작업 공간"></section>

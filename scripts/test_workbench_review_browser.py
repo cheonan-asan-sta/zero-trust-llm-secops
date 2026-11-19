@@ -27,7 +27,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 @contextmanager
 def server(
-    directory, output, report, *, anonymous=False, caller_bound_reviews=False, audit_records=0
+    directory,
+    output,
+    report,
+    *,
+    anonymous=False,
+    caller_bound_reviews=False,
+    audit_records=0,
+    collection_records=False,
 ):
     with socket.socket() as sock:
         sock.bind(("127.0.0.1", 0))
@@ -54,6 +61,7 @@ def server(
             *(["--caller-bound-reviews"] if caller_bound_reviews else []),
             "--audit-records",
             str(audit_records),
+            *(["--collection-records"] if collection_records else []),
         ]
     with (output / ("anonymous-server.log" if anonymous else "server.log")).open(
         "w", encoding="utf-8"

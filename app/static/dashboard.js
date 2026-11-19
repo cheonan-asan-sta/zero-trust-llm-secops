@@ -68,7 +68,6 @@
     identity: "/auth/me",
     metrics: "/metrics",
     logs: "/results?limit=100",
-    sessions: "/zero-trust/sessions",
     signals: "/zero-trust/signals/status",
     inbox: "/zero-trust/signals/inbox"
   };
@@ -117,6 +116,20 @@
   };
   const badge = (value, tone = "neutral") => node("span", value, `pill ${tone}`);
   const empty = (message) => node("p", message, "empty");
+
+  const sessionView = new CollectionView({prefix: "sessionPages", label: "세션 목록", body: $("sessionRows"), columns: 7,
+    url: "/zero-trust/session-pages", id: "session_id", request,
+    context: () => ({epoch: state.epoch, identity: state.data.identity}),
+    filters: () => ({decision: $("sessionFilter").value}),
+    render: rows => { state.data.sessions = rows; renderSessions(); },
+    authorityError: () => resetConnection("none", ""),
+    validate: row => typeof row.user_id === "string" && typeof row.resource_id === "string" && Object.hasOwn(decisions, row.decision) &&
+      ["ACTIVE", "STEP_UP_REQUIRED", "HELD", "REVOKED"].includes(row.status) && ["demo", "verified_source"].includes(row.signal_trust) &&
+      Number.isSafeInteger(row.version) && row.version > 0 && (!$("sessionFilter").value || row.decision === $("sessionFilter").value)});
+  const caseView = new CollectionView({prefix: "caseDashboardPages", label: "사고 목록", body: $("caseRows"), columns: 6,
+    url: "/case-pages", id: "case_id", request, context: () => ({epoch: state.epoch, identity: state.data.identity}),
+    render: renderCaseRows, authorityError: () => resetConnection("none", ""),
+    validate: row => ["NEW", "TRIAGED", "INVESTIGATING", "CONTAINED", "RESOLVED", "CLOSED"].includes(row.status) && Number.isSafeInteger(row.version) && row.version > 0 && typeof row.updated_at === "string" && Number.isFinite(Date.parse(row.updated_at))});
 
   function errorLabel(error) {
     if (error.invalidResponse) return "서버 응답 형식이 올바르지 않습니다.";
@@ -611,8 +624,8 @@
   function renderSessions() {
     const records = state.data.sessions;
     text("metricRevoked", records ? num(records.filter((item) => item.status === "REVOKED").length) : "—");
-    text("sessionSample", records ? `/ ${records.length}건` : "");
-    text("sessionCount", records ? `최근 ${records.length}개 세션 조회` : "조회 결과 없음");
+    text("sessionSample", records ? `/ 현재 페이지 ${records.length}건` : "");
+    text("sessionCount", records ? `현재 페이지 ${records.length}개 세션 조회` : "조회 결과 없음");
     const target = $("sessionRows");
     target.replaceChildren();
     if (!records) return tableMessage(target, state.errors.sessions ? errorLabel(state.errors.sessions) : "세션을 불러오고 있습니다.", 7);
@@ -628,6 +641,19 @@
       detail.append(rowButton(record, "session"));
       row.append(decision, subject, node("td", record.resource_id, "mono"), node("td", record.signal_trust === "verified_source" ? "검증된 출처" : "합성 시연"), node("td", `v${record.version}`, "mono"), node("td", record.status, "mono"), detail);
       target.append(row);
+    });
+  }
+
+  function renderCaseRows(rows) {
+    const body = $("caseRows"); body.replaceChildren();
+    const labels = {NEW: "신규", TRIAGED: "분류 완료", INVESTIGATING: "조사 중", CONTAINED: "봉쇄 확인", RESOLVED: "해결 완료", CLOSED: "종결"};
+    rows.forEach(record => {
+      const row = node("tr"), detail = node("td"), button = node("button", "현재 상세 열기", "button secondary");
+      button.type = "button";
+      button.addEventListener("click", () => window.dashboardOperations?.open("/cases/{case_id}", "GET", {case_id: record.case_id}));
+      detail.append(button);
+      row.append(node("td", record.case_id), node("td", date(record.updated_at, true)), node("td", labels[record.status]), node("td", record.assignee || "미배정"), node("td", record.version), detail);
+      body.append(row);
     });
   }
 
@@ -862,13 +888,15 @@
             if (key === "identity" && previousIdentity && !sameReviewIdentity(previousIdentity, result)) {
               identityChanged = true;
               auditIdentityChanged();
+              sessionView.reset();
+              caseView.reset();
             }
           }
         } catch (error) {
           if (epoch === state.epoch) {
             delete state.data[key];
             state.errors[key] = error;
-            if (key === "identity") { resetAudit(); state.audit.error = error; renderLogs(); }
+            if (key === "identity") { resetAudit(); sessionView.reset(); caseView.reset(); state.audit.error = error; renderLogs(); }
           }
         }
       }));
@@ -882,6 +910,10 @@
       render();
       if (!identityChanged && state.page === "logs" && state.data.identity && !state.audit.busy &&
           (reload || (!state.audit.page && !state.audit.error))) await loadAuditPage();
+      if (!identityChanged && state.data.identity && !sessionView.busy &&
+          ((!sessionView.page && !sessionView.error) || (state.page === "sessions" && options.resetAudit !== false))) await sessionView.load();
+      if (!identityChanged && state.page === "cases" && state.data.identity && !caseView.busy &&
+          ((!caseView.page && !caseView.error) || options.resetAudit !== false)) await caseView.load();
     } finally {
       if (epoch === state.epoch) {
         state.busy = false;
@@ -912,6 +944,8 @@
     document.title = `${name} | 천안아산역`;
     window.dashboardOperations?.navigate(state.page);
     if (state.page === "logs" && state.data.identity) loadAuditPage();
+    if (state.page === "sessions" && state.data.identity) sessionView.load();
+    if (state.page === "cases" && state.data.identity) caseView.load();
     if (state.page === "evidence") {
       if (state.busy) state.refreshRequested = true;
       else refresh();
@@ -924,6 +958,8 @@
     state.credentialType = type;
     state.credential = credential;
     state.data = {};
+    sessionView.reset();
+    caseView.reset();
     state.errors = {};
     state.busy = false;
     state.refreshRequested = false;
@@ -1040,7 +1076,7 @@
   $("auditSearchForm").addEventListener("submit", (event) => { event.preventDefault(); loadAuditPage(); });
   ["auditQuery", "auditAnalyzer"].forEach((id) => $(id).addEventListener(id === "auditQuery" ? "input" : "change", () => { resetAudit(); renderLogs(); }));
   ["riskFilter", "reviewFilter"].forEach((id) => $(id).addEventListener("change", () => loadAuditPage()));
-  $("sessionFilter").addEventListener("change", renderSessions);
+  $("sessionFilter").addEventListener("change", () => sessionView.load());
   $("prevPage").addEventListener("click", () => {
     const audit = state.audit;
     if (!audit.busy && audit.page && audit.index > 0) loadAuditPage(audit.index - 1, audit.cursors[audit.index - 1]);

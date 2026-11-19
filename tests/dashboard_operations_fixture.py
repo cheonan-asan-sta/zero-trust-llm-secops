@@ -16,6 +16,7 @@ def main():
     parser.add_argument("--sqlite-audit", action="store_true")
     parser.add_argument("--caller-bound-reviews", action="store_true")
     parser.add_argument("--audit-records", type=int, default=0)
+    parser.add_argument("--collection-records", action="store_true")
     args = parser.parse_args()
     if not 0 <= args.audit_records <= 1000:
         parser.error("audit-records must be between 0 and 1000")
@@ -89,6 +90,57 @@ def main():
             await api.audit_store.save(foreign)
 
         asyncio.run(seed_audit())
+    if args.collection_records:
+        import asyncio
+        from dataclasses import replace
+        from datetime import UTC, datetime
+
+        from app import main as api
+        from app.services.cases import IncidentCaseService
+        from tests.test_incident_cases import _correlation
+        from tests.test_trusted_signals import OPERATOR, setup, signal
+        from tests.test_zero_trust_operations import evaluate, event
+
+        signed_directory = args.directory / "signed-seed"
+        signed_directory.mkdir()
+        verifier_service, private_key, _, _ = setup.__wrapped__(signed_directory)
+        operations = api.zero_trust_operations
+        operations.signal_verifier = verifier_service.signal_verifier
+        for index in range(103):
+            request = signal(
+                private_key,
+                when=datetime.now(UTC),
+                session=f"signed-page-{index:03d}",
+                event_id=f"signed-page-event-{index:03d}",
+            )
+            operations.evaluate_signed(request, OPERATOR)
+        evaluate(
+            operations,
+            e=event("foreign-page-event", when=datetime.now(UTC)),
+            session_id="foreign-page-session",
+            principal=replace(OPERATOR, tenant_id="tenant-b"),
+            now=datetime.now(UTC),
+        )
+        records, _, _ = asyncio.run(
+            IncidentCaseService(api.case_store).create_from_correlation(
+                _correlation("page-cases", "tenant-a"),
+                "tenant-a",
+                "synthetic-operator",
+                "Local page fixture",
+            )
+        )
+        for index in range(26):
+            asyncio.run(
+                api.case_store.save(records[0].model_copy(update={"case_id": f"case-{index:032x}"}))
+            )
+        asyncio.run(
+            IncidentCaseService(api.case_store).create_from_correlation(
+                _correlation("foreign-page-cases", "tenant-b"),
+                "tenant-b",
+                "synthetic-foreign",
+                "Foreign local page fixture",
+            )
+        )
     import uvicorn
 
     uvicorn.run(app, host="127.0.0.1", port=args.port, log_level="warning")

@@ -701,9 +701,9 @@ function renderOutbox(records) {
 async function refreshCases() {
   const epoch = state.epoch;
   try {
-    const [metrics, cases, outboxMetrics, outboxRecords] = await Promise.all([
+    const [metrics, , outboxMetrics, outboxRecords] = await Promise.all([
       request("/cases/metrics"),
-      request("/cases?limit=8"),
+      state.caseView.load(),
       request("/integrations/outbox/metrics"),
       request("/integrations/outbox?limit=8"),
     ]);
@@ -712,7 +712,6 @@ async function refreshCases() {
     $("caseOpen").textContent = metrics.open_case_count;
     $("caseUnassigned").textContent = metrics.unassigned_case_count;
     $("caseLatest").textContent = metrics.latest_case_id || "-";
-    renderCases(cases);
     $("outboxPending").textContent = outboxMetrics.pending_count;
     $("outboxRetry").textContent = outboxMetrics.retry_scheduled_count;
     $("outboxDelivered").textContent = outboxMetrics.delivered_count;
@@ -721,7 +720,7 @@ async function refreshCases() {
     renderOutbox(outboxRecords);
   } catch (_) {
     if (epoch !== state.epoch) return;
-    $("caseBody").innerHTML = '<tr><td colspan="6" class="table-empty">케이스를 불러오지 못했습니다.</td></tr>';
+    $("caseState").textContent = "사고 개요 또는 전송 집계를 불러오지 못했습니다. 목록 조회 결과는 별도로 확인하세요.";
     $("outboxBody").innerHTML = '<tr><td colspan="6" class="table-empty">연동 이벤트를 불러오지 못했습니다.</td></tr>';
   }
 }
@@ -1051,16 +1050,19 @@ const ztReasons = {
 
 async function refreshSignedSessions() {
   const epoch = state.epoch;
-  const button = $("ztSignedRefresh");
-  button.disabled = true;
+  const button = $("ztSignedRefresh"); button.disabled = true;
   try {
-    const [status, sessions] = await Promise.all([
-      request("/zero-trust/signals/status"), request("/zero-trust/sessions"),
-    ]);
-    $("ztSignalStatus").textContent = !status.ok ? "수집기 등록 정보를 읽을 수 없어 서명 접근을 차단합니다."
-      : status.configured ? `공개키 등록 정보 정상 · 등록 수집기 ${status.source_count}개`
-      : "서명 수집기가 설정되지 않았습니다. 로컬 수집기를 설정한 뒤 조회하세요.";
-    const rows = sessions.filter((session) => session.signal_trust === "verified_source");
+    const [status] = await Promise.all([request("/zero-trust/signals/status", {epoch}), state.signedView.load()]);
+    if (epoch !== state.epoch) return;
+    $("ztSignalStatus").textContent = !status.ok ? "수집기 등록 정보를 확인할 수 없습니다."
+      : status.configured ? `등록 수집기 ${status.source_count}개 · 아래 목록은 조회 시점의 세션 상태입니다.`
+      : "서명 수집기가 설정되지 않았습니다.";
+  } catch (_) {
+    if (epoch === state.epoch) $("ztSignalStatus").textContent = "수집기 등록 정보를 확인할 수 없습니다.";
+  } finally { if (epoch === state.epoch) button.disabled = false; }
+}
+
+function renderSignedSessions(rows) {
     const body = $("ztSignedSessions");
     body.replaceChildren();
     rows.forEach((session) => {
@@ -1078,18 +1080,10 @@ async function refreshSignedSessions() {
       const cell = document.createElement("td");
       cell.colSpan = 6;
       cell.className = "table-empty";
-      cell.textContent = "최근 100개 세션에 서명 수집기 세션이 없습니다.";
+      cell.textContent = "조건에 맞는 검증된 출처 세션이 없습니다.";
       row.append(cell);
       body.append(row);
     }
-  } catch (error) {
-    if (epoch !== state.epoch) return;
-    $("ztSignalStatus").textContent = `서명 세션 조회 실패: ${error.message}`;
-    $("ztSignedSessions").replaceChildren();
-  } finally {
-    if (epoch !== state.epoch) return;
-    button.disabled = false;
-  }
 }
 
 async function renderZt(session) {
@@ -1171,6 +1165,15 @@ async function operateZt(operation) {
 }
 
 function bindWorkbenchControls() {
+  const context = () => ({epoch: state.epoch, identity: state.identity});
+  const authorityError = () => { resetConnection("none", "", false); $("workbenchIdentity").textContent = "조회 신원 또는 권한이 변경됐습니다. 연결 및 인증을 다시 적용하세요."; };
+  state.caseView = new CollectionView({prefix: "casePages", label: "사고 목록", body: $("caseBody"), columns: 6,
+    url: "/case-pages", id: "case_id", request, context, render: renderCases, authorityError,
+    validate: row => Object.hasOwn(caseStatusLabels, row.status) && Number.isSafeInteger(row.version) && row.version > 0 && Number.isFinite(Date.parse(row.updated_at))});
+  state.signedView = new CollectionView({prefix: "signedPages", label: "검증된 출처 세션", body: $("ztSignedSessions"), columns: 6,
+    url: "/zero-trust/session-pages", id: "session_id", request, context, render: renderSignedSessions, authorityError,
+    filters: () => ({signal_trust: "verified_source"}),
+    validate: row => row.signal_trust === "verified_source" && Object.hasOwn(ztDecisions, row.decision) && Object.hasOwn(ztStatuses, row.status) && Number.isSafeInteger(row.version) && Array.isArray(row.reason_codes)});
   $("ztStart").addEventListener("click", () => operateZt("start"));
   $("ztAccess").addEventListener("click", () => operateZt("access"));
   $("ztChallenge").addEventListener("click", () => operateZt("challenge"));
@@ -1213,6 +1216,7 @@ function bindWorkbenchControls() {
   $("reviewCancel").addEventListener("click", () => { invalidateReview(); syncReviewControls(); });
 }
 function resetConnection(type, credential, reconnect = true) {
+  state.caseView?.destroy(); state.signedView?.destroy();
   state.audit.controller?.abort(); clearTimeout(state.audit.timer);
   state.audit = {page: null, index: 0, cursors: [], identity: null, scope: null, generation: 0, busy: false, error: null, controller: null, timer: null};
   state.epoch++;
