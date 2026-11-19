@@ -97,3 +97,23 @@ groups:
         for: 2s
         labels:
           severity: warning
+      - alert: C01WitnessStatusUnavailable
+        expr: secops_witness_bridge_enabled == 1 and on(job,instance) secops_witness_status_success == 0
+        for: 2s
+        labels:
+          severity: critical
+      - alert: C01WitnessObservationNotHealthy
+        expr: secops_witness_bridge_enabled == 1 and on(job,instance) secops_witness_status_success == 1 and on(job,instance) secops_witness_observation_healthy == 0
+        for: 2s
+        labels:
+          severity: critical
+      - alert: C01WitnessCapacityPressure
+        expr: secops_witness_state{state=~"capacity_pressure|capacity_exhausted"} == 1
+        for: 2s
+        labels:
+          severity: warning
+      - alert: C01WitnessCollectionFailed
+        expr: secops_witness_bridge_enabled == 1 and on(job,instance) secops_witness_status_success == 1 and on(job,instance) secops_witness_last_cycle_success == 0
+        for: 2s
+        labels:
+          severity: critical

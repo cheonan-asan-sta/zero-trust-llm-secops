@@ -1,0 +1,203 @@
+"""Opt-in cached witness monitoring. Unsigned local aggregates confer no trust.
+
+Scrapes never open the audit database or signing key. Producers retain original
+observation times; cache checks cannot refresh a stale observation. Publication
+requires POSIX ownership/locking/directory durability, not Windows lab chmod.
+"""
+
+import math
+import os
+import sqlite3
+import stat
+import tempfile
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
+
+from app.services import audit_witness as witness
+from app.services import audit_witness_observer as observer
+from app.services.audit_transfer import AuditTransferError, canonical, require
+from app.services.federated_audit import AuditQueryUnavailable
+from scripts.f1_lab.collector_status_bridge import read_public, timestamp
+
+SCHEMA = "zt-witness-observer-status-1"
+PROFILE_SCHEMA = "zt-witness-observer-metrics-profile-1"
+TTL = 30
+STATES = (
+    "healthy", "offline", "uninitialized", "pending", "stale", "unobserved",
+    "clock_regression", "witness_advanced", "capacity_pressure", "capacity_exhausted", "unavailable",
+)
+FIELDS = {
+    "state", "live_checked", "audit_minimum_verified", "observed_at", "pending_started_at",
+    "max_age_seconds", "capacity_warning", "anchor_count", "remaining_receipts", "unobserved_rows",
+}
+ERRORS = (AuditTransferError, AuditQueryUnavailable, OSError, ValueError, TypeError, sqlite3.Error)
+
+
+def validate(value, profile_sha256, minimum_receipt):
+    require(witness._hex(profile_sha256) and witness._hex(minimum_receipt), "witness_status_pins")
+    require(type(value) is dict and set(value) == {
+        "schema", "profile_sha256", "minimum_receipt", "checked_at", "values", "cycle_success",
+        "independent_storage_verified", "automatic_activation_allowed", "authorization_asserted",
+    }, "witness_status_shape")
+    require(value["schema"] == SCHEMA and value["profile_sha256"] == profile_sha256
+            and value["minimum_receipt"] == minimum_receipt
+            and all(value[k] is False for k in (
+                "independent_storage_verified", "automatic_activation_allowed", "authorization_asserted"
+            )), "witness_status_binding")
+    checked = timestamp(value["checked_at"])
+    require(value["cycle_success"] is None or type(value["cycle_success"]) is bool,
+            "witness_status_cycle")
+    data = value["values"]
+    require(type(data) is dict and (not data or set(data) == FIELDS), "witness_status_values")
+    if data:
+        require(type(data["state"]) is str and data["state"] in STATES
+                and all(type(data[k]) is bool for k in ("live_checked", "audit_minimum_verified")),
+                "witness_status_state")
+        require(type(data["max_age_seconds"]) is int and 2 <= data["max_age_seconds"] <= 86400
+                and type(data["capacity_warning"]) is int
+                and 0 <= data["capacity_warning"] <= witness.MAX_RECEIPTS
+                and type(data["anchor_count"]) is int
+                and 0 <= data["anchor_count"] <= witness.MAX_RECEIPTS,
+                "witness_status_policy")
+        for key, maximum in (("remaining_receipts", witness.MAX_RECEIPTS),
+                             ("unobserved_rows", 1_000_000)):
+            require(data[key] is None or (type(data[key]) is int and 0 <= data[key] <= maximum),
+                    "witness_status_count")
+        for key in ("observed_at", "pending_started_at"):
+            if data[key] is not None:
+                instant = observer._time(data[key])
+                require(instant <= checked or data["state"] == "clock_regression",
+                        "witness_status_future_time")
+        if data["state"] == "healthy":
+            require(data["live_checked"] and data["audit_minimum_verified"]
+                    and data["observed_at"] is not None and data["pending_started_at"] is None
+                    and data["unobserved_rows"] == 0 and data["remaining_receipts"] is not None
+                    and data["remaining_receipts"] > data["capacity_warning"]
+                    and timedelta(0) <= checked - observer._time(data["observed_at"])
+                    <= timedelta(seconds=data["max_age_seconds"]), "witness_status_false_healthy")
+    return checked
+
+
+def report(profile_sha256, minimum_receipt, state=None, *, now=None, cycle_success=None):
+    value = {
+        "schema": SCHEMA, "profile_sha256": profile_sha256, "minimum_receipt": minimum_receipt,
+        "checked_at": (datetime.now(UTC) if now is None else now).isoformat(),
+        "values": {} if state is None else {k: state.get(k) for k in FIELDS},
+        "cycle_success": cycle_success,
+        "independent_storage_verified": False, "automatic_activation_allowed": False,
+        "authorization_asserted": False,
+    }
+    validate(value, profile_sha256, minimum_receipt)
+    return value
+
+
+def inspect(directory, profile_sha256, minimum_receipt, *, cycle_success=None):
+    try:
+        state = observer.status(directory, profile_sha256, minimum_receipt=minimum_receipt)
+        return report(profile_sha256, minimum_receipt, state, cycle_success=cycle_success)
+    except ERRORS:
+        return report(profile_sha256, minimum_receipt, cycle_success=cycle_success)
+
+
+def publish(path, value):
+    # Explicit platform guard precedes unsupported calls and all mutations.
+    require(os.name == "posix" and hasattr(os, "geteuid") and hasattr(os, "O_NOFOLLOW"),
+            "witness_status_posix_required")
+    import fcntl
+
+    checked = validate(value, value["profile_sha256"], value["minimum_receipt"])
+    path = Path(path)
+    require(path.is_absolute() and not path.is_symlink(), "witness_status_output")
+    require(all(not p.is_symlink() for p in (path.parent, *path.parent.parents)),
+            "witness_status_parent_link")
+    info = path.parent.stat()
+    require(stat.S_ISDIR(info.st_mode) and info.st_uid == os.geteuid()
+            and not stat.S_IMODE(info.st_mode) & 0o022, "witness_status_parent_permissions")
+    raw = canonical(value) + b"\n"
+    require(len(raw) <= 8192, "witness_status_size")
+    lock = path.with_name("." + path.name + ".lock")
+    fd = os.open(lock, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW | os.O_NONBLOCK, 0o600)
+    with os.fdopen(fd, "rb") as lease:
+        info = os.fstat(lease.fileno())
+        require(stat.S_ISREG(info.st_mode) and info.st_nlink == 1 and info.st_uid == os.geteuid()
+                and not stat.S_IMODE(info.st_mode) & 0o077, "witness_status_lock_permissions")
+        fcntl.flock(lease.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        if path.exists():
+            require(path.stat().st_uid == os.geteuid(), "witness_status_previous_owner")
+            previous = read_public(path)
+            require(validate(previous, value["profile_sha256"], value["minimum_receipt"]) <= checked,
+                    "witness_status_publication_clock")
+        fd, temporary = tempfile.mkstemp(prefix=".witness-status-", dir=path.parent)
+        try:
+            with os.fdopen(fd, "wb") as stream:
+                stream.write(raw)
+                os.fchmod(stream.fileno(), 0o644)
+                stream.flush()
+                os.fsync(stream.fileno())
+            require(not path.is_symlink(), "witness_status_output_link")
+            os.replace(temporary, path)
+            directory = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+            try:
+                os.fsync(directory)
+            finally:
+                os.close(directory)
+        finally:
+            if os.path.exists(temporary):
+                os.unlink(temporary)
+
+
+def load_profile(path):
+    value = read_public(path)
+    require(type(value) is dict and set(value) == {
+        "schema", "profile_sha256", "minimum_receipt", "status_file"
+    } and value["schema"] == PROFILE_SCHEMA
+            and witness._hex(value["profile_sha256"]) and witness._hex(value["minimum_receipt"])
+            and isinstance(value["status_file"], str) and 0 < len(value["status_file"]) <= 4096
+            and Path(value["status_file"]).is_absolute(), "witness_metrics_profile")
+    return value
+
+
+def metrics(profile, *, now=None):
+    try:
+        value = read_public(profile["status_file"])
+    except (AuditTransferError, ValueError, OSError, TypeError, KeyError, RecursionError):
+        value = None
+    return render_report(profile, value, now=now)
+
+
+def render_report(profile, value, *, now=None):
+    """Pure validation/rendering, separate from native file-permission checks."""
+    now = datetime.now(UTC) if now is None else now
+    rows = ["# TYPE secops_witness_bridge_enabled gauge", "secops_witness_bridge_enabled 1"]
+    try:
+        checked = validate(value, profile["profile_sha256"], profile["minimum_receipt"])
+        require(timedelta(0) <= now - checked <= timedelta(seconds=TTL), "witness_status_expired")
+        require(bool(value["values"]), "witness_status_no_observation")
+    except (AuditTransferError, ValueError, OSError, TypeError, KeyError, RecursionError):
+        rows += ["secops_witness_status_success 0", "secops_witness_observation_healthy 0"]
+        return "\n".join(rows) + "\n"
+    data = value["values"]
+    state = data["state"]
+    age = None if data["observed_at"] is None else (
+        now - observer._time(data["observed_at"])).total_seconds()
+    if age is not None and age < 0:
+        state = "clock_regression"
+    elif state == "healthy" and age > data["max_age_seconds"]:
+        state = "stale"
+    rows += ["secops_witness_status_success 1",
+             f'secops_witness_observation_healthy {int(state == "healthy")}',
+             f"secops_witness_anchor_count {data['anchor_count']}"]
+    if value["cycle_success"] is not None:
+        rows.append(f'secops_witness_last_cycle_success {int(value["cycle_success"])}')
+    for name in STATES:
+        rows.append(f'secops_witness_state{{state="{name}"}} {int(state == name)}')
+    for key in ("remaining_receipts", "unobserved_rows"):
+        if data[key] is not None:
+            rows.append(f"secops_witness_{key} {data[key]}")
+    if age is not None and age >= 0 and math.isfinite(age):
+        rows.append(f"secops_witness_observation_age_seconds {age}")
+    if data["pending_started_at"] is not None:
+        pending_age = (now - observer._time(data["pending_started_at"])).total_seconds()
+        if pending_age >= 0:
+            rows.append(f"secops_witness_pending_age_seconds {pending_age}")
+    return "\n".join(rows) + "\n"

@@ -1,0 +1,221 @@
+# Controlled aggregate rule contracts; not labeled threat evaluation.
+rule_files:
+- alerts.yaml
+evaluation_interval: 1s
+tests:
+- name: opted_out
+  interval: 1s
+  input_series: []
+  alert_rule_test:
+  - eval_time: 3s
+    alertname: C01WitnessStatusUnavailable
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessObservationNotHealthy
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessCapacityPressure
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessCollectionFailed
+    exp_alerts: []
+- name: healthy
+  interval: 1s
+  input_series:
+  - series: secops_witness_bridge_enabled{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_status_success{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_observation_healthy{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_last_cycle_success{job="zt-signals",instance="local"}
+    values: 1+0x6
+  alert_rule_test:
+  - eval_time: 3s
+    alertname: C01WitnessStatusUnavailable
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessObservationNotHealthy
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessCapacityPressure
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessCollectionFailed
+    exp_alerts: []
+- name: read_only_no_cycle_assertion
+  interval: 1s
+  input_series:
+  - series: secops_witness_bridge_enabled{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_status_success{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_observation_healthy{job="zt-signals",instance="local"}
+    values: 1+0x6
+  alert_rule_test:
+  - eval_time: 3s
+    alertname: C01WitnessStatusUnavailable
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessObservationNotHealthy
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessCapacityPressure
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessCollectionFailed
+    exp_alerts: []
+- name: cache_missing_or_expired
+  interval: 1s
+  input_series:
+  - series: secops_witness_bridge_enabled{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_status_success{job="zt-signals",instance="local"}
+    values: 0+0x6
+  - series: secops_witness_observation_healthy{job="zt-signals",instance="local"}
+    values: 0+0x6
+  alert_rule_test:
+  - eval_time: 3s
+    alertname: C01WitnessStatusUnavailable
+    exp_alerts:
+    - exp_labels:
+        job: zt-signals
+        instance: local
+        severity: critical
+  - eval_time: 3s
+    alertname: C01WitnessObservationNotHealthy
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessCapacityPressure
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessCollectionFailed
+    exp_alerts: []
+- name: stale_observation
+  interval: 1s
+  input_series:
+  - series: secops_witness_bridge_enabled{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_status_success{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_observation_healthy{job="zt-signals",instance="local"}
+    values: 0+0x6
+  - series: secops_witness_state{state="stale",job="zt-signals",instance="local"}
+    values: 1+0x6
+  alert_rule_test:
+  - eval_time: 3s
+    alertname: C01WitnessStatusUnavailable
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessObservationNotHealthy
+    exp_alerts:
+    - exp_labels:
+        job: zt-signals
+        instance: local
+        severity: critical
+  - eval_time: 3s
+    alertname: C01WitnessCapacityPressure
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessCollectionFailed
+    exp_alerts: []
+- name: failed_pending_cycle
+  interval: 1s
+  input_series:
+  - series: secops_witness_bridge_enabled{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_status_success{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_observation_healthy{job="zt-signals",instance="local"}
+    values: 0+0x6
+  - series: secops_witness_last_cycle_success{job="zt-signals",instance="local"}
+    values: 0+0x6
+  - series: secops_witness_state{state="pending",job="zt-signals",instance="local"}
+    values: 1+0x6
+  alert_rule_test:
+  - eval_time: 3s
+    alertname: C01WitnessStatusUnavailable
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessObservationNotHealthy
+    exp_alerts:
+    - exp_labels:
+        job: zt-signals
+        instance: local
+        severity: critical
+  - eval_time: 3s
+    alertname: C01WitnessCapacityPressure
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessCollectionFailed
+    exp_alerts:
+    - exp_labels:
+        job: zt-signals
+        instance: local
+        severity: critical
+- name: capacity_pressure
+  interval: 1s
+  input_series:
+  - series: secops_witness_bridge_enabled{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_status_success{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_observation_healthy{job="zt-signals",instance="local"}
+    values: 0+0x6
+  - series: secops_witness_state{state="capacity_pressure",job="zt-signals",instance="local"}
+    values: 1+0x6
+  alert_rule_test:
+  - eval_time: 3s
+    alertname: C01WitnessStatusUnavailable
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessObservationNotHealthy
+    exp_alerts:
+    - exp_labels:
+        job: zt-signals
+        instance: local
+        severity: critical
+  - eval_time: 3s
+    alertname: C01WitnessCapacityPressure
+    exp_alerts:
+    - exp_labels:
+        job: zt-signals
+        instance: local
+        severity: warning
+        state: capacity_pressure
+  - eval_time: 3s
+    alertname: C01WitnessCollectionFailed
+    exp_alerts: []
+- name: capacity_exhausted
+  interval: 1s
+  input_series:
+  - series: secops_witness_bridge_enabled{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_status_success{job="zt-signals",instance="local"}
+    values: 1+0x6
+  - series: secops_witness_observation_healthy{job="zt-signals",instance="local"}
+    values: 0+0x6
+  - series: secops_witness_state{state="capacity_exhausted",job="zt-signals",instance="local"}
+    values: 1+0x6
+  alert_rule_test:
+  - eval_time: 3s
+    alertname: C01WitnessStatusUnavailable
+    exp_alerts: []
+  - eval_time: 3s
+    alertname: C01WitnessObservationNotHealthy
+    exp_alerts:
+    - exp_labels:
+        job: zt-signals
+        instance: local
+        severity: critical
+  - eval_time: 3s
+    alertname: C01WitnessCapacityPressure
+    exp_alerts:
+    - exp_labels:
+        job: zt-signals
+        instance: local
+        severity: warning
+        state: capacity_exhausted
+  - eval_time: 3s
+    alertname: C01WitnessCollectionFailed
+    exp_alerts: []

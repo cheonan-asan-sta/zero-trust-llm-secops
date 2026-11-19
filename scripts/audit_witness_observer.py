@@ -13,7 +13,7 @@ from app.services.federated_audit import AuditQueryUnavailable
 ERRORS = (AuditTransferError, AuditQueryUnavailable, OSError, ValueError, TypeError, sqlite3.Error)
 
 
-def watch(directory, profile_sha256, *, minimum_receipt, cycles=None):
+def watch(directory, profile_sha256, *, minimum_receipt, cycles=None, status_file=None):
     if cycles is not None and (type(cycles) is not int or not 1 <= cycles <= 10000):
         raise ValueError("observer watch cycles rejected")
     _directory, profile, _public = observer._load(directory, profile_sha256)
@@ -24,16 +24,25 @@ def watch(directory, profile_sha256, *, minimum_receipt, cycles=None):
             result = observer.cycle(directory, profile_sha256, minimum_receipt=minimum_receipt)
             state = observer.status(directory, profile_sha256, minimum_receipt=minimum_receipt)
             state["recovered"] = result["recovered"]
+            state["cycle_success"] = True
         except ERRORS:
             # A durable pending ID is retained. Do not replace the profile,
             # expected receipt or signing key to make the next cycle succeed.
             failures += 1
-            state = {
-                "state": "unavailable",
-                "healthy": False,
-                "independent_storage_verified": False,
-                "automatic_activation_allowed": False,
-            }
+            try:
+                state = observer.status(directory, profile_sha256, minimum_receipt=minimum_receipt)
+            except ERRORS:
+                state = {"state": "unavailable", "healthy": False,
+                         "independent_storage_verified": False, "automatic_activation_allowed": False}
+            # A successful read after a failed collection does not prove the
+            # signing capability or erase the failed cycle.
+            state["cycle_success"] = False
+        if status_file is not None:
+            from scripts.f1_lab import witness_observer_status as bridge
+
+            bridge.publish(status_file, bridge.inspect(
+                directory, profile_sha256, minimum_receipt, cycle_success=state["cycle_success"]
+            ))
         completed += 1
         print(json.dumps(state, ensure_ascii=False, allow_nan=False), flush=True)
         if cycles is None or completed < cycles:
@@ -53,7 +62,7 @@ def main():
     init.add_argument("--interval-seconds", type=int, default=60)
     init.add_argument("--max-age-seconds", type=int, default=180)
     init.add_argument("--capacity-warning", type=int, default=16)
-    for action in ("cycle", "status", "watch"):
+    for action in ("cycle", "status", "watch", "export-status"):
         command = commands.add_parser(action)
         command.add_argument("--directory", required=True)
         command.add_argument("--profile-sha256", required=True)
@@ -62,6 +71,9 @@ def main():
             command.add_argument("--offline", action="store_true")
         elif action == "watch":
             command.add_argument("--cycles", type=int)
+            command.add_argument("--status-file")
+        elif action == "export-status":
+            command.add_argument("--status-file", required=True)
     args = parser.parse_args()
     try:
         if args.action == "init":
@@ -86,15 +98,23 @@ def main():
                 minimum_receipt=args.minimum_receipt,
                 offline=args.offline,
             )
+        elif args.action == "export-status":
+            from scripts.f1_lab import witness_observer_status as bridge
+
+            value = bridge.inspect(args.directory, args.profile_sha256, args.minimum_receipt)
+            bridge.publish(args.status_file, value)
+            result = {"published": True, "healthy": value["values"].get("state") == "healthy",
+                      "automatic_activation_allowed": False, "independent_storage_verified": False}
         else:
             return watch(
                 args.directory,
                 args.profile_sha256,
                 minimum_receipt=args.minimum_receipt,
                 cycles=args.cycles,
+                status_file=args.status_file,
             )
         print(json.dumps(result, ensure_ascii=False, allow_nan=False))
-        return 0 if args.action != "status" or result["healthy"] else 1
+        return 0 if args.action not in {"status", "export-status"} or result["healthy"] else 1
     except ERRORS:
         print(
             "Local observer refused operation; pins and pending state were not reset.",
