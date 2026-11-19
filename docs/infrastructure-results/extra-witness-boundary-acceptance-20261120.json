@@ -201,6 +201,46 @@
     {
       "path": "docs/infrastructure-results/witness-boundary-extra-until0800-latest-source-linux-20261120.json",
       "sha256": "8c611a9c01e88459c58ff99483be56a963595ce8e90138f7fd789084519c4ab7"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-real-4096-report-20261120.json",
+      "sha256": "8124a73b66cf1fa82ec80864fd2c0e63c4b28ff26f6c894f4146f6d6b76ac431"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-persistent-loss-linux-20261120/after-calls.jsonl",
+      "sha256": "b56616307ca0557f155119dad16e13d03aa41bcb93c4ec4a0e842de225f9b8a2"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-persistent-loss-linux-20261120/after-recovered.log",
+      "sha256": "e08e5095cd4e110b572c8296d8660f15a9205612595d5e4f47cabcaa5a680567"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-persistent-loss-linux-20261120/after-watch.log",
+      "sha256": "c946d0b6efc6b86476b5cd95cab3ab8be821606af1eb6a6b65079054c2c7f387"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-persistent-loss-linux-20261120/before-calls.jsonl",
+      "sha256": "67017587cefcb8797d6e39e490bc8dad496bf28f658fee3eb6877caffca13d6d"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-persistent-loss-linux-20261120/before-recovered.log",
+      "sha256": "e43194aa33274df7e6d76d580864401cd12d7a5408496ba4c415f763cc9a0648"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-persistent-loss-linux-20261120/before-watch.log",
+      "sha256": "d64d36b62c3b140915b73f738091e2b4bace956374c6b0d37b8ddee7b824e6e2"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-persistent-loss-linux-20261120/result.json",
+      "sha256": "508ce179a7124f365c1363af4649f5cb0fff2981b3b52f5f62dcff0c09469c61"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-persistent-loss-linux-20261120.log",
+      "sha256": "e8c80bde2b395f6c3cc3fa23ac9cac5fe9f54212f7e7403a5c5dd021211ede5e"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-harness-run_persistent_witness_loss_20261120.py.txt",
+      "sha256": "8d5368d72376988d598f25bca0337ec95ff221cb2a0b957ce277fa03758a4bbc"
     }
   ],
   "real_default_cadence": {
@@ -222,8 +262,26 @@
     "windows": true,
     "linux": true
   },
-  "actual_sequential_4096_drill": "separate_corrected_run_in_progress",
+  "actual_sequential_4096_drill": {
+    "completed": true,
+    "source_commit": "af311242e57a064f599001f33c9095335e380e23",
+    "witness_observations": 4096,
+    "checks": 4,
+    "not_4096_collector_cycles": true
+  },
   "paid_api_calls": 0,
   "detection_metrics_changed": false,
-  "goal_status": "active_until_0800"
+  "goal_status": "active_until_0800",
+  "persistent_response_loss": {
+    "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+    "checks": 13,
+    "failed_watch_cycles_per_mode": 3,
+    "fault_modes": [
+      "before_sign",
+      "after_sign"
+    ],
+    "source_bytes_unchanged": true,
+    "private_fixture_removed": true,
+    "paid_api_calls": 0
+  }
 }

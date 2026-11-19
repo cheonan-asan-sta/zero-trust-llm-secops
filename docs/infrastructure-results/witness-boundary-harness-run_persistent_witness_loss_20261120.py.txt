@@ -1,0 +1,93 @@
+"""Three real watch failures keep one pending; unmodified CLI then recovers it."""
+import asyncio
+import json
+import hashlib
+import os
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+source=Path(sys.argv[1]).resolve();output=Path(sys.argv[2]).resolve()
+manifest=json.loads(Path(sys.argv[3]).read_text(encoding='utf-8'))
+assert os.name=='posix' and source==Path(manifest['path']).resolve()
+output.mkdir(exist_ok=False,parents=True);sys.path.insert(0,str(source))
+from app.analyzers.rule_based import RuleBasedAnalyzer
+from app.models import AnalysisResult
+from app.scenarios import synthetic_events
+from app.services import audit_witness as witness
+from app.services import audit_witness_observer as observer
+from app.services.policy import response_preview
+from app.services.sqlite_audit import SQLiteAuditStore
+from scripts.f1_lab import witness_observer_status as bridge
+
+def altered():return [n for n,h in manifest['files'].items() if hashlib.sha256((source/n).read_bytes()).hexdigest()!=h]
+assert not altered()
+started=time.monotonic()
+result={'schema':'owned-persistent-witness-response-loss-1','completed':False,'source_commit':manifest['source_commit'],'all_data_synthetic':True,'fault_injection':'in-memory child function wrapper, no source edit','paid_api_calls':0,'detection_metrics_changed':False,'independent_storage_verified':False,'automatic_activation_allowed':False,'checks':[]}
+def check(mode,name,condition):
+    assert condition,(mode,name)
+    result['checks'].append({'mode':mode,'name':name,'passed':True})
+
+worker='''import json,sys
+from pathlib import Path
+from app.services import audit_witness as witness
+from scripts.audit_witness_observer import watch
+directory,pin,minimum,public,trace,mode=sys.argv[1:]
+actual=witness.observe
+def lost(*args,**kwargs):
+ item={"observation_id":kwargs["observation_id"],"minimum_observed_at":kwargs["minimum_observed_at"]}
+ if mode=="after":
+  result=actual(*args,**kwargs)
+  item.update(receipt_sha256=result["receipt_sha256"],observed_at=result["receipt"]["body"]["observed_at"],replayed=result["replayed"])
+ with Path(trace).open("a",encoding="utf-8") as stream:stream.write(json.dumps(item)+"\\n")
+ raise OSError("test-owned persistent observation response loss")
+witness.observe=lost
+raise SystemExit(watch(directory,pin,minimum_receipt=minimum,cycles=3,status_file=public))
+'''
+env=dict(os.environ,AWS_EC2_METADATA_DISABLED='true',AWS_SHARED_CREDENTIALS_FILE=str(output/'no-cloud-credentials'),AWS_CONFIG_FILE=str(output/'no-cloud-config'),PYTHONPYCACHEPREFIX='/home/chaehj02/.cache/zt-until0800-frozen-bytecode',PYTHONPATH=str(source))
+for name in ('OPENAI_API_KEY','AZURE_OPENAI_API_KEY','ANTHROPIC_API_KEY','C01_UPSTREAM_API_KEY','AWS_ACCESS_KEY_ID','AWS_SECRET_ACCESS_KEY','AWS_SESSION_TOKEN','AWS_SECURITY_TOKEN','AWS_PROFILE','AWS_DEFAULT_PROFILE','AWS_WEB_IDENTITY_TOKEN_FILE','AWS_ROLE_ARN','AWS_ROLE_SESSION_NAME','AWS_CONTAINER_CREDENTIALS_FULL_URI','AWS_CONTAINER_CREDENTIALS_RELATIVE_URI','AWS_CONTAINER_AUTHORIZATION_TOKEN'):env.pop(name,None)
+try:
+    with tempfile.TemporaryDirectory(prefix='private-persistent-witness-loss-') as temporary:
+        root=Path(temporary)
+        for mode in ['before','after']:
+            private=root/mode;private.mkdir(mode=0o700)
+            audit=SQLiteAuditStore(private/'audit.sqlite3');signer=private/'signer';control=private/'control'
+            event=synthetic_events()[0];assessment=RuleBasedAnalyzer().assess(event)
+            asyncio.run(audit.save(AnalysisResult(event_id=event.event_id,analyzer='rule',assessment=assessment,policy_decision=response_preview(assessment,event),latency_ms=1)))
+            audit_before=audit.path.read_bytes()
+            key=witness.initialize(signer,audit.path,'persistent-'+mode)['public_key_sha256']
+            minimum=witness.observe(signer,audit.path,key,expected_receipt=witness.GENESIS)['receipt_sha256']
+            pin=observer.initialize(control,signer,audit.path,key,expected_receipt=minimum,interval_seconds=1,max_age_seconds=30,capacity_warning=0)['profile_sha256']
+            public=private/'status.json';trace=output/(mode+'-calls.jsonl')
+            before=(signer/'journal.sqlite3').read_bytes()
+            process=subprocess.run([sys.executable,'-c',worker,str(control),pin,minimum,str(public),str(trace),mode],cwd=source,env=env,capture_output=True,timeout=45)
+            (output/(mode+'-watch.log')).write_bytes(process.stdout+process.stderr)
+            states=[json.loads(line) for line in process.stdout.decode('utf-8').splitlines()]
+            calls=[json.loads(line) for line in trace.read_text(encoding='utf-8').splitlines()]
+            check(mode,'three_failed_watch_cycles_are_not_reported_as_success',process.returncode==1 and len(states)==3 and all(s['cycle_success'] is False and not s['healthy'] for s in states))
+            check(mode,'one_pending_identity_and_original_start_survive_all_attempts',len(calls)==3 and len({c['observation_id'] for c in calls})==1 and len({c['minimum_observed_at'] for c in calls})==1 and len({s['pending_started_at'] for s in states})==1 and states[0]['pending_started_at']==calls[0]['minimum_observed_at'])
+            failed_metrics=bridge.render_report({'profile_sha256':pin,'minimum_receipt':minimum},json.loads(public.read_bytes()))
+            check(mode,'failure_and_unhealthy_signals_remain_visible','secops_witness_last_cycle_success 0' in failed_metrics and 'secops_witness_observation_healthy 0' in failed_metrics)
+            signed=witness.status(signer,key,minimum_receipt=minimum)
+            held=(signer/'journal.sqlite3').read_bytes()
+            if mode=='before':
+                check(mode,'no_signature_before_source_call',held==before and signed['receipt']['body']['number']==1)
+            else:
+                check(mode,'lost_responses_reuse_one_signature_and_original_time',signed['receipt']['body']['number']==2 and [c['replayed'] for c in calls]==[False,True,True] and len({c['receipt_sha256'] for c in calls})==1 and len({c['observed_at'] for c in calls})==1)
+            recovered=subprocess.run([sys.executable,'-m','scripts.audit_witness_observer','cycle','--directory',str(control),'--profile-sha256',pin,'--minimum-receipt',minimum],cwd=source,env=env,capture_output=True,timeout=30)
+            (output/(mode+'-recovered.log')).write_bytes(recovered.stdout+recovered.stderr)
+            assert recovered.returncode==0
+            receipt=json.loads(recovered.stdout)
+            state=observer.status(control,pin,minimum_receipt=minimum)
+            check(mode,'unmodified_cli_recovers_expected_operation',receipt['recovered'] is (mode=='after') and state['anchor_count']==1 and not state['pending'] and state['healthy'])
+            if mode=='after':check(mode,'recovery_keeps_exact_committed_receipt_bytes',receipt['receipt_sha256']==calls[0]['receipt_sha256'] and (signer/'journal.sqlite3').read_bytes()==held)
+            check(mode,'source_audit_unchanged',audit.path.read_bytes()==audit_before)
+    result['private_fixture_removed']=not root.exists();result['mutated_source_files']=altered();result['source_bytes_unchanged']=not result['mutated_source_files']
+    result['completed']=result['private_fixture_removed'] and result['source_bytes_unchanged']
+finally:
+    result['elapsed_seconds']=time.monotonic()-started
+    (output/'result.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps(result))
+raise SystemExit(0 if result['completed'] else 1)
