@@ -1,3 +1,5 @@
+> 2026-11-19 extra 후속: [운영자 감사 검토 CLI·조회 버전/신원·HTTPS/mTLS 연결](docs/extra-operator-review-client-20261119.md). 로컬 구현·검증 범위이며 UI/기업 SSO·독립 성능 목표 완료와 구분한다.
+
 # zero-trust-llm-secops
 
 **2026-11-17 LLM 후속 개발:** [검증 근거 연결·전체 평가·미해결 항목](docs/llm-operation-evidence-20261117.md), [읽기 전용 근거 조회와 권고 안전 제한](docs/llm-read-only-evidence-review-20261117.md). 개발360건은 정밀도96.45%·재현율90.56%·F1 93.41%·보수 오탐률3.33%로 목표 미달이다. 작은 로컬 정책 사례의100% 결과와 구분한다. 고정47fc624 Linux7,696통과/2skip·Windows660통과/27skip·브라우저57/142검사 통과다. 실제 접근 권한은 기존 PE/PA/PEP가 판단하며 LLM 검토는 권고만 제공한다. 이번 후속 변경은 로컬 보존 상태이며 push·CI·병합·AWS 배포는 하지 않았다. 아래는 이전 시점 기록이다.

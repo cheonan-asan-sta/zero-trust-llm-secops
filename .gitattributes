@@ -13,6 +13,8 @@ docs/infrastructure-results/http-review-contract-linux-final-20261119.xml -text 
 docs/infrastructure-results/jsonl-read-contract-windows-final-20261119.xml -text whitespace=cr-at-eol
 docs/infrastructure-results/local-validation-evidence-checker-20261119.xml -text whitespace=cr-at-eol
 docs/infrastructure-results/local-validation-evidence-checker-linux-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/operator-review-client-final-windows-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/operator-review-client-final-linux-20261119.xml -text whitespace=cr-at-eol
 infra/mtls/nginx-renewal.sh text eol=lf
 infra/mtls/nginx-rekey.sh text eol=lf
 infra/runtime/** text eol=lf

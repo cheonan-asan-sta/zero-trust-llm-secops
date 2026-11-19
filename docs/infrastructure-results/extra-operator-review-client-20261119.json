@@ -1,0 +1,110 @@
+{
+  "schema": "extra-operator-review-client-1",
+  "date_kst": "2026-11-19",
+  "source_commit": "c0a810841f65e3f1b3365c0da61de93adfdbb775",
+  "branch": "extra",
+  "windows": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "3",
+    "tests": "160",
+    "time": "36.809",
+    "timestamp": "2026-11-19T11:21:31.605855+09:00",
+    "hostname": "희주",
+    "passed": 157,
+    "repository_xml": "docs/infrastructure-results/operator-review-client-final-windows-20261119.xml",
+    "raw_sha256": "1d75b6626bbd517fab5a9ba2673ccefa6a2f6b189d2e4602c4ea241af967e6c3",
+    "new_client_tests": 46,
+    "new_client_passed": 44,
+    "excluded": [
+      {
+        "classname": "tests.test_audit_review_client",
+        "name": "test_snapshot_symlink_and_fifo_are_rejected_without_read",
+        "reason": "POSIX symlink/FIFO file contract"
+      },
+      {
+        "classname": "tests.test_audit_review_client_process",
+        "name": "test_real_operator_cli_reads_then_reviews_once_and_refuses_replay",
+        "reason": "Owned native Linux worker fixture"
+      },
+      {
+        "classname": "tests.test_http_review_preconditions",
+        "name": "test_actual_http_review_version_survives_concurrent_writers_and_worker_loss",
+        "reason": "Owned Linux native worker fixture"
+      }
+    ]
+  },
+  "linux": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "160",
+    "time": "63.193",
+    "timestamp": "2026-11-19T11:21:32.894957+09:00",
+    "hostname": "localhost",
+    "passed": 160,
+    "repository_xml": "docs/infrastructure-results/operator-review-client-final-linux-20261119.xml",
+    "raw_sha256": "75223f5fedd1e196906227f99e52c561d3fe0ffd9a119d9ec7e10252eb8131d7",
+    "new_client_tests": 46,
+    "new_client_passed": 46,
+    "excluded": []
+  },
+  "new_client_tests": 46,
+  "new_real_tls_cases": 6,
+  "real_cli_subprocess_case": 1,
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "push": false,
+  "ci": false,
+  "merged": false,
+  "model_quality_reevaluated": false,
+  "evaluation_raw_labels_predictions_changed": false,
+  "new_full_suite_run": false,
+  "production_server_model_ui_modified": false,
+  "strict_review_default_changed": false,
+  "no_retry_after_412_or_network_failure": true,
+  "tls_verification_disabled_option": false,
+  "redirects_followed": false,
+  "proxy_environment_inherited": false,
+  "snapshot_is_independent_witness": false,
+  "owner_resource_cleanup": "Owned HTTP worker context killed/waited child; TLS server contexts shutdown/closed/joined threads",
+  "limitations": [
+    "UI If-Match and cursor adoption remain",
+    "Not enterprise SSO/online revocation, independent witness/WORM, multi-host or power loss acceptance",
+    "No actual eight-hour soak; no new model inference or quality improvement claim",
+    "CLI failure can follow a committed review; inspect server history before another action",
+    "Snapshots are local records, not proof of human reading or independently signed evidence"
+  ],
+  "sources": [
+    {
+      "path": "scripts/audit_review_client.py",
+      "sha256": "18059f163057d8fa1453c37f662ccbb172b3d2f4efd45ef4713452afb8cb533f"
+    },
+    {
+      "path": "tests/test_audit_review_client.py",
+      "sha256": "b6a7c56aeaea6f288d79ba49faa31f4a36b5cb9c38c5cd657f8aa68bbdca863b"
+    },
+    {
+      "path": "tests/test_audit_review_client_transport.py",
+      "sha256": "2a37f81cd8752e6a693d8edb89e092ca7e5c01d65826cce701c669eb571dce74"
+    },
+    {
+      "path": "tests/test_audit_review_client_process.py",
+      "sha256": "b72e5c5fe4658b6b8ee7f594df84f2a3c2513ed5a0356720fdc23a053291895f"
+    },
+    {
+      "path": "app/services/audit_review_preconditions.py",
+      "sha256": "c9df34c01ee26b14c45aab2e2a0f3c73383399423643bef39888759b446d5164"
+    },
+    {
+      "path": "app/services/audit_wire.py",
+      "sha256": "5a9177fe5ec00a983f113ffebb118b5fb5cd3de233fd89657dcc7122db67d814"
+    },
+    {
+      "path": "app/main.py",
+      "sha256": "4f13c6adc5ec2746790b14c01e2f861067ca4548ba57895f8c52f02d5d17efdb"
+    }
+  ]
+}

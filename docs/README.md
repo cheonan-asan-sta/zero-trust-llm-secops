@@ -1,3 +1,5 @@
+> 2026-11-19 extra 후속: [운영자 감사 검토 CLI·조회 버전/신원·HTTPS/mTLS 연결](extra-operator-review-client-20261119.md). 로컬 구현·검증 범위이며 UI/기업 SSO·독립 성능 목표 완료와 구분한다.
+
 # 개발 주차별 산출물
 
 
