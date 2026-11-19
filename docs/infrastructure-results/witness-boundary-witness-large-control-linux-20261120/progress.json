@@ -1,0 +1,63 @@
+{
+  "schema": "owned-large-signed-witness-control-1",
+  "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "completed": false,
+  "configured_max_receipts": 4096,
+  "limit_monkeypatched": false,
+  "all_data_synthetic": true,
+  "synthetically_signed_preload_receipts": 4094,
+  "preloaded_control_anchors": 4095,
+  "actual_observe_calls_before_preload": 1,
+  "actual_successful_collection_cycles_after_preload": 1,
+  "paid_api_calls": 0,
+  "detection_metrics_changed": false,
+  "independent_storage_verified": false,
+  "automatic_activation_allowed": false,
+  "service_memory_limit_verified": false,
+  "checks": [
+    {
+      "name": "full_preload_is_really_verified_before_last_collection",
+      "passed": true,
+      "elapsed_seconds": 2.536702530000184
+    },
+    {
+      "name": "actual_final_collection_reaches_both_4096_ledgers",
+      "passed": true,
+      "elapsed_seconds": 8.388993298999594
+    },
+    {
+      "name": "full_control_rejects_new_work_without_creating_pending",
+      "passed": true,
+      "elapsed_seconds": 9.40507477600022
+    },
+    {
+      "name": "middle_receipt_corrupt_fails_closed_without_signer_change",
+      "passed": true,
+      "elapsed_seconds": 10.396570828999756
+    },
+    {
+      "name": "middle_anchor_missing_fails_closed_without_signer_change",
+      "passed": true,
+      "elapsed_seconds": 11.423447928000314
+    },
+    {
+      "name": "held_minimum_missing_fails_closed_without_signer_change",
+      "passed": true,
+      "elapsed_seconds": 13.458968752000146
+    },
+    {
+      "name": "full_control_encrypted_backup_restore_and_keyless_inspection",
+      "passed": true,
+      "elapsed_seconds": 24.695383500999924
+    },
+    {
+      "name": "source_audit_bytes_unchanged",
+      "passed": true,
+      "elapsed_seconds": 24.707216552000318
+    }
+  ],
+  "observer_database_bytes": 2818048,
+  "signer_journal_bytes": 2818048,
+  "encrypted_package_bytes": 2819629,
+  "encrypted_package_sha256": "d81bcad3767aefec6eb6167e4b1c76a17cfb909439f1e884b8a10f6903ef106b"
+}

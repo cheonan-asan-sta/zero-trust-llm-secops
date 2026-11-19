@@ -1,0 +1,18 @@
+{
+  "schema": "owned-native-witness-full-capacity-1",
+  "completed": false,
+  "source_commit": "af311242e57a064f599001f33c9095335e380e23",
+  "configured_max_receipts": 4096,
+  "limit_monkeypatched": false,
+  "all_data_synthetic": true,
+  "paid_api_calls": 0,
+  "detection_metrics_changed": false,
+  "independent_storage_verified": false,
+  "automatic_activation_allowed": false,
+  "checks": [],
+  "stopped_before_capacity": true,
+  "private_fixture_removed": true,
+  "mutated_source_files": [],
+  "source_bytes_unchanged": true,
+  "elapsed_seconds": 815.3279754239998
+}

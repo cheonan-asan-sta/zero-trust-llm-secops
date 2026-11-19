@@ -1,0 +1,189 @@
+{
+  "schema": "witness-additional-boundary-evidence-1",
+  "implementation_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "source_sha256": {
+    "app/services/audit_witness.py": "8a7d821f0bc6fcce0dc9f2ae1faff3c03f97ad1bad41fc6d8007b930e7685300",
+    "app/services/audit_witness_observer.py": "98adc1f6f77744162d79fed60baa675fdaca5265ccd934cf8aebf0cdf728aec3",
+    "app/services/audit_witness_observer_backup.py": "2c23a892756b4def9f902f3345041601dbbb5178e671b175635dfffdfb276020",
+    "scripts/audit_witness_observer.py": "519e66f70a6c93c4f746662229f033dd58dacc308498ab4a89cc5dccbfce5171",
+    "scripts/f1_lab/witness_observer_status.py": "c2b07cbd204e0602a5647df457cdb6e22be249522cab67303b7dde75fdff4674",
+    "scripts/run_witness_safety_sequence.py": "53189724dc1e0cb643b62474026dae13ad8cc255e5875c095de4c93a827d0ed4"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-20261120/result.json",
+      "sha256": "b5e8f5df9a7d054e8404ccfffdd3c6653d56c62a922abcd53ba52ba242d1de16"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-20261120.log",
+      "sha256": "6fe780222caf4572427840be2ad240d6ea51012c6ca13c3f629619a962b686c3"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/45-seconds.metrics",
+      "sha256": "6585acb69ba683aff25e4d3a25e30bd73a3e144c94224ec259bb7b31208e3496"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/expired-cache.metrics",
+      "sha256": "277e9324553246afc093bc9e5d240c6c875316d9cd252d24d3a3dc98ff96d79c"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/owned-process.json",
+      "sha256": "b8d290971b88ffdb104ce40c9937339b9be87c9ab3e02bd35dbeaf24a673130e"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/progress.json",
+      "sha256": "5991b98ffd562bde3742c6c4ec08c5df69ae0daeadab36361ea44da15a773856"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/read-only-refresh-status.json",
+      "sha256": "a1fdf4e5f52e5d1280e8fc27ee65b2f5eb2d8a1c657baa4a43a7b4c596403604"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/result.json",
+      "sha256": "ad328c76883fb12571d4f964615a74a4aeed8d5517cfaead11d2c699a67ed391"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/resumed-cycle.log",
+      "sha256": "2c423c261b06ec69c345357005372f7f843759877cf649f5ae038cd35d34c347"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/stale-status.json",
+      "sha256": "ebfcf5aeebabb8bf2975ca431b9ae362610ea34b180cc8112ae5b80d76478bbd"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/stale.metrics",
+      "sha256": "c28434d1507c9358a7b69a43cd4f37b17eba63b98763db9dd7d8b64bfe17fff0"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/watch.log",
+      "sha256": "2b73bb1370b44b63ae2e332512c4491f2d685e1a5f87b20a4a21bd41a378f280"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120.log",
+      "sha256": "004f2c6b9817e2fc13cb2257b24f583dfb82ea73dfeca1e105b250d0c448efcf"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-control-linux-20261120/keyless-proof.json",
+      "sha256": "8a88d67518dfe0aa7262d712a56beae7ca2e1aae0e7ff627428106f5cb97068a"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-control-linux-20261120/progress.json",
+      "sha256": "66b2f0e414f85b1c91fa80541d409128ee0d10b6e46de3f3e58379a3d7a3bafd"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-control-linux-20261120/result.json",
+      "sha256": "589266b87856bd560bb40fbf615a7f87e40fcc7bdf17104db8bf73aeb055fd2c"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-control-linux-20261120.log",
+      "sha256": "e6542ee55ddbf0c0d04fb84272fcf43bc04a87c8ac463b35dfddd77ddbeb586d"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-capacity-linux-20261120/result.json",
+      "sha256": "bac3b29454363e5a76f530d81f344ef8eec983f8de88ab5308afc2362a7be3e0"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-capacity-linux-20261120/progress.json",
+      "sha256": "aac7923b67ce40fcebab80c560d01d83984920bcb366d1bd393f5af2f6005fe2"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-first-capacity-stopped-20261120.log",
+      "sha256": "02754db72eb0da4263239f2303890460bf375ab02a3ddcec3b0082f67d0115f0"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/result.json",
+      "sha256": "e014d83d0632ed07cd37fd311afab65906db516b2c59979eb788e2cb7f59821f"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-0.log",
+      "sha256": "6814e1fb41e04d8473524b55e79e4aca8e2b8aa47b2436f6d86bb1bdb4644c8a"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-4294967295.log",
+      "sha256": "c0cbf2c1fa293caf320a60bcaed748f36cf1f4b0a85affdeffe656658f59b27f"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-17.log",
+      "sha256": "5ff102fa00f2fc0625f73c76fc150004614751b97ed28876117dcdb1974ba605"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-0/report.json",
+      "sha256": "bf2acc1b8e1de62033fdb7c1d1835d1417fb741e3276ef30d645e6f67ca8b1ca"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-0/trace.jsonl",
+      "sha256": "54261cf48553ad3b367f665a3503be7af1222107c0f9371e2e91f763fa5cab18"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-4294967295/report.json",
+      "sha256": "c12dd3de86c0c63f3adadcf1254995cae5aad915170e4da4b27e607ac6ce6369"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-4294967295/trace.jsonl",
+      "sha256": "3c12fffb35cdcc91e74dddbb04b0f6779adc00afa6d8f77057f54a5ef24b4593"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-17/report.json",
+      "sha256": "c5f2e288230ffa3ee32701a2f3991b0c243ed07ab3aa49bf0ad565dba90b4bcc"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-17/trace.jsonl",
+      "sha256": "a267598c6992e92687e67ac865ebcc658879d8e6489011909eb35d3036f19ed0"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-harness-run_seed_matrix_20261120.py.txt",
+      "sha256": "1dc42e545c45497d0bc6e3eab27b8ccdc1edca0816461be29f6d365a9a826eaf"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-harness-run_real_witness_cadence_20261120-v1.py.txt",
+      "sha256": "56b6a9db6e4027388956b32e1661c6a87a4ea56037a61c0153765ff81ac1899e"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-harness-run_real_witness_cadence_20261120.py.txt",
+      "sha256": "aa3a8e071e907daebf6f6ca26815713ff21b3f333a1b1e1c6104c991fb50cc2e"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-harness-run_large_witness_control_20261120.py.txt",
+      "sha256": "f46ba9e71744720a9bff1b3bcc94dec3d4651a84edabf18a57d65ef147e67e94"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-harness-run_native_witness_capacity_20261120-v1.py.txt",
+      "sha256": "ec4a7cdf42d6938bcf2226fa8b8934f4891064633b0c8d544d604eb482780318"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-harness-run_native_witness_capacity_20261120.py.txt",
+      "sha256": "a58cb7ab1f06d7a18e82f38ced598c102f13eda8dec8b9f7a367f4b18dd88601"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-extra-until0800-latest-source-20261120.json",
+      "sha256": "497039172fba36b33a4084dbb69cda3a1184acc8e046b1b5f8cec83422d7fe4d"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-extra-until0800-latest-source-linux-20261120.json",
+      "sha256": "8c611a9c01e88459c58ff99483be56a963595ce8e90138f7fd789084519c4ab7"
+    }
+  ],
+  "real_default_cadence": {
+    "checks": 10,
+    "elapsed_seconds": 302.99831607600026,
+    "os_clock_changed": false
+  },
+  "large_control_fixture": {
+    "checks": 8,
+    "preloaded_anchors": 4095,
+    "synthetically_signed_receipts": 4094,
+    "actual_observe_before_preload": 1,
+    "actual_collection_after_preload": 1,
+    "all_4096_calls_exercised": false,
+    "service_memory_limit_verified": false
+  },
+  "matrix_source_commit": "6033a7b5f7da91c66e0ca00fa7607e4dc7517ff3",
+  "matrix_completed": {
+    "windows": true,
+    "linux": false
+  },
+  "actual_sequential_4096_drill": "separate_corrected_run_in_progress",
+  "paid_api_calls": 0,
+  "detection_metrics_changed": false,
+  "goal_status": "active_until_0800"
+}

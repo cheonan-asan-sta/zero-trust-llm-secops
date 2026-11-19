@@ -1,0 +1,22 @@
+{
+  "backup_created_at": "2026-11-19T19:14:09.942673+00:00",
+  "restore_started_at": "2026-11-19T19:14:13.686506+00:00",
+  "snapshot_scope": {
+    "anchor_count": 4096,
+    "pending": false,
+    "receipt_sha256": "f4b324ea13a7c38cf56c960019e5562c0802343bc6c85c634989194cb7c29aa6"
+  },
+  "current_scope": {
+    "receipt_sha256": "f4b324ea13a7c38cf56c960019e5562c0802343bc6c85c634989194cb7c29aa6",
+    "anchor_count": 4096,
+    "pending": false
+  },
+  "ciphertext_pin_verified": true,
+  "restore_receipt_pin_verified": true,
+  "signed_snapshot_minimum_present": true,
+  "decryption_checked": false,
+  "live_source_checked": false,
+  "restore_completion_time_attested": false,
+  "independent_storage_verified": false,
+  "automatic_activation_allowed": false
+}

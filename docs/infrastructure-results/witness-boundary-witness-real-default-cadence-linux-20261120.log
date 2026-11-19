@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/mnt/c/Users/chaeh/Desktop/파란학기/tmp/extra-development-20261118/runtime/run_real_witness_cadence_20261120.py", line 62, in <module>
+    pin=observer.initialize(control,signer,audit.path,key,minimum_receipt=minimum)['profile_sha256']
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: initialize() got an unexpected keyword argument 'minimum_receipt'

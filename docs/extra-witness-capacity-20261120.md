@@ -21,7 +21,7 @@
 
 중간 시험에서 public pending이 bool인데 None으로 비교한 단언을 바로잡았고, 잘못 입력한 시험 파일명으로0건 수집한 실행도 보존했다. 실제 최초 결함 재현은 pending state 자체의 차이였으며, 수정된 최종 단언은 pending:false를 확인한다. 오류 로그를 숨기거나0건 실행을 성공으로 계산하지 않는다.
 
-운영상 기본60초 수집이면4096개는 약2.84일 분량이다. 이미 bootstrap 영수증 등이 있으면 남은 시간은 더 짧다. 현재는 소진 시 안전하게 거부하고 경보하는 모델이며, 무기한 운영이나 자동 epoch 교체를 구현했다고 주장하지 않는다. 운영자는 소진 전에 이력을 보존하고 별도 신뢰 기준을 검토해야 한다. 삭제/새 키 채택/외부 pin 교체는 이 작업에서 자동 실행하지 않는다. 실제 독립 호스트·외부SSO·원격WORM·운영 배포·8시간 soak도 별도 남은 항목이다.
+운영상 기본60초 수집이면4096개는 약2.84일 분량이다. 이미 bootstrap 영수증 등이 있으면 남은 시간은 더 짧다. 기본 capacity_warning16은 그 주기에서 약16분 전 경고다. 운영자는 필요한 대응 시간을 고려해 초기화 시 `--capacity-warning`을 명시할 수 있다. 예를 들어60초 주기에서1440개는 약1일 분량이다. 기존 고정 profile/pin을 자동 변경하지는 않는다. 현재는 소진 시 안전하게 거부하고 경보하는 모델이며, 무기한 운영이나 자동 epoch 교체를 구현했다고 주장하지 않는다. 운영자는 소진 전에 이력을 보존하고 별도 신뢰 기준을 검토해야 한다. 삭제/새 키 채택/외부 pin 교체는 이 작업에서 자동 실행하지 않는다. 실제 독립 호스트·외부SSO·원격WORM·운영 배포·8시간 soak도 별도 남은 항목이다.
 
 원본·소스 커밋·SHA256·진행 중 실제 경계 시험의 실행기: [검증 명세](infrastructure-results/extra-witness-capacity-20261120.json). 구현은 app/services/audit_witness_observer.py의 _prepare와 scripts/f1_lab/witness_observer_status.py의 render_report다. 관련 pytest 파일은 test_audit_witness_observer.py, test_audit_witness_operations.py, test_witness_monitor_cadence.py, test_audit_witness_observer_process.py, test_witness_clock_boundary.py다.
 

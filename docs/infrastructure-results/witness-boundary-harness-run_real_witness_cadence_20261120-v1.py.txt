@@ -1,0 +1,120 @@
+"""Real default 60/180-second boundaries; no OS clock or thresholds changed."""
+import asyncio
+import hashlib
+import json
+import os
+import subprocess
+import sys
+import tempfile
+import time
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
+
+source=Path(sys.argv[1]).resolve();output=Path(sys.argv[2]).resolve()
+manifest=json.loads(Path(sys.argv[3]).read_text())
+assert os.name=='posix' and source==Path(manifest['path']).resolve()
+output.mkdir(exist_ok=False,parents=True);sys.path.insert(0,str(source))
+from app.analyzers.rule_based import RuleBasedAnalyzer
+from app.models import AnalysisResult
+from app.scenarios import synthetic_events
+from app.services import audit_witness as witness
+from app.services import audit_witness_observer as observer
+from app.services.policy import response_preview
+from app.services.sqlite_audit import SQLiteAuditStore
+from scripts.f1_lab import witness_observer_status as bridge
+
+def altered():return [n for n,h in manifest['files'].items() if hashlib.sha256((source/n).read_bytes()).hexdigest()!=h]
+assert not altered()
+started=time.monotonic();process=None
+result={'schema':'owned-real-default-witness-cadence-1','source_commit':manifest['source_commit'],'completed':False,'interval_seconds':60,'max_age_seconds':180,'os_clock_changed':False,'thresholds_changed':False,'paid_api_calls':0,'real_8h_soak':False,'independent_storage_verified':False,'automatic_activation_allowed':False,'checks':[]}
+
+def check(name,condition):
+    assert condition,name
+    result['checks'].append({'name':name,'passed':True,'elapsed_seconds':time.monotonic()-started})
+    (output/'progress.json').write_text(json.dumps(result,indent=2)+'\n')
+
+def guard():
+    if (output/'stop.request').exists():raise InterruptedError('owned cadence stop')
+    if time.monotonic()-started>600:raise TimeoutError('owned cadence deadline')
+
+def wait_for(predicate):
+    while True:
+        guard()
+        value=predicate()
+        if value:return value
+        time.sleep(.2)
+
+def wait_until(instant):
+    while datetime.now(UTC)<instant:
+        guard();time.sleep(min(.2,max(0,(instant-datetime.now(UTC)).total_seconds())))
+
+env=dict(os.environ,AWS_EC2_METADATA_DISABLED='true',AWS_SHARED_CREDENTIALS_FILE=str(output/'no-cloud-credentials'),AWS_CONFIG_FILE=str(output/'no-cloud-config'),PYTHONPYCACHEPREFIX='/home/chaehj02/.cache/zt-until0800-frozen-bytecode')
+for name in ('OPENAI_API_KEY','AZURE_OPENAI_API_KEY','ANTHROPIC_API_KEY','C01_UPSTREAM_API_KEY','AWS_ACCESS_KEY_ID','AWS_SECRET_ACCESS_KEY','AWS_SESSION_TOKEN','AWS_SECURITY_TOKEN','AWS_PROFILE','AWS_DEFAULT_PROFILE','AWS_WEB_IDENTITY_TOKEN_FILE','AWS_ROLE_ARN','AWS_ROLE_SESSION_NAME','AWS_CONTAINER_CREDENTIALS_FULL_URI','AWS_CONTAINER_CREDENTIALS_RELATIVE_URI','AWS_CONTAINER_AUTHORIZATION_TOKEN'):env.pop(name,None)
+env['PYTHONPATH']=str(source)
+try:
+    with tempfile.TemporaryDirectory(prefix='private-witness-real-cadence-') as temporary:
+        root=Path(temporary);audit=SQLiteAuditStore(root/'audit.sqlite3');signer=root/'signer';control=root/'control'
+        event=synthetic_events()[0];assessment=RuleBasedAnalyzer().assess(event)
+        asyncio.run(audit.save(AnalysisResult(event_id=event.event_id,analyzer='rule',assessment=assessment,policy_decision=response_preview(assessment,event),latency_ms=1)))
+        before=audit.path.read_bytes()
+        key=witness.initialize(signer,audit.path,'real-default-cadence')['public_key_sha256']
+        minimum=witness.observe(signer,audit.path,key,expected_receipt=witness.GENESIS)['receipt_sha256']
+        pin=observer.initialize(control,signer,audit.path,key,minimum_receipt=minimum)['profile_sha256']
+        public=root/'status.json'
+        profile={'profile_sha256':pin,'minimum_receipt':minimum,'status_file':str(public)}
+        argv=[sys.executable,'-m','scripts.audit_witness_observer','watch','--directory',str(control),'--profile-sha256',pin,'--minimum-receipt',minimum,'--cycles','3','--status-file',str(public)]
+        with (output/'watch.log').open('wb') as stream:
+            process=subprocess.Popen(argv,cwd=source,env=env,stdout=stream,stderr=subprocess.STDOUT)
+            (output/'owned-process.json').write_text(json.dumps({'pid':process.pid,'arguments':argv}))
+            wait_for(lambda: public.exists() or process.poll() is not None)
+            assert public.exists()
+            first=json.loads(public.read_bytes())
+            check('watch_uses_real_default_policy',first['values']['interval_seconds']==60 and first['values']['max_age_seconds']==180)
+            wait_until(datetime.fromisoformat(first['checked_at'])+timedelta(seconds=45))
+            text=bridge.metrics(profile)
+            (output/'45-seconds.metrics').write_text(text)
+            check('45_seconds_old_cache_survives_default_60_second_cadence','secops_witness_status_success 1' in text and 'secops_witness_observation_healthy 1' in text)
+            wait_for(lambda: process.poll() is not None)
+            assert process.returncode==0
+        rows=[json.loads(line) for line in (output/'watch.log').read_text().splitlines()]
+        check('three_real_watch_cycles_finish_without_failure',len(rows)==3 and all(r['cycle_success'] for r in rows))
+        instants=[datetime.fromisoformat(r['observed_at']) for r in rows]
+        result['observed_cycle_spacing_seconds']=[(b-a).total_seconds() for a,b in zip(instants,instants[1:])]
+        check('signed_observation_times_advance_with_real_watch',instants[0]<instants[1]<instants[2])
+        last=json.loads(public.read_bytes());original=last['values']['observed_at']
+        wait_until(datetime.fromisoformat(last['checked_at'])+timedelta(seconds=121))
+        expired=bridge.metrics(profile)
+        (output/'expired-cache.metrics').write_text(expired)
+        check('stopped_publisher_expires_after_real_120_second_budget','secops_witness_status_success 0' in expired)
+        value=bridge.inspect(control,pin,minimum)
+        bridge.publish(public,value)
+        text=bridge.metrics(profile)
+        check('read_only_refresh_preserves_original_signed_time',value['values']['observed_at']==original and 'secops_witness_observation_healthy 1' in text)
+        (output/'read-only-refresh-status.json').write_text(json.dumps(value,indent=2)+'\n')
+        wait_until(datetime.fromisoformat(original)+timedelta(seconds=181))
+        value=bridge.inspect(control,pin,minimum);bridge.publish(public,value)
+        text=bridge.metrics(profile)
+        check('fresh_public_check_does_not_rejuvenate_stale_signed_observation',value['values']['observed_at']==original and value['values']['state']=='stale' and 'secops_witness_observation_healthy 0' in text and 'secops_witness_observation_action_required 1' in text)
+        (output/'stale-status.json').write_text(json.dumps(value,indent=2)+'\n');(output/'stale.metrics').write_text(text)
+        command=[sys.executable,'-m','scripts.audit_witness_observer','cycle','--directory',str(control),'--profile-sha256',pin,'--minimum-receipt',minimum]
+        resumed=subprocess.run(command,cwd=source,env=env,capture_output=True,timeout=30)
+        (output/'resumed-cycle.log').write_bytes(resumed.stdout+resumed.stderr)
+        assert resumed.returncode==0
+        value=bridge.inspect(control,pin,minimum);bridge.publish(public,value)
+        text=bridge.metrics(profile)
+        check('only_real_new_collection_restores_fresh_observation',value['values']['observed_at']>original and value['values']['anchor_count']==4 and 'secops_witness_observation_healthy 1' in text)
+        check('same_external_profile_and_minimum_remain_bound',value['profile_sha256']==pin and value['minimum_receipt']==minimum and value['automatic_activation_allowed'] is False)
+        check('source_audit_bytes_unchanged',audit.path.read_bytes()==before)
+    result['private_fixture_removed']=not root.exists()
+    result['mutated_source_files']=altered();result['source_bytes_unchanged']=not result['mutated_source_files']
+    result['completed']=result['private_fixture_removed'] and result['source_bytes_unchanged']
+finally:
+    if process is not None and process.poll() is None:
+        process.terminate()
+        try:process.wait(timeout=10)
+        except subprocess.TimeoutExpired:process.kill();process.wait(timeout=10)
+    result['owned_process_finished']=process is None or process.poll() is not None
+    result['elapsed_seconds']=time.monotonic()-started
+    (output/'result.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result))
+raise SystemExit(0 if result['completed'] else 1)
