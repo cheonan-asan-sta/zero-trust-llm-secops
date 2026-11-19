@@ -26,7 +26,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 @contextmanager
-def server(directory, output, report, *, anonymous=False, caller_bound_reviews=False):
+def server(
+    directory, output, report, *, anonymous=False, caller_bound_reviews=False, audit_records=0
+):
     with socket.socket() as sock:
         sock.bind(("127.0.0.1", 0))
         port = sock.getsockname()[1]
@@ -50,6 +52,8 @@ def server(directory, output, report, *, anonymous=False, caller_bound_reviews=F
             str(port),
             "--sqlite-audit",
             *(["--caller-bound-reviews"] if caller_bound_reviews else []),
+            "--audit-records",
+            str(audit_records),
         ]
     with (output / ("anonymous-server.log" if anonymous else "server.log")).open(
         "w", encoding="utf-8"
@@ -164,7 +168,7 @@ def run(args, directory, report):
             return response
 
         def opened(target=page):
-            target.locator("#refreshButton").click()
+            target.locator("#historyReload").click()
             row = target.locator("#historyBody tr").filter(has_text=event_id)
             expect(row).to_have_count(1)
             with target.expect_response(

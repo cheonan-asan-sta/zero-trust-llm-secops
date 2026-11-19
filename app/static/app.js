@@ -18,6 +18,7 @@ const state = {
   reviewing: false,
   replaying: false,
   caseCreating: false,
+  audit: {page: null, index: 0, cursors: [], identity: null, scope: null, generation: 0, busy: false, error: null, controller: null, timer: null},
 };
 
 const $ = (id) => document.getElementById(id);
@@ -83,6 +84,9 @@ async function request(path, options = {}) {
   if (options.ifMatch !== undefined && !strongReviewTag(options.ifMatch)) throw new Error("검토 버전을 다시 조회하세요.");
   if (options.reviewIdentity !== undefined && !reviewBinding(options.reviewIdentity)) throw new Error("검토 신원을 다시 확인하세요.");
   const controller = new AbortController();
+  const abort = () => controller.abort();
+  if (options.signal?.aborted) abort();
+  else options.signal?.addEventListener("abort", abort, {once: true});
   state.controllers.add(controller);
   const timer = setTimeout(() => controller.abort(), options.timeoutMs || 12000);
   const headers = {Accept: "application/json"};
@@ -110,6 +114,7 @@ async function request(path, options = {}) {
       options.allowDenied ? {data, ok: response.ok, status: response.status} : data;
   } finally {
     clearTimeout(timer);
+    options.signal?.removeEventListener("abort", abort);
     state.controllers.delete(controller);
   }
 }
@@ -462,7 +467,7 @@ function renderHistory(results) {
     const cell = document.createElement("td");
     cell.colSpan = 7;
     cell.className = "table-empty";
-    cell.textContent = "아직 분석 기록이 없습니다.";
+    cell.textContent = "조건에 맞는 감사 기록이 없습니다. 조건을 바꾸거나 최신 목록을 조회하세요.";
     row.append(cell);
     body.append(row);
     return;
@@ -470,6 +475,7 @@ function renderHistory(results) {
 
   results.forEach((result) => {
     const row = document.createElement("tr");
+    row.dataset.analysisId = result.analysis_id;
     const values = [
       formatTime(result.analyzed_at),
       result.event_id,
@@ -504,13 +510,108 @@ function renderHistory(results) {
   });
 }
 
+const historyScope = () => JSON.stringify([$("historyRisk").value, $("historyReview").value]);
+function historyError(error) {
+  if (error.historyCaller || [401, 403].includes(error.status)) return "조회 신원 또는 권한이 변경됐습니다. 연결 및 인증을 다시 적용하세요.";
+  if (error.status === 410) return "조회 기준이 만료됐습니다. 최신 목록을 다시 조회하세요.";
+  if ([400, 409].includes(error.status)) return "조회 기준을 이어갈 수 없습니다. 최신 목록을 다시 조회하세요.";
+  if (error.status === 501) return "이 서버는 감사 페이지 조회를 지원하지 않습니다. 관리자에게 문의하세요.";
+  if (error.status === 503) return "감사 기록을 검증하거나 조회할 수 없습니다. 잠시 후 최신 목록을 조회하세요.";
+  if (error.invalidResponse) return "감사 페이지 응답을 확인할 수 없습니다. 최신 목록을 다시 조회하세요.";
+  return "감사 기록을 불러오지 못했습니다. 최신 목록을 다시 조회하세요.";
+}
+function renderHistoryPage() {
+  const audit = state.audit, page = audit.page;
+  $("historyBody").setAttribute("aria-busy", String(audit.busy));
+  $("historyPrevious").disabled = audit.busy || !page || audit.index === 0;
+  $("historyNext").disabled = audit.busy || !page?.next_cursor;
+  $("historyReload").disabled = audit.busy;
+  $("historyPage").textContent = page ? `${audit.index + 1} / ${Math.max(1, Math.ceil(page.total_matches / 12))} 페이지` : "페이지 미확인";
+  $("historyCount").textContent = page ? `현재 ${page.items.length}건 · 전체 조건 일치 ${page.total_matches}건` : "조회 결과 없음";
+  $("historyStatus").textContent = audit.busy ? "감사 기록과 현재 조회 신원을 확인하고 있습니다." : audit.error ? historyError(audit.error) :
+    page ? `${new Date(page.snapshot_created_at).toLocaleString("ko-KR")} 기준 기록입니다. 최신 목록 조회로 갱신하세요. 열기와 검토는 현재 상태를 다시 확인합니다.` : "최신 목록 조회를 눌러 시작하세요.";
+  $("historyStatus").dataset.error = String(Boolean(audit.error));
+  renderHistory(page?.items || []);
+  if (!page) $("historyBody").querySelector("td").textContent = audit.busy ? "감사 기록을 확인하고 있습니다." : audit.error ? historyError(audit.error) : "아직 조회한 감사 기록이 없습니다.";
+}
+function checkedHistoryPage(page, index, identity) {
+  const invalid = () => { throw Object.assign(new Error("Invalid audit page"), {invalidResponse: true}); };
+  const cursor = (value) => typeof value === "string" && /^[A-Za-z0-9_-]{1,2048}$/.test(value);
+  if (!page || !Array.isArray(page.items) || page.items.length > 12 || !Number.isSafeInteger(page.total_matches) || page.total_matches < 0 ||
+      !cursor(page.page_cursor) || !(page.next_cursor === null || cursor(page.next_cursor)) ||
+      typeof page.snapshot_id !== "string" || !/^[a-f0-9]{64}$/.test(page.snapshot_id) || page.historical_audit_snapshot !== true ||
+      !["sqlite_prefix", "unchanged_local_view"].includes(page.snapshot_mode) || typeof page.snapshot_created_at !== "string" || typeof page.snapshot_expires_at !== "string" || !Number.isFinite(Date.parse(page.snapshot_created_at)) ||
+      !(Date.parse(page.snapshot_expires_at) > Date.parse(page.snapshot_created_at)) || !(Date.parse(page.snapshot_expires_at) > Date.now())) invalid();
+  if (page.items.length !== Math.max(0, Math.min(12, page.total_matches - index * 12)) ||
+      (page.next_cursor !== null) !== (index * 12 + page.items.length < page.total_matches) || (index > 0 && index * 12 >= page.total_matches)) invalid();
+  const ids = new Set();
+  for (const row of page.items) {
+    if (!row || typeof row.analysis_id !== "string" || !row.analysis_id || ids.has(row.analysis_id) || row.tenant_id !== identity.tenant_id ||
+        typeof row.event_id !== "string" || !row.event_id || typeof row.analyzer !== "string" || typeof row.analyzed_at !== "string" || !Number.isFinite(Date.parse(row.analyzed_at)) ||
+        !Object.hasOwn(riskLabels, row.assessment?.risk_level) || !Object.hasOwn(reviewStatusLabels, row.review_status) ||
+        !row.policy_decision || !Object.hasOwn(actionLabels, row.policy_decision.action) ||
+        ($("historyRisk").value && row.assessment.risk_level !== $("historyRisk").value) ||
+        ($("historyReview").value && row.review_status !== $("historyReview").value)) invalid();
+    ids.add(row.analysis_id);
+  }
+  return page;
+}
+async function loadHistoryPage(index = 0, cursor = null) {
+  const audit = state.audit, old = audit.page, identity = audit.identity, scope = historyScope(), epoch = state.epoch;
+  const cursors = cursor ? [...audit.cursors] : [];
+  audit.controller?.abort(); clearTimeout(audit.timer);
+  const controller = new AbortController(), generation = ++audit.generation;
+  audit.controller = controller; audit.busy = true; audit.page = null; audit.error = null;
+  if (!cursor) { audit.index = 0; audit.cursors = []; audit.identity = null; audit.scope = null; }
+  renderHistoryPage();
+  const active = () => epoch === state.epoch && generation === audit.generation && scope === historyScope();
+  const invalid = () => Object.assign(new Error("Invalid audit continuation"), {invalidResponse: true});
+  const changed = () => Object.assign(new Error("Audit caller changed"), {historyCaller: true});
+  try {
+    if (!state.identity) throw changed();
+    const options = {epoch, signal: controller.signal};
+    const before = await request("/auth/me", options);
+    if (!active()) return;
+    if (!sameIdentity(before, state.identity) || (cursor && !sameIdentity(before, identity))) throw changed();
+    const params = new URLSearchParams({limit: "12"});
+    if ($("historyRisk").value) params.set("risk_level", $("historyRisk").value);
+    if ($("historyReview").value) params.set("review_status", $("historyReview").value);
+    if (cursor) params.set("cursor", cursor);
+    const page = checkedHistoryPage(await request("/audit/results?" + params, options), index, before);
+    if (!active()) return;
+    const after = await request("/auth/me", options);
+    if (!active()) return;
+    if (!sameIdentity(before, after) || !sameIdentity(before, state.identity)) throw changed();
+    if (!(Date.parse(page.snapshot_expires_at) > Date.now())) throw Object.assign(new Error("Audit page expired"), {status: 410});
+    if (cursor && (!old || audit.scope !== scope || ["snapshot_id", "total_matches", "snapshot_created_at", "snapshot_expires_at", "snapshot_mode"].some((key) => old[key] !== page[key]))) throw invalid();
+    if (cursor && index !== audit.index && page.items.some((row) => old.items.some((previous) => row.analysis_id === previous.analysis_id))) throw invalid();
+    cursors[index] = page.page_cursor;
+    if (page.next_cursor) cursors[index + 1] = page.next_cursor;
+    Object.assign(audit, {page, index, identity: before, scope, cursors: cursors.slice(0, index + (page.next_cursor ? 2 : 1))});
+    audit.timer = setTimeout(() => {
+      if (active() && audit.page === page) {
+        audit.page = null; audit.cursors = []; audit.identity = null; audit.scope = null;
+        audit.error = {status: 410}; renderHistoryPage();
+      }
+    }, Math.min(2147483647, Math.max(0, Date.parse(page.snapshot_expires_at) - Date.now())));
+  } catch (error) {
+    if (active()) {
+      if (error.historyCaller || [401, 403].includes(error.status)) {
+        resetConnection("none", "", false);
+        $("workbenchIdentity").textContent = historyError(error);
+      }
+      Object.assign(state.audit, {page: null, cursors: [], identity: null, scope: null, busy: false, error});
+      renderHistoryPage();
+    }
+  } finally {
+    if (active()) { audit.busy = false; audit.controller = null; renderHistoryPage(); }
+  }
+}
+
 async function refreshSummary() {
   const epoch = state.epoch;
   try {
-    const [metrics, results] = await Promise.all([
-      request("/metrics"),
-      request("/results?limit=8"),
-    ]);
+    const metrics = await request("/metrics", {epoch});
     if (epoch !== state.epoch) return;
     $("totalAnalyses").textContent = metrics.total_analyses;
     $("highRiskCount").textContent =
@@ -521,10 +622,10 @@ async function refreshSummary() {
     $("latestEvent").textContent = metrics.latest_event_id || "-";
     $("averageLatency").textContent = `${metrics.average_latency_ms.toFixed(1)}ms`;
     $("p95Latency").textContent = `${metrics.p95_latency_ms.toFixed(1)}ms`;
-    renderHistory(results);
+    $("summaryFeedback").textContent = "개요는 현재 집계입니다. 감사 목록은 최신 목록 조회로 따로 갱신합니다.";
   } catch (_) {
     if (epoch !== state.epoch) return;
-    $("historyBody").innerHTML = '<tr><td colspan="7" class="table-empty">기록을 불러오지 못했습니다.</td></tr>';
+    $("summaryFeedback").textContent = "개요를 불러오지 못했습니다. 개요 새로고침으로 다시 시도하세요.";
   }
 }
 
@@ -926,7 +1027,7 @@ async function initialize() {
     setHealthError();
     $("scenarioGrid").textContent = "서버와 연결되지 않았습니다.";
   }
-  await Promise.all([refreshSummary(), refreshCases(), loadAssuranceSummary()]);
+  await Promise.all([refreshSummary(), loadHistoryPage(), refreshCases(), loadAssuranceSummary()]);
 }
 
 const zt = { sessionId: null, event: null, version: 0, token: null, busy: false };
@@ -1075,6 +1176,16 @@ function bindWorkbenchControls() {
   $("ztSignedRefresh").addEventListener("click", refreshSignedSessions);
   $("analyzeButton").addEventListener("click", runAnalysis);
   $("refreshButton").addEventListener("click", refreshSummary);
+  $("historyReload").addEventListener("click", () => loadHistoryPage());
+  ["historyRisk", "historyReview"].forEach((id) => $(id).addEventListener("change", () => loadHistoryPage()));
+  $("historyPrevious").addEventListener("click", () => {
+    const audit = state.audit;
+    if (!audit.busy && audit.page && audit.index > 0) loadHistoryPage(audit.index - 1, audit.cursors[audit.index - 1]);
+  });
+  $("historyNext").addEventListener("click", () => {
+    const audit = state.audit;
+    if (!audit.busy && audit.page?.next_cursor) loadHistoryPage(audit.index + 1, audit.page.next_cursor);
+  });
   $("evaluationButton").addEventListener("click", runEvaluation);
   $("replayButton").addEventListener("click", runPublicReplay);
   $("caseCreateButton").addEventListener("click", createDemoCase);
@@ -1089,7 +1200,9 @@ function bindWorkbenchControls() {
   $("reviewExecute").addEventListener("click", executeReview);
   $("reviewCancel").addEventListener("click", () => { invalidateReview(); syncReviewControls(); });
 }
-function resetConnection(type, credential) {
+function resetConnection(type, credential, reconnect = true) {
+  state.audit.controller?.abort(); clearTimeout(state.audit.timer);
+  state.audit = {page: null, index: 0, cursors: [], identity: null, scope: null, generation: 0, busy: false, error: null, controller: null, timer: null};
   state.epoch++;
   state.controllers.forEach((controller) => controller.abort());
   state.controllers.clear();
@@ -1104,7 +1217,7 @@ function resetConnection(type, credential) {
   $("workbenchIdentity").textContent = "현재 연결의 신원을 확인하고 있습니다.";
   setHealthError();
   bindWorkbenchControls();
-  initialize();
+  if (reconnect) initialize();
 }
 $("workbenchConnectionForm").addEventListener("submit", (event) => {
   event.preventDefault();

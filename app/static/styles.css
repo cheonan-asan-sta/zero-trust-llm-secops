@@ -364,6 +364,18 @@ h1 span { color: var(--blue); }
 .operation-metrics { grid-template-columns: repeat(7, 1fr); }
 
 .history-wrap { margin-top: 18px; overflow-x: auto; }
+.history-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-top: 28px; }
+.history-heading h3 { margin: 0; font-size: 18px; color: var(--ink); }
+.history-heading span, .history-status { font-size: 13px; line-height: 1.6; color: #40556b; }
+.history-filters { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; margin-top: 16px; }
+.history-filters label { display: grid; gap: 6px; font-size: 13px; color: var(--ink); }
+.history-filters select { min-height: 44px; max-width: 100%; border: 1px solid var(--line); border-radius: 8px; background: white; padding: 8px 12px; font: inherit; font-size: 16px; color: var(--ink); }
+.history-filters .secondary-button, .history-pagination .secondary-button { min-height: 44px; font-size: 13px; }
+.history-filters :focus-visible, .history-pagination :focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+.history-pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; font-size: 13px; font-variant-numeric: tabular-nums; }
+.history-pagination .secondary-button:disabled { cursor: not-allowed; }
+.history-status { margin: 14px 0 0; overflow-wrap: anywhere; }
+.history-status[data-error="true"] { color: #99351f; }
 table { width: 100%; border-collapse: collapse; font-size: 12px; }
 th { padding: 11px 12px; background: #f3f6f9; color: var(--muted); text-align: left; font-size: 9px; letter-spacing: 0.08em; }
 td { padding: 13px 12px; border-bottom: 1px solid #edf0f3; }
