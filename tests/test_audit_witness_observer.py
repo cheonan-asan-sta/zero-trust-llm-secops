@@ -189,6 +189,32 @@ def test_full_signer_never_rotates_or_deletes_history_to_keep_collecting(tmp_pat
     with pytest.raises(AuditTransferError, match="capacity"):
         cycle(directory, pin, first)
     assert (signer / "journal.sqlite3").read_bytes() == before
+    after = read(directory, pin, first)
+    assert after["state"] == "capacity_exhausted" and after["pending"] is False
+
+
+def test_lost_final_capacity_receipt_recovers_before_rejecting_further_work(tmp_path, monkeypatch):
+    _source, signer, _key_pin, first, directory, pin = ready(tmp_path)
+    monkeypatch.setattr(witness, "MAX_RECEIPTS", 2)
+    actual = witness.observe
+
+    def lost(*args, **kwargs):
+        actual(*args, **kwargs)
+        raise OSError("test-owned lost final-capacity response")
+
+    monkeypatch.setattr(witness, "observe", lost)
+    with pytest.raises(OSError, match="final-capacity"):
+        cycle(directory, pin, first)
+    before = (signer / "journal.sqlite3").read_bytes()
+    assert read(directory, pin, first)["pending"] is True
+    monkeypatch.setattr(witness, "observe", actual)
+    result = cycle(directory, pin, first)
+    assert result["recovered"] and (signer / "journal.sqlite3").read_bytes() == before
+    assert read(directory, pin, first)["state"] == "capacity_exhausted"
+    with pytest.raises(AuditTransferError, match="capacity"):
+        cycle(directory, pin, first)
+    after = read(directory, pin, first)
+    assert after["state"] == "capacity_exhausted" and after["pending"] is False
 
 
 def test_lease_prevents_another_collector_from_mutating_pending_state(tmp_path, monkeypatch):

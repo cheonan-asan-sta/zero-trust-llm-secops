@@ -319,6 +319,13 @@ def _prepare(directory, profile, public, minimum_receipt):
                 _time(state["receipt"]["body"]["observed_at"]) <= now, "observer clock regressed"
             )
         if state["pending"] is None:
+            # A verified full head cannot acquire another receipt. Do not turn
+            # that terminal capacity state into an impossible durable pending.
+            # Existing pending work may still recover the final committed
+            # receipt, so this guard applies only when creating a new operation.
+            require(state["receipt"] is None
+                    or state["receipt"]["body"]["number"] < witness.MAX_RECEIPTS,
+                    "observer receipt capacity exhausted")
             pending = {
                 "observation_id": uuid.uuid4().hex,
                 "predecessor": state["receipt_sha256"],
