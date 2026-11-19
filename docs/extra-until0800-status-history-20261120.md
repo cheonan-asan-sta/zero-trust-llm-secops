@@ -38,4 +38,3 @@
 > 2026-11-20 08:00까지 지속 목표 진행 중: [수집기·별도 확인 기록·중단 복구](../docs/extra-witness-observer-20261120.md) 구현e6c9b12. Windows102통과/2제외·Linux104통과, 실제3지점 프로세스 종료/재개. 외부 pin·같은 pending 유지, 자동 기준 채택 없음. 다음은 경보/metrics·백업/복원 연결. 탐지 F1 93.41% 그대로·목표 미달, 유료/AWS/Docker/push/CI/병합 없음. 아래는 이전 기록.
 
 > 2026-11-20 08:00까지 후속 목표 진행 중: [지속 작업 범위](../docs/extra-until-0800-20261120.md). [witness 정확한 작업 재개](../docs/extra-witness-operations-20261120.md) 구현5b908ad, Windows80통과/2제외·Linux82통과. 기존 v1 수동 계약 유지, v2는 명시적 작업ID·서명/시각 재사용·다른writer/rollback 거부. 다음은 별도 확인 기록과 주기 수집·신선도/경보. F1재측정/개선·실제 독립호스트 인수·유료/API/AWS/Docker/push/CI/병합 없음. 아래는 이전 기록.
-
