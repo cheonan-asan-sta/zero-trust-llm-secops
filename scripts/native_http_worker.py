@@ -30,7 +30,7 @@ def main():
     if path.is_symlink() or path.stat().st_size > 16384:
         raise ValueError("worker control file rejected")
     data = json.loads(path.read_text(encoding="utf-8"))
-    if set(data) != {
+    if set(data) - {"review_policy"} != {
         "token",
         "ready",
         "stats",
@@ -53,6 +53,11 @@ def main():
         raise ValueError("worker control fields rejected")
     if data["audit_mode"] not in {"sqlite", "jsonl", "federated_jsonl"}:
         raise ValueError("worker audit mode rejected")
+    review_policy = data.get("review_policy", "optional")
+    if review_policy not in {"optional", "caller_bound"} or (
+        review_policy == "caller_bound" and data["audit_mode"] != "sqlite"
+    ):
+        raise ValueError("worker review policy rejected")
     os.environ.pop("API_KEY_ACCOUNTS_PATH", None)
     if data["accounts_path"] is not None:
         os.environ["API_KEY_ACCOUNTS_PATH"] = data["accounts_path"]
@@ -87,6 +92,8 @@ def main():
             "API_KEY_TENANT_ID": data["tenant_id"],
             "API_KEY_ROLES": "responder",
             "AUDIT_BACKEND": "sqlite" if data["audit_mode"] == "sqlite" else "jsonl",
+            "AUDIT_REVIEW_REQUIRE_IF_MATCH": str(review_policy == "caller_bound").lower(),
+            "AUDIT_REVIEW_REQUIRE_IDENTITY": str(review_policy == "caller_bound").lower(),
             "AUDIT_DB_PATH": data["audit_db"],
             "AUDIT_LOG_PATH": str(path.parent / "unused-audit.jsonl")
             if data["audit_mode"] == "sqlite"

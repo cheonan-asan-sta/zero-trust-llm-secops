@@ -12,6 +12,7 @@ from app.services.audit_checkpoint import capture_checkpoint, inspect_checkpoint
 from app.services.audit_transfer import AuditTransferError
 from app.services.sqlite_audit import SQLiteAuditStore
 from scripts.f1_lab.native_jsonl import require
+from scripts.local_review_intent import review_observed
 
 
 def run(audit, payload, client, headers, directory, passed, stack):
@@ -46,10 +47,12 @@ def run(audit, payload, client, headers, directory, passed, stack):
         baseline_checkpoint["head"] == backup["head"],
         "native_checkpoint_baseline_matches_restored_snapshot",
     )
-    reviewed = client.patch(
-        f"/results/{payload['event_id']}/review",
-        headers=headers,
-        json={"status": "RESOLVED", "note": "Verified recovered native audit"},
+    reviewed = review_observed(
+        client,
+        headers,
+        payload,
+        status="RESOLVED",
+        note="Verified recovered native audit",
     )
     require(
         reviewed.status_code == 200

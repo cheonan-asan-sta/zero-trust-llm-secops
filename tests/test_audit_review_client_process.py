@@ -16,7 +16,8 @@ from scripts.run_exec_history_controls import setup_app
 
 
 @pytest.mark.skipif(os.name != "posix", reason="Owned native Linux worker fixture")
-def test_real_operator_cli_reads_then_reviews_once_and_refuses_replay(tmp_path):
+@pytest.mark.parametrize("review_policy", ["optional", "caller_bound"])
+def test_real_operator_cli_reads_then_reviews_once_and_refuses_replay(tmp_path, review_policy):
     lab = setup_app(tmp_path / "control", "fixture.service")
     config, pin, _ = configure(lab, tmp_path / "shared")
     record = AnalysisResult(
@@ -45,7 +46,9 @@ def test_real_operator_cli_reads_then_reviews_once_and_refuses_replay(tmp_path):
     asyncio.run(SQLiteAuditStore(path).save(record))
     key = "operator-cli-placeholder-not-production"
     snapshot = tmp_path / "snapshot.json"
-    with owned_worker(lab, (config, pin), path, tmp_path / "worker", key) as (_, client, _):
+    with owned_worker(
+        lab, (config, pin), path, tmp_path / "worker", key, review_policy=review_policy
+    ) as (_, client, _):
         env = {k: v for k, v in os.environ.items() if not k.startswith(("OPENAI_", "AWS_"))}
         env.update(AWS_EC2_METADATA_DISABLED="true", OPERATOR_FIXTURE_KEY=key)
         command = [

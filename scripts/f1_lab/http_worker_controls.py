@@ -20,6 +20,7 @@ from scripts.f1_lab.native_jsonl import require
 from scripts.f1_lab.service_analysis_evidence import publish_service_analysis
 from scripts.f1_lab.shared_service_analysis import open_shared_service_registry
 from scripts.local_process_runtime import direct_python
+from scripts.local_review_intent import review_observed
 
 
 @contextmanager
@@ -35,8 +36,14 @@ def owned_worker(
     audit_mode="sqlite",
     accounts_path=None,
     provider_gate=None,
+    review_policy="optional",
 ):
     require(audit_mode in {"sqlite", "jsonl", "federated_jsonl"}, "owned_http_worker_audit_mode")
+    require(
+        review_policy in {"optional", "caller_bound"}
+        and (review_policy == "optional" or audit_mode == "sqlite"),
+        "owned_http_worker_review_policy",
+    )
     directory = Path(directory).absolute()
     directory.mkdir(parents=True, exist_ok=True, mode=0o700)
     require(
@@ -56,6 +63,7 @@ def owned_worker(
         "shared_pin": shared_config[1],
         "audit_db": str(Path(audit_path).absolute()),
         "audit_mode": audit_mode,
+        "review_policy": review_policy,
         "accounts_path": str(Path(accounts_path).absolute()) if accounts_path else None,
         "provider_gate": str(Path(provider_gate).absolute()) if provider_gate else None,
         "api_key_sha256": hashlib.sha256(api_key.encode()).hexdigest(),
@@ -193,7 +201,13 @@ def _run(
     api_key = secrets.token_urlsafe(32)
     headers = {"X-API-Key": api_key}
     with owned_worker(
-        lab, shared_config, audit_path, directory / "worker-1", api_key, cursor_config=cursor_config
+        lab,
+        shared_config,
+        audit_path,
+        directory / "worker-1",
+        api_key,
+        cursor_config=cursor_config,
+        review_policy="caller_bound",
     ) as (
         first,
         client,
@@ -238,7 +252,13 @@ def _run(
     )
     passed("committed_native_analysis_survives_actual_http_process_kill")
     with owned_worker(
-        lab, shared_config, audit_path, directory / "worker-2", api_key, cursor_config=cursor_config
+        lab,
+        shared_config,
+        audit_path,
+        directory / "worker-2",
+        api_key,
+        cursor_config=cursor_config,
+        review_policy="caller_bound",
     ) as (
         second,
         client,
@@ -263,6 +283,10 @@ def _run(
             "owned_restarted_worker_revalidates_reference",
         )
         passed("restarted_http_process_revalidates_shared_execution_reference")
+        # The second analysis replaces this event's current representation.
+        # Review that observed output, never silently bind the first output to
+        # the newer analysis during the later paging acceptance step.
+        restarted_payload = response.json()
         registry.revoke(ref)
         require(
             client.post(
@@ -292,10 +316,12 @@ def _run(
                 and page["items"][0]["review_status"] == "PENDING",
                 "owned_http_cursor_initial_snapshot",
             )
-            reviewed = client.patch(
-                f"/results/{payload['event_id']}/review",
-                headers=headers,
-                json={"status": "RESOLVED", "note": "Owned worker cursor acceptance"},
+            reviewed = review_observed(
+                client,
+                headers,
+                restarted_payload,
+                status="RESOLVED",
+                note="Owned worker cursor acceptance",
             )
             require(
                 reviewed.status_code == 200 and reviewed.json()["review_status"] == "RESOLVED",
