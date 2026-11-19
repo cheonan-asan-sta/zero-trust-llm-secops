@@ -15,17 +15,19 @@ import stat
 from datetime import UTC, datetime
 from http.client import HTTPException
 from pathlib import Path
+from types import SimpleNamespace
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlsplit, urlunsplit
 from urllib.request import HTTPRedirectHandler, HTTPSHandler, ProxyHandler, Request, build_opener
 
 from app.models import AnalysisResult, ReviewUpdateRequest
-from app.services.audit_review_preconditions import review_etag
+from app.services.audit_review_preconditions import review_etag, review_identity
 from app.services.audit_wire import analysis_core_equal
 
 MAX_BYTES = 2 * 1024 * 1024
-SCHEMA = "operator-audit-review-snapshot-1"
+SCHEMA = "operator-audit-review-snapshot-2"
 TAG = re.compile(r'"r1-[a-f0-9]{64}"')
+BINDING = re.compile(r"[a-f0-9]{64}")
 
 
 class ReviewClientError(RuntimeError):
@@ -35,6 +37,17 @@ class ReviewClientError(RuntimeError):
 def require(condition, message):
     if not condition:
         raise ReviewClientError(message)
+
+
+def identity_binding(identity):
+    require(
+        type(identity) is dict
+        and set(identity) == {"subject", "tenant_id", "auth_method"}
+        and all(isinstance(value, str) and value for value in identity.values())
+        and identity["auth_method"] in {"api_key", "oidc"},
+        "Invalid snapshot identity",
+    )
+    return review_identity(SimpleNamespace(**identity))
 
 
 def base_url(value):
@@ -109,11 +122,18 @@ class AuditReviewClient:
         )
         self._opener = build_opener(ProxyHandler({}), NoRedirect(), HTTPSHandler(context=context))
 
-    def _request(self, method, path, payload=None, *, etag=None):
+    def _request(self, method, path, payload=None, *, etag=None, caller_binding=None):
         data = None if payload is None else json.dumps(payload, allow_nan=False).encode()
         headers = self._headers | {"Accept": "application/json", "Content-Type": "application/json"}
         if etag is not None:
+            require(isinstance(etag, str) and TAG.fullmatch(etag), "Invalid review ETag")
             headers["If-Match"] = etag
+        if caller_binding is not None:
+            require(
+                isinstance(caller_binding, str) and BINDING.fullmatch(caller_binding),
+                "Invalid review caller binding",
+            )
+            headers["X-Review-Identity"] = caller_binding
         request = Request(
             self.url + path,
             data=data,
@@ -159,6 +179,15 @@ class AuditReviewClient:
         value, headers = self._request("GET", path)
         tags = headers.get_all("ETag", [])
         require(len(tags) == 1 and TAG.fullmatch(tags[0]), "One strong review ETag is required")
+        bindings = headers.get_all("X-Review-Identity", [])
+        require(
+            len(bindings) == 1
+            and BINDING.fullmatch(bindings[0])
+            and hmac.compare_digest(bindings[0], identity_binding(identity)),
+            "One matching review caller binding is required",
+        )
+        modes = headers.get_all("X-Review-Mode", [])
+        require(modes == ["conditional"], "Conditional review backend is required")
         record = AnalysisResult.model_validate(value)
         require(
             record.event_id == event_id and record.tenant_id == identity["tenant_id"],
@@ -171,19 +200,34 @@ class AuditReviewClient:
             "base_url": self.url,
             "identity": identity,
             "etag": tags[0],
+            "review_identity": bindings[0],
+            "review_mode": modes[0],
             "observed_at": datetime.now(UTC).isoformat(),
             "result": record.model_dump(mode="json"),
         }
 
     def review(self, snapshot, status, note):
+        require(type(snapshot) is dict, "Invalid snapshot fields")
         require(
-            type(snapshot) is dict
-            and set(snapshot)
-            == {"schema", "base_url", "identity", "etag", "observed_at", "result"},
+            snapshot.get("schema") == SCHEMA,
+            "Unsupported snapshot version; prepare and inspect a new snapshot",
+        )
+        require(
+            set(snapshot)
+            == {
+                "schema",
+                "base_url",
+                "identity",
+                "etag",
+                "observed_at",
+                "result",
+                "review_identity",
+                "review_mode",
+            },
             "Invalid snapshot fields",
         )
         require(
-            snapshot["schema"] == SCHEMA and snapshot["base_url"] == self.url,
+            snapshot["base_url"] == self.url,
             "Snapshot origin does not match the explicit target",
         )
         record = AnalysisResult.model_validate(snapshot["result"])
@@ -195,11 +239,17 @@ class AuditReviewClient:
             "Snapshot result or ETag was changed",
         )
         identity = snapshot["identity"]
+        binding = identity_binding(identity)
         require(
-            type(identity) is dict
-            and set(identity) == {"subject", "tenant_id", "auth_method"}
-            and identity["tenant_id"] == record.tenant_id,
+            identity["tenant_id"] == record.tenant_id,
             "Invalid snapshot identity",
+        )
+        require(snapshot["review_mode"] == "conditional", "Conditional review snapshot is required")
+        require(
+            isinstance(snapshot["review_identity"], str)
+            and BINDING.fullmatch(snapshot["review_identity"])
+            and hmac.compare_digest(snapshot["review_identity"], binding),
+            "Snapshot caller binding was changed",
         )
         # Validate everything locally before contacting the configured service.
         require(
@@ -212,7 +262,7 @@ class AuditReviewClient:
         path = "/results/" + self._event(record.event_id) + "/review"
         require(identity == self._identity(), "Current caller does not match snapshot identity")
         # No refetch/retry: a stale version is a conflict for the operator to review.
-        result, headers = self._request("PATCH", path, payload, etag=tag)
+        result, headers = self._request("PATCH", path, payload, etag=tag, caller_binding=binding)
         updated = AnalysisResult.model_validate(result)
         require(
             updated.analysis_id == record.analysis_id
@@ -229,6 +279,11 @@ class AuditReviewClient:
         )
         tags = headers.get_all("ETag", [])
         require(len(tags) == 1 and tags[0] == review_etag(updated), "Review response ETag mismatch")
+        bindings = headers.get_all("X-Review-Identity", [])
+        require(
+            len(bindings) == 1 and bindings[0] == binding,
+            "Review response caller binding mismatch; inspect current history before another review",
+        )
         return updated
 
 
