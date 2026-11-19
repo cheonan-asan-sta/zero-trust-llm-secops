@@ -1,4 +1,4 @@
-> 2026-11-19 extra 후속: [기존 워크벤치의 조회 버전·현재 신원·확인 후 검토 저장](docs/extra-workbench-review-20261119.md), [감사 페이지·동일 조회 기준 탐색](docs/extra-dashboard-paging-20261119.md), [대시보드 검토 보호](docs/extra-dashboard-review-20261119.md), [검토 CLI·HTTPS/mTLS](docs/extra-operator-review-client-20261119.md). 로컬 구현·검증이며 main/aitest 미병합. 기업 SSO·독립 성능 목표 완료와 구분한다.
+> 2026-11-19 extra 후속: [검토 CLI 서버 신원 연결·snapshot v2](docs/extra-cli-review-binding-20261119.md) — v1 파일은 새 prepare·확인 필요. [기존 워크벤치의 조회 버전·현재 신원·확인 후 검토 저장](docs/extra-workbench-review-20261119.md), [감사 페이지·동일 조회 기준 탐색](docs/extra-dashboard-paging-20261119.md), [대시보드 검토 보호](docs/extra-dashboard-review-20261119.md), [검토 CLI·HTTPS/mTLS](docs/extra-operator-review-client-20261119.md). 로컬 구현·검증이며 main/aitest 미병합. 기업 SSO·독립 성능 목표 완료와 구분한다.
 
 # zero-trust-llm-secops
 

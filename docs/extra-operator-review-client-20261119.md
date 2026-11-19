@@ -1,6 +1,6 @@
 # 운영자 검토 CLI: 읽은 버전·호출 신원·TLS 연결
 
-> 후속 안내: 이 문서는 `c0a8108` 당시 CLI 범위를 보존한다. 이후 [대시보드 검토](extra-dashboard-review-20261119.md)·[감사 페이지](extra-dashboard-paging-20261119.md)·[기존 워크벤치 검토](extra-workbench-review-20261119.md)는 각각 완료했다. 아래의 UI 미완료 표현은 CLI 작업 시점이며, CLI/다른 client의 서버 caller binding 소비와 워크벤치의 페이지 이전은 여전히 별도다.
+> 후속 안내: 이 문서는 `c0a8108` 당시 CLI 범위를 보존한다. 이후 [대시보드 검토](extra-dashboard-review-20261119.md)·[감사 페이지](extra-dashboard-paging-20261119.md)·[기존 워크벤치 검토](extra-workbench-review-20261119.md)는 각각 완료했다. 아래의 UI 미완료 표현은 CLI 작업 시점이며, [CLI 서버 caller binding 후속](extra-cli-review-binding-20261119.md)도 완료했다. 현재 CLI는 snapshot v2만 검토하며 v1은 새 파일로 prepare하고 다시 읽어야 한다. 아래 v1 계약·160건 수치는 과거 기록이다. 다른 custom client·서버 필수화 정책·워크벤치 페이지 이전은 남아 있다.
 
 2026-11-19 오전08:00 개발 마감 뒤의 별도 후속 작업이다. `extra` 전용 로컬 구현이며 GitHub 업로드·CI·main/aitest 병합·AWS·유료 API 호출은 하지 않았다. 구현 기준은 `c0a8108`이다.
 

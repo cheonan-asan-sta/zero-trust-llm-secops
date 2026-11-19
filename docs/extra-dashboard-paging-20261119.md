@@ -1,6 +1,6 @@
 # 대시보드의 검증된 감사 페이지 조회
 
-> 후속: 아래에서 남긴 기존 워크벤치의 검토 신원 binding 이전은 [워크벤치 후속](extra-workbench-review-20261119.md)에서 완료했다. 워크벤치 자체의 페이지 탐색 이전·전체 자유 검색·CLI/다른 client 서버 binding은 별도이며, 아래 수치는 감사 페이지 연결 시점이다.
+> 후속: 아래에서 남긴 기존 워크벤치의 검토 신원 binding 이전은 [워크벤치 후속](extra-workbench-review-20261119.md)에서 완료했다. [CLI 서버 binding](extra-cli-review-binding-20261119.md)도 후속으로 완료했다. 워크벤치 페이지 탐색 이전·전체 자유 검색·다른 custom client/서버 필수화 정책은 별도이며, 아래 수치는 감사 페이지 연결 시점이다.
 
 2026-11-19 · 로컬 `extra`. app/server 기준 `57b1590`, 브라우저 지연 fixture 후속 `72610d0`이며 두 commit 사이 app/tests는 동일하다. 유료 API·AWS·Docker 자원 생성·push·CI·main/aitest 병합은 하지 않았다.
 

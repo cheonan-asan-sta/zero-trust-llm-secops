@@ -1,0 +1,200 @@
+{
+  "schema": "extra-cli-review-binding-1",
+  "date_kst": "2026-11-19",
+  "branch": "extra",
+  "source_commit": "a293c8074de03289a245a34de61d7ab26dcc4817",
+  "baseline": {
+    "source_head": "0f4165aba9b52980e78803745ecca2f78c367a3b",
+    "test_was_new_and_untracked": true,
+    "not_a_full_clean_baseline_run": true,
+    "original_cli_git_lf_sha256": "18059f163057d8fa1453c37f662ccbb172b3d2f4efd45ef4713452afb8cb533f",
+    "expected_chain_rows": 2,
+    "observed_wrong_caller_commit_rows": 3
+  },
+  "pytest": {
+    "before": {
+      "tests": 1,
+      "errors": 0,
+      "failures": 1,
+      "skipped": 0,
+      "passed": 0,
+      "time_seconds": 5.063,
+      "artifact": "docs/infrastructure-results/cli-binding-before-20261119.xml",
+      "sha256": "d0f77c8599dc9a7854bcb36d5aca0798ded8fbe0be5bf50ceac57e1cc2e85b80",
+      "excluded": [],
+      "new_binding_cases": 1
+    },
+    "windows": {
+      "tests": 220,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 3,
+      "passed": 217,
+      "time_seconds": 41.818,
+      "artifact": "docs/infrastructure-results/cli-binding-final-windows-20261119.xml",
+      "sha256": "03f6b569456a0f15abd2152969d0014592fa8e189ad9d247dfea9f60612153e5",
+      "excluded": [
+        {
+          "case": "test_snapshot_symlink_and_fifo_are_rejected_without_read",
+          "reason": "POSIX symlink/FIFO file contract"
+        },
+        {
+          "case": "test_real_operator_cli_reads_then_reviews_once_and_refuses_replay",
+          "reason": "Owned native Linux worker fixture"
+        },
+        {
+          "case": "test_actual_http_review_version_survives_concurrent_writers_and_worker_loss",
+          "reason": "Owned Linux native worker fixture"
+        }
+      ],
+      "new_binding_cases": 26
+    },
+    "linux": {
+      "tests": 220,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "passed": 220,
+      "time_seconds": 65.54,
+      "artifact": "docs/infrastructure-results/cli-binding-final-linux-20261119.xml",
+      "sha256": "3226c8a52f22ba620711235bca2daad659783767e41025b7157275d89d17da72",
+      "excluded": [],
+      "new_binding_cases": 26
+    }
+  },
+  "new_cases_per_os": 26,
+  "new_actual_cli_tcp_cases_per_os": 2,
+  "existing_tls_mtls_cases_per_os": 6,
+  "transport_scope": "New CLI subprocess uses actual loopback TCP bridge into authenticated ASGI/SQLite; existing native Linux worker/CLI regression and independent TLS/mTLS transport cases included.",
+  "snapshot_schema": "operator-audit-review-snapshot-2",
+  "new_fields": [
+    "review_identity",
+    "review_mode"
+  ],
+  "v1_review_accepted": false,
+  "v1_automatically_upgraded": false,
+  "old_snapshot_files_modified": false,
+  "protocol": {
+    "mandatory_read_headers": [
+      "ETag",
+      "X-Review-Identity",
+      "X-Review-Mode"
+    ],
+    "required_mode": "conditional",
+    "write_headers": [
+      "If-Match",
+      "X-Review-Identity"
+    ],
+    "reply_caller_binding_verified": true,
+    "local_binding_identity_fields": [
+      "tenant_id",
+      "subject",
+      "auth_method"
+    ],
+    "not_authentication_token_or_signature_or_proof_of_reading": true,
+    "auto_rebase_retry_or_unconditional_fallback": false
+  },
+  "compatibility": {
+    "cli_arguments_unchanged": true,
+    "tls_verification_disabled_option": false,
+    "https_required_except_local_loopback": true,
+    "optional_mtls_preserved": true,
+    "redirects_followed": false,
+    "proxy_environment_inherited": false,
+    "server_strict_default_changed": false,
+    "server_binding_mandatory_for_all_clients": false
+  },
+  "scope": {
+    "server_ui_modified": false,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "docker_resources_created": 0,
+    "push": false,
+    "ci": false,
+    "merge": false,
+    "new_full_repository_run": false,
+    "eight_hour_soak": false,
+    "new_llm_quality_evaluation": false,
+    "tracked_labels_predictions_modified": false
+  },
+  "historical_synthetic_development_360": {
+    "precision_percent": 96.45,
+    "recall_percent": 90.56,
+    "f1_percent": 93.41,
+    "false_positive_rate_percent": 3.33,
+    "unchanged": true,
+    "independent_goal_qualified": false
+  },
+  "owned_resource_cleanup": "TCP bridges shutdown/server_close/thread join; actual CLI subprocesses use owned interpreters and bounded subprocess.run; existing native worker context kills/waits its process and TLS fixtures close their servers.",
+  "limitations": [
+    "V1 snapshots must be re-prepared into a new file and reviewed; no automatic migration.",
+    "Other custom clients and server-side mandatory binding policy still need inventory/rollout.",
+    "Public caller digest is not a human identity proof, signature, key generation binding or independent witness.",
+    "No new complete TLS deployment, enterprise SSO/online revocation, full suite or long-soak acceptance.",
+    "A response verification failure may follow a committed review; inspect current history rather than retry."
+  ],
+  "sources": [
+    {
+      "path": "scripts/audit_review_client.py",
+      "sha256": "67498007170045aa5cb869ce597b68038b159f2fedcc3d4f96d4a8c24a94d702",
+      "normalized_lf_sha256": "67498007170045aa5cb869ce597b68038b159f2fedcc3d4f96d4a8c24a94d702"
+    },
+    {
+      "path": "tests/test_audit_review_client_binding.py",
+      "sha256": "6607ade298eb368f8f2f76ba9eb22bc70a5a5bd46ea69e12d90f8cfd1965c096",
+      "normalized_lf_sha256": "6607ade298eb368f8f2f76ba9eb22bc70a5a5bd46ea69e12d90f8cfd1965c096"
+    },
+    {
+      "path": "tests/test_audit_review_client_binding_process.py",
+      "sha256": "f19a2dbd73e53135e5930fad7c740fcb65c0fefcd0e3c149cb66720955fd1155",
+      "normalized_lf_sha256": "f19a2dbd73e53135e5930fad7c740fcb65c0fefcd0e3c149cb66720955fd1155"
+    },
+    {
+      "path": "tests/test_audit_review_client_process.py",
+      "sha256": "b72e5c5fe4658b6b8ee7f594df84f2a3c2513ed5a0356720fdc23a053291895f",
+      "normalized_lf_sha256": "b72e5c5fe4658b6b8ee7f594df84f2a3c2513ed5a0356720fdc23a053291895f"
+    },
+    {
+      "path": "tests/test_audit_review_client_transport.py",
+      "sha256": "2a37f81cd8752e6a693d8edb89e092ca7e5c01d65826cce701c669eb571dce74",
+      "normalized_lf_sha256": "2a37f81cd8752e6a693d8edb89e092ca7e5c01d65826cce701c669eb571dce74"
+    },
+    {
+      "path": "app/main.py",
+      "sha256": "e416287b99b9c03667b16a6f7126181f0b8531f27ced75243438f2ecb7d7e063",
+      "normalized_lf_sha256": "5fc95c2616e5b7263c7d11963c7b363750177f3956303959966d97c84631e404"
+    },
+    {
+      "path": "app/services/audit_review_preconditions.py",
+      "sha256": "85c46854031f5c9f1bdb3397478598b2330d6c44ddb1813b67dc8597f44edd3e",
+      "normalized_lf_sha256": "85c46854031f5c9f1bdb3397478598b2330d6c44ddb1813b67dc8597f44edd3e"
+    },
+    {
+      "path": "app/services/audit_wire.py",
+      "sha256": "5a9177fe5ec00a983f113ffebb118b5fb5cd3de233fd89657dcc7122db67d814",
+      "normalized_lf_sha256": "5a9177fe5ec00a983f113ffebb118b5fb5cd3de233fd89657dcc7122db67d814"
+    },
+    {
+      "path": "scripts/local_process_runtime.py",
+      "sha256": "c31f0fbf2aacd32c20e6a8e82a5e34eceb1419bfd3601ae8dff296d6506088b4",
+      "normalized_lf_sha256": "c31f0fbf2aacd32c20e6a8e82a5e34eceb1419bfd3601ae8dff296d6506088b4"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/cli-binding-before-20261119.xml",
+      "sha256": "d0f77c8599dc9a7854bcb36d5aca0798ded8fbe0be5bf50ceac57e1cc2e85b80",
+      "bytes": 1510
+    },
+    {
+      "path": "docs/infrastructure-results/cli-binding-final-windows-20261119.xml",
+      "sha256": "03f6b569456a0f15abd2152969d0014592fa8e189ad9d247dfea9f60612153e5",
+      "bytes": 33512
+    },
+    {
+      "path": "docs/infrastructure-results/cli-binding-final-linux-20261119.xml",
+      "sha256": "3226c8a52f22ba620711235bca2daad659783767e41025b7157275d89d17da72",
+      "bytes": 32815
+    }
+  ]
+}

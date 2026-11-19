@@ -10,11 +10,13 @@
 
 이후 [대시보드 조회 버전·호출 신원 연결](extra-dashboard-review-20261119.md)을 `bef9a97`에 구현했다. 상세에서 연 결과를 그대로 If-Match에 연결하고, 호출자 binding은 서버에서도 검사한다. 신규 브라우저27조건·기존 Linux 운영146조건·조회57조건, 관련 pytest Windows206통과/23제외·Linux229통과다. 확인/충돌의 desktop·mobile 화면과 원본 결과를 보존했다. 브라우저 오류 fixture 보강은 별도 `bd1cb17`이며 app/tests는 동일하다. legacy workbench의 이전과 audit cursor 소비는 남아 있고 strict 기본값은 false다.
 
-최신 후속은 [대시보드 감사 페이지 연결](extra-dashboard-paging-20261119.md)이다. `57b1590`에서 `/audit/results?limit=12`와 현재 페이지 `page_cursor`를 연결해 과거100건 밖의 필터 조회·동일 snapshot 다음/이전·저장 전 신원 재검증을 구현했다. 신규 브라우저38·기존 검토27·조회57·Linux 운영146조건, 관련 pytest Windows233통과/25제외·Linux256통과/2제외다. fixture 후속 `72610d0`은 app/tests를 바꾸지 않았다. 위 문단의 cursor 미완료는 이전 시점이며 지금은 완료했다. 자유 검색·분석기는 현재 페이지 범위이고 legacy workbench/다른 목록의 이전은 남아 있다.
+대시보드 감사 페이지 후속은 [대시보드 감사 페이지 연결](extra-dashboard-paging-20261119.md)이다. `57b1590`에서 `/audit/results?limit=12`와 현재 페이지 `page_cursor`를 연결해 과거100건 밖의 필터 조회·동일 snapshot 다음/이전·저장 전 신원 재검증을 구현했다. 신규 브라우저38·기존 검토27·조회57·Linux 운영146조건, 관련 pytest Windows233통과/25제외·Linux256통과/2제외다. fixture 후속 `72610d0`은 app/tests를 바꾸지 않았다. 위 문단의 cursor 미완료는 이전 시점이며 지금은 완료했다. 자유 검색·분석기는 현재 페이지 범위이고 legacy workbench/다른 목록의 이전은 남아 있다.
+
+최신 후속은 [검토 CLI의 서버 호출 신원 연결](extra-cli-review-binding-20261119.md)이다. 구현 `a293c80`에서 최종 신원 확인 직후 같은 키의 subject가 바뀌어도 서버가 저장 전에403으로 거부하도록 조회 binding을 PATCH에 연결했다. 변경 전 새 재현1건은 실패했고, 개선 후 새26건을 포함해 Windows217통과/3제외·Linux220통과다. 스냅샷 v2를 사용하며 v1은 자동 변환하지 않는다. 새 파일로 prepare하고 내용을 다시 확인해야 한다. 서버·UI·모델은 변경하지 않았다.
 
 ## 기준과 실행 범위
 
-기존 워크벤치 검토도 [별도 후속](extra-workbench-review-20261119.md)으로 연결했다. frontend `6c0100f`·대비 보강 `1b8233d`이며 backend는 변경하지 않았다. 개별 인증·상세 ETag/caller binding·확인 후 저장·연결 변경 시 이전 화면/요청 폐기를 구현했다. 워크벤치 실제 브라우저32조건·기존 대시보드 검토27조건, 관련 pytest Windows191통과/3제외·Linux194통과다. 워크벤치의 검토 이전은 완료했고, CLI/다른 client의 서버 binding 소비와 워크벤치의 페이지 탐색 이전은 별도다.
+기존 워크벤치 검토도 [별도 후속](extra-workbench-review-20261119.md)으로 연결했다. frontend `6c0100f`·대비 보강 `1b8233d`이며 backend는 변경하지 않았다. 개별 인증·상세 ETag/caller binding·확인 후 저장·연결 변경 시 이전 화면/요청 폐기를 구현했다. 워크벤치 실제 브라우저32조건·기존 대시보드 검토27조건, 관련 pytest Windows191통과/3제외·Linux194통과다. 워크벤치의 검토 이전은 완료했다. 당시 남긴 CLI는 위 후속으로 연결했고, 다른 custom client와 워크벤치의 페이지 탐색 이전은 남아 있다.
 
 오전08:00 시점 app 기준은 `3165fc1`, 검토 연결은 `bef9a97`, 최신 감사 페이지 연결은 `57b1590`이다. 오전 당시 로컬의 `origin/main=e058bca`보다35개 commit이 앞섰다는 비교는 그 시점 기록이다. 원격을 새로 조회한 결과가 아니며 이번 작업을 push·CI·main/aitest 병합하지 않았다. 실행은 무료 로컬 Python·WSL·loopback HTTP/systemd다. AWS·유료 모델 API와 미뤄둔 실제8시간 soak는 실행하지 않았다.
 
@@ -48,7 +50,7 @@
 | 항목 | 현재 한계/다음 확인 |
 |---|---|
 | 전체 회귀 | 전체 실행 종료. 두 기대값 수정 후 관련 재검증 통과. 수정 후 새 전체 실행·Windows 전체 플랫폼 정리는 별도 미실행 |
-| 사람의 오래된 검토 화면 | 자체 대시보드·기존 워크벤치 모두 ETag와 서버 caller binding 연결 완료. CLI는 기존 client 측 신원/버전 검사이며 서버 binding 소비는 별도. strict 기본 false 유지 |
+| 사람의 오래된 검토 화면 | 자체 대시보드·기존 워크벤치·CLI 모두 ETag와 서버 caller binding 연결 완료. CLI v1 파일은 새 prepare 필요. 다른 custom client 목록화/이전·서버 필수화 정책은 별도이며 strict 기본 false 유지 |
 | 대시보드 전체 검색/다른 목록 | 로그 탐색의 감사 cursor 소비는 완료. 자유 검색·분석기는 현재 페이지 범위. 다른 목록과 워크벤치의 페이지 탐색 이전·전체 범위 자유 검색 설계는 남음 |
 | 독립 최신성 증명 | checkpoint 파일/DB/pin 전체를 함께 되돌릴 수 있는 관리자에 대한 독립 witness/WORM 미완료. 최소 history 검증을 전체 최신성 보장으로 표현하지 않음 |
 | 실제 기업 신원 | 로컬 signed OIDC/JWKS·key 계정 철회 시험은 완료했지만 외부 기업 SSO/MFA·online token revocation은 미완료 |
