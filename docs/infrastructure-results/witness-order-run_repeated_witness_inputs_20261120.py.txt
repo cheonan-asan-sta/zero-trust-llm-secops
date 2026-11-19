@@ -1,0 +1,54 @@
+"""Authored repeated inputs; only the test input selector is replaced in memory."""
+import hashlib
+import json
+import sys
+import time
+from pathlib import Path
+from types import SimpleNamespace
+
+source=Path(sys.argv[1]).resolve();output=Path(sys.argv[2]).resolve()
+manifest=json.loads(Path(sys.argv[3]).read_text(encoding='utf-8'))
+assert source==Path(manifest['path']).resolve()
+output.mkdir(exist_ok=False,parents=True);sys.path.insert(0,str(source))
+from scripts import run_witness_safety_sequence as sequence
+from app.services import audit_witness as witness
+from app.services import audit_witness_observer as observer
+from app.services import audit_witness_observer_backup as backup
+
+def altered():return [n for n,h in manifest['files'].items() if hashlib.sha256((source/n).read_bytes()).hexdigest()!=h]
+assert not altered()
+patterns=[['lost_before']*9,['lost_after']*9,['lost_after','backup_handoff','restore_resume']*3,
+          ['audit_rollback','control_rollback','lost_after']*3,['backup_handoff']*9,
+          ['restore_resume']*9,['control_rollback']*9,['audit_rollback']*9,
+          ['cycle']*9,['freshness']*9,['append','control_rollback','cycle']*3,['append']*9]
+assert all(len(p)==9 and set(p)<=set(sequence.ACTIONS) for p in patterns)
+(output/'authored-patterns.json').write_text(json.dumps(patterns,indent=2)+'\n',encoding='utf-8')
+original_random=sequence.random
+service_functions=(witness.observe,observer.cycle,observer.status,backup.backup,backup.restore)
+class InputSelector:
+    def __init__(self,seed):
+        self.count=0;self.count_rng=original_random.Random(seed)
+    def shuffle(self,actions):
+        actions[:]=patterns[self.count];self.count+=1
+    def randint(self,*args):return self.count_rng.randint(*args)
+
+started=time.monotonic()
+result={'schema':'owned-authored-repeated-witness-inputs-1','source_commit':manifest['source_commit'],'completed':False,'test_input_selector_replaced_in_memory':True,'product_service_functions_replaced':False,'normal_seed_shuffle_not_exercised':True,'seed_controls_append_counts_only':True,'not_independent_detection_cases':True,'not_part_of_504_distinct_triple_metric':True,'paid_api_calls':0,'detection_metrics_changed':False,'real_8h_soak':False}
+try:
+    sequence.random=SimpleNamespace(Random=InputSelector)
+    value=sequence.run(output/'sequence',seed=20261120,rounds=len(patterns),max_seconds=900)
+    rows=[json.loads(line) for line in (output/'sequence/trace.jsonl').read_text(encoding='utf-8').splitlines()]
+    assert value['completed'] and len(rows)==108 and [r['action'] for r in rows]==[a for p in patterns for a in p]
+    assert all(r['passed'] is True for r in rows)
+    assert service_functions==(witness.observe,observer.cycle,observer.status,backup.backup,backup.restore)
+    result['protocol_report']=value
+    result['executed_steps']=len(rows);result['authored_rounds']=len(patterns)
+    result['mutated_source_files']=altered();result['source_bytes_unchanged']=not result['mutated_source_files']
+    result['completed']=result['source_bytes_unchanged']
+finally:
+    sequence.random=original_random
+    result['test_selector_restored']=sequence.random is original_random
+    result['elapsed_seconds']=time.monotonic()-started
+    (output/'result.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({k:result[k] for k in ['completed','source_commit','elapsed_seconds']}))
+raise SystemExit(0 if result['completed'] else 1)
