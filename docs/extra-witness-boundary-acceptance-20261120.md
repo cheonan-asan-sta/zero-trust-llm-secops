@@ -55,3 +55,13 @@
 같은b77/추적2241개 파일의 대용량4096 서명 control fixture를 별도 비루트 transient systemd unit에서 다시 실행했다. MemoryMax256MiB·CPUQuota50%·TasksMax8을 실제 자기 cgroup 값으로 확인했고, 8개 검증 조건이 통과했다. 최대 메모리140,496,896bytes(약134MiB), memory limit hit0·OOM kill0·CPU throttled period296이었다. 시스템 전체 메모리 수치를 가져온 것이 아니다. 이 단일 fixture의 결과를 모든 최대 입력의 메모리 상한이나 처리량 보증으로 해석하지 않는다.
 
 기존 계정chaehj02를 사용했으며 새 계정이나/etc 설정을 만들지 않았다. NoNewPrivileges·빈 capability·private network도 사용했지만 전체 운영 sandbox 템플릿을 재현한 시험은 아니므로 그 인수와 구분한다. 앞의 preload4094개+실제 관측 경계 방식 그대로이며 실제 collector4096회로 바꾸어 설명하지 않는다. 원본 harness의 service_memory_limit_verified:false 표기는 최초 도구의 범위를 나타내므로 편집하지 않았고, 별도 cgroup-resources/resource-acceptance 원본에서 추가 확인을 연결했다. 비공개 fixture·소유 transient unit/임시 트리 정리와 제품 소스 불변을 확인했다.
+
+## 감사 원본 행 한도의 별도 자원 검증
+
+서명 control4096개와 별도로 감사 원본 MAX_ROWS의 실제 설정100,000행도 확인했다. 유효한 서로 다른 analysis ID를 갖는 합성 payload/해시 체인을 단일 fixture DB에 bulk 적재했다. 실제 API 수집10만 회·독립 공격10만 건은 아니며 한도 상수도 바꾸지 않았다. payload92,100,000bytes·DB136,884,224bytes였고, MAX_BYTES256MiB까지 채운 시험은 아니다.
+
+같은b77·추적2241개 파일에서 실제 full chain 검증·head100000 서명·collector 확인·중간50000행 손상 거부·동일 pending ID 재개5조건을 통과했다. 임시 시험 unit은256MiB/CPU50%/Tasks8이며 최대 메모리236,150,784bytes(약225MiB), limit hit0·OOM kill0·throttle575였다. 이 한 입력의 결과이며 모든 최대 크기 payload/대용량 control과의 조합까지 보증하지 않는다. 기존 서명 control4096개 fixture와 이 원본 행 규모 시험을 합쳐 한 번에 실행한 것처럼 표시하지 않는다.
+
+손상 주입 후 서명 journal은 그대로였고 pending이 남았다. 시험 부모가 원래 알고 있던 fixture payload를 되돌린 뒤 같은 observation ID로 새 서명/anchor를 만들었다. 제품에 자동 원본 복구 기능을 추가한 것이 아니다. 첫 도구는 recovered:true를 기대해 실패했다. 실제 recovered는 이미 만들어진 서명의 replay 여부이며 이번에는 손상 때문에 서명 전에 거부했으므로 false가 맞다. 마지막 anchor의 observation ID가 저장된 pending과 같은지 직접 대조하고 false도 명시적으로 확인하도록 단언을 보완했다.
+
+최초 실패/도구v1도 보존했다. 초기 자원 wrapper의 finally가 일반 예외를 harness_exit_code0으로 남겼으나 실제 systemd 종료는1·completed:false였고 성공으로 집계하지 않았다. 또한 부모가 실패 결과에 없는 source_bytes_unchanged를 읽어 KeyError를 냈다. wrapper가 일반 예외를1로 기록하고 실패 필드 누락을 false로 처리하도록 보완했으며, 제품 소스는 바꾸지 않았다. 수정 실행의 실제 종료0·원본 검증 완료·비공개 fixture/소유 unit 정리·추적 소스 불변을 확인했다.

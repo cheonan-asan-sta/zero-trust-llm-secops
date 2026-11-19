@@ -1,0 +1,29 @@
+{
+  "unit": "zt-large-witness-8f74095cec304c5a8b3b6fe80f02ad73.service",
+  "temporary_root": "/var/tmp/zt-owned-large-resource-vqfhwzht",
+  "command": [
+    "systemd-run",
+    "--unit=zt-large-witness-8f74095cec304c5a8b3b6fe80f02ad73.service",
+    "--wait",
+    "--pipe",
+    "--collect",
+    "--property=User=chaehj02",
+    "--property=Group=1000",
+    "--property=MemoryMax=256M",
+    "--property=CPUQuota=50%",
+    "--property=TasksMax=8",
+    "--property=RuntimeMaxSec=600",
+    "--property=NoNewPrivileges=yes",
+    "--property=CapabilityBoundingSet=",
+    "--property=PrivateNetwork=yes",
+    "--property=RestrictAddressFamilies=AF_UNIX",
+    "--setenv=AWS_EC2_METADATA_DISABLED=true",
+    "--setenv=PYTHONDONTWRITEBYTECODE=1",
+    "/home/chaehj02/team-llm-prep-venv/bin/python",
+    "/var/tmp/zt-owned-large-resource-vqfhwzht/worker.py",
+    "/home/chaehj02/witness-verified-source-20261120-b77eceb3",
+    "/mnt/c/Users/chaeh/Desktop/\ud30c\ub780\ud559\uae30/tmp/extra-development-20261118/runtime/extra-until0800-latest-source-linux-20261120.json",
+    "/mnt/c/Users/chaeh/Desktop/\ud30c\ub780\ud559\uae30/tmp/extra-development-20261118/runtime/run_witness_source_scale_20261120.py",
+    "/var/tmp/zt-owned-large-resource-vqfhwzht/work/result"
+  ]
+}

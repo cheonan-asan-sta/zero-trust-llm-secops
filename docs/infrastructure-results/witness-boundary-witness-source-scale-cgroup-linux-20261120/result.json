@@ -1,0 +1,37 @@
+{
+  "schema": "witness-bulk-source-scale-1",
+  "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "completed": false,
+  "checks": [
+    {
+      "name": "all_maximum_rows_really_validate",
+      "passed": true,
+      "elapsed_seconds": 6.3894942790011555
+    },
+    {
+      "name": "real_signature_covers_maximum_source_head",
+      "passed": true,
+      "elapsed_seconds": 15.236602971999673
+    },
+    {
+      "name": "real_collector_validates_large_source",
+      "passed": true,
+      "elapsed_seconds": 35.49880614600079
+    },
+    {
+      "name": "middle_corruption_refuses_without_signing",
+      "passed": true,
+      "elapsed_seconds": 38.479274440000154
+    }
+  ],
+  "source_rows": 100000,
+  "all_rows_synthetic_bulk_fixture": true,
+  "not_actual_api_ingestions": true,
+  "limits_monkeypatched": false,
+  "paid_api_calls": 0,
+  "detection_metrics_changed": false,
+  "independent_storage_verified": false,
+  "payload_bytes": 92100000,
+  "database_bytes": 136884224,
+  "elapsed_seconds": 55.820287398999426
+}

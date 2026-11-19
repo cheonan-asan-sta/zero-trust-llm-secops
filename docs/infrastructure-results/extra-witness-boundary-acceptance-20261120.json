@@ -277,6 +277,78 @@
     {
       "path": "docs/infrastructure-results/witness-boundary-run_large_witness_cgroup_20261120.py.txt",
       "sha256": "01082bf1d570dbdfc492a450d12020566c45f3dfe9e4458ebd56dce9a8c8b641"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-20261120/cgroup-resources.json",
+      "sha256": "114474454aa0da125130a313ab27286233bde0ee7cc3fddfc82735210c102f5b"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-20261120/ownership.json",
+      "sha256": "cdde3b285addbab388cac8252e12f9b6c6ba9a718dff0252cfbdcaa15b42ef9c"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-20261120/progress.json",
+      "sha256": "8e97f17d3a83d66b682796099459c8adb3677159c057379c93cbf2808d59c8ca"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-20261120/resource-acceptance.json",
+      "sha256": "5d456810ace32f1d127f3cc7192eff44ef554aac18369156aee4221a6a75989a"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-20261120/result.json",
+      "sha256": "3cf867b24a2856cd7480a7b6dd54105eb747be4e353974408015fd39d9467d62"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-20261120/stderr.log",
+      "sha256": "699848c968ecdd63ed77a9a3d4da58286e3df9724ee76a2807e836e8c1c0f7fb"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-20261120/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-fixed-20261120/cgroup-resources.json",
+      "sha256": "2d7a587acddcc9b126164e532a22866159316627c943b2b7b1eeea7ff16a707c"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-fixed-20261120/ownership.json",
+      "sha256": "473d98a451e229611d2480d26cdde1fab1e994a04604d0f3428795157373afb3"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-fixed-20261120/progress.json",
+      "sha256": "1434ba452f18a4662610e654c98ee3bec41d8c5a54aa0e9d37475fefcad48911"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-fixed-20261120/resource-acceptance.json",
+      "sha256": "c249ecb886fa6bfde981f661ad2598827048b2fb63edbd2d9c7d1ecafbdea367"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-fixed-20261120/result.json",
+      "sha256": "e828b32885dc9f711a5a2290a323e022572c8278757248d195f32c4d167401e5"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-fixed-20261120/stderr.log",
+      "sha256": "de4b40253bfbc7afeeb05fe4c6fe82218183c4097c84bb9903b29b77ea6e3ca6"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-fixed-20261120/stdout.log",
+      "sha256": "ae6b76098a6a9ee5acb9ef31aefa3e8502d00c070ca812da47ca863354062c74"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-run_witness_source_scale_20261120-v1.py.txt",
+      "sha256": "8048342e19ba17eda3b9762cc024584c34a79e3c8b27011403597b20f660d573"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-run_witness_source_scale_20261120.py.txt",
+      "sha256": "5f374b06b23c178445fd945858c634c7a87ae81e00a2579020c142f18f411498"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-run_source_scale_cgroup_20261120-v1.py.txt",
+      "sha256": "b2cfc03f689a3b0428d4ad29188fffa9bce195f5a1fef2e3e9a7f361e04c3b6a"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-run_source_scale_cgroup_20261120.py.txt",
+      "sha256": "ccbb1b1ed034cbe0fe52a6f2de9d9ffd82ffc4ca778e984f653beb8c28a9f1ad"
     }
   ],
   "real_default_cadence": {
@@ -354,5 +426,58 @@
     "production_sandbox_tested": false,
     "owned_unit_inactive": true,
     "owned_temporary_tree_removed": true
+  },
+  "maximum_source_rows_resource_runs": {
+    "initial": {
+      "schema": "owned-large-witness-resource-envelope-1",
+      "unit": "zt-large-witness-8f74095cec304c5a8b3b6fe80f02ad73.service",
+      "completed": false,
+      "production_sandbox_tested": false,
+      "unit_created_in_etc": false,
+      "paid_api_calls": 0,
+      "owned_temporary_tree_removed": true,
+      "owned_unit_inactive": true
+    },
+    "fixed": {
+      "schema": "owned-large-witness-resource-envelope-1",
+      "unit": "zt-large-witness-9db404bd592a4192be59a8daad4d2bdc.service",
+      "completed": true,
+      "production_sandbox_tested": false,
+      "unit_created_in_etc": false,
+      "paid_api_calls": 0,
+      "exit_code": 0,
+      "resources": {
+        "before": {
+          "cpu_usage_nsec": 25912000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 6819840,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": 50.0,
+          "throttled_periods": 0,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 8
+        },
+        "after": {
+          "cpu_usage_nsec": 28841551000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 236150784,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": 50.0,
+          "throttled_periods": 575,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 8
+        },
+        "harness_exit_code": 0
+      },
+      "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+      "source_bytes_unchanged": true,
+      "large_fixture_checks": 5,
+      "owned_temporary_tree_removed": true,
+      "owned_unit_inactive": true
+    }
   }
 }

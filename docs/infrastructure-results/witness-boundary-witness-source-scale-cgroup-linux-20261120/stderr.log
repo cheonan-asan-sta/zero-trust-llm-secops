@@ -1,0 +1,17 @@
+Running as unit: zt-large-witness-8f74095cec304c5a8b3b6fe80f02ad73.service
+Traceback (most recent call last):
+  File "/var/tmp/zt-owned-large-resource-vqfhwzht/worker.py", line 9, in <module>
+    try:runpy.run_path(harness,run_name="__main__")
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 286, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/c/Users/chaeh/Desktop/파란학기/tmp/extra-development-20261118/runtime/run_witness_source_scale_20261120.py", line 68, in <module>
+    check('original_pending_resumes_after_fixture_repair',repaired['recovered'] and state['state']=='healthy' and not state['pending'] and state['anchor_count']==2 and state['unobserved_rows']==0)
+  File "/mnt/c/Users/chaeh/Desktop/파란학기/tmp/extra-development-20261118/runtime/run_witness_source_scale_20261120.py", line 29, in check
+    assert value,name
+           ^^^^^
+AssertionError: original_pending_resumes_after_fixture_repair
+Finished with result: exit-code
+Main processes terminated with: code=exited/status=1
+Service runtime: 58.454s

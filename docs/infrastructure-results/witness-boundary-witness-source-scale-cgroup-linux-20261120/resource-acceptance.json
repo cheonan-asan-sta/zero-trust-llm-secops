@@ -1,0 +1,10 @@
+{
+  "schema": "owned-large-witness-resource-envelope-1",
+  "unit": "zt-large-witness-8f74095cec304c5a8b3b6fe80f02ad73.service",
+  "completed": false,
+  "production_sandbox_tested": false,
+  "unit_created_in_etc": false,
+  "paid_api_calls": 0,
+  "owned_temporary_tree_removed": true,
+  "owned_unit_inactive": true
+}
