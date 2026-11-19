@@ -431,7 +431,7 @@
     },
     {
       "path": "docs/infrastructure-results/until0800-harness-audit_witness_evidence_20261120.py.txt",
-      "sha256": "2654c099fd5feb491753ceec93c884809e720631b159582a8d44c6040b8407ef"
+      "sha256": "e75399c370eb4c2ad65c7fff39092845ff36c6052b5635b1052ee20713c1420e"
     },
     {
       "path": "docs/infrastructure-results/until0800-until0800-windows-launcher-cp949-reproduction-20261120.log",
@@ -440,6 +440,14 @@
     {
       "path": "docs/infrastructure-results/until0800-witness-evidence-audit-uncommitted-metadata-20261120.log",
       "sha256": "e1003facbe2c56cd0c7309505b537873ad2dbf9f8401025e97bbcb461a0b1e9e"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-origin-until0800-archive-origin-20261120.json",
+      "sha256": "b14977ac7e81813b9c9cdf15bf50e0daafa097c4a8022001b09706d4735f76ff"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-origin-verify_archive_checkout_origin_20261120.py.txt",
+      "sha256": "7d91e812859c33c8eb40674f5abf9e6f62e23cfe046cd50ceadb9ecc4e552e5b"
     },
     {
       "path": "docs/infrastructure-results/until0800-extra-until0800-source-20261120.json",
