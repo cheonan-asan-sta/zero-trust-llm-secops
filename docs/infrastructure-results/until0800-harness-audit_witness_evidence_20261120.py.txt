@@ -10,6 +10,8 @@ head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
 tracked=set(subprocess.check_output(['git','ls-tree','-r','-z','--name-only',head]).decode('utf-8').split('\0'))
 manifests=[root/n for n in sorted(tracked) if n.startswith('docs/infrastructure-results/extra-witness') and n.endswith('-20261120.json')]
 manifests.append(root/'docs/infrastructure-results/extra-local-regression-repairs-20261120.json')
+if 'docs/infrastructure-results/extra-local-report-boundaries-20261120.json' in tracked:
+    manifests.append(root/'docs/infrastructure-results/extra-local-report-boundaries-20261120.json')
 manifests += [root/name for name in sorted(tracked) if name.startswith('docs/infrastructure-results/extra-until0800-') and name.endswith('-20261120.json')]
 result={'schema':'committed-witness-evidence-audit-1','review_commit':head,'source_hash_checks':0,'artifact_hash_checks':0,'document_links_checked':0,'errors':[],'manifests':[],'paid_api_calls':0}
 process=subprocess.Popen(['git','cat-file','--batch'],stdin=subprocess.PIPE,stdout=subprocess.PIPE)
@@ -34,6 +36,11 @@ try:
         for name,expected in m.get('source_sha256',{}).items():
             result['source_hash_checks']+=1
             if digest(m['implementation_commit']+':'+name)!=expected:result['errors'].append('source:'+name)
+        for reference in m.get('tested_source_manifest_references',{}).values():
+            tested=json.loads(subprocess.check_output(['git','show',head+':'+reference]))
+            for name,expected in m.get('tested_source_sha256',{}).items():
+                result['source_hash_checks']+=1
+                if tested['files'].get(name)!=expected:result['errors'].append('tested-source:'+name)
         for a in m.get('artifacts',[]):
             result['artifact_hash_checks']+=1
             if digest(head+':'+a['path'])!=a['sha256']:result['errors'].append('artifact:'+a['path'])
@@ -42,6 +49,7 @@ finally:
 
 docs=[root/n for n in sorted(tracked) if n.startswith('docs/extra-witness') and n.endswith('-20261120.md')]
 docs += [root/'docs/extra-local-regression-repairs-20261120.md',root/'docs/extra-until-0800-20261120.md']
+if 'docs/extra-local-report-boundaries-20261120.md' in tracked:docs.append(root/'docs/extra-local-report-boundaries-20261120.md')
 docs += [root/name for name in sorted(tracked) if name.startswith('docs/extra-until0800-') and name.endswith('-20261120.md')]
 for path in docs:
     content=subprocess.check_output(['git','show',head+':'+path.relative_to(root).as_posix()]).decode('utf-8')
