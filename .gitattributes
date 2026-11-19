@@ -82,3 +82,5 @@ docs/infrastructure-results/witness-monitor-* -text whitespace=-blank-at-eol,cr-
 docs/infrastructure-results/witness-alert-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
 
 docs/infrastructure-results/witness-control-backup-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-restore-inspection-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
