@@ -1,0 +1,235 @@
+{
+  "schema": "dashboard-browser-1",
+  "synthetic": true,
+  "checks": [
+    {
+      "name": "isolated_rule_only_local_server",
+      "passed": true
+    },
+    {
+      "name": "real_api_metrics_and_synthetic_scope",
+      "passed": true
+    },
+    {
+      "name": "keyboard_skip_link_preserves_current_page",
+      "passed": true
+    },
+    {
+      "name": "verified_audit_logs_pagination",
+      "passed": true
+    },
+    {
+      "name": "risk_search_and_review_filters",
+      "passed": true
+    },
+    {
+      "name": "legacy_analysis_does_not_invent_verified_context",
+      "passed": true
+    },
+    {
+      "name": "filtered_page_json_export",
+      "passed": true
+    },
+    {
+      "name": "session_filter_and_server_history",
+      "passed": true
+    },
+    {
+      "name": "real_approval_records_read_only",
+      "passed": true
+    },
+    {
+      "name": "actual_normal_protected_access_200",
+      "passed": true
+    },
+    {
+      "name": "actual_consumed_grant_denied_403",
+      "passed": true
+    },
+    {
+      "name": "actual_revoked_unused_grant_denied_403",
+      "passed": true
+    },
+    {
+      "name": "historical_logs_show_calendar_year",
+      "passed": true
+    },
+    {
+      "name": "stored_markup_is_text",
+      "passed": true
+    },
+    {
+      "name": "token_fields_redacted_from_export",
+      "passed": true
+    },
+    {
+      "name": "verified_evidence_distinguishes_caller_mfa_scope_and_advisory_result",
+      "passed": true
+    },
+    {
+      "name": "evidence_citations_never_execute_markup_or_expose_bearer",
+      "passed": true
+    },
+    {
+      "name": "inline_evidence_does_not_invent_a_tool_read",
+      "passed": true
+    },
+    {
+      "name": "evidence_detail_390_no_horizontal_overflow",
+      "passed": true
+    },
+    {
+      "name": "evidence_detail_768_no_horizontal_overflow",
+      "passed": true
+    },
+    {
+      "name": "evidence_detail_1440_no_horizontal_overflow",
+      "passed": true
+    },
+    {
+      "name": "evidence_detail_200_percent_zoom_no_horizontal_overflow",
+      "passed": true
+    },
+    {
+      "name": "invalid_booleans_missing_tokens_and_incomplete_comparisons_stay_unknown",
+      "passed": true
+    },
+    {
+      "name": "malformed_optional_evidence_does_not_hide_the_original_assessment",
+      "passed": true
+    },
+    {
+      "name": "malformed_optional_trace_never_becomes_verified_usage",
+      "passed": true
+    },
+    {
+      "name": "http_401_removes_stale_logs",
+      "passed": true
+    },
+    {
+      "name": "http_403_removes_stale_logs",
+      "passed": true
+    },
+    {
+      "name": "http_503_removes_stale_logs",
+      "passed": true
+    },
+    {
+      "name": "malformed_metrics_not_presented_as_zero",
+      "passed": true
+    },
+    {
+      "name": "successful_empty_result_distinct_from_failure",
+      "passed": true
+    },
+    {
+      "name": "identity_switch_cancels_old_tenant_results",
+      "passed": true
+    },
+    {
+      "name": "credential_not_in_dom_or_browser_storage",
+      "passed": true
+    },
+    {
+      "name": "reload_forgets_credential",
+      "passed": true
+    },
+    {
+      "name": "unavailable_approval_service_not_empty_approval_list",
+      "passed": true
+    },
+    {
+      "name": "layout_390_overview_no_document_overflow",
+      "passed": true
+    },
+    {
+      "name": "layout_390_logs_no_document_overflow",
+      "passed": true
+    },
+    {
+      "name": "layout_390_sessions_no_document_overflow",
+      "passed": true
+    },
+    {
+      "name": "layout_390_evidence_no_document_overflow",
+      "passed": true
+    },
+    {
+      "name": "layout_390_demo_no_document_overflow",
+      "passed": true
+    },
+    {
+      "name": "layout_768_overview_no_document_overflow",
+      "passed": true
+    },
+    {
+      "name": "layout_768_logs_no_document_overflow",
+      "passed": true
+    },
+    {
+      "name": "layout_768_sessions_no_document_overflow",
+      "passed": true
+    },
+    {
+      "name": "layout_768_evidence_no_document_overflow",
+      "passed": true
+    },
+    {
+      "name": "layout_768_demo_no_document_overflow",
+      "passed": true
+    },
+    {
+      "name": "layout_1440_overview_no_document_overflow",
+      "passed": true
+    },
+    {
+      "name": "layout_1440_logs_no_document_overflow",
+      "passed": true
+    },
+    {
+      "name": "layout_1440_sessions_no_document_overflow",
+      "passed": true
+    },
+    {
+      "name": "layout_1440_evidence_no_document_overflow",
+      "passed": true
+    },
+    {
+      "name": "layout_1440_demo_no_document_overflow",
+      "passed": true
+    },
+    {
+      "name": "legacy_workbench_preserved_with_return_link",
+      "passed": true
+    },
+    {
+      "name": "new_log_created_through_actual_rule_api",
+      "passed": true
+    },
+    {
+      "name": "automatic_refresh_displays_new_server_records",
+      "passed": true
+    },
+    {
+      "name": "no_browser_script_errors",
+      "passed": true
+    },
+    {
+      "name": "no_external_browser_requests",
+      "passed": true
+    },
+    {
+      "name": "restart_preserves_records_without_duplicate_seeding",
+      "passed": true
+    },
+    {
+      "name": "restart_preserves_demo_session_revocation",
+      "passed": true
+    },
+    {
+      "name": "unowned_data_directory_rejected_without_modification",
+      "passed": true
+    }
+  ],
+  "passed": true
+}

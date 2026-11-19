@@ -1,3 +1,5 @@
+> 2026-11-19 extra: [워크벤치·대시보드의 세션/사고 페이지](docs/extra-collection-pages-ui-20261119.md) 연결 완료. 실제 브라우저112조건·기존 검토34/조회57조건·관련 Python 양 OS72건 통과. [지속 목표](docs/extra-active-development-goal-20261119.md)는 호출 정책 준비·별도 감사 검증자 개발로 이어진다. 미업로드·미병합.
+
 > 2026-11-19 extra 개발 중: [세션·사고 페이지 서버 API](docs/extra-collection-paging-20261119.md)와 양 OS49건 기능 검증 완료. UI 연결은 남았으며 [지속 목표](docs/extra-active-development-goal-20261119.md)는 활성 상태다. 미업로드·미병합.
 
 > 2026-11-19 extra: [전체 감사 기록 검색·분석기 필터](docs/extra-audit-search-20261119.md) 구현. [지속 개발 목표](docs/extra-active-development-goal-20261119.md)는 활성 상태이며 세션·사고 페이지와 별도 감사 검증자 개발을 이어간다. 로컬 검증, 미업로드·미병합.
