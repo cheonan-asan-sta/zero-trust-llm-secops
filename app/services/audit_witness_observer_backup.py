@@ -174,9 +174,9 @@ def backup(directory, profile_sha256, minimum_receipt, destination, key):
             "automatic_activation_allowed": False}
 
 
-def _unpack(package, expected_backup_sha256, profile_sha256, key):
-    require(type(key) is bytes and len(key) == 32 and witness._hex(expected_backup_sha256)
-            and witness._hex(profile_sha256), "observer restore external pins/key required")
+def _package(package, expected_backup_sha256, profile_sha256):
+    require(witness._hex(expected_backup_sha256) and witness._hex(profile_sha256),
+            "observer backup external package/profile pins required")
     package = Path(package)
     raw = _bytes(package, MAX_PAYLOAD + MAX_HEADER + 28)
     require(sha(raw) == expected_backup_sha256, "observer backup package pin mismatch")
@@ -184,7 +184,10 @@ def _unpack(package, expected_backup_sha256, profile_sha256, key):
     length = int.from_bytes(raw[8:12], "big")
     require(0 < length <= MAX_HEADER and 12 + length + 16 < len(raw), "observer backup header length rejected")
     raw_header = raw[12:12 + length]
-    header = decode(raw_header)
+    try:
+        header = decode(raw_header)
+    except (ValueError, UnicodeError, RecursionError):
+        raise AuditTransferError("observer backup header JSON rejected") from None
     require(type(header) is dict and set(header) == {
         "schema", "algorithm", "backup_id", "created_at", "profile_sha256", "minimum_receipt",
         "scope", "files", "payload_sha256", "payload_bytes", "nonce"
@@ -213,8 +216,14 @@ def _unpack(package, expected_backup_sha256, profile_sha256, key):
     nonce = base64.b64decode(header["nonce"], altchars=b"-_", validate=True)
     require(len(nonce) == 12 and len(raw) == 12 + length + header["payload_bytes"] + 16,
             "observer backup ciphertext size rejected")
+    return header, raw_header, nonce, raw[12 + length:]
+
+
+def _unpack(package, expected_backup_sha256, profile_sha256, key):
+    require(type(key) is bytes and len(key) == 32, "observer restore 32-byte key required")
+    header, raw_header, nonce, encrypted = _package(package, expected_backup_sha256, profile_sha256)
     try:
-        payload = AESGCM(key).decrypt(nonce, raw[12 + length:], MAGIC + raw_header)
+        payload = AESGCM(key).decrypt(nonce, encrypted, MAGIC + raw_header)
     except InvalidTag:
         raise AuditTransferError("observer backup authentication failed") from None
     require(sha(payload) == header["payload_sha256"], "observer backup payload digest rejected")
@@ -264,4 +273,51 @@ def restore(package, destination, expected_backup_sha256, profile_sha256, minimu
         _sync(target)
     return {"restore_receipt_sha256": sha(raw_receipt), "profile_sha256": profile_sha256,
             **_scope(final), "private_signing_key_included": False,
+            "independent_storage_verified": False, "automatic_activation_allowed": False}
+
+
+def inspect_restore(package, directory, expected_backup_sha256, expected_restore_receipt_sha256,
+                    profile_sha256, minimum_receipt):
+    """Keyless immutable-byte and signed-ancestry checks, not a decryption test.
+
+Package/receipt pins must have been retained from an approved backup/restore.
+Never discover a new receipt pin, sign a new observation, refresh the original
+restore time or require custody of a recovery/signing key for monitoring.
+"""
+    require(witness._hex(expected_restore_receipt_sha256) and witness._hex(minimum_receipt),
+            "observer restore external receipt/minimum pins required")
+    header, _raw_header, _nonce, _encrypted = _package(package, expected_backup_sha256, profile_sha256)
+    directory, profile, public = observer._load(directory, profile_sha256)
+    raw = _bytes(directory / "restore.receipt.json", 16384)
+    require(sha(raw) == expected_restore_receipt_sha256, "observer restore receipt pin mismatch")
+    value = decode(raw)
+    require(type(value) is dict and set(value) == {
+        "schema", "backup_sha256", "profile_sha256", "minimum_receipt", "started_at", "scope",
+        "private_signing_key_included", "source_locators_preserved", "independent_storage_verified",
+        "automatic_activation_allowed"
+    } and value["schema"] == RESTORE_SCHEMA and value["backup_sha256"] == expected_backup_sha256
+            and value["profile_sha256"] == profile_sha256 and witness._hex(value["minimum_receipt"])
+            and value["scope"] == header["scope"] and value["source_locators_preserved"] is True
+            and all(value[k] is False for k in ("private_signing_key_included",
+                                               "independent_storage_verified", "automatic_activation_allowed")),
+            "observer restore receipt binding rejected")
+    require(observer._time(header["created_at"]) <= observer._time(value["started_at"])
+            <= datetime.now(UTC), "observer restore receipt chronology rejected")
+    # A normal collector may have appended signed descendants after restore.
+    # Require every retained minimum, not byte equality with a historical DB.
+    # One read transaction fixes all ancestry checks. Monitoring needs no write
+    # reservation and cannot block the collector by taking its execution lease.
+    with observer._database(directory) as con:
+        current = observer._read(con, profile, public, minimum_receipt)
+        for minimum in (header["minimum_receipt"], header["scope"]["receipt_sha256"], value["minimum_receipt"]):
+            observer._read(con, profile, public, minimum)
+        require(current["anchors"] >= header["scope"]["anchor_count"],
+                "observer restore signed history behind snapshot")
+        require(con.execute("PRAGMA quick_check").fetchall() == [("ok",)],
+                "observer restore SQLite integrity rejected")
+    return {"backup_created_at": header["created_at"], "restore_started_at": value["started_at"],
+            "snapshot_scope": header["scope"], "current_scope": _scope(current),
+            "ciphertext_pin_verified": True, "restore_receipt_pin_verified": True,
+            "signed_snapshot_minimum_present": True, "decryption_checked": False,
+            "live_source_checked": False, "restore_completion_time_attested": False,
             "independent_storage_verified": False, "automatic_activation_allowed": False}
