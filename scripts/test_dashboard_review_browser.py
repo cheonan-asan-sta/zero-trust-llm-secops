@@ -289,18 +289,23 @@ def run(args, directory, report):
             )
 
             def metadata_handler(invalid):
+                # Fetch outside interception: this case changes only response
+                # metadata, not the live backend or its request scheduling.
+                fetched = latest()
+                body = fetched.body()
+                modified = dict(fetched.headers)
+                modified.pop("content-length", None)
+                if invalid == "missing-identity":
+                    modified.pop("x-review-identity", None)
+                elif invalid == "unavailable":
+                    modified["x-review-mode"] = "unavailable"
+                elif invalid is None:
+                    modified.pop("etag", None)
+                else:
+                    modified["etag"] = invalid
+
                 def invalid_metadata(route):
-                    fetched = route.fetch()
-                    modified = dict(fetched.headers)
-                    if invalid == "missing-identity":
-                        modified.pop("x-review-identity", None)
-                    elif invalid == "unavailable":
-                        modified["x-review-mode"] = "unavailable"
-                    elif invalid is None:
-                        modified.pop("etag", None)
-                    else:
-                        modified["etag"] = invalid
-                    route.fulfill(response=fetched, headers=modified)
+                    route.fulfill(status=200, headers=modified, body=body)
 
                 return invalid_metadata
 
@@ -311,13 +316,15 @@ def run(args, directory, report):
                 ("unavailable", "nontransactional_backend"),
             ):
                 fresh_form(page)
-                page.route(url, metadata_handler(invalid), times=1)
+                handler = metadata_handler(invalid)
+                page.route(url, handler)
                 before = len(patches)
                 page.locator("#operationPrepare").click()
+                expect(page.locator("#operationPrepare")).to_be_enabled(timeout=20000)
                 expect(page.locator("#operationMessage")).to_contain_text("검토")
-                expect(page.locator("#operationPrepare")).to_be_enabled()
                 expect(page.locator("#operationConfirmation")).not_to_be_visible()
                 check(name + "_never_sends_unconditional_patch", len(patches) == before)
+                page.unroute(url, handler)
 
             fresh_form(page)
             prepare(page)
