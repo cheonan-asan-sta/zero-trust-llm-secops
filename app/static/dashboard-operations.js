@@ -59,6 +59,7 @@
   };
   let catalog = null, loading = null, selection = null, activeGroup = null;
   let sequence = 0, busy = false, prepared = null, inputs = [], resultValue = null;
+  let observedReview = null, intentRevision = 0;
   let lastGrant = null, lastSession = null, jobTimer = null, capabilities = null, pendingJob = null;
   const label = (key) => names[key] || key;
   const roleLabel = (role) => ({viewer:"조회 사용자",analyst:"분석 담당자",responder:"대응 담당자",admin:"관리자"}[role] || role);
@@ -88,6 +89,7 @@
     return result;
   }
   function invalidate() {
+    intentRevision++;
     prepared = null;
     const panel = document.getElementById("operationConfirmation");
     if (panel) { panel.hidden = true; panel.replaceChildren(); }
@@ -269,7 +271,17 @@
     const path = command.path.split("?")[0];
     const body = command.body;
     let record;
-    if (path === "/response/requests" && body?.session_id) {
+    if (command.method === "PATCH" && /^\/results\/[^/]+\/review$/.test(path)) {
+      const eventId = decodeURIComponent(path.slice("/results/".length, -"/review".length));
+      const observation = observedReview?.record.event_id === eventId ? observedReview : await ctx.readReviewObservation(eventId);
+      if (observation.reviewMode !== "conditional") throw new Error("현재 서버에서는 버전을 확인한 검토를 사용할 수 없습니다. 관리자에게 문의하세요.");
+      if (observation.epoch !== current().epoch || !/^"r1-[a-f0-9]{64}"$/.test(observation.etag || "") ||
+          !/^[a-f0-9]{64}$/.test(observation.reviewIdentity || "")) throw new Error("검토용 조회 버전과 신원을 확인할 수 없습니다. 다시 조회하세요.");
+      await requireReviewCaller(observation);
+      command.review = observation;
+      delete body.reviewer;
+      record = observation.record;
+    } else if (path === "/response/requests" && body?.session_id) {
       const rows = await request("/zero-trust/sessions/" + encodeURIComponent(body.session_id));
       record = rows.at(-1);
       body.expected_session_version = record.version;
@@ -290,11 +302,24 @@
       if (inputs.some((i) => i.key === "expected_version")) body.expected_version = record.version;
       if (inputs.some((i) => i.key === "expected_attempt_count")) body.expected_attempt_count = record.attempt_count;
     }
-    inputs.filter((i) => i.input.readOnly).forEach((i) => { i.input.value = body?.[i.key] ?? ""; });
+    inputs.filter((i) => i.input.readOnly).forEach((i) => {
+      i.input.value = i.key === "reviewer" && command.review ? command.review.identity.subject : body?.[i.key] ?? "";
+    });
     return record ? redact(record) : null;
   }
-  function failure(error, writing) {
+  async function requireReviewCaller(observation) {
+    const reject = (text) => Object.assign(new Error(text), {reviewCaller: true});
+    if (!["api_key", "oidc"].includes(observation.identity.auth_method)) throw reject("개별 인증으로 연결한 뒤 검토 대상을 다시 조회하세요.");
+    const identity = await request("/auth/me");
+    if (observation.epoch !== current().epoch || !ctx.sameReviewIdentity(identity, observation.identity) ||
+        !ctx.sameReviewIdentity(current().data.identity, observation.identity)) throw reject("검토 신원이 변경됐습니다. 다시 조회하고 내용을 확인하세요.");
+  }
+  function failure(error, writing, review = false) {
     const detail = error.detail ? " (" + redact(error.detail) + ")" : "";
+    if (error.reviewCaller) return error.message;
+    if (error.status === 412 || error.status === 428) return "검토 대상의 버전이 변경됐거나 조회 버전이 없습니다. 다시 조회하고 내용을 검토하세요.";
+    if (review && error.status === 403) return "검토 신원 또는 권한이 변경됐습니다. 연결을 확인하고 다시 조회하세요.";
+    if (review && writing && (!error.status || error.status >= 500)) return "검토 저장 여부를 확인하지 못했습니다. 현재 검토 기록을 다시 조회하세요. 자동 재전송하지 않았습니다.";
     if (error.status === 409) return "기록이 변경됐거나 현재 상태에서는 실행할 수 없습니다. 다시 조회하고 내용을 검토하세요." + detail;
     if (error.status === 422) return "입력 값 또는 유효기간이 맞지 않습니다. 필수 항목과 입력 형식을 확인하세요." + detail;
     if (writing && (!error.status || error.status >= 500)) return "처리 결과를 확인하지 못했습니다. 요청 ID로 상태를 조회한 뒤 재시도하세요. 자동 재전송하지 않았습니다.";
@@ -304,6 +329,7 @@
     if (!allowed()) return;
     const epoch = current().epoch, ticket = ++sequence;
     invalidate();
+    const revision = intentRevision;
     try {
       const form = document.getElementById("operationForm");
       if (!form.reportValidity()) return;
@@ -313,7 +339,7 @@
       }
       busy = true; sync();
       const bound = isWrite() ? await bindVersion(command) : null;
-      if (epoch !== current().epoch || ticket !== sequence) return;
+      if (epoch !== current().epoch || ticket !== sequence || revision !== intentRevision) return;
       if (command.path.startsWith("/analysis")) command.body = stripLabels(command.body);
       if (!isWrite()) {
         const value = await request(command.path, {method: "GET", timeoutMs: 120000});
@@ -323,7 +349,7 @@
       }
       const paid = command.path.startsWith("/analysis/verified-session") || command.path.startsWith("/analysis/evidence-review") || (command.path.startsWith("/analysis") && current().data.health?.analyzer_mode !== "rule") ||
         (command.path === "/evaluation/run" && command.body?.analyzer !== "rule");
-      prepared = {...command, epoch, ticket};
+      prepared = {...command, epoch, ticket, revision};
       const panel = document.getElementById("operationConfirmation");
       panel.replaceChildren(node("h3", "실행 전 확인"),
         node("p", current().data.identity.subject + " / " + current().data.identity.tenant_id, "mono"),
@@ -339,7 +365,8 @@
       execute.id = "operationExecute"; execute.disabled = true;
       checkbox.addEventListener("change", () => { execute.disabled = !checkbox.checked || busy; });
       panel.append(confirm, execute); panel.hidden = false;
-      message("검토한 버전으로 실행합니다. 중간에 기록이 변경되면 서버가 거부합니다.");
+      message(command.review ? "조회한 분석과 신원에만 검토를 적용합니다. 변경이 있으면 다시 조회해야 합니다." :
+        "검토한 버전으로 실행합니다. 중간에 기록이 변경되면 서버가 거부합니다.");
     } catch (error) {
       if (epoch === current().epoch && ticket === sequence) { invalidate(); message(failure(error, false), true); }
     } finally {
@@ -349,28 +376,38 @@
   async function executePrepared() {
     if (!prepared || !allowed() || !document.getElementById("operationAcknowledge")?.checked) return;
     const command = prepared, epoch = current().epoch;
-    if (command.epoch !== epoch) return;
+    if (command.epoch !== epoch || command.revision !== intentRevision) return;
     busy = true; document.getElementById("operationExecute").disabled = true; sync();
     invalidate();
+    const revision = intentRevision;
     try {
+      if (command.review) await requireReviewCaller(command.review);
+      if (epoch !== current().epoch || command.ticket !== sequence || revision !== intentRevision) return;
       const value = await request(command.path, {
         method: command.method, body: command.body, timeoutMs: 120000,
         allowDenied: command.path === "/zero-trust/protected-access",
+        ifMatch: command.review?.etag,
+        reviewIdentity: command.review?.reviewIdentity,
       });
       if (epoch !== current().epoch || command.ticket !== sequence) return;
+      if (command.review) observedReview = null;
       showResult(value);
       message(command.path === "/zero-trust/protected-access" ?
         (value.data?.allowed ? "접근 허용" : "접근 거부") + " (HTTP " + value.status + ")" :
         command.path.endsWith("/execute") ? "모의 실행 결과를 확인하세요. 실제 외부 조치는 수행하지 않습니다." : "서버 처리 완료");
       ctx.refresh();
     } catch (error) {
-      if (epoch === current().epoch && command.ticket === sequence) message(failure(error, true), true);
+      if (epoch === current().epoch && command.ticket === sequence) {
+        if (command.review) observedReview = null;
+        message(failure(error, true, Boolean(command.review)), true);
+      }
     } finally {
       if (epoch === current().epoch && command.ticket === sequence) { busy = false; sync(); }
     }
   }
-  function selectOperation(operation, preset = {}) {
+  function selectOperation(operation, preset = {}, reviewObservation = null) {
     sequence++; busy = false; prepared = null; selection = operation; inputs = []; resultValue = null;
+    observedReview = reviewObservation;
     const host = document.getElementById("operationEditor"); host.replaceChildren();
     host.append(node("h2", operation.title), node("p", "필요 권한: " + roleLabel(operation.role), "muted"));
     if (hints[operation.path]) host.append(node("p", hints[operation.path], "operation-message"));
@@ -426,6 +463,7 @@
     }
     host.append(form, controls, node("p", "", "operation-message"));
     host.lastChild.id = "operationMessage";
+    host.lastChild.setAttribute("role", "status");
     const confirmation = node("section", null, "operation-confirmation");
     confirmation.id = "operationConfirmation"; confirmation.hidden = true;
     const result = node("section", null, "operation-result");
@@ -442,6 +480,10 @@
   }
   function sync() {
     const identity = current().data.identity;
+    if (prepared?.review && !ctx.sameReviewIdentity(identity, prepared.review.identity)) {
+      invalidate(); observedReview = null;
+      message("검토 신원이 변경됐습니다. 다시 조회하고 내용을 확인하세요.", true);
+    }
     const button = document.getElementById("operationPrepare");
     if (button) button.disabled = !allowed();
     if (selection && !roles().includes(selection.role)) message(
@@ -476,19 +518,23 @@
       nav.firstChild.setAttribute("aria-current", "true"); selectOperation(options[0]);
     }
   }
-  async function open(path, method, preset = {}) {
+  async function open(path, method, preset = {}, reviewObservation = null) {
     await getCatalog();
+    if (reviewObservation && (reviewObservation.epoch !== current().epoch ||
+        !ctx.sameReviewIdentity(reviewObservation.identity, current().data.identity))) {
+      ctx.notify("검토 신원이 변경됐습니다. 다시 조회하세요."); return;
+    }
     const op = catalog?.operations.find((item) => item.path === path && item.method === method);
     if (!op) return;
     document.getElementById("detailDialog").close();
     location.hash = op.group;
     navigate(op.group, true);
-    selectOperation(op, preset);
+    selectOperation(op, preset, reviewObservation);
     root.querySelectorAll("[data-operation]").forEach((button) => {
       button.toggleAttribute("aria-current", button.dataset.operation === op.id);
     });
   }
-  function detailActions(type, record, host) {
+  function detailActions(type, record, host, reviewObservation = null) {
     const controls = node("div", null, "operation-form-actions");
     const responder = roles().includes("responder");
     if (type === "response" && responder) {
@@ -506,7 +552,7 @@
       if (session) controls.append(button("세션 회수", () => open("/zero-trust/sessions/{session_id}/revoke", "POST", {session_id:session.session_id})),
         button("대응 요청", () => open("/response/requests", "POST", {session_id:session.session_id})));
     } else if (type === "log" && responder) {
-      controls.append(button("검토 상태 변경", () => open("/results/{event_id}/review", "PATCH", {event_id:record.event_id})));
+      controls.append(button("검토 상태 변경", () => open("/results/{event_id}/review", "PATCH", {event_id:record.event_id}, reviewObservation)));
     }
     if (controls.children.length) host.append(controls);
   }
@@ -598,6 +644,7 @@
     sequence++; busy=false;prepared=null;catalog=null;loading=null;selection=null;inputs=[];
     lastGrant=null;lastSession=null;resultValue=null;capabilities=null;pendingJob=null;activeGroup=null;
     clearInterval(jobTimer);jobTimer=null;root.replaceChildren();
+    observedReview = null; intentRevision++;
   }
   window.dashboardOperations={sync,navigate,reset,open,detailActions};
   navigate(current().page);

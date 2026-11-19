@@ -108,7 +108,7 @@ def run(args, directory, report):
             page.locator("#closeDetail").click()
             with page.expect_download() as downloaded:
                 page.locator("#exportLogs").click()
-            exported = json.loads(Path(downloaded.value.path()).read_text())
+            exported = json.loads(Path(downloaded.value.path()).read_text(encoding="utf-8"))
             check("filtered_json_export", len(exported["records"]) == (pending or 24)
                   and (not pending or all(row["review_status"] == "PENDING"
                                           for row in exported["records"])))
@@ -170,7 +170,7 @@ def run(args, directory, report):
             page.locator("#closeDetail").click()
             with page.expect_download() as downloaded:
                 page.locator("#exportLogs").click()
-            exported = Path(downloaded.value.path()).read_text()
+            exported = Path(downloaded.value.path()).read_text(encoding="utf-8")
             check("token_fields_redacted_from_export", "SYNTHETIC_SECRET" not in exported
                   and "[REDACTED]" in exported)
             page.unroute(logs_pattern)

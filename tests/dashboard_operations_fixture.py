@@ -13,10 +13,19 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--directory", type=Path, required=True)
     parser.add_argument("--port", type=int, required=True)
+    parser.add_argument("--sqlite-audit", action="store_true")
     args = parser.parse_args()
     args.directory.mkdir(mode=0o700)
     app = isolated_app(args.directory)
     from app.main import settings
+
+    if args.sqlite_audit:
+        from app import main as api
+        from app.services.sqlite_audit import SQLiteAuditStore
+
+        api.audit_store = SQLiteAuditStore(args.directory / "audit.sqlite3")
+        settings.audit_backend = "sqlite"
+        settings.audit_review_require_if_match = True
     from tests.test_api_key_accounts import account, sha
 
     settings.auth_mode = "api_key"
@@ -25,17 +34,25 @@ def main():
     settings.api_key_tenant_id = "tenant-a"
     settings.api_key_roles = "admin"
     settings.api_key_accounts_path = args.directory / "accounts.json"
-    settings.api_key_accounts_path.write_text(json.dumps({
-        "schema": "api-key-accounts-1", "accounts": [
-            account("reviewer-a", "synthetic-reviewer-a-key"),
-            account("reviewer-b", "synthetic-reviewer-b-key"),
-            account("viewer", "synthetic-viewer-key", roles=["viewer"]),
-            account("foreign", "synthetic-foreign-key", tenant_id="tenant-b", roles=["admin"]),
-        ],
-    }))
+    settings.api_key_accounts_path.write_text(
+        json.dumps(
+            {
+                "schema": "api-key-accounts-1",
+                "accounts": [
+                    account("reviewer-a", "synthetic-reviewer-a-key"),
+                    account("reviewer-b", "synthetic-reviewer-b-key"),
+                    account("viewer", "synthetic-viewer-key", roles=["viewer"]),
+                    account(
+                        "foreign", "synthetic-foreign-key", tenant_id="tenant-b", roles=["admin"]
+                    ),
+                ],
+            }
+        )
+    )
     settings.dashboard_operations_directory = args.directory / "jobs"
     settings.dashboard_operations_tenant = "tenant-a"
     import uvicorn
+
     uvicorn.run(app, host="127.0.0.1", port=args.port, log_level="warning")
 
 

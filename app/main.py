@@ -80,9 +80,12 @@ from app.services.audit_paging import (
     create_audit_pager,
 )
 from app.services.audit_review_preconditions import (
+    parse_review_identity,
     parse_review_if_match,
+    require_review_identity,
     require_review_match,
     review_etag,
+    review_identity,
 )
 from app.services.behavior_context import BehaviorContextService
 from app.services.behavior_context_store import BehaviorContextStore
@@ -1466,11 +1469,14 @@ async def update_review(
     async with _audit_query_slot():
         updated = await _update_review_in_slot(event_id, request, principal, http_request)
         response.headers["ETag"] = review_etag(updated)
+        response.headers["X-Review-Identity"] = review_identity(principal)
         return updated
 
 
 async def _update_review_in_slot(event_id, request, principal, http_request):
     tag = parse_review_if_match(http_request.headers.getlist("if-match"))
+    expected_identity = parse_review_identity(http_request.headers.getlist("x-review-identity"))
+    require_review_identity(principal, expected_identity, tag)
     store = audit_store
     record = await _audit_read_in_slot(store, "get", principal, http_request, event_id, principal.tenant_id)
     if record is None:
@@ -1514,6 +1520,7 @@ async def _update_review_in_slot(event_id, request, principal, http_request):
     )
     updated = AnalysisResult.model_validate(payload)
     await _audit_boundary(store, principal, http_request)
+    require_review_identity(principal, expected_identity, tag)
     require_review_match(
         record, tag, required=settings.audit_review_require_if_match,
         transactional=isinstance(store, SQLiteAuditStore),
@@ -1541,12 +1548,15 @@ async def result(
     event_id: str, request: Request, principal: ViewerPrincipal, response: Response,
 ) -> AnalysisResult:
     async with _audit_query_slot():
+        store = audit_store
         record = await _audit_read_in_slot(
-            audit_store, "get", principal, request, event_id, principal.tenant_id
+            store, "get", principal, request, event_id, principal.tenant_id
         )
     if record is None:
         raise HTTPException(status_code=404, detail="Result not found")
     response.headers["ETag"] = review_etag(record)
+    response.headers["X-Review-Identity"] = review_identity(principal)
+    response.headers["X-Review-Mode"] = "conditional" if isinstance(store, SQLiteAuditStore) else "unavailable"
     return record
 
 

@@ -139,8 +139,13 @@
     allowDenied = false,
     method,
     timeoutMs = 12000,
-    operation = false
+    operation = false,
+    ifMatch,
+    reviewIdentity,
+    withMetadata = false
   } = {}) {
+    if (ifMatch !== undefined && !/^"r1-[a-f0-9]{64}"$/.test(ifMatch)) throw new Error("검토 버전을 다시 조회하세요.");
+    if (reviewIdentity !== undefined && !/^[a-f0-9]{64}$/.test(reviewIdentity)) throw new Error("검토 신원을 다시 확인하세요.");
     const epoch = state.epoch;
     const controller = new AbortController();
     state.controllers.add(controller);
@@ -152,6 +157,8 @@
     if (state.credentialType === "bearer" && state.credential) headers.Authorization = `Bearer ${state.credential}`;
     if (body !== undefined) headers["Content-Type"] = "application/json";
     if (operation) headers["X-Dashboard-Action"] = "1";
+    if (ifMatch !== undefined) headers["If-Match"] = ifMatch;
+    if (reviewIdentity !== undefined) headers["X-Review-Identity"] = reviewIdentity;
     try {
       const response = await fetch(path, {
         method: method || (body === undefined ? "GET" : "POST"),
@@ -181,6 +188,7 @@
       }
       if (path === "/health" && response.headers.get("X-Secops-Data-Scope") === "synthetic-dashboard-demo") data.dashboard_demo = true;
       if (epoch !== state.epoch) throw new DOMException("Connection changed", "AbortError");
+      if (withMetadata) return {data, etag: response.headers.get("ETag"), reviewIdentity: response.headers.get("X-Review-Identity"), reviewMode: response.headers.get("X-Review-Mode")};
       return allowDenied ? {
         status: response.status,
         data
@@ -191,6 +199,21 @@
     }
   }
 
+  function sameReviewIdentity(left, right) {
+    return Boolean(left && right) && ["subject", "tenant_id", "auth_method"].every((key) =>
+      typeof left[key] === "string" && left[key].length > 0 && left[key] === right[key]);
+  }
+  async function readReviewObservation(eventId) {
+    const epoch = state.epoch;
+    const before = checked("identity", await request("/auth/me"));
+    const response = await request(`/results/${encodeURIComponent(eventId)}`, {withMetadata: true});
+    const record = checked("log", response.data);
+    const after = checked("identity", await request("/auth/me"));
+    if (epoch !== state.epoch || !sameReviewIdentity(before, after)) throw new Error("조회 중 신원이 변경됐습니다. 다시 조회하세요.");
+    if (record.event_id !== eventId || record.tenant_id !== before.tenant_id || typeof record.analysis_id !== "string") throw new Error("조회 결과의 대상과 신원을 확인할 수 없습니다.");
+    const identity = Object.fromEntries(["subject", "tenant_id", "auth_method"].map((key) => [key, before[key]]));
+    return {record, identity, epoch, etag: response.etag, reviewIdentity: response.reviewIdentity, reviewMode: response.reviewMode};
+  }
   function checked(key, value) {
     const object = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
     const count = (v) => Number.isFinite(v) && v >= 0;
@@ -362,7 +385,8 @@
     const sequence = openDetail(type === "log" ? "분석 기록" : type === "session" ? "세션 이력" : "대응 요청");
     try {
       const path = type === "log" ? `/results/${encodeURIComponent(record.event_id)}` : type === "session" ? `/zero-trust/sessions/${encodeURIComponent(record.session_id)}` : `/response/requests/${encodeURIComponent(record.request_id)}`;
-      const item = checked(type === "session" ? "sessions" : type, await request(path));
+      const reviewObservation = type === "log" ? await readReviewObservation(record.event_id) : null;
+      const item = reviewObservation ? reviewObservation.record : checked(type === "session" ? "sessions" : type, await request(path));
       if (epoch !== state.epoch || sequence !== state.detailSequence) return;
       const body = $("detailBody");
       body.replaceChildren();
@@ -402,7 +426,7 @@
           ["승인", `${item.approved_by.length} / ${item.required_approvals}`]
         ]), detailsList("요청 사유", [item.reason]), detailsList("검토 이력", item.reviews.map((review) => `${review.subject} / ${date(review.approved_at, true)} / ${review.reason}`)), node("p", "서로 다른 검토자 2명의 승인이 필요합니다. 실행 결과는 로컬 모의 대응입니다.", "scope-note"));
       }
-      window.dashboardOperations?.detailActions(type, item, body);
+      window.dashboardOperations?.detailActions(type, item, body, reviewObservation);
       body.append(rawPanel(item));
     } catch (error) {
       if (epoch === state.epoch && sequence === state.detailSequence) $("detailBody").replaceChildren(empty(errorLabel(error)));
@@ -950,6 +974,7 @@
   $("demoCompromise").addEventListener("click", () => runDemo("compromise"));
   const tick = () => text("clock", `${new Date().toLocaleDateString("ko-KR")} ${date(Date.now())}`);
   window.dashboardContext = {request, node, redact, rawPanel, analysisEvidence, refresh, notify, errorLabel,
+    readReviewObservation, sameReviewIdentity,
     get state() { return {epoch: state.epoch, page: state.page, data: state.data}; }};
   tick();
   setInterval(tick, 1000);
