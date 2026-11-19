@@ -1,0 +1,78 @@
+{
+  "schema": "witness-restore-monitor-evidence-1",
+  "date": "2026-11-20",
+  "implementation_commit": "1c9868789a88b7bfd6236ccc2e42d13bcf610151",
+  "source_sha256": {
+    "infra/observability/alerts.yaml": "829f03be6389adbda23f3dd0e6bea210b8664757979a1beb5c03ea55e0546b43",
+    "infra/observability/witness-alerts.test.yaml": "b9d79062743a43bf0bea7df37a48c9b693e0e7488725c8db9cf9937a9ea3bf7a",
+    "scripts/f1_lab/witness_observer_status.py": "bead7950db1aacfa962697532b358f861c88e4ae8799abdcab304b076f454980",
+    "scripts/run_witness_alert_flow.py": "fff407aac8d511097146a611ae48b8c0ceddc14ad829237d791d5e0777c80515",
+    "scripts/signal_metrics_exporter.py": "8d52724af70103a06b0b56b7f8729e4dfcc5cdbf1aa6b60d02bb85e8302d0ad2",
+    "tests/test_witness_observer_status.py": "8932afefef2cf0be3c57c6b55a1b243701e558690cfa9e7288a9a9c98a29fadf",
+    "scripts/f1_lab/status_publication.py": "a99410f67943382e02f0211f7c983d1e2bfdb1cbbb9a9861d3d4a7cb3451e62b",
+    "scripts/f1_lab/witness_restore_status.py": "05b477cad75f1dddffcc08793e8b3ef3338a76e1427566e2fc236b2ec984679e",
+    "scripts/witness_restore_status.py": "45c15984a1ef45de1a2b7e44197c6ce9b1ad68df4e011a64fb948b6b95b2e293",
+    "tests/test_witness_restore_status.py": "f9f64580b23bebe4f76b27fe87b45bfc55a9bd7dc83301befc9bd12ab2f06c6d",
+    "app/services/audit_witness_observer_backup.py": "467b5fd868d959d124db0d9797f246208f09e5fcf892fdede15dfaeed88fc73f"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/witness-restore-monitor-linux-final-20261120.xml",
+      "sha256": "9d246dcfa94c723e01a7e735d677f778e1fe52413929a80a9eb74f49f85f3d41",
+      "tests": 164,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-restore-monitor-windows-final-20261120.xml",
+      "sha256": "df753eb9615573124078bb56933edb32774c8bba639801a294b8808583601bc7",
+      "tests": 164,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 17,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-restore-monitor-windows-initial-20261120.xml",
+      "sha256": "4f566954923072e4729b1ea9615041c516d370ddbe4707997ea04dbe57c0f925",
+      "tests": 108,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 13,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-restore-monitor-ruff-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-restore-alert-rules-20261120.txt",
+      "sha256": "8289a4919870ab5b28f5e90a86b4af3cdbd8c244516c02fca90d6e3f289a6711"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-restore-alert-native-report.json",
+      "sha256": "0c893a925c47d784685851af88b325bf823e6e2ac74b26adf569453e1e7b2a1b",
+      "purpose": "Successful real four-fault native flow"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-restore-alert-native-promtool.txt",
+      "sha256": "eee39a49c209ebcf78652b78f0e3c93bb77eca8139311b361a2dd005f334ec32",
+      "purpose": "Successful real four-fault native flow"
+    }
+  ],
+  "new_restore_monitor_tests": 27,
+  "rule_contract_scenarios": 11,
+  "real_alert_flow_checks": 18,
+  "real_alert_episodes": 4,
+  "recovery_key_read_by_monitor": false,
+  "signing_key_read_by_monitor": false,
+  "decryption_checked_by_monitor": false,
+  "same_host_local_only": true,
+  "real_8h_soak": false,
+  "detection_metrics_changed": false,
+  "paid_api_calls": 0,
+  "github_push_ci_merge": false,
+  "until_0800_goal_complete": false
+}
