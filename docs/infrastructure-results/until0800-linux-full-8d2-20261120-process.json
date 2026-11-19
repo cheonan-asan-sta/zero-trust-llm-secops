@@ -1,0 +1,14 @@
+{
+  "pid": 11046,
+  "executable": "/home/chaehj02/team-llm-prep-venv/bin/python",
+  "arguments": [
+    "/home/chaehj02/team-llm-prep-venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "--durations=15",
+    "--junitxml=/mnt/c/Users/chaeh/Desktop/파란학기/tmp/extra-development-20261118/runtime/until0800-linux-full-8d2-20261120.xml"
+  ],
+  "cwd": "/home/chaehj02/witness-verified-source-20261120-8d2df526",
+  "source_commit": "8d2df526843418e50124b23808c54b9597e79008"
+}
