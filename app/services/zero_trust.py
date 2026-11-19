@@ -214,7 +214,7 @@ class ZeroTrustOperations:
         except JournalUnavailable:
             return {"ok": False, "mode": "local_simulation"}
 
-    def sessions(self, principal: Principal) -> list[SessionDecision]:
+    def sessions(self, principal: Principal, *, limit: int = 100) -> list[SessionDecision]:
         with self._transaction() as (_, entries, _):
             latest = {}
             for entry in entries:
@@ -222,8 +222,8 @@ class ZeroTrustOperations:
                     latest[entry["session"]["session_id"]] = entry["session"]
             return sorted(
                 (SessionDecision.model_validate(value) for value in latest.values()),
-                key=lambda value: value.evaluated_at, reverse=True,
-            )[:100]
+                key=lambda value: (value.evaluated_at, value.session_id), reverse=True,
+            )[:limit]
 
     def history(self, session_id: str, principal: Principal) -> list[SessionDecision]:
         with self._transaction() as (_, entries, _):

@@ -1,10 +1,12 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 
 from app.continuous_signal_models import SignedContinuousSignal
 from app.security import Principal, Role, require_roles
+from app.services.collection_paging import CollectionPage, read_collection
 from app.services.continuous_signals import ContinuousSignalService
+from app.services.federated_audit import AuditQueryUnavailable
 from app.services.signal_inbox import (
     InboxConflict,
     InboxFull,
@@ -35,7 +37,8 @@ Responder = Annotated[Principal, Depends(require_roles(Role.RESPONDER))]
 
 
 def zero_trust_router(service: ZeroTrustOperations | None,
-                      inbox_service: ContinuousSignalService | None = None) -> APIRouter:
+                      inbox_service: ContinuousSignalService | None = None,
+                      *, page_service=None, page_slot=None) -> APIRouter:
     def available() -> ZeroTrustOperations:
         if service is None:
             raise HTTPException(404, "Local Zero Trust simulation is disabled in production")
@@ -86,6 +89,30 @@ def zero_trust_router(service: ZeroTrustOperations | None,
     @router.get("/sessions/{session_id}", response_model=list[SessionDecision])
     def history(session_id: str, principal: Viewer, operations: Service):
         return operations.history(session_id, principal)
+
+    @router.get("/session-pages", response_model=CollectionPage[SessionDecision])
+    async def session_pages(
+        request: Request, principal: Viewer, operations: Service,
+        limit: Annotated[int, Query(ge=1, le=100)] = 12,
+        cursor: Annotated[str | None, Query(min_length=1, max_length=2048, pattern=r"^[A-Za-z0-9_-]+$")] = None,
+        decision: Literal["ALLOW", "STEP_UP", "HOLD", "DENY"] | None = None,
+        signal_trust: Literal["demo", "verified_source"] | None = None,
+    ):
+        if page_service is None or page_slot is None:
+            raise HTTPException(501, "Session page service is not configured")
+        source_path = operations.path
+        def load():
+            rows = operations.sessions(principal, limit=10001)
+            if len(rows) > 10000:
+                raise AuditQueryUnavailable("session collection exceeds local page budget")
+            return [row for row in rows if (decision is None or row.decision == decision)
+                    and (signal_trust is None or row.signal_trust == signal_trust)]
+        async with page_slot():
+            return await read_collection(
+                request, principal, page_service(), load,
+                ["sessions", str(source_path)], lambda: service is operations and operations.path == source_path,
+                limit=limit, cursor=cursor, filters={"decision": decision, "signal_trust": signal_trust},
+            )
 
     @router.post("/sessions/{session_id}/revoke", response_model=SessionDecision)
     def revoke(session_id: str, request: SessionRevocationRequest,

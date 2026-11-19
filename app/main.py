@@ -98,6 +98,12 @@ from app.services.cases import (
     InvalidCaseTransitionError,
     create_case_store,
 )
+from app.services.collection_paging import (
+    CollectionPage,
+    CollectionPager,
+    case_rows,
+    read_collection,
+)
 from app.services.continuous_signals import ContinuousSignalService
 from app.services.correlation import get_correlation_engine
 from app.services.detection_benchmark import BenchmarkUnavailable, get_detection_benchmark
@@ -157,6 +163,7 @@ app.include_router(dashboard_router)
 app.include_router(dashboard_jobs_router)
 audit_store = create_audit_store(settings)
 audit_pager = create_audit_pager(settings)
+collection_pager = CollectionPager(lambda: audit_pager._master())
 case_store = create_case_store(settings)
 integration_outbox_store = create_integration_outbox_store(settings)
 integration_outbox_service = IntegrationOutboxService(integration_outbox_store)
@@ -195,7 +202,10 @@ continuous_signal_service = (
     else None
 )
 native_analysis_registry = create_native_analysis_registry(zero_trust_operations, settings)
-app.include_router(zero_trust_router(zero_trust_operations, continuous_signal_service))
+app.include_router(zero_trust_router(
+    zero_trust_operations, continuous_signal_service,
+    page_service=lambda: collection_pager, page_slot=lambda: _audit_query_slot(),
+))
 install_zero_trust_error_handlers(app)
 behavior_context_service = (
     BehaviorContextService(
@@ -567,6 +577,26 @@ def recent_cases(
 ) -> list[IncidentCase]:
     safe_limit = min(max(limit, 1), 100)
     return case_store.recent(safe_limit, principal.tenant_id, status)
+
+
+@app.get("/case-pages", response_model=CollectionPage[IncidentCase])
+async def paged_cases(
+    request: Request, principal: ViewerPrincipal,
+    limit: Annotated[int, Query(ge=1, le=100)] = 12,
+    cursor: Annotated[str | None, Query(min_length=1, max_length=2048, pattern=r"^[A-Za-z0-9_-]+$")] = None,
+    status: IncidentCaseStatus | None = None,
+):
+    store = case_store
+    source_path = getattr(store, "_path", None)
+    def load():
+        rows = case_rows(store, principal.tenant_id)
+        return [row for row in rows if status is None or row.status == status]
+    async with _audit_query_slot():
+        return await read_collection(
+            request, principal, collection_pager, load,
+            ["cases", str(source_path)], lambda: case_store is store and getattr(store, "_path", None) == source_path,
+            limit=limit, cursor=cursor, filters={"status": status},
+        )
 
 
 @app.get("/cases/{case_id}", response_model=IncidentCase)
