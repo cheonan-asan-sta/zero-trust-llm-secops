@@ -424,6 +424,7 @@ def cycle(directory, profile_sha256, *, minimum_receipt):
             profile["public_key_sha256"],
             expected_receipt=pending["predecessor"],
             observation_id=pending["observation_id"],
+            minimum_observed_at=pending["started_at"],
         )
         _acknowledge(directory, profile, public, minimum_receipt, pending, result)
     return {

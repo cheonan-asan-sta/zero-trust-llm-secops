@@ -19,7 +19,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey,
 
 from app.services.audit_backup import read_key
 from app.services.audit_checkpoint import _locator, _verified_head
-from app.services.audit_transfer import canonical, decode, require, sha
+from app.services.audit_transfer import AuditTransferError, canonical, decode, require, sha
 from app.services.sqlite_audit import SQLiteAuditStore
 
 SCHEMA = "local-sqlite-audit-witness-1"
@@ -299,8 +299,18 @@ def status(directory, public_key_sha256, *, minimum_receipt):
     }
 
 
-def observe(directory, database, public_key_sha256, *, expected_receipt, observation_id=None):
+def observe(directory, database, public_key_sha256, *, expected_receipt, observation_id=None,
+            minimum_observed_at=None):
     require(observation_id is None or _operation(observation_id), "witness observation ID rejected")
+    minimum_time = None
+    if minimum_observed_at is not None:
+        require(observation_id is not None and isinstance(minimum_observed_at, str)
+                and 0 < len(minimum_observed_at) <= 64, "witness operation minimum time rejected")
+        try:
+            minimum_time = datetime.fromisoformat(minimum_observed_at)
+        except ValueError:
+            raise AuditTransferError("witness operation minimum time rejected") from None
+        require(minimum_time.utcoffset() is not None, "witness operation aware minimum time required")
     directory = _directory(directory)
     _key, public = _public(directory, public_key_sha256)
     private_path = directory / "private.key"
@@ -327,6 +337,9 @@ def observe(directory, database, public_key_sha256, *, expected_receipt, observa
                 and last["body"]["previous_receipt"] == expected_receipt,
                 "witness observation is not the current exact operation",
             )
+            require(minimum_time is None
+                    or datetime.fromisoformat(last["body"]["observed_at"]) >= minimum_time,
+                    "witness replay predates operation minimum time")
             # A committed response may be recovered, never refreshed or resigned.
             # The current DB still has to contain the already witnessed history.
             with store._transaction() as audit:
@@ -345,6 +358,8 @@ def observe(directory, database, public_key_sha256, *, expected_receipt, observa
         with store._transaction() as audit:
             seq, digest = _verified_head(store, audit, minimum)
         observed_at = datetime.now(UTC)
+        require(minimum_time is None or observed_at >= minimum_time,
+                "witness observation predates operation minimum time")
         if observation_id is not None and last is not None:
             require(
                 observed_at >= datetime.fromisoformat(last["body"]["observed_at"]),

@@ -28,6 +28,7 @@ def main():
             command.add_argument(
                 "--observation-id", help="Explicit 32-hex operation ID for recovery"
             )
+            command.add_argument("--minimum-observed-at", help="Aware lower time bound for this operation")
         else:
             command.add_argument("--minimum-receipt", required=True)
     command = sub.add_parser("inspect")
@@ -48,6 +49,7 @@ def main():
                 args.public_key_sha256,
                 expected_receipt=args.expected_receipt,
                 observation_id=args.observation_id,
+                minimum_observed_at=args.minimum_observed_at,
             )
         elif args.action == "status":
             result = witness.status(
