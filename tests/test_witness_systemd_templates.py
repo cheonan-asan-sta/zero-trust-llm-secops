@@ -22,7 +22,8 @@ def unit(name):
 
 
 @pytest.mark.parametrize("name,memory", [("secops-audit-witness@.service", "512M"),
-                                        ("secops-audit-witness-restore-status@.service", "256M")])
+                                        ("secops-audit-witness-restore-status@.service", "256M")],
+                         ids=["secops-audit-witness@.service", "secops-audit-witness-restore-status@.service"])
 def test_service_runs_without_network_capabilities_or_extra_process_inspection(name, memory):
     service = unit(name)["Service"]
     for key, expected in {"User": "secops-witness", "Group": "secops-witness", "NoNewPrivileges": "yes",
