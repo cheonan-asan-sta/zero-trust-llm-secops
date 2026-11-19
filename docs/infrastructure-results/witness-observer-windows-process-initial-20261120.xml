@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="21" time="14.007" timestamp="2026-11-20T01:33:03.162824+09:00" hostname="희주"><testcase classname="tests.test_audit_witness_observer" name="test_initial_profile_copies_only_public_key_and_collects_exact_next_heads" time="0.204" /><testcase classname="tests.test_audit_witness_observer" name="test_pending_operation_recovers_without_adopting_or_resigning[False]" time="0.175" /><testcase classname="tests.test_audit_witness_observer" name="test_pending_operation_recovers_without_adopting_or_resigning[True]" time="0.175" /><testcase classname="tests.test_audit_witness_observer" name="test_other_writer_is_never_automatically_adopted" time="0.156" /><testcase classname="tests.test_audit_witness_observer" name="test_audit_rollback_blocks_status_and_new_collection_without_changing_anchor" time="0.221" /><testcase classname="tests.test_audit_witness_observer" name="test_control_rollback_cannot_cross_external_minimum_or_silently_follow_signer" time="0.200" /><testcase classname="tests.test_audit_witness_observer" name="test_freshness_unobserved_rows_and_clock_regression_are_explicit" time="0.177" /><testcase classname="tests.test_audit_witness_observer" name="test_offline_verification_never_claims_live_health_and_does_not_need_signing_key" time="0.170" /><testcase classname="tests.test_audit_witness_observer" name="test_full_signer_never_rotates_or_deletes_history_to_keep_collecting" time="0.171" /><testcase classname="tests.test_audit_witness_observer" name="test_lease_prevents_another_collector_from_mutating_pending_state" time="0.159" /><testcase classname="tests.test_audit_witness_observer" name="test_invalid_policy_does_not_create_observer_state[policy0]" time="0.078" /><testcase classname="tests.test_audit_witness_observer" name="test_invalid_policy_does_not_create_observer_state[policy1]" time="0.080" /><testcase classname="tests.test_audit_witness_observer" name="test_invalid_policy_does_not_create_observer_state[policy2]" time="0.077" /><testcase classname="tests.test_audit_witness_observer" name="test_invalid_policy_does_not_create_observer_state[policy3]" time="0.078" /><testcase classname="tests.test_audit_witness_observer" name="test_invalid_policy_does_not_create_observer_state[policy4]" time="0.077" /><testcase classname="tests.test_audit_witness_observer" name="test_profile_pin_and_corrupt_pending_cannot_reset_trust" time="0.132" /><testcase classname="tests.test_audit_witness_observer" name="test_initializer_does_not_discover_a_newer_unconfirmed_bootstrap" time="0.087" /><testcase classname="tests.test_audit_witness_observer_process" name="test_process_loss_recovers_committed_pending_and_never_rebases[before_witness]" time="2.367" /><testcase classname="tests.test_audit_witness_observer_process" name="test_process_loss_recovers_committed_pending_and_never_rebases[after_witness]" time="2.289" /><testcase classname="tests.test_audit_witness_observer_process" name="test_process_loss_recovers_committed_pending_and_never_rebases[after_ack]" time="1.250"><failure message="AssertionError: &#10;assert 0 == 73&#10; +  where 0 = CompletedProcess(args=['C:\\Users\\chaeh\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', '-c', &quot;\nimport os...873484cfbfbe', 'a6a7f87a713213bf0af5debf8ac222718075669f6ffda2e2ecb939d6cfd89dee'], returncode=0, stdout='', stderr='').returncode">tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1463/test_process_loss_recovers_com2')
+stage = 'after_ack'
+
+    @pytest.mark.parametrize("stage", ["before_witness", "after_witness", "after_ack"])
+    def test_process_loss_recovers_committed_pending_and_never_rebases(tmp_path, stage):
+        source, signer, key_pin, first, directory, pin = ready(tmp_path)
+        # Test-owned wrapper only. Production CLI has no crash/debug environment switch.
+        program = """
+    import os,sys
+    from app.services import audit_witness as w
+    from app.services import audit_witness_observer as o
+    stage=sys.argv[1]
+    actual=w.observe
+    ack=o._acknowledge
+    def observe(*a,**kw):
+        if stage=='before_witness':os._exit(71)
+        result=actual(*a,**kw)
+        if stage=='after_witness':os._exit(72)
+        return result
+    def acknowledged(*a,**kw):
+        ack(*a,**kw)
+        if stage=='after_ack':os._exit(73)
+    w.observe=observe
+    o._acknowledge=ack
+    o.cycle(sys.argv[2],sys.argv[3],minimum_receipt=sys.argv[4])
+    """
+        stopped = run_process(["-c", program, stage, str(directory), pin, first["receipt_sha256"]])
+&gt;       assert (
+            stopped.returncode == {"before_witness": 71, "after_witness": 72, "after_ack": 73}[stage]
+        ), stopped.stderr
+E       AssertionError: 
+E       assert 0 == 73
+E        +  where 0 = CompletedProcess(args=['C:\\Users\\chaeh\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', '-c', "\nimport os...873484cfbfbe', 'a6a7f87a713213bf0af5debf8ac222718075669f6ffda2e2ecb939d6cfd89dee'], returncode=0, stdout='', stderr='').returncode
+
+tests\test_audit_witness_observer_process.py:53: AssertionError</failure></testcase><testcase classname="tests.test_audit_witness_observer_process" name="test_bounded_watch_uses_pinned_profile_and_owned_process_only" time="2.245" /></testsuite></testsuites>
