@@ -61,14 +61,20 @@ def connected(tmp_path, callback, *, verify=True, with_certificate=True,
                         return result
 
             future = pool.submit(server)
+            client_error = None
             try:
                 with (socket.create_connection(listener.getsockname(), timeout=5) as sock,
                       contexts[1].wrap_socket(sock, server_hostname='gateway') as tls):
                     tls.recv(1)
-            except ssl.SSLError:
-                # Propagate the server's actual handshake/collector rejection.
-                pass
-            return future.result(timeout=5), client_leaf
+            except (ssl.SSLError, ConnectionError) as error:
+                # Windows may report a TCP reset while the server reports the
+                # actual missing-certificate TLS alert. Never count a reset as
+                # certificate rejection without the server's own exception.
+                client_error = error
+            result = future.result(timeout=5)
+            if client_error is not None:
+                raise client_error
+            return result, client_leaf
     finally:
         for name in ('server', 'client'):
             (tmp_path/(name+'.key')).unlink(missing_ok=True)
@@ -131,8 +137,41 @@ def test_actual_tls_alone_cannot_supply_device_or_permission_authority(tmp_path,
 def test_optional_or_absent_peer_authentication_is_not_evidence(tmp_path):
     with pytest.raises(ValueError, match='vpn_verified_tls_server'):
         connected(tmp_path, lambda tls: collect_connection(tls, **CLAIMS), verify=False)
-    with pytest.raises(ssl.SSLError):
-        connected(tmp_path, lambda tls: collect_connection(tls, **CLAIMS), with_certificate=False)
+    observed = []
+    with pytest.raises(ssl.SSLError) as rejected:
+        connected(tmp_path, lambda tls: observed.append(collect_connection(tls, **CLAIMS)),
+                  with_certificate=False)
+    assert rejected.value.reason == 'PEER_DID_NOT_RETURN_A_CERTIFICATE'
+    assert observed == []
+
+
+def test_client_reset_cannot_be_hidden_by_successful_server_authentication(tmp_path, monkeypatch):
+    original = ssl.SSLContext.wrap_socket
+    observed = []
+
+    class ResetAfterServerResponse:
+        def __init__(self, tls):
+            self.tls = tls
+
+        def __enter__(self):
+            self.tls.__enter__()
+            return self
+
+        def __exit__(self, *args):
+            return self.tls.__exit__(*args)
+
+        def recv(self, count):
+            assert self.tls.recv(count) == b'x'
+            raise ConnectionResetError('injected client reset after successful server response')
+
+    def wrap(context, *args, **kwargs):
+        tls = original(context, *args, **kwargs)
+        return tls if kwargs.get('server_side') else ResetAfterServerResponse(tls)
+
+    monkeypatch.setattr(ssl.SSLContext, 'wrap_socket', wrap)
+    with pytest.raises(ConnectionResetError, match='injected client reset'):
+        connected(tmp_path, lambda tls: observed.append(collect_connection(tls, **CLAIMS)))
+    assert len(observed) == 1
 
 
 def test_submitted_socket_like_objects_and_naive_time_are_rejected(tmp_path):
