@@ -1,3 +1,5 @@
+> 2026-11-19 extra 후속: [전체 회귀·Windows 실패 분류·수집기 링크 보강](docs/extra-full-regression-20261119.md). 기준58d698a Linux8,600통과/4제외, Windows7,996통과/70실패/538제외. b87c0a0 링크/경로 신원 보강 뒤 Linux영향113·Windows선택12통과. 최신 전체 재실행 통과/Windows 운영 인수로 표현하지 않음. 전체/후속 원본·환경 지문 보존, F1변경·유료·AWS·Docker·push·CI·병합·8h없음. 아래는 이전 기록.
+
 > 2026-11-19 extra: [별도 로컬 감사 검증자·서명 영수증](docs/extra-audit-witness-20261119.md) 완료. 구현64e33a9, Windows65통과/2제외·Linux67통과. [회귀 결과 정리 전 개발 목표](docs/extra-active-development-goal-20261119.md)의 네 구현 항목 완료. 최종 전체 회귀/8h soak·실제 조직 배포/독립 호스트 보관은 미완료. 미업로드·미병합·유료/AWS/Docker 없음. 아래는 이전 시점 기록이다.
 
 > 2026-11-19 extra: [남은 검토 호출자·필수 정책 준비](docs/extra-review-callers-20261119.md) 완료. 구현 ab2dbfc, Windows11통과/2제외·Linux21통과. 최초 실패 보존, 실제 조직 배포 미완료. 지속 목표는 별도 감사 검증자 로컬 구현으로 진행. push/CI/병합/유료/AWS/Docker/전체회귀/8h soak 없음. 아래는 이전 기록이다.

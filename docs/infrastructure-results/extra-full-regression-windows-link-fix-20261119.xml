@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="6" time="5.902" timestamp="2026-11-19T22:26:42.737233+09:00" hostname="희주"><testcase classname="tests.test_execution_private_input_identity" name="test_plain_binary_input_is_unchanged" time="0.031" /><testcase classname="tests.test_execution_private_input_identity" name="test_link_is_rejected_without_no_follow_flag" time="0.009" /><testcase classname="tests.test_execution_private_input_identity" name="test_replaced_input_cannot_be_accepted_under_old_path_identity" time="0.024" /><testcase classname="tests.test_execution_continuous" name="test_feed_rejects_unprotected_or_blocking_files[symlink]" time="1.004" /><testcase classname="tests.test_execution_continuous" name="test_feed_rejects_unprotected_or_blocking_files[fifo]" time="0.666"><failure message="AttributeError: module 'os' has no attribute 'mkfifo'">lab = namespace(directory=WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1450/test_feed_rejects_unpro...n lab.&lt;locals&gt;.transport at 0x000001F01DEAF740&gt;, client=&lt;starlette.testclient.TestClient object at 0x000001F01EF89340&gt;)
+tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1450/test_feed_rejects_unprotected_1')
+kind = 'fifo'
+
+    @pytest.mark.parametrize('kind', ['symlink', 'fifo', 'public'])
+    def test_feed_rejects_unprotected_or_blocking_files(lab, tmp_path, kind):
+        directory, path = feed(tmp_path, lab.record)
+        if kind == 'symlink':
+            target = tmp_path / 'private.json'
+            path.rename(target)
+            path.symlink_to(target)
+        elif kind == 'fifo':
+            path.unlink()
+&gt;           os.mkfifo(path, 0o600)
+            ^^^^^^^^^
+E           AttributeError: module 'os' has no attribute 'mkfifo'
+
+tests\test_execution_continuous.py:112: AttributeError</failure></testcase><testcase classname="tests.test_execution_continuous" name="test_feed_rejects_unprotected_or_blocking_files[public]" time="0.973"><failure message="AssertionError: assert 'pending' == 'input_error'&#10;  &#10;  - input_error&#10;  + pending">lab = namespace(directory=WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1450/test_feed_rejects_unpro...n lab.&lt;locals&gt;.transport at 0x000001F01D984540&gt;, client=&lt;starlette.testclient.TestClient object at 0x000001F01DEFCAA0&gt;)
+tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1450/test_feed_rejects_unprotected_2')
+kind = 'public'
+
+    @pytest.mark.parametrize('kind', ['symlink', 'fifo', 'public'])
+    def test_feed_rejects_unprotected_or_blocking_files(lab, tmp_path, kind):
+        directory, path = feed(tmp_path, lab.record)
+        if kind == 'symlink':
+            target = tmp_path / 'private.json'
+            path.rename(target)
+            path.symlink_to(target)
+        elif kind == 'fifo':
+            path.unlink()
+            os.mkfifo(path, 0o600)
+        else:
+            path.chmod(0o644)
+&gt;       assert lab.collector().tick(directory)['input']['state'] == 'input_error'
+E       AssertionError: assert 'pending' == 'input_error'
+E         
+E         - input_error
+E         + pending
+
+tests\test_execution_continuous.py:115: AssertionError</failure></testcase></testsuite></testsuites>

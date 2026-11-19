@@ -1,0 +1,540 @@
+{
+  "schema": "extra-full-regression-evidence-1",
+  "date": "2026-11-19",
+  "branch": "extra",
+  "baseline_full_suite_commit": "58d698a85002891707ed096248baab44736317fc",
+  "baseline_git_tree": "f3d9503364e4d80ff19498f244bd6429c9c55504",
+  "collector_followup_commit": "b87c0a09325fecacbecb83a82387bba8c52878be",
+  "followup_source_sha256": {
+    "scripts/behavior_execution_collector.py": "2936d434cfd83cd29131f1cb173a2124108369fb408209cd111e23721c1a28b4",
+    "tests/test_execution_private_input_identity.py": "690c93a7362aa17a3f30fd35e785ac29ada184e77486e5ec36a5714780b7d6a8"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/extra-full-regression-linux-collector-followup-20261119.xml",
+      "sha256": "f96476bb20b1ba160c7c7f6911ae13708fbd19dfdcf2539cb443074d2006b5ef",
+      "tests": 113,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 55.951,
+      "source_commit": "b87c0a09325fecacbecb83a82387bba8c52878be"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-full-regression-linux-native-20261119.xml",
+      "sha256": "4d47a134de5698ca6244a30a3a0749428566d8eba275180afb0992e9c7b3cba2",
+      "tests": 8604,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 4,
+      "seconds": 1031.957,
+      "source_commit": "58d698a85002891707ed096248baab44736317fc"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-full-regression-windows-20261119.xml",
+      "sha256": "7fd82490b26caf67c261c64d430c5d95b529dc7772bf770823b2e7df0b42bb2d",
+      "tests": 8604,
+      "failures": 70,
+      "errors": 0,
+      "skipped": 538,
+      "seconds": 2301.655,
+      "source_commit": "58d698a85002891707ed096248baab44736317fc"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-full-regression-windows-async-recheck-20261119.xml",
+      "sha256": "4c33b6a447458566c758c34f9f09e7cea24920b71fcff3452a30bbc13d2ff574",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 8.698,
+      "source_commit": "58d698a85002891707ed096248baab44736317fc"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-full-regression-windows-collector-followup-20261119.xml",
+      "sha256": "c52cbcb6463a4e4f1bedc048759c93ad90da38dfa643de064be1e1ec79acb448",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 9.687,
+      "source_commit": "b87c0a09325fecacbecb83a82387bba8c52878be"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-full-regression-windows-link-fix-20261119.xml",
+      "sha256": "da0b5588deb59fca00610d3e06927945732dec4ca31c35edc6b2cdd858d8c170",
+      "tests": 6,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 5.902,
+      "source_commit": "b87c0a09325fecacbecb83a82387bba8c52878be"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-full-regression-linux-environment-20261119.json",
+      "sha256": "fe6f4b78f9a55282d91958d75db9fe0cbc23e74c01d6e585ef0e7d09d52cbefd"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-full-regression-native-source-20261119.json",
+      "sha256": "33dd8edbb8a57fde3f80e134a4b09384ebca346a86b9da587d38d9acb0b4ff2f"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-full-regression-windows-environment-20261119.json",
+      "sha256": "e71de2a0aa43f7d92cd7ead85a84a18e4f8df4b310338e9ba70b7bda1e1b73bd"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-full-ruff-20261119.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-full-ruff-followup-20261119.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "original_windows_failures": [
+    {
+      "class": "tests.test_async_evidence_io",
+      "name": "test_cancelled_sdk_source_check_settles_without_blocking_event_loop[adapter_retry]",
+      "message": "assert False",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_behavior_context_mtls_recovery",
+      "name": "test_mtls_job_retries_same_backup_and_preserves_context_after_publication_failure",
+      "message": "AttributeError: module 'os' has no attribute 'O_DIRECTORY'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_behavior_execution_collector",
+      "name": "test_private_feed_permissions_and_symlink_checked_before_signing",
+      "message": "Failed: DID NOT RAISE <class 'ValueError'>",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_credential_peer_service",
+      "name": "test_peer_authentication_requires_current_unit_main_pid_and_kernel_membership[valid]",
+      "message": "ValueError: native_source_credential_peer_kernel_identity",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_trace_limits_fail_before_fork[0]",
+      "message": "AttributeError: module 'signal' has no attribute 'SIGCHLD'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_trace_limits_fail_before_fork[-1]",
+      "message": "AttributeError: module 'signal' has no attribute 'SIGCHLD'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_trace_limits_fail_before_fork[31]",
+      "message": "AttributeError: module 'signal' has no attribute 'SIGCHLD'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_trace_limits_fail_before_fork[True]",
+      "message": "AttributeError: module 'signal' has no attribute 'SIGCHLD'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_trace_limits_fail_before_fork[nan]",
+      "message": "AttributeError: module 'signal' has no attribute 'SIGCHLD'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_trace_limits_fail_before_fork[inf]",
+      "message": "AttributeError: module 'signal' has no attribute 'SIGCHLD'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_trace_limits_fail_before_fork[10]",
+      "message": "AttributeError: module 'signal' has no attribute 'SIGCHLD'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_failed_trace_never_kills_reaped_or_unowned_pid[initial_exit]",
+      "message": "AttributeError: <module 'os' (frozen)> has no attribute 'fork'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_failed_trace_never_kills_reaped_or_unowned_pid[exec_failure]",
+      "message": "AttributeError: <module 'os' (frozen)> has no attribute 'fork'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_failed_trace_never_kills_reaped_or_unowned_pid[ownership_lost]",
+      "message": "AttributeError: <module 'os' (frozen)> has no attribute 'fork'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_failed_trace_never_kills_reaped_or_unowned_pid[timeout]",
+      "message": "AttributeError: <module 'os' (frozen)> has no attribute 'fork'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_metrics_show_original_age_both_pending_types_and_capacity",
+      "message": "AssertionError: assert 'secops_exec_recovery_status_success 1' in '# TYPE secops_exec_recovery_bridge_enabled gauge\\nsecops_exec_recovery_bridge_enabled 1\\nsecops_exec_recovery_status_success 0\\n'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_profile_does_not_accept_invalid_limits_or_remote_paths[max_intents-0]",
+      "message": "AssertionError: Regex pattern did not match.\n Regex: 'exec_recovery_profile'\n Input: 'native_source_bridge_file_shape'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_profile_does_not_accept_invalid_limits_or_remote_paths[max_intents-True]",
+      "message": "AssertionError: Regex pattern did not match.\n Regex: 'exec_recovery_profile'\n Input: 'native_source_bridge_file_shape'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_profile_does_not_accept_invalid_limits_or_remote_paths[max_indeterminate_age_seconds-0]",
+      "message": "AssertionError: Regex pattern did not match.\n Regex: 'exec_recovery_profile'\n Input: 'native_source_bridge_file_shape'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_profile_does_not_accept_invalid_limits_or_remote_paths[max_unpublished_age_seconds-86401]",
+      "message": "AssertionError: Regex pattern did not match.\n Regex: 'exec_recovery_profile'\n Input: 'native_source_bridge_file_shape'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_profile_does_not_accept_invalid_limits_or_remote_paths[status_file-relative.json]",
+      "message": "AssertionError: Regex pattern did not match.\n Regex: 'exec_recovery_profile'\n Input: 'native_source_bridge_file_shape'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_profile_does_not_accept_invalid_limits_or_remote_paths[scope_sha256-bad]",
+      "message": "AssertionError: Regex pattern did not match.\n Regex: 'exec_recovery_profile'\n Input: 'native_source_bridge_file_shape'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_profile_does_not_accept_invalid_limits_or_remote_paths[schema-old]",
+      "message": "AssertionError: Regex pattern did not match.\n Regex: 'exec_recovery_profile'\n Input: 'native_source_bridge_file_shape'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_execution_continuous",
+      "name": "test_feed_rejects_unprotected_or_blocking_files[symlink]",
+      "message": "AssertionError: assert 'pending' == 'input_error'\n  \n  - input_error\n  + pending",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_execution_continuous",
+      "name": "test_feed_rejects_unprotected_or_blocking_files[fifo]",
+      "message": "AttributeError: module 'os' has no attribute 'mkfifo'",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_execution_continuous",
+      "name": "test_feed_rejects_unprotected_or_blocking_files[public]",
+      "message": "AssertionError: assert 'pending' == 'input_error'\n  \n  - input_error\n  + pending",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_execution_retention",
+      "name": "test_archived_bundle_replays_after_expiry_without_resigning_or_consuming_approval",
+      "message": "OSError: [Errno 9] Bad file descriptor",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_execution_retention",
+      "name": "test_pending_receipts_and_evaluations_are_never_archived",
+      "message": "OSError: [Errno 9] Bad file descriptor",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_execution_retention",
+      "name": "test_input_rotation_resumes_after_link_but_before_unlink",
+      "message": "OSError: [Errno 9] Bad file descriptor",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_execution_retention",
+      "name": "test_failed_file_sync_never_removes_original_input",
+      "message": "OSError: [Errno 9] Bad file descriptor",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_execution_retention",
+      "name": "test_rotation_refuses_replaced_symlink_and_conflicting_destination",
+      "message": "OSError: [Errno 9] Bad file descriptor",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_complete_private_record_and_idempotent_publication",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[exit_code]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[sealed_at]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[signature]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.access_record_sha256]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.policy_sha256]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.caller_ref_sha256]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.session_ref_sha256]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.session_version]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.resource_id]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.request_sha256]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[caller_receipt.signature]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[caller_receipt.service_evidence_sha256]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[authorization_proof.signature]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[runtime_proof.signature]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[request.nonce]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[request.command_sha256]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[event.event_id]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[event.collection_basis]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_no_pin_stale_restore_and_clock_regression",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_stripping_managed_seal_cannot_downgrade_to_legacy_capture",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_durable_outbox_resumes_without_execution_or_resigning[before_run]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_durable_outbox_resumes_without_execution_or_resigning[before_latest]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_archive_restore_is_byte_exact_and_never_rolls_latest_back",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_refuse_wrong_worker_before_sealing",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[runtime_disabled]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[authorization_disabled]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[caller_disabled]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[policy_changed]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[caller_wrong_pin]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[service_wrong_pin]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[outbox_nested]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[outbox_same]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[outbox_link]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[run_link]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[capture_link]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[latest_link]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[run_extra_file]",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_operator_retry_cli_cannot_execute_and_health_cli_requires_caller_pin",
+      "message": "AttributeError: module 'os' has no attribute 'geteuid'. Did you mean: 'getpid'?",
+      "linux_same_case_passed": true
+    }
+  ],
+  "original_windows_failure_groups": {
+    "tests.test_async_evidence_io": 1,
+    "tests.test_behavior_context_mtls_recovery": 1,
+    "tests.test_behavior_execution_collector": 1,
+    "tests.test_credential_peer_service": 1,
+    "tests.test_exec_history_binding": 11,
+    "tests.test_exec_recovery_status": 8,
+    "tests.test_execution_continuous": 3,
+    "tests.test_execution_retention": 5,
+    "tests.test_managed_exec_retention": 39
+  },
+  "windows_entire_suite_passed": false,
+  "linux_baseline_entire_suite_passed": true,
+  "entire_suite_rerun_after_collector_fix": false,
+  "async_full_run_failure_reproduced_in_focused_run": false,
+  "async_flake_cause_resolved": false,
+  "paid_api_calls": 0,
+  "aws_deployment": false,
+  "docker_resources_created": false,
+  "github_push_ci_merge": false,
+  "browser_rerun": false,
+  "eight_hour_soak_completed": false,
+  "detection_metrics_changed": false,
+  "interrupted_shared_linux_run_counted_as_complete": false
+}
