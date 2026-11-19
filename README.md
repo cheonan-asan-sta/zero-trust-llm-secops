@@ -1,3 +1,5 @@
+> 2026-11-19 extra 개발 중: [세션·사고 페이지 서버 API](docs/extra-collection-paging-20261119.md)와 양 OS49건 기능 검증 완료. UI 연결은 남았으며 [지속 목표](docs/extra-active-development-goal-20261119.md)는 활성 상태다. 미업로드·미병합.
+
 > 2026-11-19 extra: [전체 감사 기록 검색·분석기 필터](docs/extra-audit-search-20261119.md) 구현. [지속 개발 목표](docs/extra-active-development-goal-20261119.md)는 활성 상태이며 세션·사고 페이지와 별도 감사 검증자 개발을 이어간다. 로컬 검증, 미업로드·미병합.
 
 > 2026-11-19 extra 후속: [기존 워크벤치 감사 페이지·신원/조회 기준 보호](docs/extra-workbench-paging-20261119.md). [서버 검토 필수화 선택 정책](docs/extra-server-review-policy-20261119.md) — 기본 off, 실제 조직 배포 별도. [검토 CLI 서버 신원 연결·snapshot v2](docs/extra-cli-review-binding-20261119.md) — v1 파일은 새 prepare·확인 필요. [기존 워크벤치의 조회 버전·현재 신원·확인 후 검토 저장](docs/extra-workbench-review-20261119.md), [감사 페이지·동일 조회 기준 탐색](docs/extra-dashboard-paging-20261119.md), [대시보드 검토 보호](docs/extra-dashboard-review-20261119.md), [검토 CLI·HTTPS/mTLS](docs/extra-operator-review-client-20261119.md). 로컬 구현·검증이며 main/aitest 미병합. 기업 SSO·독립 성능 목표 완료와 구분한다.

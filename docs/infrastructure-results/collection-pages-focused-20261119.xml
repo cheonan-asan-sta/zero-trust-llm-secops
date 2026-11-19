@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="5" time="3.754" timestamp="2026-11-19T16:36:28.415938+09:00" hostname="희주"><testcase classname="tests.test_collection_paging" name="test_live_pages_round_trip_and_bind_all_scope_dimensions" time="0.003" /><testcase classname="tests.test_collection_paging" name="test_view_change_expiry_key_change_and_invalid_cursor_fail_closed" time="0.001" /><testcase classname="tests.test_collection_paging" name="test_case_reader_checks_actual_disk_and_known_prefix" time="0.163" /><testcase classname="tests.test_collection_paging" name="test_case_http_pages_auth_scope_change_and_missing_source" time="0.331" /><testcase classname="tests.test_collection_paging" name="test_session_http_pages_exceed_legacy100_and_refuse_changed_view" time="0.063"><failure message="app.services.zero_trust.SessionConflict: event identifier reused with different input or session">tests\test_collection_paging.py:130: in test_session_http_pages_exceed_legacy100_and_refuse_changed_view
+    evaluate(operations, session_id=f"session-{i:03}", principal=principal)
+tests\test_zero_trust_operations.py:43: in evaluate
+    return service.evaluate(SessionEvaluationRequest(
+app\services\zero_trust.py:359: in evaluate
+    return self._evaluate(request, principal, now=now or datetime.now(UTC))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\services\zero_trust.py:559: in _evaluate
+    raise SessionConflict("event identifier reused with different input or session")
+E   app.services.zero_trust.SessionConflict: event identifier reused with different input or session</failure></testcase></testsuite></testsuites>
