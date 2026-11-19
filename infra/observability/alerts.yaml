@@ -103,7 +103,7 @@ groups:
         labels:
           severity: critical
       - alert: C01WitnessObservationNotHealthy
-        expr: secops_witness_bridge_enabled == 1 and on(job,instance) secops_witness_status_success == 1 and on(job,instance) secops_witness_observation_healthy == 0
+        expr: secops_witness_bridge_enabled == 1 and on(job,instance) secops_witness_status_success == 1 and on(job,instance) (secops_witness_observation_action_required == 1 or (secops_witness_observation_healthy == 0 unless on(job,instance) secops_witness_observation_action_required))
         for: 2s
         labels:
           severity: critical

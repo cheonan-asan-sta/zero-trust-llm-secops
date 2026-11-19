@@ -17,7 +17,8 @@ from app.services.federated_audit import AuditQueryUnavailable
 from scripts.f1_lab import status_publication
 from scripts.f1_lab.collector_status_bridge import read_public, timestamp
 
-SCHEMA = "zt-witness-observer-status-1"
+SCHEMA = "zt-witness-observer-status-2"
+LEGACY_SCHEMA = "zt-witness-observer-status-1"
 PROFILE_SCHEMA = "zt-witness-observer-metrics-profile-1"
 TTL = 30
 STATES = (
@@ -27,6 +28,7 @@ STATES = (
 FIELDS = {
     "state", "live_checked", "audit_minimum_verified", "observed_at", "pending_started_at",
     "max_age_seconds", "capacity_warning", "anchor_count", "remaining_receipts", "unobserved_rows",
+    "interval_seconds",
 }
 ERRORS = (AuditTransferError, AuditQueryUnavailable, OSError, ValueError, TypeError, sqlite3.Error)
 
@@ -37,7 +39,7 @@ def validate(value, profile_sha256, minimum_receipt):
         "schema", "profile_sha256", "minimum_receipt", "checked_at", "values", "cycle_success",
         "independent_storage_verified", "automatic_activation_allowed", "authorization_asserted",
     }, "witness_status_shape")
-    require(value["schema"] == SCHEMA and value["profile_sha256"] == profile_sha256
+    require(value["schema"] in {SCHEMA, LEGACY_SCHEMA} and value["profile_sha256"] == profile_sha256
             and value["minimum_receipt"] == minimum_receipt
             and all(value[k] is False for k in (
                 "independent_storage_verified", "automatic_activation_allowed", "authorization_asserted"
@@ -46,12 +48,15 @@ def validate(value, profile_sha256, minimum_receipt):
     require(value["cycle_success"] is None or type(value["cycle_success"]) is bool,
             "witness_status_cycle")
     data = value["values"]
-    require(type(data) is dict and (not data or set(data) == FIELDS), "witness_status_values")
+    fields = FIELDS if value["schema"] == SCHEMA else FIELDS - {"interval_seconds"}
+    require(type(data) is dict and (not data or set(data) == fields), "witness_status_values")
     if data:
         require(type(data["state"]) is str and data["state"] in STATES
                 and all(type(data[k]) is bool for k in ("live_checked", "audit_minimum_verified")),
                 "witness_status_state")
-        require(type(data["max_age_seconds"]) is int and 2 <= data["max_age_seconds"] <= 86400
+        interval = data.get("interval_seconds", 1)
+        require(type(interval) is int and 1 <= interval <= 3600
+                and type(data["max_age_seconds"]) is int and 2 * interval <= data["max_age_seconds"] <= 86400
                 and type(data["capacity_warning"]) is int
                 and 0 <= data["capacity_warning"] <= witness.MAX_RECEIPTS
                 and type(data["anchor_count"]) is int
@@ -66,6 +71,8 @@ def validate(value, profile_sha256, minimum_receipt):
                 instant = observer._time(data[key])
                 require(instant <= checked or data["state"] == "clock_regression",
                         "witness_status_future_time")
+        require(data["state"] != "pending" or data["pending_started_at"] is not None,
+                "witness_status_pending_time_missing")
         if data["state"] == "healthy":
             require(data["live_checked"] and data["audit_minimum_verified"]
                     and data["observed_at"] is not None and data["pending_started_at"] is None
@@ -128,8 +135,12 @@ def render_report(profile, value, *, now=None):
     rows = ["# TYPE secops_witness_bridge_enabled gauge", "secops_witness_bridge_enabled 1"]
     try:
         checked = validate(value, profile["profile_sha256"], profile["minimum_receipt"])
-        require(timedelta(0) <= now - checked <= timedelta(seconds=TTL), "witness_status_expired")
         require(bool(value["values"]), "witness_status_no_observation")
+        interval = value["values"].get("interval_seconds", 1)
+        # Permit the configured collection cadence, not an arbitrary 30s gap in
+        # a healthy default 60s worker. Observation age is checked separately.
+        ttl = max(TTL, 2 * interval)
+        require(timedelta(0) <= now - checked <= timedelta(seconds=ttl), "witness_status_expired")
     except (AuditTransferError, ValueError, OSError, TypeError, KeyError, RecursionError):
         rows += ["secops_witness_status_success 0", "secops_witness_observation_healthy 0"]
         return "\n".join(rows) + "\n"
@@ -141,8 +152,18 @@ def render_report(profile, value, *, now=None):
         state = "clock_regression"
     elif state == "healthy" and age > data["max_age_seconds"]:
         state = "stale"
+    pending_age = None if data["pending_started_at"] is None else (
+        now - observer._time(data["pending_started_at"])).total_seconds()
+    action_required = state not in {"healthy", "capacity_pressure"}
+    if state == "pending":
+        action_required = pending_age is None or pending_age > 2 * interval or (
+            age is not None and age > data["max_age_seconds"])
+    elif state == "unobserved":
+        action_required = age is None or age > data["max_age_seconds"]
     rows += ["secops_witness_status_success 1",
              f'secops_witness_observation_healthy {int(state == "healthy")}',
+             f"secops_witness_observation_action_required {int(action_required)}",
+             f"secops_witness_collection_interval_seconds {interval}",
              f"secops_witness_anchor_count {data['anchor_count']}"]
     if value["cycle_success"] is not None:
         rows.append(f'secops_witness_last_cycle_success {int(value["cycle_success"])}')
@@ -153,8 +174,6 @@ def render_report(profile, value, *, now=None):
             rows.append(f"secops_witness_{key} {data[key]}")
     if age is not None and age >= 0 and math.isfinite(age):
         rows.append(f"secops_witness_observation_age_seconds {age}")
-    if data["pending_started_at"] is not None:
-        pending_age = (now - observer._time(data["pending_started_at"])).total_seconds()
-        if pending_age >= 0:
-            rows.append(f"secops_witness_pending_age_seconds {pending_age}")
+    if pending_age is not None and pending_age >= 0:
+        rows.append(f"secops_witness_pending_age_seconds {pending_age}")
     return "\n".join(rows) + "\n"

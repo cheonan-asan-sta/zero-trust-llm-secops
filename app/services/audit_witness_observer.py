@@ -459,6 +459,7 @@ def status(directory, profile_sha256, *, minimum_receipt, now=None, offline=Fals
         "observed_at": None if receipt is None else receipt["body"]["observed_at"],
         "pending_started_at": None if state["pending"] is None else state["pending"]["started_at"],
         "max_age_seconds": profile["max_age_seconds"],
+        "interval_seconds": profile["interval_seconds"],
         "capacity_warning": profile["capacity_warning"],
         "pending": state["pending"] is not None,
         "anchor_count": state["anchors"],

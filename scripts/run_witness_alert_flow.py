@@ -15,6 +15,7 @@ import socket
 import subprocess
 import tempfile
 import threading
+import time
 from contextlib import ExitStack
 from datetime import UTC, datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -39,7 +40,7 @@ from scripts.run_collector_alert_flow import http, wait_for
 from scripts.signal_metrics_exporter import handler
 
 
-def run(directory, tools_directory):
+def run(directory, tools_directory, *, cadence_controls=False):
     require(os.name == "posix", "witness_alert_flow_posix_required")
     output = Path(directory).absolute()
     output.mkdir(parents=True, exist_ok=False)
@@ -127,12 +128,14 @@ def run(directory, tools_directory):
                                     policy_decision=response_preview(assessment, event), latency_ms=1)
             asyncio.run(store.save(record))
             before = store.path.read_bytes()
+            with store._transaction() as con:
+                first_digest = con.execute("SELECT digest FROM audit_entries WHERE seq=1").fetchone()[0]
             signer, control = root / "witness", root / "control"
             key_pin = witness.initialize(signer, store.path, "witness-alert-lab")["public_key_sha256"]
             initial = witness.observe(signer, store.path, key_pin, expected_receipt=witness.GENESIS)
             minimum = initial["receipt_sha256"]
             pin = observer.initialize(control, signer, store.path, key_pin, expected_receipt=minimum,
-                                      interval_seconds=1, max_age_seconds=6,
+                                      interval_seconds=1, max_age_seconds=12 if cadence_controls else 6,
                                       capacity_warning=0)["profile_sha256"]
             public = root / "status.json"
             profile = {"schema": bridge.PROFILE_SCHEMA, "profile_sha256": pin,
@@ -256,6 +259,29 @@ def run(directory, tools_directory):
                 pause.set()
                 require(paused.wait(5), "witness_alert_pause")
 
+            if cadence_controls:
+                pause_collector()
+                appended = event.model_copy(update={"event_id": "witness-cadence-append"})
+                assessed = RuleBasedAnalyzer().assess(appended)
+                asyncio.run(store.save(AnalysisResult(
+                    event_id=appended.event_id, analyzer="rule", assessment=assessed,
+                    policy_decision=response_preview(assessed, appended), latency_ms=1
+                )))
+                # This is the one declared fixture append, not mutation of the
+                # immutable evaluation corpus or an original audit prefix.
+                before = store.path.read_bytes()
+                bridge.publish(public, bridge.inspect(control, pin, minimum))
+                wait_for(lambda: query('secops_witness_state{job="zt-signals",state="unobserved"} == 1'))
+                check("new_rows_remain_explicitly_unobserved", bool(query(
+                    'secops_witness_observation_healthy{job="zt-signals"} == 0')))
+                time.sleep(3)
+                check("in_budget_lag_does_not_fire_critical_observation_alert", not query(
+                    'ALERTS{job="zt-signals",alertname="C01WitnessObservationNotHealthy",alertstate="firing"}'))
+                pause.clear()
+                wait_for(lambda: query('secops_witness_observation_healthy{job="zt-signals"} == 1'))
+                check("next_collection_observes_declared_append", observer.status(
+                    control, pin, minimum_receipt=minimum)["unobserved_rows"] == 0)
+
             episode("C01WitnessObservationNotHealthy",
                     'secops_witness_state{job="zt-signals",state="stale"} == 1',
                     pause_collector, pause.clear)
@@ -308,13 +334,19 @@ def run(directory, tools_directory):
             check("collector_stopped", not worker.is_alive())
             state = observer.status(control, pin, minimum_receipt=minimum)
             check("no_pending_after_recovery", not state["pending"] and state["healthy"])
-            check("original_audit_unchanged", store.path.read_bytes() == before)
+            check("audit_matches_declared_test_append" if cadence_controls else "original_audit_unchanged",
+                  store.path.read_bytes() == before)
+            if cadence_controls:
+                with store._transaction() as con:
+                    check("original_signed_audit_prefix_preserved", con.execute(
+                        "SELECT digest FROM audit_entries WHERE seq=1").fetchone()[0] == first_digest)
             check("no_publication_failures", not failures)
             check("legacy_has_no_witness_alerts", not query(
                 'ALERTS{job="zt-signals-legacy",alertname=~"C01Witness.*"}'))
             result = {"schema": "local-witness-alert-flow-1", "checked_at": datetime.now(UTC).isoformat(),
                       "completed": True, "checks": checks, "episodes": episodes,
                       "binary_sha256": binaries, "local_loopback_only": True,
+                      "cadence_controls": cadence_controls, "declared_synthetic_audit_appends": int(cadence_controls),
                       "real_8h_soak": False, "paid_api_calls": 0, "detection_metrics_changed": False,
                       "independent_storage_verified": False, "automatic_activation_allowed": False}
             (output / "report.json").write_bytes(canonical(result) + b"\n")
@@ -327,8 +359,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--directory", required=True)
     parser.add_argument("--tools-directory", required=True)
+    parser.add_argument("--cadence-controls", action="store_true")
     args = parser.parse_args()
-    print(json.dumps(run(args.directory, args.tools_directory), ensure_ascii=False))
+    print(json.dumps(run(args.directory, args.tools_directory, cadence_controls=args.cadence_controls), ensure_ascii=False))
 
 
 if __name__ == "__main__":
