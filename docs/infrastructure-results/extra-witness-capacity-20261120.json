@@ -1,12 +1,13 @@
 {
   "schema": "witness-capacity-state-evidence-1",
-  "implementation_commit": "b7d69c965bcb4068bc60074affd4ee1e0a9ab2fa",
+  "implementation_commit": "b77eceb30747a0a764cf997879a124b590eef972",
   "preflight_commit": "f5d1a27",
   "source_sha256": {
     "app/services/audit_witness_observer.py": "98adc1f6f77744162d79fed60baa675fdaca5265ccd934cf8aebf0cdf728aec3",
     "tests/test_audit_witness_observer.py": "7ab6d1dbee9b71a9cf05c15bb96dccaf5476d439b84ec6ac4842fce72f5a01d7",
     "scripts/f1_lab/witness_observer_status.py": "c2b07cbd204e0602a5647df457cdb6e22be249522cab67303b7dde75fdff4674",
-    "tests/test_witness_monitor_cadence.py": "a6fbdad2dda88dbaef8c6c0afbad7111c26c28788ddcd35fb8f804e39d3ac44a"
+    "tests/test_witness_monitor_cadence.py": "a6fbdad2dda88dbaef8c6c0afbad7111c26c28788ddcd35fb8f804e39d3ac44a",
+    "infra/observability/witness-alerts.test.yaml": "5d7e1ed227e4a02d29d1b6a89f71c874d115a09a0a551717cee536d4a3db6b9b"
   },
   "artifacts": [
     {
@@ -149,11 +150,31 @@
     {
       "path": "docs/infrastructure-results/witness-capacity-extra-until0800-capacity-source-linux-20261120.json",
       "sha256": "ea9ec47cdc47b9b9010a7d9418380d8ccd5e2aacbc09d181b5673ae57222beed"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-promtool-20261120.log",
+      "sha256": "8289a4919870ab5b28f5e90a86b4af3cdbd8c244516c02fca90d6e3f289a6711"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-alert-native-report-20261120.json",
+      "sha256": "7554da9408b8f404543519271992e54e2e5b6d4483dbabaef910d115e9de9e02"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-alert-native-promtool-20261120.txt",
+      "sha256": "9026d1264e8ede82b7b81c0b5def9a20d4020d8e15d29e6e8efcdfc27919b424"
     }
   ],
   "real_4096_boundary_drill": "running_on_af311242",
   "latest_full_regression_complete": false,
   "goal_status": "active_until_0800",
   "paid_api_calls": 0,
-  "detection_metrics_changed": false
+  "detection_metrics_changed": false,
+  "controlled_rule_scenarios": 20,
+  "real_alert_flow": {
+    "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+    "checks": 22,
+    "fault_episodes": 4,
+    "local_loopback_only": true,
+    "capacity_episode_not_injected": true
+  }
 }
