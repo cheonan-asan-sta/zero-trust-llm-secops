@@ -94,3 +94,6 @@ docs/infrastructure-results/witness-restore-resume-* -text whitespace=-blank-at-
 docs/infrastructure-results/witness-resume-alert-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
 
 docs/infrastructure-results/witness-safety-sequence-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-monitor-cadence-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+docs/infrastructure-results/witness-cadence-alert-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
