@@ -1,0 +1,32 @@
+from pathlib import Path
+
+root=Path.cwd();source=(root/'runtime/run_large_witness_control_20261120.py').read_text(encoding='utf-8')
+old="        asyncio.run(audit.save(AnalysisResult(event_id=event.event_id,analyzer='rule',assessment=assessment,policy_decision=response_preview(assessment,event),latency_ms=1)))"
+new="""        from app.services.audit import _record_hash
+        base=AnalysisResult(event_id=event.event_id,analyzer='rule',assessment=assessment,policy_decision=response_preview(assessment,event),latency_ms=1)
+        previous=witness.GENESIS;payload_bytes=0
+        with audit._transaction(write=True) as con:
+            for number in range(1,100001):
+                record=base.model_copy(update={'analysis_id':f'{number:032x}','event_id':f'combined-{number:08d}'})
+                payload=record.model_dump_json();digest=_record_hash(previous,payload)
+                con.execute('INSERT INTO audit_entries VALUES (?,?,?,?)',(number,previous,digest,payload))
+                previous=digest;payload_bytes+=len(payload.encode())
+            con.execute('UPDATE audit_head SET seq=?,digest=? WHERE id=1',(100000,previous))
+        assert SQLiteAuditStore.MAX_ROWS==100000 and payload_bytes<=SQLiteAuditStore.MAX_BYTES
+        result.update(source_rows=100000,source_rows_synthetic_bulk_fixture=True,source_payload_bytes=payload_bytes,source_database_bytes=audit.path.stat().st_size)
+""".rstrip()
+assert source.count(old)==1;source=source.replace(old,new)
+definition="""def audit_digest(path):
+    value=hashlib.sha256()
+    with path.open('rb') as stream:
+        for block in iter(lambda:stream.read(65536),b''):value.update(block)
+    return value.hexdigest()
+
+"""
+source=source.replace('def altered():',definition+'def altered():',1)
+source=source.replace('audit_before=audit.path.read_bytes()','audit_before=audit_digest(audit.path)')
+source=source.replace('audit.path.read_bytes()==audit_before','audit_digest(audit.path)==audit_before')
+assert 'audit.path.read_bytes()' not in source
+source=source.replace('owned-large-signed-witness-control-1','combined-source-and-control-resource-fixture-1',1)
+(root/'runtime/run_combined_witness_scale_20261120.py').write_text(source,encoding='utf-8')
+print('Prepared combined fixture harness; product source unchanged.')

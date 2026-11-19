@@ -1,8 +1,8 @@
-> 2026-11-20 08:00까지 후속 검증 진행 중 (05:03 KST).
-> 제품 소스 `b77eceb`: Linux8848통과/5제외, Windows 8240통과/613제외/0실패. 기존 개발360건 F1 93.41%·목표 미달.
-> [현재 현황](docs/extra-until-0800-20261120.md) · [전체 회귀](docs/extra-until0800-regression-20261120.md) · [추가 경계](docs/extra-witness-boundary-acceptance-20261120.md) · [이전 상태표기](docs/extra-until0800-status-history-20261120.md).
-> extra 로컬만 사용. 유료/AWS/Docker 생성·업로드·CI·병합·실제8시간 soak 없음.
-> 08:00 전 기능이 끝나도 검증/확인된 개선을 이어간다. 실제4096회 순차 witness 서명과 양 OS 전체 회귀는 완료했다. b77 후속 시간 시험과 선정한 추가 입력 순서 검증을 확인하고 원본/문서를 갱신한다. 시간 목표 전 완료 처리하지 않는다. F1 목표 달성과 구분한다.
+> 2026-11-20 08:00까지 후속 검증 진행 중 (06:11 KST).
+> 최신 제품 `f6e1a0a`: 수집기 메모리512MiB 조정·실제 systemd15조건·결합 규모8조건 통과, 양 OS 전체 회귀 진행 중. 앞선 `b77eceb` 전체 회귀는 Linux8848통과/5제외·Windows8240통과/613제외·실패0.
+> [현재 현황](docs/extra-until-0800-20261120.md) · [전체 회귀](docs/extra-until0800-regression-20261120.md) · [메모리 선정 근거](docs/extra-witness-resource-budget-20261120.md) · [지속 수집 시험](docs/extra-witness-sustained-20261120.md).
+> 기존 개발360건 F1 93.41%·목표 미달. extra 로컬만 사용. 유료/AWS/Docker 생성·업로드·CI·병합·실제8시간 soak 없음.
+> 오전08:00 전 목표를 완료 처리하지 않는다. b77 후속 시간 시험·100분 기본 수집 시험과f6e1a0a 전체 회귀를 구분해 확인하고, 새 실패가 남으면 해결까지 이어간다.
 
 > 2026-11-20 extra 지속 목표 완료: [플랫폼 거부 경계·SDK 취소·실제 VPN TLS 검증](docs/extra-platform-admission-20261120.md). 제품 ff44064·표시범위4b4c50c·TLS 시험217d090. 최종 Windows8,025통과/591제외·실패0; Linux 전체8,610통과/5제외, 이후 보관40/TLS25 별도 통과. 기존 Windows7,996통과 유지·기존 실패70은17통과/53 Linux전용, 해당70 Linux 모두통과. 실제 Windows 운영/SSO/독립호스트/8h/F1 달성으로 표시하지 않음. 모델·정답·예측·기존 F1 93.41% 유지, 유료/AWS/Docker/push/CI/병합 없음. 아래는 이전 기록이다.
 

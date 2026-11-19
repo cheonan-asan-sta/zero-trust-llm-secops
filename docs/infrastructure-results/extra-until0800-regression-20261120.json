@@ -1,6 +1,6 @@
 {
   "schema": "until0800-frozen-full-regression-evidence-1",
-  "implementation_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "implementation_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26",
   "source_sha256": {
     "app/services/audit_witness_observer.py": "98adc1f6f77744162d79fed60baa675fdaca5265ccd934cf8aebf0cdf728aec3",
     "infra/observability/alerts.yaml": "115e55d93cf5be9648035880f8f6221e809e02a8344a559c84720660e2837ec6",
@@ -8,18 +8,18 @@
     "infra/systemd/secops-audit-witness-restore-status@.service": "ae0ecf495441acb9fd56ce3fd23e41a458e3bfde8b1d90eb17326de7e238bfbc",
     "infra/systemd/secops-audit-witness-restore-status@.timer": "421390b019423ba9ee508bccd0697223992ad73e0cc7dac06e278ccfba1d8ef4",
     "infra/systemd/secops-audit-witness.sysusers": "65f2e8ae7d8664a7bb13af2dffa6f2d8f196e41839e5bc423669f489c3939be6",
-    "infra/systemd/secops-audit-witness@.service": "1f1a9a5805c22da3b3bae16a0b4de125229853a2a30c65f91b954041956f0968",
+    "infra/systemd/secops-audit-witness@.service": "d932e78dd39284ac4c070d8268b81a3b176cfc2a2b3af4fa01c5481ac00f2161",
     "scripts/evaluate_m6.py": "d8e346095947ac43f3194117e887f57960404219bd353a6070f67cd1266c3c7e",
     "scripts/f1_lab/witness_observer_status.py": "c2b07cbd204e0602a5647df457cdb6e22be249522cab67303b7dde75fdff4674",
     "scripts/run_witness_alert_flow.py": "472a9220c752c6637b57f817c2c7f8479faeaf4e089719a0939a88d916c78d41",
-    "scripts/run_witness_systemd_controls.py": "68aad58dce44274780027af5264d45a8267d0236bc2f6d8efc0396a0999ebd89",
+    "scripts/run_witness_systemd_controls.py": "2230149d60812dbd7db0d094a4c9016a11d4055ca0970b5e608a4e14469726e7",
     "scripts/witness_systemd_probe.py": "ed5f78d836c2762faf65d9cd0e65df46ae72a76e0de9109f70a884ef3ee2f967",
     "tests/test_async_evidence_io.py": "c842a321996d9f8f2306edc83fc8038065422afd622f9d4b8efda021dae4a639",
     "tests/test_audit_witness_observer.py": "7ab6d1dbee9b71a9cf05c15bb96dccaf5476d439b84ec6ac4842fce72f5a01d7",
     "tests/test_m6_report_lock.py": "d022f748154d9b68911c0e0bfbd50a275ec1184b6039b9f3bf2a4c194143c1fe",
     "tests/test_m6_report_publication.py": "c3544ad50f98cd4b98b6518956661ba277220c30ea147be2cc43873134e9a062",
     "tests/test_witness_monitor_cadence.py": "a6fbdad2dda88dbaef8c6c0afbad7111c26c28788ddcd35fb8f804e39d3ac44a",
-    "tests/test_witness_systemd_templates.py": "234f859e465489c10e4242bff6e58a5e40de4638a1a9c59008b6b6f5bf28e81a"
+    "tests/test_witness_systemd_templates.py": "73f75fdc23cbaaf8634b6df8a70429bc3ec9c6c0d796ff9fef6c157800c48759"
   },
   "bundles": {
     "windows-full-d45-venv-20261120": {
@@ -117,6 +117,14 @@
         "passed": 8848
       },
       "case_outcome_map_sha256": "587fe74242a7e2c6cb845fb759adc4cddef4f24cac32dc73dac29c21e78391c9"
+    },
+    "windows-full-resource-20261120": {
+      "status": "running",
+      "source_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26"
+    },
+    "linux-full-resource-20261120": {
+      "status": "running",
+      "source_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26"
     }
   },
   "comparisons": [
@@ -472,24 +480,31 @@
     {
       "path": "docs/infrastructure-results/until0800-extra-until0800-latest-source-linux-20261120.json",
       "sha256": "8c611a9c01e88459c58ff99483be56a963595ce8e90138f7fd789084519c4ab7"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-resource-extra-until0800-resource-source-20261120.json",
+      "sha256": "309f6884f824f9cc3ea2682c56658c86bab67b15f2d837c5b7fd08a31f0423ae"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-resource-extra-until0800-resource-source-linux-20261120.json",
+      "sha256": "8c5fe8f48cd899af6538a8ec5f543298355b8b27fcfb73c226e54924b5d23166"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-resource-run_frozen_resource_20261120.py.txt",
+      "sha256": "e1686d4773985114b9f4638d9ac2656de43d7b5a01e634d924dba27bfeafe871"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-resource-freeze_resource_budget_20261120.py.txt",
+      "sha256": "e07e7bb4c5af2b55e700c34a3da01455e701015423d3e1ab708eaa76eeb1aa1b"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-resource-freeze_resource_linux_20261120.py.txt",
+      "sha256": "224081f70a998f1b90ddf827fdc2b5f56c59047c3aaa48fefbeeb2cb8505b27c"
     }
   ],
   "current_runtime_paths_changed_since_verified_source": [],
-  "latest_both_platforms_passed": true,
-  "cross_platform_case_mapping": {
-    "same_case_ids": 8853,
-    "passed_both": 8239,
-    "passed_linux_only": 609,
-    "passed_windows_only": 1,
-    "not_passed_on_either": [
-      "tests.test_audit_paging::test_jsonl_own_view_change_requires_explicit_restart[sqlite-append]",
-      "tests.test_audit_paging::test_jsonl_own_view_change_requires_explicit_restart[sqlite-review]",
-      "tests.test_runtime_patches::test_actual_container_runtime_security_and_provenance",
-      "tests.test_runtime_patches::test_new_offline_venv_bootstraps_patched_pip"
-    ],
-    "not_code_coverage": true,
-    "not_detection_metric": true
-  },
+  "latest_both_platforms_passed": false,
+  "cross_platform_case_mapping": null,
   "existing_passed_ids_retained": true,
   "paid_api_calls": 0,
   "goal_status": "active_until_0800",

@@ -118,3 +118,6 @@ docs/infrastructure-results/report-failure-boundaries-* -text whitespace=-blank-
 
 docs/infrastructure-results/witness-sustained-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
 docs/infrastructure-results/witness-sustained-*/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-resource-budget-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+docs/infrastructure-results/witness-resource-budget-*/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol

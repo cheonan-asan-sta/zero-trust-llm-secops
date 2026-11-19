@@ -1,0 +1,29 @@
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+runtime=Path(sys.argv[1]);manifest=json.loads((runtime/'extra-until0800-resource-source-linux-20261120.json').read_text(encoding='utf-8'));source=Path(manifest['path'])
+output=runtime/'witness-resource-budget-systemd-linux-20261120'
+stage=Path(tempfile.mkdtemp(prefix='ztw-code-resource-',dir='/run'));stage.chmod(0o755)
+inventory={};result={'completed':False,'source_commit':manifest['source_commit']}
+try:
+    for name in manifest['files']:
+        if not name.startswith(('app/','scripts/','infra/')):continue
+        target=stage/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source/name,target);target.chmod(0o644)
+        inventory[name]=hashlib.sha256(target.read_bytes()).hexdigest()
+    env={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','PYTHONPATH':str(stage),'PYTHONDONTWRITEBYTECODE':'1','AWS_EC2_METADATA_DISABLED':'true'}
+    process=subprocess.run(['/home/chaehj02/team-llm-prep-venv/bin/python','-m','scripts.run_witness_systemd_controls','--directory',str(output)],cwd=stage,env=env,capture_output=True,text=True,timeout=180)
+    (runtime/'witness-resource-budget-systemd-linux-20261120.stdout.log').write_text(process.stdout)
+    (runtime/'witness-resource-budget-systemd-linux-20261120.stderr.log').write_text(process.stderr)
+    value=json.loads((output/'report.json').read_text());assert process.returncode==0 and value['completed']
+    assert value['kernel_resource_limits']['memory_limit_bytes']==512*1024*1024
+    result.update(completed=True,checks=len(value['checks']),source_files_staged=len(inventory),staged_bytes_unchanged=all(hashlib.sha256((stage/name).read_bytes()).hexdigest()==h for name,h in inventory.items()))
+finally:
+    shutil.rmtree(stage);result['owned_public_source_removed']=not stage.exists();result['staged_file_sha256']=inventory
+    (runtime/'witness-resource-budget-systemd-linux-20261120-provenance.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps({k:v for k,v in result.items() if k!='staged_file_sha256'}))

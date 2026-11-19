@@ -1,0 +1,22 @@
+import hashlib
+import json
+import os
+import sys
+import tarfile
+from pathlib import Path
+
+runtime=Path(sys.argv[1]);manifest=json.loads((runtime/'extra-until0800-resource-source-20261120.json').read_text(encoding='utf-8'))
+target=Path('/home/chaehj02')/('witness-verified-source-20261120-'+manifest['source_commit'][:8]);target.mkdir(exist_ok=False)
+archive=runtime/('until0800-source-'+manifest['source_commit'][:8]+'.tar')
+assert hashlib.sha256(archive.read_bytes()).hexdigest()==manifest['archive_sha256']
+with tarfile.open(archive) as bundle:
+    for item in bundle:
+        assert item.isfile() or item.isdir()
+        assert not Path(item.name).is_absolute() and '..' not in Path(item.name).parts
+        path=target/item.name
+        if item.isdir():path.mkdir(parents=True,exist_ok=True);continue
+        path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(bundle.extractfile(item).read());path.chmod(item.mode)
+assert all(hashlib.sha256((target/name).read_bytes()).hexdigest()==expected for name,expected in manifest['files'].items())
+manifest['path']=str(target)
+(runtime/'extra-until0800-resource-source-linux-20261120.json').write_text(json.dumps(manifest,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({'source_commit':manifest['source_commit'],'files':len(manifest['files']),'path':str(target),'verified':True}))
