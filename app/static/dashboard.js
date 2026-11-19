@@ -80,7 +80,8 @@
     controllers: new Set(),
     data: {},
     errors: {},
-    pageNumber: 1,
+    audit: {generation: 0, busy: false, page: null, cursors: [], index: 0,
+      error: null, identity: null, scope: null, controller: null},
     busy: false,
     detailSequence: 0,
     demo: {},
@@ -142,12 +143,16 @@
     operation = false,
     ifMatch,
     reviewIdentity,
-    withMetadata = false
+    withMetadata = false,
+    signal
   } = {}) {
     if (ifMatch !== undefined && !/^"r1-[a-f0-9]{64}"$/.test(ifMatch)) throw new Error("검토 버전을 다시 조회하세요.");
     if (reviewIdentity !== undefined && !/^[a-f0-9]{64}$/.test(reviewIdentity)) throw new Error("검토 신원을 다시 확인하세요.");
     const epoch = state.epoch;
     const controller = new AbortController();
+    const abort = () => controller.abort();
+    if (signal?.aborted) abort();
+    else signal?.addEventListener("abort", abort, {once: true});
     state.controllers.add(controller);
     const timeout = setTimeout(() => controller.abort(), Math.min(timeoutMs, 120000));
     const headers = {
@@ -196,6 +201,7 @@
     } finally {
       clearTimeout(timeout);
       state.controllers.delete(controller);
+      signal?.removeEventListener("abort", abort);
     }
   }
 
@@ -226,6 +232,13 @@
       metrics: () => object(value) && count(value.total_analyses) && count(value.pending_review_count) && count(value.average_latency_ms) && object(value.risk_counts) && Object.values(value.risk_counts).every(count),
       logs: () => Array.isArray(value) && value.every(log),
       log: () => log(value),
+      audit: () => object(value) && Array.isArray(value.items) && value.items.length <= 12 && value.items.every(log) &&
+        Number.isSafeInteger(value.total_matches) && value.total_matches >= 0 &&
+        /^[A-Za-z0-9_-]{1,2048}$/.test(value.page_cursor || "") &&
+        (value.next_cursor === null || (typeof value.next_cursor === "string" && /^[A-Za-z0-9_-]{1,2048}$/.test(value.next_cursor))) &&
+        /^[a-f0-9]{64}$/.test(value.snapshot_id || "") && value.historical_audit_snapshot === true &&
+        ["sqlite_prefix", "unchanged_local_view"].includes(value.snapshot_mode) &&
+        Number.isFinite(Date.parse(value.snapshot_created_at)) && Date.parse(value.snapshot_expires_at) > Date.parse(value.snapshot_created_at),
       sessions: () => Array.isArray(value) && value.every(session),
       responses: () => Array.isArray(value) && value.every(response),
       response: () => response(value),
@@ -468,7 +481,9 @@
   function renderLogRows(id, rows) {
     const target = $(id);
     target.replaceChildren();
-    if (!state.data.logs) return tableMessage(target, state.errors.logs ? errorLabel(state.errors.logs) : "기록을 불러오고 있습니다.", 6);
+    if (id === "logRows" && !state.audit.page) return tableMessage(target,
+      state.audit.error ? auditError(state.audit.error) : state.audit.busy ? "기록을 불러오고 있습니다." : "최신 목록 조회를 눌러 기록을 확인하세요.", 6);
+    if (id !== "logRows" && !state.data.logs) return tableMessage(target, state.errors.logs ? errorLabel(state.errors.logs) : "기록을 불러오고 있습니다.", 6);
     if (!rows.length) return tableMessage(target, "조건에 맞는 분석 기록이 없습니다.", 6);
     rows.forEach((record) => {
       const row = node("tr");
@@ -487,23 +502,106 @@
 
   function filteredLogs() {
     const query = $("logSearch").value.trim().toLocaleLowerCase();
-    return (state.data.logs || []).filter((record) =>
-      (!$("riskFilter").value || record.assessment.risk_level === $("riskFilter").value) &&
+    return (state.audit.page?.items || []).filter((record) =>
       (!$("analyzerFilter").value || record.analyzer === $("analyzerFilter").value) &&
-      (!$("reviewFilter").value || record.review_status === $("reviewFilter").value) &&
       (!query || JSON.stringify(redact(record)).toLocaleLowerCase().includes(query)));
   }
 
+  const auditScope = () => JSON.stringify([$("riskFilter").value, $("reviewFilter").value]);
+  function auditError(error) {
+    if (error.status === 410) return "조회가 만료됐습니다. 최신 목록 조회를 눌러 다시 시작하세요.";
+    if ([400, 409].includes(error.status)) return "이전 조회를 이어갈 수 없습니다. 최신 목록 조회를 눌러 다시 시작하세요.";
+    if (error.status === 501) return "현재 서버는 감사 페이지 조회를 지원하지 않습니다. 관리자에게 문의하세요.";
+    if (error.identityChanged) return "조회 신원이 변경됐습니다. 연결 및 인증을 확인한 뒤 최신 목록을 다시 조회하세요.";
+    if (error.invalidResponse) return "감사 페이지 응답을 확인할 수 없습니다. 최신 목록을 다시 조회하세요.";
+    return errorLabel(error) + " 최신 목록 조회로 다시 시도하세요.";
+  }
+  function resetAudit() {
+    const audit = state.audit;
+    audit.controller?.abort();
+    audit.generation++;
+    audit.busy = false; audit.page = null; audit.error = null;
+    audit.cursors = []; audit.index = 0; audit.identity = null; audit.scope = null; audit.controller = null;
+  }
+  function auditIdentityChanged() {
+    resetAudit();
+    state.audit.error = {identityChanged: true};
+    renderLogs();
+  }
+  async function loadAuditPage(index = 0, cursor = null, exporting = false) {
+    const audit = state.audit, epoch = state.epoch;
+    const old = audit.page, scope = auditScope();
+    const identity = audit.identity;
+    const history = cursor ? [...audit.cursors] : [];
+    const localFilter = JSON.stringify([$("logSearch").value, $("analyzerFilter").value]);
+    audit.controller?.abort();
+    const controller = new AbortController(), generation = ++audit.generation;
+    audit.controller = controller; audit.busy = true; audit.page = null; audit.error = null;
+    if (!cursor) { audit.cursors = []; audit.index = 0; audit.identity = null; audit.scope = null; }
+    renderLogs();
+    const active = () => epoch === state.epoch && generation === audit.generation && scope === auditScope();
+    const invalid = () => Object.assign(new Error("Invalid audit page"), {invalidResponse: true});
+    const changed = () => Object.assign(new Error("Audit identity changed"), {identityChanged: true});
+    try {
+      const signal = controller.signal;
+      const before = checked("identity", await request("/auth/me", {signal}));
+      if (!active()) return false;
+      if (!sameReviewIdentity(before, state.data.identity) || (cursor && !sameReviewIdentity(before, identity))) throw changed();
+      const params = new URLSearchParams({limit: "12"});
+      if ($("riskFilter").value) params.set("risk_level", $("riskFilter").value);
+      if ($("reviewFilter").value) params.set("review_status", $("reviewFilter").value);
+      if (cursor) params.set("cursor", cursor);
+      const page = checked("audit", await request("/audit/results?" + params, {signal}));
+      if (!active()) return false;
+      const after = checked("identity", await request("/auth/me", {signal}));
+      if (!active()) return false;
+      if (!sameReviewIdentity(before, after) || !sameReviewIdentity(before, state.data.identity)) throw changed();
+      if (cursor && (!old || audit.scope !== scope || old.snapshot_id !== page.snapshot_id ||
+          old.total_matches !== page.total_matches || old.snapshot_expires_at !== page.snapshot_expires_at ||
+          old.snapshot_created_at !== page.snapshot_created_at || old.snapshot_mode !== page.snapshot_mode)) throw invalid();
+      if (cursor && index !== audit.index && page.items.some((record) => old.items.some((previous) => previous.analysis_id === record.analysis_id))) throw invalid();
+      if (page.items.length !== Math.max(0, Math.min(12, page.total_matches - index * 12)) ||
+          (page.next_cursor !== null) !== (index * 12 + page.items.length < page.total_matches) ||
+          (index > 0 && index * 12 >= page.total_matches) ||
+          new Set(page.items.map((record) => record.analysis_id)).size !== page.items.length ||
+          !page.items.every((record) => record.tenant_id === before.tenant_id && typeof record.analysis_id === "string" && record.analysis_id.length > 0 &&
+            (!$("riskFilter").value || record.assessment.risk_level === $("riskFilter").value) &&
+            (!$("reviewFilter").value || record.review_status === $("reviewFilter").value))) throw invalid();
+      history[index] = page.page_cursor;
+      if (page.next_cursor) history[index + 1] = page.next_cursor;
+      audit.cursors = history.slice(0, index + (page.next_cursor ? 2 : 1));
+      audit.page = page; audit.index = index; audit.identity = before; audit.scope = scope;
+      if (exporting) {
+        if (localFilter === JSON.stringify([$("logSearch").value, $("analyzerFilter").value])) exportAuditPage();
+        else notify("검색 조건이 변경됐습니다. 현재 결과를 확인한 뒤 다시 저장하세요.");
+      }
+      return true;
+    } catch (error) {
+      if (active()) {
+        audit.page = null; audit.cursors = []; audit.identity = null; audit.scope = null;
+        audit.error = error;
+        if (error.identityChanged || [401, 403].includes(error.status)) {
+          state.detailSequence++; $("detailDialog").close(); $("detailBody").replaceChildren();
+        }
+      }
+      return false;
+    } finally {
+      if (active()) { audit.busy = false; audit.controller = null; render(); }
+    }
+  }
+
   function renderLogs() {
-    const rows = filteredLogs();
-    const pageCount = Math.max(1, Math.ceil(rows.length / 12));
-    state.pageNumber = Math.min(state.pageNumber, pageCount);
-    text("logCount", state.data.logs ? `${rows.length}건 표시 / 조회 ${state.data.logs.length}건` : "조회 결과 없음");
-    text("pageLabel", `${state.pageNumber} / ${pageCount} 페이지`);
-    $("prevPage").disabled = state.pageNumber <= 1;
-    $("nextPage").disabled = state.pageNumber >= pageCount;
-    $("exportLogs").disabled = !state.data.logs || rows.length === 0;
-    renderLogRows("logRows", rows.slice((state.pageNumber - 1) * 12, state.pageNumber * 12));
+    const audit = state.audit, page = audit.page, rows = filteredLogs();
+    text("logCount", page ? `현재 페이지 ${rows.length}건 / 전체 조건 일치 ${num(page.total_matches)}건` : "조회 결과 없음");
+    text("pageLabel", page ? `${audit.index + 1} / ${Math.max(1, Math.ceil(page.total_matches / 12))} 페이지` : "페이지 미확인");
+    text("logSnapshot", audit.busy ? "감사 기록과 현재 조회 신원을 확인하고 있습니다." : audit.error ? auditError(audit.error) :
+      page ? `${date(page.snapshot_created_at, true)} 기준 기록입니다. 최신 목록 조회로 갱신하세요. 상세와 검토는 현재 상태를 다시 확인합니다.` : "최신 목록 조회를 눌러 시작하세요.");
+    $("logRows").setAttribute("aria-busy", String(audit.busy));
+    $("prevPage").disabled = audit.busy || !page || audit.index <= 0;
+    $("nextPage").disabled = audit.busy || !page || !page.next_cursor;
+    $("exportLogs").disabled = audit.busy || !page || rows.length === 0;
+    $("reloadAudit").disabled = audit.busy;
+    renderLogRows("logRows", rows);
     renderLogRows("recentLogs", (state.data.logs || []).slice(0, 5));
   }
 
@@ -720,7 +818,7 @@
       hybrid: "규칙 + OpenAI"
     } [health.analyzer_mode] || health.analyzer_mode : "—");
     text("footerVersion", health ? `v${health.version} / ${health.environment.toUpperCase()} / ${Intl.DateTimeFormat().resolvedOptions().timeZone}` : "LOCAL FRAMEWORK");
-    const errors = Object.entries(state.errors);
+    const errors = [...Object.entries(state.errors), ...(state.audit.error ? [["audit", state.audit.error]] : [])];
     const coreOkay = ["health", "identity", "metrics", "logs", "sessions"].every((key) => state.data[key]);
     text("connectionStatus", coreOkay ? (errors.length ? "일부 조회 기능 확인 필요" : "조회 API 연결됨") : "데이터 조회 확인 필요");
     $("statusDot").className = `status-dot ${coreOkay && !errors.length ? "online" : ""}`;
@@ -735,9 +833,13 @@
     updateDemoButtons();
     window.dashboardOperations?.sync();
   }
-  async function refresh() {
+  async function refresh(options = {}) {
     if (state.busy) return;
     const epoch = state.epoch;
+    const previousIdentity = state.data.identity;
+    let identityChanged = false;
+    const reload = options.resetAudit !== false && state.page === "logs";
+    if (reload) { resetAudit(); renderLogs(); }
     state.busy = true;
     $("refresh").disabled = true;
     const urls = {
@@ -754,11 +856,16 @@
           if (epoch === state.epoch) {
             state.data[key] = result;
             delete state.errors[key];
+            if (key === "identity" && previousIdentity && !sameReviewIdentity(previousIdentity, result)) {
+              identityChanged = true;
+              auditIdentityChanged();
+            }
           }
         } catch (error) {
           if (epoch === state.epoch) {
             delete state.data[key];
             state.errors[key] = error;
+            if (key === "identity") { resetAudit(); state.audit.error = error; renderLogs(); }
           }
         }
       }));
@@ -770,6 +877,8 @@
       }
       text("lastUpdated", `마지막 조회 ${date(Date.now())}`);
       render();
+      if (!identityChanged && state.page === "logs" && state.data.identity && !state.audit.busy &&
+          (reload || (!state.audit.page && !state.audit.error))) await loadAuditPage();
     } finally {
       if (epoch === state.epoch) {
         state.busy = false;
@@ -799,6 +908,7 @@
     });
     document.title = `${name} | 천안아산역`;
     window.dashboardOperations?.navigate(state.page);
+    if (state.page === "logs" && state.data.identity) loadAuditPage();
     if (state.page === "evidence") {
       if (state.busy) state.refreshRequested = true;
       else refresh();
@@ -814,7 +924,7 @@
     state.errors = {};
     state.busy = false;
     state.refreshRequested = false;
-    state.pageNumber = 1;
+    resetAudit();
     state.demo = {};
     window.dashboardOperations?.reset();
     state.detailSequence++;
@@ -916,29 +1026,43 @@
       }
     }
   }
-  $("refresh").addEventListener("click", refresh);
+  $("refresh").addEventListener("click", () => refresh());
   document.querySelector(".skip-link").addEventListener("click", (event) => {
     event.preventDefault();
     $("content").focus();
     $("content").scrollIntoView();
   });
   window.addEventListener("hashchange", navigate);
-  ["logSearch", "riskFilter", "analyzerFilter", "reviewFilter"].forEach((id) => $(id).addEventListener(id === "logSearch" ? "input" : "change", () => {
-    state.pageNumber = 1;
-    renderLogs();
-  }));
+  ["logSearch", "analyzerFilter"].forEach((id) => $(id).addEventListener(id === "logSearch" ? "input" : "change", renderLogs));
+  ["riskFilter", "reviewFilter"].forEach((id) => $(id).addEventListener("change", () => loadAuditPage()));
   $("sessionFilter").addEventListener("change", renderSessions);
   $("prevPage").addEventListener("click", () => {
-    state.pageNumber--;
-    renderLogs();
+    const audit = state.audit;
+    if (!audit.busy && audit.page && audit.index > 0) loadAuditPage(audit.index - 1, audit.cursors[audit.index - 1]);
   });
   $("nextPage").addEventListener("click", () => {
-    state.pageNumber++;
-    renderLogs();
+    const audit = state.audit;
+    if (!audit.busy && audit.page?.next_cursor) loadAuditPage(audit.index + 1, audit.page.next_cursor);
   });
+  $("reloadAudit").addEventListener("click", () => loadAuditPage());
   $("exportLogs").addEventListener("click", () => {
+    const audit = state.audit;
+    if (!audit.busy && audit.page && filteredLogs().length) loadAuditPage(audit.index, audit.page.page_cursor, true);
+  });
+  function exportAuditPage() {
+    const audit = state.audit;
+    if (!audit.page || !filteredLogs().length) return;
     const blob = new Blob([JSON.stringify({
-      scope: "current_tenant_recent_100_filtered",
+      scope: "current_tenant_audit_snapshot_page_filtered",
+      historical_audit_snapshot: true,
+      snapshot_id: audit.page.snapshot_id,
+      snapshot_created_at: audit.page.snapshot_created_at,
+      snapshot_expires_at: audit.page.snapshot_expires_at,
+      snapshot_mode: audit.page.snapshot_mode,
+      page_number: audit.index + 1,
+      total_matches: audit.page.total_matches,
+      filters: {risk_level: $("riskFilter").value, review_status: $("reviewFilter").value,
+        page_search: $("logSearch").value, page_analyzer: $("analyzerFilter").value},
       exported_at: new Date().toISOString(),
       records: redact(filteredLogs())
     }, null, 2)], {
@@ -950,8 +1074,8 @@
     link.download = `security-logs-${new Date().toISOString().slice(0, 10)}.json`;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    notify("선택한 로그를 저장했습니다. 업무 정보가 포함되어 있으니 공유 시 확인해 주세요.");
-  });
+    notify(`현재 페이지의 검색 결과 ${filteredLogs().length}건을 저장했습니다.`);
+  }
   $("connectionButton").addEventListener("click", () => $("connectionDialog").showModal());
   $("closeConnection").addEventListener("click", () => {
     $("credential").value = "";
@@ -982,6 +1106,6 @@
   render();
   refresh();
   setInterval(() => {
-    if ($("autoRefresh").checked && !document.hidden && !state.demo.busy && !$("connectionDialog").open) refresh();
+    if ($("autoRefresh").checked && !document.hidden && !state.demo.busy && !state.audit.busy && !$("connectionDialog").open) refresh({resetAudit: false});
   }, 10000);
 })();

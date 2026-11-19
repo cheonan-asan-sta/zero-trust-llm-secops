@@ -1235,6 +1235,7 @@ class AnalysisResult(StrictModel):
 class AuditResultPage(StrictModel):
     items: list[AnalysisResult] = Field(max_length=100)
     total_matches: int = Field(ge=0)
+    page_cursor: str = Field(min_length=1, max_length=2048, pattern=r"^[A-Za-z0-9_-]+$")
     next_cursor: str | None = Field(default=None, max_length=2048)
     snapshot_id: str = Field(pattern=r"^[a-f0-9]{64}$")
     snapshot_created_at: datetime

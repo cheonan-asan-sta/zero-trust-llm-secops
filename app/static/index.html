@@ -393,7 +393,7 @@
       <div class="filter-bar">
        <label class="search-box">
         <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg>
-        <input aria-label="로그 검색" id="logSearch" placeholder="이벤트 ID, 근거, 사용자 검색" type="search"/>
+        <input aria-label="현재 페이지에서 로그 검색" id="logSearch" placeholder="현재 페이지에서 검색" type="search"/>
        </label>
        <label>
         위험도
@@ -417,7 +417,7 @@
        </label>
        <label>
         분석기
-        <select id="analyzerFilter">
+        <select id="analyzerFilter" aria-label="현재 페이지 분석기">
          <option value="">
           모든 분석기
          </option>
@@ -456,7 +456,7 @@
         </select>
        </label>
        <button class="button secondary" id="exportLogs">
-        JSON 저장
+        현재 페이지 JSON
        </button>
       </div>
       <div class="table-meta">
@@ -464,9 +464,10 @@
         불러오는 중
        </span>
        <span>
-        최근 100건에서 검색
+        위험도·검토는 전체 기록 / 검색·분석기는 현재 페이지
        </span>
       </div>
+      <p class="scope-note" id="logSnapshot" role="status"></p>
       <div class="table-wrap">
        <table>
         <thead>
@@ -503,6 +504,9 @@
         </button>
         <button class="button small" id="nextPage">
          다음 →
+        </button>
+        <button class="button small" id="reloadAudit">
+         최신 목록 조회
         </button>
        </div>
       </div>

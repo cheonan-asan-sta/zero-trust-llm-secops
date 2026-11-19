@@ -61,6 +61,46 @@ def pager(clock=None):
     return AuditPager(lambda: b"local-page-fixture-key-32-bytes!!!"[:32], clock=clock)
 
 
+def test_current_page_cursor_returns_to_same_first_page_and_expiry(store):
+    seed(store, 27)
+    service = pager()
+    first = service.page(store, "local", 12)
+    second = service.page(store, "local", 12, first.next_cursor)
+    last = service.page(store, "local", 12, second.next_cursor)
+    back = service.page(store, "local", 12, first.page_cursor)
+    assert len(first.items) == len(second.items) == 12 and len(last.items) == 3
+    assert back.items == first.items and back.total_matches == 27
+    assert back.snapshot_id == first.snapshot_id == second.snapshot_id == last.snapshot_id
+    assert back.snapshot_created_at == first.snapshot_created_at
+    assert back.snapshot_expires_at == first.snapshot_expires_at
+    assert service.page(store, "local", 12, second.page_cursor).items == second.items
+
+
+def test_first_page_cursor_does_not_silently_include_new_sqlite_rows(tmp_path):
+    store = SQLiteAuditStore(tmp_path / "audit.sqlite3")
+    rows = seed(store, 3)
+    service = pager()
+    first = service.page(store, "local", 2)
+    seed(store, 1, start=9)
+    asyncio.run(store.save_review(review(rows[-1]), rows[-1]))
+    back = service.page(store, "local", 2, first.page_cursor)
+    assert back.items == first.items and back.total_matches == 3
+    fresh = service.page(store, "local", 2)
+    assert fresh.total_matches == 4 and fresh.snapshot_id != back.snapshot_id
+
+
+def test_first_page_cursor_keeps_original_expiry(store):
+    seed(store, 3)
+    clock = {"now": 1000}
+    service = pager(clock=lambda: clock["now"])
+    first = service.page(store, "local", 2)
+    clock["now"] = 1100
+    assert service.page(store, "local", 2, first.page_cursor).snapshot_expires_at == first.snapshot_expires_at
+    clock["now"] = 1900
+    with pytest.raises(AuditCursorExpired):
+        service.page(store, "local", 2, first.page_cursor)
+
+
 def test_pages_cover_more_than_recent_window_without_duplicates_or_other_tenant(store):
     rows = seed(store, 125)
     seed(store, 1, tenant="other", start=999)

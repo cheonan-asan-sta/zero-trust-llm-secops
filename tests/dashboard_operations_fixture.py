@@ -14,7 +14,10 @@ def main():
     parser.add_argument("--directory", type=Path, required=True)
     parser.add_argument("--port", type=int, required=True)
     parser.add_argument("--sqlite-audit", action="store_true")
+    parser.add_argument("--audit-records", type=int, default=0)
     args = parser.parse_args()
+    if not 0 <= args.audit_records <= 1000:
+        parser.error("audit-records must be between 0 and 1000")
     args.directory.mkdir(mode=0o700)
     app = isolated_app(args.directory)
     from app.main import settings
@@ -51,6 +54,37 @@ def main():
     )
     settings.dashboard_operations_directory = args.directory / "jobs"
     settings.dashboard_operations_tenant = "tenant-a"
+    if args.audit_records:
+        import asyncio
+        from datetime import UTC, datetime, timedelta
+
+        from app import main as api
+        from app.models import ReviewStatus, RiskLevel
+        from tests.test_audit_cancellation import record
+
+        async def seed_audit():
+            for index in range(1, args.audit_records + 1):
+                original = record(index)
+                row = original.model_copy(
+                    update={
+                        "analysis_id": f"{index:032x}",
+                        "event_id": f"page-event-{index:03d}",
+                        "tenant_id": "tenant-a",
+                        "actor_id": "synthetic-operator",
+                        "analyzed_at": datetime(2026, 1, 1, tzinfo=UTC) + timedelta(seconds=index),
+                        "review_status": ReviewStatus.PENDING,
+                        "assessment": original.assessment.model_copy(
+                            update={
+                                "risk_level": RiskLevel.CRITICAL if index == 1 else RiskLevel.HIGH,
+                            }
+                        ),
+                    }
+                )
+                await api.audit_store.save(row)
+            foreign = record(999).model_copy(update={"tenant_id": "tenant-b"})
+            await api.audit_store.save(foreign)
+
+        asyncio.run(seed_audit())
     import uvicorn
 
     uvicorn.run(app, host="127.0.0.1", port=args.port, log_level="warning")

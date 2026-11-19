@@ -371,6 +371,7 @@ class AuditPager:
         return AuditResultPage(
             items=items,
             total_matches=total,
+            page_cursor=self._seal(state, encryption_key),
             next_cursor=next_cursor,
             snapshot_id=snapshot_id,
             snapshot_created_at=datetime.fromtimestamp(state.issued, UTC),
