@@ -1,5 +1,7 @@
 # 검토 CLI의 서버 측 호출 신원 연결
 
+> 후속: [기존 워크벤치의 감사 페이지 탐색](extra-workbench-paging-20261119.md)을 완료했다. 아래 워크벤치 페이지 미완료 표현과 수치는 당시 기록이다. 전체 자유 검색·다른 목록 이전·실제 조직 배포/독립 성능 인수는 남아 있다.
+
 > 후속: [서버 caller binding 필수화 선택 정책](extra-server-review-policy-20261119.md)을 추가했다. 아래 서버 정책 미완료 표현은 CLI 연결 시점이다. 기본값은 false이며 실제 조직 client 이관/전체 worker 배포는 남아 있다.
 
 2026-11-19 · 로컬 `extra` · 구현 `a293c80`. 기존 대시보드·워크벤치 다음으로 운영자 CLI도 서버의 caller binding 검사를 사용하도록 연결했다. 서버·UI·모델은 바꾸지 않았다. 유료 API·AWS·Docker 자원 생성·push·CI·main/aitest 병합은 하지 않았다.

@@ -1,0 +1,80 @@
+{
+  "schema": "workbench-paging-browser-1",
+  "synthetic": true,
+  "paid_calls": 0,
+  "caller_bound_policy_required": true,
+  "passed": false,
+  "checks": [
+    {
+      "name": "first_page_is_bounded_and_tenant_scoped",
+      "passed": true
+    },
+    {
+      "name": "first_previous_disabled",
+      "passed": true
+    },
+    {
+      "name": "next_retains_original_snapshot_and_expiry",
+      "passed": true
+    },
+    {
+      "name": "previous_uses_saved_current_page_cursor",
+      "passed": true
+    },
+    {
+      "name": "historical_list_opens_current_detail_for_review",
+      "passed": true
+    },
+    {
+      "name": "summary_refresh_preserves_snapshot_without_list_request",
+      "passed": true
+    },
+    {
+      "name": "explicit_reload_includes_new_analysis_and_review",
+      "passed": true
+    },
+    {
+      "name": "all_137_rows_visited_once_across_12_pages",
+      "passed": true
+    },
+    {
+      "name": "last_next_disabled",
+      "passed": true
+    },
+    {
+      "name": "server_filter_finds_oldest_outside_recent_100",
+      "passed": true
+    },
+    {
+      "name": "review_filter_applies_to_whole_audit",
+      "passed": true
+    },
+    {
+      "name": "empty_filter_has_no_navigation",
+      "passed": true
+    },
+    {
+      "name": "late_previous_filter_cannot_replace_current_rows",
+      "passed": true
+    }
+  ],
+  "source_sha256": {
+    "app/static/app.js": "2c3ec46346bbcf7e2887ac2d3e991b01d617aacc321a03fe5528e31b852951de",
+    "app/static/workbench.html": "186063c8fb12155bb3cd008933fad76f5f148b78a9e15b169386449bd957c43d",
+    "app/static/styles.css": "f4d38fedd2cd8d515f074fa1f98d8a0fa45832ba76fbd319ea44a2c43589dee0",
+    "app/main.py": "fea40ce2d4faea65d9959466ae03c55e0662a97c7bace11effa22c73e47ed341",
+    "app/config.py": "a53dfabb0bd7f0d61563c7342759966f775be93de8a1ef4cb3a26effd6488357",
+    "app/services/audit_paging.py": "edb3bcb33b5fde81d06692a3b9fb6f3ec2d77b694a454b58369612638b18c82b",
+    "tests/dashboard_operations_fixture.py": "c3b1318b20cb51ec6eb5aadc103522a1467e28c08c4b0fb8faef6a177ac13dd8",
+    "scripts/test_workbench_review_browser.py": "7e4a8876ec2c258da9171868d20b4ead1df275594873496cbac5b40e42d53a22",
+    "scripts/test_workbench_paging_browser.py": "d9c77f2e60802bdf213e0bd44051411fb55c9dc7f0441ec4e7f12dac7d2ced4a"
+  },
+  "traversal": {
+    "rows": 137,
+    "unique": 137,
+    "pages": 12
+  },
+  "owned_servers_stopped": [
+    true
+  ]
+}

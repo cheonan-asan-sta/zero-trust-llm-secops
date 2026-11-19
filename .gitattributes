@@ -33,6 +33,8 @@ docs/infrastructure-results/review-policy-final-windows-20261119.xml -text white
 docs/infrastructure-results/review-policy-final-linux-20261119.xml -text whitespace=cr-at-eol
 docs/infrastructure-results/review-policy-dashboard-browser-20261119.json -text whitespace=cr-at-eol
 docs/infrastructure-results/review-policy-workbench-browser-20261119.json -text whitespace=cr-at-eol
+docs/infrastructure-results/workbench-paging-*.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/workbench-paging-*.json -text whitespace=cr-at-eol
 infra/mtls/nginx-renewal.sh text eol=lf
 infra/mtls/nginx-rekey.sh text eol=lf
 infra/runtime/** text eol=lf

@@ -14,11 +14,13 @@
 
 CLI 후속은 [검토 CLI의 서버 호출 신원 연결](extra-cli-review-binding-20261119.md)이다. 구현 `a293c80`에서 최종 신원 확인 직후 같은 키의 subject가 바뀌어도 서버가 저장 전에403으로 거부하도록 조회 binding을 PATCH에 연결했다. 변경 전 새 재현1건은 실패했고, 개선 후 새26건을 포함해 Windows217통과/3제외·Linux220통과다. 스냅샷 v2를 사용하며 v1은 자동 변환하지 않는다. 새 파일로 prepare하고 내용을 다시 확인해야 한다. 서버·UI·모델은 변경하지 않았다.
 
-최신 후속은 [서버 검토 필수화 선택 정책](extra-server-review-policy-20261119.md)이다. 구현 `d461b5f`에서 SQLite·API key/OIDC·If-Match 설정을 전제로 `AUDIT_REVIEW_REQUIRE_IDENTITY=true`를 지원한다. 누락428·현재 신원/권한·저장 전 정책 강화·CAS 검사를 확인했다. Windows250통과/3제외·Linux253통과, 필수 모드 실제 대시보드29·워크벤치34조건 통과다. 기본값 false와 실제 운영 설정은 유지하며, 모든 조직 writer/worker의 이관·배포를 완료한 것은 아니다.
+서버 정책 후속은 [서버 검토 필수화 선택 정책](extra-server-review-policy-20261119.md)이다. 구현 `d461b5f`에서 SQLite·API key/OIDC·If-Match 설정을 전제로 `AUDIT_REVIEW_REQUIRE_IDENTITY=true`를 지원한다. 누락428·현재 신원/권한·저장 전 정책 강화·CAS 검사를 확인했다. Windows250통과/3제외·Linux253통과, 필수 모드 실제 대시보드29·워크벤치34조건 통과다. 기본값 false와 실제 운영 설정은 유지하며, 모든 조직 writer/worker의 이관·배포를 완료한 것은 아니다.
+
+최신 후속은 [기존 워크벤치 감사 페이지 탐색](extra-workbench-paging-20261119.md)이다. 기능 `d82052e`·모바일 표시 `79bdf4e`에서 최근8건을 서버12건 페이지/전체 위험도·검토 상태 필터로 이전했다. 이전/다음 조회 기준 보존·신원 전후 검사·만료/오류/지연 응답 차단·현재 상세 재조회를 연결했다. 최종 브라우저45조건, 기능 기준 검토34조건·Windows324통과/5제외·Linux327통과/2제외다. backend/모델/평가 원본은 동일하며, 이 묶음을 새 전체 저장소 회귀나 탐지 성능 개선으로 집계하지 않는다.
 
 ## 기준과 실행 범위
 
-기존 워크벤치 검토도 [별도 후속](extra-workbench-review-20261119.md)으로 연결했다. frontend `6c0100f`·대비 보강 `1b8233d`이며 backend는 변경하지 않았다. 개별 인증·상세 ETag/caller binding·확인 후 저장·연결 변경 시 이전 화면/요청 폐기를 구현했다. 워크벤치 실제 브라우저32조건·기존 대시보드 검토27조건, 관련 pytest Windows191통과/3제외·Linux194통과다. 워크벤치의 검토 이전은 완료했다. 당시 남긴 CLI는 위 후속으로 연결했고, 다른 custom client와 워크벤치의 페이지 탐색 이전은 남아 있다.
+기존 워크벤치 검토도 [별도 후속](extra-workbench-review-20261119.md)으로 연결했다. frontend `6c0100f`·대비 보강 `1b8233d`이며 backend는 변경하지 않았다. 개별 인증·상세 ETag/caller binding·확인 후 저장·연결 변경 시 이전 화면/요청 폐기를 구현했다. 워크벤치 실제 브라우저32조건·기존 대시보드 검토27조건, 관련 pytest Windows191통과/3제외·Linux194통과다. 워크벤치의 검토 이전은 완료했다. 당시 남긴 CLI는 위 후속으로 연결했고, 당시 남긴 워크벤치 페이지 이전은 위 최신 후속에서 완료했다. 다른 custom client의 조직 배포 인수는 남아 있다.
 
 오전08:00 시점 app 기준은 `3165fc1`, 검토 연결은 `bef9a97`, 최신 감사 페이지 연결은 `57b1590`이다. 오전 당시 로컬의 `origin/main=e058bca`보다35개 commit이 앞섰다는 비교는 그 시점 기록이다. 원격을 새로 조회한 결과가 아니며 이번 작업을 push·CI·main/aitest 병합하지 않았다. 실행은 무료 로컬 Python·WSL·loopback HTTP/systemd다. AWS·유료 모델 API와 미뤄둔 실제8시간 soak는 실행하지 않았다.
 
@@ -53,7 +55,7 @@ CLI 후속은 [검토 CLI의 서버 호출 신원 연결](extra-cli-review-bindi
 |---|---|
 | 전체 회귀 | 전체 실행 종료. 두 기대값 수정 후 관련 재검증 통과. 수정 후 새 전체 실행·Windows 전체 플랫폼 정리는 별도 미실행 |
 | 사람의 오래된 검토 화면 | 자체 대시보드·기존 워크벤치·CLI 모두 ETag와 서버 caller binding 연결 완료. CLI v1 파일은 새 prepare 필요. 서버 caller binding 필수화 선택 정책도 추가. 다른 custom client 목록화/이전·모든 worker에 동일 정책 배포 인수는 남아 있으며 두 strict 기본값 false 유지 |
-| 대시보드 전체 검색/다른 목록 | 로그 탐색의 감사 cursor 소비는 완료. 자유 검색·분석기는 현재 페이지 범위. 다른 목록과 워크벤치의 페이지 탐색 이전·전체 범위 자유 검색 설계는 남음 |
+| 대시보드 전체 검색/다른 목록 | 자체 대시보드와 기존 워크벤치의 감사 cursor 소비 완료. 워크벤치 위험도/검토 상태는 서버 전체 범위. 대시보드 자유 검색·분석기는 현재 페이지 범위. 다른 목록 페이지 이전·서버 전체 자유 검색 설계는 남음 |
 | 독립 최신성 증명 | checkpoint 파일/DB/pin 전체를 함께 되돌릴 수 있는 관리자에 대한 독립 witness/WORM 미완료. 최소 history 검증을 전체 최신성 보장으로 표현하지 않음 |
 | 실제 기업 신원 | 로컬 signed OIDC/JWKS·key 계정 철회 시험은 완료했지만 외부 기업 SSO/MFA·online token revocation은 미완료 |
 | 다른 장애 종류 | 소유 process kill/restart와 local SQLite 복구 검증은 OS 전원 단절·다중 호스트 장애·네트워크 저장소 내구성 검증을 대체하지 않음 |
