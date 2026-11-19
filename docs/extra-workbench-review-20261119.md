@@ -1,6 +1,6 @@
 # 기존 워크벤치 검토의 조회 버전·호출 신원 연결
 
-> 후속: [CLI 서버 호출 신원 연결](extra-cli-review-binding-20261119.md)도 완료했다. 아래 CLI 미완료 표현과 시험 수치는 워크벤치 작업 당시 기록이다. 다른 custom client·서버 필수화 정책과 워크벤치 페이지 이전은 남아 있다.
+> 후속: [CLI 서버 호출 신원 연결](extra-cli-review-binding-20261119.md)도 완료했다. 아래 CLI 미완료 표현과 시험 수치는 워크벤치 작업 당시 기록이다. [서버 필수화 선택 정책](extra-server-review-policy-20261119.md)도 추가했다. 실제 조직 client 이관/전체 worker 배포·워크벤치 페이지·기업 신원·독립 성능 인수는 남아 있다.
 
 2026-11-19 · 로컬 `extra`. 구현은 `6c0100f`, 검토 영역의 대비·글자 보강은 `1b8233d`다. 서버·모델 코드는 변경하지 않았다. 유료 모델 API·AWS·Docker 자원 생성·GitHub push·CI·main/aitest 병합은 하지 않았다.
 

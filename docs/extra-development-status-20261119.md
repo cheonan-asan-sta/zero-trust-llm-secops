@@ -12,7 +12,9 @@
 
 대시보드 감사 페이지 후속은 [대시보드 감사 페이지 연결](extra-dashboard-paging-20261119.md)이다. `57b1590`에서 `/audit/results?limit=12`와 현재 페이지 `page_cursor`를 연결해 과거100건 밖의 필터 조회·동일 snapshot 다음/이전·저장 전 신원 재검증을 구현했다. 신규 브라우저38·기존 검토27·조회57·Linux 운영146조건, 관련 pytest Windows233통과/25제외·Linux256통과/2제외다. fixture 후속 `72610d0`은 app/tests를 바꾸지 않았다. 위 문단의 cursor 미완료는 이전 시점이며 지금은 완료했다. 자유 검색·분석기는 현재 페이지 범위이고 legacy workbench/다른 목록의 이전은 남아 있다.
 
-최신 후속은 [검토 CLI의 서버 호출 신원 연결](extra-cli-review-binding-20261119.md)이다. 구현 `a293c80`에서 최종 신원 확인 직후 같은 키의 subject가 바뀌어도 서버가 저장 전에403으로 거부하도록 조회 binding을 PATCH에 연결했다. 변경 전 새 재현1건은 실패했고, 개선 후 새26건을 포함해 Windows217통과/3제외·Linux220통과다. 스냅샷 v2를 사용하며 v1은 자동 변환하지 않는다. 새 파일로 prepare하고 내용을 다시 확인해야 한다. 서버·UI·모델은 변경하지 않았다.
+CLI 후속은 [검토 CLI의 서버 호출 신원 연결](extra-cli-review-binding-20261119.md)이다. 구현 `a293c80`에서 최종 신원 확인 직후 같은 키의 subject가 바뀌어도 서버가 저장 전에403으로 거부하도록 조회 binding을 PATCH에 연결했다. 변경 전 새 재현1건은 실패했고, 개선 후 새26건을 포함해 Windows217통과/3제외·Linux220통과다. 스냅샷 v2를 사용하며 v1은 자동 변환하지 않는다. 새 파일로 prepare하고 내용을 다시 확인해야 한다. 서버·UI·모델은 변경하지 않았다.
+
+최신 후속은 [서버 검토 필수화 선택 정책](extra-server-review-policy-20261119.md)이다. 구현 `d461b5f`에서 SQLite·API key/OIDC·If-Match 설정을 전제로 `AUDIT_REVIEW_REQUIRE_IDENTITY=true`를 지원한다. 누락428·현재 신원/권한·저장 전 정책 강화·CAS 검사를 확인했다. Windows250통과/3제외·Linux253통과, 필수 모드 실제 대시보드29·워크벤치34조건 통과다. 기본값 false와 실제 운영 설정은 유지하며, 모든 조직 writer/worker의 이관·배포를 완료한 것은 아니다.
 
 ## 기준과 실행 범위
 
@@ -50,7 +52,7 @@
 | 항목 | 현재 한계/다음 확인 |
 |---|---|
 | 전체 회귀 | 전체 실행 종료. 두 기대값 수정 후 관련 재검증 통과. 수정 후 새 전체 실행·Windows 전체 플랫폼 정리는 별도 미실행 |
-| 사람의 오래된 검토 화면 | 자체 대시보드·기존 워크벤치·CLI 모두 ETag와 서버 caller binding 연결 완료. CLI v1 파일은 새 prepare 필요. 다른 custom client 목록화/이전·서버 필수화 정책은 별도이며 strict 기본 false 유지 |
+| 사람의 오래된 검토 화면 | 자체 대시보드·기존 워크벤치·CLI 모두 ETag와 서버 caller binding 연결 완료. CLI v1 파일은 새 prepare 필요. 서버 caller binding 필수화 선택 정책도 추가. 다른 custom client 목록화/이전·모든 worker에 동일 정책 배포 인수는 남아 있으며 두 strict 기본값 false 유지 |
 | 대시보드 전체 검색/다른 목록 | 로그 탐색의 감사 cursor 소비는 완료. 자유 검색·분석기는 현재 페이지 범위. 다른 목록과 워크벤치의 페이지 탐색 이전·전체 범위 자유 검색 설계는 남음 |
 | 독립 최신성 증명 | checkpoint 파일/DB/pin 전체를 함께 되돌릴 수 있는 관리자에 대한 독립 witness/WORM 미완료. 최소 history 검증을 전체 최신성 보장으로 표현하지 않음 |
 | 실제 기업 신원 | 로컬 signed OIDC/JWKS·key 계정 철회 시험은 완료했지만 외부 기업 SSO/MFA·online token revocation은 미완료 |

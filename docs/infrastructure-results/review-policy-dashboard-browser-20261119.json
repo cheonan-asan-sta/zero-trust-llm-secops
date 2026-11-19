@@ -1,0 +1,135 @@
+{
+  "schema": "dashboard-review-browser-1",
+  "synthetic": true,
+  "caller_bound_policy_required": true,
+  "paid_calls": 0,
+  "passed": true,
+  "checks": [
+    {
+      "name": "isolated_local_rule_sqlite",
+      "passed": true
+    },
+    {
+      "name": "real_rule_analysis_review_required",
+      "passed": true
+    },
+    {
+      "name": "server_requires_caller_binding",
+      "passed": true
+    },
+    {
+      "name": "denied_write_preserves_observed_version",
+      "passed": true
+    },
+    {
+      "name": "detail_confirmation_shows_evidence_and_caller",
+      "passed": true
+    },
+    {
+      "name": "confirmation_no_horizontal_overflow_desktop",
+      "passed": true
+    },
+    {
+      "name": "confirmation_no_horizontal_overflow_mobile",
+      "passed": true
+    },
+    {
+      "name": "detail_patch_uses_exact_read_headers",
+      "passed": true
+    },
+    {
+      "name": "server_owns_reviewer_and_issues_new_etag",
+      "passed": true
+    },
+    {
+      "name": "old_detail_does_not_rebase_at_prepare",
+      "passed": true
+    },
+    {
+      "name": "explicit_re_read_after_conflict_succeeds",
+      "passed": true
+    },
+    {
+      "name": "two_browser_review_cas_preserves_winner",
+      "passed": true
+    },
+    {
+      "name": "identity_change_stops_patch_before_network",
+      "passed": true
+    },
+    {
+      "name": "server_rejects_identity_change_after_browser_lookup",
+      "passed": true
+    },
+    {
+      "name": "missing_etag_never_sends_unconditional_patch",
+      "passed": true
+    },
+    {
+      "name": "weak_etag_never_sends_unconditional_patch",
+      "passed": true
+    },
+    {
+      "name": "missing_identity_never_sends_unconditional_patch",
+      "passed": true
+    },
+    {
+      "name": "nontransactional_backend_never_sends_unconditional_patch",
+      "passed": true
+    },
+    {
+      "name": "editing_invalidates_confirmation",
+      "passed": true
+    },
+    {
+      "name": "edit_during_async_caller_check_never_submits_old_input",
+      "passed": true
+    },
+    {
+      "name": "connection_change_discards_prepared_review",
+      "passed": true
+    },
+    {
+      "name": "lost_response_preserves_commit_without_retry",
+      "passed": true
+    },
+    {
+      "name": "status_message_accessible",
+      "passed": true
+    },
+    {
+      "name": "explicit_review_after_uncertain_outcome_reads_current_version",
+      "passed": true
+    },
+    {
+      "name": "credentials_not_persisted_or_displayed",
+      "passed": true
+    },
+    {
+      "name": "viewer_cannot_prepare_review",
+      "passed": true
+    },
+    {
+      "name": "other_tenant_cannot_observe_result",
+      "passed": true
+    },
+    {
+      "name": "no_javascript_errors",
+      "passed": true
+    },
+    {
+      "name": "no_external_requests",
+      "passed": true
+    }
+  ],
+  "source_sha256": {
+    "app/main.py": "fea40ce2d4faea65d9959466ae03c55e0662a97c7bace11effa22c73e47ed341",
+    "app/config.py": "a53dfabb0bd7f0d61563c7342759966f775be93de8a1ef4cb3a26effd6488357",
+    "app/services/audit_review_preconditions.py": "ed38a58b2c59973a6fefb1d819e9d0989d0b5c7aa338654950db48fe857bf163",
+    "app/static/dashboard.js": "29c8c5a553343f660fb7c7174a91943d8ac9f92711270862b5c2b0f0aecfdec1",
+    "app/static/dashboard-operations.js": "02314493462b37d426728eba24b33a76b2ffbdffc84d7efa52854e1e3048f580",
+    "tests/dashboard_operations_fixture.py": "c3b1318b20cb51ec6eb5aadc103522a1467e28c08c4b0fb8faef6a177ac13dd8",
+    "scripts/test_dashboard_review_browser.py": "2d8008902d308b75cb66caf95a88e9288e302f4b1138eb9efa9c95838f479ebd"
+  },
+  "owned_server_stopped": true
+}

@@ -1,6 +1,6 @@
 # 대시보드 검토: 조회한 버전과 호출 신원 연결
 
-> 후속: audit cursor UI 소비는 [감사 페이지 후속](extra-dashboard-paging-20261119.md), 기존 워크벤치의 검토 버전·신원 연결은 [워크벤치 후속](extra-workbench-review-20261119.md)에서 완료했다. 아래의 app.js 미이전 표현과 수치는 당시 작업 범위다. [CLI 서버 binding](extra-cli-review-binding-20261119.md)도 후속으로 완료했다. 다른 custom client·서버 필수화 정책·기업 신원·독립 성능 인수는 계속 남아 있다.
+> 후속: audit cursor UI 소비는 [감사 페이지 후속](extra-dashboard-paging-20261119.md), 기존 워크벤치의 검토 버전·신원 연결은 [워크벤치 후속](extra-workbench-review-20261119.md)에서 완료했다. 아래의 app.js 미이전 표현과 수치는 당시 작업 범위다. [CLI 서버 binding](extra-cli-review-binding-20261119.md)도 후속으로 완료했다. [서버 필수화 선택 정책](extra-server-review-policy-20261119.md)도 추가했다. 실제 조직 client 이관/전체 worker 배포·워크벤치 페이지·기업 신원·독립 성능 인수는 남아 있다.
 
 2026-11-19, 로컬 `extra` 후속. app/server 구현 기준은 `bef9a97`, 브라우저 응답 fixture 후속 보강은 `bd1cb17`이다. 두 commit 사이 app/tests는 동일하다. GitHub push·CI·main/aitest 병합·AWS·유료 모델 API 호출은 하지 않았다.
 
