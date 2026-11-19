@@ -25,6 +25,9 @@ def main():
         if name == "observe":
             command.add_argument("--database", required=True)
             command.add_argument("--expected-receipt", required=True)
+            command.add_argument(
+                "--observation-id", help="Explicit 32-hex operation ID for recovery"
+            )
         else:
             command.add_argument("--minimum-receipt", required=True)
     command = sub.add_parser("inspect")
@@ -44,6 +47,7 @@ def main():
                 args.database,
                 args.public_key_sha256,
                 expected_receipt=args.expected_receipt,
+                observation_id=args.observation_id,
             )
         elif args.action == "status":
             result = witness.status(

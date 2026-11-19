@@ -23,10 +23,24 @@ from app.services.audit_transfer import canonical, decode, require, sha
 from app.services.sqlite_audit import SQLiteAuditStore
 
 SCHEMA = "local-sqlite-audit-witness-1"
+OPERATION_SCHEMA = "local-sqlite-audit-witness-2"
 GENESIS = "0" * 64
 MAX_RECEIPTS = 4096
 HEX = re.compile(r"[a-f0-9]{64}")
 STREAM = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,63}")
+OPERATION = re.compile(r"[a-f0-9]{32}")
+
+
+def _signature_prefix(schema):
+    return (
+        b"zero-trust-audit-witness-v2\x00"
+        if schema == OPERATION_SCHEMA
+        else b"zero-trust-audit-witness-v1\x00"
+    )
+
+
+def _operation(value):
+    return isinstance(value, str) and OPERATION.fullmatch(value) is not None
 
 
 def _hex(value):
@@ -104,23 +118,29 @@ def verify_receipt(receipt, public_raw, *, stream_id, expected_receipt):
         "witness receipt fields/pin rejected",
     )
     body = receipt["body"]
+    require(type(body) is dict, "witness receipt body rejected")
+    require(isinstance(body.get("schema"), str), "witness receipt schema rejected")
+    operational = body.get("schema") == OPERATION_SCHEMA
     require(
-        type(body) is dict
-        and set(body)
-        == {
-            "schema",
-            "stream_id",
-            "source_locator_sha256",
-            "public_key_sha256",
-            "number",
-            "previous_receipt",
-            "observed_at",
-            "head",
-        },
+        set(body)
+        == (
+            {
+                "schema",
+                "stream_id",
+                "source_locator_sha256",
+                "public_key_sha256",
+                "number",
+                "previous_receipt",
+                "observed_at",
+                "head",
+            }
+            | ({"observation_id"} if operational else set())
+        ),
         "witness receipt body rejected",
     )
     require(
-        body["schema"] == SCHEMA
+        body["schema"] in {SCHEMA, OPERATION_SCHEMA}
+        and (not operational or _operation(body["observation_id"]))
         and body["stream_id"] == stream_id
         and isinstance(stream_id, str)
         and STREAM.fullmatch(stream_id)
@@ -154,7 +174,7 @@ def verify_receipt(receipt, public_raw, *, stream_id, expected_receipt):
     require(len(signature) == 64, "witness signature size rejected")
     try:
         Ed25519PublicKey.from_public_bytes(public_raw).verify(
-            signature, b"zero-trust-audit-witness-v1\x00" + canonical(body)
+            signature, _signature_prefix(body["schema"]) + canonical(body)
         )
     except InvalidSignature:
         require(False, "witness signature rejected")
@@ -180,6 +200,7 @@ def _history(con, public_raw, *, expected_receipt, exact):
     ).fetchall()
     require(len(rows) <= MAX_RECEIPTS, "witness receipt capacity exceeded")
     previous, last, seen = GENESIS, None, expected_receipt == GENESIS
+    operations = {}
     for number, raw in rows:
         require(
             isinstance(raw, str) and len(raw.encode()) <= 16384, "witness receipt size rejected"
@@ -187,6 +208,10 @@ def _history(con, public_raw, *, expected_receipt, exact):
         receipt = decode(raw)
         digest = sha(canonical(receipt))
         body = verify_receipt(receipt, public_raw, stream_id=stream_id, expected_receipt=digest)
+        if body["schema"] == OPERATION_SCHEMA:
+            ident = body["observation_id"]
+            require(ident not in operations, "witness observation ID reused")
+            operations[ident] = receipt
         require(
             body["number"] == number == (1 if last is None else last["body"]["number"] + 1)
             and body["previous_receipt"] == previous
@@ -200,13 +225,19 @@ def _history(con, public_raw, *, expected_receipt, exact):
                 and (body["head"]["seq"] != older["seq"] or body["head"] == older),
                 "witness head regressed",
             )
+            if body["schema"] == OPERATION_SCHEMA:
+                require(
+                    datetime.fromisoformat(body["observed_at"])
+                    >= datetime.fromisoformat(last["body"]["observed_at"]),
+                    "witness observation clock regressed",
+                )
         previous, last = digest, receipt
         seen = seen or digest == expected_receipt
     require(
         seen and (not exact or previous == expected_receipt),
         "witness history changed/behind required receipt; inspect without retrying write",
     )
-    return stream_id, locator, last, previous
+    return stream_id, locator, last, previous, operations
 
 
 def initialize(directory, database, stream_id):
@@ -256,7 +287,7 @@ def status(directory, public_key_sha256, *, minimum_receipt):
     directory = _directory(directory)
     _key, raw = _public(directory, public_key_sha256)
     with _journal(directory) as con:
-        stream, _locator_hash, receipt, digest = _history(
+        stream, _locator_hash, receipt, digest, _operations = _history(
             con, raw, expected_receipt=minimum_receipt, exact=False
         )
     return {
@@ -268,7 +299,8 @@ def status(directory, public_key_sha256, *, minimum_receipt):
     }
 
 
-def observe(directory, database, public_key_sha256, *, expected_receipt):
+def observe(directory, database, public_key_sha256, *, expected_receipt, observation_id=None):
+    require(observation_id is None or _operation(observation_id), "witness observation ID rejected")
     directory = _directory(directory)
     _key, public = _public(directory, public_key_sha256)
     private_path = directory / "private.key"
@@ -284,36 +316,66 @@ def observe(directory, database, public_key_sha256, *, expected_receipt):
         "audit must be outside witness directory",
     )
     with _journal(directory, write=True) as con:
-        stream, locator, last, previous = _history(
-            con, public, expected_receipt=expected_receipt, exact=True
+        stream, locator, last, previous, operations = _history(
+            con, public, expected_receipt=expected_receipt, exact=observation_id is None
         )
         require(_locator(store) == locator, "witness source locator changed")
+        replayed = observation_id is not None and observation_id in operations
+        if replayed:
+            require(
+                operations[observation_id] == last
+                and last["body"]["previous_receipt"] == expected_receipt,
+                "witness observation is not the current exact operation",
+            )
+            # A committed response may be recovered, never refreshed or resigned.
+            # The current DB still has to contain the already witnessed history.
+            with store._transaction() as audit:
+                _verified_head(store, audit, last["body"]["head"])
+            return {
+                "receipt": last,
+                "receipt_sha256": previous,
+                "replayed": True,
+                "automatic_activation_allowed": False,
+                "independent_storage_verified": False,
+            }
+        require(previous == expected_receipt, "witness observation predecessor changed")
         number = 1 if last is None else last["body"]["number"] + 1
         require(number <= MAX_RECEIPTS, "witness receipt capacity exceeded")
         minimum = last["body"]["head"] if last else None
         with store._transaction() as audit:
             seq, digest = _verified_head(store, audit, minimum)
+        observed_at = datetime.now(UTC)
+        if observation_id is not None and last is not None:
+            require(
+                observed_at >= datetime.fromisoformat(last["body"]["observed_at"]),
+                "witness observation clock regressed",
+            )
         body = {
-            "schema": SCHEMA,
+            "schema": SCHEMA if observation_id is None else OPERATION_SCHEMA,
             "stream_id": stream,
             "source_locator_sha256": locator,
             "public_key_sha256": public_key_sha256,
             "number": number,
             "previous_receipt": previous,
-            "observed_at": datetime.now(UTC).isoformat(),
+            "observed_at": observed_at.isoformat(),
             "head": {"seq": seq, "digest": digest},
         }
-        signature = private.sign(b"zero-trust-audit-witness-v1\x00" + canonical(body))
+        if observation_id is not None:
+            body["observation_id"] = observation_id
+        signature = private.sign(_signature_prefix(body["schema"]) + canonical(body))
         receipt = {"body": body, "signature": base64.b64encode(signature).decode("ascii")}
         con.execute(
             "INSERT INTO witness_receipts VALUES (?,?)", (number, canonical(receipt).decode())
         )
-    return {
+    result = {
         "receipt": receipt,
         "receipt_sha256": sha(canonical(receipt)),
         "automatic_activation_allowed": False,
         "independent_storage_verified": False,
     }
+    if observation_id is not None:
+        result["replayed"] = False
+    return result
 
 
 def inspect(database, receipt, public_raw, *, public_key_sha256, stream_id, expected_receipt):
