@@ -114,3 +114,4 @@ docs/infrastructure-results/until0800-*/** -text whitespace=-blank-at-eol,-blank
 
 docs/infrastructure-results/witness-order-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
 docs/infrastructure-results/witness-order-*/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+docs/infrastructure-results/report-failure-boundaries-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol

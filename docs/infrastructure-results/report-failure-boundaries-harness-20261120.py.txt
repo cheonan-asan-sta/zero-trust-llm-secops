@@ -1,0 +1,54 @@
+"""Preserve a complete old report through serialization/fsync/publication faults."""
+import errno
+import hashlib
+import json
+import os
+import sys
+import tempfile
+from pathlib import Path
+
+source=Path(sys.argv[1]).resolve();output=Path(sys.argv[2]).resolve()
+manifest=json.loads(Path(sys.argv[3]).read_text(encoding='utf-8'))
+assert source==Path(manifest['path']).resolve()
+output.mkdir(exist_ok=False,parents=True);sys.path.insert(0,str(source))
+from scripts import evaluate_m6 as evaluation
+
+result={'schema':'owned-report-failure-boundaries-1','completed':False,'source_commit':manifest['source_commit'],'paid_api_calls':0,'detection_metrics_changed':False,'all_data_synthetic':True,'checks':[]}
+original_os=evaluation.os;original_kernel=evaluation._report_mutex_kernel
+class FsyncFault:
+    def __getattr__(self,name):return getattr(original_os,name)
+    def fsync(self,fd):raise OSError(errno.EIO,'test-owned fsync failure')
+class FailedKernel:
+    def CreateMutexW(self,*args):return None
+try:
+    with tempfile.TemporaryDirectory(prefix='private-report-failure-') as temporary:
+        private=Path(temporary);folder=private/'한글-🔐';folder.mkdir()
+        path=folder/'평가결과.json';previous={'message':'기존 완성 보고서','emoji':'🛡'}
+        evaluation.write_report(path,previous);old=path.read_bytes()
+        cases=[('unsupported_object_after_valid_prefix',{'prefix':'유효한 첫 항목','bad':object()},TypeError),
+               ('invalid_unicode_encoding',{'invalid':chr(0xD800)},UnicodeEncodeError),
+               ('file_fsync_failure',{'message':'새 본문'},OSError)]
+        if os.name=='nt':cases.append(('mutex_creation_failure',{'message':'새 본문'},OSError))
+        for name,payload,expected in cases:
+            evaluation.os=FsyncFault() if name=='file_fsync_failure' else original_os
+            evaluation._report_mutex_kernel=(lambda:FailedKernel()) if name=='mutex_creation_failure' else original_kernel
+            try:
+                try:evaluation.write_report(path,payload)
+                except expected:pass
+                else:raise AssertionError('test-owned report failure was accepted: '+name)
+                assert path.read_bytes()==old and list(folder.iterdir())==[path]
+                result['checks'].append({'name':name,'old_report_intact':True,'temporary_removed':True,'passed':True})
+            finally:evaluation.os=original_os;evaluation._report_mutex_kernel=original_kernel
+        current={'message':'새 완성 보고서','emoji':'🔐','count':4}
+        evaluation.write_report(path,current)
+        assert json.loads(path.read_bytes())==current and list(folder.iterdir())==[path]
+        result['checks'].append({'name':'unicode_path_and_utf8_report_recover_after_all_faults','passed':True})
+    result['private_fixture_removed']=not private.exists()
+    result['source_bytes_unchanged']=all(hashlib.sha256((source/n).read_bytes()).hexdigest()==h for n,h in manifest['files'].items())
+    result['completed']=result['private_fixture_removed'] and result['source_bytes_unchanged']
+finally:
+    evaluation.os=original_os;evaluation._report_mutex_kernel=original_kernel
+    result['test_dependencies_restored']=evaluation.os is original_os and evaluation._report_mutex_kernel is original_kernel
+    (output/'result.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps(result))
+raise SystemExit(0 if result['completed'] else 1)
