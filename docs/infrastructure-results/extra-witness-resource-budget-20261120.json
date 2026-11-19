@@ -247,5 +247,7 @@
   "restore_checker_kernel_limit_separately_measured": false,
   "paid_api_calls": 0,
   "detection_target_reached": false,
-  "focused_windows_template_source_commit": "c96db35c64980165c395419f8c05606b998fa49b"
+  "focused_windows_template_source_commit": "c96db35c64980165c395419f8c05606b998fa49b",
+  "combined_fixture_measurement_includes_setup_and_backup": true,
+  "standalone_collector_at_combined_limits_peak_separately_measured": false
 }

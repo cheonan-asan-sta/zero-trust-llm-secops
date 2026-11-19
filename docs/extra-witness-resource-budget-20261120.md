@@ -15,6 +15,8 @@
 
 기존 실행은 한도까지 약0.7MiB만 남아 입력/환경 변화에 대한 여유가 거의 없었다. 측정값을 근거로 수집기에512MiB 예산을 두었다. 두 실행은 소스 archive/암호 nonce/호스트 동시 부하가 다르므로 메모리/시간의 통제된 성능 비교나 모든 최대 payload의 메모리 상한으로 설명하지 않는다. 조정 후 시험은84.091초였고 서비스 지연 SLA 수치가 아니다. 실제 peak가512MiB 아래였다는 한 fixture의 관측이다.
 
+표의 peak는 fixture 생성·서명 preload·검증·백업/복원·시험 도구를 함께 실행한 cgroup의 값이다. 최대 규모에서 collector 단독의 정상 상태 RSS/peak를 분리 측정한 수치가 아니다. 따라서512MiB는 이 결합 시험을 근거로 잡은 보수적 실행 예산이며, 수집기 자체의 메모리 최적화 효과나 단독 처리량/SLA로 해석하지 않는다. 아래 실제 systemd의 작은 fixture 권한/재시작 시험과도 구분한다.
+
 별도 실제 systemd 템플릿 실행에서도15조건을 통과했다. collector 자기 cgroup에서536,870,912bytes·CPU50%·Tasks8을 확인했다. 비루트·빈 capability·쓰기/읽기·socket/process 접근 거부·SIGKILL 뒤 supervisor 재시작·키 없는 점검/timer도 확인했다. 복원 점검기의256MiB는 템플릿 계약으로 확인했으며 이번 도구가 그 역할의 커널 limit를 별도로 측정한 것으로 표시하지 않는다. /run UUID 소유 unit·상태/public source를 정리했고/etc 설치나 새 계정 생성은 없다.
 
 ## 전체 회귀와 출처
