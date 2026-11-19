@@ -22,11 +22,13 @@ from app.services.trusted_signals import SignalRejected
 
 
 @asynccontextmanager
-async def sdk(responses):
+async def sdk(responses, *, first_response_delay=0):
     requests = []
 
     async def handle(request):
         requests.append(request)
+        if len(requests) == 1 and first_response_delay:
+            await asyncio.sleep(first_response_delay)
         assert responses, "unexpected paid-provider-shaped request"
         return httpx.Response(200, json=responses.pop(0))
 
@@ -39,11 +41,18 @@ async def sdk(responses):
 
 
 @pytest.mark.parametrize(
-    "mode", ["adapter_initial", "adapter_retry", "agent_initial", "agent_final"]
+    "mode,first_response_delay", [
+        pytest.param("adapter_initial", 0, id="adapter_initial"),
+        pytest.param("adapter_retry", 0, id="adapter_retry"),
+        pytest.param("agent_initial", 0, id="agent_initial"),
+        pytest.param("agent_final", 0, id="agent_final"),
+        pytest.param("adapter_retry", 2.2, id="adapter_retry_slow_local_response"),
+    ]
 )
-def test_cancelled_sdk_source_check_settles_without_blocking_event_loop(lab, mode):
+def test_cancelled_sdk_source_check_settles_without_blocking_event_loop(lab, mode, first_response_delay):
     signal, context = lab.create(scenario("permitted_team"))
-    entered, release = threading.Event(), threading.Event()
+    release = threading.Event()
+    notify_entered = None
     checks = 0
     blocking_check = 2 if mode.endswith(("retry", "final")) else 1
 
@@ -51,7 +60,7 @@ def test_cancelled_sdk_source_check_settles_without_blocking_event_loop(lab, mod
         nonlocal checks
         checks += 1
         if checks == blocking_check:
-            entered.set()
+            notify_entered()
             assert release.wait(3)
 
     context = replace(context, verify_current=check)
@@ -64,10 +73,14 @@ def test_cancelled_sdk_source_check_settles_without_blocking_event_loop(lab, mod
     )
 
     async def run():
+        nonlocal notify_entered
+        loop = asyncio.get_running_loop()
+        entered = asyncio.Event()
+        notify_entered = lambda: loop.call_soon_threadsafe(entered.set)
         responses = (
             [truncated_body(), valid_body()] if mode == "adapter_retry" else [final_response()]
         )
-        async with sdk(responses) as (client, requests):
+        async with sdk(responses, first_response_delay=first_response_delay) as (client, requests):
             if mode.startswith("adapter"):
                 adapter = OpenAIAnalyzer(config)
                 await adapter._client.close()
@@ -77,7 +90,10 @@ def test_cancelled_sdk_source_check_settles_without_blocking_event_loop(lab, mod
                 agent = EvidenceReviewAgent(config, client=client)
                 task = asyncio.create_task(agent.review(signal.event, context, dict))
             try:
-                assert await asyncio.to_thread(entered.wait, 2)
+                # This is a synchronization watchdog, not a two-second SDK
+                # parsing/host scheduling performance requirement. A callback
+                # running on the loop still fails: release cannot arrive there.
+                await asyncio.wait_for(entered.wait(), 10)
                 # This only runs before release if the callback leaves the loop responsive.
                 assert not task.done()
                 assert len(requests) == (blocking_check - 1)

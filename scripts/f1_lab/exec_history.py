@@ -68,15 +68,17 @@ def collect_owned_exec(
     request, argv, signing_key, *, source_id, key_id, mode="systemd", child_uid=65534, timeout=10
 ):
     require(
-        sys.platform == "linux"
-        and threading.active_count() == 1
-        and threading.current_thread() is threading.main_thread()
-        and signal.getsignal(signal.SIGCHLD) == signal.SIG_DFL
-        and mode in {"systemd", "local_process_lab"}
+        mode in {"systemd", "local_process_lab"}
         and type(child_uid) is int
         and 0 < child_uid < 4294967295
         and type(timeout) in {int, float}
-        and 0 < timeout <= 30,
+        and 0 < timeout <= 30
+        and sys.platform == "linux"
+        and threading.active_count() == 1
+        and threading.current_thread() is threading.main_thread()
+        and hasattr(signal, "SIGCHLD")
+        and signal.getsignal(signal.SIGCHLD) == signal.SIG_DFL
+        and hasattr(os, "fork"),
         "exec_history_linux_configuration",
     )
     validate_target(request, argv)

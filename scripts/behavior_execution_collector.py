@@ -91,6 +91,8 @@ def _owned(metadata, *, directory=False):
 
 def read_private(path, maximum=MAX_RECORD_BYTES, *, durable=False):
     """Reject symlinks and non-regular input; check permissions on the opened object."""
+    if durable and os.name != "posix":
+        raise ValueError("execution_collector_durable_input_requires_posix")
     path = Path(path)
     entry = path.lstat()
     if stat.S_ISLNK(entry.st_mode):

@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import os
 import sqlite3
 from datetime import datetime, timedelta
 from types import SimpleNamespace
@@ -192,6 +193,7 @@ def test_revoked_key_blocks_outbound_delivery_and_preserves_pending(lab):
     assert lab.sent == []
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX owner-only feed permissions; portable link test separate")
 def test_private_feed_permissions_and_symlink_checked_before_signing(lab, tmp_path):
     collector = lab.collector()
     path = tmp_path / "upstream.json"

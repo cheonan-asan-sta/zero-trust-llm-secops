@@ -27,6 +27,10 @@ from scripts.f1_lab.shared_execution_evidence import (
 )
 from scripts.run_exec_history_controls import setup_app
 
+# The sealed outbox uses POSIX UID/mode/no-follow and directory durability.
+# Windows must reject this native storage contract, never emulate it as trusted.
+pytestmark = pytest.mark.skipif(os.name != "posix", reason="Native POSIX sealed-outbox storage")
+
 
 def fixture(tmp_path):
     lab = setup_app(tmp_path / "control", "fixture.service")

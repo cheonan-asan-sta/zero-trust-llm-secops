@@ -72,6 +72,7 @@ def test_report_shape_binding_and_uncertainty_are_strict(damage):
         mod.validate(value,mod.scope_hash(SCOPE))
 
 
+@pytest.mark.skipif(os.name != 'posix', reason='Actual POSIX protected public status file')
 def test_metrics_show_original_age_both_pending_types_and_capacity(tmp_path):
     p=profile(tmp_path)
     write(tmp_path/'status.json',mod.report(SCOPE,values(),now=NOW))
@@ -107,7 +108,10 @@ def test_unavailable_or_expired_status_omits_all_cached_counts(condition,tmp_pat
 @pytest.mark.parametrize('field,bad',[('max_intents',0),('max_intents',True),('max_indeterminate_age_seconds',0),
                                    ('max_unpublished_age_seconds',86401),('status_file','relative.json'),
                                    ('scope_sha256','bad'),('schema','old')])
-def test_profile_does_not_accept_invalid_limits_or_remote_paths(field,bad,tmp_path):
+def test_profile_does_not_accept_invalid_limits_or_remote_paths(field,bad,tmp_path,monkeypatch):
+    # Profile-shape unit coverage is independent of the POSIX file admission
+    # tested above and by test_collector_status_bridge on Linux.
+    monkeypatch.setattr(mod, 'read_public', lambda path: json.loads(path.read_bytes()))
     value=profile(tmp_path)
     value[field]=bad
     write(tmp_path/'profile.json',value)

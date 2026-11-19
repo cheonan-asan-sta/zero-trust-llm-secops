@@ -41,6 +41,10 @@ def test_peer_authentication_requires_current_unit_main_pid_and_kernel_membershi
 
     from scripts.f1_lab import credential_peer_service as peer
 
+    # This test supplies every kernel/manager response; it is a protocol unit
+    # test, distinct from the real SO_PEERCRED Linux integration tests.
+    monkeypatch.setattr(peer, 'socket', SimpleNamespace(SOL_SOCKET=1, SO_PEERCRED=17))
+
     unit = 'collector-test@owned.service'
     fields = {'Id': unit, 'MainPID': '1234', 'ControlGroup': EXPECTED,
         'InvocationID': 'a'*32, 'ActiveState': 'activating', 'SubState': 'start'}
