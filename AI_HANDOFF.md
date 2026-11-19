@@ -1,3 +1,5 @@
+> 2026-11-19 extra: [남은 검토 호출자·필수 정책 준비](docs/extra-review-callers-20261119.md) 완료. 구현 ab2dbfc, Windows11통과/2제외·Linux21통과. 최초 실패 보존, 실제 조직 배포 미완료. 지속 목표는 별도 감사 검증자 로컬 구현으로 진행. push/CI/병합/유료/AWS/Docker/전체회귀/8h soak 없음. 아래는 이전 기록이다.
+
 > 활성 목표 진행: 48520ef 공통 collection-view.js로 워크벤치 사례/서명 세션·대시보드 사례/세션4경로 연결. 실제 서명 검증103세션/27사고 순회, 실제 변경409·401/403·키 remap·이전tenant응답 폐기 포함112조건. 기존 review34/read57·Win/Linux72개 pass. [UI근거](docs/extra-collection-pages-ui-20261119.md)·[활성목표](docs/extra-active-development-goal-20261119.md). 다음은 기존 audit review caller2개 harness의 headers 이전/필수정책 준비, 별도 witness 로컬 구현. 캐시형 CaseStore 다중 writer 쓰기 지원을 추가한 것은 아니므로 운영 공유 writer로 배포하지 않는다. paid/AWS/Docker/push/CI/merge/전체회귀결과정리/8h0. 아래는 이전 기록.
 
 > 활성 목표 진행: dd4f3ce 세션/사고 목록의 live-view 페이지 서버 API 추가. /case-pages·/zero-trust/session-pages, 주체/tenant/조건/limit/지문/만료 binding, 변경409·전후 신원/저장소 확인·취소 worker 슬롯 유지. 실제 사고 파일 hash/prefix 검증, 세션103건 전체 순회. Windows/Linux 각각49pass. 화면 연결은 미완료이며 다음 필수 단계다. [서버 계약/검증](docs/extra-collection-paging-20261119.md)·[활성 목표](docs/extra-active-development-goal-20261119.md). paid/AWS/Docker/push/CI/merge/전체회귀정리/8h0. 아래는 이전 기록.

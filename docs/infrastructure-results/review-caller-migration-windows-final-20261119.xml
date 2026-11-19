@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="2" tests="13" time="15.873" timestamp="2026-11-19T17:14:46.740474+09:00" hostname="희주"><testcase classname="tests.test_local_review_intent" name="test_harness_reviews_exact_observed_record_under_required_policy" time="0.146" /><testcase classname="tests.test_local_review_intent" name="test_harness_expected_record_mismatch_never_writes" time="0.077" /><testcase classname="tests.test_local_review_intent" name="test_snapshot_does_not_rebind_retry_or_overwrite[caller]" time="0.077" /><testcase classname="tests.test_local_review_intent" name="test_snapshot_does_not_rebind_retry_or_overwrite[version]" time="0.096" /><testcase classname="tests.test_local_review_intent" name="test_snapshot_does_not_rebind_retry_or_overwrite[withdraw]" time="0.065" /><testcase classname="tests.test_local_review_intent" name="test_required_policy_rejects_legacy_unbound_write" time="0.065" /><testcase classname="tests.test_local_review_intent" name="test_actual_recovery_harness_can_review_under_required_policy" time="0.166"><failure message="KeyError: 'verification_context'">api = namespace(client=&lt;starlette.testclient.TestClient object at 0x0000020430CB9DF0&gt;, store=&lt;app.services.sqlite_audit.SQLi...iewer=None, review_note=None, review_updated_at=None), withdraw=&lt;function api.&lt;locals&gt;.withdraw at 0x0000020430C1B6A0&gt;)
+tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1442/test_actual_recovery_harness_c0')
+
+    def test_actual_recovery_harness_can_review_under_required_policy(api, tmp_path):
+        strict()
+        passed = []
+        with ExitStack() as stack:
+&gt;           result = run_recovery(
+                api.store, api.first.model_dump(mode="json"), api.client, api.headers,
+                tmp_path, passed.append, stack,
+            )
+
+tests\test_local_review_intent.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+audit = &lt;app.services.sqlite_audit.SQLiteAuditStore object at 0x0000020430CBB950&gt;
+payload = {'actor_id': 'local-operator', 'analysis_id': '83be6fe1e4524e5eb25e854e0ba8635a', 'analyzed_at': '2026-11-19T08:14:52.502124Z', 'analyzer': 'rule', ...}
+client = &lt;starlette.testclient.TestClient object at 0x0000020430CB9DF0&gt;
+headers = {'X-API-Key': 'local-audit-query-placeholder'}
+directory = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1442/test_actual_recovery_harness_c0')
+passed = &lt;built-in method append of list object at 0x0000020430CD3800&gt;
+stack = &lt;contextlib.ExitStack object at 0x0000020430B36240&gt;
+
+    def run(audit, payload, client, headers, directory, passed, stack):
+        from app import main
+    
+        directory = Path(directory)
+        original_digest = hashlib.sha256(audit.path.read_bytes()).hexdigest()
+        key = secrets.token_bytes(32)
+        package = directory / "native-audit.enc"
+        backup = backup_sqlite(audit, package, key)
+        passed("native_audit_sqlite_online_snapshot_and_encrypted_backup")
+        destination = directory / "native-audit-restored.sqlite3"
+        receipt = restore_sqlite(
+            package, destination, backup["backup_sha256"], key, minimum_head=backup["head"]
+        )
+        restored = SQLiteAuditStore.open_existing(destination)
+        require(
+            restored.get(payload["event_id"], payload["tenant_id"]).model_dump(mode="json") == payload
+            and receipt["automatic_activation_allowed"] is False,
+            "native_audit_restored_snapshot",
+        )
+        passed("native_audit_restore_preserves_exact_analysis_context_and_guard")
+        # This explicit local harness selection is not performed by restore_sqlite.
+        stack.enter_context(patch.object(main, "audit_store", restored))
+        fetched = client.get(f"/results/{payload['event_id']}", headers=headers)
+        require(
+            fetched.status_code == 200 and fetched.json() == payload, "native_audit_restored_http_read"
+        )
+        baseline_path = directory / "native-audit-baseline.checkpoint.json"
+        baseline_checkpoint = capture_checkpoint(restored.path, baseline_path)
+        require(
+            baseline_checkpoint["head"] == backup["head"],
+            "native_checkpoint_baseline_matches_restored_snapshot",
+        )
+        reviewed = review_observed(
+            client, headers, payload,
+            status="RESOLVED", note="Verified recovered native audit",
+        )
+        require(
+            reviewed.status_code == 200
+&gt;           and reviewed.json()["verification_context"] == payload["verification_context"]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            and reviewed.json()["assessment"] == payload["assessment"],
+            "native_audit_recovered_http_review",
+        )
+E       KeyError: 'verification_context'
+
+scripts\f1_lab\audit_recovery_controls.py:56: KeyError</failure></testcase><testcase classname="tests.test_audit_review_client_binding_process" name="test_real_cli_sends_bound_intent_and_server_rejects_post_check_remap[False-False]" time="2.401" /><testcase classname="tests.test_audit_review_client_binding_process" name="test_real_cli_sends_bound_intent_and_server_rejects_post_check_remap[False-True]" time="2.341" /><testcase classname="tests.test_audit_review_client_binding_process" name="test_real_cli_sends_bound_intent_and_server_rejects_post_check_remap[True-False]" time="2.397" /><testcase classname="tests.test_audit_review_client_binding_process" name="test_real_cli_sends_bound_intent_and_server_rejects_post_check_remap[True-True]" time="2.231" /><testcase classname="tests.test_audit_review_client_process" name="test_real_operator_cli_reads_then_reviews_once_and_refuses_replay[optional]" time="0.000"><skipped type="pytest.skip" message="Owned native Linux worker fixture">C:\Users\chaeh\Desktop\파란학기\tmp\extra-development-20261118\tests\test_audit_review_client_process.py:18: Owned native Linux worker fixture</skipped></testcase><testcase classname="tests.test_audit_review_client_process" name="test_real_operator_cli_reads_then_reviews_once_and_refuses_replay[caller_bound]" time="0.000"><skipped type="pytest.skip" message="Owned native Linux worker fixture">C:\Users\chaeh\Desktop\파란학기\tmp\extra-development-20261118\tests\test_audit_review_client_process.py:18: Owned native Linux worker fixture</skipped></testcase></testsuite></testsuites>

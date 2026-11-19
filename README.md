@@ -1,4 +1,6 @@
-> 2026-11-19 extra: [워크벤치·대시보드의 세션/사고 페이지](docs/extra-collection-pages-ui-20261119.md) 연결 완료. 실제 브라우저112조건·기존 검토34/조회57조건·관련 Python 양 OS72건 통과. [지속 목표](docs/extra-active-development-goal-20261119.md)는 호출 정책 준비·별도 감사 검증자 개발로 이어진다. 미업로드·미병합.
+> 2026-11-19 extra: [남은 로컬 검토 호출 경로·필수 정책 준비](docs/extra-review-callers-20261119.md) 완료. Windows11통과/2제외·Linux21통과. 실제 조직 배포는 별도이며 [지속 목표](docs/extra-active-development-goal-20261119.md)는 별도 감사 검증자 로컬 개발로 이어진다. 미업로드·미병합.
+
+> 2026-11-19 extra: [워크벤치·대시보드의 세션/사고 페이지](docs/extra-collection-pages-ui-20261119.md) 연결 완료. 실제 브라우저112조건·기존 검토34/조회57조건·관련 Python 양 OS72건 통과. 미업로드·미병합.
 
 > 2026-11-19 extra 개발 중: [세션·사고 페이지 서버 API](docs/extra-collection-paging-20261119.md)와 양 OS49건 기능 검증 완료. UI 연결은 남았으며 [지속 목표](docs/extra-active-development-goal-20261119.md)는 활성 상태다. 미업로드·미병합.
 

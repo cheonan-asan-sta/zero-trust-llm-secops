@@ -63,3 +63,4 @@ infra/f1-lab/native-audit/captured-v113/execution.json -text whitespace=cr-at-eo
 
 # Historical approval evidence is pinned to the original committed bytes.
 tests/fixtures/behavior_context/historical-approval.json text eol=lf
+docs/infrastructure-results/review-caller-migration-*.xml -text whitespace=cr-at-eol

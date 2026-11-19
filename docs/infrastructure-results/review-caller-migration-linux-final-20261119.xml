@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="21" time="52.777" timestamp="2026-11-19T17:15:10.373425+09:00" hostname="localhost"><testcase classname="tests.test_local_review_intent" name="test_harness_reviews_exact_observed_record_under_required_policy" time="0.115" /><testcase classname="tests.test_local_review_intent" name="test_harness_expected_record_mismatch_never_writes" time="0.045" /><testcase classname="tests.test_local_review_intent" name="test_snapshot_does_not_rebind_retry_or_overwrite[caller]" time="0.049" /><testcase classname="tests.test_local_review_intent" name="test_snapshot_does_not_rebind_retry_or_overwrite[version]" time="0.069" /><testcase classname="tests.test_local_review_intent" name="test_snapshot_does_not_rebind_retry_or_overwrite[withdraw]" time="0.048" /><testcase classname="tests.test_local_review_intent" name="test_required_policy_rejects_legacy_unbound_write" time="0.038" /><testcase classname="tests.test_local_review_intent" name="test_actual_recovery_harness_can_review_under_required_policy" time="0.104"><failure message="KeyError: 'verification_context'">api = namespace(client=&lt;starlette.testclient.TestClient object at 0x7f0f3c4715b0&gt;, store=&lt;app.services.sqlite_audit.SQLiteAu... reviewer=None, review_note=None, review_updated_at=None), withdraw=&lt;function api.&lt;locals&gt;.withdraw at 0x7f0f3cdaae80&gt;)
+tmp_path = PosixPath('/tmp/pytest-of-chaehj02/pytest-1/test_actual_recovery_harness_c0')
+
+    def test_actual_recovery_harness_can_review_under_required_policy(api, tmp_path):
+        strict()
+        passed = []
+        with ExitStack() as stack:
+&gt;           result = run_recovery(
+                api.store, api.first.model_dump(mode="json"), api.client, api.headers,
+                tmp_path, passed.append, stack,
+            )
+
+tests/test_local_review_intent.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+audit = &lt;app.services.sqlite_audit.SQLiteAuditStore object at 0x7f0f3c470080&gt;
+payload = {'actor_id': 'local-operator', 'analysis_id': '9b7b0c7ed19f4abe8f538f3ee276c397', 'analyzed_at': '2026-11-19T08:15:24.972934Z', 'analyzer': 'rule', ...}
+client = &lt;starlette.testclient.TestClient object at 0x7f0f3c4715b0&gt;
+headers = {'X-API-Key': 'local-audit-query-placeholder'}
+directory = PosixPath('/tmp/pytest-of-chaehj02/pytest-1/test_actual_recovery_harness_c0')
+passed = &lt;built-in method append of list object at 0x7f0f3c476140&gt;
+stack = &lt;contextlib.ExitStack object at 0x7f0f3c4703b0&gt;
+
+    def run(audit, payload, client, headers, directory, passed, stack):
+        from app import main
+    
+        directory = Path(directory)
+        original_digest = hashlib.sha256(audit.path.read_bytes()).hexdigest()
+        key = secrets.token_bytes(32)
+        package = directory / "native-audit.enc"
+        backup = backup_sqlite(audit, package, key)
+        passed("native_audit_sqlite_online_snapshot_and_encrypted_backup")
+        destination = directory / "native-audit-restored.sqlite3"
+        receipt = restore_sqlite(
+            package, destination, backup["backup_sha256"], key, minimum_head=backup["head"]
+        )
+        restored = SQLiteAuditStore.open_existing(destination)
+        require(
+            restored.get(payload["event_id"], payload["tenant_id"]).model_dump(mode="json") == payload
+            and receipt["automatic_activation_allowed"] is False,
+            "native_audit_restored_snapshot",
+        )
+        passed("native_audit_restore_preserves_exact_analysis_context_and_guard")
+        # This explicit local harness selection is not performed by restore_sqlite.
+        stack.enter_context(patch.object(main, "audit_store", restored))
+        fetched = client.get(f"/results/{payload['event_id']}", headers=headers)
+        require(
+            fetched.status_code == 200 and fetched.json() == payload, "native_audit_restored_http_read"
+        )
+        baseline_path = directory / "native-audit-baseline.checkpoint.json"
+        baseline_checkpoint = capture_checkpoint(restored.path, baseline_path)
+        require(
+            baseline_checkpoint["head"] == backup["head"],
+            "native_checkpoint_baseline_matches_restored_snapshot",
+        )
+        reviewed = review_observed(
+            client, headers, payload,
+            status="RESOLVED", note="Verified recovered native audit",
+        )
+        require(
+            reviewed.status_code == 200
+&gt;           and reviewed.json()["verification_context"] == payload["verification_context"]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            and reviewed.json()["assessment"] == payload["assessment"],
+            "native_audit_recovered_http_review",
+        )
+E       KeyError: 'verification_context'
+
+scripts/f1_lab/audit_recovery_controls.py:56: KeyError</failure></testcase><testcase classname="tests.test_audit_review_client_binding_process" name="test_real_cli_sends_bound_intent_and_server_rejects_post_check_remap[False-False]" time="1.492" /><testcase classname="tests.test_audit_review_client_binding_process" name="test_real_cli_sends_bound_intent_and_server_rejects_post_check_remap[False-True]" time="1.423" /><testcase classname="tests.test_audit_review_client_binding_process" name="test_real_cli_sends_bound_intent_and_server_rejects_post_check_remap[True-False]" time="1.474" /><testcase classname="tests.test_audit_review_client_binding_process" name="test_real_cli_sends_bound_intent_and_server_rejects_post_check_remap[True-True]" time="1.450" /><testcase classname="tests.test_audit_review_client_process" name="test_real_operator_cli_reads_then_reviews_once_and_refuses_replay[optional]" time="3.643" /><testcase classname="tests.test_audit_review_client_process" name="test_real_operator_cli_reads_then_reviews_once_and_refuses_replay[caller_bound]" time="3.907" /><testcase classname="tests.test_http_worker_restart" name="test_actual_http_worker_kill_restart_revalidates_reference_and_audit" time="4.705" /><testcase classname="tests.test_http_worker_restart" name="test_bad_bootstrap_pin_does_not_start_or_retry_http_worker" time="2.315" /><testcase classname="tests.test_http_worker_restart" name="test_actual_http_worker_cursor_resume_and_current_key_readiness" time="7.120" /><testcase classname="tests.test_http_worker_restart" name="test_wrong_cursor_key_pin_never_falls_back_or_starts_worker" time="1.975" /><testcase classname="tests.test_http_worker_restart" name="test_worker_does_not_inherit_parent_app_storage_or_cursor_settings" time="2.272" /><testcase classname="tests.test_http_worker_restart" name="test_worker_rejects_a_dotenv_file_in_its_owned_directory" time="0.147" /><testcase classname="tests.test_http_worker_restart" name="test_actual_http_process_returns_a_preserved_jsonl_analysis[jsonl]" time="2.245" /><testcase classname="tests.test_http_worker_restart" name="test_actual_http_process_returns_a_preserved_jsonl_analysis[federated_jsonl]" time="2.585" /></testsuite></testsuites>

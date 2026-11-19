@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="20" time="51.612" timestamp="2026-11-19T17:14:03.858541+09:00" hostname="localhost"><testcase classname="tests.test_local_review_intent" name="test_harness_reviews_exact_observed_record_under_required_policy" time="0.116" /><testcase classname="tests.test_local_review_intent" name="test_harness_expected_record_mismatch_never_writes" time="0.045" /><testcase classname="tests.test_local_review_intent" name="test_snapshot_does_not_rebind_retry_or_overwrite[caller]" time="0.046" /><testcase classname="tests.test_local_review_intent" name="test_snapshot_does_not_rebind_retry_or_overwrite[version]" time="0.069" /><testcase classname="tests.test_local_review_intent" name="test_snapshot_does_not_rebind_retry_or_overwrite[withdraw]" time="0.048" /><testcase classname="tests.test_local_review_intent" name="test_required_policy_rejects_legacy_unbound_write" time="0.037" /><testcase classname="tests.test_audit_review_client_binding_process" name="test_real_cli_sends_bound_intent_and_server_rejects_post_check_remap[False-False]" time="1.483" /><testcase classname="tests.test_audit_review_client_binding_process" name="test_real_cli_sends_bound_intent_and_server_rejects_post_check_remap[False-True]" time="1.524" /><testcase classname="tests.test_audit_review_client_binding_process" name="test_real_cli_sends_bound_intent_and_server_rejects_post_check_remap[True-False]" time="1.520" /><testcase classname="tests.test_audit_review_client_binding_process" name="test_real_cli_sends_bound_intent_and_server_rejects_post_check_remap[True-True]" time="1.496" /><testcase classname="tests.test_audit_review_client_process" name="test_real_operator_cli_reads_then_reviews_once_and_refuses_replay[optional]" time="4.446" /><testcase classname="tests.test_audit_review_client_process" name="test_real_operator_cli_reads_then_reviews_once_and_refuses_replay[caller_bound]" time="3.593" /><testcase classname="tests.test_http_worker_restart" name="test_actual_http_worker_kill_restart_revalidates_reference_and_audit" time="4.666" /><testcase classname="tests.test_http_worker_restart" name="test_bad_bootstrap_pin_does_not_start_or_retry_http_worker" time="2.364" /><testcase classname="tests.test_http_worker_restart" name="test_actual_http_worker_cursor_resume_and_current_key_readiness" time="4.813"><failure message="scripts.audit_review_client.ReviewClientError: Observed record changed; inspect before reviewing">executed = (namespace(keys={'runtime': &lt;cryptography.hazmat.bindings._rust.openssl.ed25519.Ed25519PrivateKey object at 0x7fa2c0a6...s': &lt;app.services.zero_trust.ZeroTrustOperations object at 0x7fa2c0895340&gt;, ...}, ['0116eabb506679a7546ac3a8b2928c78'])
+tmp_path = PosixPath('/tmp/pytest-of-chaehj02/pytest-0/test_actual_http_worker_cursor0')
+
+    def test_actual_http_worker_cursor_resume_and_current_key_readiness(executed, tmp_path):
+        lab, args, _ = executed
+        path, pin, _ = configure(lab, tmp_path / "shared")
+        passed = []
+&gt;       result = run(
+            lab,
+            args["request"],
+            SimpleNamespace(session_id=args["signal"].session_id),
+            args["receipt"],
+            args["event"],
+            args["proofs"],
+            (path, pin),
+            tmp_path,
+            passed.append,
+            paging=True,
+        )
+
+tests/test_http_worker_restart.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/f1_lab/http_worker_controls.py:153: in run
+    result = _run(
+scripts/f1_lab/http_worker_controls.py:303: in _run
+    "owned_http_cursor_initial_snapshot",
+scripts/local_review_intent.py:48: in review_observed
+    require(snapshot["result"] == expected, "Observed record changed; inspect before reviewing")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False, message = 'Observed record changed; inspect before reviewing'
+
+    def require(condition, message):
+        if not condition:
+&gt;           raise ReviewClientError(message)
+E           scripts.audit_review_client.ReviewClientError: Observed record changed; inspect before reviewing
+
+scripts/audit_review_client.py:39: ReviewClientError</failure></testcase><testcase classname="tests.test_http_worker_restart" name="test_wrong_cursor_key_pin_never_falls_back_or_starts_worker" time="2.330" /><testcase classname="tests.test_http_worker_restart" name="test_worker_does_not_inherit_parent_app_storage_or_cursor_settings" time="2.417" /><testcase classname="tests.test_http_worker_restart" name="test_worker_rejects_a_dotenv_file_in_its_owned_directory" time="0.186" /><testcase classname="tests.test_http_worker_restart" name="test_actual_http_process_returns_a_preserved_jsonl_analysis[jsonl]" time="2.243" /><testcase classname="tests.test_http_worker_restart" name="test_actual_http_process_returns_a_preserved_jsonl_analysis[federated_jsonl]" time="2.577" /></testsuite></testsuites>
