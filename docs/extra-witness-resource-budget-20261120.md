@@ -6,6 +6,8 @@
 
 감사 원본100,000행과 서명 control4096개를 같은 fixture에 넣어 함께 시험했다. 감사 payload/해시 체인과 중간4094개 서명은 유효하게 bulk 생성했고 실제 마지막 관측·서명/용량 거부·중간 control 손상 거부·암호화 백업·복원·키 없는 확인을 수행했다. 독립 공격10만 건이나 실제 collector4096회 검증은 아니다. source MAX_ROWS 한도이며 MAX_BYTES256MiB payload 한도까지 채운 시험도 아니다. 감사 DB 전체 bytes 불변은 streaming SHA256으로 확인해 시험 도구가136MB 원본을 한꺼번에 메모리에 올리지 않게 했다.
 
+이 규모 시험에서 암호화 백업한 대상은 control의 profile/public key/observer DB이며, 서명 개인키나10만 행의 감사 원본 DB 자체는 포함하지 않는다. 원본 감사 bytes의 불변과 서명 head 검증을 별도로 확인했다. 원본 감사 데이터 전체의 백업/복원 검증으로 확대하지 않는다.
+
 | 실제 실행 | 고정 제품 소스 | 제한 | 관측한 cgroup 최대 메모리 | 결과 |
 |---|---|---|---|---|
 | 기존 결합 fixture | b77eceb/2241파일 | 256MiB | 267,689,984bytes, 약255.3MiB | 8조건 통과·limit hit0·OOM0 |
@@ -16,6 +18,8 @@
 별도 실제 systemd 템플릿 실행에서도15조건을 통과했다. collector 자기 cgroup에서536,870,912bytes·CPU50%·Tasks8을 확인했다. 비루트·빈 capability·쓰기/읽기·socket/process 접근 거부·SIGKILL 뒤 supervisor 재시작·키 없는 점검/timer도 확인했다. 복원 점검기의256MiB는 템플릿 계약으로 확인했으며 이번 도구가 그 역할의 커널 limit를 별도로 측정한 것으로 표시하지 않는다. /run UUID 소유 unit·상태/public source를 정리했고/etc 설치나 새 계정 생성은 없다.
 
 ## 전체 회귀와 출처
+
+설정 변경 직후 c96db35의 Windows 템플릿7조건이 먼저 통과했다. 이후 기존 사례ID를 유지한 f6e1a0a로 전체 소스를 고정했으며, 정적 코드 검사도 오류0이었다. 앞선 집중 검사 XML의 사례 표기와 최종 전체 회귀의 사례 표기를 구분한다.
 
 변경 후 Windows·Linux 전체 pytest는 별도 f6e1a0a archive에서 수행한다. 진행/최종 통과 수·제외 이유·기존 통과ID 비교는 [전체 회귀](extra-until0800-regression-20261120.md)에 갱신한다. 완료 전에는 b77 전체 회귀 수를 새 설정의 결과로 재사용하지 않는다. 두 기존 서비스 계약 사례의 ID는 유지했고 해당 수집기 메모리 기대값만512M으로 조정했다. 같은ID가 이전과 완전히 같은 단언이라는 의미는 아니다.
 

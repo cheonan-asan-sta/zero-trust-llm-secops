@@ -129,6 +129,10 @@
       "sha256": "1cf4cc11570c3b8f82edf12e26481d089bf16c954043e5c2810a04883d88ac7a"
     },
     {
+      "path": "docs/infrastructure-results/witness-resource-budget-until0800-resource-ruff-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
       "path": "docs/infrastructure-results/witness-resource-budget-prepare_combined_witness_fixture_20261120.py.txt",
       "sha256": "2dde61ce8d2541f4f4fd655733a21cf3e4b0f559e8437eedc33d258d1b389317"
     },
@@ -242,5 +246,6 @@
   "restore_checker_template_limit_bytes": 268435456,
   "restore_checker_kernel_limit_separately_measured": false,
   "paid_api_calls": 0,
-  "detection_target_reached": false
+  "detection_target_reached": false,
+  "focused_windows_template_source_commit": "c96db35c64980165c395419f8c05606b998fa49b"
 }
