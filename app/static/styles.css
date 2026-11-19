@@ -295,6 +295,23 @@ h1 span { color: var(--blue); }
 .review-actions button:disabled { opacity: 0.5; cursor: wait; }
 .review-feedback { min-height: 15px; margin: 9px 0 0 !important; color: var(--muted) !important; font-size: 9px !important; }
 
+.workbench-connection { margin-top: 24px; padding: 18px; border: 1px solid var(--line); border-radius: 10px; background: white; }
+.workbench-connection h2 { margin: 0 0 12px; font-size: 18px; }
+.workbench-connection-form { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
+.workbench-connection-form label { display: grid; gap: 6px; flex: 1 1 180px; min-width: 0; font-size: 14px; }
+.workbench-connection-form input, .workbench-connection-form select { width: 100%; min-width: 0; padding: 9px; border: 1px solid var(--line); border-radius: 7px; color: var(--ink); background: white; font: inherit; font-size: 16px; }
+.workbench-connection p { margin: 12px 0 0; font-size: 14px; overflow-wrap: anywhere; }
+.review-confirmation { margin-top: 16px; padding: 14px; border: 1px solid var(--line); border-radius: 8px; }
+.review-confirmation h3 { margin: 0; font-size: 16px; }
+.review-confirmation p { white-space: pre-line; overflow-wrap: anywhere; font-size: 14px; }
+.review-confirmation .review-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.review-workflow .review-ack { display: flex; align-items: start; gap: 8px; font-size: 14px; }
+.review-workflow .review-ack input { width: auto; margin-top: 3px; }
+#reviewWorkflow label, #reviewWorkflow .review-feedback, #reviewWorkflow .review-actions button { font-size: 14px !important; }
+#reviewWorkflow input, #reviewWorkflow textarea { font-size: 16px; }
+#reviewWorkflow textarea { font-weight: 400; }
+#reviewReload { margin-top: 12px; }
+
 .metric-grid { margin-top: 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .zt-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
 #zeroTrustSection .metric-grid strong { font-size: 17px; }

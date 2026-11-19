@@ -1,4 +1,14 @@
 const state = {
+  epoch: 0,
+  credential: "",
+  credentialType: "none",
+  identity: null,
+  controllers: new Set(),
+  observation: null,
+  preparedReview: null,
+  reviewRevision: 0,
+  resultSequence: 0,
+  loadingResult: false,
   scenarios: [],
   selected: null,
   running: false,
@@ -11,6 +21,11 @@ const state = {
 };
 
 const $ = (id) => document.getElementById(id);
+const initialMain = document.querySelector("main").cloneNode(true);
+const sameIdentity = (left, right) => Boolean(left && right) &&
+  ["subject", "tenant_id", "auth_method"].every((key) => typeof left[key] === "string" && left[key].length > 0 && left[key] === right[key]);
+const strongReviewTag = (value) => typeof value === "string" && /^"r1-[a-f0-9]{64}"$/.test(value);
+const reviewBinding = (value) => typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
 
 const riskLabels = {
   LOW: "낮음",
@@ -62,22 +77,41 @@ const caseStatusLabels = {
 };
 
 async function request(path, options = {}) {
-  const response = await fetch(path, {
-    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
-    ...options,
-  });
-
-  if (!response.ok) {
-    let message = `요청 실패 (${response.status})`;
-    try {
-      const body = await response.json();
-      if (body.detail) message = body.detail;
-    } catch (_) {
-      // The status code remains the safe fallback message.
+  const epoch = state.epoch, credential = state.credential;
+  if (options.epoch !== undefined && options.epoch !== epoch) throw new DOMException("연결이 변경됐습니다.", "AbortError");
+  if (!path.startsWith("/") || path.startsWith("//")) throw new Error("같은 서버의 API만 사용할 수 있습니다.");
+  if (options.ifMatch !== undefined && !strongReviewTag(options.ifMatch)) throw new Error("검토 버전을 다시 조회하세요.");
+  if (options.reviewIdentity !== undefined && !reviewBinding(options.reviewIdentity)) throw new Error("검토 신원을 다시 확인하세요.");
+  const controller = new AbortController();
+  state.controllers.add(controller);
+  const timer = setTimeout(() => controller.abort(), options.timeoutMs || 12000);
+  const headers = {Accept: "application/json"};
+  if (options.body !== undefined) headers["Content-Type"] = "application/json";
+  if (state.credentialType === "api_key" && credential) headers["X-API-Key"] = credential;
+  if (state.credentialType === "bearer" && credential) headers.Authorization = `Bearer ${credential}`;
+  if (options.ifMatch !== undefined) headers["If-Match"] = options.ifMatch;
+  if (options.reviewIdentity !== undefined) headers["X-Review-Identity"] = options.reviewIdentity;
+  try {
+    const response = await fetch(path, {
+      method: options.method || "GET", body: options.body, headers, signal: controller.signal,
+      redirect: "error", cache: "no-store", credentials: "omit",
+    });
+    if (epoch !== state.epoch) throw new DOMException("연결이 변경됐습니다.", "AbortError");
+    let data;
+    try { data = await response.json(); }
+    catch { throw Object.assign(new Error("서버 응답을 확인할 수 없습니다."), {status: response.status, invalidResponse: true}); }
+    if (epoch !== state.epoch) throw new DOMException("연결이 변경됐습니다.", "AbortError");
+    if (!response.ok && !(options.allowDenied && response.status === 403)) {
+      const detail = typeof data.detail === "string" ? data.detail.slice(0, 500) : `요청 실패 (${response.status})`;
+      throw Object.assign(new Error(credential ? detail.split(credential).join("[REDACTED]") : detail), {status: response.status});
     }
-    throw new Error(message);
+    return options.withMetadata ? {data, etag: response.headers.get("ETag"),
+      reviewIdentity: response.headers.get("X-Review-Identity"), reviewMode: response.headers.get("X-Review-Mode")} :
+      options.allowDenied ? {data, ok: response.ok, status: response.status} : data;
+  } finally {
+    clearTimeout(timer);
+    state.controllers.delete(controller);
   }
-  return response.json();
 }
 
 function setHealth(health) {
@@ -147,6 +181,7 @@ function setRunning(running, message, isError = false) {
 }
 
 async function runAnalysis() {
+  const epoch = state.epoch;
   if (!state.selected || state.running) return;
   const analyzerLabel = analyzerLabels[state.analyzerMode] || state.analyzerMode.toUpperCase();
   setRunning(true, `합성 이벤트를 생성하고 ${analyzerLabel} 및 정책 검증을 진행하고 있습니다.`);
@@ -156,19 +191,28 @@ async function runAnalysis() {
       method: "POST",
       body: JSON.stringify({ scenario_id: state.selected.scenario_id, count: 1 }),
     });
+    if (epoch !== state.epoch) return;
+    delete events[0].ground_truth;
     const result = await request("/analysis", {
       method: "POST",
+      epoch,
       body: JSON.stringify(events[0]),
     });
     renderResult(result);
+    await openResult(result.event_id, false);
+    if (epoch !== state.epoch) return;
     await refreshSummary();
+    if (epoch !== state.epoch) return;
     setRunning(false, "분석이 완료됐습니다. 아래 결과는 실제 조치가 아닌 대응 미리보기입니다.");
   } catch (error) {
+    if (epoch !== state.epoch) return;
     setRunning(false, `분석하지 못했습니다: ${error.message}`, true);
   }
 }
 
-function renderResult(result, shouldScroll = true) {
+function renderResult(result, shouldScroll = true, observation = null) {
+  invalidateReview();
+  state.observation = observation;
   state.latestResult = result;
   const assessment = result.assessment;
   const decision = result.policy_decision;
@@ -247,21 +291,37 @@ function renderReviewWorkflow(result) {
   const badge = $("reviewStatusBadge");
   badge.textContent = reviewStatusLabels[status] || status;
   badge.dataset.status = status;
-  $("reviewerInput").value = result.reviewer || $("reviewerInput").value;
+  $("reviewerInput").value = state.observation?.identity.subject || "";
   $("reviewNoteInput").value = result.review_note || "";
   $("reviewFeedback").textContent = result.review_updated_at
     ? `${formatTime(result.review_updated_at)} · ${result.reviewer}`
-    : "담당자를 지정해 검토를 시작하세요.";
+    : "조회한 분석과 현재 검토 신원을 확인한 뒤 변경 내용을 선택하세요.";
+  if (!state.observation) $("reviewFeedback").textContent = "현재 결과 다시 조회를 눌러 검토 버전과 신원을 확인하세요.";
+  else if (state.observation.reviewMode !== "conditional") $("reviewFeedback").textContent = "현재 서버는 버전을 확인한 검토를 지원하지 않습니다. 관리자에게 문의하세요.";
+  else if (!["api_key", "oidc"].includes(state.observation.identity.auth_method)) $("reviewFeedback").textContent = "개별 인증으로 연결한 뒤 현재 결과를 다시 조회하세요.";
+  else if (!strongReviewTag(state.observation.etag) || !reviewBinding(state.observation.reviewIdentity)) $("reviewFeedback").textContent = "조회 버전 또는 신원을 확인할 수 없습니다. 현재 결과를 다시 조회하세요.";
+  else if (!state.identity?.roles.includes("responder")) $("reviewFeedback").textContent = "현재 계정에는 검토 권한이 없습니다.";
+  syncReviewControls();
+}
 
-  const allowedTransitions = {
+const reviewTransitions = {
     PENDING: ["IN_REVIEW", "RESOLVED", "DISMISSED"],
     IN_REVIEW: ["IN_REVIEW", "RESOLVED", "DISMISSED"],
     RESOLVED: ["IN_REVIEW"],
     DISMISSED: ["IN_REVIEW"],
-  };
+};
+function reviewUsable() {
+  const observed = state.observation;
+  return Boolean(observed && observed.epoch === state.epoch && observed.reviewMode === "conditional" &&
+    strongReviewTag(observed.etag) && reviewBinding(observed.reviewIdentity) &&
+    ["api_key", "oidc"].includes(observed.identity.auth_method) &&
+    sameIdentity(observed.identity, state.identity) && state.identity.roles.includes("responder"));
+}
+function syncReviewControls() {
+  const status = state.latestResult?.review_status;
   document.querySelectorAll("[data-review-status]").forEach((button) => {
     const targetStatus = button.dataset.reviewStatus;
-    button.disabled = state.reviewing || !allowedTransitions[status]?.includes(targetStatus);
+    button.disabled = state.reviewing || state.loadingResult || !reviewUsable() || !reviewTransitions[status]?.includes(targetStatus);
     if (targetStatus === "IN_REVIEW") {
       button.textContent = ["RESOLVED", "DISMISSED"].includes(status)
         ? "검토 재개"
@@ -270,42 +330,115 @@ function renderReviewWorkflow(result) {
           : "검토 시작";
     }
   });
+  $("reviewReload").disabled = state.reviewing || state.loadingResult || !state.latestResult;
+  $("reviewExecute").disabled = state.reviewing || !state.preparedReview || !$("reviewAcknowledge").checked;
 }
 
-async function submitReview(status) {
-  if (!state.latestResult || state.reviewing) return;
-  const reviewer = $("reviewerInput").value.trim();
-  const note = $("reviewNoteInput").value.trim();
-  if (reviewer.length < 2) {
-    $("reviewFeedback").textContent = "담당자 이름을 두 글자 이상 입력하세요.";
-    return;
+function invalidateReview() {
+  state.reviewRevision++;
+  state.preparedReview = null;
+  $("reviewConfirmation").hidden = true;
+  $("reviewAcknowledge").checked = false;
+  $("reviewExecute").disabled = true;
+}
+function failReview(error, submitted) {
+  if ([412, 428].includes(error.status)) return "조회한 검토 버전이 변경됐습니다. 현재 결과를 다시 조회하고 내용을 확인하세요.";
+  if ([401, 403].includes(error.status) || error.reviewCaller) return "검토 신원 또는 권한이 변경됐습니다. 연결을 확인하고 현재 결과를 다시 조회하세요.";
+  if (submitted) return "검토 저장 여부를 확인하지 못했습니다. 현재 기록을 다시 조회하세요. 자동 재전송하지 않았습니다.";
+  return error.message;
+}
+async function requireReviewCaller(observed) {
+  const identity = await request("/auth/me", {epoch: observed.epoch});
+  if (!sameIdentity(identity, observed.identity) || !sameIdentity(state.identity, observed.identity) ||
+      !Array.isArray(identity.roles) || !identity.roles.includes("responder")) {
+    throw Object.assign(new Error("검토 신원이 변경됐습니다."), {reviewCaller: true});
   }
+}
+async function openResult(eventId, shouldScroll = true) {
+  const epoch = state.epoch, sequence = ++state.resultSequence;
+  invalidateReview(); state.observation = null; state.loadingResult = true; state.reviewing = false;
+  $("reviewFeedback").textContent = "현재 결과와 호출 신원을 확인하고 있습니다.";
+  syncReviewControls();
+  const active = () => epoch === state.epoch && sequence === state.resultSequence;
+  try {
+    const before = await request("/auth/me", {epoch});
+    const response = await request(`/results/${encodeURIComponent(eventId)}`, {withMetadata: true, epoch});
+    const after = await request("/auth/me", {epoch});
+    if (!active()) return;
+    if (!sameIdentity(before, after) || !sameIdentity(before, state.identity)) throw Object.assign(new Error("조회 중 신원이 변경됐습니다."), {reviewCaller: true});
+    const result = response.data;
+    if (!result || result.event_id !== eventId || result.tenant_id !== before.tenant_id || typeof result.analysis_id !== "string" ||
+        !result.assessment || !Array.isArray(result.assessment.evidence) || !result.policy_decision) throw new Error("조회 결과를 확인할 수 없습니다.");
+    renderResult(result, shouldScroll, {record: result, identity: before, epoch, ...response});
+  } catch (error) {
+    if (active()) {
+      $("reviewFeedback").textContent = failReview(error, false);
+      $("runState").textContent = "현재 결과를 조회하지 못했습니다. 연결 및 인증을 확인한 뒤 다시 조회하세요.";
+    }
+  } finally {
+    if (active()) { state.loadingResult = false; syncReviewControls(); }
+  }
+}
+async function prepareReview(status) {
+  if (!state.latestResult || state.reviewing || state.loadingResult || !reviewUsable()) return;
+  const observed = state.observation, epoch = state.epoch, sequence = state.resultSequence;
+  if (!reviewTransitions[observed.record.review_status]?.includes(status)) return;
+  const note = $("reviewNoteInput").value.trim();
   if (["RESOLVED", "DISMISSED"].includes(status) && note.length < 3) {
     $("reviewFeedback").textContent = "완료 또는 오탐 처리에는 검토 메모가 필요합니다.";
     return;
   }
 
-  state.reviewing = true;
-  $("reviewFeedback").textContent = "검토 상태를 저장하고 있습니다…";
-  document.querySelectorAll("[data-review-status]").forEach((button) => {
-    button.disabled = true;
-  });
-
+  invalidateReview();
+  const revision = state.reviewRevision;
+  state.reviewing = true; syncReviewControls();
   try {
-    const updated = await request(
-      `/results/${encodeURIComponent(state.latestResult.event_id)}/review`,
-      {
-        method: "PATCH",
-        body: JSON.stringify({ status, reviewer, note: note || null }),
-      },
-    );
-    state.reviewing = false;
+    await requireReviewCaller(observed);
+    if (epoch !== state.epoch || sequence !== state.resultSequence || revision !== state.reviewRevision) return;
+    state.preparedReview = {observed, epoch, sequence, revision, status, note: note || null};
+    $("reviewConfirmationSummary").textContent = `검토자: ${observed.identity.subject} / ${observed.identity.tenant_id}\n분석: ${observed.record.analysis_id}\n조회한 상태: ${reviewStatusLabels[observed.record.review_status]}\n변경할 상태: ${reviewStatusLabels[status]}\n메모: ${note || "없음"}`;
+    $("reviewConfirmation").hidden = false;
+    $("reviewFeedback").textContent = "조회한 버전과 신원으로만 저장합니다. 내용을 확인하고 저장하세요.";
+  } catch (error) {
+    if (epoch === state.epoch && sequence === state.resultSequence) {
+      state.observation = null; invalidateReview();
+      $("reviewFeedback").textContent = failReview(error, false);
+    }
+  } finally {
+    if (epoch === state.epoch && sequence === state.resultSequence) { state.reviewing = false; syncReviewControls(); }
+  }
+}
+async function executeReview() {
+  const command = state.preparedReview;
+  if (!command || state.reviewing || !reviewUsable() || !$("reviewAcknowledge").checked || command.revision !== state.reviewRevision) return;
+  const {epoch, sequence, observed} = command;
+  invalidateReview(); const revision = state.reviewRevision;
+  state.reviewing = true; syncReviewControls();
+  let submitted = false;
+  try {
+    await requireReviewCaller(observed);
+    if (epoch !== state.epoch || sequence !== state.resultSequence || revision !== state.reviewRevision) return;
+    submitted = true;
+    const response = await request(`/results/${encodeURIComponent(observed.record.event_id)}/review`, {
+      method: "PATCH", body: JSON.stringify({status: command.status, note: command.note}),
+      ifMatch: observed.etag, reviewIdentity: observed.reviewIdentity, withMetadata: true, epoch,
+    });
+    if (epoch !== state.epoch || sequence !== state.resultSequence) return;
+    const updated = response.data;
+    if (!updated || updated.event_id !== observed.record.event_id || updated.analysis_id !== observed.record.analysis_id ||
+        updated.tenant_id !== observed.identity.tenant_id || updated.reviewer !== observed.identity.subject ||
+        updated.review_status !== command.status || updated.review_note !== command.note || !strongReviewTag(response.etag) ||
+        response.etag === observed.etag || response.reviewIdentity !== observed.reviewIdentity) throw new Error("검토 저장 응답을 확인할 수 없습니다.");
     renderResult(updated, false);
+    $("reviewFeedback").textContent = "검토를 저장했습니다. 추가 검토는 현재 결과를 다시 조회하세요.";
     await refreshSummary();
   } catch (error) {
-    state.reviewing = false;
-    renderReviewWorkflow(state.latestResult);
-    $("reviewFeedback").textContent = `저장하지 못했습니다: ${error.message}`;
+    if (epoch === state.epoch && sequence === state.resultSequence) {
+      state.observation = null; invalidateReview();
+      $("reviewFeedback").textContent = failReview(error, submitted);
+    }
+  } finally {
+    if (epoch === state.epoch && sequence === state.resultSequence) { state.reviewing = false; syncReviewControls(); }
   }
 }
 
@@ -321,6 +454,7 @@ function formatTime(value) {
 }
 
 function renderHistory(results) {
+  const epoch = state.epoch;
   const body = $("historyBody");
   body.replaceChildren();
   if (!results.length) {
@@ -363,7 +497,7 @@ function renderHistory(results) {
     openButton.type = "button";
     openButton.className = "table-action";
     openButton.textContent = "열기";
-    openButton.addEventListener("click", () => renderResult(result));
+    openButton.addEventListener("click", () => { if (epoch === state.epoch) openResult(result.event_id); });
     actionCell.append(openButton);
     row.append(actionCell);
     body.append(row);
@@ -371,11 +505,13 @@ function renderHistory(results) {
 }
 
 async function refreshSummary() {
+  const epoch = state.epoch;
   try {
     const [metrics, results] = await Promise.all([
       request("/metrics"),
       request("/results?limit=8"),
     ]);
+    if (epoch !== state.epoch) return;
     $("totalAnalyses").textContent = metrics.total_analyses;
     $("highRiskCount").textContent =
       (metrics.risk_counts.HIGH || 0) + (metrics.risk_counts.CRITICAL || 0);
@@ -387,6 +523,7 @@ async function refreshSummary() {
     $("p95Latency").textContent = `${metrics.p95_latency_ms.toFixed(1)}ms`;
     renderHistory(results);
   } catch (_) {
+    if (epoch !== state.epoch) return;
     $("historyBody").innerHTML = '<tr><td colspan="7" class="table-empty">기록을 불러오지 못했습니다.</td></tr>';
   }
 }
@@ -458,6 +595,7 @@ function renderOutbox(records) {
 }
 
 async function refreshCases() {
+  const epoch = state.epoch;
   try {
     const [metrics, cases, outboxMetrics, outboxRecords] = await Promise.all([
       request("/cases/metrics"),
@@ -465,6 +603,7 @@ async function refreshCases() {
       request("/integrations/outbox/metrics"),
       request("/integrations/outbox?limit=8"),
     ]);
+    if (epoch !== state.epoch) return;
     $("caseTotal").textContent = metrics.total_cases;
     $("caseOpen").textContent = metrics.open_case_count;
     $("caseUnassigned").textContent = metrics.unassigned_case_count;
@@ -477,12 +616,14 @@ async function refreshCases() {
     $("outboxDue").textContent = outboxMetrics.due_count;
     renderOutbox(outboxRecords);
   } catch (_) {
+    if (epoch !== state.epoch) return;
     $("caseBody").innerHTML = '<tr><td colspan="6" class="table-empty">케이스를 불러오지 못했습니다.</td></tr>';
     $("outboxBody").innerHTML = '<tr><td colspan="6" class="table-empty">연동 이벤트를 불러오지 못했습니다.</td></tr>';
   }
 }
 
 async function createDemoCase() {
+  const epoch = state.epoch;
   if (state.caseCreating) return;
   state.caseCreating = true;
   $("caseCreateButton").disabled = true;
@@ -496,21 +637,26 @@ async function createDemoCase() {
         body: JSON.stringify({ scenario_id: scenario.scenario_id, count: 1 }),
       })),
     );
+    if (epoch !== state.epoch) return;
     const events = generated.flat();
     const result = await request("/cases/from-events", {
       method: "POST",
+      epoch,
       body: JSON.stringify({
         events,
         note: "대시보드에서 합성 공격 체인의 상관분석 결과를 케이스로 생성했습니다.",
       }),
     });
     await refreshCases();
+    if (epoch !== state.epoch) return;
     $("caseState").textContent = result.created_case_count
       ? "새 사고 케이스를 생성했습니다. 실제 조치는 수행되지 않았으며 담당자 분류를 기다립니다."
       : "동일한 증거의 기존 케이스를 재사용했습니다. 중복 케이스는 생성하지 않았습니다.";
   } catch (error) {
+    if (epoch !== state.epoch) return;
     $("caseState").textContent = `케이스를 생성하지 못했습니다: ${error.message}`;
   } finally {
+    if (epoch !== state.epoch) return;
     state.caseCreating = false;
     $("caseCreateButton").disabled = false;
     $("caseCreateButton").textContent = "합성 공격 케이스 생성";
@@ -546,9 +692,11 @@ function renderAssurance(summary) {
 }
 
 async function loadAssuranceSummary() {
+  const epoch = state.epoch;
   try {
     renderAssurance(await request("/assurance/summary"));
   } catch (error) {
+    if (epoch !== state.epoch) return;
     $("assuranceState").textContent = `통제 준비도를 불러오지 못했습니다: ${error.message}`;
   }
 }
@@ -578,6 +726,7 @@ function renderEvaluationDetails(result) {
 }
 
 async function runEvaluation() {
+  const epoch = state.epoch;
   if (state.evaluating) return;
   state.evaluating = true;
   $("evaluationButton").disabled = true;
@@ -587,6 +736,7 @@ async function runEvaluation() {
   try {
     const result = await request("/evaluation/run", {
       method: "POST",
+      timeoutMs: 120000,
       body: JSON.stringify({ analyzer: state.analyzerMode, runs_per_scenario: 5, concurrency: 4 }),
     });
     $("evaluationGrid").hidden = false;
@@ -604,8 +754,10 @@ async function runEvaluation() {
     renderEvaluationDetails(result);
     $("evaluationState").textContent = `${result.total_cases}개 사례 평가 완료 · ${result.analyzer.toUpperCase()} 분석기`;
   } catch (error) {
+    if (epoch !== state.epoch) return;
     $("evaluationState").textContent = `평가하지 못했습니다: ${error.message}`;
   } finally {
+    if (epoch !== state.epoch) return;
     state.evaluating = false;
     $("evaluationButton").disabled = false;
     $("evaluationButton").textContent = "40개 안정성 평가";
@@ -719,6 +871,7 @@ function renderIncidentQualityDetails(result) {
 }
 
 async function runPublicReplay() {
+  const epoch = state.epoch;
   if (state.replaying) return;
   state.replaying = true;
   $("replayButton").disabled = true;
@@ -727,7 +880,7 @@ async function runPublicReplay() {
 
   try {
     const [result, quality, incidentQuality] = await Promise.all([
-      request("/replay/public/run", { method: "POST" }),
+      request("/replay/public/run", { method: "POST", timeoutMs: 120000 }),
       request("/evaluation/detection-quality"),
       request("/evaluation/incident-quality"),
     ]);
@@ -745,8 +898,10 @@ async function runPublicReplay() {
       ? "공개 고정 표본 12건의 회귀 기준을 통과했습니다. 확장 합성 평가와 실제 기업 성능은 별도로 확인해야 합니다."
       : "공개 로그 회귀 기준을 통과하지 못한 항목이 있습니다.";
   } catch (error) {
+    if (epoch !== state.epoch) return;
     $("replayState").textContent = `공개 로그를 재생하지 못했습니다: ${error.message}`;
   } finally {
+    if (epoch !== state.epoch) return;
     state.replaying = false;
     $("replayButton").disabled = false;
     $("replayButton").textContent = "공개 로그 12건 재생";
@@ -754,12 +909,20 @@ async function runPublicReplay() {
 }
 
 async function initialize() {
+  const epoch = state.epoch;
   try {
-    const [health, scenarios] = await Promise.all([request("/health"), request("/scenarios")]);
+    const [health, scenarios, identity] = await Promise.all([request("/health"), request("/scenarios"), request("/auth/me")]);
+    if (epoch !== state.epoch) return;
+    if (!identity || !Array.isArray(identity.roles) || !sameIdentity(identity, identity)) throw new Error("조회 신원을 확인할 수 없습니다.");
+    state.identity = identity;
+    $("workbenchIdentity").textContent = `${identity.subject} / ${identity.tenant_id} / ${identity.roles.join(", ")}`;
     setHealth(health);
     state.scenarios = scenarios;
     renderScenarios();
   } catch (_) {
+    if (epoch !== state.epoch) return;
+    state.identity = null;
+    $("workbenchIdentity").textContent = "신원을 확인하지 못했습니다. 연결 및 인증을 확인하세요.";
     setHealthError();
     $("scenarioGrid").textContent = "서버와 연결되지 않았습니다.";
   }
@@ -783,6 +946,7 @@ const ztReasons = {
 };
 
 async function refreshSignedSessions() {
+  const epoch = state.epoch;
   const button = $("ztSignedRefresh");
   button.disabled = true;
   try {
@@ -815,19 +979,22 @@ async function refreshSignedSessions() {
       body.append(row);
     }
   } catch (error) {
+    if (epoch !== state.epoch) return;
     $("ztSignalStatus").textContent = `서명 세션 조회 실패: ${error.message}`;
     $("ztSignedSessions").replaceChildren();
   } finally {
+    if (epoch !== state.epoch) return;
     button.disabled = false;
   }
 }
 
 async function renderZt(session) {
+  const epoch = state.epoch;
   $("ztDecision").textContent = ztDecisions[session.decision];
   $("ztStatus").textContent = ztStatuses[session.status];
   $("ztRisk").textContent = session.risk_score;
   $("ztPolicy").textContent = session.policy_version;
-  const history = await request(`/zero-trust/sessions/${encodeURIComponent(zt.sessionId)}`);
+  const history = await request(`/zero-trust/sessions/${encodeURIComponent(zt.sessionId)}`, {epoch});
   $("ztHistory").replaceChildren();
   history.forEach((item) => {
     const row = document.createElement("tr");
@@ -840,18 +1007,19 @@ async function renderZt(session) {
 }
 
 async function operateZt(operation) {
+  const epoch = state.epoch;
   if (zt.busy) return;
   zt.busy = true;
   document.querySelectorAll("#zeroTrustSection button").forEach((button) => { button.disabled = true; });
   try {
     if (operation === "access") {
       // Keep an old capability to demonstrate denial after a session decision changes.
-      const response = await fetch("/zero-trust/protected-access", {
-        method: "POST", headers: { "Content-Type": "application/json" },
+      const response = await request("/zero-trust/protected-access", {
+        method: "POST", allowDenied: true, epoch,
         body: JSON.stringify({ session_id: zt.sessionId, resource_id: "zt-demo-documents",
           action: "READ", grant_token: zt.token || "no-grant-available-000000000000000000" }),
       });
-      const result = await response.json();
+      const result = response.data;
       $("ztFeedback").textContent = response.ok && result.allowed
         ? "모의 문서 접근 허용. 이 허용은 한 번 사용됐습니다. 다음 접근은 새 평가가 필요합니다."
         : `모의 문서 접근 거부 (${response.status}) · ${ztReasons[result.reason_code] || "정책 확인 실패"}`;
@@ -860,6 +1028,7 @@ async function operateZt(operation) {
     if (operation === "start") {
       const generated = await request("/events/simulate", { method: "POST",
         body: JSON.stringify({ scenario_id: "NORMAL-01", count: 1 }) });
+      if (epoch !== state.epoch) return;
       zt.event = generated[0];
       delete zt.event.ground_truth;
       zt.event.user.role = "employee";
@@ -878,15 +1047,18 @@ async function operateZt(operation) {
     }
     zt.event.event_id = `signal-${crypto.randomUUID()}`;
     zt.event.timestamp = new Date().toISOString();
-    const result = await request("/zero-trust/sessions/evaluate", { method: "POST",
+    const result = await request("/zero-trust/sessions/evaluate", { method: "POST", epoch,
       body: JSON.stringify({ session_id: zt.sessionId, expected_version: zt.version, event: zt.event }) });
     zt.version = result.session.version;
     if (result.grant_token) zt.token = result.grant_token;
     await renderZt(result.session);
+    if (epoch !== state.epoch) return;
     $("ztFeedback").textContent = `${ztDecisions[result.session.decision]} · ${result.session.reason_codes.map((code) => ztReasons[code] || code).join(" · ")}. 모의 문서 접근으로 집행 결과를 확인하세요.`;
   } catch (error) {
+    if (epoch !== state.epoch) return;
     $("ztFeedback").textContent = `세션 처리를 완료하지 못했습니다: ${error.message}`;
   } finally {
+    if (epoch !== state.epoch) return;
     zt.busy = false;
     document.querySelectorAll("#zeroTrustSection button").forEach((button) => {
       button.disabled = button.id !== "ztStart" && !zt.version;
@@ -894,19 +1066,57 @@ async function operateZt(operation) {
   }
 }
 
-$("ztStart").addEventListener("click", () => operateZt("start"));
-$("ztAccess").addEventListener("click", () => operateZt("access"));
-$("ztChallenge").addEventListener("click", () => operateZt("challenge"));
-$("ztRecover").addEventListener("click", () => operateZt("recover"));
-$("ztCompromise").addEventListener("click", () => operateZt("compromise"));
-$("ztSignedRefresh").addEventListener("click", refreshSignedSessions);
-
-$("analyzeButton").addEventListener("click", runAnalysis);
-$("refreshButton").addEventListener("click", refreshSummary);
-$("evaluationButton").addEventListener("click", runEvaluation);
-$("replayButton").addEventListener("click", runPublicReplay);
-$("caseCreateButton").addEventListener("click", createDemoCase);
-document.querySelectorAll("[data-review-status]").forEach((button) => {
-  button.addEventListener("click", () => submitReview(button.dataset.reviewStatus));
+function bindWorkbenchControls() {
+  $("ztStart").addEventListener("click", () => operateZt("start"));
+  $("ztAccess").addEventListener("click", () => operateZt("access"));
+  $("ztChallenge").addEventListener("click", () => operateZt("challenge"));
+  $("ztRecover").addEventListener("click", () => operateZt("recover"));
+  $("ztCompromise").addEventListener("click", () => operateZt("compromise"));
+  $("ztSignedRefresh").addEventListener("click", refreshSignedSessions);
+  $("analyzeButton").addEventListener("click", runAnalysis);
+  $("refreshButton").addEventListener("click", refreshSummary);
+  $("evaluationButton").addEventListener("click", runEvaluation);
+  $("replayButton").addEventListener("click", runPublicReplay);
+  $("caseCreateButton").addEventListener("click", createDemoCase);
+  document.querySelectorAll("[data-review-status]").forEach((button) => {
+    button.addEventListener("click", () => prepareReview(button.dataset.reviewStatus));
+  });
+  $("reviewReload").addEventListener("click", () => {
+    if (state.latestResult && !state.reviewing) openResult(state.latestResult.event_id, false);
+  });
+  $("reviewNoteInput").addEventListener("input", () => { invalidateReview(); syncReviewControls(); });
+  $("reviewAcknowledge").addEventListener("change", syncReviewControls);
+  $("reviewExecute").addEventListener("click", executeReview);
+  $("reviewCancel").addEventListener("click", () => { invalidateReview(); syncReviewControls(); });
+}
+function resetConnection(type, credential) {
+  state.epoch++;
+  state.controllers.forEach((controller) => controller.abort());
+  state.controllers.clear();
+  Object.assign(state, {credentialType: type, credential, identity: null, observation: null,
+    preparedReview: null, selected: null, scenarios: [], latestResult: null, analyzerMode: "rule",
+    reviewing: false, loadingResult: false, running: false, evaluating: false, replaying: false, caseCreating: false});
+  state.resultSequence++; state.reviewRevision++;
+  Object.assign(zt, {sessionId: null, event: null, version: 0, token: null, busy: false});
+  document.querySelector("main").replaceChildren(...[...initialMain.childNodes].map((child) => child.cloneNode(true)));
+  $("workbenchCredential").value = "";
+  $("workbenchCredentialType").value = type;
+  $("workbenchIdentity").textContent = "현재 연결의 신원을 확인하고 있습니다.";
+  setHealthError();
+  bindWorkbenchControls();
+  initialize();
+}
+$("workbenchConnectionForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const type = $("workbenchCredentialType").value;
+  resetConnection(type, type === "none" ? "" : $("workbenchCredential").value.trim());
 });
+$("workbenchDisconnect").addEventListener("click", () => resetConnection("none", ""));
+[$("workbenchCredential"), $("workbenchCredentialType")].forEach((input) => {
+  input.addEventListener("input", () => {
+    invalidateReview(); state.observation = null; syncReviewControls();
+    $("reviewFeedback").textContent = "연결 정보를 수정했습니다. 적용한 뒤 현재 결과를 다시 조회하세요.";
+  });
+});
+bindWorkbenchControls();
 initialize();

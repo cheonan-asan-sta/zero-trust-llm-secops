@@ -29,6 +29,21 @@
       </div>
     </header>
 
+    <section class="shell workbench-connection" aria-labelledby="workbenchConnectionTitle">
+      <h2 id="workbenchConnectionTitle">연결 및 인증</h2>
+      <form id="workbenchConnectionForm" class="workbench-connection-form">
+        <label>인증 방식<select id="workbenchCredentialType">
+          <option value="none">인증 없이 조회</option>
+          <option value="api_key">API 키</option>
+          <option value="bearer">OIDC 토큰</option>
+        </select></label>
+        <label>자격 증명<input id="workbenchCredential" type="password" autocomplete="off" spellcheck="false" placeholder="현재 화면의 메모리에서만 사용" /></label>
+        <button class="secondary-button" type="submit">적용하고 조회</button>
+        <button id="workbenchDisconnect" class="secondary-button" type="button">연결 해제</button>
+      </form>
+      <p id="workbenchIdentity" role="status">조회 신원을 확인하고 있습니다.</p>
+    </section>
+
     <main>
       <section class="hero shell">
         <div>
@@ -177,7 +192,7 @@
               </div>
               <label>
                 담당자
-                <input id="reviewerInput" type="text" maxlength="64" placeholder="담당자 이름" />
+                <input id="reviewerInput" type="text" maxlength="64" placeholder="서버가 확인한 현재 검토자" readonly />
               </label>
               <label>
                 검토 메모
@@ -188,6 +203,16 @@
                 <button type="button" data-review-status="RESOLVED">해결 완료</button>
                 <button type="button" data-review-status="DISMISSED">오탐 처리</button>
               </div>
+              <button id="reviewReload" type="button" class="secondary-button">현재 결과 다시 조회</button>
+              <section id="reviewConfirmation" class="review-confirmation" aria-labelledby="reviewConfirmationTitle" hidden>
+                <h3 id="reviewConfirmationTitle">검토 저장 전 확인</h3>
+                <p id="reviewConfirmationSummary"></p>
+                <label class="review-ack"><input id="reviewAcknowledge" type="checkbox" />조회한 분석과 검토 신원·변경 내용을 확인했습니다.</label>
+                <div class="review-actions">
+                  <button id="reviewExecute" type="button" disabled>검토 저장</button>
+                  <button id="reviewCancel" type="button">취소</button>
+                </div>
+              </section>
               <p id="reviewFeedback" class="review-feedback" aria-live="polite"></p>
             </div>
           </article>
