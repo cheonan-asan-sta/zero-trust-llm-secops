@@ -14,6 +14,8 @@
 
 ## 기준과 실행 범위
 
+기존 워크벤치 검토도 [별도 후속](extra-workbench-review-20261119.md)으로 연결했다. frontend `6c0100f`·대비 보강 `1b8233d`이며 backend는 변경하지 않았다. 개별 인증·상세 ETag/caller binding·확인 후 저장·연결 변경 시 이전 화면/요청 폐기를 구현했다. 워크벤치 실제 브라우저32조건·기존 대시보드 검토27조건, 관련 pytest Windows191통과/3제외·Linux194통과다. 워크벤치의 검토 이전은 완료했고, CLI/다른 client의 서버 binding 소비와 워크벤치의 페이지 탐색 이전은 별도다.
+
 오전08:00 시점 app 기준은 `3165fc1`, 검토 연결은 `bef9a97`, 최신 감사 페이지 연결은 `57b1590`이다. 오전 당시 로컬의 `origin/main=e058bca`보다35개 commit이 앞섰다는 비교는 그 시점 기록이다. 원격을 새로 조회한 결과가 아니며 이번 작업을 push·CI·main/aitest 병합하지 않았다. 실행은 무료 로컬 Python·WSL·loopback HTTP/systemd다. AWS·유료 모델 API와 미뤄둔 실제8시간 soak는 실행하지 않았다.
 
 최신 Linux 전체 실행은 8,411통과·2실패·4제외로 종료됐다. 감사 손상 조회를 빈 목록으로 기대하던 두 테스트를 수정한 뒤 관련 Linux53건·Windows75건이 통과했다. 새 전체 실행을 모두 통과했다고 표현하지 않는다. [원본 결과와 수정 후 재검증](extra-local-validation-20261119.md)을 함께 읽는다.
@@ -46,8 +48,8 @@
 | 항목 | 현재 한계/다음 확인 |
 |---|---|
 | 전체 회귀 | 전체 실행 종료. 두 기대값 수정 후 관련 재검증 통과. 수정 후 새 전체 실행·Windows 전체 플랫폼 정리는 별도 미실행 |
-| 사람의 오래된 검토 화면 | SQLite 서버·검토 CLI·자체 대시보드의 ETag/If-Match 연결 완료. 대시보드는 신원 binding도 서버와 연결. legacy workbench/다른 client 이전은 남음. strict 기본 false 유지 |
-| 대시보드 전체 검색/다른 목록 | 로그 탐색의 감사 cursor 소비는 완료. 자유 검색·분석기는 현재 페이지 범위. 다른 목록/legacy workbench 이전과 전체 범위 자유 검색 설계는 남음 |
+| 사람의 오래된 검토 화면 | 자체 대시보드·기존 워크벤치 모두 ETag와 서버 caller binding 연결 완료. CLI는 기존 client 측 신원/버전 검사이며 서버 binding 소비는 별도. strict 기본 false 유지 |
+| 대시보드 전체 검색/다른 목록 | 로그 탐색의 감사 cursor 소비는 완료. 자유 검색·분석기는 현재 페이지 범위. 다른 목록과 워크벤치의 페이지 탐색 이전·전체 범위 자유 검색 설계는 남음 |
 | 독립 최신성 증명 | checkpoint 파일/DB/pin 전체를 함께 되돌릴 수 있는 관리자에 대한 독립 witness/WORM 미완료. 최소 history 검증을 전체 최신성 보장으로 표현하지 않음 |
 | 실제 기업 신원 | 로컬 signed OIDC/JWKS·key 계정 철회 시험은 완료했지만 외부 기업 SSO/MFA·online token revocation은 미완료 |
 | 다른 장애 종류 | 소유 process kill/restart와 local SQLite 복구 검증은 OS 전원 단절·다중 호스트 장애·네트워크 저장소 내구성 검증을 대체하지 않음 |

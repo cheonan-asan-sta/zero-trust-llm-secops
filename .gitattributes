@@ -22,6 +22,8 @@ docs/infrastructure-results/dashboard-review-final-pin-windows-20261119.xml -tex
 docs/infrastructure-results/dashboard-review-final-pin-linux-20261119.xml -text whitespace=cr-at-eol
 docs/infrastructure-results/dashboard-paging-final-windows-20261119.xml -text whitespace=cr-at-eol
 docs/infrastructure-results/dashboard-paging-final-linux-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/workbench-review-final-windows-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/workbench-review-final-linux-20261119.xml -text whitespace=cr-at-eol
 infra/mtls/nginx-renewal.sh text eol=lf
 infra/mtls/nginx-rekey.sh text eol=lf
 infra/runtime/** text eol=lf
