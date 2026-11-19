@@ -367,6 +367,23 @@ async def mock_report(inputs, cases, contract, budget, dispatch, models, *,
     }
 
 
+def _replace_report(temporary, output):
+    """Preserve atomic publication through bounded Windows sharing conflicts.
+
+    A concurrent rename (or a scanner's open handle) may briefly deny replace.
+    Never truncate/remove the old report, retry unrelated POSIX permission errors,
+    or retry indefinitely when the target genuinely cannot be replaced.
+    """
+    for attempt in range(10):
+        try:
+            temporary.replace(output)
+            return
+        except PermissionError as error:
+            if getattr(error, "winerror", None) not in {5, 32, 33} or attempt == 9:
+                raise
+            time.sleep(min(0.01 * 2**attempt, 0.1))
+
+
 def write_report(output, report):
     output.parent.mkdir(parents=True, exist_ok=True)
     fd, name = tempfile.mkstemp(prefix=".m6-report-", dir=output.parent)
@@ -377,7 +394,7 @@ def write_report(output, report):
             stream.write("\n")
             stream.flush()
             os.fsync(stream.fileno())
-        temporary.replace(output)
+        _replace_report(temporary, output)
     finally:
         temporary.unlink(missing_ok=True)
 

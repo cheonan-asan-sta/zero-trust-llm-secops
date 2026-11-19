@@ -47,6 +47,7 @@ async def sdk(responses, *, first_response_delay=0):
         pytest.param("agent_initial", 0, id="agent_initial"),
         pytest.param("agent_final", 0, id="agent_final"),
         pytest.param("adapter_retry", 2.2, id="adapter_retry_slow_local_response"),
+        pytest.param("adapter_retry", 12, id="adapter_retry_response_exceeds_old_watchdog"),
     ]
 )
 def test_cancelled_sdk_source_check_settles_without_blocking_event_loop(lab, mode, first_response_delay):
@@ -90,10 +91,13 @@ def test_cancelled_sdk_source_check_settles_without_blocking_event_loop(lab, mod
                 agent = EvidenceReviewAgent(config, client=client)
                 task = asyncio.create_task(agent.review(signal.event, context, dict))
             try:
-                # This is a synchronization watchdog, not a two-second SDK
-                # parsing/host scheduling performance requirement. A callback
-                # running on the loop still fails: release cannot arrive there.
-                await asyncio.wait_for(entered.wait(), 10)
+                # Allow transport/parsing to finish before the callback whose
+                # responsiveness is under test. A controlled 12s response must
+                # not fail a cancellation test before that callback is reached.
+                # The callback's unchanged 3s release watchdog still makes a
+                # synchronous event-loop implementation fail, even with this
+                # longer outer synchronization bound. No API SLA is measured.
+                await asyncio.wait_for(entered.wait(), 30)
                 # This only runs before release if the callback leaves the loop responsive.
                 assert not task.done()
                 assert len(requests) == (blocking_check - 1)
