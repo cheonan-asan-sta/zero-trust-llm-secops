@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/run/ztw-code-4499da4b830e419b81951c370e51b62f/scripts/run_witness_systemd_controls.py", line 260, in <module>
+    main()
+  File "/run/ztw-code-4499da4b830e419b81951c370e51b62f/scripts/run_witness_systemd_controls.py", line 256, in main
+    print(json.dumps(run(args.directory)))
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/run/ztw-code-4499da4b830e419b81951c370e51b62f/scripts/run_witness_systemd_controls.py", line 122, in run
+    restored = backup.restore(package, review, saved["backup_sha256"], pin, minimum, key)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/run/ztw-code-4499da4b830e419b81951c370e51b62f/app/services/audit_witness_observer_backup.py", line 246, in restore
+    target = _target(destination, protected=(package,), fresh=not resume)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/run/ztw-code-4499da4b830e419b81951c370e51b62f/app/services/audit_witness_observer_backup.py", line 74, in _target
+    witness._directory(path.parent)
+  File "/run/ztw-code-4499da4b830e419b81951c370e51b62f/app/services/audit_witness.py", line 71, in _directory
+    require(
+  File "/run/ztw-code-4499da4b830e419b81951c370e51b62f/app/services/audit_transfer.py", line 23, in require
+    raise AuditTransferError(message)
+app.services.audit_transfer.AuditTransferError: witness directory ownership/permission rejected
