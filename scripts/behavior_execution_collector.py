@@ -7,6 +7,7 @@ destination information stays missing. Signing never derives facts from an appro
 
 import argparse
 import base64
+import errno
 import hashlib
 import json
 import os
@@ -90,10 +91,22 @@ def _owned(metadata, *, directory=False):
 
 def read_private(path, maximum=MAX_RECORD_BYTES, *, durable=False):
     """Reject symlinks and non-regular input; check permissions on the opened object."""
-    descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0))
+    path = Path(path)
+    entry = path.lstat()
+    if stat.S_ISLNK(entry.st_mode):
+        raise OSError(errno.ELOOP, "execution_collector_input_link_rejected")
+    descriptor = os.open(
+        path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+        | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_BINARY", 0),
+    )
     with os.fdopen(descriptor, "rb") as stream:
         metadata = os.fstat(stream.fileno())
         _owned(metadata)
+        current = path.lstat()
+        if (stat.S_ISLNK(current.st_mode)
+                or (entry.st_dev, entry.st_ino) != (metadata.st_dev, metadata.st_ino)
+                or (current.st_dev, current.st_ino) != (metadata.st_dev, metadata.st_ino)):
+            raise ValueError("execution_collector_input_changed")
         if metadata.st_size > maximum:
             raise ValueError("execution_collector_file_too_large")
         raw = stream.read(maximum + 1)
