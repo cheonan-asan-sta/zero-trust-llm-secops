@@ -1,0 +1,116 @@
+"""Finalize only the bounded local goal, never claim detector/enterprise acceptance."""
+import argparse
+import hashlib
+import json
+import subprocess
+from datetime import UTC, datetime, timedelta, timezone
+from pathlib import Path
+
+parser=argparse.ArgumentParser();parser.add_argument('--check',action='store_true');args=parser.parse_args()
+root=Path.cwd();runtime=root/'runtime';dest=root/'docs/infrastructure-results'
+def read(path):return json.loads(path.read_text(encoding='utf-8'))
+def git(*argv):return subprocess.check_output(['git',*argv],text=True,encoding='utf-8').strip()
+now=datetime.now(UTC).astimezone(timezone(timedelta(hours=9)))
+full=read(dest/'extra-until0800-regression-20261120.json');order=read(dest/'extra-witness-order-coverage-20261120.json')
+documented=read(dest/'extra-witness-sustained-20261120.json')
+run=runtime/'witness-sustained-default-linux-pending-fixed-20261120/result.json'
+sustained=read(run) if run.exists() else {}
+launcher=read(runtime/'witness-sustained-default-linux-pending-fixed-20261120-launcher.json')
+replay=read(runtime/'until0800-final-frozen-replay-comparison-20261120.json')
+cleanup=read(runtime/'until0800-owned-cleanup-20261120.json')
+commit=full['implementation_commit']
+primary=[
+    'until0800-windows-full-resource-20261120.xml',
+    'until0800-linux-full-resource-20261120.xml',
+    'until0800-linux-timed-b77-seed21-20261120-sequence/report.json',
+    'until0800-windows-timed-b77-seed21-20261120-sequence/report.json',
+    'witness-sustained-witness-sustained-default-linux-pending-fixed-20261120/result.json',
+    'until0800-replay-until0800-final-frozen-replay-comparison-20261120.json',
+    'witness-resource-budget-witness-combined-scale-512-cgroup-linux-20261120/resource-acceptance.json',
+    'until0800-owned-cleanup-20261120.json',
+    'until0800-owned-cleanup-harness-20261120.py.txt',
+]
+tracked=set(git('ls-tree','-r','--name-only','HEAD').splitlines())
+changed=git('diff','--name-only',commit,'HEAD').splitlines()
+changed=[name for name in changed if name not in {'README.md','AI_HANDOFF.md','.gitattributes'} and not name.startswith('docs/')]
+checks={
+    'deadline_reached':now>=datetime(2026,11,20,8,0,tzinfo=now.tzinfo),
+    'extra_branch':git('branch','--show-current')=='extra',
+    'clean_before_finalization':not git('status','--porcelain'),
+    'verified_product_paths_unchanged':not changed,
+    'full_regressions_complete':full['latest_both_platforms_passed'],
+    'old_passed_cases_retained':full['existing_passed_ids_retained'] and len(full['comparisons'])==6,
+    'actual_order_coverage_verified':all(row.get('combined_verified_input_triples')==504 for row in order['results'].values()),
+    'primary_evidence_committed':all('docs/infrastructure-results/'+name in tracked for name in primary),
+    'sustained_run_complete':sustained.get('completed') is True,
+    'sustained_documented':documented['runs']['sustained'].get('completed') is True,
+    'sustained_source_unchanged':sustained.get('source_bytes_unchanged') is True,
+    'sustained_private_fixture_removed':sustained.get('private_fixture_removed') is True,
+    'sustained_owned_process_inactive':sustained.get('owned_process_inactive') is True,
+    'sustained_real_duration_reached':sustained.get('elapsed_seconds',0)>=6000,
+    'two_owned_restarts_verified':len(sustained.get('owned_restarts',[]))==2,
+    'executed_harness_matches_archived_source':hashlib.sha256((runtime/'run_sustained_witness_watch_20261120.py').read_bytes()).hexdigest()==launcher['harness_sha256'],
+    'frozen_replay_identical_and_free':replay['completed'] and replay['baseline_report_sha256']==replay['final_report_sha256'] and replay['provider_requests']==0,
+    'owned_execution_resources_absent':cleanup['completed'] and cleanup['exact_owned_units_checked']==10,
+}
+if args.check:
+    print(json.dumps({'ready_to_finalize':all(checks.values()),'checked_at':now.isoformat(),'checks':checks}));raise SystemExit(0)
+assert all(checks.values()),json.dumps(checks)
+
+artifacts=[]
+for name in primary:
+    path=dest/name;relative=path.relative_to(root).as_posix()
+    committed=subprocess.check_output(['git','show','HEAD:'+relative])
+    assert path.read_bytes()==committed,relative
+    artifacts.append({'path':relative,'sha256':hashlib.sha256(committed).hexdigest()})
+finalizer_copy=dest/'until0800-finalizer-20261120.py.txt'
+finalizer_bytes=Path(__file__).read_bytes();finalizer_copy.write_bytes(finalizer_bytes)
+artifacts.append({'path':finalizer_copy.relative_to(root).as_posix(),'sha256':hashlib.sha256(finalizer_bytes).hexdigest()})
+sources=['infra/systemd/secops-audit-witness@.service','app/services/audit_witness_observer.py',
+         'scripts/audit_witness_observer.py','scripts/f1_lab/witness_observer_status.py']
+final={'schema':'until0800-local-goal-final-evidence-1','implementation_commit':commit,
+       'finished_at':now.isoformat(),'scope':'bounded local function/recovery acceptance; no detector target claim',
+       'local_scope_completed':True,'checks':checks,
+       'source_sha256':{name:hashlib.sha256(subprocess.check_output(['git','show',commit+':'+name])).hexdigest() for name in sources},
+       'artifacts':artifacts,'full_case_counts':{name:data['counts'] for name,data in full['bundles'].items() if name in {'windows-full-resource-20261120','linux-full-resource-20261120'}},
+       'sustained_summary':{name:sustained[name] for name in ['source_commit','elapsed_seconds','watch_successful_cycles','samples','appended_source_rows','before_final_drain','final_state','owned_restarts','source_bytes_unchanged','private_fixture_removed','owned_process_inactive']},
+       'paid_api_calls':0,'frozen_replay_sha256_equal':True,'detection_target_reached':False,
+       'owned_cleanup_summary':{'recorded_runs':cleanup['recorded_runs'],'exact_units':cleanup['exact_owned_units_checked'],'recorded_paths':sum(len(row['recorded_paths']) for row in cleanup['results']),'all_absent':cleanup['completed'],'read_only_check':True},
+       'independent_acceptance':False,'real_8h_soak':False,'github_upload':False,'ci_started':False,'merged':False}
+(dest/'extra-until0800-final-20261120.json').write_text(json.dumps(final,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+summary=f"실제{sustained['elapsed_seconds']:.3f}초·watch{sustained['watch_successful_cycles']}회·상태{sustained['samples']}표본·감사{sustained['appended_source_rows']}행·SIGKILL/동일 기준 재개2회"
+banner=f'''> 2026-11-20 {now:%H:%M} KST · 오전08:00까지 요청한 로컬 검증·개선 범위를 마쳤다.
+> 제품 `{commit[:7]}`: Windows8240통과/613제외·Linux8848통과/5제외·실패0·양 OS2498개 파일 불변. 이전 통과 사례6구간에서 누락/실패·제외 전환0.
+> 기본 주기 장시간 시험: {summary}. [최종 현황](docs/extra-until-0800-20261120.md) · [전체 회귀](docs/extra-until0800-regression-20261120.md) · [지속 실행 원본](docs/extra-witness-sustained-20261120.md).
+> 기존 개발360건 F1 93.41%·탐지 목표 미달. 무료 재생 SHA256동일·새 API0. 유료/AWS/Docker 생성·업로드·CI·병합·실제8시간 soak 없음.
+'''
+for name in ['README.md','AI_HANDOFF.md']:
+    path=root/name;first,rest=path.read_text(encoding='utf-8').split('\n\n',1)
+    assert first.startswith('> 2026-11-20 08:00까지 후속 검증 진행 중')
+    extra='> 이번 로컬 목표와 프로젝트 전체 목표를 구분한다. 외부SSO·독립 호스트/WORM·실제8시간 soak·컨테이너 이미지 전용2검사·4096개 이후 운영 및 탐지 목표/독립 평가는 잔여 사항이다. 새 지속 목표가 필요하면 사용자의 다음 지시를 따른다.\n' if name=='AI_HANDOFF.md' else ''
+    path.write_text(banner+extra+'\n'+rest,encoding='utf-8')
+
+path=root/'docs/extra-until-0800-20261120.md';text=path.read_text(encoding='utf-8')
+text=text.replace('# 오전8시까지의 후속 검증·개선 목표','# 오전8시 후속 로컬 검증·개선 결과',1)
+text=text.replace('사용자 답변이 수치 목표 개선을 뜻하면 이 진행 조건을 조정하고, 실제 비용이나 독립 근거가 필요한 부분을 별도로 명시한다.','탐지 지표 목표는 이번 로컬 기능 검증 완료와 별개다. 독립 평가와 모델 개선의 근거/비용 검토는 후속 항목으로 남긴다.')
+start=text.index('2026-11-20 KST ·');end=text.index('\n\n유료 API',start)
+text=text[:start]+f'2026-11-20 {now:%H:%M} KST · `extra`. 사용자 지정 오전08:00까지 기능별 로컬 시험·확인된 개선을 이어간 뒤 이번 로컬 검증 범위를 마쳤다. 최종 제품 소스는`{commit[:7]}`이며 문서/원본 갱신과 구분한다. 새로 확인한 미해결 실패는 없고, 탐지 지표와 외부 운영 인수 등 프로젝트 잔여 항목은 아래에 별도로 남겼다.'+text[end:]
+text=text.replace('시간 목표와100분 지속 시험은 계속 진행','시간 목표와100분 지속 시험도 확인 완료')
+text=text.replace('100분 지속 시험도 완료했고08:00까지 최종 검토는 진행 중','100분 지속 시험과08:00까지의 최종 검토도 완료')
+text=text.replace('전체 시간 목표는 계속 진행','후속 전체 시간 목표도 확인 완료')
+start=text.index('## 이번 실행의 남은 확인 조건');end=text.index('다음은 이번 로컬 목표의 완료와 구분',start)
+before=sustained['before_final_drain'];unobserved=before.get('unobserved_rows')
+unobserved_text='미확정' if unobserved is None else str(unobserved)
+block=f'''## 이번 로컬 검증의 최종 확인
+
+1. f6e1a0a 양 OS 전체 회귀와2498개 파일 불변·이전 통과ID6구간 보존을 확인했다.
+2. b77 양 OS 시간 간격288단계·97/97행 관측과 실제 입력 순서504종을 확인했다. 각 고정 소스/fixture를 하나의 운영 인수로 합치지 않았다.
+3. [기본 주기 지속 실행](extra-witness-sustained-20261120.md): {summary}. 종료 직전 상태는`{before['state']}`·미관측{unobserved_text}행으로 원본에 남겼고, 별도 명시적 최종 cycle 뒤`{sustained['final_state']['state']}`·미관측{sustained['final_state'].get('unobserved_rows')}행이었다. 최종 cycle을 watch 성공 횟수에 더하지 않았다.
+4. 장시간 시험의2241개 소스 불변·비공개 fixture 삭제·소유 프로세스 종료를 확인했다. 실제8시간 soak로 표시하지 않았다.
+5. 오전08:00 이전 완료 처리하지 않았고, 같은 제품 코드에서 결과/원본/문서 검토를 이어갔다. 최종 원본·소스 해시·완료 조건은 [최종 명세](infrastructure-results/extra-until0800-final-20261120.json)에 있다. 커밋 후`runtime/audit_witness_evidence_20261120.py`로 HEAD의 manifest/원본/링크를 다시 대조한다.
+
+'''
+text=text[:start]+block+text[end:]
+path.write_text(text,encoding='utf-8')
+print(json.dumps({'local_scope_completed':True,'finished_at':now.isoformat(),'product_commit':commit,'detection_target_reached':False}))

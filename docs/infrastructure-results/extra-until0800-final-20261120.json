@@ -1,0 +1,172 @@
+{
+  "schema": "until0800-local-goal-final-evidence-1",
+  "implementation_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26",
+  "finished_at": "2026-11-20T08:00:18.883408+09:00",
+  "scope": "bounded local function/recovery acceptance; no detector target claim",
+  "local_scope_completed": true,
+  "checks": {
+    "deadline_reached": true,
+    "extra_branch": true,
+    "clean_before_finalization": true,
+    "verified_product_paths_unchanged": true,
+    "full_regressions_complete": true,
+    "old_passed_cases_retained": true,
+    "actual_order_coverage_verified": true,
+    "primary_evidence_committed": true,
+    "sustained_run_complete": true,
+    "sustained_documented": true,
+    "sustained_source_unchanged": true,
+    "sustained_private_fixture_removed": true,
+    "sustained_owned_process_inactive": true,
+    "sustained_real_duration_reached": true,
+    "two_owned_restarts_verified": true,
+    "executed_harness_matches_archived_source": true,
+    "frozen_replay_identical_and_free": true,
+    "owned_execution_resources_absent": true
+  },
+  "source_sha256": {
+    "infra/systemd/secops-audit-witness@.service": "d932e78dd39284ac4c070d8268b81a3b176cfc2a2b3af4fa01c5481ac00f2161",
+    "app/services/audit_witness_observer.py": "98adc1f6f77744162d79fed60baa675fdaca5265ccd934cf8aebf0cdf728aec3",
+    "scripts/audit_witness_observer.py": "519e66f70a6c93c4f746662229f033dd58dacc308498ab4a89cc5dccbfce5171",
+    "scripts/f1_lab/witness_observer_status.py": "c2b07cbd204e0602a5647df457cdb6e22be249522cab67303b7dde75fdff4674"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-resource-20261120.xml",
+      "sha256": "6c122f128bb9bd219367140846135cf31e43f8d2b59f6192bb13fae6a4fc9e6f"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-resource-20261120.xml",
+      "sha256": "54761642b0abaf49048de751cbbc270c6e64f304f7be6c001161e690e1c59ede"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-timed-b77-seed21-20261120-sequence/report.json",
+      "sha256": "944d1d72a5ea2e7a697d23498f1ed3d419a3dce4b9e04f36e78bc5f9ec2c44eb"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-timed-b77-seed21-20261120-sequence/report.json",
+      "sha256": "6f9ac469371a4d302881706552a02bf3692903b80c7c73239440aed90847a484"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-pending-fixed-20261120/result.json",
+      "sha256": "e77a98457ce12a4ade217f1ca747edf10040cd5deea55a4d96add5428ca15ced"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay-until0800-final-frozen-replay-comparison-20261120.json",
+      "sha256": "0cc85037d8effb1017b75a81fe7752b620316da23177044e55a2dbad14b6704e"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-combined-scale-512-cgroup-linux-20261120/resource-acceptance.json",
+      "sha256": "54701decec75a570d582f87e94bf6460a1974e1c7344c76417a1172d2c3e131f"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-owned-cleanup-20261120.json",
+      "sha256": "c70757f84f3f51965b3f2a1e1f9e71a824d72e992d1a9d25d2a1caf759944e5a"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-owned-cleanup-harness-20261120.py.txt",
+      "sha256": "fea04703ace6639d3a0ad480afb8f2008256a0f5aa2826a53d7d08c765e17051"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-finalizer-20261120.py.txt",
+      "sha256": "33ed1308f9c58fdccb974ac19b8b014a7834fbb6a60ef49b851df4991214d290"
+    }
+  ],
+  "full_case_counts": {
+    "windows-full-resource-20261120": {
+      "tests": 8853,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 613,
+      "passed": 8240
+    },
+    "linux-full-resource-20261120": {
+      "tests": 8853,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 5,
+      "passed": 8848
+    }
+  },
+  "sustained_summary": {
+    "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+    "elapsed_seconds": 6000.819762862999,
+    "watch_successful_cycles": 100,
+    "samples": 599,
+    "appended_source_rows": 34,
+    "before_final_drain": {
+      "schema": "local-audit-witness-observer-1",
+      "state": "healthy",
+      "healthy": true,
+      "anchor_verified": true,
+      "live_checked": true,
+      "audit_minimum_verified": true,
+      "signing_capability_checked": false,
+      "receipt_sha256": "fd8945048101fba0418ff0ee696de50537bff127f99fb751a0b56acc3ca9cd37",
+      "age_seconds": 58.945721,
+      "observed_at": "2026-11-19T22:38:36.888038+00:00",
+      "pending_started_at": null,
+      "max_age_seconds": 180,
+      "interval_seconds": 60,
+      "capacity_warning": 16,
+      "pending": false,
+      "anchor_count": 100,
+      "independent_storage_verified": false,
+      "automatic_activation_allowed": false,
+      "unobserved_rows": 0,
+      "remaining_receipts": 3995
+    },
+    "final_state": {
+      "schema": "local-audit-witness-observer-1",
+      "state": "healthy",
+      "healthy": true,
+      "anchor_verified": true,
+      "live_checked": true,
+      "audit_minimum_verified": true,
+      "signing_capability_checked": false,
+      "receipt_sha256": "6e28759ac1273d83a10566f021e5bef36729b4a12f2e463ebd9e394a31e966cf",
+      "age_seconds": 0.067843,
+      "observed_at": "2026-11-19T22:39:35.901734+00:00",
+      "pending_started_at": null,
+      "max_age_seconds": 180,
+      "interval_seconds": 60,
+      "capacity_warning": 16,
+      "pending": false,
+      "anchor_count": 101,
+      "independent_storage_verified": false,
+      "automatic_activation_allowed": false,
+      "unobserved_rows": 0,
+      "remaining_receipts": 3994
+    },
+    "owned_restarts": [
+      {
+        "at_elapsed_seconds": 1200.1731365119995,
+        "exit_code": -9,
+        "previous_anchor_count": 20
+      },
+      {
+        "at_elapsed_seconds": 3600.5317898470003,
+        "exit_code": -9,
+        "previous_anchor_count": 60
+      }
+    ],
+    "source_bytes_unchanged": true,
+    "private_fixture_removed": true,
+    "owned_process_inactive": true
+  },
+  "paid_api_calls": 0,
+  "frozen_replay_sha256_equal": true,
+  "detection_target_reached": false,
+  "owned_cleanup_summary": {
+    "recorded_runs": 6,
+    "exact_units": 10,
+    "recorded_paths": 7,
+    "all_absent": true,
+    "read_only_check": true
+  },
+  "independent_acceptance": false,
+  "real_8h_soak": false,
+  "github_upload": false,
+  "ci_started": false,
+  "merged": false
+}
