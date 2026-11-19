@@ -1,0 +1,33 @@
+{
+  "schema": "committed-witness-evidence-audit-1",
+  "review_commit": "99adb82a6ceaf73e8429a9f514aa8cd5303b11bf",
+  "source_hash_checks": 99,
+  "artifact_hash_checks": 425,
+  "document_links_checked": 91,
+  "errors": [
+    "source:scripts/run_witness_safety_sequence.py"
+  ],
+  "manifests": [
+    "extra-witness-boundary-acceptance-20261120.json",
+    "extra-witness-capacity-20261120.json",
+    "extra-witness-clock-boundary-20261120.json",
+    "extra-witness-control-backup-20261120.json",
+    "extra-witness-monitor-20261120.json",
+    "extra-witness-monitor-cadence-20261120.json",
+    "extra-witness-observer-20261120.json",
+    "extra-witness-operations-20261120.json",
+    "extra-witness-operations-baseline-20261120.json",
+    "extra-witness-order-coverage-20261120.json",
+    "extra-witness-restore-inspection-20261120.json",
+    "extra-witness-restore-monitor-20261120.json",
+    "extra-witness-restore-resume-20261120.json",
+    "extra-witness-safety-sequence-20261120.json",
+    "extra-witness-systemd-20261120.json",
+    "extra-local-regression-repairs-20261120.json",
+    "extra-local-report-boundaries-20261120.json",
+    "extra-until0800-regression-20261120.json",
+    "extra-until0800-timed-20261120.json"
+  ],
+  "paid_api_calls": 0,
+  "completed": false
+}

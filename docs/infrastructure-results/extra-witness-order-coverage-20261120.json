@@ -2,7 +2,14 @@
   "schema": "witness-selected-input-order-evidence-1",
   "implementation_commit": "b77eceb30747a0a764cf997879a124b590eef972",
   "source_sha256": {
+    "scripts/run_witness_safety_sequence.py": "53189724dc1e0cb643b62474026dae13ad8cc255e5875c095de4c93a827d0ed4"
+  },
+  "tested_source_sha256": {
     "scripts/run_witness_safety_sequence.py": "592d2870ad69ce55cc196ebaba0e80cf8d5fe489789456ef7ccf5f7b1c044222"
+  },
+  "tested_source_manifest_references": {
+    "windows": "docs/infrastructure-results/witness-boundary-extra-until0800-latest-source-20261120.json",
+    "linux": "docs/infrastructure-results/witness-boundary-extra-until0800-latest-source-linux-20261120.json"
   },
   "artifacts": [
     {
@@ -220,6 +227,22 @@
     {
       "path": "docs/infrastructure-results/witness-order-run_repeated_witness_inputs_20261120.py.txt",
       "sha256": "313bef8103d2246facc9a1196a3ef1b1cc2112417e1ca46798f797c9b09373d5"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-extra-until0800-latest-source-20261120.json",
+      "sha256": "497039172fba36b33a4084dbb69cda3a1184acc8e046b1b5f8cec83422d7fe4d"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-extra-until0800-latest-source-linux-20261120.json",
+      "sha256": "8c611a9c01e88459c58ff99483be56a963595ce8e90138f7fd789084519c4ab7"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-witness-evidence-audit-source-newline-mismatch-20261120.json",
+      "sha256": "a13738925af3d516913e7a1f440aa87a92b18c13fc552937058b7446fa5a70b1"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-order-witness-order-source-newline-diagnostic-20261120.json",
+      "sha256": "fb50273bfaa38f4eb21dd84ef40320d42e6035c2b46160979b958d78a015b7b4"
     }
   ],
   "results": {
