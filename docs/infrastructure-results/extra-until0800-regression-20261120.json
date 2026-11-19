@@ -87,7 +87,20 @@
       "case_outcome_map_sha256": "16d2b9707bbc2395f10eb86605188a2ff68dce035487e3268fe1711f6161d62b"
     },
     "windows-full-b77-20261120": {
-      "status": "running"
+      "status": "complete",
+      "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+      "source_files": 2241,
+      "exit_code": 0,
+      "source_bytes_unchanged": true,
+      "timed_out": false,
+      "counts": {
+        "tests": 8853,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 613,
+        "passed": 8240
+      },
+      "case_outcome_map_sha256": "98102135635ff9ff414cc1c9ca8ff30c79aad613543e12dfab3ad01be5b99223"
     },
     "linux-full-b77-20261120": {
       "status": "complete",
@@ -201,6 +214,31 @@
       ]
     },
     {
+      "old": "windows-full-8d2-20261120",
+      "new": "windows-full-b77-20261120",
+      "case_id_scheme": [
+        "classname",
+        "name"
+      ],
+      "old_passed": 8229,
+      "missing_old_passed_ids": [],
+      "old_passed_now_not_passed": [],
+      "recovered_failures": [],
+      "new_ids": [
+        "tests.test_audit_witness_observer::test_lost_final_capacity_receipt_recovers_before_rejecting_further_work",
+        "tests.test_m6_report_lock::test_failed_creation_never_waits_or_closes_invalid_handle",
+        "tests.test_m6_report_lock::test_failed_wait_closes_handle_without_releasing_an_unowned_mutex[258-TimeoutError]",
+        "tests.test_m6_report_lock::test_failed_wait_closes_handle_without_releasing_an_unowned_mutex[4294967295-OSError]",
+        "tests.test_m6_report_lock::test_normal_and_abandoned_mutex_are_released_even_when_publication_raises[False-0]",
+        "tests.test_m6_report_lock::test_normal_and_abandoned_mutex_are_released_even_when_publication_raises[False-128]",
+        "tests.test_m6_report_lock::test_normal_and_abandoned_mutex_are_released_even_when_publication_raises[True-0]",
+        "tests.test_m6_report_lock::test_normal_and_abandoned_mutex_are_released_even_when_publication_raises[True-128]",
+        "tests.test_m6_report_lock::test_release_failure_still_closes_handle",
+        "tests.test_witness_monitor_cadence::test_known_exhaustion_is_urgent_even_during_pending_or_new_row_grace[legacy_pending]",
+        "tests.test_witness_monitor_cadence::test_known_exhaustion_is_urgent_even_during_pending_or_new_row_grace[new_rows]"
+      ]
+    },
+    {
       "old": "linux-full-8d2-20261120",
       "new": "linux-full-b77-20261120",
       "case_id_scheme": [
@@ -308,6 +346,30 @@
       "sha256": "208a5271b74cd4a42d0d71d5c1704fd965622cb19dab63c442dbe13427a5edb8"
     },
     {
+      "path": "docs/infrastructure-results/until0800-windows-full-b77-20261120-completion.json",
+      "sha256": "19571d7f77c1c1c4b3560ea2b7d8a4f10c29571f95307dce110d60d5c4975c7d"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-b77-20261120-environment.json",
+      "sha256": "d4308a1ceeb5fa13d8698b7791d50331530c3f9dfc67c67e362ac2bca5e3622c"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-b77-20261120-launch.json",
+      "sha256": "fc75ec6272d387d3334bb257276a964c17bfe379cfad9376f57923a01836f870"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-b77-20261120-process.json",
+      "sha256": "77b798004aa90be6e6047265f4a1083eea18bdd5f3c390181d2fbe036a824a9a"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-b77-20261120.stdout.log",
+      "sha256": "5eae02391f6303712a94f85aa5e72dfd3eede61b2cfe06519b2296eca0a59120"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-b77-20261120.xml",
+      "sha256": "e41d6e5643737c295e90180aa075f1bfd2835d571997079cc29a8282d29e9c19"
+    },
+    {
       "path": "docs/infrastructure-results/until0800-linux-full-b77-20261120-completion.json",
       "sha256": "bf47cb40720decf27160d063a8fc360564747f0b829e81078a3a147bf18aeda3"
     },
@@ -369,7 +431,7 @@
     },
     {
       "path": "docs/infrastructure-results/until0800-harness-audit_witness_evidence_20261120.py.txt",
-      "sha256": "7db1d9b452fc89ebc494a202de077ea5bce0702751c45866fd8d710699c0aba1"
+      "sha256": "2654c099fd5feb491753ceec93c884809e720631b159582a8d44c6040b8407ef"
     },
     {
       "path": "docs/infrastructure-results/until0800-until0800-windows-launcher-cp949-reproduction-20261120.log",
@@ -405,7 +467,21 @@
     }
   ],
   "current_runtime_paths_changed_since_verified_source": [],
-  "latest_both_platforms_passed": false,
+  "latest_both_platforms_passed": true,
+  "cross_platform_case_mapping": {
+    "same_case_ids": 8853,
+    "passed_both": 8239,
+    "passed_linux_only": 609,
+    "passed_windows_only": 1,
+    "not_passed_on_either": [
+      "tests.test_audit_paging::test_jsonl_own_view_change_requires_explicit_restart[sqlite-append]",
+      "tests.test_audit_paging::test_jsonl_own_view_change_requires_explicit_restart[sqlite-review]",
+      "tests.test_runtime_patches::test_actual_container_runtime_security_and_provenance",
+      "tests.test_runtime_patches::test_new_offline_venv_bootstraps_patched_pip"
+    ],
+    "not_code_coverage": true,
+    "not_detection_metric": true
+  },
   "existing_passed_ids_retained": true,
   "paid_api_calls": 0,
   "goal_status": "active_until_0800",

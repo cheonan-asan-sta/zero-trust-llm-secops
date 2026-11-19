@@ -1,5 +1,5 @@
-> 2026-11-20 08:00까지 후속 검증 진행 중 (04:33 KST).
-> 제품 소스 `b77eceb`: Linux8848통과/5제외, Windows 진행 중. 기존 개발360건 F1 93.41%·목표 미달.
+> 2026-11-20 08:00까지 후속 검증 진행 중 (05:03 KST).
+> 제품 소스 `b77eceb`: Linux8848통과/5제외, Windows 8240통과/613제외/0실패. 기존 개발360건 F1 93.41%·목표 미달.
 > [현재 현황](docs/extra-until-0800-20261120.md) · [전체 회귀](docs/extra-until0800-regression-20261120.md) · [추가 경계](docs/extra-witness-boundary-acceptance-20261120.md) · [이전 상태표기](docs/extra-until0800-status-history-20261120.md).
 > extra 로컬만 사용. 유료/AWS/Docker 생성·업로드·CI·병합·실제8시간 soak 없음.
 

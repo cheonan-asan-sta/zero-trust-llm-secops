@@ -2,6 +2,17 @@
 
 2026-11-20. README/AI_HANDOFF에 누적된 이 실행의 중복 상태표기를 옮겼다. 아래는 각 단계 당시 기록이며 현재 상태가 아니다. 대체로 최신 단계부터 배치했고, 원래 문서/원본/커밋은 유지했다. 문서 위치에 맞춰 상대 링크만 조정했다. 현재 상태는 [목표 현황](extra-until-0800-20261120.md)과 [전체 회귀](extra-until0800-regression-20261120.md)를 따른다.
 
+> 2026-11-20 08:00까지 후속 검증 진행 중 (04:33 KST).
+> 제품 소스 `b77eceb`: Linux8848통과/5제외, Windows 진행 중. 기존 개발360건 F1 93.41%·목표 미달.
+> [현재 현황](../docs/extra-until-0800-20261120.md) · [전체 회귀](../docs/extra-until0800-regression-20261120.md) · [추가 경계](../docs/extra-witness-boundary-acceptance-20261120.md) · [이전 상태표기](../docs/extra-until0800-status-history-20261120.md).
+> extra 로컬만 사용. 유료/AWS/Docker 생성·업로드·CI·병합·실제8시간 soak 없음.
+
+> 2026-11-20 08:00까지 후속 검증 진행 중 (04:33 KST).
+> 제품 소스 `b77eceb`: Linux8848통과/5제외, Windows 진행 중. 기존 개발360건 F1 93.41%·목표 미달.
+> [현재 현황](../docs/extra-until-0800-20261120.md) · [전체 회귀](../docs/extra-until0800-regression-20261120.md) · [추가 경계](../docs/extra-witness-boundary-acceptance-20261120.md) · [이전 상태표기](../docs/extra-until0800-status-history-20261120.md).
+> extra 로컬만 사용. 유료/AWS/Docker 생성·업로드·CI·병합·실제8시간 soak 없음.
+> 08:00 전 기능이 끝나도 검증/확인된 개선을 이어간다. 실제4096회 순차 witness 서명·최신 Windows 회귀·b77 후속 시간 시험을 확인하고 원본/문서를 갱신한다. 시간 목표 전 완료 처리하지 않는다. F1 목표 달성과 구분한다.
+
 > 2026-11-20 08:00 지속 목표 진행 중: [추가 경계 검증](../docs/extra-witness-boundary-acceptance-20261120.md). 실제 기본60/180초 경계10조건·대용량4096 anchor fixture8조건 통과, 양 OS 각각3시드×288단계 완료. 실제4096회 순차 서명/최신 전체 회귀는 별도 진행 중. F1 목표 미달·비용/CI/병합 없음. 아래는 이전 기록.
 
 > 2026-11-20 08:00 지속 목표 진행 중: [용량 소진 상태·경보](../docs/extra-witness-capacity-20261120.md) 구현b7d69c9/f5d1a27. 관련 Windows63통과/1제외·Linux64통과. 마지막 응답 유실 복구 유지, 새 불가능한 pending 방지·기존 기록 보존/즉시 경보. 실제4096개 한계 시험과 전체 회귀는 진행 중. F1 목표 미달·비용/CI/병합 없음. 아래는 이전 기록.
@@ -27,3 +38,4 @@
 > 2026-11-20 08:00까지 지속 목표 진행 중: [수집기·별도 확인 기록·중단 복구](../docs/extra-witness-observer-20261120.md) 구현e6c9b12. Windows102통과/2제외·Linux104통과, 실제3지점 프로세스 종료/재개. 외부 pin·같은 pending 유지, 자동 기준 채택 없음. 다음은 경보/metrics·백업/복원 연결. 탐지 F1 93.41% 그대로·목표 미달, 유료/AWS/Docker/push/CI/병합 없음. 아래는 이전 기록.
 
 > 2026-11-20 08:00까지 후속 목표 진행 중: [지속 작업 범위](../docs/extra-until-0800-20261120.md). [witness 정확한 작업 재개](../docs/extra-witness-operations-20261120.md) 구현5b908ad, Windows80통과/2제외·Linux82통과. 기존 v1 수동 계약 유지, v2는 명시적 작업ID·서명/시각 재사용·다른writer/rollback 거부. 다음은 별도 확인 기록과 주기 수집·신선도/경보. F1재측정/개선·실제 독립호스트 인수·유료/API/AWS/Docker/push/CI/병합 없음. 아래는 이전 기록.
+
