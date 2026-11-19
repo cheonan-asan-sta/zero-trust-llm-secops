@@ -1,0 +1,172 @@
+{
+  "schema": "extra-audit-search-1",
+  "source_commit": "400d742bc8d32d4a86031e3dad283d6c849c19b3",
+  "pytest": {
+    "windows": {
+      "tests": 85,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2,
+      "passed": 83,
+      "artifact": "docs/infrastructure-results/audit-search-windows-20261119.xml"
+    },
+    "linux": {
+      "tests": 85,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2,
+      "passed": 83,
+      "artifact": "docs/infrastructure-results/audit-search-linux-20261119.xml"
+    },
+    "wire_windows": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 3,
+      "artifact": "docs/infrastructure-results/audit-search-wire-budget-20261119.xml"
+    },
+    "wire_linux": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 3,
+      "artifact": "docs/infrastructure-results/audit-search-wire-budget-linux-20261119.xml"
+    },
+    "initial_fixture": {
+      "tests": 85,
+      "failures": 3,
+      "errors": 0,
+      "skipped": 2,
+      "passed": 80,
+      "artifact": "docs/infrastructure-results/audit-search-focused-20261119.xml"
+    }
+  },
+  "browser": {
+    "search": {
+      "conditions": 18,
+      "artifact": "docs/infrastructure-results/audit-search-search-browser-20261119.json",
+      "passed": true
+    },
+    "workbench": {
+      "conditions": 45,
+      "artifact": "docs/infrastructure-results/audit-search-workbench-browser-20261119.json",
+      "passed": true
+    },
+    "dashboard": {
+      "conditions": 38,
+      "artifact": "docs/infrastructure-results/audit-search-dashboard-browser-20261119.json",
+      "passed": true
+    }
+  },
+  "sources": [
+    {
+      "path": "app/main.py",
+      "sha256": "abbc9c83035ee6bba2cfc1e2ed0f41327f3bae52f611a21cad77503e73f531db",
+      "normalized_lf_sha256": "bc6ffda073aba451fa0b4ed22279ba3c781c99473decd76a521c4b7eab213db1"
+    },
+    {
+      "path": "app/services/audit_paging.py",
+      "sha256": "5ad3c10cd481753381290d0972f7b89ca069380b2077c22d4454cdf5049280b8",
+      "normalized_lf_sha256": "5ad3c10cd481753381290d0972f7b89ca069380b2077c22d4454cdf5049280b8"
+    },
+    {
+      "path": "app/static/app.js",
+      "sha256": "3449a764c843cc3702c8766b90495252e0818a02e32533d1826148adda74ec06",
+      "normalized_lf_sha256": "60555a1539f2402aeda172ffa68160c71792cd210b64b10848460a05070de004"
+    },
+    {
+      "path": "app/static/dashboard.js",
+      "sha256": "25d349619f67d44e7015b4ae739057df1b0c812ad790cd243da39eb4708627e7",
+      "normalized_lf_sha256": "bc99f6424186f0eee2b5cd9f67aeea0f4b7a3eaad08f96d832644b277fecceff"
+    },
+    {
+      "path": "app/static/index.html",
+      "sha256": "bdb690849500e0b14b16952597da20144e4620e298add55af1440862bc804910",
+      "normalized_lf_sha256": "fc1db8fcb3d77901ece8a077d00286fcb404e266bac7b2da5e93f5986a0c0f2a"
+    },
+    {
+      "path": "app/static/styles.css",
+      "sha256": "1c12a2d640823d560ff00c4863eff341ae60ddbfc6a1d0698e5ffa3195725d18",
+      "normalized_lf_sha256": "f4a2bcbfa54ee581a2b04556ad20c132e28c59cc71663dd9515c951fd29941e6"
+    },
+    {
+      "path": "app/static/workbench.html",
+      "sha256": "06ff11e55bb0d6a2e5b52581a2a7ad68ca71f0777a887b57ce38f1cb5e7f59a4",
+      "normalized_lf_sha256": "f21dfcfe91648ceef3dc57d2fdd58c98153aef7e99ac3425e47d69155763f2f0"
+    },
+    {
+      "path": "scripts/test_audit_search_browser.py",
+      "sha256": "62452d5d7db96d477a560908ef1f216bb6ce0a6a2a27712522d007832dcbde27",
+      "normalized_lf_sha256": "62452d5d7db96d477a560908ef1f216bb6ce0a6a2a27712522d007832dcbde27"
+    },
+    {
+      "path": "tests/test_audit_search.py",
+      "sha256": "489d837bf038d2a676f7e9d252978c44d69ef9b34591a4fd46d38aa60f72d048",
+      "normalized_lf_sha256": "489d837bf038d2a676f7e9d252978c44d69ef9b34591a4fd46d38aa60f72d048"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/audit-search-windows-20261119.xml",
+      "sha256": "ea783e9f3eea2305bb8781448f215816ffa57a1ebe231bab6cbcf69d0bfcb6d8",
+      "bytes": 15174
+    },
+    {
+      "path": "docs/infrastructure-results/audit-search-linux-20261119.xml",
+      "sha256": "3b2553305e9b2f96548c66a1dad6a1add17c9a3ada82df052103b0d2d6031c34",
+      "bytes": 15185
+    },
+    {
+      "path": "docs/infrastructure-results/audit-search-wire-budget-20261119.xml",
+      "sha256": "a1c44b31366ca76556208d37cc48c9d65ea6807f4bab16a8e65c702561672f42",
+      "bytes": 628
+    },
+    {
+      "path": "docs/infrastructure-results/audit-search-wire-budget-linux-20261119.xml",
+      "sha256": "07b61eec2aa814bb90b8e20cec3d1b143d35de1e07f9cbf7d498682b83e4cfd0",
+      "bytes": 631
+    },
+    {
+      "path": "docs/infrastructure-results/audit-search-focused-20261119.xml",
+      "sha256": "f0a56f085e05738b5ebdef63414d350f504a25e94cbc4afacffc20f5ce079188",
+      "bytes": 19544
+    },
+    {
+      "path": "docs/infrastructure-results/audit-search-search-browser-20261119.json",
+      "sha256": "8d5d8598204dd0653e76181566519852105ac0121a26993cce6a3cb9fe083dcb",
+      "bytes": 1744
+    },
+    {
+      "path": "docs/infrastructure-results/audit-search-workbench-browser-20261119.json",
+      "sha256": "359967e09a969c20745f4c0d7f6e53b7f1d9aeed9633fc33655cc790b6015584",
+      "bytes": 5749
+    },
+    {
+      "path": "docs/infrastructure-results/audit-search-dashboard-browser-20261119.json",
+      "sha256": "f04fe071a83ea2314880fa7246bc261c0eebb6ad3eded8c73fc1c28fd8077c1a",
+      "bytes": 10473
+    },
+    {
+      "path": "docs/infrastructure-results/audit-search-workbench-mobile-20261119.png",
+      "sha256": "710f30013afdeec785e6af02980fb513d3029f42308467df6fb34eaffd2cadd6",
+      "bytes": 52553
+    },
+    {
+      "path": "docs/infrastructure-results/audit-search-dashboard-mobile-20261119.png",
+      "sha256": "76f6fd828dd3dad3bf3a16c608454e22709ed6d778f1d6389f19d97225e7099e",
+      "bytes": 59017
+    }
+  ],
+  "full_project_regression": false,
+  "wire_tests_added_after_os85_case_run": true,
+  "paid_aws_docker_push_ci_merge": false,
+  "goal_still_active": true,
+  "remaining": [
+    "session/case pagination",
+    "caller/policy rollout preparation",
+    "separate witness local implementation"
+  ],
+  "model_labels_predictions_unchanged": true
+}

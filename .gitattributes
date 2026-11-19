@@ -35,6 +35,8 @@ docs/infrastructure-results/review-policy-dashboard-browser-20261119.json -text 
 docs/infrastructure-results/review-policy-workbench-browser-20261119.json -text whitespace=cr-at-eol
 docs/infrastructure-results/workbench-paging-*.xml -text whitespace=cr-at-eol
 docs/infrastructure-results/workbench-paging-*.json -text whitespace=cr-at-eol
+docs/infrastructure-results/audit-search-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+docs/infrastructure-results/audit-search-*.json -text whitespace=cr-at-eol
 infra/mtls/nginx-renewal.sh text eol=lf
 infra/mtls/nginx-rekey.sh text eol=lf
 infra/runtime/** text eol=lf
