@@ -1,0 +1,295 @@
+{
+  "schema": "extra-native-platform-admission-evidence-1",
+  "date": "2026-11-20",
+  "branch": "extra",
+  "goal_scope": "Supported local verification; not Windows native production acceptance or detection F1 qualification",
+  "implementation_commit": "ff440648d39a37915064f8968709c58d167f784f",
+  "test_scope_correction_commit": "4b4c50cfca3465d67d52197c33f65e44f6706928",
+  "windows_final_full_commit": "217d09049194df07a8bb9ef65c6629daa8b6bbfb",
+  "linux_full_commit": "ff440648d39a37915064f8968709c58d167f784f",
+  "windows_final_source_sha256": {
+    "scripts/behavior_execution_collector.py": "73876b50ccf888f137966cccafa3f709551581b526de1ec711c6d342b80be53f",
+    "scripts/f1_lab/capture_backup.py": "b2b33ea237d227c33fa765ff477638663795d4032830c9805f2ae9e3feb442f8",
+    "scripts/f1_lab/exec_history.py": "018c07d793e56978e6fa1d16afeda136eeb29e2c2e537636508e1fc456bf7471",
+    "scripts/mtls_app_recovery.py": "4464b67cfe8c031f740b82daa14bdf5ca0f4dc5f9b5978453073176ebf675f5a",
+    "tests/test_async_evidence_io.py": "d5127b4f56466329c54b7dc229eef8ecd58a280ffd335781a47c5b62238b5007",
+    "tests/test_behavior_context_mtls_recovery.py": "e6b0928518118e74c7638693890f0cceb395624c7d845df09d0a4db8435a4ae2",
+    "tests/test_behavior_execution_collector.py": "0257e2a4fed5fbba887c4d4af5779770c56061220d748949ad5be526397de525",
+    "tests/test_credential_peer_service.py": "2460265c3df1acba6389f57bc9ff231ca2f62f000242b0727326528a71e1575f",
+    "tests/test_exec_history_binding.py": "05cfdfd53094e07adc898f4c27fde18d540d5ebfc41110190145196a291d86ef",
+    "tests/test_exec_recovery_status.py": "d735941d81f918d9572b54e468641e6a69ecbdc3a51fa11dcb1c71cecbd7e5c6",
+    "tests/test_execution_continuous.py": "527041ea48afcd8e6bc7c1032b8705c62e303896fa7aadedaf27e0e817de2a2c",
+    "tests/test_execution_retention.py": "dbbd67d17f228972b74527a0ab1d10cb4e912017de7cf9eb80d13b5029831b83",
+    "tests/test_managed_exec_retention.py": "bb7f320d621b2fe87e3f4f073f6e452ce861091820e3c63892ab62240b3e286d",
+    "tests/test_native_platform_admission.py": "5551d997070398bfb0df486ded7d3b1757854464f5292f0c3a99ade0fdab3563",
+    "tests/test_vpn_gateway_collector.py": "f2ad3d17b54b3fec07744c4c78c6f20ea5c8b64773e35a923af0509a007182c6"
+  },
+  "linux_full_implementation_source_sha256": {
+    "scripts/behavior_execution_collector.py": "73876b50ccf888f137966cccafa3f709551581b526de1ec711c6d342b80be53f",
+    "scripts/f1_lab/capture_backup.py": "b2b33ea237d227c33fa765ff477638663795d4032830c9805f2ae9e3feb442f8",
+    "scripts/f1_lab/exec_history.py": "018c07d793e56978e6fa1d16afeda136eeb29e2c2e537636508e1fc456bf7471",
+    "scripts/mtls_app_recovery.py": "4464b67cfe8c031f740b82daa14bdf5ca0f4dc5f9b5978453073176ebf675f5a",
+    "tests/test_async_evidence_io.py": "d5127b4f56466329c54b7dc229eef8ecd58a280ffd335781a47c5b62238b5007",
+    "tests/test_behavior_context_mtls_recovery.py": "e6b0928518118e74c7638693890f0cceb395624c7d845df09d0a4db8435a4ae2",
+    "tests/test_behavior_execution_collector.py": "0257e2a4fed5fbba887c4d4af5779770c56061220d748949ad5be526397de525",
+    "tests/test_credential_peer_service.py": "2460265c3df1acba6389f57bc9ff231ca2f62f000242b0727326528a71e1575f",
+    "tests/test_exec_history_binding.py": "05cfdfd53094e07adc898f4c27fde18d540d5ebfc41110190145196a291d86ef",
+    "tests/test_exec_recovery_status.py": "d735941d81f918d9572b54e468641e6a69ecbdc3a51fa11dcb1c71cecbd7e5c6",
+    "tests/test_execution_continuous.py": "527041ea48afcd8e6bc7c1032b8705c62e303896fa7aadedaf27e0e817de2a2c",
+    "tests/test_execution_retention.py": "dbbd67d17f228972b74527a0ab1d10cb4e912017de7cf9eb80d13b5029831b83",
+    "tests/test_managed_exec_retention.py": "8f40290f15926f86522f9e8bbd5f7041e918f6add738d36a6c734c89829f8ad7",
+    "tests/test_native_platform_admission.py": "5551d997070398bfb0df486ded7d3b1757854464f5292f0c3a99ade0fdab3563"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-legacy-delay-reproduction-20261120.xml",
+      "sha256": "cff2cc999d8ff32d2934fb1ccbaa74dad011ff5577d5a2471b54850e6cdd659f",
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 13.568,
+      "tested_commit": null,
+      "purpose": "legacy_assumption_expected_failure",
+      "source_note": "Uncommitted initial fixture state or explicitly modified legacy replay; see document"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-linux-focused-20261119.xml",
+      "sha256": "c496a8550c393ca8b9b5dbdd4ceec2750c9171b12ede6d5483b61d11d3d03f47",
+      "tests": 303,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 1,
+      "seconds": 79.187,
+      "tested_commit": null,
+      "purpose": "initial_fixture_failure",
+      "source_note": "Uncommitted initial fixture state or explicitly modified legacy replay; see document"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-linux-full-20261120.xml",
+      "sha256": "0cec16949d5f2b8c0323d272f107b72a6895915ade956783ce3200e5cbfaa076",
+      "tests": 8615,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 5,
+      "seconds": 1163.246,
+      "tested_commit": "ff440648d39a37915064f8968709c58d167f784f",
+      "purpose": "local_validation",
+      "source_note": null
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-linux-guards-final-20261119.xml",
+      "sha256": "14c7dbda2696c6bff3bf4674b97549511c984ea58f2c3ee9c8507071c83503bc",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "seconds": 4.698,
+      "tested_commit": "ff440648d39a37915064f8968709c58d167f784f",
+      "purpose": "local_validation",
+      "source_note": null
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-linux-retention-scope-20261120.xml",
+      "sha256": "761a3c9c40e7ff35a8822ff8227dba44d7d8c806fd4ab3806a492ee4aa526860",
+      "tests": 40,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 12.362,
+      "tested_commit": "4b4c50cfca3465d67d52197c33f65e44f6706928",
+      "purpose": "local_validation",
+      "source_note": null
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-linux-vpn-handshake-20261120.xml",
+      "sha256": "39f15014cae589d7b8bb08d3d93d1beae8c479ec625eea79d7d448df13a339b0",
+      "tests": 25,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.834,
+      "tested_commit": "217d09049194df07a8bb9ef65c6629daa8b6bbfb",
+      "purpose": "local_validation",
+      "source_note": null
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-platform-guards-initial-20261119.xml",
+      "sha256": "58b85242d2c0756aad941dc4a00fcfe61d71008acd9a2a14b2c793a0011cf745",
+      "tests": 7,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 4.415,
+      "tested_commit": null,
+      "purpose": "initial_fixture_failure",
+      "source_note": "Uncommitted initial fixture state or explicitly modified legacy replay; see document"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-windows-focused-20261119.xml",
+      "sha256": "506ca2afcb68d479781c89cc0895d5ac3189c7e287c312b3dfcd717ae7f96a2e",
+      "tests": 255,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 58,
+      "seconds": 114.367,
+      "tested_commit": null,
+      "purpose": "initial_fixture_failure",
+      "source_note": "Uncommitted initial fixture state or explicitly modified legacy replay; see document"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-windows-full-20261120.xml",
+      "sha256": "6c88b0e77136c8675604ef7f818db20e4f67278698ff08d3710b751b22e4fe89",
+      "tests": 8615,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 592,
+      "seconds": 2334.779,
+      "tested_commit": "ff440648d39a37915064f8968709c58d167f784f",
+      "purpose": "intermediate_full",
+      "source_note": null
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-windows-full-final-20261120.xml",
+      "sha256": "49eb74bacc25cb997135be49b21671dfe51bbba470b836eebf0b07ae8d3f8aa2",
+      "tests": 8616,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 591,
+      "seconds": 1555.159,
+      "tested_commit": "217d09049194df07a8bb9ef65c6629daa8b6bbfb",
+      "purpose": "final_validation",
+      "source_note": null
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-windows-guards-final-20261119.xml",
+      "sha256": "54e1c9345904b8f745c73ec8871dda5b360ff8f56c34480fbb60c801beb07757",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 13.892,
+      "tested_commit": "ff440648d39a37915064f8968709c58d167f784f",
+      "purpose": "local_validation",
+      "source_note": null
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-windows-retention-scope-20261120.xml",
+      "sha256": "d39302d52347d1b1b60e9ff5a77f7a4954766de697ce4d0a387698a5a0c0437d",
+      "tests": 40,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 39,
+      "seconds": 3.185,
+      "tested_commit": "4b4c50cfca3465d67d52197c33f65e44f6706928",
+      "purpose": "local_validation",
+      "source_note": null
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-windows-vpn-handshake-20261120.xml",
+      "sha256": "4ef4c54950c5948c6c76addd54a2d933730f5a3e3c5fef98628854166fc298db",
+      "tests": 25,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 3.576,
+      "tested_commit": "217d09049194df07a8bb9ef65c6629daa8b6bbfb",
+      "purpose": "local_validation",
+      "source_note": null
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-cohort-audit-20261120.json",
+      "sha256": "2df943fa36bb74c3e4d567f7484e5715df5094b1d415e354c0db84db9cb60822"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-collection-scope-audit-20261120.json",
+      "sha256": "0c0f1e95bb00f5481ec1d98a227611f85875d12006065e8a7ba25896bf6c71be"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-linux-environment-20261120.json",
+      "sha256": "fe6f4b78f9a55282d91958d75db9fe0cbc23e74c01d6e585ef0e7d09d52cbefd"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-linux-final-environment-20261120.json",
+      "sha256": "85e4a960b24935d7bcd2bf99c844c15591e20e31942d2ad06b2afd0d6c56160a"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-native-source-20261120.json",
+      "sha256": "e7a86f3da2397ac9ae90a3a9dbf056af3af847644cc0e73894997206736308b5"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-production-proof-20261120.json",
+      "sha256": "95a4773c4a7c9b0d3a31887f0380b42efa9de76c4bf8dd3d3b1ad1a19e41b6db"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-ruff-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-ruff-final-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-ruff-scope-final-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-ruff-vpn-final-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-scope-proof-20261120.json",
+      "sha256": "fefdbb2cb5f040d0ed045a668273e073392116fa8812f5fda87ebf0e19ee2628"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-windows-environment-20261120.json",
+      "sha256": "e71de2a0aa43f7d92cd7ead85a84a18e4f8df4b310338e9ba70b7bda1e1b73bd"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-windows-final-environment-20261120.json",
+      "sha256": "110028b3bba7da2f4e816166cbb12800a3f4099c133fdc03f979f371ed2d3e1d"
+    },
+    {
+      "path": "docs/infrastructure-results/extra-platform-admission-legacy-delay-source-20261120.py.txt",
+      "sha256": "c3f71fd20f2a56ed36e19395cbc63329cd29596230f5935ad0f613b24f40e177",
+      "purpose": "Exact modified old test: adapter_retry only and 2.2 second local mock delay; expected one failure"
+    }
+  ],
+  "baseline_windows_failures": 70,
+  "baseline_failure_final_windows_pass": 17,
+  "baseline_failure_declared_linux_only": 53,
+  "all_baseline70_pass_on_linux": true,
+  "all_baseline7996_windows_passes_preserved": true,
+  "newly_excluded_previously_passed_nodes": 0,
+  "windows_final_full": {
+    "passed": 8025,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 591,
+    "tests": 8616
+  },
+  "linux_full": {
+    "passed": 8610,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 5,
+    "tests": 8615
+  },
+  "linux_followup_tests": {
+    "retention_scope": 40,
+    "vpn_handshake": 25
+  },
+  "linux_full_rerun_after_test_only_followups": false,
+  "production_code_unchanged_after_linux_full": true,
+  "independent_enterprise_identity_verified": false,
+  "windows_native_security_storage_supported": false,
+  "eight_hour_soak_completed": false,
+  "docker_image_acceptance_run": false,
+  "paid_api_calls": 0,
+  "aws_resources_created": false,
+  "docker_resources_created": false,
+  "github_push_ci_merge": false,
+  "detection_metrics_changed": false,
+  "metrics_remeasured": false,
+  "ruff_passed": true
+}

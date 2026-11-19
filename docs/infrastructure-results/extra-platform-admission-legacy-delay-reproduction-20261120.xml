@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="13.568" timestamp="2026-11-20T00:01:05.556500+09:00" hostname="희주"><testcase classname="runtime.legacy-async-wait-20261120.test_legacy_async_wait" name="test_cancelled_sdk_source_check_settles_without_blocking_event_loop[adapter_retry]" time="7.648"><failure message="assert False">runtime\legacy-async-wait-20261120\test_legacy_async_wait.py:96: in test_cancelled_sdk_source_check_settles_without_blocking_event_loop
+    asyncio.run(run())
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+runtime\legacy-async-wait-20261120\test_legacy_async_wait.py:81: in run
+    assert await asyncio.to_thread(entered.wait, 2)
+E   assert False</failure></testcase></testsuite></testsuites>

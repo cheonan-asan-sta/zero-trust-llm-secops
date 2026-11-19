@@ -1,0 +1,6 @@
+{
+  "source_commit": "ff440648d39a37915064f8968709c58d167f784f",
+  "archive_sha256": "fca7cbbfb5343fd93f68b62825aa36da56a6170749402f66c13d44e59d5b0883",
+  "native_checkout": "/home/chaehj02/extra-platform-full-20261120-8cb3c47e",
+  "scope": "same committed sources; no dotenv or untracked files"
+}

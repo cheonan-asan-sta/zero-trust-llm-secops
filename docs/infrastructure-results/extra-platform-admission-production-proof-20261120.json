@@ -1,0 +1,14 @@
+{
+  "linux_full_suite_commit": "ff440648d39a37915064f8968709c58d167f784f",
+  "windows_final_full_suite_commit": "217d09049194df07a8bb9ef65c6629daa8b6bbfb",
+  "files_changed_after_linux_full": [
+    "tests/test_managed_exec_retention.py",
+    "tests/test_vpn_gateway_collector.py"
+  ],
+  "production_files_changed": [],
+  "production_code_identical": true,
+  "linux_followup_files_tested": [
+    "tests/test_managed_exec_retention.py",
+    "tests/test_vpn_gateway_collector.py"
+  ]
+}

@@ -1,0 +1,2829 @@
+{
+  "source_commit": "217d09049194df07a8bb9ef65c6629daa8b6bbfb",
+  "collected": 8616,
+  "active_declared_exclusions": [
+    {
+      "class": "tests.test_audit_review_client",
+      "name": "test_snapshot_symlink_and_fifo_are_rejected_without_read",
+      "reason": "POSIX symlink/FIFO file contract"
+    },
+    {
+      "class": "tests.test_audit_review_client_process",
+      "name": "test_real_operator_cli_reads_then_reviews_once_and_refuses_replay[optional]",
+      "reason": "Owned native Linux worker fixture"
+    },
+    {
+      "class": "tests.test_audit_review_client_process",
+      "name": "test_real_operator_cli_reads_then_reviews_once_and_refuses_replay[caller_bound]",
+      "reason": "Owned native Linux worker fixture"
+    },
+    {
+      "class": "tests.test_audit_witness",
+      "name": "test_world_readable_signer_and_linked_journal_are_rejected",
+      "reason": "POSIX ownership/mode contract"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_pinned_package_and_restored_database_bind_without_key_or_mutation",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_rechecking_cannot_renew_snapshot_or_restore_age",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_reporter_clock_and_expiry_do_not_reuse_success_values[-1-0]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_reporter_clock_and_expiry_do_not_reuse_success_values[0-1]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_reporter_clock_and_expiry_do_not_reuse_success_values[179-1]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_reporter_clock_and_expiry_do_not_reuse_success_values[180-0]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_reporter_clock_and_expiry_do_not_reuse_success_values[181-0]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_disconnected_or_changed_evidence_is_not_verified[manifest_pin]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_disconnected_or_changed_evidence_is_not_verified[checkpoint_pin]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_disconnected_or_changed_evidence_is_not_verified[receipt_pin]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_disconnected_or_changed_evidence_is_not_verified[ciphertext]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_disconnected_or_changed_evidence_is_not_verified[database]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_disconnected_or_changed_evidence_is_not_verified[scope]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_disconnected_or_changed_evidence_is_not_verified[missing_review]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_report_validation_rejects_forged_aggregate_contracts[extra]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_report_validation_rejects_forged_aggregate_contracts[activation]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_report_validation_rejects_forged_aggregate_contracts[attestation]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_report_validation_rejects_forged_aggregate_contracts[boolean_count]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_report_validation_rejects_forged_aggregate_contracts[negative]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_report_validation_rejects_forged_aggregate_contracts[chronology]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_report_validation_rejects_forged_aggregate_contracts[state]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_report_validation_rejects_forged_aggregate_contracts[scope]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_report_validation_rejects_forged_aggregate_contracts[timezone]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_profile_requires_explicit_bounded_policy[max_snapshot_age_seconds-True]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_profile_requires_explicit_bounded_policy[max_snapshot_age_seconds-59]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_profile_requires_explicit_bounded_policy[max_snapshot_age_seconds-604801]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_profile_requires_explicit_bounded_policy[max_restore_age_seconds-2592001]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_profile_requires_explicit_bounded_policy[max_restore_age_seconds-60.0]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_profile_requires_explicit_bounded_policy[status_file-relative.json]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_profile_requires_explicit_bounded_policy[status_file-]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_profile_requires_explicit_bounded_policy[schema-unknown]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_profile_requires_explicit_bounded_policy[scope_sha256-bad]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_profile_requires_explicit_bounded_policy[extra-not-allowed]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_profile_and_publication_refuse_links_and_clock_rollback",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_public_output_never_overwrites_private_inputs[package]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_public_output_never_overwrites_private_inputs[review]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_public_output_never_overwrites_private_inputs[checkpoint]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_cli_replaces_prior_success_with_safe_unavailable_and_recovers",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_exporter_backup_bridge_is_opt_in_and_keeps_scrape_authentication[False]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_backup_recovery_status",
+      "name": "test_exporter_backup_bridge_is_opt_in_and_keeps_scrape_authentication[True]",
+      "reason": "private POSIX backup/review contracts"
+    },
+    {
+      "class": "tests.test_behavior_context_mtls_recovery",
+      "name": "test_mtls_job_retries_same_backup_and_preserves_context_after_publication_failure",
+      "reason": "Container recovery requires POSIX directory fsync"
+    },
+    {
+      "class": "tests.test_behavior_execution_collector",
+      "name": "test_private_feed_permissions_and_symlink_checked_before_signing",
+      "reason": "POSIX owner-only feed permissions; portable link test separate"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_preview_preserves_originals_and_does_not_create_archive_database",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_compaction_is_lossless_latest_protected_and_restart_idempotent",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_archive_capacity_keeps_every_hot_file_and_latest[max_records-2]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_archive_capacity_keeps_every_hot_file_and_latest[max_raw_bytes-1]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_policy_limits_are_explicit_and_strict[max_hot_records-0]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_policy_limits_are_explicit_and_strict[max_records-True]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_policy_limits_are_explicit_and_strict[max_raw_bytes-0]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_policy_limits_are_explicit_and_strict[batch_size-0]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_policy_limits_are_explicit_and_strict[batch_size-257]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_policy_limits_are_explicit_and_strict[max_hot_bytes-1.1]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_invalid_latest_stops_all_cleanup[missing_latest]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_invalid_latest_stops_all_cleanup[corrupt_latest]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_invalid_latest_stops_all_cleanup[latest_scope]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_invalid_latest_stops_all_cleanup[unbacked_latest]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_unknown_or_unsafe_entries_are_preserved[symlink]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_unknown_or_unsafe_entries_are_preserved[hardlink]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_unknown_or_unsafe_entries_are_preserved[extra_file]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_unknown_or_unsafe_entries_are_preserved[foreign_scope]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_unknown_or_unsafe_entries_are_preserved[unknown_directory]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_real_process_exit_after_preservation_resumes_without_duplicates[after_commit]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_real_process_exit_after_preservation_resumes_without_duplicates[after_unlink]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_failed_archive_commit_never_removes_hot_files",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_changed_source_after_commit_is_not_deleted[0]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_changed_source_after_commit_is_not_deleted[1]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_changed_source_after_commit_is_not_deleted[2]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_corrupt_archive_stops_cleanup_and_restore[UPDATE captures SET payload=x'00']",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_corrupt_archive_stops_cleanup_and_restore[UPDATE captures SET raw_sha='bad']",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_corrupt_archive_stops_cleanup_and_restore[DELETE FROM captures WHERE seq=1]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_corrupt_archive_stops_cleanup_and_restore[UPDATE archive_head SET records=0]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_corrupt_archive_stops_cleanup_and_restore[UPDATE captures SET cleaned=9]",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_concurrent_compactors_preserve_one_archive_and_latest",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_busy_lock_is_bounded_and_release_recovers",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_archive",
+      "name": "test_restore_rejects_existing_and_managed_targets",
+      "reason": "Linux cooperative directory locks and no-follow cleanup"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_encrypted_snapshot_and_isolated_restore_survive_total_source_loss",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_bad_packages_or_authority_inputs_create_no_restore_state[key]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_bad_packages_or_authority_inputs_create_no_restore_state[key_id]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_bad_packages_or_authority_inputs_create_no_restore_state[manifest_pin]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_bad_packages_or_authority_inputs_create_no_restore_state[checkpoint_pin]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_bad_packages_or_authority_inputs_create_no_restore_state[payload]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_bad_packages_or_authority_inputs_create_no_restore_state[manifest]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_bad_packages_or_authority_inputs_create_no_restore_state[extra]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_bad_packages_or_authority_inputs_create_no_restore_state[symlink]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_bad_packages_or_authority_inputs_create_no_restore_state[hardlink]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_bad_packages_or_authority_inputs_create_no_restore_state[foreign_scope]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_bad_packages_or_authority_inputs_create_no_restore_state[future_checkpoint]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_restore_never_overwrites_or_reuses_active_or_package_paths[existing]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_restore_never_overwrites_or_reuses_active_or_package_paths[source]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_restore_never_overwrites_or_reuses_active_or_package_paths[within_source]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_restore_never_overwrites_or_reuses_active_or_package_paths[package]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_restore_never_overwrites_or_reuses_active_or_package_paths[package_parent]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_restore_never_overwrites_or_reuses_active_or_package_paths[checkpoint]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_restore_never_overwrites_or_reuses_active_or_package_paths[link]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_current_checkpoint_rejects_older_snapshot_and_cannot_be_minted_from_rollback",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_snapshot_requires_current_checkpoint_but_later_equal_head_anchor_can_validate_data",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_restored_review_requires_receipt_pin_current_checkpoint_and_unmodified_database[database]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_restored_review_requires_receipt_pin_current_checkpoint_and_unmodified_database[receipt]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_restored_review_requires_receipt_pin_current_checkpoint_and_unmodified_database[extra]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_restored_review_requires_receipt_pin_current_checkpoint_and_unmodified_database[pin]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_restored_review_requires_receipt_pin_current_checkpoint_and_unmodified_database[checkpoint_inside]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_restored_review_requires_receipt_pin_current_checkpoint_and_unmodified_database[missing_receipt]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_actual_process_exit_never_publishes_incomplete_review_as_complete[after_backup_payload]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_actual_process_exit_never_publishes_incomplete_review_as_complete[after_backup_publish]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_actual_process_exit_never_publishes_incomplete_review_as_complete[before_restore_state]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_actual_process_exit_never_publishes_incomplete_review_as_complete[before_restore_publish]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_actual_process_exit_never_publishes_incomplete_review_as_complete[after_restore_state]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_actual_process_exit_never_publishes_incomplete_review_as_complete[after_restore_publish]",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_backup_capacity_and_private_parent_errors_leave_source_unchanged",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_encryption_uses_distinct_nonce_and_does_not_include_signing_keys",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_same_scope_same_count_but_different_history_is_not_an_acceptable_checkpoint",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_authenticated_payload_still_requires_supported_sqlite_schema",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_backup",
+      "name": "test_database_bound_is_checked_before_creating_a_package",
+      "reason": "private POSIX archive and file locks"
+    },
+    {
+      "class": "tests.test_capture_load",
+      "name": "test_real_pipeline_faults_and_worker_exit_preserve_every_original",
+      "reason": "Linux nonroot worker, cooperative locks and readonly storage faults"
+    },
+    {
+      "class": "tests.test_capture_load",
+      "name": "test_bad_workload_never_creates_runtime[arguments0]",
+      "reason": "Linux nonroot worker, cooperative locks and readonly storage faults"
+    },
+    {
+      "class": "tests.test_capture_load",
+      "name": "test_bad_workload_never_creates_runtime[arguments1]",
+      "reason": "Linux nonroot worker, cooperative locks and readonly storage faults"
+    },
+    {
+      "class": "tests.test_capture_load",
+      "name": "test_bad_workload_never_creates_runtime[arguments2]",
+      "reason": "Linux nonroot worker, cooperative locks and readonly storage faults"
+    },
+    {
+      "class": "tests.test_capture_load",
+      "name": "test_bad_workload_never_creates_runtime[arguments3]",
+      "reason": "Linux nonroot worker, cooperative locks and readonly storage faults"
+    },
+    {
+      "class": "tests.test_capture_load",
+      "name": "test_bad_workload_never_creates_runtime[arguments4]",
+      "reason": "Linux nonroot worker, cooperative locks and readonly storage faults"
+    },
+    {
+      "class": "tests.test_capture_load",
+      "name": "test_bad_workload_never_creates_runtime[arguments5]",
+      "reason": "Linux nonroot worker, cooperative locks and readonly storage faults"
+    },
+    {
+      "class": "tests.test_capture_load",
+      "name": "test_bad_workload_never_creates_runtime[arguments6]",
+      "reason": "Linux nonroot worker, cooperative locks and readonly storage faults"
+    },
+    {
+      "class": "tests.test_capture_load",
+      "name": "test_bad_workload_never_creates_runtime[arguments7]",
+      "reason": "Linux nonroot worker, cooperative locks and readonly storage faults"
+    },
+    {
+      "class": "tests.test_capture_load",
+      "name": "test_bad_workload_never_creates_runtime[arguments8]",
+      "reason": "Linux nonroot worker, cooperative locks and readonly storage faults"
+    },
+    {
+      "class": "tests.test_capture_load",
+      "name": "test_bad_workload_never_creates_runtime[arguments9]",
+      "reason": "Linux nonroot worker, cooperative locks and readonly storage faults"
+    },
+    {
+      "class": "tests.test_capture_load",
+      "name": "test_bad_workload_never_creates_runtime[arguments10]",
+      "reason": "Linux nonroot worker, cooperative locks and readonly storage faults"
+    },
+    {
+      "class": "tests.test_capture_load",
+      "name": "test_existing_output_and_ordinary_filesystem_are_never_filled",
+      "reason": "Linux nonroot worker, cooperative locks and readonly storage faults"
+    },
+    {
+      "class": "tests.test_capture_load",
+      "name": "test_footprint_refuses_link_instead_of_following_external_file",
+      "reason": "Linux nonroot worker, cooperative locks and readonly storage faults"
+    },
+    {
+      "class": "tests.test_capture_load",
+      "name": "test_changed_signature_cannot_be_counted_as_healthy_work",
+      "reason": "Linux nonroot worker, cooperative locks and readonly storage faults"
+    },
+    {
+      "class": "tests.test_capture_load",
+      "name": "test_latency_uses_nearest_rank_without_hiding_tail",
+      "reason": "Linux nonroot worker, cooperative locks and readonly storage faults"
+    },
+    {
+      "class": "tests.test_collector_provider_delivery",
+      "name": "test_fresh_provider_process_accepts_only_assigned_stdin_key_and_logs_no_secret",
+      "reason": "private Unix provider processes"
+    },
+    {
+      "class": "tests.test_collector_provider_delivery",
+      "name": "test_provider_cli_failure_never_falls_back_to_stdin_or_overwrites_latest[both_offline]",
+      "reason": "private Unix provider processes"
+    },
+    {
+      "class": "tests.test_collector_provider_delivery",
+      "name": "test_provider_cli_failure_never_falls_back_to_stdin_or_overwrites_latest[wrong_primary]",
+      "reason": "private Unix provider processes"
+    },
+    {
+      "class": "tests.test_collector_provider_delivery",
+      "name": "test_provider_cli_failure_never_falls_back_to_stdin_or_overwrites_latest[missing_pin]",
+      "reason": "private Unix provider processes"
+    },
+    {
+      "class": "tests.test_collector_provider_delivery",
+      "name": "test_ha_templates_keep_one_collector_writer_and_no_stdin_or_unpinned_key_source",
+      "reason": "private Unix provider processes"
+    },
+    {
+      "class": "tests.test_collector_provider_delivery",
+      "name": "test_provider_cli_requires_service_binding_or_explicit_uid_only_fixture",
+      "reason": "private Unix provider processes"
+    },
+    {
+      "class": "tests.test_collector_provider_delivery",
+      "name": "test_same_uid_rejection_never_calls_private_key_supplier",
+      "reason": "private Unix provider processes"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_primary_then_unavailable_endpoint_selects_distinct_preapproved_key",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_missing_primary_and_both_missing_have_bounded_explicit_behavior",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_invalid_primary_is_not_hidden_by_trying_standby[wrong_key]",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_invalid_primary_is_not_hidden_by_trying_standby[short_body]",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_invalid_primary_is_not_hidden_by_trying_standby[private_parent]",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_invalid_primary_is_not_hidden_by_trying_standby[socket_file]",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_invalid_primary_is_not_hidden_by_trying_standby[socket_symlink]",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_invalid_primary_is_not_hidden_by_trying_standby[peer_uid]",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_only_current_preapproved_standby_can_replace_noncurrent_primary[disabled]",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_only_current_preapproved_standby_can_replace_noncurrent_primary[expired]",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_only_current_preapproved_standby_can_replace_noncurrent_primary[future]",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_immutable_profile_binding_rejects_scope_and_key_substitution[file_pin]",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_immutable_profile_binding_rejects_scope_and_key_substitution[scope]",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_immutable_profile_binding_rejects_scope_and_key_substitution[registry_pin]",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_immutable_profile_binding_rejects_scope_and_key_substitution[unknown_key]",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_immutable_profile_binding_rejects_scope_and_key_substitution[wrong_source]",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_immutable_profile_binding_rejects_scope_and_key_substitution[duplicate_endpoint]",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_mid_selection_pin_change_cannot_return_a_key_or_try_standby",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_alternate_capture_remains_opt_in_and_requires_current_exact_runtime_authority",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_one_persistent_monitor_fence_prevents_old_primary_replay_after_standby",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_provider_ha",
+      "name": "test_bridge_rechecks_only_explicit_standby_and_preserves_original_age",
+      "reason": "private Unix peer credential HA"
+    },
+    {
+      "class": "tests.test_collector_schedule",
+      "name": "test_health_security_report_does_not_change_freshness_or_allow_enforcement[fresh]",
+      "reason": "Linux worker self-observation"
+    },
+    {
+      "class": "tests.test_collector_schedule",
+      "name": "test_health_security_report_does_not_change_freshness_or_allow_enforcement[missing]",
+      "reason": "Linux worker self-observation"
+    },
+    {
+      "class": "tests.test_collector_schedule",
+      "name": "test_health_security_report_does_not_change_freshness_or_allow_enforcement[wrong_pin]",
+      "reason": "Linux worker self-observation"
+    },
+    {
+      "class": "tests.test_collector_schedule",
+      "name": "test_security_observation_failure_cannot_report_fresh",
+      "reason": "Linux worker self-observation"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_public_projection_is_bounded_and_contains_no_raw_identity_or_credentials",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_scrape_expires_proof_and_stopped_worker_reports_without_reusing_fresh_values[0-1-1]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_scrape_expires_proof_and_stopped_worker_reports_without_reusing_fresh_values[5-0-1]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_scrape_expires_proof_and_stopped_worker_reports_without_reusing_fresh_values[25-0-0]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_scrape_expires_proof_and_stopped_worker_reports_without_reusing_fresh_values[181-0-0]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_scrape_expires_proof_and_stopped_worker_reports_without_reusing_fresh_values[-1-0-0]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_unsafe_reports_fail_closed_without_leaking_content[missing]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_unsafe_reports_fail_closed_without_leaking_content[corrupt]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_unsafe_reports_fail_closed_without_leaking_content[oversize]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_unsafe_reports_fail_closed_without_leaking_content[symlink]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_unsafe_reports_fail_closed_without_leaking_content[hardlink]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_unsafe_reports_fail_closed_without_leaking_content[writable]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_unsafe_reports_fail_closed_without_leaking_content[foreign_scope]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_unsafe_reports_fail_closed_without_leaking_content[foreign_kind]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_unsafe_reports_fail_closed_without_leaking_content[extra_field]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_unsafe_reports_fail_closed_without_leaking_content[future]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_unsafe_reports_fail_closed_without_leaking_content[invalid_window]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_unsafe_reports_fail_closed_without_leaking_content[bool_counter]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_publication_refuses_unsafe_existing_destination[symlink]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_publication_refuses_unsafe_existing_destination[hardlink]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_publication_refuses_unsafe_existing_destination[wrong_scope]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_publication_refuses_unsafe_existing_destination[clock_regression]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_publication_refuses_unsafe_existing_destination[wrong_kind]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_publication_refuses_unsafe_existing_destination[corrupt]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_failed_atomic_replace_preserves_last_report_and_removes_only_own_temp",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_health_report_revalidates_signed_capture_and_clips_short_key_expiry",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_profile_validation_is_fixed_and_local[extra]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_profile_validation_is_fixed_and_local[relative]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_profile_validation_is_fixed_and_local[same]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_profile_validation_is_fixed_and_local[bad_scope]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_archive_failure_never_reuses_previous_good_counts[storage_pressure]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_archive_failure_never_reuses_previous_good_counts[unavailable]",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_collector_status_bridge",
+      "name": "test_opt_in_existing_exporter_keeps_inbox_metrics_and_scrape_authentication",
+      "reason": "POSIX public status file contract"
+    },
+    {
+      "class": "tests.test_control_plane_ha",
+      "name": "test_peer_symlink_never_escapes_replica",
+      "reason": "Windows symlink creation requires separate OS privileges"
+    },
+    {
+      "class": "tests.test_dashboard_integration_boundaries",
+      "name": "test_dashboard_command_contracts_keep_explicit_live_boundary[runtime-status-scripts.execution_mtls_runtime-status]",
+      "reason": "POSIX job commands"
+    },
+    {
+      "class": "tests.test_dashboard_integration_boundaries",
+      "name": "test_dashboard_command_contracts_keep_explicit_live_boundary[runtime-up-scripts.execution_mtls_runtime-up]",
+      "reason": "POSIX job commands"
+    },
+    {
+      "class": "tests.test_dashboard_integration_boundaries",
+      "name": "test_dashboard_command_contracts_keep_explicit_live_boundary[runtime-down-scripts.execution_mtls_runtime-down]",
+      "reason": "POSIX job commands"
+    },
+    {
+      "class": "tests.test_dashboard_integration_boundaries",
+      "name": "test_dashboard_command_contracts_keep_explicit_live_boundary[runtime-recover-scripts.execution_mtls_runtime-recover]",
+      "reason": "POSIX job commands"
+    },
+    {
+      "class": "tests.test_dashboard_integration_boundaries",
+      "name": "test_dashboard_command_contracts_keep_explicit_live_boundary[runtime-verify-scripts.test_execution_mtls_runtime-None]",
+      "reason": "POSIX job commands"
+    },
+    {
+      "class": "tests.test_dashboard_integration_boundaries",
+      "name": "test_dashboard_command_contracts_keep_explicit_live_boundary[m6-mock-scripts.evaluate_m6-None]",
+      "reason": "POSIX job commands"
+    },
+    {
+      "class": "tests.test_dashboard_integration_boundaries",
+      "name": "test_dashboard_command_contracts_keep_explicit_live_boundary[m6-plan-scripts.evaluate_m6-None]",
+      "reason": "POSIX job commands"
+    },
+    {
+      "class": "tests.test_dashboard_integration_boundaries",
+      "name": "test_dashboard_command_contracts_keep_explicit_live_boundary[m6-live-scripts.evaluate_m6-None]",
+      "reason": "POSIX job commands"
+    },
+    {
+      "class": "tests.test_dashboard_operations",
+      "name": "test_host_jobs_require_server_bound_admin_and_deduplicate[viewer-403]",
+      "reason": "POSIX host jobs"
+    },
+    {
+      "class": "tests.test_dashboard_operations",
+      "name": "test_host_jobs_require_server_bound_admin_and_deduplicate[responder-403]",
+      "reason": "POSIX host jobs"
+    },
+    {
+      "class": "tests.test_dashboard_operations",
+      "name": "test_host_jobs_require_server_bound_admin_and_deduplicate[admin-202]",
+      "reason": "POSIX host jobs"
+    },
+    {
+      "class": "tests.test_dashboard_operations",
+      "name": "test_disabled_host_control_and_live_budget_are_not_browser_overrides",
+      "reason": "POSIX host jobs"
+    },
+    {
+      "class": "tests.test_database_transport_preflight",
+      "name": "test_private_reader_rejects_world_readable_files_and_symlinks",
+      "reason": "POSIX key modes are enforced in Linux helper"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_snapshot_and_review_preserve_unknown_consumed_state_after_source_loss",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_bundle_includes_only_typed_data_and_encrypts_raw_identifiers",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_snapshot_does_not_upgrade_an_unsealed_or_unpublished_request[preseal]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_snapshot_does_not_upgrade_an_unsealed_or_unpublished_request[preoutbox]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_in_flight_execution_is_refused_before_creating_backup_or_pin",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_snapshot_waits_for_actual_other_process_broker_transaction_then_refuses_launching",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_modified_or_unpinned_package_never_creates_review[ciphertext]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_modified_or_unpinned_package_never_creates_review[manifest]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_modified_or_unpinned_package_never_creates_review[wrong_key]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_modified_or_unpinned_package_never_creates_review[key_id]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_modified_or_unpinned_package_never_creates_review[checkpoint]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_modified_or_unpinned_package_never_creates_review[extra_file]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_current_external_pin_rejects_an_older_authentic_package",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_review_recheck_rejects_missing_changed_or_linked_originals[capture]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_review_recheck_rejects_missing_changed_or_linked_originals[intent]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_review_recheck_rejects_missing_changed_or_linked_originals[app_db]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_review_recheck_rejects_missing_changed_or_linked_originals[broker_db]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_review_recheck_rejects_missing_changed_or_linked_originals[inventory]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_review_recheck_rejects_missing_changed_or_linked_originals[unknown_file]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_review_recheck_rejects_missing_changed_or_linked_originals[link]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_snapshot_contract_and_current_trust_are_rechecked[signature]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_snapshot_contract_and_current_trust_are_rechecked[caller_pin]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_snapshot_contract_and_current_trust_are_rechecked[policy_sha256]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_snapshot_contract_and_current_trust_are_rechecked[scope]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_snapshot_contract_and_current_trust_are_rechecked[created_at]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_snapshot_contract_and_current_trust_are_rechecked[runs]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_snapshot_refuses_unconfigured_or_unsafe_sources[worker_allowlist]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_snapshot_refuses_unconfigured_or_unsafe_sources[private_permissions]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_snapshot_refuses_unconfigured_or_unsafe_sources[extra_intent_file]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_snapshot_refuses_unconfigured_or_unsafe_sources[body_capacity]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_snapshot_refuses_unconfigured_or_unsafe_sources[database_schema]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_snapshot_refuses_unconfigured_or_unsafe_sources[other_unit]",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_restored_intent_and_databases_cannot_override_current_registry",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_backup_and_restore_refuse_existing_destinations",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_backup",
+      "name": "test_wal_databases_restore_a_consistent_logical_snapshot_without_copying_sidecars",
+      "reason": "private POSIX recovery bundle"
+    },
+    {
+      "class": "tests.test_exec_bundle_cli",
+      "name": "test_local_operator_backup_restore_and_keyless_verify_need_no_signing_credentials",
+      "reason": "private POSIX operator CLI"
+    },
+    {
+      "class": "tests.test_exec_bundle_cli",
+      "name": "test_operator_cli_refuses_unsafe_configuration_without_partial_package_or_secret_output[local_issuer_default]",
+      "reason": "private POSIX operator CLI"
+    },
+    {
+      "class": "tests.test_exec_bundle_cli",
+      "name": "test_operator_cli_refuses_unsafe_configuration_without_partial_package_or_secret_output[world_readable_key]",
+      "reason": "private POSIX operator CLI"
+    },
+    {
+      "class": "tests.test_exec_bundle_cli",
+      "name": "test_operator_cli_refuses_unsafe_configuration_without_partial_package_or_secret_output[short_key]",
+      "reason": "private POSIX operator CLI"
+    },
+    {
+      "class": "tests.test_exec_bundle_cli",
+      "name": "test_operator_cli_refuses_unsafe_configuration_without_partial_package_or_secret_output[absent_database]",
+      "reason": "private POSIX operator CLI"
+    },
+    {
+      "class": "tests.test_exec_bundle_cli",
+      "name": "test_operator_interface_has_no_activation_dispatch_or_grant_reissue_command",
+      "reason": "private POSIX operator CLI"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_keyless_package_and_review_recheck_retains_unknown_and_original_dates",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_package_or_review_damage_cannot_report_verified_or_zero_counts[payload]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_package_or_review_damage_cannot_report_verified_or_zero_counts[manifest]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_package_or_review_damage_cannot_report_verified_or_zero_counts[checkpoint]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_package_or_review_damage_cannot_report_verified_or_zero_counts[app]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_package_or_review_damage_cannot_report_verified_or_zero_counts[broker]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_package_or_review_damage_cannot_report_verified_or_zero_counts[inventory]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_package_or_review_damage_cannot_report_verified_or_zero_counts[seal]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_package_or_review_damage_cannot_report_verified_or_zero_counts[current_pin]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_actual_ciphertext_repair_preserves_snapshot_backup_restore_times_and_unknown",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_public_status_schema_rejects_misleading_counts_or_authorization_claims[unknown_field]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_public_status_schema_rejects_misleading_counts_or_authorization_claims[activation]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_public_status_schema_rejects_misleading_counts_or_authorization_claims[auth]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_public_status_schema_rejects_misleading_counts_or_authorization_claims[execute]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_public_status_schema_rejects_misleading_counts_or_authorization_claims[wrong_scope]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_public_status_schema_rejects_misleading_counts_or_authorization_claims[counter_bool]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_public_status_schema_rejects_misleading_counts_or_authorization_claims[count_invariant]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_public_status_schema_rejects_misleading_counts_or_authorization_claims[worker_count]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_public_status_schema_rejects_misleading_counts_or_authorization_claims[future_origin]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_future_or_expired_public_report_never_exports_cached_counts[-1]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_future_or_expired_public_report_never_exports_cached_counts[60]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_future_or_expired_public_report_never_exports_cached_counts[61]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_repeated_integrity_check_never_renews_snapshot_or_restore_age",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_optional_metrics_profile_requires_exact_bounded_policy[schema]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_optional_metrics_profile_requires_exact_bounded_policy[scope]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_optional_metrics_profile_requires_exact_bounded_policy[relative_path]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_optional_metrics_profile_requires_exact_bounded_policy[negative_age]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_optional_metrics_profile_requires_exact_bounded_policy[boolean_age]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_optional_metrics_profile_requires_exact_bounded_policy[extra]",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_publisher_rejects_clock_regression_and_evidence_directory_overlap",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status",
+      "name": "test_current_pin_expiry_during_reconstruction_cannot_be_hidden_by_start_time",
+      "reason": "private POSIX typed bundle status"
+    },
+    {
+      "class": "tests.test_exec_bundle_status_delivery",
+      "name": "test_authenticated_exporter_exposes_bundle_only_when_opted_in[False]",
+      "reason": "private POSIX bundle delivery"
+    },
+    {
+      "class": "tests.test_exec_bundle_status_delivery",
+      "name": "test_authenticated_exporter_exposes_bundle_only_when_opted_in[True]",
+      "reason": "private POSIX bundle delivery"
+    },
+    {
+      "class": "tests.test_exec_bundle_status_delivery",
+      "name": "test_keyless_cli_actual_damage_and_repair_preserve_unknown_and_original_times",
+      "reason": "private POSIX bundle delivery"
+    },
+    {
+      "class": "tests.test_exec_bundle_status_delivery",
+      "name": "test_monitoring_cli_and_systemd_template_have_no_recovery_key_or_activation_inputs",
+      "reason": "private POSIX bundle delivery"
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_failed_trace_never_kills_reaped_or_unowned_pid[initial_exit]",
+      "reason": "POSIX wait-status and fork cleanup contract"
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_failed_trace_never_kills_reaped_or_unowned_pid[exec_failure]",
+      "reason": "POSIX wait-status and fork cleanup contract"
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_failed_trace_never_kills_reaped_or_unowned_pid[ownership_lost]",
+      "reason": "POSIX wait-status and fork cleanup contract"
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_failed_trace_never_kills_reaped_or_unowned_pid[timeout]",
+      "reason": "POSIX wait-status and fork cleanup contract"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_normal_dispatch_persists_intent_and_same_original_before_outbox",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_completed_bytes_recover_before_outbox_without_any_command_or_grant_retry",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_post_exec_pre_seal_failure_remains_indeterminate_even_with_worker_and_used_grant",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_pre_dispatch_intent_is_only_a_proposal_and_does_not_consume_or_launch",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_modified_signed_intent_never_resumes[signature]",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_modified_signed_intent_never_resumes[policy_sha256]",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_modified_signed_intent_never_resumes[proposed_caller_ref_sha256]",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_modified_signed_intent_never_resumes[session_ref_sha256]",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_modified_signed_intent_never_resumes[worker_directory]",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_modified_signed_intent_never_resumes[resource_id]",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_linked_damaged_or_partial_private_inventory_is_not_silently_reused[intent_link]",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_linked_damaged_or_partial_private_inventory_is_not_silently_reused[intent_hardlink]",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_linked_damaged_or_partial_private_inventory_is_not_silently_reused[capture_link]",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_linked_damaged_or_partial_private_inventory_is_not_silently_reused[capture_damage]",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_linked_damaged_or_partial_private_inventory_is_not_silently_reused[unknown_file]",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_app_record_or_broker_receipt_loss_cannot_be_replaced_by_intent",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_other_request_worker_file_cannot_explain_unsealed_intent",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_current_policy_or_pin_change_prevents_automatic_republication",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_intent",
+      "name": "test_invalid_and_overlapping_intent_root_is_rejected_before_launch",
+      "reason": "private POSIX intent contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_full_mirror_and_encrypted_restore_include_latest_and_unpublished",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_isolated_recovery_survives_all_owned_source_directories_lost",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_cleanup_previews_then_removes_only_old_published_backed_records",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_recent_and_new_unbacked_records_survive_cleanup",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_bad_backup_scope_or_private_file_never_prunes[receipt_pin]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_bad_backup_scope_or_private_file_never_prunes[checkpoint_pin]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_bad_backup_scope_or_private_file_never_prunes[receipt]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_bad_backup_scope_or_private_file_never_prunes[database]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_bad_backup_scope_or_private_file_never_prunes[checkpoint]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_bad_backup_scope_or_private_file_never_prunes[outbox_link]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_bad_backup_scope_or_private_file_never_prunes[capture_link]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_bad_backup_scope_or_private_file_never_prunes[outbox_mode]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_bad_backup_scope_or_private_file_never_prunes[hot_collision]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_inventory_fails_closed_and_never_changes_originals[unknown]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_inventory_fails_closed_and_never_changes_originals[wrong_id]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_inventory_fails_closed_and_never_changes_originals[cross_scope]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_inventory_fails_closed_and_never_changes_originals[extra_field]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_inventory_fails_closed_and_never_changes_originals[link]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_inventory_fails_closed_and_never_changes_originals[mode]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_cold_publication_is_recognized_without_rehydrating_hot_files",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_preserve_collision_rolls_back_whole_batch_and_never_deletes_input",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_prune_policy_is_strict[min_age_seconds-0]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_prune_policy_is_strict[min_age_seconds-True]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_prune_policy_is_strict[limit-0]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_prune_policy_is_strict[limit-257]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_recovery",
+      "name": "test_prune_policy_is_strict[apply-1]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_actual_published_and_pending_records_export_only_bounded_aggregates",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_expiration_has_no_cached_queue_counts[59.999-True]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_expiration_has_no_cached_queue_counts[60-False]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_expiration_has_no_cached_queue_counts[60.001-False]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_expiration_has_no_cached_queue_counts[-0.001-False]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_malformed_public_status_never_exports_success[scope]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_malformed_public_status_never_exports_success[schema]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_malformed_public_status_never_exports_success[extra]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_malformed_public_status_never_exports_success[negative]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_malformed_public_status_never_exports_success[boolean]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_malformed_public_status_never_exports_success[too_many]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_malformed_public_status_never_exports_success[wrong_sum]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_malformed_public_status_never_exports_success[future_oldest]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_malformed_public_status_never_exports_success[no_oldest]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_malformed_public_status_never_exports_success[permission]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_malformed_public_status_never_exports_success[authority]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_malformed_public_status_never_exports_success[state]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_malformed_public_status_never_exports_success[missing_counter]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_status_file_failure_is_not_an_empty_healthy_queue[missing]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_status_file_failure_is_not_an_empty_healthy_queue[link]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_status_file_failure_is_not_an_empty_healthy_queue[mode]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_status_file_failure_is_not_an_empty_healthy_queue[hardlink]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_status_file_failure_is_not_an_empty_healthy_queue[unavailable]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_empty_outbox_checks_pins_and_reports_ready_not_permission",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_ready_and_capacity_use_actual_counts",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_profile_is_explicit_bounded_and_publication_cannot_go_backwards",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_existing_exporter_is_opt_in_and_requires_bearer[False]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_outbox_status",
+      "name": "test_existing_exporter_is_opt_in_and_requires_bearer[True]",
+      "reason": "private POSIX outbox contracts"
+    },
+    {
+      "class": "tests.test_exec_recovery_delivery",
+      "name": "test_authenticated_exporter_adds_recovery_only_when_explicitly_configured[False]",
+      "reason": "POSIX native recovery reporting"
+    },
+    {
+      "class": "tests.test_exec_recovery_delivery",
+      "name": "test_authenticated_exporter_adds_recovery_only_when_explicitly_configured[True]",
+      "reason": "POSIX native recovery reporting"
+    },
+    {
+      "class": "tests.test_exec_recovery_delivery",
+      "name": "test_cli_requires_real_environment_unless_local_fixture_is_explicit_and_does_not_launch",
+      "reason": "POSIX native recovery reporting"
+    },
+    {
+      "class": "tests.test_exec_recovery_delivery",
+      "name": "test_enabled_profile_does_not_refresh_an_expired_signed_artifact_report",
+      "reason": "POSIX native recovery reporting"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_published_sealed_and_empty_inventory_are_checked_without_grants",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_preseal_gap_is_visible_even_when_sealed_outbox_is_empty",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_durable_capture_before_outbox_is_pending_publication",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_later_recovery_resolves_publication_but_preserves_original_indeterminate_request",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_cold_and_hot_publications_are_both_exactly_counted",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_missing_malformed_or_linked_evidence_is_unavailable_not_zero[unknown_root]",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_missing_malformed_or_linked_evidence_is_unavailable_not_zero[unknown_run]",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_missing_malformed_or_linked_evidence_is_unavailable_not_zero[intent_damage]",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_missing_malformed_or_linked_evidence_is_unavailable_not_zero[intent_link]",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_missing_malformed_or_linked_evidence_is_unavailable_not_zero[capture_damage]",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_missing_malformed_or_linked_evidence_is_unavailable_not_zero[capture_link]",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_missing_malformed_or_linked_evidence_is_unavailable_not_zero[hot_collision]",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_intent_signatures_are_rechecked_for_every_inventory[signature]",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_intent_signatures_are_rechecked_for_every_inventory[proposed_caller_ref_sha256]",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_intent_signatures_are_rechecked_for_every_inventory[session_ref_sha256]",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_intent_signatures_are_rechecked_for_every_inventory[worker_directory]",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_worker_broker_and_app_directories_are_not_required_by_keyless_inventory",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_wrong_unit_or_current_pin_cannot_return_a_healthy_inventory",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_inventory",
+      "name": "test_capacity_and_deadline_failure_do_not_emit_partial_counts",
+      "reason": "private POSIX recovery inventory"
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_metrics_show_original_age_both_pending_types_and_capacity",
+      "reason": "Actual POSIX protected public status file"
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_atomic_publication_and_clock_regression_denial",
+      "reason": "POSIX publisher contracts"
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_publisher_refuses_redirected_or_writable_output[symlink]",
+      "reason": "POSIX publisher contracts"
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_publisher_refuses_redirected_or_writable_output[hardlink]",
+      "reason": "POSIX publisher contracts"
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_publisher_refuses_redirected_or_writable_output[writable_parent]",
+      "reason": "POSIX publisher contracts"
+    },
+    {
+      "class": "tests.test_execution_continuous",
+      "name": "test_feed_rejects_unprotected_or_blocking_files[fifo]",
+      "reason": "POSIX FIFO input"
+    },
+    {
+      "class": "tests.test_execution_continuous",
+      "name": "test_feed_rejects_unprotected_or_blocking_files[public]",
+      "reason": "POSIX owner-only mode"
+    },
+    {
+      "class": "tests.test_execution_maintenance_probe",
+      "name": "test_real_spool_lock_is_classified_without_mutation[init]",
+      "reason": "real POSIX flock requires Linux"
+    },
+    {
+      "class": "tests.test_execution_maintenance_probe",
+      "name": "test_real_spool_lock_is_classified_without_mutation[compact]",
+      "reason": "real POSIX flock requires Linux"
+    },
+    {
+      "class": "tests.test_execution_retention",
+      "name": "test_archived_bundle_replays_after_expiry_without_resigning_or_consuming_approval",
+      "reason": "POSIX durable input retirement"
+    },
+    {
+      "class": "tests.test_execution_retention",
+      "name": "test_pending_receipts_and_evaluations_are_never_archived",
+      "reason": "POSIX durable input retirement"
+    },
+    {
+      "class": "tests.test_execution_retention",
+      "name": "test_input_rotation_resumes_after_link_but_before_unlink",
+      "reason": "POSIX fsync/link/unlink recovery"
+    },
+    {
+      "class": "tests.test_execution_retention",
+      "name": "test_failed_file_sync_never_removes_original_input",
+      "reason": "POSIX durable input retirement"
+    },
+    {
+      "class": "tests.test_execution_retention",
+      "name": "test_rotation_refuses_replaced_symlink_and_conflicting_destination",
+      "reason": "POSIX durable input retirement; portable link test separate"
+    },
+    {
+      "class": "tests.test_executor_transition",
+      "name": "test_dangling_transition_symlink_is_not_treated_as_absent_intent",
+      "reason": "Windows symlink creation needs separate OS privileges"
+    },
+    {
+      "class": "tests.test_http_review_preconditions",
+      "name": "test_actual_http_review_version_survives_concurrent_writers_and_worker_loss",
+      "reason": "Owned Linux native worker fixture"
+    },
+    {
+      "class": "tests.test_jsonl_writer_boundary",
+      "name": "test_fifo_cannot_block_bootstrap_or_a_live_disk_proof",
+      "reason": "POSIX FIFO contract"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_complete_private_record_and_idempotent_publication",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[exit_code]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[sealed_at]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[signature]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.access_record_sha256]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.policy_sha256]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.caller_ref_sha256]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.session_ref_sha256]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.session_version]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.resource_id]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.request_sha256]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[caller_receipt.signature]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[caller_receipt.service_evidence_sha256]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[authorization_proof.signature]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[runtime_proof.signature]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[request.nonce]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[request.command_sha256]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[event.event_id]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[event.collection_basis]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_no_pin_stale_restore_and_clock_regression",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_stripping_managed_seal_cannot_downgrade_to_legacy_capture",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_durable_outbox_resumes_without_execution_or_resigning[before_run]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_durable_outbox_resumes_without_execution_or_resigning[before_latest]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_archive_restore_is_byte_exact_and_never_rolls_latest_back",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_refuse_wrong_worker_before_sealing",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[runtime_disabled]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[authorization_disabled]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[caller_disabled]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[policy_changed]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[caller_wrong_pin]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[service_wrong_pin]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[outbox_nested]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[outbox_same]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[outbox_link]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[run_link]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[capture_link]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[latest_link]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[run_extra_file]",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_operator_retry_cli_cannot_execute_and_health_cli_requires_caller_pin",
+      "reason": "Native POSIX sealed-outbox storage"
+    },
+    {
+      "class": "tests.test_native_batch_reproducer",
+      "name": "test_symlink_archive_cannot_follow_external_file",
+      "reason": "actual Linux link semantics"
+    },
+    {
+      "class": "tests.test_pam_journal_delivery",
+      "name": "test_private_fresh_publication_keyless_hash_and_no_output_overwrite",
+      "reason": "native bounded reader and private Linux artifact files"
+    },
+    {
+      "class": "tests.test_pam_journal_delivery",
+      "name": "test_unsafe_files_and_output_parents_cannot_be_used[symlink]",
+      "reason": "native bounded reader and private Linux artifact files"
+    },
+    {
+      "class": "tests.test_pam_journal_delivery",
+      "name": "test_unsafe_files_and_output_parents_cannot_be_used[hardlink]",
+      "reason": "native bounded reader and private Linux artifact files"
+    },
+    {
+      "class": "tests.test_pam_journal_delivery",
+      "name": "test_unsafe_files_and_output_parents_cannot_be_used[fifo]",
+      "reason": "native bounded reader and private Linux artifact files"
+    },
+    {
+      "class": "tests.test_pam_journal_delivery",
+      "name": "test_unsafe_files_and_output_parents_cannot_be_used[unsafe_parent]",
+      "reason": "native bounded reader and private Linux artifact files"
+    },
+    {
+      "class": "tests.test_pam_journal_delivery",
+      "name": "test_fixed_reader_bounds_real_child_output_and_always_reaps_only_its_process[valid]",
+      "reason": "native bounded reader and private Linux artifact files"
+    },
+    {
+      "class": "tests.test_pam_journal_delivery",
+      "name": "test_fixed_reader_bounds_real_child_output_and_always_reaps_only_its_process[oversized]",
+      "reason": "native bounded reader and private Linux artifact files"
+    },
+    {
+      "class": "tests.test_pam_journal_delivery",
+      "name": "test_fixed_reader_bounds_real_child_output_and_always_reaps_only_its_process[truncated]",
+      "reason": "native bounded reader and private Linux artifact files"
+    },
+    {
+      "class": "tests.test_pam_journal_delivery",
+      "name": "test_fixed_reader_bounds_real_child_output_and_always_reaps_only_its_process[partial]",
+      "reason": "native bounded reader and private Linux artifact files"
+    },
+    {
+      "class": "tests.test_pam_journal_delivery",
+      "name": "test_fixed_reader_bounds_real_child_output_and_always_reaps_only_its_process[failed]",
+      "reason": "native bounded reader and private Linux artifact files"
+    },
+    {
+      "class": "tests.test_pam_journal_delivery",
+      "name": "test_fixed_reader_bounds_real_child_output_and_always_reaps_only_its_process[timeout]",
+      "reason": "native bounded reader and private Linux artifact files"
+    },
+    {
+      "class": "tests.test_pam_journal_delivery",
+      "name": "test_fixed_reader_bounds_real_child_output_and_always_reaps_only_its_process[cancel]",
+      "reason": "native bounded reader and private Linux artifact files"
+    },
+    {
+      "class": "tests.test_pam_journal_delivery",
+      "name": "test_fixed_reader_rejects_unit_and_window_before_spawning",
+      "reason": "native bounded reader and private Linux artifact files"
+    },
+    {
+      "class": "tests.test_pam_journal_delivery",
+      "name": "test_missing_systemd_auth_credential_never_reads_stdin_or_collects",
+      "reason": "native bounded reader and private Linux artifact files"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_encrypted_copy_survives_source_loss_without_recreating_live_store",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_wrong_observation_pin_creates_no_package_or_checkpoint",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_wrong_keys_or_pins_and_damaged_bytes_refuse_before_destination_exists[key]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_wrong_keys_or_pins_and_damaged_bytes_refuse_before_destination_exists[key_id]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_wrong_keys_or_pins_and_damaged_bytes_refuse_before_destination_exists[outer_pin]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_wrong_keys_or_pins_and_damaged_bytes_refuse_before_destination_exists[checkpoint]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_wrong_keys_or_pins_and_damaged_bytes_refuse_before_destination_exists[manifest]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_wrong_keys_or_pins_and_damaged_bytes_refuse_before_destination_exists[payload]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_keyless_monitor_drops_all_cached_counts_after_any_evidence_loss[ciphertext]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_keyless_monitor_drops_all_cached_counts_after_any_evidence_loss[review_db]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_keyless_monitor_drops_all_cached_counts_after_any_evidence_loss[receipt]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_keyless_monitor_drops_all_cached_counts_after_any_evidence_loss[extra_package]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_keyless_monitor_drops_all_cached_counts_after_any_evidence_loss[extra_review]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_keyless_monitor_drops_all_cached_counts_after_any_evidence_loss[missing_review]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_repair_of_exact_bytes_preserves_original_restore_time_without_key",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_original_store_and_overlapping_paths_are_never_destinations[backup_source]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_original_store_and_overlapping_paths_are_never_destinations[backup_child]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_original_store_and_overlapping_paths_are_never_destinations[checkpoint_source]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_original_store_and_overlapping_paths_are_never_destinations[restore_source]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_original_store_and_overlapping_paths_are_never_destinations[restore_package]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_existing_package_checkpoint_and_review_are_never_overwritten",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_unsafe_package_files_are_refused[symlink]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_unsafe_package_files_are_refused[hardlink]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_unsafe_package_files_are_refused[permissions]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_future_manifest_is_refused_even_with_new_operator_byte_pin",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_new_live_admissions_do_not_renew_or_expand_the_older_review",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_backup",
+      "name": "test_damaged_source_cannot_be_packaged_as_valid_history",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_empty_checkpoint_is_stable_and_has_no_freshness_or_identity_claim",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_reopened_checkpoint_matches_external_pin_without_touching_database",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_detects_whole_database_rollback_with_a_separately_retained_new_pin",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_equal_counts_with_different_valid_observations_have_different_pins",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_overlapping_capture_and_duplicate_admission_metadata_remain_bound",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_explicit_signer_selection_does_not_reset_logical_checkpoint",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_malformed_external_pin_is_not_silently_adopted[]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_malformed_external_pin_is_not_silently_adopted[AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_malformed_external_pin_is_not_silently_adopted[fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_malformed_external_pin_is_not_silently_adopted[fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_malformed_external_pin_is_not_silently_adopted[None]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_malformed_external_pin_is_not_silently_adopted[True]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_malformed_external_pin_is_not_silently_adopted[7]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_no_checkpoint_is_issued_for_invalid_internal_inventory[UPDATE events SET sha='altered']",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_no_checkpoint_is_issued_for_invalid_internal_inventory[UPDATE captures SET body=X'7b7d']",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_no_checkpoint_is_issued_for_invalid_internal_inventory[DELETE FROM events]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_no_checkpoint_is_issued_for_invalid_internal_inventory[CREATE VIEW surprise AS SELECT * FROM events]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_individually_valid_metadata_change_invalidates_old_external_pin",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_inventory_and_hash_share_one_writer_fence",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_physical_database_repacking_keeps_logical_pin",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_checkpoint",
+      "name": "test_cli_fails_closed_without_echoing_paths_or_creating_missing_storage",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_repeated_capture_is_idempotent_after_reopening",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_overlapping_new_capture_keeps_original_events_and_times",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_another_export_serialization_is_not_another_event",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_same_cursor_conflicting_authenticated_fields_roll_back[_PID-999]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_same_cursor_conflicting_authenticated_fields_roll_back[_UID-1]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_same_cursor_conflicting_authenticated_fields_roll_back[__REALTIME_TIMESTAMP-None]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_same_cursor_conflicting_authenticated_fields_roll_back[MESSAGE-pam_unix(sudo:session): session opened for user root by (uid=1)]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_new_cursor_with_same_message_and_pid_is_retained",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_verified_empty_is_never_normal_or_human_authenticated",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_clock_regression_and_capture_expiry_never_refresh_old_event",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_older_unseen_capture_cannot_replace_latest",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_duplicate_old_capture_never_replaces_newest_or_adds_events",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_explicit_new_key_does_not_reset_dedup_or_reenable_revoked_key",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_capacity_failure_keeps_all_original_observations[captures]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_capacity_failure_keeps_all_original_observations[events]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_damaged_or_foreign_store_is_not_reused_for_new_admission[UPDATE events SET sha='broken']",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_damaged_or_foreign_store_is_not_reused_for_new_admission[UPDATE captures SET body=X'7b7d']",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_damaged_or_foreign_store_is_not_reused_for_new_admission[UPDATE captures SET new_events=0]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_damaged_or_foreign_store_is_not_reused_for_new_admission[UPDATE events SET first_capture='missing']",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_damaged_or_foreign_store_is_not_reused_for_new_admission[UPDATE metadata SET latest='missing']",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_damaged_or_foreign_store_is_not_reused_for_new_admission[DELETE FROM events]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_damaged_or_foreign_store_is_not_reused_for_new_admission[CREATE TRIGGER surprise AFTER INSERT ON captures BEGIN SELECT 1; END]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_unsafe_database_files_fail_without_following_links[symlink]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_unsafe_database_files_fail_without_following_links[hardlink]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_unsafe_database_files_fail_without_following_links[permissions]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_unsafe_database_files_fail_without_following_links[wal_link]",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_concurrent_same_capture_is_stored_once",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_scope_and_capacity_changes_need_new_explicit_storage",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_pam_observation_ledger",
+      "name": "test_cli_uses_real_pin_and_exposes_no_key_or_raw_message",
+      "reason": "private Linux observation ledger"
+    },
+    {
+      "class": "tests.test_runtime_patches",
+      "name": "test_actual_container_runtime_security_and_provenance",
+      "reason": "patched Linux image only; host runtime unchanged"
+    },
+    {
+      "class": "tests.test_runtime_patches",
+      "name": "test_new_offline_venv_bootstraps_patched_pip",
+      "reason": "patched Linux image only; host runtime unchanged"
+    },
+    {
+      "class": "tests.test_shared_execution_collector",
+      "name": "test_proc_snapshot_rejects_process_changes_during_capture[pid_reuse]",
+      "reason": "Linux /proc reader"
+    },
+    {
+      "class": "tests.test_shared_execution_collector",
+      "name": "test_proc_snapshot_rejects_process_changes_during_capture[uid_change]",
+      "reason": "Linux /proc reader"
+    },
+    {
+      "class": "tests.test_shared_execution_collector",
+      "name": "test_proc_snapshot_rejects_process_changes_during_capture[command_change]",
+      "reason": "Linux /proc reader"
+    },
+    {
+      "class": "tests.test_shared_execution_collector",
+      "name": "test_proc_snapshot_rejects_process_changes_during_capture[truncated_command]",
+      "reason": "Linux /proc reader"
+    },
+    {
+      "class": "tests.test_shared_execution_evidence",
+      "name": "test_real_owned_process_collection_and_policy_controls",
+      "reason": "Requires Linux /proc"
+    },
+    {
+      "class": "tests.test_shared_execution_evidence",
+      "name": "test_actual_snapshot_keeps_unknown_login_identity_and_hashes_only",
+      "reason": "Requires Linux /proc"
+    },
+    {
+      "class": "tests.test_shared_native_analysis",
+      "name": "test_world_readable_encryption_key_is_rejected",
+      "reason": "POSIX key permission contract"
+    },
+    {
+      "class": "tests.test_systemd_credential_reader",
+      "name": "test_reads_exact_readonly_systemd_copy",
+      "reason": "Linux no-follow credential file open"
+    },
+    {
+      "class": "tests.test_systemd_credential_reader",
+      "name": "test_backup_credential_never_falls_back_to_runtime_signing_key",
+      "reason": "Linux no-follow credential file open"
+    },
+    {
+      "class": "tests.test_systemd_credential_reader",
+      "name": "test_credential_name_is_fixed_not_an_arbitrary_file[../runtime-key]",
+      "reason": "Linux no-follow credential file open"
+    },
+    {
+      "class": "tests.test_systemd_credential_reader",
+      "name": "test_credential_name_is_fixed_not_an_arbitrary_file[unrelated-key]",
+      "reason": "Linux no-follow credential file open"
+    },
+    {
+      "class": "tests.test_systemd_credential_reader",
+      "name": "test_accepts_readonly_systemd_acl_mask_in_private_directory",
+      "reason": "Linux no-follow credential file open"
+    },
+    {
+      "class": "tests.test_systemd_credential_reader",
+      "name": "test_missing_or_unsafe_credentials_never_fall_back[missing_env]",
+      "reason": "Linux no-follow credential file open"
+    },
+    {
+      "class": "tests.test_systemd_credential_reader",
+      "name": "test_missing_or_unsafe_credentials_never_fall_back[wrong_root]",
+      "reason": "Linux no-follow credential file open"
+    },
+    {
+      "class": "tests.test_systemd_credential_reader",
+      "name": "test_missing_or_unsafe_credentials_never_fall_back[wrong_unit]",
+      "reason": "Linux no-follow credential file open"
+    },
+    {
+      "class": "tests.test_systemd_credential_reader",
+      "name": "test_missing_or_unsafe_credentials_never_fall_back[symlink]",
+      "reason": "Linux no-follow credential file open"
+    },
+    {
+      "class": "tests.test_systemd_credential_reader",
+      "name": "test_missing_or_unsafe_credentials_never_fall_back[writable]",
+      "reason": "Linux no-follow credential file open"
+    },
+    {
+      "class": "tests.test_systemd_credential_reader",
+      "name": "test_missing_or_unsafe_credentials_never_fall_back[public]",
+      "reason": "Linux no-follow credential file open"
+    },
+    {
+      "class": "tests.test_systemd_credential_reader",
+      "name": "test_missing_or_unsafe_credentials_never_fall_back[short]",
+      "reason": "Linux no-follow credential file open"
+    },
+    {
+      "class": "tests.test_systemd_credential_reader",
+      "name": "test_missing_or_unsafe_credentials_never_fall_back[long]",
+      "reason": "Linux no-follow credential file open"
+    },
+    {
+      "class": "tests.test_systemd_credential_reader",
+      "name": "test_missing_or_unsafe_credentials_never_fall_back[directory]",
+      "reason": "Linux no-follow credential file open"
+    },
+    {
+      "class": "tests.test_systemd_credentials",
+      "name": "test_socket_transfer_is_bounded_private_and_peer_checked[valid]",
+      "reason": "Linux Unix peer credentials"
+    },
+    {
+      "class": "tests.test_systemd_credentials",
+      "name": "test_socket_transfer_is_bounded_private_and_peer_checked[wrong_uid]",
+      "reason": "Linux Unix peer credentials"
+    },
+    {
+      "class": "tests.test_systemd_credentials",
+      "name": "test_socket_transfer_is_bounded_private_and_peer_checked[wrong_size]",
+      "reason": "Linux Unix peer credentials"
+    },
+    {
+      "class": "tests.test_systemd_credentials",
+      "name": "test_socket_transfer_is_bounded_private_and_peer_checked[supplier_error]",
+      "reason": "Linux Unix peer credentials"
+    },
+    {
+      "class": "tests.test_systemd_credentials",
+      "name": "test_public_parent_symlink_and_existing_file_are_not_modified",
+      "reason": "Linux Unix peer credentials"
+    }
+  ],
+  "original_failure_nodes_declared_linux_only": 53,
+  "previously_passed_nodes_now_declared_excluded": [],
+  "scope": "declared skip markers only; runtime fixture skips checked in final XML"
+}

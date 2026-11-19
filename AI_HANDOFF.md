@@ -1,3 +1,5 @@
+> 2026-11-20 extra 지속 목표 완료: [플랫폼 거부 경계·SDK 취소·실제 VPN TLS 검증](docs/extra-platform-admission-20261120.md). 제품 ff44064·표시범위4b4c50c·TLS 시험217d090. 최종 Windows8,025통과/591제외·실패0; Linux 전체8,610통과/5제외, 이후 보관40/TLS25 별도 통과. 기존 Windows7,996통과 유지·기존 실패70은17통과/53 Linux전용, 해당70 Linux 모두통과. 실제 Windows 운영/SSO/독립호스트/8h/F1 달성으로 표시하지 않음. 모델·정답·예측·기존 F1 93.41% 유지, 유료/AWS/Docker/push/CI/병합 없음. 아래는 이전 기록이다.
+
 > 2026-11-19 extra 후속: [전체 회귀·Windows 실패 분류·수집기 링크 보강](docs/extra-full-regression-20261119.md). 기준58d698a Linux8,600통과/4제외, Windows7,996통과/70실패/538제외. b87c0a0 링크/경로 신원 보강 뒤 Linux영향113·Windows선택12통과. 최신 전체 재실행 통과/Windows 운영 인수로 표현하지 않음. 전체/후속 원본·환경 지문 보존, F1변경·유료·AWS·Docker·push·CI·병합·8h없음. 아래는 이전 기록.
 
 > 2026-11-19 extra: [별도 로컬 감사 검증자·서명 영수증](docs/extra-audit-witness-20261119.md) 완료. 구현64e33a9, Windows65통과/2제외·Linux67통과. [회귀 결과 정리 전 개발 목표](docs/extra-active-development-goal-20261119.md)의 네 구현 항목 완료. 최종 전체 회귀/8h soak·실제 조직 배포/독립 호스트 보관은 미완료. 미업로드·미병합·유료/AWS/Docker 없음. 아래는 이전 시점 기록이다.

@@ -1,0 +1,15 @@
+{
+  "python": "3.12.9",
+  "platform": "Windows",
+  "openssl": "OpenSSL 3.0.15 3 Sep 2024",
+  "packages": {
+    "pytest": "8.4.2",
+    "fastapi": "0.141.1",
+    "starlette": "1.6.0",
+    "httpx": "0.28.1",
+    "openai": "2.54.0",
+    "cryptography": "50.0.1",
+    "pydantic": "2.13.5",
+    "pydantic-settings": "2.15.0"
+  }
+}
