@@ -1,0 +1,16 @@
+{
+  "schema": "owned-report-mutex-crash-controls-1",
+  "completed": true,
+  "source_commit": "6033a7b5f7da91c66e0ca00fa7607e4dc7517ff3",
+  "source_sha256": "26d252edc1f7f36ff142ecdc4f4bb493b79c9efc6c6027837226e612449dbf3f",
+  "paid_api_calls": 0,
+  "checks": [
+    "bounded_mutex_wait_preserves_old_report_and_cleans_temporary",
+    "actual_process_death_releases_abandoned_mutex_for_next_writer",
+    "persistent_unshared_reader_remains_bounded_failure_with_old_report_intact",
+    "publication_recovers_after_reader_closes"
+  ],
+  "owned_child_pid": 57308,
+  "lock_timeout_seconds": 5.0,
+  "owned_child_finished": true
+}

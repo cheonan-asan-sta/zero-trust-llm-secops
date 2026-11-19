@@ -1,0 +1,75 @@
+[
+  {
+    "cell": null,
+    "code": "SIM117",
+    "end_location": {
+      "column": 73,
+      "row": 53
+    },
+    "filename": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\extra-development-20261118\\tests\\test_m6_report_lock.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "    with pytest.raises(error), evaluation._windows_report_mutex(tmp_path / 'report.json'):\n        pytest.fail('failed acquisition admitted publication')",
+          "end_location": {
+            "column": 67,
+            "row": 54
+          },
+          "location": {
+            "column": 1,
+            "row": 52
+          }
+        }
+      ],
+      "message": "Combine `with` statements"
+    },
+    "location": {
+      "column": 5,
+      "row": 52
+    },
+    "message": "Use a single `with` statement with multiple contexts instead of nested `with` statements",
+    "name": "multiple-with-statements",
+    "noqa_row": 52,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-with-statements"
+  },
+  {
+    "cell": null,
+    "code": "SIM117",
+    "end_location": {
+      "column": 73,
+      "row": 63
+    },
+    "filename": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\extra-development-20261118\\tests\\test_m6_report_lock.py",
+    "fix": null,
+    "location": {
+      "column": 5,
+      "row": 62
+    },
+    "message": "Use a single `with` statement with multiple contexts instead of nested `with` statements",
+    "name": "multiple-with-statements",
+    "noqa_row": 62,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-with-statements"
+  },
+  {
+    "cell": null,
+    "code": "SIM117",
+    "end_location": {
+      "column": 73,
+      "row": 72
+    },
+    "filename": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\extra-development-20261118\\tests\\test_m6_report_lock.py",
+    "fix": null,
+    "location": {
+      "column": 5,
+      "row": 71
+    },
+    "message": "Use a single `with` statement with multiple contexts instead of nested `with` statements",
+    "name": "multiple-with-statements",
+    "noqa_row": 71,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/multiple-with-statements"
+  }
+]
