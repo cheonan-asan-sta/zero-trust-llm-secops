@@ -21,13 +21,14 @@ def unit(name):
     return result
 
 
-@pytest.mark.parametrize("name", ["secops-audit-witness@.service", "secops-audit-witness-restore-status@.service"])
-def test_service_runs_without_network_capabilities_or_extra_process_inspection(name):
+@pytest.mark.parametrize("name,memory", [("secops-audit-witness@.service", "512M"),
+                                        ("secops-audit-witness-restore-status@.service", "256M")])
+def test_service_runs_without_network_capabilities_or_extra_process_inspection(name, memory):
     service = unit(name)["Service"]
     for key, expected in {"User": "secops-witness", "Group": "secops-witness", "NoNewPrivileges": "yes",
                           "CapabilityBoundingSet": "", "AmbientCapabilities": "", "PrivateNetwork": "yes",
                           "ProtectSystem": "strict", "ProtectHome": "yes", "PrivateDevices": "yes",
-                          "StandardInput": "null", "TasksMax": "8", "MemoryMax": "256M",
+                          "StandardInput": "null", "TasksMax": "8", "MemoryMax": memory,
                           "RestrictAddressFamilies": "AF_UNIX", "RestrictNamespaces": "yes"}.items():
         assert service[key] == expected
     assert "ptrace" in service["SystemCallFilter"] and "pidfd_getfd" in service["SystemCallFilter"]

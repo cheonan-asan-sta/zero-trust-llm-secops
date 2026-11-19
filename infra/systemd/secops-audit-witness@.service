@@ -40,7 +40,8 @@ InaccessiblePaths=/proc
 ReadOnlyPaths=/var/lib/secops-audit /var/lib/secops-audit-witness/%i/signer/private.key /var/lib/secops-audit-witness/%i/signer/public.key
 ReadWritePaths=/var/lib/secops-audit-witness/%i/control /var/lib/secops-audit-witness/%i/signer /var/cache/secops-audit-witness/%i
 CPUQuota=50%
-MemoryMax=256M
+# Local combined row/control-cap fixture peaked near 256M; allow measured headroom.
+MemoryMax=512M
 TasksMax=8
 
 [Install]

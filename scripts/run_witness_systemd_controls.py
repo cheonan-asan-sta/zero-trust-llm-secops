@@ -211,7 +211,7 @@ def run(directory):
         limits = resource_snapshot(groups)
         result["kernel_resource_limits"] = limits
         check("collector_kernel_resource_limits_match_template",
-              limits["memory_limit_bytes"] == 256 * 1024 * 1024 and limits["tasks_limit"] == 8
+              limits["memory_limit_bytes"] == 512 * 1024 * 1024 and limits["tasks_limit"] == 8
               and limits["cpu_quota_percent"] == 50)
         check("collector_real_private_network_namespace", Path("/proc/1/ns/net").readlink()
               != Path(f"/proc/{initial['MainPID']}/ns/net").readlink())
