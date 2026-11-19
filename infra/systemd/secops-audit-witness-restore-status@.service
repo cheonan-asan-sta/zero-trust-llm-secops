@@ -1,0 +1,44 @@
+[Unit]
+Description=Keyless pinned audit witness restore review for %i
+
+[Service]
+Type=oneshot
+User=secops-witness
+Group=secops-witness
+WorkingDirectory=/opt/secops
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=AWS_EC2_METADATA_DISABLED=true
+EnvironmentFile=/etc/secops/audit-witness-restore/%i.conf
+ExecStart=/opt/secops/.venv/bin/python -m scripts.witness_restore_status --package /var/lib/secops-audit-witness-backups/%i/control.aesgcm --directory /var/lib/secops-audit-witness-reviews/%i --backup-sha256 ${WITNESS_BACKUP_SHA256} --restore-receipt-sha256 ${WITNESS_RESTORE_RECEIPT_SHA256} --profile-sha256 ${WITNESS_PROFILE_SHA256} --minimum-receipt ${WITNESS_MINIMUM_RECEIPT} --status-file /var/cache/secops-audit-witness-restore/%i/restore.json
+TimeoutStartSec=20
+TimeoutStopSec=5
+UMask=0077
+StandardInput=null
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+RestrictNamespaces=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+SystemCallFilter=~ptrace process_vm_readv process_vm_writev pidfd_getfd
+SystemCallErrorNumber=EPERM
+InaccessiblePaths=-/var/lib/secops-audit-witness -/var/lib/secops-audit /proc
+ReadWritePaths=/var/cache/secops-audit-witness-restore/%i
+CPUQuota=50%
+MemoryMax=256M
+TasksMax=8
+
+# No signing/recovery key, control lease write, grant or restore activation.
+# Root provisions same-owner0700 review/package directories and external pins.
+# A same-UID local admin and external pin custody remain trusted dependencies.
