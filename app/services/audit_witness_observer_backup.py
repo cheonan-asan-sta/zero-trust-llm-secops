@@ -69,7 +69,7 @@ def _sync(path):
             os.close(fd)
 
 
-def _target(path, *, protected=()):
+def _target(path, *, protected=(), fresh=True):
     path = Path(path).absolute()
     witness._directory(path.parent)
     require(all(not p.is_symlink() for p in (path, path.parent, *path.parent.parents)),
@@ -79,7 +79,10 @@ def _target(path, *, protected=()):
         item = Path(item).resolve()
         require(not resolved.is_relative_to(item) and not item.is_relative_to(resolved),
                 "observer backup output overlaps protected storage")
-    require(not path.exists(), "observer backup destination must be fresh")
+    if fresh:
+        require(not path.exists(), "observer backup destination must be fresh")
+    else:
+        witness._directory(path)
     return path
 
 
@@ -236,9 +239,11 @@ def _unpack(package, expected_backup_sha256, profile_sha256, key):
     return header, files
 
 
-def restore(package, destination, expected_backup_sha256, profile_sha256, minimum_receipt, key):
+def restore(package, destination, expected_backup_sha256, profile_sha256, minimum_receipt, key,
+            *, resume=False):
+    require(type(resume) is bool, "observer restore explicit resume flag required")
     require(witness._hex(minimum_receipt), "observer restore explicit minimum receipt required")
-    target = _target(destination, protected=(package,))
+    target = _target(destination, protected=(package,), fresh=not resume)
     header, files = _unpack(package, expected_backup_sha256, profile_sha256, key)
     with tempfile.TemporaryDirectory(prefix=".witness-restore-", dir=target.parent) as temporary:
         candidate = Path(temporary)
@@ -249,31 +254,69 @@ def restore(package, destination, expected_backup_sha256, profile_sha256, minimu
         # a corrupted manifest's claimed ancestry by choosing an older pin.
         _checked(candidate, profile_sha256, header["minimum_receipt"])
         require(_scope(state) == header["scope"], "observer backup signed snapshot scope mismatch")
-        target = _target(target, protected=(package, profile["witness_directory"], profile["database"]))
+        target = _target(target, protected=(package, profile["witness_directory"], profile["database"]),
+                         fresh=not resume)
         observer._separate(target, Path(profile["witness_directory"]), Path(profile["database"]))
         _lease(candidate, profile_sha256)
-        target.mkdir(mode=0o700, exist_ok=False)
-        _sync(target.parent)
-        pending = {"schema": RESTORE_SCHEMA, "backup_sha256": expected_backup_sha256,
-                   "profile_sha256": profile_sha256, "minimum_receipt": minimum_receipt,
-                   "started_at": datetime.now(UTC).isoformat()}
-        observer._write(target / "restore.pending", canonical(pending) + b"\n")
-        _sync(target)
+        if resume:
+            marker = _bytes(target / "restore.pending", 4096)
+            pending = decode(marker)
+            require(type(pending) is dict and set(pending) == {
+                "schema", "backup_sha256", "profile_sha256", "minimum_receipt", "started_at"
+            } and pending["schema"] == RESTORE_SCHEMA
+                    and pending["backup_sha256"] == expected_backup_sha256
+                    and pending["profile_sha256"] == profile_sha256
+                    and pending["minimum_receipt"] == minimum_receipt,
+                    "observer restore resume scope/pin changed")
+            require(observer._time(header["created_at"]) <= observer._time(pending["started_at"])
+                    <= datetime.now(UTC), "observer restore resume chronology rejected")
+            require(set(os.listdir(target)) <= {*NAMES, "lease.sqlite3", "restore.pending", "restore.receipt.json"},
+                    "observer restore resume inventory rejected")
+        else:
+            target.mkdir(mode=0o700, exist_ok=False)
+            _sync(target.parent)
+            pending = {"schema": RESTORE_SCHEMA, "backup_sha256": expected_backup_sha256,
+                       "profile_sha256": profile_sha256, "minimum_receipt": minimum_receipt,
+                       "started_at": datetime.now(UTC).isoformat()}
+            marker = canonical(pending) + b"\n"
+            observer._write(target / "restore.pending", marker)
+            _sync(target)
         for name in (*NAMES, "lease.sqlite3"):
-            observer._write(target / name, _bytes(candidate / name, MAX_PAYLOAD))
-        final_profile, final = _checked(target, profile_sha256, minimum_receipt, restoring=True)
-        require(final_profile == profile and final == state, "observer restored candidate changed")
-        receipt = {**pending, "scope": _scope(final), "private_signing_key_included": False,
-                   "source_locators_preserved": True, "independent_storage_verified": False,
-                   "automatic_activation_allowed": False}
-        raw_receipt = canonical(receipt) + b"\n"
-        observer._write(target / "restore.receipt.json", raw_receipt)
-        _sync(target)
-        (target / "restore.pending").unlink()
-        _sync(target)
-    return {"restore_receipt_sha256": sha(raw_receipt), "profile_sha256": profile_sha256,
-            **_scope(final), "private_signing_key_included": False,
-            "independent_storage_verified": False, "automatic_activation_allowed": False}
+            content = _bytes(candidate / name, MAX_PAYLOAD)
+            path = target / name
+            if resume and path.exists():
+                if name != "lease.sqlite3":
+                    require(_bytes(path, MAX_PAYLOAD) == content,
+                            "observer restore resume refuses changed/partial file")
+                # The ephemeral lease is validated/acquired below. Its SQLite
+                # file bytes need not match a different interpreter's new DB.
+            else:
+                observer._write(path, content)
+        with observer._database(target, lease=True, profile_pin=profile_sha256):
+            require(_bytes(target / "restore.pending", 4096) == marker,
+                    "observer restore pending changed before completion")
+            final_profile, final = _checked(target, profile_sha256, minimum_receipt, restoring=True)
+            require(final_profile == profile and final == state, "observer restored candidate changed")
+            receipt = {**pending, "scope": _scope(final), "private_signing_key_included": False,
+                       "source_locators_preserved": True, "independent_storage_verified": False,
+                       "automatic_activation_allowed": False}
+            raw_receipt = canonical(receipt) + b"\n"
+            path = target / "restore.receipt.json"
+            if resume and path.exists():
+                require(_bytes(path, 16384) == raw_receipt, "observer restore resume receipt changed")
+            else:
+                observer._write(path, raw_receipt)
+            _sync(target)
+            require(_bytes(target / "restore.pending", 4096) == marker,
+                    "observer restore pending changed before admission")
+            (target / "restore.pending").unlink()
+            _sync(target)
+    result = {"restore_receipt_sha256": sha(raw_receipt), "profile_sha256": profile_sha256,
+              **_scope(final), "private_signing_key_included": False,
+              "independent_storage_verified": False, "automatic_activation_allowed": False}
+    if resume:
+        result["resumed"] = True
+    return result
 
 
 def inspect_restore(package, directory, expected_backup_sha256, expected_restore_receipt_sha256,

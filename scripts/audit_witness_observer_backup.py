@@ -14,7 +14,7 @@ from app.services.federated_audit import AuditQueryUnavailable
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="action", required=True)
-    for name in ("backup", "restore", "inspect-restore"):
+    for name in ("backup", "restore", "resume-restore", "inspect-restore"):
         command = commands.add_parser(name)
         command.add_argument("--profile-sha256", required=True)
         command.add_argument("--minimum-receipt", required=True)
@@ -43,7 +43,8 @@ def main():
         else:
             key = read_key(args.key_file, args.key_sha256)
             result = backup.restore(args.package, args.destination, args.backup_sha256,
-                                    args.profile_sha256, args.minimum_receipt, key)
+                                    args.profile_sha256, args.minimum_receipt, key,
+                                    resume=args.action == "resume-restore")
         print(json.dumps(result, ensure_ascii=False, allow_nan=False))
         return 0
     except (AuditTransferError, AuditQueryUnavailable, OSError, ValueError, TypeError, RecursionError, sqlite3.Error):
