@@ -1,0 +1,54 @@
+{
+  "schema": "completed-sustained-log-crosscheck-1",
+  "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "completed": true,
+  "checks": {
+    "reported_watch_rows_match": true,
+    "every_completed_watch_log_reports_success": true,
+    "actual_default_profile_in_every_log": true,
+    "three_process_segments": true,
+    "both_owned_kills_were_sigkill": true,
+    "reported_samples_match": true,
+    "all_sample_status_checks_succeeded": true,
+    "sample_time_increases": true,
+    "source_rows_do_not_regress": true,
+    "sample_anchors_do_not_regress": true,
+    "logged_anchors_increase": true,
+    "logged_receipt_digests_unique": true,
+    "explicit_final_cycle_separate": true,
+    "final_source_fully_observed": true,
+    "source_and_cleanup_verified": true,
+    "watch_backend_unchanged_in_memory_budget_revision": true
+  },
+  "watch_logs": 100,
+  "per_process_logs": {
+    "watch-0.log": 20,
+    "watch-1.log": 40,
+    "watch-2.log": 40
+  },
+  "samples": 599,
+  "sample_states": {
+    "healthy": 471,
+    "unobserved": 124,
+    "pending": 4
+  },
+  "sample_unobserved_rows_missing_or_null": 4,
+  "observed_timestamp_gap_seconds": {
+    "minimum": 59.970962,
+    "maximum": 60.429729,
+    "not_a_latency_sla": true
+  },
+  "last_logged_anchor": 100,
+  "before_final_drain_anchor": 100,
+  "after_explicit_final_cycle_anchor": 101,
+  "raw_file_sha256": {
+    "watch-0.log": "6249f214e9387e05794ac1c6a6f16c538cb869e02ca7e158b426949cddc46a84",
+    "watch-1.log": "13f92889765f9bfcb7ef535d2453a286b1c298fb1783644f3452884cf35b2180",
+    "watch-2.log": "46d8e0631bfd8334cdb8c0148c0779a6cea15e6d8128da7f6358d8e25e609d3b",
+    "samples.jsonl": "c150aa24dc3b3a9a14b272c8b88c7f41396a25653561386b75f2f918b70b394c",
+    "result.json": "e77a98457ce12a4ade217f1ca747edf10040cd5deea55a4d96add5428ca15ced"
+  },
+  "not_new_service_run": true,
+  "not_independent_detection_cases": true,
+  "paid_api_calls": 0
+}

@@ -1,7 +1,7 @@
-> 2026-11-20 08:00까지 후속 검증 진행 중 (06:41 KST).
-> 최신 제품 `f6e1a0a`: Windows8240통과/613제외·Linux8848통과/5제외·실패0, 양 OS2498개 파일 불변. 이전 통과 사례6구간 비교에서 누락/실패·제외 전환0.
-> [현재 현황](docs/extra-until-0800-20261120.md) · [전체 회귀](docs/extra-until0800-regression-20261120.md) · [메모리 선정 근거](docs/extra-witness-resource-budget-20261120.md) · [지속 수집 시험](docs/extra-witness-sustained-20261120.md).
-> 기존 개발360건 F1 93.41%·목표 미달. 무료 재생 결과 SHA256동일·새 API0. extra 로컬만 사용하며 유료/AWS/Docker 생성·업로드·CI·병합·실제8시간 soak 없음.
+> 2026-11-20 08:00까지 후속 검증 진행 중 (07:42 KST).
+> 제품 `f6e1a0a`: Windows8240통과/613제외·Linux8848통과/5제외·실패0·2498개 파일 불변. 이전 통과 사례6구간에서 누락/실패·제외 전환0.
+> 기본 주기100분 시험도 완료: 실제6000.820초·수집100회·표본599개·SIGKILL/재개2회·감사34행 모두 관측·소스/정리 확인. [현재 현황](docs/extra-until-0800-20261120.md) · [전체 회귀](docs/extra-until0800-regression-20261120.md) · [지속 실행](docs/extra-witness-sustained-20261120.md).
+> 기존 개발360건 F1 93.41%·탐지 목표 미달. 무료 재생 SHA256동일·새 API0. 유료/AWS/Docker 생성·업로드·CI·병합·실제8시간 soak 없음.
 
 > 2026-11-20 extra 지속 목표 완료: [플랫폼 거부 경계·SDK 취소·실제 VPN TLS 검증](docs/extra-platform-admission-20261120.md). 제품 ff44064·표시범위4b4c50c·TLS 시험217d090. 최종 Windows8,025통과/591제외·실패0; Linux 전체8,610통과/5제외, 이후 보관40/TLS25 별도 통과. 기존 Windows7,996통과 유지·기존 실패70은17통과/53 Linux전용, 해당70 Linux 모두통과. 실제 Windows 운영/SSO/독립호스트/8h/F1 달성으로 표시하지 않음. 모델·정답·예측·기존 F1 93.41% 유지, 유료/AWS/Docker/push/CI/병합 없음. 아래는 이전 기록이다.
 

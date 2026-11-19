@@ -121,6 +121,38 @@
       "sha256": "00f12a5f1b8b8b9f82869bc46136aa47eb7d497ffb51687b2403ffbd1a637948"
     },
     {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-pending-fixed-20261120/owned-processes.json",
+      "sha256": "923024dfa58422e82d1598a36a62d70f3c66b2abfbbfdc1db33db5eee988711d"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-pending-fixed-20261120/progress.json",
+      "sha256": "d9c3cabd1cd911b13b5c77865905b21549ce38a3b33827f395b88c5921fa983f"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-pending-fixed-20261120/result.json",
+      "sha256": "e77a98457ce12a4ade217f1ca747edf10040cd5deea55a4d96add5428ca15ced"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-pending-fixed-20261120/samples.jsonl",
+      "sha256": "c150aa24dc3b3a9a14b272c8b88c7f41396a25653561386b75f2f918b70b394c"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-pending-fixed-20261120/watch-0.log",
+      "sha256": "6249f214e9387e05794ac1c6a6f16c538cb869e02ca7e158b426949cddc46a84"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-pending-fixed-20261120/watch-1.log",
+      "sha256": "13f92889765f9bfcb7ef535d2453a286b1c298fb1783644f3452884cf35b2180"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-pending-fixed-20261120/watch-2.log",
+      "sha256": "46d8e0631bfd8334cdb8c0148c0779a6cea15e6d8128da7f6358d8e25e609d3b"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-pending-fixed-20261120.log",
+      "sha256": "4e4600d1e9a5c2f8da511a34370e0c952cbf2acf116829cfece439be3c1d9f5b"
+    },
+    {
       "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-20261120-launcher.json",
       "sha256": "93bf3db977d2214acd9b3193fa5d8a5e737b24152256124ce3a5b7e5c1884cec"
     },
@@ -131,6 +163,14 @@
     {
       "path": "docs/infrastructure-results/witness-sustained-witness-sustained-default-linux-20261120.log",
       "sha256": "8a2363f9356560263d984722c3a132719d7f245f331f5682a62ccd564de11a53"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-log-crosscheck-20261120.json",
+      "sha256": "053c852e704631d766307b9a60d748f44f7727adfd734a3bad449156ff4c0dd8"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-sustained-crosscheck_sustained_logs_20261120.py.txt",
+      "sha256": "eb54882932a338f3840ae0fc52c7bc5c9681e56e317f8c46c526d4161bd8687e"
     }
   ],
   "runs": {
@@ -412,9 +452,168 @@
       "elapsed_seconds": 240.51361374799853
     },
     "sustained": {
-      "status": "running",
-      "completed": false
+      "schema": "sustained-local-witness-watch-1",
+      "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+      "source_files": 2241,
+      "duration_requested_seconds": 6000,
+      "completed": true,
+      "real_8h_soak": false,
+      "independent_storage_verified": false,
+      "detection_metrics_changed": false,
+      "paid_api_calls": 0,
+      "watch_default_interval_seconds": 60,
+      "watch_default_max_age_seconds": 180,
+      "samples": 599,
+      "appended_source_rows": 34,
+      "owned_restarts": [
+        {
+          "at_elapsed_seconds": 1200.1731365119995,
+          "exit_code": -9,
+          "previous_anchor_count": 20
+        },
+        {
+          "at_elapsed_seconds": 3600.5317898470003,
+          "exit_code": -9,
+          "previous_anchor_count": 60
+        }
+      ],
+      "processes": [
+        {
+          "pid": 32616,
+          "started_elapsed_seconds": 0.11477591000038956,
+          "exit_code": -9
+        },
+        {
+          "pid": 37545,
+          "started_elapsed_seconds": 1200.194548088999,
+          "exit_code": -9
+        },
+        {
+          "pid": 41893,
+          "started_elapsed_seconds": 3600.5630190779993,
+          "exit_code": -15
+        }
+      ],
+      "last_sample": {
+        "elapsed_seconds": 5990.664868753998,
+        "pid": 41893,
+        "state": "healthy",
+        "anchor_count": 100,
+        "source_rows": 34,
+        "unobserved_rows": 0,
+        "rss_bytes": 72474624,
+        "status_success": true,
+        "action_required": false
+      },
+      "before_final_drain": {
+        "schema": "local-audit-witness-observer-1",
+        "state": "healthy",
+        "healthy": true,
+        "anchor_verified": true,
+        "live_checked": true,
+        "audit_minimum_verified": true,
+        "signing_capability_checked": false,
+        "receipt_sha256": "fd8945048101fba0418ff0ee696de50537bff127f99fb751a0b56acc3ca9cd37",
+        "age_seconds": 58.945721,
+        "observed_at": "2026-11-19T22:38:36.888038+00:00",
+        "pending_started_at": null,
+        "max_age_seconds": 180,
+        "interval_seconds": 60,
+        "capacity_warning": 16,
+        "pending": false,
+        "anchor_count": 100,
+        "independent_storage_verified": false,
+        "automatic_activation_allowed": false,
+        "unobserved_rows": 0,
+        "remaining_receipts": 3995
+      },
+      "watch_successful_cycles": 100,
+      "final_state": {
+        "schema": "local-audit-witness-observer-1",
+        "state": "healthy",
+        "healthy": true,
+        "anchor_verified": true,
+        "live_checked": true,
+        "audit_minimum_verified": true,
+        "signing_capability_checked": false,
+        "receipt_sha256": "6e28759ac1273d83a10566f021e5bef36729b4a12f2e463ebd9e394a31e966cf",
+        "age_seconds": 0.067843,
+        "observed_at": "2026-11-19T22:39:35.901734+00:00",
+        "pending_started_at": null,
+        "max_age_seconds": 180,
+        "interval_seconds": 60,
+        "capacity_warning": 16,
+        "pending": false,
+        "anchor_count": 101,
+        "independent_storage_verified": false,
+        "automatic_activation_allowed": false,
+        "unobserved_rows": 0,
+        "remaining_receipts": 3994
+      },
+      "final_drain_explicit": true,
+      "profile_pin_unchanged": true,
+      "private_fixture_removed": true,
+      "mutated_source_files": [],
+      "source_bytes_unchanged": true,
+      "owned_process_inactive": true,
+      "elapsed_seconds": 6000.819762862999,
+      "sample_rss_min_bytes": 9371648,
+      "sample_rss_max_bytes": 73400320
     }
+  },
+  "postrun_log_crosscheck": {
+    "schema": "completed-sustained-log-crosscheck-1",
+    "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+    "completed": true,
+    "checks": {
+      "reported_watch_rows_match": true,
+      "every_completed_watch_log_reports_success": true,
+      "actual_default_profile_in_every_log": true,
+      "three_process_segments": true,
+      "both_owned_kills_were_sigkill": true,
+      "reported_samples_match": true,
+      "all_sample_status_checks_succeeded": true,
+      "sample_time_increases": true,
+      "source_rows_do_not_regress": true,
+      "sample_anchors_do_not_regress": true,
+      "logged_anchors_increase": true,
+      "logged_receipt_digests_unique": true,
+      "explicit_final_cycle_separate": true,
+      "final_source_fully_observed": true,
+      "source_and_cleanup_verified": true,
+      "watch_backend_unchanged_in_memory_budget_revision": true
+    },
+    "watch_logs": 100,
+    "per_process_logs": {
+      "watch-0.log": 20,
+      "watch-1.log": 40,
+      "watch-2.log": 40
+    },
+    "samples": 599,
+    "sample_states": {
+      "healthy": 471,
+      "unobserved": 124,
+      "pending": 4
+    },
+    "sample_unobserved_rows_missing_or_null": 4,
+    "observed_timestamp_gap_seconds": {
+      "minimum": 59.970962,
+      "maximum": 60.429729,
+      "not_a_latency_sla": true
+    },
+    "last_logged_anchor": 100,
+    "before_final_drain_anchor": 100,
+    "after_explicit_final_cycle_anchor": 101,
+    "raw_file_sha256": {
+      "watch-0.log": "6249f214e9387e05794ac1c6a6f16c538cb869e02ca7e158b426949cddc46a84",
+      "watch-1.log": "13f92889765f9bfcb7ef535d2453a286b1c298fb1783644f3452884cf35b2180",
+      "watch-2.log": "46d8e0631bfd8334cdb8c0148c0779a6cea15e6d8128da7f6358d8e25e609d3b",
+      "samples.jsonl": "c150aa24dc3b3a9a14b272c8b88c7f41396a25653561386b75f2f918b70b394c",
+      "result.json": "e77a98457ce12a4ade217f1ca747edf10040cd5deea55a4d96add5428ca15ced"
+    },
+    "not_new_service_run": true,
+    "not_independent_detection_cases": true,
+    "paid_api_calls": 0
   },
   "paid_api_calls": 0,
   "real_8h_soak": false,
