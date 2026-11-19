@@ -89,8 +89,11 @@ def _database(directory, *, write=False, lease=False, profile_pin=None):
         con.close()
 
 
-def _load(directory, profile_pin):
+def _load(directory, profile_pin, *, restoring=False):
     directory = witness._directory(directory)
+    require(restoring or not ((directory / "restore.pending").exists()
+                             or (directory / "restore.pending").is_symlink()),
+            "observer restore is incomplete; candidate must not run")
     path = directory / "profile.json"
     witness._file(path, PROFILE_LIMIT)
     raw = path.read_bytes()
