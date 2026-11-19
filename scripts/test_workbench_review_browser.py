@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 @contextmanager
-def server(directory, output, report, *, anonymous=False):
+def server(directory, output, report, *, anonymous=False, caller_bound_reviews=False):
     with socket.socket() as sock:
         sock.bind(("127.0.0.1", 0))
         port = sock.getsockname()[1]
@@ -49,6 +49,7 @@ def server(directory, output, report, *, anonymous=False):
             "--port",
             str(port),
             "--sqlite-audit",
+            *(["--caller-bound-reviews"] if caller_bound_reviews else []),
         ]
     with (output / ("anonymous-server.log" if anonymous else "server.log")).open(
         "w", encoding="utf-8"
@@ -88,7 +89,15 @@ def run(args, directory, report):
         if not condition:
             raise AssertionError(name)
 
-    with server(directory / "data", args.output_dir, report) as base, sync_playwright() as pw:
+    with (
+        server(
+            directory / "data",
+            args.output_dir,
+            report,
+            caller_bound_reviews=args.caller_bound_reviews,
+        ) as base,
+        sync_playwright() as pw,
+    ):
         browser = pw.chromium.launch(
             **({"executable_path": args.browser_executable} if args.browser_executable else {})
         )
@@ -136,6 +145,18 @@ def run(args, directory, report):
         assert created.ok and created.json()["review_status"] == "PENDING"
         event_id = sample["event_id"]
         url, review_url = base + "/results/" + event_id, base + "/results/" + event_id + "/review"
+        if args.caller_bound_reviews:
+            policy_read = page.request.get(url, headers=admin)
+            denied = page.request.patch(
+                review_url,
+                headers=admin | {"If-Match": policy_read.headers["etag"]},
+                data={"status": "IN_REVIEW", "note": "Missing caller binding must fail"},
+            )
+            check("server_requires_caller_binding", denied.status == 428)
+            check(
+                "denied_write_preserves_observed_version",
+                page.request.get(url, headers=admin).headers["etag"] == policy_read.headers["etag"],
+            )
 
         def latest():
             response = page.request.get(url, headers=headers)
@@ -171,10 +192,15 @@ def run(args, directory, report):
             return received.value
 
         def elsewhere(note):
-            observed = latest()
+            observed = page.request.get(url, headers=admin)
+            assert observed.ok
             response = page.request.patch(
                 review_url,
-                headers=admin | {"If-Match": observed.headers["etag"]},
+                headers=admin
+                | {
+                    "If-Match": observed.headers["etag"],
+                    "X-Review-Identity": observed.headers["x-review-identity"],
+                },
                 data={"status": "IN_REVIEW", "note": note},
             )
             assert response.ok
@@ -537,6 +563,7 @@ def run(args, directory, report):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--browser-executable")
+    parser.add_argument("--caller-bound-reviews", action="store_true")
     parser.add_argument("--output-dir", type=Path, default=Path("runtime/workbench-review-browser"))
     args = parser.parse_args()
     args.output_dir = args.output_dir.resolve()
@@ -546,12 +573,15 @@ def main():
         "app/static/workbench.html",
         "app/static/styles.css",
         "app/main.py",
+        "app/config.py",
+        "tests/dashboard_operations_fixture.py",
         "app/services/audit_review_preconditions.py",
         __file__,
     ]
     report = {
         "schema": "workbench-review-browser-1",
         "synthetic": True,
+        "caller_bound_policy_required": args.caller_bound_reviews,
         "paid_calls": 0,
         "passed": False,
         "checks": [],

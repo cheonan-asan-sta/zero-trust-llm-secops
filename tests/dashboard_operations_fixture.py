@@ -14,10 +14,13 @@ def main():
     parser.add_argument("--directory", type=Path, required=True)
     parser.add_argument("--port", type=int, required=True)
     parser.add_argument("--sqlite-audit", action="store_true")
+    parser.add_argument("--caller-bound-reviews", action="store_true")
     parser.add_argument("--audit-records", type=int, default=0)
     args = parser.parse_args()
     if not 0 <= args.audit_records <= 1000:
         parser.error("audit-records must be between 0 and 1000")
+    if args.caller_bound_reviews and not args.sqlite_audit:
+        parser.error("caller-bound-reviews requires sqlite-audit")
     args.directory.mkdir(mode=0o700)
     app = isolated_app(args.directory)
     from app.main import settings
@@ -36,6 +39,7 @@ def main():
     settings.api_key_subject = "operator"
     settings.api_key_tenant_id = "tenant-a"
     settings.api_key_roles = "admin"
+    settings.audit_review_require_identity = args.caller_bound_reviews
     settings.api_key_accounts_path = args.directory / "accounts.json"
     settings.api_key_accounts_path.write_text(
         json.dumps(

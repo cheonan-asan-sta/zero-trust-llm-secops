@@ -31,7 +31,9 @@ def parse_review_identity(values):
     return values[0]
 
 
-def require_review_identity(principal, expected, tag):
+def require_review_identity(principal, expected, tag, *, required=False):
+    if required and (expected is None or tag is None):
+        raise HTTPException(428, "Read the result and provide its review ETag and caller binding")
     if expected is None:
         return
     if tag is None:

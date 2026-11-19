@@ -79,6 +79,7 @@ class Settings(BaseSettings):
         default=0.05, ge=0.01, le=2, allow_inf_nan=False
     )
     audit_review_require_if_match: bool = False
+    audit_review_require_identity: bool = False
     audit_cursor_key_path: Path | None = None
     audit_cursor_key_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
     # Host-only control plane. Disabled unless an operator selects a private root.
@@ -104,8 +105,15 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_enterprise_security(self) -> "Settings":
-        if self.audit_review_require_if_match and self.audit_backend != "sqlite":
+        if (
+            self.audit_review_require_if_match or self.audit_review_require_identity
+        ) and self.audit_backend != "sqlite":
             raise ValueError("required conditional audit reviews need sqlite backend")
+        if self.audit_review_require_identity:
+            if not self.audit_review_require_if_match:
+                raise ValueError("caller-bound reviews require AUDIT_REVIEW_REQUIRE_IF_MATCH=true")
+            if self.auth_mode == "disabled":
+                raise ValueError("caller-bound reviews require api_key or oidc authentication")
         if (self.audit_checkpoint_path is None) != (self.audit_checkpoint_sha256 is None):
             raise ValueError("audit checkpoint requires both path and SHA-256 pin")
         if self.audit_checkpoint_path is not None and self.audit_backend != "sqlite":

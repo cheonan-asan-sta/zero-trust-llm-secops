@@ -1476,13 +1476,16 @@ async def update_review(
 async def _update_review_in_slot(event_id, request, principal, http_request):
     tag = parse_review_if_match(http_request.headers.getlist("if-match"))
     expected_identity = parse_review_identity(http_request.headers.getlist("x-review-identity"))
-    require_review_identity(principal, expected_identity, tag)
+    require_review_identity(
+        principal, expected_identity, tag, required=settings.audit_review_require_identity,
+    )
     store = audit_store
     record = await _audit_read_in_slot(store, "get", principal, http_request, event_id, principal.tenant_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Result not found")
     require_review_match(
-        record, tag, required=settings.audit_review_require_if_match,
+        record, tag,
+        required=settings.audit_review_require_if_match or settings.audit_review_require_identity,
         transactional=isinstance(store, SQLiteAuditStore),
     )
     if record.review_status == ReviewStatus.NOT_REQUIRED:
@@ -1520,9 +1523,12 @@ async def _update_review_in_slot(event_id, request, principal, http_request):
     )
     updated = AnalysisResult.model_validate(payload)
     await _audit_boundary(store, principal, http_request)
-    require_review_identity(principal, expected_identity, tag)
+    require_review_identity(
+        principal, expected_identity, tag, required=settings.audit_review_require_identity,
+    )
     require_review_match(
-        record, tag, required=settings.audit_review_require_if_match,
+        record, tag,
+        required=settings.audit_review_require_if_match or settings.audit_review_require_identity,
         transactional=isinstance(store, SQLiteAuditStore),
     )
     if isinstance(store, SQLiteAuditStore):

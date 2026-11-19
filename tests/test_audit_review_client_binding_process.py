@@ -19,9 +19,12 @@ from scripts.local_process_runtime import direct_python
 
 
 @pytest.mark.parametrize("remap_after_who", [False, True])
+@pytest.mark.parametrize("required_policy", [False, True])
 def test_real_cli_sends_bound_intent_and_server_rejects_post_check_remap(
-    api, tmp_path, remap_after_who
+    api, tmp_path, remap_after_who, required_policy
 ):
+    main.settings.audit_review_require_if_match = required_policy
+    main.settings.audit_review_require_identity = required_policy
     control = {"remap": False, "patches": []}
 
     class Handler(BaseHTTPRequestHandler):

@@ -41,6 +41,7 @@ def run(args, directory, report):
             "--port",
             str(port),
             "--sqlite-audit",
+            *(["--caller-bound-reviews"] if args.caller_bound_reviews else []),
         ],
         cwd=ROOT,
         stdout=log,
@@ -133,6 +134,19 @@ def run(args, directory, report):
             event_id = created.json()["event_id"]
             url = base + "/results/" + event_id
             review_url = url + "/review"
+            if args.caller_bound_reviews:
+                policy_read = page.request.get(url, headers=admin)
+                denied = page.request.patch(
+                    review_url,
+                    headers=admin | {"If-Match": policy_read.headers["etag"]},
+                    data={"status": "IN_REVIEW", "note": "Missing caller binding must fail"},
+                )
+                check("server_requires_caller_binding", denied.status == 428)
+                check(
+                    "denied_write_preserves_observed_version",
+                    page.request.get(url, headers=admin).headers["etag"]
+                    == policy_read.headers["etag"],
+                )
             metadata = page.request.get(base + "/auth/dashboard-catalog", headers=headers).json()
             operation = next(
                 o for o in metadata["operations"] if o["path"] == "/results/{event_id}/review"
@@ -181,12 +195,14 @@ def run(args, directory, report):
                 return received.value
 
             def change_elsewhere(note):
-                observation = latest()
+                observation = page.request.get(url, headers=admin)
+                assert observation.ok
                 response = page.request.patch(
                     review_url,
                     headers=admin
                     | {
                         "If-Match": observation.headers["etag"],
+                        "X-Review-Identity": observation.headers["x-review-identity"],
                     },
                     data={"status": "IN_REVIEW", "note": note},
                 )
@@ -413,12 +429,14 @@ def run(args, directory, report):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--browser-executable")
+    parser.add_argument("--caller-bound-reviews", action="store_true")
     parser.add_argument("--output-dir", type=Path, default=Path("runtime/dashboard-review-browser"))
     args = parser.parse_args()
     args.output_dir = args.output_dir.resolve()
     args.output_dir.mkdir(parents=True, exist_ok=True)
     sources = (
         "app/main.py",
+        "app/config.py",
         "app/services/audit_review_preconditions.py",
         "app/static/dashboard.js",
         "app/static/dashboard-operations.js",
@@ -428,6 +446,7 @@ def main():
     report = {
         "schema": "dashboard-review-browser-1",
         "synthetic": True,
+        "caller_bound_policy_required": args.caller_bound_reviews,
         "paid_calls": 0,
         "passed": False,
         "checks": [],
