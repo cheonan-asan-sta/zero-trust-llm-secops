@@ -1,3 +1,5 @@
+> 2026-11-20 08:00까지 지속 목표 진행 중: [pending/서명 사이 시각 역행 수정](docs/extra-witness-clock-boundary-20261120.md) 구현c14ef6f. Windows112통과/5제외·Linux117통과. 잘못된 시각의 영수증 저장을 막고 같은 pending으로 회복, 기존 서명 재개는 시각/bytes 유지. 최초 실패 원본 보존. 다음은 중단 복원 후보의 명시적 재개. 기존 F1 93.41%·목표 미달, 유료/AWS/Docker/push/CI/병합 없음. 아래는 이전 기록.
+
 > 2026-11-20 08:00까지 지속 목표 진행 중: [키 없는 복원 점검·경보](docs/extra-witness-restore-monitor-20261120.md) 구현1c98687. Windows147통과/17제외·Linux164통과, 실제 Prometheus/Alertmanager 장애4회 발생·해제18조건·규칙11시나리오 통과. 반복 점검으로 복원 시각을 갱신하지 않음. 다음은 수집/서명 시각 경계·중단 복원 재개. 탐지 F1 93.41% 그대로·목표 미달, 유료/AWS/Docker/push/CI/병합 없음. 아래는 이전 기록.
 
 > 2026-11-20 08:00까지 지속 목표 진행 중: [확인 기록 암호화 백업/복원](docs/extra-witness-control-backup-20261120.md) 구현c05c87a. Linux123통과·Windows109통과/10제외+후속4통과. 원래 pending/외부 최소 기준 보존·개인키 제외·부분 후보 실행 차단, 실제4지점 프로세스 종료 확인. 다음은 복원 receipt 검증/경보·명시적 재개. 탐지 F1 93.41% 그대로·목표 미달, 유료/AWS/Docker/push/CI/병합 없음. 아래는 이전 기록.
