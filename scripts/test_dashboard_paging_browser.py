@@ -85,10 +85,26 @@ def run(args, directory, report):
             page = context.new_page()
             page.set_default_timeout(15000)
             errors, external, audit_requests, downloads = [], [], [], []
+            network_tail = []
+            report["network_tail"] = network_tail
+
+            def network(kind, req, status=None):
+                path = urlparse(req.url).path
+                if path in {"/auth/me", "/audit/results"}:
+                    network_tail.append(
+                        {"event": kind, "path": path, "request": id(req), "status": status}
+                    )
+                    del network_tail[:-45]
+
+            page.on(
+                "response", lambda response: network("response", response.request, response.status)
+            )
+            page.on("requestfailed", lambda req: network("failed", req))
             page.on("pageerror", lambda error: errors.append(str(error)))
             page.on("download", lambda download: downloads.append(download))
 
             def requested(req):
+                network("request", req)
                 if not req.url.startswith(base + "/"):
                     external.append(req.url)
                 if req.url.startswith(base + "/audit/results?"):
@@ -310,7 +326,14 @@ def run(args, directory, report):
 
             identity = page.request.get(base + "/auth/me", headers=headers).json()
             held_export = []
-            page.route("**/auth/me", lambda route: held_export.append(route), times=1)
+
+            def hold_first_export_identity(route):
+                if held_export:
+                    route.continue_()
+                else:
+                    held_export.append(route)
+
+            page.route("**/auth/me", hold_first_export_identity)
             before = len(downloads)
             with page.expect_request(lambda req: req.url == base + "/auth/me"):
                 page.locator("#exportLogs").click()
@@ -319,7 +342,13 @@ def run(args, directory, report):
             for route in held_export:
                 route.fulfill(json=identity)
             settled()
+            report["export_race_state"] = {
+                "held_requests": len(held_export),
+                "status": page.locator("#logSnapshot").inner_text(),
+                "page": page.locator("#pageLabel").inner_text(),
+            }
             expect(page.locator("#toast")).to_contain_text("검색 조건이 변경됐습니다")
+            page.unroute("**/auth/me", hold_first_export_identity)
             check(
                 "edit_during_export_cannot_download_old_filter",
                 len(downloads) == before
