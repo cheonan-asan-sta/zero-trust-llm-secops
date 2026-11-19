@@ -1,4 +1,4 @@
-> 2026-11-19 extra 후속: [운영자 감사 검토 CLI·조회 버전/신원·HTTPS/mTLS 연결](docs/extra-operator-review-client-20261119.md). 로컬 구현·검증 범위이며 UI/기업 SSO·독립 성능 목표 완료와 구분한다.
+> 2026-11-19 extra 후속: [대시보드 검토의 조회 버전·호출 신원 연결](docs/extra-dashboard-review-20261119.md), [운영자 검토 CLI·HTTPS/mTLS](docs/extra-operator-review-client-20261119.md). 로컬 구현·검증이며 main/aitest 미병합. legacy workbench·기업 SSO·독립 성능 목표 완료와 구분한다.
 
 # zero-trust-llm-secops
 

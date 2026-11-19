@@ -1,5 +1,7 @@
 # 운영자 검토 CLI: 읽은 버전·호출 신원·TLS 연결
 
+> 후속 안내: 이 문서는 `c0a8108` 당시 CLI 범위를 보존한다. 이후 자체 대시보드 연결은 [별도 구현·검증 보고서](extra-dashboard-review-20261119.md)에서 완료했다. 아래의 UI 미완료 표현은 CLI 작업 시점이며 legacy workbench/다른 client 이전과 audit cursor 소비는 여전히 남아 있다.
+
 2026-11-19 오전08:00 개발 마감 뒤의 별도 후속 작업이다. `extra` 전용 로컬 구현이며 GitHub 업로드·CI·main/aitest 병합·AWS·유료 API 호출은 하지 않았다. 구현 기준은 `c0a8108`이다.
 
 ## 해결한 빈 연결

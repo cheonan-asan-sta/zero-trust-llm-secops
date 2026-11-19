@@ -1,6 +1,6 @@
 # extra 로컬 개발 현황과 남은 검증
 
-2026-11-19 오전 08:00 시간 상한으로 개발을 마감했다. 소유 시험 실행은 종료됐으며 아래 미완료 항목은 다음 작업으로 남긴다. 이번 작업의 소스·시험·문서는 로컬 extra에만 저장했다.
+2026-11-19 오전 08:00 시간 상한의 이전 작업은 마감했고, 이후 사용자 요청으로 아래 후속을 진행했다. 소스·시험·문서는 로컬 extra에만 저장했으며 push·CI·병합하지 않았다.
 
 2026-11-19 오전 개발 기록. 이 문서는 세부 보고서의 과거 수치/남은 항목을 현재 구현과 구분해 읽기 위한 시작점이다. 주차별 완료나 기말 발표 성과 전체를 새로 판정하는 문서는 아니다.
 
@@ -8,9 +8,11 @@
 
 운영자의 실제 검토 client를 연결했다. [ETag·신원·HTTPS/mTLS 검토 CLI](extra-operator-review-client-20261119.md)는 조회 snapshot을 만든 뒤 명시적으로 검토하며 stale412·신원/tenant 변경·응답 유실에 자동 우회/재시도하지 않는다. 구현은 `c0a8108`의 scripts/tests이며 서버·모델·UI 코드는 변경하지 않았다. 기존 오전08:00 종료 기록은 그 작업 시간대의 기록으로 보존한다.
 
+이후 [대시보드 조회 버전·호출 신원 연결](extra-dashboard-review-20261119.md)을 `bef9a97`에 구현했다. 상세에서 연 결과를 그대로 If-Match에 연결하고, 호출자 binding은 서버에서도 검사한다. 신규 브라우저27조건·기존 Linux 운영146조건·조회57조건, 관련 pytest Windows206통과/23제외·Linux229통과다. 확인/충돌의 desktop·mobile 화면과 원본 결과를 보존했다. 브라우저 오류 fixture 보강은 별도 `bd1cb17`이며 app/tests는 동일하다. legacy workbench의 이전과 audit cursor 소비는 남아 있고 strict 기본값은 false다.
+
 ## 기준과 실행 범위
 
-구현 기준은 `extra`의 `3165fc1`다. 당시 로컬에 저장된 `origin/main=e058bca`보다35개 commit이 앞섰고 이후 테스트·문서 보강은 별도 로컬 commit이다. 원격을 새로 조회한 결과가 아니며 이번 작업을 push·CI·main/aitest 병합하지 않았다. 실행은 무료 로컬 Python·WSL·loopback HTTP/systemd다. AWS·유료 모델 API와 미뤄둔 실제8시간 soak는 실행하지 않았다.
+오전08:00 시점 app 기준은 `3165fc1`이며, 이후 대시보드/서버 검토 연결 기준은 `bef9a97`이다. 오전 당시 로컬의 `origin/main=e058bca`보다35개 commit이 앞섰다는 비교는 그 시점 기록이다. 원격을 새로 조회한 결과가 아니며 이번 작업을 push·CI·main/aitest 병합하지 않았다. 실행은 무료 로컬 Python·WSL·loopback HTTP/systemd다. AWS·유료 모델 API와 미뤄둔 실제8시간 soak는 실행하지 않았다.
 
 최신 Linux 전체 실행은 8,411통과·2실패·4제외로 종료됐다. 감사 손상 조회를 빈 목록으로 기대하던 두 테스트를 수정한 뒤 관련 Linux53건·Windows75건이 통과했다. 새 전체 실행을 모두 통과했다고 표현하지 않는다. [원본 결과와 수정 후 재검증](extra-local-validation-20261119.md)을 함께 읽는다.
 
@@ -42,7 +44,7 @@
 | 항목 | 현재 한계/다음 확인 |
 |---|---|
 | 전체 회귀 | 전체 실행 종료. 두 기대값 수정 후 관련 재검증 통과. 수정 후 새 전체 실행·Windows 전체 플랫폼 정리는 별도 미실행 |
-| 사람의 오래된 검토 화면 | SQLite 서버와 운영자 검토 CLI의 ETag/If-Match 연결 완료. UI 소비는 남음. strict 기본 false 유지 |
+| 사람의 오래된 검토 화면 | SQLite 서버·검토 CLI·자체 대시보드의 ETag/If-Match 연결 완료. 대시보드는 신원 binding도 서버와 연결. legacy workbench/다른 client 이전은 남음. strict 기본 false 유지 |
 | 대시보드 페이지 소비 | 새 `/audit/results` API를 자체 대시보드에서 사용하도록 바꾸는 것은 아직 남음. API 구현과 UI 적용을 구분 |
 | 독립 최신성 증명 | checkpoint 파일/DB/pin 전체를 함께 되돌릴 수 있는 관리자에 대한 독립 witness/WORM 미완료. 최소 history 검증을 전체 최신성 보장으로 표현하지 않음 |
 | 실제 기업 신원 | 로컬 signed OIDC/JWKS·key 계정 철회 시험은 완료했지만 외부 기업 SSO/MFA·online token revocation은 미완료 |
