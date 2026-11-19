@@ -308,6 +308,8 @@ h1 span { color: var(--blue); }
 .review-workflow .review-ack { display: flex; align-items: start; gap: 8px; font-size: 14px; }
 .review-workflow .review-ack input { width: auto; margin-top: 3px; }
 #reviewWorkflow label, #reviewWorkflow .review-feedback, #reviewWorkflow .review-actions button { font-size: 14px !important; }
+#reviewWorkflow label, #reviewWorkflow .review-feedback { color: var(--ink) !important; }
+#reviewWorkflow .review-heading > span, #reviewWorkflow .review-heading strong { color: var(--ink); font-size: 12px; letter-spacing: normal; }
 #reviewWorkflow input, #reviewWorkflow textarea { font-size: 16px; }
 #reviewWorkflow textarea { font-weight: 400; }
 #reviewReload { margin-top: 12px; }
