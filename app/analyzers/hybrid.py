@@ -6,7 +6,13 @@ from app.analyzers.base import Analyzer
 from app.analyzers.openai_analyzer import OpenAIAnalyzer
 from app.analyzers.rule_based import RuleBasedAnalyzer
 from app.config import Settings
-from app.models import RiskLevel, SecurityAssessment, SecurityEvent, ViolationType
+from app.models import (
+    RecommendedAction,
+    RiskLevel,
+    SecurityAssessment,
+    SecurityEvent,
+    ViolationType,
+)
 from app.services.session_analysis_evidence import VerifiedSessionContext
 
 _RISK_ORDER = {
@@ -15,6 +21,85 @@ _RISK_ORDER = {
     RiskLevel.HIGH: 2,
     RiskLevel.CRITICAL: 3,
 }
+
+
+def _verified_remote_baseline(event, facts, baseline):
+    if (
+        event.action != "REMOTE_ACCESS"
+        or event.network.access_method not in {"remote", "vpn"}
+        or facts.get("scope") != "current_local_zero_trust_session_snapshot_not_historical_backfill"
+    ):
+        return baseline
+    policy, signal, session = facts["policy"], facts["signal"], facts["session"]
+    if policy["origin"] != "server_owned_configuration" or signal["signature_verified"] is not True:
+        return baseline
+
+    violations = [
+        (policy["resource_registered"] is False, ("policy.resource_registered",)),
+        (policy["role_permitted"] is False, ("policy.role_permitted",)),
+        (policy["action_permitted"] is False, ("policy.action_permitted",)),
+        (session["status"] == "REVOKED", ("session.status",)),
+        (
+            policy["mfa_required"] is True and signal["mfa_observation"] != "success",
+            ("policy.mfa_required", "signal.mfa_observation"),
+        ),
+        (
+            policy["managed_device_required"] is True and not event.device.managed,
+            ("policy.managed_device_required",),
+        ),
+    ]
+    paths = [
+        f"verified_session.{path}" for applies, fields in violations if applies for path in fields
+    ]
+    if paths:
+        if policy["managed_device_required"] is True and not event.device.managed:
+            paths.append("device.managed")
+        violation = baseline.violation_type
+        if violation == ViolationType.NORMAL or (
+            violation == ViolationType.LATERAL_MOVEMENT
+            and event.behavior.distinct_resources_10m < 8
+        ):
+            violation = ViolationType.ACCESS_POLICY_VIOLATION
+        return baseline.model_copy(
+            update={
+                "violation_type": violation,
+                "rationale": "검증한 원격 접속 근거가 서버의 접근 요건을 충족하지 않습니다.",
+                "evidence": list(dict.fromkeys([*paths, *baseline.evidence]))[:20],
+                "recommended_action": RecommendedAction.HOLD_FOR_REVIEW,
+                "requires_human_review": True,
+            }
+        )
+
+    # The generic remote-logon match can call for step-up without showing lateral movement.
+    allowed_rule_evidence = (
+        {"device.managed"} if policy["managed_device_required"] is False else set()
+    )
+    if (
+        baseline.violation_type != ViolationType.LATERAL_MOVEMENT
+        or event.behavior.distinct_resources_10m >= 8
+        or not set(baseline.evidence) <= allowed_rule_evidence
+        or event.auth_context.failed_attempts != 0
+        or event.device.security_posture != "healthy"
+        or signal["authentication_observation"] != "success"
+        or session["version"] != 1
+        or session["decision"] != "STEP_UP"
+        or session["reason_codes"] != ["ELEVATED_RISK"]
+        or session.get("only_generic_remote_logon_rule_matched") is not True
+    ):
+        return baseline
+    return baseline.model_copy(
+        update={
+            "violation_type": ViolationType.NORMAL,
+            "rationale": "일반 원격 접속 신호로 추가 인증이 대기 중입니다. 별도 규칙 경보는 확인되지 않았습니다.",
+            "evidence": [
+                "verified_session.session.only_generic_remote_logon_rule_matched",
+                "verified_session.session.reason_codes",
+                *baseline.evidence,
+            ],
+            "recommended_action": RecommendedAction.HOLD_FOR_REVIEW,
+            "requires_human_review": True,
+        }
+    )
 
 
 class HybridAnalyzer:
@@ -39,13 +124,17 @@ class HybridAnalyzer:
         self, event: SecurityEvent, context: VerifiedSessionContext
     ) -> SecurityAssessment:
         # This explicit endpoint requests contextual LLM review even for confident rules.
-        context.for_event(event)
         return await self._analyze(event, context)
 
     async def _analyze(
         self, event: SecurityEvent, context: VerifiedSessionContext | None = None
     ) -> SecurityAssessment:
         baseline = self._rule.assess(event)
+        adjusted = False
+        if context is not None:
+            verified = _verified_remote_baseline(event, context.for_event(event), baseline)
+            adjusted = verified is not baseline
+            baseline = verified
         if (
             context is None
             and not self._review_all
@@ -65,12 +154,28 @@ class HybridAnalyzer:
         except (TimeoutError, OpenAIError, RuntimeError, TypeError, ValueError):
             return baseline.model_copy(
                 update={
+                    "violation_type": (
+                        ViolationType.UNKNOWN
+                        if adjusted and baseline.violation_type == ViolationType.NORMAL
+                        else baseline.violation_type
+                    ),
                     "rationale": baseline.rationale
                     + " LLM 교차 검토를 완료하지 못해 사람 검토로 전환합니다.",
                     "requires_human_review": True,
                 }
             )
-        return self._merge(baseline, llm_assessment)
+        merged = self._merge(baseline, llm_assessment)
+        if adjusted:
+            return merged.model_copy(
+                update={
+                    "rationale": (baseline.rationale + " LLM 검토: " + llm_assessment.rationale)[
+                        :1000
+                    ],
+                    "recommended_action": RecommendedAction.HOLD_FOR_REVIEW,
+                    "requires_human_review": True,
+                }
+            )
+        return merged
 
     def _merge(
         self,
@@ -98,7 +203,9 @@ class HybridAnalyzer:
             risk_score=max(baseline.risk_score, llm_assessment.risk_score),
             risk_level=risk_level,
             violation_type=violation,
-            rationale="규칙 기준선과 LLM 심층 검토를 결합했습니다. " + llm_assessment.rationale,
+            rationale=("규칙 기준선과 LLM 심층 검토를 결합했습니다. " + llm_assessment.rationale)[
+                :1000
+            ],
             recommended_action=action,
             confidence=round((baseline.confidence + llm_assessment.confidence) / 2, 3),
             evidence=evidence,

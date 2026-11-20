@@ -23,6 +23,7 @@ if TYPE_CHECKING:
     from app.services.zero_trust import ZeroTrustOperations
 
 _TIMESTAMP_TYPE = datetime
+_REMOTE_LOGON_RULE_ID = "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
 
 
 def event_digest(event: SecurityEvent) -> str:
@@ -182,6 +183,7 @@ def collect_session_evidence(
             "decision": current.decision,
             "status": current.status,
             "reason_codes": current.reason_codes,
+            "only_generic_remote_logon_rule_matched": current.matched_rule_ids == [_REMOTE_LOGON_RULE_ID],
             "challenge_pending": current.challenge_id is not None,
             "approval_currently_usable": approval_usable,
         },

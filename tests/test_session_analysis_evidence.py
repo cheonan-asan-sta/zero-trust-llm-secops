@@ -464,10 +464,10 @@ def test_verified_hybrid_review_cannot_skip_llm_or_reduce_existing_rule_finding(
     hybrid = HybridAnalyzer(Settings(hybrid_review_all=False), llm=fake)
     result = asyncio.run(hybrid.analyze_with_evidence(signal.event, context))
     fake.analyze_with_evidence.assert_awaited_once()
-    assert (
-        result.risk_score >= baseline.risk_score
-        and result.violation_type == baseline.violation_type
-    )
+    assert result.risk_score >= baseline.risk_score
+    assert result.violation_type == "ACCESS_POLICY_VIOLATION"
+    assert set(baseline.evidence) <= set(result.evidence)
+    assert "verified_session.policy.mfa_required" in result.evidence
 
 
 @pytest.mark.parametrize(
