@@ -563,6 +563,46 @@ tests:
   - eval_time: 3s
     alertname: C01WitnessCollectionFailed
     exp_alerts: []
+- name: approved_generation_switch_clears_unavailable_and_old_capacity
+  interval: 1s
+  input_series:
+  - series: secops_witness_bridge_enabled{job="zt-signals",instance="local"}
+    values: 1+0x10
+  - series: secops_witness_status_success{job="zt-signals",instance="local"}
+    values: '1 1 1 1 0 0 0 0 1 1 1'
+  - series: secops_witness_observation_healthy{job="zt-signals",instance="local"}
+    values: '0 0 0 0 0 0 0 0 1 1 1'
+  - series: secops_witness_observation_action_required{job="zt-signals",instance="local"}
+    values: '1 1 1 1 stale _ _ _ 0 0 0'
+  - series: secops_witness_state{state="capacity_exhausted",job="zt-signals",instance="local"}
+    values: '1 1 1 1 stale _ _ _ 0 0 0'
+  - series: secops_witness_last_cycle_success{job="zt-signals",instance="local"}
+    values: '1 1 1 1 stale _ _ _ 1 1 1'
+  alert_rule_test:
+  - eval_time: 3s
+    alertname: C01WitnessCapacityPressure
+    exp_alerts:
+    - exp_labels:
+        job: zt-signals
+        instance: local
+        severity: warning
+        state: capacity_exhausted
+  - eval_time: 7s
+    alertname: C01WitnessStatusUnavailable
+    exp_alerts:
+    - exp_labels:
+        job: zt-signals
+        instance: local
+        severity: critical
+  - eval_time: 9s
+    alertname: C01WitnessStatusUnavailable
+    exp_alerts: []
+  - eval_time: 9s
+    alertname: C01WitnessCapacityPressure
+    exp_alerts: []
+  - eval_time: 9s
+    alertname: C01WitnessCollectionFailed
+    exp_alerts: []
 - name: exhausted_unobserved_has_no_cadence_grace
   interval: 1s
   input_series:

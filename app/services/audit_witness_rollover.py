@@ -191,6 +191,19 @@ def _existing(destination, approval):
     return verify(destination, sha(raw))
 
 
+def collection_target(record, record_pin, minimum_receipt, *, expected_profile=None):
+    result = verify(record, record_pin)
+    pin = result["profile_sha256"]
+    require(expected_profile is None or pin == expected_profile,
+            "rollover collector profile pin mismatch")
+    directory, profile, public = observer._load(result["directory"], pin)
+    with observer._database(directory) as con:
+        observer._read(con, profile, public, minimum_receipt)
+    witness.status(profile["witness_directory"], profile["public_key_sha256"],
+                   minimum_receipt=minimum_receipt)
+    return directory, pin, profile
+
+
 def approve(old_control, old_profile, old_terminal, new_signer, new_key, destination, approval):
     proposal, profile, _ = _proposal(
         old_control, old_profile, old_terminal, new_signer, new_key, destination,

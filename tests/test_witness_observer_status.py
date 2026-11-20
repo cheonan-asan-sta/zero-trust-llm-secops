@@ -46,6 +46,30 @@ def test_real_observation_exports_only_aggregates_without_source_or_pin_labels(t
     assert value["authorization_asserted"] is False
 
 
+def test_generation_metrics_require_the_approved_record_even_with_matching_observer_pins(tmp_path):
+    _, _, directory, legacy, snapshot = fixture(tmp_path)
+    pin = "a" * 64
+    profile = dict(legacy, schema=bridge.GENERATION_PROFILE_SCHEMA, record_sha256=pin)
+    profile_path = tmp_path / "profile.json"
+    profile_path.write_text(json.dumps(profile), encoding="utf-8")
+    profile_path.chmod(0o400)
+    try:
+        assert bridge.load_profile(profile_path) == profile
+    finally:
+        profile_path.chmod(0o600)
+    signed_scope = bridge.inspect(directory, profile["profile_sha256"], profile["minimum_receipt"],
+                                  record_sha256=pin, cycle_success=True)
+    wrong_scope = dict(signed_scope, record_sha256="b" * 64)
+    for rejected in (snapshot, wrong_scope):
+        metrics = bridge.render_report(profile, rejected)
+        assert "secops_witness_status_success 0" in metrics
+        assert "anchor_count" not in metrics
+    metrics = bridge.render_report(profile, signed_scope)
+    assert "secops_witness_status_success 1" in metrics
+    assert "secops_witness_last_cycle_success 1" in metrics
+    assert pin not in metrics
+
+
 def test_cached_observation_expires_even_before_report_cache_ttl(tmp_path):
     _, _, _, profile, value = fixture(tmp_path)
     # Real observation is still valid at publication; time advances after it.

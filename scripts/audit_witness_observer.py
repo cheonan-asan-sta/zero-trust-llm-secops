@@ -13,7 +13,8 @@ from app.services.federated_audit import AuditQueryUnavailable
 ERRORS = (AuditTransferError, AuditQueryUnavailable, OSError, ValueError, TypeError, sqlite3.Error)
 
 
-def watch(directory, profile_sha256, *, minimum_receipt, cycles=None, status_file=None):
+def watch(directory, profile_sha256, *, minimum_receipt, cycles=None, status_file=None,
+          record_sha256=None):
     if cycles is not None and (type(cycles) is not int or not 1 <= cycles <= 10000):
         raise ValueError("observer watch cycles rejected")
     _directory, profile, _public = observer._load(directory, profile_sha256)
@@ -41,7 +42,8 @@ def watch(directory, profile_sha256, *, minimum_receipt, cycles=None, status_fil
             from scripts.f1_lab import witness_observer_status as bridge
 
             bridge.publish(status_file, bridge.inspect(
-                directory, profile_sha256, minimum_receipt, cycle_success=state["cycle_success"]
+                directory, profile_sha256, minimum_receipt, cycle_success=state["cycle_success"],
+                record_sha256=record_sha256,
             ))
         completed += 1
         print(json.dumps(state, ensure_ascii=False, allow_nan=False), flush=True)

@@ -20,6 +20,8 @@ from scripts.f1_lab.collector_status_bridge import read_public, timestamp
 SCHEMA = "zt-witness-observer-status-2"
 LEGACY_SCHEMA = "zt-witness-observer-status-1"
 PROFILE_SCHEMA = "zt-witness-observer-metrics-profile-1"
+GENERATION_SCHEMA = "zt-witness-observer-status-3"
+GENERATION_PROFILE_SCHEMA = "zt-witness-observer-metrics-profile-2"
 TTL = 30
 STATES = (
     "healthy", "offline", "uninitialized", "pending", "stale", "unobserved",
@@ -33,13 +35,20 @@ FIELDS = {
 ERRORS = (AuditTransferError, AuditQueryUnavailable, OSError, ValueError, TypeError, sqlite3.Error)
 
 
-def validate(value, profile_sha256, minimum_receipt):
+def validate(value, profile_sha256, minimum_receipt, record_sha256=None):
     require(witness._hex(profile_sha256) and witness._hex(minimum_receipt), "witness_status_pins")
-    require(type(value) is dict and set(value) == {
+    fields = {
         "schema", "profile_sha256", "minimum_receipt", "checked_at", "values", "cycle_success",
         "independent_storage_verified", "automatic_activation_allowed", "authorization_asserted",
-    }, "witness_status_shape")
-    require(value["schema"] in {SCHEMA, LEGACY_SCHEMA} and value["profile_sha256"] == profile_sha256
+    }
+    schemas = {SCHEMA, LEGACY_SCHEMA}
+    if record_sha256 is not None:
+        require(witness._hex(record_sha256), "witness_generation_pin")
+        fields.add("record_sha256")
+        schemas = {GENERATION_SCHEMA}
+    require(type(value) is dict and set(value) == fields, "witness_status_shape")
+    require(value["schema"] in schemas and value.get("record_sha256") == record_sha256
+            and value["profile_sha256"] == profile_sha256
             and value["minimum_receipt"] == minimum_receipt
             and all(value[k] is False for k in (
                 "independent_storage_verified", "automatic_activation_allowed", "authorization_asserted"
@@ -48,7 +57,7 @@ def validate(value, profile_sha256, minimum_receipt):
     require(value["cycle_success"] is None or type(value["cycle_success"]) is bool,
             "witness_status_cycle")
     data = value["values"]
-    fields = FIELDS if value["schema"] == SCHEMA else FIELDS - {"interval_seconds"}
+    fields = FIELDS - {"interval_seconds"} if value["schema"] == LEGACY_SCHEMA else FIELDS
     require(type(data) is dict and (not data or set(data) == fields), "witness_status_values")
     if data:
         require(type(data["state"]) is str and data["state"] in STATES
@@ -83,7 +92,8 @@ def validate(value, profile_sha256, minimum_receipt):
     return checked
 
 
-def report(profile_sha256, minimum_receipt, state=None, *, now=None, cycle_success=None):
+def report(profile_sha256, minimum_receipt, state=None, *, now=None, cycle_success=None,
+           record_sha256=None):
     value = {
         "schema": SCHEMA, "profile_sha256": profile_sha256, "minimum_receipt": minimum_receipt,
         "checked_at": (datetime.now(UTC) if now is None else now).isoformat(),
@@ -92,29 +102,39 @@ def report(profile_sha256, minimum_receipt, state=None, *, now=None, cycle_succe
         "independent_storage_verified": False, "automatic_activation_allowed": False,
         "authorization_asserted": False,
     }
-    validate(value, profile_sha256, minimum_receipt)
+    if record_sha256 is not None:
+        value.update(schema=GENERATION_SCHEMA, record_sha256=record_sha256)
+    validate(value, profile_sha256, minimum_receipt, record_sha256)
     return value
 
 
-def inspect(directory, profile_sha256, minimum_receipt, *, cycle_success=None):
+def inspect(directory, profile_sha256, minimum_receipt, *, cycle_success=None, record_sha256=None):
     try:
         state = observer.status(directory, profile_sha256, minimum_receipt=minimum_receipt)
-        return report(profile_sha256, minimum_receipt, state, cycle_success=cycle_success)
+        return report(profile_sha256, minimum_receipt, state, cycle_success=cycle_success,
+                      record_sha256=record_sha256)
     except ERRORS:
-        return report(profile_sha256, minimum_receipt, cycle_success=cycle_success)
+        return report(profile_sha256, minimum_receipt, cycle_success=cycle_success,
+                      record_sha256=record_sha256)
 
 
 def publish(path, value):
     return status_publication.publish(
-        path, value, lambda doc: validate(doc, value["profile_sha256"], value["minimum_receipt"])
+        path, value, lambda doc: validate(
+            doc, value["profile_sha256"], value["minimum_receipt"], value.get("record_sha256")
+        )
     )
 
 
 def load_profile(path):
     value = read_public(path)
-    require(type(value) is dict and set(value) == {
-        "schema", "profile_sha256", "minimum_receipt", "status_file"
-    } and value["schema"] == PROFILE_SCHEMA
+    require(type(value) is dict, "witness_metrics_profile")
+    fields = {"schema", "profile_sha256", "minimum_receipt", "status_file"}
+    generation = value.get("schema") == GENERATION_PROFILE_SCHEMA
+    if generation:
+        fields.add("record_sha256")
+    require(set(value) == fields and value["schema"] in {PROFILE_SCHEMA, GENERATION_PROFILE_SCHEMA}
+            and (not generation or witness._hex(value["record_sha256"]))
             and witness._hex(value["profile_sha256"]) and witness._hex(value["minimum_receipt"])
             and isinstance(value["status_file"], str) and 0 < len(value["status_file"]) <= 4096
             and Path(value["status_file"]).is_absolute(), "witness_metrics_profile")
@@ -134,7 +154,8 @@ def render_report(profile, value, *, now=None):
     now = datetime.now(UTC) if now is None else now
     rows = ["# TYPE secops_witness_bridge_enabled gauge", "secops_witness_bridge_enabled 1"]
     try:
-        checked = validate(value, profile["profile_sha256"], profile["minimum_receipt"])
+        checked = validate(value, profile["profile_sha256"], profile["minimum_receipt"],
+                           profile.get("record_sha256"))
         require(bool(value["values"]), "witness_status_no_observation")
         interval = value["values"].get("interval_seconds", 1)
         # Permit the configured collection cadence, not an arbitrary 30s gap in

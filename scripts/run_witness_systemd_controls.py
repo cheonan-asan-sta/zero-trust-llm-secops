@@ -7,6 +7,7 @@ no /etc configuration and never starts production services or cloud resources.
 
 import argparse
 import asyncio
+import base64
 import json
 import os
 import secrets
@@ -19,16 +20,21 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
 from app.analyzers.rule_based import RuleBasedAnalyzer
 from app.models import AnalysisResult
 from app.scenarios import synthetic_events
 from app.services import audit_witness as witness
 from app.services import audit_witness_observer as observer
 from app.services import audit_witness_observer_backup as backup
-from app.services.audit_transfer import canonical, require
+from app.services import audit_witness_rollover as rollover
+from app.services.audit_transfer import canonical, require, sha
 from app.services.policy import response_preview
 from app.services.sqlite_audit import SQLiteAuditStore
+from scripts.f1_lab import witness_observer_status as bridge
 from scripts.systemd_resources import snapshot as resource_snapshot
+from scripts.witness_rollover_systemd import configuration
 
 READ_ENV = {"PATH": "/usr/bin:/bin", "LANG": "C.UTF-8", "SYSTEMD_PAGER": "", "SYSTEMD_COLORS": "0"}
 
@@ -50,7 +56,31 @@ def wait_for(callback, seconds=40):
     raise RuntimeError("owned witness systemd condition timed out")
 
 
-def run(directory):
+def fill_generation(signer, control, key_pin, minimum):
+    """Extend the owned fixture with valid signatures to exercise the actual cap."""
+    last = witness.status(signer, key_pin, minimum_receipt=minimum)
+    body = last["receipt"]["body"]
+    first_number = body["number"] + 1
+    previous = last["receipt_sha256"]
+    key = Ed25519PrivateKey.from_private_bytes((signer / "private.key").read_bytes())
+    receipts = []
+    for number in range(first_number, witness.MAX_RECEIPTS + 1):
+        payload = dict(body, number=number, previous_receipt=previous,
+                       observation_id=f"{number:032x}", schema=witness.OPERATION_SCHEMA)
+        signature = key.sign(witness._signature_prefix(payload["schema"]) + canonical(payload))
+        receipt = {"body": payload, "signature": base64.b64encode(signature).decode()}
+        receipts.append((number, canonical(receipt).decode()))
+        previous = sha(canonical(receipt))
+    with witness._journal(signer, write=True) as con:
+        con.executemany("INSERT INTO witness_receipts VALUES (?,?)", receipts)
+    with observer._database(control, write=True) as con:
+        offset = con.execute("SELECT count(*) FROM anchors").fetchone()[0]
+        con.executemany("INSERT INTO anchors VALUES (?,?)",
+                        [(offset + index, raw) for index, (_, raw) in enumerate(receipts, 1)])
+    return previous
+
+
+def run(directory, *, exercise_rollover=False):
     require(os.name == "posix" and os.geteuid() == 0
             and Path("/proc/1/comm").read_text().strip() == "systemd", "witness_systemd_root_required")
     import pwd
@@ -67,6 +97,7 @@ def run(directory):
     (output / "ownership.json").write_bytes(canonical({"unit_prefix": prefix, "state_root": str(root),
                                                        "public_source": str(source)}) + b"\n")
     units, files, created_trees = [], [], []
+    drop_in_directory = None
     result = {"schema": "local-witness-systemd-controls-1", "completed": False, "checks": [],
               "fixture_uid": user.pw_uid, "fixture_account_created": False,
               "production_installation_completed": False, "etc_configuration_changed": False,
@@ -251,6 +282,66 @@ def run(directory):
         check("timer_runs_real_keyless_checks", bool(first_check["values"]) and bool(second_check["values"]))
         check("timer_preserves_original_restore_start", second_check["values"]["restore_started_at"]
               == checked["values"]["restore_started_at"])
+        if exercise_rollover:
+            command("/usr/bin/systemctl", "stop", collector)
+            for path in (control, signer):
+                for item in (path, *path.iterdir()):
+                    os.chown(item, 0, 0)
+            terminal = fill_generation(signer, control, key_pin, minimum)
+            generation = owned_tree(root / "generation", public=True)
+            next_signer = generation / "signer"
+            next_key = witness.initialize(next_signer, source_db.path,
+                                          "systemd-fixture")["public_key_sha256"]
+            record = generation / "approved.json"
+            old_paths = (control / "observer.sqlite3", signer / "journal.sqlite3")
+            old_bytes = [path.read_bytes() for path in old_paths]
+            args = (control, pin, terminal, next_signer, next_key, record)
+            plan = rollover.plan(*args)
+            approved = rollover.approve(*args, plan["approval_sha256"])
+            configured = configuration(record, approved["record_sha256"],
+                                       approved["minimum_receipt"], cache)
+            metrics = configured["metrics_profile"]
+            new_status = Path(metrics["status_file"])
+            check("approved_fixture_at_actual_capacity",
+                  plan["proposal"]["old_terminal_receipt"]["body"]["number"] == 4096)
+            check("legacy_cache_unavailable_under_generation_profile",
+                  "secops_witness_status_success 0" in bridge.render_report(metrics, public(status_file))
+                  and "secops_witness_status_success 0" in bridge.metrics(metrics))
+            for path in (control, signer, generation):
+                assign(path)
+            drop_in_directory = Path("/run/systemd/system") / (collector + ".d")
+            drop_in_directory.mkdir()
+            drop_in = configured["systemd_drop_in"].replace(
+                "/opt/secops/.venv/bin/python", "/usr/bin/python3",
+            )
+            (drop_in_directory / "rollover.conf").write_text(drop_in)
+            command("/usr/bin/systemctl", "daemon-reload")
+            hidden = generation / "held.json"
+            record.rename(hidden)
+            command("/usr/bin/systemctl", "restart", collector)
+            wait_for(lambda: new_status.is_file() and public(new_status)["cycle_success"] is False)
+            check("restart_requires_pinned_approved_record",
+                  not public(new_status)["values"] and "secops_witness_status_success 0" in bridge.metrics(metrics))
+            command("/usr/bin/systemctl", "stop", collector)
+            hidden.rename(record)
+            command("/usr/bin/systemctl", "restart", collector)
+            wait_for(lambda: public(new_status)["cycle_success"] is True)
+            new_invocation = props(collector)["InvocationID"]
+            check("approved_restart_collects_and_recovers_metrics",
+                  new_invocation != changed["InvocationID"]
+                  and public(new_status)["record_sha256"] == approved["record_sha256"]
+                  and public(new_status)["values"]["anchor_count"] >= 1
+                  and "secops_witness_status_success 1" in bridge.metrics(metrics)
+                  and "secops_witness_observation_healthy 1" in bridge.metrics(metrics))
+            check("old_generation_archives_unchanged",
+                  [path.read_bytes() for path in old_paths] == old_bytes)
+            # A second start with the same pin must keep collecting the same lineage.
+            anchors = public(new_status)["values"]["anchor_count"]
+            command("/usr/bin/systemctl", "restart", collector)
+            wait_for(lambda: public(new_status)["values"].get("anchor_count", 0) > anchors)
+            check("later_restart_extends_same_generation",
+                  props(collector)["InvocationID"] != new_invocation
+                  and public(new_status)["record_sha256"] == approved["record_sha256"])
         check("source_bytes_unchanged", source_db.path.read_bytes() == before)
         result["completed"] = True
     except Exception as error:
@@ -270,6 +361,12 @@ def run(directory):
             require(path.parent == Path("/run/systemd/system") and path.name.startswith(prefix + "-"),
                     "witness_systemd_cleanup_file")
             path.unlink(missing_ok=True)
+        if drop_in_directory is not None:
+            require(drop_in_directory.parent == Path("/run/systemd/system")
+                    and drop_in_directory.name == prefix + "-collector@lab.service.d",
+                    "witness_systemd_cleanup_drop_in")
+            (drop_in_directory / "rollover.conf").unlink(missing_ok=True)
+            drop_in_directory.rmdir()
         command("/usr/bin/systemctl", "daemon-reload", check=False)
         result["owned_units_removed"] = all("LoadState=not-found" in command(
             "/usr/bin/systemctl", "show", name, "--property=LoadState", check=False).stdout for name in units)
@@ -290,8 +387,9 @@ def main():
     signal.signal(signal.SIGTERM, terminate)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--directory", required=True)
+    parser.add_argument("--rollover", action="store_true")
     args = parser.parse_args()
-    print(json.dumps(run(args.directory)))
+    print(json.dumps(run(args.directory, exercise_rollover=args.rollover)))
 
 
 if __name__ == "__main__":
