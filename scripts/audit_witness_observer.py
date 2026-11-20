@@ -5,24 +5,38 @@ import json
 import sqlite3
 import sys
 import time
+from pathlib import Path
 
 from app.services import audit_witness_observer as observer
-from app.services.audit_transfer import AuditTransferError
+from app.services.audit_transfer import AuditTransferError, require
 from app.services.federated_audit import AuditQueryUnavailable
 
 ERRORS = (AuditTransferError, AuditQueryUnavailable, OSError, ValueError, TypeError, sqlite3.Error)
 
 
+def require_unrestored(directory):
+    receipt = Path(directory) / "restore.receipt.json"
+    require(not receipt.exists() and not receipt.is_symlink(),
+            "restored control requires operator activation for collection")
+
+
 def watch(directory, profile_sha256, *, minimum_receipt, cycles=None, status_file=None,
-          record_sha256=None):
+          record_sha256=None, collect=None):
     if cycles is not None and (type(cycles) is not int or not 1 <= cycles <= 10000):
         raise ValueError("observer watch cycles rejected")
     _directory, profile, _public = observer._load(directory, profile_sha256)
+    if collect is None:
+        require_unrestored(directory)
+
+        def collect():
+            require_unrestored(directory)
+            return observer.cycle(directory, profile_sha256, minimum_receipt=minimum_receipt)
+
     completed, failures = 0, 0
     while cycles is None or completed < cycles:
         started = time.monotonic()
         try:
-            result = observer.cycle(directory, profile_sha256, minimum_receipt=minimum_receipt)
+            result = collect()
             state = observer.status(directory, profile_sha256, minimum_receipt=minimum_receipt)
             state["recovered"] = result["recovered"]
             state["cycle_success"] = True
@@ -90,6 +104,7 @@ def main():
                 capacity_warning=args.capacity_warning,
             )
         elif args.action == "cycle":
+            require_unrestored(args.directory)
             result = observer.cycle(
                 args.directory, args.profile_sha256, minimum_receipt=args.minimum_receipt
             )

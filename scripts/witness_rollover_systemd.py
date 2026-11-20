@@ -22,15 +22,25 @@ def configuration(record, record_pin, minimum_receipt, status_directory):
     cache = unit_path(status_directory)
     require(cache.is_dir(), "witness status directory must exist")
     control, profile_pin, profile = rollover.collection_target(record, record_pin, minimum_receipt)
-    control = unit_path(control)
-    signer = unit_path(profile["witness_directory"])
     _, transition = rollover._read_record(record)
     previous = transition["proposal"]
     _, old_profile, _ = observer._load(
         previous["old_control"], previous["old_profile_sha256"],
     )
-    for location in (control, signer, record, Path(profile["database"]),
-                     Path(previous["old_control"]), Path(old_profile["witness_directory"])):
+    return render_configuration(
+        control, profile_pin, profile, cache, record_pin, minimum_receipt,
+        f"scripts.audit_witness_rollover watch --record {record} --record-sha256 {record_pin}",
+        protected=(record, Path(previous["old_control"]), Path(old_profile["witness_directory"])),
+    )
+
+
+def render_configuration(control, profile_pin, profile, cache, record_pin, minimum_receipt,
+                         command, *, protected=(), writable=()):
+    control = unit_path(control)
+    signer = unit_path(profile["witness_directory"])
+    cache = unit_path(cache)
+    require(cache.is_dir(), "witness status directory must exist")
+    for location in (control, signer, Path(profile["database"]), *protected, *writable):
         require(not cache.is_relative_to(location) and not location.is_relative_to(cache),
                 "witness cache overlaps witness history or input")
     cache_scope = sha((record_pin + minimum_receipt).encode("ascii"))
@@ -39,13 +49,12 @@ def configuration(record, record_pin, minimum_receipt, status_directory):
     drop_in = (
         "[Service]\n"
         "ExecStart=\n"
-        "ExecStart=/opt/secops/.venv/bin/python -m scripts.audit_witness_rollover watch "
-        f"--record {record} --record-sha256 {record_pin} --profile-sha256 {profile_pin} "
+        f"ExecStart=/opt/secops/.venv/bin/python -m {command} --profile-sha256 {profile_pin} "
         f"--minimum-receipt {minimum_receipt} --status-file {status}\n"
         "ReadOnlyPaths=\n"
         f"ReadOnlyPaths={audit_parent} {signer}/private.key {signer}/public.key\n"
         "ReadWritePaths=\n"
-        f"ReadWritePaths={control} {signer} {cache}\n"
+        "ReadWritePaths=" + " ".join(str(path) for path in (control, signer, cache, *writable)) + "\n"
     )
     return {
         "systemd_drop_in": drop_in,

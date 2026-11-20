@@ -23,6 +23,7 @@ from app.analyzers.rule_based import RuleBasedAnalyzer
 from app.models import AnalysisResult
 from app.scenarios import synthetic_events
 from app.services import audit_witness as witness
+from app.services import audit_witness_activation as activation
 from app.services import audit_witness_observer as observer
 from app.services import audit_witness_observer_backup as backup
 from app.services.audit_transfer import AuditTransferError, canonical, require
@@ -93,6 +94,9 @@ def run(directory, *, seed=20261120, rounds=1, delay_seconds=0, max_seconds=None
             initial_control = (control / "observer.sqlite3").read_bytes()
             receipts, anchors, observed_rows, handoffs, packages = 1, 0, 1, 0, 0
             recovery_key = secrets.token_bytes(32)
+            selection_journal = root / "activation.sqlite3"
+            activation.initialize(selection_journal)
+            active_pin = witness.GENESIS
             binary, environment = direct_python(dict(os.environ, AWS_EC2_METADATA_DISABLED="true"))
 
             def accepted(result, *, replayed=None):
@@ -112,7 +116,11 @@ def run(directory, *, seed=20261120, rounds=1, delay_seconds=0, max_seconds=None
             def recover_cli(replayed):
                 result = subprocess.run([binary, "-m", "scripts.audit_witness_observer", "cycle",
                                          "--directory", str(control), "--profile-sha256", profile_pin,
-                                         "--minimum-receipt", minimum], env=environment,
+                                         "--minimum-receipt", minimum] if active_pin == witness.GENESIS
+                                        else [binary, "-m", "scripts.audit_witness_activation", "cycle",
+                                              "--journal", str(selection_journal),
+                                              "--activation-sha256", active_pin,
+                                              "--minimum-receipt", minimum], env=environment,
                                         capture_output=True, text=True, timeout=30, check=False)
                 require(result.returncode == 0, "witness_sequence_cli_recovery_failed")
                 accepted(json.loads(result.stdout), replayed=replayed)
@@ -143,7 +151,7 @@ def run(directory, *, seed=20261120, rounds=1, delay_seconds=0, max_seconds=None
                         "witness_sequence_pending_id_changed")
 
             def handoff(interrupt):
-                nonlocal control, handoffs, packages
+                nonlocal control, handoffs, packages, active_pin
                 packages += 1
                 package = root / f"snapshot-{packages}.aesgcm"
                 saved = backup.backup(control, profile_pin, minimum, package, recovery_key)
@@ -185,7 +193,10 @@ def run(directory, *, seed=20261120, rounds=1, delay_seconds=0, max_seconds=None
                         and proof["signed_snapshot_minimum_present"]
                         and (signer / "journal.sqlite3").read_bytes() == before,
                         "witness_sequence_handoff_changed_history")
-                # Only this fixture variable changes. No app/system service is activated.
+                parameters = (selection_journal, target, package, saved["backup_sha256"],
+                              restored["restore_receipt_sha256"], profile_pin, minimum, active_pin)
+                approved = activation.plan(*parameters)["approval_sha256"]
+                active_pin = activation.activate(*parameters, approved, "local-fixture")["activation_sha256"]
                 control, handoffs = target, handoffs + 1
 
             def invariant():

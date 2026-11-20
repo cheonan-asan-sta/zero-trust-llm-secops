@@ -26,12 +26,14 @@ from app.analyzers.rule_based import RuleBasedAnalyzer
 from app.models import AnalysisResult
 from app.scenarios import synthetic_events
 from app.services import audit_witness as witness
+from app.services import audit_witness_activation as activation
 from app.services import audit_witness_observer as observer
 from app.services import audit_witness_observer_backup as backup
 from app.services import audit_witness_rollover as rollover
-from app.services.audit_transfer import canonical, require, sha
+from app.services.audit_transfer import AuditTransferError, canonical, require, sha
 from app.services.policy import response_preview
 from app.services.sqlite_audit import SQLiteAuditStore
+from scripts.audit_witness_activation import configuration as activation_configuration
 from scripts.f1_lab import witness_observer_status as bridge
 from scripts.systemd_resources import snapshot as resource_snapshot
 from scripts.witness_rollover_systemd import configuration
@@ -80,7 +82,7 @@ def fill_generation(signer, control, key_pin, minimum):
     return previous
 
 
-def run(directory, *, exercise_rollover=False):
+def run(directory, *, exercise_rollover=False, exercise_activation=False):
     require(os.name == "posix" and os.geteuid() == 0
             and Path("/proc/1/comm").read_text().strip() == "systemd", "witness_systemd_root_required")
     import pwd
@@ -342,6 +344,67 @@ def run(directory, *, exercise_rollover=False):
             check("later_restart_extends_same_generation",
                   props(collector)["InvocationID"] != new_invocation
                   and public(new_status)["record_sha256"] == approved["record_sha256"])
+        if exercise_activation:
+            command("/usr/bin/systemctl", "stop", collector)
+            for path in (control, signer):
+                for item in (path, *path.iterdir()):
+                    os.chown(item, 0, 0)
+            current = witness.status(signer, key_pin, minimum_receipt=minimum)["receipt_sha256"]
+            restored_parent = owned_tree(root / "activation-candidate")
+            journal_parent = owned_tree(root / "activation-journal")
+            journal = journal_parent / "selection.sqlite3"
+            package = restored_parent / "control.aesgcm"
+            candidate = restored_parent / "control"
+            key = secrets.token_bytes(32)
+            saved = backup.backup(control, pin, current, package, key)
+            restored = backup.restore(package, candidate, saved["backup_sha256"], pin, current, key)
+            del key
+            activation.initialize(journal)
+            params = (journal, candidate, package, saved["backup_sha256"],
+                      restored["restore_receipt_sha256"], pin, current, witness.GENESIS)
+            review = activation.plan(*params)
+            try:
+                activation.activate(*params, "f" * 64, "systemd-fixture")
+            except AuditTransferError:
+                check("failed_activation_keeps_no_selected_target",
+                      activation.history(journal)["active_sha256"] == witness.GENESIS)
+            else:
+                raise AssertionError("wrong approval accepted")
+            selected = activation.activate(*params, review["approval_sha256"], "systemd-fixture")
+            active_pin = selected["activation_sha256"]
+            configured = activation_configuration(journal, active_pin, current, cache)
+            metrics = configured["metrics_profile"]
+            new_status = Path(metrics["status_file"])
+            archived = (control / "observer.sqlite3").read_bytes()
+            for path in (control, signer, restored_parent, journal_parent):
+                assign(path)
+            drop_in_directory = Path("/run/systemd/system") / (collector + ".d")
+            drop_in_directory.mkdir()
+            (drop_in_directory / "rollover.conf").write_text(configured["systemd_drop_in"].replace(
+                "/opt/secops/.venv/bin/python", "/usr/bin/python3",
+            ))
+            command("/usr/bin/systemctl", "daemon-reload")
+            command("/usr/bin/systemctl", "restart", collector)
+            wait_for(lambda: public(new_status)["cycle_success"] is True)
+            invocation = props(collector)["InvocationID"]
+            anchors = public(new_status)["values"]["anchor_count"]
+            check("activated_candidate_is_used_by_systemd",
+                  public(new_status)["record_sha256"] == active_pin
+                  and "secops_witness_status_success 1" in bridge.metrics(metrics)
+                  and archived == (control / "observer.sqlite3").read_bytes())
+            command("/usr/bin/systemctl", "restart", collector)
+            wait_for(lambda: public(new_status)["values"]["anchor_count"] > anchors)
+            check("activated_candidate_remains_selected_after_restart",
+                  props(collector)["InvocationID"] != invocation)
+            command("/usr/bin/systemctl", "stop", collector)
+            for item in (journal_parent, journal):
+                os.chown(item, 0, 0)
+            events = activation.history(journal, active_pin)["events"]
+            check("activation_history_has_approval_switch_and_failure",
+                  [event["kind"] for event in events] == [
+                      "approval_submitted", "activation_failed",
+                      "approval_submitted", "approved", "activated",
+                  ])
         check("source_bytes_unchanged", source_db.path.read_bytes() == before)
         result["completed"] = True
     except Exception as error:
@@ -387,9 +450,12 @@ def main():
     signal.signal(signal.SIGTERM, terminate)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--directory", required=True)
-    parser.add_argument("--rollover", action="store_true")
+    options = parser.add_mutually_exclusive_group()
+    options.add_argument("--rollover", action="store_true")
+    options.add_argument("--activation", action="store_true")
     args = parser.parse_args()
-    print(json.dumps(run(args.directory, exercise_rollover=args.rollover)))
+    print(json.dumps(run(args.directory, exercise_rollover=args.rollover,
+                         exercise_activation=args.activation)))
 
 
 if __name__ == "__main__":

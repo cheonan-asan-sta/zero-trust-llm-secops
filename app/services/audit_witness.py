@@ -299,6 +299,16 @@ def status(directory, public_key_sha256, *, minimum_receipt):
     }
 
 
+def _signing_key(directory, public):
+    private_path = directory / "private.key"
+    _file(private_path, 32)
+    secret = private_path.read_bytes()
+    require(len(secret) == 32, "witness private key size rejected")
+    private = Ed25519PrivateKey.from_private_bytes(read_key(private_path, sha(secret)))
+    require(private.public_key().public_bytes_raw() == public, "witness signer key mismatch")
+    return private
+
+
 def observe(directory, database, public_key_sha256, *, expected_receipt, observation_id=None,
             minimum_observed_at=None, initial_audit_head=None):
     require(observation_id is None or _operation(observation_id), "witness observation ID rejected")
@@ -322,13 +332,7 @@ def observe(directory, database, public_key_sha256, *, expected_receipt, observa
         require(minimum_time.utcoffset() is not None, "witness operation aware minimum time required")
     directory = _directory(directory)
     _key, public = _public(directory, public_key_sha256)
-    private_path = directory / "private.key"
-    _file(private_path, 32)
-    secret = private_path.read_bytes()
-    require(len(secret) == 32, "witness private key size rejected")
-    # read_key also enforces the existing platform-specific key-file contract.
-    private = Ed25519PrivateKey.from_private_bytes(read_key(private_path, sha(secret)))
-    require(private.public_key().public_bytes_raw() == public, "witness signer key mismatch")
+    private = _signing_key(directory, public)
     store = SQLiteAuditStore.open_existing(database)
     require(
         not store.path.resolve().is_relative_to(directory.resolve()),
