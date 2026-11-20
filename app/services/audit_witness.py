@@ -47,11 +47,11 @@ def _hex(value):
     return isinstance(value, str) and HEX.fullmatch(value) is not None
 
 
-def _file(path, limit):
+def _file(path, limit, *, links=(1,)):
     require(not path.is_symlink(), "witness file link rejected")
     info = path.stat()
     require(
-        stat.S_ISREG(info.st_mode) and info.st_nlink == 1 and info.st_size <= limit,
+        stat.S_ISREG(info.st_mode) and info.st_nlink in links and info.st_size <= limit,
         "witness file type/size rejected",
     )
     if os.name == "posix":
@@ -300,8 +300,17 @@ def status(directory, public_key_sha256, *, minimum_receipt):
 
 
 def observe(directory, database, public_key_sha256, *, expected_receipt, observation_id=None,
-            minimum_observed_at=None):
+            minimum_observed_at=None, initial_audit_head=None):
     require(observation_id is None or _operation(observation_id), "witness observation ID rejected")
+    if initial_audit_head is not None:
+        require(
+            observation_id is not None and expected_receipt == GENESIS
+            and type(initial_audit_head) is dict and set(initial_audit_head) == {"seq", "digest"}
+            and type(initial_audit_head["seq"]) is int
+            and 0 <= initial_audit_head["seq"] <= SQLiteAuditStore.MAX_ROWS
+            and _hex(initial_audit_head["digest"]),
+            "witness initial audit minimum rejected",
+        )
     minimum_time = None
     if minimum_observed_at is not None:
         require(observation_id is not None and isinstance(minimum_observed_at, str)
@@ -344,6 +353,10 @@ def observe(directory, database, public_key_sha256, *, expected_receipt, observa
             # The current DB still has to contain the already witnessed history.
             with store._transaction() as audit:
                 _verified_head(store, audit, last["body"]["head"])
+                if initial_audit_head is not None:
+                    require(last["body"]["head"]["seq"] >= initial_audit_head["seq"],
+                            "witness replay predates initial audit minimum")
+                    _verified_head(store, audit, initial_audit_head)
             return {
                 "receipt": last,
                 "receipt_sha256": previous,
@@ -354,7 +367,7 @@ def observe(directory, database, public_key_sha256, *, expected_receipt, observa
         require(previous == expected_receipt, "witness observation predecessor changed")
         number = 1 if last is None else last["body"]["number"] + 1
         require(number <= MAX_RECEIPTS, "witness receipt capacity exceeded")
-        minimum = last["body"]["head"] if last else None
+        minimum = last["body"]["head"] if last else initial_audit_head
         with store._transaction() as audit:
             seq, digest = _verified_head(store, audit, minimum)
         observed_at = datetime.now(UTC)
