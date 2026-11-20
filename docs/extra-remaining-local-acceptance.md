@@ -96,6 +96,8 @@ Hybrid는 독립 신호가 없는 단순 관리자 작업을 유효한 현재 �
 
 최종 확대 회귀는 Windows와 WSL Linux 각각 324개 통과, 실패·제외 0개였다. 기존 development 360건 및 이미 사용한 holdout 360건의 보고서를 원본과 정확히 재현하는 검사도 포함했다. 최종 JUnit은 `runtime/hybrid-verified-admin-scoped-20261121-{windows,linux}.xml`에 보존했다.
 
+추가로 실제 ASGI 요청과 SQLite 감사 저장소를 연결했다. 확인된 정책 위반과 서버 승인 근거에 반하는 모델 경보가 보정된 뒤 응답과 저장 행이 일치했다. 분석 중 세션이 회수된 경우에는 HTTP 502로 종료했고 SQLite에 성공 분석 행이 남지 않았다. 이 검사와 관련 회귀는 Windows와 WSL Linux에서 각각 82개 통과했다. 원본은 `runtime/hybrid-verified-http-sqlite-20261121-{windows,linux}.xml`이다.
+
 ## 장기 시험을 보류하는 동안 실행한 단기 검증
 
 패치 검사에 사용했던 `9c83559` 테스트 이미지를 재사용했다. 네트워크 차단·비루트·읽기 전용 루트 조건에서 기능까지 동작하는지 확인했고, 각 묶음의 로그와 JUnit 결과를 별도로 보존했다.

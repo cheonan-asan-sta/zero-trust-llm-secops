@@ -1,15 +1,19 @@
 import asyncio
 from datetime import UTC, datetime, timedelta
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, Mock
 
 import pytest
+from fastapi.testclient import TestClient
 
 import scripts.local_session_analysis_lab as session_lab
+from app import main
 from app.analyzers.hybrid import HybridAnalyzer
 from app.config import Settings
 from app.models import SecurityAssessment, ViolationType
+from app.security import get_principal
 from app.services.session_analysis_evidence import collect_session_evidence
-from app.zero_trust_models import ProtectedAccessRequest
+from app.services.sqlite_audit import SQLiteAuditStore
+from app.zero_trust_models import ProtectedAccessRequest, SessionRevocationRequest
 from scripts.local_session_analysis_lab import SCENARIOS, LocalSessionAnalysisLab
 
 
@@ -346,3 +350,57 @@ def test_verified_admin_cannot_clear_a_server_action_denial(tmp_path, monkeypatc
     result = analyze(signed, context, assessment())
     assert result.violation_type == ViolationType.PRIVILEGE_ESCALATION
     assert "verified_session.policy.action_permitted" in result.evidence
+
+
+@pytest.mark.parametrize(
+    "kind", ["confirmed_denial", "contradicted_claim", "revoked_during_review"]
+)
+def test_verified_http_returns_and_audits_current_policy_classification(
+    lab, monkeypatch, tmp_path, kind
+):
+    denied = kind == "confirmed_denial"
+    updates = {"auth_context": {"mfa": "unknown"}} if denied else {}
+    signed, _ = signed_read_control(lab, kind, not denied, updates)
+    before = lab.service.history(signed.session_id, lab.principal)
+    response = assessment() if denied else contradictory_policy_response()
+
+    async def model(_event, _context):
+        if kind == "revoked_during_review":
+            lab.service.revoke(
+                signed.session_id,
+                SessionRevocationRequest(
+                    expected_version=before[-1].version, note="Local review test withdrawal"
+                ),
+                lab.principal,
+            )
+        return response
+
+    settings = Settings(analyzer_mode="hybrid", openai_prompt_mode="grounded")
+    llm = Mock(analyze_with_evidence=AsyncMock(side_effect=model))
+    hybrid = HybridAnalyzer(settings, llm=llm)
+    audit = SQLiteAuditStore(tmp_path / "verified-analysis.sqlite3")
+    monkeypatch.setattr(main, "zero_trust_operations", lab.service)
+    monkeypatch.setattr(main, "get_analyzer", lambda: hybrid)
+    monkeypatch.setattr(main, "get_settings", lambda: settings)
+    monkeypatch.setattr(main, "audit_store", audit)
+    monkeypatch.setitem(main.app.dependency_overrides, get_principal, lambda: lab.principal)
+
+    result = TestClient(main.app).post(
+        "/analysis/verified-session", json=signed.model_dump(mode="json")
+    )
+    llm.analyze_with_evidence.assert_awaited_once()
+    if kind == "revoked_during_review":
+        assert result.status_code == 502
+        assert audit.integrity()["verified_lines"] == 0
+        assert lab.service.history(signed.session_id, lab.principal)[-1].status == "REVOKED"
+    else:
+        assert result.status_code == 200, result.text
+        payload = result.json()
+        expected = ViolationType.ACCESS_POLICY_VIOLATION if denied else ViolationType.NORMAL
+        assert payload["assessment"]["violation_type"] == expected
+        assert payload["assessment"]["requires_human_review"]
+        saved = audit.get(signed.event.event_id, tenant_id=lab.principal.tenant_id)
+        assert audit.integrity()["verified_lines"] == 1
+        assert saved.assessment.violation_type == expected
+        assert saved.verification_context == payload["verification_context"]
+        assert lab.service.history(signed.session_id, lab.principal) == before
