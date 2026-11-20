@@ -22,6 +22,7 @@ from app.zero_trust_models import SignedSessionSignal
 if TYPE_CHECKING:
     from app.services.zero_trust import ZeroTrustOperations
 
+LIVE_SESSION_SCOPE = "current_local_zero_trust_session_snapshot_not_historical_backfill"
 _TIMESTAMP_TYPE = datetime
 _REMOTE_LOGON_RULE_ID = "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
 
@@ -148,7 +149,7 @@ def collect_session_evidence(
     if approval_usable:
         expires = min(expires, current.grant_expires_at)
     facts = {
-        "scope": "current_local_zero_trust_session_snapshot_not_historical_backfill",
+        "scope": LIVE_SESSION_SCOPE,
         "collected_at": now.isoformat(),
         "valid_until": expires.isoformat(),
         "tenant_id": principal.tenant_id,

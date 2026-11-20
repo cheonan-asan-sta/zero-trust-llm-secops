@@ -353,6 +353,56 @@ def test_verified_admin_cannot_clear_a_server_action_denial(tmp_path, monkeypatc
 
 
 @pytest.mark.parametrize(
+    "role, observed_required_role, matches_in_verified_response",
+    [
+        ("administrator", None, False),
+        ("administrator", "employee", True),
+        ("employee", None, True),
+    ],
+)
+def test_verified_http_admin_sigma_uses_only_current_confirmed_scope(
+    tmp_path, monkeypatch, role, observed_required_role, matches_in_verified_response
+):
+    lab = admin_lab(tmp_path / "admin-authority", monkeypatch)
+    original, _ = lab.create(("admin-read", False, "remote-admin", role, "success", True, "ADMIN"))
+    event = original.event.model_copy(
+        update={
+            "event_id": "http-admin-scope-check",
+            "resource": original.event.resource.model_copy(
+                update={"required_role": observed_required_role}
+            ),
+        }
+    )
+    signed = lab.sign(event, "http-admin-scope-check")
+    lab.service.evaluate_signed(signed, lab.principal)
+    settings = Settings(analyzer_mode="hybrid", openai_prompt_mode="grounded")
+    hybrid = HybridAnalyzer(
+        settings, llm=Mock(analyze_with_evidence=AsyncMock(return_value=assessment()))
+    )
+    audit = SQLiteAuditStore(tmp_path / "verified-admin.sqlite3")
+    monkeypatch.setattr(main, "zero_trust_operations", lab.service)
+    monkeypatch.setattr(main, "get_analyzer", lambda: hybrid)
+    monkeypatch.setattr(main, "get_settings", lambda: settings)
+    monkeypatch.setattr(main, "audit_store", audit)
+    monkeypatch.setitem(main.app.dependency_overrides, get_principal, lambda: lab.principal)
+
+    client = TestClient(main.app)
+    raw = client.post("/detections/evaluate", json=event.model_dump(mode="json"))
+    verified = client.post("/analysis/verified-session", json=signed.model_dump(mode="json"))
+    assert raw.status_code == verified.status_code == 200
+    assert any("attack.t1098" in row["tags"] for row in raw.json()["detection"]["matches"])
+    detection = verified.json()["detection"]
+    assert (
+        any("attack.t1098" in row["tags"] for row in detection["matches"])
+        is matches_in_verified_response
+    )
+    saved = audit.get(event.event_id, tenant_id=lab.principal.tenant_id)
+    assert saved.detection.model_dump(mode="json") == detection
+    if not matches_in_verified_response:
+        assert detection["highest_level"] != "high"
+
+
+@pytest.mark.parametrize(
     "kind", ["confirmed_denial", "contradicted_claim", "revoked_during_review"]
 )
 def test_verified_http_returns_and_audits_current_policy_classification(

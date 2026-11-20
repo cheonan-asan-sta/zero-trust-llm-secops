@@ -238,14 +238,26 @@ class SigmaEngine:
                         )
         return result
 
-    def evaluate(self, normalized: NormalizedSecurityEvent) -> SigmaDetectionResult:
+    def evaluate(
+        self, normalized: NormalizedSecurityEvent, *, verified_admin_scope: bool = False
+    ) -> SigmaDetectionResult:
         event = normalized.event.model_dump(mode="json", exclude_none=True)
-        return self.evaluate_fields(event)
+        return self.evaluate_fields(event, verified_admin_scope=verified_admin_scope)
 
-    def evaluate_fields(self, event: dict[str, object]) -> SigmaDetectionResult:
+    def evaluate_fields(
+        self, event: dict[str, object], *, verified_admin_scope: bool = False
+    ) -> SigmaDetectionResult:
         """Evaluate observed fields, retaining missing values for source-aware adapters."""
         matches: list[SigmaDetectionMatch] = []
+        _, observed_role = _lookup(event, "unmapped.resource.required_role")
         for rule in self.approved_rules:
+            if (
+                verified_admin_scope
+                and observed_role is None
+                and rule.summary.rule_id == "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
+            ):
+                # A server-confirmed role membership resolves the missing operand.
+                continue
             selector_results = {
                 name: _match_selector(selector, event)
                 for name, selector in rule.detection.items()

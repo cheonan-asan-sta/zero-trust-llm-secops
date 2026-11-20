@@ -13,7 +13,7 @@ from app.models import (
     SecurityEvent,
     ViolationType,
 )
-from app.services.session_analysis_evidence import VerifiedSessionContext
+from app.services.session_analysis_evidence import LIVE_SESSION_SCOPE, VerifiedSessionContext
 
 _RISK_ORDER = {
     RiskLevel.LOW: 0,
@@ -21,7 +21,6 @@ _RISK_ORDER = {
     RiskLevel.HIGH: 2,
     RiskLevel.CRITICAL: 3,
 }
-_LIVE_SESSION_SCOPE = "current_local_zero_trust_session_snapshot_not_historical_backfill"
 _APPROVAL_EVIDENCE = frozenset(
     {
         "verified_session.policy.resource_registered",
@@ -64,7 +63,7 @@ def _approved_administrator_action(event, facts, baseline):
 
 
 def _verified_session_baseline(event, facts, baseline):
-    if facts.get("scope") != _LIVE_SESSION_SCOPE:
+    if facts.get("scope") != LIVE_SESSION_SCOPE:
         return baseline
     policy, signal, session = facts["policy"], facts["signal"], facts["session"]
     if policy["origin"] != "server_owned_configuration" or signal["signature_verified"] is not True:
@@ -167,7 +166,7 @@ def _verified_session_baseline(event, facts, baseline):
 
 def _contradicted_policy_finding(facts, baseline, model):
     if (
-        facts.get("scope") != _LIVE_SESSION_SCOPE
+        facts.get("scope") != LIVE_SESSION_SCOPE
         or baseline.violation_type != ViolationType.NORMAL
         or model.violation_type != ViolationType.ACCESS_POLICY_VIOLATION
         or not model.evidence

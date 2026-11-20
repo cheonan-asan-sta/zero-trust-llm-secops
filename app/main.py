@@ -135,7 +135,11 @@ from app.services.public_detection import PublicSession, evaluate_public_session
 from app.services.public_replay import get_public_replay_service
 from app.services.response_actions import ResponseService
 from app.services.scenario_evaluator import evaluate_scenarios
-from app.services.session_analysis_evidence import VerifiedSessionContext, collect_session_evidence
+from app.services.session_analysis_evidence import (
+    LIVE_SESSION_SCOPE,
+    VerifiedSessionContext,
+    collect_session_evidence,
+)
 from app.services.settled_io import settled_io
 from app.services.sigma import get_sigma_engine
 from app.services.signal_inbox import SignalInbox
@@ -1236,6 +1240,19 @@ async def _analyze_event_in_slot(
         else verification_context
     )
     snapshot = selected_context.for_event(event) if selected_context is not None else None
+    if (
+        snapshot is not None
+        and snapshot.get("scope") == LIVE_SESSION_SCOPE
+        and event.action == "ADMIN"
+        and event.resource.required_role is None
+        and snapshot["signal"]["signature_verified"] is True
+        and snapshot["policy"]["origin"] == "server_owned_configuration"
+        and all(
+            snapshot["policy"][key] is True
+            for key in ("resource_registered", "role_permitted", "action_permitted")
+        )
+    ):
+        detection = sigma_engine.evaluate(normalized, verified_admin_scope=True)
     safe_assessment = enforce_assessment_safety(assessment, event)
     verified_controls = None
     if snapshot is not None:
