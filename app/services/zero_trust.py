@@ -36,6 +36,7 @@ from app.zero_trust_models import (
 
 POLICY_PATH = Path(__file__).parents[1] / "data" / "zero-trust-policies.json"
 _RESTRICTION_RANK = {"ALLOW": 0, "STEP_UP": 1, "HOLD": 2, "DENY": 3}
+_PRIVILEGE_SCOPE_RULE_ID = "ac3d4e5f-6071-4c8d-ae9f-0a1b2c3d4e5f"
 
 
 class SessionConflict(ValueError):
@@ -588,13 +589,20 @@ class ZeroTrustOperations:
                 )})
                 assessment = RuleBasedAnalyzer().assess(safe_event)
                 detection = get_sigma_engine().evaluate(get_ocsf_normalizer().normalize(safe_event))
-                matched = [match.rule_id for match in detection.matches]
+                scope_permitted = event.user.role in resource.roles and event.action in resource.actions
+                # For a verified subject the server-owned role list is stronger
+                # evidence than Sigma's comparison with the empty required_role.
+                matches = [
+                    match for match in detection.matches
+                    if not (proof is not None and scope_permitted and match.rule_id == _PRIVILEGE_SCOPE_RULE_ID)
+                ]
+                matched = [match.rule_id for match in matches]
                 risk = max(assessment.risk_score, max(
                     ({"critical": 75, "high": 50, "medium": 25}.get(match.level.value, 0)
-                     for match in detection.matches), default=0,
+                     for match in matches), default=0,
                 ))
                 evidence = assessment.evidence
-                if event.user.role not in resource.roles or event.action not in resource.actions:
+                if not scope_permitted:
                     deny = True
                     reasons.append("RESOURCE_SCOPE_DENIED")
                 if resource.require_managed and not event.device.managed:

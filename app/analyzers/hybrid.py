@@ -34,6 +34,35 @@ _APPROVAL_EVIDENCE = frozenset(
 )
 
 
+def _active_server_approval(policy, signal, session):
+    return (
+        policy["origin"] == "server_owned_configuration"
+        and policy["resource_registered"] is True
+        and policy["role_permitted"] is True
+        and policy["action_permitted"] is True
+        and signal["signature_verified"] is True
+        and session["decision"] == "ALLOW"
+        and session["status"] == "ACTIVE"
+        and session["approval_currently_usable"] is True
+    )
+
+
+def _approved_administrator_action(event, facts, baseline):
+    return (
+        event.action == "ADMIN"
+        and event.user.role == "administrator"
+        and baseline.violation_type == ViolationType.PRIVILEGE_ESCALATION
+        and not baseline.evidence
+        and event.auth_context.failed_attempts == 0
+        and event.device.security_posture == "healthy"
+        and facts["signal"]["authentication_observation"] == "success"
+        and facts["session"]["reason_codes"] == ["POLICY_SATISFIED"]
+        and "execution" not in facts
+        and "native_execution" not in facts
+        and _active_server_approval(facts["policy"], facts["signal"], facts["session"])
+    )
+
+
 def _verified_session_baseline(event, facts, baseline):
     if facts.get("scope") != _LIVE_SESSION_SCOPE:
         return baseline
@@ -91,6 +120,17 @@ def _verified_session_baseline(event, facts, baseline):
             }
         )
 
+    if _approved_administrator_action(event, facts, baseline):
+        return baseline.model_copy(
+            update={
+                "violation_type": ViolationType.NORMAL,
+                "rationale": "현재 서버의 유효한 관리자 작업 승인을 확인했습니다.",
+                "evidence": ["verified_session.session.approval_currently_usable"],
+                "recommended_action": RecommendedAction.HOLD_FOR_REVIEW,
+                "requires_human_review": True,
+            }
+        )
+
     # The generic remote-logon match can call for step-up without showing lateral movement.
     allowed_rule_evidence = (
         {"device.managed"} if policy["managed_device_required"] is False else set()
@@ -134,17 +174,7 @@ def _contradicted_policy_finding(facts, baseline, model):
         or not set(model.evidence) <= _APPROVAL_EVIDENCE
     ):
         return False
-    policy, signal, session = facts["policy"], facts["signal"], facts["session"]
-    return (
-        policy["origin"] == "server_owned_configuration"
-        and policy["resource_registered"] is True
-        and policy["role_permitted"] is True
-        and policy["action_permitted"] is True
-        and signal["signature_verified"] is True
-        and session["decision"] == "ALLOW"
-        and session["status"] == "ACTIVE"
-        and session["approval_currently_usable"] is True
-    )
+    return _active_server_approval(facts["policy"], facts["signal"], facts["session"])
 
 
 class HybridAnalyzer:

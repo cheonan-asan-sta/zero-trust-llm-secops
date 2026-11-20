@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+import scripts.local_session_analysis_lab as session_lab
 from app.analyzers.hybrid import HybridAnalyzer
 from app.config import Settings
 from app.models import SecurityAssessment, ViolationType
@@ -253,3 +254,95 @@ def test_consumed_approval_does_not_clear_model_policy_finding(lab):
     assert analyze(signed, current, contradictory_policy_response()).violation_type == (
         ViolationType.ACCESS_POLICY_VIOLATION
     )
+
+
+def admin_lab(directory, monkeypatch):
+    policy = session_lab.remote_policy_bundle()
+    admin = next(
+        resource for resource in policy["resources"] if resource["resource_id"] == "remote-admin"
+    )
+    admin["actions"].append("ADMIN")
+    monkeypatch.setattr(session_lab, "remote_policy_bundle", lambda: policy)
+    return LocalSessionAnalysisLab(directory)
+
+
+ADMIN_CONTROLS = (
+    (
+        "approved_admin",
+        "administrator",
+        "success",
+        True,
+        ViolationType.NORMAL,
+        ViolationType.NORMAL,
+    ),
+    (
+        "approved_with_policy_error",
+        "administrator",
+        "success",
+        True,
+        ViolationType.ACCESS_POLICY_VIOLATION,
+        ViolationType.NORMAL,
+    ),
+    (
+        "denied_employee",
+        "employee",
+        "success",
+        True,
+        ViolationType.NORMAL,
+        ViolationType.PRIVILEGE_ESCALATION,
+    ),
+    (
+        "approved_with_model_threat",
+        "administrator",
+        "success",
+        True,
+        ViolationType.CREDENTIAL_ANOMALY,
+        ViolationType.CREDENTIAL_ANOMALY,
+    ),
+    (
+        "required_mfa_unconfirmed",
+        "administrator",
+        "unknown",
+        True,
+        ViolationType.NORMAL,
+        ViolationType.PRIVILEGE_ESCALATION,
+    ),
+)
+
+
+@pytest.mark.parametrize(
+    "name,role,mfa,managed,model_finding,expected",
+    ADMIN_CONTROLS,
+    ids=[row[0] for row in ADMIN_CONTROLS],
+)
+def test_verified_admin_preserves_only_grounded_findings(
+    tmp_path, monkeypatch, name, role, mfa, managed, model_finding, expected
+):
+    lab = admin_lab(tmp_path / "admin-authority", monkeypatch)
+    signed, context = lab.create(
+        (name, expected != ViolationType.NORMAL, "remote-admin", role, mfa, managed, "ADMIN")
+    )
+    before = lab.service.history(signed.session_id, lab.principal)
+    decision = {"denied_employee": "DENY", "required_mfa_unconfirmed": "STEP_UP"}.get(name, "ALLOW")
+    assert before[-1].decision == decision
+    response = (
+        contradictory_policy_response()
+        if model_finding == ViolationType.ACCESS_POLICY_VIOLATION
+        else assessment(model_finding)
+    )
+    result = analyze(signed, context, response)
+    assert result.violation_type == expected
+    assert result.recommended_action == "HOLD_FOR_REVIEW"
+    assert lab.service.history(signed.session_id, lab.principal) == before
+
+
+def test_verified_admin_cannot_clear_a_server_action_denial(tmp_path, monkeypatch):
+    lab = admin_lab(tmp_path / "admin-authority", monkeypatch)
+    signed, context = lab.create(
+        ("denied_admin_action", True, "remote-team", "administrator", "success", True, "ADMIN")
+    )
+    current = context.for_event(signed.event)["session"]
+    assert current["decision"] == "DENY" and "RESOURCE_SCOPE_DENIED" in current["reason_codes"]
+    result = analyze(signed, context, assessment())
+    assert result.violation_type == ViolationType.PRIVILEGE_ESCALATION
+    assert "verified_session.policy.action_permitted" in result.evidence
