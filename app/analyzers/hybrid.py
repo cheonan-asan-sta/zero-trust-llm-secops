@@ -21,14 +21,21 @@ _RISK_ORDER = {
     RiskLevel.HIGH: 2,
     RiskLevel.CRITICAL: 3,
 }
+_LIVE_SESSION_SCOPE = "current_local_zero_trust_session_snapshot_not_historical_backfill"
+_APPROVAL_EVIDENCE = frozenset(
+    {
+        "verified_session.policy.resource_registered",
+        "verified_session.policy.role_permitted",
+        "verified_session.policy.action_permitted",
+        "verified_session.session.decision",
+        "verified_session.session.status",
+        "verified_session.session.approval_currently_usable",
+    }
+)
 
 
-def _verified_remote_baseline(event, facts, baseline):
-    if (
-        event.action != "REMOTE_ACCESS"
-        or event.network.access_method not in {"remote", "vpn"}
-        or facts.get("scope") != "current_local_zero_trust_session_snapshot_not_historical_backfill"
-    ):
+def _verified_session_baseline(event, facts, baseline):
+    if facts.get("scope") != _LIVE_SESSION_SCOPE:
         return baseline
     policy, signal, session = facts["policy"], facts["signal"], facts["session"]
     if policy["origin"] != "server_owned_configuration" or signal["signature_verified"] is not True:
@@ -38,7 +45,10 @@ def _verified_remote_baseline(event, facts, baseline):
         (policy["resource_registered"] is False, ("policy.resource_registered",)),
         (policy["role_permitted"] is False, ("policy.role_permitted",)),
         (policy["action_permitted"] is False, ("policy.action_permitted",)),
-        (session["status"] == "REVOKED", ("session.status",)),
+        (
+            session["status"] == "REVOKED" and "SESSION_ALREADY_REVOKED" in session["reason_codes"],
+            ("session.status", "session.reason_codes"),
+        ),
         (
             policy["mfa_required"] is True and signal["mfa_observation"] != "success",
             ("policy.mfa_required", "signal.mfa_observation"),
@@ -51,19 +61,30 @@ def _verified_remote_baseline(event, facts, baseline):
     paths = [
         f"verified_session.{path}" for applies, fields in violations if applies for path in fields
     ]
+    if "IDENTITY_DENIED" in session["reason_codes"]:
+        if not event.user.active:
+            paths.append("user.active")
+        if signal["authentication_observation"] == "failure":
+            paths.append("verified_session.signal.authentication_observation")
+    if (
+        "DEVICE_COMPROMISED" in session["reason_codes"]
+        and event.device.security_posture == "compromised"
+    ):
+        paths.append("device.security_posture")
     if paths:
         if policy["managed_device_required"] is True and not event.device.managed:
             paths.append("device.managed")
         violation = baseline.violation_type
         if violation == ViolationType.NORMAL or (
             violation == ViolationType.LATERAL_MOVEMENT
+            and event.action == "REMOTE_ACCESS"
             and event.behavior.distinct_resources_10m < 8
         ):
             violation = ViolationType.ACCESS_POLICY_VIOLATION
         return baseline.model_copy(
             update={
                 "violation_type": violation,
-                "rationale": "검증한 원격 접속 근거가 서버의 접근 요건을 충족하지 않습니다.",
+                "rationale": "검증한 세션 근거가 서버의 접근 요건을 충족하지 않습니다.",
                 "evidence": list(dict.fromkeys([*paths, *baseline.evidence]))[:20],
                 "recommended_action": RecommendedAction.HOLD_FOR_REVIEW,
                 "requires_human_review": True,
@@ -75,7 +96,9 @@ def _verified_remote_baseline(event, facts, baseline):
         {"device.managed"} if policy["managed_device_required"] is False else set()
     )
     if (
-        baseline.violation_type != ViolationType.LATERAL_MOVEMENT
+        event.action != "REMOTE_ACCESS"
+        or event.network.access_method not in {"remote", "vpn"}
+        or baseline.violation_type != ViolationType.LATERAL_MOVEMENT
         or event.behavior.distinct_resources_10m >= 8
         or not set(baseline.evidence) <= allowed_rule_evidence
         or event.auth_context.failed_attempts != 0
@@ -99,6 +122,28 @@ def _verified_remote_baseline(event, facts, baseline):
             "recommended_action": RecommendedAction.HOLD_FOR_REVIEW,
             "requires_human_review": True,
         }
+    )
+
+
+def _contradicted_policy_finding(facts, baseline, model):
+    if (
+        facts.get("scope") != _LIVE_SESSION_SCOPE
+        or baseline.violation_type != ViolationType.NORMAL
+        or model.violation_type != ViolationType.ACCESS_POLICY_VIOLATION
+        or not model.evidence
+        or not set(model.evidence) <= _APPROVAL_EVIDENCE
+    ):
+        return False
+    policy, signal, session = facts["policy"], facts["signal"], facts["session"]
+    return (
+        policy["origin"] == "server_owned_configuration"
+        and policy["resource_registered"] is True
+        and policy["role_permitted"] is True
+        and policy["action_permitted"] is True
+        and signal["signature_verified"] is True
+        and session["decision"] == "ALLOW"
+        and session["status"] == "ACTIVE"
+        and session["approval_currently_usable"] is True
     )
 
 
@@ -131,8 +176,10 @@ class HybridAnalyzer:
     ) -> SecurityAssessment:
         baseline = self._rule.assess(event)
         adjusted = False
+        facts = None
         if context is not None:
-            verified = _verified_remote_baseline(event, context.for_event(event), baseline)
+            facts = context.for_event(event)
+            verified = _verified_session_baseline(event, facts, baseline)
             adjusted = verified is not baseline
             baseline = verified
         if (
@@ -161,6 +208,28 @@ class HybridAnalyzer:
                     ),
                     "rationale": baseline.rationale
                     + " LLM 교차 검토를 완료하지 못해 사람 검토로 전환합니다.",
+                    "requires_human_review": True,
+                }
+            )
+        if facts is not None and _contradicted_policy_finding(facts, baseline, llm_assessment):
+            llm_assessment = llm_assessment.model_copy(
+                update={
+                    "violation_type": ViolationType.NORMAL,
+                    "rationale": "모델이 인용한 현재 서버 정책과 세션 기록은 접근 요건 충족을 나타냅니다.",
+                }
+            )
+            return self._merge(baseline, llm_assessment).model_copy(
+                update={
+                    "evidence": list(
+                        dict.fromkeys(
+                            [
+                                "verified_session.session.approval_currently_usable",
+                                *baseline.evidence,
+                                *llm_assessment.evidence,
+                            ]
+                        )
+                    )[:20],
+                    "recommended_action": RecommendedAction.HOLD_FOR_REVIEW,
                     "requires_human_review": True,
                 }
             )

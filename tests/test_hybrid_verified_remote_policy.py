@@ -8,6 +8,7 @@ from app.analyzers.hybrid import HybridAnalyzer
 from app.config import Settings
 from app.models import SecurityAssessment, ViolationType
 from app.services.session_analysis_evidence import collect_session_evidence
+from app.zero_trust_models import ProtectedAccessRequest
 from scripts.local_session_analysis_lab import SCENARIOS, LocalSessionAnalysisLab
 
 
@@ -119,4 +120,136 @@ def test_verified_policy_and_model_rationale_fit_the_response_contract(lab):
     assert (
         SecurityAssessment.model_validate(result.model_dump()).violation_type
         == ViolationType.NORMAL
+    )
+
+
+READ_CONTROLS = (
+    ("permitted_vpn_read", True, {}, None),
+    ("permitted_office_read", True, {"network": {"access_method": "office"}}, None),
+    (
+        "inactive_account",
+        False,
+        {"user": {"active": False}},
+        "user.active",
+    ),
+    (
+        "failed_authentication",
+        False,
+        {"auth_context": {"authentication_result": "failure"}},
+        "verified_session.signal.authentication_observation",
+    ),
+    (
+        "required_mfa_unknown",
+        False,
+        {"auth_context": {"mfa": "unknown"}},
+        "verified_session.policy.mfa_required",
+    ),
+    (
+        "compromised_device",
+        False,
+        {"device": {"security_posture": "compromised"}},
+        "device.security_posture",
+    ),
+    (
+        "revoked_request",
+        False,
+        {},
+        "verified_session.session.status",
+    ),
+    (
+        "role_denied_by_server",
+        False,
+        {"user": {"role": "administrator"}, "resource": {"required_role": "administrator"}},
+        "verified_session.policy.role_permitted",
+    ),
+)
+
+
+def signed_read_control(lab, name, allowed, updates):
+    signed, context = lab.create(
+        (name, not allowed, "remote-read", "employee", "success", True, "READ")
+    )
+    if not updates:
+        return signed, context
+    event = signed.event.model_copy(
+        update={
+            "event_id": "read-" + name,
+            **{
+                field: getattr(signed.event, field).model_copy(update=values)
+                for field, values in updates.items()
+            },
+        }
+    )
+    signed = lab.sign(event, "read-" + name)
+    lab.service.evaluate_signed(signed, lab.principal)
+    return signed, collect_session_evidence(lab.service, signed, lab.principal)
+
+
+@pytest.mark.parametrize(
+    "name,allowed,updates,required_evidence", READ_CONTROLS, ids=[row[0] for row in READ_CONTROLS]
+)
+def test_verified_read_reports_confirmed_policy_failure(
+    lab, name, allowed, updates, required_evidence
+):
+    signed, context = signed_read_control(lab, name, allowed, updates)
+    before = lab.service.history(signed.session_id, lab.principal)
+    result = analyze(signed, context, assessment())
+    if allowed:
+        assert result.violation_type == ViolationType.NORMAL
+    else:
+        assert result.violation_type == ViolationType.ACCESS_POLICY_VIOLATION
+        assert required_evidence in result.evidence
+        assert result.recommended_action == "HOLD_FOR_REVIEW"
+        assert result.requires_human_review
+        fallback = analyze(signed, context, None)
+        assert fallback.violation_type == result.violation_type
+    assert lab.service.history(signed.session_id, lab.principal) == before
+
+
+def contradictory_policy_response():
+    return assessment(ViolationType.ACCESS_POLICY_VIOLATION).model_copy(
+        update={
+            "evidence": ["verified_session.policy.action_permitted"],
+        }
+    )
+
+
+def test_verified_allow_corrects_contradicted_policy_only_claim(lab):
+    signed, context = signed_read_control(lab, "permitted_read", True, {})
+    before = lab.service.history(signed.session_id, lab.principal)
+    result = analyze(signed, context, contradictory_policy_response())
+    assert result.violation_type == ViolationType.NORMAL
+    assert result.recommended_action == "HOLD_FOR_REVIEW" and result.requires_human_review
+    assert "verified_session.session.approval_currently_usable" in result.evidence
+    assert lab.service.history(signed.session_id, lab.principal) == before
+
+
+def test_verified_allow_preserves_a_model_finding_with_separate_evidence(lab):
+    signed, context = signed_read_control(lab, "permitted_read", True, {})
+    response = contradictory_policy_response()
+    response = response.model_copy(
+        update={"evidence": [*response.evidence, "network.access_method"]}
+    )
+    assert (
+        analyze(signed, context, response).violation_type == ViolationType.ACCESS_POLICY_VIOLATION
+    )
+
+
+def test_consumed_approval_does_not_clear_model_policy_finding(lab):
+    signed, _ = signed_read_control(lab, "permitted_read", True, {})
+    event = signed.event.model_copy(update={"event_id": "approval-consumption-check"})
+    signed = lab.sign(event, "approval-consumption-check")
+    issued = lab.service.evaluate_signed(signed, lab.principal)
+    assert issued.grant_token
+    access = ProtectedAccessRequest(
+        session_id=signed.session_id,
+        resource_id=event.resource.resource_id,
+        action=event.action,
+        grant_token=issued.grant_token,
+    )
+    assert lab.service.access(access, lab.principal).allowed
+    current = collect_session_evidence(lab.service, signed, lab.principal)
+    assert current.for_event(event)["session"]["approval_currently_usable"] is False
+    assert analyze(signed, current, contradictory_policy_response()).violation_type == (
+        ViolationType.ACCESS_POLICY_VIOLATION
     )
