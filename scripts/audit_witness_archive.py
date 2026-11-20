@@ -75,6 +75,11 @@ def main():
                 archive.write(raw, args.destination)
         print(json.dumps(result, ensure_ascii=False, allow_nan=False))
         return 0
+    except worm.WormReadbackError as error:
+        print(f"Generation archive write returned version {json.dumps(error.version_id)}. "
+              "Verification incomplete. Verify this version with fetch-worm.",
+              file=sys.stderr)
+        return 1
     except (AuditTransferError, AuditQueryUnavailable, OSError, ValueError, TypeError,
             KeyError, RecursionError, sqlite3.Error, BotoCoreError, ClientError, InvalidTag) as error:
         detail = str(error) if isinstance(error, AuditTransferError) else type(error).__name__

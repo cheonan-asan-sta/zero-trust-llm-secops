@@ -5,8 +5,16 @@ import re
 from contextlib import closing
 from datetime import UTC, datetime
 
+from botocore.exceptions import BotoCoreError, ClientError
+
 from app.services import audit_witness_archive as archive
-from app.services.audit_transfer import require
+from app.services.audit_transfer import AuditTransferError, require
+
+
+class WormReadbackError(AuditTransferError):
+    def __init__(self, version_id):
+        super().__init__("WORM write returned a version but verification did not complete")
+        self.version_id = version_id
 
 
 def _location(bucket, owner, archive_pin):
@@ -43,8 +51,14 @@ def fetch(client, bucket, owner, version, retain_until, *, archive_pin, key_pin,
         size = response.get("ContentLength")
         require(type(size) is int and 0 < size <= archive.MAX_ARCHIVE_BYTES,
                 "WORM object size rejected")
-        raw = body.read(size + 1)
-        require(len(raw) == size, "WORM object incomplete")
+        buffer = bytearray()
+        while len(buffer) <= size:
+            chunk = body.read(min(65536, size + 1 - len(buffer)))
+            if not chunk:
+                break
+            buffer.extend(chunk)
+        require(len(buffer) == size, "WORM object length mismatch")
+        raw = bytes(buffer)
     result = archive.inspect(raw, archive_pin, key_pin, terminal_pin)
     result.update(bucket=bucket, bucket_owner=owner, object_key=location["Key"],
                   version_id=version, retention_mode="COMPLIANCE",
@@ -64,7 +78,11 @@ def upload(client, bucket, owner, retain_until, raw, *, archive_pin, key_pin, te
         ObjectLockMode="COMPLIANCE", ObjectLockRetainUntilDate=retain_until,
     )
     version = _version(response.get("VersionId"))
-    _, result = fetch(client, bucket, owner, version, retain_until, archive_pin=archive_pin,
-                      key_pin=key_pin, terminal_pin=terminal_pin)
-    require(result["retention_active"], "WORM retention expired before verification")
+    try:
+        _, result = fetch(client, bucket, owner, version, retain_until, archive_pin=archive_pin,
+                          key_pin=key_pin, terminal_pin=terminal_pin)
+        require(result["retention_active"], "WORM retention expired before verification")
+    except (AuditTransferError, BotoCoreError, ClientError, OSError, ValueError, TypeError,
+            KeyError, RecursionError) as error:
+        raise WormReadbackError(version) from error
     return result

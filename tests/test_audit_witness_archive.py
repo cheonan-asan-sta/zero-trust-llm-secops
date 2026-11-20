@@ -10,7 +10,7 @@ from datetime import UTC, datetime, timedelta
 
 import boto3
 import pytest
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, IncompleteReadError
 from botocore.response import StreamingBody
 from botocore.stub import Stubber
 from test_audit_witness_observer import ready
@@ -20,6 +20,7 @@ from app.services import audit_witness_worm as worm
 from app.services.audit_backup import backup_sqlite
 from app.services.audit_transfer import AuditTransferError, canonical, decode, sha
 from app.services.sqlite_audit import SQLiteAuditStore
+from scripts import audit_witness_archive as archive_cli
 from scripts.run_witness_systemd_controls import fill_generation
 
 BUCKET = "separate-audit-fixture"
@@ -171,3 +172,74 @@ def test_worm_refuses_unpinned_or_unprotected_readback(closed_generation, fault)
         with pytest.raises(AuditTransferError):
             worm.fetch(client, BUCKET, OWNER, VERSION, until, **pins)
         stub.assert_no_pending_responses()
+
+
+@pytest.mark.parametrize("size_mismatch", [0, -1, 1])
+def test_worm_readback_handles_fragmented_response(closed_generation, size_mismatch):
+    class FragmentedBody(io.BytesIO):
+        def read(self, size=-1):
+            return super().read(min(size, 65536))
+
+    exported, _, _, _, pins, _ = closed_generation
+    raw = archive.read(exported)
+    until = datetime.now(UTC) + timedelta(days=10)
+    client, _, request, response = s3_stub(raw, pins, until)
+    body = raw[:-1] if size_mismatch < 0 else raw + b"x" * size_mismatch
+    source = FragmentedBody(body)
+    response["Body"] = StreamingBody(source, len(raw))
+    with Stubber(client) as stub:
+        stub.add_response("get_object", response, request)
+        if size_mismatch < 0:
+            with pytest.raises(IncompleteReadError):
+                worm.fetch(client, BUCKET, OWNER, VERSION, until, **pins)
+        elif size_mismatch > 0:
+            with pytest.raises(AuditTransferError, match="object length mismatch"):
+                worm.fetch(client, BUCKET, OWNER, VERSION, until, **pins)
+        else:
+            downloaded, result = worm.fetch(client, BUCKET, OWNER, VERSION, until, **pins)
+            assert downloaded == raw and result["version_id"] == VERSION
+        stub.assert_no_pending_responses()
+    assert source.closed
+
+
+def test_worm_upload_preserves_version_when_verification_could_not_finish(closed_generation):
+    exported, _, _, _, pins, _ = closed_generation
+    raw = archive.read(exported)
+    until = datetime.now(UTC) + timedelta(days=10)
+    client, location, request, response = s3_stub(raw, pins, until)
+    put = dict(location, Body=raw, IfNoneMatch="*", ContentType="application/json",
+               ChecksumAlgorithm="SHA256", ChecksumSHA256=base64.b64encode(bytes.fromhex(pins["archive_pin"])).decode(),
+               ObjectLockMode="COMPLIANCE", ObjectLockRetainUntilDate=until)
+    with Stubber(client) as stub:
+        stub.add_response("put_object", {"VersionId": VERSION}, put)
+        stub.add_client_error("get_object", service_error_code="ServiceUnavailable",
+                              http_status_code=503, expected_params=request)
+        with pytest.raises(worm.WormReadbackError) as result:
+            worm.upload(client, BUCKET, OWNER, until, raw, **pins)
+        assert result.value.version_id == VERSION
+        assert isinstance(result.value.__cause__, ClientError)
+        stub.add_response("get_object", response, request)
+        assert worm.fetch(client, BUCKET, OWNER, result.value.version_id, until, **pins)[0] == raw
+        stub.assert_no_pending_responses()
+
+
+def test_worm_upload_cli_reports_unverified_version_without_success(closed_generation, monkeypatch, capsys):
+    exported, _, _, _, pins, _ = closed_generation
+    until = datetime.now(UTC) + timedelta(days=10)
+    client = object()
+    monkeypatch.setattr(boto3, "client", lambda *args, **kwargs: client)
+    def interrupted(s3, bucket, owner, deadline, raw, **expected):
+        assert (s3, bucket, owner, deadline, expected) == (client, BUCKET, OWNER, until, pins)
+        raise worm.WormReadbackError(VERSION)
+
+    monkeypatch.setattr(worm, "upload", interrupted)
+    monkeypatch.setattr(sys, "argv", [
+        "archive", "upload-worm", "--archive", str(exported),
+        "--archive-sha256", pins["archive_pin"], "--public-key-sha256", pins["key_pin"],
+        "--terminal-sha256", pins["terminal_pin"], "--bucket", BUCKET, "--bucket-owner", OWNER,
+        "--region", "us-east-1", "--retain-until", until.isoformat(),
+    ])
+    assert archive_cli.main() == 1
+    output = capsys.readouterr()
+    assert output.out == ""
+    assert json.dumps(VERSION) in output.err and "fetch-worm" in output.err
