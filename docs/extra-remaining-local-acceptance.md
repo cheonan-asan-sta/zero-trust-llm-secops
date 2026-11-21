@@ -141,6 +141,18 @@ grounded 지침과 관련 회귀까지 Windows·WSL Linux에서 각각 191개 �
 
 이번에 원래 최종 인수 조건을 충족한 새 외부 평가 사례는 0건이다. 독립 평가에는 익명화된 정상·위협 세션과 같은 시점의 접속 승인·MFA 정책 및 결과를 대조할 수 있는 기록이 필요하다. 원래 후보를 동결한 뒤 정답 없이 예측하고, 이후 정답을 결합해 채점한다.
 
+#### 새 원격 자료의 근거 연결 검사
+
+평가 메타데이터 목록과 승인·MFA 참조 목록을 [로컬 검사기](../scripts/check_remote_evaluation_evidence.py)로 비교할 수 있다. 두 목록은 JSONL과 각각의 SHA-256으로 고정한다. 참조에는 사례 ID, 입력 SHA-256, 승인·MFA 기록별 SHA-256과 세션 그룹 지문, 기록이 최초로 이용 가능했던 시각과 관측 결과를 넣는다. 승인 거부와 MFA 비필수도 명시적으로 기록할 수 있고, 확인할 수 없는 결과는 미상으로 둔다.
+
+```text
+python -m scripts.check_remote_evaluation_evidence --catalog catalog.jsonl --catalog-sha256 CATALOG_PIN --evidence references.jsonl --evidence-sha256 REFERENCES_PIN
+```
+
+검사기는 입력 또는 세션 불일치, 사례 종료 후에 생긴 기록, 다른 세션에 재사용된 같은 기록과 미상을 구분한다. 참조 확인은 별도의 원본 무결성·출처·독립 라벨 검토나 추론·채점을 대신하지 않는다. 근거가 없는 사례의 정상·위협 라벨을 변경하지 않는다.
+
+원래 입력 지문에서 미탐 17건을 다시 추출해 검사했다. 승인 참조와 MFA 참조가 모두 없었던 사례는 17건이며 새 최종 예약 사례는 0건이다. Windows와 WSL Linux에서 관련 검사가 각각 52개 통과했다. JUnit은 `runtime/remote-evidence-intake-{windows,linux}-20261121.xml`, 17건의 원본 검사는 `runtime/remote-evidence-intake-historical-20261121/report.json`에 남겼다. 유료 API 호출과 새 추론은 0회였다.
+
 ## 장기 시험을 보류하는 동안 실행한 단기 검증
 
 패치 검사에 사용했던 `9c83559` 테스트 이미지를 재사용했다. 네트워크 차단·비루트·읽기 전용 루트 조건에서 기능까지 동작하는지 확인했고, 각 묶음의 로그와 JUnit 결과를 별도로 보존했다.
