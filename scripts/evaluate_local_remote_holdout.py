@@ -118,10 +118,79 @@ CONFIRMATION_PROFILES = (
     ("night-shift", "vpn", "198.51.100.96", 6),
     ("field-operations", "remote", "203.0.113.144", 2),
 )
+MFA_VALIDATION_FAMILIES = (
+    ("repeated_managed_remote", "REMOTE_ACCESS", "standard", "bound-repeat", "success", False),
+    ("repeated_privileged_remote", "REMOTE_ACCESS", "restricted", "bound-repeat", "success", False),
+    ("verified_privileged_read", "READ", "restricted", "bound", "success", False),
+    ("accepted_required_remote", "REMOTE_ACCESS", "standard", "bound", "success", False),
+    (
+        "verified_after_prior_success",
+        "REMOTE_ACCESS",
+        "standard",
+        "bound-existing-mfa",
+        "success",
+        False,
+    ),
+    ("normal_seven_resource_remote", "REMOTE_ACCESS", "standard", "bound-busy", "success", False),
+    ("optional_mfa_success_remote", "REMOTE_ACCESS", "optional", "bound", "success", False),
+    ("optional_mfa_unknown_read", "READ", "optional", "direct", "unknown", False),
+    ("ordinary_privileged_remote", "REMOTE_ACCESS", "restricted", "direct", "success", False),
+    ("ordinary_optional_remote", "REMOTE_ACCESS", "optional", "direct", "unknown", False),
+    (
+        "missing_third_response",
+        "REMOTE_ACCESS",
+        "standard",
+        "bound-repeat-missing",
+        "success",
+        True,
+    ),
+    (
+        "mismatched_third_response",
+        "REMOTE_ACCESS",
+        "standard",
+        "bound-repeat-wrong",
+        "success",
+        True,
+    ),
+    ("missing_protected_read_response", "READ", "read-only", "absent", "success", True),
+    ("mismatched_protected_remote_response", "REMOTE_ACCESS", "standard", "wrong", "success", True),
+    ("failed_protected_remote_response", "REMOTE_ACCESS", "standard", "bound", "failed", True),
+    ("failed_direct_protected_read", "READ", "read-only", "direct", "failed", True),
+    (
+        "fanout_after_matching_challenge",
+        "REMOTE_ACCESS",
+        "standard",
+        "bound-fanout",
+        "success",
+        True,
+    ),
+    ("withdrawn_remote_permission", "REMOTE_ACCESS", "standard", "revoked", "success", True),
+    (
+        "unmanaged_remote_after_challenge",
+        "REMOTE_ACCESS",
+        "standard",
+        "bound-unmanaged",
+        "success",
+        True,
+    ),
+    (
+        "inactive_remote_after_challenge",
+        "REMOTE_ACCESS",
+        "standard",
+        "bound-inactive",
+        "success",
+        True,
+    ),
+)
+MFA_VALIDATION_PROFILES = (
+    ("engineering-gateway", "vpn", "192.0.2.56", 3),
+    ("continuity-gateway", "remote", "203.0.113.162", 5),
+)
 COHORTS = {
     "initial": (FAMILIES, PROFILES, 6211709, "L"),
     "followup": (FOLLOWUP_FAMILIES, FOLLOWUP_PROFILES, 4190013, "H"),
     "confirmation": (CONFIRMATION_FAMILIES, CONFIRMATION_PROFILES, 679331, "C"),
+    "mfa-validation": (MFA_VALIDATION_FAMILIES, MFA_VALIDATION_PROFILES, 761109, "M"),
 }
 
 
@@ -309,7 +378,7 @@ def collect(lab, case_id, case):
         )
     signal = lab.sign(event, session_id, previous.version, challenge_id=challenge)
     result = lab.service.evaluate_signed(signal, lab.principal)
-    if workflow == "bound-repeat":
+    if workflow.startswith("bound-repeat"):
         latest = result.session
         if latest.challenge_id is None:
             raise ValueError(f"{case_id}: expected a pending review challenge")
@@ -319,7 +388,12 @@ def collect(lab, case_id, case):
                 "timestamp": max(datetime.now(UTC), latest.observed_at + timedelta(microseconds=1)),
             }
         )
-        signal = lab.sign(final, session_id, latest.version, challenge_id=latest.challenge_id)
+        challenge = latest.challenge_id
+        if workflow == "bound-repeat-missing":
+            challenge = None
+        elif workflow == "bound-repeat-wrong":
+            challenge = hashlib.sha256(case_id.encode()).hexdigest()
+        signal = lab.sign(final, session_id, latest.version, challenge_id=challenge)
         lab.service.evaluate_signed(signal, lab.principal)
     return signal
 

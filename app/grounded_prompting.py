@@ -9,7 +9,7 @@ from pydantic import Field, create_model
 
 from app.models import SecurityAssessment, SecurityEvent
 from app.services.ocsf import get_ocsf_normalizer
-from app.services.session_analysis_evidence import VerifiedSessionContext
+from app.services.session_analysis_evidence import LIVE_SESSION_SCOPE, VerifiedSessionContext
 from app.services.sigma import get_sigma_engine
 
 GROUNDED_INSTRUCTIONS = """
@@ -104,23 +104,32 @@ The caller identity binds the request operator only. It does not verify the obse
 identity/MFA, and the operator's administrative role never overrides the event subject's scope.
 
 For a verified session, use this decision order instead of unsigned-session uncertainty:
-1. If session.status is REVOKED and session.reason_codes contains SESSION_ALREADY_REVOKED,
+1. If remote_mfa_check.required_response_missing_or_mismatched is true, return
+   ACCESS_POLICY_VIOLATION for the attempted access even if signed MFA says success and the
+   server decision is STEP_UP. Cite verified_session.policy.mfa_required,
+   verified_session.session.challenge_pending and verified_session.session.reason_codes.
+   For example, required MFA + pending + SIGNED_MFA_CHALLENGE_REQUIRED means the response
+   did not satisfy that server challenge. This is a concrete policy failure without a DENY.
+2. If session.status is REVOKED and session.reason_codes contains SESSION_ALREADY_REVOKED,
    return ACCESS_POLICY_VIOLATION for the current attempted access. Successful authentication
    or MFA cannot restore access. Scope denial, a required managed device that is unmanaged,
    required MFA without success, or SIGNED_MFA_CHALLENGE_REQUIRED on a pending challenge are
    also concrete policy failures. These labels report violations, even without proof of a breach.
-2. In the absence of a concrete policy failure, if observed behavior.distinct_resources_10m
+3. In the absence of a concrete policy failure, if observed behavior.distinct_resources_10m
    is 8 or higher, return LATERAL_MOVEMENT as a triage finding and cite that field. Normal
    request rate, successful MFA and lack of proof of compromise do not negate this finding.
    A count below 8 is insufficient by itself. Consider other independent threat evidence.
-3. If the only server reason is ELEVATED_RISK, decision is STEP_UP, and only the generic
+4. If the only server reason is ELEVATED_RISK, decision is STEP_UP, and only the generic
    remote-logon rule matched, evaluate any concrete failure or independent threat above.
    Without either, return NORMAL with HOLD_FOR_REVIEW. This applies to the initial step-up
    and the matching same-scope MFA follow-up. Cite session.reason_codes and the decisive
    observations. A pending flag, unavailable grant, or absent independent IdP proof in
    this case changes access verification, never the triage label to violation or UNKNOWN.
-Before returning, check the output label against steps 1 and 2. If one of those conditions
-is present, do not return NORMAL or UNKNOWN just because the outcome is review-only.
+   For example, generic_remote_step_up_only=true and same_scope_response_verified=true
+   can coexist with challenge_pending=true. With no separate failure or threat, return
+   NORMAL and HOLD_FOR_REVIEW. The pending flag alone does not contradict a matched response.
+Before returning, check the output label against steps 1–3. Do not cite remote_mfa_check
+as evidence; cite the corresponding original verified_session fields.
 """.strip()
 
 VERIFIED_EXECUTION_INSTRUCTIONS = """
@@ -201,6 +210,31 @@ def grounded_output_type(
     )
 
 
+def _remote_mfa_check(event: SecurityEvent, facts: dict) -> dict | None:
+    if facts.get("scope") != LIVE_SESSION_SCOPE or event.network.access_method not in {
+        "vpn",
+        "remote",
+    }:
+        return None
+    policy, signal, session = facts["policy"], facts["signal"], facts["session"]
+    if policy["origin"] != "server_owned_configuration" or signal["signature_verified"] is not True:
+        return None
+    reasons = session["reason_codes"]
+    return {
+        "required_response_missing_or_mismatched": (
+            policy["mfa_required"] is True
+            and session["challenge_pending"] is True
+            and "SIGNED_MFA_CHALLENGE_REQUIRED" in reasons
+        ),
+        "generic_remote_step_up_only": (
+            session["decision"] == "STEP_UP"
+            and reasons == ["ELEVATED_RISK"]
+            and session.get("only_generic_remote_logon_rule_matched") is True
+        ),
+        "same_scope_response_verified": session.get("same_scope_mfa_response_verified") is True,
+    }
+
+
 def grounded_input(
     event: SecurityEvent,
     context: VerifiedSessionContext | None = None,
@@ -246,7 +280,9 @@ def grounded_input(
             for row in get_sigma_engine().observation_comparisons(normalized)
             if row["field_expression"].split("|", 1)[0] == "unmapped.behavior.download_volume_mb"
         ]
-    execution = context.for_event(event).get("execution") if context else None
+    facts = context.for_event(event) if context else {}
+    execution = facts.get("execution")
+    remote_mfa_check = _remote_mfa_check(event, facts)
     return [
         {
             "role": "user",
@@ -272,6 +308,11 @@ def grounded_input(
                         else {}
                     ),
                     "evidence_catalog": evidence_catalog(event, context),
+                    **(
+                        {"remote_mfa_check": remote_mfa_check}
+                        if remote_mfa_check is not None
+                        else {}
+                    ),
                     "server_detection_policies": policies,
                     **(
                         {

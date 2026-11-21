@@ -1,4 +1,5 @@
 import asyncio
+import json
 from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, Mock
 
@@ -9,6 +10,7 @@ import scripts.local_session_analysis_lab as session_lab
 from app import main
 from app.analyzers.hybrid import HybridAnalyzer
 from app.config import Settings
+from app.grounded_prompting import grounded_input
 from app.models import SecurityAssessment, ViolationType
 from app.security import get_principal
 from app.services.session_analysis_evidence import collect_session_evidence
@@ -486,6 +488,12 @@ def test_success_observation_cannot_replace_server_required_challenge(lab, bind_
     signed, context, session = signed_mfa_read_control(lab, bind_challenge=bind_challenge)
     assert context.for_event(signed.event)["signal"]["mfa_observation"] == "success"
     assert session.decision == ("ALLOW" if bind_challenge else "STEP_UP")
+    payload = json.loads(grounded_input(signed.event, context)[0]["content"])
+    assert (
+        payload["remote_mfa_check"]["required_response_missing_or_mismatched"] is not bind_challenge
+    )
+    assert not payload["remote_mfa_check"]["generic_remote_step_up_only"]
+    assert all(not path.startswith("remote_mfa_check") for path in payload["evidence_catalog"])
     result = analyze(signed, context, assessment())
     if bind_challenge:
         assert result.violation_type == ViolationType.NORMAL
@@ -541,6 +549,14 @@ def test_verified_remote_followup_limits_generic_alarm_only(lab, variant, expect
     context = collect_session_evidence(lab.service, signed, lab.principal)
     facts = context.for_event(event)["session"]
     assert facts["same_scope_mfa_response_verified"] is verified
+    if variant in {"same_scope", "absent_challenge"}:
+        matched = variant == "same_scope"
+        payload = json.loads(grounded_input(event, context)[0]["content"])
+        assert payload["remote_mfa_check"] == {
+            "required_response_missing_or_mismatched": not matched,
+            "generic_remote_step_up_only": matched,
+            "same_scope_response_verified": matched,
+        }
     assert facts["challenge_pending"] and not facts["approval_currently_usable"]
     history = lab.service.history(signed.session_id, lab.principal)
     response = assessment()

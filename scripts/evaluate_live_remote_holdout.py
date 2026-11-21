@@ -65,7 +65,11 @@ async def capture(source, output, key_file, plan_sha256, case_ids):
     if fingerprint(source_plan) != plan_sha256:
         raise ValueError("frozen remote cohort plan hash mismatch")
     plan = read(source_plan)
-    if (plan["cohort"], len(plan["cases"])) not in {("followup", 64), ("confirmation", 40)}:
+    if (plan["cohort"], len(plan["cases"])) not in {
+        ("followup", 64),
+        ("confirmation", 40),
+        ("mfa-validation", 40),
+    }:
         raise ValueError("invalid frozen cohort")
     selected_ids = case_ids or list(plan["cases"])
     if len(set(selected_ids)) != len(selected_ids) or not set(selected_ids) <= plan["cases"].keys():
