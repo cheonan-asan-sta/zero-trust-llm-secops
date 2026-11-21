@@ -59,6 +59,7 @@ class Settings(BaseSettings):
     oidc_issuer: str | None = None
     oidc_audience: str | None = None
     oidc_jwks_url: str | None = None
+    oidc_revoked_subjects_path: Path | None = None
     oidc_roles_claim: str = Field(default="roles", min_length=1, max_length=64)
     oidc_tenant_claim: str = Field(default="tenant_id", min_length=1, max_length=64)
     allowed_hosts: str = "127.0.0.1,localhost,testserver"

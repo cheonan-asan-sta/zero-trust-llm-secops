@@ -57,7 +57,7 @@ def unique_object(pairs):
     return result
 
 
-def load_accounts(path: Path, legacy_digest: str) -> list[ApiKeyAccount]:
+def load_authentication_json(path: Path):
     # Reopen each time so disabling a credential takes effect on the next call.
     # Never interpret a missing/malformed configured file as a legacy fallback.
     path = Path(path)
@@ -92,9 +92,11 @@ def load_accounts(path: Path, legacy_digest: str) -> list[ApiKeyAccount]:
         or signature(after) != signature(current)
     ):
         raise ValueError("account source changed or exceeds limit")
-    accounts = ApiKeyAccounts.model_validate(
-        json.loads(body, object_pairs_hook=unique_object)
-    ).accounts
+    return json.loads(body, object_pairs_hook=unique_object)
+
+
+def load_accounts(path: Path, legacy_digest: str) -> list[ApiKeyAccount]:
+    accounts = ApiKeyAccounts.model_validate(load_authentication_json(path)).accounts
     if any(account.sha256 == legacy_digest for account in accounts):
         raise ValueError("account credential conflicts with legacy identity")
     return accounts

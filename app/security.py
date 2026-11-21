@@ -6,15 +6,17 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
 from functools import lru_cache
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 import jwt
 from fastapi import Depends, Header, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import InvalidTokenError, PyJWKClient, PyJWKClientConnectionError, PyJWKClientError
+from pydantic import Field
 
-from app.api_key_accounts import load_accounts
+from app.api_key_accounts import load_accounts, load_authentication_json
 from app.config import Settings, get_settings
+from app.models import StrictModel
 from app.services.authentication_admission import authentication_slot
 from app.services.settled_io import settled_io
 
@@ -52,6 +54,37 @@ class Principal:
 
 _bearer = HTTPBearer(auto_error=False)
 _TENANT_PATTERN = re.compile(r"^[a-zA-Z0-9._-]{1,64}$")
+
+
+class RevokedOIDCSubject(StrictModel):
+    tenant_id: str = Field(pattern=_TENANT_PATTERN.pattern)
+    subject: str = Field(min_length=1, max_length=128)
+
+
+class OIDCRevocations(StrictModel):
+    schema_version: Literal["oidc-revocations-1"] = Field(alias="schema")
+    issuer: str = Field(min_length=1, max_length=2048)
+    subjects: list[RevokedOIDCSubject] = Field(max_length=1000)
+
+
+def _check_oidc_revocation(settings: Settings, principal: Principal) -> None:
+    if settings.oidc_revoked_subjects_path is None:
+        return
+    try:
+        policy = OIDCRevocations.model_validate(
+            load_authentication_json(settings.oidc_revoked_subjects_path)
+        )
+        if policy.issuer != settings.oidc_issuer:
+            raise ValueError("revocation policy issuer mismatch")
+    except (OSError, ValueError, TypeError, RecursionError) as exc:
+        raise HTTPException(
+            status_code=503, detail="OIDC revocation policy is unavailable"
+        ) from exc
+    if any(
+        (row.tenant_id, row.subject) == (principal.tenant_id, principal.subject)
+        for row in policy.subjects
+    ):
+        raise _unauthorized("Caller authority is revoked")
 
 
 @lru_cache(maxsize=8)
@@ -240,6 +273,7 @@ async def _resolve_principal(
                 value.oidc_jwks_url,
                 value.oidc_roles_claim,
                 value.oidc_tenant_claim,
+                value.oidc_revoked_subjects_path,
             )
 
         admitted_scope = oidc_scope(settings)
@@ -252,6 +286,7 @@ async def _resolve_principal(
                 or datetime.now(UTC) >= principal.authentication_expires_at
             ):
                 raise _unauthorized("Caller authentication policy changed or expired")
+            _check_oidc_revocation(current, principal)
 
         request.state.authentication_revalidator = revalidate_oidc_scope
     return principal
