@@ -6,6 +6,7 @@ import json
 import logging
 import os
 from contextvars import ContextVar
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
@@ -17,7 +18,12 @@ from app.analyzers import openai_analyzer
 from app.analyzers.hybrid import HybridAnalyzer
 from app.analyzers.openai_analyzer import OpenAIAnalyzer
 from app.config import Settings
-from app.services.session_analysis_evidence import collect_session_evidence, event_digest
+from app.models import SecurityAssessment, SecurityEvent
+from app.services.session_analysis_evidence import (
+    VerifiedSessionContext,
+    collect_session_evidence,
+    event_digest,
+)
 from scripts import local_session_analysis_lab
 from scripts.evaluate_llm_grounded import MODEL, metrics, prediction, reservation
 from scripts.evaluate_local_remote_holdout import (
@@ -219,6 +225,9 @@ def score(source, output, sealed):
         "prediction_sha256": sealed,
         "stopped": data["stopped"],
         "attempts": sum(r["attempted"] for r in rows),
+        "fresh_api_requests": 0
+        if read(protocol).get("replay_of")
+        else sum(r["attempted"] for r in rows),
         "valid_model_responses": sum("model_assessment" in r for r in rows),
         "estimated_usage_usd": sum(r.get("usage", {}).get("estimated_usd", 0.0) for r in rows),
         "reserved_usd": data["reserved_usd"],
@@ -242,9 +251,59 @@ def score(source, output, sealed):
     print(json.dumps({key: value for key, value in report.items() if not key.endswith("_errors")}))
 
 
+class FrozenAssessment:
+    def __init__(self, assessment):
+        self.assessment = assessment
+
+    async def analyze_with_evidence(self, event, context):
+        if self.assessment is None:
+            raise RuntimeError("frozen response unavailable")
+        return SecurityAssessment.model_validate(self.assessment)
+
+
+async def replay(original, output, sealed):
+    packet = original / "predictions.json"
+    protocol_path = original / "protocol.json"
+    if fingerprint(packet) != sealed:
+        raise ValueError("original prediction seal mismatch")
+    data, protocol = read(packet), read(protocol_path)
+    if fingerprint(protocol_path) != data["protocol_sha256"] or protocol.get("replay_of"):
+        raise ValueError("original protocol mismatch")
+    output.mkdir()
+    write(
+        output / "protocol.json",
+        {
+            **protocol,
+            "original_revision": protocol["revision"],
+            "revision": git("rev-parse", "HEAD").decode().strip(),
+            "replay_of": sealed,
+        },
+    )
+    settings = Settings(_env_file=None, hybrid_llm_timeout_seconds=30)
+    for row in data["rows"]:
+        event = SecurityEvent.model_validate(row["event"])
+        if event_digest(event) != row["event_sha256"]:
+            raise ValueError("original event binding changed")
+        # Replay only: keep captured facts and bypass live expiry without using a provider or PEP.
+        context = VerifiedSessionContext(
+            row["event_sha256"],
+            datetime.now(UTC) + timedelta(minutes=1),
+            json.dumps(row["facts"]).encode(),
+        )
+        analyzer = HybridAnalyzer(settings, FrozenAssessment(row.get("model_assessment")))
+        assessment = await analyzer.analyze_with_evidence(event, context)
+        row["hybrid_assessment"] = assessment.model_dump(mode="json")
+        row["hybrid_prediction"] = prediction(assessment)
+    write(
+        output / "predictions.json",
+        {**data, "protocol_sha256": fingerprint(output / "protocol.json")},
+    )
+    print(fingerprint(output / "predictions.json"))
+
+
 if __name__ == "__main__":
     cli = argparse.ArgumentParser(description=__doc__)
-    cli.add_argument("phase", choices=("capture", "score"))
+    cli.add_argument("phase", choices=("capture", "score", "replay"))
     cli.add_argument("source", type=Path)
     cli.add_argument("output", type=Path)
     cli.add_argument("--key-file", type=Path)
@@ -252,7 +311,9 @@ if __name__ == "__main__":
     args = cli.parse_args()
     if args.phase == "capture":
         asyncio.run(capture(args.source, args.output, args.key_file))
-    elif args.prediction_sha256:
+    elif args.phase == "replay" and args.prediction_sha256:
+        asyncio.run(replay(args.source, args.output, args.prediction_sha256))
+    elif args.phase == "score" and args.prediction_sha256:
         score(args.source, args.output, args.prediction_sha256)
     else:
-        cli.error("score requires --prediction-sha256")
+        cli.error("score and replay require --prediction-sha256")

@@ -506,6 +506,9 @@ def test_success_observation_cannot_replace_server_required_challenge(lab, bind_
         ("fanout", ViolationType.LATERAL_MOVEMENT, True),
         ("model_threat", ViolationType.CREDENTIAL_ANOMALY, True),
         ("model_unavailable", ViolationType.UNKNOWN, True),
+        ("model_generic_denial", ViolationType.NORMAL, True),
+        ("model_generic_unknown", ViolationType.NORMAL, True),
+        ("model_other_denial_evidence", ViolationType.ACCESS_POLICY_VIOLATION, True),
     ],
 )
 def test_verified_remote_followup_limits_generic_alarm_only(lab, variant, expected, verified):
@@ -545,6 +548,16 @@ def test_verified_remote_followup_limits_generic_alarm_only(lab, variant, expect
         response = assessment(ViolationType.CREDENTIAL_ANOMALY)
     if variant == "model_unavailable":
         response = None
+    if variant in {"model_generic_denial", "model_generic_unknown", "model_other_denial_evidence"}:
+        evidence = ["verified_session.session.challenge_pending", "behavior.distinct_resources_10m"]
+        if variant == "model_other_denial_evidence":
+            evidence.append("network.ip")
+        violation = (
+            ViolationType.UNKNOWN
+            if variant == "model_generic_unknown"
+            else ViolationType.ACCESS_POLICY_VIOLATION
+        )
+        response = assessment(violation).model_copy(update={"evidence": evidence})
     result = analyze(signed, context, response)
     assert result.violation_type == expected
     if variant in {"same_scope", "model_threat", "model_unavailable"}:

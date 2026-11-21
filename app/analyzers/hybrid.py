@@ -31,6 +31,45 @@ _APPROVAL_EVIDENCE = frozenset(
         "verified_session.session.approval_currently_usable",
     }
 )
+_GENERIC_STEP_UP_FIELDS = {
+    "verified_session.session.decision",
+    "verified_session.session.status",
+    "verified_session.session.reason_codes",
+    "verified_session.session.challenge_pending",
+}
+_GENERIC_REMOTE_RULE = "verified_session.session.only_generic_remote_logon_rule_matched"
+_REMOTE_REVIEW_CONTEXT = (
+    _APPROVAL_EVIDENCE
+    | _GENERIC_STEP_UP_FIELDS
+    | {
+        _GENERIC_REMOTE_RULE,
+        "action",
+        "auth_context.authentication_result",
+        "auth_context.mfa",
+        "auth_context.failed_attempts",
+        "behavior.distinct_resources_10m",
+        "device.managed",
+        "device.security_posture",
+        "network.access_method",
+        "resource.resource_type",
+        "verified_session.scope",
+        "verified_session.valid_until",
+        "verified_session.not_an_access_grant",
+        "verified_session.external_enterprise_identity_verified",
+        "verified_session.caller.authentication_method",
+        "verified_session.caller.identity_scope",
+        "verified_session.caller.event_subject_mfa_independently_verified",
+        "verified_session.caller.session_operator_binding_verified",
+        "verified_session.policy.mfa_required",
+        "verified_session.policy.managed_device_required",
+        "verified_session.session.input_digest_sha256",
+        "verified_session.session.same_scope_mfa_response_verified",
+        "verified_session.signal.authentication_observation",
+        "verified_session.signal.mfa_observation",
+        "verified_session.signal.meaning",
+        "verified_session.signal.signature_verified",
+    }
+)
 
 
 def _active_server_approval(policy, signal, session):
@@ -161,7 +200,7 @@ def _verified_session_baseline(event, facts, baseline):
     ):
         return baseline
     evidence = [
-        "verified_session.session.only_generic_remote_logon_rule_matched",
+        _GENERIC_REMOTE_RULE,
         "verified_session.session.reason_codes",
         *baseline.evidence,
     ]
@@ -192,6 +231,33 @@ def _contradicted_policy_finding(facts, baseline, model):
     ):
         return False
     return _active_server_approval(facts["policy"], facts["signal"], facts["session"])
+
+
+def _only_generic_remote_review(event, facts, baseline, model):
+    if (
+        baseline.violation_type != ViolationType.NORMAL
+        or _GENERIC_REMOTE_RULE not in baseline.evidence
+        or model.violation_type
+        not in {ViolationType.ACCESS_POLICY_VIOLATION, ViolationType.UNKNOWN}
+        or "execution" in facts
+        or "native_execution" in facts
+    ):
+        return False
+    observed = event.behavior
+    benign = {
+        "behavior.download_volume_mb": observed.download_volume_mb == 0,
+        "behavior.new_device": not observed.new_device,
+        "behavior.policy_exception_approved": not observed.policy_exception_approved,
+        "behavior.request_rate": observed.request_rate == "normal",
+        "behavior.unusual_time": not observed.unusual_time,
+        "network.location_anomaly": not event.network.location_anomaly,
+    }
+    cited = set(model.evidence)
+    return bool(
+        cited & _GENERIC_STEP_UP_FIELDS
+        and cited
+        <= _REMOTE_REVIEW_CONTEXT | {field for field, ordinary in benign.items() if ordinary}
+    )
 
 
 class HybridAnalyzer:
@@ -278,6 +344,17 @@ class HybridAnalyzer:
                     )[:20],
                     "recommended_action": RecommendedAction.HOLD_FOR_REVIEW,
                     "requires_human_review": True,
+                }
+            )
+        if (
+            facts is not None
+            and adjusted
+            and _only_generic_remote_review(event, facts, baseline, llm_assessment)
+        ):
+            llm_assessment = llm_assessment.model_copy(
+                update={
+                    "violation_type": ViolationType.NORMAL,
+                    "rationale": "모델이 인용한 근거는 일반 추가 인증 대기 상태를 설명합니다. 접근은 계속 검토합니다.",
                 }
             )
         merged = self._merge(baseline, llm_assessment)
