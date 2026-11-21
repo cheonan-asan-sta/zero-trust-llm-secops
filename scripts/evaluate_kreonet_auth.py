@@ -25,6 +25,8 @@ WINDOWS = {
     "calibration": (datetime(2026, 3, 1, tzinfo=UTC), START),
     "holdout": (START, STOP),
 }
+PROTOCOL_MODULES = {"op", "rp", "idp", "sp"}
+PROTOCOL_STATUSES = {400, 401, 403, 404, 500}
 
 
 def auth_flow_signals(statuses, *, post_denied):
@@ -36,7 +38,36 @@ def auth_flow_signals(statuses, *, post_denied):
     return [name for name, seen in signals.items() if seen]
 
 
-def capture(output, source=None, *, cohort="holdout", include_auth_flow=False):
+def protocol_flow_signals(statuses, stages):
+    redirected = any(statuses[code] > 0 for code in (301, 302, 303, 307, 308))
+    protocol_statuses = {code for code, _, module in stages if module in PROTOCOL_MODULES}
+    unauthorized_modules = {module for code, _, module in stages if code == 401 and module}
+    protocol_server_errors = {
+        module for code, _, module in stages if code == 500 and module in PROTOCOL_MODULES
+    }
+    signals = {
+        "protocol_bad_request_with_redirect": redirected and 400 in protocol_statuses,
+        "protocol_get_denied_with_unauthorized": statuses[401] > 0
+        and any(
+            code == 403 and method == "GET" and module in PROTOCOL_MODULES
+            for code, method, module in stages
+        ),
+        "protocol_not_found_with_unauthorized_and_redirect": (
+            redirected and statuses[401] > 0 and 404 in protocol_statuses
+        ),
+        "protocol_server_error_and_unauthorized_at_distinct_components": any(
+            server != unauthorized
+            for server in protocol_server_errors
+            for unauthorized in unauthorized_modules
+        ),
+    }
+    return [name for name, seen in signals.items() if seen]
+
+
+def capture(
+    output, source=None, *, cohort="holdout", include_auth_flow=False, include_protocol_flow=False
+):
+    include_auth_flow = include_auth_flow or include_protocol_flow
     output.mkdir(exist_ok=True)
     plan = output / "plan.json"
     start, stop = WINDOWS[cohort]
@@ -65,6 +96,17 @@ def capture(output, source=None, *, cohort="holdout", include_auth_flow=False):
                 ],
             }
         )
+    if include_protocol_flow:
+        expected_plan["input_fields"].append("module")
+        expected_plan["candidate"] = (
+            "previous authentication flow detector OR protocol flow signals"
+        )
+        expected_plan["protocol_flow_signals"] = [
+            "HTTP 400 at OP/RP/IdP/SP and a redirect",
+            "HTTP 403 on GET at OP/RP/IdP/SP and HTTP 401",
+            "HTTP 404 at OP/RP/IdP/SP with a redirect and HTTP 401",
+            "HTTP 500 at OP/RP/IdP/SP and HTTP 401 at a different component",
+        ]
     if plan.exists():
         if read(plan) != expected_plan:
             raise ValueError("existing plan differs from frozen protocol")
@@ -90,21 +132,24 @@ def capture(output, source=None, *, cohort="holdout", include_auth_flow=False):
             when = datetime.fromisoformat(row["timestamp"])
             if when.tzinfo is None:
                 when = when.replace(tzinfo=UTC)
-            first, last, statuses, post_denied = traces.setdefault(
-                key, (when, when, Counter(), False)
+            first, last, statuses, post_denied, stages = traces.setdefault(
+                key, (when, when, Counter(), False, set())
             )
             status = row.get("http_status")
             statuses[status] += 1
+            if include_protocol_flow and status in PROTOCOL_STATUSES:
+                stages.add((status, row.get("http_method"), row.get("module")))
             traces[key] = (
                 min(first, when),
                 max(last, when),
                 statuses,
                 post_denied
                 or (include_auth_flow and status == 403 and row.get("http_method") == "POST"),
+                stages,
             )
     analyzer = RuleBasedAnalyzer()
     rows = {}
-    for key, (first, last, statuses, post_denied) in traces.items():
+    for key, (first, last, statuses, post_denied, stages) in traces.items():
         if not start <= first <= last < stop:
             continue
         failures = statuses[401]
@@ -148,6 +193,16 @@ def capture(output, source=None, *, cohort="holdout", include_auth_flow=False):
                     "prediction": baseline or bool(signals),
                     "baseline_prediction": baseline,
                     "auth_flow_signals": signals,
+                }
+            )
+        if include_protocol_flow:
+            signals = protocol_flow_signals(statuses, stages)
+            previous = rows[identity]["prediction"]
+            rows[identity].update(
+                {
+                    "previous_auth_flow_prediction": previous,
+                    "prediction": previous or bool(signals),
+                    "protocol_flow_signals": signals,
                 }
             )
     write(
@@ -208,10 +263,14 @@ def score(output, seal, source=None):
         ),
         "paid_api_calls": 0,
     }
-    if "baseline_prediction" in next(iter(forecasts.values())):
-        reference = [
-            {**row, "prediction": forecasts[row["id"]]["baseline_prediction"]} for row in scored
-        ]
+    sample_forecast = next(iter(forecasts.values()))
+    if "baseline_prediction" in sample_forecast:
+        compare_protocol = "previous_auth_flow_prediction" in sample_forecast
+        reference_field = (
+            "previous_auth_flow_prediction" if compare_protocol else "baseline_prediction"
+        )
+        signals_field = "protocol_flow_signals" if compare_protocol else "auth_flow_signals"
+        reference = [{**row, "prediction": forecasts[row["id"]][reference_field]} for row in scored]
         comparison = compare_rows(reference, scored)
         recovered = comparison["recovered_TP_ids"]
         report.update(
@@ -232,11 +291,7 @@ def score(output, seal, source=None):
                     )
                 ),
                 "recoveries_by_signal": dict(
-                    Counter(
-                        signal
-                        for key in recovered
-                        for signal in forecasts[key]["auth_flow_signals"]
-                    )
+                    Counter(signal for key in recovered for signal in forecasts[key][signals_field])
                 ),
             }
         )
@@ -252,10 +307,15 @@ if __name__ == "__main__":
     cli.add_argument("--source", type=Path)
     cli.add_argument("--cohort", choices=tuple(WINDOWS), default="holdout")
     cli.add_argument("--include-auth-flow", action="store_true")
+    cli.add_argument("--include-protocol-flow", action="store_true")
     args = cli.parse_args()
     if args.phase == "capture":
         capture(
-            args.output, args.source, cohort=args.cohort, include_auth_flow=args.include_auth_flow
+            args.output,
+            args.source,
+            cohort=args.cohort,
+            include_auth_flow=args.include_auth_flow,
+            include_protocol_flow=args.include_protocol_flow,
         )
     elif args.prediction_sha256:
         score(args.output, args.prediction_sha256, args.source)
