@@ -16,16 +16,16 @@ from unittest.mock import patch
 from uuid import uuid4
 
 import httpx
-import jwt
 from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 
 from app import security
 from app.config import Settings
-from app.services.auth_alert_triage import resolve_auth_alert
+from app.services.auth_alert_triage import resolve_auth_alert, resolve_terminal_auth_alert
 from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
 from app.zero_trust_models import SignedSessionSignal
 from scripts.evaluate_local_remote_holdout import write
+from scripts.local_keycloak_evidence_collector import LocalKeycloakEvidenceCollector
 from scripts.local_session_analysis_lab import LocalSessionAnalysisLab
 
 IMAGE = "quay.io/keycloak/keycloak:26.8.0"
@@ -124,7 +124,7 @@ def fixture_otp(seed):
     return f"{value % 1_000_000:06d}"
 
 
-def verify(base, root, password, otp_seed, admin_password):
+def verify(base, root, password, otp_seed, admin_password, *, stop_provider):
     issuer = f"{base}/realms/{REALM}"
     metadata_url = issuer + "/.well-known/openid-configuration"
     with httpx.Client(trust_env=False, timeout=8) as client:
@@ -143,25 +143,6 @@ def verify(base, root, password, otp_seed, admin_password):
 
         def token(**fields):
             return client.post(token_url, data={"client_id": CLIENT_ID, **fields})
-
-        def sign_in(**fields):
-            return token(
-                grant_type="password",
-                username=TEST_USER,
-                password=password,
-                scope="openid",
-                **fields,
-            )
-
-        valid_otp = fixture_otp(otp_seed)
-        wrong_otp = sign_in(otp=f"{(int(valid_otp) + 1) % 1_000_000:06d}")
-        missing_otp = sign_in()
-        assert wrong_otp.status_code == missing_otp.status_code == 400
-        assert wrong_otp.json().get("error") == missing_otp.json().get("error") == "invalid_grant"
-        approved_otp = sign_in(otp=fixture_otp(otp_seed))
-        assert approved_otp.status_code == 200, approved_otp.status_code
-        tokens = approved_otp.json()
-        identity = jwt.decode(tokens["id_token"], options={"verify_signature": False})["sub"]
 
         policy = root / "revocations.json"
 
@@ -183,6 +164,31 @@ def verify(base, root, password, otp_seed, admin_password):
             oidc_revoked_subjects_path=policy,
         )
         lab = LocalSessionAnalysisLab(root / "gateway")
+        collector = LocalKeycloakEvidenceCollector(lab, settings, client)
+
+        def sign_in(**fields):
+            return collector.sign_in(username=TEST_USER, password=password, **fields)
+
+        valid_otp = fixture_otp(otp_seed)
+        wrong_otp = sign_in(otp=f"{(int(valid_otp) + 1) % 1_000_000:06d}")
+        missing_otp = sign_in()
+        for rejected in (wrong_otp, missing_otp):
+            assert rejected.response.status_code == 400 and rejected.signal is not None
+            assert rejected.signal.event.auth_context.authentication_result == "failure"
+            assert rejected.signal.event.auth_context.mfa == "unknown"
+        approved_otp = sign_in(otp=fixture_otp(otp_seed))
+        assert approved_otp.response.status_code == 200 and approved_otp.signal is not None
+        tokens = approved_otp.response.json()
+        identity = security._decode_oidc_token(tokens["id_token"], settings)["sub"]
+
+        cancelled_event = collector.attempts.open("cancel-before-auth-" + uuid4().hex)
+        assert collector.probe_readiness(cancelled_event.event_id) is None
+        cancelled_receipt = collector.attempts.cancel(cancelled_event.event_id)
+        cancelled_alert = resolve_terminal_auth_alert(
+            lab.service, cancelled_event, cancelled_receipt, lab.principal
+        )
+        assert cancelled_alert == "cleared"
+
         gateway = FastAPI()
         gateway.include_router(zero_trust_router(lab.service))
         install_zero_trust_error_handlers(gateway)
@@ -207,12 +213,9 @@ def verify(base, root, password, otp_seed, admin_password):
             TestClient(gateway) as app,
         ):
 
-            def evaluate(action, authentication):
-                mfa = "success" if authentication.status_code == 200 else "failed"
-                scenario = ("fixture", False, "remote-read", "employee", mfa, True, action)
-                old, _ = lab.create(scenario)
-                event = old.event.model_copy(update={"event_id": "keycloak-" + old.event.event_id})
-                signed = lab.sign(event, "keycloak-" + old.session_id)
+            def evaluate(authentication):
+                signed = authentication.signal
+                assert signed is not None
                 response = app.post(
                     "/zero-trust/signals/evaluate",
                     json=signed.model_dump(mode="json"),
@@ -225,7 +228,7 @@ def verify(base, root, password, otp_seed, admin_password):
                 assert triage.status_code == 200, triage.status_code
                 return response.json(), triage.json()["disposition"]
 
-            approved, approved_alert = evaluate("READ", approved_otp)
+            approved, approved_alert = evaluate(approved_otp)
             assert approved_alert == "cleared"
             assert approved["session"]["decision"] == "ALLOW" and approved["grant_token"]
             requested = {
@@ -237,12 +240,15 @@ def verify(base, root, password, otp_seed, admin_password):
             assert app.post("/zero-trust/protected-access", json=requested, headers=analyst).json()[
                 "allowed"
             ]
-            scope_denial, scope_alert = evaluate("REMOTE_ACCESS", approved_otp)
+            out_of_scope = sign_in(otp=fixture_otp(otp_seed), action="REMOTE_ACCESS")
+            scope_denial, scope_alert = evaluate(out_of_scope)
             assert scope_alert == "confirmed"
             assert scope_denial["session"]["decision"] == "DENY" and not scope_denial["grant_token"]
-            failed, failed_alert = evaluate("READ", wrong_otp)
-            assert failed_alert == "confirmed"
-            assert failed["session"]["decision"] == "STEP_UP" and not failed["grant_token"]
+            failed, failed_alert = evaluate(wrong_otp)
+            missing, missing_alert = evaluate(missing_otp)
+            assert failed_alert == missing_alert == "confirmed"
+            for rejected in (failed, missing):
+                assert rejected["session"]["decision"] == "DENY" and not rejected["grant_token"]
 
             admin = client.post(
                 f"{base}/realms/master/protocol/openid-connect/token",
@@ -297,19 +303,40 @@ def verify(base, root, password, otp_seed, admin_password):
                 and blocked.json()["detail"] == "Caller authority is revoked"
             )
         security._jwks_client.cache_clear()
+        stop_provider()
+        unavailable_event = collector.attempts.open("outage-before-auth-" + uuid4().hex)
+        unavailable_receipt = collector.probe_readiness(unavailable_event.event_id)
+        assert unavailable_receipt is not None
+        assert unavailable_receipt.outcome == "upstream_unavailable"
+        unavailable_alert = resolve_terminal_auth_alert(
+            lab.service, unavailable_event, unavailable_receipt, lab.principal
+        )
+        assert unavailable_alert == "cleared"
+        assert (
+            resolve_terminal_auth_alert(
+                lab.service, unavailable_event, cancelled_receipt, lab.principal
+            )
+            == "needs_evidence"
+        )
     return {
         "image": IMAGE,
         "alert_triage": {
             "approved_mfa_and_scope": approved_alert,
             "denied_scope": scope_alert,
-            "failed_mfa": failed_alert,
+            "rejected_otp_request": failed_alert,
+            "missing_otp_request": missing_alert,
+            "pre_auth_cancelled": cancelled_alert,
+            "pre_auth_outage": unavailable_alert,
+            "cross_attempt_receipt": "needs_evidence",
         },
         "mfa_correct": 200,
         "mfa_wrong": 400,
         "mfa_missing": 400,
         "allowed_read": True,
         "remote_out_of_scope": "DENY",
-        "failed_mfa_policy": "STEP_UP",
+        "failed_mfa_policy": failed["session"]["decision"],
+        "failed_mfa_observation": "unknown",
+        "pre_auth_outage_probe": "actual stopped loopback provider",
         "failed_mfa_grant": False,
         "downgraded_role": 403,
         "logout": 204,
@@ -351,14 +378,29 @@ def run(output):
             "start-dev",
             "--import-realm",
         )
+        stopped = False
+
+        def stop_provider():
+            nonlocal stopped
+            if not stopped:
+                docker("stop", "--time", "12", name)
+                stopped = True
+
         try:
             mapping = docker("port", name, "8080/tcp")
             if not re.fullmatch(r"127\.0\.0\.1:\d{1,5}", mapping):
                 raise RuntimeError("unexpected Keycloak endpoint")
-            report = verify(f"http://{mapping}", root, password, otp_seed, admin_password)
+            report = verify(
+                f"http://{mapping}",
+                root,
+                password,
+                otp_seed,
+                admin_password,
+                stop_provider=stop_provider,
+            )
         finally:
             try:
-                docker("stop", "--time", "12", name)
+                stop_provider()
             except RuntimeError:
                 if name in docker("ps", "-a", "--format", "{{.Names}}").splitlines():
                     raise

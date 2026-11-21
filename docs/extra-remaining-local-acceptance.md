@@ -661,6 +661,24 @@ KREONET 개발 구간에서 같은 모델을 다시 학습해, 이전 비교 구
 
 `python -m scripts.evaluate_auth_alert_triage runtime/kreonet-transfer-v1 runtime/kreonet-evidence-terminal-final --terminal-evidence`로 재현한다. 유료 API와 AWS 호출 없이 관련 회귀 테스트 125개를 통과했다. 기존 Keycloak 통합 시험도 재실행해 OTP, 접근 범위, 역할 변경과 토큰 회수를 확인했다. 결과는 `runtime/keycloak-auth-alert-terminal-regression-v1.json`에 있다.
 
+#### 로컬 Keycloak 요청의 인증 증거 수집
+
+Keycloak 앞단의 로컬 시험 수집기에서 시도 ID와 요청 범위를 정한 뒤 실제 토큰 요청을 보낸다. HTTP 200과 필요한 토큰 필드를 확인한 뒤 ID 토큰의 서명·issuer·audience·유효 시간·사용자·테넌트를 검증한다. 테스트 realm은 등록된 사용자에게 OTP를 요구하며, 통과한 요청만 MFA 성공을 서명한다. 잘못되거나 빠진 OTP가 `400 invalid_grant`로 돌아온 경우에는 인증 거절을 기록하고 MFA 세부 상태는 미확인으로 남긴다. 5xx, TLS나 전송 오류, 토큰 검증 실패를 성공이나 MFA 실패로 바꾸지 않는다. 비밀번호, OTP, 토큰, 개인키는 산출물에 저장하지 않는다.
+
+| 조건 | 실제 로컬 관측 | 경보·접근 결과 |
+| --- | --- | --- |
+| OTP 정상 및 읽기 범위 허용 | Keycloak 200, 검증된 토큰 | 경보 해소, 읽기 승인 |
+| OTP 오류 또는 누락 | 각각 Keycloak 400 | 경보 확정, 권한 미발급 |
+| 승인 범위 밖 요청 | 별도 인증 시도의 토큰 검증 | 경보 확정, 접근 거부 |
+| 인증 시작 전 시험 클라이언트 취소 | 정상 Keycloak 준비 상태 확인 후 취소 | 정확한 시도의 서명 종료 기록으로 경보 해소 |
+| 인증 시작 전 상위 인증 서버 종료 | 실제 Keycloak 컨테이너 중지 후 준비 상태 연결 실패 | 정확한 시도의 장애 기록으로 경보 해소 |
+| 다른 시도의 종료 기록 | 현재 요청과 해시 불일치 | 검토 대기 |
+| 역할 변경 및 회수 목록 반영 | 새 역할은 403, 이전 토큰은 401 | 기존 접근 통제 유지 |
+
+토큰 요청을 시작할 때 인증 전 상태를 소비해, 요청 전송 뒤 시간 초과나 불확실한 응답을 인증 전 종료로 기록하지 않는다. 기기 상태는 로컬 장치 fixture를 사용했고, 권한 회수 목록은 Keycloak 로그아웃이 확인된 뒤 시험 실행기가 게시했다. 이 시험은 로컬 수집기 연동 결과이며 운영 기기 수집기, 자동 로그아웃·회수 연동 및 별도 외부 데이터셋의 목표 수치 검증은 남았다.
+
+`python -m scripts.run_keycloak_remote_acceptance runtime/keycloak-live-collector-final.json`로 재현한다. 기존 로컬 Keycloak 이미지만 사용했고, 실행 후 시험 컨테이너를 제거했다. 유료 API와 AWS 호출 없이 관련 회귀 테스트 128개를 통과했다.
+
 #### Keycloak 승인·MFA·권한 회수 통합 시험
 
 `scripts/run_keycloak_remote_acceptance.py`는 Keycloak 26.8.0의 임시 realm과 공개 키 조회를 루프백에 구성한다. 등록된 테스트 사용자의 비밀번호·TOTP로 로그인한 뒤 실제 HTTP 응답을 테스트 수집기의 MFA 관측으로 연결한다. 게이트웨이는 서명된 관측과 읽기 전용 자원 정책을 검사한다. Keycloak의 실제 역할 변경 및 로그아웃 결과를 확인하고 앱의 운영자 차단 목록을 갱신한다. 임시 계정, OTP, 토큰과 개인키는 결과 파일에 넣지 않는다. [Keycloak 컨테이너](https://www.keycloak.org/server/containers) · [Keycloak OTP 관리](https://www.keycloak.org/docs/26.8.0/server_admin/)

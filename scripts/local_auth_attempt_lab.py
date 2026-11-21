@@ -47,7 +47,7 @@ class LocalAuthAttemptLab:
         )
         session_lab.save_registry()
 
-    def open(self, event_id, *, failed_attempts=0):
+    def open(self, event_id, *, failed_attempts=0, action="READ"):
         if event_id in self.pending or event_id in self.closed:
             raise ValueError("duplicate local authentication attempt")
         event = SecurityEvent.model_validate(
@@ -66,7 +66,7 @@ class LocalAuthAttemptLab:
                     "resource_type": "document",
                     "sensitivity": "internal",
                 },
-                "action": "READ",
+                "action": action,
                 "auth_context": {
                     "authentication_result": "unknown",
                     "mfa": "unknown",
@@ -78,9 +78,14 @@ class LocalAuthAttemptLab:
         self.pending[event_id] = event
         return event
 
-    def _close(self, event_id, outcome):
+    def begin_authentication(self, event_id):
+        """Consume the pre-authentication state before an upstream credential exchange."""
         event = self.pending.pop(event_id)
         self.closed.add(event_id)
+        return event
+
+    def _close(self, event_id, outcome):
+        event = self.begin_authentication(event_id)
         now = datetime.now(UTC)
         receipt = SignedAuthAttemptReceipt(
             tenant_id=self.tenant_id,
@@ -100,6 +105,8 @@ class LocalAuthAttemptLab:
 
     def check_upstream(self, event_id, probe: Callable[[], httpx.Response]):
         """Observe the configured identity-provider health request before authentication."""
+        if event_id not in self.pending:
+            raise KeyError(event_id)
         try:
             response = probe()
         except (httpx.ConnectError, httpx.ConnectTimeout):
