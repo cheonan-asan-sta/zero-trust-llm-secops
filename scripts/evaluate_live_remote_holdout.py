@@ -60,7 +60,7 @@ class RecordedAnalyzer(OpenAIAnalyzer):
         return result
 
 
-async def capture(source, output, key_file, plan_sha256, case_ids):
+async def capture(source, output, key_file, plan_sha256, case_ids, reasoning_effort):
     source_plan = source / "plan.json"
     if fingerprint(source_plan) != plan_sha256:
         raise ValueError("frozen remote cohort plan hash mismatch")
@@ -76,6 +76,7 @@ async def capture(source, output, key_file, plan_sha256, case_ids):
     if len(set(selected_ids)) != len(selected_ids) or not set(selected_ids) <= plan["cases"].keys():
         raise ValueError("invalid selection from frozen cohort")
     cases = {case_id: plan["cases"][case_id] for case_id in selected_ids}
+    output_limit = 1400 if reasoning_effort == "low" else OUTPUT_LIMIT
     key = os.getenv("OPENAI_API_KEY") or (
         dotenv_values(key_file).get("OPENAI_API_KEY") if key_file else None
     )
@@ -91,8 +92,8 @@ async def capture(source, output, key_file, plan_sha256, case_ids):
             "case_ids": selected_ids,
             "truth_sha256": plan["truth_sha256"],
             "model": MODEL,
-            "reasoning_effort": "none",
-            "output_token_limit": OUTPUT_LIMIT,
+            "reasoning_effort": reasoning_effort,
+            "output_token_limit": output_limit,
             "reservation_limit_usd": BUDGET_USD,
             "requests_per_case": 1,
             "concurrency": CONCURRENCY,
@@ -104,8 +105,8 @@ async def capture(source, output, key_file, plan_sha256, case_ids):
         openai_api_key=key,
         openai_model=MODEL,
         openai_prompt_mode="grounded",
-        openai_reasoning_effort="none",
-        openai_max_output_tokens=OUTPUT_LIMIT,
+        openai_reasoning_effort=reasoning_effort,
+        openai_max_output_tokens=output_limit,
         openai_incomplete_retries=0,
         hybrid_llm_timeout_seconds=30,
     )
@@ -119,7 +120,7 @@ async def capture(source, output, key_file, plan_sha256, case_ids):
         row = ACTIVE_ROW.get()
         if stopped:
             raise RuntimeError(stopped)
-        amount = reservation(kwargs["input"], output_limit=OUTPUT_LIMIT)
+        amount = reservation(kwargs["input"], output_limit=output_limit)
         if reserved + amount > BUDGET_USD:
             stopped = "reservation_limit"
             raise RuntimeError(stopped)
@@ -317,10 +318,18 @@ if __name__ == "__main__":
     cli.add_argument("--prediction-sha256")
     cli.add_argument("--cohort-plan-sha256", default=COHORT_PLAN)
     cli.add_argument("--case-id", action="append")
+    cli.add_argument("--reasoning-effort", choices=("none", "low"), default="none")
     args = cli.parse_args()
     if args.phase == "capture":
         asyncio.run(
-            capture(args.source, args.output, args.key_file, args.cohort_plan_sha256, args.case_id)
+            capture(
+                args.source,
+                args.output,
+                args.key_file,
+                args.cohort_plan_sha256,
+                args.case_id,
+                args.reasoning_effort,
+            )
         )
     elif args.phase == "replay" and args.prediction_sha256:
         asyncio.run(replay(args.source, args.output, args.prediction_sha256))
