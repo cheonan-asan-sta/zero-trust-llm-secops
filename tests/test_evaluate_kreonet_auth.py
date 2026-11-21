@@ -185,6 +185,22 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
                 "user_agent": agent,
             }
         )
+    for offset, (module, method, status) in enumerate(
+        (("rp", "GET", 302), ("auth", "POST", 200), ("auth", "POST", 401))
+    ):
+        events.append(
+            {
+                "trace_id": "fifteen",
+                "timestamp": f"2026-03-20T01:02:0{offset + 3}Z",
+                "module": module,
+                "http_method": method,
+                "http_status": status,
+                "user_id": "",
+                "user_agent": "synthetic client A",
+                "client_ip": "192.0.2.10",
+                "ref_id": "synthetic entity",
+            }
+        )
     snapshots = []
     for label in ("attack", "benign"):
         source = tmp_path / f"{label}.jsonl"
@@ -213,7 +229,7 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
         monkeypatch.setattr(evaluation, "SOURCE_HASH", hashlib.sha256(raw).hexdigest())
         monkeypatch.setattr(evaluation, "SOURCE_SIZE", len(raw))
         output = tmp_path / label
-        evaluation.capture(output, source, include_auth_recovery_flow=True)
+        evaluation.capture(output, source, include_auth_outcome_flow=True)
         packet = output / "predictions.json"
         for raw_value in (
             b"synthetic client",
@@ -281,6 +297,12 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
     assert retry["previous_op_entity_handoff_prediction"] is False
     assert retry["auth_recovery_signals"] == ["same_subject_client_agent_changed_on_auth_retry"]
     assert retry["prediction"] is True
+    outcome = snapshots[0][hashlib.sha256(b"fifteen").hexdigest()]
+    assert outcome["previous_auth_recovery_prediction"] is False
+    assert outcome["auth_outcome_signals"] == [
+        "unattributed_auth_200_then_401_for_same_client_and_entity"
+    ]
+    assert outcome["prediction"] is True
 
 
 @pytest.mark.parametrize(
@@ -579,3 +601,55 @@ def test_auth_retry_requires_adjacent_same_subject_with_observed_new_agent():
     assert classify(statuses, [failed, (*retried[:2], "subject", "")]) == []
     between = (start + timedelta(seconds=1), OP_LOOKUP, "", "")
     assert classify(statuses, [failed, between, retried]) == []
+
+
+def test_auth_outcome_requires_adjacent_ordered_requests_with_nonblank_matching_context():
+    start = datetime(2026, 3, 20, tzinfo=UTC)
+    client = ("192.0.2.10", "browser")
+    accepted_response = (start, ("auth", "POST", 200), "", client, "entity")
+    denied_response = (
+        start + timedelta(seconds=2),
+        ("auth", "POST", 401),
+        "",
+        client,
+        "entity",
+    )
+    classify = evaluation.auth_outcome_signals
+    statuses = Counter([200, 302, 401])
+    assert classify(statuses, [denied_response, accepted_response]) == [
+        "unattributed_auth_200_then_401_for_same_client_and_entity"
+    ]
+    assert classify(statuses, [accepted_response, (*denied_response[:4], "")]) == []
+    assert classify(statuses, [accepted_response, (*denied_response[:4], "other entity")]) == []
+    assert (
+        classify(statuses, [accepted_response, (*denied_response[:2], "subject", client, "entity")])
+        == []
+    )
+    assert (
+        classify(
+            statuses,
+            [accepted_response, (*denied_response[:3], ("192.0.2.11", "browser"), "entity")],
+        )
+        == []
+    )
+    assert classify(statuses, [accepted_response, (start, *denied_response[1:])]) == []
+    assert classify(Counter([200, 302, 401, 400]), [accepted_response, denied_response]) == []
+
+
+def test_sp_outcome_connects_earlier_idp_and_adjacent_sp_to_failed_auth():
+    start = datetime(2026, 3, 20, tzinfo=UTC)
+    client = ("192.0.2.10", "browser")
+    idp = (start, ("idp", "GET", 200), "", client, "entity")
+    sp = (start + timedelta(seconds=2), ("sp", "GET", 200), "", client, "")
+    denied = (start + timedelta(seconds=3), ("auth", "POST", 401), "", client, "entity")
+    classify = evaluation.auth_outcome_signals
+    statuses = Counter([200, 302, 401])
+    assert classify(statuses, [denied, sp, idp]) == [
+        "sp_lookup_then_auth_401_for_client_seen_at_idp"
+    ]
+    assert classify(statuses, [sp, denied]) == []
+    assert classify(statuses, [(*idp[:4], "other entity"), sp, denied]) == []
+    assert classify(statuses, [(sp[0], *idp[1:]), sp, denied]) == []
+    assert classify(statuses, [idp, (*sp[:3], ("192.0.2.11", "browser"), ""), denied]) == []
+    intermediate = (sp[0] + timedelta(milliseconds=500), ("rp", "GET", 200), "", client, "")
+    assert classify(statuses, [idp, sp, intermediate, denied]) == []
