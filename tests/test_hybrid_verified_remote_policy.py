@@ -514,6 +514,27 @@ def test_grounded_scope_check_distinguishes_read_and_remote_action(lab, action, 
 
 
 @pytest.mark.parametrize(
+    "resource,mfa,unsatisfied",
+    [
+        ("remote-team", "failed", True),
+        ("remote-team", "unknown", True),
+        ("remote-team", "success", False),
+        ("remote-no-mfa", "unknown", False),
+    ],
+)
+def test_grounded_first_request_distinguishes_required_mfa_from_bound_challenge(
+    lab, resource, mfa, unsatisfied
+):
+    signed, context = lab.create(
+        ("initial-mfa", unsatisfied, resource, "employee", mfa, True, "REMOTE_ACCESS")
+    )
+    payload = json.loads(grounded_input(signed.event, context)[0]["content"])
+    assert payload["remote_mfa_check"]["required_mfa_unsatisfied"] is unsatisfied
+    assert not payload["remote_mfa_check"]["required_challenge_unsatisfied"]
+    assert payload["evidence_catalog"]["verified_session.session.version"] == 1
+
+
+@pytest.mark.parametrize(
     "variant,expected,verified",
     [
         ("same_scope", ViolationType.NORMAL, True),
@@ -567,6 +588,7 @@ def test_verified_remote_followup_limits_generic_alarm_only(lab, variant, expect
             in grounded_system_instructions(event, context)
         )
         assert payload["remote_mfa_check"] == {
+            "required_mfa_unsatisfied": False,
             "server_scope_denied": False,
             "required_challenge_unsatisfied": not matched,
             "generic_remote_step_up_only": matched,
