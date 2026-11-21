@@ -345,6 +345,18 @@ API는 40회 호출해 유효한 응답 40개를 받았다. 사용량 기반 추
 
 로컬 회귀는 탐지·OIDC·보관·복원 214개 통과, 4개 제외였다. 자료 연결 변경과 새 OIDC 인수 시험은 46개, 루프백 WORM을 포함한 보관 묶음은 17개 통과했다. 묶음 간 중복이 있다. 결과는 `runtime/remote-scope-operational-regression-20261121.xml`, `runtime/remote-source-local-oidc-20261121.xml`, `runtime/local-worm-http-intake-verified-20261121.xml`에 있다. 이 두 운영 인수 실험의 AWS 호출과 외부 유료 API 호출은 0회였다.
 
+#### 서울 리전 AWS 운영 인수 시험
+
+`aitest-target`의 STS 계정이 `172585182454`와 일치한 뒤 서울 리전에서 조회했다. IAM Identity Center 인스턴스, Client VPN 엔드포인트, CloudWatch Logs 그룹, 프로젝트 CloudFormation 스택은 각각 0개였다. 조회 계정의 Organizations 가입 상태는 `AWSOrganizationsNotInUseException`이었다. 작업공간에서도 승인·MFA와 연결된 실제 운영 원본을 확인하지 못했다. 기존 정상·위협 40건의 실제 API 회귀는 유지하며 익명 운영 데이터의 독립 성능은 미측정이다. `scripts/check-aws-operational-intake.ps1`은 계정 확인 뒤 조회만 하고, `-ArchiveBucket`과 `-ArchiveOwner`를 함께 주면 지정 저장소의 Object Lock 설정도 대조한다.
+
+AWS S3에는 합성 감사 세대 한 개를 임시 버킷에 올렸다. 버전 ID·`COMPLIANCE`·보존 종료 시각·파일 및 서명 해시를 확인했다. 보존 중인 정확한 버전의 삭제를 요청했을 때 `AccessDenied`가 반환됐다. 원본 경로 밖에서 해당 버전을 내려받아 4,096개 서명과 별도 암호화 SQLite 백업을 확인하고 동일 감사 헤드의 SQLite를 열었다. 만료 뒤 시험 객체와 버킷을 삭제했다. 저장과 복원에 사용한 AWS 계정은 동일하며, 실제 별도 계정의 소유자·복구 권한 확인은 남아 있다. [S3 Object Lock](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html)
+
+AWS Cognito의 임시 사용자가 발급받은 토큰으로 앱의 실제 JWKS 검증과 권한 경로를 실행했다. 분석자 토큰의 정책 요청은 200, 역할을 뷰어로 내린 뒤 새 토큰의 같은 권한 요청은 403이었다. `AdminUserGlobalSignOut` 뒤 Cognito API는 폐기된 액세스 토큰을 거부했지만, 앱의 서명·만료 확인만으로는 같은 사용자의 기존 ID 토큰이 200으로 통과했다. [Cognito 토큰 회수](https://docs.aws.amazon.com/cognito/latest/developerguide/token-revocation.html)
+
+앱에 `OIDC_REVOKED_SUBJECTS_PATH`를 추가해 운영자 정책 파일의 발급자·테넌트·사용자 ID가 일치하는 요청을 즉시 차단한다. 분석 도중 차단이 추가되면 결과 게시 전에도 확인한다. 새 Cognito 시험에서는 전역 로그아웃 뒤 아직 만료되지 않은 같은 ID 토큰이 정책 등록 전 200, 등록 뒤 401이었다. 최초 시험의 ID 토큰도 실제 유효기간 경과 후 401로 거부됐다. 운영 정책 파일의 오류는 503으로 처리한다. 기업 IdP 자체의 회수 통지와 이 운영자 정책의 자동 연결은 이번 환경에서 검증하지 않았다. 앱 인증·회수 회귀는 106개 통과, 15개 제외였고 제로트러스트·OIDC·감사 정책 회귀는 289개 통과했다. 운영 자료 검증 준비 회귀는 111개 통과, 로컬 S3 서버 선택 실행 1개 제외였다. 회귀 묶음 간 중복이 있다.
+
+임시 S3 버킷 1개와 Cognito 사용자 풀 2개를 삭제하고 각각 조회 실패를 확인했다. 외부 LLM 호출은 없었다. AWS 증적은 `runtime/aws-remote-storage-20261121.jsonl`, `runtime/aws-remote-identity-20261121.jsonl`, `runtime/aws-remote-identity-operator-block-20261121.jsonl`에 있다. 실제 환경 인수에는 승인·MFA와 연결된 운영 로그, 사용할 조직 IdP와 회수 전달 방식, 그리고 보관 계정과 분리된 복구 역할이 필요하다.
+
 ## 장기 시험을 보류하는 동안 실행한 단기 검증
 
 패치 검사에 사용했던 `9c83559` 테스트 이미지를 재사용했다. 네트워크 차단·비루트·읽기 전용 루트 조건에서 기능까지 동작하는지 확인했고, 각 묶음의 로그와 JUnit 결과를 별도로 보존했다.
