@@ -153,6 +153,14 @@ python -m scripts.check_remote_evaluation_evidence --catalog catalog.jsonl --cat
 
 원래 입력 지문에서 미탐 17건을 다시 추출해 검사했다. 승인 참조와 MFA 참조가 모두 없었던 사례는 17건이며 새 최종 예약 사례는 0건이다. Windows와 WSL Linux에서 관련 검사가 각각 52개 통과했다. JUnit은 `runtime/remote-evidence-intake-{windows,linux}-20261121.xml`, 17건의 원본 검사는 `runtime/remote-evidence-intake-historical-20261121/report.json`에 남겼다. 유료 API 호출과 새 추론은 0회였다.
 
+#### 외부 원격 접속 기록의 로컬 재생
+
+Daniel Peng이 공개한 합성 인증 로그 180,000건에서 발행자가 지정한 보류 기간인 2026년 5월 16~30일의 성공한 `RemoteInteractive` 원격 로그온만 평가 대상으로 미리 고정했다. 기존 Sigma 원격 접속 경로에서 정답 없이 예측을 저장하고, 예측 파일의 해시 확인 후 발행자 라벨을 결합했다. [공개 데이터](https://www.kaggle.com/datasets/codewithdaniel1/synthetic-enterprise-auth-logs) · [발행자 데이터 설명](https://raw.githubusercontent.com/codewithdaniel1/lateral-movement-detection/main/docs/DATASET.md)
+
+선택된 25,378건은 모두 위협 라벨이었고 Sigma가 모두 탐지했다. 정상은 0건으로 오탐률을 계산할 수 없었다. 전체 자료를 사후 점검한 결과, 앞 기간에 포함된 원격 로그온 13,529건도 모두 위협 라벨이었다. 승인 범위·서버 MFA 정책/검증 결과·기기 권한을 같은 원격 세션에 연결할 필드가 없어 개선된 Hybrid 판정과 실제 LLM 성능은 이 자료로 측정할 수 없다. 기존 360건의 실제 LLM F1 93.41% 및 미탐 17건에 합산하지 않았다.
+
+평가 조건, 예측 해시와 채점 결과는 `runtime/independent-remoteinteractive-20261121/{plan,predictions,report,post-score-coverage}.json`에 보관했다. 새 API 호출은 0회였다. 목표 검증에는 17건과 매칭되는 당시 승인·MFA 기록, 그리고 같은 근거를 확인할 수 있는 새 정상·위협 원격 접속 사례가 필요하다.
+
 ## 장기 시험을 보류하는 동안 실행한 단기 검증
 
 패치 검사에 사용했던 `9c83559` 테스트 이미지를 재사용했다. 네트워크 차단·비루트·읽기 전용 루트 조건에서 기능까지 동작하는지 확인했고, 각 묶음의 로그와 JUnit 결과를 별도로 보존했다.
