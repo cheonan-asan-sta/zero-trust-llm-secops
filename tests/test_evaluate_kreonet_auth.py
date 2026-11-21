@@ -145,6 +145,27 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
                 "ref": "synthetic saml ref",
             }
         )
+    events.append({**base, "trace_id": "twelve", "module": "rp", "http_status": 302})
+    for offset, (module, method, ip, agent, reference) in enumerate(
+        (
+            ("op", "GET", "192.0.2.60", "synthetic client A", "synthetic ldap ref"),
+            ("ldap", "POST", "192.0.2.60", "synthetic client A", ""),
+            ("op", "POST", "192.0.2.61", "", "synthetic ldap ref"),
+        ),
+    ):
+        events.append(
+            {
+                "trace_id": "twelve",
+                "timestamp": f"2026-03-20T01:02:0{offset + 4}Z",
+                "module": module,
+                "http_method": method,
+                "http_status": 200,
+                "client_ip": ip,
+                "user_agent": agent,
+                "ref": reference,
+                "duration_ms": 50,
+            }
+        )
     snapshots = []
     for label in ("attack", "benign"):
         source = tmp_path / f"{label}.jsonl"
@@ -160,7 +181,7 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
                     "client_ip": event.get("client_ip", label),
                     "user_id": event.get("user_id", label),
                     "ref": event.get("ref", label),
-                    "duration_ms": len(label),
+                    "duration_ms": event.get("duration_ms", len(label)),
                     "message": label,
                     "payload": {"classification": label},
                 }
@@ -172,7 +193,7 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
         monkeypatch.setattr(evaluation, "SOURCE_HASH", hashlib.sha256(raw).hexdigest())
         monkeypatch.setattr(evaluation, "SOURCE_SIZE", len(raw))
         output = tmp_path / label
-        evaluation.capture(output, source, include_saml_handoff_flow=True)
+        evaluation.capture(output, source, include_ldap_handoff_flow=True)
         packet = output / "predictions.json"
         for raw_value in (
             b"synthetic client",
@@ -223,6 +244,12 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
         "saml_idp_post_missing_agent_between_bound_client_observations"
     ]
     assert saml["prediction"] is True
+    ldap = snapshots[0][hashlib.sha256(b"twelve").hexdigest()]
+    assert ldap["previous_saml_handoff_prediction"] is False
+    assert ldap["ldap_handoff_signals"] == [
+        "short_ldap_processing_with_bound_op_client_discontinuity"
+    ]
+    assert ldap["prediction"] is True
 
 
 @pytest.mark.parametrize(
@@ -424,3 +451,35 @@ def test_saml_handoff_requires_same_context_and_only_one_missing_agent():
     intermediate = (start + timedelta(milliseconds=1500), ("auth", "GET", 200), ("", "", "", ""))
     assert classify(statuses, [*events[:2], intermediate, *events[2:]]) == []
     assert classify(Counter({200: 3, 302: 1, 401: 1}), events) == []
+
+
+def test_ldap_handoff_requires_short_processing_and_client_discontinuity():
+    start = datetime(2026, 3, 20, tzinfo=UTC)
+    lookup = (start, OP_LOOKUP, ("", "192.0.2.60", "browser", "client ref"), None)
+    directory = (
+        start + timedelta(seconds=1),
+        LDAP_POST,
+        ("", "192.0.2.60", "browser", ""),
+        50,
+    )
+    submission = (
+        start + timedelta(seconds=2),
+        OP_SUBMIT,
+        ("", "192.0.2.61", "", "client ref"),
+        None,
+    )
+    classify = evaluation.ldap_handoff_signals
+    statuses = Counter({200: 3, 302: 1})
+    assert classify(statuses, [submission, directory, lookup]) == [
+        "short_ldap_processing_with_bound_op_client_discontinuity"
+    ]
+    for duration in (None, True, 0, -1, 51, "50"):
+        assert classify(statuses, [lookup, (*directory[:3], duration), submission]) == []
+    for context in (
+        ("", "192.0.2.60", "", "client ref"),
+        ("", "192.0.2.61", "browser", "client ref"),
+        ("", "192.0.2.61", "", "other client"),
+    ):
+        assert classify(statuses, [lookup, directory, (*submission[:2], context, None)]) == []
+    assert classify(statuses, [lookup, directory, (directory[0], *submission[1:])]) == []
+    assert classify(Counter({200: 3, 302: 1, 401: 1}), [lookup, directory, submission]) == []
