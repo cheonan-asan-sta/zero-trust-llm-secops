@@ -11,17 +11,20 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Annotated
 from unittest.mock import patch
 from uuid import uuid4
 
 import httpx
 import jwt
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 
 from app import security
 from app.config import Settings
+from app.services.auth_alert_triage import resolve_auth_alert
 from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
+from app.zero_trust_models import SignedSessionSignal
 from scripts.evaluate_local_remote_holdout import write
 from scripts.local_session_analysis_lab import LocalSessionAnalysisLab
 
@@ -183,6 +186,16 @@ def verify(base, root, password, otp_seed, admin_password):
         gateway = FastAPI()
         gateway.include_router(zero_trust_router(lab.service))
         install_zero_trust_error_handlers(gateway)
+
+        @gateway.post("/fixture/auth-alert")
+        def auth_alert(
+            signal: SignedSessionSignal,
+            principal: Annotated[
+                security.Principal, Depends(security.require_roles(security.Role.ANALYST))
+            ],
+        ):
+            return {"disposition": resolve_auth_alert(lab.service, signal.event, signal, principal)}
+
         security._jwks_client.cache_clear()
 
         def headers(token_value):
@@ -206,9 +219,14 @@ def verify(base, root, password, otp_seed, admin_password):
                     headers=analyst,
                 )
                 assert response.status_code == 200, response.status_code
-                return response.json()
+                triage = app.post(
+                    "/fixture/auth-alert", json=signed.model_dump(mode="json"), headers=analyst
+                )
+                assert triage.status_code == 200, triage.status_code
+                return response.json(), triage.json()["disposition"]
 
-            approved = evaluate("READ", approved_otp)
+            approved, approved_alert = evaluate("READ", approved_otp)
+            assert approved_alert == "cleared"
             assert approved["session"]["decision"] == "ALLOW" and approved["grant_token"]
             requested = {
                 "session_id": approved["session"]["session_id"],
@@ -219,9 +237,11 @@ def verify(base, root, password, otp_seed, admin_password):
             assert app.post("/zero-trust/protected-access", json=requested, headers=analyst).json()[
                 "allowed"
             ]
-            scope_denial = evaluate("REMOTE_ACCESS", approved_otp)
+            scope_denial, scope_alert = evaluate("REMOTE_ACCESS", approved_otp)
+            assert scope_alert == "confirmed"
             assert scope_denial["session"]["decision"] == "DENY" and not scope_denial["grant_token"]
-            failed = evaluate("READ", wrong_otp)
+            failed, failed_alert = evaluate("READ", wrong_otp)
+            assert failed_alert == "confirmed"
             assert failed["session"]["decision"] == "STEP_UP" and not failed["grant_token"]
 
             admin = client.post(
@@ -279,6 +299,11 @@ def verify(base, root, password, otp_seed, admin_password):
         security._jwks_client.cache_clear()
     return {
         "image": IMAGE,
+        "alert_triage": {
+            "approved_mfa_and_scope": approved_alert,
+            "denied_scope": scope_alert,
+            "failed_mfa": failed_alert,
+        },
         "mfa_correct": 200,
         "mfa_wrong": 400,
         "mfa_missing": 400,

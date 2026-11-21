@@ -624,6 +624,25 @@ KREONET 개발 구간에서 같은 모델을 다시 학습해, 이전 비교 구
 
 `python -m scripts.evaluate_kreonet_transfer <결과 경로> --source <로컬 KREONET 원본> --references <개발 결과> <보정 결과> <비교 결과> --frozen <기존 target 결과>`로 재현한다. 산출물은 `runtime/kreonet-transfer-v1/`와 `runtime/keycloak-remote-acceptance-independent-v1.json`에 있다. 유료 API와 AWS 호출 없이 로컬 회귀 테스트 109개를 통과했다.
 
+#### 서명된 인증 근거를 이용한 모델 경보 판정
+
+별도 로컬 시나리오 96개의 기존 규칙과 모델 예측을 고정해 다시 사용했다. 원래 모델 경보 중 추가 확인이 필요한 사건을 같은 요청의 인증 정책 근거와 연결했다. 기존 서명 검증기와 세션 기록 수집기를 사용해 수집기 권한, 서명, 유효 시간, 현재 정책과 세션 버전, 요청의 정확한 내용을 검증한다. 다른 사건에 발급된 승인이나 검증되지 않은 관측을 같은 경보에 적용하지 않는다.
+
+- 현재 세션에 유효한 승인이 확인되면 해당 인증 정책 경보를 해소한다.
+- 현재 세션의 MFA 요구, 관리 기기 요구, 범위 거부, 세션 회수 등의 제한이 확인되면 경보를 확정한다.
+- 최신 근거가 없거나 일반적인 추가 인증 대기만 있으면 검토 대기다. 기존 규칙의 탐지와 실제 접근 제어는 그대로 유지한다.
+
+| 동일한 로컬 모의 시나리오 96개 | 정상 경보 | 위협 경보 | 근거 대기 |
+| --- | ---: | ---: | ---: |
+| 기존 모델 경보와 규칙 | 40 | 48 | 해당 없음 |
+| 근거 확인 뒤 확정 경보와 기존 규칙 | 0 | 48 | 16 |
+
+정상 경보 40개 중 승인된 로그인·정상 재시도·정상 갱신 시나리오 24개를 현재 승인으로 해소했다. 인프라 장애와 사용자가 중단한 인증 16개는 세션 근거를 제공하지 않아 검토 대기로 남았다. 위협 48개에는 검증된 정책 위반 32개와 기존 규칙 탐지 16개가 포함됐다. 위협 경보 손실은 0개였다. 검토 대기까지 경보 업무량에 포함하면 정상 사례 16개가 아직 남는다.
+
+모의 사례별로 필요한 인증·기기·정책 관측을 로컬 수집기에 제공하고 실제 프로젝트의 정책 엔진과 서명 검증 경로에서 결정을 얻었다. 별도 Docker Keycloak 시험에서는 실제 OTP 성공과 허용된 읽기 범위의 경보 해소, MFA 실패와 범위를 벗어난 요청의 경보 확정을 확인했다. 이 두 검증은 신뢰할 수 있는 근거가 있을 때의 분기 검증이며, 기존 KREONET 데이터에는 같은 형식의 서명 세션 근거가 없어 새 오탐 57개와 미탐 65개를 재채점하지 않았다.
+
+`python -m scripts.evaluate_auth_alert_triage runtime/kreonet-transfer-v1 runtime/kreonet-evidence-triage-final`로 재현한다. 실제 OTP 시험은 `python -m scripts.run_keycloak_remote_acceptance runtime/keycloak-auth-alert-triage-v1.json`로 재현하며 시험 컨테이너는 종료 후 제거한다. 로컬 회귀 테스트 112개를 통과했고 유료 API와 AWS 호출은 없었다.
+
 #### Keycloak 승인·MFA·권한 회수 통합 시험
 
 `scripts/run_keycloak_remote_acceptance.py`는 Keycloak 26.8.0의 임시 realm과 공개 키 조회를 루프백에 구성한다. 등록된 테스트 사용자의 비밀번호·TOTP로 로그인한 뒤 실제 HTTP 응답을 테스트 수집기의 MFA 관측으로 연결한다. 게이트웨이는 서명된 관측과 읽기 전용 자원 정책을 검사한다. Keycloak의 실제 역할 변경 및 로그아웃 결과를 확인하고 앱의 운영자 차단 목록을 갱신한다. 임시 계정, OTP, 토큰과 개인키는 결과 파일에 넣지 않는다. [Keycloak 컨테이너](https://www.keycloak.org/server/containers) · [Keycloak OTP 관리](https://www.keycloak.org/docs/26.8.0/server_admin/)
