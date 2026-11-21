@@ -166,6 +166,11 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
                 "duration_ms": 50,
             }
         )
+    events.extend(
+        {**event, "trace_id": "thirteen", "user_id": "", "ref": "", "ref_id": "synthetic entity"}
+        for event in tuple(events)
+        if event["trace_id"] == "ten"
+    )
     snapshots = []
     for label in ("attack", "benign"):
         source = tmp_path / f"{label}.jsonl"
@@ -181,6 +186,7 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
                     "client_ip": event.get("client_ip", label),
                     "user_id": event.get("user_id", label),
                     "ref": event.get("ref", label),
+                    "ref_id": event.get("ref_id", label),
                     "duration_ms": event.get("duration_ms", len(label)),
                     "message": label,
                     "payload": {"classification": label},
@@ -193,13 +199,14 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
         monkeypatch.setattr(evaluation, "SOURCE_HASH", hashlib.sha256(raw).hexdigest())
         monkeypatch.setattr(evaluation, "SOURCE_SIZE", len(raw))
         output = tmp_path / label
-        evaluation.capture(output, source, include_ldap_handoff_flow=True)
+        evaluation.capture(output, source, include_op_entity_handoff_flow=True)
         packet = output / "predictions.json"
         for raw_value in (
             b"synthetic client",
             b"synthetic subject",
             b"192.0.2.10",
             b"synthetic op ref",
+            b"synthetic entity",
         ):
             assert raw_value not in packet.read_bytes()
         snapshots.append(evaluation.read(packet)["prediction_rows"])
@@ -250,6 +257,12 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
         "short_ldap_processing_with_bound_op_client_discontinuity"
     ]
     assert ldap["prediction"] is True
+    entity_handoff = snapshots[0][hashlib.sha256(b"thirteen").hexdigest()]
+    assert entity_handoff["previous_ldap_handoff_prediction"] is False
+    assert entity_handoff["op_entity_handoff_signals"] == [
+        "entity_linked_op_client_discontinuity_with_unobserved_subject_and_client_ref"
+    ]
+    assert entity_handoff["prediction"] is True
 
 
 @pytest.mark.parametrize(
@@ -483,3 +496,38 @@ def test_ldap_handoff_requires_short_processing_and_client_discontinuity():
         assert classify(statuses, [lookup, directory, (*submission[:2], context, None)]) == []
     assert classify(statuses, [lookup, directory, (directory[0], *submission[1:])]) == []
     assert classify(Counter({200: 3, 302: 1, 401: 1}), [lookup, directory, submission]) == []
+
+
+def test_op_entity_handoff_requires_a_shared_observed_entity_and_client_change():
+    start = datetime(2026, 3, 20, tzinfo=UTC)
+    lookup = (start, OP_LOOKUP, ("", "192.0.2.30", "browser", ""), None, "entity")
+    auth = (
+        start + timedelta(seconds=1),
+        ("auth", "POST", 200),
+        ("", "192.0.2.30", "browser", ""),
+        None,
+        "entity",
+    )
+    submission = (
+        start + timedelta(seconds=2),
+        OP_SUBMIT,
+        ("", "192.0.2.40", "", ""),
+        None,
+        "entity",
+    )
+    classify = evaluation.op_entity_handoff_signals
+    statuses = Counter({200: 3, 302: 1})
+    assert classify(statuses, [submission, lookup, auth]) == [
+        "entity_linked_op_client_discontinuity_with_unobserved_subject_and_client_ref"
+    ]
+    for entity in ("", "different entity"):
+        assert classify(statuses, [lookup, auth, (*submission[:4], entity)]) == []
+    for context in (
+        ("known user", "192.0.2.40", "", ""),
+        ("", "192.0.2.40", "", "known ref"),
+        ("", "192.0.2.30", "", ""),
+        ("", "192.0.2.40", "browser", ""),
+    ):
+        assert classify(statuses, [lookup, auth, (*submission[:2], context, *submission[3:])]) == []
+    assert classify(statuses, [lookup, auth, (auth[0], *submission[1:])]) == []
+    assert classify(Counter({200: 3, 302: 1, 401: 1}), [lookup, auth, submission]) == []

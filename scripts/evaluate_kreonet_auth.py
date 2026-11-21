@@ -174,6 +174,21 @@ def unattributed_op_signals(statuses, events):
 OP_AUTH_STAGES = (("op", "GET", 200), ("auth", "POST", 200), ("op", "POST", 200))
 
 
+def op_client_discontinuity(lookup, authentication, submission):
+    _, initial_ip, initial_agent, _ = lookup
+    _, auth_ip, auth_agent, _ = authentication
+    _, submit_ip, submit_agent, _ = submission
+    return (
+        initial_ip
+        and initial_ip == auth_ip
+        and initial_agent
+        and initial_agent == auth_agent
+        and submit_ip
+        and submit_ip != auth_ip
+        and not submit_agent
+    )
+
+
 def op_handoff_signals(statuses, events):
     if statuses.keys() != {200, 302}:
         return []
@@ -183,21 +198,15 @@ def op_handoff_signals(statuses, events):
             continue
         if not lookup[0] < authentication[0] < submission[0]:
             continue
-        _, initial_ip, initial_agent, initial_ref = lookup[2]
-        auth_user, auth_ip, auth_agent, _ = authentication[2]
-        submit_user, submit_ip, submit_agent, submit_ref = submission[2]
+        _, _, _, initial_ref = lookup[2]
+        auth_user = authentication[2][0]
+        submit_user, _, _, submit_ref = submission[2]
         if (
             auth_user
             and auth_user == submit_user
             and initial_ref
             and initial_ref == submit_ref
-            and initial_ip
-            and initial_ip == auth_ip
-            and initial_agent
-            and initial_agent == auth_agent
-            and submit_ip
-            and submit_ip != auth_ip
-            and not submit_agent
+            and op_client_discontinuity(lookup[2], authentication[2], submission[2])
         ):
             return ["client_observation_discontinuity_at_bound_op_submission"]
     return []
@@ -271,6 +280,25 @@ def ldap_handoff_signals(statuses, events):
     return []
 
 
+def op_entity_handoff_signals(statuses, events):
+    if statuses.keys() != {200, 302}:
+        return []
+    ordered = sorted(events, key=lambda event: event[0])
+    for lookup, authentication, submission in zip(ordered, ordered[1:], ordered[2:]):
+        if (lookup[1], authentication[1], submission[1]) != OP_AUTH_STAGES:
+            continue
+        if not lookup[0] < authentication[0] < submission[0]:
+            continue
+        if (
+            lookup[4]
+            and lookup[4] == authentication[4] == submission[4]
+            and all(not row[2][0] and not row[2][3] for row in (lookup, authentication, submission))
+            and op_client_discontinuity(lookup[2], authentication[2], submission[2])
+        ):
+            return ["entity_linked_op_client_discontinuity_with_unobserved_subject_and_client_ref"]
+    return []
+
+
 def capture(
     output,
     source=None,
@@ -285,7 +313,9 @@ def capture(
     include_op_handoff_flow=False,
     include_saml_handoff_flow=False,
     include_ldap_handoff_flow=False,
+    include_op_entity_handoff_flow=False,
 ):
+    include_ldap_handoff_flow = include_ldap_handoff_flow or include_op_entity_handoff_flow
     include_saml_handoff_flow = include_saml_handoff_flow or include_ldap_handoff_flow
     include_op_handoff_flow = include_op_handoff_flow or include_saml_handoff_flow
     include_unattributed_op_flow = include_unattributed_op_flow or include_op_handoff_flow
@@ -393,6 +423,14 @@ def capture(
             "same OP ref and client context through LDAP, then different IP and no agent on OP POST",
             "positive LDAP processing time at most 50 ms",
         ]
+    if include_op_entity_handoff_flow:
+        expected_plan["input_fields"].append("nonblank ref_id equality across OP and auth")
+        expected_plan["candidate"] = "previous LDAP handoff detector OR entity-linked OP handoff"
+        expected_plan["op_entity_handoff_signals"] = [
+            "OP GET 200, auth POST 200 and OP POST 200 in strict order",
+            "same nonblank ref_id and no user_id or ref on those stages",
+            "client IP and agent stable before OP POST, then IP changes and agent is absent",
+        ]
     if plan.exists():
         if read(plan) != expected_plan:
             raise ValueError("existing plan differs from frozen protocol")
@@ -469,7 +507,12 @@ def capture(
                         if include_ldap_handoff_flow and stage == LDAP_AUTH_STAGES[1]
                         else None
                     )
-                    handoff_events[key].append((when, stage, context, duration))
+                    entity = (
+                        nonblank_text(row.get("ref_id"))
+                        if include_op_entity_handoff_flow and stage in OP_AUTH_STAGES
+                        else ""
+                    )
+                    handoff_events[key].append((when, stage, context, duration, entity))
                 if module in PROTOCOL_MODULES and method in {"GET", "POST"}:
                     stage = (module, method)
                     request_counts[key][stage] += 1
@@ -614,6 +657,16 @@ def capture(
                     "ldap_handoff_signals": signals,
                 }
             )
+        if include_op_entity_handoff_flow:
+            signals = op_entity_handoff_signals(statuses, handoff_events.get(key, ()))
+            previous = rows[identity]["prediction"]
+            rows[identity].update(
+                {
+                    "previous_ldap_handoff_prediction": previous,
+                    "prediction": previous or bool(signals),
+                    "op_entity_handoff_signals": signals,
+                }
+            )
     write(
         output / "predictions.json",
         {
@@ -677,6 +730,7 @@ def score(output, seal, source=None):
         reference_field, signals_field = next(
             (reference, signals)
             for reference, signals in (
+                ("previous_ldap_handoff_prediction", "op_entity_handoff_signals"),
                 ("previous_saml_handoff_prediction", "ldap_handoff_signals"),
                 ("previous_op_handoff_prediction", "saml_handoff_signals"),
                 ("previous_unattributed_op_prediction", "op_handoff_signals"),
@@ -734,6 +788,7 @@ if __name__ == "__main__":
     cli.add_argument("--include-op-handoff-flow", action="store_true")
     cli.add_argument("--include-saml-handoff-flow", action="store_true")
     cli.add_argument("--include-ldap-handoff-flow", action="store_true")
+    cli.add_argument("--include-op-entity-handoff-flow", action="store_true")
     args = cli.parse_args()
     if args.phase == "capture":
         capture(
@@ -749,6 +804,7 @@ if __name__ == "__main__":
             include_op_handoff_flow=args.include_op_handoff_flow,
             include_saml_handoff_flow=args.include_saml_handoff_flow,
             include_ldap_handoff_flow=args.include_ldap_handoff_flow,
+            include_op_entity_handoff_flow=args.include_op_entity_handoff_flow,
         )
     elif args.prediction_sha256:
         score(args.output, args.prediction_sha256, args.source)
