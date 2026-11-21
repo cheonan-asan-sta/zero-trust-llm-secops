@@ -591,6 +591,22 @@ LANL 공개 자료는 익명화한 실제 인증 이벤트와 레드팀 일부 �
 
 `scripts/evaluate_kreonet_auth.py`에서 `capture <결과 경로> --source <로컬 원본> --include-auth-outcome-flow`를 실행한 뒤 `score <결과 경로> --source <로컬 원본> --prediction-sha256 <예측 해시>`로 채점한다. 개발·보정 구간은 `capture`에 `--cohort development` 또는 `--cohort calibration`을 붙인다. 결과는 `runtime/kreonet-auth-outcome-flow-{development,calibration,holdout}-v1/`에 있다. 유료 API·AWS 호출 없이 로컬 회귀 테스트 105개를 통과했다.
 
+#### KREONET 로컬 모델로 전체 탐지 목표 검증
+
+직전 규칙이 놓친 이진 흐름만 대상으로 모델을 학습했다. 개발 구간 미탐 후보 9,019개에서 학습하고, 보정 구간 후보 2,099개에서 판정 기준을 정했다. 기존 탐지 결과는 그대로 합쳤다. 인증 단계·HTTP 상태의 순서와 횟수, 사용자·클라이언트·엔터티 관측값의 일치 여부를 쓴 HistGradientBoosting 모델과, 여기에 상대 요청 간격과 처리 시간 구간을 추가한 ExtraTrees 모델을 학습했다. 두 모델의 점수 중 큰 값을 사용한다.
+
+원문 사용자 ID·IP·User-Agent·클라이언트 참조는 일치 여부와 개수로만 표현하고 평가 산출물에 기록하지 않는다. 절대 시각과 트레이스 ID는 판정 입력에서 제외하고 구간 확인과 그룹화에만 사용했다. 정답 라벨은 개발 구간의 학습, 보정 구간의 기준 선정, 예측 해시를 확정한 뒤의 비교 구간 채점에만 쓰였다. 이벤트 이름·분류·메시지·URL·페이로드는 모델 입력에서 제외했다. 시간 특징을 포함하므로 수집기의 처리 시간 특성이 달라지는 환경에는 별도 검증이 필요하다.
+
+| 공개 합성 데이터 비교 구간 3,063개 | 정밀도 | 재현율 | F1 | 오탐률 | TP / FP / FN / TN | 새 오탐 / 탐지 손실 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 직전 규칙 | 99.72% | 57.02% | 72.57% | 0.13% | 897 / 2 / 676 / 1,488 | 0 / 0 |
+| 보수적 기준 | 99.78% | 84.87% | 91.72% | 0.20% | 1,335 / 3 / 238 / 1,487 | 1 / 0 |
+| 목표 기준 | 96.23% | 95.87% | 96.05% | 3.96% | 1,508 / 59 / 65 / 1,431 | 57 / 0 |
+
+최초 목표용 기준은 보정 오탐률 상한 5%에서 정했지만 비교 구간 오탐률이 5.37%였다. 이 결과를 본 뒤 기준 선정에 여유를 두기 위해 보정 오탐률 상한을 4%로 낮췄다. 기준값 자체는 보정 구간에서 정밀도 95% 이상과 오탐률 상한을 만족하면서 가장 많은 위협을 잡는 값으로 산정했다. 새 기준의 비교 구간 수치가 프로젝트 목표인 정밀도·재현율·F1 각각 95% 이상, 오탐률 5% 이하를 충족했다. 같은 비교 구간을 재사용했으므로 별도 데이터에서 독립적으로 검증한 성능으로 해석하지 않는다. 목표 기준에는 새 오탐 57개가 있으며 기존의 새 오탐 0개 조건은 충족하지 않았다. 모델은 로컬 평가에서만 선택할 수 있고 서비스의 기본 판정은 기존 규칙이다.
+
+로컬 Python에 `scikit-learn==1.7.2`를 추가하고 `python -m scripts.evaluate_kreonet_model capture <결과 경로> --source <로컬 원본> --references <개발 결과 경로> <보정 결과 경로> <비교 결과 경로>`를 실행한다. 참조 경로는 순서대로 `runtime/kreonet-auth-outcome-flow-{development,calibration,holdout}-v1/`이다. 각 실행 모드의 예측 해시를 확인하고 `python -m scripts.evaluate_kreonet_model score <결과 경로>/target --source <로컬 원본> --prediction-sha256 <target 해시>`로 채점한다. 보수적 기준은 같은 방식으로 `guarded` 경로와 해시를 지정한다. 평가 결과는 `runtime/kreonet-model-confirmation-v1/`에 있다. 유료 모델 API나 AWS 호출 없이 로컬 회귀 테스트 107개를 통과했다.
+
 #### Keycloak 승인·MFA·권한 회수 통합 시험
 
 `scripts/run_keycloak_remote_acceptance.py`는 Keycloak 26.8.0의 임시 realm과 공개 키 조회를 루프백에 구성한다. 등록된 테스트 사용자의 비밀번호·TOTP로 로그인한 뒤 실제 HTTP 응답을 테스트 수집기의 MFA 관측으로 연결한다. 게이트웨이는 서명된 관측과 읽기 전용 자원 정책을 검사한다. Keycloak의 실제 역할 변경 및 로그아웃 결과를 확인하고 앱의 운영자 차단 목록을 갱신한다. 임시 계정, OTP, 토큰과 개인키는 결과 파일에 넣지 않는다. [Keycloak 컨테이너](https://www.keycloak.org/server/containers) · [Keycloak OTP 관리](https://www.keycloak.org/docs/26.8.0/server_admin/)

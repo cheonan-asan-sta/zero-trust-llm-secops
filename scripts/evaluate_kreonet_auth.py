@@ -867,6 +867,7 @@ def score(output, seal, source=None):
         reference_field, signals_field = next(
             (reference, signals)
             for reference, signals in (
+                ("previous_auth_outcome_prediction", "model_signals"),
                 ("previous_auth_recovery_prediction", "auth_outcome_signals"),
                 ("previous_op_entity_handoff_prediction", "auth_recovery_signals"),
                 ("previous_ldap_handoff_prediction", "op_entity_handoff_signals"),
