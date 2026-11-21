@@ -75,6 +75,25 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
             "client_ip": "192.0.2.20",
             "user_agent": "synthetic client B",
         },
+        {**base, "trace_id": "nine", "module": "rp", "http_status": 302},
+        {
+            **base,
+            "trace_id": "nine",
+            "module": "op",
+            "http_status": 200,
+            "timestamp": "2026-03-20T01:02:04Z",
+            "user_id": "",
+            "ref": "synthetic op ref",
+        },
+        {
+            **base,
+            "trace_id": "nine",
+            "module": "op",
+            "http_status": 200,
+            "timestamp": "2026-03-20T01:02:05Z",
+            "user_id": " ",
+            "ref": "synthetic op ref",
+        },
     ]
     snapshots = []
     for label in ("attack", "benign"):
@@ -90,7 +109,7 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
                     "uri": f"/{label}",
                     "client_ip": event.get("client_ip", label),
                     "user_id": event.get("user_id", label),
-                    "ref": label,
+                    "ref": event.get("ref", label),
                     "duration_ms": len(label),
                     "message": label,
                     "payload": {"classification": label},
@@ -103,9 +122,14 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
         monkeypatch.setattr(evaluation, "SOURCE_HASH", hashlib.sha256(raw).hexdigest())
         monkeypatch.setattr(evaluation, "SOURCE_SIZE", len(raw))
         output = tmp_path / label
-        evaluation.capture(output, source, include_linked_flow=True)
+        evaluation.capture(output, source, include_unattributed_op_flow=True)
         packet = output / "predictions.json"
-        for raw_value in (b"synthetic client", b"synthetic subject", b"192.0.2.10"):
+        for raw_value in (
+            b"synthetic client",
+            b"synthetic subject",
+            b"192.0.2.10",
+            b"synthetic op ref",
+        ):
             assert raw_value not in packet.read_bytes()
         snapshots.append(evaluation.read(packet)["prediction_rows"])
 
@@ -131,6 +155,12 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
     assert linked["previous_sequence_flow_prediction"] is False
     assert linked["linked_flow_signals"] == ["same_subject_client_changed_between_posts"]
     assert linked["prediction"] is True
+    unattributed = snapshots[0][hashlib.sha256(b"nine").hexdigest()]
+    assert unattributed["previous_linked_flow_prediction"] is False
+    assert unattributed["unattributed_op_flow_signals"] == [
+        "consecutive_op_posts_for_same_client_without_subject"
+    ]
+    assert unattributed["prediction"] is True
 
 
 @pytest.mark.parametrize(
@@ -238,3 +268,23 @@ def test_linked_flow_uses_strict_order_adjacency_and_ldap_interval():
     late = (start + timedelta(seconds=3, milliseconds=1), LDAP_POST, CLIENT_A)
     assert evaluation.linked_flow_signals(statuses, [first, late]) == []
     assert evaluation.linked_flow_signals(Counter([200, 302, 401]), [first, last]) == []
+
+
+def test_unattributed_op_requires_consecutive_same_client_and_no_op_subject():
+    start = datetime(2026, 3, 20, tzinfo=UTC)
+    first = (start, OP_SUBMIT, "", "client")
+    second = (start + timedelta(seconds=2), OP_SUBMIT, "", "client")
+    middle = start + timedelta(seconds=1)
+    late_subject = (start + timedelta(seconds=3), OP_LOOKUP, "observed subject", "")
+    redirect = (start - timedelta(seconds=1), RP_REDIRECT, "", "")
+    statuses = Counter([200, 302])
+    classify = evaluation.unattributed_op_signals
+    assert classify(statuses, [second, redirect, first]) == [
+        "consecutive_op_posts_for_same_client_without_subject"
+    ]
+    assert classify(statuses, [first, second, redirect, late_subject]) == []
+    assert classify(statuses, [first, second, (middle, RP_REDIRECT, "", "")]) == []
+    assert classify(statuses, [first, (second[0], OP_SUBMIT, "", "other"), redirect]) == []
+    assert classify(statuses, [first, (second[0], OP_SUBMIT, "", ""), redirect]) == []
+    assert classify(statuses, [first, first, redirect]) == []
+    assert classify(Counter([200, 302, 401]), [first, second, redirect]) == []

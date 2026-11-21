@@ -151,6 +151,26 @@ def linked_flow_signals(statuses, events):
     return sorted(signals)
 
 
+def unattributed_op_signals(statuses, events):
+    if statuses.keys() != {200, 302}:
+        return []
+    if any(stage[0] == "op" and user for _, stage, user, _ in events):
+        return []
+    ordered = sorted(events, key=lambda event: event[0])
+    op_post = ("op", "POST", 200)
+    for previous, current in pairwise(ordered):
+        previous_time, previous_stage, _, previous_ref = previous
+        current_time, current_stage, _, current_ref = current
+        if (
+            previous_stage == current_stage == op_post
+            and previous_time < current_time
+            and current_ref
+            and previous_ref == current_ref
+        ):
+            return ["consecutive_op_posts_for_same_client_without_subject"]
+    return []
+
+
 def capture(
     output,
     source=None,
@@ -161,7 +181,9 @@ def capture(
     include_success_flow=False,
     include_sequence_flow=False,
     include_linked_flow=False,
+    include_unattributed_op_flow=False,
 ):
+    include_linked_flow = include_linked_flow or include_unattributed_op_flow
     include_sequence_flow = include_sequence_flow or include_linked_flow
     include_success_flow = include_success_flow or include_sequence_flow
     include_protocol_flow = include_protocol_flow or include_success_flow
@@ -230,6 +252,14 @@ def capture(
             "only 200 and 302: adjacent request POST 200 has same user and changed IP and agent",
             "only 200 and 302: adjacent LDAP POST 200 has same IP and agent within three seconds",
         ]
+    if include_unattributed_op_flow:
+        expected_plan["input_fields"].append(
+            "OP user_id presence and nonblank ref equality on adjacent OP POST 200 rows"
+        )
+        expected_plan["candidate"] = "previous linked flow detector OR unattributed OP flow signals"
+        expected_plan["unattributed_op_flow_signals"] = [
+            "adjacent OP POST 200 with equal nonblank ref, strict order, and no OP user_id"
+        ]
     if plan.exists():
         if read(plan) != expected_plan:
             raise ValueError("existing plan differs from frozen protocol")
@@ -250,6 +280,7 @@ def capture(
     traces = {}
     sequence_events = defaultdict(list)
     linked_events = defaultdict(list)
+    op_context_events = defaultdict(list)
     request_counts = defaultdict(Counter)
     stage_user_agents = defaultdict(lambda: defaultdict(set))
     with source.open("rb") as stream:
@@ -279,6 +310,14 @@ def capture(
                             for field in ("user_id", "client_ip", "user_agent")
                         )
                     linked_events[key].append((when, (module, method, status), binding))
+                if include_unattributed_op_flow:
+                    user = nonblank_text(row.get("user_id")) if module == "op" else ""
+                    client = (
+                        nonblank_text(row.get("ref"))
+                        if (module, method, status) == ("op", "POST", 200)
+                        else ""
+                    )
+                    op_context_events[key].append((when, (module, method, status), user, client))
                 if module in PROTOCOL_MODULES and method in {"GET", "POST"}:
                     stage = (module, method)
                     request_counts[key][stage] += 1
@@ -383,6 +422,16 @@ def capture(
                     "linked_flow_signals": signals,
                 }
             )
+        if include_unattributed_op_flow:
+            signals = unattributed_op_signals(statuses, op_context_events.get(key, ()))
+            previous = rows[identity]["prediction"]
+            rows[identity].update(
+                {
+                    "previous_linked_flow_prediction": previous,
+                    "prediction": previous or bool(signals),
+                    "unattributed_op_flow_signals": signals,
+                }
+            )
     write(
         output / "predictions.json",
         {
@@ -446,6 +495,7 @@ def score(output, seal, source=None):
         reference_field, signals_field = next(
             (reference, signals)
             for reference, signals in (
+                ("previous_linked_flow_prediction", "unattributed_op_flow_signals"),
                 ("previous_sequence_flow_prediction", "linked_flow_signals"),
                 ("previous_success_flow_prediction", "sequence_flow_signals"),
                 ("previous_protocol_flow_prediction", "success_flow_signals"),
@@ -495,6 +545,7 @@ if __name__ == "__main__":
     cli.add_argument("--include-success-flow", action="store_true")
     cli.add_argument("--include-sequence-flow", action="store_true")
     cli.add_argument("--include-linked-flow", action="store_true")
+    cli.add_argument("--include-unattributed-op-flow", action="store_true")
     args = cli.parse_args()
     if args.phase == "capture":
         capture(
@@ -506,6 +557,7 @@ if __name__ == "__main__":
             include_success_flow=args.include_success_flow,
             include_sequence_flow=args.include_sequence_flow,
             include_linked_flow=args.include_linked_flow,
+            include_unattributed_op_flow=args.include_unattributed_op_flow,
         )
     elif args.prediction_sha256:
         score(args.output, args.prediction_sha256, args.source)
