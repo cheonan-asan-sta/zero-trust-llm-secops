@@ -487,6 +487,23 @@ LANL 공개 자료는 익명화한 실제 인증 이벤트와 레드팀 일부 �
 
 `scripts/evaluate_kreonet_auth.py`에서 `capture <결과 경로> --source <로컬 원본> --include-unattributed-op-flow`를 실행하고 `score <결과 경로> --source <로컬 원본> --prediction-sha256 <예측 해시>`로 채점한다. 개발·보정 구간은 `capture`에 `--cohort development` 또는 `--cohort calibration`을 추가한다. 결과는 `runtime/kreonet-unattributed-op-flow-{development,calibration,holdout}-v1/`에 있으며, 비교 구간의 `target-overlap.json`에 35개 대상 사례 집계를 남겼다. 로컬 회귀 테스트 96개를 통과했고 모델 API와 AWS를 호출하지 않았다. 이 수치는 이미 사용한 공개 합성 데이터의 전후 비교이며, 수집기별 사용자 필드 생략 관행이 다른 운영 환경에는 추가 검증이 필요하다.
 
+#### KREONET OP 제출 단계의 클라이언트 관측 단절
+
+직전 평가에서 정상과 연합 인증 단계 순서가 같은 프로토콜 이상 미탐은 25개였다. HTTP 상태와 연합 인증 단계가 같아도 그 사이의 내부 인증 로그에는 다른 단서가 남을 수 있다. 직전 규칙은 같은 요청 단계의 User-Agent 변화나 연속 OP POST를 관찰했지만, 내부 인증에서 OP로 이어지는 서로 다른 단계의 클라이언트 관측은 연결하지 않았다. 개발·보정 구간에서도 같은 유형 미탐이 104개·24개 있었고, 그중 아래 조건은 각각 29개·8개를 구분했다.
+
+같은 트레이스에서 HTTP 200과 302만 있고, 타임스탬프가 증가하는 **OP GET 200 → 내부 인증(auth) POST 200 → OP POST 200** 세 단계가 인접해야 한다. 내부 인증과 마지막 OP POST의 사용자 ID가 비어 있지 않고 같아야 하며, 두 OP 요청의 클라이언트 참조(`ref`)도 비어 있지 않고 같아야 한다. 첫 OP 요청과 내부 인증에서 IP·User-Agent가 일치한 뒤 마지막 OP POST에서 다른 IP가 관측되고 User-Agent가 비어 있을 때 추가 탐지한다. IP 변화나 User-Agent 누락 각각으로는 판정하지 않는다.
+
+사용자 ID·클라이언트 참조·IP·User-Agent는 관측값의 유무와 일치 여부에만 쓰며 원문을 예측 파일에 남기지 않는다. 정답 라벨·유형·이벤트 이름·URL·메시지·페이로드는 입력에서 제외했다. 회귀 테스트에서 해당 값을 바꿔도 결과가 같았다. 서버 간 전달이나 프록시, 수집기 정책에 따라 비슷한 관측이 생길 수 있어 운영 환경의 정책 위반이나 동일 기기 여부를 이 신호만으로 확정할 수 없다.
+
+| 같은 정상 1,490·공격 1,573개 흐름 | 정밀도 | 재현율 | F1 | 오탐률 | TP / FP / FN / TN |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 직전 OP의 참조·사용자 관측 판정 | 99.69% | 40.81% | 57.92% | 0.13% | 642 / 2 / 931 / 1,488 |
+| OP 제출 단계의 클라이언트 관측 단절 추가 | 99.70% | 42.47% | 59.56% | 0.13% | 668 / 2 / 905 / 1,488 |
+
+비교 구간의 사례 ID와 직전 예측을 대조했다. 새 오탐과 기존 탐지 손실은 각각 0개였다. 추가 탐지 26개는 대상 프로토콜 이상 8개, 계정 악용 8개, 자격 증명 관련 위협 6개, 행동 기반 위협 4개였다. 대상 미탐은 25→17개, 200·302 프로토콜 이상 미탐은 57→49개, 전체 프로토콜 이상 미탐은 345→337개가 됐다. 개발·보정 구간에서는 합계 기준 각각 68개·16개를 추가 탐지했고 오탐은 29개·4개로 유지됐다. 재현율·F1은 95% 목표에 미달했다.
+
+`scripts/evaluate_kreonet_auth.py`에서 `capture <결과 경로> --source <로컬 원본> --include-op-handoff-flow`로 예측을 기록하고, `score <결과 경로> --source <로컬 원본> --prediction-sha256 <예측 해시>`로 채점한다. 개발·보정 구간은 `capture`에 `--cohort development` 또는 `--cohort calibration`을 추가한다. 결과는 `runtime/kreonet-op-handoff-flow-{development,calibration,holdout}-v1/`에 있으며 비교 구간의 `target-overlap.json`에 대상 25개 집계를 기록했다. API·AWS 호출 없이 로컬 회귀 테스트 97개를 통과했다. 이번 수치는 이미 사용한 공개 합성 데이터의 전후 비교다.
+
 #### Keycloak 승인·MFA·권한 회수 통합 시험
 
 `scripts/run_keycloak_remote_acceptance.py`는 Keycloak 26.8.0의 임시 realm과 공개 키 조회를 루프백에 구성한다. 등록된 테스트 사용자의 비밀번호·TOTP로 로그인한 뒤 실제 HTTP 응답을 테스트 수집기의 MFA 관측으로 연결한다. 게이트웨이는 서명된 관측과 읽기 전용 자원 정책을 검사한다. Keycloak의 실제 역할 변경 및 로그아웃 결과를 확인하고 앱의 운영자 차단 목록을 갱신한다. 임시 계정, OTP, 토큰과 개인키는 결과 파일에 넣지 않는다. [Keycloak 컨테이너](https://www.keycloak.org/server/containers) · [Keycloak OTP 관리](https://www.keycloak.org/docs/26.8.0/server_admin/)

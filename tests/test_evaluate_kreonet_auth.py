@@ -95,6 +95,40 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
             "ref": "synthetic op ref",
         },
     ]
+    events += [
+        {**base, "trace_id": "ten", "module": "rp", "http_status": 302},
+        {
+            **base,
+            "trace_id": "ten",
+            "module": "op",
+            "http_status": 200,
+            "http_method": "GET",
+            "timestamp": "2026-03-20T01:02:04Z",
+            "ref": "synthetic handoff ref",
+            "client_ip": "192.0.2.30",
+            "user_agent": "synthetic client A",
+        },
+        {
+            **base,
+            "trace_id": "ten",
+            "module": "auth",
+            "http_status": 200,
+            "timestamp": "2026-03-20T01:02:05Z",
+            "user_id": "synthetic subject",
+            "client_ip": "192.0.2.30",
+            "user_agent": "synthetic client A",
+        },
+        {
+            **base,
+            "trace_id": "ten",
+            "module": "op",
+            "http_status": 200,
+            "timestamp": "2026-03-20T01:02:06Z",
+            "user_id": "synthetic subject",
+            "client_ip": "192.0.2.40",
+            "ref": "synthetic handoff ref",
+        },
+    ]
     snapshots = []
     for label in ("attack", "benign"):
         source = tmp_path / f"{label}.jsonl"
@@ -122,7 +156,7 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
         monkeypatch.setattr(evaluation, "SOURCE_HASH", hashlib.sha256(raw).hexdigest())
         monkeypatch.setattr(evaluation, "SOURCE_SIZE", len(raw))
         output = tmp_path / label
-        evaluation.capture(output, source, include_unattributed_op_flow=True)
+        evaluation.capture(output, source, include_op_handoff_flow=True)
         packet = output / "predictions.json"
         for raw_value in (
             b"synthetic client",
@@ -161,6 +195,12 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
         "consecutive_op_posts_for_same_client_without_subject"
     ]
     assert unattributed["prediction"] is True
+    handoff = snapshots[0][hashlib.sha256(b"ten").hexdigest()]
+    assert handoff["previous_unattributed_op_prediction"] is False
+    assert handoff["op_handoff_signals"] == [
+        "client_observation_discontinuity_at_bound_op_submission"
+    ]
+    assert handoff["prediction"] is True
 
 
 @pytest.mark.parametrize(
@@ -288,3 +328,35 @@ def test_unattributed_op_requires_consecutive_same_client_and_no_op_subject():
     assert classify(statuses, [first, (second[0], OP_SUBMIT, "", ""), redirect]) == []
     assert classify(statuses, [first, first, redirect]) == []
     assert classify(Counter([200, 302, 401]), [first, second, redirect]) == []
+
+
+def test_op_handoff_requires_observed_discontinuity_on_correlated_consecutive_stages():
+    start = datetime(2026, 3, 20, tzinfo=UTC)
+    lookup = (start, OP_LOOKUP, ("", "192.0.2.30", "browser", "client ref"))
+    auth = (
+        start + timedelta(seconds=1),
+        ("auth", "POST", 200),
+        ("subject", "192.0.2.30", "browser", ""),
+    )
+    submit = (
+        start + timedelta(seconds=2),
+        OP_SUBMIT,
+        ("subject", "192.0.2.40", "", "client ref"),
+    )
+    classify = evaluation.op_handoff_signals
+    statuses = Counter({200: 3, 302: 1})
+    assert classify(statuses, [submit, auth, lookup]) == [
+        "client_observation_discontinuity_at_bound_op_submission"
+    ]
+    for context in (
+        ("subject", "192.0.2.40", "browser", "client ref"),
+        ("subject", "192.0.2.30", "", "client ref"),
+        ("subject", "", "", "client ref"),
+        ("other", "192.0.2.40", "", "client ref"),
+        ("subject", "192.0.2.40", "", "other client"),
+    ):
+        assert classify(statuses, [lookup, auth, (*submit[:2], context)]) == []
+    assert classify(statuses, [lookup, auth, (auth[0], *submit[1:])]) == []
+    unrelated = (start + timedelta(seconds=1, milliseconds=500), RP_REDIRECT, ("", "", "", ""))
+    assert classify(statuses, [lookup, auth, unrelated, submit]) == []
+    assert classify(Counter({200: 3, 302: 1, 401: 1}), [lookup, auth, submit]) == []

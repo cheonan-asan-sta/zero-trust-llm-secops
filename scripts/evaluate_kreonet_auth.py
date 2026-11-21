@@ -171,6 +171,38 @@ def unattributed_op_signals(statuses, events):
     return []
 
 
+OP_AUTH_STAGES = (("op", "GET", 200), ("auth", "POST", 200), ("op", "POST", 200))
+
+
+def op_handoff_signals(statuses, events):
+    if statuses.keys() != {200, 302}:
+        return []
+    ordered = sorted(events, key=lambda event: event[0])
+    for lookup, authentication, submission in zip(ordered, ordered[1:], ordered[2:]):
+        if (lookup[1], authentication[1], submission[1]) != OP_AUTH_STAGES:
+            continue
+        if not lookup[0] < authentication[0] < submission[0]:
+            continue
+        _, initial_ip, initial_agent, initial_ref = lookup[2]
+        auth_user, auth_ip, auth_agent, _ = authentication[2]
+        submit_user, submit_ip, submit_agent, submit_ref = submission[2]
+        if (
+            auth_user
+            and auth_user == submit_user
+            and initial_ref
+            and initial_ref == submit_ref
+            and initial_ip
+            and initial_ip == auth_ip
+            and initial_agent
+            and initial_agent == auth_agent
+            and submit_ip
+            and submit_ip != auth_ip
+            and not submit_agent
+        ):
+            return ["client_observation_discontinuity_at_bound_op_submission"]
+    return []
+
+
 def capture(
     output,
     source=None,
@@ -182,7 +214,9 @@ def capture(
     include_sequence_flow=False,
     include_linked_flow=False,
     include_unattributed_op_flow=False,
+    include_op_handoff_flow=False,
 ):
+    include_unattributed_op_flow = include_unattributed_op_flow or include_op_handoff_flow
     include_linked_flow = include_linked_flow or include_unattributed_op_flow
     include_sequence_flow = include_sequence_flow or include_linked_flow
     include_success_flow = include_success_flow or include_sequence_flow
@@ -260,6 +294,15 @@ def capture(
         expected_plan["unattributed_op_flow_signals"] = [
             "adjacent OP POST 200 with equal nonblank ref, strict order, and no OP user_id"
         ]
+    if include_op_handoff_flow:
+        expected_plan["input_fields"].append(
+            "user_id, client_ip, user_agent and ref presence/equality across OP and auth stages"
+        )
+        expected_plan["candidate"] = "previous unattributed OP detector OR OP handoff signal"
+        expected_plan["op_handoff_signals"] = [
+            "OP GET 200, auth POST 200, OP POST 200 in strict order with stable user and client ref",
+            "IP and agent stable before OP POST, then IP changes and agent is absent",
+        ]
     if plan.exists():
         if read(plan) != expected_plan:
             raise ValueError("existing plan differs from frozen protocol")
@@ -281,6 +324,7 @@ def capture(
     sequence_events = defaultdict(list)
     linked_events = defaultdict(list)
     op_context_events = defaultdict(list)
+    op_handoff_events = defaultdict(list)
     request_counts = defaultdict(Counter)
     stage_user_agents = defaultdict(lambda: defaultdict(set))
     with source.open("rb") as stream:
@@ -318,6 +362,15 @@ def capture(
                         else ""
                     )
                     op_context_events[key].append((when, (module, method, status), user, client))
+                if include_op_handoff_flow:
+                    stage = (module, method, status)
+                    context = ("", "", "", "")
+                    if stage in OP_AUTH_STAGES:
+                        context = tuple(
+                            nonblank_text(row.get(field))
+                            for field in ("user_id", "client_ip", "user_agent", "ref")
+                        )
+                    op_handoff_events[key].append((when, stage, context))
                 if module in PROTOCOL_MODULES and method in {"GET", "POST"}:
                     stage = (module, method)
                     request_counts[key][stage] += 1
@@ -432,6 +485,16 @@ def capture(
                     "unattributed_op_flow_signals": signals,
                 }
             )
+        if include_op_handoff_flow:
+            signals = op_handoff_signals(statuses, op_handoff_events.get(key, ()))
+            previous = rows[identity]["prediction"]
+            rows[identity].update(
+                {
+                    "previous_unattributed_op_prediction": previous,
+                    "prediction": previous or bool(signals),
+                    "op_handoff_signals": signals,
+                }
+            )
     write(
         output / "predictions.json",
         {
@@ -495,6 +558,7 @@ def score(output, seal, source=None):
         reference_field, signals_field = next(
             (reference, signals)
             for reference, signals in (
+                ("previous_unattributed_op_prediction", "op_handoff_signals"),
                 ("previous_linked_flow_prediction", "unattributed_op_flow_signals"),
                 ("previous_sequence_flow_prediction", "linked_flow_signals"),
                 ("previous_success_flow_prediction", "sequence_flow_signals"),
@@ -546,6 +610,7 @@ if __name__ == "__main__":
     cli.add_argument("--include-sequence-flow", action="store_true")
     cli.add_argument("--include-linked-flow", action="store_true")
     cli.add_argument("--include-unattributed-op-flow", action="store_true")
+    cli.add_argument("--include-op-handoff-flow", action="store_true")
     args = cli.parse_args()
     if args.phase == "capture":
         capture(
@@ -558,6 +623,7 @@ if __name__ == "__main__":
             include_sequence_flow=args.include_sequence_flow,
             include_linked_flow=args.include_linked_flow,
             include_unattributed_op_flow=args.include_unattributed_op_flow,
+            include_op_handoff_flow=args.include_op_handoff_flow,
         )
     elif args.prediction_sha256:
         score(args.output, args.prediction_sha256, args.source)
