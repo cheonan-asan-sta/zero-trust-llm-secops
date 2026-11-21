@@ -88,7 +88,10 @@ The snapshot does not authorize access; it includes no grant token and is not an
 to execute actions. Always retain human review. Cite exact verified_session field paths.
 Use ACCESS_POLICY_VIOLATION for a specifically established access-control failure in the
 verified snapshot: an unregistered target, a denied server role/action scope, a previously
-revoked session, or an explicitly required MFA assertion that is not successful. This records
+revoked session, or an explicitly required MFA assertion that is not successful. When MFA is
+required and the server reports SIGNED_MFA_CHALLENGE_REQUIRED with challenge_pending true,
+a signed success observation alone does not satisfy that challenge. Cite the server policy,
+pending state, and reason codes. This records
 the failed access condition, not proof of a specific attack technique or successful compromise.
 Do not return UNKNOWN solely because the attack subtype or external human identity is unknown
 when those current server conditions are established. The caller's equal role claims do not

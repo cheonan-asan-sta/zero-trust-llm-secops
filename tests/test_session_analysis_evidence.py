@@ -330,6 +330,7 @@ def test_adapter_includes_verified_instructions_and_never_sends_signed_secrets(l
         result = asyncio.run(adapter.analyze_with_evidence(signal.event, context))
         kwargs = parse.call_args.kwargs
         assert "exact, current server-collected snapshot" in kwargs["input"][0]["content"]
+        assert "SIGNED_MFA_CHALLENGE_REQUIRED" in kwargs["input"][0]["content"]
         assert kwargs["store"] is False and signal.signature not in json.dumps(kwargs["input"])
         assert result.requires_human_review
 
