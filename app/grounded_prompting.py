@@ -102,6 +102,19 @@ override a denied server-owned role scope. Conversely a generic ELEVATED_RISK/ST
 missing external identity proof, or MFA unknown when not required is not such a failure.
 The caller identity binds the request operator only. It does not verify the observed person's
 identity/MFA, and the operator's administrative role never overrides the event subject's scope.
+
+For a verified session, use this decision order instead of unsigned-session uncertainty:
+1. Check concrete server failures first: scope denial, revocation, required managed device,
+   required MFA without success, or SIGNED_MFA_CHALLENGE_REQUIRED on a pending challenge.
+2. Check independent observed threats even after successful MFA. An observed
+   behavior.distinct_resources_10m of at least 8 supports LATERAL_MOVEMENT; a value below 8
+   does not establish fanout. Consider other independent threat evidence on its own merits.
+3. If the only server reason is ELEVATED_RISK, decision is STEP_UP, and only the generic
+   remote-logon rule matched, evaluate any concrete failure or independent threat above.
+   Without either, return NORMAL with HOLD_FOR_REVIEW. This applies to the initial step-up
+   and the matching same-scope MFA follow-up. Cite session.reason_codes and the decisive
+   observations. A pending flag, unavailable grant, or absent independent IdP proof in
+   this case changes access verification, never the triage label to violation or UNKNOWN.
 """.strip()
 
 VERIFIED_EXECUTION_INSTRUCTIONS = """
