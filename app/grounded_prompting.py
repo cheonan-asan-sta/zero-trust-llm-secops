@@ -104,7 +104,7 @@ The caller identity binds the request operator only. It does not verify the obse
 identity/MFA, and the operator's administrative role never overrides the event subject's scope.
 
 For a verified session, use this decision order instead of unsigned-session uncertainty:
-1. If remote_mfa_check.required_response_missing_or_mismatched is true, return
+1. If remote_mfa_check.required_challenge_unsatisfied is true, return
    ACCESS_POLICY_VIOLATION for the attempted access even if signed MFA says success and the
    server decision is STEP_UP. Cite verified_session.policy.mfa_required,
    verified_session.session.challenge_pending and verified_session.session.reason_codes.
@@ -221,7 +221,7 @@ def _remote_mfa_check(event: SecurityEvent, facts: dict) -> dict | None:
         return None
     reasons = session["reason_codes"]
     return {
-        "required_response_missing_or_mismatched": (
+        "required_challenge_unsatisfied": (
             policy["mfa_required"] is True
             and session["challenge_pending"] is True
             and "SIGNED_MFA_CHALLENGE_REQUIRED" in reasons

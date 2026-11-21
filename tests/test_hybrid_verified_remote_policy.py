@@ -489,9 +489,7 @@ def test_success_observation_cannot_replace_server_required_challenge(lab, bind_
     assert context.for_event(signed.event)["signal"]["mfa_observation"] == "success"
     assert session.decision == ("ALLOW" if bind_challenge else "STEP_UP")
     payload = json.loads(grounded_input(signed.event, context)[0]["content"])
-    assert (
-        payload["remote_mfa_check"]["required_response_missing_or_mismatched"] is not bind_challenge
-    )
+    assert payload["remote_mfa_check"]["required_challenge_unsatisfied"] is not bind_challenge
     assert not payload["remote_mfa_check"]["generic_remote_step_up_only"]
     assert all(not path.startswith("remote_mfa_check") for path in payload["evidence_catalog"])
     result = analyze(signed, context, assessment())
@@ -553,7 +551,7 @@ def test_verified_remote_followup_limits_generic_alarm_only(lab, variant, expect
         matched = variant == "same_scope"
         payload = json.loads(grounded_input(event, context)[0]["content"])
         assert payload["remote_mfa_check"] == {
-            "required_response_missing_or_mismatched": not matched,
+            "required_challenge_unsatisfied": not matched,
             "generic_remote_step_up_only": matched,
             "same_scope_response_verified": matched,
         }
