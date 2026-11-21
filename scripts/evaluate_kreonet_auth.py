@@ -299,6 +299,39 @@ def op_entity_handoff_signals(statuses, events):
     return []
 
 
+def auth_recovery_signals(statuses, events):
+    if not statuses[302]:
+        return []
+    ordered = sorted(events, key=lambda event: event[0])
+    signals = set()
+    provider_time = None
+    for when, (module, method, status), _, _ in ordered:
+        if provider_time is None and module in {"op", "idp"} and method == "GET" and status == 200:
+            provider_time = when
+        if (
+            provider_time is not None
+            and provider_time < when
+            and (module, method) == ("auth", "POST")
+            and status in {400, 409}
+        ):
+            signals.add("auth_request_rejected_after_provider_lookup")
+    for previous, current in pairwise(ordered):
+        previous_time, previous_stage, previous_subject, previous_agent = previous
+        current_time, current_stage, current_subject, current_agent = current
+        if (
+            previous_stage == ("auth", "POST", 401)
+            and current_stage in {("auth", "POST", 200), ("auth", "POST", 401)}
+            and previous_time < current_time
+            and previous_subject
+            and previous_subject == current_subject
+            and previous_agent
+            and current_agent
+            and previous_agent != current_agent
+        ):
+            signals.add("same_subject_client_agent_changed_on_auth_retry")
+    return sorted(signals)
+
+
 def capture(
     output,
     source=None,
@@ -314,7 +347,9 @@ def capture(
     include_saml_handoff_flow=False,
     include_ldap_handoff_flow=False,
     include_op_entity_handoff_flow=False,
+    include_auth_recovery_flow=False,
 ):
+    include_op_entity_handoff_flow = include_op_entity_handoff_flow or include_auth_recovery_flow
     include_ldap_handoff_flow = include_ldap_handoff_flow or include_op_entity_handoff_flow
     include_saml_handoff_flow = include_saml_handoff_flow or include_ldap_handoff_flow
     include_op_handoff_flow = include_op_handoff_flow or include_saml_handoff_flow
@@ -431,6 +466,15 @@ def capture(
             "same nonblank ref_id and no user_id or ref on those stages",
             "client IP and agent stable before OP POST, then IP changes and agent is absent",
         ]
+    if include_auth_recovery_flow:
+        expected_plan["input_fields"].append(
+            "timestamp, status and nonblank user_id/User-Agent equality on auth POST"
+        )
+        expected_plan["candidate"] = "previous entity handoff detector OR auth recovery signals"
+        expected_plan["auth_recovery_signals"] = [
+            "302 in trace and auth POST 400 or 409 after OP/IdP GET 200",
+            "302 in trace and adjacent auth POST 401 then 200 or 401 with same user and new agent",
+        ]
     if plan.exists():
         if read(plan) != expected_plan:
             raise ValueError("existing plan differs from frozen protocol")
@@ -453,6 +497,7 @@ def capture(
     linked_events = defaultdict(list)
     op_context_events = defaultdict(list)
     handoff_events = defaultdict(list)
+    auth_recovery_events = defaultdict(list)
     request_counts = defaultdict(Counter)
     stage_user_agents = defaultdict(lambda: defaultdict(set))
     with source.open("rb") as stream:
@@ -519,6 +564,13 @@ def capture(
                     agent = nonblank_text(row.get("user_agent"))
                     if agent:
                         stage_user_agents[key][stage].add(agent)
+            if include_auth_recovery_flow:
+                stage = (row.get("module"), row.get("http_method"), status)
+                subject = agent = ""
+                if stage[:2] == ("auth", "POST") and status in {200, 401}:
+                    subject = nonblank_text(row.get("user_id"))
+                    agent = nonblank_text(row.get("user_agent"))
+                auth_recovery_events[key].append((when, stage, subject, agent))
             traces[key] = (
                 min(first, when),
                 max(last, when),
@@ -667,6 +719,16 @@ def capture(
                     "op_entity_handoff_signals": signals,
                 }
             )
+        if include_auth_recovery_flow:
+            signals = auth_recovery_signals(statuses, auth_recovery_events.get(key, ()))
+            previous = rows[identity]["prediction"]
+            rows[identity].update(
+                {
+                    "previous_op_entity_handoff_prediction": previous,
+                    "prediction": previous or bool(signals),
+                    "auth_recovery_signals": signals,
+                }
+            )
     write(
         output / "predictions.json",
         {
@@ -730,6 +792,7 @@ def score(output, seal, source=None):
         reference_field, signals_field = next(
             (reference, signals)
             for reference, signals in (
+                ("previous_op_entity_handoff_prediction", "auth_recovery_signals"),
                 ("previous_ldap_handoff_prediction", "op_entity_handoff_signals"),
                 ("previous_saml_handoff_prediction", "ldap_handoff_signals"),
                 ("previous_op_handoff_prediction", "saml_handoff_signals"),
@@ -789,6 +852,7 @@ if __name__ == "__main__":
     cli.add_argument("--include-saml-handoff-flow", action="store_true")
     cli.add_argument("--include-ldap-handoff-flow", action="store_true")
     cli.add_argument("--include-op-entity-handoff-flow", action="store_true")
+    cli.add_argument("--include-auth-recovery-flow", action="store_true")
     args = cli.parse_args()
     if args.phase == "capture":
         capture(
@@ -805,6 +869,7 @@ if __name__ == "__main__":
             include_saml_handoff_flow=args.include_saml_handoff_flow,
             include_ldap_handoff_flow=args.include_ldap_handoff_flow,
             include_op_entity_handoff_flow=args.include_op_entity_handoff_flow,
+            include_auth_recovery_flow=args.include_auth_recovery_flow,
         )
     elif args.prediction_sha256:
         score(args.output, args.prediction_sha256, args.source)

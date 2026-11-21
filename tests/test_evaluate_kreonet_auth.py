@@ -171,6 +171,20 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
         for event in tuple(events)
         if event["trace_id"] == "ten"
     )
+    for offset, (module, method, status, agent) in enumerate(
+        (("rp", "GET", 302, ""), ("auth", "POST", 401, "a"), ("auth", "POST", 200, "b"))
+    ):
+        events.append(
+            {
+                "trace_id": "fourteen",
+                "timestamp": f"2026-03-20T01:02:0{offset + 3}Z",
+                "module": module,
+                "http_method": method,
+                "http_status": status,
+                "user_id": "synthetic subject",
+                "user_agent": agent,
+            }
+        )
     snapshots = []
     for label in ("attack", "benign"):
         source = tmp_path / f"{label}.jsonl"
@@ -199,7 +213,7 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
         monkeypatch.setattr(evaluation, "SOURCE_HASH", hashlib.sha256(raw).hexdigest())
         monkeypatch.setattr(evaluation, "SOURCE_SIZE", len(raw))
         output = tmp_path / label
-        evaluation.capture(output, source, include_op_entity_handoff_flow=True)
+        evaluation.capture(output, source, include_auth_recovery_flow=True)
         packet = output / "predictions.json"
         for raw_value in (
             b"synthetic client",
@@ -263,6 +277,10 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
         "entity_linked_op_client_discontinuity_with_unobserved_subject_and_client_ref"
     ]
     assert entity_handoff["prediction"] is True
+    retry = snapshots[0][hashlib.sha256(b"fourteen").hexdigest()]
+    assert retry["previous_op_entity_handoff_prediction"] is False
+    assert retry["auth_recovery_signals"] == ["same_subject_client_agent_changed_on_auth_retry"]
+    assert retry["prediction"] is True
 
 
 @pytest.mark.parametrize(
@@ -531,3 +549,33 @@ def test_op_entity_handoff_requires_a_shared_observed_entity_and_client_change()
         assert classify(statuses, [lookup, auth, (*submission[:2], context, *submission[3:])]) == []
     assert classify(statuses, [lookup, auth, (auth[0], *submission[1:])]) == []
     assert classify(Counter({200: 3, 302: 1, 401: 1}), [lookup, auth, submission]) == []
+
+
+@pytest.mark.parametrize("status", [400, 409])
+def test_auth_rejection_requires_prior_provider_lookup_in_redirected_flow(status):
+    start = datetime(2026, 3, 20, tzinfo=UTC)
+    lookup = (start, OP_LOOKUP, "", "")
+    error = (start + timedelta(seconds=2), ("auth", "POST", status), "", "")
+    classify = evaluation.auth_recovery_signals
+    statuses = Counter([302, 200, status])
+    assert classify(statuses, [error, lookup]) == ["auth_request_rejected_after_provider_lookup"]
+    assert classify(statuses, [error]) == []
+    assert classify(statuses, [lookup, (start, *error[1:])]) == []
+    assert classify(statuses, [lookup, (error[0], ("request", "POST", status), "", "")]) == []
+    assert classify(Counter([200, status]), [lookup, error]) == []
+
+
+def test_auth_retry_requires_adjacent_same_subject_with_observed_new_agent():
+    start = datetime(2026, 3, 20, tzinfo=UTC)
+    failed = (start, ("auth", "POST", 401), "subject", "first")
+    retried = (start + timedelta(seconds=2), ("auth", "POST", 200), "subject", "second")
+    classify = evaluation.auth_recovery_signals
+    statuses = Counter([302, 401, 200])
+    assert classify(statuses, [retried, failed]) == [
+        "same_subject_client_agent_changed_on_auth_retry"
+    ]
+    assert classify(statuses, [failed, (*retried[:2], "different user", "second")]) == []
+    assert classify(statuses, [failed, (*retried[:2], "subject", "first")]) == []
+    assert classify(statuses, [failed, (*retried[:2], "subject", "")]) == []
+    between = (start + timedelta(seconds=1), OP_LOOKUP, "", "")
+    assert classify(statuses, [failed, between, retried]) == []
