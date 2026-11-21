@@ -60,13 +60,17 @@ class RecordedAnalyzer(OpenAIAnalyzer):
         return result
 
 
-async def capture(source, output, key_file):
+async def capture(source, output, key_file, plan_sha256, case_ids):
     source_plan = source / "plan.json"
-    if fingerprint(source_plan) != COHORT_PLAN:
-        raise ValueError("expected the frozen follow-up cohort")
+    if fingerprint(source_plan) != plan_sha256:
+        raise ValueError("frozen remote cohort plan hash mismatch")
     plan = read(source_plan)
-    if len(plan["cases"]) != 64 or plan["cohort"] != "followup":
+    if (plan["cohort"], len(plan["cases"])) not in {("followup", 64), ("confirmation", 40)}:
         raise ValueError("invalid frozen cohort")
+    selected_ids = case_ids or list(plan["cases"])
+    if len(set(selected_ids)) != len(selected_ids) or not set(selected_ids) <= plan["cases"].keys():
+        raise ValueError("invalid selection from frozen cohort")
+    cases = {case_id: plan["cases"][case_id] for case_id in selected_ids}
     key = os.getenv("OPENAI_API_KEY") or (
         dotenv_values(key_file).get("OPENAI_API_KEY") if key_file else None
     )
@@ -78,7 +82,8 @@ async def capture(source, output, key_file):
         output / "protocol.json",
         {
             "revision": revision,
-            "cohort_plan_sha256": COHORT_PLAN,
+            "cohort_plan_sha256": plan_sha256,
+            "case_ids": selected_ids,
             "truth_sha256": plan["truth_sha256"],
             "model": MODEL,
             "reasoning_effort": "none",
@@ -180,7 +185,7 @@ async def capture(source, output, key_file):
             (output / "responses.jsonl").open("x", encoding="utf-8", newline="\n") as journal,
         ):
             labs = {}
-            for profile in sorted({case["profile"] for case in plan["cases"].values()}):
+            for profile in sorted({case["profile"] for case in cases.values()}):
                 with patch.object(
                     local_session_analysis_lab,
                     "remote_policy_bundle",
@@ -189,10 +194,7 @@ async def capture(source, output, key_file):
                     labs[profile] = LocalSessionAnalysisLab(Path(scratch) / profile)
             hybrid = HybridAnalyzer(settings, RecordedAnalyzer(settings))
             rows = await asyncio.gather(
-                *(
-                    run_case(case_id, case, labs, hybrid, journal)
-                    for case_id, case in plan["cases"].items()
-                )
+                *(run_case(case_id, case, labs, hybrid, journal) for case_id, case in cases.items())
             )
     write(
         output / "predictions.json",
@@ -214,10 +216,12 @@ def score(source, output, sealed):
     protocol = output / "protocol.json"
     if fingerprint(protocol) != data["protocol_sha256"]:
         raise ValueError("protocol seal mismatch")
+    settings = read(protocol)
     truth_file = source / "truth.json"
-    if fingerprint(truth_file) != read(protocol)["truth_sha256"]:
+    if fingerprint(truth_file) != settings["truth_sha256"]:
         raise ValueError("truth seal mismatch")
     truth = read(truth_file)
+    truth = {case_id: truth[case_id] for case_id in settings.get("case_ids", truth)}
     rows = data["rows"]
     if len(rows) != len(truth) or {r["id"] for r in rows} != set(truth):
         raise ValueError("evaluation coverage mismatch")
@@ -225,9 +229,7 @@ def score(source, output, sealed):
         "prediction_sha256": sealed,
         "stopped": data["stopped"],
         "attempts": sum(r["attempted"] for r in rows),
-        "fresh_api_requests": 0
-        if read(protocol).get("replay_of")
-        else sum(r["attempted"] for r in rows),
+        "fresh_api_requests": 0 if settings.get("replay_of") else sum(r["attempted"] for r in rows),
         "valid_model_responses": sum("model_assessment" in r for r in rows),
         "estimated_usage_usd": sum(r.get("usage", {}).get("estimated_usd", 0.0) for r in rows),
         "reserved_usd": data["reserved_usd"],
@@ -308,9 +310,13 @@ if __name__ == "__main__":
     cli.add_argument("output", type=Path)
     cli.add_argument("--key-file", type=Path)
     cli.add_argument("--prediction-sha256")
+    cli.add_argument("--cohort-plan-sha256", default=COHORT_PLAN)
+    cli.add_argument("--case-id", action="append")
     args = cli.parse_args()
     if args.phase == "capture":
-        asyncio.run(capture(args.source, args.output, args.key_file))
+        asyncio.run(
+            capture(args.source, args.output, args.key_file, args.cohort_plan_sha256, args.case_id)
+        )
     elif args.phase == "replay" and args.prediction_sha256:
         asyncio.run(replay(args.source, args.output, args.prediction_sha256))
     elif args.phase == "score" and args.prediction_sha256:

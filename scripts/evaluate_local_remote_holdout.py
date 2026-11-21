@@ -85,6 +85,44 @@ FOLLOWUP_PROFILES = (
     ("release", "vpn", "192.0.2.27", 2),
     ("continuity", "remote", "203.0.113.79", 4),
 )
+CONFIRMATION_FAMILIES = (
+    ("repeated_mfa_supported", "REMOTE_ACCESS", "standard", "bound-repeat", "success", False),
+    ("repeated_admin_mfa", "REMOTE_ACCESS", "restricted", "bound-repeat", "success", False),
+    ("seven_assets_after_mfa", "REMOTE_ACCESS", "restricted", "bound-busy", "success", False),
+    ("remote_no_required_mfa", "REMOTE_ACCESS", "optional", "direct", "not_required", False),
+    ("optional_remote_reported_mfa", "REMOTE_ACCESS", "optional", "direct", "success", False),
+    ("restricted_read_approved", "READ", "restricted", "direct", "success", False),
+    ("read_only_mfa_followup", "READ", "read-only", "bound", "success", False),
+    ("optional_read_without_mfa", "READ", "optional", "direct", "not_required", False),
+    ("initial_verified_team_access", "REMOTE_ACCESS", "standard", "direct", "success", False),
+    ("optional_repeated_mfa", "REMOTE_ACCESS", "optional", "bound-repeat", "success", False),
+    ("eight_assets_after_mfa", "REMOTE_ACCESS", "standard", "bound-fanout", "success", True),
+    ("nine_assets_after_mfa", "REMOTE_ACCESS", "standard", "bound-peak", "success", True),
+    ("read_after_operator_revocation", "READ", "read-only", "revoked", "success", True),
+    ("remote_revoked_optional_mfa", "REMOTE_ACCESS", "optional", "revoked", "success", True),
+    (
+        "compromised_device_after_mfa",
+        "REMOTE_ACCESS",
+        "standard",
+        "bound-compromised",
+        "success",
+        True,
+    ),
+    ("disabled_subject_after_mfa", "REMOTE_ACCESS", "standard", "bound-inactive", "success", True),
+    ("unmanaged_device_on_protected_read", "READ", "read-only", "bound-unmanaged", "success", True),
+    ("wrong_bound_read_response", "READ", "read-only", "wrong", "success", True),
+    ("remote_missing_bound_response", "REMOTE_ACCESS", "standard", "absent", "success", True),
+    ("read_failed_required_mfa", "READ", "read-only", "bound", "failed", True),
+)
+CONFIRMATION_PROFILES = (
+    ("night-shift", "vpn", "198.51.100.96", 6),
+    ("field-operations", "remote", "203.0.113.144", 2),
+)
+COHORTS = {
+    "initial": (FAMILIES, PROFILES, 6211709, "L"),
+    "followup": (FOLLOWUP_FAMILIES, FOLLOWUP_PROFILES, 4190013, "H"),
+    "confirmation": (CONFIRMATION_FAMILIES, CONFIRMATION_PROFILES, 679331, "C"),
+}
 
 
 def git(*args):
@@ -119,10 +157,7 @@ def freeze(directory, reference, candidate, cohort):
     verify_product(candidate)
     directory.mkdir()
     scenarios = []
-    followup = cohort == "followup"
-    families, profiles = (
-        (FOLLOWUP_FAMILIES, FOLLOWUP_PROFILES) if followup else (FAMILIES, PROFILES)
-    )
+    families, profiles, seed, prefix = COHORTS[cohort]
     for family, action, resource, workflow, mfa, threat in families:
         for profile, method, ip, distinct in profiles:
             role = "administrator" if resource == "restricted" and not threat else "employee"
@@ -143,10 +178,10 @@ def freeze(directory, reference, candidate, cohort):
                 )
             )
 
-    random.Random(4190013 if followup else 6211709).shuffle(scenarios)
+    random.Random(seed).shuffle(scenarios)
     cases, truth = {}, {}
     for index, (case, label) in enumerate(scenarios, 1):
-        case_id = f"{'H' if followup else 'L'}{index:03}"
+        case_id = f"{prefix}{index:03}"
         cases[case_id], truth[case_id] = case, label
     write(directory / "truth.json", truth)
     write(
@@ -256,21 +291,36 @@ def collect(lab, case_id, case):
             ),
         }
     )
-    if workflow in {"bound-busy", "bound-fanout"}:
+    resource_counts = {"bound-busy": 7, "bound-fanout": 8, "bound-peak": 9}
+    if workflow in resource_counts:
         event.behavior = event.behavior.model_copy(
-            update={
-                "distinct_resources_10m": 8 if workflow == "bound-fanout" else 7,
-            }
+            update={"distinct_resources_10m": resource_counts[workflow]}
         )
     if workflow == "bound-unmanaged":
         event.device = event.device.model_copy(update={"managed": False})
+    if workflow == "bound-compromised":
+        event.device = event.device.model_copy(update={"security_posture": "compromised"})
+    if workflow == "bound-inactive":
+        event.user = event.user.model_copy(update={"active": False})
     if workflow in {"bound-denied", "bound-unregistered"}:
         target = "read-only" if workflow == "bound-denied" else "unregistered"
         event.resource = event.resource.model_copy(
             update={"resource_id": f"{case['profile']}-{target}"}
         )
     signal = lab.sign(event, session_id, previous.version, challenge_id=challenge)
-    lab.service.evaluate_signed(signal, lab.principal)
+    result = lab.service.evaluate_signed(signal, lab.principal)
+    if workflow == "bound-repeat":
+        latest = result.session
+        if latest.challenge_id is None:
+            raise ValueError(f"{case_id}: expected a pending review challenge")
+        final = event.model_copy(
+            update={
+                "event_id": f"holdout-event-{case_id}-3",
+                "timestamp": max(datetime.now(UTC), latest.observed_at + timedelta(microseconds=1)),
+            }
+        )
+        signal = lab.sign(final, session_id, latest.version, challenge_id=latest.challenge_id)
+        lab.service.evaluate_signed(signal, lab.principal)
     return signal
 
 
@@ -427,7 +477,7 @@ if __name__ == "__main__":
     cli.add_argument("--prediction-sha256")
     cli.add_argument("--reference", default=REFERENCE)
     cli.add_argument("--candidate", default=CANDIDATE)
-    cli.add_argument("--cohort", choices=("initial", "followup"), default="initial")
+    cli.add_argument("--cohort", choices=tuple(COHORTS), default="initial")
     args = cli.parse_args()
     if args.phase == "freeze":
         freeze(args.directory, args.reference, args.candidate, args.cohort)
