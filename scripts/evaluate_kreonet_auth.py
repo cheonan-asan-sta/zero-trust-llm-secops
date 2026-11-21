@@ -5,6 +5,7 @@ import hashlib
 import json
 from collections import Counter, defaultdict
 from datetime import UTC, datetime
+from itertools import pairwise
 from pathlib import Path
 from urllib.request import urlopen
 
@@ -78,6 +79,42 @@ def success_flow_signals(statuses, request_counts, stage_user_agents):
     return [name for name, seen in signals.items() if seen]
 
 
+def sequence_flow_signals(statuses, events):
+    if statuses.keys() != {200, 302}:
+        return []
+    ordered = sorted(events, key=lambda event: event[0])
+    federation = [event for event in ordered if event[1] in PROTOCOL_MODULES]
+    signals = []
+    rp_redirect = ("rp", "GET", 302)
+    end = federation[-2:]
+    if [event[1:] for event in end] == [rp_redirect, rp_redirect] and end[0][0] < end[1][0]:
+        signals.append("consecutive_rp_redirects_at_end")
+
+    end = federation[-4:]
+    saml_reads = [
+        ("sp", "GET", 302),
+        ("idp", "GET", 200),
+        ("idp", "GET", 200),
+        ("idp", "GET", 200),
+    ]
+    if [event[1:] for event in end] == saml_reads and all(
+        first[0] < second[0] for first, second in pairwise(end)
+    ):
+        signals.append("repeated_idp_reads_after_sp_redirect_at_end")
+
+    for redirect, lookup, submit in zip(ordered, ordered[1:], ordered[2:]):
+        if (
+            redirect[1:] == rp_redirect
+            and lookup[1:] == ("op", "GET", 200)
+            and submit[1:] == ("op", "POST", 200)
+            and redirect[0] < lookup[0] < submit[0]
+            and (submit[0] - redirect[0]).total_seconds() > 5
+        ):
+            signals.append("delayed_op_submission_after_rp_redirect")
+            break
+    return signals
+
+
 def capture(
     output,
     source=None,
@@ -86,7 +123,9 @@ def capture(
     include_auth_flow=False,
     include_protocol_flow=False,
     include_success_flow=False,
+    include_sequence_flow=False,
 ):
+    include_success_flow = include_success_flow or include_sequence_flow
     include_protocol_flow = include_protocol_flow or include_success_flow
     include_auth_flow = include_auth_flow or include_protocol_flow
     output.mkdir(exist_ok=True)
@@ -135,6 +174,15 @@ def capture(
             "only 200 and 302: repeated POST at IdP with POST at SP in the same trace",
             "only 200 and 302: user agent changes within a protocol component and HTTP method",
         ]
+    if include_sequence_flow:
+        expected_plan["input_fields"].append("relative timestamp order and elapsed seconds")
+        expected_plan["candidate"] = "previous success flow detector OR sequence flow signals"
+        expected_plan["sequence_flow_signals"] = [
+            "only 200 and 302: final two federation stages are RP GET 302",
+            "only 200 and 302: final four federation stages are SP GET 302 and three IdP GET 200",
+            "only 200 and 302: RP GET 302, OP GET 200, OP POST 200 over more than five seconds",
+        ]
+        expected_plan["sequence_order"] = "strictly increasing timestamps within matched stages"
     if plan.exists():
         if read(plan) != expected_plan:
             raise ValueError("existing plan differs from frozen protocol")
@@ -153,6 +201,7 @@ def capture(
         raise ValueError("public dataset does not match pinned bytes")
 
     traces = {}
+    sequence_events = defaultdict(list)
     request_counts = defaultdict(Counter)
     stage_user_agents = defaultdict(lambda: defaultdict(set))
     with source.open("rb") as stream:
@@ -172,6 +221,8 @@ def capture(
             if include_success_flow and status in {200, 302}:
                 module = row.get("module")
                 method = row.get("http_method")
+                if include_sequence_flow:
+                    sequence_events[key].append((when, module, method, status))
                 if module in PROTOCOL_MODULES and method in {"GET", "POST"}:
                     stage = (module, method)
                     request_counts[key][stage] += 1
@@ -256,6 +307,16 @@ def capture(
                     "success_flow_signals": signals,
                 }
             )
+        if include_sequence_flow:
+            signals = sequence_flow_signals(statuses, sequence_events.get(key, ()))
+            previous = rows[identity]["prediction"]
+            rows[identity].update(
+                {
+                    "previous_success_flow_prediction": previous,
+                    "prediction": previous or bool(signals),
+                    "sequence_flow_signals": signals,
+                }
+            )
     write(
         output / "predictions.json",
         {
@@ -319,6 +380,7 @@ def score(output, seal, source=None):
         reference_field, signals_field = next(
             (reference, signals)
             for reference, signals in (
+                ("previous_success_flow_prediction", "sequence_flow_signals"),
                 ("previous_protocol_flow_prediction", "success_flow_signals"),
                 ("previous_auth_flow_prediction", "protocol_flow_signals"),
                 ("baseline_prediction", "auth_flow_signals"),
@@ -364,6 +426,7 @@ if __name__ == "__main__":
     cli.add_argument("--include-auth-flow", action="store_true")
     cli.add_argument("--include-protocol-flow", action="store_true")
     cli.add_argument("--include-success-flow", action="store_true")
+    cli.add_argument("--include-sequence-flow", action="store_true")
     args = cli.parse_args()
     if args.phase == "capture":
         capture(
@@ -373,6 +436,7 @@ if __name__ == "__main__":
             include_auth_flow=args.include_auth_flow,
             include_protocol_flow=args.include_protocol_flow,
             include_success_flow=args.include_success_flow,
+            include_sequence_flow=args.include_sequence_flow,
         )
     elif args.prediction_sha256:
         score(args.output, args.prediction_sha256, args.source)
