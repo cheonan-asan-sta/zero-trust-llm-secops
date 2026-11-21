@@ -115,7 +115,7 @@ class LocalSessionAnalysisLab:
     def save_registry(self):
         self.registry_path.write_bytes(json.dumps(self.registry).encode())
 
-    def sign(self, event, session_id, expected_version=0):
+    def sign(self, event, session_id, expected_version=0, *, challenge_id=None):
         now = datetime.now(UTC)
         unsigned = SignedSessionSignal(
             session_id=session_id,
@@ -126,6 +126,7 @@ class LocalSessionAnalysisLab:
             key_id="ephemeral-key",
             issued_at=now,
             expires_at=now + timedelta(seconds=120),
+            challenge_id=challenge_id,
             signature="A" * 86,
         )
         signature = (

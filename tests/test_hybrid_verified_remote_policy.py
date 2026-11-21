@@ -107,7 +107,8 @@ def test_outstanding_signed_challenge_does_not_clear_generic_rule(lab):
     assert "SIGNED_MFA_CHALLENGE_REQUIRED" in issued.session.reason_codes
     context = collect_session_evidence(lab.service, signed, lab.principal)
     result = analyze(signed, context, assessment())
-    assert result.violation_type == ViolationType.LATERAL_MOVEMENT
+    assert result.violation_type == ViolationType.ACCESS_POLICY_VIOLATION
+    assert "verified_session.session.challenge_pending" in result.evidence
 
 
 def test_generic_step_up_without_model_output_is_reviewed_as_unknown(lab):
@@ -454,3 +455,42 @@ def test_verified_http_returns_and_audits_current_policy_classification(
         assert saved.assessment.violation_type == expected
         assert saved.verification_context == payload["verification_context"]
         assert lab.service.history(signed.session_id, lab.principal) == before
+
+
+def signed_mfa_read_control(lab, *, bind_challenge):
+    signed, _ = lab.create(
+        ("reading-challenge", True, "remote-read", "employee", "unknown", True, "READ")
+    )
+    first = lab.service.history(signed.session_id, lab.principal)[-1]
+    assert first.challenge_id
+    event = signed.event.model_copy(
+        update={
+            "event_id": "follow-up-" + signed.event.event_id,
+            "timestamp": max(datetime.now(UTC), first.observed_at + timedelta(microseconds=1)),
+            "auth_context": signed.event.auth_context.model_copy(update={"mfa": "success"}),
+        }
+    )
+    next_signal = lab.sign(
+        event,
+        signed.session_id,
+        expected_version=first.version,
+        challenge_id=first.challenge_id if bind_challenge else None,
+    )
+    result = lab.service.evaluate_signed(next_signal, lab.principal)
+    context = collect_session_evidence(lab.service, next_signal, lab.principal)
+    return next_signal, context, result.session
+
+
+@pytest.mark.parametrize("bind_challenge", [False, True])
+def test_success_observation_cannot_replace_server_required_challenge(lab, bind_challenge):
+    signed, context, session = signed_mfa_read_control(lab, bind_challenge=bind_challenge)
+    assert context.for_event(signed.event)["signal"]["mfa_observation"] == "success"
+    assert session.decision == ("ALLOW" if bind_challenge else "STEP_UP")
+    result = analyze(signed, context, assessment())
+    if bind_challenge:
+        assert result.violation_type == ViolationType.NORMAL
+    else:
+        assert result.violation_type == ViolationType.ACCESS_POLICY_VIOLATION
+        assert "verified_session.session.challenge_pending" in result.evidence
+        assert result.recommended_action == "HOLD_FOR_REVIEW"
+        assert session.challenge_id not in result.model_dump_json()

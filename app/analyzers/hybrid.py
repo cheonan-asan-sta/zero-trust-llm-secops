@@ -82,6 +82,12 @@ def _verified_session_baseline(event, facts, baseline):
             ("policy.mfa_required", "signal.mfa_observation"),
         ),
         (
+            policy["mfa_required"] is True
+            and session["challenge_pending"] is True
+            and "SIGNED_MFA_CHALLENGE_REQUIRED" in session["reason_codes"],
+            ("policy.mfa_required", "session.challenge_pending", "session.reason_codes"),
+        ),
+        (
             policy["managed_device_required"] is True and not event.device.managed,
             ("policy.managed_device_required",),
         ),
