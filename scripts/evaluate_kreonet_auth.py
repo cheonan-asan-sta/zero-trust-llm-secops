@@ -115,6 +115,42 @@ def sequence_flow_signals(statuses, events):
     return signals
 
 
+def nonblank_text(value):
+    return value.strip() if isinstance(value, str) else ""
+
+
+def linked_flow_signals(statuses, events):
+    if statuses.keys() != {200, 302}:
+        return []
+    ordered = sorted(events, key=lambda event: event[0])
+    signals = set()
+    for previous, current in pairwise(ordered):
+        previous_time, previous_stage, previous_binding = previous
+        current_time, current_stage, current_binding = current
+        if previous_stage != current_stage or current_time <= previous_time:
+            continue
+        previous_user, previous_ip, previous_agent = previous_binding
+        user, ip, agent = current_binding
+        if not all((previous_ip, previous_agent, ip, agent)):
+            continue
+        if (
+            current_stage == ("request", "POST", 200)
+            and user
+            and user == previous_user
+            and ip != previous_ip
+            and agent != previous_agent
+        ):
+            signals.add("same_subject_client_changed_between_posts")
+        if (
+            current_stage == ("ldap", "POST", 200)
+            and ip == previous_ip
+            and agent == previous_agent
+            and (current_time - previous_time).total_seconds() <= 3
+        ):
+            signals.add("same_client_rapid_ldap_posts")
+    return sorted(signals)
+
+
 def capture(
     output,
     source=None,
@@ -124,7 +160,9 @@ def capture(
     include_protocol_flow=False,
     include_success_flow=False,
     include_sequence_flow=False,
+    include_linked_flow=False,
 ):
+    include_sequence_flow = include_sequence_flow or include_linked_flow
     include_success_flow = include_success_flow or include_sequence_flow
     include_protocol_flow = include_protocol_flow or include_success_flow
     include_auth_flow = include_auth_flow or include_protocol_flow
@@ -183,6 +221,15 @@ def capture(
             "only 200 and 302: RP GET 302, OP GET 200, OP POST 200 over more than five seconds",
         ]
         expected_plan["sequence_order"] = "strictly increasing timestamps within matched stages"
+    if include_linked_flow:
+        expected_plan["input_fields"].append(
+            "nonblank user_id, client_ip and user_agent equality for adjacent POST 200 rows"
+        )
+        expected_plan["candidate"] = "previous sequence flow detector OR linked flow signals"
+        expected_plan["linked_flow_signals"] = [
+            "only 200 and 302: adjacent request POST 200 has same user and changed IP and agent",
+            "only 200 and 302: adjacent LDAP POST 200 has same IP and agent within three seconds",
+        ]
     if plan.exists():
         if read(plan) != expected_plan:
             raise ValueError("existing plan differs from frozen protocol")
@@ -202,6 +249,7 @@ def capture(
 
     traces = {}
     sequence_events = defaultdict(list)
+    linked_events = defaultdict(list)
     request_counts = defaultdict(Counter)
     stage_user_agents = defaultdict(lambda: defaultdict(set))
     with source.open("rb") as stream:
@@ -223,12 +271,20 @@ def capture(
                 method = row.get("http_method")
                 if include_sequence_flow:
                     sequence_events[key].append((when, module, method, status))
+                if include_linked_flow:
+                    binding = ("", "", "")
+                    if method == "POST" and status == 200 and module in {"request", "ldap"}:
+                        binding = tuple(
+                            nonblank_text(row.get(field))
+                            for field in ("user_id", "client_ip", "user_agent")
+                        )
+                    linked_events[key].append((when, (module, method, status), binding))
                 if module in PROTOCOL_MODULES and method in {"GET", "POST"}:
                     stage = (module, method)
                     request_counts[key][stage] += 1
-                    agent = row.get("user_agent")
-                    if isinstance(agent, str) and agent.strip():
-                        stage_user_agents[key][stage].add(agent.strip())
+                    agent = nonblank_text(row.get("user_agent"))
+                    if agent:
+                        stage_user_agents[key][stage].add(agent)
             traces[key] = (
                 min(first, when),
                 max(last, when),
@@ -317,6 +373,16 @@ def capture(
                     "sequence_flow_signals": signals,
                 }
             )
+        if include_linked_flow:
+            signals = linked_flow_signals(statuses, linked_events.get(key, ()))
+            previous = rows[identity]["prediction"]
+            rows[identity].update(
+                {
+                    "previous_sequence_flow_prediction": previous,
+                    "prediction": previous or bool(signals),
+                    "linked_flow_signals": signals,
+                }
+            )
     write(
         output / "predictions.json",
         {
@@ -380,6 +446,7 @@ def score(output, seal, source=None):
         reference_field, signals_field = next(
             (reference, signals)
             for reference, signals in (
+                ("previous_sequence_flow_prediction", "linked_flow_signals"),
                 ("previous_success_flow_prediction", "sequence_flow_signals"),
                 ("previous_protocol_flow_prediction", "success_flow_signals"),
                 ("previous_auth_flow_prediction", "protocol_flow_signals"),
@@ -427,6 +494,7 @@ if __name__ == "__main__":
     cli.add_argument("--include-protocol-flow", action="store_true")
     cli.add_argument("--include-success-flow", action="store_true")
     cli.add_argument("--include-sequence-flow", action="store_true")
+    cli.add_argument("--include-linked-flow", action="store_true")
     args = cli.parse_args()
     if args.phase == "capture":
         capture(
@@ -437,6 +505,7 @@ if __name__ == "__main__":
             include_protocol_flow=args.include_protocol_flow,
             include_success_flow=args.include_success_flow,
             include_sequence_flow=args.include_sequence_flow,
+            include_linked_flow=args.include_linked_flow,
         )
     elif args.prediction_sha256:
         score(args.output, args.prediction_sha256, args.source)

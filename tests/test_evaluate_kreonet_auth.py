@@ -54,6 +54,27 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
             "http_method": "GET",
             "timestamp": "2026-03-20T01:02:05Z",
         },
+        {**base, "trace_id": "eight", "http_status": 302},
+        {
+            **base,
+            "trace_id": "eight",
+            "timestamp": "2026-03-20T01:02:04Z",
+            "module": "request",
+            "http_status": 200,
+            "user_id": "synthetic subject",
+            "client_ip": "192.0.2.10",
+            "user_agent": "synthetic client A",
+        },
+        {
+            **base,
+            "trace_id": "eight",
+            "timestamp": "2026-03-20T01:02:05Z",
+            "module": "request",
+            "http_status": 200,
+            "user_id": "synthetic subject",
+            "client_ip": "192.0.2.20",
+            "user_agent": "synthetic client B",
+        },
     ]
     snapshots = []
     for label in ("attack", "benign"):
@@ -67,8 +88,8 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
                     "subcategory": label,
                     "event_type": label,
                     "uri": f"/{label}",
-                    "client_ip": label,
-                    "user_id": label,
+                    "client_ip": event.get("client_ip", label),
+                    "user_id": event.get("user_id", label),
                     "ref": label,
                     "duration_ms": len(label),
                     "message": label,
@@ -82,9 +103,10 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
         monkeypatch.setattr(evaluation, "SOURCE_HASH", hashlib.sha256(raw).hexdigest())
         monkeypatch.setattr(evaluation, "SOURCE_SIZE", len(raw))
         output = tmp_path / label
-        evaluation.capture(output, source, include_sequence_flow=True)
+        evaluation.capture(output, source, include_linked_flow=True)
         packet = output / "predictions.json"
-        assert b"synthetic client" not in packet.read_bytes()
+        for raw_value in (b"synthetic client", b"synthetic subject", b"192.0.2.10"):
+            assert raw_value not in packet.read_bytes()
         snapshots.append(evaluation.read(packet)["prediction_rows"])
 
     assert snapshots[0] == snapshots[1]
@@ -105,6 +127,10 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
     assert ordered["previous_success_flow_prediction"] is False
     assert ordered["sequence_flow_signals"] == ["consecutive_rp_redirects_at_end"]
     assert ordered["prediction"] is True
+    linked = snapshots[0][hashlib.sha256(b"eight").hexdigest()]
+    assert linked["previous_sequence_flow_prediction"] is False
+    assert linked["linked_flow_signals"] == ["same_subject_client_changed_between_posts"]
+    assert linked["prediction"] is True
 
 
 @pytest.mark.parametrize(
@@ -166,3 +192,49 @@ def test_sequence_flow_checks_relative_order_bounds_and_terminal_stages(observed
     statuses = Counter(event[-1] for event in events)
     assert evaluation.sequence_flow_signals(statuses, events) == expected
     assert evaluation.sequence_flow_signals(statuses + Counter({401: 1}), events) == []
+
+
+REQUEST_POST = ("request", "POST", 200)
+LDAP_POST = ("ldap", "POST", 200)
+CLIENT_A = ("subject", "192.0.2.10", "agent A")
+CLIENT_B = ("subject", "192.0.2.20", "agent B")
+
+
+@pytest.mark.parametrize(
+    "first, second, expected",
+    [
+        (
+            (REQUEST_POST, CLIENT_A),
+            (REQUEST_POST, CLIENT_B),
+            ["same_subject_client_changed_between_posts"],
+        ),
+        ((REQUEST_POST, CLIENT_A), (REQUEST_POST, ("other", *CLIENT_B[1:])), []),
+        ((REQUEST_POST, CLIENT_A), (REQUEST_POST, ("", *CLIENT_B[1:])), []),
+        ((REQUEST_POST, CLIENT_A), (REQUEST_POST, (*CLIENT_B[:2], CLIENT_A[2])), []),
+        ((REQUEST_POST, CLIENT_A), (REQUEST_POST, (CLIENT_B[0], "", CLIENT_B[2])), []),
+        ((LDAP_POST, CLIENT_A), (LDAP_POST, CLIENT_A), ["same_client_rapid_ldap_posts"]),
+        ((LDAP_POST, CLIENT_A), (LDAP_POST, CLIENT_B), []),
+    ],
+)
+def test_linked_flow_requires_correlated_observations(first, second, expected):
+    start = datetime(2026, 3, 20, tzinfo=UTC)
+    events = [
+        (start + timedelta(seconds=3), *second),
+        (start, *first),
+        (start - timedelta(seconds=1), RP_REDIRECT, ("", "", "")),
+    ]
+    statuses = Counter(event[1][-1] for event in events)
+    assert evaluation.linked_flow_signals(statuses, events) == expected
+
+
+def test_linked_flow_uses_strict_order_adjacency_and_ldap_interval():
+    start = datetime(2026, 3, 20, tzinfo=UTC)
+    first = (start, LDAP_POST, CLIENT_A)
+    last = (start + timedelta(seconds=3), LDAP_POST, CLIENT_A)
+    redirect = (start + timedelta(seconds=1), RP_REDIRECT, ("", "", ""))
+    statuses = Counter([200, 302])
+    assert evaluation.linked_flow_signals(statuses, [first, redirect, last]) == []
+    assert evaluation.linked_flow_signals(statuses, [first, first]) == []
+    late = (start + timedelta(seconds=3, milliseconds=1), LDAP_POST, CLIENT_A)
+    assert evaluation.linked_flow_signals(statuses, [first, late]) == []
+    assert evaluation.linked_flow_signals(Counter([200, 302, 401]), [first, last]) == []
