@@ -6,10 +6,14 @@ import json
 import os
 import subprocess
 import sys
+from contextlib import closing
 from datetime import UTC, datetime, timedelta
+from urllib.parse import urlsplit
+from uuid import uuid4
 
 import boto3
 import pytest
+from botocore.config import Config
 from botocore.exceptions import ClientError, IncompleteReadError
 from botocore.response import StreamingBody
 from botocore.stub import Stubber
@@ -151,6 +155,36 @@ def test_worm_conditional_upload_readback_and_pinned_recovery(closed_generation,
         assert archive.read(recovered) == raw
         assert evidence == receipt
         stub.assert_no_pending_responses()
+
+
+@pytest.mark.skipif(not os.getenv("AUDIT_LOCAL_S3_ENDPOINT"), reason="local S3 simulator is opt-in")
+def test_loopback_s3_worm_exact_version_restore(closed_generation, tmp_path):
+    endpoint = os.environ["AUDIT_LOCAL_S3_ENDPOINT"]
+    parts = urlsplit(endpoint)
+    assert parts.scheme == "http" and parts.hostname == "127.0.0.1" and parts.port
+    assert parts.netloc == f"127.0.0.1:{parts.port}" and not (parts.path or parts.query or parts.fragment)
+    exported, backup, backup_pin, key_file, pins, _ = closed_generation
+    bucket = "ephemeral-archive-" + uuid4().hex[:12]
+
+    def client(identity):
+        return boto3.client("s3", endpoint_url=endpoint, region_name="us-east-1",
+                            aws_access_key_id=identity, aws_secret_access_key="fixture-secret",
+                            config=Config(s3={"addressing_style": "path"}, retries={"max_attempts": 0}))
+
+    with closing(client("placeholder-publisher")) as publisher, closing(client("placeholder-restorer")) as restorer:
+        publisher.create_bucket(Bucket=bucket, ObjectLockEnabledForBucket=True)
+        retain_until = datetime.now(UTC).replace(microsecond=0) + timedelta(days=2)
+        receipt = worm.upload(publisher, bucket, OWNER, retain_until, archive.read(exported), **pins)
+        with pytest.raises(ClientError) as retained:
+            publisher.delete_object(Bucket=bucket, Key=receipt["object_key"], VersionId=receipt["version_id"])
+        assert retained.value.response["Error"]["Code"] == "AccessDenied"
+        raw, copied = worm.fetch(restorer, bucket, OWNER, receipt["version_id"], retain_until, **pins)
+        assert copied["retention_mode"] == "COMPLIANCE" and copied["retention_active"]
+        assert copied["archive_sha256"] == pins["archive_pin"] and copied["receipt_count"] == 4096
+        destination = tmp_path / "recovered-from-loopback.sqlite3"
+        archive.restore_audit(raw, pins["archive_pin"], pins["key_pin"], pins["terminal_pin"],
+                              backup, backup_pin, key_file.read_bytes(), destination)
+        SQLiteAuditStore.open_existing(destination)
 
 
 @pytest.mark.parametrize("fault", ["version", "mode", "retention", "bytes"])

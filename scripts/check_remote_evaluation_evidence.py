@@ -1,6 +1,7 @@
 """Check which remote evaluation cases have contemporaneous evidence references."""
 
 import argparse
+import hashlib
 import json
 from collections import defaultdict
 from datetime import datetime
@@ -56,7 +57,22 @@ def read_metadata(path, sha256, model):
     return result
 
 
-def summarize(catalog, sidecar):
+def record_issue(directory, digest):
+    path = directory / digest
+    if path.is_symlink() or not path.is_file():
+        return "record_file_missing_or_unsafe"
+    limit = 1024 * 1024
+    try:
+        with path.open("rb") as record:
+            data = record.read(limit + 1)
+    except OSError:
+        return "record_file_unreadable"
+    if not data or len(data) > limit:
+        return "record_file_size"
+    return None if hashlib.sha256(data).hexdigest() == digest else "record_file_hash_mismatch"
+
+
+def summarize(catalog, sidecar, records_directory=None):
     remote = {key: row for key, row in catalog.items() if "remote" in row.domains}
     require(sidecar.keys() <= remote.keys(), "remote_evidence_unknown_or_nonremote_case")
     sessions_by_record = defaultdict(set)
@@ -69,6 +85,7 @@ def summarize(catalog, sidecar):
                 )
 
     cases = {}
+    checked = {}
     for key, case in remote.items():
         row = sidecar.get(key)
         issues = []
@@ -87,6 +104,13 @@ def summarize(catalog, sidecar):
                 issues.append(f"{kind}_outcome_unknown")
             if len(sessions_by_record[(kind, reference.record_sha256)]) > 1:
                 issues.append(f"{kind}_record_reused_across_sessions")
+            if records_directory is not None:
+                if reference.record_sha256 not in checked:
+                    checked[reference.record_sha256] = record_issue(
+                        records_directory, reference.record_sha256
+                    )
+                if issue := checked[reference.record_sha256]:
+                    issues.append(f"{kind}_{issue}")
         cases[key] = {
             "split": case.requested_split,
             "source_kind": case.source_kind,
@@ -101,7 +125,11 @@ def summarize(catalog, sidecar):
             row["reference_binding_complete"] and row["split"] == "final_reserved"
             for row in cases.values()
         ),
-        "evidence_bytes_verified": False,
+        "evidence_bytes_verified": bool(
+            records_directory is not None
+            and cases
+            and all(row["reference_binding_complete"] for row in cases.values())
+        ),
         "independent_evaluation_performed": False,
         "by_case": cases,
     }
@@ -113,10 +141,13 @@ def main():
     parser.add_argument("--catalog-sha256", required=True)
     parser.add_argument("--evidence", type=Path, required=True)
     parser.add_argument("--evidence-sha256", required=True)
+    parser.add_argument(
+        "--records-directory", type=Path, help="Optional anonymized records named by their SHA-256"
+    )
     args = parser.parse_args()
     catalog = read_metadata(args.catalog, args.catalog_sha256, CaseMetadata)
     sidecar = read_metadata(args.evidence, args.evidence_sha256, RemoteEvidence)
-    print(json.dumps(summarize(catalog, sidecar), sort_keys=True))
+    print(json.dumps(summarize(catalog, sidecar, args.records_directory), sort_keys=True))
 
 
 if __name__ == "__main__":
