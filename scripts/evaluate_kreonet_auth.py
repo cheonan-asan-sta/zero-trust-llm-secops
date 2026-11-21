@@ -10,6 +10,7 @@ from urllib.request import urlopen
 
 from app.analyzers.rule_based import RuleBasedAnalyzer
 from app.models import SecurityEvent
+from scripts.compare_llm_grounded import compare_rows
 from scripts.evaluate_llm_grounded import metrics, prediction
 from scripts.evaluate_local_remote_holdout import fingerprint, read, write
 
@@ -19,16 +20,31 @@ SOURCE_SIZE = 91592665
 SOURCE_HASH = "445f69377a2e12b4203a68f15cd9a4013fbc7e0ef21c19843969f671b1334a30"
 START = datetime(2026, 3, 16, tzinfo=UTC)
 STOP = datetime(2026, 3, 30, tzinfo=UTC)
+WINDOWS = {
+    "development": (datetime(2026, 1, 1, tzinfo=UTC), datetime(2026, 3, 1, tzinfo=UTC)),
+    "calibration": (datetime(2026, 3, 1, tzinfo=UTC), START),
+    "holdout": (START, STOP),
+}
 
 
-def capture(output):
+def auth_flow_signals(statuses, *, post_denied):
+    signals = {
+        "malformed_request_and_unauthorized": statuses[400] > 0 and statuses[401] > 0,
+        "denied_post_request": post_denied,
+        "rate_limit_response": statuses[429] > 0,
+    }
+    return [name for name, seen in signals.items() if seen]
+
+
+def capture(output, source=None, *, cohort="holdout", include_auth_flow=False):
     output.mkdir(exist_ok=True)
     plan = output / "plan.json"
+    start, stop = WINDOWS[cohort]
     expected_plan = {
         "source": SOURCE,
         "source_sha256": SOURCE_HASH,
-        "holdout_start": START.isoformat(),
-        "holdout_stop_exclusive": STOP.isoformat(),
+        "holdout_start": start.isoformat(),
+        "holdout_stop_exclusive": stop.isoformat(),
         "timestamp_without_offset": "UTC",
         "metric_unit": "trace_id_entirely_in_window",
         "input_fields": ["trace_id for grouping", "timestamp for window", "http_status"],
@@ -36,12 +52,25 @@ def capture(output):
         "rule": "existing RuleBasedAnalyzer on LOGIN",
         "score_labels": ["attack", "benign"],
     }
+    if include_auth_flow:
+        expected_plan.update(
+            {
+                "cohort": cohort,
+                "input_fields": [*expected_plan["input_fields"], "http_method"],
+                "candidate": "baseline OR auth flow signals",
+                "auth_flow_signals": [
+                    "HTTP 400 and 401 in one flow",
+                    "HTTP 403 on POST",
+                    "HTTP 429",
+                ],
+            }
+        )
     if plan.exists():
         if read(plan) != expected_plan:
             raise ValueError("existing plan differs from frozen protocol")
     else:
         write(plan, expected_plan)
-    source = output / "source.jsonl"
+    source = source or output / "source.jsonl"
     if not source.exists():
         written = 0
         with urlopen(SOURCE, timeout=30) as response, source.open("xb") as stream:
@@ -61,17 +90,24 @@ def capture(output):
             when = datetime.fromisoformat(row["timestamp"])
             if when.tzinfo is None:
                 when = when.replace(tzinfo=UTC)
-            first, last, failures = traces.setdefault(key, (when, when, 0))
+            first, last, statuses, post_denied = traces.setdefault(
+                key, (when, when, Counter(), False)
+            )
+            status = row.get("http_status")
+            statuses[status] += 1
             traces[key] = (
                 min(first, when),
                 max(last, when),
-                failures + (row.get("http_status") == 401),
+                statuses,
+                post_denied
+                or (include_auth_flow and status == 403 and row.get("http_method") == "POST"),
             )
     analyzer = RuleBasedAnalyzer()
     rows = {}
-    for key, (first, last, failures) in traces.items():
-        if not START <= first <= last < STOP:
+    for key, (first, last, statuses, post_denied) in traces.items():
+        if not start <= first <= last < stop:
             continue
+        failures = statuses[401]
         identity = hashlib.sha256(key.encode()).hexdigest()
         event = SecurityEvent.model_validate(
             {
@@ -103,7 +139,17 @@ def capture(output):
             }
         )
         result = analyzer.assess(event)
-        rows[identity] = {"prediction": prediction(result), "failed_401_rows": failures}
+        baseline = prediction(result)
+        rows[identity] = {"prediction": baseline, "failed_401_rows": failures}
+        if include_auth_flow:
+            signals = auth_flow_signals(statuses, post_denied=post_denied)
+            rows[identity].update(
+                {
+                    "prediction": baseline or bool(signals),
+                    "baseline_prediction": baseline,
+                    "auth_flow_signals": signals,
+                }
+            )
     write(
         output / "predictions.json",
         {
@@ -114,9 +160,9 @@ def capture(output):
     print(fingerprint(output / "predictions.json"))
 
 
-def score(output, seal):
+def score(output, seal, source=None):
     packet = output / "predictions.json"
-    source = output / "source.jsonl"
+    source = source or output / "source.jsonl"
     if fingerprint(packet) != seal or fingerprint(source) != SOURCE_HASH:
         raise ValueError("source or prediction seal mismatch")
     packet = read(packet)
@@ -124,6 +170,7 @@ def score(output, seal):
         raise ValueError("plan seal mismatch")
     forecasts = packet["prediction_rows"]
     labels = {}
+    categories = {}
     with source.open("rb") as stream:
         for raw in stream:
             row = json.loads(raw)
@@ -132,6 +179,10 @@ def score(output, seal):
                 label = labels.setdefault(identity, row["label"])
                 if label != row["label"]:
                     raise ValueError("inconsistent publisher labels in a trace")
+                category = row.get("category") or "unknown"
+                current = categories.setdefault(identity, category)
+                if current != category:
+                    categories[identity] = "mixed"
     if labels.keys() != forecasts.keys() or not set(labels.values()) <= {
         "attack",
         "benign",
@@ -139,28 +190,58 @@ def score(output, seal):
     }:
         raise ValueError("missing or unsupported labels")
     scored = [
-        {"truth": label == "attack", "prediction": forecasts[key]["prediction"]}
+        {"id": key, "truth": label == "attack", "prediction": forecasts[key]["prediction"]}
         for key, label in labels.items()
         if label in {"attack", "benign"}
     ]
     counts = Counter(labels.values())
     if not counts["attack"] or not counts["benign"]:
         raise ValueError("missing comparable populations")
-    write(
-        output / "report.json",
-        {
-            "prediction_sha256": seal,
-            "trace_counts": dict(counts),
-            "metrics": metrics(scored),
-            "anomaly_signalled": sum(
-                forecasts[key]["prediction"] is True
-                for key, label in labels.items()
-                if label == "anomaly"
-            ),
-            "paid_api_calls": 0,
-        },
-    )
-    print(json.dumps(read(output / "report.json")))
+    report = {
+        "prediction_sha256": seal,
+        "trace_counts": dict(counts),
+        "metrics": metrics(scored),
+        "anomaly_signalled": sum(
+            forecasts[key]["prediction"] is True
+            for key, label in labels.items()
+            if label == "anomaly"
+        ),
+        "paid_api_calls": 0,
+    }
+    if "baseline_prediction" in next(iter(forecasts.values())):
+        reference = [
+            {**row, "prediction": forecasts[row["id"]]["baseline_prediction"]} for row in scored
+        ]
+        comparison = compare_rows(reference, scored)
+        recovered = comparison["recovered_TP_ids"]
+        report.update(
+            {
+                "comparison": comparison,
+                "baseline_misses_by_category": dict(
+                    Counter(
+                        categories[row["id"]]
+                        for row in reference
+                        if row["truth"] and not row["prediction"]
+                    )
+                ),
+                "candidate_misses_by_category": dict(
+                    Counter(
+                        categories[row["id"]]
+                        for row in scored
+                        if row["truth"] and not row["prediction"]
+                    )
+                ),
+                "recoveries_by_signal": dict(
+                    Counter(
+                        signal
+                        for key in recovered
+                        for signal in forecasts[key]["auth_flow_signals"]
+                    )
+                ),
+            }
+        )
+    write(output / "report.json", report)
+    print(json.dumps({key: value for key, value in report.items() if key != "comparison"}))
 
 
 if __name__ == "__main__":
@@ -168,10 +249,15 @@ if __name__ == "__main__":
     cli.add_argument("phase", choices=("capture", "score"))
     cli.add_argument("output", type=Path)
     cli.add_argument("--prediction-sha256")
+    cli.add_argument("--source", type=Path)
+    cli.add_argument("--cohort", choices=tuple(WINDOWS), default="holdout")
+    cli.add_argument("--include-auth-flow", action="store_true")
     args = cli.parse_args()
     if args.phase == "capture":
-        capture(args.output)
+        capture(
+            args.output, args.source, cohort=args.cohort, include_auth_flow=args.include_auth_flow
+        )
     elif args.prediction_sha256:
-        score(args.output, args.prediction_sha256)
+        score(args.output, args.prediction_sha256, args.source)
     else:
         cli.error("score requires --prediction-sha256")
