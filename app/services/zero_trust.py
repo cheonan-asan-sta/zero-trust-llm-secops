@@ -248,6 +248,16 @@ class ZeroTrustOperations:
                 raise SessionMissing(session_id)
             return history
 
+    def has_session_event(self, event_id: str, principal: Principal) -> bool:
+        """Check the validated journal for a session associated with the exact event."""
+        with self._transaction() as (_, entries, _):
+            return any(
+                entry["kind"] == "decision"
+                and entry["session"]["tenant_id"] == principal.tenant_id
+                and entry["session"]["event_id"] == event_id
+                for entry in entries
+            )
+
     def analysis_history(self, session_id: str, principal: Principal) -> tuple[list[SessionDecision], bool]:
         """Read the validated session history and current grant consumption atomically.
 

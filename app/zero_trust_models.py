@@ -145,6 +145,7 @@ class TrustedSignalSource(StrictModel):
     session_proof_resource_ids: list[ResourceIdentifier] = Field(default_factory=list, max_length=100)
     behavior_scopes: list[BehaviorScope] = Field(default_factory=list, max_length=100)
     execution_scopes: list[BehaviorScope] = Field(default_factory=list, max_length=100)
+    auth_attempt_resource_ids: list[ResourceIdentifier] = Field(default_factory=list, max_length=100)
 
     @model_serializer(mode="wrap")
     def serialize_source(self, handler):
@@ -158,7 +159,21 @@ class TrustedSignalSource(StrictModel):
             value.pop("behavior_scopes", None)
         if not self.execution_scopes:
             value.pop("execution_scopes", None)
+        if not self.auth_attempt_resource_ids:
+            value.pop("auth_attempt_resource_ids", None)
         return value
+
+    @model_validator(mode="after")
+    def auth_attempt_scope(self):
+        if self.auth_attempt_resource_ids and (
+            self.observation_kinds
+            or self.behavior_scopes
+            or self.execution_scopes
+            or self.guardduty_resource_ids
+            or self.session_proof_resource_ids
+        ):
+            raise ValueError("Authentication attempt receipts require a dedicated source")
+        return self
 
     @model_validator(mode="after")
     def behavior_scope(self):
@@ -207,6 +222,35 @@ class TrustedSignalSource(StrictModel):
 
 class TrustedSignalRegistry(StrictModel):
     sources: list[TrustedSignalSource] = Field(max_length=100)
+
+
+class SignedAuthAttemptReceipt(StrictModel):
+    """A trusted gateway observed a permanent stop before credential verification or grant."""
+
+    schema_version: Literal["zt-auth-attempt-1"] = "zt-auth-attempt-1"
+    algorithm: Literal["Ed25519"] = "Ed25519"
+    tenant_id: str = Field(pattern=r"^[A-Za-z0-9._-]{1,64}$")
+    source_id: str = Field(pattern=r"^[A-Za-z0-9._-]{1,64}$")
+    key_id: str = Field(pattern=r"^[A-Za-z0-9._-]{1,64}$")
+    event_digest_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    outcome: Literal["client_cancelled", "upstream_unavailable"]
+    terminal_state: Literal["closed_before_authentication"] = "closed_before_authentication"
+    issued_at: datetime
+    expires_at: datetime
+    signature: str = Field(pattern=r"^[A-Za-z0-9_-]{86}$", repr=False)
+
+    @field_validator("issued_at", "expires_at")
+    @classmethod
+    def receipt_time_requires_timezone(cls, value):
+        if value.utcoffset() is None:
+            raise ValueError("receipt timestamps require timezone")
+        return value
+
+    @model_validator(mode="after")
+    def bounded_lifetime(self):
+        if not 0 < (self.expires_at - self.issued_at).total_seconds() <= 60:
+            raise ValueError("authentication attempt receipt lifetime must be at most 60 seconds")
+        return self
 
 
 class SignedSessionSignal(SessionEvaluationRequest):

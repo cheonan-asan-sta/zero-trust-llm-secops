@@ -643,6 +643,24 @@ KREONET 개발 구간에서 같은 모델을 다시 학습해, 이전 비교 구
 
 `python -m scripts.evaluate_auth_alert_triage runtime/kreonet-transfer-v1 runtime/kreonet-evidence-triage-final`로 재현한다. 실제 OTP 시험은 `python -m scripts.run_keycloak_remote_acceptance runtime/keycloak-auth-alert-triage-v1.json`로 재현하며 시험 컨테이너는 종료 후 제거한다. 로컬 회귀 테스트 112개를 통과했고 유료 API와 AWS 호출은 없었다.
 
+#### 인증 시작 전 중단·장애 근거로 검토 대기 해소
+
+같은 로컬 시나리오 96개에서 모델·임계값·기존 규칙을 고정하고, 검토 대기 16개에 인증 시도 종료 기록을 추가했다. 신뢰 등록부에서 지정한 게이트웨이가 인증을 시작하기 전에 요청을 취소했거나 상위 인증 서버의 준비 상태를 확인할 수 없어 종료했음을 Ed25519로 서명한다. 정상 인증 결과, 사용 완료된 세션, 접근 권한을 이 기록으로 대체하지 않는다.
+
+경보 분류는 요청 전체의 해시, 테넌트, 수집기 권한, 키 활성 상태와 유효 시간, 사용자·기기·자원 범위를 확인한다. 최대 60초 수명의 기록만 사용하며, 같은 사건으로 세션이 만들어졌는지 검증된 저널에서 확인한다. 이미 인증 시도가 실패했거나 계정·기기에 별도 제한 근거가 있는 흐름은 이 기록으로 해소하지 않는다. 다른 요청의 기록, 잘못된 서명, 비활성 키, 기록 누락이나 저널 장애는 검토 대상으로 남긴다. 기존 규칙 경보와 세션 접근 판정은 계속 유지한다.
+
+| 동일한 로컬 모의 시나리오 96개 | 확정 오탐 | 검토 대기 | 탐지한 위협 |
+| --- | ---: | ---: | ---: |
+| 기존 모델 경보와 규칙 | 40 | 0 | 48 |
+| 서명된 현재 세션 근거 반영 | 0 | 16 | 48 |
+| 인증 시작 전 종료 기록 추가 | 0 | 0 | 48 |
+
+이번 로컬 재평가에서는 정상 48개와 위협 48개가 모두 올바르게 분류됐다. 정밀도·재현율·F1은 각각 100%, 오탐률은 0%였다. 인증 중단 8개와 상위 서비스 장애 8개를 해소했고, 기존 탐지 손실은 0개였다. 취소·상위 장애는 로컬 시험 게이트웨이와 모의 HTTP 응답으로 검증했다. 추가 회귀 시험은 성공·인증 거절·요청 제한을 장애로 오인하지 않는지, 만료·서명 변조·다른 요청·이미 생성된 세션의 기록이 검토 대기로 남는지 확인했다.
+
+이 결과는 종료 기록을 제공한 기존 96개 로컬 시나리오의 재검증이다. KREONET 공개 합성 데이터에는 같은 서명 기록이 없고, 실제 운영 인증 수집기에서 종료 기록을 발행하는 연동과 외부 독립 데이터 검증은 남아 있다.
+
+`python -m scripts.evaluate_auth_alert_triage runtime/kreonet-transfer-v1 runtime/kreonet-evidence-terminal-final --terminal-evidence`로 재현한다. 유료 API와 AWS 호출 없이 관련 회귀 테스트 125개를 통과했다. 기존 Keycloak 통합 시험도 재실행해 OTP, 접근 범위, 역할 변경과 토큰 회수를 확인했다. 결과는 `runtime/keycloak-auth-alert-terminal-regression-v1.json`에 있다.
+
 #### Keycloak 승인·MFA·권한 회수 통합 시험
 
 `scripts/run_keycloak_remote_acceptance.py`는 Keycloak 26.8.0의 임시 realm과 공개 키 조회를 루프백에 구성한다. 등록된 테스트 사용자의 비밀번호·TOTP로 로그인한 뒤 실제 HTTP 응답을 테스트 수집기의 MFA 관측으로 연결한다. 게이트웨이는 서명된 관측과 읽기 전용 자원 정책을 검사한다. Keycloak의 실제 역할 변경 및 로그아웃 결과를 확인하고 앱의 운영자 차단 목록을 갱신한다. 임시 계정, OTP, 토큰과 개인키는 결과 파일에 넣지 않는다. [Keycloak 컨테이너](https://www.keycloak.org/server/containers) · [Keycloak OTP 관리](https://www.keycloak.org/docs/26.8.0/server_admin/)

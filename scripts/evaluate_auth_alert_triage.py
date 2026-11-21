@@ -6,9 +6,12 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from app.services.auth_alert_triage import resolve_auth_alert
+import httpx
+
+from app.services.auth_alert_triage import resolve_auth_alert, resolve_terminal_auth_alert
 from scripts.evaluate_llm_grounded import metrics
 from scripts.evaluate_local_remote_holdout import fingerprint, read, write
+from scripts.local_auth_attempt_lab import LocalAuthAttemptLab
 from scripts.local_session_analysis_lab import LocalSessionAnalysisLab
 
 # These describe the local collector observations and requested policy scope.
@@ -55,7 +58,22 @@ def evidence_for_alert(lab, key, scenario):
     return resolve_auth_alert(lab.service, event, signal, lab.principal)
 
 
-def evaluate(previous, output):
+def terminal_evidence_for_alert(lab, attempts, key, scenario):
+    if scenario == "normal_user_abandons_auth":
+        event = attempts.open(key)
+        receipt = attempts.cancel(key)
+    elif scenario == "ordinary_upstream_outage":
+        event = attempts.open(key)
+        with httpx.Client(transport=httpx.MockTransport(lambda _: httpx.Response(503))) as client:
+            receipt = attempts.check_upstream(key, lambda: client.get("http://fixture-idp/ready"))
+    else:
+        return "needs_evidence"
+    if receipt is None:
+        return "needs_evidence"
+    return resolve_terminal_auth_alert(lab.service, event, receipt, lab.principal)
+
+
+def evaluate(previous, output, *, terminal_evidence=False):
     plan_path = previous / "plan.json"
     packet_path = previous / "predictions.json"
     truth_path = previous / "fixture_truth.json"
@@ -77,11 +95,14 @@ def evaluate(previous, output):
     decisions = {}
     with TemporaryDirectory(prefix="zt-auth-alert-triage-") as scratch:
         lab = LocalSessionAnalysisLab(Path(scratch) / "authority")
+        attempts = LocalAuthAttemptLab(lab) if terminal_evidence else None
         for key, row in packet["rows"].items():
             if row["enforced"]:
                 disposition = "existing_rule"
             elif row["alert"]:
                 disposition = evidence_for_alert(lab, key, scenarios[key])
+                if disposition == "needs_evidence" and attempts is not None:
+                    disposition = terminal_evidence_for_alert(lab, attempts, key, scenarios[key])
             else:
                 disposition = "no_alert"
             decisions[key] = {"enforced": row["enforced"], "disposition": disposition}
@@ -122,6 +143,7 @@ def evaluate(previous, output):
             for a, b in zip(before, actionable, strict=True)
         ),
         "scenarios": by_scenario,
+        "terminal_evidence_enabled": terminal_evidence,
         "paid_api_calls": 0,
     }
     write(output / "report.json", result)
@@ -132,5 +154,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("previous", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--terminal-evidence", action="store_true")
     args = parser.parse_args()
-    evaluate(args.previous, args.output)
+    evaluate(args.previous, args.output, terminal_evidence=args.terminal_evidence)
