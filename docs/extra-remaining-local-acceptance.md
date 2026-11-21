@@ -418,6 +418,21 @@ LANL 공개 자료는 익명화한 실제 인증 이벤트와 레드팀 일부 �
 
 재현은 `scripts/evaluate_kreonet_auth.py`에서 `capture <출력 경로> --source <원본> --include-protocol-flow`를 실행한 뒤 같은 원본과 예측 해시로 `score`를 수행한다. 개발·보정 구간은 `--cohort development`·`calibration`으로 지정한다. 최종 비교 결과는 `runtime/kreonet-protocol-flow-final-{development,calibration,holdout}-20261203/`에 있다. 로컬 회귀 테스트는 104개 통과했다. 탐지 변경은 KREONET 로컬 평가 경로에 적용했고 유료 API와 AWS는 호출하지 않았다. 이 구간의 직전 미탐을 원인 분석에도 사용했으므로 같은 사례에서의 개선 비교로 해석한다.
 
+#### KREONET 200·302 인증 흐름의 단계 반복과 클라이언트 변화
+
+기존 비교 구간에서 프로토콜 이상 미탐 134개는 HTTP 200·302만 포함했다. 기존 상태 코드 규칙이 탐지하지 않은 정상 1,009개 흐름에도 같은 상태 조합이 있었다. 개발·보정 구간에서 이 조건으로 좁혀도 IP가 둘 이상인 정상 흐름은 각각 2,086개·496개라 IP 변화는 판정에서 제외했다.
+
+두 가지 추가 조건을 개발·보정 구간에서 정한 뒤 비교 구간에 적용했다. 첫째, 같은 흐름에서 IdP의 POST가 두 번 이상이고 SP의 POST도 관측됐다. 반복 제출의 단서로 쓰며 요청의 시간 순서나 동일한 인증 응답의 재사용까지 추정하지 않는다. 둘째, 같은 인증 컴포넌트와 HTTP 메서드에서 비어 있지 않은 User-Agent 값이 달라졌다. 컴포넌트나 메서드가 다른 요청끼리는 비교하지 않으며 원문 값은 예측 파일에 기록하지 않는다. URL, 이벤트 이름, 메시지, 페이로드, 발행자 라벨·카테고리·세부 분류를 예측에서 제외했다. 해당 값을 바꿔도 예측이 같음을 회귀 테스트에서 확인했다. [KREONET 공개 데이터 스키마](https://github.com/KREONET/auth-anomaly-dataset#schema-21-fields)
+
+| 같은 정상 1,490·공격 1,573개 흐름 | 정밀도 | 재현율 | F1 | 오탐률 | TP / FP / FN / TN |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 직전 프로토콜 흐름 판정 | 99.64% | 35.60% | 52.46% | 0.13% | 560 / 2 / 1,013 / 1,488 |
+| HTTP 200·302 단계 신호 추가 | 99.66% | 37.70% | 54.70% | 0.13% | 593 / 2 / 980 / 1,488 |
+
+직전 저장 예측과 사례 ID·예측값을 먼저 대조했다. 비교 구간에서 IdP·SP POST 조건으로 20개, 동일 단계 User-Agent 변화로 13개를 추가 탐지했다. 프로토콜 이상 28개, 계정 악용 2개, 행동 기반 위협 3개다. 200·302 프로토콜 이상 미탐은 134→106개, 전체 프로토콜 이상 미탐은 422→394개였다. 새 오탐과 기존 탐지 손실은 각각 0개였다. 개발·보정 구간에서도 각각 63개와 18개를 추가 탐지했고 오탐은 29개와 4개로 유지됐다. 재현율·F1은 95% 목표에 미달했다.
+
+재현은 `scripts/evaluate_kreonet_auth.py`의 `capture <출력 경로> --source <원본> --include-success-flow`로 예측을 생성한 뒤 반환된 해시를 `score <출력 경로> --source <원본> --prediction-sha256 <해시>`에 전달한다. 개발·보정에는 `capture`에 `--cohort development` 또는 `--cohort calibration`을 추가한다. 결과는 `runtime/kreonet-success-flow-{development,calibration,holdout}-v1/`에 있다. 모델 API와 AWS 호출 없이 로컬 평가에서 검증했고 관련 회귀 테스트 79개가 통과했다. 이전에도 사용한 공개 합성 데이터의 동일 구간 비교이며, 기업 운영 환경의 성능은 별도 검증이 필요하다.
+
 #### Keycloak 승인·MFA·권한 회수 통합 시험
 
 `scripts/run_keycloak_remote_acceptance.py`는 Keycloak 26.8.0의 임시 realm과 공개 키 조회를 루프백에 구성한다. 등록된 테스트 사용자의 비밀번호·TOTP로 로그인한 뒤 실제 HTTP 응답을 테스트 수집기의 MFA 관측으로 연결한다. 게이트웨이는 서명된 관측과 읽기 전용 자원 정책을 검사한다. Keycloak의 실제 역할 변경 및 로그아웃 결과를 확인하고 앱의 운영자 차단 목록을 갱신한다. 임시 계정, OTP, 토큰과 개인키는 결과 파일에 넣지 않는다. [Keycloak 컨테이너](https://www.keycloak.org/server/containers) · [Keycloak OTP 관리](https://www.keycloak.org/docs/26.8.0/server_admin/)

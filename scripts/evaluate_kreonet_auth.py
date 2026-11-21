@@ -3,7 +3,7 @@
 import argparse
 import hashlib
 import json
-from collections import Counter
+from collections import Counter, defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
 from urllib.request import urlopen
@@ -64,9 +64,30 @@ def protocol_flow_signals(statuses, stages):
     return [name for name, seen in signals.items() if seen]
 
 
+def success_flow_signals(statuses, request_counts, stage_user_agents):
+    if statuses.keys() != {200, 302}:
+        return []
+    signals = {
+        "repeated_idp_post_with_sp_post": (
+            request_counts["idp", "POST"] >= 2 and request_counts["sp", "POST"] > 0
+        ),
+        "client_agent_changed_at_same_protocol_stage": any(
+            len(agents) > 1 for agents in stage_user_agents.values()
+        ),
+    }
+    return [name for name, seen in signals.items() if seen]
+
+
 def capture(
-    output, source=None, *, cohort="holdout", include_auth_flow=False, include_protocol_flow=False
+    output,
+    source=None,
+    *,
+    cohort="holdout",
+    include_auth_flow=False,
+    include_protocol_flow=False,
+    include_success_flow=False,
 ):
+    include_protocol_flow = include_protocol_flow or include_success_flow
     include_auth_flow = include_auth_flow or include_protocol_flow
     output.mkdir(exist_ok=True)
     plan = output / "plan.json"
@@ -107,6 +128,13 @@ def capture(
             "HTTP 404 at OP/RP/IdP/SP with a redirect and HTTP 401",
             "HTTP 500 at OP/RP/IdP/SP and HTTP 401 at a different component",
         ]
+    if include_success_flow:
+        expected_plan["input_fields"].append("nonblank user_agent equality within a protocol stage")
+        expected_plan["candidate"] = "previous protocol flow detector OR success flow signals"
+        expected_plan["success_flow_signals"] = [
+            "only 200 and 302: repeated POST at IdP with POST at SP in the same trace",
+            "only 200 and 302: user agent changes within a protocol component and HTTP method",
+        ]
     if plan.exists():
         if read(plan) != expected_plan:
             raise ValueError("existing plan differs from frozen protocol")
@@ -125,6 +153,8 @@ def capture(
         raise ValueError("public dataset does not match pinned bytes")
 
     traces = {}
+    request_counts = defaultdict(Counter)
+    stage_user_agents = defaultdict(lambda: defaultdict(set))
     with source.open("rb") as stream:
         for raw in stream:
             row = json.loads(raw)
@@ -139,6 +169,15 @@ def capture(
             statuses[status] += 1
             if include_protocol_flow and status in PROTOCOL_STATUSES:
                 stages.add((status, row.get("http_method"), row.get("module")))
+            if include_success_flow and status in {200, 302}:
+                module = row.get("module")
+                method = row.get("http_method")
+                if module in PROTOCOL_MODULES and method in {"GET", "POST"}:
+                    stage = (module, method)
+                    request_counts[key][stage] += 1
+                    agent = row.get("user_agent")
+                    if isinstance(agent, str) and agent.strip():
+                        stage_user_agents[key][stage].add(agent.strip())
             traces[key] = (
                 min(first, when),
                 max(last, when),
@@ -205,6 +244,18 @@ def capture(
                     "protocol_flow_signals": signals,
                 }
             )
+        if include_success_flow:
+            signals = success_flow_signals(
+                statuses, request_counts.get(key, Counter()), stage_user_agents.get(key, {})
+            )
+            previous = rows[identity]["prediction"]
+            rows[identity].update(
+                {
+                    "previous_protocol_flow_prediction": previous,
+                    "prediction": previous or bool(signals),
+                    "success_flow_signals": signals,
+                }
+            )
     write(
         output / "predictions.json",
         {
@@ -265,11 +316,15 @@ def score(output, seal, source=None):
     }
     sample_forecast = next(iter(forecasts.values()))
     if "baseline_prediction" in sample_forecast:
-        compare_protocol = "previous_auth_flow_prediction" in sample_forecast
-        reference_field = (
-            "previous_auth_flow_prediction" if compare_protocol else "baseline_prediction"
+        reference_field, signals_field = next(
+            (reference, signals)
+            for reference, signals in (
+                ("previous_protocol_flow_prediction", "success_flow_signals"),
+                ("previous_auth_flow_prediction", "protocol_flow_signals"),
+                ("baseline_prediction", "auth_flow_signals"),
+            )
+            if reference in sample_forecast
         )
-        signals_field = "protocol_flow_signals" if compare_protocol else "auth_flow_signals"
         reference = [{**row, "prediction": forecasts[row["id"]][reference_field]} for row in scored]
         comparison = compare_rows(reference, scored)
         recovered = comparison["recovered_TP_ids"]
@@ -308,6 +363,7 @@ if __name__ == "__main__":
     cli.add_argument("--cohort", choices=tuple(WINDOWS), default="holdout")
     cli.add_argument("--include-auth-flow", action="store_true")
     cli.add_argument("--include-protocol-flow", action="store_true")
+    cli.add_argument("--include-success-flow", action="store_true")
     args = cli.parse_args()
     if args.phase == "capture":
         capture(
@@ -316,6 +372,7 @@ if __name__ == "__main__":
             cohort=args.cohort,
             include_auth_flow=args.include_auth_flow,
             include_protocol_flow=args.include_protocol_flow,
+            include_success_flow=args.include_success_flow,
         )
     elif args.prediction_sha256:
         score(args.output, args.prediction_sha256, args.source)
