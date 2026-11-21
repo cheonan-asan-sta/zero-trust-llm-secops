@@ -385,6 +385,7 @@ def capture(
     include_op_entity_handoff_flow=False,
     include_auth_recovery_flow=False,
     include_auth_outcome_flow=False,
+    local_source_sha256=None,
 ):
     include_auth_recovery_flow = include_auth_recovery_flow or include_auth_outcome_flow
     include_op_entity_handoff_flow = include_op_entity_handoff_flow or include_auth_recovery_flow
@@ -400,9 +401,12 @@ def capture(
     output.mkdir(exist_ok=True)
     plan = output / "plan.json"
     start, stop = WINDOWS[cohort]
+    if local_source_sha256 is not None and (source is None or not source.is_file()):
+        raise ValueError("an explicit local source file is required")
+    expected_hash = SOURCE_HASH if local_source_sha256 is None else local_source_sha256
     expected_plan = {
-        "source": SOURCE,
-        "source_sha256": SOURCE_HASH,
+        "source": SOURCE if local_source_sha256 is None else "explicit_local_fixture",
+        "source_sha256": expected_hash,
         "holdout_start": start.isoformat(),
         "holdout_stop_exclusive": stop.isoformat(),
         "timestamp_without_offset": "UTC",
@@ -537,7 +541,9 @@ def capture(
                 if written > SOURCE_SIZE:
                     raise ValueError("source grew past pinned size")
                 stream.write(chunk)
-    if source.stat().st_size != SOURCE_SIZE or fingerprint(source) != SOURCE_HASH:
+    if local_source_sha256 is None and source.stat().st_size != SOURCE_SIZE:
+        raise ValueError("public dataset does not match pinned bytes")
+    if fingerprint(source) != expected_hash:
         raise ValueError("public dataset does not match pinned bytes")
 
     traces = {}

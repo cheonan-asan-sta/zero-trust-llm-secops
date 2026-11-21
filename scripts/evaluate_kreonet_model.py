@@ -146,8 +146,11 @@ def read_reference(references):
     return members, seals
 
 
-def read_observations(source, members):
-    if source.stat().st_size != SOURCE_SIZE or fingerprint(source) != SOURCE_HASH:
+def read_observations(source, members, *, local_source_sha256=None):
+    expected_hash = SOURCE_HASH if local_source_sha256 is None else local_source_sha256
+    if local_source_sha256 is None and source.stat().st_size != SOURCE_SIZE:
+        raise ValueError("public dataset does not match pinned bytes")
+    if fingerprint(source) != expected_hash:
         raise ValueError("public dataset does not match pinned bytes")
     events = defaultdict(list)
     labels = {}
