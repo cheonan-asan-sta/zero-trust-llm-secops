@@ -9,6 +9,7 @@ from contextvars import ContextVar
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from time import perf_counter
 from unittest.mock import patch
 
 from dotenv import dotenv_values
@@ -127,6 +128,7 @@ async def capture(source, output, key_file, plan_sha256, case_ids, reasoning_eff
         reserved += amount
         row["reserved_usd"] = amount
         row["attempted"] = True
+        started = perf_counter()
         try:
             response, diagnostics = await parse(client, **kwargs)
         except BLOCKING_FAILURES as error:
@@ -137,6 +139,8 @@ async def capture(source, output, key_file, plan_sha256, case_ids, reasoning_eff
             if diagnostics is not None:
                 row["response_diagnostics"] = diagnostics.as_dict()
             raise
+        finally:
+            row["provider_latency_seconds"] = perf_counter() - started
         row["response_diagnostics"] = diagnostics.as_dict()
         row["resolved_model"] = response.model
         if response.usage:

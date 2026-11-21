@@ -502,6 +502,17 @@ def test_success_observation_cannot_replace_server_required_challenge(lab, bind_
         assert session.challenge_id not in result.model_dump_json()
 
 
+@pytest.mark.parametrize("action,denied", [("READ", False), ("REMOTE_ACCESS", True)])
+def test_grounded_scope_check_distinguishes_read_and_remote_action(lab, action, denied):
+    signed, context = lab.create(
+        ("read-only-scope", denied, "remote-read", "employee", "success", True, action)
+    )
+    payload = json.loads(grounded_input(signed.event, context)[0]["content"])
+    assert payload["remote_mfa_check"]["server_scope_denied"] is denied
+    assert payload["evidence_catalog"]["verified_session.policy.action_permitted"] is not denied
+    assert "server_scope_denied" not in payload["evidence_catalog"]
+
+
 @pytest.mark.parametrize(
     "variant,expected,verified",
     [
@@ -556,6 +567,7 @@ def test_verified_remote_followup_limits_generic_alarm_only(lab, variant, expect
             in grounded_system_instructions(event, context)
         )
         assert payload["remote_mfa_check"] == {
+            "server_scope_denied": False,
             "required_challenge_unsatisfied": not matched,
             "generic_remote_step_up_only": matched,
             "same_scope_response_verified": matched,
