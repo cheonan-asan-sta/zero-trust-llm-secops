@@ -203,6 +203,41 @@ def op_handoff_signals(statuses, events):
     return []
 
 
+SAML_AUTH_STAGES = (
+    ("idp", "GET", 200),
+    ("auth", "POST", 200),
+    ("idp", "POST", 200),
+    ("sp", "POST", 302),
+)
+
+
+def saml_handoff_signals(statuses, events):
+    if statuses.keys() != {200, 302}:
+        return []
+    ordered = sorted(events, key=lambda event: event[0])
+    for lookup, auth, assertion, returned in zip(ordered, ordered[1:], ordered[2:], ordered[3:]):
+        stages = (lookup[1], auth[1], assertion[1], returned[1])
+        if stages != SAML_AUTH_STAGES or not lookup[0] < auth[0] < assertion[0] < returned[0]:
+            continue
+        _, lookup_ip, lookup_agent, lookup_ref = lookup[2]
+        auth_user, auth_ip, auth_agent, auth_ref = auth[2]
+        assertion_user, assertion_ip, assertion_agent, assertion_ref = assertion[2]
+        return_user, return_ip, return_agent, return_ref = returned[2]
+        if (
+            auth_user
+            and auth_user == assertion_user == return_user
+            and lookup_ref
+            and lookup_ref == auth_ref == assertion_ref == return_ref
+            and lookup_ip
+            and lookup_ip == auth_ip == assertion_ip == return_ip
+            and lookup_agent
+            and lookup_agent == auth_agent == return_agent
+            and not assertion_agent
+        ):
+            return ["saml_idp_post_missing_agent_between_bound_client_observations"]
+    return []
+
+
 def capture(
     output,
     source=None,
@@ -215,7 +250,9 @@ def capture(
     include_linked_flow=False,
     include_unattributed_op_flow=False,
     include_op_handoff_flow=False,
+    include_saml_handoff_flow=False,
 ):
+    include_op_handoff_flow = include_op_handoff_flow or include_saml_handoff_flow
     include_unattributed_op_flow = include_unattributed_op_flow or include_op_handoff_flow
     include_linked_flow = include_linked_flow or include_unattributed_op_flow
     include_sequence_flow = include_sequence_flow or include_linked_flow
@@ -303,6 +340,16 @@ def capture(
             "OP GET 200, auth POST 200, OP POST 200 in strict order with stable user and client ref",
             "IP and agent stable before OP POST, then IP changes and agent is absent",
         ]
+    if include_saml_handoff_flow:
+        expected_plan["input_fields"].append(
+            "user_id, client_ip, user_agent and ref presence/equality across IdP, auth and SP"
+        )
+        expected_plan["candidate"] = "previous OP handoff detector OR SAML handoff signal"
+        expected_plan["saml_handoff_signals"] = [
+            "IdP GET 200, auth POST 200, IdP POST 200, SP POST 302 in strict order",
+            "stable user after lookup and same IP and ref throughout",
+            "same nonblank agent except on the intermediate IdP POST",
+        ]
     if plan.exists():
         if read(plan) != expected_plan:
             raise ValueError("existing plan differs from frozen protocol")
@@ -324,7 +371,7 @@ def capture(
     sequence_events = defaultdict(list)
     linked_events = defaultdict(list)
     op_context_events = defaultdict(list)
-    op_handoff_events = defaultdict(list)
+    handoff_events = defaultdict(list)
     request_counts = defaultdict(Counter)
     stage_user_agents = defaultdict(lambda: defaultdict(set))
     with source.open("rb") as stream:
@@ -365,12 +412,14 @@ def capture(
                 if include_op_handoff_flow:
                     stage = (module, method, status)
                     context = ("", "", "", "")
-                    if stage in OP_AUTH_STAGES:
+                    if stage in OP_AUTH_STAGES or (
+                        include_saml_handoff_flow and stage in SAML_AUTH_STAGES
+                    ):
                         context = tuple(
                             nonblank_text(row.get(field))
                             for field in ("user_id", "client_ip", "user_agent", "ref")
                         )
-                    op_handoff_events[key].append((when, stage, context))
+                    handoff_events[key].append((when, stage, context))
                 if module in PROTOCOL_MODULES and method in {"GET", "POST"}:
                     stage = (module, method)
                     request_counts[key][stage] += 1
@@ -486,13 +535,23 @@ def capture(
                 }
             )
         if include_op_handoff_flow:
-            signals = op_handoff_signals(statuses, op_handoff_events.get(key, ()))
+            signals = op_handoff_signals(statuses, handoff_events.get(key, ()))
             previous = rows[identity]["prediction"]
             rows[identity].update(
                 {
                     "previous_unattributed_op_prediction": previous,
                     "prediction": previous or bool(signals),
                     "op_handoff_signals": signals,
+                }
+            )
+        if include_saml_handoff_flow:
+            signals = saml_handoff_signals(statuses, handoff_events.get(key, ()))
+            previous = rows[identity]["prediction"]
+            rows[identity].update(
+                {
+                    "previous_op_handoff_prediction": previous,
+                    "prediction": previous or bool(signals),
+                    "saml_handoff_signals": signals,
                 }
             )
     write(
@@ -558,6 +617,7 @@ def score(output, seal, source=None):
         reference_field, signals_field = next(
             (reference, signals)
             for reference, signals in (
+                ("previous_op_handoff_prediction", "saml_handoff_signals"),
                 ("previous_unattributed_op_prediction", "op_handoff_signals"),
                 ("previous_linked_flow_prediction", "unattributed_op_flow_signals"),
                 ("previous_sequence_flow_prediction", "linked_flow_signals"),
@@ -611,6 +671,7 @@ if __name__ == "__main__":
     cli.add_argument("--include-linked-flow", action="store_true")
     cli.add_argument("--include-unattributed-op-flow", action="store_true")
     cli.add_argument("--include-op-handoff-flow", action="store_true")
+    cli.add_argument("--include-saml-handoff-flow", action="store_true")
     args = cli.parse_args()
     if args.phase == "capture":
         capture(
@@ -624,6 +685,7 @@ if __name__ == "__main__":
             include_linked_flow=args.include_linked_flow,
             include_unattributed_op_flow=args.include_unattributed_op_flow,
             include_op_handoff_flow=args.include_op_handoff_flow,
+            include_saml_handoff_flow=args.include_saml_handoff_flow,
         )
     elif args.prediction_sha256:
         score(args.output, args.prediction_sha256, args.source)

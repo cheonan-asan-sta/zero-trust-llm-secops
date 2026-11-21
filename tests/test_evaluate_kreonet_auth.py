@@ -129,6 +129,22 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
             "ref": "synthetic handoff ref",
         },
     ]
+    for offset, (module, method, status) in enumerate(
+        (("idp", "GET", 200), ("auth", "POST", 200), ("idp", "POST", 200), ("sp", "POST", 302))
+    ):
+        events.append(
+            {
+                "trace_id": "eleven",
+                "timestamp": f"2026-03-20T01:02:0{offset + 3}Z",
+                "module": module,
+                "http_method": method,
+                "http_status": status,
+                "user_id": "synthetic subject" if offset else "",
+                "client_ip": "192.0.2.50",
+                "user_agent": "" if offset == 2 else "synthetic client A",
+                "ref": "synthetic saml ref",
+            }
+        )
     snapshots = []
     for label in ("attack", "benign"):
         source = tmp_path / f"{label}.jsonl"
@@ -156,7 +172,7 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
         monkeypatch.setattr(evaluation, "SOURCE_HASH", hashlib.sha256(raw).hexdigest())
         monkeypatch.setattr(evaluation, "SOURCE_SIZE", len(raw))
         output = tmp_path / label
-        evaluation.capture(output, source, include_op_handoff_flow=True)
+        evaluation.capture(output, source, include_saml_handoff_flow=True)
         packet = output / "predictions.json"
         for raw_value in (
             b"synthetic client",
@@ -201,6 +217,12 @@ def test_auth_flow_uses_only_observation_fields(monkeypatch, tmp_path):
         "client_observation_discontinuity_at_bound_op_submission"
     ]
     assert handoff["prediction"] is True
+    saml = snapshots[0][hashlib.sha256(b"eleven").hexdigest()]
+    assert saml["previous_op_handoff_prediction"] is False
+    assert saml["saml_handoff_signals"] == [
+        "saml_idp_post_missing_agent_between_bound_client_observations"
+    ]
+    assert saml["prediction"] is True
 
 
 @pytest.mark.parametrize(
@@ -360,3 +382,45 @@ def test_op_handoff_requires_observed_discontinuity_on_correlated_consecutive_st
     unrelated = (start + timedelta(seconds=1, milliseconds=500), RP_REDIRECT, ("", "", "", ""))
     assert classify(statuses, [lookup, auth, unrelated, submit]) == []
     assert classify(Counter({200: 3, 302: 1, 401: 1}), [lookup, auth, submit]) == []
+
+
+def test_saml_handoff_requires_same_context_and_only_one_missing_agent():
+    start = datetime(2026, 3, 20, tzinfo=UTC)
+    events = [
+        (start, ("idp", "GET", 200), ("", "192.0.2.50", "browser", "client ref")),
+        (
+            start + timedelta(seconds=1),
+            ("auth", "POST", 200),
+            ("subject", "192.0.2.50", "browser", "client ref"),
+        ),
+        (
+            start + timedelta(seconds=2),
+            ("idp", "POST", 200),
+            ("subject", "192.0.2.50", "", "client ref"),
+        ),
+        (
+            start + timedelta(seconds=3),
+            ("sp", "POST", 302),
+            ("subject", "192.0.2.50", "browser", "client ref"),
+        ),
+    ]
+    classify = evaluation.saml_handoff_signals
+    statuses = Counter({200: 3, 302: 1})
+    assert classify(statuses, list(reversed(events))) == [
+        "saml_idp_post_missing_agent_between_bound_client_observations"
+    ]
+    for index, context in (
+        (2, ("subject", "192.0.2.50", "browser", "client ref")),
+        (1, ("subject", "192.0.2.50", "", "client ref")),
+        (3, ("other", "192.0.2.50", "browser", "client ref")),
+        (3, ("subject", "192.0.2.50", "browser", "")),
+        (3, ("subject", "192.0.2.51", "browser", "client ref")),
+    ):
+        altered = events.copy()
+        altered[index] = (*events[index][:2], context)
+        assert classify(statuses, altered) == []
+    tied_return = (events[2][0], *events[3][1:])
+    assert classify(statuses, [*events[:3], tied_return]) == []
+    intermediate = (start + timedelta(milliseconds=1500), ("auth", "GET", 200), ("", "", "", ""))
+    assert classify(statuses, [*events[:2], intermediate, *events[2:]]) == []
+    assert classify(Counter({200: 3, 302: 1, 401: 1}), events) == []
