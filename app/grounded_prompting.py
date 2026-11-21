@@ -82,6 +82,9 @@ If server policy requires MFA and the signed observation is unknown/failed, eval
 policy assurance gap; do not call that the same as successful MFA. If MFA is not required,
 do not invent an MFA violation. A generic ELEVATED_RISK/STEP_UP from remote-event detection
 alone is not proof of an unauthorized activity. Separate the specific reasons and observations.
+When same_scope_mfa_response_verified is true, the signed response matched the preceding
+server challenge in the same scope. Generic step-up may still be active. Keep it separate
+from independent threat evidence or an access grant.
 Signature verification proves configured collector provenance, not independent enterprise human
 identity, external IdP authentication, approval-ticket validation or confirmed compromise.
 The snapshot does not authorize access; it includes no grant token and is not an instruction

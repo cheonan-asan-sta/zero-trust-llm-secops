@@ -137,6 +137,11 @@ def _verified_session_baseline(event, facts, baseline):
         )
 
     # The generic remote-logon match can call for step-up without showing lateral movement.
+    followup_verified = (
+        session.get("same_scope_mfa_response_verified") is True
+        and "execution" not in facts
+        and "native_execution" not in facts
+    )
     allowed_rule_evidence = (
         {"device.managed"} if policy["managed_device_required"] is False else set()
     )
@@ -149,21 +154,28 @@ def _verified_session_baseline(event, facts, baseline):
         or event.auth_context.failed_attempts != 0
         or event.device.security_posture != "healthy"
         or signal["authentication_observation"] != "success"
-        or session["version"] != 1
+        or (session["version"] != 1 and not followup_verified)
         or session["decision"] != "STEP_UP"
         or session["reason_codes"] != ["ELEVATED_RISK"]
         or session.get("only_generic_remote_logon_rule_matched") is not True
     ):
         return baseline
+    evidence = [
+        "verified_session.session.only_generic_remote_logon_rule_matched",
+        "verified_session.session.reason_codes",
+        *baseline.evidence,
+    ]
+    rationale = (
+        "일반 원격 접속 신호로 추가 인증이 대기 중입니다. 별도 규칙 경보는 확인되지 않았습니다."
+    )
+    if followup_verified:
+        evidence.append("verified_session.session.same_scope_mfa_response_verified")
+        rationale = "같은 접근 범위의 MFA 응답을 확인했습니다. 일반 원격 접속 규칙만 일치해 검토를 유지합니다."
     return baseline.model_copy(
         update={
             "violation_type": ViolationType.NORMAL,
-            "rationale": "일반 원격 접속 신호로 추가 인증이 대기 중입니다. 별도 규칙 경보는 확인되지 않았습니다.",
-            "evidence": [
-                "verified_session.session.only_generic_remote_logon_rule_matched",
-                "verified_session.session.reason_codes",
-                *baseline.evidence,
-            ],
+            "rationale": rationale,
+            "evidence": evidence,
             "recommended_action": RecommendedAction.HOLD_FOR_REVIEW,
             "requires_human_review": True,
         }

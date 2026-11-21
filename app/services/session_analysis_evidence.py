@@ -65,7 +65,7 @@ def collect_session_evidence(
     now: datetime | None = None,
 ) -> VerifiedSessionContext:
     """Collect current server policy and persisted signed-session state; writes nothing."""
-    from app.services.zero_trust import SessionConflict
+    from app.services.zero_trust import SessionConflict, matches_session_challenge
 
     now = now or datetime.now(UTC)
     if (
@@ -148,6 +148,27 @@ def collect_session_evidence(
     # This remains a snapshot, never a token that can be redeemed for access.
     if approval_usable:
         expires = min(expires, current.grant_expires_at)
+    # Match the signed response to the immediately preceding challenge. Only
+    # carry it into advisory analysis when the challenge had the same scope.
+    previous = history[-2] if len(history) >= 2 else None
+    same_scope_mfa_response = bool(
+        previous is not None
+        and previous.version + 1 == current.version
+        and previous.decision == "STEP_UP"
+        and previous.matched_rule_ids == [_REMOTE_LOGON_RULE_ID]
+        and set(previous.reason_codes) <= {"ELEVATED_RISK", "FRESH_MFA_REQUIRED"}
+        and previous.resource_id == current.resource_id
+        and previous.action == current.action
+        and previous.source_ip == current.source_ip
+        and previous.policy_digest_sha256 == current.policy_digest_sha256
+        and previous.signal_source_digest == current.signal_source_digest
+        and matches_session_challenge(
+            previous,
+            proof,
+            mfa_succeeded=signal.event.auth_context.mfa == "success",
+            now=current.evaluated_at,
+        )
+    )
     facts = {
         "scope": LIVE_SESSION_SCOPE,
         "collected_at": now.isoformat(),
@@ -184,8 +205,10 @@ def collect_session_evidence(
             "decision": current.decision,
             "status": current.status,
             "reason_codes": current.reason_codes,
-            "only_generic_remote_logon_rule_matched": current.matched_rule_ids == [_REMOTE_LOGON_RULE_ID],
+            "only_generic_remote_logon_rule_matched": current.matched_rule_ids
+            == [_REMOTE_LOGON_RULE_ID],
             "challenge_pending": current.challenge_id is not None,
+            "same_scope_mfa_response_verified": same_scope_mfa_response,
             "approval_currently_usable": approval_usable,
         },
         "not_an_access_grant": True,

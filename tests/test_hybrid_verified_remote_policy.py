@@ -494,3 +494,62 @@ def test_success_observation_cannot_replace_server_required_challenge(lab, bind_
         assert "verified_session.session.challenge_pending" in result.evidence
         assert result.recommended_action == "HOLD_FOR_REVIEW"
         assert session.challenge_id not in result.model_dump_json()
+
+
+@pytest.mark.parametrize(
+    "variant,expected,verified",
+    [
+        ("same_scope", ViolationType.NORMAL, True),
+        ("absent_challenge", ViolationType.ACCESS_POLICY_VIOLATION, False),
+        ("different_resource", ViolationType.LATERAL_MOVEMENT, False),
+        ("changed_network", ViolationType.LATERAL_MOVEMENT, False),
+        ("fanout", ViolationType.LATERAL_MOVEMENT, True),
+        ("model_threat", ViolationType.CREDENTIAL_ANOMALY, True),
+        ("model_unavailable", ViolationType.UNKNOWN, True),
+    ],
+)
+def test_verified_remote_followup_limits_generic_alarm_only(lab, variant, expected, verified):
+    initial, _ = lab.create(
+        ("remote-mfa-followup", False, "remote-team", "employee", "unknown", True, "REMOTE_ACCESS")
+    )
+    previous = lab.service.history(initial.session_id, lab.principal)[-1]
+    assert previous.decision == "STEP_UP" and previous.challenge_id
+    event = initial.event.model_copy(
+        update={
+            "event_id": "followup-" + initial.event.event_id,
+            "timestamp": max(datetime.now(UTC), previous.observed_at + timedelta(microseconds=1)),
+            "auth_context": initial.event.auth_context.model_copy(update={"mfa": "success"}),
+        }
+    )
+    if variant == "different_resource":
+        event.resource = event.resource.model_copy(update={"resource_id": "remote-no-mfa"})
+    if variant == "changed_network":
+        event.network = event.network.model_copy(update={"ip": "198.51.100.14"})
+    if variant == "fanout":
+        event.behavior = event.behavior.model_copy(update={"distinct_resources_10m": 8})
+    signed = lab.sign(
+        event,
+        initial.session_id,
+        expected_version=previous.version,
+        challenge_id=None if variant == "absent_challenge" else previous.challenge_id,
+    )
+    evaluation = lab.service.evaluate_signed(signed, lab.principal)
+    assert evaluation.session.decision == "STEP_UP" and evaluation.grant_token is None
+    context = collect_session_evidence(lab.service, signed, lab.principal)
+    facts = context.for_event(event)["session"]
+    assert facts["same_scope_mfa_response_verified"] is verified
+    assert facts["challenge_pending"] and not facts["approval_currently_usable"]
+    history = lab.service.history(signed.session_id, lab.principal)
+    response = assessment()
+    if variant == "model_threat":
+        response = assessment(ViolationType.CREDENTIAL_ANOMALY)
+    if variant == "model_unavailable":
+        response = None
+    result = analyze(signed, context, response)
+    assert result.violation_type == expected
+    if variant in {"same_scope", "model_threat", "model_unavailable"}:
+        assert "verified_session.session.same_scope_mfa_response_verified" in result.evidence
+        assert result.recommended_action == "HOLD_FOR_REVIEW"
+        assert result.requires_human_review
+    assert previous.challenge_id not in context.facts_json.decode()
+    assert lab.service.history(signed.session_id, lab.principal) == history

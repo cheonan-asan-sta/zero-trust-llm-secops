@@ -54,6 +54,19 @@ def _digest(value: str) -> str:
     return hashlib.sha256(value.encode()).hexdigest()
 
 
+def matches_session_challenge(
+    previous: SessionDecision, proof: VerifiedSignal, *, mfa_succeeded: bool, now: datetime,
+) -> bool:
+    return bool(
+        previous.challenge_id
+        and proof.challenge_id == previous.challenge_id
+        and previous.challenge_expires_at
+        and previous.challenge_expires_at > now
+        and proof.issued_at > previous.evaluated_at
+        and mfa_succeeded
+    )
+
+
 def _validate_security_transition(previous, current, entry):
     if current.version <= MAX_EVALUATION_VERSION:
         if previous is not None and previous.version > MAX_EVALUATION_VERSION:
@@ -646,11 +659,8 @@ class ZeroTrustOperations:
                 reasons.append("SESSION_HISTORY_CAPACITY")
             challenge_verified = False
             if proof and previous and previous.challenge_id is not None:
-                challenge_verified = bool(
-                    previous.challenge_id and proof.challenge_id == previous.challenge_id
-                    and previous.challenge_expires_at and previous.challenge_expires_at > now
-                    and proof.issued_at > previous.evaluated_at
-                    and event.auth_context.mfa == "success"
+                challenge_verified = matches_session_challenge(
+                    previous, proof, mfa_succeeded=event.auth_context.mfa == "success", now=now,
                 )
                 if not challenge_verified:
                     step_up = True

@@ -11,7 +11,7 @@ import hashlib
 import json
 import random
 import subprocess
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import ModuleType
@@ -54,6 +54,37 @@ PROFILES = (
     ("build", "vpn", "203.0.113.45", 3),
     ("recovery", "remote", "192.0.2.112", 2),
 )
+FOLLOWUP_FAMILIES = (
+    ("service_desk_verified", "REMOTE_ACCESS", "standard", "bound", "success", False),
+    ("after_hours_admin", "REMOTE_ACCESS", "restricted", "bound", "success", False),
+    ("verified_previous_mfa", "REMOTE_ACCESS", "standard", "bound-existing-mfa", "success", False),
+    ("busy_verified_operator", "REMOTE_ACCESS", "standard", "bound-busy", "success", False),
+    ("optional_verified_followup", "REMOTE_ACCESS", "optional", "bound", "success", False),
+    ("read_after_challenge", "READ", "standard", "bound", "success", False),
+    ("first_authorized_admin", "REMOTE_ACCESS", "restricted", "direct", "success", False),
+    ("optional_read_with_mfa", "READ", "optional", "direct", "success", False),
+    ("verified_but_fanout", "REMOTE_ACCESS", "standard", "bound-fanout", "success", True),
+    ("verified_but_unmanaged", "REMOTE_ACCESS", "standard", "bound-unmanaged", "success", True),
+    ("verified_but_denied_action", "REMOTE_ACCESS", "standard", "bound-denied", "success", True),
+    (
+        "verified_but_unregistered",
+        "REMOTE_ACCESS",
+        "standard",
+        "bound-unregistered",
+        "success",
+        True,
+    ),
+    ("wrong_remote_challenge", "REMOTE_ACCESS", "standard", "wrong", "success", True),
+    ("missing_read_challenge", "READ", "standard", "absent", "success", True),
+    ("failed_remote_challenge", "REMOTE_ACCESS", "standard", "bound", "failed", True),
+    ("remote_after_revocation", "REMOTE_ACCESS", "standard", "revoked", "success", True),
+)
+FOLLOWUP_PROFILES = (
+    ("service-desk", "vpn", "203.0.113.18", 0),
+    ("after-hours", "remote", "198.51.100.43", 5),
+    ("release", "vpn", "192.0.2.27", 2),
+    ("continuity", "remote", "203.0.113.79", 4),
+)
 
 
 def git(*args):
@@ -74,17 +105,27 @@ def read(path):
     return json.loads(path.read_bytes())
 
 
-def verify_product():
-    subprocess.run(["git", "diff", "--exit-code", CANDIDATE, "--", "app"], check=True)
+def verify_product(revision):
+    subprocess.run(["git", "diff", "--exit-code", revision, "--", "app"], check=True)
 
 
-def freeze(directory):
-    verify_product()
+def freeze(directory, reference, candidate, cohort):
+    reference = (
+        git("rev-parse", "--verify", "--end-of-options", f"{reference}^{{commit}}").decode().strip()
+    )
+    candidate = (
+        git("rev-parse", "--verify", "--end-of-options", f"{candidate}^{{commit}}").decode().strip()
+    )
+    verify_product(candidate)
     directory.mkdir()
     scenarios = []
-    for family, action, resource, workflow, mfa, threat in FAMILIES:
-        for profile, method, ip, distinct in PROFILES:
-            role = "administrator" if family == "authorized_restricted_role" else "employee"
+    followup = cohort == "followup"
+    families, profiles = (
+        (FOLLOWUP_FAMILIES, FOLLOWUP_PROFILES) if followup else (FAMILIES, PROFILES)
+    )
+    for family, action, resource, workflow, mfa, threat in families:
+        for profile, method, ip, distinct in profiles:
+            role = "administrator" if resource == "restricted" and not threat else "employee"
             scenarios.append(
                 (
                     {
@@ -102,18 +143,19 @@ def freeze(directory):
                 )
             )
 
-    random.Random(6211709).shuffle(scenarios)
+    random.Random(4190013 if followup else 6211709).shuffle(scenarios)
     cases, truth = {}, {}
     for index, (case, label) in enumerate(scenarios, 1):
-        case_id = f"L{index:03}"
+        case_id = f"{'H' if followup else 'L'}{index:03}"
         cases[case_id], truth[case_id] = case, label
     write(directory / "truth.json", truth)
     write(
         directory / "plan.json",
         {
             "cases": cases,
-            "candidate": CANDIDATE,
-            "reference": REFERENCE,
+            "candidate": candidate,
+            "reference": reference,
+            "cohort": cohort,
             "truth_sha256": fingerprint(directory / "truth.json"),
             "harness_sha256": fingerprint(Path(__file__)),
             "scope": "new_local_controlled_signed_session_holdout",
@@ -148,6 +190,11 @@ def local_policy(profile):
 
 def collect(lab, case_id, case):
     workflow = case["workflow"]
+    initial_mfa = "unknown"
+    if workflow in {"direct", "revoked"}:
+        initial_mfa = case["mfa"]
+    if workflow == "bound-existing-mfa":
+        initial_mfa = "success"
     session_id = f"holdout-session-{case_id}"
     event = SecurityEvent.model_validate(
         {
@@ -169,8 +216,8 @@ def collect(lab, case_id, case):
             "behavior": {"distinct_resources_10m": case["distinct"]},
             "auth_context": {
                 "authentication_result": "success",
-                "mfa": case["mfa"] if workflow in {"direct", "revoked"} else "unknown",
-                "failed_attempts": int(case["mfa"] == "failed"),
+                "mfa": initial_mfa,
+                "failed_attempts": int(initial_mfa == "failed"),
             },
         }
     )
@@ -192,7 +239,7 @@ def collect(lab, case_id, case):
     else:
         if not first.challenge_id:
             raise ValueError(f"{case_id}: no server challenge")
-        if workflow == "bound":
+        if workflow.startswith("bound"):
             challenge = first.challenge_id
         elif workflow == "wrong":
             # Submit a deterministic placeholder instead of the issued challenge.
@@ -200,10 +247,28 @@ def collect(lab, case_id, case):
     event = event.model_copy(
         update={
             "event_id": f"holdout-event-{case_id}-2",
-            "timestamp": datetime.now(UTC),
-            "auth_context": event.auth_context.model_copy(update={"mfa": case["mfa"]}),
+            "timestamp": max(datetime.now(UTC), previous.observed_at + timedelta(microseconds=1)),
+            "auth_context": event.auth_context.model_copy(
+                update={
+                    "mfa": case["mfa"],
+                    "failed_attempts": int(case["mfa"] == "failed"),
+                }
+            ),
         }
     )
+    if workflow in {"bound-busy", "bound-fanout"}:
+        event.behavior = event.behavior.model_copy(
+            update={
+                "distinct_resources_10m": 8 if workflow == "bound-fanout" else 7,
+            }
+        )
+    if workflow == "bound-unmanaged":
+        event.device = event.device.model_copy(update={"managed": False})
+    if workflow in {"bound-denied", "bound-unregistered"}:
+        target = "read-only" if workflow == "bound-denied" else "unregistered"
+        event.resource = event.resource.model_copy(
+            update={"resource_id": f"{case['profile']}-{target}"}
+        )
     signal = lab.sign(event, session_id, previous.version, challenge_id=challenge)
     lab.service.evaluate_signed(signal, lab.principal)
     return signal
@@ -229,20 +294,21 @@ class LocalModelStub:
 
 
 async def capture(directory):
-    verify_product()
     plan_path = directory / "plan.json"
     plan = read(plan_path)
+    verify_product(plan["candidate"])
     if plan["harness_sha256"] != fingerprint(Path(__file__)):
         raise ValueError("frozen harness changed")
     old = ModuleType("local_previous_hybrid")
     # The baseline is read from the fixed, trusted local repository revision.
-    exec(compile(git("show", f"{REFERENCE}:{ANALYZER}"), ANALYZER, "exec"), old.__dict__)  # noqa: S102
+    baseline = git("show", f"{plan['reference']}:{ANALYZER}")
+    exec(compile(baseline, ANALYZER, "exec"), old.__dict__)  # noqa: S102
     before = old.HybridAnalyzer(replay_settings(), LocalModelStub())
     after = HybridAnalyzer(replay_settings(), LocalModelStub())
     rows, observations = {"reference": [], "candidate": []}, {}
     with TemporaryDirectory(prefix="remote-holdout-") as scratch:
         labs = {}
-        for profile, *_ in PROFILES:
+        for profile in sorted({case["profile"] for case in plan["cases"].values()}):
             with patch.object(
                 lab_support, "remote_policy_bundle", return_value=local_policy(profile)
             ):
@@ -345,6 +411,7 @@ def score(directory, sealed_hash):
         "predictions_sha256": sealed_hash,
         "plan_sha256": packet["plan_sha256"],
         "scope": plan["scope"],
+        "cohort": plan.get("cohort", "initial"),
         "provider_calls": 0,
         "comparison": comparison,
         "families": families,
@@ -358,9 +425,12 @@ if __name__ == "__main__":
     cli.add_argument("phase", choices=("freeze", "capture", "score"))
     cli.add_argument("directory", type=Path)
     cli.add_argument("--prediction-sha256")
+    cli.add_argument("--reference", default=REFERENCE)
+    cli.add_argument("--candidate", default=CANDIDATE)
+    cli.add_argument("--cohort", choices=("initial", "followup"), default="initial")
     args = cli.parse_args()
     if args.phase == "freeze":
-        freeze(args.directory)
+        freeze(args.directory, args.reference, args.candidate, args.cohort)
     elif args.phase == "capture":
         asyncio.run(capture(args.directory))
     else:
