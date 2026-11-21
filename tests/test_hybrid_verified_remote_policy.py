@@ -10,7 +10,7 @@ import scripts.local_session_analysis_lab as session_lab
 from app import main
 from app.analyzers.hybrid import HybridAnalyzer
 from app.config import Settings
-from app.grounded_prompting import grounded_input
+from app.grounded_prompting import grounded_input, grounded_system_instructions
 from app.models import SecurityAssessment, ViolationType
 from app.security import get_principal
 from app.services.session_analysis_evidence import collect_session_evidence
@@ -550,6 +550,11 @@ def test_verified_remote_followup_limits_generic_alarm_only(lab, variant, expect
     if variant in {"same_scope", "absent_challenge"}:
         matched = variant == "same_scope"
         payload = json.loads(grounded_input(event, context)[0]["content"])
+        assert "session_assurance_context" not in payload
+        assert (
+            "Otherwise, including generic_remote_step_up_only=true: NORMAL"
+            in grounded_system_instructions(event, context)
+        )
         assert payload["remote_mfa_check"] == {
             "required_challenge_unsatisfied": not matched,
             "generic_remote_step_up_only": matched,

@@ -186,11 +186,73 @@ MFA_VALIDATION_PROFILES = (
     ("engineering-gateway", "vpn", "192.0.2.56", 3),
     ("continuity-gateway", "remote", "203.0.113.162", 5),
 )
+REMOTE_TRIAGE_FAMILIES = (
+    ("privileged_initial_review", "REMOTE_ACCESS", "restricted", "direct", "success", False),
+    ("privileged_matching_response", "REMOTE_ACCESS", "restricted", "bound", "success", False),
+    ("optional_mfa_repeat_review", "REMOTE_ACCESS", "optional", "bound-repeat", "success", False),
+    (
+        "ordinary_worker_repeat_review",
+        "REMOTE_ACCESS",
+        "standard",
+        "bound-repeat",
+        "success",
+        False,
+    ),
+    (
+        "privileged_busy_below_threshold",
+        "REMOTE_ACCESS",
+        "restricted",
+        "bound-busy",
+        "success",
+        False,
+    ),
+    ("optional_mfa_no_enrollment", "REMOTE_ACCESS", "optional", "direct", "not_required", False),
+    ("privileged_protected_read", "READ", "restricted", "bound", "success", False),
+    ("same_scope_protected_read", "READ", "read-only", "bound", "success", False),
+    ("optional_read_no_observation", "READ", "optional", "direct", "unknown", False),
+    (
+        "successful_prior_mfa_and_response",
+        "REMOTE_ACCESS",
+        "standard",
+        "bound-existing-mfa",
+        "success",
+        False,
+    ),
+    ("withdrawn_protected_read", "READ", "read-only", "revoked", "success", True),
+    ("revoked_remote_with_success", "REMOTE_ACCESS", "standard", "revoked", "success", True),
+    ("third_response_absent", "REMOTE_ACCESS", "standard", "bound-repeat-missing", "success", True),
+    (
+        "third_response_mismatched",
+        "REMOTE_ACCESS",
+        "standard",
+        "bound-repeat-wrong",
+        "success",
+        True,
+    ),
+    ("read_response_mismatched", "READ", "read-only", "wrong", "success", True),
+    ("remote_initial_mfa_failure", "REMOTE_ACCESS", "standard", "direct", "failed", True),
+    ("devices_and_fanout_eight", "REMOTE_ACCESS", "standard", "bound-fanout", "success", True),
+    ("devices_and_fanout_nine", "REMOTE_ACCESS", "standard", "bound-peak", "success", True),
+    (
+        "compromised_remote_device",
+        "REMOTE_ACCESS",
+        "standard",
+        "bound-compromised",
+        "success",
+        True,
+    ),
+    ("scope_restricted_to_read", "REMOTE_ACCESS", "standard", "bound-denied", "success", True),
+)
+REMOTE_TRIAGE_PROFILES = (
+    ("support-access", "vpn", "198.51.100.113", 4),
+    ("service-recovery", "remote", "203.0.113.32", 1),
+)
 COHORTS = {
     "initial": (FAMILIES, PROFILES, 6211709, "L"),
     "followup": (FOLLOWUP_FAMILIES, FOLLOWUP_PROFILES, 4190013, "H"),
     "confirmation": (CONFIRMATION_FAMILIES, CONFIRMATION_PROFILES, 679331, "C"),
     "mfa-validation": (MFA_VALIDATION_FAMILIES, MFA_VALIDATION_PROFILES, 761109, "M"),
+    "remote-triage": (REMOTE_TRIAGE_FAMILIES, REMOTE_TRIAGE_PROFILES, 994017, "T"),
 }
 
 

@@ -69,6 +69,7 @@ async def capture(source, output, key_file, plan_sha256, case_ids):
         ("followup", 64),
         ("confirmation", 40),
         ("mfa-validation", 40),
+        ("remote-triage", 40),
     }:
         raise ValueError("invalid frozen cohort")
     selected_ids = case_ids or list(plan["cases"])

@@ -7,12 +7,9 @@ from openai import AsyncOpenAI
 from app.analyzers.structured_response import StructuredResponseFailure, parse_structured_response
 from app.config import Settings
 from app.grounded_prompting import (
-    GROUNDED_INSTRUCTIONS,
-    VERIFIED_EXECUTION_INSTRUCTIONS,
-    VERIFIED_NATIVE_EXECUTION_INSTRUCTIONS,
-    VERIFIED_SESSION_INSTRUCTIONS,
     grounded_input,
     grounded_output_type,
+    grounded_system_instructions,
     validate_grounded,
 )
 from app.models import SecurityAssessment, SecurityEvent
@@ -136,23 +133,7 @@ class OpenAIAnalyzer:
                 {
                     "role": "system",
                     "content": (
-                        GROUNDED_INSTRUCTIONS
-                        + (
-                            "\n"
-                            + VERIFIED_SESSION_INSTRUCTIONS
-                            + (
-                                "\n" + VERIFIED_EXECUTION_INSTRUCTIONS
-                                if "execution" in context.for_event(event)
-                                else ""
-                            )
-                            + (
-                                "\n" + VERIFIED_NATIVE_EXECUTION_INSTRUCTIONS
-                                if "native_execution" in context.for_event(event)
-                                else ""
-                            )
-                            if context
-                            else ""
-                        )
+                        grounded_system_instructions(event, context)
                         if self._prompt_mode == "grounded"
                         else SYSTEM_INSTRUCTIONS
                     ),
