@@ -679,6 +679,23 @@ Keycloak 앞단의 로컬 시험 수집기에서 시도 ID와 요청 범위를 �
 
 `python -m scripts.run_keycloak_remote_acceptance runtime/keycloak-live-collector-final.json`로 재현한다. 기존 로컬 Keycloak 이미지만 사용했고, 실행 후 시험 컨테이너를 제거했다. 유료 API와 AWS 호출 없이 관련 회귀 테스트 128개를 통과했다.
 
+#### 로컬 Keycloak 역할·세션 회수 자동 반영
+
+로컬 게이트웨이는 서명·발급자·수신자·유효 시간을 확인한 OIDC 토큰의 사용자, 역할과 `sid`를 현재 Keycloak 상태와 대조한다. 읽기 전용 서비스 계정은 사용자 활성 상태, 현재 유효한 realm 역할, 활성 세션을 조회한다. 토큰의 역할이 제거됐거나 해당 세션이 종료됐으면 401을 반환한다. Keycloak 상태를 확인할 수 없으면 503을 반환한다. 기존 파일 기반 검사도 구성 시 그대로 동작한다. [Keycloak Admin REST API](https://www.keycloak.org/docs-api/26.8.0/rest-api/index.html)
+
+| 로컬 Docker 시험 | 관찰 결과 |
+| --- | --- |
+| 현재 역할·세션이 유효한 사용자 | 읽기 승인 |
+| 분석자 역할 제거 뒤 기존 토큰 | 다음 요청에서 401 |
+| 조회자 역할로 새로 발급된 토큰 | 제한된 자원 요청은 403 |
+| Keycloak 로그아웃 뒤 그 세션의 토큰 | 다음 요청에서 401, 갱신 요청은 400 |
+
+실제 Keycloak에서 역할을 제거하고 세션을 종료했다. 수동 회수 파일은 사용하지 않았고 서비스 계정에는 사용자 조회 역할만 부여했다. 회귀 테스트 174개에는 공급자 응답을 확인할 수 없을 때의 503과 서명된 세션 ID의 정확한 비교가 포함된다.
+
+이 경로는 로컬 게이트웨이에 등록한 요청 시점 조회다. 운영용 공급자 구성과 다중 인스턴스 성능 검증은 별도이며, 이미 처리된 요청에 영향을 주지 않는다. 역할 재부여가 기존 세션에서 이전 토큰의 영구 폐기를 보장하는지는 이 시험 범위에서 검증하지 않았다.
+
+`python -m scripts.run_keycloak_remote_acceptance runtime/keycloak-automatic-authority-v1.json`로 재현한다. 시험 후 컨테이너를 제거하며 유료 API와 AWS를 호출하지 않는다.
+
 #### Keycloak 승인·MFA·권한 회수 통합 시험
 
 `scripts/run_keycloak_remote_acceptance.py`는 Keycloak 26.8.0의 임시 realm과 공개 키 조회를 루프백에 구성한다. 등록된 테스트 사용자의 비밀번호·TOTP로 로그인한 뒤 실제 HTTP 응답을 테스트 수집기의 MFA 관측으로 연결한다. 게이트웨이는 서명된 관측과 읽기 전용 자원 정책을 검사한다. Keycloak의 실제 역할 변경 및 로그아웃 결과를 확인하고 앱의 운영자 차단 목록을 갱신한다. 임시 계정, OTP, 토큰과 개인키는 결과 파일에 넣지 않는다. [Keycloak 컨테이너](https://www.keycloak.org/server/containers) · [Keycloak OTP 관리](https://www.keycloak.org/docs/26.8.0/server_admin/)

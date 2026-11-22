@@ -25,12 +25,14 @@ from app.services.auth_alert_triage import resolve_auth_alert, resolve_terminal_
 from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
 from app.zero_trust_models import SignedSessionSignal
 from scripts.evaluate_local_remote_holdout import write
+from scripts.keycloak_live_authority import KeycloakLiveAuthority
 from scripts.local_keycloak_evidence_collector import LocalKeycloakEvidenceCollector
 from scripts.local_session_analysis_lab import LocalSessionAnalysisLab
 
 IMAGE = "quay.io/keycloak/keycloak:26.8.0"
 REALM = "zt-acceptance"
 CLIENT_ID = "local-gateway"
+AUTHORITY_CLIENT = "local-authority-reader"
 TEST_USER = "local-analyst"
 ADMIN = "fixture-admin"
 TENANT = "local-lab"
@@ -45,7 +47,7 @@ def docker(*args):
     return result.stdout.strip()
 
 
-def realm(password, otp_seed):
+def realm(password, otp_seed, authority_secret):
     return {
         "realm": REALM,
         "enabled": True,
@@ -83,7 +85,17 @@ def realm(password, otp_seed):
                         },
                     },
                 ],
-            }
+            },
+            {
+                "clientId": AUTHORITY_CLIENT,
+                "protocol": "openid-connect",
+                "publicClient": False,
+                "secret": authority_secret,
+                "serviceAccountsEnabled": True,
+                "standardFlowEnabled": False,
+                "directAccessGrantsEnabled": False,
+                "fullScopeAllowed": True,
+            },
         ],
         "users": [
             {
@@ -124,7 +136,39 @@ def fixture_otp(seed):
     return f"{value % 1_000_000:06d}"
 
 
-def verify(base, root, password, otp_seed, admin_password, *, stop_provider):
+def provision_authority_reader(client, base, admin_password):
+    admin = client.post(
+        f"{base}/realms/master/protocol/openid-connect/token",
+        data={
+            "client_id": "admin-cli",
+            "grant_type": "password",
+            "username": ADMIN,
+            "password": admin_password,
+        },
+    )
+    admin.raise_for_status()
+    authorization = {"Authorization": "Bearer " + admin.json()["access_token"]}
+    admin_base = f"{base}/admin/realms/{REALM}"
+    clients = admin_base + "/clients"
+
+    def client_id(name):
+        response = client.get(clients, params={"clientId": name}, headers=authorization)
+        response.raise_for_status()
+        return next(row["id"] for row in response.json() if row["clientId"] == name)
+
+    account_path = f"{clients}/{client_id(AUTHORITY_CLIENT)}/service-account-user"
+    account = client.get(account_path, headers=authorization)
+    account.raise_for_status()
+    realm_management = client_id("realm-management")
+    role = client.get(f"{clients}/{realm_management}/roles/view-users", headers=authorization)
+    role.raise_for_status()
+    mappings = f"{admin_base}/users/{account.json()['id']}/role-mappings/clients/{realm_management}"
+    assigned = client.post(mappings, json=[role.json()], headers=authorization)
+    assigned.raise_for_status()
+    return authorization
+
+
+def verify(base, root, password, otp_seed, admin_password, authority_secret, *, stop_provider):
     issuer = f"{base}/realms/{REALM}"
     metadata_url = issuer + "/.well-known/openid-configuration"
     with httpx.Client(trust_env=False, timeout=8) as client:
@@ -144,16 +188,7 @@ def verify(base, root, password, otp_seed, admin_password, *, stop_provider):
         def token(**fields):
             return client.post(token_url, data={"client_id": CLIENT_ID, **fields})
 
-        policy = root / "revocations.json"
-
-        def publish_revocations(subjects):
-            temporary = policy.with_suffix(".tmp")
-            write(
-                temporary, {"schema": "oidc-revocations-1", "issuer": issuer, "subjects": subjects}
-            )
-            temporary.replace(policy)
-
-        publish_revocations([])
+        authorization = provision_authority_reader(client, base, admin_password)
         settings = Settings(
             _env_file=None,
             app_environment="test",
@@ -161,7 +196,6 @@ def verify(base, root, password, otp_seed, admin_password, *, stop_provider):
             oidc_issuer=issuer,
             oidc_audience=CLIENT_ID,
             oidc_jwks_url=issuer + "/protocol/openid-connect/certs",
-            oidc_revoked_subjects_path=policy,
         )
         lab = LocalSessionAnalysisLab(root / "gateway")
         collector = LocalKeycloakEvidenceCollector(lab, settings, client)
@@ -190,6 +224,9 @@ def verify(base, root, password, otp_seed, admin_password, *, stop_provider):
         assert cancelled_alert == "cleared"
 
         gateway = FastAPI()
+        gateway.state.oidc_live_authority = KeycloakLiveAuthority(
+            issuer, AUTHORITY_CLIENT, authority_secret
+        )
         gateway.include_router(zero_trust_router(lab.service))
         install_zero_trust_error_handlers(gateway)
 
@@ -250,17 +287,6 @@ def verify(base, root, password, otp_seed, admin_password, *, stop_provider):
             for rejected in (failed, missing):
                 assert rejected["session"]["decision"] == "DENY" and not rejected["grant_token"]
 
-            admin = client.post(
-                f"{base}/realms/master/protocol/openid-connect/token",
-                data={
-                    "client_id": "admin-cli",
-                    "grant_type": "password",
-                    "username": ADMIN,
-                    "password": admin_password,
-                },
-            )
-            assert admin.status_code == 200, admin.status_code
-            authorization = headers(admin.json()["access_token"])
             roles = f"{base}/admin/realms/{REALM}/roles"
             mappings = f"{base}/admin/realms/{REALM}/users/{identity}/role-mappings/realm"
             entries = {}
@@ -278,10 +304,13 @@ def verify(base, root, password, otp_seed, admin_password, *, stop_provider):
                 client.post(mappings, headers=authorization, json=[entries["viewer"]]).status_code
                 == 204
             )
+            app_path = "/zero-trust/protected-access"
+            old_role = app.post(app_path, json=requested, headers=analyst)
+            assert old_role.status_code == 401
+            assert old_role.json()["detail"] == "Caller roles changed since token issuance"
             refresh = token(grant_type="refresh_token", refresh_token=tokens["refresh_token"])
             assert refresh.status_code == 200, refresh.status_code
             viewer = headers(refresh.json()["id_token"])
-            app_path = "/zero-trust/protected-access"
             downgraded = app.post(app_path, json=requested, headers=viewer)
             assert downgraded.status_code == 403
             assert downgraded.json()["detail"] == "Insufficient role for this operation"
@@ -296,12 +325,9 @@ def verify(base, root, password, otp_seed, admin_password, *, stop_provider):
                 ).status_code
                 == 400
             )
-            publish_revocations([{"tenant_id": TENANT, "subject": identity}])
-            blocked = app.post(app_path, json=requested, headers=analyst)
-            assert (
-                blocked.status_code == 401
-                and blocked.json()["detail"] == "Caller authority is revoked"
-            )
+            blocked = app.post(app_path, json=requested, headers=viewer)
+            assert blocked.status_code == 401
+            assert blocked.json()["detail"] == "Caller session is no longer active"
         security._jwks_client.cache_clear()
         stop_provider()
         unavailable_event = collector.attempts.open("outage-before-auth-" + uuid4().hex)
@@ -341,8 +367,10 @@ def verify(base, root, password, otp_seed, admin_password, *, stop_provider):
         "downgraded_role": 403,
         "logout": 204,
         "refresh_after_logout": 400,
-        "old_token_after_published_revocation": 401,
-        "revocation_publication": "fixture operator after confirmed Keycloak logout",
+        "old_token_after_role_removal": old_role.status_code,
+        "token_after_provider_logout": blocked.status_code,
+        "authority_mode": "read-only provider checks on each request",
+        "manual_revocation_file": False,
         "finished_at": datetime.now(UTC).isoformat(),
         "paid_api_calls": 0,
     }
@@ -352,11 +380,12 @@ def run(output):
     name = f"zt-keycloak-{uuid4().hex[:12]}"
     password, admin_password = secrets.token_urlsafe(28), secrets.token_urlsafe(28)
     otp_seed = secrets.token_hex(20)
+    authority_secret = secrets.token_urlsafe(32)
     with TemporaryDirectory(prefix="zt-keycloak-") as directory:
         root = Path(directory)
         imports = root / "imports"
         imports.mkdir()
-        write(imports / f"{REALM}-realm.json", realm(password, otp_seed))
+        write(imports / f"{REALM}-realm.json", realm(password, otp_seed, authority_secret))
         docker(
             "run",
             "-d",
@@ -396,6 +425,7 @@ def run(output):
                 password,
                 otp_seed,
                 admin_password,
+                authority_secret,
                 stop_provider=stop_provider,
             )
         finally:

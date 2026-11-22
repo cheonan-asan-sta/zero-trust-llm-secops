@@ -43,6 +43,7 @@ class Principal:
     roles: frozenset[Role]
     auth_method: str
     authentication_expires_at: datetime | None = field(default=None, repr=False, compare=False)
+    oidc_session_id: str | None = field(default=None, repr=False, compare=False)
 
     @property
     def effective_roles(self) -> frozenset[Role]:
@@ -219,12 +220,16 @@ async def _oidc_principal(
         or not _TENANT_PATTERN.fullmatch(tenant_id)
     ):
         raise _unauthorized("Token identity claims are invalid")
+    session_id = claims.get("sid")
     return Principal(
         subject=subject,
         tenant_id=tenant_id,
         roles=roles,
         auth_method="oidc",
         authentication_expires_at=authentication_expires_at,
+        oidc_session_id=session_id
+        if isinstance(session_id, str) and 0 < len(session_id) <= 128
+        else None,
     )
 
 
@@ -277,6 +282,8 @@ async def _resolve_principal(
             )
 
         admitted_scope = oidc_scope(settings)
+        app_state = getattr(request.scope.get("app"), "state", None)
+        authority_check = getattr(app_state, "oidc_live_authority", None)
 
         def revalidate_oidc_scope():
             current = get_settings()
@@ -287,6 +294,10 @@ async def _resolve_principal(
             ):
                 raise _unauthorized("Caller authentication policy changed or expired")
             _check_oidc_revocation(current, principal)
+            if getattr(app_state, "oidc_live_authority", None) is not authority_check:
+                raise _unauthorized("Caller authority policy changed during request")
+            if authority_check is not None:
+                authority_check(current.oidc_issuer, principal)
 
         request.state.authentication_revalidator = revalidate_oidc_scope
     return principal
