@@ -1,6 +1,7 @@
 """SQLite queue for the gateway's original login event and optional signed evidence."""
 
 import argparse
+import hashlib
 import json
 import math
 import sqlite3
@@ -18,6 +19,8 @@ from app.services.collector_spool import (
 )
 from app.services.login_delivery import LoginDeliveryIdentity
 from app.zero_trust_models import LoginDeliveryRequest
+
+MAX_LOGIN_QUEUE_RECORDS = 10_000
 
 
 @dataclass(frozen=True, slots=True)
@@ -66,14 +69,16 @@ class LoginDeliverySpool:
             pass
 
     @contextmanager
-    def _transaction(self, *, create=False):
+    def _transaction(self, *, create=False, read_only=False):
         try:
             if self.path.is_symlink():
                 raise SpoolUnavailable("login queue link rejected")
-            target = self.path if create else self.path.resolve().as_uri() + "?mode=rw"
+            mode = "ro" if read_only else "rw"
+            target = self.path if create else self.path.resolve().as_uri() + f"?mode={mode}"
             with closing(sqlite3.connect(target, uri=not create, timeout=5)) as con, con:
-                con.execute("PRAGMA synchronous=FULL")
-                con.execute("BEGIN IMMEDIATE")
+                if not read_only:
+                    con.execute("PRAGMA synchronous=FULL")
+                con.execute("BEGIN" if read_only else "BEGIN IMMEDIATE")
                 if not create:
                     self._check_binding(con)
                 yield con
@@ -91,6 +96,7 @@ class LoginDeliverySpool:
             "login_queue": {
                 "attempts": "INTEGER NOT NULL DEFAULT 0", "available_at": "REAL NOT NULL DEFAULT 0",
                 "last_attempt_at": "REAL", "failure_code": "TEXT", "last_http_status": "INTEGER",
+                "enqueued_at": "REAL",
             },
         }
         for table, columns in additions.items():
@@ -100,7 +106,7 @@ class LoginDeliverySpool:
                     con.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
         con.execute("CREATE INDEX IF NOT EXISTS login_queue_ready ON login_queue(held_status, available_at, seq)")
 
-    def enqueue(self, body):
+    def enqueue(self, body, *, now=None):
         self._check_owner(body)
         identity = LoginDeliveryIdentity.from_request(body)
         raw = body.model_dump_json()
@@ -115,11 +121,11 @@ class LoginDeliverySpool:
                 if stored[0] != identity.payload_sha256:
                     raise SpoolConflict("login event already queued with another payload")
                 return
-            if con.execute("SELECT count(*) FROM login_queue").fetchone()[0] >= 10000:
+            if con.execute("SELECT count(*) FROM login_queue").fetchone()[0] >= MAX_LOGIN_QUEUE_RECORDS:
                 raise SpoolFull("login queue capacity reached")
             con.execute(
-                "INSERT INTO login_queue(event_id,payload,payload_sha256) VALUES (?,?,?)",
-                (event_id, raw, identity.payload_sha256),
+                "INSERT INTO login_queue(event_id,payload,payload_sha256,enqueued_at) VALUES (?,?,?,?)",
+                (event_id, raw, identity.payload_sha256, time() if now is None else now),
             )
 
     def _check_owner(self, body):
@@ -220,6 +226,30 @@ class LoginDeliverySpool:
             ).fetchone()
         return {"pending": pending, "held": held}
 
+    @property
+    def status_scope_sha256(self):
+        scope = json.dumps([self.path.resolve().as_posix(), self._binding])
+        return hashlib.sha256(scope.encode()).hexdigest()
+
+    def status_snapshot(self):
+        """Read counts and times from one snapshot without reading any login bodies."""
+        with self._transaction(read_only=True) as con:
+            pending, pending_known, first_enqueued, next_due = con.execute(
+                "SELECT count(*),count(enqueued_at),min(enqueued_at),min(available_at) "
+                "FROM login_queue WHERE held_status IS NULL"
+            ).fetchone()
+            held, held_known, first_held = con.execute(
+                "SELECT count(*),count(last_attempt_at),min(last_attempt_at) "
+                "FROM login_queue WHERE held_status IS NOT NULL"
+            ).fetchone()
+            next_send = con.execute("SELECT next_send_at FROM login_queue_binding WHERE id=1").fetchone()[0]
+        return {
+            "pending": pending, "held": held,
+            "pending_age_unknown": pending - pending_known, "held_age_unknown": held - held_known,
+            "oldest_pending_at": _utc(first_enqueued), "oldest_held_at": _utc(first_held),
+            "retry_at": _utc(max(next_send, next_due)) if next_due is not None else None,
+        }
+
 
 def _utc(value):
     return None if value is None else datetime.fromtimestamp(value, UTC).isoformat()
@@ -233,6 +263,7 @@ def main():
     parser.add_argument("--collector-subject", required=True)
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("status")
+    commands.add_parser("publish-status").add_argument("output", type=Path)
     commands.add_parser("held").add_argument("--limit", type=int, default=50)
     commands.add_parser("requeue").add_argument("event_id")
     args = parser.parse_args()
@@ -240,7 +271,12 @@ def main():
         parser.error("existing login queue database is required")
     queue = LoginDeliverySpool(args.database, origin=args.origin.rstrip("/") + "/",
                                tenant_id=args.tenant_id, collector_subject=args.collector_subject)
-    if args.command == "status":
+    if args.command == "publish-status":
+        from scripts.f1_lab.login_queue_status import publish_queue_status
+
+        publish_queue_status(queue, args.output)
+        result = {"scope_sha256": queue.status_scope_sha256}
+    elif args.command == "status":
         result = queue.counts() | {"next_attempt_at": _utc(queue.next_attempt())}
     elif args.command == "held":
         result = queue.held(limit=args.limit)

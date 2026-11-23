@@ -165,3 +165,22 @@ python -m scripts.login_delivery_spool <queue-db> --origin <analysis-api-origin>
 ```powershell
 python -m scripts.run_login_queue_recovery <output.json> --cases 192
 ```
+
+## 로그인 대기열 운영 지표와 경보
+
+Linux 수집기에서 `replaying(status_path=...)`를 지정하면 5초 간격으로 공개 집계 파일을 발행한다. 수집기는 같은 SQLite 읽기 트랜잭션에서 대기·보류 건수, 가장 오래 대기하거나 보류된 시각, 다음 전송 시각을 얻는다. 대기 시간은 로그인 발생 시각 대신 처음 큐에 커밋한 시각부터 센다. 이전 버전에서 저장 시각이 없는 행은 집계에 포함하고 나이는 `unknown`으로 표시한다.
+
+공개 파일에는 원본 이벤트, 사용자·테넌트·기기 식별자, 개별 실패 사유, 토큰을 넣지 않는다. 기존 인증된 `signal_metrics_exporter`에 `--login-queue-profile`을 지정하면 발행 출처가 일치하고 30초보다 새 보고서의 집계만 노출한다. 저장소나 보고서가 없거나 손상되거나 만료되면 `secops_login_queue_status_success 0`을 내보내고 대기·보류 집계를 숨긴다. 기존 분석 API 접근 장애 중에도 큐 상태는 별도로 관측할 수 있다.
+
+프로필은 `schema`를 `zt-login-queue-metrics-profile-1`로 두고 `scope_sha256`, `status_file` 절대 경로, `max_pending_age_seconds`, `capacity_warning_records`를 지정한다. 수집기 소유의 출력 디렉터리에서 큐의 `publish-status <output>` 명령을 실행하면 프로필에 넣을 `scope_sha256`을 확인할 수 있다. 로컬 인수 기준으로 대기 120초, 경고 용량 8,000건을 사용한다. 경보는 각각 30초 동안 조건이 유지되면 발화한다.
+
+| 경보 | 발화 조건 |
+| --- | --- |
+| `C01LoginQueueStatusUnavailable` | 활성화된 큐의 현재 보고서 상태 확인 실패 |
+| `C01LoginQueueBacklog` | 대기 한도 초과 또는 대기 시각을 확인할 수 없는 항목 |
+| `C01LoginQueueHeld` | 수동 확인과 재접수가 필요한 보류 항목 |
+| `C01LoginQueueCapacityPressure` | 대기·보류 합계가 설정한 경고 용량에 도달 |
+
+로컬 Docker의 실제 Prometheus와 Alertmanager에서 경보 4종의 발화와 해제 알림을 받았다. 발화와 해제의 지문과 시작 시각이 일치했고, 보고서를 읽을 수 없을 때 대기·보류 값은 제공되지 않았다. 스크레이프와 알림 수신기의 인증을 확인했다. 첫 통합 확인 중 시험 코드의 HTTP 응답 바이트 비교를 수정해 다시 실행했다. `promtool` 3.15.1로 신규 규칙 20조건과 기존 witness 규칙을 확인했고 Linux 회귀 테스트 132개와 Ruff도 통과했다.
+
+이전과 동일한 192건을 다시 복구해 분석·Sigma 결과 192건, 위협 탐지 96/96건, 오탐 0/96건, 감사 기록 192건이 일치했다. 첫 실행 이후 구성한 감시와 경보는 로컬 집계 및 알림 경로에서 검증했다. AWS·유료 API 호출은 0회다. [경보와 복구 비교 결과](infrastructure-results/local-login-queue-status-20261123.json)

@@ -1,0 +1,59 @@
+# Login queue alerts operate on aggregate exporter data only.
+rule_files:
+  - alerts.yaml
+evaluation_interval: 1s
+tests:
+  - name: feature_not_configured
+    interval: 1s
+    input_series: []
+    alert_rule_test:
+      - {eval_time: 45s, alertname: C01LoginQueueStatusUnavailable, exp_alerts: []}
+      - {eval_time: 45s, alertname: C01LoginQueueBacklog, exp_alerts: []}
+      - {eval_time: 45s, alertname: C01LoginQueueHeld, exp_alerts: []}
+      - {eval_time: 45s, alertname: C01LoginQueueCapacityPressure, exp_alerts: []}
+  - name: short_pressure_does_not_fire
+    interval: 1s
+    input_series:
+      - {series: 'secops_login_queue_bridge_enabled{job="zt-signals",instance="local"}', values: '1+0x45'}
+      - {series: 'secops_login_queue_status_success{job="zt-signals",instance="local"}', values: '1+0x45'}
+      - {series: 'secops_login_queue_pending_attention{job="zt-signals",instance="local"}', values: '1+0x15 0+0x29'}
+      - {series: 'secops_login_queue_held{job="zt-signals",instance="local"}', values: '1+0x15 0+0x29'}
+      - {series: 'secops_login_queue_capacity_pressure{job="zt-signals",instance="local"}', values: '1+0x15 0+0x29'}
+    alert_rule_test:
+      - {eval_time: 15s, alertname: C01LoginQueueBacklog, exp_alerts: []}
+      - {eval_time: 31s, alertname: C01LoginQueueBacklog, exp_alerts: []}
+      - {eval_time: 31s, alertname: C01LoginQueueHeld, exp_alerts: []}
+      - {eval_time: 31s, alertname: C01LoginQueueCapacityPressure, exp_alerts: []}
+  - name: stuck_queue_unavailable_report_and_recovery
+    interval: 1s
+    input_series:
+      - {series: 'secops_login_queue_bridge_enabled{job="zt-signals",instance="local"}', values: '1+0x79'}
+      - {series: 'secops_login_queue_status_success{job="zt-signals",instance="local"}', values: '1+0x34 0+0x34 1+0x9'}
+      - {series: 'secops_login_queue_pending_attention{job="zt-signals",instance="local"}', values: '1+0x69 0+0x9'}
+      - {series: 'secops_login_queue_held{job="zt-signals",instance="local"}', values: '6+0x69 0+0x9'}
+      - {series: 'secops_login_queue_capacity_pressure{job="zt-signals",instance="local"}', values: '1+0x69 0+0x9'}
+    alert_rule_test:
+      - {eval_time: 29s, alertname: C01LoginQueueBacklog, exp_alerts: []}
+      - eval_time: 30s
+        alertname: C01LoginQueueBacklog
+        exp_alerts:
+          - exp_labels: {job: zt-signals, instance: local, severity: warning}
+      - eval_time: 30s
+        alertname: C01LoginQueueHeld
+        exp_alerts:
+          - exp_labels: {job: zt-signals, instance: local, severity: warning}
+      - eval_time: 30s
+        alertname: C01LoginQueueCapacityPressure
+        exp_alerts:
+          - exp_labels: {job: zt-signals, instance: local, severity: warning}
+      - {eval_time: 40s, alertname: C01LoginQueueBacklog, exp_alerts: []}
+      - {eval_time: 40s, alertname: C01LoginQueueHeld, exp_alerts: []}
+      - {eval_time: 40s, alertname: C01LoginQueueCapacityPressure, exp_alerts: []}
+      - eval_time: 65s
+        alertname: C01LoginQueueStatusUnavailable
+        exp_alerts:
+          - exp_labels: {job: zt-signals, instance: local, severity: critical}
+      - {eval_time: 75s, alertname: C01LoginQueueStatusUnavailable, exp_alerts: []}
+      - {eval_time: 75s, alertname: C01LoginQueueBacklog, exp_alerts: []}
+      - {eval_time: 75s, alertname: C01LoginQueueHeld, exp_alerts: []}
+      - {eval_time: 75s, alertname: C01LoginQueueCapacityPressure, exp_alerts: []}

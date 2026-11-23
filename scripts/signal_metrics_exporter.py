@@ -151,6 +151,7 @@ def handler(
     bundle_profile=None,
     witness_profile=None,
     witness_restore_profile=None,
+    login_queue_profile=None,
 ):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *_):
@@ -202,6 +203,10 @@ def handler(
                 from scripts.f1_lab.witness_restore_status import metrics as witness_restore_metrics
 
                 body += witness_restore_metrics(witness_restore_profile).encode()
+            if login_queue_profile is not None:
+                from scripts.f1_lab.login_queue_status import metrics as login_queue_metrics
+
+                body += login_queue_metrics(login_queue_profile).encode()
             self.send_response(200)
             self.send_header("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
             self.send_header("Cache-Control", "no-store")
@@ -227,6 +232,7 @@ def main():
     parser.add_argument("--exec-bundle-profile", type=Path)
     parser.add_argument("--witness-observer-profile", type=Path)
     parser.add_argument("--witness-restore-profile", type=Path)
+    parser.add_argument("--login-queue-profile", type=Path)
     args = parser.parse_args()
     token = args.token_file.read_text(encoding="utf-8").strip()
     key = os.environ.get("C01_UPSTREAM_API_KEY", "")
@@ -269,6 +275,11 @@ def main():
         )
 
         witness_restore_profile = witness_restore_profile_loader(args.witness_restore_profile)
+    login_queue_profile = None
+    if args.login_queue_profile:
+        from scripts.f1_lab.login_queue_status import load_profile as login_queue_profile_loader
+
+        login_queue_profile = login_queue_profile_loader(args.login_queue_profile)
     service = handler(
         validate_upstream(args.upstream),
         key,
@@ -281,6 +292,7 @@ def main():
         bundle_profile,
         witness_profile,
         witness_restore_profile,
+        login_queue_profile,
     )
     if args.server_tls_profile:
         from scripts.mtls_native import NativeServer
