@@ -82,7 +82,23 @@ func clientFamily(value string) string {
 	return value
 }
 
-func project(in io.Reader, cohorts map[string]*cohort, probed map[string]bool, environment bool) error {
+func cohortName(bucket uint64, mode string) string {
+	if mode == "confirmation" {
+		if bucket < 20 {
+			return "confirmation"
+		}
+		return ""
+	}
+	if bucket >= 85 {
+		return "reviewed"
+	}
+	if mode == "environment" && bucket >= 70 {
+		return "holdout"
+	}
+	return ""
+}
+
+func project(in io.Reader, cohorts map[string]*cohort, probed map[string]bool, mode string) error {
 	csvDigest := sha256.New()
 	reader := csv.NewReader(io.TeeReader(in, csvDigest))
 	reader.ReuseRecord = true
@@ -102,12 +118,9 @@ func project(in io.Reader, cohorts map[string]*cohort, probed map[string]bool, e
 		ordinal++
 		userDigest := sha256.Sum256([]byte("rba-user:" + row[2]))
 		bucket := binary.BigEndian.Uint64(userDigest[:8]) % 100
-		if bucket < 70 || (bucket < 85 && !environment) {
+		name := cohortName(bucket, mode)
+		if name == "" {
 			continue
-		}
-		name := "reviewed"
-		if bucket < 85 {
-			name = "holdout"
 		}
 		output := cohorts[name]
 		user := hex.EncodeToString(userDigest[:])
@@ -134,7 +147,7 @@ func project(in io.Reader, cohorts map[string]*cohort, probed map[string]bool, e
 		if _, err := fmt.Fprintf(output.observations, "%d\t%s\t%s\t%s\t%c", ordinal, row[1], user, client, observed); err != nil {
 			return err
 		}
-		if environment {
+		if mode != "basic" {
 			if _, err := fmt.Fprintf(output.observations, "\t%s\t%s\t%s\t%s\t%s", featureKey(row[5]), featureKey(row[8]), featureKey(clientFamily(row[10])), featureKey(clientFamily(row[11])), featureKey(row[12])); err != nil {
 				return err
 			}
@@ -146,13 +159,16 @@ func project(in io.Reader, cohorts map[string]*cohort, probed map[string]bool, e
 			return err
 		}
 	}
-	if ordinal != 31269264 || cohorts["reviewed"].rows != 2575003 || (environment && cohorts["holdout"].rows != 2572078) || fmt.Sprintf("%x", csvDigest.Sum(nil)) != "001f3589595821519b53428aee656b4458e43d8f5b4b9beb6ec2bed8f2209067" {
+	if ordinal != 31269264 || fmt.Sprintf("%x", csvDigest.Sum(nil)) != "001f3589595821519b53428aee656b4458e43d8f5b4b9beb6ec2bed8f2209067" {
 		return fmt.Errorf("publisher CSV or reserved population differs")
+	}
+	if (mode != "confirmation" && cohorts["reviewed"].rows != 2575003) || (mode == "environment" && cohorts["holdout"].rows != 2572078) || (mode == "confirmation" && cohorts["confirmation"].rows == 0) {
+		return fmt.Errorf("unexpected selected population")
 	}
 	return nil
 }
 
-func run(archivePath, probePath, output string, environment bool) error {
+func run(archivePath, probePath, output string, mode string) error {
 	probe, err := probeReferences(probePath)
 	if err != nil {
 		return err
@@ -196,12 +212,15 @@ func run(archivePath, probePath, output string, environment bool) error {
 	}
 	cohorts := make(map[string]*cohort)
 	names := []string{"reviewed"}
-	if environment {
+	if mode == "environment" {
 		names = append(names, "holdout")
+	}
+	if mode == "confirmation" {
+		names = []string{"confirmation"}
 	}
 	for _, name := range names {
 		directory := output
-		if environment {
+		if mode != "basic" {
 			directory = filepath.Join(output, name)
 			if err := os.Mkdir(directory, 0700); err != nil {
 				return err
@@ -219,7 +238,7 @@ func run(archivePath, probePath, output string, environment bool) error {
 		defer truth.Close()
 		cohorts[name] = &cohort{observations: bufio.NewWriterSize(observations, 1<<18), truth: bufio.NewWriterSize(truth, 1<<18)}
 	}
-	if err := project(stream, cohorts, probe, environment); err != nil {
+	if err := project(stream, cohorts, probe, mode); err != nil {
 		return err
 	}
 	for _, result := range cohorts {
@@ -230,17 +249,33 @@ func run(archivePath, probePath, output string, environment bool) error {
 			return err
 		}
 	}
+	if mode == "confirmation" {
+		report, err := json.Marshal(map[string]any{"bucket_first": 0, "bucket_last": 19, "rows": cohorts["confirmation"].rows, "archive_sha256": archiveSHA, "probe_sha256": probeSHA})
+		if err != nil {
+			return err
+		}
+		if err := os.WriteFile(filepath.Join(output, "population.json"), report, 0600); err != nil {
+			return err
+		}
+	}
 	return os.WriteFile(filepath.Join(output, "completed"), []byte(archiveSHA+"\n"), 0600)
 }
 
 func main() {
 	environment := flag.Bool("environment", false, "include environment changes for reviewed and withheld users")
+	confirmation := flag.Bool("confirmation", false, "project untouched account buckets 0 through 19")
 	flag.Parse()
-	if flag.NArg() != 3 {
-		fmt.Fprintln(os.Stderr, "usage: go run main.go [--environment] <rba-zip> <probe-receipt> <new-output>")
+	if flag.NArg() != 3 || (*environment && *confirmation) {
+		fmt.Fprintln(os.Stderr, "usage: go run main.go [--environment | --confirmation] <rba-zip> <probe-receipt> <new-output>")
 		os.Exit(2)
 	}
-	if err := run(flag.Arg(0), flag.Arg(1), flag.Arg(2), *environment); err != nil {
+	mode := "basic"
+	if *environment {
+		mode = "environment"
+	} else if *confirmation {
+		mode = "confirmation"
+	}
+	if err := run(flag.Arg(0), flag.Arg(1), flag.Arg(2), mode); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

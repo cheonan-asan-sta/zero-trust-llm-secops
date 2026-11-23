@@ -54,40 +54,11 @@ def available_for_new_review(success, repeat, baseline):
     return success and not repeat and not baseline
 
 
-def capture(projection, output, cohort, frozen_path=None, expected_frozen=None):
-    if (projection / "completed").read_text(encoding="ascii").strip() != ARCHIVE_SHA:
-        raise ValueError("incomplete environment projection")
-    frozen = None
-    if cohort == "holdout":
-        if frozen_path is None or digest(frozen_path) != expected_frozen:
-            raise ValueError("holdout requires the frozen reviewed candidate")
-        frozen = read(frozen_path)["rule"]
-    elif frozen_path is not None or expected_frozen is not None:
-        raise ValueError("reviewed predictions do not use the held-out rule")
-    observed = projection / cohort / "observations.tsv"
-    observed_sha = digest(observed)
-    rows, accounts, _ = COHORTS[cohort]
+def observed_signals(observed, rows, accounts):
     attempts = AccountLoginHistory(max_accounts=accounts)
     environments = SuccessfulEnvironments()
-    output.mkdir()
-    plan, predictions = output / "plan.json", output / "predictions.tsv"
-    write(
-        plan,
-        {
-            "source_sha256": ARCHIVE_SHA,
-            "observation_sha256": observed_sha,
-            "cohort": cohort,
-            "rows": rows,
-            "accounts": accounts,
-            "history_limit": HISTORY_LIMIT,
-            "windows_minutes": WINDOW_MINUTES,
-            "frozen_candidate_sha256": expected_frozen,
-            "rule": frozen,
-            "truth_read_by_capture": False,
-        },
-    )
     last_time = last_ordinal = number = 0
-    with observed.open("rb") as stream, predictions.open("xb") as saved:
+    with observed.open("rb") as stream:
         for number, raw in enumerate(stream, 1):
             ordinal, stamp, account, address, outcome, *client = raw.rstrip(b"\n").split(b"\t")
             moment = (datetime.fromisoformat(stamp.decode("ascii")) - BASE_TIME) // MILLISECOND
@@ -109,6 +80,45 @@ def capture(projection, output, cohort, frozen_path=None, expected_frozen=None):
                 if success
                 else (0, len(WINDOW_MINUTES))
             )
+            yield ordinal, success, repeated, baseline, flags, delay
+    if number != rows or attempts.account_count != accounts:
+        raise ValueError("unexpected environment evaluation population")
+
+
+def capture(projection, output, cohort, frozen_path=None, expected_frozen=None):
+    if (projection / "completed").read_text(encoding="ascii").strip() != ARCHIVE_SHA:
+        raise ValueError("incomplete environment projection")
+    frozen = None
+    if cohort == "holdout":
+        if frozen_path is None or digest(frozen_path) != expected_frozen:
+            raise ValueError("holdout requires the frozen reviewed candidate")
+        frozen = read(frozen_path)["rule"]
+    elif frozen_path is not None or expected_frozen is not None:
+        raise ValueError("reviewed predictions do not use the held-out rule")
+    observed = projection / cohort / "observations.tsv"
+    observed_sha = digest(observed)
+    rows, accounts, _ = COHORTS[cohort]
+    output.mkdir()
+    plan, predictions = output / "plan.json", output / "predictions.tsv"
+    write(
+        plan,
+        {
+            "source_sha256": ARCHIVE_SHA,
+            "observation_sha256": observed_sha,
+            "cohort": cohort,
+            "rows": rows,
+            "accounts": accounts,
+            "history_limit": HISTORY_LIMIT,
+            "windows_minutes": WINDOW_MINUTES,
+            "frozen_candidate_sha256": expected_frozen,
+            "rule": frozen,
+            "truth_read_by_capture": False,
+        },
+    )
+    with predictions.open("xb") as saved:
+        for ordinal, success, repeated, baseline, flags, delay in observed_signals(
+            observed, rows, accounts
+        ):
             alert = baseline or (
                 available_for_new_review(success, repeated, baseline)
                 and matches(frozen, flags, delay)
@@ -117,7 +127,7 @@ def capture(projection, output, cohort, frozen_path=None, expected_frozen=None):
                 b"%s\t%d\t%d\t%d\t%d\t%d\t%d\n"
                 % (ordinal, success, repeated, baseline, flags, delay, alert)
             )
-    if number != rows or attempts.account_count != accounts or digest(observed) != observed_sha:
+    if digest(observed) != observed_sha:
         raise ValueError("unexpected environment evaluation population")
     write(
         output / "seal.json",

@@ -26,6 +26,7 @@ from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_rou
 from app.zero_trust_models import ProtectedAccessRequest, SignedSessionSignal
 from scripts import local_oidc_redirect_lab
 from scripts.evaluate_local_remote_holdout import write
+from scripts.f1_lab.ato_triage import Factor, Takeover, assess_login
 from scripts.keycloak_live_authority import KeycloakLiveAuthority
 from scripts.local_keycloak_evidence_collector import LocalKeycloakEvidenceCollector
 from scripts.local_keycloak_login_history import fetch_login_history
@@ -313,6 +314,18 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
             assert login_history["baseline_repeated_failure_warning"] is True
             assert login_history["candidate_repeated_failure_warning"] is False
             assert login_history["candidate_with_independent_hard_alert"] is True
+            assert redirect_signin.signal.event.auth_context.mfa == "success"
+            verified_otp_with_change = assess_login(
+                warning=login_history["candidate_repeated_failure_warning"],
+                success=login_history["verified_session_match"],
+                environment_change=True,
+                factor=Factor.VERIFIED,
+            )
+            provider_error = wrong_otp.signal.event.auth_context
+            assert provider_error.authentication_result == "failure" and provider_error.mfa == "unknown"
+            failed_login = assess_login(warning=True, success=False, environment_change=True)
+            assert verified_otp_with_change.takeover is Takeover.REVIEW
+            assert failed_login.repeated_failure_warning and failed_login.takeover is Takeover.NO_SIGNAL
             redirect_tokens = redirect_signin.response.json()
             redirect_caller = headers(redirect_tokens["id_token"])
             redirect_session, redirect_alert = evaluate(redirect_signin)
@@ -454,6 +467,13 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
         },
         "authority_mode": "read-only provider checks on each request",
         "login_history_review": login_history,
+        "account_takeover_triage": {
+            "environment_change_is_controlled_input": True,
+            "verified_otp_with_unknown_device": verified_otp_with_change.takeover.value,
+            "ambiguous_provider_error_factor": provider_error.mfa,
+            "failed_login_retained_warning": failed_login.repeated_failure_warning,
+            "failed_login_takeover": failed_login.takeover.value,
+        },
         "manual_revocation_file": False,
         "finished_at": datetime.now(UTC).isoformat(),
         "paid_api_calls": 0,

@@ -54,3 +54,5 @@ python -m scripts.evaluate_rba_login_environment <projection> <holdout-output> h
 ```
 
 로컬 회귀 34개, Ruff, Go 빌드를 통과했다. 유료 API·AWS 호출·병합은 0회다. [집계와 봉인 SHA-256](infrastructure-results/rba-login-environment-20261123.json)
+
+[후속 반복 실패·ATO 검토 분리](extra-rba-ato-separation-20261123.md)에서 새 계정군의 오탐 감소와 우선 검토 재현율의 변화를 별도로 측정했다.
