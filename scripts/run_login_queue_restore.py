@@ -13,12 +13,14 @@ from contextlib import closing, contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from time import monotonic, sleep
+from unittest.mock import patch
 
 import httpx
 
 from app import config, login_queue_api, security
 from app.config import Settings
 from app.services.sqlite_audit import SQLiteAuditStore
+from scripts import login_queue_backup
 from scripts.evaluate_local_remote_holdout import write
 from scripts.f1_lab.native_bayes import counts, metrics, record
 from scripts.keycloak_login_evidence import KeycloakLoginAnalysisCollector
@@ -156,14 +158,72 @@ def approval(reviewer, review, event_id):
     }, json={"event_id": event_id, "hold_id": row["hold_id"], "note": "로컬 복구 확인"})
 
 
-def exercise(root):
+def online_restore_fixture(source, backup, collector, api, outcomes, unconfirmed, queued):
+    from scripts.f1_lab.capture_backup import fresh_file, sha
+
+    scope = {"origin": str(api.base_url), "tenant_id": TENANT, "collector_subject": COLLECTOR}
+    key_file = backup / "key"
+    fresh_file(key_file, secrets.token_bytes(32))
+    producer = login_queue_backup.copy_database
+    for name in (QUEUE, AUDIT):
+        with closing(sqlite3.connect(source / name)) as active:
+            assert active.execute("PRAGMA journal_mode=WAL").fetchone() == ("wal",)
+
+    def copy_during_writes(src, target):
+        producer(src, target)
+        if src != source / QUEUE:
+            return
+        # Interleave writes while the real API and collector are still live,
+        # after the queue image has cut but before the audit image starts.
+        outcomes[unconfirmed.event_id] = outcomes[queued.event_id] = "ready"
+        deadline = monotonic() + 6
+        with collector.replaying(interval=0.05):
+            while collector.spool.counts()["pending"] and monotonic() < deadline:
+                sleep(0.05)
+        assert collector.spool.counts() == {"held": 1, "pending": 0}
+        assert SQLiteAuditStore.open_existing(source / AUDIT).integrity()["verified_lines"] == 7
+
+    document = backup / "online-backup.bin"
+    with patch.object(login_queue_backup, "copy_database", copy_during_writes):
+        summary = login_queue_backup.backup(source / QUEUE, source / AUDIT, document, key_file, **scope)
+    package_pin = summary["package_sha256"]
+    assert b"SQLite format 3" not in document.read_bytes()
+    corrupt = backup / "bad-authentication.bin"
+    raw = document.read_bytes()
+    wrong = raw[:-1] + bytes([raw[-1] ^ 1])
+    fresh_file(corrupt, wrong)
+    rejected = backup / "invalid-target"
+    for candidate, pin, binding in (
+        (document, "0" * 64, scope), (corrupt, sha(wrong), scope),
+        (document, package_pin, {**scope, "tenant_id": "another-tenant"}),
+    ):
+        try:
+            login_queue_backup.restore(candidate, pin, rejected, key_file, **binding)
+        except ValueError:
+            assert not rejected.exists()
+        else:
+            raise AssertionError("An invalid online package was accepted")
+    with TemporaryDirectory(dir=backup) as temporary:
+        mismatched = Path(temporary)
+        producer(source / QUEUE, mismatched / QUEUE)
+        SQLiteAuditStore(mismatched / AUDIT)
+        try:
+            login_queue_backup.validate_pair(mismatched, **scope)
+        except ValueError as error:
+            assert "completion has no matching analysis audit" in str(error)
+        else:
+            raise AssertionError("A newer queue and older audit formed an invalid pair")
+    return document, package_pin, key_file, scope
+
+
+def exercise(root, *, online=False):
     keys = (secrets.token_urlsafe(32), secrets.token_urlsafe(32))
     with socket.socket() as reservation:
         reservation.bind(("127.0.0.1", 0))
         port = reservation.getsockname()[1]
 
     backup = root / "snapshot"
-    backup.mkdir()
+    backup.mkdir(mode=0o700)
     cases = list(events(4))
     completed, unconfirmed, held, queued = (event for event, _ in cases)
     outcomes = {event.event_id: "hold" for event in (completed, unconfirmed, held)}
@@ -172,7 +232,6 @@ def exercise(root):
     before, after = counts(), counts()
     state_counts = {"held": 1, "pending": 2}
 
-    # Both writers are stopped before forming this pair of SQLite backup files.
     with TemporaryDirectory(prefix="original-", dir=root) as original:
         source = Path(original)
         with service(source, port, *keys) as (api, reviewer, original_pid):
@@ -223,25 +282,42 @@ def exercise(root):
                 prior = next(row for row in original_view["review"]["history"] if row["outcome"] == "delivered")
                 original_detail = reviewer.get(f"/dashboard/login-queue/deliveries/{prior['analysis_id']}")
                 original_detail.raise_for_status()
+                if online:
+                    package = online_restore_fixture(source, backup, collector, api, outcomes, unconfirmed, queued)
 
-        fingerprints = snapshot_pair(source, backup)
+        if not online:
+            fingerprints = snapshot_pair(source, backup)
 
     assert not source.exists()
     restored = root / "restored"
-    restored.mkdir()
-    try:
-        restore_pair(backup, restored, {**fingerprints, AUDIT: "0" * 64})
-    except ValueError:
-        assert not any(restored.iterdir())
+    if online:
+        document, package_pin, key_file, scope = package
+        restored_package = login_queue_backup.restore(document, package_pin, restored, key_file, **scope)
+        assert restored_package["restored_databases"] == 2
+        assert (restored / "RESTORE_READY").read_text(encoding="ascii").strip() == package_pin
+        try:
+            login_queue_backup.restore(document, package_pin, restored, key_file, **scope)
+        except FileExistsError:
+            assert (restored / "RESTORE_READY").read_text(encoding="ascii").strip() == package_pin
+        else:
+            raise AssertionError("An existing restore candidate was replaced")
     else:
-        raise AssertionError("Invalid audit digest was accepted")
-    restore_pair(backup, restored, fingerprints)
+        restored.mkdir()
+        try:
+            restore_pair(backup, restored, {**fingerprints, AUDIT: "0" * 64})
+        except ValueError:
+            assert not any(restored.iterdir())
+        else:
+            raise AssertionError("Invalid audit digest was accepted")
+        restore_pair(backup, restored, fingerprints)
     with service(restored, port, *keys) as (api, reviewer, restored_pid):
         assert original_pid != restored_pid
         collector = sender(api, restored)
         audit = SQLiteAuditStore(restored / AUDIT)
         restored_view = view(reviewer)
-        assert collector.spool.counts() == state_counts and audit.integrity() == original_audit
+        restored_audit_rows = original_audit["verified_lines"] + int(online)
+        assert collector.spool.counts() == state_counts
+        assert audit.integrity() == {**original_audit, "verified_lines": restored_audit_rows}
         assert restored_view["queue"] == original_view["queue"]
         assert restored_view["review"]["history"] == original_view["review"]["history"]
         assert restored_view["review"]["held"][0]["hold_id"] == original_view["review"]["held"][0]["hold_id"]
@@ -254,6 +330,8 @@ def exercise(root):
             while collector.spool.counts()["pending"] and monotonic() < deadline:
                 sleep(0.05)
             assert collector.spool.counts() == {"held": 1, "pending": 0}
+            if online:
+                assert audit.integrity()["verified_lines"] == restored_audit_rows
             remaining = view(reviewer)["review"]
             response = approval(reviewer, remaining, held.event_id)
             assert response.status_code == 200 and not response.json()["duplicate"]
@@ -284,9 +362,18 @@ def exercise(root):
         "source_files_absent": True,
         "snapshot_sqlite_quick_check_passed": 2,
         "mismatched_snapshot_blocked_before_restore": True,
-        "snapshot_hashes": fingerprints,
+        **({
+            "online_encrypted_package_sha256": package[1],
+            "wal_sources_copied_as_standalone_databases": True,
+            "live_audit_commit_between_queue_and_audit_copies": True,
+            "between_copy_commit_reused_without_new_audit": True,
+            "wrong_pin_modified_ciphertext_wrong_scope_rejected": True,
+            "newer_queue_with_older_audit_rejected": True,
+            "restore_ready_only_for_valid_pair": True,
+            "existing_restore_candidate_not_replaced": True,
+        } if online else {"snapshot_hashes": fingerprints}),
         "initial_queue_counts": state_counts,
-        "pre_restore_audit_records_including_baselines": 6,
+        "pre_restore_audit_records_including_baselines": restored_audit_rows,
         "final_audit_records_including_baselines": 8,
         "restored_delivery_records": 4,
         "restored_prior_audit_detail_matched": True,
@@ -304,6 +391,7 @@ def exercise(root):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=Path, nargs="?")
+    parser.add_argument("--online", action="store_true", help="verify the authenticated online backup and restore")
     parser.add_argument("--serve-fixture", nargs=2, metavar=("DIRECTORY", "PORT"), help=argparse.SUPPRESS)
     args = parser.parse_args()
     if args.serve_fixture:
@@ -313,7 +401,7 @@ def main():
     if args.output is None:
         parser.error("output is required")
     with TemporaryDirectory(prefix="zt-login-restore-") as temporary:
-        report = exercise(Path(temporary))
+        report = exercise(Path(temporary), online=args.online)
     write(args.output, report)
     print(json.dumps(report))
 

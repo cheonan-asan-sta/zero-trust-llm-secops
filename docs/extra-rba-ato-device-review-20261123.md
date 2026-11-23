@@ -330,3 +330,21 @@ Windows와 로컬 Linux Docker에서 같은 시험을 실행했다. 각 실행�
 ```powershell
 python -m scripts.run_login_queue_restore runtime/local-login-queue-isolated-restore.json
 ```
+
+## 운영 중 대기열·감사 DB 암호화 백업
+
+Linux에서 `scripts.login_queue_backup` 명령으로 수집기와 API를 실행한 상태에서 두 SQLite DB를 복제한다. 수집기는 분석 결과가 감사 DB에 확정된 뒤 대기열에서 완료 처리한다. 이 순서에 맞춰 **대기열을 먼저 복제하고 감사 DB를 나중에 복제**한다. 두 복제 사이에 이미 분석된 대기 항목은 복원 후 기존 결과를 재사용한다. 완료 이력이 참조하는 분석 원본, 감사 해시 체인, 남은 이벤트의 범위와 본문 지문이 일치할 때만 백업을 발행한다.
+
+두 DB는 하나의 AES-256-GCM 암호문으로 보관하고, 복원 때 외부에 보존한 패키지 SHA-256과 인증 태그, 원래 분석 주소·테넌트·수집기 범위를 검증한다. 운영 계정만 접근하는 Linux 디렉터리 `0700`과 별도 32바이트 키 파일 `0600`을 사용한다. 현재 명령은 SQLite 원본당 64MiB까지 지원하며, 감사 DB 파일에 포함된 전체 기록을 패키지로 묶으므로 해당 파일을 읽을 권한이 있는 운영 계정에서 사용한다. 복원 목적지는 새 디렉터리로 지정한다. 두 DB를 확인하고 마지막에 `RESTORE_READY`를 남긴다.
+
+대기열 복제 이후 들어오고 감사 DB에도 확정되지 않은 이벤트는 다음 백업 범위다. 수집기의 운영 프로필을 새 경로로 전환하거나 서비스를 시작하는 일은 승인 후 별도로 진행한다. 기존 송신기를 중단하는 절차와 호스트 자동 전환 시험은 남아 있다. 암호화 키는 패키지와 분리해서 보관한다.
+
+```bash
+python -m scripts.login_queue_backup backup /path/login-queue.sqlite3 /path/analysis-audit.sqlite3 /private/login-backup.bin --key-file /private/key --origin http://127.0.0.1:8000 --tenant-id local --collector-subject keycloak-login-collector
+python -m scripts.login_queue_backup restore /private/login-backup.bin <package-sha256> /private/restore-candidate --key-file /private/key --origin http://127.0.0.1:8000 --tenant-id local --collector-subject keycloak-login-collector
+python -m scripts.run_login_queue_restore /private/online-restore-result.json --online
+```
+
+로컬 Linux Docker에서 두 WAL DB를 복제하는 사이 실제 수집기와 API가 대기 2건을 처리하도록 했다. 그중 1건은 그 시점에 새로 감사 기록이 확정됐다. 원본 시험 폴더를 제거한 뒤 새 프로세스에서 복원하자 두 대기 이벤트가 기존 분석을 재사용했고, 남은 보류 건은 새 승인을 받은 뒤 처리됐다. 패키지 지문 오류, 재해시한 변조 암호문, 다른 범위, 최신 큐와 오래된 감사 DB 조합을 거부했다. 기존 복원 후보도 덮어쓰지 않았다. 첫 시험에서 패키지 시험 폴더를 `0700`으로 생성하도록 고친 뒤 다시 실행했다.
+
+같은 통제 사례 4건에서 위협 탐지 **2/2**, 정상 오탐 **0/2**, 중복 분석·감사 기록 **0건**이었다. 이전 Windows 오프라인 복원과 Linux 회귀 41개를 다시 통과했고 AWS와 유료 API 호출은 0회였다. [온라인 백업·복원 결과](infrastructure-results/local-login-queue-online-backup-20261123.json)
