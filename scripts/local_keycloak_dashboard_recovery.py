@@ -1,0 +1,389 @@
+"""Exercise a real held Keycloak login queue from Prometheus to operator replay."""
+
+import hashlib
+import json
+import re
+import secrets
+import socket
+import subprocess
+from contextlib import ExitStack, contextmanager
+from datetime import UTC, datetime
+from http.server import ThreadingHTTPServer
+from pathlib import Path
+from threading import Event, Thread
+from time import monotonic, sleep
+from unittest.mock import patch
+from uuid import uuid4
+
+import httpx
+
+from app.services.login_delivery import LoginDeliveryIdentity
+from app.services.sqlite_audit import SQLiteAuditStore
+from app.zero_trust_models import LoginDeliveryRequest
+from scripts.evaluate_local_remote_holdout import write
+from scripts.f1_lab.login_queue_status import PROFILE_SCHEMA, publish_queue_status
+from scripts.f1_lab.native_bayes import counts, metrics, record
+from scripts.mtls_transport import Quiet
+from scripts.signal_metrics_exporter import handler as metrics_handler
+
+MONITOR_IMAGE = "c03-f67136ddf24a-monitoring:latest"
+TARGET = "127.0.0.1:9101"
+ALERT = "C01LoginQueueHeld"
+REVIEWER = "fixture-queue-reviewer"
+NOTE = "분석 경로 복구 확인"
+FIELDS = ("detection", "assessment", "policy_decision", "review_status", "verified_login_detection")
+
+
+@contextmanager
+def serve(handler):
+    with ThreadingHTTPServer(("127.0.0.1", 0), handler) as server:
+        worker = Thread(target=server.serve_forever, daemon=True)
+        worker.start()
+        try:
+            yield f"http://127.0.0.1:{server.server_port}"
+        finally:
+            server.shutdown()
+            worker.join()
+
+
+def need(check, label, *, seconds=16):
+    deadline = monotonic() + seconds
+    while monotonic() < deadline:
+        try:
+            if value := check():
+                return value
+        except (httpx.TransportError, OSError):
+            pass
+        sleep(0.2)
+    raise AssertionError(label)
+
+
+def docker(*args):
+    return subprocess.run(["docker", *args], check=True, capture_output=True, text=True, timeout=35).stdout.strip()
+
+
+def run_monitor():
+    """Inside Docker, publish the host's aggregate through the real POSIX bridge."""
+    root = Path("/tmp/login-dashboard-monitor")
+    root.mkdir(mode=0o700)
+    feed_config = json.loads(Path("/feed/scope.json").read_bytes())
+    snapshot_file = Path("/feed/snapshot.json")
+    public_file = root / "public-login-queue.json"
+
+    class Feed:
+        status_scope_sha256 = feed_config["scope_sha256"]
+
+        @staticmethod
+        def status_snapshot():
+            return json.loads(snapshot_file.read_bytes())
+
+    token = secrets.token_urlsafe(32)
+    (root / "scrape-token").write_text(token, encoding="utf-8")
+    write(root / "prometheus.json", {
+        "global": {"scrape_interval": "1s", "evaluation_interval": "1s"},
+        "rule_files": ["/repo/infra/observability/alerts.yaml"],
+        "scrape_configs": [{
+            "job_name": "zt-signals",
+            "authorization": {"type": "Bearer", "credentials_file": str(root / "scrape-token")},
+            "static_configs": [{"targets": [TARGET]}],
+        }],
+    })
+    exporter = metrics_handler(
+        "http://127.0.0.1:1/zero-trust/signals/inbox", "unused-local", token,
+        login_queue_profile=feed_config | {
+            "schema": PROFILE_SCHEMA, "status_file": str(public_file),
+            "max_pending_age_seconds": 120, "capacity_warning_records": 8000,
+        },
+    )
+    with ThreadingHTTPServer(("127.0.0.1", 9101), exporter) as server:
+        Thread(target=server.serve_forever, daemon=True).start()
+        with subprocess.Popen([
+            "/tools/prometheus", f"--config.file={root / 'prometheus.json'}", f"--storage.tsdb.path={root / 'tsdb'}",
+            "--web.listen-address=0.0.0.0:9090", "--log.level=warn",
+        ]) as prometheus:
+            try:
+                while prometheus.poll() is None:
+                    publish_queue_status(Feed(), public_file)
+                    sleep(1)
+                raise RuntimeError("Local Prometheus stopped")
+            finally:
+                prometheus.terminate()
+                server.shutdown()
+
+
+@contextmanager
+def monitoring(feed, spool):
+    feed.mkdir()
+    write(feed / "scope.json", {"scope_sha256": spool.status_scope_sha256})
+    stop = Event()
+    errors = []
+
+    def publish_summary():
+        while not stop.is_set():
+            try:
+                staged = feed / "snapshot.new"
+                staged.write_text(json.dumps(spool.status_snapshot()), encoding="utf-8")
+                staged.replace(feed / "snapshot.json")
+            except OSError as error:
+                errors.append(type(error).__name__)
+            stop.wait(0.5)
+
+    publisher = Thread(target=publish_summary, daemon=True)
+    publisher.start()
+    name = "zt-login-dashboard-" + uuid4().hex[:12]
+    try:
+        docker(
+            "run", "-d", "--rm", "--pull=never", "--name", name,
+            "--publish", "127.0.0.1::9090",
+            "--mount", f"type=bind,source={Path(__file__).resolve().parents[1]},target=/repo,readonly",
+            "--mount", f"type=bind,source={feed},target=/feed,readonly",
+            "--workdir", "/tmp", "--env", "PYTHONPATH=/repo", "--env", "PYTHONDONTWRITEBYTECODE=1",
+            "--entrypoint", "python", MONITOR_IMAGE, "-c",
+            "from scripts.local_keycloak_dashboard_recovery import run_monitor; run_monitor()",
+        )
+        address = docker("port", name, "9090/tcp")
+        if not re.fullmatch(r"127\.0\.0\.1:\d{1,5}", address):
+            raise AssertionError("Unexpected local Prometheus endpoint")
+        with httpx.Client(base_url=f"http://{address}", trust_env=False, timeout=1) as client:
+            need(lambda: client.get("/-/ready").is_success, "Prometheus readiness", seconds=25)
+            yield str(client.base_url)
+            assert not errors, errors
+    finally:
+        stop.set()
+        publisher.join()
+        if name in docker("ps", "--format", "{{.Names}}").splitlines():
+            docker("stop", "--time", "5", name)
+
+
+@contextmanager
+def dashboard_page(browser, base, key):
+    if browser is None:
+        yield None
+        return
+    from playwright.sync_api import expect, sync_playwright
+
+    with sync_playwright() as playwright:
+        chrome = playwright.chromium.launch(executable_path=str(browser), args=["--disable-background-networking"])
+        try:
+            page = chrome.new_page(viewport={"width": 1440, "height": 1000})
+            errors = []
+            page.on("pageerror", lambda error: errors.append(str(error)))
+            page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(base + "/") else route.abort())
+            page.goto(base + "/#evidence")
+            page.locator("#autoRefresh").uncheck()
+            page.locator("#connectionButton").click()
+            page.locator("#credentialType").select_option("api_key")
+            page.locator("#credential").fill(key)
+            page.get_by_role("button", name="적용하고 조회").click()
+            expect(page.locator("#loginQueueRefresh")).to_be_enabled(timeout=15000)
+            yield page
+            assert not errors, errors
+        finally:
+            chrome.close()
+
+
+def approve(reviewer, review, row, page):
+    headers = {"If-Match": row["etag"], "X-Review-Identity": review["identity"]}
+    body = {"event_id": row["event_id"], "hold_id": row["hold_id"], "note": NOTE}
+    route = "/dashboard/login-queue/approvals"
+    if page is None:
+        response = reviewer.post(route, headers=headers, json=body)
+        response.raise_for_status()
+        first = response.json()
+    else:
+        action = page.get_by_role("button", name=row["event_id"] + " 보류 검토", exact=True)
+        action.click()
+        cause = "HTTP 503" if row["http_status"] == 503 else "전송 중 연결 중단"
+        assert cause in page.locator("#loginQueueSelected").inner_text()
+        page.locator("#loginQueueNote").fill(NOTE)
+        with page.expect_response(lambda response: response.url.endswith(route) and response.request.method == "POST") as submitted:
+            page.locator("#loginQueueApprove").click()
+        assert submitted.value.status == 200, submitted.value.text()
+        first = submitted.value.json()
+    assert first == {"approval_id": row["hold_id"], "duplicate": False}
+    replay = reviewer.post(route, headers=headers, json=body)
+    replay.raise_for_status()
+    assert replay.json() == {"approval_id": row["hold_id"], "duplicate": True}
+
+
+def exercise(root, *, cases, analysis_api, settings, audit, analysis_runs, start_collector, submit_login, browser):
+    from app import login_queue_api, main
+
+    root.mkdir()
+    fault = "unavailable"
+    lost = []
+    baselines = SQLiteAuditStore(root / "baseline.sqlite3")
+    operator_key = secrets.token_urlsafe(32)
+    accounts = root / "dashboard-accounts.json"
+    write(accounts, {"schema": "api-key-accounts-1", "accounts": [{
+        "sha256": hashlib.sha256(operator_key.encode()).hexdigest(), "tenant_id": settings.api_key_tenant_id,
+        "subject": REVIEWER, "roles": ["responder"],
+    }]})
+
+    class FaultProxy(Quiet):
+        def do_POST(self):
+            assert self.path == "/analysis/login-delivery"
+            raw = self.rfile.read(int(self.headers["Content-Length"]))
+            if fault == "unavailable":
+                self.reply(503)
+                return
+            answer = analysis_api.post(self.path, content=raw, headers={
+                "Content-Type": "application/json", "X-API-Key": self.headers.get("X-API-Key", ""),
+            })
+            if fault == "restored":
+                self.reply(answer.status_code, answer.content)
+                return
+            answer.raise_for_status()
+            lost.append(answer.json()["duplicate"])
+            self.connection.shutdown(socket.SHUT_WR)
+            self.close_connection = True
+
+    def dashboard(reviewer):
+        view = reviewer.get("/dashboard/login-queue")
+        view.raise_for_status()
+        return view.json()
+
+    observations = []
+    with ExitStack() as stack:
+        origin = stack.enter_context(serve(FaultProxy))
+        client = stack.enter_context(httpx.Client(
+            base_url=origin, trust_env=False, timeout=8, headers={"X-API-Key": analysis_api.headers["X-API-Key"]},
+        ))
+        collector = start_collector(client, root / "queue.sqlite3")
+        queue = collector.spool
+        monitor = stack.enter_context(monitoring(root / "feed", queue))
+        profile = root / "dashboard-profile.json"
+        write(profile, {
+            "queue_file": str(queue.path), "analysis_origin": str(client.base_url),
+            "tenant_id": queue.tenant_id, "collector_subject": queue.collector_subject,
+            "prometheus_origin": monitor, "scrape_instance": TARGET,
+        })
+        stack.enter_context(patch.object(settings, "api_key_accounts_path", accounts))
+        stack.enter_context(patch.object(settings, "dashboard_login_queue_profile", profile))
+        stack.enter_context(patch.object(login_queue_api, "get_settings", return_value=settings))
+        reviewer = stack.enter_context(httpx.Client(
+            base_url=analysis_api.base_url, trust_env=False, headers={"X-API-Key": operator_key}, timeout=8,
+        ))
+        writes_before = audit.integrity()["verified_lines"]
+        records = []
+        for index, case in enumerate(cases):
+            committed = index == len(cases) - 1
+            if committed:
+                # The last login commits at the analysis service, but its proxy drops the receipt.
+                fault = "drop_receipt"
+            event = submit_login(case, committed=committed)
+            with queue._transaction(read_only=True) as con:
+                raw, = con.execute("SELECT payload FROM login_queue WHERE event_id=?", (event.event_id,)).fetchone()
+            body = LoginDeliveryRequest.model_validate_json(raw)
+            assert body.evidence is not None
+            # Compare the same signed input to both healthy paths using a separate DB.
+            prior_runs = analysis_runs[event.event_id]
+            with patch.object(main, "audit_store", baselines):
+                fresh = analysis_api.post("/analysis/verified-login", json={
+                    "event": event.analysis_payload(), "evidence": body.evidence.model_dump(mode="json"),
+                })
+                basic = analysis_api.post("/analysis", json=event.analysis_payload())
+                fresh.raise_for_status()
+                basic.raise_for_status()
+            analysis_runs[event.event_id] = prior_runs
+            records.append((case, body, committed, fresh.json(), basic.json()))
+            with collector.replaying(interval=0.05):
+                expected_queue = {"pending": 0, "held": index + 1}
+                need(lambda expected=expected_queue: queue.counts() == expected, f"Login did not reach hold: {case.name}")
+            sleep(collector.retry_policy.max_delay + 0.05)
+
+        stack.enter_context(collector.replaying(interval=0.05))
+        need(lambda: queue.counts() == {"pending": 0, "held": len(records)}, "All login attempts held")
+        assert audit.integrity()["verified_lines"] == writes_before + 1
+        print("Keycloak OTP logins reached hold; waiting for the real 30-second Prometheus alert.", flush=True)
+
+        def held_alert():
+            view = dashboard(reviewer)
+            expected = {"name": ALERT, "state": "firing"}
+            return view["review"] if expected in view["alerts"]["entries"] else None
+
+        review = need(held_alert, "Dashboard did not see a firing held-login alert", seconds=48)
+        assert len(review["held"]) == len(records)
+        assert {row["failure_code"] for row in review["held"]} == {"http_503", "transport_interrupted"}
+        assert all(row["attempts"] == 2 for row in review["held"])
+        assert len(review["history"]) == 0
+        assert all(row["hold_id"] and row["etag"] for row in review["held"])
+        assert all(row["http_status"] in {503, None} for row in review["held"])
+        assert lost == [False, True]
+        last_expiry = max(body.evidence.expires_at for _, body, *_ in records)
+        need(lambda: last_expiry <= datetime.now(UTC), "Held login evidence did not reach real expiry", seconds=32)
+        print("Dashboard read the firing alert; restoring the analysis route and approving held events.", flush=True)
+        with dashboard_page(browser, str(analysis_api.base_url).rstrip("/"), operator_key) as page:
+            if page:
+                from playwright.sync_api import expect
+
+                expect(page.locator("#loginQueueAlerts")).to_contain_text("보류 항목 확인 필요 · 발화 중")
+            fault = "restored"
+            sleep(0.5)
+            assert queue.counts()["held"] == len(records), "API recovery bypassed the operator hold"
+            for row in review["held"]:
+                approve(reviewer, review, row, page)
+                if page:
+                    expect(page.locator("#loginQueueStatus")).to_contain_text("승인을 기록하고")
+            need(lambda: queue.counts() == {"pending": 0, "held": 0}, "Approved login queue did not drain")
+            if page:
+                page.locator("#loginQueueRefresh").click()
+                expect(page.locator("#loginQueueHistoryRows")).to_contain_text("분석 결과 확인")
+            def alert_cleared():
+                status = dashboard(reviewer)["alerts"]
+                return status["state"] == "ready" and not any(item["name"] == ALERT for item in status["entries"])
+
+            need(alert_cleared, "Held-login alert did not clear")
+
+        history = dashboard(reviewer)["review"]["history"]
+        assert len(history) == 2 * len(records)
+        classified_fresh, classified_after = counts(), counts()
+        for case, body, committed, fresh, basic in records:
+            event_id = body.event.event_id
+            verify = analysis_api.post("/analysis/login-delivery", json=body.model_dump(mode="json"))
+            verify.raise_for_status()
+            receipt = verify.json()
+            assert receipt["duplicate"]
+            assert receipt["evidence_state"] == ("verified" if committed else "expired")
+            saved = audit.login_delivery(LoginDeliveryIdentity.from_request(body).analysis_id)
+            outcome = receipt["result"]
+            assert outcome == saved.model_dump(mode="json")
+            assert analysis_runs[event_id] == 1, (case.name, analysis_runs[event_id])
+            assert outcome["detection"] == fresh["detection"] == basic["detection"]
+            reference = fresh if committed else basic
+            assert all(outcome.get(field) == reference.get(field) for field in FIELDS), case.name
+            matched_history = [item for item in history if item["event_id"] == event_id]
+            assert [item["outcome"] for item in matched_history] == ["delivered", "approved"]
+            delivery, approval = matched_history
+            assert delivery["analysis_id"] == outcome["analysis_id"] and delivery["duplicate"] is committed
+            assert approval["actor"] == REVIEWER and approval["note"] == NOTE
+            expected_fresh = fresh["policy_decision"]["requires_human_review"]
+            actual = outcome["policy_decision"]["requires_human_review"]
+            assert expected_fresh == case.priority
+            assert actual == (case.priority and case.name != "dashboard_outage_device_only")
+            record(classified_fresh, case.priority, expected_fresh)
+            record(classified_after, case.priority, actual)
+            observations.append({
+                "case": case.name, "expected_priority": case.priority, "fresh_priority": expected_fresh,
+                "after_priority": actual, "evidence_state": receipt["evidence_state"],
+                "held_cause": approval["failure_code"], "worker_reused_committed_result": delivery["duplicate"],
+                "analysis_runs": analysis_runs[event_id], "analysis_audit_rows": 1, "approval_history_rows": len(matched_history),
+                "sigma_equal": True, "result_matches_applicable_baseline": True,
+            })
+        assert audit.integrity()["verified_lines"] == writes_before + len(records)
+
+    return {
+        "keycloak_mfa_and_mtls": len(observations),
+        "held_alert_fired_and_cleared": ALERT,
+        "prometheus_read_as_dashboard_reviewer": True,
+        "dashboard_approval_mode": "chrome" if browser else "authenticated_dashboard_api",
+        "duplicate_approvals_reused": len(observations),
+        "analysis_and_audit_duplicates": 0,
+        "analysis_audit_rows": len(observations),
+        "approval_and_delivery_history_rows": len(history),
+        "fresh_verified_baseline": metrics(classified_fresh),
+        "after_approval": metrics(classified_after),
+        "cases": observations,
+        "aws_calls": 0,
+        "paid_api_calls": 0,
+    }

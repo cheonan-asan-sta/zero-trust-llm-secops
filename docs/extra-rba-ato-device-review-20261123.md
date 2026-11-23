@@ -229,3 +229,33 @@ Linux 수집기에서 `replaying(status_path=...)`를 지정하면 5초 간격�
 python -m pytest -q tests/test_dashboard_login_queue.py
 python -m scripts.run_login_queue_recovery <new-output.json> --cases 192
 ```
+
+## 실제 Keycloak 로그인부터 대시보드 재전송까지
+
+Keycloak 26.8.0에서 별도 시험 계정 4개로 실제 OTP 로그인을 하고 mTLS 게이트웨이에서 서명 근거를 수집했다. 로컬 분석 경로에 장애를 주입했다. 3건은 분석 API에 도달하기 전에 HTTP `503`을 받았고, 1건은 실제 API가 분석을 저장했지만 로컬 프록시가 확인 응답을 끊었다. 시험용 수집기의 시도 한도를 2회로 설정했다. 4건 모두 보류될 때까지 실제 수집기를 실행했다.
+
+수집기 SQLite의 공개 집계만 로컬 Linux 컨테이너로 넘겼다. 실제 상태 발행기·인증된 메트릭 내보내기·Prometheus를 사용했으며 `C01LoginQueueHeld`의 30초 발화 조건을 그대로 적용했다. Chrome에서 **증거와 승인 → 로그인 대기열**에 표시된 발화 경보와 보류 원인 `HTTP 503`·전송 중 연결 중단을 확인했다. 분석 경로를 복구해도 보류는 유지됐고, 대응 권한이 있는 별도 운영자가 메모를 남기고 승인한 후에 수집기가 4건을 재전송했다. 완료 이력을 브라우저에서 확인하고 Prometheus 경보 해제를 확인했다.
+
+| 같은 로컬 로그인 4건 | 유효 근거로 즉시 분석 | 경보 확인·승인 후 재전송 |
+| --- | ---: | ---: |
+| 우선 검토 대상 탐지 | 3/3 | 2/3 |
+| 우선 검토 미탐 | 0/3 | 1/3 |
+| 정상 오탐 | 0/1 | 0/1 |
+| 정밀도 | 100% | 100% |
+| 재현율 | 100% | 66.7% |
+| F1 | 100% | 80% |
+| 오탐률 | 0% | 0% |
+
+기존 Sigma 판정은 4건 모두 일치했다. 분석이 이미 저장된 응답 유실 사례는 근거가 만료된 뒤에도 원래 검증 결과와 우선 검토를 그대로 반환했다. 첫 분석 전에 근거가 만료된 `503` 사례 3건은 동일 이벤트의 기본 분석 결과와 일치했다. 이 중 정상과 기본 고위험 사례의 판정은 유지됐다. **회수 기기 근거가 있어야 우선 검토되는 1건은 근거 만료 뒤 기본 분석으로 진행되어 우선 검토에서 빠졌다.** 다시 보냈을 때 만료 근거에 새 유효기간을 부여하지 않는 현재 동작에 따른 결과다. 이 비교는 로컬 통제 사례 4건에 한정한다.
+
+같은 승인 4건을 다시 제출해 기존 승인 ID를 돌려받았고, 원본 로그인 본문 4건을 분석 API에 다시 제출해 기존 결과를 돌려받았다. 이벤트당 실제 분석과 감사 기록은 각 1건이었다. 승인 이력 4건과 전송 결과 4건이 남았고, 중복 분석·감사·승인 기록은 0건이었다. 기존 Keycloak 로그인 10건도 재실행해 위협 우선 검토 4/4건과 정상·대조군 오탐 0/6건을 재현했다. 기존 근거 누락·만료 4건과 자동 복구 4건의 판정도 일치했다.
+
+로컬 Linux 회귀 45개와 Ruff가 통과했다. 시험용 Keycloak과 Prometheus 컨테이너를 정리했고 AWS·유료 API 호출은 0회였다. [통합 검증 결과 JSON](infrastructure-results/local-keycloak-dashboard-recovery-20261123.json)
+
+재현에는 기존 로컬 Keycloak 이미지 `quay.io/keycloak/keycloak:26.8.0`과 Prometheus 실행 파일이 포함된 캐시 이미지 `c03-f67136ddf24a-monitoring:latest`가 필요하다. 아래 명령은 앱 Python 환경에서 실행한다. Chrome 시험은 기존 브라우저 잠금 파일의 Playwright를 사용한다. `--dashboard-browser`를 생략하면 동일 흐름을 인증된 대시보드 API로 확인한다.
+
+```powershell
+python -m pip install --only-binary=:all: --require-hashes -r infra/runtime/requirements/browser.lock --target runtime/keycloak-dashboard-browser-tools
+$env:PYTHONPATH = Join-Path (Get-Location) 'runtime/keycloak-dashboard-browser-tools'
+python -m scripts.run_keycloak_remote_acceptance runtime/keycloak-dashboard-result.json --dashboard-recovery --dashboard-browser 'C:/Program Files/Google/Chrome/Application/chrome.exe'
+```

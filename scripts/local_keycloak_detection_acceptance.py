@@ -75,6 +75,12 @@ RECOVERY_CASES = (
     Case("response_lost_threat", "revoked", True, True),
 )
 CASES = HOLDOUT + tuple(case for case, _ in FALLBACK_CASES) + RECOVERY_CASES
+DASHBOARD_CASES = (
+    Case("dashboard_outage_normal", "active", True, False),
+    Case("dashboard_outage_existing_high_risk", "revoked", True, True),
+    Case("dashboard_outage_device_only", "revoked", True, True),
+    Case("dashboard_lost_receipt_device_only", "revoked", True, True),
+)
 
 
 def username(case):
@@ -121,7 +127,7 @@ class LoseCommittedResponse(httpx.HTTPTransport):
         return response
 
 
-def exercise(root, *, acquire, settings, authority, tenant):
+def exercise(root, *, acquire, settings, authority, tenant, dashboard_recovery=False, dashboard_browser=None):
     root.mkdir()
     now = datetime.now(UTC)
     ca = mtls_fixtures.authority("Independent login holdout CA")
@@ -134,16 +140,17 @@ def exercise(root, *, acquire, settings, authority, tenant):
     tls.load_verify_locations(cafile=str(ca_path))
     tls.load_cert_chain(*_material(root, "server", mtls_fixtures.leaf(ca, "localhost", server=True)))
 
+    cases = CASES + DASHBOARD_CASES if dashboard_recovery else CASES
     credentials = {}
-    for case in CASES:
+    for case in cases:
         bundle = mtls_fixtures.leaf(ca, case.name)
         context = ssl.create_default_context(cafile=str(ca_path))
         context.load_cert_chain(*_material(root, case.name, bundle))
         credentials[case.name] = (bundle["fingerprint"], context)
 
     # Discover account identifiers from the IdP outside the scoring and capture requests.
-    subjects = {case.name: acquire(case, lookup=True) for case in CASES}
-    devices = {case.name: "device-" + str(index) for index, case in enumerate(CASES, 1)}
+    subjects = {case.name: acquire(case, lookup=True) for case in cases}
+    devices = {case.name: "device-" + str(index) for index, case in enumerate(cases, 1)}
     registry_path = root / "device-enrollments.json"
     write(registry_path, {
         "schema_version": "zt-vpn-enrollments-1",
@@ -159,7 +166,7 @@ def exercise(root, *, acquire, settings, authority, tenant):
                 "client_certificate_sha256": credentials[case.name][0],
                 "enabled": case.enrollment != "revoked",
             }
-            for case in CASES if case.enrollment != "missing"
+            for case in cases if case.enrollment != "missing"
         ],
     })
     registry = PinnedVPNEnrollments(registry_path, hashlib.sha256(registry_path.read_bytes()).hexdigest())
@@ -289,12 +296,12 @@ def exercise(root, *, acquire, settings, authority, tenant):
             "baseline_assessment_and_detection_unchanged": True, "audit_writes": 1,
         }
 
-    def make_collector(api, path):
+    def make_collector(api, path, *, policy=None):
         return KeycloakLoginAnalysisCollector(
             api, settings=settings, authority=authority, registry=registry,
             gateway_id=GATEWAY, source_id=SOURCE, key_id=KEY_ID, signing_key=signing_key,
             spool_path=path, tenant_id=tenant, collector_subject=analysis_settings.api_key_subject,
-            retry_policy=LoginRetryPolicy(success_interval=0),
+            retry_policy=policy or LoginRetryPolicy(success_interval=0),
         )
 
     def queue_recovery_cases(server, api, cases):
@@ -362,6 +369,7 @@ def exercise(root, *, acquire, settings, authority, tenant):
     observed = []
     fallback_observations = []
     recovery_observations = []
+    dashboard_observations = None
     analysis_runs = {}
     guards = {}
     with ThreadingHTTPServer(("127.0.0.1", 0), Handler) as server:
@@ -525,6 +533,37 @@ def exercise(root, *, acquire, settings, authority, tenant):
                         with patch.object(main, "audit_store", SQLiteAuditStore(audit.path)):
                             ready = make_collector(api, response_path)
                             inspect_recovery(ready, api, queued, committed_before_retry=True)
+
+                    if dashboard_recovery:
+                        from scripts import local_keycloak_dashboard_recovery
+
+                        def submit_login(case, *, committed):
+                            authentication = acquire(case)
+                            binding = authentication.otp_binding
+                            assert authentication.response.status_code == 200
+                            assert binding is not None and binding.subject == subjects[case.name]
+                            bearer = authentication.response.json()["id_token"]
+                            event = make_event(
+                                case, cases.index(case) + 1,
+                                severe=case.name == "dashboard_outage_existing_high_risk",
+                            )
+                            analysis_runs[event.event_id] = 0
+                            status, outcome = gateway_request(server, event, binding, bearer, case)
+                            assert status == 202 and outcome == {"evidence_state": "queued", "result": None}
+                            assert analysis_runs[event.event_id] == int(committed)
+                            return event
+
+                        def dashboard_collector(api, path):
+                            nonlocal collector
+                            policy = LoginRetryPolicy(base_delay=0.15, max_delay=0.3, max_attempts=2, success_interval=0)
+                            collector = make_collector(api, path, policy=policy)
+                            return collector
+
+                        dashboard_observations = local_keycloak_dashboard_recovery.exercise(
+                            root / "dashboard-recovery", cases=DASHBOARD_CASES, analysis_api=api,
+                            settings=analysis_settings, audit=audit, analysis_runs=analysis_runs,
+                            start_collector=dashboard_collector, submit_login=submit_login, browser=dashboard_browser,
+                        )
         finally:
             server.shutdown()
             thread.join(timeout=5)
@@ -540,4 +579,5 @@ def exercise(root, *, acquire, settings, authority, tenant):
         "distinct_actual_otp_accounts": len(HOLDOUT),
         "delivery_fallback": fallback_observations,
         "delivery_recovery": recovery_observations,
+        **({"dashboard_recovery": dashboard_observations} if dashboard_observations is not None else {}),
     }

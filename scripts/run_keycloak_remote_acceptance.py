@@ -55,7 +55,7 @@ def docker(*args):
     return result.stdout.strip()
 
 
-def realm(password, otp_seed, authority_secret, *, login_detection=False):
+def realm(password, otp_seed, authority_secret, *, login_detection=False, dashboard_recovery=False):
     configuration = {
         "realm": REALM,
         "enabled": True,
@@ -136,7 +136,10 @@ def realm(password, otp_seed, authority_secret, *, login_detection=False):
     }
     if login_detection:
         template = configuration["users"][0]
-        for case in local_keycloak_detection_acceptance.CASES:
+        cases = local_keycloak_detection_acceptance.CASES
+        if dashboard_recovery:
+            cases += local_keycloak_detection_acceptance.DASHBOARD_CASES
+        for case in cases:
             username = local_keycloak_detection_acceptance.username(case)
             credentials = [template["credentials"][0], {
                 **template["credentials"][1], "secretData": json.dumps({"value": otp_seed + username}),
@@ -192,7 +195,7 @@ def provision_authority_reader(client, base, admin_password):
 
 def verify(
     base, root, password, otp_seed, admin_password, authority_secret, *, stop_provider,
-    ato_residual=None, device_lifecycle=False, login_detection=False,
+    ato_residual=None, device_lifecycle=False, login_detection=False, dashboard_recovery=False, dashboard_browser=None,
 ):
     issuer = f"{base}/realms/{REALM}"
     metadata_url = issuer + "/.well-known/openid-configuration"
@@ -499,6 +502,7 @@ def verify(
                 login_review = local_keycloak_detection_acceptance.exercise(
                     root / "login-detection", acquire=acquire, settings=settings,
                     authority=gateway.state.oidc_live_authority, tenant=TENANT,
+                    dashboard_recovery=dashboard_recovery, dashboard_browser=dashboard_browser,
                 )
         security._jwks_client.cache_clear()
         stop_provider()
@@ -569,9 +573,15 @@ def verify(
     }
 
 
-def run(output, *, ato_residual=None, device_lifecycle=False, login_detection=False):
+def run(
+    output, *, ato_residual=None, device_lifecycle=False, login_detection=False,
+    dashboard_recovery=False, dashboard_browser=None,
+):
     if device_lifecycle and ato_residual is None:
         raise ValueError("device lifecycle requires an ATO residual report")
+    if dashboard_browser is not None and not dashboard_recovery:
+        raise ValueError("dashboard browser requires the dashboard recovery test")
+    login_detection = login_detection or dashboard_recovery
     name = f"zt-keycloak-{uuid4().hex[:12]}"
     password, admin_password = secrets.token_urlsafe(28), secrets.token_urlsafe(28)
     otp_seed = secrets.token_hex(20)
@@ -581,7 +591,7 @@ def run(output, *, ato_residual=None, device_lifecycle=False, login_detection=Fa
         imports = root / "imports"
         imports.mkdir()
         write(imports / f"{REALM}-realm.json", realm(
-            password, otp_seed, authority_secret, login_detection=login_detection,
+            password, otp_seed, authority_secret, login_detection=login_detection, dashboard_recovery=dashboard_recovery,
         ))
         docker(
             "run",
@@ -627,6 +637,8 @@ def run(output, *, ato_residual=None, device_lifecycle=False, login_detection=Fa
                 ato_residual=ato_residual,
                 device_lifecycle=device_lifecycle,
                 login_detection=login_detection,
+                dashboard_recovery=dashboard_recovery,
+                dashboard_browser=dashboard_browser,
             )
         finally:
             try:
@@ -644,6 +656,8 @@ if __name__ == "__main__":
     parser.add_argument("--ato-residual", type=Path)
     parser.add_argument("--device-lifecycle", action="store_true", help="include device transitions and targeted Keycloak session revocation")
     parser.add_argument("--login-detection", action="store_true", help="run the independent verified-login application holdout")
+    parser.add_argument("--dashboard-recovery", action="store_true", help="verify held login replay through live dashboard and Prometheus")
+    parser.add_argument("--dashboard-browser", type=Path, help="also approve in a headless browser at this Chrome/Chromium path")
     args = parser.parse_args()
     run(args.output, ato_residual=args.ato_residual, device_lifecycle=args.device_lifecycle,
-        login_detection=args.login_detection)
+        login_detection=args.login_detection, dashboard_recovery=args.dashboard_recovery, dashboard_browser=args.dashboard_browser)
