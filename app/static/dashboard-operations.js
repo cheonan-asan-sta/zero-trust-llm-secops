@@ -59,7 +59,7 @@
   };
   let catalog = null, loading = null, selection = null, activeGroup = null;
   let sequence = 0, busy = false, prepared = null, inputs = [], resultValue = null;
-  let observedReview = null, intentRevision = 0;
+  let observedReview = null, pinnedReplayAnalysisId = null, intentRevision = 0;
   let lastGrant = null, lastSession = null, jobTimer = null, capabilities = null, pendingJob = null;
   const label = (key) => names[key] || key;
   const roleLabel = (role) => ({viewer:"조회 사용자",analyst:"분석 담당자",responder:"대응 담당자",admin:"관리자"}[role] || role);
@@ -153,6 +153,7 @@
     input.addEventListener("input", invalidate);
     input.addEventListener("change", invalidate);
     if (key === "reviewer" && current().data.identity?.auth_method !== "disabled") input.readOnly = true;
+    if (place === "path" && key === "event_id" && pinnedReplayAnalysisId) input.disabled = true;
     if (["expected_version", "expected_session_version", "request_digest", "expected_attempt_count"].includes(key) &&
         (selection.path.startsWith("/response/requests") || selection.path.endsWith("/revoke") ||
          selection.path.endsWith("/attempt") || (selection.path.startsWith("/cases/") && selection.method === "PATCH"))) {
@@ -273,6 +274,11 @@
     let record;
     if (command.method === "PATCH" && /^\/results\/[^/]+\/review$/.test(path)) {
       const eventId = decodeURIComponent(path.slice("/results/".length, -"/review".length));
+      if (pinnedReplayAnalysisId && (
+        observedReview?.record.event_id !== eventId || observedReview.record.analysis_id !== pinnedReplayAnalysisId
+      )) {
+        throw new Error("재전송 분석 기록을 다시 열어 현재 검토 상태를 확인하세요.");
+      }
       const observation = observedReview?.record.event_id === eventId ? observedReview : await ctx.readReviewObservation(eventId);
       if (observation.reviewMode !== "conditional") throw new Error("현재 서버에서는 버전을 확인한 검토를 사용할 수 없습니다. 관리자에게 문의하세요.");
       if (observation.epoch !== current().epoch || !/^"r1-[a-f0-9]{64}"$/.test(observation.etag || "") ||
@@ -408,6 +414,7 @@
   function selectOperation(operation, preset = {}, reviewObservation = null) {
     sequence++; busy = false; prepared = null; selection = operation; inputs = []; resultValue = null;
     observedReview = reviewObservation;
+    pinnedReplayAnalysisId = reviewObservation?.pinnedToReplay ? reviewObservation.record.analysis_id : null;
     const host = document.getElementById("operationEditor"); host.replaceChildren();
     host.append(node("h2", operation.title), node("p", "필요 권한: " + roleLabel(operation.role), "muted"));
     if (hints[operation.path]) host.append(node("p", hints[operation.path], "operation-message"));
@@ -644,7 +651,7 @@
     sequence++; busy=false;prepared=null;catalog=null;loading=null;selection=null;inputs=[];
     lastGrant=null;lastSession=null;resultValue=null;capabilities=null;pendingJob=null;activeGroup=null;
     clearInterval(jobTimer);jobTimer=null;root.replaceChildren();
-    observedReview = null; intentRevision++;
+    observedReview = null; pinnedReplayAnalysisId = null; intentRevision++;
   }
   window.dashboardOperations={sync,navigate,reset,open,detailActions};
   navigate(current().page);

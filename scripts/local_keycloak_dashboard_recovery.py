@@ -188,7 +188,7 @@ def connect_dashboard(page, key):
     expect(page.locator("#loginQueueRefresh")).to_be_enabled(timeout=15000)
 
 
-def check_replay_detail(page, body):
+def open_replay_detail(page, body):
     from playwright.sync_api import expect
 
     analysis_id = LoginDeliveryIdentity.from_request(body).analysis_id
@@ -196,9 +196,82 @@ def check_replay_detail(page, body):
     expect(page.locator("#detailTitle")).to_have_text("재전송 분석 기록")
     detail = page.locator("#detailBody")
     expect(detail).to_contain_text(analysis_id)
+    return detail
+
+
+def check_replay_detail(page, body):
+    from playwright.sync_api import expect
+
+    detail = open_replay_detail(page, body)
     expect(detail).to_contain_text("인증 근거가 만료")
-    assert detail.get_by_role("button", name="검토 상태 변경").count() == 0
+    expect(detail.get_by_role("button", name="검토 상태 변경")).to_be_visible()
+    expect(detail.get_by_role("status")).to_have_text("검토 대기")
     assert page.locator("#detailDialog").evaluate("e => e.scrollWidth <= e.clientWidth + 1")
+    page.locator("#closeDetail").click()
+
+
+def check_replay_review(page, analysis_api, records):
+    from playwright.sync_api import expect
+
+    bodies = {case.name: body for case, body, *_ in records}
+
+    def return_to_queue():
+        page.locator('a[data-page="evidence"]').click()
+
+    def prepare(body):
+        detail = open_replay_detail(page, body)
+        detail.get_by_role("button", name="검토 상태 변경").click()
+        field = page.locator("#op-path-event_id")
+        expect(field).to_have_value(body.event.event_id)
+        expect(field).to_be_disabled()
+        page.locator("#op-body-status").select_option("IN_REVIEW")
+        page.locator("#op-body-note").fill("실제 회수 기기 근거 검토 중")
+        page.locator("#operationPrepare").click()
+        expect(page.locator("#operationConfirmation")).to_be_visible()
+        page.locator("#operationAcknowledge").check()
+        return f"/results/{body.event.event_id}/review"
+
+    def save(path):
+        with page.expect_response(lambda response: response.url.endswith(path) and response.request.method == "PATCH") as reply:
+            page.locator("#operationExecute").click()
+        return reply.value
+
+    normal = open_replay_detail(page, bodies["dashboard_outage_normal"])
+    expect(normal.get_by_role("status")).to_have_text("검토 불필요")
+    expect(normal.get_by_role("button", name="검토 상태 변경")).to_have_count(0)
+    page.locator("#closeDetail").click()
+
+    specific = bodies["dashboard_outage_device_only"]
+    accepted = save(prepare(specific))
+    assert accepted.status == 200, accepted.text()
+    latest = accepted.json()
+    assert latest["analysis_id"] == LoginDeliveryIdentity.from_request(specific).analysis_id
+    assert latest["review_status"] == "IN_REVIEW" and latest["reviewer"] == REVIEWER
+    expect(page.locator("#operationMessage")).to_contain_text("서버 처리 완료")
+    return_to_queue()
+    updated = open_replay_detail(page, specific)
+    expect(updated.get_by_role("status")).to_have_text("조사 중")
+    expect(updated).to_contain_text(REVIEWER)
+    expect(updated).to_contain_text("검토 대기")
+    page.locator("#closeDetail").click()
+
+    stale_body = bodies["dashboard_outage_existing_high_risk"]
+    stale_path = prepare(stale_body)
+    newer = analysis_api.post("/analysis", json=stale_body.event.analysis_payload())
+    newer.raise_for_status()
+    assert newer.json()["analysis_id"] != LoginDeliveryIdentity.from_request(stale_body).analysis_id
+    rejected = save(stale_path)
+    assert rejected.status == 412
+    expect(page.locator("#operationMessage")).to_contain_text("버전이 변경")
+    page.locator("#operationPrepare").click()
+    expect(page.locator("#operationMessage")).to_contain_text("재전송 분석 기록을 다시 열어")
+    expect(page.locator("#operationConfirmation")).to_be_hidden()
+    assert analysis_api.get(stale_path.removesuffix("/review")).json() == newer.json()
+    return_to_queue()
+    stale_detail = open_replay_detail(page, stale_body)
+    expect(stale_detail.get_by_role("status")).to_contain_text("이 이벤트에 새 분석이 있습니다")
+    expect(stale_detail.get_by_role("button", name="검토 상태 변경")).to_have_count(0)
+    expect(stale_detail.get_by_role("link", name="로그 탐색")).to_be_visible()
     page.locator("#closeDetail").click()
 
 
@@ -264,6 +337,7 @@ def exercise(root, *, cases, analysis_api, settings, audit, analysis_runs, start
         return view.json()
 
     observations = []
+    review_workflow = {}
     with ExitStack() as stack:
         origin = stack.enter_context(serve(FaultProxy))
         client = stack.enter_context(httpx.Client(
@@ -434,6 +508,19 @@ def exercise(root, *, cases, analysis_api, settings, audit, analysis_runs, start
                 "sigma_equal": True, "result_matches_applicable_baseline": True,
             })
         assert audit.integrity()["verified_lines"] == writes_before + len(records)
+        if browser:
+            with dashboard_page(browser, str(analysis_api.base_url).rstrip("/"), operator_key) as page:
+                check_replay_review(page, analysis_api, records)
+            assert audit.integrity()["verified_lines"] == writes_before + len(records) + 2
+            review_workflow = {
+                "normal_without_review_has_no_edit_action": True,
+                "changed_review_keeps_the_original_analysis_id": True,
+                "original_review_status_preserved_alongside_current_status": True,
+                "review_revisions_appended": 1,
+                "controlled_newer_analyses_added": 1,
+                "superseded_write_http_status": 412,
+                "superseded_replay_cannot_rebind_or_modify_the_newer_analysis": True,
+            }
 
     return {
         "keycloak_mfa_and_mtls": len(observations),
@@ -443,6 +530,7 @@ def exercise(root, *, cases, analysis_api, settings, audit, analysis_runs, start
         "browser_history_viewports_px": [1440, 390] if browser else [],
         "browser_replay_detail_after_reload": browser is not None,
         "exact_replay_details_matched": len(observations),
+        **({"browser_replay_review": review_workflow} if review_workflow else {}),
         "duplicate_approvals_reused": len(observations),
         "analysis_and_audit_duplicates": 0,
         "analysis_audit_rows": len(observations),

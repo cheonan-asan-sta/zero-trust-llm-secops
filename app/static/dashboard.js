@@ -406,6 +406,38 @@
     if (!$("detailDialog").open) $("detailDialog").showModal();
     return ++state.detailSequence;
   }
+
+  async function showReplayReview(host, original, epoch, sequence) {
+    const section = node("section");
+    const status = node("p", "현재 검토 상태를 불러오고 있습니다.");
+    status.setAttribute("role", "status");
+    section.append(node("h3", "현재 검토"), status);
+    host.append(section);
+    const active = () => epoch === state.epoch && sequence === state.detailSequence && $("detailDialog").open;
+    try {
+      const observation = await readReviewObservation(original.event_id);
+      if (!active()) return;
+      if (observation.record.analysis_id !== original.analysis_id) {
+        status.textContent = "이 이벤트에 새 분석이 있습니다. 로그 탐색에서 최신 기록을 확인하세요.";
+        const link = node("a", "로그 탐색", "text-link");
+        link.href = "#logs";
+        link.addEventListener("click", () => $("detailDialog").close());
+        section.append(link);
+        return;
+      }
+      const record = observation.record;
+      status.textContent = reviews[record.review_status] || record.review_status;
+      if (record.review_updated_at) {
+        section.append(node("p", `${record.reviewer} · ${date(record.review_updated_at, true)}`));
+      }
+      if (observation.reviewMode === "conditional" && record.review_status !== "NOT_REQUIRED") {
+        window.dashboardOperations?.detailActions("log", record, section, {...observation, pinnedToReplay: true});
+      }
+    } catch {
+      if (active()) status.textContent = "현재 검토 상태를 확인할 수 없습니다. 상세 기록을 다시 열어 조회하세요.";
+    }
+  }
+
   async function showRecord(record, type, {replay = false} = {}) {
     const identity = state.data.identity;
     const epoch = state.epoch;
@@ -439,6 +471,7 @@
           [replay ? "분석 당시 검토 상태" : "검토 상태", reviews[item.review_status] || item.review_status],
           ["테넌트", item.tenant_id]
         ]));
+        if (replay) void showReplayReview(body, item, epoch, sequence);
         body.append(detailsList("판단 근거", [item.assessment.rationale, ...item.assessment.evidence]), detailsList("정책과 대응 제안", [item.policy_decision.reason, `제안: ${item.policy_decision.action} / 실행 모드: ${item.policy_decision.mode}`, "이 분석 제안만으로 외부 계정이나 기기를 차단하지 않습니다."]));
         const evidence = analysisEvidence(item);
         if (evidence) body.append(evidence);
