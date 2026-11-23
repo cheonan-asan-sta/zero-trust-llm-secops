@@ -97,7 +97,7 @@ def _require_active(con):
         raise ActivationConflict("This login queue host was retired by an approved handoff")
 
 
-def initialize(root, queue, audit, *, handoff=None, **scope):
+def initialize(root, queue, audit, *, handoff=None, fenced_recovery=False, **scope):
     root = private_directory(root)
     for path in (queue, audit):
         backup.source_identity(path)
@@ -114,6 +114,8 @@ def initialize(root, queue, audit, *, handoff=None, **scope):
             raise ActivationConflict("Activation control is already initialized")
         if _present(root / "standby-id") and handoff is None:
             raise ActivationConflict("This standby requires its pinned host handoff")
+        if _present(root / "disaster-profile.json") != fenced_recovery:
+            raise ActivationConflict("This selection requires the enrolled standby recovery method")
         con.execute("CREATE TABLE binding (origin TEXT, tenant_id TEXT, collector_subject TEXT)")
         con.execute("""CREATE TABLE generation (
             number INTEGER PRIMARY KEY, queue TEXT NOT NULL UNIQUE, audit TEXT NOT NULL UNIQUE,
@@ -128,7 +130,8 @@ def initialize(root, queue, audit, *, handoff=None, **scope):
         con.execute("INSERT INTO binding VALUES (:origin, :tenant_id, :collector_subject)", scope)
         number, predecessor = 1, "enrolled"
         if handoff is not None:
-            number, predecessor = handoff["generation"] + 1, "approved_host_handoff"
+            number = handoff["generation"] + 1
+            predecessor = "externally_fenced_host" if fenced_recovery else "approved_host_handoff"
             _record_handoff(con, "incoming", handoff)
         con.execute("INSERT INTO generation VALUES (?, ?, ?, NULL, ?, ?, ?)",
                     (number, str(queue), str(audit), os.geteuid(), int(time()), predecessor))

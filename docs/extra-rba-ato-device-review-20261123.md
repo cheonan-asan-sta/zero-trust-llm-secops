@@ -404,3 +404,28 @@ python -m scripts.login_queue_host_handoff /private/standby-control receive /pri
 로컬 WSL의 실제 systemd에서 제어·저장 디렉터리가 서로 다른 두 서비스 인스턴스로 시험했다. API 재시작 때 송신기 PID도 바뀌었고, API 중지 때 송신기와 이전 상태 파일이 함께 내려갔다. 세대 2의 기존 직접 분석과 재전송 4건 비교에서 위협 탐지 **2/2**, 정상 오탐 **0/2**, 중복 감사 **0건**이었다. 계획된 인계에서는 대기 호스트가 시작되기 전에 퇴역 호스트의 재기동이 거부됐다. 같은 인계 기록의 재발행은 기존 지문을 유지했고, 다른 대기 ID·잘못된 지문·이미 수신한 세대로의 재초기화는 거부됐다. 대기 인스턴스가 세대 3에서 대기 2건을 이어 보냈고 감사 기록은 **기존 8건에서 10건**이 됐다. 두 결과를 다시 요청했을 때 기존 분석이 돌아왔고 감사 기록은 10건으로 유지됐다.
 
 첫 시험에서는 임시 systemd 유닛을 쓰는 경로에 복원 파일용 권한 검사를 잘못 적용해, 고유한 시험 유닛 파일만 생성하도록 고친 뒤 다시 실행했다. 별도 Docker 회귀 41개와 암호화 복원·활성화 통합 시험을 통과했다. AWS·유료 API 호출은 0회다. 두 서비스 인스턴스는 같은 WSL 호스트에서 검증했다. 물리적으로 분리된 호스트의 통신·전원 장애와 운영 트래픽 전환은 검증 범위에 남아 있다. [재시작·인계 검증 결과](infrastructure-results/local-login-queue-systemd-handoff-20261123.json)
+
+## 원본 호스트 장애 후 격리 확인과 대기 호스트 복구
+
+원본 호스트에서 계획된 영구 중지를 기록할 수 없는 경우에는 `scripts.login_queue_disaster_recovery`로 대기 호스트를 활성화한다. 원본과 별도의 관리 영역에 현재 원본의 고유 ID, 세대 번호, 최신 승인 백업 SHA-256, 분석 주소·테넌트·수집기 범위를 보관한다. 같은 체크포인트와 독립 관리자의 Ed25519 공개키 지문을 대기 호스트에 미리 고정한다. 서명 개인키, 암호화 백업 키, 원본 서비스 권한은 각각 분리한다.
+
+독립 관리자는 외부 전원·하이퍼바이저·플랫폼 관리 경로에서 **등록된 원본의 재기동이 계속 차단됐음**을 확인한다. 관리 기록에 원본 ID, 격리 방식, 기록 ID, 확인 시각을 남긴다. 연결 실패나 서비스의 일시 정지만 확인된 경우에는 발급을 보류한다. `issue`는 승인 직전 15분 이내의 확인을 요구하며, 고정된 원본과 백업 세대에 대해 지정 대기 ID 하나만 서명한다. 이 명령에는 관리 시스템을 직접 조작하는 동작이 없으며 운영자가 확인한 기록을 독립 승인에 결속한다.
+
+대기 호스트는 공개키 지문, 서명, 고정 체크포인트, 자체 대기 ID, 암호화 패키지와 두 DB를 확인한다. 두 DB의 새 세대와 격리 승인 기록은 같은 제어 DB 트랜잭션에 남긴다. 재해 복구로 등록한 대기 호스트는 일반 초기화와 계획 인계의 활성화 경로를 거부한다. 유실 범위는 마지막 백업 시점까지의 기록으로 결정하며, 복구 후 기존 호스트를 다시 쓰려면 오래된 큐·감사 상태와 자격 증명을 격리한 상태에서 새 역할로 재등록해야 한다. 같은 관리 영역에서 체크포인트와 발급 이력을 유지하고, 새 발급을 위해 이미 승인한 권한 저장소를 복제하거나 되돌리지 않는다.
+
+```bash
+# 원본과 분리된 관리 영역
+python -m scripts.login_queue_disaster_recovery /private/authority enroll-authority /private/checkpoint.json <checkpoint-sha256> <public-key-sha256>
+# 준비된 대기 호스트
+python -m scripts.login_queue_disaster_recovery /private/control enroll-standby /private/checkpoint.json <checkpoint-sha256> <public-key-sha256>
+# 외부 관리 경로의 원본 격리를 확인한 뒤 독립 관리 영역에서 발급
+python -m scripts.login_queue_disaster_recovery /private/authority issue /private/authority.key <standby-id> /private/fence-confirmation.json <confirmation-sha256>
+# 대기 호스트에 후보를 복원한 뒤 발급된 기록으로 활성화
+python -m scripts.login_queue_disaster_recovery /private/control receive /private/fenced-recovery.json /private/authority.pub /private/archive.bin /private/backup.key /private/candidate
+```
+
+`python -m scripts.run_login_queue_disaster <새 결과 JSON 경로>`로 캐시된 이미지에서 원본·대기·승인 프로세스를 분리해 재현한다. 실제 하이퍼바이저나 전원 관리 적용, 운영 트래픽 전환은 별도 검증 범위다.
+
+로컬 Docker에서 서로 다른 컨테이너와 루프백을 사용했다. 원본 송신기의 잠금을 확인한 뒤 원본을 강제 종료했다. 대기 호스트는 기록 없이 시작할 수 없었고, 독립 관리 경로에서 원본의 정확한 인스턴스가 제거됐으며 같은 ID로 재기동이 거부된 후에만 승인했다. 단순 접속 실패, 오래된 확인, 다른 원본, 다른 서명키, 중복 발급을 거부했다. 대기 쪽에서도 변조된 서명, 다른 대기 ID·세대, 승인 재사용을 거부했다.
+
+대기 호스트는 세대 2에서 대기 4건을 재전송했다. 원본이 이미 감사에 저장했지만 큐에 확인하지 못한 1건은 기존 결과를 반환했다. 감사 기록은 **5건에서 8건**이 됐으며 중복 분석·감사는 **0건**이었다. 같은 통제 사례에서 전후 위협 탐지 **2/2**, 정상 오탐 **0/2**를 확인했다. 첫 시험에서 시험 프로필과 초기 세대의 분석 주소 표기가 맞지 않아, 기존 시험 실행기와 같은 표기를 사용해 다시 검증했다. Linux Docker 회귀 41개와 기존 WSL systemd 계획 인계도 통과했다. AWS·유료 API 호출은 0회였다. [원본 강제 중단·격리·복구 결과](infrastructure-results/local-login-queue-disaster-20261123.json)
