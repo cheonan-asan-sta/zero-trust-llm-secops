@@ -3,6 +3,8 @@
 from dataclasses import dataclass
 from enum import StrEnum
 
+from app.models import VerifiedLoginDetection
+
 
 class Factor(StrEnum):
     UNKNOWN = "unknown"
@@ -42,3 +44,20 @@ def assess_login(
     ):
         return LoginTriage(warning, Takeover.PRIORITY_REVIEW)
     return LoginTriage(warning, Takeover.REVIEW)
+
+
+def detect_verified_login(event, proof, source_digest):
+    decision = assess_login(
+        warning=event.auth_context.failed_attempts >= 3,
+        success=True,
+        environment_change=event.network.location_anomaly,
+        factor=Factor.VERIFIED,
+        device=Device(proof.device_state),
+    )
+    return VerifiedLoginDetection(
+        disposition=decision.takeover.value,
+        device_state=proof.device_state,
+        source_id=proof.source_id,
+        source_digest_sha256=source_digest,
+        observed_at=proof.issued_at,
+    )

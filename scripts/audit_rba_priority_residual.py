@@ -5,11 +5,11 @@ from collections import Counter
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+from app.services.account_takeover import Takeover, assess_login
 from scripts.evaluate_local_remote_holdout import read, write
 from scripts.evaluate_public_login_history import bit, digest
 from scripts.evaluate_rba_ato_separation import CHANNELS, ROWS, decisions
 from scripts.evaluate_rba_login_environment import observed_signals
-from scripts.f1_lab.ato_triage import Takeover, assess_login
 from scripts.f1_lab.login_environment import WINDOW_MINUTES, Change
 
 REFERENCE = (

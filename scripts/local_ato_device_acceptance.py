@@ -17,31 +17,21 @@ from fastapi import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
 
 from app import security
+from app.services.account_takeover import Device, Factor, Takeover, assess_login
 from scripts import mtls_fixtures
 from scripts.evaluate_local_remote_holdout import write
 from scripts.evaluate_rba_ato_separation import network_change
-from scripts.f1_lab.ato_triage import Device, Factor, Takeover, assess_login
 from scripts.f1_lab.login_environment import Change
 from scripts.f1_lab.native_bayes import counts, metrics, record
 from scripts.f1_lab.vpn_enrollment import PinnedVPNEnrollments
-from scripts.mtls_native import valid_client
+from scripts.keycloak_login_evidence import client_fingerprint
 from scripts.mtls_transport import Quiet
 
 GATEWAY = "ato-loopback"
 
 
 def device_from_peer(channel, registry, principal, now, device_ids=None):
-    if (
-        not isinstance(channel, ssl.SSLSocket)
-        or not channel.server_side
-        or channel.context.verify_mode != ssl.CERT_REQUIRED
-    ):
-        raise ValueError("client-authenticated TLS required")
-    certificate = channel.getpeercert(binary_form=True)
-    if not certificate:
-        raise ValueError("verified client certificate unavailable")
-    valid_client(certificate)
-    fingerprint = hashlib.sha256(certificate).hexdigest()
+    fingerprint = client_fingerprint(channel)
     enrollment = registry.assess(
         SimpleNamespace(
             tenant_id=principal.tenant_id,

@@ -69,3 +69,29 @@ python -m scripts.run_keycloak_remote_acceptance <new-keycloak-report.json> --at
 ```powershell
 python -m scripts.run_keycloak_remote_acceptance <new-keycloak-report.json> --ato-residual <new-residual.json> --device-lifecycle
 ```
+
+## 앱의 로그인 탐지에 연결
+
+신뢰된 수집기는 Keycloak에서 OTP에 성공한 원본 토큰, 서명·발급자·수신자, 활성 세션과 현재 역할을 대조한다. 같은 계정·테넌트·게이트웨이·기기 범위에서 서버가 직접 받은 mTLS 클라이언트 인증서를 고정 등록부로 검증한다. 등록 근거가 일치하면 로그인 이벤트의 정규 해시에 결합한 Ed25519 근거를 발급한다. 근거의 유효기간은 최대 30초이며 서명한 근거와 분석 결과에는 원본 토큰·개인키를 담지 않는다.
+
+인증된 분석 호출자는 이벤트와 서명 근거를 `POST /analysis/verified-login`에 제출한다. 앱은 `TRUSTED_SIGNAL_SOURCES_PATH`의 해당 테넌트에 등록한 전용 수집기와 `login_evidence_resource_ids`를 읽어 계정·기기·역할·리소스 범위 및 서명과 유효기간을 검증한다. 이 전용 키는 접근 허가에 쓰이는 세션 증명을 발급할 권한이 없다. 처리 중에도 수집기와 호출 권한을 다시 검사한다. 미등록·다른 계정의 기기에는 검증 근거를 발급하지 않으며 그 이벤트는 기존 `/analysis`로 처리할 수 있다.
+
+검증된 OTP 성공, 접속 위치 이상 신호, 회수된 기기 인증서가 함께 관측되면 `priority_review`를 `verified_login_detection`에 남기고 기존 검토 절차로 보낸다. 정상 등록 기기는 이 조건으로 우선 검토에 올라가지 않는다. 기존 Sigma 판정과 더 강한 권고는 보존한다. 새 결과는 기존 분석 API 결과와 같은 감사 저장소에 쌓인다. 이 경로는 로컬 규칙 판정으로 동작하며 조치는 기존 검토·승인 절차를 따른다.
+
+보류한 로컬 시험 사례는 기존 평가의 RBA 계정과 기기 수명주기 시험에서 사용한 Keycloak 계정과 겹치지 않도록 별도 계정으로 구성했다. 각 사례의 기대 판정을 수집 전에 정하고 HTTP 요청과 서명 근거에서 제외했다. 실제 OTP 세션·mTLS 연결에 통제된 접속 환경과 등록 상태를 조합했다.
+
+| 동일한 신규 로컬 사례 10건 | 기존 `/analysis` | 새 검증 근거 적용 |
+| --- | ---: | ---: |
+| 위협 우선 검토 | 0/4 | 4/4 |
+| 위협 미탐 | 4/4 | 0/4 |
+| 정상 및 근거 부족 대조군의 오탐 | 0/6 | 0/6 |
+| 재현율 / F1 | 0% / 0% | 100% / 100% |
+| 오탐률 | 0% | 0% |
+
+10건 모두 기존 Sigma 결과가 동일했다. 이전 Keycloak 대조군도 재실행해 위협 탐지 7/7건, 정상 오탐 0/7건, 별도 OS 기반 우선 검토 1건, 역할·세션 회수 직후 `401`을 유지했다. 새 검증 근거가 반영된 결과를 감사 저장소에서 다시 읽어 응답과 일치함을 확인했다. 다른 기기 인증서는 근거를 받지 못했고, 이벤트 바꿔치기·근거 변조·수집기 비활성화는 `401`로 거부됐다. 이번 수치는 로컬 시나리오 성능이며 공개 RBA·운영 환경 성능은 다시 측정하지 않았다.
+
+관련 회귀 394개와 Ruff를 통과했다. 통합 시험의 임시 감사 파일 초기화와 시험용 수집기 등록부 교체를 수정한 뒤 전체를 재실행했다. Keycloak 컨테이너를 정리했고 AWS와 유료 API는 사용하지 않았다. [사례 및 결과 JSON](infrastructure-results/local-keycloak-login-detection-20261123.json)
+
+```powershell
+python -m scripts.run_keycloak_remote_acceptance <new-keycloak-report.json> --ato-residual <new-residual.json> --device-lifecycle --login-detection
+```

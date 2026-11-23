@@ -22,6 +22,7 @@ from app.continuous_signal_models import (
 from app.security import Principal, Role
 from app.zero_trust_models import (
     SignedAuthAttemptReceipt,
+    SignedLoginEvidence,
     SignedSessionSignal,
     TrustedSignalRegistry,
 )
@@ -50,6 +51,11 @@ def canonical_observation(signal: SignedContinuousSignal) -> bytes:
 
 def canonical_auth_attempt(receipt: SignedAuthAttemptReceipt) -> bytes:
     payload = receipt.model_dump(mode="json", exclude={"signature"})
+    return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()
+
+
+def canonical_login_evidence(proof: SignedLoginEvidence) -> bytes:
+    payload = proof.model_dump(mode="json", exclude={"signature"})
     return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()
 
 
@@ -159,6 +165,7 @@ class SignalVerifier:
             or source.behavior_scopes
             or source.execution_scopes
             or source.auth_attempt_resource_ids
+            or source.login_evidence_resource_ids
         ):
             raise SignalRejected("observation-only source cannot assert a full session")
         key = next((item for item in source.keys if item.key_id == signal.key_id), None)
@@ -221,6 +228,38 @@ class SignalVerifier:
             public.verify(signature, canonical_auth_attempt(receipt))
         except (InvalidSignature, TypeError, ValueError) as exc:
             raise SignalRejected("authentication attempt receipt signature rejected") from exc
+        return hashlib.sha256(source.model_dump_json().encode()).hexdigest()
+
+    def verify_login_evidence(self, proof, event, principal, now):
+        from app.services.session_analysis_evidence import event_digest
+
+        source = self._sources().get((principal.tenant_id, proof.source_id))
+        if (
+            source is None or not source.enabled or proof.tenant_id != principal.tenant_id
+            or event.resource.resource_id not in source.login_evidence_resource_ids
+            or event.user.user_id not in source.user_ids
+            or event.device.device_id not in source.device_ids
+            or event.user.role not in source.roles
+            or event.action != "LOGIN" or event.ground_truth is not None
+            or event.auth_context.authentication_result != "success" or event.auth_context.mfa != "success"
+            or proof.event_digest_sha256 != event_digest(event)
+        ):
+            raise SignalRejected("login evidence source scope or event binding rejected")
+        key = next((item for item in source.keys if item.key_id == proof.key_id), None)
+        if (
+            key is None or not key.enabled
+            or not key.not_before <= proof.issued_at <= now < proof.expires_at <= key.not_after
+            or not 0 <= (proof.issued_at - event.timestamp).total_seconds() <= 30
+        ):
+            raise SignalRejected("login evidence freshness rejected")
+        try:
+            signature = base64.urlsafe_b64decode(proof.signature + "==")
+            if base64.urlsafe_b64encode(signature).decode().rstrip("=") != proof.signature:
+                raise ValueError("noncanonical signature")
+            public = serialization.load_pem_public_key(key.public_key_pem.encode())
+            public.verify(signature, canonical_login_evidence(proof))
+        except (InvalidSignature, ValueError, TypeError) as exc:
+            raise SignalRejected("login evidence signature rejected") from exc
         return hashlib.sha256(source.model_dump_json().encode()).hexdigest()
 
     def verify_behavior_capture(

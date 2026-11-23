@@ -2,8 +2,8 @@ from collections import Counter
 
 import pytest
 
+from app.services.account_takeover import Device, Factor, Takeover, assess_login
 from scripts.evaluate_rba_ato_separation import NETWORK, choose_candidate, decisions
-from scripts.f1_lab.ato_triage import Device, Factor, Takeover, assess_login
 from scripts.f1_lab.login_environment import Change
 
 

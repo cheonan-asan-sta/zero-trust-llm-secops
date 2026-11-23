@@ -5,6 +5,7 @@ from collections import Counter
 from itertools import product
 from pathlib import Path
 
+from app.services.account_takeover import Takeover, assess_login
 from scripts.evaluate_local_remote_holdout import read, write
 from scripts.evaluate_public_login_history import ARCHIVE_SHA, bit, digest
 from scripts.evaluate_rba_login_environment import (
@@ -12,7 +13,6 @@ from scripts.evaluate_rba_login_environment import (
     available_for_new_review,
     observed_signals,
 )
-from scripts.f1_lab.ato_triage import Takeover, assess_login
 from scripts.f1_lab.login_environment import WINDOW_MINUTES, Change
 from scripts.f1_lab.native_bayes import counts, metrics, record
 

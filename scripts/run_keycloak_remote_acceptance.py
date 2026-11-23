@@ -22,12 +22,16 @@ from fastapi.testclient import TestClient
 
 from app import security
 from app.config import Settings
+from app.services.account_takeover import Factor, Takeover, assess_login
 from app.services.auth_alert_triage import resolve_auth_alert, resolve_terminal_auth_alert
 from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
 from app.zero_trust_models import ProtectedAccessRequest, SignedSessionSignal
-from scripts import local_ato_device_acceptance, local_oidc_redirect_lab
+from scripts import (
+    local_ato_device_acceptance,
+    local_keycloak_detection_acceptance,
+    local_oidc_redirect_lab,
+)
 from scripts.evaluate_local_remote_holdout import fingerprint, read, write
-from scripts.f1_lab.ato_triage import Factor, Takeover, assess_login
 from scripts.keycloak_live_authority import KeycloakLiveAuthority
 from scripts.local_keycloak_evidence_collector import LocalKeycloakEvidenceCollector
 from scripts.local_keycloak_login_history import fetch_login_history
@@ -51,8 +55,8 @@ def docker(*args):
     return result.stdout.strip()
 
 
-def realm(password, otp_seed, authority_secret):
-    return {
+def realm(password, otp_seed, authority_secret, *, login_detection=False):
+    configuration = {
         "realm": REALM,
         "enabled": True,
         "sslRequired": "none",
@@ -130,6 +134,17 @@ def realm(password, otp_seed, authority_secret):
             }
         ],
     }
+    if login_detection:
+        template = configuration["users"][0]
+        for case in local_keycloak_detection_acceptance.HOLDOUT:
+            username = local_keycloak_detection_acceptance.username(case)
+            credentials = [template["credentials"][0], {
+                **template["credentials"][1], "secretData": json.dumps({"value": otp_seed + username}),
+            }]
+            configuration["users"].append({
+                **template, "username": username, "email": username + "@example.invalid", "credentials": credentials,
+            })
+    return configuration
 
 
 def fixture_otp(seed, *, unix_time=None):
@@ -177,11 +192,12 @@ def provision_authority_reader(client, base, admin_password):
 
 def verify(
     base, root, password, otp_seed, admin_password, authority_secret, *, stop_provider,
-    ato_residual=None, device_lifecycle=False,
+    ato_residual=None, device_lifecycle=False, login_detection=False,
 ):
     issuer = f"{base}/realms/{REALM}"
     metadata_url = issuer + "/.well-known/openid-configuration"
     device_review = None
+    login_review = None
     with httpx.Client(trust_env=False, timeout=8) as client:
         for _ in range(210):
             try:
@@ -457,6 +473,33 @@ def verify(
             assert web_after_logout.status_code == 401
             assert web_after_logout.json()["detail"] == "Caller session is no longer active"
             assert "redirect" not in local_oidc_redirect_lab.receipt(redirect_lab, web_after_logout)
+            if login_detection:
+                holdout_admin = fixture_admin_authorization(client, base, admin_password)
+
+                def acquire(case, *, lookup=False):
+                    username = local_keycloak_detection_acceptance.username(case)
+                    if lookup:
+                        observed = client.get(
+                            f"{base}/admin/realms/{REALM}/users", headers=holdout_admin,
+                            params={"username": username, "exact": "true"},
+                        )
+                        observed.raise_for_status()
+                        account, = observed.json()
+                        assert account["username"] == username
+                        return account["id"]
+                    instant = time.time()
+                    while not 1 <= instant % 30 <= 27:
+                        time.sleep(0.25)
+                        instant = time.time()
+                    return collector.sign_in(
+                        username=username, password=password,
+                        otp=fixture_otp(otp_seed + username, unix_time=instant), action="LOGIN",
+                    )
+
+                login_review = local_keycloak_detection_acceptance.exercise(
+                    root / "login-detection", acquire=acquire, settings=settings,
+                    authority=gateway.state.oidc_live_authority, tenant=TENANT,
+                )
         security._jwks_client.cache_clear()
         stop_provider()
         unavailable_event = collector.attempts.open("outage-before-auth-" + uuid4().hex)
@@ -519,13 +562,14 @@ def verify(
             "failed_login_takeover": failed_login.takeover.value,
         },
         "ato_device_review": device_review,
+        **({"verified_login_holdout": login_review} if login_review is not None else {}),
         "manual_revocation_file": False,
         "finished_at": datetime.now(UTC).isoformat(),
         "paid_api_calls": 0,
     }
 
 
-def run(output, *, ato_residual=None, device_lifecycle=False):
+def run(output, *, ato_residual=None, device_lifecycle=False, login_detection=False):
     if device_lifecycle and ato_residual is None:
         raise ValueError("device lifecycle requires an ATO residual report")
     name = f"zt-keycloak-{uuid4().hex[:12]}"
@@ -536,7 +580,9 @@ def run(output, *, ato_residual=None, device_lifecycle=False):
         root = Path(directory)
         imports = root / "imports"
         imports.mkdir()
-        write(imports / f"{REALM}-realm.json", realm(password, otp_seed, authority_secret))
+        write(imports / f"{REALM}-realm.json", realm(
+            password, otp_seed, authority_secret, login_detection=login_detection,
+        ))
         docker(
             "run",
             "-d",
@@ -580,6 +626,7 @@ def run(output, *, ato_residual=None, device_lifecycle=False):
                 stop_provider=stop_provider,
                 ato_residual=ato_residual,
                 device_lifecycle=device_lifecycle,
+                login_detection=login_detection,
             )
         finally:
             try:
@@ -596,5 +643,7 @@ if __name__ == "__main__":
     parser.add_argument("output", type=Path)
     parser.add_argument("--ato-residual", type=Path)
     parser.add_argument("--device-lifecycle", action="store_true", help="include device transitions and targeted Keycloak session revocation")
+    parser.add_argument("--login-detection", action="store_true", help="run the independent verified-login application holdout")
     args = parser.parse_args()
-    run(args.output, ato_residual=args.ato_residual, device_lifecycle=args.device_lifecycle)
+    run(args.output, ato_residual=args.ato_residual, device_lifecycle=args.device_lifecycle,
+        login_detection=args.login_detection)

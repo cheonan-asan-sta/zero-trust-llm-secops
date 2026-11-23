@@ -56,6 +56,7 @@ from app.models import (
     PublicReplayDataset,
     PublicReplayResult,
     PublicReplaySuiteResult,
+    RecommendedAction,
     ResponsePreviewRequest,
     ReviewStatus,
     ReviewUpdateRequest,
@@ -64,11 +65,13 @@ from app.models import (
     SecurityEvent,
     SigmaRuleSummary,
     SimulationRequest,
+    VerifiedLoginDetection,
 )
 from app.native_analysis_models import NativeServiceAnalysisRequest
 from app.response_api import response_router
 from app.scenarios import SCENARIOS, generate_events, get_scenario
 from app.security import Principal, Role, require_roles
+from app.services.account_takeover import Takeover, detect_verified_login
 from app.services.analysis_authority import bind_analysis_authority
 from app.services.assurance import get_assurance_registry
 from app.services.audit import AuditStore, create_audit_store
@@ -147,7 +150,7 @@ from app.services.sqlite_audit import AuditReviewConflict, SQLiteAuditStore
 from app.services.trusted_signals import SignalRejected, SignalVerifier
 from app.services.zero_trust import POLICY_PATH, ZeroTrustOperations
 from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
-from app.zero_trust_models import SignedSessionSignal
+from app.zero_trust_models import SignedSessionSignal, VerifiedLoginAnalysisRequest
 
 settings = get_settings()
 static_dir = Path(__file__).parent / "static"
@@ -798,6 +801,41 @@ async def analyze(
         raise HTTPException(status_code=502, detail="Analysis provider failed") from exc
 
 
+@app.post("/analysis/verified-login", response_model=AnalysisResult)
+async def analyze_verified_login(
+    body: VerifiedLoginAnalysisRequest, request: Request, principal: AnalystPrincipal,
+) -> AnalysisResult:
+    if principal.auth_method not in {"api_key", "oidc"}:
+        raise HTTPException(401, "Authenticated analyst required for verified login evidence")
+    caller_check = getattr(request.state, "authentication_revalidator", None)
+    verifier = SignalVerifier(get_settings().trusted_signal_sources_path)
+
+    def source_digest():
+        if caller_check is not None:
+            caller_check()
+        if get_settings().trusted_signal_sources_path != verifier.registry_path:
+            raise SignalRejected("verified login registry changed")
+        return verifier.verify_login_evidence(body.evidence, body.event, principal, datetime.now(UTC))
+
+    try:
+        async with _analysis_slot():
+            digest = await settled_io(source_digest)
+            finding = detect_verified_login(body.event, body.evidence, digest)
+
+            def check_evidence():
+                if source_digest() != digest:
+                    raise SignalRejected("verified login source changed")
+
+            return await _analyze_event_in_slot(
+                body.event, RuleBasedAnalyzer(), principal, request.state.request_id,
+                caller_authority_check=check_evidence, verified_login_detection=finding,
+            )
+    except AnalysisCapacityExceeded as exc:
+        raise HTTPException(
+            429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from exc
+
+
 @app.post("/analysis/batch", response_model=BatchAnalysisResult)
 async def analyze_batch(
     batch_request: BatchAnalysisRequest,
@@ -1216,6 +1254,7 @@ async def _analyze_event_in_slot(
     verification_context_supplier: Callable[[], VerifiedSessionContext] | None = None,
     llm_trace_supplier: Callable[[], dict | None] | None = None,
     caller_authority_check: Callable[[], None] | None = None,
+    verified_login_detection: VerifiedLoginDetection | None = None,
 ) -> AnalysisResult:
     """Internal pipeline; its caller must hold an analysis slot throughout."""
     # Live integrity scans must not block the event loop or release capacity
@@ -1259,6 +1298,11 @@ async def _analyze_event_in_slot(
         safe_assessment, verified_controls = enforce_verified_review_safety(
             safe_assessment, snapshot
         )
+    if verified_login_detection is not None and verified_login_detection.disposition == Takeover.PRIORITY_REVIEW:
+        updates = {"requires_human_review": True}
+        if safe_assessment.recommended_action == RecommendedAction.ALLOW:
+            updates["recommended_action"] = RecommendedAction.HOLD_FOR_REVIEW
+        safe_assessment = safe_assessment.model_copy(update=updates)
     decision = response_preview(safe_assessment, event)
     result = AnalysisResult(
         event_id=event.event_id,
@@ -1267,6 +1311,7 @@ async def _analyze_event_in_slot(
         policy_decision=decision,
         normalized_event=normalized,
         detection=detection,
+        verified_login_detection=verified_login_detection,
         verification_context=snapshot,
         llm_trace=llm_trace_supplier() if llm_trace_supplier else None,
         verified_review_controls=verified_controls,

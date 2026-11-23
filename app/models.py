@@ -1158,6 +1158,15 @@ class VerifiedReviewControls(StrictModel):
         return self
 
 
+class VerifiedLoginDetection(StrictModel):
+    disposition: Literal["no_signal", "review", "priority_review"]
+    mfa_verified: Literal[True] = True
+    device_state: Literal["known", "revoked_verified_device"]
+    source_id: str = Field(pattern=r"^[A-Za-z0-9._-]{1,64}$")
+    source_digest_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    observed_at: datetime
+
+
 class AnalysisResult(StrictModel):
     analysis_id: str = Field(default_factory=lambda: uuid4().hex)
     event_id: str
@@ -1166,6 +1175,7 @@ class AnalysisResult(StrictModel):
     policy_decision: PolicyDecision
     normalized_event: NormalizedSecurityEvent | None = None
     detection: SigmaDetectionResult | None = None
+    verified_login_detection: VerifiedLoginDetection | None = None
     verification_context: dict[str, object] | None = None
     llm_trace: dict[str, object] | None = None
     verified_review_controls: VerifiedReviewControls | None = None
@@ -1182,6 +1192,8 @@ class AnalysisResult(StrictModel):
     @model_serializer(mode="wrap")
     def omit_absent_verification_context(self, handler):
         value = handler(self)
+        if self.verified_login_detection is None:
+            value.pop("verified_login_detection", None)
         if self.verification_context is None:
             value.pop("verification_context", None)
         if self.llm_trace is None:

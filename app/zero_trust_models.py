@@ -146,6 +146,7 @@ class TrustedSignalSource(StrictModel):
     behavior_scopes: list[BehaviorScope] = Field(default_factory=list, max_length=100)
     execution_scopes: list[BehaviorScope] = Field(default_factory=list, max_length=100)
     auth_attempt_resource_ids: list[ResourceIdentifier] = Field(default_factory=list, max_length=100)
+    login_evidence_resource_ids: list[ResourceIdentifier] = Field(default_factory=list, max_length=100)
 
     @model_serializer(mode="wrap")
     def serialize_source(self, handler):
@@ -161,6 +162,8 @@ class TrustedSignalSource(StrictModel):
             value.pop("execution_scopes", None)
         if not self.auth_attempt_resource_ids:
             value.pop("auth_attempt_resource_ids", None)
+        if not self.login_evidence_resource_ids:
+            value.pop("login_evidence_resource_ids", None)
         return value
 
     @model_validator(mode="after")
@@ -173,6 +176,16 @@ class TrustedSignalSource(StrictModel):
             or self.session_proof_resource_ids
         ):
             raise ValueError("Authentication attempt receipts require a dedicated source")
+        return self
+
+    @model_validator(mode="after")
+    def login_evidence_scope(self):
+        if self.login_evidence_resource_ids and (
+            self.observation_kinds or self.behavior_scopes or self.execution_scopes
+            or self.guardduty_resource_ids or self.session_proof_resource_ids
+            or self.auth_attempt_resource_ids
+        ):
+            raise ValueError("Verified login evidence requires a dedicated source")
         return self
 
     @model_validator(mode="after")
@@ -251,6 +264,34 @@ class SignedAuthAttemptReceipt(StrictModel):
         if not 0 < (self.expires_at - self.issued_at).total_seconds() <= 60:
             raise ValueError("authentication attempt receipt lifetime must be at most 60 seconds")
         return self
+
+
+class SignedLoginEvidence(StrictModel):
+    """A registered collector's exact-event observation of Keycloak OTP and mTLS enrollment."""
+
+    schema_version: Literal["zt-keycloak-login-1"] = "zt-keycloak-login-1"
+    algorithm: Literal["Ed25519"] = "Ed25519"
+    tenant_id: str = Field(pattern=r"^[A-Za-z0-9._-]{1,64}$")
+    source_id: str = Field(pattern=r"^[A-Za-z0-9._-]{1,64}$")
+    key_id: str = Field(pattern=r"^[A-Za-z0-9._-]{1,64}$")
+    event_digest_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    device_state: Literal["known", "revoked_verified_device"]
+    issued_at: datetime
+    expires_at: datetime
+    signature: str = Field(pattern=r"^[A-Za-z0-9_-]{86}$", repr=False)
+
+    @model_validator(mode="after")
+    def bounded_lifetime(self):
+        if self.issued_at.utcoffset() is None or self.expires_at.utcoffset() is None:
+            raise ValueError("login proof timestamps require timezone")
+        if not 0 < (self.expires_at - self.issued_at).total_seconds() <= 30:
+            raise ValueError("login proof lifetime must be at most 30 seconds")
+        return self
+
+
+class VerifiedLoginAnalysisRequest(StrictModel):
+    event: SecurityEvent
+    evidence: SignedLoginEvidence
 
 
 class SignedSessionSignal(SessionEvaluationRequest):
