@@ -301,6 +301,19 @@ def exercise(root, *, online=False):
             assert (restored / "RESTORE_READY").read_text(encoding="ascii").strip() == package_pin
         else:
             raise AssertionError("An existing restore candidate was replaced")
+        verified = login_queue_backup.verify_candidate(document, package_pin, restored, key_file, **scope)
+        assert verified["verified_databases"] == 2
+        tampered = backup / "tampered-candidate"
+        login_queue_backup.restore(document, package_pin, tampered, key_file, **scope)
+        altered = tampered / QUEUE
+        raw = altered.read_bytes()
+        altered.write_bytes(raw[:-1] + bytes([raw[-1] ^ 1]))
+        try:
+            login_queue_backup.verify_candidate(document, package_pin, tampered, key_file, **scope)
+        except ValueError as error:
+            assert "differs from the authenticated backup" in str(error)
+        else:
+            raise AssertionError("A candidate with a valid ready marker but modified DB was accepted")
     else:
         restored.mkdir()
         try:
@@ -371,6 +384,7 @@ def exercise(root, *, online=False):
             "newer_queue_with_older_audit_rejected": True,
             "restore_ready_only_for_valid_pair": True,
             "existing_restore_candidate_not_replaced": True,
+            "candidate_with_ready_marker_and_modified_database_rejected": True,
         } if online else {"snapshot_hashes": fingerprints}),
         "initial_queue_counts": state_counts,
         "pre_restore_audit_records_including_baselines": restored_audit_rows,

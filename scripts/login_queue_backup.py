@@ -148,7 +148,7 @@ def backup(queue_path, audit_path, output, key_file, *, origin, tenant_id, colle
     return {"package_sha256": sha(package), "package_bytes": len(package)}
 
 
-def restore(package_path, package_sha256, target, key_file, *, origin, tenant_id, collector_subject):
+def package_files(package_path, package_sha256, key_file, *, origin, tenant_id, collector_subject):
     package = pinned(package_path, package_sha256, MAX_PACKAGE)
     if not package.startswith(FORMAT) or len(package) < len(FORMAT) + 12 + 8 + 16:
         raise ValueError("Invalid login backup format")
@@ -165,19 +165,38 @@ def restore(package_path, package_sha256, target, key_file, *, origin, tenant_id
         or len(plaintext) != 8 + queue_bytes + audit_bytes
     ):
         raise ValueError("Invalid login backup database lengths")
-    files = {QUEUE: plaintext[8:8 + queue_bytes], AUDIT: plaintext[8 + queue_bytes:]}
+    return {QUEUE: plaintext[8:8 + queue_bytes], AUDIT: plaintext[8 + queue_bytes:]}
+
+
+def restore(package_path, package_sha256, target, key_file, **scope):
+    files = package_files(package_path, package_sha256, key_file, **scope)
     parent = private_directory(target.parent)
     with TemporaryDirectory(prefix=".login-restore-", dir=parent) as temporary:
         staging = Path(temporary)
         for name, content in files.items():
             fresh_file(staging / name, content)
-        validate_pair(staging, origin=origin, tenant_id=tenant_id, collector_subject=collector_subject)
+        validate_pair(staging, **scope)
         destination = reserve(target, (package_path, key_file))
         for name, content in files.items():
             fresh_file(destination / name, content)
         # The marker is written last. This command stages only and never starts a service.
         fresh_file(destination / "RESTORE_READY", (package_sha256 + "\n").encode())
     return {"package_sha256": package_sha256, "restored_databases": len(files)}
+
+
+def verify_candidate(package_path, package_sha256, target, key_file, **scope):
+    """Check the exact staged files shortly before the operator selects them."""
+    files = package_files(package_path, package_sha256, key_file, **scope)
+    directory = private_directory(target)
+    if (
+        {entry.name for entry in directory.iterdir()} != {*files, "RESTORE_READY"}
+        or private_file(directory / "RESTORE_READY", 65) != (package_sha256 + "\n").encode()
+    ):
+        raise ValueError("Login restore candidate is incomplete")
+    for name, content in files.items():
+        if private_file(directory / name, MAX_DATABASE) != content:
+            raise ValueError("Login restore candidate differs from the authenticated backup")
+    return {"package_sha256": package_sha256, "verified_databases": len(files)}
 
 
 def main():
@@ -188,10 +207,12 @@ def main():
     capture.add_argument("audit", type=Path)
     capture.add_argument("output", type=Path)
     recovery = actions.add_parser("restore")
-    recovery.add_argument("package", type=Path)
-    recovery.add_argument("sha256")
-    recovery.add_argument("target", type=Path)
-    for action in (capture, recovery):
+    verify = actions.add_parser("verify")
+    for action in (recovery, verify):
+        action.add_argument("package", type=Path)
+        action.add_argument("sha256")
+        action.add_argument("target", type=Path)
+    for action in (capture, recovery, verify):
         action.add_argument("--key-file", type=Path, required=True)
         action.add_argument("--origin", required=True)
         action.add_argument("--tenant-id", required=True)
@@ -200,8 +221,10 @@ def main():
     scope = {"origin": args.origin, "tenant_id": args.tenant_id, "collector_subject": args.collector_subject}
     if args.action == "backup":
         result = backup(args.queue, args.audit, args.output, args.key_file, **scope)
-    else:
+    elif args.action == "restore":
         result = restore(args.package, args.sha256, args.target, args.key_file, **scope)
+    else:
+        result = verify_candidate(args.package, args.sha256, args.target, args.key_file, **scope)
     print(json.dumps(result))
 
 

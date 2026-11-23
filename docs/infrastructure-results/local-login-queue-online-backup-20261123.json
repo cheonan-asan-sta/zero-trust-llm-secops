@@ -4,7 +4,7 @@
     "source_files_absent": true,
     "snapshot_sqlite_quick_check_passed": 2,
     "mismatched_snapshot_blocked_before_restore": true,
-    "online_encrypted_package_sha256": "7de2d11ba6d6527adb7f0d5931a94bf7f7bfc88c26dc4db8bc096c264319d807",
+    "online_encrypted_package_sha256": "d8cd40bc2e132b1ad510be8d0fce521afc9c77b3d6a7d81bdd21f1a74937d238",
     "wal_sources_copied_as_standalone_databases": true,
     "live_audit_commit_between_queue_and_audit_copies": true,
     "between_copy_commit_reused_without_new_audit": true,
@@ -12,6 +12,7 @@
     "newer_queue_with_older_audit_rejected": true,
     "restore_ready_only_for_valid_pair": true,
     "existing_restore_candidate_not_replaced": true,
+    "candidate_with_ready_marker_and_modified_database_rejected": true,
     "initial_queue_counts": {
       "held": 1,
       "pending": 2
@@ -104,6 +105,6 @@
     "paid_api_calls": 0
   },
   "linux_regression_tests_passed": 41,
-  "backup_and_restore_cli_passed": true,
+  "backup_restore_verify_cli_passed": true,
   "ruff_passed": true
 }
