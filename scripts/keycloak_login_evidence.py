@@ -174,15 +174,10 @@ class KeycloakLoginAnalysisCollector:
         return self.submit(event, self.capture(channel, event, bearer, otp_binding))
 
     def submit(self, event, proof: SignedLoginEvidence | None):
-        if event.action != "LOGIN" or event.ground_truth is not None:
-            raise ValueError("collector requires an observed login event")
         if self.spool is not None:
-            body = LoginDeliveryRequest(
-                tenant_id=self.spool.tenant_id, collector_subject=self.spool.collector_subject,
-                event=event, evidence=proof,
-            )
-            self.spool.enqueue(body, now=self.clock())
+            enqueue_login(self.spool, event, proof, now=self.clock())
             return self._dispatch(event_id=event.event_id) or LoginAnalysisDelivery(httpx.Response(202), "queued")
+        _require_observed_login(event)
         payload = event.analysis_payload()
         state = "missing"
         if proof is not None:
@@ -268,36 +263,56 @@ class KeycloakLoginAnalysisCollector:
                 sent += 1
         return sent
 
-    @contextmanager
-    def replaying(self, *, interval=1, status_path=None):
-        """Start with the existing queue and drain it again after short outages."""
+    def replay_until_stopped(self, stop, *, interval=1, status_path=None, batch_size=50):
+        """Drain in the current thread so a service supervisor sees failures."""
         if self.spool is None or interval <= 0:
             raise ValueError("durable replay requires a persistent login queue and positive interval")
         if status_path is not None:
             from scripts.f1_lab.login_queue_status import publish_queue_status
 
+        next_status = 0
+        while not stop.is_set():
+            if status_path is not None and monotonic() >= next_status:
+                try:
+                    publish_queue_status(self.spool, status_path)
+                except (AuditTransferError, OSError):
+                    LOGGER.warning("Login queue status publication failed")
+                next_status = monotonic() + 5
+            self.flush_pending(limit=batch_size)
+            due = self.spool.next_attempt()
+            wait = interval if due is None else min(interval, max(0.01, due - self.clock()))
+            if status_path is not None:
+                wait = min(wait, max(0, next_status - monotonic()))
+            stop.wait(wait)
+
+    @contextmanager
+    def replaying(self, *, interval=1, status_path=None):
+        """Start with the existing queue and drain it again after short outages."""
+        if self.spool is None or interval <= 0:
+            raise ValueError("durable replay requires a persistent login queue and positive interval")
         stop = Event()
-
-        def replay():
-            next_status = 0
-            while not stop.is_set():
-                if status_path is not None and monotonic() >= next_status:
-                    try:
-                        publish_queue_status(self.spool, status_path)
-                    except (AuditTransferError, OSError):
-                        LOGGER.warning("Login queue status publication failed")
-                    next_status = monotonic() + 5
-                self.flush_pending()
-                due = self.spool.next_attempt()
-                wait = interval if due is None else min(interval, max(0.01, due - self.clock()))
-                if status_path is not None:
-                    wait = min(wait, max(0, next_status - monotonic()))
-                stop.wait(wait)
-
-        worker = Thread(target=replay, name="keycloak-login-replay", daemon=True)
+        worker = Thread(
+            target=self.replay_until_stopped, args=(stop,),
+            kwargs={"interval": interval, "status_path": status_path},
+            name="keycloak-login-replay", daemon=True,
+        )
         worker.start()
         try:
             yield self
         finally:
             stop.set()
             worker.join()
+
+
+def _require_observed_login(event):
+    if event.action != "LOGIN" or event.ground_truth is not None:
+        raise ValueError("collector requires an observed login event")
+
+
+def enqueue_login(spool, event, proof, *, now=None):
+    """Persist the original observation before a separate service sends it."""
+    _require_observed_login(event)
+    spool.enqueue(LoginDeliveryRequest(
+        tenant_id=spool.tenant_id, collector_subject=spool.collector_subject,
+        event=event, evidence=proof,
+    ), now=now)

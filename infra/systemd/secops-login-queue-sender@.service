@@ -1,0 +1,38 @@
+[Unit]
+Description=SecOps managed login queue sender for %i
+Wants=secops-login-queue-api@%i.service
+After=secops-login-queue-api@%i.service
+PartOf=secops-login-queue-api@%i.service
+StartLimitIntervalSec=60
+StartLimitBurst=10
+
+[Service]
+Type=exec
+User=secops-login
+Group=secops-login
+WorkingDirectory=/opt/secops
+Environment=PYTHONDONTWRITEBYTECODE=1
+EnvironmentFile=/etc/secops/login-queue/%i.env
+LoadCredential=analysis-key:/etc/secops/login-queue/%i.analysis-key
+ExecStart=/opt/secops/.venv/bin/python -m scripts.run_login_queue_sender /var/lib/secops-login-queue/%i/control --origin ${LOGIN_QUEUE_ORIGIN} --status-file /run/secops-login-queue-status/%i/status.json
+StateDirectory=secops-login-queue/%i
+StateDirectoryMode=0700
+RuntimeDirectory=secops-login-queue-status/%i
+RuntimeDirectoryMode=0755
+UMask=0077
+StandardInput=null
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

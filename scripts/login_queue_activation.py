@@ -79,7 +79,25 @@ def _scope(con):
     return dict(row)
 
 
-def initialize(root, queue, audit, **scope):
+def _handoff(con):
+    if not con.execute("SELECT 1 FROM sqlite_master WHERE name = 'host_handoff'").fetchone():
+        return None
+    direction, receipt = con.execute("SELECT direction, receipt FROM host_handoff ORDER BY rowid DESC LIMIT 1").fetchone()
+    return {"direction": direction, "receipt": json.loads(receipt)}
+
+
+def _record_handoff(con, direction, receipt):
+    con.execute("CREATE TABLE IF NOT EXISTS host_handoff (direction TEXT, receipt TEXT)")
+    con.execute("INSERT INTO host_handoff VALUES (?, ?)", (direction, json.dumps(receipt)))
+
+
+def _require_active(con):
+    entry = _handoff(con)
+    if entry and entry["direction"] == "outgoing":
+        raise ActivationConflict("This login queue host was retired by an approved handoff")
+
+
+def initialize(root, queue, audit, *, handoff=None, **scope):
     root = private_directory(root)
     for path in (queue, audit):
         backup.source_identity(path)
@@ -94,6 +112,8 @@ def initialize(root, queue, audit, **scope):
     with _lock(root, "active.lock"), _state(root, write=True) as con:
         if con.execute("SELECT 1 FROM sqlite_master WHERE name = 'generation'").fetchone():
             raise ActivationConflict("Activation control is already initialized")
+        if _present(root / "standby-id") and handoff is None:
+            raise ActivationConflict("This standby requires its pinned host handoff")
         con.execute("CREATE TABLE binding (origin TEXT, tenant_id TEXT, collector_subject TEXT)")
         con.execute("""CREATE TABLE generation (
             number INTEGER PRIMARY KEY, queue TEXT NOT NULL UNIQUE, audit TEXT NOT NULL UNIQUE,
@@ -106,8 +126,12 @@ def initialize(root, queue, audit, **scope):
             approved_at INTEGER NOT NULL, note TEXT NOT NULL
         )""")
         con.execute("INSERT INTO binding VALUES (:origin, :tenant_id, :collector_subject)", scope)
-        con.execute("INSERT INTO generation VALUES (1, ?, ?, NULL, ?, ?, 'enrolled')",
-                    (str(queue), str(audit), os.geteuid(), int(time())))
+        number, predecessor = 1, "enrolled"
+        if handoff is not None:
+            number, predecessor = handoff["generation"] + 1, "approved_host_handoff"
+            _record_handoff(con, "incoming", handoff)
+        con.execute("INSERT INTO generation VALUES (?, ?, ?, NULL, ?, ?, ?)",
+                    (number, str(queue), str(audit), os.geteuid(), int(time()), predecessor))
     sync(root)
 
 
@@ -118,10 +142,12 @@ def approve(root, package, pin, candidate, key, *, note):
     if not 3 <= len(note) <= 300:
         raise ValueError("An approval note of 3–300 characters is required")
     with _state(root) as con:
+        _require_active(con)
         base, scope = _current(con)["number"], _scope(con)
     backup.verify_candidate(package, pin, candidate, key, **scope)
     identifier = uuid4().hex
     with _state(root, write=True) as con:
+        _require_active(con)
         if _current(con)["number"] != base:
             raise ActivationConflict("Active generation changed during approval")
         con.execute("INSERT INTO approval VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -157,18 +183,23 @@ def _predecessor(root, current, candidate, allow_missing):
     return "verified_identical"
 
 
+def _approved_candidate(con, identifier):
+    _require_active(con)
+    current = _current(con)
+    approval = con.execute("SELECT * FROM approval WHERE id = ?", (identifier,)).fetchone()
+    if approval is None or approval["base"] != current["number"]:
+        raise ActivationConflict("Approval is missing or belongs to a former generation")
+    candidate = Path(approval["candidate"])
+    pair = str(candidate / backup.QUEUE), str(candidate / backup.AUDIT)
+    if con.execute("SELECT 1 FROM generation WHERE queue IN (?, ?) OR audit IN (?, ?)", pair * 2).fetchone():
+        raise ActivationConflict("Candidate overlaps an existing generation")
+    return current, approval, candidate, pair
+
+
 def activate(root, identifier, package, key, *, allow_missing=False):
     root = private_directory(root)
     with _lock(root, "active.lock"), _state(root, write=True) as con:
-        current = _current(con)
-        approval = con.execute("SELECT * FROM approval WHERE id = ?", (identifier,)).fetchone()
-        if approval is None or approval["base"] != current["number"]:
-            raise ActivationConflict("Approval is missing or belongs to a former generation")
-        candidate = Path(approval["candidate"])
-        queue, audit = str(candidate / backup.QUEUE), str(candidate / backup.AUDIT)
-        if con.execute("SELECT 1 FROM generation WHERE queue IN (?, ?) OR audit IN (?, ?)",
-                       (queue, audit, queue, audit)).fetchone():
-            raise ActivationConflict("Candidate overlaps an existing generation")
+        current, approval, candidate, (queue, audit) = _approved_candidate(con, identifier)
         backup.verify_candidate(package, approval["package_sha256"], candidate, key, **_scope(con))
         predecessor = _predecessor(root, current, candidate, allow_missing)
         number = current["number"] + 1
@@ -181,20 +212,39 @@ def status(root):
     with _state(private_directory(root)) as con:
         history = con.execute("SELECT * FROM generation ORDER BY number").fetchall()
         approvals = con.execute("SELECT * FROM approval ORDER BY rowid").fetchall()
-        return {"scope": _scope(con), "generations": list(map(dict, history)), "approvals": list(map(dict, approvals))}
+        result = {"scope": _scope(con), "generations": list(map(dict, history)), "approvals": list(map(dict, approvals))}
+        if entry := _handoff(con):
+            result["host_handoff"] = entry
+        return result
+
+
+@contextmanager
+def _active_selection(root):
+    root = private_directory(root)
+    with _lock(root, "active.lock", shared=True):
+        with _state(root) as con:
+            _require_active(con)
+            current, scope = _current(con), _scope(con)
+        for kind in ("queue", "audit"):
+            backup.source_identity(Path(current[kind]))
+        yield current, scope
 
 
 @contextmanager
 def active_pair(root):
-    root = private_directory(root)
-    with _lock(root, "active.lock", shared=True):
-        with _state(root) as con:
-            current, scope = _current(con), _scope(con)
-        for kind in ("queue", "audit"):
-            backup.source_identity(Path(current[kind]))
+    with _active_selection(root) as (current, scope):
         LoginDeliverySpool(Path(current["queue"]), **scope, create=False).counts()
         SQLiteAuditStore.open_existing(Path(current["audit"]))
         yield current, scope
+
+
+def stage_login(root, event, evidence):
+    """Gateway intake commits to the current pair without becoming a sender."""
+    from scripts.keycloak_login_evidence import enqueue_login
+
+    with _active_selection(root) as (current, scope):
+        spool = LoginDeliverySpool(Path(current["queue"]), **scope, create=False)
+        enqueue_login(spool, event, evidence)
 
 
 @contextmanager

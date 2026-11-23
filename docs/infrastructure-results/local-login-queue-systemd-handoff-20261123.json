@@ -1,0 +1,51 @@
+{
+  "active_generation_audit_records": 8,
+  "after": {
+    "accuracy": 1.0,
+    "f1": 1.0,
+    "false_positive_rate": 0.0,
+    "fn": 0,
+    "fp": 0,
+    "inference_errors": 0,
+    "population": 4,
+    "precision": 1.0,
+    "recall": 1.0,
+    "tn": 2,
+    "tp": 2
+  },
+  "aws_calls": 0,
+  "before": {
+    "accuracy": 1.0,
+    "f1": 1.0,
+    "false_positive_rate": 0.0,
+    "fn": 0,
+    "fp": 0,
+    "inference_errors": 0,
+    "population": 4,
+    "precision": 1.0,
+    "recall": 1.0,
+    "tn": 2,
+    "tp": 2
+  },
+  "duplicate_analysis_or_audit_records": 0,
+  "durable_records_on_api_restart": 6,
+  "generation_2_used_by_both_units": true,
+  "old_generation_audit_records": 6,
+  "paid_api_calls": 0,
+  "planned_host_handoff": {
+    "duplicate_analysis_or_audit_records": 0,
+    "final_standby_audit_records": 10,
+    "generation": 3,
+    "receipt_pin_and_standby_binding_checked": true,
+    "received_handoff_could_not_be_reinitialized": true,
+    "replayed_standby_events": 2,
+    "retained_audit_records": 8,
+    "retired_source_restart_failed_before_standby_started": true,
+    "retirement_blocked_while_source_active": true,
+    "scope": "two independent state directories and unit pairs on one WSL systemd host"
+  },
+  "previous_generation_preserved": true,
+  "status_bound_to_active_queue": true,
+  "systemd_api_restart_restarted_sender": true,
+  "systemd_api_stop_drained_processes_and_removed_status": true
+}

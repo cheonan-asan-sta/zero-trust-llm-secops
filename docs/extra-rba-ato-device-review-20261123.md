@@ -370,3 +370,37 @@ python -m scripts.run_login_queue_restore /private/activation-result.json --acti
 네트워크를 차단한 로컬 Linux Docker에서 기존 API와 송신기를 각각 실행해 전환이 막히는 것을 확인했다. 두 번째 송신기, 최신 변경이 남은 이전 DB, 원본 DB 없이 남은 WAL, 승인 후 변경된 후보, 이전 세대 승인도 거부됐다. 원본 시험 파일이 유실된 뒤 명시적으로 승인한 세대 2로 전환했고, 새 API와 송신기가 복원된 두 DB를 사용했다. 이후 같은 내용의 정지 상태 백업으로 세대 3에 전환할 때는 이전 DB 두 파일을 보존했다.
 
 같은 로컬 통제 사례에서 전환 전후 위협 탐지는 **2/2**, 정상 오탐은 **0/2**, 중복 분석·감사는 **0건**이었다. 승인 대기 1건과 전송 대기 2건을 복원했고, 최종 감사 8건과 기존 분석 ID로 조회한 원본 기록을 확인했다. Linux 회귀 41개가 통과했고 AWS·유료 API 호출은 0회였다. [승인·전환 검증 결과](infrastructure-results/local-login-queue-activation-20261123.json)
+
+## systemd 재시작과 계획된 대기 호스트 인계
+
+`secops-login-queue-api@.service`와 `secops-login-queue-sender@.service`는 같은 `secops-login` 계정과 인스턴스별 제어 디렉터리를 사용한다. API를 중지하거나 재시작하면 송신기가 함께 중지되거나 재시작된다. 송신기는 시작 전에 `/auth/me`에서 API 키 인증, 테넌트, 수집기 주체, 분석자 역할을 확인한다. 분석 대상을 잘못 연결하면 큐를 보내기 전에 종료하고 systemd가 재시도한다. 요청 발송과 큐 집계 발행을 서비스의 주 스레드에서 실행하며, SIGTERM 후 현재 요청을 마무리하고 잠금을 놓는다.
+
+API 키 인증 인스턴스에 설치할 때 `/opt/secops`에 코드와 가상환경을 두고 인스턴스별 `/etc/secops/login-queue/<인스턴스>.env` 및 root 소유의 `<인스턴스>.analysis-key` 파일을 준비한다. 환경 파일에는 `LOGIN_QUEUE_API_PORT`, `LOGIN_QUEUE_ORIGIN`, SQLite·대시보드 프로필·인증 설정을 넣는다. 큐·감사·세션처럼 쓰기가 필요한 파일은 `/var/lib/secops-login-queue/<인스턴스>` 아래에 배치하고 같은 운영 계정으로 제어 디렉터리를 초기화한다. 대시보드 프로필은 활성 세대의 분석 주소·테넌트·수집기와 일치해야 한다. 기존 게이트웨이는 로그인 관측과 검증된 근거를 `stage_login(control, event, evidence)`로 저장한다. 이 입력 함수는 현재 세대 잠금 안에서 저장만 하며, 전송은 관리 송신기가 담당한다.
+
+송신기는 `/run/secops-login-queue-status/<인스턴스>/status.json`에 집계를 발행한다. 정지 후 이전 실행의 파일을 지우고, 새 세대에서는 새 경로에 결속된 집계를 발행한다. 외부 메트릭 내보내기를 사용하는 경우 운영자가 새 상태의 `scope_sha256`을 확인해 메트릭 프로필에도 반영한다. 이전 지문으로는 새 집계가 대신 표시되지 않는다.
+
+```bash
+systemctl start secops-login-queue-sender@<인스턴스>.service
+systemctl restart secops-login-queue-api@<인스턴스>.service
+systemctl stop secops-login-queue-api@<인스턴스>.service
+```
+
+**계획된 인계**는 기존 호스트의 저장소에 접근할 수 있을 때 사용한다. 대기 호스트에서 소유자 전용 제어 디렉터리를 만든 뒤 `prepare`로 대기 ID를 발급한다. 기존 호스트의 API와 송신기를 중지하고 최신 큐·감사 DB를 캡처·복원·승인한다. `retire`는 두 서비스가 잡은 잠금이 모두 풀렸고, 승인 후보가 현재 DB와 정확히 일치할 때만 기존 제어 DB에 영구 중지를 기록한다. 이후 기존 제어 디렉터리를 쓰는 API, 송신기, 수집 입력 및 전환 요청을 거부한다.
+
+`publish`로 기존 세대·대기 ID·승인 ID·백업 지문이 든 인계 기록을 발행한다. 작업이 중단돼도 같은 지문으로 다시 발행할 수 있다. 이미 신뢰하는 경로로 인계 지문과 대기 ID를 각각 확인한다. 암호화 백업과 복구 키는 분리해 전달한다. 대기 호스트에서 같은 패키지로 새 후보를 복원하고 `receive`로 인계 지문, 대상 ID, 패키지와 두 DB를 확인한다. 새 호스트는 기존 세대 번호에 1을 더해 시작한다. 기존 호스트의 제어 DB와 중지 이력을 함께 유지해야 하며, 중지 전 제어 DB 사본을 되돌려 기존 서비스를 시작하면 이 보호를 우회한다.
+
+```bash
+# 대기 호스트
+python -m scripts.login_queue_host_handoff /private/standby-control prepare
+# 기존 호스트
+python -m scripts.login_queue_host_handoff /private/active-control retire <approval-id> <standby-id> /private/login-backup.bin --key-file /private/key
+python -m scripts.login_queue_host_handoff /private/active-control publish /private/handoff.json
+# 대기 호스트에서 동일 패키지의 후보 복원 후 실행
+python -m scripts.login_queue_host_handoff /private/standby-control receive /private/handoff.json <receipt-sha256> /private/restore-candidate /private/login-backup.bin --key-file /private/key
+```
+
+인계는 **원본이 살아 있을 때 영구 중지부터 확정**하는 절차다. 갑자기 접근이 끊긴 원본의 격리 확인, 외부 트래픽 경로 교체, 자동 전환은 별도 작업이다. 시험 재현은 로컬 systemd 호스트에서 `python -m scripts.run_login_queue_systemd <새 결과 JSON 경로> --venv <Linux 가상환경>`을 사용한다.
+
+로컬 WSL의 실제 systemd에서 제어·저장 디렉터리가 서로 다른 두 서비스 인스턴스로 시험했다. API 재시작 때 송신기 PID도 바뀌었고, API 중지 때 송신기와 이전 상태 파일이 함께 내려갔다. 세대 2의 기존 직접 분석과 재전송 4건 비교에서 위협 탐지 **2/2**, 정상 오탐 **0/2**, 중복 감사 **0건**이었다. 계획된 인계에서는 대기 호스트가 시작되기 전에 퇴역 호스트의 재기동이 거부됐다. 같은 인계 기록의 재발행은 기존 지문을 유지했고, 다른 대기 ID·잘못된 지문·이미 수신한 세대로의 재초기화는 거부됐다. 대기 인스턴스가 세대 3에서 대기 2건을 이어 보냈고 감사 기록은 **기존 8건에서 10건**이 됐다. 두 결과를 다시 요청했을 때 기존 분석이 돌아왔고 감사 기록은 10건으로 유지됐다.
+
+첫 시험에서는 임시 systemd 유닛을 쓰는 경로에 복원 파일용 권한 검사를 잘못 적용해, 고유한 시험 유닛 파일만 생성하도록 고친 뒤 다시 실행했다. 별도 Docker 회귀 41개와 암호화 복원·활성화 통합 시험을 통과했다. AWS·유료 API 호출은 0회다. 두 서비스 인스턴스는 같은 WSL 호스트에서 검증했다. 물리적으로 분리된 호스트의 통신·전원 장애와 운영 트래픽 전환은 검증 범위에 남아 있다. [재시작·인계 검증 결과](infrastructure-results/local-login-queue-systemd-handoff-20261123.json)
