@@ -83,16 +83,19 @@ def baseline(location):
     return values, fingerprint(seal_path)
 
 
-def capture(source, original, output, exe):
+def capture(source, original, output, exe, *, rule_ids=False):
     sha = file_digests(source)
     expected, baseline_sha = baseline(original)
     if read(original / "plan.json")["source_sha256"] != sha:
         raise ValueError("source differs from baseline")
     output.mkdir()
     pred = output / "crs-predictions.jsonl"
+    command = [str(exe.resolve())]
+    if rule_ids:
+        command.append("--rule-ids")
     with (
         pred.open("xb") as stream,
-        subprocess.Popen([str(exe.resolve())], stdin=subprocess.PIPE, stdout=stream) as proc,
+        subprocess.Popen(command, stdin=subprocess.PIPE, stdout=stream) as proc,
     ):
         for ordinal, event in request_events(source):
             expected.pop(ordinal)
@@ -109,6 +112,7 @@ def capture(source, original, output, exe):
             "coraza_version": "3.8.1",
             "binary_sha256": fingerprint(exe),
             "predictions_sha256": fingerprint(pred),
+            "attack_rule_ids": rule_ids,
             "http_egress": False,
             "representation": "publisher request columns; reconstructed Content-Length from stored body",
         },
@@ -188,11 +192,14 @@ def main():
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--exe", type=Path)
     mode.add_argument("--score-seal")
+    parser.add_argument("--rule-ids", action="store_true")
     args = parser.parse_args()
     csv.field_size_limit(1_048_576)
     if args.exe:
-        capture(args.source, args.original, args.output, args.exe)
+        capture(args.source, args.original, args.output, args.exe, rule_ids=args.rule_ids)
     else:
+        if args.rule_ids:
+            parser.error("--rule-ids requires --exe")
         score(args.source, args.original, args.output, args.score_seal)
 
 

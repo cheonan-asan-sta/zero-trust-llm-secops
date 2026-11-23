@@ -44,3 +44,5 @@ Apache 자료에서 관찰한 보정 효과는 새 자료에서 위협 탐지를
 - [요청 구조 비교기](../scripts/evaluate_public_post_body_shape.py)는 `scikit-learn==1.7.2`에서 `python -m scripts.evaluate_public_post_body_shape <csv> <post-output> <new-output>`으로 실행한다. 보정 점수로 기준을 정한 뒤 시점 검증 예측을 봉인하고 정답을 결합한다.
 
 기존 관련 테스트 142개, 발행자 라벨 분리와 본문 제외를 확인한 새 테스트 1개를 통과했다. [결과와 SHA-256](infrastructure-results/public-successful-post-transfer-20261123.json)에 감사를 위한 집계를 남겼다. 판정 경로·자동 대응 정책의 운영 적용은 아직 승인 조건을 충족하지 않았다.
+
+[후속 CRS 규칙 근거 평가](extra-public-post-crs-rules-transfer-20261123.md)에서 이 자료의 7월 19일 진단 결과와 별도 crAPI·VAmPI 공개 실험 기록으로 고정 후보의 전이 성능을 비교했다.

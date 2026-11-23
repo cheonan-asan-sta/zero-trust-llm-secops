@@ -8,10 +8,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import urlsplit
 
-import numpy as np
-from sklearn.ensemble import ExtraTreesClassifier
-from threadpoolctl import threadpool_limits
-
 from scripts.evaluate_local_remote_holdout import fingerprint, read, write
 from scripts.evaluate_public_successful_post import (
     file_digests,
@@ -43,6 +39,14 @@ def text_shape(value):
     ]
 
 
+def request_shape(target, body, status):
+    try:
+        depth = urlsplit(target).path.count("/")
+    except ValueError:
+        depth = -1
+    return [status, depth, *text_shape(target), *text_shape(body)]
+
+
 def load_features(source):
     cohorts = defaultdict(list)
     for ordinal, row, _ in source_rows(source):
@@ -53,17 +57,7 @@ def load_features(source):
         if cohort is None:
             raise ValueError("unexpected target day")
         target, body = row["request_http_request"], row["request_body"]
-        try:
-            parsed = urlsplit(target)
-            depth = parsed.path.count("/")
-        except ValueError:
-            depth = -1
-        features = [
-            int(row["response_http_status_code"]),
-            depth,
-            *text_shape(target),
-            *text_shape(body),
-        ]
+        features = request_shape(target, body, int(row["response_http_status_code"]))
         cohorts[cohort].append((ordinal, group_key(target, body), features))
     return cohorts
 
@@ -81,6 +75,15 @@ def ordinary_labels(source, ordinals):
     return truth
 
 
+def split_by_date(groups):
+    temporal = groups["temporal"]
+    temporal_keys = {key for _, key, _ in temporal}
+    calibration = [row for row in groups["calibration"] if row[1] not in temporal_keys]
+    later_keys = temporal_keys | {key for _, key, _ in calibration}
+    development = [row for row in groups["development"] if row[1] not in later_keys]
+    return development, calibration, temporal
+
+
 def measurements(scores, cases, truth, baseline, threshold):
     values = counts()
     new_fp = lost_tp = 0
@@ -95,6 +98,8 @@ def measurements(scores, cases, truth, baseline, threshold):
 
 
 def choose(calibration, probabilities, truth, baseline):
+    import numpy as np
+
     ranked = []
     for cut in np.linspace(0, 1, 101):
         scored = measurements(probabilities, calibration, truth, baseline, cut)
@@ -118,13 +123,12 @@ def choose(calibration, probabilities, truth, baseline):
 
 
 def run(source, native, output, source_sha):
+    from sklearn.ensemble import ExtraTreesClassifier
+    from threadpoolctl import threadpool_limits
+
     output.mkdir()
     groups = load_features(source)
-    temporal = groups["temporal"]
-    temporal_keys = {key for _, key, _ in temporal}
-    calibration = [row for row in groups["calibration"] if row[1] not in temporal_keys]
-    other_keys = temporal_keys | {key for _, key, _ in calibration}
-    development = [row for row in groups["development"] if row[1] not in other_keys]
+    development, calibration, temporal = split_by_date(groups)
     expected = {row[0] for row in development + calibration}
     truth = ordinary_labels(source, expected)
     native_path = native / "predictions.jsonl"
