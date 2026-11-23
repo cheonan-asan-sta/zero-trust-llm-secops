@@ -4,7 +4,7 @@ import base64
 import hashlib
 import json
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
@@ -26,6 +26,16 @@ from app.zero_trust_models import (
     SignedSessionSignal,
     TrustedSignalRegistry,
 )
+
+DELAYED_LOGIN_REVIEW_WINDOW = timedelta(hours=1)
+
+
+def eligible_for_delayed_login_review(proof, event, received_at):
+    return (
+        proof.device_state == "revoked_verified_device"
+        and event.network.location_anomaly is True
+        and proof.expires_at <= received_at < proof.expires_at + DELAYED_LOGIN_REVIEW_WINDOW
+    )
 
 
 class SignalRejected(ValueError):
@@ -235,6 +245,18 @@ class SignalVerifier:
         return hashlib.sha256(source.model_dump_json().encode()).hexdigest()
 
     def verify_login_evidence(self, proof, event, principal, now):
+        digest = self._verify_login_observation(proof, event, principal, now)
+        if now >= proof.expires_at:
+            raise LoginEvidenceExpired("verified login evidence expired")
+        return digest
+
+    def verify_delayed_login_review(self, proof, event, principal, now, *, received_at):
+        """Authenticate a past risk observation for review without renewing its proof."""
+        if received_at > now or not eligible_for_delayed_login_review(proof, event, received_at):
+            raise SignalRejected("delayed login review scope or time window rejected")
+        return self._verify_login_observation(proof, event, principal, now)
+
+    def _verify_login_observation(self, proof, event, principal, now):
         from app.services.session_analysis_evidence import event_digest
 
         source = self._sources().get((principal.tenant_id, proof.source_id))
@@ -265,8 +287,6 @@ class SignalVerifier:
             public.verify(signature, canonical_login_evidence(proof))
         except (InvalidSignature, ValueError, TypeError) as exc:
             raise SignalRejected("login evidence signature rejected") from exc
-        if now >= proof.expires_at:
-            raise LoginEvidenceExpired("verified login evidence expired")
         return hashlib.sha256(source.model_dump_json().encode()).hexdigest()
 
     def verify_behavior_capture(

@@ -283,8 +283,18 @@ def exercise(root, *, acquire, settings, authority, tenant, dashboard_recovery=F
         assert saved is not None and saved.analysis_id == result["analysis_id"]
         assert saved.verified_login_detection is None, case.name
         assert "verified_login_detection" not in result, case.name
+        delayed = saved.delayed_login_review
+        assert (delayed is not None) == (state == "expired" and case.enrollment == "revoked")
+        if delayed is not None:
+            assert result["delayed_login_review"] == delayed.model_dump(mode="json")
         for field in ("detection", "assessment", "policy_decision", "review_status"):
-            assert result[field] == previous[field], (case.name, field)
+            if field == "policy_decision" and delayed is not None:
+                assert "인증 근거가 만료" in result[field]["reason"]
+                assert {key: value for key, value in result[field].items() if key != "reason"} == {
+                    key: value for key, value in previous[field].items() if key != "reason"
+                }
+            else:
+                assert result[field] == previous[field], (case.name, field)
         review = result["policy_decision"]["requires_human_review"]
         sigma_count = len(result["detection"]["matches"])
         if case.name == "missing_existing_credential_alert":

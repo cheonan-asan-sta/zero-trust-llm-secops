@@ -34,6 +34,7 @@ from app.models import (
     CorrelationPolicy,
     CorrelationRequest,
     CorrelationResult,
+    DelayedLoginReview,
     DetectionPipelineResult,
     DetectionQualityReport,
     EvaluationRequest,
@@ -153,7 +154,12 @@ from app.services.settled_io import settled_io
 from app.services.sigma import get_sigma_engine
 from app.services.signal_inbox import SignalInbox
 from app.services.sqlite_audit import AuditReviewConflict, SQLiteAuditStore
-from app.services.trusted_signals import LoginEvidenceExpired, SignalRejected, SignalVerifier
+from app.services.trusted_signals import (
+    LoginEvidenceExpired,
+    SignalRejected,
+    SignalVerifier,
+    eligible_for_delayed_login_review,
+)
 from app.services.zero_trust import POLICY_PATH, ZeroTrustOperations
 from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
 from app.zero_trust_models import (
@@ -842,7 +848,7 @@ async def analyze_verified_login(
         ) from exc
 
 
-async def _analyze_verified_login_in_slot(body, request, principal, *, before_persist=None, delivery=None):
+async def _login_evidence_guard(body, request, principal, *, delayed_at=None):
     caller_check = getattr(request.state, "authentication_revalidator", None)
     verifier = SignalVerifier(get_settings().trusted_signal_sources_path)
 
@@ -851,15 +857,23 @@ async def _analyze_verified_login_in_slot(body, request, principal, *, before_pe
             caller_check()
         if get_settings().trusted_signal_sources_path != verifier.registry_path:
             raise SignalRejected("verified login registry changed")
-        return verifier.verify_login_evidence(body.evidence, body.event, principal, datetime.now(UTC))
+        now = datetime.now(UTC)
+        if delayed_at is not None:
+            return verifier.verify_delayed_login_review(body.evidence, body.event, principal, now, received_at=delayed_at)
+        return verifier.verify_login_evidence(body.evidence, body.event, principal, now)
 
     digest = await settled_io(source_digest)
-    finding = detect_verified_login(body.event, body.evidence, digest)
 
     def check_evidence():
         if source_digest() != digest:
             raise SignalRejected("verified login source changed")
 
+    return digest, check_evidence
+
+
+async def _analyze_verified_login_in_slot(body, request, principal, *, before_persist=None, delivery=None):
+    digest, check_evidence = await _login_evidence_guard(body, request, principal)
+    finding = detect_verified_login(body.event, body.evidence, digest)
     return await _analyze_event_in_slot(
         body.event, RuleBasedAnalyzer(), principal, request.state.request_id,
         caller_authority_check=check_evidence, verified_login_detection=finding,
@@ -910,6 +924,8 @@ async def deliver_login(body: LoginDeliveryRequest, request: Request, principal:
         if existing is not None:
             return receipt(existing, duplicate=True)
         try:
+            delayed_review = None
+            authority_guard = caller_check
             if body.evidence is not None:
                 try:
                     result = await _analyze_verified_login_in_slot(
@@ -920,12 +936,22 @@ async def deliver_login(body: LoginDeliveryRequest, request: Request, principal:
                     existing = await recorded()
                     if existing is not None:
                         return receipt(existing, duplicate=True)
+                    received_at = datetime.now(UTC)
+                    if eligible_for_delayed_login_review(body.evidence, body.event, received_at):
+                        digest, authority_guard = await _login_evidence_guard(
+                            body, request, principal, delayed_at=received_at,
+                        )
+                        delayed_review = DelayedLoginReview(
+                            source_id=body.evidence.source_id, source_digest_sha256=digest,
+                            observed_at=body.evidence.issued_at, evidence_expired_at=body.evidence.expires_at,
+                        )
                 else:
                     return receipt(result, duplicate=False)
             analyzer = await _load_analysis_provider_in_slot(request, principal, get_analyzer)
             result = await _analyze_event_in_slot(
                 body.event, analyzer, principal, request.state.request_id,
-                caller_authority_check=caller_check, login_delivery=identity, before_persist=assert_audit,
+                caller_authority_check=authority_guard, login_delivery=identity, before_persist=assert_audit,
+                delayed_login_review=delayed_review,
             )
         except AuditReviewConflict:
             # SQLite arbitrates same-ID writes from independent workers.
@@ -1363,6 +1389,7 @@ async def _analyze_event_in_slot(
     llm_trace_supplier: Callable[[], dict | None] | None = None,
     caller_authority_check: Callable[[], None] | None = None,
     verified_login_detection: VerifiedLoginDetection | None = None,
+    delayed_login_review: DelayedLoginReview | None = None,
     before_persist: Callable[[], None] | None = None,
     login_delivery: LoginDeliveryIdentity | None = None,
 ) -> AnalysisResult:
@@ -1408,12 +1435,20 @@ async def _analyze_event_in_slot(
         safe_assessment, verified_controls = enforce_verified_review_safety(
             safe_assessment, snapshot
         )
-    if verified_login_detection is not None and verified_login_detection.disposition == Takeover.PRIORITY_REVIEW:
+    verified_priority = (
+        verified_login_detection is not None and verified_login_detection.disposition == Takeover.PRIORITY_REVIEW
+    )
+    if verified_priority or delayed_login_review is not None:
         updates = {"requires_human_review": True}
         if safe_assessment.recommended_action == RecommendedAction.ALLOW:
             updates["recommended_action"] = RecommendedAction.HOLD_FOR_REVIEW
         safe_assessment = safe_assessment.model_copy(update=updates)
     decision = response_preview(safe_assessment, event)
+    if delayed_login_review is not None:
+        decision = decision.model_copy(update={
+            "reason": "로그인 당시 회수된 기기와 접속 환경 변화가 관측됐습니다. "
+            "인증 근거가 만료되어 운영자 검토가 필요합니다.",
+        })
     result = AnalysisResult(
         **({"analysis_id": login_delivery.analysis_id} if login_delivery is not None else {}),
         event_id=event.event_id,
@@ -1423,6 +1458,7 @@ async def _analyze_event_in_slot(
         normalized_event=normalized,
         detection=detection,
         verified_login_detection=verified_login_detection,
+        delayed_login_review=delayed_login_review,
         login_delivery_sha256=login_delivery.payload_sha256 if login_delivery is not None else None,
         verification_context=snapshot,
         llm_trace=llm_trace_supplier() if llm_trace_supplier else None,

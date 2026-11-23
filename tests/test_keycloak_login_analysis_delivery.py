@@ -1,5 +1,6 @@
 """Guard the automatic fallback at the analysis audit persistence boundary."""
 
+import base64
 import hashlib
 import json
 import sqlite3
@@ -11,16 +12,23 @@ from unittest.mock import Mock
 
 import httpx
 import pytest
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from fastapi.testclient import TestClient
 
 from app import main, security
 from app.config import Settings
-from app.models import SecurityEvent
+from app.models import RecommendedAction, SecurityEvent
 from app.scenarios import synthetic_events
 from app.services.audit import AuditStore
 from app.services.login_delivery import LoginDeliveryIdentity, lock_login_delivery
+from app.services.session_analysis_evidence import event_digest
 from app.services.sqlite_audit import SQLiteAuditStore
-from app.services.trusted_signals import LoginEvidenceExpired, SignalVerifier
+from app.services.trusted_signals import (
+    LoginEvidenceExpired,
+    SignalVerifier,
+    canonical_login_evidence,
+)
 from app.zero_trust_models import LoginDeliveryRequest, SignedLoginEvidence
 from scripts.keycloak_login_evidence import KeycloakLoginAnalysisCollector
 from scripts.login_delivery_spool import LoginDeliverySpool, LoginRetryPolicy
@@ -159,6 +167,110 @@ def test_committed_login_replay_reopens_audit_without_analyzing_twice(observed_l
         changed["location"] = "different-location"
         assert api.post("/analysis/login-delivery", json=payload).status_code == 409
     assert reopened.integrity()["verified_lines"] == runs == 1
+
+
+@pytest.fixture
+def delayed_login_api(observed_login, tmp_path, monkeypatch):
+    event, proof = observed_login
+    registry = tmp_path / "sources.json"
+    key = "fixture-delayed-login"
+    settings = Settings(
+        _env_file=None, app_environment="test", auth_mode="api_key", analyzer_mode="rule",
+        api_key_sha256=hashlib.sha256(key.encode()).hexdigest(), trusted_signal_sources_path=registry,
+    )
+    audit = SQLiteAuditStore(tmp_path / "audit.sqlite3")
+    monkeypatch.setattr(main, "get_settings", lambda: settings)
+    monkeypatch.setattr(security, "get_settings", lambda: settings)
+    monkeypatch.setattr(main, "audit_store", audit)
+    signer = Ed25519PrivateKey.generate()
+
+    def signed_body(case):
+        now = datetime.now(UTC)
+        issued = now - timedelta(seconds=3650 if case == "outside_window" else 45)
+        values = event.analysis_payload()
+        values["timestamp"] = issued
+        values["auth_context"].update(authentication_result="success", mfa="success", failed_attempts=0)
+        values["network"]["location_anomaly"] = case != "no_anomaly"
+        login = SecurityEvent.model_validate(values)
+        expires = issued + timedelta(seconds=30)
+        source = {
+            "source_id": proof.source_id, "tenant_id": "local", "enabled": case != "disabled_source",
+            "user_ids": [login.user.user_id], "device_ids": [login.device.device_id], "roles": [login.user.role],
+            "login_evidence_resource_ids": [login.resource.resource_id],
+            "keys": [{
+                "key_id": proof.key_id, "enabled": case != "disabled_key",
+                "public_key_pem": signer.public_key().public_bytes(
+                    serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo,
+                ).decode(),
+                "not_before": (issued - timedelta(seconds=1)).isoformat(),
+                "not_after": (expires if case == "expired_key" else now + timedelta(minutes=5)).isoformat(),
+            }],
+        }
+        registry.write_text(json.dumps({"sources": [source]}), encoding="utf-8")
+        signed = proof.model_copy(update={
+            "event_digest_sha256": event_digest(login), "issued_at": issued, "expires_at": expires,
+            "device_state": "known" if case == "known_device" else "revoked_verified_device",
+        })
+        signature = base64.urlsafe_b64encode(signer.sign(canonical_login_evidence(signed))).decode().rstrip("=")
+        signed = signed.model_copy(update={"signature": signature if case != "tampered" else "A" * 86})
+        if case == "wrong_event":
+            login = login.model_copy(update={"event_id": "different-event"})
+        return LoginDeliveryRequest(event=login, evidence=signed, tenant_id="local", collector_subject="service-client")
+
+    with TestClient(main.app, headers={"X-API-Key": key}) as api:
+        yield api, audit, registry, signed_body
+
+
+@pytest.mark.parametrize("case,expected", [
+    ("delayed_threat", 200), ("known_device", 200), ("no_anomaly", 200), ("outside_window", 200),
+    ("tampered", 401), ("wrong_event", 401), ("disabled_source", 401), ("disabled_key", 401), ("expired_key", 401),
+])
+def test_expired_login_can_only_add_a_bounded_historical_review(delayed_login_api, case, expected):
+    api, audit, _, signed_body = delayed_login_api
+    body = signed_body(case)
+    payload = body.model_dump(mode="json")
+    live_path = "/analysis/verified-login"
+    verified_payload = {name: payload[name] for name in ("event", "evidence")}
+    assert api.post(live_path, json=verified_payload).status_code == 401
+    assert api.post(live_path + "?report_expiry=true", json=verified_payload).status_code == (
+        410 if expected == 200 else 401
+    )
+    response = api.post("/analysis/login-delivery", json=payload)
+    assert response.status_code == expected, response.text
+    if expected == 401:
+        assert audit.integrity()["verified_lines"] == 0
+        return
+    receipt = response.json()
+    assert receipt["evidence_state"] == "expired" and receipt["duplicate"] is False
+    result = receipt["result"]
+    assert "verified_login_detection" not in result and "verification_context" not in result
+    historical = result.get("delayed_login_review")
+    if case == "delayed_threat":
+        assert historical["reason"] == "expired_revoked_device_observation"
+        assert result["policy_decision"]["requires_human_review"]
+        assert result["policy_decision"]["action"] == RecommendedAction.HOLD_FOR_REVIEW
+        assert "인증 근거가 만료" in result["policy_decision"]["reason"]
+    else:
+        assert historical is None
+        assert not result["policy_decision"]["requires_human_review"]
+    assert api.post("/analysis/login-delivery", json=payload).json() == {**receipt, "duplicate": True}
+    assert audit.integrity()["verified_lines"] == 1
+
+
+def test_delayed_login_source_withdrawal_stops_audit_commit(delayed_login_api, monkeypatch):
+    api, audit, registry, signed_body = delayed_login_api
+    body = signed_body("delayed_threat")
+    analyze = main.RuleBasedAnalyzer.analyze
+
+    async def withdraw_source(analyzer, event):
+        result = await analyze(analyzer, event)
+        registry.write_text('{"sources":[]}', encoding="utf-8")
+        return result
+
+    monkeypatch.setattr(main.RuleBasedAnalyzer, "analyze", withdraw_source)
+    response = api.post("/analysis/login-delivery", json=body.model_dump(mode="json"))
+    assert response.status_code == 401
+    assert audit.integrity()["verified_lines"] == 0
 
 
 def test_spool_survives_abrupt_process_exit(observed_login, tmp_path):

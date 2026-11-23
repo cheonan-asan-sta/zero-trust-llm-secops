@@ -31,7 +31,7 @@ TARGET = "127.0.0.1:9101"
 ALERT = "C01LoginQueueHeld"
 REVIEWER = "fixture-queue-reviewer"
 NOTE = "분석 경로 복구 확인"
-FIELDS = ("detection", "assessment", "policy_decision", "review_status", "verified_login_detection")
+FIELDS = ("detection", "assessment", "review_status")
 
 
 @contextmanager
@@ -350,8 +350,25 @@ def exercise(root, *, cases, analysis_api, settings, audit, analysis_runs, start
             assert outcome == saved.model_dump(mode="json")
             assert analysis_runs[event_id] == 1, (case.name, analysis_runs[event_id])
             assert outcome["detection"] == fresh["detection"] == basic["detection"]
-            reference = fresh if committed else basic
-            assert all(outcome.get(field) == reference.get(field) for field in FIELDS), case.name
+            historical = not committed and body.evidence.device_state == "revoked_verified_device"
+            reference = fresh if committed or historical else basic
+            assert all(outcome[field] == reference[field] for field in FIELDS), case.name
+            assert outcome.get("verified_login_detection") == (fresh["verified_login_detection"] if committed else None)
+            marker = outcome.get("delayed_login_review")
+            policy = outcome["policy_decision"].copy()
+            if historical:
+                assert marker == {
+                    "reason": "expired_revoked_device_observation",
+                    "source_id": fresh["verified_login_detection"]["source_id"],
+                    "source_digest_sha256": fresh["verified_login_detection"]["source_digest_sha256"],
+                    "observed_at": fresh["verified_login_detection"]["observed_at"],
+                    "evidence_expired_at": body.evidence.model_dump(mode="json")["expires_at"],
+                }
+                assert "인증 근거가 만료" in policy["reason"]
+                policy["reason"] = reference["policy_decision"]["reason"]
+            else:
+                assert marker is None
+            assert policy == reference["policy_decision"], case.name
             matched_history = [item for item in history if item["event_id"] == event_id]
             assert [item["outcome"] for item in matched_history] == ["delivered", "approved"]
             delivery, approval = matched_history
@@ -360,12 +377,13 @@ def exercise(root, *, cases, analysis_api, settings, audit, analysis_runs, start
             expected_fresh = fresh["policy_decision"]["requires_human_review"]
             actual = outcome["policy_decision"]["requires_human_review"]
             assert expected_fresh == case.priority
-            assert actual == (case.priority and case.name != "dashboard_outage_device_only")
+            assert actual == case.priority
             record(classified_fresh, case.priority, expected_fresh)
             record(classified_after, case.priority, actual)
             observations.append({
                 "case": case.name, "expected_priority": case.priority, "fresh_priority": expected_fresh,
                 "after_priority": actual, "evidence_state": receipt["evidence_state"],
+                "historical_review": historical,
                 "held_cause": approval["failure_code"], "worker_reused_committed_result": delivery["duplicate"],
                 "analysis_runs": analysis_runs[event_id], "analysis_audit_rows": 1, "approval_history_rows": len(matched_history),
                 "sigma_equal": True, "result_matches_applicable_baseline": True,
