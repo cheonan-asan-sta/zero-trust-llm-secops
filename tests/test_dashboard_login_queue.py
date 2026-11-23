@@ -16,7 +16,7 @@ from app.scenarios import synthetic_events
 from app.services.sqlite_audit import SQLiteAuditStore
 from scripts import login_delivery_spool
 from scripts.keycloak_login_evidence import KeycloakLoginAnalysisCollector
-from scripts.login_delivery_spool import LoginRetryPolicy
+from scripts.login_delivery_spool import LoginDeliverySpool, LoginRetryPolicy
 
 TENANT = "local"
 OPERATOR = "operator"
@@ -151,7 +151,11 @@ def test_duplicate_approval_and_lost_receipt_preserve_detection_and_audit(setup,
     history = review(state)["history"]
     assert [row["outcome"] for row in history] == ["delivered", "deferred", "approved"]
     assert history[0]["duplicate"] and history[2]["actor"] == OPERATOR
-    row = main.audit_store.login_delivery(history[0]["analysis_id"]).model_dump(mode="json")
+    delivered = history[0]
+    assert delivered["evidence_state"] == "missing"
+    assert all(row["evidence_state"] is None and row["review_kind"] is None for row in history[1:])
+    row = main.audit_store.login_delivery(delivered["analysis_id"]).model_dump(mode="json")
+    assert delivered["review_kind"] == ("required" if row["policy_decision"]["requires_human_review"] else "not_required")
     assert row["detection"] == original["detection"]
     assert row["assessment"] == original["assessment"]
     assert row["policy_decision"] == original["policy_decision"]
@@ -193,3 +197,27 @@ def test_only_scoped_alerts_survive_queue_unavailability(setup):
     assert unavailable["alerts"] == data["alerts"]
     assert unavailable["queue"] is unavailable["review"] is None
     assert not state.collector.spool.path.exists()
+
+
+def test_legacy_history_stays_readable_across_collector_upgrade(setup):
+    state = setup
+    queue = state.collector.spool
+    hold(state, event_for(False))
+    metadata = review(state)
+    item, = metadata["held"]
+    assert approval(state, item, metadata).status_code == 200
+    state.mode = "recover"
+    assert state.collector.flush_pending() == 1
+    complete = review(state)["history"]
+
+    # Simulate the schema of the earlier collector on this disposable fixture.
+    with queue._transaction() as con:
+        con.execute("ALTER TABLE login_queue_review_history DROP COLUMN evidence_state")
+        con.execute("ALTER TABLE login_queue_review_history DROP COLUMN review_kind")
+    legacy = review(state)["history"]
+    assert legacy == [{**entry, "evidence_state": None, "review_kind": None} for entry in complete]
+    migrated = LoginDeliverySpool(
+        queue.path, origin="http://127.0.0.1", tenant_id=TENANT, collector_subject="collector",
+    )
+    assert migrated.review_page()["history"] == legacy
+    assert migrated.counts() == {"held": 0, "pending": 0}

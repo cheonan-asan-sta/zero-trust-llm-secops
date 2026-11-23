@@ -246,6 +246,10 @@ pre { padding: 14px; border: 1px solid var(--line); border-radius: 3px; backgrou
 .login-queue .table-wrap { overflow: auto; }
 .login-queue td { overflow-wrap: anywhere; white-space: normal; }
 .login-queue td:first-child { min-width: 108px; }
+#loginQueueHistoryTable th:first-child { width: 210px; }
+.login-queue-history-meta, .login-queue-history-review { display: block; margin-top: 4px; }
+.login-queue-history-meta { color: var(--muted); }
+.login-queue-history-mobile { display: none; }
 .login-queue-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .login-queue-search { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; padding-top: 6px; }
 .login-queue-search input { width: min(100%, 28ch); padding: 6px 8px; border: 1px solid var(--line); }
@@ -264,6 +268,11 @@ pre { padding: 14px; border: 1px solid var(--line); border-radius: 3px; backgrou
     #loginQueueHeldTable :is(th, td):nth-child(3),
     #loginQueueHeldTable :is(th, td):nth-child(4) { display: none; }
     #loginQueueHeldTable th:last-child { width: 64px; }
+    #loginQueueHistoryTable table { min-width: 0; table-layout: fixed; }
+    #loginQueueHistoryTable th, #loginQueueHistoryTable td { padding: 8px; white-space: normal; }
+    #loginQueueHistoryTable th:first-child { width: 58%; }
+    #loginQueueHistoryTable :is(th, td):nth-child(n+3) { display: none; }
+    .login-queue-history-mobile { display: block; margin-top: 6px; }
 }
 
 /* Local demonstration tools */

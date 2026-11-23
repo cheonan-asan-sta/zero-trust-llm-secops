@@ -12,6 +12,7 @@ from pathlib import Path
 from time import time
 from uuid import uuid4
 
+from app.services.account_takeover import Takeover
 from app.services.collector_spool import (
     SpoolBindingMismatch,
     SpoolConflict,
@@ -112,7 +113,7 @@ class LoginDeliverySpool:
             },
         }
         for table, columns in additions.items():
-            existing = {row[1] for row in con.execute(f"PRAGMA table_info({table})")}
+            existing = _columns(con, table)
             for column, definition in columns.items():
                 if column not in existing:
                     con.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
@@ -124,6 +125,10 @@ class LoginDeliverySpool:
             "outcome TEXT NOT NULL, observed_at REAL NOT NULL, actor TEXT, note TEXT, "
             "failure_code TEXT, http_status INTEGER, analysis_id TEXT, duplicate INTEGER)"
         )
+        history_columns = _columns(con, "login_queue_review_history")
+        for column in ("evidence_state", "review_kind"):
+            if column not in history_columns:
+                con.execute(f"ALTER TABLE login_queue_review_history ADD COLUMN {column} TEXT")
         con.execute(
             "CREATE UNIQUE INDEX IF NOT EXISTS login_queue_approval_once "
             "ON login_queue_review_history(approval_id) WHERE outcome='approved'"
@@ -184,8 +189,12 @@ class LoginDeliverySpool:
             if row is not None and row[0] is not None:
                 if receipt is None:
                     raise SpoolConflict("approved login resend requires a confirmed analysis receipt")
-                self._record_review(con, row[0], body.event.event_id, "delivered", now,
-                                    analysis_id=receipt.result.analysis_id, duplicate=int(receipt.duplicate))
+                con.execute(
+                    "INSERT INTO login_queue_review_history(approval_id,event_id,outcome,observed_at,"
+                    "analysis_id,duplicate,evidence_state,review_kind) VALUES (?,?,'delivered',?,?,?,?,?)",
+                    (row[0], body.event.event_id, now, receipt.result.analysis_id, int(receipt.duplicate),
+                     receipt.evidence_state, _review_kind(receipt.result)),
+                )
             con.execute("DELETE FROM login_queue WHERE event_id=? AND payload_sha256=?", self._key(body))
             self._schedule(con, now + policy.success_interval, 0)
 
@@ -262,8 +271,13 @@ class LoginDeliverySpool:
                 "WHERE held_status IS NOT NULL AND seq>? AND (? IS NULL OR event_id=?) ORDER BY seq LIMIT ?",
                 (after, event_id, event_id, limit + 1),
             ).fetchall()
+            history_columns = _columns(con, "login_queue_review_history")
+            result_cols = (
+                "evidence_state,review_kind" if {"evidence_state", "review_kind"} <= history_columns else "NULL,NULL"
+            )
             history = con.execute(
-                "SELECT approval_id,event_id,outcome,observed_at,actor,note,failure_code,http_status,analysis_id,duplicate "
+                "SELECT approval_id,event_id,outcome,observed_at,actor,note,failure_code,http_status,analysis_id,duplicate,"
+                f"{result_cols} "
                 "FROM login_queue_review_history WHERE (? IS NULL OR event_id=?) ORDER BY seq DESC LIMIT 30",
                 (event_id, event_id),
             ).fetchall()
@@ -277,8 +291,9 @@ class LoginDeliverySpool:
             "history": [
                 {"approval_id": approval, "event_id": eid, "outcome": outcome, "observed_at": _utc(at),
                  "actor": actor, "note": note, "failure_code": code, "http_status": status,
-                 "analysis_id": analysis, "duplicate": bool(duplicate) if duplicate is not None else None}
-                for approval, eid, outcome, at, actor, note, code, status, analysis, duplicate in history
+                 "analysis_id": analysis, "duplicate": bool(duplicate) if duplicate is not None else None,
+                 "evidence_state": evidence, "review_kind": review_kind}
+                for approval, eid, outcome, at, actor, note, code, status, analysis, duplicate, evidence, review_kind in history
             ],
         }
 
@@ -309,11 +324,11 @@ class LoginDeliverySpool:
 
     @staticmethod
     def _record_review(con, approval_id, event_id, outcome, now, *, actor=None, note=None,
-                       failure_code=None, http_status=None, analysis_id=None, duplicate=None):
+                       failure_code=None, http_status=None):
         con.execute(
             "INSERT INTO login_queue_review_history(approval_id,event_id,outcome,observed_at,actor,note,"
-            "failure_code,http_status,analysis_id,duplicate) VALUES (?,?,?,?,?,?,?,?,?,?)",
-            (approval_id, event_id, outcome, now, actor, note, failure_code, http_status, analysis_id, duplicate),
+            "failure_code,http_status) VALUES (?,?,?,?,?,?,?,?)",
+            (approval_id, event_id, outcome, now, actor, note, failure_code, http_status),
         )
 
     def counts(self):
@@ -346,6 +361,21 @@ class LoginDeliverySpool:
             "oldest_pending_at": _utc(first_enqueued), "oldest_held_at": _utc(first_held),
             "retry_at": _utc(max(next_send, next_due)) if next_due is not None else None,
         }
+
+
+def _columns(connection, table):
+    return {row[1] for row in connection.execute(f"PRAGMA table_info({table})")}
+
+
+def _review_kind(result):
+    if result.delayed_login_review is not None:
+        return "expired_device_priority"
+    if (
+        result.verified_login_detection is not None
+        and result.verified_login_detection.disposition == Takeover.PRIORITY_REVIEW
+    ):
+        return "verified_priority"
+    return "required" if result.policy_decision.requires_human_review else "not_required"
 
 
 def _utc(value):

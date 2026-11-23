@@ -328,7 +328,17 @@ def exercise(root, *, cases, analysis_api, settings, audit, analysis_runs, start
             need(lambda: queue.counts() == {"pending": 0, "held": 0}, "Approved login queue did not drain")
             if page:
                 page.locator("#loginQueueRefresh").click()
-                expect(page.locator("#loginQueueHistoryRows")).to_contain_text("분석 결과 확인")
+                for width in (1440, 390):
+                    page.set_viewport_size({"width": width, "height": 1000})
+                    history_rows = page.locator("#loginQueueHistoryRows")
+                    expect(history_rows.get_by_text("우선 검토 · 당시 회수 기기", exact=True)).to_have_count(2)
+                    expect(history_rows.get_by_text("우선 검토 · 검증된 회수 기기", exact=True)).to_have_count(1)
+                    expect(history_rows.get_by_text("분석 당시 검토 불필요", exact=True)).to_have_count(1)
+                    expect(history_rows.get_by_text("인증 근거 만료", exact=True)).to_have_count(3)
+                    expect(history_rows.get_by_text("인증 근거 검증됨", exact=True)).to_have_count(1)
+                    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
+                    if width == 390:
+                        assert page.locator("#loginQueueHistoryTable").evaluate("e => e.scrollWidth <= e.clientWidth + 1")
             def alert_cleared():
                 status = dashboard(reviewer)["alerts"]
                 return status["state"] == "ready" and not any(item["name"] == ALERT for item in status["entries"])
@@ -373,6 +383,12 @@ def exercise(root, *, cases, analysis_api, settings, audit, analysis_runs, start
             assert [item["outcome"] for item in matched_history] == ["delivered", "approved"]
             delivery, approval = matched_history
             assert delivery["analysis_id"] == outcome["analysis_id"] and delivery["duplicate"] is committed
+            assert delivery["evidence_state"] == receipt["evidence_state"]
+            expected_kind = (
+                "expired_device_priority" if historical else "verified_priority" if committed else "not_required"
+            )
+            assert delivery["review_kind"] == expected_kind
+            assert approval["evidence_state"] is None and approval["review_kind"] is None
             assert approval["actor"] == REVIEWER and approval["note"] == NOTE
             expected_fresh = fresh["policy_decision"]["requires_human_review"]
             actual = outcome["policy_decision"]["requires_human_review"]
@@ -384,6 +400,8 @@ def exercise(root, *, cases, analysis_api, settings, audit, analysis_runs, start
                 "case": case.name, "expected_priority": case.priority, "fresh_priority": expected_fresh,
                 "after_priority": actual, "evidence_state": receipt["evidence_state"],
                 "historical_review": historical,
+                "history_evidence_state": delivery["evidence_state"],
+                "history_review_kind": delivery["review_kind"],
                 "held_cause": approval["failure_code"], "worker_reused_committed_result": delivery["duplicate"],
                 "analysis_runs": analysis_runs[event_id], "analysis_audit_rows": 1, "approval_history_rows": len(matched_history),
                 "sigma_equal": True, "result_matches_applicable_baseline": True,
@@ -395,6 +413,7 @@ def exercise(root, *, cases, analysis_api, settings, audit, analysis_runs, start
         "held_alert_fired_and_cleared": ALERT,
         "prometheus_read_as_dashboard_reviewer": True,
         "dashboard_approval_mode": "chrome" if browser else "authenticated_dashboard_api",
+        "browser_history_viewports_px": [1440, 390] if browser else [],
         "duplicate_approvals_reused": len(observations),
         "analysis_and_audit_duplicates": 0,
         "analysis_audit_rows": len(observations),

@@ -11,6 +11,13 @@
     C01LoginQueueCapacityPressure: "대기열 용량 경고",
   };
   const outcomes = {approved: "승인·재전송 등록", deferred: "재시도 대기", held_again: "다시 보류", delivered: "분석 결과 확인"};
+  const evidenceStates = {verified: "인증 근거 검증됨", missing: "인증 근거 없음", expired: "인증 근거 만료"};
+  const reviewLabels = {
+    expired_device_priority: "우선 검토 · 당시 회수 기기",
+    verified_priority: "우선 검토 · 검증된 회수 기기",
+    required: "운영자 검토 필요",
+    not_required: "분석 당시 검토 불필요",
+  };
   const causes = {
     transport_timeout: "연결 시간 초과", transport_connect: "API 연결 실패",
     transport_interrupted: "전송 중 연결 중단", receipt_invalid: "확인 응답 형식 오류",
@@ -79,6 +86,25 @@
     return row;
   }
 
+  function historyRow(entry) {
+    const observed = timestamp(entry.observed_at);
+    const detail = entry.actor
+      ? [entry.actor, entry.note, cause(entry)].join(" · ")
+      : entry.analysis_id
+        ? (entry.duplicate ? "기존 결과 확인" : "분석 ID") + " · " + entry.analysis_id
+        : cause(entry);
+    const row = tableRow(["", entry.event_id, observed, detail]);
+    const status = row.firstElementChild;
+    status.append(node("strong", outcomes[entry.outcome]));
+    if (entry.outcome === "delivered") {
+      status.append(node("span", evidenceStates[entry.evidence_state] ?? "근거 상태 미기록", "login-queue-history-meta"));
+      const decision = reviewLabels[entry.review_kind];
+      if (decision) status.append(node("span", decision, "login-queue-history-review"));
+    }
+    status.append(node("span", observed + " · " + detail, "login-queue-history-mobile login-queue-history-meta"));
+    return row;
+  }
+
   function render(payload) {
     const queue = payload.queue;
     const metrics = queue ? [
@@ -128,14 +154,7 @@
     $("Next").disabled = next === null;
     $("HistoryEmpty").hidden = review.history.length > 0;
     $("HistoryTable").hidden = !review.history.length;
-    $("HistoryRows").replaceChildren(...review.history.map((entry) => {
-      const detail = entry.actor
-        ? [entry.actor, entry.note, cause(entry)].join(" · ")
-        : entry.analysis_id
-          ? (entry.duplicate ? "기존 결과 확인" : "분석 ID") + " · " + entry.analysis_id
-          : cause(entry);
-      return tableRow([timestamp(entry.observed_at), entry.event_id, outcomes[entry.outcome], detail]);
-    }));
+    $("HistoryRows").replaceChildren(...review.history.map(historyRow));
   }
 
   async function load(message) {
