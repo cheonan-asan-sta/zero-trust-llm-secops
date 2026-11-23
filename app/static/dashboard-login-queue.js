@@ -3,7 +3,7 @@
   "use strict";
   const $ = (id) => document.getElementById("loginQueue" + id);
   const ctx = window.dashboardContext;
-  const {request, node, errorLabel} = ctx;
+  const {request, node, errorLabel, openReplayAnalysis} = ctx;
   const alertNames = {
     C01LoginQueueStatusUnavailable: "대기열 상태 확인 실패",
     C01LoginQueueBacklog: "대기 시간 확인 필요",
@@ -100,6 +100,13 @@
       status.append(node("span", evidenceStates[entry.evidence_state] ?? "근거 상태 미기록", "login-queue-history-meta"));
       const decision = reviewLabels[entry.review_kind];
       if (decision) status.append(node("span", decision, "login-queue-history-review"));
+      if (/^[a-f0-9]{64}$/.test(entry.analysis_id ?? "")) {
+        const button = node("button", "분석 기록 보기", "row-button");
+        button.type = "button";
+        button.setAttribute("aria-label", entry.event_id + " 분석 기록 보기");
+        button.addEventListener("click", () => openReplayAnalysis(entry));
+        status.append(button);
+      }
     }
     status.append(node("span", observed + " · " + detail, "login-queue-history-mobile login-queue-history-meta"));
     return row;

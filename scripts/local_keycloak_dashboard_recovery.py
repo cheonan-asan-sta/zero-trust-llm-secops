@@ -160,7 +160,7 @@ def dashboard_page(browser, base, key):
     if browser is None:
         yield None
         return
-    from playwright.sync_api import expect, sync_playwright
+    from playwright.sync_api import sync_playwright
 
     with sync_playwright() as playwright:
         chrome = playwright.chromium.launch(executable_path=str(browser), args=["--disable-background-networking"])
@@ -170,16 +170,36 @@ def dashboard_page(browser, base, key):
             page.on("pageerror", lambda error: errors.append(str(error)))
             page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(base + "/") else route.abort())
             page.goto(base + "/#evidence")
-            page.locator("#autoRefresh").uncheck()
-            page.locator("#connectionButton").click()
-            page.locator("#credentialType").select_option("api_key")
-            page.locator("#credential").fill(key)
-            page.get_by_role("button", name="적용하고 조회").click()
-            expect(page.locator("#loginQueueRefresh")).to_be_enabled(timeout=15000)
+            connect_dashboard(page, key)
             yield page
             assert not errors, errors
         finally:
             chrome.close()
+
+
+def connect_dashboard(page, key):
+    from playwright.sync_api import expect
+
+    page.locator("#autoRefresh").uncheck()
+    page.locator("#connectionButton").click()
+    page.locator("#credentialType").select_option("api_key")
+    page.locator("#credential").fill(key)
+    page.get_by_role("button", name="적용하고 조회").click()
+    expect(page.locator("#loginQueueRefresh")).to_be_enabled(timeout=15000)
+
+
+def check_replay_detail(page, body):
+    from playwright.sync_api import expect
+
+    analysis_id = LoginDeliveryIdentity.from_request(body).analysis_id
+    page.get_by_role("button", name=body.event.event_id + " 분석 기록 보기", exact=True).click()
+    expect(page.locator("#detailTitle")).to_have_text("재전송 분석 기록")
+    detail = page.locator("#detailBody")
+    expect(detail).to_contain_text(analysis_id)
+    expect(detail).to_contain_text("인증 근거가 만료")
+    assert detail.get_by_role("button", name="검토 상태 변경").count() == 0
+    assert page.locator("#detailDialog").evaluate("e => e.scrollWidth <= e.clientWidth + 1")
+    page.locator("#closeDetail").click()
 
 
 def approve(reviewer, review, row, page):
@@ -339,6 +359,11 @@ def exercise(root, *, cases, analysis_api, settings, audit, analysis_runs, start
                     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
                     if width == 390:
                         assert page.locator("#loginQueueHistoryTable").evaluate("e => e.scrollWidth <= e.clientWidth + 1")
+                    body = next(body for case, body, *_ in records if case.name == "dashboard_outage_device_only")
+                    check_replay_detail(page, body)
+                page.reload()
+                connect_dashboard(page, operator_key)
+                check_replay_detail(page, body)
             def alert_cleared():
                 status = dashboard(reviewer)["alerts"]
                 return status["state"] == "ready" and not any(item["name"] == ALERT for item in status["entries"])
@@ -389,6 +414,8 @@ def exercise(root, *, cases, analysis_api, settings, audit, analysis_runs, start
             )
             assert delivery["review_kind"] == expected_kind
             assert approval["evidence_state"] is None and approval["review_kind"] is None
+            detail = reviewer.get(f"/dashboard/login-queue/deliveries/{delivery['analysis_id']}")
+            assert detail.status_code == 200 and detail.json() == outcome
             assert approval["actor"] == REVIEWER and approval["note"] == NOTE
             expected_fresh = fresh["policy_decision"]["requires_human_review"]
             actual = outcome["policy_decision"]["requires_human_review"]
@@ -414,6 +441,8 @@ def exercise(root, *, cases, analysis_api, settings, audit, analysis_runs, start
         "prometheus_read_as_dashboard_reviewer": True,
         "dashboard_approval_mode": "chrome" if browser else "authenticated_dashboard_api",
         "browser_history_viewports_px": [1440, 390] if browser else [],
+        "browser_replay_detail_after_reload": browser is not None,
+        "exact_replay_details_matched": len(observations),
         "duplicate_approvals_reused": len(observations),
         "analysis_and_audit_duplicates": 0,
         "analysis_audit_rows": len(observations),

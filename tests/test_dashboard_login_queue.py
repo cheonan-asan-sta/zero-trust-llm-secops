@@ -221,3 +221,44 @@ def test_legacy_history_stays_readable_across_collector_upgrade(setup):
     )
     assert migrated.review_page()["history"] == legacy
     assert migrated.counts() == {"held": 0, "pending": 0}
+
+
+def test_replay_detail_resolves_exact_completed_analysis_within_queue_scope(setup):
+    state = setup
+    event = event_for(False)
+    hold(state, event)
+    metadata = review(state)
+    item, = metadata["held"]
+    assert approval(state, item, metadata).status_code == 200
+    state.mode = "recover"
+    assert state.collector.flush_pending() == 1
+    delivery = review(state)["history"][0]
+    original = main.audit_store.login_delivery(delivery["analysis_id"]).model_dump(mode="json")
+
+    # Two audit records can share the same event ID; the queue references exactly one.
+    later = state.api.post("/analysis", headers=headers("collector-key"), json=event.analysis_payload()).json()
+    assert later["analysis_id"] != original["analysis_id"]
+    event_path = f"/results/{event.event_id}"
+    assert state.api.get(event_path, headers=headers()).json() == later
+
+    path = f"/dashboard/login-queue/deliveries/{delivery['analysis_id']}"
+    response = state.api.get(path, headers=headers())
+    assert response.status_code == 200 and response.json() == original
+    assert "ETag" not in response.headers
+    assert state.api.get(path, headers=headers("viewer-key")).status_code == 403
+    assert state.api.get(path, headers=headers("foreign-key")).status_code == 403
+    assert state.api.get(path).status_code == 401
+
+    # Even a same-tenant durable analysis cannot be referenced without a completion row.
+    other = event.model_copy(update={"event_id": "other-delivery"})
+    receipt = state.api.post("/analysis/login-delivery", headers=headers("collector-key"), json={
+        "tenant_id": TENANT, "collector_subject": "collector", "event": other.analysis_payload(),
+    })
+    assert receipt.status_code == 200
+    unrelated = receipt.json()["result"]["analysis_id"]
+    assert state.api.get(f"/dashboard/login-queue/deliveries/{unrelated}", headers=headers()).status_code == 404
+
+    with state.collector.spool._transaction() as con:
+        con.execute("UPDATE login_queue_review_history SET event_id='wrong-event' WHERE outcome='delivered'")
+    assert state.api.get(path, headers=headers()).status_code == 404
+    assert main.audit_store.integrity()["verified_lines"] == 3

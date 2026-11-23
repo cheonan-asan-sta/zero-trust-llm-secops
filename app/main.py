@@ -8,6 +8,7 @@ from time import perf_counter
 from typing import Annotated, Literal
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request, Response
+from fastapi import Path as RoutePath
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from mangum import Mangum
@@ -21,6 +22,7 @@ from app.behavior_context_api import behavior_context_router
 from app.config import get_settings
 from app.dashboard_api import router as dashboard_router
 from app.dashboard_jobs_api import router as dashboard_jobs_router
+from app.login_queue_api import confirmed_delivery_reference
 from app.login_queue_api import router as login_queue_router
 from app.middleware import RequestBodyLimitMiddleware, RequestContextMiddleware
 from app.models import (
@@ -1808,6 +1810,30 @@ async def result(
     response.headers["X-Review-Identity"] = review_identity(principal)
     response.headers["X-Review-Mode"] = "conditional" if isinstance(store, SQLiteAuditStore) else "unavailable"
     return record
+
+
+@app.get("/dashboard/login-queue/deliveries/{analysis_id}", response_model=AnalysisResult)
+async def replay_analysis_detail(
+    analysis_id: Annotated[str, RoutePath(pattern=r"^[a-f0-9]{64}$")],
+    request: Request, principal: ResponderPrincipal,
+) -> AnalysisResult:
+    async with _audit_query_slot():
+        store = audit_store
+        if not isinstance(store, SQLiteAuditStore):
+            raise HTTPException(503, "Login delivery requires a SQLite audit store")
+        reference = await _audit_call_in_slot(store, confirmed_delivery_reference, principal, request, principal, analysis_id)
+        profile, event_id = reference
+        record = await _audit_read_in_slot(store, "login_delivery", principal, request, analysis_id)
+        if (
+            record is None or record.event_id != event_id or record.tenant_id != principal.tenant_id
+            or record.actor_id != profile.collector_subject or record.login_delivery_sha256 is None
+        ):
+            raise HTTPException(404, "Confirmed analysis not found")
+        if reference != await _audit_call_in_slot(
+            store, confirmed_delivery_reference, principal, request, principal, analysis_id,
+        ):
+            raise HTTPException(409, "Login queue reference changed; reload the queue")
+        return record
 
 
 handler = Mangum(app, lifespan="off")

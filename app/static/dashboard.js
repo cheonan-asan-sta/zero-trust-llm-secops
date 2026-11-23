@@ -406,23 +406,37 @@
     if (!$("detailDialog").open) $("detailDialog").showModal();
     return ++state.detailSequence;
   }
-  async function showRecord(record, type) {
+  async function showRecord(record, type, {replay = false} = {}) {
+    const identity = state.data.identity;
     const epoch = state.epoch;
-    const sequence = openDetail(type === "log" ? "분석 기록" : type === "session" ? "세션 이력" : "대응 요청");
+    const title = {log: replay ? "재전송 분석 기록" : "분석 기록", session: "세션 이력", response: "대응 요청"};
+    const sequence = openDetail(title[type]);
     try {
-      const path = type === "log" ? `/results/${encodeURIComponent(record.event_id)}` : type === "session" ? `/zero-trust/sessions/${encodeURIComponent(record.session_id)}` : `/response/requests/${encodeURIComponent(record.request_id)}`;
-      const reviewObservation = type === "log" ? await readReviewObservation(record.event_id) : null;
-      const item = reviewObservation ? reviewObservation.record : checked(type === "session" ? "sessions" : type, await request(path));
+      let item, reviewObservation;
+      if (replay) {
+        item = checked("log", await request(`/dashboard/login-queue/deliveries/${encodeURIComponent(record.analysis_id)}`));
+        if (!sameReviewIdentity(identity, state.data.identity) || item.tenant_id !== identity.tenant_id ||
+            item.event_id !== record.event_id || item.analysis_id !== record.analysis_id) {
+          throw new Error("조회 결과의 대상과 신원을 확인할 수 없습니다.");
+        }
+      } else if (type === "log") {
+        reviewObservation = await readReviewObservation(record.event_id);
+        item = reviewObservation.record;
+      } else {
+        const path = type === "session" ? `/zero-trust/sessions/${encodeURIComponent(record.session_id)}` : `/response/requests/${encodeURIComponent(record.request_id)}`;
+        item = checked(type === "session" ? "sessions" : type, await request(path));
+      }
       if (epoch !== state.epoch || sequence !== state.detailSequence) return;
       const body = $("detailBody");
       body.replaceChildren();
       if (type === "log") {
         body.append(fields([
           ["이벤트 ID", item.event_id],
+          ...(replay ? [["분석 ID", item.analysis_id]] : []),
           ["분석 시각", date(item.analyzed_at, true)],
           ["위험도 / 점수", `${item.assessment.risk_level} / ${item.assessment.risk_score}`],
           ["분석기", item.analyzer],
-          ["검토 상태", reviews[item.review_status] || item.review_status],
+          [replay ? "분석 당시 검토 상태" : "검토 상태", reviews[item.review_status] || item.review_status],
           ["테넌트", item.tenant_id]
         ]));
         body.append(detailsList("판단 근거", [item.assessment.rationale, ...item.assessment.evidence]), detailsList("정책과 대응 제안", [item.policy_decision.reason, `제안: ${item.policy_decision.action} / 실행 모드: ${item.policy_decision.mode}`, "이 분석 제안만으로 외부 계정이나 기기를 차단하지 않습니다."]));
@@ -452,10 +466,13 @@
           ["승인", `${item.approved_by.length} / ${item.required_approvals}`]
         ]), detailsList("요청 사유", [item.reason]), detailsList("검토 이력", item.reviews.map((review) => `${review.subject} / ${date(review.approved_at, true)} / ${review.reason}`)), node("p", "서로 다른 검토자 2명의 승인이 필요합니다. 실행 결과는 로컬 모의 대응입니다.", "scope-note"));
       }
-      window.dashboardOperations?.detailActions(type, item, body, reviewObservation);
+      if (!replay) window.dashboardOperations?.detailActions(type, item, body, reviewObservation);
       body.append(rawPanel(item));
     } catch (error) {
-      if (epoch === state.epoch && sequence === state.detailSequence) $("detailBody").replaceChildren(empty(errorLabel(error)));
+      if (epoch === state.epoch && sequence === state.detailSequence) {
+        const message = replay && error.status === 404 ? "재전송에 연결된 분석 기록을 찾을 수 없습니다." : errorLabel(error);
+        $("detailBody").replaceChildren(empty(message));
+      }
     }
   }
 
@@ -1143,7 +1160,7 @@
   $("demoCompromise").addEventListener("click", () => runDemo("compromise"));
   const tick = () => text("clock", `${new Date().toLocaleDateString("ko-KR")} ${date(Date.now())}`);
   window.dashboardContext = {request, node, redact, rawPanel, analysisEvidence, refresh, notify, errorLabel,
-    readReviewObservation, sameReviewIdentity,
+    readReviewObservation, sameReviewIdentity, openReplayAnalysis: (record) => showRecord(record, "log", {replay: true}),
     get state() { return {epoch: state.epoch, page: state.page, data: state.data}; }};
   tick();
   setInterval(tick, 1000);

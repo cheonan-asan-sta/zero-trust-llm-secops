@@ -100,6 +100,17 @@ def _tag(queue, event_id, hold_id):
     return '"r1-' + hashlib.sha256(scope).hexdigest() + '"'
 
 
+def confirmed_delivery_reference(principal, analysis_id):
+    profile = _profile(principal)
+    try:
+        event_id = _queue(profile).completed_event(analysis_id)
+    except (OSError, SpoolUnavailable, SpoolBindingMismatch) as error:
+        raise HTTPException(503, "Login queue unavailable") from error
+    if event_id is None:
+        raise HTTPException(404, "Confirmed delivery not found")
+    return profile, event_id
+
+
 def _prometheus_get(client, origin, path):
     with client.stream("GET", origin.rstrip("/") + path) as response:
         response.raise_for_status()

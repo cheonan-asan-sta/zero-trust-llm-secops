@@ -134,6 +134,8 @@ class LoginDeliverySpool:
             "ON login_queue_review_history(approval_id) WHERE outcome='approved'"
         )
         con.execute("CREATE INDEX IF NOT EXISTS login_queue_review_event ON login_queue_review_history(event_id,seq)")
+        con.execute("CREATE INDEX IF NOT EXISTS login_queue_delivered_analysis "
+                    "ON login_queue_review_history(analysis_id,seq) WHERE outcome='delivered'")
 
     def enqueue(self, body, *, now=None):
         self._check_owner(body)
@@ -321,6 +323,15 @@ class LoginDeliverySpool:
                                 failure_code=held[0], http_status=held[1])
             authorize()
         return {"approval_id": hold_id, "duplicate": False}
+
+    def completed_event(self, analysis_id):
+        with self._transaction(read_only=True) as con:
+            row = con.execute(
+                "SELECT event_id FROM login_queue_review_history "
+                "WHERE outcome='delivered' AND analysis_id=? ORDER BY seq DESC LIMIT 1",
+                (analysis_id,),
+            ).fetchone()
+        return None if row is None else row[0]
 
     @staticmethod
     def _record_review(con, approval_id, event_id, outcome, now, *, actor=None, note=None,
