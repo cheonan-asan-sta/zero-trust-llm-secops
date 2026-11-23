@@ -30,7 +30,7 @@ from scripts.mtls_transport import Quiet
 GATEWAY = "ato-loopback"
 
 
-def device_from_peer(channel, registry, principal, now):
+def device_from_peer(channel, registry, principal, now, device_ids=None):
     if (
         not isinstance(channel, ssl.SSLSocket)
         or not channel.server_side
@@ -47,7 +47,7 @@ def device_from_peer(channel, registry, principal, now):
             tenant_id=principal.tenant_id,
             gateway_id=GATEWAY,
             user_id=principal.subject,
-            device_id=fingerprint,
+            device_id=(device_ids or {}).get(fingerprint, fingerprint),
             client_certificate_sha256=fingerprint,
         ),
         now=now,
@@ -64,7 +64,10 @@ def _material(root, name, bundle):
     return str(cert), str(key)
 
 
-def exercise(root, *, settings, binding, token, other_token, authority, pattern_report, warning):
+def exercise(
+    root, *, settings, binding, token, other_token, authority, pattern_report, warning,
+    revoke_session=None,
+):
     """Run paired controls with real key possession and provider MFA, using scoped test conditions."""
     root.mkdir()
     patterns = [
@@ -84,39 +87,60 @@ def exercise(root, *, settings, binding, token, other_token, authority, pattern_
         name: mtls_fixtures.leaf(ca, name)
         for name in ("approved", "revoked", "foreign-account", "unregistered")
     }
+    device_ids = {}
+    if revoke_session is not None:
+        for name, device_id in (
+            ("first", "fixture-device-a"),
+            ("replacement", "fixture-device-b"),
+            ("reenrolled", "fixture-device-b"),
+        ):
+            clients[name] = mtls_fixtures.leaf(ca, name)
+            device_ids[clients[name]["fingerprint"]] = device_id
     contexts = {}
     for name, bundle in clients.items():
         client = ssl.create_default_context(cafile=str(ca_path))
         client.load_cert_chain(*_material(root, name, bundle))
         contexts[name] = client
     contexts["no-certificate"] = ssl.create_default_context(cafile=str(ca_path))
-    now = datetime.now(UTC)
-    config_path = root / "enrollments.json"
-    write(
-        config_path,
-        {
-            "schema_version": "zt-vpn-enrollments-1",
-            "version": 1,
-            "issued_at": (now - timedelta(seconds=1)).isoformat(),
-            "expires_at": (now + timedelta(minutes=5)).isoformat(),
-            "bindings": [
-                {
-                    "tenant_id": binding.tenant,
-                    "gateway_id": GATEWAY,
-                    "user_id": binding.subject
-                    if name != "foreign-account"
-                    else "separate-fixture-subject",
-                    "device_id": clients[name]["fingerprint"],
-                    "client_certificate_sha256": clients[name]["fingerprint"],
-                    "enabled": name != "revoked",
-                }
-                for name in ("approved", "revoked", "foreign-account")
-            ],
-        },
-    )
-    registry = PinnedVPNEnrollments(
-        config_path, hashlib.sha256(config_path.read_bytes()).hexdigest()
-    )
+    gate = Lock()
+    enabled = {"approved": True, "revoked": False, "foreign-account": True}
+    version = 0
+    registry = None
+
+    def publish_registry(**updates):
+        nonlocal registry, version
+        now = datetime.now(UTC)
+        version += 1
+        enabled.update(updates)
+        bindings = []
+        for name, is_enabled in enabled.items():
+            certificate = clients[name]["fingerprint"]
+            bindings.append({
+                "tenant_id": binding.tenant,
+                "gateway_id": GATEWAY,
+                "user_id": binding.subject if name != "foreign-account" else "separate-fixture-subject",
+                "device_id": device_ids.get(certificate, certificate),
+                "client_certificate_sha256": certificate,
+                "enabled": is_enabled,
+            })
+        config_path = root / f"enrollments-v{version}.json"
+        write(
+            config_path,
+            {
+                "schema_version": "zt-vpn-enrollments-1",
+                "version": version,
+                "issued_at": (now - timedelta(seconds=1)).isoformat(),
+                "expires_at": (now + timedelta(minutes=5)).isoformat(),
+                "bindings": bindings,
+            },
+        )
+        candidate = PinnedVPNEnrollments(
+            config_path, hashlib.sha256(config_path.read_bytes()).hexdigest(), minimum_version=version
+        )
+        with gate:
+            registry = candidate
+
+    publish_registry()
     tls = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     tls.minimum_version = ssl.TLSVersion.TLSv1_2
     tls.verify_mode = ssl.CERT_REQUIRED
@@ -124,7 +148,6 @@ def exercise(root, *, settings, binding, token, other_token, authority, pattern_
     tls.load_verify_locations(cafile=str(ca_path))
     tls.load_cert_chain(*server_cert)
     pending = {}
-    gate = Lock()
 
     class Handler(Quiet):
         def do_POST(self):
@@ -142,9 +165,12 @@ def exercise(root, *, settings, binding, token, other_token, authority, pattern_
                 authority(settings.oidc_issuer, principal)
                 with gate:
                     challenge = pending.pop(self.path, None)
+                    current_registry = registry
                 if challenge is None or monotonic() >= challenge[1]:
                     raise HTTPException(409)
-                device = device_from_peer(self.connection, registry, principal, datetime.now(UTC))
+                device = device_from_peer(
+                    self.connection, current_registry, principal, datetime.now(UTC), device_ids
+                )
                 if not binding.matches(principal, presented):
                     raise HTTPException(403)
             except HTTPException as error:
@@ -192,7 +218,64 @@ def exercise(root, *, settings, binding, token, other_token, authority, pattern_
         finally:
             connection.close()
 
+    def check_lifecycle(port, flags):
+        previous, current = counts(), counts()
+        cases = {}
+
+        def observe(name, path, client, expected):
+            status, result = request(port, path, client)
+            assert status == 200 and result["device"] == expected, (name, status, result)
+            assert result["still_reviewed"] and result["warning"] == warning, name
+            cases[name] = {"http_status": status, **result}
+            return result
+
+        def score(name, path, client, expected):
+            result = observe(name, path, client, expected)
+            needs_priority = expected is Device.REVOKED
+            assert result["new_priority"] == needs_priority, name
+            record(previous, needs_priority, result["previous_priority"])
+            record(current, needs_priority, result["new_priority"])
+
+        unregistered = observe("before_registration", issue(flags), "first", Device.UNKNOWN)
+        assert not unregistered["new_priority"]
+        publish_registry(first=True)
+        score("new_device_registered", issue(flags), "first", Device.KNOWN)
+
+        issued_before_replacement = issue(flags)
+        publish_registry(first=False, replacement=True)
+        score("retired_device_after_replacement", issued_before_replacement, "first", Device.REVOKED)
+        score("new_replacement_device", issue(flags), "replacement", Device.KNOWN)
+
+        issued_before_revocation = issue(flags)
+        publish_registry(replacement=False)
+        score("first_request_after_device_revocation", issued_before_revocation, "replacement", Device.REVOKED)
+        publish_registry(reenrolled=True)
+        score("old_certificate_after_reenrollment", issue(flags), "replacement", Device.REVOKED)
+        score("reenrolled_device_new_certificate", issue(flags), "reenrolled", Device.KNOWN)
+
+        issued_before_session_revocation = issue(flags)
+        revoke_status = revoke_session()
+        status, result = request(port, issued_before_session_revocation, "reenrolled")
+        assert status == 401 and not result, (status, result)
+        signed_principal = asyncio.run(security._oidc_principal(
+            HTTPAuthorizationCredentials(scheme="Bearer", credentials=token), settings
+        ))
+        assert binding.matches(signed_principal, token)
+        return {
+            "registry_versions": version,
+            "cases": cases,
+            "before": metrics(previous),
+            "after": metrics(current),
+            "keycloak_session_revocation": {
+                "admin_http_status": revoke_status,
+                "first_request_http_status": status,
+                "revoked_token_still_passed_signed_claims_and_otp_binding": True,
+                "decision_returned": bool(result),
+            },
+        }
+
     before, after = counts(), counts()
+    lifecycle = None
     with ThreadingHTTPServer(("127.0.0.1", 0), Handler) as server:
         server.socket = tls.wrap_socket(server.socket, server_side=True)
         port = server.server_address[1]
@@ -231,6 +314,8 @@ def exercise(root, *, settings, binding, token, other_token, authority, pattern_
                 pass
             else:
                 raise AssertionError("device test accepted the connection without a certificate")
+            if revoke_session is not None:
+                lifecycle = check_lifecycle(port, flags)
         finally:
             server.shutdown()
             thread.join(timeout=5)
@@ -245,4 +330,5 @@ def exercise(root, *, settings, binding, token, other_token, authority, pattern_
         "existing_priority_retained": 1,
         "unregistered_and_foreign_scope_remained_review": 2,
         "rejected_replay_expiry_other_session_missing_token_missing_certificate": 5,
+        **({"device_lifecycle": lifecycle} if lifecycle is not None else {}),
     }

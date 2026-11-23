@@ -46,3 +46,26 @@ python -m scripts.run_keycloak_remote_acceptance <new-keycloak-report.json> --at
 관련 회귀 128개와 Ruff를 통과했다. 일회성 Keycloak 컨테이너와 임시 mTLS 인증서·키를 정리했다. 유료 API·AWS·병합은 0회다. [집계와 검증 기록](infrastructure-results/rba-ato-device-review-20261123.json)
 
 [후속 공개 자료 검토](extra-public-mfa-device-evaluation-20261123.md)에서 Entra·Okta 등의 원본을 검사하고, 다른 RBA 계정군에서 인증 근거 결측 시 기존 판정을 보존하는지 확인했다.
+
+## 기기 등록·교체·재등록과 권한 회수 통합 시험
+
+로컬 Docker의 Keycloak 26.8.0에서 OTP로 실제 세션을 발급받고, 임시 CA의 기기 인증서로 mTLS 연결을 열었다. 앱 쪽 시험 등록부는 5개 버전을 차례로 발행하고 매번 SHA-256과 최저 버전을 고정했다. 교체와 권한 회수 전에 발급한 미사용 검토 요청도 포함해, 요청 처리 시점의 등록 상태를 적용하는지 확인했다. 재등록은 교체 기기의 동일한 등록 ID에 새 인증서를 등록하는 절차로 구성했다.
+
+같은 계정의 세 번째 OTP 세션을 대상으로 Keycloak 관리자 API에서 세션을 개별 회수했다. 관리자 응답 직후 같은 토큰과 활성 기기 인증서로 첫 요청을 보냈다. 기기 등록부의 회수는 ATO 우선 검토 판정으로 확인하고, Keycloak 역할·세션 회수는 접근 거부로 확인한다. 기기 상태의 근거는 로컬 앱 등록부와 mTLS이며, Keycloak은 OTP와 세션·역할 상태를 제공한다. [Keycloak 세션 관리 API](https://www.keycloak.org/docs-api/26.8.0/rest-api/index.html)
+
+| 시나리오 | 확인 결과 |
+| --- | --- |
+| 정상 신규 등록·교체·재등록 | 활성 인증서 요청 3건 모두 `200`, 우선 검토 오탐 0건 |
+| 교체한 기기의 기존 인증서 | 교체 전에 발급한 요청도 새 등록부에서 회수로 확인해 우선 검토 |
+| 기기 회수 직후 첫 요청 | 회수 전에 발급한 요청도 우선 검토 |
+| 재등록 이후 이전 인증서 | 이전 인증서는 회수 상태와 우선 검토 유지 |
+| Keycloak 세션 개별 회수 | 관리자 API `204`, 첫 요청 `401`, 검토 판정 미반환. 기존 토큰의 서명·OTP 연결은 여전히 유효했고 같은 계정의 다른 세션 2개도 유지 |
+| Keycloak 분석가 역할 회수 | 관리자 API `204`, 새 역할 부여 전 이전 토큰의 보호 리소스 및 리다이렉트 요청 `401`. 뷰어 부여 후 보호 요청 `403` |
+
+동일한 기기 전환 6건에서 기존 OS 조건은 `TP 0 / FN 3 / FP 0 / TN 3`, MFA·기기 근거를 사용한 판정은 `TP 3 / FN 0 / FP 0 / TN 3`이었다. 우선 검토 재현율과 F1은 각각 0%에서 100%로 바뀌었고 오탐률은 0%를 유지했다. 앞선 통합 시험의 14건을 재실행해 탐지 7/7건과 오탐 0/7건이 그대로 유지됨을 확인했다. 별도 OS 기반 우선 검토 1건도 유지했다. 이 수치는 로컬 통제 시나리오의 결과이며 공개 RBA 지표의 추가 측정은 없다.
+
+관련 회귀 128개와 Ruff를 통과했다. Keycloak 시험 컨테이너와 임시 인증서는 실행 후 정리했다. AWS와 유료 API는 사용하지 않았다. [기기 수명주기 시험 결과](infrastructure-results/local-keycloak-device-lifecycle-20261123.json)
+
+```powershell
+python -m scripts.run_keycloak_remote_acceptance <new-keycloak-report.json> --ato-residual <new-residual.json> --device-lifecycle
+```

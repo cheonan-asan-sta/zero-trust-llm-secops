@@ -13,6 +13,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Annotated
 from unittest.mock import patch
+from urllib.parse import quote
 from uuid import uuid4
 
 import httpx
@@ -174,7 +175,10 @@ def provision_authority_reader(client, base, admin_password):
     assigned.raise_for_status()
 
 
-def verify(base, root, password, otp_seed, admin_password, authority_secret, *, stop_provider, ato_residual=None):
+def verify(
+    base, root, password, otp_seed, admin_password, authority_secret, *, stop_provider,
+    ato_residual=None, device_lifecycle=False,
+):
     issuer = f"{base}/realms/{REALM}"
     metadata_url = issuer + "/.well-known/openid-configuration"
     device_review = None
@@ -362,19 +366,46 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
             reused_redirect = app.post(redirect_path, headers=redirect_caller, follow_redirects=False)
             assert reused_redirect.status_code == 403
             assert "redirect" not in local_oidc_redirect_lab.receipt(redirect_lab, reused_redirect)
-            if ato_residual is not None:
-                device_review = local_ato_device_acceptance.exercise(
-                    root / "ato-device", settings=settings, binding=otp_binding,
-                    token=redirect_tokens["id_token"], other_token=tokens["id_token"],
-                    authority=gateway.state.oidc_live_authority,
-                    pattern_report=read(ato_residual), warning=login_history["candidate_repeated_failure_warning"],
-                )
-                device_review["residual_report_sha256"] = fingerprint(ato_residual)
             out_of_scope = fresh_sign_in(action="REMOTE_ACCESS")
             scope_denial, scope_alert = evaluate(out_of_scope)
             assert scope_alert == "confirmed"
             assert scope_denial["session"]["decision"] == "DENY" and not scope_denial["grant_token"]
+            if ato_residual is not None:
+                review_binding = otp_binding
+                review_token = redirect_tokens["id_token"]
+                revoke_session = None
+                if device_lifecycle:
+                    review_binding = out_of_scope.otp_binding
+                    assert review_binding is not None and review_binding.session != otp_binding.session
+                    review_token = out_of_scope.response.json()["id_token"]
+
+                    def revoke_session():
+                        session = quote(review_binding.session, safe="")
+                        response = client.delete(
+                            f"{base}/admin/realms/{REALM}/sessions/{session}",
+                            headers=fixture_admin_authorization(client, base, admin_password),
+                        )
+                        assert response.status_code == 204, response.status_code
+                        return response.status_code
+
+                device_review = local_ato_device_acceptance.exercise(
+                    root / "ato-device", settings=settings, binding=review_binding,
+                    token=review_token, other_token=tokens["id_token"],
+                    authority=gateway.state.oidc_live_authority,
+                    pattern_report=read(ato_residual), warning=login_history["candidate_repeated_failure_warning"],
+                    revoke_session=revoke_session,
+                )
+                device_review["residual_report_sha256"] = fingerprint(ato_residual)
             authorization = fixture_admin_authorization(client, base, admin_password)
+            if device_lifecycle:
+                sessions = client.get(
+                    f"{base}/admin/realms/{REALM}/users/{identity}/sessions", headers=authorization
+                )
+                sessions.raise_for_status()
+                active = {row["id"] for row in sessions.json()}
+                assert review_binding.session not in active
+                assert approved_otp.otp_binding.session in active and otp_binding.session in active
+                device_review["device_lifecycle"]["keycloak_session_revocation"]["other_sessions_retained"] = 2
             roles = f"{base}/admin/realms/{REALM}/roles"
             mappings = f"{base}/admin/realms/{REALM}/users/{identity}/role-mappings/realm"
             entries = {}
@@ -382,16 +413,10 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
                 response = client.get(f"{roles}/{role}", headers=authorization)
                 response.raise_for_status()
                 entries[role] = response.json()
-            assert (
-                client.request(
-                    "DELETE", mappings, headers=authorization, json=[entries["analyst"]]
-                ).status_code
-                == 204
+            role_removal = client.request(
+                "DELETE", mappings, headers=authorization, json=[entries["analyst"]]
             )
-            assert (
-                client.post(mappings, headers=authorization, json=[entries["viewer"]]).status_code
-                == 204
-            )
+            assert role_removal.status_code == 204
             app_path = "/zero-trust/protected-access"
             old_role = app.post(app_path, json=requested, headers=analyst)
             assert old_role.status_code == 401
@@ -400,6 +425,10 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
             assert web_old_role.status_code == 401
             assert web_old_role.json()["detail"] == "Caller roles changed since token issuance"
             assert "redirect" not in local_oidc_redirect_lab.receipt(redirect_lab, web_old_role)
+            assert (
+                client.post(mappings, headers=authorization, json=[entries["viewer"]]).status_code
+                == 204
+            )
             refresh = token(grant_type="refresh_token", refresh_token=tokens["refresh_token"])
             assert refresh.status_code == 200, refresh.status_code
             viewer = headers(refresh.json()["id_token"])
@@ -465,6 +494,7 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
         "pre_auth_outage_probe": "actual stopped loopback provider",
         "failed_mfa_grant": False,
         "downgraded_role": 403,
+        "role_removal": role_removal.status_code,
         "logout": 204,
         "refresh_after_logout": 400,
         "old_token_after_role_removal": old_role.status_code,
@@ -495,7 +525,9 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
     }
 
 
-def run(output, *, ato_residual=None):
+def run(output, *, ato_residual=None, device_lifecycle=False):
+    if device_lifecycle and ato_residual is None:
+        raise ValueError("device lifecycle requires an ATO residual report")
     name = f"zt-keycloak-{uuid4().hex[:12]}"
     password, admin_password = secrets.token_urlsafe(28), secrets.token_urlsafe(28)
     otp_seed = secrets.token_hex(20)
@@ -547,6 +579,7 @@ def run(output, *, ato_residual=None):
                 authority_secret,
                 stop_provider=stop_provider,
                 ato_residual=ato_residual,
+                device_lifecycle=device_lifecycle,
             )
         finally:
             try:
@@ -562,5 +595,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=Path)
     parser.add_argument("--ato-residual", type=Path)
+    parser.add_argument("--device-lifecycle", action="store_true", help="include device transitions and targeted Keycloak session revocation")
     args = parser.parse_args()
-    run(args.output, ato_residual=args.ato_residual)
+    run(args.output, ato_residual=args.ato_residual, device_lifecycle=args.device_lifecycle)
