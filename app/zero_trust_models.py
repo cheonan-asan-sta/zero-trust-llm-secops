@@ -5,7 +5,7 @@ from pydantic import Field, field_validator, model_serializer, model_validator
 
 from app.behavior_context_models import BehaviorScope
 from app.continuous_signal_models import MAX_SECURITY_VERSION, ObservationKind, ResourceIdentifier
-from app.models import EventAction, SecurityEvent, StrictModel
+from app.models import AnalysisResult, EventAction, SecurityEvent, StrictModel
 
 MAX_EVALUATION_VERSION = 200
 LOGIN_EVIDENCE_EXPIRED = "verified_login_evidence_expired"
@@ -293,6 +293,25 @@ class SignedLoginEvidence(StrictModel):
 class VerifiedLoginAnalysisRequest(StrictModel):
     event: SecurityEvent
     evidence: SignedLoginEvidence
+
+
+class LoginDeliveryRequest(StrictModel):
+    tenant_id: str = Field(pattern=r"^[A-Za-z0-9._-]{1,64}$")
+    collector_subject: str = Field(min_length=1, max_length=128)
+    event: SecurityEvent
+    evidence: SignedLoginEvidence | None = None
+
+    @model_validator(mode="after")
+    def observed_login_only(self):
+        if self.event.action != EventAction.LOGIN or self.event.ground_truth is not None:
+            raise ValueError("delivery requires an observed login event")
+        return self
+
+
+class LoginDeliveryReceipt(StrictModel):
+    result: AnalysisResult
+    evidence_state: Literal["verified", "missing", "expired"]
+    duplicate: bool
 
 
 class SignedSessionSignal(SessionEvaluationRequest):

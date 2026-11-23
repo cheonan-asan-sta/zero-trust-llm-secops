@@ -1,0 +1,79 @@
+{
+  "aws_calls": 0,
+  "container_removed": true,
+  "finished_at": "2026-11-23T03:59:10.031129+00:00",
+  "image": "quay.io/keycloak/keycloak:26.8.0",
+  "login_metrics": {
+    "accuracy": 1.0,
+    "f1": 1.0,
+    "false_positive_rate": 0.0,
+    "fn": 0,
+    "fp": 0,
+    "inference_errors": 0,
+    "population": 10,
+    "precision": 1.0,
+    "recall": 1.0,
+    "tn": 6,
+    "tp": 4
+  },
+  "paid_api_calls": 0,
+  "previous_keycloak_results_matched": true,
+  "previous_login_and_fallback_results_matched": true,
+  "recovery_by_failure": {
+    "api_unreachable": {
+      "duplicate_analysis_or_audit": 0,
+      "false_positives": 0,
+      "recovered": 2,
+      "threats_retained": 1
+    },
+    "response_lost": {
+      "duplicate_analysis_or_audit": 0,
+      "false_positives": 0,
+      "recovered": 2,
+      "threats_retained": 1
+    }
+  },
+  "recovery_scenarios": [
+    {
+      "analysis_runs": 1,
+      "audit_rows": 1,
+      "case": "api_unreachable_normal",
+      "committed_before_replay": false,
+      "existing_sigma_matches_unchanged": true,
+      "expected_priority": false,
+      "original_result_replayed": true,
+      "requires_human_review": false
+    },
+    {
+      "analysis_runs": 1,
+      "audit_rows": 1,
+      "case": "api_unreachable_threat",
+      "committed_before_replay": false,
+      "existing_sigma_matches_unchanged": true,
+      "expected_priority": true,
+      "original_result_replayed": true,
+      "requires_human_review": true
+    },
+    {
+      "analysis_runs": 1,
+      "audit_rows": 1,
+      "case": "response_lost_normal",
+      "committed_before_replay": true,
+      "existing_sigma_matches_unchanged": true,
+      "expected_priority": false,
+      "original_result_replayed": true,
+      "requires_human_review": false
+    },
+    {
+      "analysis_runs": 1,
+      "audit_rows": 1,
+      "case": "response_lost_threat",
+      "committed_before_replay": true,
+      "existing_sigma_matches_unchanged": true,
+      "expected_priority": true,
+      "original_result_replayed": true,
+      "requires_human_review": true
+    }
+  ],
+  "regression_tests_passed": 459
+}

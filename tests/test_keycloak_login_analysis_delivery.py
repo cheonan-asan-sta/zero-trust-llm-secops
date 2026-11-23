@@ -1,6 +1,8 @@
 """Guard the automatic fallback at the analysis audit persistence boundary."""
 
 import hashlib
+import subprocess
+import sys
 from datetime import UTC, datetime, timedelta
 from unittest.mock import Mock
 
@@ -13,9 +15,12 @@ from app.config import Settings
 from app.models import SecurityEvent
 from app.scenarios import synthetic_events
 from app.services.audit import AuditStore
+from app.services.login_delivery import LoginDeliveryIdentity, lock_login_delivery
+from app.services.sqlite_audit import SQLiteAuditStore
 from app.services.trusted_signals import LoginEvidenceExpired, SignalVerifier
-from app.zero_trust_models import SignedLoginEvidence
+from app.zero_trust_models import LoginDeliveryRequest, SignedLoginEvidence
 from scripts.keycloak_login_evidence import KeycloakLoginAnalysisCollector
+from scripts.login_delivery_spool import LoginDeliverySpool
 
 
 @pytest.fixture
@@ -113,3 +118,83 @@ def test_unconfirmed_failure_is_never_retried_as_baseline(status, observed_login
             collector(client).submit(event, proof)
     request_handler.assert_called_once()
     assert request_handler.call_args.args[0].url.path == "/analysis/verified-login"
+
+
+def test_committed_login_replay_reopens_audit_without_analyzing_twice(observed_login, tmp_path, monkeypatch):
+    event, _ = observed_login
+    api_key = "test-durable-login-api-key"
+    settings = Settings(
+        _env_file=None, app_environment="test", auth_mode="api_key", analyzer_mode="rule",
+        api_key_sha256=hashlib.sha256(api_key.encode()).hexdigest(),
+    )
+    monkeypatch.setattr(main, "get_settings", lambda: settings)
+    monkeypatch.setattr(security, "get_settings", lambda: settings)
+    store = SQLiteAuditStore(tmp_path / "audit.sqlite3")
+    monkeypatch.setattr(main, "audit_store", store)
+    runs = 0
+    analyze = main.RuleBasedAnalyzer.analyze
+
+    async def count(analyzer, observed):
+        nonlocal runs
+        runs += 1
+        return await analyze(analyzer, observed)
+
+    monkeypatch.setattr(main.RuleBasedAnalyzer, "analyze", count)
+    body = LoginDeliveryRequest(event=event, tenant_id="local", collector_subject="service-client")
+    payload = body.model_dump(mode="json")
+    with TestClient(main.app, headers={"X-API-Key": api_key}) as api:
+        initial = api.post("/analysis/login-delivery", json=payload)
+        assert initial.status_code == 200, initial.text
+        assert initial.json()["duplicate"] is False
+        reopened = SQLiteAuditStore(store.path)
+        monkeypatch.setattr(main, "audit_store", reopened)
+        repeated = api.post("/analysis/login-delivery", json=payload)
+        assert repeated.json() == {**initial.json(), "duplicate": True}
+        assert api.post("/analysis/login-delivery", json={**payload, "tenant_id": "other"}).status_code == 403
+        assert api.post("/analysis/login-delivery", json={**payload, "collector_subject": "other"}).status_code == 403
+        changed = payload["event"]["network"]
+        changed["location"] = "different-location"
+        assert api.post("/analysis/login-delivery", json=payload).status_code == 409
+    assert reopened.integrity()["verified_lines"] == runs == 1
+
+
+def test_spool_survives_abrupt_process_exit(observed_login, tmp_path):
+    event, proof = observed_login
+    body = LoginDeliveryRequest(event=event, evidence=proof, tenant_id="local", collector_subject="service-client")
+    path = tmp_path / "pending.sqlite3"
+    program = (
+        "import os, sys; "
+        "from scripts.login_delivery_spool import LoginDeliverySpool, LoginDeliveryRequest; "
+        "queue = LoginDeliverySpool(sys.argv[1], origin='http://127.0.0.1/', "
+        "tenant_id='local', collector_subject='service-client'); "
+        "queue.enqueue(LoginDeliveryRequest.model_validate_json(sys.stdin.buffer.read())); os._exit(0)"
+    )
+    subprocess.run([sys.executable, "-c", program, str(path)], input=body.model_dump_json().encode(),
+                   check=True, timeout=20)
+    queue = LoginDeliverySpool(path, origin="http://127.0.0.1/", tenant_id="local", collector_subject="service-client")
+    assert queue.counts() == {"pending": 1, "held": 0}
+    assert queue.peek() == body
+
+
+def test_same_login_lock_is_shared_across_api_processes(observed_login, tmp_path):
+    event, _ = observed_login
+    body = LoginDeliveryRequest(event=event, tenant_id="local", collector_subject="service-client")
+    identity = LoginDeliveryIdentity.from_request(body)
+    path = tmp_path / "audit.sqlite3"
+    program = """
+import sys
+from pathlib import Path
+from app.services.login_delivery import LoginDeliveryBusy, LoginDeliveryIdentity, lock_login_delivery
+try:
+    with lock_login_delivery(Path(sys.argv[1]), LoginDeliveryIdentity(sys.argv[2], '')):
+        print('acquired')
+except LoginDeliveryBusy:
+    print('busy')
+"""
+
+    def child():
+        return subprocess.check_output([sys.executable, "-c", program, str(path), identity.analysis_id], timeout=20).strip()
+
+    with lock_login_delivery(path, identity):
+        assert child() == b"busy"
+    assert child() == b"acquired"

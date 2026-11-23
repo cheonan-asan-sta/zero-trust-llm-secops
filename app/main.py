@@ -124,6 +124,11 @@ from app.services.integration_outbox import (
     OutboxTerminalStateError,
     create_integration_outbox_store,
 )
+from app.services.login_delivery import (
+    LoginDeliveryBusy,
+    LoginDeliveryIdentity,
+    lock_login_delivery,
+)
 from app.services.native_analysis_registry import (
     NativeAnalysisMissing,
     create_native_analysis_registry,
@@ -152,6 +157,8 @@ from app.services.zero_trust import POLICY_PATH, ZeroTrustOperations
 from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
 from app.zero_trust_models import (
     LOGIN_EVIDENCE_EXPIRED,
+    LoginDeliveryReceipt,
+    LoginDeliveryRequest,
     SignedSessionSignal,
     VerifiedLoginAnalysisRequest,
 )
@@ -812,34 +819,16 @@ async def analyze_verified_login(
 ) -> AnalysisResult:
     if principal.auth_method not in {"api_key", "oidc"}:
         raise HTTPException(401, "Authenticated analyst required for verified login evidence")
-    caller_check = getattr(request.state, "authentication_revalidator", None)
-    verifier = SignalVerifier(get_settings().trusted_signal_sources_path)
     persistence_started = False
 
     def mark_persistence_started():
         nonlocal persistence_started
         persistence_started = True
 
-    def source_digest():
-        if caller_check is not None:
-            caller_check()
-        if get_settings().trusted_signal_sources_path != verifier.registry_path:
-            raise SignalRejected("verified login registry changed")
-        return verifier.verify_login_evidence(body.evidence, body.event, principal, datetime.now(UTC))
-
     try:
         async with _analysis_slot():
-            digest = await settled_io(source_digest)
-            finding = detect_verified_login(body.event, body.evidence, digest)
-
-            def check_evidence():
-                if source_digest() != digest:
-                    raise SignalRejected("verified login source changed")
-
-            return await _analyze_event_in_slot(
-                body.event, RuleBasedAnalyzer(), principal, request.state.request_id,
-                caller_authority_check=check_evidence, verified_login_detection=finding,
-                before_persist=mark_persistence_started,
+            return await _analyze_verified_login_in_slot(
+                body, request, principal, before_persist=mark_persistence_started,
             )
     except LoginEvidenceExpired as exc:
         if report_expiry and not persistence_started:
@@ -849,6 +838,108 @@ async def analyze_verified_login(
         raise HTTPException(
             429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
         ) from exc
+
+
+async def _analyze_verified_login_in_slot(body, request, principal, *, before_persist=None, delivery=None):
+    caller_check = getattr(request.state, "authentication_revalidator", None)
+    verifier = SignalVerifier(get_settings().trusted_signal_sources_path)
+
+    def source_digest():
+        if caller_check is not None:
+            caller_check()
+        if get_settings().trusted_signal_sources_path != verifier.registry_path:
+            raise SignalRejected("verified login registry changed")
+        return verifier.verify_login_evidence(body.evidence, body.event, principal, datetime.now(UTC))
+
+    digest = await settled_io(source_digest)
+    finding = detect_verified_login(body.event, body.evidence, digest)
+
+    def check_evidence():
+        if source_digest() != digest:
+            raise SignalRejected("verified login source changed")
+
+    return await _analyze_event_in_slot(
+        body.event, RuleBasedAnalyzer(), principal, request.state.request_id,
+        caller_authority_check=check_evidence, verified_login_detection=finding,
+        before_persist=before_persist, login_delivery=delivery,
+    )
+
+
+@app.post("/analysis/login-delivery", response_model=LoginDeliveryReceipt)
+async def deliver_login(body: LoginDeliveryRequest, request: Request, principal: AnalystPrincipal):
+    if principal.auth_method not in {"api_key", "oidc"} or (
+        body.tenant_id != principal.tenant_id or body.collector_subject != principal.subject
+    ):
+        raise HTTPException(403, "Login delivery identity mismatch")
+    store = audit_store
+    if not isinstance(store, SQLiteAuditStore):
+        raise HTTPException(503, "Login delivery requires a SQLite audit store")
+    identity = LoginDeliveryIdentity.from_request(body)
+    caller_check = getattr(request.state, "authentication_revalidator", None)
+
+    def assert_audit():
+        if audit_store is not store:
+            raise AuditQueryUnavailable("login delivery audit authority changed")
+
+    async def recorded():
+        await _analysis_caller_boundary(principal, caller_check)
+        assert_audit()
+        result = await settled_io(store.login_delivery, identity.analysis_id)
+        await _analysis_caller_boundary(principal, caller_check)
+        assert_audit()
+        if result is not None and (
+            result.login_delivery_sha256 != identity.payload_sha256
+            or result.event_id != body.event.event_id
+            or result.actor_id != principal.subject or result.tenant_id != principal.tenant_id
+        ):
+            raise HTTPException(409, "Login delivery conflicts with committed event")
+        return result
+
+    def receipt(result, *, duplicate):
+        assert_audit()
+        if result.verified_login_detection is not None:
+            state = "verified"
+        else:
+            state = "missing" if body.evidence is None else "expired"
+        return LoginDeliveryReceipt(result=result, evidence_state=state, duplicate=duplicate)
+
+    async def process_delivery():
+        existing = await recorded()
+        if existing is not None:
+            return receipt(existing, duplicate=True)
+        try:
+            if body.evidence is not None:
+                try:
+                    result = await _analyze_verified_login_in_slot(
+                        body, request, principal, delivery=identity, before_persist=assert_audit,
+                    )
+                except LoginEvidenceExpired:
+                    # An expiry after committing is a historical success, not a second analysis.
+                    existing = await recorded()
+                    if existing is not None:
+                        return receipt(existing, duplicate=True)
+                else:
+                    return receipt(result, duplicate=False)
+            analyzer = await _load_analysis_provider_in_slot(request, principal, get_analyzer)
+            result = await _analyze_event_in_slot(
+                body.event, analyzer, principal, request.state.request_id,
+                caller_authority_check=caller_check, login_delivery=identity, before_persist=assert_audit,
+            )
+        except AuditReviewConflict:
+            # SQLite arbitrates same-ID writes from independent workers.
+            existing = await recorded()
+            if existing is None:
+                raise
+            return receipt(existing, duplicate=True)
+        return receipt(result, duplicate=False)
+    try:
+        async with _analysis_slot():
+            with lock_login_delivery(store.path, identity):
+                return await process_delivery()
+    except (AnalysisCapacityExceeded, LoginDeliveryBusy) as exc:
+        raise HTTPException(429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}) from exc
+    except OSError as exc:
+        raise AuditQueryUnavailable("login delivery unavailable") from exc
 
 
 @app.post("/analysis/batch", response_model=BatchAnalysisResult)
@@ -1271,6 +1362,7 @@ async def _analyze_event_in_slot(
     caller_authority_check: Callable[[], None] | None = None,
     verified_login_detection: VerifiedLoginDetection | None = None,
     before_persist: Callable[[], None] | None = None,
+    login_delivery: LoginDeliveryIdentity | None = None,
 ) -> AnalysisResult:
     """Internal pipeline; its caller must hold an analysis slot throughout."""
     # Live integrity scans must not block the event loop or release capacity
@@ -1321,6 +1413,7 @@ async def _analyze_event_in_slot(
         safe_assessment = safe_assessment.model_copy(update=updates)
     decision = response_preview(safe_assessment, event)
     result = AnalysisResult(
+        **({"analysis_id": login_delivery.analysis_id} if login_delivery is not None else {}),
         event_id=event.event_id,
         analyzer=analyzer.name,
         assessment=safe_assessment,
@@ -1328,6 +1421,7 @@ async def _analyze_event_in_slot(
         normalized_event=normalized,
         detection=detection,
         verified_login_detection=verified_login_detection,
+        login_delivery_sha256=login_delivery.payload_sha256 if login_delivery is not None else None,
         verification_context=snapshot,
         llm_trace=llm_trace_supplier() if llm_trace_supplier else None,
         verified_review_controls=verified_controls,

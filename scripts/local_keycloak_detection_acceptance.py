@@ -24,8 +24,9 @@ from fastapi import HTTPException
 from app import config, security
 from app.config import Settings
 from app.models import SecurityEvent
-from app.services.audit import AuditStore
-from app.zero_trust_models import LOGIN_EVIDENCE_EXPIRED, SignedLoginEvidence
+from app.services.login_delivery import LoginDeliveryIdentity
+from app.services.sqlite_audit import SQLiteAuditStore
+from app.zero_trust_models import LOGIN_EVIDENCE_EXPIRED, LoginDeliveryRequest, SignedLoginEvidence
 from scripts import mtls_fixtures
 from scripts.evaluate_local_remote_holdout import write
 from scripts.f1_lab.native_bayes import counts, metrics, record
@@ -66,7 +67,13 @@ FALLBACK_CASES = (
     (Case("expired_normal", "active", True, False), "expired"),
     (Case("expired_existing_high_risk", "revoked", True, True), "expired"),
 )
-CASES = HOLDOUT + tuple(case for case, _ in FALLBACK_CASES)
+RECOVERY_CASES = (
+    Case("api_unreachable_normal", "active", True, False),
+    Case("api_unreachable_threat", "revoked", True, True),
+    Case("response_lost_normal", "active", False, False),
+    Case("response_lost_threat", "revoked", True, True),
+)
+CASES = HOLDOUT + tuple(case for case, _ in FALLBACK_CASES) + RECOVERY_CASES
 
 
 def username(case):
@@ -74,9 +81,9 @@ def username(case):
 
 
 @contextmanager
-def analysis_client(app, operator_key):
+def analysis_client(app, operator_key, *, port=0):
     with socket.socket() as listener:
-        listener.bind(("127.0.0.1", 0))
+        listener.bind(("127.0.0.1", port))
         listener.listen()
         server = uvicorn.Server(uvicorn.Config(
             app, lifespan="off", access_log=False, log_config=None,
@@ -99,6 +106,18 @@ def analysis_client(app, operator_key):
             thread.join(timeout=8)
             if thread.is_alive():
                 raise RuntimeError("loopback analysis service failed to stop")
+
+
+class LoseCommittedResponse(httpx.HTTPTransport):
+    """Deliver to the actual API, then simulate loss of its successful response."""
+
+    def handle_request(self, request):
+        response = super().handle_request(request)
+        if response.status_code == 200:
+            response.read()
+            response.close()
+            raise httpx.ReadError("test lost response after commit", request=request)
+        return response
 
 
 def exercise(root, *, acquire, settings, authority, tenant):
@@ -171,15 +190,14 @@ def exercise(root, *, acquire, settings, authority, tenant):
     analysis_settings = Settings(
         _env_file=None, app_environment="test", analyzer_mode="rule", auth_mode="api_key",
         api_key_sha256=hashlib.sha256(operator_key.encode()).hexdigest(), api_key_tenant_id=tenant,
-        trusted_signal_sources_path=source_path, audit_backend="jsonl", audit_log_path=root / "analysis-audit.jsonl",
+        trusted_signal_sources_path=source_path, audit_backend="sqlite", audit_db_path=root / "analysis-audit.sqlite3",
         case_log_path=root / "cases.jsonl", outbox_log_path=root / "outbox.jsonl",
         zero_trust_db_path=root / "sessions.sqlite3",
     )
     with patch.object(config, "get_settings", return_value=analysis_settings):
         from app import main
 
-    analysis_settings.audit_log_path.touch()
-    audit = AuditStore(analysis_settings.audit_log_path, strict_reads=True)
+    audit = SQLiteAuditStore(analysis_settings.audit_db_path)
     pending = {}
     gate = Lock()
 
@@ -207,8 +225,8 @@ def exercise(root, *, acquire, settings, authority, tenant):
             except httpx.HTTPStatusError as error:
                 self.reply(error.response.status_code)
                 return
-            self.reply(200, json.dumps({
-                "evidence_state": delivered.evidence_state, "result": delivered.response.json(),
+            self.reply(delivered.response.status_code, json.dumps({
+                "evidence_state": delivered.evidence_state, "result": delivered.result,
             }).encode())
 
     def gateway_request(server, event, binding, bearer, cert_case, *, capture_only=False):
@@ -270,9 +288,76 @@ def exercise(root, *, acquire, settings, authority, tenant):
             "baseline_assessment_and_detection_unchanged": True, "audit_writes": 1,
         }
 
+    def make_collector(api, path):
+        return KeycloakLoginAnalysisCollector(
+            api, settings=settings, authority=authority, registry=registry,
+            gateway_id=GATEWAY, source_id=SOURCE, key_id=KEY_ID, signing_key=signing_key,
+            spool_path=path, tenant_id=tenant, collector_subject=analysis_settings.api_key_subject,
+        )
+
+    def queue_recovery_cases(server, api, cases):
+        queued = []
+        for index, case in enumerate(cases, len(HOLDOUT) + len(FALLBACK_CASES) + 1):
+            authentication = acquire(case)
+            binding = authentication.otp_binding
+            assert binding is not None and binding.subject == subjects[case.name]
+            bearer = authentication.response.json()["id_token"]
+            event = make_event(case, index)
+            baseline = api.post("/analysis", json=event.analysis_payload())
+            baseline.raise_for_status()
+            analysis_runs[event.event_id] = 0
+            status, outcome = gateway_request(server, event, binding, bearer, case)
+            assert status == 202 and outcome == {"evidence_state": "queued", "result": None}, case.name
+            queued.append((case, event, baseline.json()))
+        return queued
+
+    def inspect_recovery(ready, api, queued, *, committed_before_retry):
+        observed_before = [analysis_runs[event.event_id] for _, event, _ in queued]
+        assert observed_before == [int(committed_before_retry)] * len(queued)
+        assert ready.spool.counts() == {"pending": len(queued), "held": 0}
+        # Read each immutable envelope for later explicit duplicate checks; the worker drains it.
+        with ready.spool._transaction() as con:
+            bodies = [LoginDeliveryRequest.model_validate_json(row[0]) for row in con.execute(
+                "SELECT payload FROM login_queue ORDER BY seq"
+            )]
+        writes = audit.integrity()["verified_lines"]
+        with ready.replaying(interval=0.05):
+            deadline = monotonic() + 12
+            while ready.spool.counts()["pending"]:
+                assert monotonic() < deadline, "automatic login replay did not drain"
+                sleep(0.05)
+        assert ready.spool.counts() == {"pending": 0, "held": 0}
+        assert audit.integrity()["verified_lines"] == writes + (0 if committed_before_retry else len(queued))
+        for (case, event, baseline), body in zip(queued, bodies, strict=True):
+            identity = LoginDeliveryIdentity.from_request(body)
+            original = audit.login_delivery(identity.analysis_id)
+            assert original is not None
+            resent = api.post("/analysis/login-delivery", json=body.model_dump(mode="json"))
+            assert resent.status_code == 200, (case.name, resent.status_code)
+            replay = resent.json()
+            assert replay["duplicate"] and replay["evidence_state"] == "verified"
+            result = replay["result"]
+            assert result == original.model_dump(mode="json")
+            assert analysis_runs[event.event_id] == 1, case.name
+            assert result["detection"] == baseline["detection"], case.name
+            assert result["policy_decision"]["requires_human_review"] == case.priority, case.name
+            changed = body.model_dump(mode="json")
+            changed["event"]["network"]["location"] = "different-location"
+            assert api.post("/analysis/login-delivery", json=changed).status_code == 409
+            recovery_observations.append({
+                "case": case.name, "expected_priority": case.priority,
+                "committed_before_replay": committed_before_retry,
+                "analysis_runs": analysis_runs[event.event_id], "audit_rows": 1,
+                "original_result_replayed": True, "existing_sigma_matches_unchanged": True,
+                "requires_human_review": result["policy_decision"]["requires_human_review"],
+            })
+        assert audit.integrity()["verified_lines"] == writes + (0 if committed_before_retry else len(queued))
+
     before, after = counts(), counts()
     observed = []
     fallback_observations = []
+    recovery_observations = []
+    analysis_runs = {}
     guards = {}
     with ThreadingHTTPServer(("127.0.0.1", 0), Handler) as server:
         server.socket = tls.wrap_socket(server.socket, server_side=True)
@@ -285,10 +370,7 @@ def exercise(root, *, acquire, settings, authority, tenant):
                 patch.object(main, "audit_store", audit),
                 analysis_client(main.app, operator_key) as api,
             ):
-                collector = KeycloakLoginAnalysisCollector(
-                    api, settings=settings, authority=authority, registry=registry,
-                    gateway_id=GATEWAY, source_id=SOURCE, key_id=KEY_ID, signing_key=signing_key,
-                )
+                collector = make_collector(api, root / "normal-login-queue.sqlite3")
                 for index, case in enumerate(HOLDOUT, 1):
                     authentication = acquire(case)
                     binding = authentication.otp_binding
@@ -390,20 +472,53 @@ def exercise(root, *, acquire, settings, authority, tenant):
                         expiry = api.post("/analysis/verified-login?report_expiry=true", json=payload)
                         assert expiry.status_code == 410 and expiry.json() == {"detail": LOGIN_EVIDENCE_EXPIRED}
                         altered = proof.model_copy(update={"device_state": "revoked_verified_device"})
-                        try:
-                            collector.submit(event, altered)
-                        except httpx.HTTPStatusError as error:
-                            assert error.response.status_code == 401
-                        else:
-                            raise AssertionError("forged expired evidence triggered fallback")
+                        malicious = LoginDeliveryRequest(
+                            event=event, evidence=altered, tenant_id=tenant,
+                            collector_subject=analysis_settings.api_key_subject,
+                        )
+                        refused = api.post("/analysis/login-delivery", json=malicious.model_dump(mode="json"))
+                        assert refused.status_code == 401
                         assert audit.integrity()["verified_lines"] == writes
                         guards.update(expired_strict=strict.status_code, expired_signal=expiry.status_code,
                                       altered_expired_no_fallback=401)
                     delivery = collector.submit(event, proof)
                     assert delivery.evidence_state == "expired", case.name
                     fallback_observations.append(fallback_result(
-                        event, case, "expired", delivery.response.json(), previous, writes,
+                        event, case, "expired", delivery.result, previous, writes,
                     ))
+
+                analyze = main.RuleBasedAnalyzer.analyze
+
+                async def count_analysis(analyzer, event):
+                    if event.event_id in analysis_runs:
+                        analysis_runs[event.event_id] += 1
+                    return await analyze(analyzer, event)
+
+                with patch.object(main.RuleBasedAnalyzer, "analyze", count_analysis):
+                    offline_path = root / "offline-login-queue.sqlite3"
+                    with socket.socket() as offline_socket:
+                        offline_socket.bind(("127.0.0.1", 0))
+                        port = offline_socket.getsockname()[1]
+                        with httpx.Client(
+                            base_url=f"http://127.0.0.1:{port}", trust_env=False, timeout=1,
+                            headers={"X-API-Key": operator_key},
+                        ) as unreachable:
+                            collector = make_collector(unreachable, offline_path)
+                            queued = queue_recovery_cases(server, api, RECOVERY_CASES[:2])
+                    with analysis_client(main.app, operator_key, port=port) as restored:
+                        ready = make_collector(restored, offline_path)
+                        inspect_recovery(ready, restored, queued, committed_before_retry=False)
+
+                    response_path = root / "lost-response-login-queue.sqlite3"
+                    with httpx.Client(
+                        base_url=api.base_url, trust_env=False, timeout=10,
+                        headers={"X-API-Key": operator_key}, transport=LoseCommittedResponse(),
+                    ) as disconnected:
+                        collector = make_collector(disconnected, response_path)
+                        queued = queue_recovery_cases(server, api, RECOVERY_CASES[2:])
+                    with patch.object(main, "audit_store", SQLiteAuditStore(audit.path)):
+                        ready = make_collector(api, response_path)
+                        inspect_recovery(ready, api, queued, committed_before_retry=True)
         finally:
             server.shutdown()
             thread.join(timeout=5)
@@ -418,4 +533,5 @@ def exercise(root, *, acquire, settings, authority, tenant):
         "audit_integrity": True,
         "distinct_actual_otp_accounts": len(HOLDOUT),
         "delivery_fallback": fallback_observations,
+        "delivery_recovery": recovery_observations,
     }

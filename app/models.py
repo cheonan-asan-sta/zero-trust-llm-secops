@@ -1176,6 +1176,7 @@ class AnalysisResult(StrictModel):
     normalized_event: NormalizedSecurityEvent | None = None
     detection: SigmaDetectionResult | None = None
     verified_login_detection: VerifiedLoginDetection | None = None
+    login_delivery_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
     verification_context: dict[str, object] | None = None
     llm_trace: dict[str, object] | None = None
     verified_review_controls: VerifiedReviewControls | None = None
@@ -1194,6 +1195,8 @@ class AnalysisResult(StrictModel):
         value = handler(self)
         if self.verified_login_detection is None:
             value.pop("verified_login_detection", None)
+        if self.login_delivery_sha256 is None:
+            value.pop("login_delivery_sha256", None)
         if self.verification_context is None:
             value.pop("verification_context", None)
         if self.llm_trace is None:

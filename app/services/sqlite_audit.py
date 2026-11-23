@@ -250,3 +250,15 @@ class SQLiteAuditStore:
             self._read(con, retain_records=False, row_observer=observe)
             if not found:
                 raise AuditQueryUnavailable("returned analysis is not preserved in audit history")
+
+    def login_delivery(self, analysis_id):
+        original = None
+
+        def observe(record, _number):
+            nonlocal original
+            if original is None and record.analysis_id == analysis_id:
+                original = record
+
+        with self._transaction() as con:
+            self._read(con, retain_records=False, row_observer=observe)
+        return original
