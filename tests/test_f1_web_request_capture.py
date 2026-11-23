@@ -235,3 +235,20 @@ def test_redirect_receipt_hashes_only_observed_response_location(tmp_path, statu
     assert row['redirect'] == {'state': state, 'location_sha256': expected}
     assert 'private-example' not in json.dumps(row)
     assert row['decision'] is None
+
+
+def test_live_redirect_receipt_binds_real_local_auth_and_resource_policy(tmp_path):
+    lab = LocalWebCaptureLab(tmp_path/'lab', baseline())
+    response = request(lab, method='GET', url='/continue')
+    assert response.status_code == 303 and response.headers['location'] == '/account'
+    row = receipts(lab)[0]
+    assert row['request_id'] == response.headers['x-capture-id']
+    assert row['redirect']['context_state'] == 'review'
+    assert len(row['redirect']['evidence_sha256']) == 64
+    assert row['redirect']['location_sha256'] == hashlib.sha256(b'/account').hexdigest()
+    assert '/account' not in json.dumps(row)
+    assert row['decision'] is None and lab.executions == 0
+
+    lab.revoke_session()
+    assert request(lab, method='GET', url='/continue').status_code == 401
+    assert all('redirect' not in receipt for receipt in receipts(lab) if receipt['status'] == 401)

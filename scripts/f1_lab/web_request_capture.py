@@ -22,11 +22,15 @@ from scripts.f1_lab.web_durable_risk import DurableWebRisk
 from scripts.f1_lab.web_evidence_ledger import require
 from scripts.f1_lab.web_residual import build_evidence, encoded_argv_request
 from scripts.f1_lab.web_verified_context import (
+    REDIRECT_STATUSES,
     Authentication,
     Authorization,
+    RedirectBundle,
+    RedirectRequest,
     Runtime,
     ServerProof,
     WebBundle,
+    WebFacts,
     WebRequest,
     digest,
     digest_raw,
@@ -55,7 +59,7 @@ class RedirectObservation:
 
 
 def observe_redirect(status, headers):
-    if status not in (301, 302, 303, 307, 308):
+    if status not in REDIRECT_STATUSES:
         return None
     locations = [value for name, value in headers if name.lower() == b'location']
     if not locations:
@@ -232,6 +236,38 @@ class WebCapturePipeline:
             self.model.verified.bridge._authorize(principal,request.tenant_id,self.operator.subject)
             return request.model_copy(deep=True)
 
+    def _sign(self, challenge, observations, moment):
+        proofs = []
+        for observed in observations:
+            source, key_id = self.sources[observed.kind]
+            proof = ServerProof(schema_version='zt-web-server-proof-1', tenant_id=challenge.request.tenant_id,
+                source_id=source, key_id=key_id, request_sha256=challenge.sha256, observed_at=moment,
+                issued_at=moment, expires_at=moment+timedelta(seconds=30), observation=observed, signature='A'*86)
+            signature = base64.urlsafe_b64encode(self.keys[observed.kind].sign(proof_bytes(proof))).decode().rstrip('=')
+            proofs.append(proof.model_copy(update={'signature': signature}))
+        return proofs
+
+    def _redirect_context(self, value, observation, raw_line):
+        redirect = value.redirect
+        if (value.capture_state != 'complete' or redirect.state != 'captured'
+                or value.status not in REDIRECT_STATUSES or value.method not in {'GET', 'POST', 'HEAD'}):
+            return None
+        moment = value.observed_at
+        raw_sha = digest_raw(raw_line)
+        request = RedirectRequest(tenant_id=observation.principal.tenant_id, server_id=self.server_id,
+            request_id=value.request_id, case_id=digest(['redirect', value.request_id, raw_sha]),
+            subject_id=observation.principal.subject, session_id=observation.session_id,
+            session_version=observation.session_version, resource_id=observation.resource_id, method=value.method,
+            target_sha256=value.target_sha256, body_sha256=value.body_sha256, raw_line_sha256=raw_sha,
+            observed_at=moment, status=value.status, location_sha256=redirect.location_sha256)
+        bridge = self.model.verified.bridge
+        try:
+            challenge = bridge.issue(request, self.operator, now=moment)
+        except ValueError:
+            return WebFacts('unavailable', 'web_redirect_challenge_unavailable')
+        bundle = RedirectBundle(proofs=self._sign(challenge, (observation.authentication, observation.authorization), moment))
+        return bridge.check_redirect(challenge.nonce, bundle, request, self.operator, now=moment)
+
     def __call__(self, value):
         require(get_settings().app_environment in {'local','test'} and isinstance(value,Capture),'web_capture_local_only')
         with self.lock:
@@ -251,7 +287,8 @@ class WebCapturePipeline:
             usable = (value.body_complete and value.raw_target is not None and value.peer_ip is not None
                 and isinstance(observation,ServerObservation) and isinstance(observation.principal,Principal)
                 and observation.session_id is not None and observation.session_version is not None
-                and observation.resource_id is not None and observation.authorization is not None and observation.runtime is not None)
+                and observation.resource_id is not None and observation.authorization is not None
+                and (observation.runtime is not None or observation.authorization.action == 'redirect'))
             if usable:
                 # This is an explicit server projection, not a publisher's raw
                 # log. '-' marks unavailable response bytes/referer/agent.
@@ -262,7 +299,12 @@ class WebCapturePipeline:
                 record['identity_sha256'] = digest([observation.principal.tenant_id,observation.principal.subject,
                     observation.session_id,observation.session_version])
                 record['execution_scope'] = observation.execution_scope
-                if encoded_argv_request(raw_line):
+                if value.redirect is not None and observation.authorization.action == 'redirect':
+                    facts = self._redirect_context(value, observation, raw_line)
+                    if facts is not None:
+                        record['redirect'].update(context_state=facts.state, evidence_sha256=facts.evidence_sha256)
+                if (observation.runtime is not None and observation.authorization.action == 'execute_uploaded_script'
+                        and encoded_argv_request(raw_line)):
                     evidence = next(iter(build_evidence([(1,None,raw_line)],'access',digest_raw(raw_line)).values()))
                     request = WebRequest(tenant_id=observation.principal.tenant_id,server_id=self.server_id,
                         request_id=value.request_id,case_id=evidence.case_id,subject_id=observation.principal.subject,
@@ -270,14 +312,8 @@ class WebCapturePipeline:
                         resource_id=observation.resource_id,method=value.method,target_sha256=value.target_sha256,
                         body_sha256=value.body_sha256,raw_line_sha256=digest_raw(raw_line),observed_at=moment)
                     challenge = self.model.verified.bridge.issue(request,self.operator,now=moment)
-                    proofs = []
-                    for observed in (observation.authentication,observation.authorization,observation.runtime):
-                        source,key_id = self.sources[observed.kind]
-                        proof = ServerProof(schema_version='zt-web-server-proof-1',tenant_id=request.tenant_id,
-                            source_id=source,key_id=key_id,request_sha256=challenge.sha256,observed_at=moment,
-                            issued_at=moment,expires_at=moment+timedelta(seconds=30),observation=observed,signature='A'*86)
-                        signature = base64.urlsafe_b64encode(self.keys[observed.kind].sign(proof_bytes(proof))).decode().rstrip('=')
-                        proofs.append(proof.model_copy(update={'signature':signature}))
+                    proofs = self._sign(challenge,
+                        (observation.authentication, observation.authorization, observation.runtime), moment)
                     result = self.model.decide(request,{**core_features(raw_line),**semantic_observations(raw_line)},
                         request.case_id,evidence=evidence,nonce=challenge.nonce,bundle=WebBundle(proofs=proofs),
                         raw_line=raw_line,principal=self.operator,now=moment)
