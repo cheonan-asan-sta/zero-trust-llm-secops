@@ -1,0 +1,277 @@
+{
+  "aws_calls": 0,
+  "coraza_crs": {
+    "report": {
+      "candidate_adopted": false,
+      "crs_unknown": 0,
+      "modes": {
+        "crs": {
+          "accuracy": 0.6948294379379123,
+          "f1": 0.797557251908397,
+          "false_positive_rate": 0.003264417845484222,
+          "fn": 5961,
+          "fp": 6,
+          "inference_errors": 0,
+          "lost_true_positives": 5883,
+          "new_false_positives": 0,
+          "population": 19553,
+          "precision": 0.9994897959183674,
+          "recall": 0.6635055038103302,
+          "tn": 1832,
+          "tp": 11754
+        },
+        "crs_or_post": {
+          "accuracy": 0.8571574694420293,
+          "f1": 0.9181586427169104,
+          "false_positive_rate": 0.4053318824809576,
+          "fn": 2048,
+          "fp": 745,
+          "inference_errors": 0,
+          "lost_true_positives": 1970,
+          "new_false_positives": 0,
+          "population": 19553,
+          "precision": 0.954606385571533,
+          "recall": 0.8843917583968388,
+          "tn": 1093,
+          "tp": 15667
+        },
+        "native": {
+          "accuracy": 0.8990436250191787,
+          "f1": 0.9468096572537185,
+          "false_positive_rate": 0.9945593035908596,
+          "fn": 146,
+          "fp": 1828,
+          "inference_errors": 0,
+          "lost_true_positives": 0,
+          "new_false_positives": 0,
+          "population": 19553,
+          "precision": 0.9057586224673919,
+          "recall": 0.9917583968388372,
+          "tn": 10,
+          "tp": 17569
+        },
+        "native_filtered_by_crs": {
+          "accuracy": 0.6913517107349256,
+          "f1": 0.7947767538341212,
+          "false_positive_rate": 0.003264417845484222,
+          "fn": 6029,
+          "fp": 6,
+          "inference_errors": 0,
+          "lost_true_positives": 5883,
+          "new_false_positives": 0,
+          "population": 19553,
+          "precision": 0.9994868286007527,
+          "recall": 0.6596669489133503,
+          "tn": 1832,
+          "tp": 11686
+        },
+        "native_or_crs": {
+          "accuracy": 0.9025213522221655,
+          "f1": 0.9487358795051103,
+          "false_positive_rate": 0.9945593035908596,
+          "fn": 78,
+          "fp": 1828,
+          "inference_errors": 0,
+          "lost_true_positives": 0,
+          "new_false_positives": 0,
+          "population": 19553,
+          "precision": 0.9060878499871564,
+          "recall": 0.9955969517358171,
+          "tn": 10,
+          "tp": 17637
+        }
+      },
+      "seal_sha256": "ff5604df491bd3bb4d911ddf0a1e8672b34f3a699bea9c8981a197f6b56d6f82",
+      "source_sha256": "9c73c90ce6564ae48b14f7179cd864d037a6a130ef69c68c1626ec5d7ce4a910"
+    },
+    "seal": {
+      "binary_sha256": "98c2a4be4bc93ded7f2f0f9e09a40ed0296ad6e1f04c73dc199c8f58a55c2d32",
+      "coraza_version": "3.8.1",
+      "crs_version": "4.25.0",
+      "http_egress": false,
+      "predictions_sha256": "c4fcf8c3b500b93f7d39f03720cdd886c3ab67a30691411027898f0631e84ea8",
+      "reference_sha256": "87329e6ed460cff59bea4078f63a8161e97d0c7e610aef8d8dcb7da50fdac2de",
+      "representation": "publisher request columns; reconstructed Content-Length from stored body",
+      "source_sha256": "9c73c90ce6564ae48b14f7179cd864d037a6a130ef69c68c1626ec5d7ce4a910"
+    }
+  },
+  "paid_api_calls": 0,
+  "production_change": false,
+  "successful_post": {
+    "plan": {
+      "body_inspected": false,
+      "candidate": "existing v52 SuccessfulPostRefinement",
+      "git_revision": "33811f388d9c101c543faefc775abb58afcff3ac",
+      "model_pins": {
+        "heads": {
+          "path": "infra\\f1-lab\\frozen-vpn-control-v114\\heads.json",
+          "sha256": "4ebbcb6bb5fce286e80beeedbc18139d566d00998575487a867f129330344075"
+        },
+        "policy": {
+          "path": "infra\\f1-lab\\frozen-vpn-control-v114\\policy.json",
+          "sha256": "c39db63f29cf2524963378b05a9b419ab0a8858066fb8c02a703eb317fb7c0c0"
+        },
+        "vpn": {
+          "path": "infra\\f1-lab\\frozen-vpn-control-v114\\vpn.json",
+          "sha256": "c1ff27423e63ba607a80fc7dd891ff473baccd7f11853fb3eaba10e9e37b48b6"
+        },
+        "web": {
+          "path": "infra\\f1-lab\\frozen-vpn-control-v114\\web.json",
+          "sha256": "21318fa61f830ae1d03d47de1a01acf2c40ae19ebaf769923e3d575613f74f38"
+        }
+      },
+      "runner_sha256": "b035c0711bc2efafba19b8655a3c5a1fba77455c970e388707a3b8e2259820e6",
+      "scope": "all observed POST with HTTP 2xx, label-independent selection",
+      "source": "https://doi.org/10.7910/DVN/OGOIXX",
+      "source_md5": "173ec515308bdce5aec19cfd5b792596",
+      "source_sha256": "9c73c90ce6564ae48b14f7179cd864d037a6a130ef69c68c1626ec5d7ce4a910",
+      "threshold": 0.95
+    },
+    "report": {
+      "after": {
+        "accuracy": 0.4281695903441927,
+        "f1": 0.5653982197691142,
+        "false_positive_rate": 0.4020674646354733,
+        "fn": 10442,
+        "fp": 739,
+        "inference_errors": 0,
+        "population": 19553,
+        "precision": 0.9077633549675487,
+        "recall": 0.4105560259666949,
+        "tn": 1099,
+        "tp": 7273
+      },
+      "ambiguous_publisher_labels": 0,
+      "before": {
+        "accuracy": 0.8990436250191787,
+        "f1": 0.9468096572537185,
+        "false_positive_rate": 0.9945593035908596,
+        "fn": 146,
+        "fp": 1828,
+        "inference_errors": 0,
+        "population": 19553,
+        "precision": 0.9057586224673919,
+        "recall": 0.9917583968388372,
+        "tn": 10,
+        "tp": 17569
+      },
+      "body_features_used": false,
+      "capture_seconds": 99.953,
+      "date_support": {
+        "17/Jul/2020": {
+          "normal": 478,
+          "threat": 5081
+        },
+        "18/Jul/2020": {
+          "normal": 1239,
+          "threat": 12230
+        },
+        "19/Jul/2020": {
+          "normal": 121,
+          "threat": 404
+        }
+      },
+      "lost_true_positives": 10296,
+      "new_false_positives": 0,
+      "population": {
+        "physical_csv_records": 907815,
+        "selected_post_2xx": 19553,
+        "selected_with_recorded_body": 19553,
+        "unusable_http_context_rows": 4080
+      },
+      "seal_sha256": "87329e6ed460cff59bea4078f63a8161e97d0c7e610aef8d8dcb7da50fdac2de",
+      "source": "https://doi.org/10.7910/DVN/OGOIXX",
+      "source_sha256": "9c73c90ce6564ae48b14f7179cd864d037a6a130ef69c68c1626ec5d7ce4a910"
+    }
+  },
+  "target_qualified": false,
+  "temporal_body_shape": {
+    "plan": {
+      "calibration_dates": [
+        "18/Jul/2020"
+      ],
+      "calibration_metrics": {
+        "accuracy": 0.9360344429922349,
+        "f1": 0.9655999338460266,
+        "false_positive_rate": 0.49287169042769857,
+        "fn": 348,
+        "fp": 484,
+        "inference_errors": 0,
+        "lost_true_positives": 348,
+        "new_false_positives": 2,
+        "population": 13007,
+        "precision": 0.9602006413946221,
+        "recall": 0.971060291060291,
+        "tn": 498,
+        "tp": 11677
+      },
+      "development_dates": [
+        "17/Jul/2020"
+      ],
+      "fit_label_counts": {
+        "normal": 371,
+        "threat": 4717
+      },
+      "frozen_at": "2026-11-23T00:51:07+00:00",
+      "input": {
+        "calibration": 13469,
+        "development": 5559,
+        "temporal": 525
+      },
+      "model": "ExtraTreesClassifier 128, min_samples_leaf=3, max_features=.75, seed=42",
+      "observation": "generic bounded shape of request target and body; only response status retained",
+      "qualified_in_calibration": false,
+      "source_sha256": "9c73c90ce6564ae48b14f7179cd864d037a6a130ef69c68c1626ec5d7ce4a910",
+      "temporal_dates": [
+        "19/Jul/2020"
+      ],
+      "threshold": 0.49,
+      "used": {
+        "calibration": 13007,
+        "development": 5088,
+        "temporal": 525
+      }
+    },
+    "report": {
+      "candidate": {
+        "accuracy": 0.8933333333333333,
+        "f1": 0.9287531806615776,
+        "false_positive_rate": 0.14049586776859505,
+        "fn": 39,
+        "fp": 17,
+        "inference_errors": 0,
+        "lost_true_positives": 39,
+        "new_false_positives": 1,
+        "population": 525,
+        "precision": 0.9554973821989529,
+        "recall": 0.9034653465346535,
+        "tn": 104,
+        "tp": 365
+      },
+      "candidate_adopted": false,
+      "claims_independent_source": false,
+      "native": {
+        "accuracy": 0.579047619047619,
+        "f1": 0.7288343558282209,
+        "false_positive_rate": 0.9421487603305785,
+        "fn": 107,
+        "fp": 114,
+        "inference_errors": 0,
+        "population": 525,
+        "precision": 0.7226277372262774,
+        "recall": 0.7351485148514851,
+        "tn": 7,
+        "tp": 297
+      },
+      "prediction_sha256": "033f507d4ef9b11b2629443afe3938334ac726efd0ea9269a52a12da1416805e"
+    },
+    "seal": {
+      "plan_sha256": "9e4be424c18600f04604d18e95daa0014f7aa28818522f56680d4674effa090e",
+      "predictions_sha256": "033f507d4ef9b11b2629443afe3938334ac726efd0ea9269a52a12da1416805e"
+    }
+  },
+  "tests": {
+    "new_adapter_passed": 1,
+    "related_passed": 142
+  }
+}
