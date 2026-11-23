@@ -28,6 +28,7 @@ from scripts import local_oidc_redirect_lab
 from scripts.evaluate_local_remote_holdout import write
 from scripts.keycloak_live_authority import KeycloakLiveAuthority
 from scripts.local_keycloak_evidence_collector import LocalKeycloakEvidenceCollector
+from scripts.local_keycloak_login_history import fetch_login_history
 from scripts.local_session_analysis_lab import LocalSessionAnalysisLab
 
 IMAGE = "quay.io/keycloak/keycloak:26.8.0"
@@ -223,7 +224,8 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
         valid_otp = fixture_otp(otp_seed)
         wrong_otp = sign_in(otp=f"{(int(valid_otp) + 1) % 1_000_000:06d}")
         missing_otp = sign_in()
-        for rejected in (wrong_otp, missing_otp):
+        repeated_missing_otp = sign_in()
+        for rejected in (wrong_otp, missing_otp, repeated_missing_otp):
             assert rejected.response.status_code == 400 and rejected.signal is not None
             assert rejected.signal.event.auth_context.authentication_result == "failure"
             assert rejected.signal.event.auth_context.mfa == "unknown"
@@ -294,9 +296,23 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
             assert app.post("/zero-trust/protected-access", json=requested, headers=analyst).json()[
                 "allowed"
             ]
+            # Verify these short-lived signals before waiting for additional OTP windows.
+            failed, failed_alert = evaluate(wrong_otp)
+            missing, missing_alert = evaluate(missing_otp)
+            assert failed_alert == missing_alert == "confirmed"
+            for rejected in (failed, missing):
+                assert rejected["session"]["decision"] == "DENY" and not rejected["grant_token"]
             redirect_signin = fresh_sign_in()
             otp_binding = redirect_signin.otp_binding
             assert otp_binding is not None and otp_binding.subject == identity
+            login_history = fetch_login_history(
+                client, issuer, authorization, client_id=CLIENT_ID, binding=otp_binding,
+            )
+            assert login_history["earlier_same_account_failures"] == 3
+            assert login_history["earlier_same_account_successes"] == 1
+            assert login_history["baseline_repeated_failure_warning"] is True
+            assert login_history["candidate_repeated_failure_warning"] is False
+            assert login_history["candidate_with_independent_hard_alert"] is True
             redirect_tokens = redirect_signin.response.json()
             redirect_caller = headers(redirect_tokens["id_token"])
             redirect_session, redirect_alert = evaluate(redirect_signin)
@@ -332,12 +348,6 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
             scope_denial, scope_alert = evaluate(out_of_scope)
             assert scope_alert == "confirmed"
             assert scope_denial["session"]["decision"] == "DENY" and not scope_denial["grant_token"]
-            failed, failed_alert = evaluate(wrong_otp)
-            missing, missing_alert = evaluate(missing_otp)
-            assert failed_alert == missing_alert == "confirmed"
-            for rejected in (failed, missing):
-                assert rejected["session"]["decision"] == "DENY" and not rejected["grant_token"]
-
             roles = f"{base}/admin/realms/{REALM}/roles"
             mappings = f"{base}/admin/realms/{REALM}/users/{identity}/role-mappings/realm"
             entries = {}
@@ -443,6 +453,7 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
             "denied_redirect_receipts": 0,
         },
         "authority_mode": "read-only provider checks on each request",
+        "login_history_review": login_history,
         "manual_revocation_file": False,
         "finished_at": datetime.now(UTC).isoformat(),
         "paid_api_calls": 0,

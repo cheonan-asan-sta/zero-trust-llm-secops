@@ -48,3 +48,5 @@ python -m scripts.evaluate_public_api_post_transfer score <publisher.tar.gz> <ex
 ```
 
 각 출력은 새 디렉터리를 사용한다. 원본 요청과 개별 예측은 `runtime/independent-web-target-20261123/`에 로컬로 보관했다. 평가기와 웹 회귀 160개, Ruff, 로컬 Go 빌드를 통과했다. 유료 API·AWS 호출·병합은 0회다. [집계 결과와 봉인 지문](infrastructure-results/public-post-crs-rules-transfer-20261123.json)
+
+[후속 인증 결과·계정 이력 실험](extra-account-login-history-20261123.md)은 Keycloak에서 연결을 검증하고, 별도 공개 RBA에서 오탐 변화를 측정했다. 이 웹 자료의 검증된 이력 결측 시 기존 판정이 유지되는 것도 확인했다.
