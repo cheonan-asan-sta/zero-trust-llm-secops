@@ -9,6 +9,7 @@ import (
 	"encoding/csv"
 	"encoding/hex"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -58,7 +59,30 @@ func publisherBit(value string) (byte, error) {
 	}
 }
 
-func project(in io.Reader, observations, truth *bufio.Writer, probed map[string]bool) error {
+type cohort struct {
+	observations, truth *bufio.Writer
+	rows                int
+}
+
+func featureKey(value string) string {
+	value = strings.ToLower(strings.TrimSpace(value))
+	if value == "" || value == "unknown" || value == "other" || value == "-" {
+		return "-"
+	}
+	hash := sha256.Sum256([]byte(value))
+	return hex.EncodeToString(hash[:12])
+}
+
+func clientFamily(value string) string {
+	for index, char := range value {
+		if char >= '0' && char <= '9' {
+			return strings.TrimSpace(value[:index])
+		}
+	}
+	return value
+}
+
+func project(in io.Reader, cohorts map[string]*cohort, probed map[string]bool, environment bool) error {
 	csvDigest := sha256.New()
 	reader := csv.NewReader(io.TeeReader(in, csvDigest))
 	reader.ReuseRecord = true
@@ -66,7 +90,7 @@ func project(in io.Reader, observations, truth *bufio.Writer, probed map[string]
 	if err != nil || !slices.Equal(header, expectedHeader) {
 		return fmt.Errorf("unexpected publisher CSV header")
 	}
-	var ordinal, reserved int
+	var ordinal int
 	for {
 		row, err := reader.Read()
 		if err == io.EOF {
@@ -77,9 +101,15 @@ func project(in io.Reader, observations, truth *bufio.Writer, probed map[string]
 		}
 		ordinal++
 		userDigest := sha256.Sum256([]byte("rba-user:" + row[2]))
-		if binary.BigEndian.Uint64(userDigest[:8])%100 < 85 {
+		bucket := binary.BigEndian.Uint64(userDigest[:8]) % 100
+		if bucket < 70 || (bucket < 85 && !environment) {
 			continue
 		}
+		name := "reviewed"
+		if bucket < 85 {
+			name = "holdout"
+		}
+		output := cohorts[name]
 		user := hex.EncodeToString(userDigest[:])
 		if probed[user] {
 			continue
@@ -87,7 +117,7 @@ func project(in io.Reader, observations, truth *bufio.Writer, probed map[string]
 		if _, err := strconv.ParseInt(row[2], 10, 64); err != nil {
 			return fmt.Errorf("unparseable reserved account at row %d", ordinal)
 		}
-		reserved++
+		output.rows++
 		observed, err := publisherBit(row[13])
 		if err != nil {
 			return err
@@ -101,20 +131,28 @@ func project(in io.Reader, observations, truth *bufio.Writer, probed map[string]
 			hash := sha256.Sum256([]byte("rba-captured-ip:" + row[4]))
 			client = hex.EncodeToString(hash[:])
 		}
-		if _, err := fmt.Fprintf(observations, "%d\t%s\t%s\t%s\t%c\n", ordinal, row[1], user, client, observed); err != nil {
+		if _, err := fmt.Fprintf(output.observations, "%d\t%s\t%s\t%s\t%c", ordinal, row[1], user, client, observed); err != nil {
 			return err
 		}
-		if _, err := fmt.Fprintf(truth, "%d\t%c\n", ordinal, label); err != nil {
+		if environment {
+			if _, err := fmt.Fprintf(output.observations, "\t%s\t%s\t%s\t%s\t%s", featureKey(row[5]), featureKey(row[8]), featureKey(clientFamily(row[10])), featureKey(clientFamily(row[11])), featureKey(row[12])); err != nil {
+				return err
+			}
+		}
+		if err := output.observations.WriteByte('\n'); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(output.truth, "%d\t%c\n", ordinal, label); err != nil {
 			return err
 		}
 	}
-	if ordinal != 31269264 || reserved != 2575003 || fmt.Sprintf("%x", csvDigest.Sum(nil)) != "001f3589595821519b53428aee656b4458e43d8f5b4b9beb6ec2bed8f2209067" {
+	if ordinal != 31269264 || cohorts["reviewed"].rows != 2575003 || (environment && cohorts["holdout"].rows != 2572078) || fmt.Sprintf("%x", csvDigest.Sum(nil)) != "001f3589595821519b53428aee656b4458e43d8f5b4b9beb6ec2bed8f2209067" {
 		return fmt.Errorf("publisher CSV or reserved population differs")
 	}
 	return nil
 }
 
-func run(archivePath, probePath, output string) error {
+func run(archivePath, probePath, output string, environment bool) error {
 	probe, err := probeReferences(probePath)
 	if err != nil {
 		return err
@@ -156,35 +194,53 @@ func run(archivePath, probePath, output string) error {
 	if err := os.Mkdir(output, 0700); err != nil {
 		return err
 	}
-	observations, err := os.Create(filepath.Join(output, "observations.tsv"))
-	if err != nil {
+	cohorts := make(map[string]*cohort)
+	names := []string{"reviewed"}
+	if environment {
+		names = append(names, "holdout")
+	}
+	for _, name := range names {
+		directory := output
+		if environment {
+			directory = filepath.Join(output, name)
+			if err := os.Mkdir(directory, 0700); err != nil {
+				return err
+			}
+		}
+		observations, err := os.Create(filepath.Join(directory, "observations.tsv"))
+		if err != nil {
+			return err
+		}
+		defer observations.Close()
+		truth, err := os.Create(filepath.Join(directory, "truth.tsv"))
+		if err != nil {
+			return err
+		}
+		defer truth.Close()
+		cohorts[name] = &cohort{observations: bufio.NewWriterSize(observations, 1<<18), truth: bufio.NewWriterSize(truth, 1<<18)}
+	}
+	if err := project(stream, cohorts, probe, environment); err != nil {
 		return err
 	}
-	defer observations.Close()
-	truth, err := os.Create(filepath.Join(output, "truth.tsv"))
-	if err != nil {
-		return err
-	}
-	defer truth.Close()
-	obsWriter, truthWriter := bufio.NewWriterSize(observations, 1<<18), bufio.NewWriterSize(truth, 1<<18)
-	if err := project(stream, obsWriter, truthWriter, probe); err != nil {
-		return err
-	}
-	if err := obsWriter.Flush(); err != nil {
-		return err
-	}
-	if err := truthWriter.Flush(); err != nil {
-		return err
+	for _, result := range cohorts {
+		if err := result.observations.Flush(); err != nil {
+			return err
+		}
+		if err := result.truth.Flush(); err != nil {
+			return err
+		}
 	}
 	return os.WriteFile(filepath.Join(output, "completed"), []byte(archiveSHA+"\n"), 0600)
 }
 
 func main() {
-	if len(os.Args) != 4 {
-		fmt.Fprintln(os.Stderr, "usage: go run main.go <rba-zip> <probe-receipt> <new-output>")
+	environment := flag.Bool("environment", false, "include environment changes for reviewed and withheld users")
+	flag.Parse()
+	if flag.NArg() != 3 {
+		fmt.Fprintln(os.Stderr, "usage: go run main.go [--environment] <rba-zip> <probe-receipt> <new-output>")
 		os.Exit(2)
 	}
-	if err := run(os.Args[1], os.Args[2], os.Args[3]); err != nil {
+	if err := run(flag.Arg(0), flag.Arg(1), flag.Arg(2), *environment); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

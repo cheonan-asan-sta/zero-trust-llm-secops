@@ -41,3 +41,5 @@ python -m scripts.run_keycloak_remote_acceptance <new-keycloak-report.json>
 ```
 
 최종 코드로 RBA 전체 예측을 다시 실행해 봉인 SHA-256이 일치하는지 확인했다. 관련 회귀 135개와 Ruff를 통과했다. 유료 API 및 AWS 호출은 0회다. [집계와 검증 기록](infrastructure-results/account-login-history-20261123.json)
+
+[후속 RBA 계정 탈취 평가](extra-rba-login-environment-20261123.md)는 미탐 26건을 분석하고 새 계정 분할에서 접속 환경 변화의 재현율과 오탐을 검증했다.
