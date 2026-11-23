@@ -23,7 +23,8 @@ from app import security
 from app.config import Settings
 from app.services.auth_alert_triage import resolve_auth_alert, resolve_terminal_auth_alert
 from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
-from app.zero_trust_models import SignedSessionSignal
+from app.zero_trust_models import ProtectedAccessRequest, SignedSessionSignal
+from scripts import local_oidc_redirect_lab
 from scripts.evaluate_local_remote_holdout import write
 from scripts.keycloak_live_authority import KeycloakLiveAuthority
 from scripts.local_keycloak_evidence_collector import LocalKeycloakEvidenceCollector
@@ -128,8 +129,8 @@ def realm(password, otp_seed, authority_secret):
     }
 
 
-def fixture_otp(seed):
-    counter = int(time.time()) // 30
+def fixture_otp(seed, *, unix_time=None):
+    counter = int(time.time() if unix_time is None else unix_time) // 30
     digest = hmac.new(seed.encode(), counter.to_bytes(8, "big"), hashlib.sha1).digest()
     offset = digest[-1] & 15
     value = int.from_bytes(digest[offset : offset + 4], "big") & 0x7FFFFFFF
@@ -203,6 +204,22 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
         def sign_in(**fields):
             return collector.sign_in(username=TEST_USER, password=password, **fields)
 
+        previous_otp = None
+
+        def fresh_sign_in(**fields):
+            nonlocal previous_otp
+            deadline = time.monotonic() + 35
+            while time.monotonic() < deadline:
+                instant = time.time()
+                otp = fixture_otp(otp_seed, unix_time=instant)
+                if otp != previous_otp and 1 <= instant % 30 <= 27:
+                    observed = sign_in(otp=otp, **fields)
+                    assert observed.response.status_code == 200, observed.response.status_code
+                    previous_otp = otp
+                    return observed
+                time.sleep(0.25)
+            raise RuntimeError("No fresh OTP window for local acceptance fixture")
+
         valid_otp = fixture_otp(otp_seed)
         wrong_otp = sign_in(otp=f"{(int(valid_otp) + 1) % 1_000_000:06d}")
         missing_otp = sign_in()
@@ -210,7 +227,7 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
             assert rejected.response.status_code == 400 and rejected.signal is not None
             assert rejected.signal.event.auth_context.authentication_result == "failure"
             assert rejected.signal.event.auth_context.mfa == "unknown"
-        approved_otp = sign_in(otp=fixture_otp(otp_seed))
+        approved_otp = fresh_sign_in()
         assert approved_otp.response.status_code == 200 and approved_otp.signal is not None
         tokens = approved_otp.response.json()
         identity = security._decode_oidc_token(tokens["id_token"], settings)["sub"]
@@ -247,7 +264,7 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
         analyst = headers(tokens["id_token"])
         with (
             patch.object(security, "get_settings", return_value=settings),
-            TestClient(gateway) as app,
+            TestClient(gateway, client=('127.0.0.1', 50000)) as app,
         ):
 
             def evaluate(authentication):
@@ -277,7 +294,41 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
             assert app.post("/zero-trust/protected-access", json=requested, headers=analyst).json()[
                 "allowed"
             ]
-            out_of_scope = sign_in(otp=fixture_otp(otp_seed), action="REMOTE_ACCESS")
+            redirect_signin = fresh_sign_in()
+            otp_binding = redirect_signin.otp_binding
+            assert otp_binding is not None and otp_binding.subject == identity
+            redirect_tokens = redirect_signin.response.json()
+            redirect_caller = headers(redirect_tokens["id_token"])
+            redirect_session, redirect_alert = evaluate(redirect_signin)
+            assert redirect_alert == "cleared" and redirect_session["grant_token"]
+            redirect_grant = ProtectedAccessRequest(
+                session_id=redirect_session["session"]["session_id"],
+                resource_id="remote-read",
+                action="READ",
+                grant_token=redirect_session["grant_token"],
+            )
+            redirect_lab = local_oidc_redirect_lab.mount(
+                gateway, root / "web", lab.service, redirect_grant, otp_binding
+            )
+            redirect_path = local_oidc_redirect_lab.ROUTE + "/continue"
+            same_role_refresh = token(
+                grant_type="refresh_token", refresh_token=redirect_tokens["refresh_token"]
+            )
+            assert same_role_refresh.status_code == 200
+            refreshed_redirect = app.post(
+                redirect_path, headers=headers(same_role_refresh.json()["id_token"]), follow_redirects=False
+            )
+            assert refreshed_redirect.status_code == 403
+            assert refreshed_redirect.json()["detail"] == "Verified OTP for this token is required"
+            assert "redirect" not in local_oidc_redirect_lab.receipt(redirect_lab, refreshed_redirect)
+            web_redirect = app.post(redirect_path, headers=redirect_caller, follow_redirects=False)
+            local_oidc_redirect_lab.verify_success(
+                redirect_lab, web_redirect, lab.service, redirect_grant, otp_binding, redirect_session["session"]["version"]
+            )
+            reused_redirect = app.post(redirect_path, headers=redirect_caller, follow_redirects=False)
+            assert reused_redirect.status_code == 403
+            assert "redirect" not in local_oidc_redirect_lab.receipt(redirect_lab, reused_redirect)
+            out_of_scope = fresh_sign_in(action="REMOTE_ACCESS")
             scope_denial, scope_alert = evaluate(out_of_scope)
             assert scope_alert == "confirmed"
             assert scope_denial["session"]["decision"] == "DENY" and not scope_denial["grant_token"]
@@ -308,12 +359,20 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
             old_role = app.post(app_path, json=requested, headers=analyst)
             assert old_role.status_code == 401
             assert old_role.json()["detail"] == "Caller roles changed since token issuance"
+            web_old_role = app.post(redirect_path, headers=redirect_caller, follow_redirects=False)
+            assert web_old_role.status_code == 401
+            assert web_old_role.json()["detail"] == "Caller roles changed since token issuance"
+            assert "redirect" not in local_oidc_redirect_lab.receipt(redirect_lab, web_old_role)
             refresh = token(grant_type="refresh_token", refresh_token=tokens["refresh_token"])
             assert refresh.status_code == 200, refresh.status_code
             viewer = headers(refresh.json()["id_token"])
             downgraded = app.post(app_path, json=requested, headers=viewer)
             assert downgraded.status_code == 403
             assert downgraded.json()["detail"] == "Insufficient role for this operation"
+            web_viewer = app.post(redirect_path, headers=viewer, follow_redirects=False)
+            assert web_viewer.status_code == 403
+            assert web_viewer.json()["detail"] == "Insufficient role for this operation"
+            assert "redirect" not in local_oidc_redirect_lab.receipt(redirect_lab, web_viewer)
 
             logout = client.post(
                 f"{base}/admin/realms/{REALM}/users/{identity}/logout", headers=authorization
@@ -328,6 +387,10 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
             blocked = app.post(app_path, json=requested, headers=viewer)
             assert blocked.status_code == 401
             assert blocked.json()["detail"] == "Caller session is no longer active"
+            web_after_logout = app.post(redirect_path, headers=redirect_caller, follow_redirects=False)
+            assert web_after_logout.status_code == 401
+            assert web_after_logout.json()["detail"] == "Caller session is no longer active"
+            assert "redirect" not in local_oidc_redirect_lab.receipt(redirect_lab, web_after_logout)
         security._jwks_client.cache_clear()
         stop_provider()
         unavailable_event = collector.attempts.open("outage-before-auth-" + uuid4().hex)
@@ -369,6 +432,16 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
         "refresh_after_logout": 400,
         "old_token_after_role_removal": old_role.status_code,
         "token_after_provider_logout": blocked.status_code,
+        "oidc_web_redirect": {
+            "verified_otp_redirect": web_redirect.status_code,
+            "evidence_state": "consistent",
+            "refreshed_token_without_exact_otp_binding": refreshed_redirect.status_code,
+            "consumed_redirect_grant": reused_redirect.status_code,
+            "old_role": web_old_role.status_code,
+            "downgraded_role": web_viewer.status_code,
+            "after_logout": web_after_logout.status_code,
+            "denied_redirect_receipts": 0,
+        },
         "authority_mode": "read-only provider checks on each request",
         "manual_revocation_file": False,
         "finished_at": datetime.now(UTC).isoformat(),

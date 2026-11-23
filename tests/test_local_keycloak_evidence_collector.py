@@ -98,3 +98,26 @@ def test_collector_will_not_issue_terminal_receipt_after_exchange_starts(lab_set
             collector.attempts.cancel(event_id)
         with pytest.raises(KeyError):
             collector.probe_readiness(event_id)
+
+
+def test_otp_binding_matches_verified_identity_and_the_exact_token(lab_settings):
+    from dataclasses import replace
+    from datetime import UTC, datetime, timedelta
+
+    from app.security import Principal, Role
+    from scripts.local_keycloak_evidence_collector import LocalOTPBinding
+
+    lab, _ = lab_settings
+    expires = (datetime.now(UTC) + timedelta(minutes=2)).replace(microsecond=0)
+    claims = {"sub": "fixture-identity", "sid": "fixture-session", "exp": expires.timestamp()}
+    binding = LocalOTPBinding.from_verified_claims(claims, "fixture-original-token", lab.principal.tenant_id)
+    principal = Principal(
+        claims["sub"], lab.principal.tenant_id, frozenset({Role.ANALYST}), "oidc", expires, claims["sid"]
+    )
+    assert binding.matches(principal, "fixture-original-token")
+    assert not binding.matches(principal, "fixture-refreshed-token")
+    assert not binding.matches(replace(principal, oidc_session_id="other"), "fixture-original-token")
+    assert not binding.matches(replace(principal, tenant_id="other"), "fixture-original-token")
+    assert LocalOTPBinding.from_verified_claims(
+        {**claims, "exp": True}, "fixture-original-token", lab.principal.tenant_id
+    ) is None
