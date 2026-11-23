@@ -49,6 +49,28 @@ class ServerObservation:
 
 
 @dataclass(frozen=True)
+class RedirectObservation:
+    state: str
+    location_sha256: str | None = None
+
+
+def observe_redirect(status, headers):
+    if status not in (301, 302, 303, 307, 308):
+        return None
+    locations = [value for name, value in headers if name.lower() == b'location']
+    if not locations:
+        return RedirectObservation('missing')
+    if len(locations) != 1:
+        return RedirectObservation('ambiguous')
+    value = locations[0]
+    if not isinstance(value, bytes) or not 0 < len(value) <= 4096 or any(
+        byte <= 32 or byte >= 127 for byte in value
+    ):
+        return RedirectObservation('invalid')
+    return RedirectObservation('captured', hashlib.sha256(value).hexdigest())
+
+
+@dataclass(frozen=True)
 class Capture:
     request_id: str
     method: str
@@ -62,6 +84,7 @@ class Capture:
     observed_at: datetime
     observation: ServerObservation | None
     capture_state: str
+    redirect: RedirectObservation | None = None
 
 
 class RequestCaptureMiddleware:
@@ -131,11 +154,11 @@ class RequestCaptureMiddleware:
             failure,status = 'invalid_raw_target',400
         delivered = False
         aborted = False
-        def capture(code):
+        def capture(code, headers=()):
             context = scope['state'].get(STATE_KEY)
             return Capture(request_id,scope['method'],hashlib.sha256(raw).hexdigest(),target,
                 hashed.hexdigest() if complete else None,size,complete,peer,code,datetime.now(UTC),
-                context if isinstance(context,ServerObservation) else None,failure)
+                context if isinstance(context,ServerObservation) else None,failure,observe_redirect(code, headers))
         async def unavailable():
             await JSONResponse({'detail':'Capture unavailable'},status_code=503)(scope,receive,send)
         if not complete or target is None:
@@ -161,14 +184,15 @@ class RequestCaptureMiddleware:
                 return
             if message['type'] == 'http.response.start':
                 require(not delivered,'web_capture_response_started_twice')
+                response_headers = list(message.get('headers', []))
                 try:
-                    self.sink(capture(message['status']))
+                    self.sink(capture(message['status'], response_headers))
                 except (ValueError,OSError):
                     aborted = True
                     await unavailable()
                     return
                 delivered = True
-                message = {**message,'headers':[(k,v) for k,v in message.get('headers',[])
+                message = {**message,'headers':[(k,v) for k,v in response_headers
                     if k.lower() != b'x-capture-id']+[(b'x-capture-id',request_id.encode())]}
             await send(message)
         try:
@@ -218,6 +242,10 @@ class WebCapturePipeline:
                 'body_complete':value.body_complete,'status':value.status,'observed_at':value.observed_at.isoformat(),
                 'capture_state':value.capture_state,'context_state':'unavailable','decision':None,
                 'source_kind':'local_asgi_projection','independent_malicious_label':None}
+            if value.redirect is not None:
+                record['redirect'] = {
+                    'state': value.redirect.state, 'location_sha256': value.redirect.location_sha256,
+                }
             observation = value.observation
             request = None
             usable = (value.body_complete and value.raw_target is not None and value.peer_ip is not None
