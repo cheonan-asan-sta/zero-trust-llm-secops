@@ -8,6 +8,7 @@ from app.continuous_signal_models import MAX_SECURITY_VERSION, ObservationKind, 
 from app.models import EventAction, SecurityEvent, StrictModel
 
 MAX_EVALUATION_VERSION = 200
+LOGIN_EVIDENCE_EXPIRED = "verified_login_evidence_expired"
 
 
 class ResourcePolicy(StrictModel):

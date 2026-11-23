@@ -32,6 +32,10 @@ class SignalRejected(ValueError):
     pass
 
 
+class LoginEvidenceExpired(SignalRejected):
+    """The login receipt was authentic and in scope, but its lifetime ended."""
+
+
 class SignalRegistryUnavailable(RuntimeError):
     pass
 
@@ -248,7 +252,8 @@ class SignalVerifier:
         key = next((item for item in source.keys if item.key_id == proof.key_id), None)
         if (
             key is None or not key.enabled
-            or not key.not_before <= proof.issued_at <= now < proof.expires_at <= key.not_after
+            or not key.not_before <= proof.issued_at <= now < key.not_after
+            or proof.expires_at > key.not_after
             or not 0 <= (proof.issued_at - event.timestamp).total_seconds() <= 30
         ):
             raise SignalRejected("login evidence freshness rejected")
@@ -260,6 +265,8 @@ class SignalVerifier:
             public.verify(signature, canonical_login_evidence(proof))
         except (InvalidSignature, ValueError, TypeError) as exc:
             raise SignalRejected("login evidence signature rejected") from exc
+        if now >= proof.expires_at:
+            raise LoginEvidenceExpired("verified login evidence expired")
         return hashlib.sha256(source.model_dump_json().encode()).hexdigest()
 
     def verify_behavior_capture(

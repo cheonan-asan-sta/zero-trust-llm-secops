@@ -147,10 +147,14 @@ from app.services.settled_io import settled_io
 from app.services.sigma import get_sigma_engine
 from app.services.signal_inbox import SignalInbox
 from app.services.sqlite_audit import AuditReviewConflict, SQLiteAuditStore
-from app.services.trusted_signals import SignalRejected, SignalVerifier
+from app.services.trusted_signals import LoginEvidenceExpired, SignalRejected, SignalVerifier
 from app.services.zero_trust import POLICY_PATH, ZeroTrustOperations
 from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
-from app.zero_trust_models import SignedSessionSignal, VerifiedLoginAnalysisRequest
+from app.zero_trust_models import (
+    LOGIN_EVIDENCE_EXPIRED,
+    SignedSessionSignal,
+    VerifiedLoginAnalysisRequest,
+)
 
 settings = get_settings()
 static_dir = Path(__file__).parent / "static"
@@ -804,11 +808,17 @@ async def analyze(
 @app.post("/analysis/verified-login", response_model=AnalysisResult)
 async def analyze_verified_login(
     body: VerifiedLoginAnalysisRequest, request: Request, principal: AnalystPrincipal,
+    report_expiry: bool = False,
 ) -> AnalysisResult:
     if principal.auth_method not in {"api_key", "oidc"}:
         raise HTTPException(401, "Authenticated analyst required for verified login evidence")
     caller_check = getattr(request.state, "authentication_revalidator", None)
     verifier = SignalVerifier(get_settings().trusted_signal_sources_path)
+    persistence_started = False
+
+    def mark_persistence_started():
+        nonlocal persistence_started
+        persistence_started = True
 
     def source_digest():
         if caller_check is not None:
@@ -829,7 +839,12 @@ async def analyze_verified_login(
             return await _analyze_event_in_slot(
                 body.event, RuleBasedAnalyzer(), principal, request.state.request_id,
                 caller_authority_check=check_evidence, verified_login_detection=finding,
+                before_persist=mark_persistence_started,
             )
+    except LoginEvidenceExpired as exc:
+        if report_expiry and not persistence_started:
+            raise HTTPException(410, LOGIN_EVIDENCE_EXPIRED) from exc
+        raise
     except AnalysisCapacityExceeded as exc:
         raise HTTPException(
             429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
@@ -1255,6 +1270,7 @@ async def _analyze_event_in_slot(
     llm_trace_supplier: Callable[[], dict | None] | None = None,
     caller_authority_check: Callable[[], None] | None = None,
     verified_login_detection: VerifiedLoginDetection | None = None,
+    before_persist: Callable[[], None] | None = None,
 ) -> AnalysisResult:
     """Internal pipeline; its caller must hold an analysis slot throughout."""
     # Live integrity scans must not block the event loop or release capacity
@@ -1323,6 +1339,8 @@ async def _analyze_event_in_slot(
     await _analysis_caller_boundary(principal, caller_authority_check)
     if audit_store is not selected_audit_store:
         raise RuntimeError("analysis audit store changed; refusing persistence")
+    if before_persist is not None:
+        before_persist()
     await selected_audit_store.save(result)
     await _analysis_caller_boundary(principal, caller_authority_check)
     # A full audit scan may be slow. Revalidate evidence after it, so source

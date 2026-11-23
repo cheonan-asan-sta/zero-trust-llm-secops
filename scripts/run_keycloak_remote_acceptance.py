@@ -136,7 +136,7 @@ def realm(password, otp_seed, authority_secret, *, login_detection=False):
     }
     if login_detection:
         template = configuration["users"][0]
-        for case in local_keycloak_detection_acceptance.HOLDOUT:
+        for case in local_keycloak_detection_acceptance.CASES:
             username = local_keycloak_detection_acceptance.username(case)
             credentials = [template["credentials"][0], {
                 **template["credentials"][1], "secretData": json.dumps({"value": otp_seed + username}),
@@ -476,7 +476,7 @@ def verify(
             if login_detection:
                 holdout_admin = fixture_admin_authorization(client, base, admin_password)
 
-                def acquire(case, *, lookup=False):
+                def acquire(case, *, lookup=False, invalid_otp=False):
                     username = local_keycloak_detection_acceptance.username(case)
                     if lookup:
                         observed = client.get(
@@ -491,10 +491,10 @@ def verify(
                     while not 1 <= instant % 30 <= 27:
                         time.sleep(0.25)
                         instant = time.time()
-                    return collector.sign_in(
-                        username=username, password=password,
-                        otp=fixture_otp(otp_seed + username, unix_time=instant), action="LOGIN",
-                    )
+                    otp = fixture_otp(otp_seed + username, unix_time=instant)
+                    if invalid_otp:
+                        otp = f"{(int(otp) + 1) % 1_000_000:06d}"
+                    return collector.sign_in(username=username, password=password, otp=otp, action="LOGIN")
 
                 login_review = local_keycloak_detection_acceptance.exercise(
                     root / "login-detection", acquire=acquire, settings=settings,

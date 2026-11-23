@@ -95,3 +95,27 @@ python -m scripts.run_keycloak_remote_acceptance <new-keycloak-report.json> --at
 ```powershell
 python -m scripts.run_keycloak_remote_acceptance <new-keycloak-report.json> --ato-residual <new-residual.json> --device-lifecycle --login-detection
 ```
+
+## 로그인 수집기의 자동 전달과 기본 탐지 전환
+
+mTLS 게이트웨이에서 로그인 관측을 마치면 `KeycloakLoginAnalysisCollector.collect`가 근거 수집과 제출을 이어서 처리한다. 수집기에 분석 API 주소와 분석 권한이 있는 서비스 자격 증명을 설정한다. 수집기는 기존 로그인 이벤트와 서명한 근거만 전송한다. Keycloak 토큰과 기기 개인키는 게이트웨이에서 사용한다.
+
+| 수집·전송 결과 | 처리 경로 |
+| --- | --- |
+| 근거 유효 | 자동으로 `POST /analysis/verified-login`에 제출 |
+| OTP 연결 또는 기기 등록 근거 없음 | 같은 이벤트를 기존 `POST /analysis`로 제출 |
+| 서명·범위가 유효한 근거가 감사 기록 저장 시작 전에 만료 | `report_expiry=true` 요청에 API가 `410`과 `verified_login_evidence_expired`를 반환. 수집기는 같은 이벤트를 기존 `/analysis`로 한 번 제출 |
+| 근거 변조, 호출 권한 거부, 수집기 키 철회, 응답 유실 | 오류를 그대로 처리하고 추가 분석 요청을 보내지 않음 |
+
+API는 저장을 시작한 뒤의 만료에 대해 전환 응답을 발행하지 않는다. 이미 기록된 분석이 중복 저장되는 것을 막는다. 기존 `/analysis/verified-login` 호출은 기본 설정에서 만료를 `401`로 처리한다. 일반 경로는 해당 배포에 설정된 기존 분석기를 사용한다. 이번 로컬 시험에는 규칙 분석기를 설정했다.
+
+위 재현 명령으로 Docker Keycloak과 mTLS 게이트웨이, 로컬 HTTP 분석 API를 함께 실행했다. 앞선 로그인 10건의 수동 제출 결과를 이번 자동 전달 결과와 대조했다. 8건은 검증 근거와 함께 전달됐고 2건은 근거 없음으로 기본 분석에 도착했다. 위협 우선 검토 4/4건과 정상·대조군 오탐 0/6건, 모든 기존 Sigma 판정이 이전 결과와 일치했다. 앞선 Keycloak 대조군의 탐지 7/7건과 오탐 0/7건도 유지했다.
+
+| 별도 비교 사례 | 기존 분석과 일치 | 기존 위협 판정 유지 | 새 오탐 |
+| --- | ---: | ---: | ---: |
+| 근거 없음 | 2/2 | 1/1 | 0/1 |
+| 서명 근거 만료 | 2/2 | 1/1 | 0/1 |
+
+근거가 없던 위협 사례는 Sigma의 반복 인증 실패 탐지를 유지했다. 서명 근거가 만료된 위협 사례는 기존 고위험 검토를 유지했다. 두 만료 사례는 실제 OTP와 mTLS 확인으로 서명을 받은 뒤 유효기간이 끝날 때까지 기다렸다. 변조된 만료 근거는 `401`로 거부됐으며 기본 분석을 일으키지 않았다. 네 사례 모두 자동 처리마다 감사 기록 한 건이 저장됐다. 별도 회귀에서 저장 직전과 직후의 만료는 각각 감사 기록 한 건을 남겼고, 응답 유실 시에는 추가 요청을 보내지 않았다.
+
+관련 회귀 402개와 Ruff를 통과했다. 시험 컨테이너를 정리했고 AWS·유료 API 사용은 0회였다. 이 비교는 로컬 통합 시험 결과다. [자동 전달 및 기본 탐지 비교 JSON](infrastructure-results/local-keycloak-login-autodelivery-20261123.json)
