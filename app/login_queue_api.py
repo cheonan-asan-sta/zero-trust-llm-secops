@@ -69,6 +69,14 @@ class ApprovalRequest(StrictModel):
         return note.strip() if isinstance(note, str) else note
 
 
+def load_profile(path):
+    with path.open("rb") as stream:
+        raw = stream.read(8193)
+    if len(raw) > 8192:
+        raise ValueError("login queue profile too large")
+    return LoginQueueProfile.model_validate_json(raw)
+
+
 def _profile(principal):
     path = get_settings().dashboard_login_queue_profile
     if path is None:
@@ -76,11 +84,7 @@ def _profile(principal):
     if principal.auth_method not in {"api_key", "oidc"}:
         raise HTTPException(401, "Authenticated operator required")
     try:
-        with path.open("rb") as stream:
-            raw = stream.read(8193)
-        if len(raw) > 8192:
-            raise ValueError("login queue profile too large")
-        profile = LoginQueueProfile.model_validate_json(raw)
+        profile = load_profile(path)
     except (OSError, ValueError) as error:
         raise HTTPException(503, "Login queue profile unavailable") from error
     if principal.tenant_id != profile.tenant_id:

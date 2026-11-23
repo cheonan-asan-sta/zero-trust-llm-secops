@@ -3,13 +3,14 @@
 import argparse
 import hashlib
 import json
+import os
 import secrets
 import shutil
 import socket
 import sqlite3
 import subprocess
 import sys
-from contextlib import closing, contextmanager
+from contextlib import closing, contextmanager, nullcontext
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from time import monotonic, sleep
@@ -20,6 +21,7 @@ import httpx
 from app import config, login_queue_api, security
 from app.config import Settings
 from app.services.sqlite_audit import SQLiteAuditStore
+from scripts import login_queue_activation as activation
 from scripts import login_queue_backup
 from scripts.evaluate_local_remote_holdout import write
 from scripts.f1_lab.native_bayes import counts, metrics, record
@@ -49,14 +51,14 @@ def serve(root, port):
     config.get_settings = fixture_settings
     security.get_settings = fixture_settings
     login_queue_api.get_settings = fixture_settings
-    # A fresh process imports the service with only the restored paths configured.
+    # A fresh process imports the service with only the selected paths configured.
     from app.main import app
 
     uvicorn.run(app, host="127.0.0.1", port=port, access_log=False, log_level="warning")
 
 
 @contextmanager
-def service(root, port, collector_key, reviewer_key):
+def service(root, port, collector_key, reviewer_key, *, control=None):
     origin = f"http://127.0.0.1:{port}"
     accounts = root / "accounts.json"
     profile = root / "queue-profile.json"
@@ -81,10 +83,16 @@ def service(root, port, collector_key, reviewer_key):
     payload = settings.model_dump(mode="json", exclude={"openai_api_key"})
     payload["api_key_sha256"] = digest(collector_key.encode())
     write(root / "settings.json", payload)
+    command = [sys.executable, "-m", "scripts.run_login_queue_restore",
+               "--serve-fixture", str(root), str(port)]
+    env = None
+    if control:
+        command = [sys.executable, "-m", "scripts.login_queue_activation", str(control),
+                   "serve-api", "--port", str(port)]
+        env = {**os.environ, **{k.upper(): str(v) for k, v in payload.items() if v is not None}}
     with (root / "service.log").open("wb") as log, subprocess.Popen(
-        [sys.executable, "-m", "scripts.run_login_queue_restore",
-         "--serve-fixture", str(root), str(port)],
-        stdout=log, stderr=subprocess.STDOUT,
+        command,
+        stdout=log, stderr=subprocess.STDOUT, env=env,
     ) as process:
         try:
             with (
@@ -136,13 +144,17 @@ def restore_pair(backup, target, fingerprints):
             raise ValueError("Restored login database digest mismatch")
 
 
-def sender(client, root):
-    return KeycloakLoginAnalysisCollector(
-        client, settings=None, authority=None, registry=None, gateway_id="restore-fixture",
-        source_id="restore-fixture", key_id="unused", signing_key=None, spool_path=root / QUEUE,
-        tenant_id=TENANT, collector_subject=COLLECTOR,
-        retry_policy=LoginRetryPolicy(base_delay=0.15, max_delay=0.3, success_interval=0),
-    )
+def sender(client, root, control=None):
+    options = {
+        "settings": None, "authority": None, "registry": None, "gateway_id": "restore-fixture",
+        "source_id": "restore-fixture", "key_id": "unused", "signing_key": None,
+        "retry_policy": LoginRetryPolicy(base_delay=0.15, max_delay=0.3, success_interval=0),
+    }
+    if control:
+        return activation.managed_collector(control, client, **options)
+    return nullcontext(KeycloakLoginAnalysisCollector(
+        client, spool_path=root / QUEUE, tenant_id=TENANT, collector_subject=COLLECTOR, **options,
+    ))
 
 
 def view(reviewer):
@@ -216,7 +228,17 @@ def online_restore_fixture(source, backup, collector, api, outcomes, unconfirmed
     return document, package_pin, key_file, scope
 
 
-def exercise(root, *, online=False):
+@contextmanager
+def rejected_transition(message, error_type=activation.ActivationConflict):
+    try:
+        yield
+    except error_type as error:
+        assert message in str(error)
+    else:
+        raise AssertionError(f"Expected activation rejection: {message}")
+
+
+def exercise(root, *, online=False, managed=False):
     keys = (secrets.token_urlsafe(32), secrets.token_urlsafe(32))
     with socket.socket() as reservation:
         reservation.bind(("127.0.0.1", 0))
@@ -224,6 +246,8 @@ def exercise(root, *, online=False):
 
     backup = root / "snapshot"
     backup.mkdir(mode=0o700)
+    restored = root / "restored"
+    control = root / "activation" if managed else None
     cases = list(events(4))
     completed, unconfirmed, held, queued = (event for event, _ in cases)
     outcomes = {event.event_id: "hold" for event in (completed, unconfirmed, held)}
@@ -256,8 +280,10 @@ def exercise(root, *, online=False):
                 expected[event.event_id] = answer.json()
                 record(before, truth, flagged(answer.json()))
 
-            with httpx.Client(base_url=api.base_url, transport=httpx.MockTransport(forward)) as transport:
-                collector = sender(transport, source)
+            with (
+                httpx.Client(base_url=api.base_url, transport=httpx.MockTransport(forward)) as transport,
+                sender(transport, source) as collector,
+            ):
                 for event in (completed, unconfirmed, held):
                     try:
                         collector.submit(event, None)
@@ -285,15 +311,36 @@ def exercise(root, *, online=False):
                 if online:
                     package = online_restore_fixture(source, backup, collector, api, outcomes, unconfirmed, queued)
 
-        if not online:
+        if control:
+            document, pin, key_file, scope = package
+            control.mkdir(mode=0o700)
+            activation.initialize(control, source / QUEUE, source / AUDIT, **scope)
+            login_queue_backup.restore(document, pin, restored, key_file, **scope)
+            decision = activation.approve(control, document, pin, restored, key_file, note="Review recovery pair")
+            before_selection = activation.status(control)
+            assert len(before_selection["generations"]) == 1
+            predecessor_config = root / "old-service-config"
+            predecessor_config.mkdir()
+            with service(predecessor_config, port, *keys, control=control), rejected_transition("active.lock"):
+                activation.activate(control, decision, document, key_file)
+            with httpx.Client(base_url=scope["origin"], trust_env=False) as transport, sender(transport, source, control):
+                with rejected_transition("sender.lock"), sender(transport, source, control):
+                    raise AssertionError("Second sender started")
+                with rejected_transition("active.lock"):
+                    activation.activate(control, decision, document, key_file)
+            with rejected_transition("Predecessor differs"):
+                activation.activate(control, decision, document, key_file)
+            assert activation.status(control) == before_selection
+            assert (source / QUEUE).is_file() and (source / AUDIT).is_file()
+        elif not online:
             fingerprints = snapshot_pair(source, backup)
 
     assert not source.exists()
-    restored = root / "restored"
     if online:
         document, package_pin, key_file, scope = package
-        restored_package = login_queue_backup.restore(document, package_pin, restored, key_file, **scope)
-        assert restored_package["restored_databases"] == 2
+        if not managed:
+            restored_package = login_queue_backup.restore(document, package_pin, restored, key_file, **scope)
+            assert restored_package["restored_databases"] == 2
         assert (restored / "RESTORE_READY").read_text(encoding="ascii").strip() == package_pin
         try:
             login_queue_backup.restore(document, package_pin, restored, key_file, **scope)
@@ -323,9 +370,35 @@ def exercise(root, *, online=False):
         else:
             raise AssertionError("Invalid audit digest was accepted")
         restore_pair(backup, restored, fingerprints)
-    with service(restored, port, *keys) as (api, reviewer, restored_pid):
+
+    if control:
+        with rejected_transition("missing or incomplete"):
+            activation.activate(control, decision, document, key_file)
+        altered = restored / QUEUE
+        raw = altered.read_bytes()
+        altered.write_bytes(raw[:-1] + bytes([raw[-1] ^ 1]))
+        with rejected_transition("differs from the authenticated backup", ValueError):
+            activation.activate(control, decision, document, key_file, allow_missing=True)
+        altered.write_bytes(raw)
+        assert activation.status(control) == before_selection
+        stale = activation.approve(control, document, package_pin, restored, key_file, note="Another review")
+        assert activation.activate(control, decision, document, key_file, allow_missing=True) == 2
+        with rejected_transition("former generation"):
+            activation.activate(control, stale, document, key_file, allow_missing=True)
+        selected = activation.status(control)
+        assert selected["generations"][-1]["approval_id"] == decision
+        assert selected["generations"][-1]["predecessor_state"] == "unavailable"
+        assert selected["approvals"][0]["approved_uid"] == selected["generations"][-1]["activated_uid"]
+
+    # The managed API and collector must use the selected pair, even when the
+    # fixture settings point at a directory that contains neither database.
+    fixture = root / "new-service-config" if managed else restored
+    fixture.mkdir(exist_ok=True)
+    with (
+        service(fixture, port, *keys, control=control) as (api, reviewer, restored_pid),
+        sender(api, source if managed else restored, control) as collector,
+    ):
         assert original_pid != restored_pid
-        collector = sender(api, restored)
         audit = SQLiteAuditStore(restored / AUDIT)
         restored_view = view(reviewer)
         restored_audit_rows = original_audit["verified_lines"] + int(online)
@@ -370,6 +443,19 @@ def exercise(root, *, online=False):
         assert audit.integrity()["ok"] and audit.integrity()["verified_lines"] == 8
         assert before == after == {"tp": 2, "fp": 0, "fn": 0, "tn": 2, "inference_errors": 0}
 
+    if control:
+        fresh_package = backup / "fresh-quiesced.bin"
+        fresh_pin = login_queue_backup.backup(restored / QUEUE, restored / AUDIT, fresh_package, key_file, **scope)[
+            "package_sha256"
+        ]
+        next_target = root / "another-restored"
+        login_queue_backup.restore(fresh_package, fresh_pin, next_target, key_file, **scope)
+        approved = activation.approve(control, fresh_package, fresh_pin, next_target, key_file, note="Fresh quiesced pair")
+        assert activation.activate(control, approved, fresh_package, key_file) == 3
+        assert activation.status(control)["generations"][-1]["predecessor_state"] == "verified_identical"
+        assert (restored / QUEUE).is_file() and (restored / AUDIT).is_file()
+        assert SQLiteAuditStore.open_existing(next_target / AUDIT).integrity()["verified_lines"] == 8
+
     return {
         "scope": "different loopback API processes; original disposable directory removed; no external host",
         "source_files_absent": True,
@@ -386,6 +472,19 @@ def exercise(root, *, online=False):
             "existing_restore_candidate_not_replaced": True,
             "candidate_with_ready_marker_and_modified_database_rejected": True,
         } if online else {"snapshot_hashes": fingerprints}),
+        **({
+            "candidate_approval_did_not_change_active_paths": True,
+            "running_managed_api_or_sender_prevented_activation": True,
+            "second_managed_sender_rejected": True,
+            "diverged_predecessor_rejected": True,
+            "missing_predecessor_required_explicit_confirmation": True,
+            "post_approval_candidate_change_rejected": True,
+            "old_generation_approval_rejected": True,
+            "active_api_and_sender_followed_restored_pair": True,
+            "fresh_identical_cutover_preserved_predecessor_files": True,
+            "approval_and_activation_os_uid_recorded": True,
+            "activated_generations": [2, 3],
+        } if managed else {}),
         "initial_queue_counts": state_counts,
         "pre_restore_audit_records_including_baselines": restored_audit_rows,
         "final_audit_records_including_baselines": 8,
@@ -406,6 +505,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=Path, nargs="?")
     parser.add_argument("--online", action="store_true", help="verify the authenticated online backup and restore")
+    parser.add_argument("--activation", action="store_true", help="also verify operator-controlled activation")
     parser.add_argument("--serve-fixture", nargs=2, metavar=("DIRECTORY", "PORT"), help=argparse.SUPPRESS)
     args = parser.parse_args()
     if args.serve_fixture:
@@ -415,7 +515,7 @@ def main():
     if args.output is None:
         parser.error("output is required")
     with TemporaryDirectory(prefix="zt-login-restore-") as temporary:
-        report = exercise(Path(temporary), online=args.online)
+        report = exercise(Path(temporary), online=args.online or args.activation, managed=args.activation)
     write(args.output, report)
     print(json.dumps(report))
 

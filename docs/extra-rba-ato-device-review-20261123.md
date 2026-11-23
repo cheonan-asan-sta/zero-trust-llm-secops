@@ -337,7 +337,7 @@ Linux에서 `scripts.login_queue_backup` 명령으로 수집기와 API를 실행
 
 두 DB는 하나의 AES-256-GCM 암호문으로 보관하고, 복원 때 외부에 보존한 패키지 SHA-256과 인증 태그, 원래 분석 주소·테넌트·수집기 범위를 검증한다. 운영 계정만 접근하는 Linux 디렉터리 `0700`과 별도 32바이트 키 파일 `0600`을 사용한다. 현재 명령은 SQLite 원본당 64MiB까지 지원하며, 감사 DB 파일에 포함된 전체 기록을 패키지로 묶으므로 해당 파일을 읽을 권한이 있는 운영 계정에서 사용한다. 복원 목적지는 새 디렉터리로 지정한다. 두 DB를 확인하고 마지막에 `RESTORE_READY`를 남긴다.
 
-대기열 복제 이후 들어오고 감사 DB에도 확정되지 않은 이벤트는 다음 백업 범위다. 실제 운영 경로로 전환하기 전에 `verify`로 준비 표시와 두 파일의 바이트가 인증된 백업과 일치하는지 다시 확인한다. 수집기의 운영 프로필을 새 경로로 바꾸거나 서비스를 시작하는 일은 승인 후 별도로 진행한다. 기존 송신기를 중단하는 절차와 호스트 자동 전환 시험은 남아 있다. 암호화 키는 패키지와 분리해서 보관한다.
+대기열 복제 이후 들어오고 감사 DB에도 확정되지 않은 이벤트는 다음 백업 범위다. 실제 운영 경로로 전환하기 전에 `verify`로 준비 표시와 두 파일의 바이트가 인증된 백업과 일치하는지 다시 확인한다. 승인과 관리 서비스 전환 절차는 아래 절을 따른다. 암호화 키는 패키지와 분리해서 보관한다.
 
 ```bash
 python -m scripts.login_queue_backup backup /path/login-queue.sqlite3 /path/analysis-audit.sqlite3 /private/login-backup.bin --key-file /private/key --origin http://127.0.0.1:8000 --tenant-id local --collector-subject keycloak-login-collector
@@ -349,3 +349,24 @@ python -m scripts.run_login_queue_restore /private/online-restore-result.json --
 로컬 Linux Docker에서 두 WAL DB를 복제하는 사이 실제 수집기와 API가 대기 2건을 처리하도록 했다. 그중 1건은 그 시점에 새로 감사 기록이 확정됐다. 원본 시험 폴더를 제거한 뒤 새 프로세스에서 복원하자 두 대기 이벤트가 기존 분석을 재사용했고, 남은 보류 건은 새 승인을 받은 뒤 처리됐다. 패키지 지문 오류, 재해시한 변조 암호문, 다른 범위, 최신 큐와 오래된 감사 DB 조합을 거부했다. 기존 복원 후보도 덮어쓰지 않았다. 준비 표시를 그대로 두고 복원 DB 한 바이트를 바꾼 후보는 재검증에서 거부됐다. 백업·복원·복원 재검증 명령을 모두 실행했다. 첫 시험에서 패키지 시험 폴더를 `0700`으로 생성하도록 고친 뒤 다시 실행했다.
 
 같은 통제 사례 4건에서 위협 탐지 **2/2**, 정상 오탐 **0/2**, 중복 분석·감사 기록 **0건**이었다. 이전 Windows 오프라인 복원과 Linux 회귀 41개를 다시 통과했고 AWS와 유료 API 호출은 0회였다. [온라인 백업·복원 결과](infrastructure-results/local-login-queue-online-backup-20261123.json)
+
+## 승인 후 로그인 대기열·감사 DB 전환
+
+Linux 단일 호스트에서 대기열과 분석 감사 DB를 하나의 세대로 선택한다. `approve`는 해당 세대, 후보 경로, 암호화 패키지 지문 및 운영자 메모를 제어 DB에 기록한다. `activate`는 현재 세대에 대한 승인인지 확인하고 준비 표시와 두 후보 DB를 다시 검증한다. 새 세대의 두 경로와 사용된 승인 ID는 SQLite 한 트랜잭션에 기록한다. 제어 디렉터리는 `0700`으로 유지한다. 기록의 승인자·전환자는 해당 운영 계정의 OS UID이며, 개인별 SSO 신원은 이 절차 바깥에서 관리한다.
+
+관리 API는 `serve-api`로 시작한다. 대시보드 프로필의 분석 주소·테넌트·수집기 범위를 확인한 뒤 활성 세대의 대기열과 감사 DB를 사용한다. 수집기 통합에서는 `managed_collector(control, client, **collector_options)` 컨텍스트가 이벤트 수신·전송·재전송 작업의 전체 생명주기를 감싸야 한다. API와 수집기는 같은 제어 디렉터리의 공유 잠금을 잡고, 관리 송신기는 추가 잠금으로 한 프로세스만 동작한다. 두 서비스가 중지되기 전에는 전환을 거부한다. 첫 등록 때 기존 직접 실행 서비스를 중지하고 이후 두 서비스 모두 같은 제어 디렉터리를 쓰도록 구성한다.
+
+이전 DB가 남아 있다면 서비스 종료 후 동일한 방식으로 SQLite 사본을 만들어 승인 후보와 비교한다. 차이가 있으면 운영자 승인이 있어도 최신 정지 상태에서 새로 캡처해야 한다. 이전 DB가 모두 유실돼 마지막 정상 백업으로 복구하는 경우에만 `--predecessor-unavailable`을 붙인다. 이때 백업에 들어가기 전 유실된 이벤트는 복원 범위에 포함되지 않는다. 이전 경로와 승인 이력은 전환 과정에서 삭제하지 않는다. 잠금의 적용 범위는 같은 Linux 호스트에서 같은 제어 디렉터리를 사용하는 관리 서비스다.
+
+```bash
+python -m scripts.login_queue_activation /private/control init /data/login-queue.sqlite3 /data/analysis-audit.sqlite3 --origin http://127.0.0.1:8000 --tenant-id local --collector-subject keycloak-login-collector
+python -m scripts.login_queue_activation /private/control approve /private/login-backup.bin <package-sha256> /private/restore-candidate --key-file /private/key --note '복원 후보와 백업 범위 확인'
+python -m scripts.login_queue_activation /private/control activate /private/login-backup.bin <approval-id> --key-file /private/key
+python -m scripts.login_queue_activation /private/control status
+python -m scripts.login_queue_activation /private/control serve-api --port 8000
+python -m scripts.run_login_queue_restore /private/activation-result.json --activation
+```
+
+네트워크를 차단한 로컬 Linux Docker에서 기존 API와 송신기를 각각 실행해 전환이 막히는 것을 확인했다. 두 번째 송신기, 최신 변경이 남은 이전 DB, 승인 후 변경된 후보, 이전 세대 승인도 거부됐다. 원본 시험 파일이 유실된 뒤 명시적으로 승인한 세대 2로 전환했고, 새 API와 송신기가 복원된 두 DB를 사용했다. 이후 같은 내용의 정지 상태 백업으로 세대 3에 전환할 때는 이전 DB 두 파일을 보존했다.
+
+같은 로컬 통제 사례에서 전환 전후 위협 탐지는 **2/2**, 정상 오탐은 **0/2**, 중복 분석·감사는 **0건**이었다. 승인 대기 1건과 전송 대기 2건을 복원했고, 최종 감사 8건과 기존 분석 ID로 조회한 원본 기록을 확인했다. Linux 회귀 41개가 통과했고 AWS·유료 API 호출은 0회였다. [승인·전환 검증 결과](infrastructure-results/local-login-queue-activation-20261123.json)
