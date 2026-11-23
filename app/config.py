@@ -85,6 +85,7 @@ class Settings(BaseSettings):
     audit_cursor_key_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
     # Host-only control plane. Disabled unless an operator selects a private root.
     dashboard_operations_directory: Path | None = None
+    dashboard_login_queue_profile: Path | None = None
     dashboard_operations_tenant: str = "local"
     dashboard_m7_paired_directory: Path | None = None
     dashboard_live_max_usd: float = Field(default=0, ge=0, le=50, allow_inf_nan=False)

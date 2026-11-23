@@ -1,0 +1,102 @@
+{
+  "aws_calls": 0,
+  "baseline_report": "local-login-queue-status-20261123.json",
+  "browser": {
+    "checked_confirmed_delivery_history": true,
+    "checks": [
+      "scoped_queue_alert_and_cause_visible",
+      "mobile_row_review_in_view",
+      "mobile_page_has_no_horizontal_overflow",
+      "review_cause_and_note_focus",
+      "cancel_returns_focus_to_original_row",
+      "approval_shows_receipt_pending_and_authenticated_actor",
+      "approved_event_can_be_found_in_history",
+      "viewer_cannot_see_review_details",
+      "no_browser_errors_or_external_requests"
+    ],
+    "errors": [],
+    "external": [],
+    "scope": "Chrome with isolated local HTTP API and SQLite queue, scoped Prometheus fixture",
+    "viewports_px": [
+      1440,
+      390
+    ]
+  },
+  "linux_regression_tests_passed": 82,
+  "matched_previous_detection_and_audit": true,
+  "monitoring": {
+    "alerts_fired_and_resolved": [
+      "C01LoginQueueBacklog",
+      "C01LoginQueueHeld",
+      "C01LoginQueueCapacityPressure",
+      "C01LoginQueueStatusUnavailable"
+    ],
+    "invalid_status_omits_counts": true,
+    "read_matching_scrape_target": true,
+    "scope": "cached local Prometheus and Alertmanager in isolated Docker"
+  },
+  "paid_api_calls": 0,
+  "queue_recovery_comparison": {
+    "after": {
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fn": 0,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 192,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tn": 96,
+      "tp": 96
+    },
+    "analysis_and_sigma_matched": 192,
+    "analysis_audit_records": 192,
+    "aws_calls": 0,
+    "before": {
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fn": 0,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 192,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tn": 96,
+      "tp": 96
+    },
+    "dashboard_approval_and_delivery_history_records": 4,
+    "dashboard_approvals": 2,
+    "duplicate_approvals_reused": 2,
+    "events_at_peak": 192,
+    "final_queue": {
+      "held": 0,
+      "pending": 0
+    },
+    "held_resolved": [
+      {
+        "attempts": 4,
+        "code": "http_503"
+      },
+      {
+        "attempts": 1,
+        "code": "http_403"
+      }
+    ],
+    "lost_ack_replayed": 1,
+    "outage_clock_seconds": 1150,
+    "outage_requests": 4,
+    "outage_retry_intervals_seconds": [
+      120,
+      10,
+      420,
+      600
+    ],
+    "paid_api_calls": 0,
+    "recovery_minimum_spacing_seconds": 0.25,
+    "recovery_requests": 194,
+    "scope": "controlled normal and credential-alert inputs, real local HTTP analysis, simulated outage clock"
+  },
+  "ruff_passed": true
+}

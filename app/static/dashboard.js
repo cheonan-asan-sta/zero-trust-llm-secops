@@ -861,6 +861,7 @@
     renderEvidence();
     updateDemoButtons();
     window.dashboardOperations?.sync();
+    window.dashboardLoginQueue?.sync();
   }
   async function refresh(options = {}) {
     if (state.busy) return;
@@ -943,6 +944,7 @@
     });
     document.title = `${name} | 천안아산역`;
     window.dashboardOperations?.navigate(state.page);
+    window.dashboardLoginQueue?.sync();
     if (state.page === "logs" && state.data.identity) loadAuditPage();
     if (state.page === "sessions" && state.data.identity) sessionView.load();
     if (state.page === "cases" && state.data.identity) caseView.load();
@@ -966,6 +968,7 @@
     resetAudit();
     state.demo = {};
     window.dashboardOperations?.reset();
+    window.dashboardLoginQueue?.reset();
     state.detailSequence++;
     $("detailDialog").close();
     $("detailBody").replaceChildren();

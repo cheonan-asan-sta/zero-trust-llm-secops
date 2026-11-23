@@ -13,7 +13,7 @@ from unittest.mock import patch
 
 import httpx
 
-from app import config, security
+from app import config, login_queue_api, security
 from app.config import Settings
 from app.models import SecurityEvent
 from app.services.sqlite_audit import SQLiteAuditStore
@@ -57,10 +57,12 @@ def flagged(result):
 
 def exercise(root, size):
     operator_key = secrets.token_urlsafe(32)
+    profile = root / "dashboard-queue.json"
     settings = Settings(
         _env_file=None, app_environment="test", analyzer_mode="rule", auth_mode="api_key",
         api_key_sha256=hashlib.sha256(operator_key.encode()).hexdigest(), api_key_tenant_id=TENANT,
         api_key_subject=SUBJECT, audit_backend="sqlite", audit_db_path=root / "original.sqlite3",
+        dashboard_login_queue_profile=profile,
         case_log_path=root / "cases.jsonl", outbox_log_path=root / "outbox.jsonl",
         zero_trust_db_path=root / "sessions.sqlite3",
     )
@@ -119,6 +121,7 @@ def exercise(root, size):
     with (
         patch.object(main, "get_settings", return_value=settings),
         patch.object(security, "get_settings", return_value=settings),
+        patch.object(login_queue_api, "get_settings", return_value=settings),
         analysis_client(main.app, operator_key) as api,
     ):
         for event, truth in cases:
@@ -175,10 +178,30 @@ def exercise(root, size):
             failures = sending.spool.held()
             assert [(row["failure_code"], row["attempts"]) for row in failures] == [("http_503", 4), ("http_403", 1)]
             fix_permissions = True
-            for failure in failures:
-                assert sending.spool.requeue(failure["event_id"], now=now)
+            profile.write_text(json.dumps({
+                "queue_file": str(sending.spool.path.resolve()), "analysis_origin": str(client.base_url),
+                "tenant_id": TENANT, "collector_subject": SUBJECT,
+            }), encoding="utf-8")
+            queue_view = api.get("/dashboard/login-queue")
+            queue_view.raise_for_status()
+            review = queue_view.json()["review"]
+            assert [row["event_id"] for row in review["held"]] == [row["event_id"] for row in failures]
+            for item in review["held"]:
+                headers = {"If-Match": item["etag"], "X-Review-Identity": review["identity"]}
+                body = {"event_id": item["event_id"], "hold_id": item["hold_id"], "note": "Local cause resolved"}
+                for duplicate in (False, True):
+                    approved = api.post("/dashboard/login-queue/approvals", headers=headers, json=body)
+                    approved.raise_for_status()
+                    assert approved.json()["duplicate"] is duplicate
             drain()
             assert sending.spool.counts() == {"pending": 0, "held": 0}
+            queue_view = api.get("/dashboard/login-queue")
+            queue_view.raise_for_status()
+            review_history = queue_view.json()["review"]["history"]
+            for item in review["held"]:
+                history = [row for row in review_history if row["event_id"] == item["event_id"]]
+                assert [row["outcome"] for row in history] == ["delivered", "approved"]
+                assert history[0]["analysis_id"] and history[1]["actor"] == SUBJECT
 
     saved = {row.event_id: row.model_dump(mode="json") for row in recovered._records()}
     assert len(saved) == recovered.integrity()["verified_lines"] == size
@@ -199,6 +222,9 @@ def exercise(root, size):
         "recovery_requests": len(recovery_requests),
         "recovery_minimum_spacing_seconds": min(intervals),
         "held_resolved": [{"code": row["failure_code"], "attempts": row["attempts"]} for row in failures],
+        "dashboard_approvals": len(review["held"]),
+        "duplicate_approvals_reused": len(review["held"]),
+        "dashboard_approval_and_delivery_history_records": len(review_history),
         "lost_ack_replayed": duplicate_receipts,
         "analysis_audit_records": len(saved),
         "analysis_and_sigma_matched": size,

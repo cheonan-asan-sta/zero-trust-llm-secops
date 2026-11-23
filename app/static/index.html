@@ -12,6 +12,7 @@
   <script defer="" src="/static/collection-view.js"></script>
   <script defer="" src="/static/dashboard.js">
   </script>
+  <script defer="" src="/static/dashboard-login-queue.js"></script>
   <script defer="" src="/static/dashboard-operations.js"></script>
  </head>
  <body>
@@ -591,6 +592,50 @@
      </div>
     </section>
     <section aria-label="증거와 승인" data-view="evidence" hidden="">
+     <article class="card login-queue" aria-labelledby="loginQueueTitle">
+      <div class="card-heading">
+       <h2 id="loginQueueTitle">로그인 대기열</h2>
+       <button class="button" type="button" id="loginQueueRefresh">대기열 새로고침</button>
+      </div>
+      <div class="login-queue-body">
+       <p id="loginQueueStatus" role="status">조회 신원을 확인한 뒤 대기열을 불러옵니다.</p>
+       <dl id="loginQueueSummary" class="login-queue-summary" hidden></dl>
+       <ul id="loginQueueAlerts" class="login-queue-alerts" aria-label="현재 대기열 경보"></ul>
+       <div id="loginQueueReview" hidden>
+        <form id="loginQueueSearch" class="login-queue-search" role="search" aria-label="로그인 대기열 이벤트 검색">
+         <label for="loginQueueEventFilter">이벤트 ID</label>
+         <input id="loginQueueEventFilter" type="search" maxlength="128" />
+         <button class="button" type="submit">조회</button>
+        </form>
+        <h3>보류 항목</h3>
+        <p id="loginQueueHeldEmpty" hidden>보류 항목이 없습니다.</p>
+        <div class="table-wrap" id="loginQueueHeldTable">
+         <table><thead><tr><th scope="col">이벤트 ID</th><th scope="col">보류 원인</th><th scope="col">마지막 시도</th><th scope="col">시도 횟수</th><th scope="col">검토</th></tr></thead>
+         <tbody id="loginQueueHeldRows"></tbody></table>
+        </div>
+        <div class="login-queue-actions" id="loginQueuePager" hidden>
+         <button class="button" type="button" id="loginQueueFirst">첫 페이지</button>
+         <button class="button" type="button" id="loginQueueNext">다음 페이지</button>
+        </div>
+        <form class="login-queue-form" id="loginQueueApproval" aria-labelledby="loginQueueApprovalTitle" hidden>
+         <h3 id="loginQueueApprovalTitle">재전송 승인</h3>
+         <p id="loginQueueSelected"></p>
+         <label for="loginQueueNote">확인한 원인과 조치</label>
+         <textarea id="loginQueueNote" rows="2" minlength="3" maxlength="300" required></textarea>
+         <div class="login-queue-actions">
+          <button class="button primary" id="loginQueueApprove" type="submit">승인하고 재전송 등록</button>
+          <button class="button" id="loginQueueCancel" type="button">취소</button>
+         </div>
+        </form>
+        <h3>최근 승인·재전송 이력</h3>
+        <p id="loginQueueHistoryEmpty" hidden>승인·재전송 이력이 없습니다.</p>
+        <div class="table-wrap" id="loginQueueHistoryTable">
+         <table><thead><tr><th scope="col">시각</th><th scope="col">이벤트 ID</th><th scope="col">처리 상태</th><th scope="col">운영자·근거</th></tr></thead>
+         <tbody id="loginQueueHistoryRows"></tbody></table>
+        </div>
+       </div>
+      </div>
+     </article>
      <div class="two-column">
       <article class="card">
        <div class="card-heading">

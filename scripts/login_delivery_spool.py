@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from time import time
+from uuid import uuid4
 
 from app.services.collector_spool import (
     SpoolBindingMismatch,
@@ -21,6 +22,10 @@ from app.services.login_delivery import LoginDeliveryIdentity
 from app.zero_trust_models import LoginDeliveryRequest
 
 MAX_LOGIN_QUEUE_RECORDS = 10_000
+
+
+class LoginRetryReviewConflict(ValueError):
+    pass
 
 
 @dataclass(frozen=True, slots=True)
@@ -44,15 +49,21 @@ class LoginRetryPolicy:
 
 
 class LoginDeliverySpool:
-    def __init__(self, path, *, origin, tenant_id, collector_subject):
+    def __init__(self, path, *, origin, tenant_id, collector_subject, create=True):
         self.path = Path(path)
         self.tenant_id = tenant_id
         self.collector_subject = collector_subject
         self._binding = json.dumps([origin, tenant_id, collector_subject])
+        if not create:
+            with self._transaction(read_only=True) as con:
+                con.execute("SELECT hold_id,approval_id FROM login_queue LIMIT 0")
+                con.execute("SELECT approval_id FROM login_queue_review_history LIMIT 0")
+            return
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self._transaction(create=True) as con:
             tables = {row[0] for row in con.execute("SELECT name FROM sqlite_master WHERE type='table'")}
-            if tables and tables != {"login_queue_binding", "login_queue"}:
+            base = {"login_queue_binding", "login_queue"}
+            if tables and tables not in (base, base | {"login_queue_review_history"}):
                 raise SpoolUnavailable("login queue database schema mismatch")
             con.execute("CREATE TABLE IF NOT EXISTS login_queue_binding (id INTEGER PRIMARY KEY, binding TEXT NOT NULL)")
             con.execute(
@@ -97,6 +108,7 @@ class LoginDeliverySpool:
                 "attempts": "INTEGER NOT NULL DEFAULT 0", "available_at": "REAL NOT NULL DEFAULT 0",
                 "last_attempt_at": "REAL", "failure_code": "TEXT", "last_http_status": "INTEGER",
                 "enqueued_at": "REAL",
+                "hold_id": "TEXT", "approval_id": "TEXT",
             },
         }
         for table, columns in additions.items():
@@ -105,6 +117,18 @@ class LoginDeliverySpool:
                 if column not in existing:
                     con.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
         con.execute("CREATE INDEX IF NOT EXISTS login_queue_ready ON login_queue(held_status, available_at, seq)")
+        con.execute("UPDATE login_queue SET hold_id=lower(hex(randomblob(16))) WHERE held_status IS NOT NULL AND hold_id IS NULL")
+        con.execute(
+            "CREATE TABLE IF NOT EXISTS login_queue_review_history ("
+            "seq INTEGER PRIMARY KEY, approval_id TEXT NOT NULL, event_id TEXT NOT NULL, "
+            "outcome TEXT NOT NULL, observed_at REAL NOT NULL, actor TEXT, note TEXT, "
+            "failure_code TEXT, http_status INTEGER, analysis_id TEXT, duplicate INTEGER)"
+        )
+        con.execute(
+            "CREATE UNIQUE INDEX IF NOT EXISTS login_queue_approval_once "
+            "ON login_queue_review_history(approval_id) WHERE outcome='approved'"
+        )
+        con.execute("CREATE INDEX IF NOT EXISTS login_queue_review_event ON login_queue_review_history(event_id,seq)")
 
     def enqueue(self, body, *, now=None):
         self._check_owner(body)
@@ -153,8 +177,15 @@ class LoginDeliverySpool:
             raise SpoolUnavailable("login queue payload integrity failed") from exc
         return body
 
-    def acknowledge(self, body, *, now, policy):
+    def acknowledge(self, body, *, now, policy, receipt=None):
         with self._transaction() as con:
+            row = con.execute("SELECT approval_id FROM login_queue WHERE event_id=? AND payload_sha256=?",
+                              self._key(body)).fetchone()
+            if row is not None and row[0] is not None:
+                if receipt is None:
+                    raise SpoolConflict("approved login resend requires a confirmed analysis receipt")
+                self._record_review(con, row[0], body.event.event_id, "delivered", now,
+                                    analysis_id=receipt.result.analysis_id, duplicate=int(receipt.duplicate))
             con.execute("DELETE FROM login_queue WHERE event_id=? AND payload_sha256=?", self._key(body))
             self._schedule(con, now + policy.success_interval, 0)
 
@@ -162,7 +193,7 @@ class LoginDeliverySpool:
         key = self._key(body)
         with self._transaction() as con:
             row = con.execute(
-                "SELECT attempts FROM login_queue WHERE event_id=? AND payload_sha256=? AND held_status IS NULL", key,
+                "SELECT attempts,approval_id FROM login_queue WHERE event_id=? AND payload_sha256=? AND held_status IS NULL", key,
             ).fetchone()
             if row is None:
                 return
@@ -174,10 +205,14 @@ class LoginDeliverySpool:
                 failures = min(33, con.execute("SELECT failures FROM login_queue_binding WHERE id=1").fetchone()[0] + 1)
                 delay = spacing = max(policy.delay(failures), delay_hint)
             held = permanent or attempts >= policy.max_attempts
+            if row[1] is not None:
+                self._record_review(con, row[1], body.event.event_id, "held_again" if held else "deferred",
+                                    now, failure_code=code, http_status=status)
             con.execute(
                 "UPDATE login_queue SET attempts=?, available_at=?, last_attempt_at=?, failure_code=?, "
-                "last_http_status=?, held_status=? WHERE event_id=? AND payload_sha256=?",
-                (attempts, now + delay, now, code, status, (status or 0) if held else None, *key),
+                "last_http_status=?, held_status=?, hold_id=?, approval_id=? WHERE event_id=? AND payload_sha256=?",
+                (attempts, now + delay, now, code, status, (status or 0) if held else None,
+                 uuid4().hex if held else None, None if held else row[1], *key),
             )
             self._schedule(con, now + spacing, failures)
 
@@ -214,10 +249,72 @@ class LoginDeliverySpool:
     def requeue(self, event_id, *, now=None):
         with self._transaction() as con:
             changed = con.execute(
-                "UPDATE login_queue SET held_status=NULL, attempts=0, available_at=? "
+                "UPDATE login_queue SET held_status=NULL, hold_id=NULL, attempts=0, available_at=? "
                 "WHERE event_id=? AND held_status IS NOT NULL", (time() if now is None else now, event_id),
             ).rowcount
         return bool(changed)
+
+    def review_page(self, *, after=0, limit=20, event_id=None):
+        with self._transaction(read_only=True) as con:
+            rows = con.execute(
+                "SELECT seq,event_id,hold_id,attempts,coalesce(failure_code,'http_' || held_status),"
+                "coalesce(last_http_status,nullif(held_status,0)),last_attempt_at FROM login_queue "
+                "WHERE held_status IS NOT NULL AND seq>? AND (? IS NULL OR event_id=?) ORDER BY seq LIMIT ?",
+                (after, event_id, event_id, limit + 1),
+            ).fetchall()
+            history = con.execute(
+                "SELECT approval_id,event_id,outcome,observed_at,actor,note,failure_code,http_status,analysis_id,duplicate "
+                "FROM login_queue_review_history WHERE (? IS NULL OR event_id=?) ORDER BY seq DESC LIMIT 30",
+                (event_id, event_id),
+            ).fetchall()
+        return {
+            "held": [
+                {"event_id": eid, "hold_id": hold, "attempts": attempts, "failure_code": code,
+                 "http_status": status, "last_attempt_at": _utc(attempted)}
+                for _, eid, hold, attempts, code, status, attempted in rows[:limit]
+            ],
+            "next_after": rows[limit - 1][0] if len(rows) > limit else None,
+            "history": [
+                {"approval_id": approval, "event_id": eid, "outcome": outcome, "observed_at": _utc(at),
+                 "actor": actor, "note": note, "failure_code": code, "http_status": status,
+                 "analysis_id": analysis, "duplicate": bool(duplicate) if duplicate is not None else None}
+                for approval, eid, outcome, at, actor, note, code, status, analysis, duplicate in history
+            ],
+        }
+
+    def approve_retry(self, event_id, hold_id, *, actor, note, authorize, now=None):
+        now = time() if now is None else now
+        with self._transaction() as con:
+            authorize()
+            existing = con.execute(
+                "SELECT event_id,actor,note FROM login_queue_review_history WHERE approval_id=? AND outcome='approved'",
+                (hold_id,),
+            ).fetchone()
+            if existing is not None:
+                if existing != (event_id, actor, note):
+                    raise LoginRetryReviewConflict("login hold already reviewed")
+                return {"approval_id": hold_id, "duplicate": True}
+            held = con.execute(
+                "SELECT coalesce(failure_code,'http_' || held_status),coalesce(last_http_status,nullif(held_status,0)) "
+                "FROM login_queue WHERE event_id=? AND hold_id=? AND held_status IS NOT NULL", (event_id, hold_id),
+            ).fetchone()
+            if held is None:
+                raise LoginRetryReviewConflict("login hold changed")
+            con.execute("UPDATE login_queue SET held_status=NULL,hold_id=NULL,approval_id=?,attempts=0,available_at=? "
+                        "WHERE event_id=? AND hold_id=?", (hold_id, now, event_id, hold_id))
+            self._record_review(con, hold_id, event_id, "approved", now, actor=actor, note=note,
+                                failure_code=held[0], http_status=held[1])
+            authorize()
+        return {"approval_id": hold_id, "duplicate": False}
+
+    @staticmethod
+    def _record_review(con, approval_id, event_id, outcome, now, *, actor=None, note=None,
+                       failure_code=None, http_status=None, analysis_id=None, duplicate=None):
+        con.execute(
+            "INSERT INTO login_queue_review_history(approval_id,event_id,outcome,observed_at,actor,note,"
+            "failure_code,http_status,analysis_id,duplicate) VALUES (?,?,?,?,?,?,?,?,?,?)",
+            (approval_id, event_id, outcome, now, actor, note, failure_code, http_status, analysis_id, duplicate),
+        )
 
     def counts(self):
         with self._transaction() as con:

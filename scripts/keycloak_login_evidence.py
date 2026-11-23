@@ -240,7 +240,7 @@ class KeycloakLoginAnalysisCollector:
         ):
             self.spool.fail(body, now=self.clock(), policy=self.retry_policy, code="receipt_mismatch", status=status)
             return queued
-        self.spool.acknowledge(body, now=self.clock(), policy=self.retry_policy)
+        self.spool.acknowledge(body, now=self.clock(), policy=self.retry_policy, receipt=receipt)
         return LoginAnalysisDelivery(response, receipt.evidence_state, receipt)
 
     def _dispatch(self, *, event_id=None):

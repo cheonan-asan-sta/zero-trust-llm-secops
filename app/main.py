@@ -21,6 +21,7 @@ from app.behavior_context_api import behavior_context_router
 from app.config import get_settings
 from app.dashboard_api import router as dashboard_router
 from app.dashboard_jobs_api import router as dashboard_jobs_router
+from app.login_queue_api import router as login_queue_router
 from app.middleware import RequestBodyLimitMiddleware, RequestContextMiddleware
 from app.models import (
     AnalysisResult,
@@ -179,6 +180,7 @@ app.add_middleware(RequestContextMiddleware)
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 app.include_router(dashboard_router)
 app.include_router(dashboard_jobs_router)
+app.include_router(login_queue_router)
 audit_store = create_audit_store(settings)
 audit_pager = create_audit_pager(settings)
 collection_pager = CollectionPager(lambda: audit_pager._master())
