@@ -374,6 +374,13 @@ def exercise(root, *, online=False, managed=False):
     if control:
         with rejected_transition("missing or incomplete"):
             activation.activate(control, decision, document, key_file)
+        source.mkdir()
+        orphaned_wal = source / (AUDIT + "-wal")
+        orphaned_wal.touch()
+        with rejected_transition("still has SQLite sidecars"):
+            activation.activate(control, decision, document, key_file, allow_missing=True)
+        orphaned_wal.unlink()
+        source.rmdir()
         altered = restored / QUEUE
         raw = altered.read_bytes()
         altered.write_bytes(raw[:-1] + bytes([raw[-1] ^ 1]))
@@ -478,6 +485,7 @@ def exercise(root, *, online=False, managed=False):
             "second_managed_sender_rejected": True,
             "diverged_predecessor_rejected": True,
             "missing_predecessor_required_explicit_confirmation": True,
+            "orphaned_predecessor_wal_prevented_activation": True,
             "post_approval_candidate_change_rejected": True,
             "old_generation_approval_rejected": True,
             "active_api_and_sender_followed_restored_pair": True,

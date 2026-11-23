@@ -356,7 +356,7 @@ Linux 단일 호스트에서 대기열과 분석 감사 DB를 하나의 세대�
 
 관리 API는 `serve-api`로 시작한다. 대시보드 프로필의 분석 주소·테넌트·수집기 범위를 확인한 뒤 활성 세대의 대기열과 감사 DB를 사용한다. 수집기 통합에서는 `managed_collector(control, client, **collector_options)` 컨텍스트가 이벤트 수신·전송·재전송 작업의 전체 생명주기를 감싸야 한다. API와 수집기는 같은 제어 디렉터리의 공유 잠금을 잡고, 관리 송신기는 추가 잠금으로 한 프로세스만 동작한다. 두 서비스가 중지되기 전에는 전환을 거부한다. 첫 등록 때 기존 직접 실행 서비스를 중지하고 이후 두 서비스 모두 같은 제어 디렉터리를 쓰도록 구성한다.
 
-이전 DB가 남아 있다면 서비스 종료 후 동일한 방식으로 SQLite 사본을 만들어 승인 후보와 비교한다. 차이가 있으면 운영자 승인이 있어도 최신 정지 상태에서 새로 캡처해야 한다. 이전 DB가 모두 유실돼 마지막 정상 백업으로 복구하는 경우에만 `--predecessor-unavailable`을 붙인다. 이때 백업에 들어가기 전 유실된 이벤트는 복원 범위에 포함되지 않는다. 이전 경로와 승인 이력은 전환 과정에서 삭제하지 않는다. 잠금의 적용 범위는 같은 Linux 호스트에서 같은 제어 디렉터리를 사용하는 관리 서비스다.
+이전 DB가 남아 있다면 서비스 종료 후 동일한 방식으로 SQLite 사본을 만들어 승인 후보와 비교한다. 차이가 있으면 운영자 승인이 있어도 최신 정지 상태에서 새로 캡처해야 한다. 이전 DB가 모두 유실돼 마지막 정상 백업으로 복구하는 경우에만 `--predecessor-unavailable`을 붙인다. 이전 DB의 WAL이나 저널 파일이 남아 있으면 전환을 중단한다. 백업에 들어가기 전 유실된 이벤트는 복원 범위에 포함되지 않는다. 이전 경로와 승인 이력은 전환 과정에서 삭제하지 않는다. 잠금의 적용 범위는 같은 Linux 호스트에서 같은 제어 디렉터리를 사용하는 관리 서비스다.
 
 ```bash
 python -m scripts.login_queue_activation /private/control init /data/login-queue.sqlite3 /data/analysis-audit.sqlite3 --origin http://127.0.0.1:8000 --tenant-id local --collector-subject keycloak-login-collector
@@ -367,6 +367,6 @@ python -m scripts.login_queue_activation /private/control serve-api --port 8000
 python -m scripts.run_login_queue_restore /private/activation-result.json --activation
 ```
 
-네트워크를 차단한 로컬 Linux Docker에서 기존 API와 송신기를 각각 실행해 전환이 막히는 것을 확인했다. 두 번째 송신기, 최신 변경이 남은 이전 DB, 승인 후 변경된 후보, 이전 세대 승인도 거부됐다. 원본 시험 파일이 유실된 뒤 명시적으로 승인한 세대 2로 전환했고, 새 API와 송신기가 복원된 두 DB를 사용했다. 이후 같은 내용의 정지 상태 백업으로 세대 3에 전환할 때는 이전 DB 두 파일을 보존했다.
+네트워크를 차단한 로컬 Linux Docker에서 기존 API와 송신기를 각각 실행해 전환이 막히는 것을 확인했다. 두 번째 송신기, 최신 변경이 남은 이전 DB, 원본 DB 없이 남은 WAL, 승인 후 변경된 후보, 이전 세대 승인도 거부됐다. 원본 시험 파일이 유실된 뒤 명시적으로 승인한 세대 2로 전환했고, 새 API와 송신기가 복원된 두 DB를 사용했다. 이후 같은 내용의 정지 상태 백업으로 세대 3에 전환할 때는 이전 DB 두 파일을 보존했다.
 
 같은 로컬 통제 사례에서 전환 전후 위협 탐지는 **2/2**, 정상 오탐은 **0/2**, 중복 분석·감사는 **0건**이었다. 승인 대기 1건과 전송 대기 2건을 복원했고, 최종 감사 8건과 기존 분석 ID로 조회한 원본 기록을 확인했다. Linux 회귀 41개가 통과했고 AWS·유료 API 호출은 0회였다. [승인·전환 검증 결과](infrastructure-results/local-login-queue-activation-20261123.json)

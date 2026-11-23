@@ -129,12 +129,20 @@ def approve(root, package, pin, candidate, key, *, note):
     return identifier
 
 
+def _present(path):
+    try:
+        path.lstat()
+    except FileNotFoundError:
+        return False
+    return True
+
+
 def _predecessor(root, current, candidate, allow_missing):
     pairs = ((Path(current["queue"]), backup.QUEUE), (Path(current["audit"]), backup.AUDIT))
-    missing = [not os.path.lexists(path) for path, _ in pairs]
+    missing = [not _present(path) for path, _ in pairs]
     if all(missing) and allow_missing:
         sidecars = ("-journal", "-wal", "-shm")
-        if any(os.path.lexists(str(path) + suffix) for path, _ in pairs for suffix in sidecars):
+        if any(_present(path.with_name(path.name + suffix)) for path, _ in pairs for suffix in sidecars):
             raise ActivationConflict("The unavailable predecessor still has SQLite sidecars")
         return "unavailable"
     if any(missing):
