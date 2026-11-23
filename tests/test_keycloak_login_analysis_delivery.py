@@ -1,8 +1,11 @@
 """Guard the automatic fallback at the analysis audit persistence boundary."""
 
 import hashlib
+import json
+import sqlite3
 import subprocess
 import sys
+from contextlib import closing
 from datetime import UTC, datetime, timedelta
 from unittest.mock import Mock
 
@@ -20,7 +23,7 @@ from app.services.sqlite_audit import SQLiteAuditStore
 from app.services.trusted_signals import LoginEvidenceExpired, SignalVerifier
 from app.zero_trust_models import LoginDeliveryRequest, SignedLoginEvidence
 from scripts.keycloak_login_evidence import KeycloakLoginAnalysisCollector
-from scripts.login_delivery_spool import LoginDeliverySpool
+from scripts.login_delivery_spool import LoginDeliverySpool, LoginRetryPolicy
 
 
 @pytest.fixture
@@ -184,9 +187,9 @@ def test_same_login_lock_is_shared_across_api_processes(observed_login, tmp_path
     program = """
 import sys
 from pathlib import Path
-from app.services.login_delivery import LoginDeliveryBusy, LoginDeliveryIdentity, lock_login_delivery
+from app.services.login_delivery import LoginDeliveryBusy, lock_login_delivery
 try:
-    with lock_login_delivery(Path(sys.argv[1]), LoginDeliveryIdentity(sys.argv[2], '')):
+    with lock_login_delivery(Path(sys.argv[1]), sys.argv[2]):
         print('acquired')
 except LoginDeliveryBusy:
     print('busy')
@@ -195,6 +198,69 @@ except LoginDeliveryBusy:
     def child():
         return subprocess.check_output([sys.executable, "-c", program, str(path), identity.analysis_id], timeout=20).strip()
 
-    with lock_login_delivery(path, identity):
+    with lock_login_delivery(path, identity.analysis_id):
         assert child() == b"busy"
     assert child() == b"acquired"
+
+
+def test_old_queue_keeps_pending_and_held_envelopes_during_upgrade(observed_login, tmp_path):
+    event, proof = observed_login
+    first = LoginDeliveryRequest(event=event, evidence=proof, tenant_id="local", collector_subject="service-client")
+    second = first.model_copy(update={"event": event.model_copy(update={"event_id": "previously-held"})})
+    path = tmp_path / "legacy.sqlite3"
+    origin = "http://127.0.0.1/"
+    with closing(sqlite3.connect(path)) as con, con:
+        con.executescript(
+            "CREATE TABLE login_queue_binding (id INTEGER PRIMARY KEY, binding TEXT NOT NULL);"
+            "CREATE TABLE login_queue (seq INTEGER PRIMARY KEY,event_id TEXT NOT NULL UNIQUE,"
+            "payload TEXT NOT NULL,payload_sha256 TEXT NOT NULL,held_status INTEGER);"
+        )
+        con.execute("INSERT INTO login_queue_binding VALUES (1,?)", (json.dumps([origin, "local", "service-client"]),))
+        for body, held in ((first, None), (second, 403)):
+            con.execute("INSERT INTO login_queue(event_id,payload,payload_sha256,held_status) VALUES (?,?,?,?)",
+                        (body.event.event_id, body.model_dump_json(), LoginDeliveryIdentity.from_request(body).payload_sha256, held))
+
+    for _ in range(2):
+        queue = LoginDeliverySpool(path, origin=origin, tenant_id="local", collector_subject="service-client")
+        assert queue.counts() == {"pending": 1, "held": 1}
+        assert queue.peek() == first
+        assert queue.held()[0]["failure_code"] == "http_403"
+    cli = [sys.executable, "-m", "scripts.login_delivery_spool", str(path), "--origin", origin,
+           "--tenant-id", "local", "--collector-subject", "service-client"]
+    assert json.loads(subprocess.check_output([*cli, "status"], timeout=20))["held"] == 1
+    held = json.loads(subprocess.check_output([*cli, "held"], timeout=20))
+    assert held[0]["event_id"] == second.event.event_id and held[0]["http_status"] == 403
+    assert json.loads(subprocess.check_output([*cli, "requeue", second.event.event_id], timeout=20)) == {
+        "requeued": second.event.event_id,
+    }
+    assert not queue.requeue(second.event.event_id)
+    queue.acknowledge(first, now=0, policy=LoginRetryPolicy(success_interval=0))
+    assert queue.peek() == second
+
+
+def test_invalid_receipt_waits_without_blocking_other_ready_logins(observed_login, tmp_path):
+    event, _ = observed_login
+    now = 100.0
+    posted = []
+
+    def exchange(request):
+        event_id = json.loads(request.content)["event"]["event_id"]
+        posted.append(event_id)
+        return httpx.Response(403) if event_id == "other-ready" else httpx.Response(200, json={})
+
+    with httpx.Client(base_url="http://127.0.0.1", transport=httpx.MockTransport(exchange)) as client:
+        delivery = KeycloakLoginAnalysisCollector(
+            client, settings=None, authority=None, registry=None, gateway_id="local", source_id="local",
+            key_id="local", signing_key=None, spool_path=tmp_path / "queue.sqlite3",
+            tenant_id="local", collector_subject="service-client",
+            retry_policy=LoginRetryPolicy(base_delay=2, max_attempts=2, success_interval=0), clock=lambda: now,
+        )
+        assert delivery.submit(event, None).evidence_state == "queued"
+        with pytest.raises(httpx.HTTPStatusError):
+            delivery.submit(event.model_copy(update={"event_id": "other-ready"}), None)
+        assert delivery.flush_pending() == 0 and posted == [event.event_id, "other-ready"]
+        now += 2
+        assert delivery.flush_pending() == 0 and posted[-1] == event.event_id
+        assert [(row["failure_code"], row["attempts"]) for row in delivery.spool.held()] == [
+            ("receipt_invalid", 2), ("http_403", 1),
+        ]

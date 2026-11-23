@@ -31,9 +31,9 @@ def _digest(value):
 
 
 @contextmanager
-def lock_login_delivery(audit_path, identity):
+def lock_login_delivery(audit_path, analysis_id):
     """Serialize analysis on the same audit host, releasing the lock on process exit."""
-    lane = int(identity.analysis_id[:2], 16) % 64
+    lane = int(analysis_id[:2], 16) % 64
     path = audit_path.with_name(f".{audit_path.name}.login-{lane:02d}.lock")
     flags = os.O_RDWR | os.O_CREAT | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_BINARY", 0)
     with os.fdopen(os.open(path, flags, 0o600), "r+b", buffering=0) as handle:

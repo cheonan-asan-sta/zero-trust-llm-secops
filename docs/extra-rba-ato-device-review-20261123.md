@@ -136,3 +136,32 @@ API는 저장을 시작한 뒤의 만료에 대해 전환 응답을 발행하지
 네 건의 동일 이벤트를 다시 제출해 원본 분석 결과가 돌아오고 분석 호출 수와 감사 기록 수가 그대로임을 확인했다. 이전 로그인 10건의 위협 우선 검토 4/4건·오탐 0/6건, 근거 누락·만료 4건, 기존 Keycloak 대조군 및 Sigma 판정도 이전 결과와 일치했다. 별도 프로세스 시험에서 큐 커밋 직후 강제 종료해도 입력 원본이 남았고, 다른 API 프로세스가 같은 감사 잠금을 획득하지 못했다.
 
 위 재현 명령으로 실행하며, 이번 결과는 한 로컬 호스트에서 영속 큐와 SQLite 감사 DB를 재사용한 범위다. 관련 회귀 459개와 Ruff를 통과했다. Docker 시험 컨테이너는 정리했고 AWS·유료 API 사용은 0회였다. [복구 및 재전송 비교 JSON](infrastructure-results/local-keycloak-login-recovery-20261123.json)
+
+## 장기 장애의 재시도 간격과 보류 항목 재접수
+
+연결 중단, 시간 초과, `408`, `429`, `5xx`가 연속되면 수집기가 같은 API에 보내는 모든 로그인 요청의 다음 시각을 늦춘다. 기본 간격은 1초부터 두 배씩 늘어나 60초에서 멈춘다. `429`·`503`에 유효한 `Retry-After`가 있으면 그 시각까지 대기하며 헤더로 설정할 수 있는 대기는 최대 1시간이다. 수집기가 재시작돼도 기존 대기 시각을 다시 읽는다. 성공 후에는 기본 50ms 간격으로 다음 이벤트를 보내며 `LoginRetryPolicy`에서 기본 간격, 상한, 시도 횟수, 복구 발송 간격을 조정할 수 있다.
+
+이벤트별 기본 시도 한도는 8회다. 시도를 소진하거나 `403`·`409` 같은 재시도로 해결되지 않는 상태를 받으면 원본을 보류한다. 응답 형식이 깨지거나 확인 정보가 이벤트와 다르면 해당 이벤트만 늦춰 다른 준비된 항목을 처리한다. 보류 목록은 이벤트 ID, 마지막 오류 코드와 HTTP 상태, 마지막 시도 시각, 시도 횟수를 보여준다. 권한이나 API 상태를 확인한 후 `requeue`로 해당 이벤트의 원본을 다시 대기열에 넣는다. 진행 중인 API 대기 시각과 서버 중복 방지 규칙은 재접수한 이벤트에도 적용한다.
+
+```powershell
+python -m scripts.login_delivery_spool <queue-db> --origin <analysis-api-origin> --tenant-id <tenant> --collector-subject <collector> status
+python -m scripts.login_delivery_spool <queue-db> --origin <analysis-api-origin> --tenant-id <tenant> --collector-subject <collector> held --limit 20
+python -m scripts.login_delivery_spool <queue-db> --origin <analysis-api-origin> --tenant-id <tenant> --collector-subject <collector> requeue <event-id>
+```
+
+대량 시험은 규칙 분석기를 사용하는 실제 로컬 HTTP API와 별도 SQLite 감사 DB를 사용했다. 장애 시간은 시험 시계로 약 19분 9초를 재현했다. 192건이 누적되는 동안 API 확인은 4회였고, 관측한 재시도 간격은 120초, 10초, 419초, 600초였다. 시험 설정은 4회 시도 한도와 복구 발송 간격 250ms였다. 수집기를 다시 초기화한 후에도 마지막 대기 시각을 지켰다. `503` 반복과 `403`으로 보류된 두 이벤트는 서비스와 권한 상태를 해결하고 각각 다시 접수했다. 서버에 기록한 직후 응답 한 건이 유실됐을 때는 기존 결과를 다시 받았다.
+
+| 동일한 로컬 192건 | 기존 `/analysis` | 대기열 복구 후 |
+| --- | ---: | ---: |
+| 위협 탐지 | 96/96 | 96/96 |
+| 정상 오탐 | 0/96 | 0/96 |
+| 오탐률 | 0% | 0% |
+| 위협 재현율·F1 | 100% | 100% |
+
+모든 이벤트의 기존 분석·Sigma 결과가 일치했다. 복구 단계에서 HTTP 요청은 실패·재전송을 포함해 194회였고, 이벤트별 분석 결과와 감사 기록은 총 192건이었다. 대기 및 보류 항목은 모두 0건이 됐다. 대량 시험은 로컬 통제 입력의 비교다.
+
+실제 Docker Keycloak·mTLS 재검증에서도 이전 10건의 위협 우선 검토 4/4건과 오탐 0/6건, 누락·만료 4건, 장애 복구 4건의 결과가 일치했다. 첫 재검증의 응답 유실 시험은 두 번째 이벤트가 먼저 대기 중이던 이벤트를 앞질러 전송된다고 가정했다. 새 큐 순서에 맞춰 두 응답 유실 사례를 별도 큐에서 실행하고 전체를 통과했다. 관련 회귀 145개와 Ruff를 통과했고 시험 컨테이너는 정리했다. AWS와 유료 API 사용은 0회였다. [대량 복구 및 Keycloak 비교 결과](infrastructure-results/local-login-queue-retry-20261123.json)
+
+```powershell
+python -m scripts.run_login_queue_recovery <output.json> --cases 192
+```

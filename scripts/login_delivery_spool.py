@@ -1,9 +1,14 @@
 """SQLite queue for the gateway's original login event and optional signed evidence."""
 
+import argparse
 import json
+import math
 import sqlite3
 from contextlib import closing, contextmanager
+from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
+from time import time
 
 from app.services.collector_spool import (
     SpoolBindingMismatch,
@@ -15,23 +20,46 @@ from app.services.login_delivery import LoginDeliveryIdentity
 from app.zero_trust_models import LoginDeliveryRequest
 
 
+@dataclass(frozen=True, slots=True)
+class LoginRetryPolicy:
+    base_delay: float = 1
+    max_delay: float = 60
+    max_attempts: int = 8
+    success_interval: float = 0.05
+
+    def __post_init__(self):
+        if (
+            not all(math.isfinite(value) for value in (self.base_delay, self.max_delay, self.success_interval))
+            or not 0 < self.base_delay <= self.max_delay <= 3600
+            or not 0 <= self.success_interval <= 60
+            or type(self.max_attempts) is not int or not 1 <= self.max_attempts <= 100
+        ):
+            raise ValueError("invalid login retry policy")
+
+    def delay(self, failures):
+        return min(self.max_delay, self.base_delay * 2 ** min(32, failures - 1))
+
+
 class LoginDeliverySpool:
     def __init__(self, path, *, origin, tenant_id, collector_subject):
         self.path = Path(path)
         self.tenant_id = tenant_id
         self.collector_subject = collector_subject
-        binding = json.dumps([origin, tenant_id, collector_subject])
+        self._binding = json.dumps([origin, tenant_id, collector_subject])
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self._transaction(create=True) as con:
+            tables = {row[0] for row in con.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+            if tables and tables != {"login_queue_binding", "login_queue"}:
+                raise SpoolUnavailable("login queue database schema mismatch")
             con.execute("CREATE TABLE IF NOT EXISTS login_queue_binding (id INTEGER PRIMARY KEY, binding TEXT NOT NULL)")
             con.execute(
                 "CREATE TABLE IF NOT EXISTS login_queue ("
                 "seq INTEGER PRIMARY KEY, event_id TEXT NOT NULL UNIQUE, payload TEXT NOT NULL, "
                 "payload_sha256 TEXT NOT NULL, held_status INTEGER)"
             )
-            con.execute("INSERT OR IGNORE INTO login_queue_binding VALUES (1,?)", (binding,))
-            if con.execute("SELECT binding FROM login_queue_binding WHERE id=1").fetchone() != (binding,):
-                raise SpoolBindingMismatch("login queue belongs to another origin or collector")
+            con.execute("INSERT OR IGNORE INTO login_queue_binding(id,binding) VALUES (1,?)", (self._binding,))
+            self._check_binding(con)
+            self._migrate(con)
         try:
             self.path.chmod(0o600)
         except OSError:
@@ -46,9 +74,31 @@ class LoginDeliverySpool:
             with closing(sqlite3.connect(target, uri=not create, timeout=5)) as con, con:
                 con.execute("PRAGMA synchronous=FULL")
                 con.execute("BEGIN IMMEDIATE")
+                if not create:
+                    self._check_binding(con)
                 yield con
         except sqlite3.Error as exc:
             raise SpoolUnavailable("login queue unavailable") from exc
+
+    def _check_binding(self, con):
+        if con.execute("SELECT binding FROM login_queue_binding WHERE id=1").fetchone() != (self._binding,):
+            raise SpoolBindingMismatch("login queue belongs to another origin or collector")
+
+    @staticmethod
+    def _migrate(con):
+        additions = {
+            "login_queue_binding": {"next_send_at": "REAL NOT NULL DEFAULT 0", "failures": "INTEGER NOT NULL DEFAULT 0"},
+            "login_queue": {
+                "attempts": "INTEGER NOT NULL DEFAULT 0", "available_at": "REAL NOT NULL DEFAULT 0",
+                "last_attempt_at": "REAL", "failure_code": "TEXT", "last_http_status": "INTEGER",
+            },
+        }
+        for table, columns in additions.items():
+            existing = {row[1] for row in con.execute(f"PRAGMA table_info({table})")}
+            for column, definition in columns.items():
+                if column not in existing:
+                    con.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
+        con.execute("CREATE INDEX IF NOT EXISTS login_queue_ready ON login_queue(held_status, available_at, seq)")
 
     def enqueue(self, body):
         self._check_owner(body)
@@ -76,10 +126,14 @@ class LoginDeliverySpool:
         if body.tenant_id != self.tenant_id or body.collector_subject != self.collector_subject:
             raise SpoolBindingMismatch("login queue payload belongs to another collector")
 
-    def peek(self):
+    def peek(self, *, now=None):
+        now = time() if now is None else now
         with self._transaction() as con:
+            if con.execute("SELECT next_send_at FROM login_queue_binding WHERE id=1").fetchone()[0] > now:
+                return None
             row = con.execute(
-                "SELECT event_id,payload,payload_sha256 FROM login_queue WHERE held_status IS NULL ORDER BY seq LIMIT 1"
+                "SELECT event_id,payload,payload_sha256 FROM login_queue "
+                "WHERE held_status IS NULL AND available_at<=? ORDER BY seq LIMIT 1", (now,),
             ).fetchone()
         if row is None:
             return None
@@ -93,20 +147,71 @@ class LoginDeliverySpool:
             raise SpoolUnavailable("login queue payload integrity failed") from exc
         return body
 
-    def acknowledge(self, body):
-        self._finish(body, None)
-
-    def hold(self, body, status):
-        self._finish(body, status)
-
-    def _finish(self, body, status):
-        identity = LoginDeliveryIdentity.from_request(body)
-        key = (body.event.event_id, identity.payload_sha256)
+    def acknowledge(self, body, *, now, policy):
         with self._transaction() as con:
-            if status is None:
-                con.execute("DELETE FROM login_queue WHERE event_id=? AND payload_sha256=?", key)
-            else:
-                con.execute("UPDATE login_queue SET held_status=? WHERE event_id=? AND payload_sha256=?", (status, *key))
+            con.execute("DELETE FROM login_queue WHERE event_id=? AND payload_sha256=?", self._key(body))
+            self._schedule(con, now + policy.success_interval, 0)
+
+    def fail(self, body, *, now, policy, code, status=None, delay_hint=0, outage=False, permanent=False):
+        key = self._key(body)
+        with self._transaction() as con:
+            row = con.execute(
+                "SELECT attempts FROM login_queue WHERE event_id=? AND payload_sha256=? AND held_status IS NULL", key,
+            ).fetchone()
+            if row is None:
+                return
+            attempts = row[0] + 1
+            failures = 0
+            spacing = policy.success_interval
+            delay = policy.delay(attempts)
+            if outage:
+                failures = min(33, con.execute("SELECT failures FROM login_queue_binding WHERE id=1").fetchone()[0] + 1)
+                delay = spacing = max(policy.delay(failures), delay_hint)
+            held = permanent or attempts >= policy.max_attempts
+            con.execute(
+                "UPDATE login_queue SET attempts=?, available_at=?, last_attempt_at=?, failure_code=?, "
+                "last_http_status=?, held_status=? WHERE event_id=? AND payload_sha256=?",
+                (attempts, now + delay, now, code, status, (status or 0) if held else None, *key),
+            )
+            self._schedule(con, now + spacing, failures)
+
+    @staticmethod
+    def _key(body):
+        return body.event.event_id, LoginDeliveryIdentity.from_request(body).payload_sha256
+
+    @staticmethod
+    def _schedule(con, when, failures):
+        con.execute("UPDATE login_queue_binding SET next_send_at=?,failures=? WHERE id=1", (when, failures))
+
+    def next_attempt(self):
+        with self._transaction() as con:
+            available = con.execute("SELECT min(available_at) FROM login_queue WHERE held_status IS NULL").fetchone()[0]
+            if available is None:
+                return None
+            return max(available, con.execute("SELECT next_send_at FROM login_queue_binding WHERE id=1").fetchone()[0])
+
+    def held(self, *, limit=50):
+        if type(limit) is not int or not 1 <= limit <= 1000:
+            raise ValueError("held login listing limit must be between 1 and 1000")
+        with self._transaction() as con:
+            rows = con.execute(
+                "SELECT event_id,attempts,coalesce(failure_code,'http_' || held_status),"
+                "coalesce(last_http_status,nullif(held_status,0)),last_attempt_at "
+                "FROM login_queue WHERE held_status IS NOT NULL ORDER BY seq LIMIT ?", (limit,),
+            ).fetchall()
+        return [
+            {"event_id": event_id, "attempts": attempts, "failure_code": code, "http_status": status,
+             "last_attempt_at": _utc(attempted)}
+            for event_id, attempts, code, status, attempted in rows
+        ]
+
+    def requeue(self, event_id, *, now=None):
+        with self._transaction() as con:
+            changed = con.execute(
+                "UPDATE login_queue SET held_status=NULL, attempts=0, available_at=? "
+                "WHERE event_id=? AND held_status IS NOT NULL", (time() if now is None else now, event_id),
+            ).rowcount
+        return bool(changed)
 
     def counts(self):
         with self._transaction() as con:
@@ -114,3 +219,37 @@ class LoginDeliverySpool:
                 "SELECT count(*) - count(held_status),count(held_status) FROM login_queue"
             ).fetchone()
         return {"pending": pending, "held": held}
+
+
+def _utc(value):
+    return None if value is None else datetime.fromtimestamp(value, UTC).isoformat()
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("database", type=Path)
+    parser.add_argument("--origin", required=True)
+    parser.add_argument("--tenant-id", required=True)
+    parser.add_argument("--collector-subject", required=True)
+    commands = parser.add_subparsers(dest="command", required=True)
+    commands.add_parser("status")
+    commands.add_parser("held").add_argument("--limit", type=int, default=50)
+    commands.add_parser("requeue").add_argument("event_id")
+    args = parser.parse_args()
+    if not args.database.is_file():
+        parser.error("existing login queue database is required")
+    queue = LoginDeliverySpool(args.database, origin=args.origin.rstrip("/") + "/",
+                               tenant_id=args.tenant_id, collector_subject=args.collector_subject)
+    if args.command == "status":
+        result = queue.counts() | {"next_attempt_at": _utc(queue.next_attempt())}
+    elif args.command == "held":
+        result = queue.held(limit=args.limit)
+    else:
+        if not queue.requeue(args.event_id):
+            parser.error("held login event not found")
+        result = {"requeued": args.event_id}
+    print(json.dumps(result, ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    main()

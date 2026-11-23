@@ -7,7 +7,9 @@ import ssl
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from threading import Event, Lock, Thread
+from email.utils import parsedate_to_datetime
+from threading import Event, Thread
+from time import time
 from types import SimpleNamespace
 from typing import Literal
 from urllib.parse import urlsplit
@@ -18,7 +20,11 @@ from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import ValidationError
 
 from app import security
-from app.services.login_delivery import LoginDeliveryIdentity
+from app.services.login_delivery import (
+    LoginDeliveryBusy,
+    LoginDeliveryIdentity,
+    lock_login_delivery,
+)
 from app.services.session_analysis_evidence import event_digest
 from app.services.trusted_signals import canonical_login_evidence
 from app.zero_trust_models import (
@@ -27,7 +33,7 @@ from app.zero_trust_models import (
     LoginDeliveryRequest,
     SignedLoginEvidence,
 )
-from scripts.login_delivery_spool import LoginDeliverySpool
+from scripts.login_delivery_spool import LoginDeliverySpool, LoginRetryPolicy
 from scripts.mtls_native import valid_client
 
 
@@ -96,12 +102,32 @@ class LoginAnalysisDelivery:
         return None if self.evidence_state == "queued" else self.response.json()
 
 
+def _retry_after(response, now):
+    if response.status_code not in {429, 503}:
+        return 0
+    value = response.headers.get("Retry-After", "").strip()
+    if not value or len(value) > 80:
+        return 0
+    try:
+        if value.isascii() and value.isdigit():
+            seconds = int(value)
+        else:
+            deadline = parsedate_to_datetime(value)
+            if deadline.utcoffset() is None:
+                return 0
+            seconds = deadline.timestamp() - now
+        return max(0, min(3600, seconds))
+    except (ValueError, OverflowError, OSError):
+        return 0
+
+
 class KeycloakLoginAnalysisCollector:
     """Submit the observed login from the same gateway that verified its evidence."""
 
     def __init__(
         self, analysis_client: httpx.Client, *, settings, authority, registry, gateway_id,
         source_id, key_id, signing_key, spool_path=None, tenant_id=None, collector_subject=None,
+        retry_policy=None, clock=time,
     ):
         target = urlsplit(str(analysis_client.base_url))
         if (
@@ -128,7 +154,8 @@ class KeycloakLoginAnalysisCollector:
                 spool_path, origin=str(analysis_client.base_url), tenant_id=tenant_id,
                 collector_subject=collector_subject,
             )
-        self._delivery_lock = Lock()
+        self.retry_policy = retry_policy if retry_policy is not None else LoginRetryPolicy()
+        self.clock = clock
 
     def capture(self, channel, event, bearer, otp_binding):
         if otp_binding is None:
@@ -150,9 +177,8 @@ class KeycloakLoginAnalysisCollector:
                 tenant_id=self.spool.tenant_id, collector_subject=self.spool.collector_subject,
                 event=event, evidence=proof,
             )
-            with self._delivery_lock:
-                self.spool.enqueue(body)
-                return self._send_pending(body)
+            self.spool.enqueue(body)
+            return self._dispatch(event_id=event.event_id) or LoginAnalysisDelivery(httpx.Response(202), "queued")
         payload = event.analysis_payload()
         state = "missing"
         if proof is not None:
@@ -176,47 +202,65 @@ class KeycloakLoginAnalysisCollector:
             response = self.analysis_client.post(
                 "/analysis/login-delivery", json=body.model_dump(mode="json"), follow_redirects=False,
             )
-        except httpx.TransportError:
+        except httpx.TransportError as error:
+            if isinstance(error, httpx.TimeoutException):
+                code = "transport_timeout"
+            elif isinstance(error, httpx.ConnectError):
+                code = "transport_connect"
+            else:
+                code = "transport_interrupted"
+            self.spool.fail(body, now=self.clock(), policy=self.retry_policy, code=code, outage=True)
             return queued
-        if response.status_code in {408, 429} or response.status_code >= 500:
+        status = response.status_code
+        if status in {408, 429} or status >= 500:
+            now = self.clock()
+            self.spool.fail(body, now=now, policy=self.retry_policy, code=f"http_{status}", status=status,
+                            delay_hint=_retry_after(response, now), outage=True)
             return queued
-        if response.status_code != 200 and response.is_success:
-            return queued  # An unexpected acknowledgement cannot remove an event.
-        if response.status_code != 200:
-            self.spool.hold(body, response.status_code)
+        if not response.is_success:
+            self.spool.fail(body, now=self.clock(), policy=self.retry_policy, code=f"http_{status}",
+                            status=status, permanent=True)
             response.raise_for_status()
-            return queued
         try:
             receipt = LoginDeliveryReceipt.model_validate_json(response.content)
         except ValidationError:
+            self.spool.fail(body, now=self.clock(), policy=self.retry_policy, code="receipt_invalid", status=status)
             return queued
         identity = LoginDeliveryIdentity.from_request(body)
         if (
-            receipt.result.analysis_id != identity.analysis_id
+            status != 200 or receipt.result.analysis_id != identity.analysis_id
             or receipt.result.login_delivery_sha256 != identity.payload_sha256
             or receipt.result.event_id != body.event.event_id
             or receipt.result.actor_id != body.collector_subject
             or receipt.result.tenant_id != body.tenant_id
         ):
+            self.spool.fail(body, now=self.clock(), policy=self.retry_policy, code="receipt_mismatch", status=status)
             return queued
-        self.spool.acknowledge(body)
+        self.spool.acknowledge(body, now=self.clock(), policy=self.retry_policy)
         return LoginAnalysisDelivery(response, receipt.evidence_state, receipt)
+
+    def _dispatch(self, *, event_id=None):
+        try:
+            with lock_login_delivery(self.spool.path, "00"):
+                body = self.spool.peek(now=self.clock())
+                if body is None or (event_id is not None and body.event.event_id != event_id):
+                    return None
+                return self._send_pending(body)
+        except LoginDeliveryBusy:
+            return None
 
     def flush_pending(self, *, limit=50):
         if self.spool is None:
             raise ValueError("configure a persistent login queue before replay")
         sent = 0
         for _ in range(limit):
-            with self._delivery_lock:
-                body = self.spool.peek()
-                if body is None:
-                    break
-                try:
-                    outcome = self._send_pending(body)
-                except httpx.HTTPStatusError:
-                    continue  # Rejected rows are retained separately from retryable work.
-                if outcome.evidence_state == "queued":
-                    break
+            try:
+                outcome = self._dispatch()
+            except httpx.HTTPStatusError:
+                continue  # Rejected rows are retained separately from retryable work.
+            if outcome is None:
+                break
+            if outcome.evidence_state != "queued":
                 sent += 1
         return sent
 
@@ -230,7 +274,8 @@ class KeycloakLoginAnalysisCollector:
         def replay():
             while not stop.is_set():
                 self.flush_pending()
-                stop.wait(interval)
+                due = self.spool.next_attempt()
+                stop.wait(interval if due is None else min(interval, max(0.01, due - self.clock())))
 
         worker = Thread(target=replay, name="keycloak-login-replay", daemon=True)
         worker.start()

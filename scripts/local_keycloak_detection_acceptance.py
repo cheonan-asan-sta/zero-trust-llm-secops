@@ -10,7 +10,7 @@ from datetime import UTC, datetime, timedelta
 from http.client import HTTPSConnection
 from http.server import ThreadingHTTPServer
 from threading import Lock, Thread
-from time import monotonic, sleep
+from time import monotonic, sleep, time
 from typing import NamedTuple
 from unittest.mock import patch
 from uuid import uuid4
@@ -33,6 +33,7 @@ from scripts.f1_lab.native_bayes import counts, metrics, record
 from scripts.f1_lab.vpn_enrollment import PinnedVPNEnrollments
 from scripts.keycloak_login_evidence import KeycloakLoginAnalysisCollector
 from scripts.local_ato_device_acceptance import _material
+from scripts.login_delivery_spool import LoginRetryPolicy
 from scripts.mtls_transport import Quiet
 
 SOURCE = "keycloak-login-observer"
@@ -293,11 +294,15 @@ def exercise(root, *, acquire, settings, authority, tenant):
             api, settings=settings, authority=authority, registry=registry,
             gateway_id=GATEWAY, source_id=SOURCE, key_id=KEY_ID, signing_key=signing_key,
             spool_path=path, tenant_id=tenant, collector_subject=analysis_settings.api_key_subject,
+            retry_policy=LoginRetryPolicy(success_interval=0),
         )
 
     def queue_recovery_cases(server, api, cases):
         queued = []
         for index, case in enumerate(cases, len(HOLDOUT) + len(FALLBACK_CASES) + 1):
+            due = collector.spool.next_attempt()
+            if due is not None:
+                sleep(max(0, due - time()) + 0.02)
             authentication = acquire(case)
             binding = authentication.otp_binding
             assert binding is not None and binding.subject == subjects[case.name]
@@ -509,16 +514,17 @@ def exercise(root, *, acquire, settings, authority, tenant):
                         ready = make_collector(restored, offline_path)
                         inspect_recovery(ready, restored, queued, committed_before_retry=False)
 
-                    response_path = root / "lost-response-login-queue.sqlite3"
-                    with httpx.Client(
-                        base_url=api.base_url, trust_env=False, timeout=10,
-                        headers={"X-API-Key": operator_key}, transport=LoseCommittedResponse(),
-                    ) as disconnected:
-                        collector = make_collector(disconnected, response_path)
-                        queued = queue_recovery_cases(server, api, RECOVERY_CASES[2:])
-                    with patch.object(main, "audit_store", SQLiteAuditStore(audit.path)):
-                        ready = make_collector(api, response_path)
-                        inspect_recovery(ready, api, queued, committed_before_retry=True)
+                    for case in RECOVERY_CASES[2:]:
+                        response_path = root / f"{case.name}-login-queue.sqlite3"
+                        with httpx.Client(
+                            base_url=api.base_url, trust_env=False, timeout=10,
+                            headers={"X-API-Key": operator_key}, transport=LoseCommittedResponse(),
+                        ) as disconnected:
+                            collector = make_collector(disconnected, response_path)
+                            queued = queue_recovery_cases(server, api, (case,))
+                        with patch.object(main, "audit_store", SQLiteAuditStore(audit.path)):
+                            ready = make_collector(api, response_path)
+                            inspect_recovery(ready, api, queued, committed_before_retry=True)
         finally:
             server.shutdown()
             thread.join(timeout=5)

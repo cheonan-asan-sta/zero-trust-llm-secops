@@ -934,7 +934,7 @@ async def deliver_login(body: LoginDeliveryRequest, request: Request, principal:
         return receipt(result, duplicate=False)
     try:
         async with _analysis_slot():
-            with lock_login_delivery(store.path, identity):
+            with lock_login_delivery(store.path, identity.analysis_id):
                 return await process_delivery()
     except (AnalysisCapacityExceeded, LoginDeliveryBusy) as exc:
         raise HTTPException(429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}) from exc
