@@ -17,6 +17,10 @@ from scripts.f1_lab.login_environment import Change
         (True, True, Factor.VERIFIED, Device.KNOWN, Takeover.REVIEW),
         (True, True, Factor.REJECTED_REQUIRED_FACTOR, Device.UNKNOWN, Takeover.PRIORITY_REVIEW),
         (True, True, Factor.VERIFIED, Device.NEW, Takeover.PRIORITY_REVIEW),
+        (True, True, Factor.VERIFIED, Device.REVOKED, Takeover.PRIORITY_REVIEW),
+        (True, True, Factor.UNKNOWN, Device.REVOKED, Takeover.REVIEW),
+        (False, True, Factor.VERIFIED, Device.REVOKED, Takeover.NO_SIGNAL),
+        (True, False, Factor.VERIFIED, Device.REVOKED, Takeover.NO_SIGNAL),
     ],
 )
 def test_takeover_classification_preserves_warning(success, drift, factor, device, expected):

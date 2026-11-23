@@ -24,8 +24,8 @@ from app.config import Settings
 from app.services.auth_alert_triage import resolve_auth_alert, resolve_terminal_auth_alert
 from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
 from app.zero_trust_models import ProtectedAccessRequest, SignedSessionSignal
-from scripts import local_oidc_redirect_lab
-from scripts.evaluate_local_remote_holdout import write
+from scripts import local_ato_device_acceptance, local_oidc_redirect_lab
+from scripts.evaluate_local_remote_holdout import fingerprint, read, write
 from scripts.f1_lab.ato_triage import Factor, Takeover, assess_login
 from scripts.keycloak_live_authority import KeycloakLiveAuthority
 from scripts.local_keycloak_evidence_collector import LocalKeycloakEvidenceCollector
@@ -139,7 +139,7 @@ def fixture_otp(seed, *, unix_time=None):
     return f"{value % 1_000_000:06d}"
 
 
-def provision_authority_reader(client, base, admin_password):
+def fixture_admin_authorization(client, base, admin_password):
     admin = client.post(
         f"{base}/realms/master/protocol/openid-connect/token",
         data={
@@ -150,7 +150,11 @@ def provision_authority_reader(client, base, admin_password):
         },
     )
     admin.raise_for_status()
-    authorization = {"Authorization": "Bearer " + admin.json()["access_token"]}
+    return {"Authorization": "Bearer " + admin.json()["access_token"]}
+
+
+def provision_authority_reader(client, base, admin_password):
+    authorization = fixture_admin_authorization(client, base, admin_password)
     admin_base = f"{base}/admin/realms/{REALM}"
     clients = admin_base + "/clients"
 
@@ -168,12 +172,12 @@ def provision_authority_reader(client, base, admin_password):
     mappings = f"{admin_base}/users/{account.json()['id']}/role-mappings/clients/{realm_management}"
     assigned = client.post(mappings, json=[role.json()], headers=authorization)
     assigned.raise_for_status()
-    return authorization
 
 
-def verify(base, root, password, otp_seed, admin_password, authority_secret, *, stop_provider):
+def verify(base, root, password, otp_seed, admin_password, authority_secret, *, stop_provider, ato_residual=None):
     issuer = f"{base}/realms/{REALM}"
     metadata_url = issuer + "/.well-known/openid-configuration"
+    device_review = None
     with httpx.Client(trust_env=False, timeout=8) as client:
         for _ in range(210):
             try:
@@ -191,7 +195,7 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
         def token(**fields):
             return client.post(token_url, data={"client_id": CLIENT_ID, **fields})
 
-        authorization = provision_authority_reader(client, base, admin_password)
+        provision_authority_reader(client, base, admin_password)
         settings = Settings(
             _env_file=None,
             app_environment="test",
@@ -307,7 +311,8 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
             otp_binding = redirect_signin.otp_binding
             assert otp_binding is not None and otp_binding.subject == identity
             login_history = fetch_login_history(
-                client, issuer, authorization, client_id=CLIENT_ID, binding=otp_binding,
+                client, issuer, fixture_admin_authorization(client, base, admin_password),
+                client_id=CLIENT_ID, binding=otp_binding,
             )
             assert login_history["earlier_same_account_failures"] == 3
             assert login_history["earlier_same_account_successes"] == 1
@@ -357,10 +362,19 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
             reused_redirect = app.post(redirect_path, headers=redirect_caller, follow_redirects=False)
             assert reused_redirect.status_code == 403
             assert "redirect" not in local_oidc_redirect_lab.receipt(redirect_lab, reused_redirect)
+            if ato_residual is not None:
+                device_review = local_ato_device_acceptance.exercise(
+                    root / "ato-device", settings=settings, binding=otp_binding,
+                    token=redirect_tokens["id_token"], other_token=tokens["id_token"],
+                    authority=gateway.state.oidc_live_authority,
+                    pattern_report=read(ato_residual), warning=login_history["candidate_repeated_failure_warning"],
+                )
+                device_review["residual_report_sha256"] = fingerprint(ato_residual)
             out_of_scope = fresh_sign_in(action="REMOTE_ACCESS")
             scope_denial, scope_alert = evaluate(out_of_scope)
             assert scope_alert == "confirmed"
             assert scope_denial["session"]["decision"] == "DENY" and not scope_denial["grant_token"]
+            authorization = fixture_admin_authorization(client, base, admin_password)
             roles = f"{base}/admin/realms/{REALM}/roles"
             mappings = f"{base}/admin/realms/{REALM}/users/{identity}/role-mappings/realm"
             entries = {}
@@ -474,13 +488,14 @@ def verify(base, root, password, otp_seed, admin_password, authority_secret, *, 
             "failed_login_retained_warning": failed_login.repeated_failure_warning,
             "failed_login_takeover": failed_login.takeover.value,
         },
+        "ato_device_review": device_review,
         "manual_revocation_file": False,
         "finished_at": datetime.now(UTC).isoformat(),
         "paid_api_calls": 0,
     }
 
 
-def run(output):
+def run(output, *, ato_residual=None):
     name = f"zt-keycloak-{uuid4().hex[:12]}"
     password, admin_password = secrets.token_urlsafe(28), secrets.token_urlsafe(28)
     otp_seed = secrets.token_hex(20)
@@ -531,6 +546,7 @@ def run(output):
                 admin_password,
                 authority_secret,
                 stop_provider=stop_provider,
+                ato_residual=ato_residual,
             )
         finally:
             try:
@@ -545,4 +561,6 @@ def run(output):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=Path)
-    run(parser.parse_args().output)
+    parser.add_argument("--ato-residual", type=Path)
+    args = parser.parse_args()
+    run(args.output, ato_residual=args.ato_residual)

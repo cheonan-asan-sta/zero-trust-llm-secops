@@ -14,6 +14,7 @@ class Device(StrEnum):
     UNKNOWN = "unknown"
     KNOWN = "known"
     NEW = "new_verified_device"
+    REVOKED = "revoked_verified_device"
 
 
 class Takeover(StrEnum):
@@ -34,6 +35,10 @@ def assess_login(
     """Accept factor and device facts already bound to the same login by a trusted source."""
     if success is not True or not environment_change:
         return LoginTriage(warning, Takeover.NO_SIGNAL)
-    if factor is Factor.REJECTED_REQUIRED_FACTOR or device is Device.NEW:
+    if (
+        factor is Factor.REJECTED_REQUIRED_FACTOR
+        or device is Device.NEW
+        or (factor is Factor.VERIFIED and device is Device.REVOKED)
+    ):
         return LoginTriage(warning, Takeover.PRIORITY_REVIEW)
     return LoginTriage(warning, Takeover.REVIEW)

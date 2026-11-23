@@ -45,3 +45,5 @@ python -m scripts.run_keycloak_remote_acceptance <new-keycloak-report.json>
 ```
 
 관련 회귀 43개와 Ruff, 로컬 Go 빌드, Docker Keycloak 통합 시험을 통과했다. 시험 컨테이너를 제거했고 유료 API·AWS·병합은 0회다. [집계와 봉인 SHA-256](infrastructure-results/rba-ato-separation-20261123.json)
+
+[후속 MFA·기기 등록 근거 확인](extra-rba-ato-device-review-20261123.md)에서 일반 검토에 남은 7건을 분석하고 같은 패턴의 로컬 통제 시험을 재현했다.
