@@ -292,7 +292,13 @@ def _serve(root, host, port):
         # Uvicorn imports the application after the selected paths have been bound.
         os.environ["AUDIT_DB_PATH"] = str(active.audit_db_path)
         os.environ["DASHBOARD_LOGIN_QUEUE_PROFILE"] = str(active.dashboard_login_queue_profile)
-        uvicorn.run("app.main:app", host=host, port=port, workers=1)
+        application = "app.main:app"
+        if key_path := os.environ.get("LOGIN_QUEUE_READINESS_KEY"):
+            from app.main import app
+            from scripts.login_queue_ingress import RecoveryReadiness
+
+            application = RecoveryReadiness(app, status(root), Path(key_path))
+        uvicorn.run(application, host=host, port=port, workers=1)
 
 
 def main():

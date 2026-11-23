@@ -58,7 +58,7 @@ def serve(root, port):
 
 
 @contextmanager
-def service(root, port, collector_key, reviewer_key, *, control=None):
+def service(root, port, collector_key, reviewer_key, *, control=None, readiness_key=None, startup_timeout=20):
     origin = f"http://127.0.0.1:{port}"
     accounts = root / "accounts.json"
     profile = root / "queue-profile.json"
@@ -90,6 +90,8 @@ def service(root, port, collector_key, reviewer_key, *, control=None):
         command = [sys.executable, "-m", "scripts.login_queue_activation", str(control),
                    "serve-api", "--port", str(port)]
         env = {**os.environ, **{k.upper(): str(v) for k, v in payload.items() if v is not None}}
+        if readiness_key is not None:
+            env["LOGIN_QUEUE_READINESS_KEY"] = str(readiness_key)
     with (root / "service.log").open("wb") as log, subprocess.Popen(
         command,
         stdout=log, stderr=subprocess.STDOUT, env=env,
@@ -99,7 +101,7 @@ def service(root, port, collector_key, reviewer_key, *, control=None):
                 httpx.Client(base_url=origin, headers={"X-API-Key": collector_key}, timeout=8, trust_env=False) as collector,
                 httpx.Client(base_url=origin, headers={"X-API-Key": reviewer_key}, timeout=8, trust_env=False) as reviewer,
             ):
-                deadline = monotonic() + 20
+                deadline = monotonic() + startup_timeout
                 while monotonic() < deadline and process.poll() is None:
                     try:
                         identity = collector.get("/auth/me", timeout=1)

@@ -112,9 +112,7 @@ def issue(root, signing_key, standby_id, confirmation):
     return sha(private_file(root / APPROVAL, MAX_DOCUMENT))
 
 
-def receive(root, receipt_path, authority_public_key, package, recovery_key, candidate):
-    root = private_directory(root)
-    profile = RecoveryProfile.model_validate_json(private_file(root / PROFILE, MAX_DOCUMENT))
+def verify_receipt(receipt_path, authority_public_key, profile, standby_id):
     key = Ed25519PublicKey.from_public_bytes(pinned(authority_public_key, profile.authority_public_key_sha256, 32))
     receipt_raw = private_file(receipt_path, MAX_DOCUMENT)
     receipt = Receipt.model_validate_json(receipt_raw)
@@ -125,15 +123,23 @@ def receive(root, receipt_path, authority_public_key, package, recovery_key, can
         raise activation.ActivationConflict("Fence receipt signature is invalid") from error
     if decision.checkpoint != profile.checkpoint or decision.confirmation.source_id != profile.checkpoint.source_id:
         raise activation.ActivationConflict("Fence receipt belongs to a different source checkpoint")
-    if private_file(root / "standby-id", 32) != decision.standby_id.encode():
+    if standby_id != decision.standby_id:
         raise activation.ActivationConflict("Fence receipt names a different standby")
     if not 0 <= decision.issued_at - decision.confirmation.observed_at <= MAX_EVIDENCE_AGE:
         raise activation.ActivationConflict("Fence receipt did not confirm a recent fence when issued")
+    return decision, sha(receipt_raw)
+
+
+def receive(root, receipt_path, authority_public_key, package, recovery_key, candidate):
+    root = private_directory(root)
+    profile = RecoveryProfile.model_validate_json(private_file(root / PROFILE, MAX_DOCUMENT))
+    standby_id = private_file(root / "standby-id", 32).decode("ascii")
+    decision, receipt_hash = verify_receipt(receipt_path, authority_public_key, profile, standby_id)
     checkpoint = profile.checkpoint
     candidate = private_directory(candidate)
     backup.verify_candidate(package, checkpoint.package_sha256, candidate, recovery_key, **checkpoint.scope())
     history = {
-        **decision.model_dump(), "generation": checkpoint.generation, "receipt_sha256": sha(receipt_raw),
+        **decision.model_dump(), "generation": checkpoint.generation, "receipt_sha256": receipt_hash,
         "authority_public_key_sha256": profile.authority_public_key_sha256,
     }
     activation.initialize(root, candidate / backup.QUEUE, candidate / backup.AUDIT, handoff=history,

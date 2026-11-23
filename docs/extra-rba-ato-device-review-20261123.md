@@ -429,3 +429,35 @@ python -m scripts.login_queue_disaster_recovery /private/control receive /privat
 로컬 Docker에서 서로 다른 컨테이너와 루프백을 사용했다. 원본 송신기의 잠금을 확인한 뒤 원본을 강제 종료했다. 대기 호스트는 기록 없이 시작할 수 없었고, 독립 관리 경로에서 원본의 정확한 인스턴스가 제거됐으며 같은 ID로 재기동이 거부된 후에만 승인했다. 단순 접속 실패, 오래된 확인, 다른 원본, 다른 서명키, 중복 발급을 거부했다. 대기 쪽에서도 변조된 서명, 다른 대기 ID·세대, 승인 재사용을 거부했다.
 
 대기 호스트는 세대 2에서 대기 4건을 재전송했다. 원본이 이미 감사에 저장했지만 큐에 확인하지 못한 1건은 기존 결과를 반환했다. 감사 기록은 **5건에서 8건**이 됐으며 중복 분석·감사는 **0건**이었다. 같은 통제 사례에서 전후 위협 탐지 **2/2**, 정상 오탐 **0/2**를 확인했다. 첫 시험에서 시험 프로필과 초기 세대의 분석 주소 표기가 맞지 않아, 기존 시험 실행기와 같은 표기를 사용해 다시 검증했다. Linux Docker 회귀 41개와 기존 WSL systemd 계획 인계도 통과했다. AWS·유료 API 호출은 0회였다. [원본 강제 중단·격리·복구 결과](infrastructure-results/local-login-queue-disaster-20261123.json)
+
+## 격리 승인 이후 같은 NGINX 주소로 트래픽 전환
+
+`scripts.login_queue_ingress`는 별도 인입 호스트에서 NGINX의 `route.conf`를 발행한다. 관리자는 원본·대기 측의 서로 다른 전용 IPv4 주소·포트와 TLS 이름, 전용 CA 지문, mTLS 클라이언트 인증서·키 경로를 프로필에 고정한다. 재해 복구 체크포인트·승인 공개키·대기 ID·준비 확인용 공개키 지문도 같은 설정에 기록한다. 원본과 대기 모두 서버 인증서를 확인하고 클라이언트 인증서를 요구하는 별도 백엔드 리스너를 쓴다. 원본·대기 호스트의 관리 API는 이 백엔드에서만 접근하는 루프백에 둔다.
+
+프로필 JSON의 `primary`와 `standby`에는 각각 `address`, `port`, `tls_name`을 넣는다. `recovery`에는 재해 복구에 쓴 `checkpoint` 객체와 `authority_public_key_sha256`을 넣는다. 최상위에는 `standby_id`, `readiness_public_key_sha256`, `ca_file`, `ca_sha256`, `client_cert`, `client_key`를 둔다. 두 관리 호스트에 같은 체크포인트와 CA 지문을 전달하고, 개인키는 해당 프로세스가 접근하는 경로에만 둔다.
+
+인입 NGINX의 기존 인증된 HTTPS 리스너에 아래 내용을 적용한다. 관리 명령을 실행한 뒤 NGINX 검사·재적용을 거쳐야 요청 경로가 바뀐다. 상태 명령은 발행한 파일을 나타내므로 실제 요청의 응답도 확인한다.
+
+```nginx
+location ^~ /internal/login-queue-ready/ { return 404; }
+location / { include /private/ingress/route.conf; }
+```
+
+1. 원본 장애를 확인하면 `pause`를 실행한다. NGINX 설정 검사와 재적용 뒤 같은 주소에서 503을 확인한다.
+2. 원본 관리자가 별도 관리 경로에서 기존 서비스의 재기동을 차단한 증거를 발급받는다. 대기 호스트에서 백업을 검증·활성화하고 관리 API를 시작한다. API는 운영 계정 소유의 32바이트 Ed25519 개인키 파일을 `LOGIN_QUEUE_READINESS_KEY`로 읽는다.
+3. `promote`는 독립 관리자의 격리 서명과 체크포인트를 확인한다. 이어서 mTLS로 대기 호스트 인증서를 확인하고, 임의 질의에 대한 대기 API의 서명에서 방금 승인한 세대·대기 ID·인계 지문을 대조한다. 같은 세대의 준비가 확인되어야 대기 경로를 발행한다.
+4. `nginx -t`와 재적용 후, 기존 인증 정보로 같은 주소에 새 요청을 보내 정상 응답을 확인한다. 이 경로는 이전 원본에 자동 재전송하거나 되돌아가지 않는다. 준비 확인 이후의 백엔드 장애는 실패 응답으로 전달하며, 기존 실패 시 처리 경로가 재전송을 관리한다.
+
+```bash
+python -m scripts.login_queue_ingress /private/ingress enroll /private/route-profile.json <profile-sha256>
+python -m scripts.login_queue_ingress /private/ingress pause
+nginx -t && systemctl reload nginx
+python -m scripts.login_queue_ingress /private/ingress promote /private/fenced-recovery.json /private/authority.pub /private/readiness.pub
+nginx -t && systemctl reload nginx
+python -m scripts.login_queue_ingress /private/ingress status
+python -m scripts.run_login_queue_disaster <새 결과 JSON 경로> --routed
+```
+
+같은 로컬 NGINX 주소에서 실제 응답이 **200 → 503 → 200**으로 바뀌었다. 원본의 강제 종료 및 재기동 차단 뒤, 유효한 격리 승인만 있고 대기 API가 준비되기 전에는 503을 유지했다. 승인 서명을 바꾼 기록도 거부했다. 대기 API의 서명된 준비 확인 후에만 NGINX를 새 경로로 재적용했다. 백엔드는 클라이언트 인증서가 없는 연결을 거부했고, 인입 주소에는 내부 준비 확인 경로가 열리지 않았다.
+
+복구 이벤트 4건의 기존 탐지는 그대로였다. 같은 주소로 다시 보낸 기존 이벤트는 원래 분석을 반환했다. 새 이벤트를 두 번 보내자 처음에만 새 분석이 기록돼 감사 행이 **8건에서 9건**으로 늘었다. Linux Docker 회귀 41개와 Ruff를 통과했다. 초반 시험에서 Docker 전체 상태 조회 지연과 Windows 마운트의 앱 시작 지연을 확인해, 지정 대기 컨테이너 검사와 Linux 내부 코드 사본으로 재시험했다. 시험망은 단일 로컬 Docker 데몬의 격리 네트워크이고, NGINX와 백엔드 사이는 mTLS로 검증했다. 실제 두 호스트의 관리 경로와 운영 HTTPS 리스너는 별도 검증 범위다. AWS·유료 API 호출은 0회였다. [NGINX 장애 전환 검증 결과](infrastructure-results/local-login-queue-ingress-20261123.json)
