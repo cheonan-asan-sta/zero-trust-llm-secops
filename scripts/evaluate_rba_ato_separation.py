@@ -143,20 +143,27 @@ def decisions(success, repeated, warning, flags, delay, rule):
 
 
 CHANNELS = ("prior_combined", "separate_warning", "ato_review", "profile_priority_proxy")
+FALLBACK_CHANNELS = (*CHANNELS, "priority_with_missing_mfa_device")
 
 
-def capture(projection, candidate, expected_candidate_sha, output):
+def capture(projection, candidate, expected_candidate_sha, output, *, missing_evidence=False):
+    cohort, first, last, rows, accounts = (
+        ("missing-evidence", 20, 24, 866_564, 215_362)
+        if missing_evidence
+        else ("confirmation", 0, 19, ROWS, ACCOUNTS)
+    )
+    channels = FALLBACK_CHANNELS if missing_evidence else CHANNELS
     population = read(projection / "population.json")
     if (
         (projection / "completed").read_text(encoding="ascii").strip() != ARCHIVE_SHA
         or population["archive_sha256"] != ARCHIVE_SHA
         or (population["bucket_first"], population["bucket_last"], population["rows"])
-        != (0, 19, ROWS)
+        != (first, last, rows)
         or digest(candidate) != expected_candidate_sha
     ):
         raise ValueError("RBA confirmation inputs do not match the frozen scope")
     rule = read(candidate)["candidate"]["rule"]
-    observations = projection / "confirmation" / "observations.tsv"
+    observations = projection / cohort / "observations.tsv"
     observation_sha = digest(observations)
     output.mkdir()
     plan_path, predictions = output / "plan.json", output / "predictions.tsv"
@@ -165,10 +172,10 @@ def capture(projection, candidate, expected_candidate_sha, output):
         {
             "projection": population,
             "observations_sha256": observation_sha,
-            "accounts": ACCOUNTS,
+            "accounts": accounts,
             "candidate_sha256": expected_candidate_sha,
             "rule": rule,
-            "channels": CHANNELS,
+            "channels": channels,
             "verified_mfa_available": False,
             "verified_device_available": False,
             "truth_read_by_capture": False,
@@ -176,16 +183,26 @@ def capture(projection, candidate, expected_candidate_sha, output):
     )
     with predictions.open("xb") as stream:
         for ordinal, success, repeated, warning, flags, delay in observed_signals(
-            observations, ROWS, ACCOUNTS
+            observations, rows, accounts
         ):
             decision = decisions(success, repeated, warning, flags, delay, rule)
-            stream.write(
-                b"%s\t%d\t%d\t%d\t%d\t%d\n"
-                % (
-                    ordinal,
-                    repeated,
-                    *(decision[channel] for channel in CHANNELS),
+            if missing_evidence:
+                review = assess_login(
+                    warning=warning, success=success, environment_change=decision["ato_review"]
                 )
+                decision[FALLBACK_CHANNELS[-1]] = (
+                    decision["profile_priority_proxy"]
+                    or review.takeover is Takeover.PRIORITY_REVIEW
+                )
+            stream.write(
+                b"\t".join(
+                    (
+                        ordinal,
+                        b"%d" % repeated,
+                        *(b"%d" % decision[channel] for channel in channels),
+                    )
+                )
+                + b"\n"
             )
     if digest(observations) != observation_sha:
         raise ValueError("confirmation observations changed")
@@ -195,7 +212,7 @@ def capture(projection, candidate, expected_candidate_sha, output):
     )
 
 
-def score(projection, output, expected_seal):
+def score(projection, output, expected_seal, *, missing_evidence=False):
     plan, predictions, seal_path = (
         output / name for name in ("plan.json", "predictions.tsv", "seal.json")
     )
@@ -206,10 +223,18 @@ def score(projection, output, expected_seal):
         or digest(predictions) != seal["prediction_sha256"]
     ):
         raise ValueError("RBA confirmation seal differs")
-    result = {channel: counts() for channel in CHANNELS}
+    cohort, expected_rows = (
+        ("missing-evidence", 866_564) if missing_evidence else ("confirmation", ROWS)
+    )
+    channels = FALLBACK_CHANNELS if missing_evidence else CHANNELS
+    plan_data = read(plan)
+    if tuple(plan_data["channels"]) != channels or plan_data["projection"]["rows"] != expected_rows:
+        raise ValueError("RBA seal has a different evaluation scope")
+    result = {channel: counts() for channel in channels}
     warning_changes = lost_review = priority_demoted = 0
     restored = cleared_warnings = new_priority_fp = number = 0
-    labels = projection / "confirmation" / "truth.tsv"
+    changes = added_fp = lost_tp = 0
+    labels = projection / cohort / "truth.tsv"
     label_sha = digest(labels)
     with predictions.open("rb") as rows, labels.open("rb") as truth:
         for number, (row, label) in enumerate(zip(rows, truth, strict=True), 1):
@@ -218,7 +243,7 @@ def score(projection, output, expected_seal):
             if ordinal != label_ordinal:
                 raise ValueError("RBA confirmation truth alignment differs")
             expected = bit(marked)
-            values = dict(zip(CHANNELS, map(bit, encoded), strict=True))
+            values = dict(zip(channels, map(bit, encoded), strict=True))
             for channel, prediction in values.items():
                 record(result[channel], expected, prediction)
             warning = values["separate_warning"]
@@ -230,8 +255,13 @@ def score(projection, output, expected_seal):
             restored += not expected and bit(original) and not warning and (review or priority)
             cleared_warnings += not expected and bit(original) and not warning
             new_priority_fp += not expected and priority and not review
+            if missing_evidence:
+                current = values[FALLBACK_CHANNELS[-1]]
+                changes += current != priority
+                added_fp += not expected and current and not priority
+                lost_tp += expected and priority and not current
     if (
-        number != ROWS
+        number != expected_rows
         or digest(labels) != label_sha
         or digest(predictions) != seal["prediction_sha256"]
     ):
@@ -250,6 +280,18 @@ def score(projection, output, expected_seal):
             "new_priority_false_positives_outside_broad_ato_review": new_priority_fp,
             "mfa_or_device_authoritative_metrics_measured": False,
             "candidate_adopted": False,
+            **(
+                {
+                    "missing_evidence_regression": {
+                        "rows_changed": changes,
+                        "new_false_positives": added_fp,
+                        "lost_true_positives": lost_tp,
+                        "authoritative_evidence_coverage": 0,
+                    }
+                }
+                if missing_evidence
+                else {}
+            ),
         },
     )
 
@@ -267,13 +309,23 @@ def main():
         command.add_argument("output", type=Path)
         for name, kind in extras:
             command.add_argument(name, type=kind)
+        if mode != "freeze":
+            command.add_argument("--missing-evidence", action="store_true")
     args = parser.parse_args()
     if args.mode == "freeze":
         freeze(args.projection, args.reviewed, args.previous_holdout, args.output)
     elif args.mode == "capture":
-        capture(args.projection, args.candidate, args.expected_candidate_sha, args.output)
+        capture(
+            args.projection,
+            args.candidate,
+            args.expected_candidate_sha,
+            args.output,
+            missing_evidence=args.missing_evidence,
+        )
     else:
-        score(args.projection, args.output, args.expected_seal)
+        score(
+            args.projection, args.output, args.expected_seal, missing_evidence=args.missing_evidence
+        )
 
 
 if __name__ == "__main__":

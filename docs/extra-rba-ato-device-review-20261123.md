@@ -44,3 +44,5 @@ python -m scripts.run_keycloak_remote_acceptance <new-keycloak-report.json> --at
 ```
 
 관련 회귀 128개와 Ruff를 통과했다. 일회성 Keycloak 컨테이너와 임시 mTLS 인증서·키를 정리했다. 유료 API·AWS·병합은 0회다. [집계와 검증 기록](infrastructure-results/rba-ato-device-review-20261123.json)
+
+[후속 공개 자료 검토](extra-public-mfa-device-evaluation-20261123.md)에서 Entra·Okta 등의 원본을 검사하고, 다른 RBA 계정군에서 인증 근거 결측 시 기존 판정을 보존하는지 확인했다.

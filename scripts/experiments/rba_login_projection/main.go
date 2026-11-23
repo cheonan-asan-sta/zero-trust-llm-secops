@@ -89,6 +89,12 @@ func cohortName(bucket uint64, mode string) string {
 		}
 		return ""
 	}
+	if mode == "missing-evidence" {
+		if 20 <= bucket && bucket <= 24 {
+			return "missing-evidence"
+		}
+		return ""
+	}
 	if bucket >= 85 {
 		return "reviewed"
 	}
@@ -162,8 +168,10 @@ func project(in io.Reader, cohorts map[string]*cohort, probed map[string]bool, m
 	if ordinal != 31269264 || fmt.Sprintf("%x", csvDigest.Sum(nil)) != "001f3589595821519b53428aee656b4458e43d8f5b4b9beb6ec2bed8f2209067" {
 		return fmt.Errorf("publisher CSV or reserved population differs")
 	}
-	if (mode != "confirmation" && cohorts["reviewed"].rows != 2575003) || (mode == "environment" && cohorts["holdout"].rows != 2572078) || (mode == "confirmation" && cohorts["confirmation"].rows == 0) {
-		return fmt.Errorf("unexpected selected population")
+	for name, count := range map[string]int{"reviewed": 2575003, "holdout": 2572078, "confirmation": 3516562, "missing-evidence": 866564} {
+		if result := cohorts[name]; result != nil && result.rows != count {
+			return fmt.Errorf("unexpected selected population")
+		}
 	}
 	return nil
 }
@@ -215,8 +223,8 @@ func run(archivePath, probePath, output string, mode string) error {
 	if mode == "environment" {
 		names = append(names, "holdout")
 	}
-	if mode == "confirmation" {
-		names = []string{"confirmation"}
+	if mode == "confirmation" || mode == "missing-evidence" {
+		names = []string{mode}
 	}
 	for _, name := range names {
 		directory := output
@@ -249,8 +257,12 @@ func run(archivePath, probePath, output string, mode string) error {
 			return err
 		}
 	}
-	if mode == "confirmation" {
-		report, err := json.Marshal(map[string]any{"bucket_first": 0, "bucket_last": 19, "rows": cohorts["confirmation"].rows, "archive_sha256": archiveSHA, "probe_sha256": probeSHA})
+	if mode == "confirmation" || mode == "missing-evidence" {
+		first, last := 0, 19
+		if mode == "missing-evidence" {
+			first, last = 20, 24
+		}
+		report, err := json.Marshal(map[string]any{"bucket_first": first, "bucket_last": last, "rows": cohorts[mode].rows, "archive_sha256": archiveSHA, "probe_sha256": probeSHA})
 		if err != nil {
 			return err
 		}
@@ -264,9 +276,10 @@ func run(archivePath, probePath, output string, mode string) error {
 func main() {
 	environment := flag.Bool("environment", false, "include environment changes for reviewed and withheld users")
 	confirmation := flag.Bool("confirmation", false, "project untouched account buckets 0 through 19")
+	missingEvidence := flag.Bool("missing-evidence", false, "project account buckets 20 through 24 for the missing-evidence regression")
 	flag.Parse()
-	if flag.NArg() != 3 || (*environment && *confirmation) {
-		fmt.Fprintln(os.Stderr, "usage: go run main.go [--environment | --confirmation] <rba-zip> <probe-receipt> <new-output>")
+	if flag.NArg() != 3 || (*environment && *confirmation) || (*missingEvidence && (*environment || *confirmation)) {
+		fmt.Fprintln(os.Stderr, "usage: go run main.go [--environment | --confirmation | --missing-evidence] <rba-zip> <probe-receipt> <new-output>")
 		os.Exit(2)
 	}
 	mode := "basic"
@@ -274,6 +287,8 @@ func main() {
 		mode = "environment"
 	} else if *confirmation {
 		mode = "confirmation"
+	} else if *missingEvidence {
+		mode = "missing-evidence"
 	}
 	if err := run(flag.Arg(0), flag.Arg(1), flag.Arg(2), mode); err != nil {
 		fmt.Fprintln(os.Stderr, err)

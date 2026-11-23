@@ -1,0 +1,217 @@
+{
+  "cloud_deployments": 0,
+  "external_source_audit": {
+    "files": {
+      "entra-device.jsonl": {
+        "coverage": {
+          "fresh_mfa_signins_joined_to_prior_registration": 0,
+          "fresh_mfa_step_success_rows": 0,
+          "fresh_mfa_success_on_successful_login": 0,
+          "registrations_with_initiator_and_device_id": 10,
+          "sign_in_rows": 0,
+          "sign_ins_with_provider_device_id": 0,
+          "success_with_token_claim_only_mfa": 0,
+          "successful_device_registration_rows": 10,
+          "successful_sign_ins": 0
+        },
+        "events": 10,
+        "sha256": "7d1c4f09f999747446560f3a4fe6c62247a41f3424b8827aeecff5f765f025b6"
+      },
+      "entra-login.jsonl": {
+        "coverage": {
+          "fresh_mfa_signins_joined_to_prior_registration": 0,
+          "fresh_mfa_step_success_rows": 5,
+          "fresh_mfa_success_on_successful_login": 0,
+          "registrations_with_initiator_and_device_id": 0,
+          "sign_in_rows": 15,
+          "sign_ins_with_provider_device_id": 0,
+          "success_with_token_claim_only_mfa": 9,
+          "successful_device_registration_rows": 0,
+          "successful_sign_ins": 9
+        },
+        "events": 15,
+        "sha256": "7de7bf2e60ee2746ab4cabfb714ffc42e7a1d839e7b5f33b2b0d07f228266a86"
+      },
+      "entra-mfa-method.jsonl": {
+        "coverage": {
+          "fresh_mfa_signins_joined_to_prior_registration": 0,
+          "fresh_mfa_step_success_rows": 1,
+          "fresh_mfa_success_on_successful_login": 0,
+          "registrations_with_initiator_and_device_id": 0,
+          "sign_in_rows": 33,
+          "sign_ins_with_provider_device_id": 0,
+          "success_with_token_claim_only_mfa": 31,
+          "successful_device_registration_rows": 0,
+          "successful_sign_ins": 31
+        },
+        "events": 38,
+        "sha256": "c99d21c5ffc0a698829aa9be7fc91f10e1ac5154c89dd12d9c16b3a9da1c8cc7"
+      },
+      "external-mfa-fatigue.json": {
+        "attacker_mfa_approved_rows": 7,
+        "attempts_with_registered_device_join_key": 0,
+        "attempts_with_session_id": 0,
+        "changes_with_registered_device_join_key": 0,
+        "mfa_setup_changes": 58,
+        "published_origin": {
+          "account owner": 306,
+          "attacker with stolen password": 74
+        },
+        "sha256": "fdb0f54316f56aa7ef18508282477ba85181a17662ca681c9b090f25086fc3c0",
+        "sign_in_attempts": 380,
+        "source_type": "external synthetic fixture"
+      },
+      "okta-device.jsonl": {
+        "coverage": {
+          "device_enrollment_success_rows": 2,
+          "mfa_factor_outcomes": {},
+          "mfa_outcomes_with_authoritative_device_id": 0,
+          "mfa_push_actions": 0,
+          "session_start_rows": 0
+        },
+        "events": 2,
+        "sha256": "f8ec2771496b383efc5e47d3d0686dfa7c6aa182ca9b75761f78e6375341e1b7"
+      },
+      "okta-mfa.jsonl": {
+        "coverage": {
+          "device_enrollment_success_rows": 0,
+          "mfa_factor_outcomes": {
+            "FAILURE": 7,
+            "SUCCESS": 3
+          },
+          "mfa_outcomes_with_authoritative_device_id": 0,
+          "mfa_push_actions": 10,
+          "session_start_rows": 0
+        },
+        "events": 20,
+        "sha256": "dda3d9c1afb6f538ffd04f666b05f1d386d38620c61cac1e6af504e625951515"
+      }
+    },
+    "takeover_detector_labeled_score_available": false
+  },
+  "paid_api_calls": 0,
+  "previous_confirmation_report_reproduced": true,
+  "previous_confirmation_report_sha256": "1ff47f88160098a4bbc3031219f7a23b5ccf3209b95328deffdf2037891b2b02",
+  "rba_missing_evidence": {
+    "plan": {
+      "accounts": 215362,
+      "candidate_sha256": "d3d657d12f57d91e14b03012396f0b4cd4f2ab54111a7273b2b6bff950afcb84",
+      "channels": [
+        "prior_combined",
+        "separate_warning",
+        "ato_review",
+        "profile_priority_proxy",
+        "priority_with_missing_mfa_device"
+      ],
+      "observations_sha256": "98d3747f2d73e6fe02874bf478dc26c7fac7f66f51a72000a36eeec0952bb11e",
+      "projection": {
+        "archive_sha256": "ca1d974e97aebfb30878a613f4ca5c793860a98ba2acb5185c9bc610d7432a33",
+        "bucket_first": 20,
+        "bucket_last": 24,
+        "probe_sha256": "a3fd499deae8427f5558b57b06f45ad1af34ec9219b1041ed874b63364044f40",
+        "rows": 866564
+      },
+      "rule": {
+        "any_of": [
+          64
+        ],
+        "name": "operating_system",
+        "window_index": 5
+      },
+      "truth_read_by_capture": false,
+      "verified_device_available": false,
+      "verified_mfa_available": false
+    },
+    "report": {
+      "ato_positives_kept_in_review_instead_of_priority": 1,
+      "candidate_adopted": false,
+      "groups": {
+        "ato_review": {
+          "accuracy": 0.9942300857178465,
+          "f1": 0.001996007984031936,
+          "false_positive_rate": 0.005766505569172679,
+          "fn": 3,
+          "fp": 4997,
+          "inference_errors": 0,
+          "population": 866564,
+          "precision": 0.0009996001599360256,
+          "recall": 0.625,
+          "tn": 861559,
+          "tp": 5
+        },
+        "prior_combined": {
+          "accuracy": 0.9818513116169146,
+          "f1": 0.0006354451293130838,
+          "false_positive_rate": 0.018145393950304425,
+          "fn": 3,
+          "fp": 15724,
+          "inference_errors": 0,
+          "population": 866564,
+          "precision": 0.0003178841630109988,
+          "recall": 0.625,
+          "tn": 850832,
+          "tp": 5
+        },
+        "priority_with_missing_mfa_device": {
+          "accuracy": 0.9970169543161267,
+          "f1": 0.0030852294639413806,
+          "false_positive_rate": 0.0029784572491564306,
+          "fn": 4,
+          "fp": 2581,
+          "inference_errors": 0,
+          "population": 866564,
+          "precision": 0.0015473887814313346,
+          "recall": 0.5,
+          "tn": 863975,
+          "tp": 4
+        },
+        "profile_priority_proxy": {
+          "accuracy": 0.9970169543161267,
+          "f1": 0.0030852294639413806,
+          "false_positive_rate": 0.0029784572491564306,
+          "fn": 4,
+          "fp": 2581,
+          "inference_errors": 0,
+          "population": 866564,
+          "precision": 0.0015473887814313346,
+          "recall": 0.5,
+          "tn": 863975,
+          "tp": 4
+        },
+        "separate_warning": {
+          "accuracy": 0.9876119940362166,
+          "f1": 0.0,
+          "false_positive_rate": 0.012378888381131745,
+          "fn": 8,
+          "fp": 10727,
+          "inference_errors": 0,
+          "population": 866564,
+          "precision": 0.0,
+          "recall": 0.0,
+          "tn": 855829,
+          "tp": 0
+        }
+      },
+      "lost_existing_detections_across_both_channels": 0,
+      "mfa_or_device_authoritative_metrics_measured": false,
+      "missing_evidence_regression": {
+        "authoritative_evidence_coverage": 0,
+        "lost_true_positives": 0,
+        "new_false_positives": 0,
+        "rows_changed": 0
+      },
+      "new_priority_false_positives_outside_broad_ato_review": 0,
+      "previously_cleared_repeated_warnings_on_unmarked_rows": 377,
+      "restored_previously_cleared_false_positives": 0,
+      "seal_sha256": "d73f44ec6a1de7019f7e3468c07adaac00bc9c6302b9c4fb26c935b2ef1713b1",
+      "truth_sha256": "8a8f6eed81868b3ac4ad9ce361ec6eb62a488493ea50da7965d00819c1f442fb",
+      "warning_or_review_changes_against_prior_combined": 0
+    },
+    "seal": {
+      "plan_sha256": "508dc6172750817afe8950710fb3558209ba96b5506a8e55a71316cfdc9c880f",
+      "prediction_sha256": "8bc35cb032dd76f9c90429669ff40c92ef3a28d050e3e79a570ab1b625e68239"
+    }
+  },
+  "regression_tests_passed": 47,
+  "splunk_attack_data_commit": "5879f5423e6c08df2b22b63f7b36e84866f9c51c"
+}
