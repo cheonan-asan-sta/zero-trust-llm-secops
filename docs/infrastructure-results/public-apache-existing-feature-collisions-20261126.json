@@ -1,0 +1,15 @@
+{
+  "best_possible_precision_upper_bound_with_all_prior_tp_retained": 0.9544658493870403,
+  "feature_groups": 7607,
+  "feature_receipt_sha256": "a90bbd27817c6760843dd5c5c055ca6f16c22539e1c120e2e2cc521a79fe4ac3",
+  "groups_to_keep": 324,
+  "minimum_fpr_with_all_prior_tp_retained": 0.00012226088592118874,
+  "mixed_groups": 16,
+  "normal_rows_in_mixed_groups": 63,
+  "prior_true_positives_to_keep": 441,
+  "rows": 213205,
+  "scope": "diagnostic full existing feature collisions, no label or alert changes",
+  "seal_sha256": "7dfae2197e5bcd8138da183c0aa1007aadc3ee87a5ef25a7e86932ef5ce8b4cc",
+  "threat_rows_in_mixed_groups": 19,
+  "unavoidable_false_positives_in_retained_groups": 26
+}
