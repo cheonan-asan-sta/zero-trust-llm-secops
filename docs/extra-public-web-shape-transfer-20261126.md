@@ -50,3 +50,9 @@ Python 3.12와 scikit-learn 1.7.2를 사용했다. 세 비교 자료의 고정 C
 ```powershell
 python -m scripts.evaluate_public_web_shape_transfer <FPAD-파일-폴더> <정상-개발-폴더> <정상-추가-평가-폴더> <새-출력> --crs <FPAD-CRS-봉인> <FPAD-OOD-CRS-봉인> <정상-추가-CRS-봉인>
 ```
+
+아래 실행은 동일한 개발 그룹에서 모델을 새로 학습하고 기준값을 고른 뒤 PKDD 예측을 봉인한다. 별도 저장 모델 파일을 불러올 필요가 없다. 기준값 0.84와 PKDD 예측 10,024행의 SHA-256이 앞선 평가와 일치했다. [재실행 집계](infrastructure-results/public-web-shape-pkdd-reproduction-20261126.json)
+
+```powershell
+python -m scripts.evaluate_public_web_calibrated_transfer <FPAD-train.jsonl> <정상-개발-폴더> <PKDD-test.jsonl> <새-출력> <고정-CRS-실행파일>
+```
