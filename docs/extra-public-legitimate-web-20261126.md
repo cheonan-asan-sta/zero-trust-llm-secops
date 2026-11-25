@@ -13,10 +13,17 @@ open-appsec 공개 벤치마크에서 실제 웹사이트를 탐색해 수집한
 
 본문을 전달한 요청은 2,844건이고, 새 오탐은 422건이었다. 이 표본에서는 두 구성 모두 오탐률 5% 이하였지만, 후자의 새 오탐 0건 조건은 미달이다. 정상만 있는 자료여서 정밀도·재현율·F1은 산정하지 않았다. 기존 [SR-BH·crAPI·VAmPI 비교](extra-public-post-body-scope-20261126.md)와 별도로 기록한다.
 
+새 오탐 중 JSON은 380건, URL 인코딩 폼은 42건이었다. 두 형식 모두 오탐이 나타났다. [형식과 규칙 계열별 집계](infrastructure-results/public-openappsec-body-fp-families-20261126.json)
+
+## 추가 수집 사이트 표본
+
+동일 크기 범위에서 앞선 12개 파일과 수집 사이트가 같은 파일을 제외한 뒤, 고정한 순서로 다른 사이트 파일 12개를 추가 선택했다. 사이트별 수집 파일에는 공용 주소나 외부 리소스 요청도 포함될 수 있다. 본문 판정 기준은 이 표본을 열기 전에 고정했다. 전체 정상 15,250건에서 요청 대상만 확인하면 오탐은 **359건(2.35%)**, 본문을 함께 보면 **764건(5.0098%)**이었다. 본문을 전달한 2,499건에서 새 오탐 405건이 생겼고 추론 오류는 없었다. 새 오탐이 없다는 조건과 오탐률 5% 기준을 모두 놓쳤다. [추가 표본과 판정 지문](infrastructure-results/public-openappsec-holdout-crs-20261126.json)
+
 ## 재현
 
 원본 ZIP의 ETag는 `"7f7b53e6e8d780e4d390c8070bffce88-71"`이고 아카이브 크기는 1,203,983,791바이트다. 원시 요청과 선택·다운로드 영수증은 로컬 `runtime/independent-web-access-20261125/openappsec-legitimate/`에 보관했다. 아래 실행은 이미 확보한 파일만 읽는다. 출력에는 집계와 판정 지문을 남기고 AWS·유료 API·실제 정책 변경은 없었다. [집계 결과](infrastructure-results/public-openappsec-legitimate-crs-20261126.json) · [선택과 지문](infrastructure-results/public-openappsec-legitimate-sample-20261126.json)
 
 ```powershell
 python -m scripts.evaluate_public_legitimate_web_crs <샘플-폴더> <새-출력> <고정-CRS-실행파일>
+python -m scripts.evaluate_public_legitimate_web_crs <추가-샘플-폴더> <새-출력> <고정-CRS-실행파일> --holdout
 ```

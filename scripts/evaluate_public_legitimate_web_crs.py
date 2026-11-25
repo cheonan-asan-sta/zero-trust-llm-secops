@@ -13,8 +13,10 @@ from scripts.f1_lab.native_jsonl import decode
 from scripts.f1_lab.operation_context import canonical
 
 RECEIPT_SHA = "31a9256782117d36f0f7d31ba2b704a37e9fffa7fa93e680df9d1f666d637bc7"
+HOLDOUT_SHA = "f4b349317bc39b6371c62242e68ce644d22415e319938f053dc89069e7721120"
 BINARY_SHA = "d49a45c26270a5df2a35dbf1544de02ba46610d65c6e55b218579ce44adffebf"
 ROWS = 12_887
+HOLDOUT_ROWS = 15_250
 BODY_HEADERS = {"content-type": "Content-Type", "content-encoding": "Content-Encoding"}
 
 
@@ -37,10 +39,10 @@ def observation(row, ordinal):
     return {"ordinal": ordinal, "method": method, "target": target, "protocol": "", "body": body, "headers": headers}
 
 
-def request_events(source):
+def request_rows(source, *, receipt_sha, expected_rows):
     receipt_path = source / "download-receipt.json"
     plan_path = source / "plan.json"
-    if fingerprint(receipt_path) != RECEIPT_SHA:
+    if fingerprint(receipt_path) != receipt_sha:
         raise ValueError("legitimate sample receipt mismatch")
     receipt, plan = read(receipt_path), read(plan_path)
     if fingerprint(plan_path) != receipt["plan_sha256"]:
@@ -55,29 +57,35 @@ def request_events(source):
             raise ValueError("legitimate sample member mismatch")
         for row in decode(body):
             ordinal += 1
-            yield observation(row, ordinal)
-    if ordinal != ROWS:
+            yield row
+    if ordinal != expected_rows:
         raise ValueError("legitimate sample row count changed")
 
 
-def evaluate(source, output, executable):
+def request_events(source, *, receipt_sha=RECEIPT_SHA, expected_rows=ROWS):
+    for ordinal, row in enumerate(request_rows(source, receipt_sha=receipt_sha, expected_rows=expected_rows), 1):
+        yield observation(row, ordinal)
+
+
+def evaluate(source, output, executable, *, holdout=False):
     binary = executable.resolve()
     if fingerprint(binary) != BINARY_SHA:
         raise ValueError("legitimate replay requires the frozen CRS binary")
     output.mkdir()
+    receipt_sha, row_count = (HOLDOUT_SHA, HOLDOUT_ROWS) if holdout else (RECEIPT_SHA, ROWS)
     paths = {mode: output / f"{mode}.jsonl" for mode in MODES}
     for mode, flag in MODES.items():
         with paths[mode].open("xb") as sink, subprocess.Popen(
             [str(binary), flag], stdin=subprocess.PIPE, stdout=sink
         ) as engine:
             with engine.stdin as pipe:
-                for event in request_events(source):
+                for event in request_events(source, receipt_sha=receipt_sha, expected_rows=row_count):
                     pipe.write(canonical(project(event, include_body=mode == "target_body")) + b"\n")
             if engine.wait():
                 raise ValueError("legitimate passive inspection failed")
     predictions = {mode: fingerprint(path) for mode, path in paths.items()}
     seal = output / "seal.json"
-    write(seal, {"source_receipt_sha256": RECEIPT_SHA, "binary_sha256": BINARY_SHA,
+    write(seal, {"source_receipt_sha256": receipt_sha, "binary_sha256": BINARY_SHA,
                  "predictions_sha256": predictions, "evaluator_sha256": fingerprint(Path(__file__))})
 
     before, after = counts(), counts()
@@ -96,7 +104,7 @@ def evaluate(source, output, executable):
             errors_added += new is None and old is not None
             record(before, False, old)
             record(after, False, True if old is True else new)
-    if count != ROWS or any(fingerprint(path) != predictions[mode] for mode, path in paths.items()):
+    if count != row_count or any(fingerprint(path) != predictions[mode] for mode, path in paths.items()):
         raise ValueError("legitimate prediction population changed")
     for result in (before, after):
         result["false_positive_rate"] = result["fp"] / count
@@ -112,8 +120,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("source", "output", "executable"):
         parser.add_argument(name, type=Path)
+    parser.add_argument("--holdout", action="store_true", help="check the additional site-separated sample")
     args = parser.parse_args()
-    evaluate(args.source, args.output, args.executable)
+    evaluate(args.source, args.output, args.executable, holdout=args.holdout)
 
 
 if __name__ == "__main__":
