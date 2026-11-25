@@ -1,0 +1,42 @@
+{
+  "baseline_prediction_sha256": "62fd7968be166a06f7b2036f32aca7a75dd686eb1700b77aba6e341d3963b563",
+  "candidate_adopted": false,
+  "changed_decisions": {
+    "normal_False->True": 12
+  },
+  "label_unchanged": true,
+  "masked_user_agent_rows": 212714,
+  "metrics": {
+    "neutral_user_agent": {
+      "accuracy": 0.8376116882812317,
+      "f1": 0.024842271293375396,
+      "false_positive_rate": 0.16231543308567667,
+      "fn": 104,
+      "fp": 34518,
+      "inference_errors": 0,
+      "population": 213205,
+      "precision": 0.012614777310563803,
+      "recall": 0.8091743119266055,
+      "tn": 178142,
+      "tp": 441
+    },
+    "prior": {
+      "accuracy": 0.8376679721394902,
+      "f1": 0.0248506705736504,
+      "false_positive_rate": 0.16225900498448229,
+      "fn": 104,
+      "fp": 34506,
+      "inference_errors": 0,
+      "population": 213205,
+      "precision": 0.01261910893638939,
+      "recall": 0.8091743119266055,
+      "tn": 178154,
+      "tp": 441
+    }
+  },
+  "paid_api_calls": 0,
+  "population": 213205,
+  "prediction_sha256": "e9b5617b5020e3ed0b1e74362d2fc2ad509af1e488bf68e91cc9f5cd5f928cd9",
+  "scope": "same Apache source; only user-agent ASCII alphanumeric characters neutralized for replay, not production",
+  "source_sha256": "1429caba2803c3e8c90e9fb287bc04f6f8249f8bb34712b39127044e134d631f"
+}

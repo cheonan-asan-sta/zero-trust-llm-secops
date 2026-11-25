@@ -1,0 +1,52 @@
+{
+  "entry_pred_sha256": "62fd7968be166a06f7b2036f32aca7a75dd686eb1700b77aba6e341d3963b563",
+  "model_sha256": {
+    "heads": "4ebbcb6bb5fce286e80beeedbc18139d566d00998575487a867f129330344075",
+    "web": "21318fa61f830ae1d03d47de1a01acf2c40ae19ebaf769923e3d575613f74f38"
+  },
+  "offline_leaf_assignment_sha256": "98d2ead560fa00f287672f8ddc5b18e2e8cb0f78834fd78b90f9d8fe79028f7c",
+  "prior": {
+    "accuracy": 0.8376679721394902,
+    "f1": 0.0248506705736504,
+    "false_positive_rate": 0.16225900498448229,
+    "fn": 104,
+    "fp": 34506,
+    "inference_errors": 0,
+    "population": 213205,
+    "precision": 0.01261910893638939,
+    "recall": 0.8091743119266055,
+    "tn": 178154,
+    "tp": 441
+  },
+  "scope": "retrospective leaf grouping bound, no classifier changed",
+  "source_sha256": "1429caba2803c3e8c90e9fb287bc04f6f8249f8bb34712b39127044e134d631f",
+  "views": {
+    "leaf_pair": {
+      "groups": 27,
+      "groups_with_prior_alerts": 10,
+      "maximum_precision_at_preserved_recall": 0.02039306358381503,
+      "minimum_fp_if_only_group_identity_can_suppress_prior_alerts": 21184,
+      "minimum_fpr_at_preserved_recall": 0.09961440797517164,
+      "prior_tp_retained": 441,
+      "threat_groups_with_prior_alerts": 4
+    },
+    "leaf_pair_and_refinement": {
+      "groups": 31,
+      "groups_with_prior_alerts": 11,
+      "maximum_precision_at_preserved_recall": 0.020474488137796554,
+      "minimum_fp_if_only_group_identity_can_suppress_prior_alerts": 21098,
+      "minimum_fpr_at_preserved_recall": 0.09921000658327847,
+      "prior_tp_retained": 441,
+      "threat_groups_with_prior_alerts": 4
+    },
+    "primary_leaf": {
+      "groups": 8,
+      "groups_with_prior_alerts": 2,
+      "maximum_precision_at_preserved_recall": 0.01261910893638939,
+      "minimum_fp_if_only_group_identity_can_suppress_prior_alerts": 34506,
+      "minimum_fpr_at_preserved_recall": 0.16225900498448229,
+      "prior_tp_retained": 441,
+      "threat_groups_with_prior_alerts": 2
+    }
+  }
+}
