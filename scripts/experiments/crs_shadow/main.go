@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"mime"
 	"os"
 	"slices"
+	"strconv"
 	"strings"
 
 	rules "github.com/corazawaf/coraza-coreruleset/v4"
@@ -26,9 +28,10 @@ type observation struct {
 }
 
 type decision struct {
-	Ordinal int   `json:"ordinal"`
-	Alert   *bool `json:"alert"`
-	RuleIDs []int `json:"rule_ids,omitempty"`
+	Ordinal      int   `json:"ordinal"`
+	Alert        *bool `json:"alert"`
+	RuleIDs      []int `json:"rule_ids,omitempty"`
+	BodyIncluded bool  `json:"body_included,omitempty"`
 }
 
 func matchedAttackIDs(tx types.Transaction) []int {
@@ -43,8 +46,25 @@ func matchedAttackIDs(tx types.Transaction) []int {
 	return slices.Compact(ids)
 }
 
-// Ignore header/protocol enforcement when only the saved request target is known.
-func inspectTarget(waf coraza.WAF, row observation) decision {
+func observedContentType(row observation) string {
+	declared := row.Headers["Content-Type"]
+	encoding := row.Headers["Content-Encoding"]
+	if row.Body == "" || len(row.Body) > 1048576 || len(declared) > 256 || strings.ContainsAny(declared, "\x00\r\n") ||
+		(encoding != "" && !strings.EqualFold(encoding, "identity")) {
+		return ""
+	}
+	mediaType, params, err := mime.ParseMediaType(declared)
+	if err != nil || !slices.Contains([]string{"application/json", "application/x-www-form-urlencoded"}, mediaType) {
+		return ""
+	}
+	if charset := params["charset"]; charset != "" && !strings.EqualFold(charset, "utf-8") {
+		return ""
+	}
+	return declared
+}
+
+// Count only content rules when inspecting saved targets and optional bodies.
+func inspectTarget(waf coraza.WAF, row observation, includeBody bool) decision {
 	value := decision{Ordinal: row.Ordinal}
 	if row.Ordinal < 1 || row.Target == "" || len(row.Target) > 16384 ||
 		strings.ContainsAny(row.Target, "\x00\r\n") ||
@@ -54,8 +74,20 @@ func inspectTarget(waf coraza.WAF, row observation) decision {
 	tx := waf.NewTransaction()
 	defer tx.Close()
 	tx.ProcessURI(row.Target, row.Method, row.Protocol)
+	if includeBody {
+		if contentType := observedContentType(row); contentType != "" {
+			tx.AddRequestHeader("Content-Type", contentType)
+			tx.AddRequestHeader("Content-Length", strconv.Itoa(len(row.Body)))
+			value.BodyIncluded = true
+		}
+	}
 	tx.ProcessRequestHeaders()
-	// CRS places request-target checks in both request phases. The body stays empty.
+	if value.BodyIncluded {
+		if _, _, err := tx.WriteRequestBody([]byte(row.Body)); err != nil {
+			return value
+		}
+	}
+	// CRS places request-target checks in both request phases.
 	if _, err := tx.ProcessRequestBody(); err != nil {
 		return value
 	}
@@ -115,9 +147,9 @@ func inspect(waf coraza.WAF, row observation, ruleIDs bool) decision {
 	return result(tx, row.Ordinal, interruption != nil, ruleIDs)
 }
 
-func run(ruleIDs, targetOnly bool) error {
+func run(ruleIDs, targetOnly, targetAndBody bool) error {
 	mode := "On"
-	if targetOnly {
+	if targetOnly || targetAndBody {
 		mode = "DetectionOnly"
 	}
 	config := coraza.NewWAFConfig().WithRootFS(rules.FS).
@@ -140,8 +172,8 @@ func run(ruleIDs, targetOnly bool) error {
 			return fmt.Errorf("invalid local observation")
 		}
 		var value decision
-		if targetOnly {
-			value = inspectTarget(waf, row)
+		if targetOnly || targetAndBody {
+			value = inspectTarget(waf, row, targetAndBody)
 		} else {
 			value = inspect(waf, row, ruleIDs)
 		}
@@ -155,8 +187,13 @@ func run(ruleIDs, targetOnly bool) error {
 func main() {
 	ruleIDs := flag.Bool("rule-ids", false, "include matching CRS attack rule IDs in local output")
 	targetOnly := flag.Bool("target-only", false, "collect content signals from saved request targets")
+	targetAndBody := flag.Bool("target-and-body", false, "inspect saved targets and bodies with an observed supported content type")
 	flag.Parse()
-	if err := run(*ruleIDs, *targetOnly); err != nil {
+	if *targetOnly && *targetAndBody {
+		fmt.Fprintln(os.Stderr, "choose one passive inspection mode")
+		os.Exit(2)
+	}
+	if err := run(*ruleIDs, *targetOnly, *targetAndBody); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

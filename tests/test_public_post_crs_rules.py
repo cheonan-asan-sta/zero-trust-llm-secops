@@ -3,6 +3,7 @@ import json
 import pytest
 
 from scripts.evaluate_local_remote_holdout import fingerprint, write
+from scripts.evaluate_public_post_body_scope import project
 from scripts.evaluate_public_post_body_shape import split_by_date
 from scripts.evaluate_public_post_crs_rules import compare_reference, load_crs
 
@@ -59,3 +60,12 @@ def test_split_excludes_matching_request_pairs_from_earlier_dates():
     assert split_by_date(
         {"development": initial, "calibration": calibration, "temporal": temporal}
     ) == ([initial[0]], [calibration[0]], temporal)
+
+
+def test_passive_body_scope_projects_only_observed_format_metadata():
+    target = {"ordinal": 1, "method": "POST", "target": "/record", "protocol": "HTTP/1.1"}
+    formats = {"Content-Type": "application/json", "Content-Encoding": "identity"}
+    event = {**target, "headers": {**formats, "Cookie": "unused"}, "body": "{}", "label": "unused"}
+    assert project(event, include_body=False) == target
+    assert project(event, include_body=True) == {**target, "headers": formats, "body": "{}"}
+    assert project({**event, "headers": {}}, include_body=True) == target
