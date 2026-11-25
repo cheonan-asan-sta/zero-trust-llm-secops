@@ -1,0 +1,958 @@
+{
+  "baseline_source": "openai-tail-latency-20261125.json",
+  "baseline": {
+    "calls": 16,
+    "risk_correct": 14,
+    "action_correct": 14,
+    "json_valid": 16,
+    "mean_response_ms": 1870.455,
+    "p95_response_ms": 2505.6,
+    "over_3000_ms": 0,
+    "mean_input_tokens": 1067.875,
+    "mean_output_tokens": 98.688,
+    "mean_header_wait_ms": 1774.761,
+    "first_request_validation_ms": [
+      0.463,
+      0.246
+    ]
+  },
+  "prompt_only_trial": {
+    "source_commit": "53488d23bd197ff61cef0c6ddbe9a8123f0d54e1",
+    "recorded_at_utc": "2026-11-25T11:01:51.601264+00:00",
+    "scope": "isolated FastAPI ASGI, synthetic submission cases only, real OpenAI SDK",
+    "model": "gpt-5.4-mini-2026-03-17",
+    "effort": "none",
+    "prompt_mode": "legacy",
+    "requested_service_tier": "default",
+    "temperature": 0.0,
+    "compact_legacy_output": true,
+    "event_id_policy": "opaque_uuid",
+    "planned_cases": 8,
+    "request_cap": 8,
+    "sdk_retries": 0,
+    "max_output_tokens": 800,
+    "store": false,
+    "aws_calls": 0,
+    "cases": [
+      {
+        "scenario_id": "NORMAL-01",
+        "app_status": 200,
+        "json_valid": true,
+        "risk_correct": true,
+        "action_correct": true,
+        "risk_level": "LOW",
+        "policy_action": "ALLOW",
+        "human_review": false,
+        "elapsed_ms": 3817.15,
+        "stage_ms": {
+          "provider_request": 3791.615,
+          "structured_validation": 0.105,
+          "analyzer": 3793.036,
+          "precheck": 3.469,
+          "audit_write": 11.782,
+          "audit_verify": 3.232
+        }
+      },
+      {
+        "scenario_id": "NORMAL-02",
+        "app_status": 200,
+        "json_valid": true,
+        "risk_correct": true,
+        "action_correct": true,
+        "risk_level": "LOW",
+        "policy_action": "ALLOW",
+        "human_review": false,
+        "elapsed_ms": 1958.841,
+        "stage_ms": {
+          "provider_request": 1927.014,
+          "structured_validation": 0.096,
+          "analyzer": 1928.532,
+          "precheck": 1.62,
+          "audit_write": 20.65,
+          "audit_verify": 4.346
+        }
+      },
+      {
+        "scenario_id": "NORMAL-03",
+        "app_status": 200,
+        "json_valid": true,
+        "risk_correct": false,
+        "action_correct": false,
+        "risk_level": "LOW",
+        "policy_action": "ALLOW",
+        "human_review": false,
+        "elapsed_ms": 2485.371,
+        "stage_ms": {
+          "provider_request": 2453.729,
+          "structured_validation": 0.158,
+          "analyzer": 2455.283,
+          "precheck": 1.448,
+          "audit_write": 21.5,
+          "audit_verify": 3.171
+        }
+      },
+      {
+        "scenario_id": "ZT-S01",
+        "app_status": 200,
+        "json_valid": true,
+        "risk_correct": true,
+        "action_correct": true,
+        "risk_level": "CRITICAL",
+        "policy_action": "HOLD_FOR_REVIEW",
+        "human_review": true,
+        "elapsed_ms": 3124.637,
+        "stage_ms": {
+          "provider_request": 3101.813,
+          "structured_validation": 0.1,
+          "analyzer": 3103.268,
+          "precheck": 1.762,
+          "audit_write": 12.766,
+          "audit_verify": 3.187
+        }
+      },
+      {
+        "scenario_id": "ZT-S02",
+        "app_status": 200,
+        "json_valid": true,
+        "risk_correct": true,
+        "action_correct": true,
+        "risk_level": "MEDIUM",
+        "policy_action": "REQUIRE_MFA",
+        "human_review": false,
+        "elapsed_ms": 2617.93,
+        "stage_ms": {
+          "provider_request": 2594.46,
+          "structured_validation": 0.093,
+          "analyzer": 2595.91,
+          "precheck": 2.16,
+          "audit_write": 13.104,
+          "audit_verify": 3.258
+        }
+      },
+      {
+        "scenario_id": "ZT-S03",
+        "app_status": 200,
+        "json_valid": true,
+        "risk_correct": true,
+        "action_correct": true,
+        "risk_level": "HIGH",
+        "policy_action": "REDUCE_PRIVILEGE",
+        "human_review": true,
+        "elapsed_ms": 1682.566,
+        "stage_ms": {
+          "provider_request": 1656.769,
+          "structured_validation": 0.16,
+          "analyzer": 1658.412,
+          "precheck": 2.144,
+          "audit_write": 14.405,
+          "audit_verify": 3.613
+        }
+      },
+      {
+        "scenario_id": "ZT-S04",
+        "app_status": 200,
+        "json_valid": true,
+        "risk_correct": true,
+        "action_correct": true,
+        "risk_level": "HIGH",
+        "policy_action": "HOLD_FOR_REVIEW",
+        "human_review": true,
+        "elapsed_ms": 1967.843,
+        "stage_ms": {
+          "provider_request": 1935.888,
+          "structured_validation": 0.16,
+          "analyzer": 1937.464,
+          "precheck": 2.546,
+          "audit_write": 20.247,
+          "audit_verify": 3.687
+        }
+      },
+      {
+        "scenario_id": "ZT-S05",
+        "app_status": 200,
+        "json_valid": true,
+        "risk_correct": true,
+        "action_correct": true,
+        "risk_level": "HIGH",
+        "policy_action": "HOLD_FOR_REVIEW",
+        "human_review": true,
+        "elapsed_ms": 2821.545,
+        "stage_ms": {
+          "provider_request": 2786.823,
+          "structured_validation": 0.121,
+          "analyzer": 2788.309,
+          "precheck": 1.732,
+          "audit_write": 22.978,
+          "audit_verify": 4.048
+        }
+      }
+    ],
+    "stop": null,
+    "asgi_startup_ms": 1254.576,
+    "audit_verified_rows": 8,
+    "audit_integrity_ok": true,
+    "external_delivery_enabled": false,
+    "provider_attempts": [
+      {
+        "request": 1,
+        "transport_ms": {
+          "connection.connect_tcp": 18.935,
+          "connection.start_tls": 18.738,
+          "http11.send_request_headers": 0.47,
+          "http11.send_request_body": 0.276,
+          "http11.receive_response_headers": 3658.415,
+          "http11.receive_response_body": 15.972
+        },
+        "status_code": 200,
+        "resolved_model": "gpt-5.4-mini-2026-03-17",
+        "service_tier": "default",
+        "input_tokens": 1037,
+        "output_tokens": 66,
+        "cached_input_tokens": 0
+      },
+      {
+        "request": 2,
+        "transport_ms": {
+          "http11.send_request_headers": 0.288,
+          "http11.send_request_body": 0.162,
+          "http11.receive_response_headers": 1899.564,
+          "http11.receive_response_body": 23.611
+        },
+        "status_code": 200,
+        "resolved_model": "gpt-5.4-mini-2026-03-17",
+        "service_tier": "default",
+        "input_tokens": 1037,
+        "output_tokens": 76,
+        "cached_input_tokens": 0
+      },
+      {
+        "request": 3,
+        "transport_ms": {
+          "http11.send_request_headers": 0.284,
+          "http11.send_request_body": 0.154,
+          "http11.receive_response_headers": 2425.069,
+          "http11.receive_response_body": 24.399
+        },
+        "status_code": 200,
+        "resolved_model": "gpt-5.4-mini-2026-03-17",
+        "service_tier": "default",
+        "input_tokens": 1265,
+        "output_tokens": 82,
+        "cached_input_tokens": 0
+      },
+      {
+        "request": 4,
+        "transport_ms": {
+          "http11.send_request_headers": 0.284,
+          "http11.send_request_body": 0.148,
+          "http11.receive_response_headers": 3094.537,
+          "http11.receive_response_body": 3.246
+        },
+        "status_code": 200,
+        "resolved_model": "gpt-5.4-mini-2026-03-17",
+        "service_tier": "default",
+        "input_tokens": 1135,
+        "output_tokens": 108,
+        "cached_input_tokens": 0
+      },
+      {
+        "request": 5,
+        "transport_ms": {
+          "http11.send_request_headers": 0.295,
+          "http11.send_request_body": 0.157,
+          "http11.receive_response_headers": 2590.407,
+          "http11.receive_response_body": 0.317
+        },
+        "status_code": 200,
+        "resolved_model": "gpt-5.4-mini-2026-03-17",
+        "service_tier": "default",
+        "input_tokens": 1071,
+        "output_tokens": 88,
+        "cached_input_tokens": 0
+      },
+      {
+        "request": 6,
+        "transport_ms": {
+          "http11.send_request_headers": 0.277,
+          "http11.send_request_body": 0.146,
+          "http11.receive_response_headers": 1652.668,
+          "http11.receive_response_body": 0.371
+        },
+        "status_code": 200,
+        "resolved_model": "gpt-5.4-mini-2026-03-17",
+        "service_tier": "default",
+        "input_tokens": 1075,
+        "output_tokens": 107,
+        "cached_input_tokens": 0
+      },
+      {
+        "request": 7,
+        "transport_ms": {
+          "http11.send_request_headers": 0.311,
+          "http11.send_request_body": 0.173,
+          "http11.receive_response_headers": 1929.97,
+          "http11.receive_response_body": 1.553
+        },
+        "status_code": 200,
+        "resolved_model": "gpt-5.4-mini-2026-03-17",
+        "service_tier": "default",
+        "input_tokens": 1107,
+        "output_tokens": 115,
+        "cached_input_tokens": 0
+      },
+      {
+        "request": 8,
+        "transport_ms": {
+          "http11.send_request_headers": 0.315,
+          "http11.send_request_body": 0.201,
+          "http11.receive_response_headers": 2781.924,
+          "http11.receive_response_body": 0.569
+        },
+        "status_code": 200,
+        "resolved_model": "gpt-5.4-mini-2026-03-17",
+        "service_tier": "default",
+        "input_tokens": 1088,
+        "output_tokens": 111,
+        "cached_input_tokens": 0
+      }
+    ],
+    "complete": true,
+    "risk_correct": 7,
+    "action_correct": 7,
+    "json_valid": 8,
+    "mean_response_ms": 2559.485,
+    "p95_response_ms": 3817.15,
+    "estimated_usd": 0.00999975
+  },
+  "policy_runs": [
+    {
+      "source_commit": "8e35d784f6a3790a3292e77ce6e75977fbb246dc",
+      "recorded_at_utc": "2026-11-25T11:04:05.275966+00:00",
+      "scope": "isolated FastAPI ASGI, synthetic submission cases only, real OpenAI SDK",
+      "model": "gpt-5.4-mini-2026-03-17",
+      "effort": "none",
+      "prompt_mode": "legacy",
+      "requested_service_tier": "default",
+      "temperature": 0.0,
+      "compact_legacy_output": true,
+      "event_id_policy": "opaque_uuid",
+      "planned_cases": 8,
+      "request_cap": 8,
+      "sdk_retries": 0,
+      "max_output_tokens": 800,
+      "store": false,
+      "aws_calls": 0,
+      "cases": [
+        {
+          "scenario_id": "NORMAL-01",
+          "app_status": 200,
+          "json_valid": true,
+          "risk_correct": true,
+          "action_correct": true,
+          "risk_level": "LOW",
+          "policy_action": "ALLOW",
+          "human_review": false,
+          "elapsed_ms": 2701.257,
+          "stage_ms": {
+            "provider_request": 2673.576,
+            "structured_validation": 0.171,
+            "analyzer": 2675.051,
+            "precheck": 3.188,
+            "audit_write": 12.767,
+            "audit_verify": 3.876
+          }
+        },
+        {
+          "scenario_id": "NORMAL-02",
+          "app_status": 200,
+          "json_valid": true,
+          "risk_correct": true,
+          "action_correct": true,
+          "risk_level": "LOW",
+          "policy_action": "ALLOW",
+          "human_review": false,
+          "elapsed_ms": 2724.862,
+          "stage_ms": {
+            "provider_request": 2694.228,
+            "structured_validation": 0.117,
+            "analyzer": 2695.787,
+            "precheck": 1.508,
+            "audit_write": 20.953,
+            "audit_verify": 2.944
+          }
+        },
+        {
+          "scenario_id": "NORMAL-03",
+          "app_status": 200,
+          "json_valid": true,
+          "risk_correct": true,
+          "action_correct": true,
+          "risk_level": "MEDIUM",
+          "policy_action": "REQUIRE_MFA",
+          "human_review": false,
+          "elapsed_ms": 2611.717,
+          "stage_ms": {
+            "provider_request": 2580.214,
+            "structured_validation": 0.09,
+            "analyzer": 2581.482,
+            "precheck": 1.38,
+            "audit_write": 20.313,
+            "audit_verify": 4.426
+          }
+        },
+        {
+          "scenario_id": "ZT-S01",
+          "app_status": 200,
+          "json_valid": true,
+          "risk_correct": true,
+          "action_correct": true,
+          "risk_level": "CRITICAL",
+          "policy_action": "HOLD_FOR_REVIEW",
+          "human_review": true,
+          "elapsed_ms": 1942.894,
+          "stage_ms": {
+            "provider_request": 1910.249,
+            "structured_validation": 0.193,
+            "analyzer": 1911.941,
+            "precheck": 1.706,
+            "audit_write": 21.696,
+            "audit_verify": 3.679
+          }
+        },
+        {
+          "scenario_id": "ZT-S02",
+          "app_status": 200,
+          "json_valid": true,
+          "risk_correct": true,
+          "action_correct": true,
+          "risk_level": "MEDIUM",
+          "policy_action": "REQUIRE_MFA",
+          "human_review": false,
+          "elapsed_ms": 2145.0,
+          "stage_ms": {
+            "provider_request": 2120.853,
+            "structured_validation": 0.09,
+            "analyzer": 2122.594,
+            "precheck": 1.721,
+            "audit_write": 13.89,
+            "audit_verify": 3.116
+          }
+        },
+        {
+          "scenario_id": "ZT-S03",
+          "app_status": 200,
+          "json_valid": true,
+          "risk_correct": true,
+          "action_correct": true,
+          "risk_level": "HIGH",
+          "policy_action": "REDUCE_PRIVILEGE",
+          "human_review": true,
+          "elapsed_ms": 1754.367,
+          "stage_ms": {
+            "provider_request": 1721.019,
+            "structured_validation": 0.124,
+            "analyzer": 1722.782,
+            "precheck": 1.469,
+            "audit_write": 21.046,
+            "audit_verify": 4.888
+          }
+        },
+        {
+          "scenario_id": "ZT-S04",
+          "app_status": 200,
+          "json_valid": true,
+          "risk_correct": true,
+          "action_correct": true,
+          "risk_level": "HIGH",
+          "policy_action": "HOLD_FOR_REVIEW",
+          "human_review": true,
+          "elapsed_ms": 3179.412,
+          "stage_ms": {
+            "provider_request": 3141.708,
+            "structured_validation": 0.143,
+            "analyzer": 3143.916,
+            "precheck": 2.526,
+            "audit_write": 24.588,
+            "audit_verify": 3.681
+          }
+        },
+        {
+          "scenario_id": "ZT-S05",
+          "app_status": 200,
+          "json_valid": true,
+          "risk_correct": true,
+          "action_correct": true,
+          "risk_level": "HIGH",
+          "policy_action": "HOLD_FOR_REVIEW",
+          "human_review": true,
+          "elapsed_ms": 3351.807,
+          "stage_ms": {
+            "provider_request": 2925.532,
+            "structured_validation": 0.109,
+            "analyzer": 2927.218,
+            "precheck": 1.942,
+            "audit_write": 413.98,
+            "audit_verify": 4.487
+          }
+        }
+      ],
+      "stop": null,
+      "asgi_startup_ms": 1143.987,
+      "audit_verified_rows": 8,
+      "audit_integrity_ok": true,
+      "external_delivery_enabled": false,
+      "provider_attempts": [
+        {
+          "request": 1,
+          "transport_ms": {
+            "connection.connect_tcp": 43.66,
+            "connection.start_tls": 22.677,
+            "http11.send_request_headers": 0.319,
+            "http11.send_request_body": 0.201,
+            "http11.receive_response_headers": 2543.354,
+            "http11.receive_response_body": 3.094
+          },
+          "status_code": 200,
+          "resolved_model": "gpt-5.4-mini-2026-03-17",
+          "service_tier": "default",
+          "input_tokens": 1003,
+          "output_tokens": 103,
+          "cached_input_tokens": 0
+        },
+        {
+          "request": 2,
+          "transport_ms": {
+            "http11.send_request_headers": 0.491,
+            "http11.send_request_body": 0.293,
+            "http11.receive_response_headers": 2684.824,
+            "http11.receive_response_body": 5.05
+          },
+          "status_code": 200,
+          "resolved_model": "gpt-5.4-mini-2026-03-17",
+          "service_tier": "default",
+          "input_tokens": 1003,
+          "output_tokens": 98,
+          "cached_input_tokens": 0
+        },
+        {
+          "request": 3,
+          "transport_ms": {
+            "http11.send_request_headers": 0.491,
+            "http11.send_request_body": 0.322,
+            "http11.receive_response_headers": 2554.633,
+            "http11.receive_response_body": 20.787
+          },
+          "status_code": 200,
+          "resolved_model": "gpt-5.4-mini-2026-03-17",
+          "service_tier": "default",
+          "input_tokens": 1231,
+          "output_tokens": 75,
+          "cached_input_tokens": 0
+        },
+        {
+          "request": 4,
+          "transport_ms": {
+            "http11.send_request_headers": 0.324,
+            "http11.send_request_body": 0.155,
+            "http11.receive_response_headers": 1883.878,
+            "http11.receive_response_body": 22.166
+          },
+          "status_code": 200,
+          "resolved_model": "gpt-5.4-mini-2026-03-17",
+          "service_tier": "default",
+          "input_tokens": 1101,
+          "output_tokens": 128,
+          "cached_input_tokens": 0
+        },
+        {
+          "request": 5,
+          "transport_ms": {
+            "http11.send_request_headers": 0.602,
+            "http11.send_request_body": 0.221,
+            "http11.receive_response_headers": 2115.963,
+            "http11.receive_response_body": 0.32
+          },
+          "status_code": 200,
+          "resolved_model": "gpt-5.4-mini-2026-03-17",
+          "service_tier": "default",
+          "input_tokens": 1037,
+          "output_tokens": 95,
+          "cached_input_tokens": 0
+        },
+        {
+          "request": 6,
+          "transport_ms": {
+            "http11.send_request_headers": 0.528,
+            "http11.send_request_body": 0.169,
+            "http11.receive_response_headers": 1707.046,
+            "http11.receive_response_body": 9.705
+          },
+          "status_code": 200,
+          "resolved_model": "gpt-5.4-mini-2026-03-17",
+          "service_tier": "default",
+          "input_tokens": 1041,
+          "output_tokens": 99,
+          "cached_input_tokens": 0
+        },
+        {
+          "request": 7,
+          "transport_ms": {
+            "http11.send_request_headers": 0.311,
+            "http11.send_request_body": 0.176,
+            "http11.receive_response_headers": 3125.324,
+            "http11.receive_response_body": 11.769
+          },
+          "status_code": 200,
+          "resolved_model": "gpt-5.4-mini-2026-03-17",
+          "service_tier": "default",
+          "input_tokens": 1073,
+          "output_tokens": 121,
+          "cached_input_tokens": 0
+        },
+        {
+          "request": 8,
+          "transport_ms": {
+            "http11.send_request_headers": 0.282,
+            "http11.send_request_body": 0.161,
+            "http11.receive_response_headers": 2921.27,
+            "http11.receive_response_body": 0.252
+          },
+          "status_code": 200,
+          "resolved_model": "gpt-5.4-mini-2026-03-17",
+          "service_tier": "default",
+          "input_tokens": 1054,
+          "output_tokens": 98,
+          "cached_input_tokens": 0
+        }
+      ],
+      "complete": true,
+      "risk_correct": 8,
+      "action_correct": 8,
+      "json_valid": 8,
+      "mean_response_ms": 2551.414,
+      "p95_response_ms": 3351.807,
+      "estimated_usd": 0.01008375
+    },
+    {
+      "source_commit": "8e35d784f6a3790a3292e77ce6e75977fbb246dc",
+      "recorded_at_utc": "2026-11-25T11:04:31.042952+00:00",
+      "scope": "isolated FastAPI ASGI, synthetic submission cases only, real OpenAI SDK",
+      "model": "gpt-5.4-mini-2026-03-17",
+      "effort": "none",
+      "prompt_mode": "legacy",
+      "requested_service_tier": "default",
+      "temperature": 0.0,
+      "compact_legacy_output": true,
+      "event_id_policy": "opaque_uuid",
+      "planned_cases": 8,
+      "request_cap": 8,
+      "sdk_retries": 0,
+      "max_output_tokens": 800,
+      "store": false,
+      "aws_calls": 0,
+      "cases": [
+        {
+          "scenario_id": "NORMAL-01",
+          "app_status": 200,
+          "json_valid": true,
+          "risk_correct": true,
+          "action_correct": true,
+          "risk_level": "LOW",
+          "policy_action": "ALLOW",
+          "human_review": false,
+          "elapsed_ms": 2339.761,
+          "stage_ms": {
+            "provider_request": 2314.463,
+            "structured_validation": 0.13,
+            "analyzer": 2315.985,
+            "precheck": 3.883,
+            "audit_write": 12.099,
+            "audit_verify": 2.63
+          }
+        },
+        {
+          "scenario_id": "NORMAL-02",
+          "app_status": 200,
+          "json_valid": true,
+          "risk_correct": true,
+          "action_correct": true,
+          "risk_level": "LOW",
+          "policy_action": "ALLOW",
+          "human_review": false,
+          "elapsed_ms": 2357.856,
+          "stage_ms": {
+            "provider_request": 2326.939,
+            "structured_validation": 0.096,
+            "analyzer": 2328.428,
+            "precheck": 1.504,
+            "audit_write": 21.012,
+            "audit_verify": 2.971
+          }
+        },
+        {
+          "scenario_id": "NORMAL-03",
+          "app_status": 200,
+          "json_valid": true,
+          "risk_correct": true,
+          "action_correct": true,
+          "risk_level": "MEDIUM",
+          "policy_action": "REQUIRE_MFA",
+          "human_review": false,
+          "elapsed_ms": 1805.279,
+          "stage_ms": {
+            "provider_request": 1773.622,
+            "structured_validation": 0.117,
+            "analyzer": 1775.115,
+            "precheck": 1.451,
+            "audit_write": 20.981,
+            "audit_verify": 3.873
+          }
+        },
+        {
+          "scenario_id": "ZT-S01",
+          "app_status": 200,
+          "json_valid": true,
+          "risk_correct": true,
+          "action_correct": true,
+          "risk_level": "CRITICAL",
+          "policy_action": "HOLD_FOR_REVIEW",
+          "human_review": true,
+          "elapsed_ms": 1967.825,
+          "stage_ms": {
+            "provider_request": 1945.552,
+            "structured_validation": 0.102,
+            "analyzer": 1947.149,
+            "precheck": 1.469,
+            "audit_write": 12.659,
+            "audit_verify": 3.072
+          }
+        },
+        {
+          "scenario_id": "ZT-S02",
+          "app_status": 200,
+          "json_valid": true,
+          "risk_correct": true,
+          "action_correct": true,
+          "risk_level": "MEDIUM",
+          "policy_action": "REQUIRE_MFA",
+          "human_review": false,
+          "elapsed_ms": 3285.603,
+          "stage_ms": {
+            "provider_request": 3263.353,
+            "structured_validation": 0.15,
+            "analyzer": 3265.027,
+            "precheck": 1.972,
+            "audit_write": 11.87,
+            "audit_verify": 2.992
+          }
+        },
+        {
+          "scenario_id": "ZT-S03",
+          "app_status": 200,
+          "json_valid": true,
+          "risk_correct": true,
+          "action_correct": true,
+          "risk_level": "HIGH",
+          "policy_action": "REDUCE_PRIVILEGE",
+          "human_review": true,
+          "elapsed_ms": 2266.485,
+          "stage_ms": {
+            "provider_request": 2237.075,
+            "structured_validation": 0.119,
+            "analyzer": 2238.536,
+            "precheck": 1.823,
+            "audit_write": 17.884,
+            "audit_verify": 4.254
+          }
+        },
+        {
+          "scenario_id": "ZT-S04",
+          "app_status": 200,
+          "json_valid": true,
+          "risk_correct": true,
+          "action_correct": true,
+          "risk_level": "HIGH",
+          "policy_action": "HOLD_FOR_REVIEW",
+          "human_review": true,
+          "elapsed_ms": 2597.31,
+          "stage_ms": {
+            "provider_request": 2575.192,
+            "structured_validation": 0.097,
+            "analyzer": 2576.691,
+            "precheck": 1.394,
+            "audit_write": 10.953,
+            "audit_verify": 4.043
+          }
+        },
+        {
+          "scenario_id": "ZT-S05",
+          "app_status": 200,
+          "json_valid": true,
+          "risk_correct": true,
+          "action_correct": true,
+          "risk_level": "HIGH",
+          "policy_action": "HOLD_FOR_REVIEW",
+          "human_review": true,
+          "elapsed_ms": 1518.444,
+          "stage_ms": {
+            "provider_request": 1499.183,
+            "structured_validation": 0.09,
+            "analyzer": 1500.426,
+            "precheck": 1.741,
+            "audit_write": 9.808,
+            "audit_verify": 2.808
+          }
+        }
+      ],
+      "stop": null,
+      "asgi_startup_ms": 1190.248,
+      "audit_verified_rows": 8,
+      "audit_integrity_ok": true,
+      "external_delivery_enabled": false,
+      "provider_attempts": [
+        {
+          "request": 1,
+          "transport_ms": {
+            "connection.connect_tcp": 23.502,
+            "connection.start_tls": 11.309,
+            "http11.send_request_headers": 0.315,
+            "http11.send_request_body": 0.187,
+            "http11.receive_response_headers": 2208.969,
+            "http11.receive_response_body": 8.838
+          },
+          "status_code": 200,
+          "resolved_model": "gpt-5.4-mini-2026-03-17",
+          "service_tier": "default",
+          "input_tokens": 1003,
+          "output_tokens": 90,
+          "cached_input_tokens": 0
+        },
+        {
+          "request": 2,
+          "transport_ms": {
+            "http11.send_request_headers": 0.251,
+            "http11.send_request_body": 0.122,
+            "http11.receive_response_headers": 2323.048,
+            "http11.receive_response_body": 0.233
+          },
+          "status_code": 200,
+          "resolved_model": "gpt-5.4-mini-2026-03-17",
+          "service_tier": "default",
+          "input_tokens": 1003,
+          "output_tokens": 99,
+          "cached_input_tokens": 0
+        },
+        {
+          "request": 3,
+          "transport_ms": {
+            "http11.send_request_headers": 0.29,
+            "http11.send_request_body": 0.163,
+            "http11.receive_response_headers": 1742.201,
+            "http11.receive_response_body": 26.477
+          },
+          "status_code": 200,
+          "resolved_model": "gpt-5.4-mini-2026-03-17",
+          "service_tier": "default",
+          "input_tokens": 1231,
+          "output_tokens": 92,
+          "cached_input_tokens": 1024
+        },
+        {
+          "request": 4,
+          "transport_ms": {
+            "http11.send_request_headers": 0.25,
+            "http11.send_request_body": 0.128,
+            "http11.receive_response_headers": 1941.238,
+            "http11.receive_response_body": 0.496
+          },
+          "status_code": 200,
+          "resolved_model": "gpt-5.4-mini-2026-03-17",
+          "service_tier": "default",
+          "input_tokens": 1101,
+          "output_tokens": 113,
+          "cached_input_tokens": 0
+        },
+        {
+          "request": 5,
+          "transport_ms": {
+            "http11.send_request_headers": 0.259,
+            "http11.send_request_body": 0.158,
+            "http11.receive_response_headers": 3216.823,
+            "http11.receive_response_body": 42.69
+          },
+          "status_code": 200,
+          "resolved_model": "gpt-5.4-mini-2026-03-17",
+          "service_tier": "default",
+          "input_tokens": 1037,
+          "output_tokens": 95,
+          "cached_input_tokens": 0
+        },
+        {
+          "request": 6,
+          "transport_ms": {
+            "http11.send_request_headers": 0.275,
+            "http11.send_request_body": 0.155,
+            "http11.receive_response_headers": 2219.882,
+            "http11.receive_response_body": 12.3
+          },
+          "status_code": 200,
+          "resolved_model": "gpt-5.4-mini-2026-03-17",
+          "service_tier": "default",
+          "input_tokens": 1041,
+          "output_tokens": 99,
+          "cached_input_tokens": 0
+        },
+        {
+          "request": 7,
+          "transport_ms": {
+            "http11.send_request_headers": 0.509,
+            "http11.send_request_body": 0.301,
+            "http11.receive_response_headers": 2570.413,
+            "http11.receive_response_body": 0.227
+          },
+          "status_code": 200,
+          "resolved_model": "gpt-5.4-mini-2026-03-17",
+          "service_tier": "default",
+          "input_tokens": 1073,
+          "output_tokens": 121,
+          "cached_input_tokens": 0
+        },
+        {
+          "request": 8,
+          "transport_ms": {
+            "http11.send_request_headers": 0.25,
+            "http11.send_request_body": 0.126,
+            "http11.receive_response_headers": 1494.849,
+            "http11.receive_response_body": 0.218
+          },
+          "status_code": 200,
+          "resolved_model": "gpt-5.4-mini-2026-03-17",
+          "service_tier": "default",
+          "input_tokens": 1054,
+          "output_tokens": 98,
+          "cached_input_tokens": 0
+        }
+      ],
+      "complete": true,
+      "risk_correct": 8,
+      "action_correct": 8,
+      "json_valid": 8,
+      "mean_response_ms": 2267.32,
+      "p95_response_ms": 3285.603,
+      "estimated_usd": 0.00934755
+    }
+  ],
+  "policy_summary": {
+    "calls": 16,
+    "risk_correct": 16,
+    "action_correct": 16,
+    "json_valid": 16,
+    "mean_response_ms": 2409.367,
+    "p95_response_ms": 3351.807,
+    "over_3000_ms": 3
+  },
+  "p95_definition": "nearest rank, first analysis requests included, ASGI startup separate",
+  "pricing_source": "https://developers.openai.com/api/docs/pricing.md",
+  "new_attempts": 24,
+  "estimated_total_usd": 0.029431
+}
