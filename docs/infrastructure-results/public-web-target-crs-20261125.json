@@ -1,0 +1,164 @@
+{
+  "baseline_web_probability_diagnostic": {
+    "alert_threshold": 0.95,
+    "all_scores_rounded": 0.066405,
+    "population": 791
+  },
+  "candidate_commit": "3ae54ba8e44cd16165d06879482f3ceba13c4cb5",
+  "cloud_calls": 0,
+  "development_minimum_matched_rules": {
+    "access": {
+      "1": {
+        "additional_threats": 53,
+        "new_false_positives": 0
+      },
+      "2": {
+        "additional_threats": 31,
+        "new_false_positives": 0
+      },
+      "3": {
+        "additional_threats": 17,
+        "new_false_positives": 0
+      }
+    },
+    "apache": {
+      "1": {
+        "additional_threats": 72,
+        "new_false_positives": 76
+      },
+      "2": {
+        "additional_threats": 66,
+        "new_false_positives": 60
+      },
+      "3": {
+        "additional_threats": 25,
+        "new_false_positives": 21
+      }
+    }
+  },
+  "evaluation_scope": "re-used public development and regression populations; no new holdout",
+  "paid_api_calls": 0,
+  "previous_crs_byte_identical_control_rows": 64,
+  "pytest_passed": 159,
+  "reports": {
+    "access_development": {
+      "additional_threats": 53,
+      "candidate_seal": "53ad256bdf1a471137b352e8950ad21d63d85bea183b5352dfd8953e6bcbf1ac",
+      "capture": {
+        "baseline_seal": "068dcc7fcd78efe9397c4258c9ecacea19930e86ab48132838f99a08f387c6af",
+        "binary_sha256": "85fa7c369711880249ae06a3f474665e6e1ba7f6aa8b11338450da8bcc00b69c",
+        "coraza": "3.8.1",
+        "crs": "4.25.0",
+        "kind": "access",
+        "observations": 791,
+        "predictions_sha256": "f3c2c37abd5f2d8ed65bf8b418aedf92d29916fff32cf5b0120fee5234866b6d",
+        "source_sha256": "42f840b5dfd0f92a5b6dea339bc2077927f2ac0f8bcc2a536c39c3ae95b0d0c7"
+      },
+      "combined": {
+        "accuracy": 0.9759797724399494,
+        "f1": 0.848,
+        "false_positive_rate": 0.0,
+        "fn": 19,
+        "fp": 0,
+        "inference_errors": 0,
+        "population": 791,
+        "precision": 1.0,
+        "recall": 0.7361111111111112,
+        "tn": 719,
+        "tp": 53
+      },
+      "combined_misses_by_publisher_group": {
+        "admin_probe": 12,
+        "command_injection": 5,
+        "sensitive_file_probe": 2
+      },
+      "lost_true_positives": 0,
+      "new_false_positives": 0,
+      "previous": {
+        "accuracy": 0.9089759797724399,
+        "f1": 0.0,
+        "false_positive_rate": 0.0,
+        "fn": 72,
+        "fp": 0,
+        "inference_errors": 0,
+        "population": 791,
+        "precision": null,
+        "recall": 0.0,
+        "tn": 719,
+        "tp": 0
+      },
+      "target_only": {
+        "accuracy": 0.9759797724399494,
+        "f1": 0.848,
+        "false_positive_rate": 0.0,
+        "fn": 19,
+        "fp": 0,
+        "inference_errors": 0,
+        "population": 791,
+        "precision": 1.0,
+        "recall": 0.7361111111111112,
+        "tn": 719,
+        "tp": 53
+      }
+    },
+    "apache_regression": {
+      "additional_threats": 72,
+      "candidate_seal": "37f38517bf80f4d683c498568eac65064302c21e7832e04d551a1c9360df793a",
+      "capture": {
+        "baseline_seal": "b68468c77ac2690952efd50b1121332f36399570857f675dd0bd6e364c8e9509",
+        "binary_sha256": "85fa7c369711880249ae06a3f474665e6e1ba7f6aa8b11338450da8bcc00b69c",
+        "coraza": "3.8.1",
+        "crs": "4.25.0",
+        "kind": "apache",
+        "observations": 213205,
+        "predictions_sha256": "1cc342e221b46a093f49417b95f70861c3bdbc84f212bea16b7f15c7dde41cb6",
+        "source_sha256": "1429caba2803c3e8c90e9fb287bc04f6f8249f8bb34712b39127044e134d631f"
+      },
+      "combined": {
+        "accuracy": 0.837649210853404,
+        "f1": 0.02878787878787879,
+        "false_positive_rate": 0.16261638295871345,
+        "fn": 32,
+        "fp": 34582,
+        "inference_errors": 0,
+        "population": 213205,
+        "precision": 0.014617466875623307,
+        "recall": 0.9412844036697248,
+        "tn": 178078,
+        "tp": 513
+      },
+      "combined_misses_by_publisher_group": {
+        "publisher": 32
+      },
+      "lost_true_positives": 0,
+      "new_false_positives": 76,
+      "previous": {
+        "accuracy": 0.8376679721394902,
+        "f1": 0.0248506705736504,
+        "false_positive_rate": 0.16225900498448229,
+        "fn": 104,
+        "fp": 34506,
+        "inference_errors": 0,
+        "population": 213205,
+        "precision": 0.01261910893638939,
+        "recall": 0.8091743119266055,
+        "tn": 178154,
+        "tp": 441
+      },
+      "target_only": {
+        "accuracy": 0.9971858070870758,
+        "f1": 0.47643979057591623,
+        "false_positive_rate": 0.0015423680993134582,
+        "fn": 272,
+        "fp": 328,
+        "inference_errors": 0,
+        "population": 213205,
+        "precision": 0.454242928452579,
+        "recall": 0.5009174311926605,
+        "tn": 212332,
+        "tp": 273
+      }
+    }
+  },
+  "use": "offline inspection and candidate review only"
+}

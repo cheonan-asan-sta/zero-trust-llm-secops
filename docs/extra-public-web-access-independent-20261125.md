@@ -2,6 +2,8 @@
 
 2026년 11월 25일 · `extra` 제품 기준 `49b3b0f` · 평가기 커밋 `0b08741` · CPU 로컬.
 
+[후속 CRS 보강 비교](extra-public-web-target-crs-20261125.md)에서 이 자료의 미탐 53건을 회복했다. 같은 자료를 다시 사용한 결과여서 기존 독립 결과와 별도로 기록한다.
+
 ## 출처와 평가 범위
 
 Database Sample의 공개 Nginx·Apache 접근 기록 v1에서 요청 791건 전체를 사용했다. 정상 719건과 위협 72건이며, 메서드·경로 조합은 정상 14개와 위협 8개다. 경로마다 발행자가 주석을 붙였으므로 같은 경로의 반복 요청은 서로 독립적인 위협 유형이 아니다. 성능 지표는 이 합성 웹 요청 집단에 대한 결과다. 발행자의 공개 자료를 로컬에 받아 SHA-256 `42f840b5dfd0f92a5b6dea339bc2077927f2ac0f8bcc2a536c39c3ae95b0d0c7`을 대조했다. [발행자 자료와 라벨 방식](https://databasesample.com/datasets/nginx-and-apache-access-log-tables-with-attack-annotations)
