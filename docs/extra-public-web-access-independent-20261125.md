@@ -8,7 +8,9 @@
 
 Database Sample의 공개 Nginx·Apache 접근 기록 v1에서 요청 791건 전체를 사용했다. 정상 719건과 위협 72건이며, 메서드·경로 조합은 정상 14개와 위협 8개다. 경로마다 발행자가 주석을 붙였으므로 같은 경로의 반복 요청은 서로 독립적인 위협 유형이 아니다. 성능 지표는 이 합성 웹 요청 집단에 대한 결과다. 발행자의 공개 자료를 로컬에 받아 SHA-256 `42f840b5dfd0f92a5b6dea339bc2077927f2ac0f8bcc2a536c39c3ae95b0d0c7`을 대조했다. [발행자 자료와 라벨 방식](https://databasesample.com/datasets/nginx-and-apache-access-log-tables-with-attack-annotations)
 
-기존 튜닝·평가에 쓰인 공개 Apache, OpenLiteSpeed, SR-BH, KREONET, RBA와 프로젝트 합성 사례를 포함하지 않았다. 저장소의 추적 파일과 브랜치 이력에서 새 자료의 명칭 및 지문과 일치하는 사용 기록을 확인하지 못했다. 실제 운영 HTTP 로그인 Biblio-US17은 기관 메타데이터에 접근할 수 있었으나 원본 다운로드가 HTTP 401로 거절돼 이번 채점에서 제외했다. [세비야대 Biblio-US17 데이터 기록](https://idus.us.es/items/53034f60-d215-44b0-a198-eb8a5229218e)
+기존 튜닝·평가에 쓰인 공개 Apache, OpenLiteSpeed, SR-BH, KREONET, RBA와 프로젝트 합성 사례를 포함하지 않았다. 저장소의 추적 파일과 브랜치 이력에서 새 자료의 명칭 및 지문과 일치하는 사용 기록을 확인하지 못했다. 실제 운영 HTTP 접근 로그인 Biblio-US17은 기관 메타데이터에 접근할 수 있었으나 원본 다운로드가 HTTP 401로 거절돼 이번 채점에서 제외했다. [세비야대 Biblio-US17 데이터 기록](https://idus.us.es/items/53034f60-d215-44b0-a198-eb8a5229218e)
+
+후속 확인에서 Biblio-US17 연구실 페이지는 원문을 요청을 통해 제공한다고 명시했다. 논문에 따르면 제공 필드는 메서드·URI·응답 코드·응답 크기이며, 원래의 시각과 승인·MFA 근거는 제공 범위에 없다. 자료를 확보하더라도 HTTP 접근 탐지 평가에 사용하며 인증 정책의 성능은 별도 근거로 검증한다. [그라나다대 연구실 자료 안내](https://dtstc.ugr.es/neus-cslab/recursos/ds-biblio/) · [Biblio-US17 논문의 자료 설명](https://link.springer.com/article/10.1186/s42400-024-00336-3)
 
 ## 동결과 채점
 

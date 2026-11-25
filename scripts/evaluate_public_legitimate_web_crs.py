@@ -14,9 +14,11 @@ from scripts.f1_lab.operation_context import canonical
 
 RECEIPT_SHA = "31a9256782117d36f0f7d31ba2b704a37e9fffa7fa93e680df9d1f666d637bc7"
 HOLDOUT_SHA = "f4b349317bc39b6371c62242e68ce644d22415e319938f053dc89069e7721120"
+EXPANDED_SHA = "64f1cad9237df9340eff9ac53dedb95e0f563624a0c74688158eaecc77522fd6"
 BINARY_SHA = "d49a45c26270a5df2a35dbf1544de02ba46610d65c6e55b218579ce44adffebf"
 ROWS = 12_887
 HOLDOUT_ROWS = 15_250
+EXPANDED_ROWS = 49_399
 BODY_HEADERS = {"content-type": "Content-Type", "content-encoding": "Content-Encoding"}
 
 
@@ -39,7 +41,7 @@ def observation(row, ordinal):
     return {"ordinal": ordinal, "method": method, "target": target, "protocol": "", "body": body, "headers": headers}
 
 
-def request_rows(source, *, receipt_sha, expected_rows):
+def request_members(source, *, receipt_sha):
     receipt_path = source / "download-receipt.json"
     plan_path = source / "plan.json"
     if fingerprint(receipt_path) != receipt_sha:
@@ -47,7 +49,6 @@ def request_rows(source, *, receipt_sha, expected_rows):
     receipt, plan = read(receipt_path), read(plan_path)
     if fingerprint(plan_path) != receipt["plan_sha256"]:
         raise ValueError("legitimate sample plan mismatch")
-    ordinal = 0
     for index, (member, pin) in enumerate(zip(plan["members"], receipt["members"], strict=True), 1):
         path = source / f"member-{index:02}.json"
         if path.stat().st_size != member["bytes"] or path.stat().st_size > 24 * 1024**2:
@@ -55,10 +56,18 @@ def request_rows(source, *, receipt_sha, expected_rows):
         body = path.read_bytes()
         if member["ordinal"] != index or pin["ordinal"] != index or hashlib.sha256(body).hexdigest() != pin["sha256"]:
             raise ValueError("legitimate sample member mismatch")
-        for row in decode(body):
-            ordinal += 1
-            yield row
-    if ordinal != expected_rows:
+        rows = decode(body)
+        if not isinstance(rows, list) or not rows:
+            raise ValueError("expected a nonempty legitimate request list")
+        yield index, rows
+
+
+def request_rows(source, *, receipt_sha, expected_rows):
+    count = 0
+    for _, rows in request_members(source, receipt_sha=receipt_sha):
+        count += len(rows)
+        yield from rows
+    if count != expected_rows:
         raise ValueError("legitimate sample row count changed")
 
 
@@ -67,12 +76,18 @@ def request_events(source, *, receipt_sha=RECEIPT_SHA, expected_rows=ROWS):
         yield observation(row, ordinal)
 
 
-def evaluate(source, output, executable, *, holdout=False):
+def evaluate(source, output, executable, *, holdout=False, expanded=False):
     binary = executable.resolve()
     if fingerprint(binary) != BINARY_SHA:
         raise ValueError("legitimate replay requires the frozen CRS binary")
+    if holdout and expanded:
+        raise ValueError("select one legitimate sample")
     output.mkdir()
-    receipt_sha, row_count = (HOLDOUT_SHA, HOLDOUT_ROWS) if holdout else (RECEIPT_SHA, ROWS)
+    receipt_sha, row_count = RECEIPT_SHA, ROWS
+    if holdout:
+        receipt_sha, row_count = HOLDOUT_SHA, HOLDOUT_ROWS
+    if expanded:
+        receipt_sha, row_count = EXPANDED_SHA, EXPANDED_ROWS
     paths = {mode: output / f"{mode}.jsonl" for mode in MODES}
     for mode, flag in MODES.items():
         with paths[mode].open("xb") as sink, subprocess.Popen(
@@ -120,9 +135,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("source", "output", "executable"):
         parser.add_argument(name, type=Path)
-    parser.add_argument("--holdout", action="store_true", help="check the additional site-separated sample")
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument("--holdout", action="store_true", help="check the additional 12-site sample")
+    selection.add_argument("--expanded", action="store_true", help="check the third, 32-site sample")
     args = parser.parse_args()
-    evaluate(args.source, args.output, args.executable, holdout=args.holdout)
+    evaluate(args.source, args.output, args.executable, holdout=args.holdout, expanded=args.expanded)
 
 
 if __name__ == "__main__":

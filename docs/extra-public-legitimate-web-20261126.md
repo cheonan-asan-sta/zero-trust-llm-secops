@@ -21,6 +21,18 @@ open-appsec 공개 벤치마크에서 실제 웹사이트를 탐색해 수집한
 
 파일별로 보면 오탐률 5%를 넘은 수집 파일은 요청 대상 검사에서 1/12개, 본문 포함 검사에서 4/12개였다. 본문 모드의 최고 오탐률은 13.65%였다. 형태 보정 모델을 CRS와 결합한 경우 전체 오탐률은 3.03%였지만 학습 중복을 제외한 같은 12개 파일 중 2개에서 5%를 넘었다. [파일별 오탐률 집계](infrastructure-results/public-openappsec-site-fpr-20261126.json) · [형태 모델 보정 결과](extra-public-web-shape-transfer-20261126.md#기준값-보정과-새-혼합-자료-검증)
 
+## 세 번째 사이트 분리 표본
+
+앞서 쓴 사이트 24개의 수집 파일을 제외하고, 파일명 SHA-256 순서에 따라 서로 다른 사이트의 파일 32개를 더 확보했다. 각 파일의 압축 해제 크기는 최대 24 MiB이며 ZIP CRC와 SHA-256을 확인했다. 총 49,399건 중 기존 형태 모델의 학습·보정과 요청 대상 및 본문이 그대로 겹친 827건을 모든 비교에서 함께 제외했다. 보정 기준값 0.84와 Windows CRS 바이너리를 기존 평가와 같게 유지했다.
+
+| 같은 정상 요청 48,572건 | 경보 | 전체 오탐률 | 5% 초과 수집 파일 | 파일 최고 오탐률 |
+| --- | ---: | ---: | ---: | ---: |
+| CRS 요청 대상 | 715 | 1.47% | 2 / 32 | 6.05% |
+| CRS 대상 및 본문 | 1,767 | 3.64% | 5 / 32 | 50.48% |
+| CRS 대상과 형태 모델 결합 | 1,339 | 2.76% | 5 / 32 | 25.71% |
+
+각 구성에서 미판정은 0건이었다. 본문 후보의 새 오탐 1,052건 중 732건이 한 수집 파일에 집중됐다. 그 파일에서 해당 오탐을 메서드·대상·본문 조합으로 중복 제거하면 308가지였으며, 같은 조합의 최다 반복은 16건이었다. 단일 요청을 반복한 현상만으로 설명되지 않는다. 파일별 차이가 크고 이 표본에는 위협 정답이 없어서 세 구성을 운영 경보에 반영하지 않았다. [세 번째 표본의 파일별 지표·지문](infrastructure-results/public-openappsec-expanded-site-fpr-20261126.json)
+
 ## 재현
 
 원본 ZIP의 ETag는 `"7f7b53e6e8d780e4d390c8070bffce88-71"`이고 아카이브 크기는 1,203,983,791바이트다. 원시 요청과 선택·다운로드 영수증은 로컬 `runtime/independent-web-access-20261125/openappsec-legitimate/`에 보관했다. 아래 실행은 이미 확보한 파일만 읽는다. 출력에는 집계와 판정 지문을 남기고 AWS·유료 API·실제 정책 변경은 없었다. [집계 결과](infrastructure-results/public-openappsec-legitimate-crs-20261126.json) · [선택과 지문](infrastructure-results/public-openappsec-legitimate-sample-20261126.json)
@@ -28,4 +40,6 @@ open-appsec 공개 벤치마크에서 실제 웹사이트를 탐색해 수집한
 ```powershell
 python -m scripts.evaluate_public_legitimate_web_crs <샘플-폴더> <새-출력> <고정-CRS-실행파일>
 python -m scripts.evaluate_public_legitimate_web_crs <추가-샘플-폴더> <새-출력> <고정-CRS-실행파일> --holdout
+python -m scripts.evaluate_public_legitimate_web_crs <32개-샘플-폴더> <CRS-출력> <고정-CRS-실행파일> --expanded
+python -m scripts.evaluate_public_web_site_distribution <32개-샘플-폴더> <FPAD-학습-JSONL> <최초-정상-샘플-폴더> <CRS-출력> <새-집계-폴더>
 ```
