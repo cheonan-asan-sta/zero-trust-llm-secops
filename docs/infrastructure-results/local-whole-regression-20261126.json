@@ -1,0 +1,165 @@
+{
+  "cloud_deployment": false,
+  "cold_windows_and_native_wsl_product_fix_revision": "7da6a890e6ad4ea9faba961ec5914f5bad17be46",
+  "initial_windows": {
+    "duration_seconds": 2230.426,
+    "errors": 0,
+    "failed_test_classes": {
+      "tests.test_execution_analysis_runner": 1,
+      "tests.test_signal_metrics_exporter": 1
+    },
+    "failures": 2,
+    "passed": 8483,
+    "sha256": "5226511d120e94e9f9e49debfcd50231a5eb39cb07a8f98c8128bc2f8fe4ac7b",
+    "skipped": 623,
+    "skipped_test_classes": [
+      [
+        "tests.test_backup_recovery_status",
+        40
+      ],
+      [
+        "tests.test_managed_exec_retention",
+        39
+      ],
+      [
+        "tests.test_capture_backup",
+        38
+      ],
+      [
+        "tests.test_exec_bundle_backup",
+        35
+      ],
+      [
+        "tests.test_capture_archive",
+        33
+      ],
+      [
+        "tests.test_collector_status_bridge",
+        33
+      ]
+    ],
+    "tests": 9108,
+    "xml": "whole-suite-20261126.xml"
+  },
+  "linux_focused": {
+    "duration_seconds": 92.841,
+    "errors": 0,
+    "failed_test_classes": {},
+    "failures": 0,
+    "passed": 268,
+    "sha256": "b133e2b1b0603b408238d7118ab935bf4d5a53dfb8501d83b495454f0e3619dd",
+    "skipped": 0,
+    "skipped_test_classes": [],
+    "tests": 268,
+    "xml": "final-targeted-wsl-20261126.xml"
+  },
+  "linux_native_after_corrected_test_configuration": {
+    "anyio_plugin_explicitly_loaded": true,
+    "archive_revision": "7da6a890e6ad4ea9faba961ec5914f5bad17be46",
+    "duration_seconds": 1376.067,
+    "errors": 0,
+    "failures": 0,
+    "passed": 9105,
+    "sha256": "4b6800599b7b1d216e550f410f06de6c385dd86ebd79021352dc48afa62cc675",
+    "skipped": 7,
+    "skipped_test_classes": [
+      [
+        "tests.test_audit_paging",
+        2
+      ],
+      [
+        "tests.test_runtime_patches",
+        2
+      ],
+      [
+        "tests.test_audit_witness_archive",
+        1
+      ],
+      [
+        "tests.test_evaluate_kreonet_model",
+        1
+      ],
+      [
+        "tests.test_native_platform_admission",
+        1
+      ]
+    ],
+    "source_archive_sha256": "9e0714cb1e20df89ec7d9a88475331a678c25294886c1bf43ec11b1f31c8ce70",
+    "tests": 9112,
+    "xml": "whole-suite-wsl-native-anyio-20261126.xml"
+  },
+  "linux_web_replay_focused": {
+    "duration_seconds": 27.153,
+    "errors": 0,
+    "failed_test_classes": {},
+    "failures": 0,
+    "passed": 10,
+    "sha256": "4625e831b8d9f60674973f608d232696858311f571aea0cd0ccd319bf468ac7f",
+    "skipped": 0,
+    "skipped_test_classes": [],
+    "tests": 10,
+    "xml": "site-distribution-targeted-wsl-20261126.xml"
+  },
+  "paid_api_calls": 0,
+  "windows_after_fixes": {
+    "duration_seconds": 2473.054,
+    "errors": 0,
+    "failed_test_classes": {},
+    "failures": 0,
+    "passed": 8489,
+    "sha256": "86215ce10e06412432ca1ca2db745eaf9c01900a96a324d3bf0dfe68d1efb684",
+    "skipped": 623,
+    "skipped_test_classes": [
+      [
+        "tests.test_backup_recovery_status",
+        40
+      ],
+      [
+        "tests.test_managed_exec_retention",
+        39
+      ],
+      [
+        "tests.test_capture_backup",
+        38
+      ],
+      [
+        "tests.test_exec_bundle_backup",
+        35
+      ],
+      [
+        "tests.test_capture_archive",
+        33
+      ],
+      [
+        "tests.test_collector_status_bridge",
+        33
+      ]
+    ],
+    "tests": 9112,
+    "xml": "whole-suite-fixed-20261126.xml"
+  },
+  "windows_focused": {
+    "duration_seconds": 64.564,
+    "errors": 0,
+    "failed_test_classes": {},
+    "failures": 0,
+    "passed": 268,
+    "sha256": "851b9b1c50cb84304c461a875e297b9e478e7897338f3a732778f442b6825137",
+    "skipped": 0,
+    "skipped_test_classes": [],
+    "tests": 268,
+    "xml": "final-targeted-windows-20261126.xml"
+  },
+  "windows_web_replay_focused": {
+    "duration_seconds": 5.487,
+    "errors": 0,
+    "failed_test_classes": {},
+    "failures": 0,
+    "passed": 10,
+    "sha256": "b74ca62beeab01490088c3298e67c8a56aecad836ecd3681e751de1a375b2f46",
+    "skipped": 0,
+    "skipped_test_classes": [],
+    "tests": 10,
+    "xml": "site-distribution-targeted-fixed-20261126.xml"
+  }
+}

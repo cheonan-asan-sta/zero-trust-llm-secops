@@ -52,6 +52,7 @@
     "target_or_shape": 5
   },
   "report_with_member_metrics_sha256": "6a91317a70ce5e667fd9f925187f1a8b7f7d1c49867e198a787f6547d84affb7",
+  "shape_decisions_provenance": "frozen existing Windows shape results; Linux independently reran the two CRS modes",
   "source_receipt_sha256": "64f1cad9237df9340eff9ac53dedb95e0f563624a0c74688158eaecc77522fd6",
   "source_windows_predictions_sha256": {
     "target": "eca3a19d110155ae583107d8c8ef1b556ad20010109023b9c0328bc311201fe9",
