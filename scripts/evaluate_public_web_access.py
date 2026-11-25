@@ -4,7 +4,7 @@ import argparse
 import ipaddress
 import re
 from collections import defaultdict
-from datetime import UTC, datetime
+from datetime import datetime
 from pathlib import Path
 
 from scripts.evaluate_local_remote_holdout import fingerprint, git, read, write
@@ -19,6 +19,8 @@ from scripts.f1_lab.web_residual import WebResidualRefinement
 SOURCE = "https://databasesample.com/datasets/nginx-and-apache-access-log-tables-with-attack-annotations"
 PUBLISHER_SHA = "42f840b5dfd0f92a5b6dea339bc2077927f2ac0f8bcc2a536c39c3ae95b0d0c7"
 POPULATION = 791
+# The publisher supplies wall-clock times without a timezone or UTC claim.
+SOURCE_CLOCK_ORIGIN = datetime(1970, 1, 1)  # noqa: DTZ001
 FIELDS = (
     "virtual_host_id", "client_ip", "method", "path", "status", "response_bytes", "requested_at",
 )
@@ -43,7 +45,7 @@ def prepare(source, output):
         "source_sha256": PUBLISHER_SHA,
         "observations_sha256": fingerprint(output / "observations.json"),
         "unit": "all publisher request rows, original physical ordinal",
-        "history": "publisher UTC offset and ordinal, one window per virtual host",
+        "history": "publisher wall clock and ordinal, one window per virtual host",
         "protocol": "unavailable; HTTP/0 is a rendering sentinel, not an observed version",
         "annotation": "read only by score; neither route ID nor user-agent class is projected",
         "threshold": THRESHOLD,
@@ -52,22 +54,23 @@ def prepare(source, output):
 
 def access_record(row):
     try:
-        stamp = datetime.fromisoformat(row["requested_at"])
+        stamp = datetime.strptime(row["requested_at"], "%Y-%m-%d %H:%M:%S")  # noqa: DTZ007
         client = str(ipaddress.ip_address(row["client_ip"]))
         method, target, status, size = (row[k] for k in ("method", "path", "status", "response_bytes"))
         if (
-            stamp.utcoffset() is None or method not in METHODS
+            method not in METHODS
             or not 1 <= len(target) <= 16384 or re.search(r"[\x00-\x1f\x7f]", target)
-            or type(status) is not int or not 100 <= status <= 599
+            or not re.fullmatch(r"[1-5][0-9]{2}", status)
             or type(size) is not int or size < 0
         ):
             return None
     except (ValueError, TypeError):
         return None
     target = target.replace('"', "%22")
-    log_time = stamp.astimezone(UTC).strftime("%d/%b/%Y:%H:%M:%S +0000")
+    log_time = stamp.strftime("%d/%b/%Y:%H:%M:%S")
     line = f'{client} - - [{log_time}] "{method} {target} HTTP/0" {status} {size} "-" "-"'
-    return (stamp.timestamp(), line) if len(line.encode()) <= MAX_ROW else None
+    moment = (stamp - SOURCE_CLOCK_ORIGIN).total_seconds()
+    return (moment, line) if len(line.encode()) <= MAX_ROW else None
 
 
 def capture(output, revision):
@@ -95,6 +98,8 @@ def capture(output, revision):
         if entry is not None:
             moment, line = entry
             timed.append((moment, ordinal, row["virtual_host_id"], line))
+    if not timed:
+        raise ValueError("no publisher request rows can be mapped by the input adapter")
     windows = defaultdict(IncrementalHTTPWindow)
     for moment, ordinal, host, line in sorted(timed):
         features = windows[host].observe(line, moment)
