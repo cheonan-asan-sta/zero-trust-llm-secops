@@ -24,6 +24,18 @@ Apache에서 정상 라벨을 가진 우선 검토는 **76건에서 9건으로 �
 
 우선 검토만 채점하면 이전 전체 CRS 결합보다 재현율이 내려간다. Apache에서 우선 검토의 새 정상 9건이 남았고, 기존 오탐도 그대로여서 운영 경보 통합은 보류했다. 이 수치는 앞서 본 합성 자료와 Apache 회귀 자료의 검토 결과이며 새 독립 평가 성적으로 합산하지 않는다. [이전 CRS 실험](extra-public-web-target-crs-20261125.md)
 
+## Apache 정답 매칭 방식 검증
+
+정상 라벨을 가진 우선 검토 9건과 위협 라벨을 가진 22건의 봉인된 판정을 유지하고, 발행자 YAML의 리터럴을 로그에 대조하는 방법만 바꿨다. 기존 채점은 규칙 하나의 문자열을 모두 찾아야 일치로 판정하고, 대소문자와 인코딩을 원문 그대로 비교한다.
+
+| 대조 방식 | 전체 213,205행에서 새로 일치 / 기존 일치에서 제외 | 새 우선 검토 31행에서 새로 일치 / 기존 일치에서 제외 |
+| --- | ---: | ---: |
+| 기존 리터럴 일치 | 0 / 0 | 0 / 0 |
+| 대소문자를 무시한 일치 | 68 / 0 | 6 / 0 |
+| URL percent 디코딩 1회 후 대소문자를 무시한 일치 | 97 / 5 | 7 / 1 |
+
+발행자 필터 일치 여부가 대조 방식에 따라 달라졌다. 이 결과만으로 요청의 실제 공격 여부를 확정할 수 없어 기존 라벨 9건과 22건, 운영 탐지 규칙, 평가 지표를 유지했다. 상태 코드와 인코딩 유무는 정상 라벨과 위협 라벨 양쪽에 나타나므로 경보 제외 조건으로 사용하지 않았다. 소스와 두 예측 봉인을 대조한 로컬 재실행에서 집계 지문이 일치했다. 원시 요청은 로컬에 두었다. [Apache 정답 민감도 집계](infrastructure-results/public-web-crs-label-sensitivity-20261125.json)
+
 ## 재현
 
 로컬 회귀 159개와 Ruff를 통과했다. 요청 대상에 근거가 없거나 규칙 계열이 다른 경우, Referer와 User-Agent를 입력에서 제외하는 경우를 별도로 확인했다. 네트워크 연결을 차단한 합성 791건 재실행에서 봉인이 같았다. 유료 API·AWS 호출은 0회다. [집계 결과와 지문](infrastructure-results/public-web-crs-priority-20261125.json)
@@ -34,4 +46,8 @@ Apache에서 정상 라벨을 가진 우선 검토는 **76건에서 9건으로 �
 python -m scripts.evaluate_public_web_crs_priority capture <access|apache> <원본> <기존-봉인-폴더> <CRS-봉인-폴더> <새-출력> <기존-seal-SHA256> <CRS-seal-SHA256>
 Get-FileHash <새-출력>/seal.json -Algorithm SHA256
 python -m scripts.evaluate_public_web_crs_priority score <access|apache> <원본> <기존-봉인-폴더> <CRS-봉인-폴더> <새-출력> <기존-seal-SHA256> <CRS-seal-SHA256> <새-seal-SHA256>
+```
+
+```powershell
+python -m scripts.audit_public_web_crs_labels <Apache-원본> <기존-봉인-폴더> <우선-검토-봉인-폴더> <새-집계-JSON> <기존-seal-SHA256> <우선-검토-seal-SHA256>
 ```
