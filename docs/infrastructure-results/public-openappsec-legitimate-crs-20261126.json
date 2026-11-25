@@ -1,0 +1,25 @@
+{
+  "body_included": 2844,
+  "crs_target": {
+    "false_positive_rate": 0.005742220842709708,
+    "fn": 0,
+    "fp": 74,
+    "inference_errors": 0,
+    "tn": 12813,
+    "tp": 0
+  },
+  "crs_target_or_body": {
+    "false_positive_rate": 0.03848839916194615,
+    "fn": 0,
+    "fp": 496,
+    "inference_errors": 0,
+    "tn": 12391,
+    "tp": 0
+  },
+  "direct_prior_alarm_losses": 0,
+  "new_inference_errors": 0,
+  "new_positive_alarms": 422,
+  "population": 12887,
+  "scope": "publisher legitimate traffic only; no recall, precision, F1 or runtime policy claim",
+  "seal_sha256": "7c06a7dedb31363d146bd09f6b7692ce5fa07662564a91dd52f809ab4937fc73"
+}

@@ -1,0 +1,107 @@
+{
+  "archive_entries": 692,
+  "archive_etag": "\"7f7b53e6e8d780e4d390c8070bffce88-71\"",
+  "archive_length": 1203983791,
+  "download_receipt_sha256": "31a9256782117d36f0f7d31ba2b704a37e9fffa7fa93e680df9d1f666d637bc7",
+  "eligible": 657,
+  "members": [
+    {
+      "bytes": 4495942,
+      "compressed_bytes": 152527,
+      "crc32": "88dccb17",
+      "name_sha256": "00123ebdffd0f1a2993344e9619108983da065b9aebf20f332f76046da53c75a",
+      "ordinal": 1,
+      "sha256": "25d0e515be4e2ec38d7c7c61141448fbc16438d5fce826a678dd040e00bda4d8"
+    },
+    {
+      "bytes": 6898498,
+      "compressed_bytes": 278652,
+      "crc32": "d1783ffc",
+      "name_sha256": "0032bd2053a660f70be80507796c8c24bf59cffd815a1ce521014fdd8b5927f7",
+      "ordinal": 2,
+      "sha256": "e0701618764142f1f2e39029a6eace25104833130416b5e245113b444255e266"
+    },
+    {
+      "bytes": 1435701,
+      "compressed_bytes": 222348,
+      "crc32": "05e8809f",
+      "name_sha256": "0142cd03e0eebf6283ab66b1e2e9a1aeac939e19ea058558cee4a6af54e30be4",
+      "ordinal": 3,
+      "sha256": "3208ef4b8c9b993cc49715fc8ac2775496e3069ee27608806cf0c46d91ea6a7b"
+    },
+    {
+      "bytes": 3309940,
+      "compressed_bytes": 894929,
+      "crc32": "b8d6a01f",
+      "name_sha256": "01d3c8470b8889020b031cbf6cad434d300d16ef08d76e60af07d9fda7d2bade",
+      "ordinal": 4,
+      "sha256": "d5edf0b16f5cf5612050e0b6dcd9d44e64fb2238e6b32e50f551099b3a560063"
+    },
+    {
+      "bytes": 4896833,
+      "compressed_bytes": 283551,
+      "crc32": "103afea9",
+      "name_sha256": "01e6b20bccabafe59500d2fedadac5f83b847afb943b12b9e5bbbc7fcbf72bca",
+      "ordinal": 5,
+      "sha256": "bbc3b21f9c2d5bb6a6dd58084b122da217b7ec589d181b7f1e0f0d3ee5adef13"
+    },
+    {
+      "bytes": 3055715,
+      "compressed_bytes": 414783,
+      "crc32": "b0bb1ef4",
+      "name_sha256": "01f340ebc056b27cb3ccff3624069dbabf59c14dac78bfd02b4a01558367631f",
+      "ordinal": 6,
+      "sha256": "3b7dc740de7de0b807ba87b350edd515ff53945a88434cf89f13bdc731466d21"
+    },
+    {
+      "bytes": 1112899,
+      "compressed_bytes": 176857,
+      "crc32": "907102e8",
+      "name_sha256": "0218f92c36d071e5d88925d5e70a32131a29281e524af46730d7d5238041573a",
+      "ordinal": 7,
+      "sha256": "b115988731351dd61b96ccb206be1827f1cba3adc47c5368a5fd3c846b9ad726"
+    },
+    {
+      "bytes": 2873562,
+      "compressed_bytes": 273570,
+      "crc32": "1e643087",
+      "name_sha256": "0239d04110b8f8cfd1c45b80aba7224443c51899a01479cd2a4b468f3243c2ae",
+      "ordinal": 8,
+      "sha256": "ca120da387a5cdd73acbd9f3bc7446943f4057ff7c1421160d616b062b03275b"
+    },
+    {
+      "bytes": 8918044,
+      "compressed_bytes": 693116,
+      "crc32": "8015c5a1",
+      "name_sha256": "030da64626c9b49c6328ef565d716ced1194d9fcce89e7f59f6a6c64b49f4760",
+      "ordinal": 9,
+      "sha256": "1c846b7f18a4ed63260bc71f77b55beb0e9555a62bf63ecfaf0b3536612e7388"
+    },
+    {
+      "bytes": 1415521,
+      "compressed_bytes": 158199,
+      "crc32": "61adfed7",
+      "name_sha256": "038f2eb2338c06845639a7d163b1da4da9275660f1354b830656f7887d10be43",
+      "ordinal": 10,
+      "sha256": "06f63986d69a6e07fb7a1988218324509a41bdb030c7a26a74f975da10543db5"
+    },
+    {
+      "bytes": 5359886,
+      "compressed_bytes": 317319,
+      "crc32": "8e6358cc",
+      "name_sha256": "03b35f49dd26fc479ff4ce04525ab12088359889a10badef3f616c3068af137f",
+      "ordinal": 11,
+      "sha256": "66fe3df7cf7dbb5e890505929b5f10dbca6f33e2f4f4e1726aaca962a0784711"
+    },
+    {
+      "bytes": 7523266,
+      "compressed_bytes": 720630,
+      "crc32": "3a2515b7",
+      "name_sha256": "03dfec598f8b4f8e3dc73402810a9d13e33e409ca07d20fdf35c15698f0c810d",
+      "ordinal": 12,
+      "sha256": "23de12eb3a30d459fc33c944860b114cb2780c965287992a96617b3d18613f75"
+    }
+  ],
+  "selection": "12 smallest SHA256 of member names after compressed/uncompressed size limits",
+  "source": "https://downloads.openappsec.io/waf-comparison-project/legitimate.zip"
+}
