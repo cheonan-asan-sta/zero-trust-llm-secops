@@ -1,7 +1,9 @@
 from hashlib import sha256
 from uuid import uuid4
 
+import pytest
 from fastapi.testclient import TestClient
+from pydantic import SecretStr
 
 from app.config import Settings
 from app.main import app
@@ -16,6 +18,30 @@ def test_health() -> None:
     assert response.json()["analyzer_mode"] == "rule"
     assert response.headers["x-content-type-options"] == "nosniff"
     assert response.headers["x-frame-options"] == "DENY"
+
+
+@pytest.mark.parametrize(("mode", "prompt", "compact", "has_key", "expected"), [
+    ("rule", "legacy", True, True, []),
+    ("openai", "legacy", False, True, ["openai.resources.responses"]),
+    ("openai", "legacy", True, False, ["openai.resources.responses"]),
+    ("openai", "legacy", True, True, ["openai.resources.responses", "analyzer"]),
+    ("hybrid", "grounded", True, True, ["openai.resources.responses"]),
+])
+def test_asgi_startup_prepares_only_configured_model_clients(
+    monkeypatch, mode, prompt, compact, has_key, expected,
+):
+    from app import main
+
+    calls = []
+    monkeypatch.setattr(main.settings, "analyzer_mode", mode)
+    monkeypatch.setattr(main.settings, "openai_prompt_mode", prompt)
+    monkeypatch.setattr(main.settings, "openai_compact_legacy_output", compact)
+    monkeypatch.setattr(main.settings, "openai_api_key", SecretStr("local-test") if has_key else None)
+    monkeypatch.setattr(main, "import_module", calls.append)
+    monkeypatch.setattr(main, "get_analyzer", lambda: calls.append("analyzer"))
+    with TestClient(app) as session:
+        assert session.get("/health").json()["analyzer_mode"] == mode
+    assert calls == expected
 
 
 def test_request_id_is_validated_and_returned() -> None:

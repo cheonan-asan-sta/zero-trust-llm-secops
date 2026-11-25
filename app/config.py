@@ -14,9 +14,12 @@ class Settings(BaseSettings):
     openai_api_key: SecretStr | None = None
     openai_api_key_secret_arn: str | None = None
     openai_model: str = "gpt-5.4-mini"
+    openai_service_tier: Literal["auto", "default", "priority"] = "auto"
     openai_prompt_mode: Literal["legacy", "grounded"] = "legacy"
     openai_few_shot_count: int = Field(default=1, ge=0, le=10)
+    openai_compact_legacy_output: bool = False
     openai_reasoning_effort: Literal["none", "low", "medium", "high"] = "none"
+    openai_temperature: float | None = Field(default=None, ge=0, le=2)
     openai_max_output_tokens: int = Field(default=800, ge=300, le=4000)
     openai_incomplete_retries: int = Field(default=0, ge=0, le=1)
     openai_retry_max_output_tokens: int = Field(default=4000, ge=300, le=4000)

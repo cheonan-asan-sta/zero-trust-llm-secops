@@ -1,8 +1,10 @@
 import asyncio
 from collections.abc import Callable
+from contextlib import asynccontextmanager
 from dataclasses import replace
 from datetime import UTC, datetime
 from functools import lru_cache
+from importlib import import_module
 from pathlib import Path
 from time import perf_counter
 from typing import Annotated, Literal
@@ -14,6 +16,7 @@ from mangum import Mangum
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from app.analysis_metrics import ANALYSIS_PHASE_DURATION
 from app.analyzers import HybridAnalyzer, OpenAIAnalyzer, RuleBasedAnalyzer
 from app.analyzers.base import Analyzer
 from app.analyzers.evidence_agent import EvidenceReviewAgent
@@ -114,6 +117,22 @@ from app.zero_trust_models import SignedSessionSignal
 
 settings = get_settings()
 static_dir = Path(__file__).parent / "static"
+
+
+@asynccontextmanager
+async def application_lifespan(_app: FastAPI):
+    if settings.analyzer_mode in {"openai", "hybrid"}:
+        await asyncio.to_thread(import_module, "openai.resources.responses")
+        if (
+            settings.openai_prompt_mode == "legacy"
+            and settings.openai_compact_legacy_output
+            and settings.openai_api_key is not None
+        ):
+            # The key is already present. Construction needs no provider or secret-store request.
+            await asyncio.to_thread(get_analyzer)
+    yield
+
+
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
@@ -121,6 +140,7 @@ app = FastAPI(
     docs_url=None if settings.app_environment == "production" else "/docs",
     redoc_url=None if settings.app_environment == "production" else "/redoc",
     openapi_url=None if settings.app_environment == "production" else "/openapi.json",
+    lifespan=application_lifespan,
 )
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.allowed_host_list)
 app.add_middleware(RequestBodyLimitMiddleware, max_bytes=settings.api_max_body_bytes)
@@ -929,12 +949,14 @@ async def _analyze_event(
     try:
         # A known local audit failure cannot be repaired by a paid analysis.
         # This cached integrity state is not a probe of future disk availability.
-        if isinstance(audit_store, AuditStore) and audit_store.integrity().get("ok") is False:
-            raise RuntimeError("audit log integrity check failed; refusing new analysis")
+        with ANALYSIS_PHASE_DURATION.labels("precheck").time():
+            if isinstance(audit_store, AuditStore) and audit_store.integrity().get("ok") is False:
+                raise RuntimeError("audit log integrity check failed; refusing new analysis")
         started = perf_counter()
         normalized = ocsf_normalizer.normalize(event)
         detection = sigma_engine.evaluate(normalized)
-        assessment = await analyzer.analyze(event)
+        with ANALYSIS_PHASE_DURATION.labels("analyzer").time():
+            assessment = await analyzer.analyze(event)
         if verification_context is not None:
             assessment = assessment.model_copy(update={"requires_human_review": True})
         selected_context = (
@@ -965,7 +987,8 @@ async def _analyze_event(
             actor_id=principal.subject,
             request_id=request_id,
         )
-        await audit_store.save(result)
+        with ANALYSIS_PHASE_DURATION.labels("audit_write").time():
+            await audit_store.save(result)
         if selected_context is not None:
             # Audit completion may have awaited another writer. Recheck before
             # delivery, retaining any committed historical record on rejection.

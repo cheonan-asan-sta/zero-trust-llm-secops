@@ -26,6 +26,8 @@ def few_shot_events() -> list[SecurityEvent]:
 def build_analysis_input(
     event: SecurityEvent,
     max_examples: int = 3,
+    *,
+    compact: bool = False,
 ) -> list[dict[str, str]]:
     analyzer = RuleBasedAnalyzer()
     messages: list[dict[str, str]] = []
@@ -33,7 +35,7 @@ def build_analysis_input(
         assessment = analyzer.assess(example)
         messages.extend(
             [
-                {"role": "user", "content": _event_content(example)},
+                {"role": "user", "content": _event_content(example, compact)},
                 {
                     "role": "assistant",
                     "content": assessment.model_dump_json(),
@@ -41,7 +43,7 @@ def build_analysis_input(
             ]
         )
 
-    messages.append({"role": "user", "content": _event_content(event)})
+    messages.append({"role": "user", "content": _event_content(event, compact)})
     return messages
 
 
@@ -62,8 +64,14 @@ def _select_examples(event: SecurityEvent, max_examples: int) -> list[SecurityEv
     return examples[: min(max_examples, len(examples))]
 
 
-def _event_content(event: SecurityEvent) -> str:
-    return EVENT_PROMPT + json.dumps(event.analysis_payload(), ensure_ascii=False)
+def _event_content(event: SecurityEvent, compact: bool) -> str:
+    payload = event.analysis_payload()
+    if compact:
+        # The API keeps the audit identifier locally. It is not decision evidence.
+        payload.pop("event_id")
+    return EVENT_PROMPT + json.dumps(
+        payload, ensure_ascii=False, separators=(",", ":") if compact else None,
+    )
 
 
 def _with_event_text(source: SecurityEvent, event_id: str, event_text: str) -> SecurityEvent:

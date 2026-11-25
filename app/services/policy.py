@@ -1,4 +1,6 @@
+from app.analyzers.rule_based import LARGE_DOWNLOAD_MB
 from app.models import (
+    EventAction,
     PolicyDecision,
     RecommendedAction,
     RiskLevel,
@@ -8,6 +10,8 @@ from app.models import (
 )
 
 ALLOWED_ACTIONS = set(RecommendedAction)
+MEDIUM_RISK_SCORE = 25
+SCOPED_DOWNLOAD_REASON = "승인 범위에 맞는 대량 다운로드에 민감 자료의 잔여 위험을 반영했습니다."
 _RISK_ORDER = {
     RiskLevel.LOW: 0,
     RiskLevel.MEDIUM: 1,
@@ -88,12 +92,26 @@ def enforce_verified_review_safety(assessment: SecurityAssessment, snapshot: dic
     return result, controls
 
 
+def _scoped_sensitive_download(event: SecurityEvent | None) -> bool:
+    return bool(
+        event is not None
+        and event.action == EventAction.DOWNLOAD
+        and event.behavior.policy_exception is not None
+        and event.resource.sensitivity in {"high", "critical"}
+        and event.behavior.download_volume_mb >= LARGE_DOWNLOAD_MB
+    )
+
+
 def enforce_assessment_safety(
     assessment: SecurityAssessment,
     event: SecurityEvent | None = None,
 ) -> SecurityAssessment:
     updates: dict = {}
-    score_level = _risk_level_for_score(assessment.risk_score)
+    scoped_download = _scoped_sensitive_download(event)
+    score = max(assessment.risk_score, MEDIUM_RISK_SCORE) if scoped_download else assessment.risk_score
+    if score != assessment.risk_score:
+        updates["risk_score"] = score
+    score_level = _risk_level_for_score(score)
     risk_level = max(
         (assessment.risk_level, score_level),
         key=lambda level: _RISK_ORDER[level],
@@ -133,6 +151,10 @@ def enforce_assessment_safety(
             if action == RecommendedAction.ALLOW:
                 action = RecommendedAction.HOLD_FOR_REVIEW
 
+    if scoped_download and risk_level == RiskLevel.MEDIUM and action == RecommendedAction.ALLOW:
+        action = RecommendedAction.REQUIRE_MFA
+        updates["rationale"] = SCOPED_DOWNLOAD_REASON
+
     if action != assessment.recommended_action:
         updates["recommended_action"] = action
     if review != assessment.requires_human_review:
@@ -164,9 +186,14 @@ def response_preview(
     if event and event.behavior.policy_exception:
         exception_id = event.behavior.policy_exception.exception_id
         controls.append("scoped-exception-validated")
+    scoped_download = _scoped_sensitive_download(event)
+    if scoped_download:
+        controls.append("scoped-sensitive-download-risk-floor")
 
     if review:
         reason = "고위험 또는 불확실한 결과이므로 실제 조치 전에 사람 검토가 필요합니다."
+    elif scoped_download and safe.recommended_action == RecommendedAction.REQUIRE_MFA:
+        reason = "승인 범위에 맞는 민감 자료 대량 다운로드이므로 추가 MFA를 권고합니다."
     else:
         reason = "허용 목록과 위험 기준을 통과했습니다. 결과는 모의 대응으로만 반환합니다."
 
@@ -185,6 +212,6 @@ def _risk_level_for_score(score: int) -> RiskLevel:
         return RiskLevel.CRITICAL
     if score >= 50:
         return RiskLevel.HIGH
-    if score >= 25:
+    if score >= MEDIUM_RISK_SCORE:
         return RiskLevel.MEDIUM
     return RiskLevel.LOW

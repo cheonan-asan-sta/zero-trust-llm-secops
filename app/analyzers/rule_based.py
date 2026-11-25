@@ -6,6 +6,8 @@ from app.models import (
     ViolationType,
 )
 
+LARGE_DOWNLOAD_MB = 500
+
 
 class RuleBasedAnalyzer:
     name = "rule"
@@ -89,7 +91,7 @@ class RuleBasedAnalyzer:
         if event.behavior.request_rate == "high":
             behavior += 6
             signal("behavior.request_rate", "높은 요청 빈도")
-        if event.behavior.download_volume_mb >= 500:
+        if event.behavior.download_volume_mb >= LARGE_DOWNLOAD_MB:
             behavior += 12
             signal("behavior.download_volume_mb", "대용량 다운로드")
         if event.behavior.distinct_resources_10m >= 8:
@@ -115,7 +117,7 @@ class RuleBasedAnalyzer:
         elif (
             event.action == "DOWNLOAD"
             and event.resource.sensitivity in {"high", "critical"}
-            and event.behavior.download_volume_mb >= 500
+            and event.behavior.download_volume_mb >= LARGE_DOWNLOAD_MB
             and not event.behavior.policy_exception_approved
         ):
             policy += 10
@@ -137,7 +139,7 @@ class RuleBasedAnalyzer:
     def _violation_type(event: SecurityEvent) -> ViolationType:
         if (
             event.action == "DOWNLOAD"
-            and event.behavior.download_volume_mb >= 500
+            and event.behavior.download_volume_mb >= LARGE_DOWNLOAD_MB
             and not event.behavior.policy_exception_approved
         ):
             return ViolationType.DATA_EXFILTRATION

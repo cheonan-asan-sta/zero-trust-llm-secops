@@ -4,7 +4,11 @@ import logging
 import boto3
 from openai import AsyncOpenAI
 
-from app.analyzers.structured_response import StructuredResponseFailure, parse_structured_response
+from app.analyzers.structured_response import (
+    StructuredResponseFailure,
+    parse_single_structured_response,
+    parse_structured_response,
+)
 from app.config import Settings
 from app.grounded_prompting import (
     GROUNDED_INSTRUCTIONS,
@@ -32,6 +36,16 @@ Write the rationale and every evidence item in clear Korean.
 Keep each evidence item concise and tie it to an observed event field.
 """.strip()
 
+COMPACT_OUTPUT_INSTRUCTIONS = """
+Match score to level: LOW 0–24, MEDIUM 25–49, HIGH 50–74, CRITICAL 75–100.
+Separate authorization-scope violations from authentication issues.
+Resource sensitivity alone is not proof of active compromise.
+A scoped exception removes the approval violation; assess the remaining exposure.
+Keep all JSON fields and review rules. Give the decisive reason in one short Korean phrase.
+Use short Korean field-based evidence phrases, usually one or two. Avoid repetitions.
+Keep every essential fact. Use this length even when examples are longer.
+""".strip()
+
 
 class OpenAIAnalyzer:
     name = "openai"
@@ -39,9 +53,17 @@ class OpenAIAnalyzer:
     def __init__(self, settings: Settings) -> None:
         api_key = _resolve_api_key(settings)
         self._model = settings.openai_model
+        self._service_tier = settings.openai_service_tier
         self._prompt_mode = settings.openai_prompt_mode
+        self._compact_legacy = self._prompt_mode == "legacy" and settings.openai_compact_legacy_output
         self._few_shot_count = settings.openai_few_shot_count
+        self._legacy_instructions = SYSTEM_INSTRUCTIONS
+        if self._compact_legacy:
+            self._legacy_instructions += "\n" + COMPACT_OUTPUT_INSTRUCTIONS
         self._reasoning_effort = settings.openai_reasoning_effort
+        self._temperature = settings.openai_temperature
+        if self._temperature is not None and self._reasoning_effort != "none":
+            raise ValueError("OPENAI_TEMPERATURE requires OPENAI_REASONING_EFFORT=none")
         self._max_output_tokens = settings.openai_max_output_tokens
         self._incomplete_retries = settings.openai_incomplete_retries
         self._retry_max_output_tokens = settings.openai_retry_max_output_tokens
@@ -93,8 +115,18 @@ class OpenAIAnalyzer:
     async def _request_assessment(
         self, event: SecurityEvent, context: VerifiedSessionContext | None, output_limit: int
     ) -> SecurityAssessment:
-        response, _ = await parse_structured_response(
-            self._client,
+        assessment = await self._parse_assessment(self._client, event, context, output_limit)
+        return validate_grounded(assessment, event, context) if self._prompt_mode == "grounded" else assessment
+
+    async def _parse_assessment(self, client, event, context, output_limit):
+        options = {}
+        if self._service_tier != "auto":
+            options["service_tier"] = self._service_tier
+        if self._temperature is not None:
+            options["temperature"] = self._temperature
+        parser = parse_single_structured_response if self._compact_legacy else parse_structured_response
+        response, _ = await parser(
+            client,
             model=self._model,
             store=False,
             reasoning={"effort": self._reasoning_effort},
@@ -117,13 +149,13 @@ class OpenAIAnalyzer:
                             else ""
                         )
                         if self._prompt_mode == "grounded"
-                        else SYSTEM_INSTRUCTIONS
+                        else self._legacy_instructions
                     ),
                 },
                 *(
                     grounded_input(event, context)
                     if self._prompt_mode == "grounded"
-                    else build_analysis_input(event, self._few_shot_count)
+                    else build_analysis_input(event, self._few_shot_count, compact=self._compact_legacy)
                 ),
             ],
             text_format=(
@@ -131,12 +163,9 @@ class OpenAIAnalyzer:
                 if self._prompt_mode == "grounded"
                 else SecurityAssessment
             ),
+            **options,
         )
-        return (
-            validate_grounded(response.output_parsed, event, context)
-            if self._prompt_mode == "grounded"
-            else response.output_parsed
-        )
+        return response if self._compact_legacy else response.output_parsed
 
 
 def _resolve_api_key(settings: Settings) -> str:
