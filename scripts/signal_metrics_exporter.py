@@ -11,6 +11,8 @@ import http.client
 import json
 import math
 import os
+import time
+from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -18,6 +20,8 @@ from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_ope
 
 STATES = ("pending", "processing", "completed", "failed")
 MAX_BODY = 65536
+MAX_REJECTED_BODY_BYTES = 4096
+REJECTED_BODY_DEADLINE_SECONDS = 0.1
 # Matches the bounded active (100,000) plus cold (1,000,000) storage ceilings.
 MAX_RETAINED_RECORDS = 1_100_000
 
@@ -156,6 +160,39 @@ def handler(
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *_):
             pass
+
+        def send_error(self, code, message=None, explain=None):
+            if code == HTTPStatus.NOT_IMPLEMENTED:
+                self._discard_small_rejected_body()
+            super().send_error(code, message, explain)
+
+        def _discard_small_rejected_body(self):
+            # Closing with unread bytes can reset the connection before the 501 reaches the client.
+            lengths = self.headers.get_all("Content-Length", [])
+            if len(lengths) != 1 or "Transfer-Encoding" in self.headers or "Expect" in self.headers:
+                return
+            length = lengths[0]
+            if not length.isascii() or not length.isdecimal() or len(length) > len(str(MAX_REJECTED_BODY_BYTES)):
+                return
+            remaining = int(length)
+            if not 0 < remaining <= MAX_REJECTED_BODY_BYTES:
+                return
+            deadline = time.monotonic() + REJECTED_BODY_DEADLINE_SECONDS
+            previous_timeout = self.connection.gettimeout()
+            try:
+                while remaining:
+                    wait = deadline - time.monotonic()
+                    if wait <= 0:
+                        break
+                    self.connection.settimeout(wait)
+                    data = self.rfile.read1(remaining)
+                    if not data:
+                        break
+                    remaining -= len(data)
+            except OSError:
+                pass
+            finally:
+                self.connection.settimeout(previous_timeout)
 
         def do_GET(self):
             if not authorized(self.headers.get("Authorization"), token):

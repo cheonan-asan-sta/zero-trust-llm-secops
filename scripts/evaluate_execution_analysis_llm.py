@@ -35,6 +35,8 @@ from scripts.evaluate_llm_grounded import (
 from scripts.local_execution_analysis_lab import EXECUTION_SCENARIOS, LocalExecutionAnalysisLab
 from scripts.local_oidc_authority import LocalOIDCAuthority
 
+EXECUTION_INPUT_RESERVATION_LIMIT = 40 * 1024
+
 
 def run(directory, key_file, *, max_budget=2.0):
     if not 0 < max_budget <= 2.0:
@@ -75,6 +77,7 @@ def run(directory, key_file, *, max_budget=2.0):
         "model": MODEL,
         "reasoning_effort": "low",
         "max_output_tokens": 2400,
+        "max_input_reservation": EXECUTION_INPUT_RESERVATION_LIMIT,
         "max_requests": 48,
         "repetitions": 2,
         "cases_per_repeat": 12,
@@ -123,7 +126,10 @@ def run(directory, key_file, *, max_budget=2.0):
 
         async def capture(provider, **kwargs):
             nonlocal reserved, fatal
-            amount = reservation(kwargs["input"], INPUT_RATE, OUTPUT_RATE, 2400)
+            # The paired execution scenario also carries the signed runtime and reviewed policy evidence.
+            amount = reservation(
+                kwargs["input"], INPUT_RATE, OUTPUT_RATE, 2400, input_limit=EXECUTION_INPUT_RESERVATION_LIMIT
+            )
             if len(receipts) >= 48 or reserved + amount > max_budget:
                 fatal = "budget_or_request_limit"
                 raise ValueError(fatal)

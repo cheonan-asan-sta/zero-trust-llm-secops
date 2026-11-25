@@ -91,11 +91,11 @@ def prediction(a):
 
 
 def reservation(
-    messages, input_rate=INPUT_RATE, output_rate=OUTPUT_RATE, output_limit=OUTPUT_LIMIT
+    messages, input_rate=INPUT_RATE, output_rate=OUTPUT_RATE, output_limit=OUTPUT_LIMIT, *, input_limit=32768
 ):
     # UTF-8 bytes plus large schema/protocol allowance conservatively bound input tokens.
     upper = len(json.dumps(messages, ensure_ascii=False).encode()) + 8192
-    if upper > 32768:
+    if upper > input_limit:
         raise ValueError("input_bound")
     return upper * input_rate + output_limit * output_rate
 
