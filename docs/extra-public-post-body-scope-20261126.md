@@ -40,6 +40,19 @@
 
 일치한 내용 규칙 ID의 심각도에 기본 CRS 가중치 5/4/3/2를 적용해 최소 5점 조건도 대조했다. FPAD·FPAD-OOD, 정상 웹 두 표본 및 PKDD의 저장 판정에서는 오탐과 위협 탐지가 모두 그대로였다. 이 계산은 저장된 내용 규칙만 대상으로 했으며 CRS의 전체 inbound 차단 판정과 범위가 다르다. [CRS 공식 점수 기준](https://coreruleset.org/docs/concepts/anomaly_scoring/) · [가중치 대조 집계](infrastructure-results/public-crs-severity-audit-20261126.json)
 
+### 같은 입력의 Windows·Linux 재현
+
+Go 1.26.1과 같은 Coraza·CRS 버전으로 Windows와 Linux 바이너리를 각각 빌드했다. 모드별로 바이트가 같은 JSONL을 두 실행기에 전달했다. Windows의 두 예측 지문은 앞선 평가와 동일했고, Linux는 요청 대상에서 위협 57건, 본문 포함에서 위협 59건을 각각 추가 탐지했다. 두 모드 모두 운영체제 사이에 정상 판정 변경과 기존 위협 탐지 손실은 없었다.
+
+| 동일 PKDD 10,024건 | TP / FP / FN / TN | 정밀도 | 재현율 | F1 | 오탐률 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Windows 대상만 | 1,500 / 232 / 1,541 / 6,751 | 86.61% | 49.33% | 62.85% | 3.32% |
+| Windows 본문 포함 | 1,562 / 244 / 1,479 / 6,739 | 86.49% | 51.36% | 64.45% | 3.49% |
+| Linux 대상만 | 1,557 / 232 / 1,484 / 6,751 | 87.03% | 51.20% | 64.47% | 3.32% |
+| Linux 본문 포함 | 1,621 / 244 / 1,420 / 6,739 | 86.92% | 53.30% | 66.08% | 3.49% |
+
+차이는 경로 변환을 쓰는 규칙 `930120`과 `932160`에서만 관측됐다. Coraza의 해당 변환은 Go의 운영체제별 경로 구분자를 따르는 `filepath.Clean`을 사용한다. 배포 대상과 같은 운영체제의 바이너리 지문을 고정해 비교해야 한다. Linux 안에서 본문을 추가했을 때는 위협 64건과 오탐 12건이 늘었으며 기존 위협 손실은 없었다. 정밀도·재현율·F1 목표는 여전히 미충족이다. [Coraza 경로 변환](https://github.com/corazawaf/coraza/blob/v3.8.1/internal/transformations/normalise_path.go) · [Go filepath 문서](https://pkg.go.dev/path/filepath#Clean) · [두 플랫폼 입력·판정 지문](infrastructure-results/public-pkdd-platform-crs-20261126.json)
+
 ## 재현
 
 `scripts/experiments/crs_shadow`에서 `go test ./...` 및 `go build -trimpath -o <검사기>`를 실행하고 저장소 루트에서 새 결과 경로를 사용한다. SR-BH에는 기존 성공 POST 봉인을 지정한다. crAPI·VAmPI 아카이브에서는 `--sr-bh-reference`를 생략한다. crAPI·VAmPI 원본 Parquet을 읽을 때 PyArrow 24.0.0을 사용했다.

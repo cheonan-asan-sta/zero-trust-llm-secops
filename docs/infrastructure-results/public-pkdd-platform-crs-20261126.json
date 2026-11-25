@@ -1,0 +1,141 @@
+{
+  "binary_sha256": {
+    "linux": "9ef786d7cf29751b472d5cb63ba88da68e2d90b6b14fe1c884baf0cf69de4431",
+    "windows": "d49a45c26270a5df2a35dbf1544de02ba46610d65c6e55b218579ce44adffebf"
+  },
+  "candidate_adopted": false,
+  "coraza": "3.8.1",
+  "crs": "4.25.0",
+  "go": "1.26.1",
+  "modes": {
+    "target": {
+      "changed_rule_ids": {
+        "930120": 195,
+        "932160": 143
+      },
+      "changes": {
+        "body_included": 0,
+        "decision_records_differ": 234,
+        "threat: False->True": 57
+      },
+      "input_sha256": "97c82aecc0824dd89712c7a84c0d67932d956f6e37b9e51671680e9dded209f2",
+      "metrics": {
+        "linux": {
+          "accuracy": 0.8288108539505188,
+          "f1": 0.6447204968944099,
+          "false_positive_rate": 0.03322354288987541,
+          "fn": 1484,
+          "fp": 232,
+          "inference_errors": 0,
+          "population": 10024,
+          "precision": 0.8703186137506987,
+          "recall": 0.5120026307135811,
+          "tn": 6751,
+          "tp": 1557
+        },
+        "windows": {
+          "accuracy": 0.8231245011971269,
+          "f1": 0.6285355122564424,
+          "false_positive_rate": 0.03322354288987541,
+          "fn": 1541,
+          "fp": 232,
+          "inference_errors": 0,
+          "population": 10024,
+          "precision": 0.8660508083140878,
+          "recall": 0.49325879644853665,
+          "tn": 6751,
+          "tp": 1500
+        }
+      },
+      "predictions_sha256": {
+        "linux": "811480846b543d102a36b78d3d2b845bccc00224c32c541d45ec0dcb68f0ac99",
+        "windows": "ad1b37a86738efdd76f6c9e5e8024e7b62223e4249e86eaa3d49da890d59a526"
+      }
+    },
+    "target_body": {
+      "changed_rule_ids": {
+        "930120": 202,
+        "932160": 150
+      },
+      "changes": {
+        "body_included": 480,
+        "decision_records_differ": 245,
+        "threat: False->True": 59
+      },
+      "input_sha256": "f1cbf248bf4b68753e45ffc22bbc8a531c9374c7a6116cb275cdc035b1b54aac",
+      "metrics": {
+        "linux": {
+          "accuracy": 0.833998403830806,
+          "f1": 0.6608234814512841,
+          "false_positive_rate": 0.034942002004868966,
+          "fn": 1420,
+          "fp": 244,
+          "inference_errors": 0,
+          "population": 10024,
+          "precision": 0.8691689008042895,
+          "recall": 0.533048339362052,
+          "tn": 6739,
+          "tp": 1621
+        },
+        "windows": {
+          "accuracy": 0.8281125299281724,
+          "f1": 0.6445223849804003,
+          "false_positive_rate": 0.034942002004868966,
+          "fn": 1479,
+          "fp": 244,
+          "inference_errors": 0,
+          "population": 10024,
+          "precision": 0.8648947951273532,
+          "recall": 0.5136468267017429,
+          "tn": 6739,
+          "tp": 1562
+        }
+      },
+      "predictions_sha256": {
+        "linux": "a9fbf428b181754c7b158a30f410ca5646810a656a7880170ea34800fa5e324d",
+        "windows": "6aee851542973c23f3fea95c8073be97df80bca6f7fdf33bcba38ab3eef431b6"
+      }
+    }
+  },
+  "paired_body_delta": {
+    "linux": {
+      "added_fp": 12,
+      "added_tp": 64,
+      "lost_fp": 0,
+      "lost_tp": 0,
+      "preserve_target": {
+        "accuracy": 0.833998403830806,
+        "f1": 0.6608234814512841,
+        "false_positive_rate": 0.034942002004868966,
+        "fn": 1420,
+        "fp": 244,
+        "inference_errors": 0,
+        "population": 10024,
+        "precision": 0.8691689008042895,
+        "recall": 0.533048339362052,
+        "tn": 6739,
+        "tp": 1621
+      }
+    },
+    "windows": {
+      "added_fp": 12,
+      "added_tp": 62,
+      "lost_fp": 0,
+      "lost_tp": 0,
+      "preserve_target": {
+        "accuracy": 0.8281125299281724,
+        "f1": 0.6445223849804003,
+        "false_positive_rate": 0.034942002004868966,
+        "fn": 1479,
+        "fp": 244,
+        "inference_errors": 0,
+        "population": 10024,
+        "precision": 0.8648947951273532,
+        "recall": 0.5136468267017429,
+        "tn": 6739,
+        "tp": 1562
+      }
+    }
+  },
+  "source_sha256": "b2a9a4cda4dff600bd9012b21fceedadd1821937329a98321142698b65a6bf2c"
+}
