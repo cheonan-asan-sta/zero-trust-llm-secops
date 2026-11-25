@@ -33,6 +33,8 @@ open-appsec 공개 벤치마크에서 실제 웹사이트를 탐색해 수집한
 
 각 구성에서 미판정은 0건이었다. 본문 후보의 새 오탐 1,052건 중 732건이 한 수집 파일에 집중됐다. 그 파일에서 해당 오탐을 메서드·대상·본문 조합으로 중복 제거하면 308가지였으며, 같은 조합의 최다 반복은 16건이었다. 단일 요청을 반복한 현상만으로 설명되지 않는다. 파일별 차이가 크고 이 표본에는 위협 정답이 없어서 세 구성을 운영 경보에 반영하지 않았다. [세 번째 표본의 파일별 지표·지문](infrastructure-results/public-openappsec-expanded-site-fpr-20261126.json)
 
+같은 입력을 Linux에서 검사하니 본문 모드 2건의 일치 규칙 ID가 달랐고, 세 구성의 정상 경보와 파일별 분포는 Windows와 모두 같았다. 가장 많이 일치한 규칙 하나를 새 본문 경보에서 제외하는 가정은 이 정상 표본의 오탐을 409건 줄였지만, SR-BH에서는 탐지한 위협 119건을 잃었다. 오탐이 집중된 두 규칙을 함께 제외하는 가정은 이 표본의 오탐을 750건 줄이는 대신 SR-BH 위협 1,470건과 crAPI·VAmPI 위협 8건을 잃었다. 규칙 제외는 적용하지 않았다. [Linux 동일 입력 비교](infrastructure-results/public-openappsec-expanded-linux-20261126.json) · [본문 규칙 제외 가정 비교](infrastructure-results/public-web-body-rule-concentration-20261126.json)
+
 ## 재현
 
 원본 ZIP의 ETag는 `"7f7b53e6e8d780e4d390c8070bffce88-71"`이고 아카이브 크기는 1,203,983,791바이트다. 원시 요청과 선택·다운로드 영수증은 로컬 `runtime/independent-web-access-20261125/openappsec-legitimate/`에 보관했다. 아래 실행은 이미 확보한 파일만 읽는다. 출력에는 집계와 판정 지문을 남기고 AWS·유료 API·실제 정책 변경은 없었다. [집계 결과](infrastructure-results/public-openappsec-legitimate-crs-20261126.json) · [선택과 지문](infrastructure-results/public-openappsec-legitimate-sample-20261126.json)

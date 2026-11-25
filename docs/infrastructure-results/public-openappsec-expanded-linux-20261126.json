@@ -1,0 +1,82 @@
+{
+  "affected_rule_ids": {
+    "target": {},
+    "target_body": {
+      "930120": 2
+    }
+  },
+  "all": {
+    "population": 49399,
+    "recorded_bodies": 3883,
+    "scopes": {
+      "target": {
+        "alerts": 715,
+        "false_positive_rate": 0.014473977206016316,
+        "unknown": 0
+      },
+      "target_or_body": {
+        "alerts": 1767,
+        "false_positive_rate": 0.03576995485738578,
+        "unknown": 0
+      },
+      "target_or_shape": {
+        "alerts": 1339,
+        "false_positive_rate": 0.027105811858539646,
+        "unknown": 0
+      }
+    }
+  },
+  "change_counts": {
+    "target": {},
+    "target_body": {
+      "rule_records_changed": 2
+    }
+  },
+  "input_sha256": {
+    "target": "f911a00435683ca9fe6cfb2218950d37a9f4ea236f3c01c9d91dea9dcd039362",
+    "target_body": "023ad5912ed20dc140b39eb048be9cddfbeda926ba28f15545df328478131fe8"
+  },
+  "linux_binary_sha256": "9ef786d7cf29751b472d5cb63ba88da68e2d90b6b14fe1c884baf0cf69de4431",
+  "linux_predictions_sha256": {
+    "target": "eca3a19d110155ae583107d8c8ef1b556ad20010109023b9c0328bc311201fe9",
+    "target_body": "6f3306a84bd38cb2dd3e3685d6ec7d50acd9f8ea8c2aed3781dd5ff9e7d2f543"
+  },
+  "max_member_fpr": {
+    "target": 0.06050198150594452,
+    "target_or_body": 0.5048275862068966,
+    "target_or_shape": 0.25707547169811323
+  },
+  "members_above_five_percent": {
+    "target": 2,
+    "target_or_body": 5,
+    "target_or_shape": 5
+  },
+  "report_with_member_metrics_sha256": "6a91317a70ce5e667fd9f925187f1a8b7f7d1c49867e198a787f6547d84affb7",
+  "source_receipt_sha256": "64f1cad9237df9340eff9ac53dedb95e0f563624a0c74688158eaecc77522fd6",
+  "source_windows_predictions_sha256": {
+    "target": "eca3a19d110155ae583107d8c8ef1b556ad20010109023b9c0328bc311201fe9",
+    "target_body": "78f557dedd02c84fec05d5bb62645f38db45cbe6d6851eb8478b36d8c08755ad"
+  },
+  "unseen_shape_keys": {
+    "population": 48572,
+    "recorded_bodies": 3854,
+    "scopes": {
+      "target": {
+        "alerts": 715,
+        "false_positive_rate": 0.014720415053940542,
+        "unknown": 0
+      },
+      "target_or_body": {
+        "alerts": 1767,
+        "false_positive_rate": 0.036378983776661454,
+        "unknown": 0
+      },
+      "target_or_shape": {
+        "alerts": 1339,
+        "false_positive_rate": 0.027567322737379562,
+        "unknown": 0
+      }
+    }
+  },
+  "windows_linux_site_metrics_identical": true
+}
