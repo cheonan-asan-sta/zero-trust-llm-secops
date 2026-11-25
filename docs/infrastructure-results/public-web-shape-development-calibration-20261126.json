@@ -1,0 +1,68 @@
+{
+  "baseline_fixed_0_95": {
+    "fpad": {
+      "accuracy": 0.964039984421654,
+      "f1": 0.9713576672526109,
+      "false_positive_rate": 0.0,
+      "fn": 277,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 7703,
+      "precision": 1.0,
+      "recall": 0.9443104141535987,
+      "tn": 2729,
+      "tp": 4697
+    },
+    "legitimate": {
+      "accuracy": 0.9990059642147118,
+      "f1": 0.0,
+      "false_positive_rate": 0.0009940357852882703,
+      "fn": 0,
+      "fp": 4,
+      "inference_errors": 0,
+      "population": 4024,
+      "precision": 0.0,
+      "recall": null,
+      "tn": 4020,
+      "tp": 0
+    }
+  },
+  "chosen_development_calibration": {
+    "fpad": {
+      "accuracy": 0.9881864208749838,
+      "f1": 0.9907679821446688,
+      "false_positive_rate": 0.0,
+      "fn": 91,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 7703,
+      "precision": 1.0,
+      "recall": 0.9817048652995577,
+      "tn": 2729,
+      "tp": 4883
+    },
+    "legitimate": {
+      "accuracy": 0.9903081510934394,
+      "f1": 0.0,
+      "false_positive_rate": 0.009691848906560637,
+      "fn": 0,
+      "fp": 39,
+      "inference_errors": 0,
+      "population": 4024,
+      "precision": 0.0,
+      "recall": null,
+      "tn": 3985,
+      "tp": 0
+    }
+  },
+  "chosen_threshold": 0.84,
+  "fit_skipped": 0,
+  "fit_unique_groups": 35358,
+  "heldout_layers_used_in_calibration": 0,
+  "model_sha256": "ae6809f616243e29b6f46d7f9b245a07cfa45e442c8b8df507884f53bbca77d1",
+  "selection": "maximize FPAD calibration recall, then F1, limiting legitimate calibration FPR to 1%",
+  "source_pins": {
+    "fpad_training": "e450fd0a0de45e5ce29053b82573e703be5e30cf8e29f02a770fa27f60fef908",
+    "legitimate_development": "31a9256782117d36f0f7d31ba2b704a37e9fffa7fa93e680df9d1f666d637bc7"
+  }
+}

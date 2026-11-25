@@ -1,0 +1,245 @@
+{
+  "reports": {
+    "fpad": {
+      "changes": {
+        "new_false_positives": 1,
+        "new_threat_hits": 382
+      },
+      "scores": {
+        "calibrated": {
+          "accuracy": 0.9867876767302587,
+          "f1": 0.9898153436131735,
+          "false_positive_rate": 0.0007158196134574087,
+          "fn": 210,
+          "fp": 4,
+          "inference_errors": 0,
+          "population": 16197,
+          "precision": 0.9996154955301355,
+          "recall": 0.9802054859081911,
+          "tn": 5584,
+          "tp": 10399
+        },
+        "crs": {
+          "accuracy": 0.6137556337593382,
+          "f1": 0.5818740810052132,
+          "false_positive_rate": 0.0,
+          "fn": 6256,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 16197,
+          "precision": 1.0,
+          "recall": 0.41031199924592326,
+          "tn": 5588,
+          "tp": 4353
+        },
+        "crs_or_calibrated": {
+          "accuracy": 0.9901216274618757,
+          "f1": 0.9924048229374347,
+          "false_positive_rate": 0.0007158196134574087,
+          "fn": 156,
+          "fp": 4,
+          "inference_errors": 0,
+          "population": 16197,
+          "precision": 0.99961748111313,
+          "recall": 0.9852955038175134,
+          "tn": 5584,
+          "tp": 10453
+        },
+        "fixed": {
+          "accuracy": 0.9632648021238501,
+          "f1": 0.9711571089243298,
+          "false_positive_rate": 0.0005368647100930566,
+          "fn": 592,
+          "fp": 3,
+          "inference_errors": 0,
+          "population": 16197,
+          "precision": 0.9997005988023953,
+          "recall": 0.9441983221792818,
+          "tn": 5585,
+          "tp": 10017
+        }
+      }
+    },
+    "fpad-ood": {
+      "changes": {
+        "new_threat_hits": 1693
+      },
+      "scores": {
+        "calibrated": {
+          "accuracy": 0.9581208687440982,
+          "f1": null,
+          "false_positive_rate": null,
+          "fn": 887,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 21180,
+          "precision": null,
+          "recall": 0.9581208687440982,
+          "tn": 0,
+          "tp": 20293
+        },
+        "crs": {
+          "accuracy": 0.417233238904627,
+          "f1": null,
+          "false_positive_rate": null,
+          "fn": 12343,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 21180,
+          "precision": null,
+          "recall": 0.417233238904627,
+          "tn": 0,
+          "tp": 8837
+        },
+        "crs_or_calibrated": {
+          "accuracy": 0.9730406043437205,
+          "f1": null,
+          "false_positive_rate": null,
+          "fn": 571,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 21180,
+          "precision": null,
+          "recall": 0.9730406043437205,
+          "tn": 0,
+          "tp": 20609
+        },
+        "fixed": {
+          "accuracy": 0.8781869688385269,
+          "f1": null,
+          "false_positive_rate": null,
+          "fn": 2580,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 21180,
+          "precision": null,
+          "recall": 0.8781869688385269,
+          "tn": 0,
+          "tp": 18600
+        }
+      }
+    },
+    "legitimate": {
+      "changes": {
+        "exact_training_or_calibration_overlap": 198,
+        "new_false_positives": 74
+      },
+      "scores": {
+        "calibrated": {
+          "accuracy": 0.9933563646027106,
+          "f1": null,
+          "false_positive_rate": 0.006643635397289397,
+          "fn": 0,
+          "fp": 100,
+          "inference_errors": 0,
+          "population": 15052,
+          "precision": null,
+          "recall": null,
+          "tn": 14952,
+          "tp": 0
+        },
+        "crs": {
+          "accuracy": 0.9761493489237311,
+          "f1": null,
+          "false_positive_rate": 0.023850651076268933,
+          "fn": 0,
+          "fp": 359,
+          "inference_errors": 0,
+          "population": 15052,
+          "precision": null,
+          "recall": null,
+          "tn": 14693,
+          "tp": 0
+        },
+        "crs_or_calibrated": {
+          "accuracy": 0.9697050225883603,
+          "f1": null,
+          "false_positive_rate": 0.03029497741163965,
+          "fn": 0,
+          "fp": 456,
+          "inference_errors": 0,
+          "population": 15052,
+          "precision": null,
+          "recall": null,
+          "tn": 14596,
+          "tp": 0
+        },
+        "fixed": {
+          "accuracy": 0.9982726547967048,
+          "f1": null,
+          "false_positive_rate": 0.0017273452032952432,
+          "fn": 0,
+          "fp": 26,
+          "inference_errors": 0,
+          "population": 15052,
+          "precision": null,
+          "recall": null,
+          "tn": 15026,
+          "tp": 0
+        }
+      }
+    },
+    "pkdd": {
+      "changes": {
+        "new_false_positives": 975,
+        "new_threat_hits": 509
+      },
+      "scores": {
+        "calibrated": {
+          "accuracy": 0.6219074221867518,
+          "f1": 0.34338184338184335,
+          "false_positive_rate": 0.2491765716740656,
+          "fn": 2050,
+          "fp": 1740,
+          "inference_errors": 0,
+          "population": 10024,
+          "precision": 0.3628707433174661,
+          "recall": 0.32587964485366655,
+          "tn": 5243,
+          "tp": 991
+        },
+        "crs": {
+          "accuracy": 0.8231245011971269,
+          "f1": 0.6285355122564424,
+          "false_positive_rate": 0.03322354288987541,
+          "fn": 1541,
+          "fp": 232,
+          "inference_errors": 0,
+          "population": 10024,
+          "precision": 0.8660508083140878,
+          "recall": 0.49325879644853665,
+          "tn": 6751,
+          "tp": 1500
+        },
+        "crs_or_calibrated": {
+          "accuracy": 0.7029130087789306,
+          "f1": 0.5641100702576113,
+          "false_positive_rate": 0.26693398252899897,
+          "fn": 1114,
+          "fp": 1864,
+          "inference_errors": 0,
+          "population": 10024,
+          "precision": 0.5083091532577156,
+          "recall": 0.6336731338375534,
+          "tn": 5119,
+          "tp": 1927
+        },
+        "fixed": {
+          "accuracy": 0.6683958499600958,
+          "f1": 0.2248134328358209,
+          "false_positive_rate": 0.10955176858083918,
+          "fn": 2559,
+          "fp": 765,
+          "inference_errors": 0,
+          "population": 10024,
+          "precision": 0.3865276663993585,
+          "recall": 0.15850049325879645,
+          "tn": 6218,
+          "tp": 482
+        }
+      }
+    }
+  },
+  "scope": "PKDD fresh; FPAD, FPAD-OOD and legitimate are regressions; source labels unchanged",
+  "seal_sha256": "53876d962ce71790a4265b9d3631ac92bdcc5f37a7fd28188f9e334c9a10c424"
+}

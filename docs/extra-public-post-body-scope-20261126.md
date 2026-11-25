@@ -32,6 +32,14 @@
 
 기존의 전체 요청 CRS는 SR-BH에서 위협 11,754건, crAPI·VAmPI에서 위협 157건을 탐지했다. 기존 웹 모델과 전체 요청 CRS를 합친 경보에 이번 본문 검사를 더해도 두 자료 모두 판정이 바뀌지 않았다. 추가 탐지 7,312건과 128건은 요청 대상만 제공한 조건과의 차이다. 기존 전체 경로의 미탐과 오탐을 줄인 결과는 이번에 확인되지 않았다. 본문 후보는 입력 범위를 제한한 로컬 진단으로 유지한다. [기존 경보와 행별 대조 집계](infrastructure-results/public-post-body-vs-existing-alerts-20261126.json)
 
+## 추가 공개 PKDD 자료의 본문 확인
+
+새 PKDD 평가 10,024건에서 본문이 있는 요청은 1,891건이다. 공개 파일의 본문이 평문 문자열로 보관돼 있고 원래 압축 바이트를 확인할 수 없었으므로, 기록된 인코딩이 `identity`인 480건에만 기존 본문 모드를 적용했다. Content-Type과 Content-Encoding은 원래 헤더 기록에서 확인했다. [새 PKDD 평가와 자료 출처](extra-public-web-shape-transfer-20261126.md#기준값-보정과-새-혼합-자료-검증)
+
+고정 CRS 요청 대상 단독 대비 위협 62건과 오탐 12건이 추가됐으며 기존 위협 탐지 손실과 추론 오류는 0건이었다. 재현율 49.33%에서 51.36%, F1 62.85%에서 64.45%, 오탐률 3.32%에서 3.49%로 바뀌었다. 정밀도는 86.61%에서 86.49%로 내려갔다. 공개 기록의 관측 한계를 유지했고 운영 경보에 적용하지 않았다. [PKDD 본문 비교 집계](infrastructure-results/public-pkdd-typed-body-20261126.json)
+
+일치한 내용 규칙 ID의 심각도에 기본 CRS 가중치 5/4/3/2를 적용해 최소 5점 조건도 대조했다. FPAD·FPAD-OOD, 정상 웹 두 표본 및 PKDD의 저장 판정에서는 오탐과 위협 탐지가 모두 그대로였다. 이 계산은 저장된 내용 규칙만 대상으로 했으며 CRS의 전체 inbound 차단 판정과 범위가 다르다. [CRS 공식 점수 기준](https://coreruleset.org/docs/concepts/anomaly_scoring/) · [가중치 대조 집계](infrastructure-results/public-crs-severity-audit-20261126.json)
+
 ## 재현
 
 `scripts/experiments/crs_shadow`에서 `go test ./...` 및 `go build -trimpath -o <검사기>`를 실행하고 저장소 루트에서 새 결과 경로를 사용한다. SR-BH에는 기존 성공 POST 봉인을 지정한다. crAPI·VAmPI 아카이브에서는 `--sr-bh-reference`를 생략한다. crAPI·VAmPI 원본 Parquet을 읽을 때 PyArrow 24.0.0을 사용했다.
