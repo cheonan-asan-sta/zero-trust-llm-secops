@@ -1,0 +1,69 @@
+{
+  "after": {
+    "accuracy": 0.9089759797724399,
+    "f1": 0.0,
+    "false_positive_rate": 0.0,
+    "fn": 72,
+    "fp": 0,
+    "inference_errors": 0,
+    "population": 791,
+    "precision": null,
+    "recall": 0.0,
+    "tn": 719,
+    "tp": 0
+  },
+  "before": {
+    "accuracy": 0.9089759797724399,
+    "f1": 0.0,
+    "false_positive_rate": 0.0,
+    "fn": 72,
+    "fp": 0,
+    "inference_errors": 0,
+    "population": 791,
+    "precision": null,
+    "recall": 0.0,
+    "tn": 719,
+    "tp": 0
+  },
+  "capture": {
+    "candidate_commit": "0b087418ea426dec049b9f4a5dcf0e7880265c00",
+    "evaluator_sha256": "9d0b285b6c64c44e5183973679f077fe8090e20ae55b53b210ff082e4b3cd0ec",
+    "model_pins": {
+      "heads": {
+        "path": "infra\\f1-lab\\frozen-vpn-control-v114\\heads.json",
+        "sha256": "4ebbcb6bb5fce286e80beeedbc18139d566d00998575487a867f129330344075"
+      },
+      "policy": {
+        "path": "infra\\f1-lab\\frozen-vpn-control-v114\\policy.json",
+        "sha256": "c39db63f29cf2524963378b05a9b419ab0a8858066fb8c02a703eb317fb7c0c0"
+      },
+      "vpn": {
+        "path": "infra\\f1-lab\\frozen-vpn-control-v114\\vpn.json",
+        "sha256": "c1ff27423e63ba607a80fc7dd891ff473baccd7f11853fb3eaba10e9e37b48b6"
+      },
+      "web": {
+        "path": "infra\\f1-lab\\frozen-vpn-control-v114\\web.json",
+        "sha256": "21318fa61f830ae1d03d47de1a01acf2c40ae19ebaf769923e3d575613f74f38"
+      }
+    },
+    "plan_sha256": "146f02bdf1318eaacba0274e0596c72e54828d2168382c8de80e4eb1ce690b31",
+    "predictions_sha256": "10ba3b86b3eb595abb25f2bc1fcf5856e5dc0c939edc1e18cf6e4ee0d2f358b6",
+    "valid_observations": 791
+  },
+  "goal_met_for_this_cohort": false,
+  "lost_true_positives": 0,
+  "new_false_positives": 0,
+  "route_support": {
+    "normal": 14,
+    "threat": 8
+  },
+  "seal_sha256": "068dcc7fcd78efe9397c4258c9ecacea19930e86ab48132838f99a08f387c6af",
+  "source": "https://databasesample.com/datasets/nginx-and-apache-access-log-tables-with-attack-annotations",
+  "source_sha256": "42f840b5dfd0f92a5b6dea339bc2077927f2ac0f8bcc2a536c39c3ae95b0d0c7",
+  "targets_met": {
+    "f1": false,
+    "false_positive_rate": true,
+    "precision": false,
+    "recall": false
+  }
+}
