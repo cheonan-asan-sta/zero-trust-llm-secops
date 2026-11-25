@@ -1,0 +1,338 @@
+{
+  "baseline_source": "openai-scoped-download-20261125.json",
+  "baseline_storage": "sqlite",
+  "baseline": {
+    "calls": 16,
+    "risk_correct": 16,
+    "action_correct": 16,
+    "json_valid": 16,
+    "mean_response_ms": 2409.367,
+    "p95_response_ms": 3351.807,
+    "over_3000_ms": 3
+  },
+  "p95_definition": "nearest rank; ASGI startup separate and every analysis request included",
+  "candidate_storage": "jsonl",
+  "stage_ms": {
+    "provider_request": {
+      "mean": 1716.709,
+      "max": 2893.936
+    },
+    "structured_validation": {
+      "mean": 0.156,
+      "max": 0.291
+    },
+    "audit_write": {
+      "mean": 1.886,
+      "max": 2.363
+    },
+    "response_header_wait": {
+      "mean": 1689.304,
+      "max": 2741.392
+    }
+  },
+  "slowest_case": "NORMAL-01",
+  "slowest_case_provider_wait_ms": 2741.392,
+  "slowest_case_audit_write_ms": 1.962,
+  "over_3000_ms": 0,
+  "estimated_usd": 0.00985425,
+  "pricing_source": "https://developers.openai.com/api/docs/pricing.md",
+  "run": {
+    "source_commit": "0b9896894aa24ed644231f1826a2caf7b572372f",
+    "recorded_at_utc": "2026-11-25T11:55:44.670196+00:00",
+    "scope": "isolated FastAPI ASGI and JSONL, synthetic submission cases only, real OpenAI SDK",
+    "model": "gpt-5.4-mini-2026-03-17",
+    "effort": "none",
+    "prompt_mode": "legacy",
+    "requested_service_tier": "default",
+    "temperature": 0.0,
+    "compact_legacy_output": true,
+    "event_id_policy": "opaque_uuid",
+    "planned_cases": 8,
+    "request_cap": 8,
+    "sdk_retries": 0,
+    "max_output_tokens": 800,
+    "store": false,
+    "aws_calls": 0,
+    "cases": [
+      {
+        "scenario_id": "NORMAL-01",
+        "app_status": 200,
+        "json_valid": true,
+        "risk_correct": true,
+        "action_correct": true,
+        "risk_level": "LOW",
+        "policy_action": "ALLOW",
+        "human_review": false,
+        "elapsed_ms": 2901.087,
+        "stage_ms": {
+          "provider_request": 2893.936,
+          "structured_validation": 0.291,
+          "analyzer": 2895.175,
+          "precheck": 0.004,
+          "audit_write": 1.962
+        }
+      },
+      {
+        "scenario_id": "NORMAL-02",
+        "app_status": 200,
+        "json_valid": true,
+        "risk_correct": true,
+        "action_correct": true,
+        "risk_level": "LOW",
+        "policy_action": "ALLOW",
+        "human_review": false,
+        "elapsed_ms": 1787.114,
+        "stage_ms": {
+          "provider_request": 1781.662,
+          "structured_validation": 0.173,
+          "analyzer": 1782.532,
+          "precheck": 0.003,
+          "audit_write": 1.56
+        }
+      },
+      {
+        "scenario_id": "NORMAL-03",
+        "app_status": 200,
+        "json_valid": true,
+        "risk_correct": true,
+        "action_correct": true,
+        "risk_level": "MEDIUM",
+        "policy_action": "REQUIRE_MFA",
+        "human_review": false,
+        "elapsed_ms": 1449.147,
+        "stage_ms": {
+          "provider_request": 1443.432,
+          "structured_validation": 0.157,
+          "analyzer": 1444.459,
+          "precheck": 0.002,
+          "audit_write": 1.713
+        }
+      },
+      {
+        "scenario_id": "ZT-S01",
+        "app_status": 200,
+        "json_valid": true,
+        "risk_correct": true,
+        "action_correct": true,
+        "risk_level": "CRITICAL",
+        "policy_action": "HOLD_FOR_REVIEW",
+        "human_review": true,
+        "elapsed_ms": 1318.226,
+        "stage_ms": {
+          "provider_request": 1312.951,
+          "structured_validation": 0.122,
+          "analyzer": 1313.716,
+          "precheck": 0.002,
+          "audit_write": 1.633
+        }
+      },
+      {
+        "scenario_id": "ZT-S02",
+        "app_status": 200,
+        "json_valid": true,
+        "risk_correct": true,
+        "action_correct": true,
+        "risk_level": "MEDIUM",
+        "policy_action": "REQUIRE_MFA",
+        "human_review": false,
+        "elapsed_ms": 1452.354,
+        "stage_ms": {
+          "provider_request": 1447.09,
+          "structured_validation": 0.095,
+          "analyzer": 1447.791,
+          "precheck": 0.002,
+          "audit_write": 1.9
+        }
+      },
+      {
+        "scenario_id": "ZT-S03",
+        "app_status": 200,
+        "json_valid": true,
+        "risk_correct": true,
+        "action_correct": true,
+        "risk_level": "HIGH",
+        "policy_action": "REDUCE_PRIVILEGE",
+        "human_review": true,
+        "elapsed_ms": 1281.88,
+        "stage_ms": {
+          "provider_request": 1276.191,
+          "structured_validation": 0.159,
+          "analyzer": 1277.004,
+          "precheck": 0.002,
+          "audit_write": 2.215
+        }
+      },
+      {
+        "scenario_id": "ZT-S04",
+        "app_status": 200,
+        "json_valid": true,
+        "risk_correct": true,
+        "action_correct": true,
+        "risk_level": "HIGH",
+        "policy_action": "HOLD_FOR_REVIEW",
+        "human_review": true,
+        "elapsed_ms": 1657.082,
+        "stage_ms": {
+          "provider_request": 1651.281,
+          "structured_validation": 0.097,
+          "analyzer": 1651.959,
+          "precheck": 0.002,
+          "audit_write": 2.363
+        }
+      },
+      {
+        "scenario_id": "ZT-S05",
+        "app_status": 200,
+        "json_valid": true,
+        "risk_correct": true,
+        "action_correct": true,
+        "risk_level": "HIGH",
+        "policy_action": "HOLD_FOR_REVIEW",
+        "human_review": true,
+        "elapsed_ms": 1931.966,
+        "stage_ms": {
+          "provider_request": 1927.131,
+          "structured_validation": 0.154,
+          "analyzer": 1927.967,
+          "precheck": 0.002,
+          "audit_write": 1.739
+        }
+      }
+    ],
+    "stop": null,
+    "asgi_startup_ms": 1522.361,
+    "audit_verified_rows": 8,
+    "audit_integrity_ok": true,
+    "external_delivery_enabled": false,
+    "provider_attempts": [
+      {
+        "request": 1,
+        "transport_ms": {
+          "connection.connect_tcp": 37.245,
+          "connection.start_tls": 36.115,
+          "http11.send_request_headers": 0.338,
+          "http11.send_request_body": 0.223,
+          "http11.receive_response_headers": 2741.392,
+          "http11.receive_response_body": 1.159
+        },
+        "status_code": 200,
+        "resolved_model": "gpt-5.4-mini-2026-03-17",
+        "service_tier": "default",
+        "input_tokens": 1003,
+        "output_tokens": 75,
+        "cached_input_tokens": 0
+      },
+      {
+        "request": 2,
+        "transport_ms": {
+          "http11.send_request_headers": 0.513,
+          "http11.send_request_body": 0.221,
+          "http11.receive_response_headers": 1776.452,
+          "http11.receive_response_body": 0.445
+        },
+        "status_code": 200,
+        "resolved_model": "gpt-5.4-mini-2026-03-17",
+        "service_tier": "default",
+        "input_tokens": 1003,
+        "output_tokens": 85,
+        "cached_input_tokens": 0
+      },
+      {
+        "request": 3,
+        "transport_ms": {
+          "http11.send_request_headers": 0.344,
+          "http11.send_request_body": 0.197,
+          "http11.receive_response_headers": 1430.432,
+          "http11.receive_response_body": 8.947
+        },
+        "status_code": 200,
+        "resolved_model": "gpt-5.4-mini-2026-03-17",
+        "service_tier": "default",
+        "input_tokens": 1231,
+        "output_tokens": 82,
+        "cached_input_tokens": 0
+      },
+      {
+        "request": 4,
+        "transport_ms": {
+          "http11.send_request_headers": 0.305,
+          "http11.send_request_body": 0.17,
+          "http11.receive_response_headers": 1308.573,
+          "http11.receive_response_body": 0.408
+        },
+        "status_code": 200,
+        "resolved_model": "gpt-5.4-mini-2026-03-17",
+        "service_tier": "default",
+        "input_tokens": 1101,
+        "output_tokens": 111,
+        "cached_input_tokens": 0
+      },
+      {
+        "request": 5,
+        "transport_ms": {
+          "http11.send_request_headers": 0.295,
+          "http11.send_request_body": 0.158,
+          "http11.receive_response_headers": 1428.684,
+          "http11.receive_response_body": 14.69
+        },
+        "status_code": 200,
+        "resolved_model": "gpt-5.4-mini-2026-03-17",
+        "service_tier": "default",
+        "input_tokens": 1037,
+        "output_tokens": 95,
+        "cached_input_tokens": 0
+      },
+      {
+        "request": 6,
+        "transport_ms": {
+          "http11.send_request_headers": 0.306,
+          "http11.send_request_body": 0.165,
+          "http11.receive_response_headers": 1265.661,
+          "http11.receive_response_body": 6.372
+        },
+        "status_code": 200,
+        "resolved_model": "gpt-5.4-mini-2026-03-17",
+        "service_tier": "default",
+        "input_tokens": 1041,
+        "output_tokens": 99,
+        "cached_input_tokens": 0
+      },
+      {
+        "request": 7,
+        "transport_ms": {
+          "http11.send_request_headers": 0.272,
+          "http11.send_request_body": 0.162,
+          "http11.receive_response_headers": 1647.266,
+          "http11.receive_response_body": 0.369
+        },
+        "status_code": 200,
+        "resolved_model": "gpt-5.4-mini-2026-03-17",
+        "service_tier": "default",
+        "input_tokens": 1073,
+        "output_tokens": 114,
+        "cached_input_tokens": 0
+      },
+      {
+        "request": 8,
+        "transport_ms": {
+          "http11.send_request_headers": 0.282,
+          "http11.send_request_body": 0.15,
+          "http11.receive_response_headers": 1915.971,
+          "http11.receive_response_body": 7.351
+        },
+        "status_code": 200,
+        "resolved_model": "gpt-5.4-mini-2026-03-17",
+        "service_tier": "default",
+        "input_tokens": 1054,
+        "output_tokens": 105,
+        "cached_input_tokens": 0
+      }
+    ],
+    "complete": true,
+    "risk_correct": 8,
+    "action_correct": 8,
+    "json_valid": 8,
+    "mean_response_ms": 1722.357,
+    "p95_response_ms": 2901.087
+  }
+}
