@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/run/ztw-code-37754fee60da41b0b0a0353738c67b66/scripts/run_witness_systemd_controls.py", line 293, in <module>
+    main()
+  File "/run/ztw-code-37754fee60da41b0b0a0353738c67b66/scripts/run_witness_systemd_controls.py", line 289, in main
+    print(json.dumps(run(args.directory)))
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/run/ztw-code-37754fee60da41b0b0a0353738c67b66/scripts/run_witness_systemd_controls.py", line 209, in run
+    memory, tasks = int((cgroup / "memory.max").read_text()), int((cgroup / "pids.max").read_text())
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sys/fs/cgroup/system.slice/system-ztw\\x2db9b4716962d3\\x2dcollector.slice/ztw-b9b4716962d3-collector@lab.service/memory.max'

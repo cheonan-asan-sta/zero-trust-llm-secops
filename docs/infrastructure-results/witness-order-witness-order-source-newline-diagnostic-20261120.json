@@ -1,0 +1,13 @@
+{
+  "schema": "tested-source-newline-diagnostic-1",
+  "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "path": "scripts/run_witness_safety_sequence.py",
+  "git_blob_sha256": "53189724dc1e0cb643b62474026dae13ad8cc255e5875c095de4c93a827d0ed4",
+  "tested_archive_sha256": "592d2870ad69ce55cc196ebaba0e80cf8d5fe489789456ef7ccf5f7b1c044222",
+  "git_blob_bytes": 17871,
+  "tested_archive_bytes": 18190,
+  "git_blob_crlf_count": 0,
+  "tested_archive_crlf_count": 319,
+  "equal_after_crlf_normalization": true,
+  "tested_source_modified": false
+}

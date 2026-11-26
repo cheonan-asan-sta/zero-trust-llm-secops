@@ -1,0 +1,165 @@
+{
+  "schema": "workbench-review-browser-1",
+  "synthetic": true,
+  "caller_bound_policy_required": true,
+  "paid_calls": 0,
+  "passed": true,
+  "checks": [
+    {
+      "name": "server_requires_caller_binding",
+      "passed": true
+    },
+    {
+      "name": "denied_write_preserves_observed_version",
+      "passed": true
+    },
+    {
+      "name": "confirmation_names_observed_analysis_caller_and_change",
+      "passed": true
+    },
+    {
+      "name": "no_horizontal_overflow_desktop",
+      "passed": true
+    },
+    {
+      "name": "no_horizontal_overflow_mobile",
+      "passed": true
+    },
+    {
+      "name": "actual_patch_uses_observed_etag_and_caller_binding",
+      "passed": true
+    },
+    {
+      "name": "server_owns_reviewer_and_body_cannot_spoof_it",
+      "passed": true
+    },
+    {
+      "name": "successful_review_requires_another_read_before_more_writes",
+      "passed": true
+    },
+    {
+      "name": "history_open_fetches_current_detail",
+      "passed": true
+    },
+    {
+      "name": "old_detail_is_not_rebased_when_preparing_review",
+      "passed": true
+    },
+    {
+      "name": "explicit_reload_recovers_from_conflict",
+      "passed": true
+    },
+    {
+      "name": "two_workbenches_preserve_first_committed_review",
+      "passed": true
+    },
+    {
+      "name": "editing_discards_confirmation",
+      "passed": true
+    },
+    {
+      "name": "editing_during_identity_check_prevents_old_patch",
+      "passed": true
+    },
+    {
+      "name": "changing_target_discards_pending_preparation_without_locking_new_target",
+      "passed": true
+    },
+    {
+      "name": "same_key_identity_remap_prevents_patch",
+      "passed": true
+    },
+    {
+      "name": "server_rejects_caller_change_after_browser_check",
+      "passed": true
+    },
+    {
+      "name": "invalid_weak_cannot_downgrade_to_unconditional_write",
+      "passed": true
+    },
+    {
+      "name": "invalid_missing_cannot_downgrade_to_unconditional_write",
+      "passed": true
+    },
+    {
+      "name": "invalid_identity_cannot_downgrade_to_unconditional_write",
+      "passed": true
+    },
+    {
+      "name": "invalid_backend_cannot_downgrade_to_unconditional_write",
+      "passed": true
+    },
+    {
+      "name": "lost_response_keeps_committed_history_without_retry",
+      "passed": true
+    },
+    {
+      "name": "manual_read_after_uncertain_outcome_is_required_and_works",
+      "passed": true
+    },
+    {
+      "name": "connection_change_discards_result_and_confirmation",
+      "passed": true
+    },
+    {
+      "name": "late_previous_tenant_result_cannot_reappear",
+      "passed": true
+    },
+    {
+      "name": "viewer_has_read_only_review_ui",
+      "passed": true
+    },
+    {
+      "name": "credentials_are_memory_only_and_not_rendered",
+      "passed": true
+    },
+    {
+      "name": "old_analysis_workflow_cannot_continue_with_new_credentials",
+      "passed": true
+    },
+    {
+      "name": "new_rule_analysis_acquires_a_real_review_observation",
+      "passed": true
+    },
+    {
+      "name": "legacy_access_demo_uses_current_authenticated_request",
+      "passed": true
+    },
+    {
+      "name": "no_javascript_errors",
+      "passed": true
+    },
+    {
+      "name": "no_external_requests",
+      "passed": true
+    },
+    {
+      "name": "anonymous_demo_remains_readable",
+      "passed": true
+    },
+    {
+      "name": "anonymous_or_nontransactional_demo_cannot_submit_reviews",
+      "passed": true
+    }
+  ],
+  "source_sha256": {
+    "app/static/app.js": "9a06ce5141e3dbff17f9cf8fa58d80073245daeb43669ab75445b524cc38f797",
+    "app/static/workbench.html": "c0aa13dc89db7df4316f7c1ad5eacdbe22d1404ff1d7be69f0c8cd71872d28dd",
+    "app/static/styles.css": "471997465c5194e0f6e9f93b09d9fa14dac5edd3fd73ecc2387218b11d2e955c",
+    "app/main.py": "71d154953014ee6a2265c319d3e79bb8df3856c03e7f8a56f21a5dc2145022d4",
+    "app/config.py": "a53dfabb0bd7f0d61563c7342759966f775be93de8a1ef4cb3a26effd6488357",
+    "tests/dashboard_operations_fixture.py": "7a812d6fc3d0d5590db2cd26777051017700d15827b642690a90b17f208d0a9d",
+    "app/services/audit_review_preconditions.py": "ed38a58b2c59973a6fefb1d819e9d0989d0b5c7aa338654950db48fe857bf163",
+    "scripts/test_workbench_review_browser.py": "322205f07333fed51ff568f862f47e1b3c7ec6eba01c4eac8337e9a30fe50187"
+  },
+  "analysis_connection_race": {
+    "requests_before": 0,
+    "requests_after": 0,
+    "result_visible_after_connection_change": false,
+    "continued_with_new_credentials": false
+  },
+  "owned_servers_stopped": [
+    true,
+    true
+  ]
+}

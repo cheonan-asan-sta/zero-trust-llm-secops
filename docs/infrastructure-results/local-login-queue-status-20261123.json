@@ -1,0 +1,78 @@
+{
+  "aws_calls": 0,
+  "existing_witness_rule_tests_passed": true,
+  "live_alerts_fired_and_resolved": [
+    "C01LoginQueueBacklog",
+    "C01LoginQueueHeld",
+    "C01LoginQueueCapacityPressure",
+    "C01LoginQueueStatusUnavailable"
+  ],
+  "login_alert_rule_assertions": 20,
+  "monitoring_scope": "local Linux Docker loopback with cached Prometheus and Alertmanager",
+  "paid_api_calls": 0,
+  "promtool_version": "3.15.1",
+  "queue_recovery_comparison": {
+    "after": {
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fn": 0,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 192,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tn": 96,
+      "tp": 96
+    },
+    "analysis_and_sigma_matched": 192,
+    "analysis_audit_records": 192,
+    "aws_calls": 0,
+    "before": {
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fn": 0,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 192,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tn": 96,
+      "tp": 96
+    },
+    "events_at_peak": 192,
+    "final_queue": {
+      "held": 0,
+      "pending": 0
+    },
+    "held_resolved": [
+      {
+        "attempts": 4,
+        "code": "http_503"
+      },
+      {
+        "attempts": 1,
+        "code": "http_403"
+      }
+    ],
+    "lost_ack_replayed": 1,
+    "outage_clock_seconds": 1150,
+    "outage_requests": 4,
+    "outage_retry_intervals_seconds": [
+      120,
+      10,
+      420,
+      600
+    ],
+    "paid_api_calls": 0,
+    "recovery_minimum_spacing_seconds": 0.25,
+    "recovery_requests": 194,
+    "scope": "controlled normal and credential-alert inputs, real local HTTP analysis, simulated outage clock"
+  },
+  "queue_recovery_outcomes_matched_previous_run": true,
+  "regression_tests_passed": 132,
+  "resolution_matched_fingerprint_and_start": true,
+  "scrape_and_local_receiver_authentication_verified": true,
+  "unavailable_metrics_omitted_queue_counts": true
+}

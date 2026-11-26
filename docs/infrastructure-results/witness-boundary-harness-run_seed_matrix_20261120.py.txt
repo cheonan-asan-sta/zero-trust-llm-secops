@@ -1,0 +1,48 @@
+"""Frozen-source boundary seeds for the existing model-counted safety protocol."""
+import hashlib
+import json
+import os
+import platform
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+source=Path(sys.argv[1]).resolve()
+output=Path(sys.argv[2]).resolve()
+manifest=json.loads(Path(sys.argv[3]).read_text())
+assert source==Path(manifest['path']).resolve()
+output.mkdir(parents=True,exist_ok=False)
+sys.path.insert(0,str(source))
+from scripts.local_process_runtime import direct_python
+
+def altered():
+    return [n for n,h in manifest['files'].items() if hashlib.sha256((source/n).read_bytes()).hexdigest()!=h]
+
+assert not altered()
+env=dict(os.environ,AWS_EC2_METADATA_DISABLED='true',AWS_SHARED_CREDENTIALS_FILE=str(output/'no-cloud-credentials'),AWS_CONFIG_FILE=str(output/'no-cloud-config'),PYTHONPYCACHEPREFIX=str(output/'bytecode'))
+for name in ('OPENAI_API_KEY','AZURE_OPENAI_API_KEY','ANTHROPIC_API_KEY','C01_UPSTREAM_API_KEY','AWS_ACCESS_KEY_ID','AWS_SECRET_ACCESS_KEY','AWS_SESSION_TOKEN','AWS_SECURITY_TOKEN','AWS_PROFILE','AWS_DEFAULT_PROFILE','AWS_WEB_IDENTITY_TOKEN_FILE','AWS_ROLE_ARN','AWS_ROLE_SESSION_NAME','AWS_CONTAINER_CREDENTIALS_FULL_URI','AWS_CONTAINER_CREDENTIALS_RELATIVE_URI','AWS_CONTAINER_AUTHORIZATION_TOKEN'):env.pop(name,None)
+env['PYTHONPATH']=str(source)+os.pathsep+env.get('PYTHONPATH','')
+binary,env=direct_python(env)
+result={'schema':'owned-witness-seed-matrix-1','source_commit':manifest['source_commit'],'source_files':len(manifest['files']),'completed':False,'platform':platform.platform(),'seeds':[],'rounds_per_seed':32,'steps_per_seed':288,'paid_api_calls':0,'detection_metrics_changed':False,'independent_acceptance':False,'real_8h_soak':False}
+started=time.monotonic()
+for seed in [0,4294967295,17]:
+    target=output/f'seed-{seed}'
+    with (output/f'seed-{seed}.log').open('wb') as stream:
+        p=subprocess.Popen([binary,'-m','scripts.run_witness_safety_sequence','--directory',str(target),'--seed',str(seed),'--rounds','32'],cwd=source,env=env,stdout=stream,stderr=subprocess.STDOUT)
+        item={'seed':seed,'pid':p.pid}
+        try:code=p.wait(timeout=1200)
+        except subprocess.TimeoutExpired:
+            p.kill();p.wait(timeout=10);code=124
+        item['exit_code']=code
+    path=target/('report.json' if code==0 else 'failure.json')
+    item['report']=json.loads(path.read_text()) if path.exists() else None
+    result['seeds'].append(item)
+    (output/'progress.json').write_text(json.dumps(result,indent=2)+'\n')
+result['mutated_source_files']=altered()
+result['source_bytes_unchanged']=not result['mutated_source_files']
+result['completed']=result['source_bytes_unchanged'] and all(s['exit_code']==0 and s['report']['completed'] and s['report']['steps']==288 for s in result['seeds'])
+result['elapsed_seconds']=time.monotonic()-started
+(output/'result.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps({k:result[k] for k in ['completed','source_commit','source_bytes_unchanged','elapsed_seconds']}))
+raise SystemExit(0 if result['completed'] else 1)

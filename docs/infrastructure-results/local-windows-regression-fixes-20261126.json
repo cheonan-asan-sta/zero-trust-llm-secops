@@ -1,0 +1,66 @@
+{
+  "aws_calls": 0,
+  "before_full_windows": {
+    "errors": 0,
+    "failures": 2,
+    "junit_sha256": "5226511d120e94e9f9e49debfcd50231a5eb39cb07a8f98c8128bc2f8fe4ac7b",
+    "passed": 8483,
+    "seconds": 2230.426,
+    "skipped": 623,
+    "tests": 9108
+  },
+  "execution_evaluation": {
+    "budget_usd": 2.0,
+    "case_specific_reservation_cap": 40960,
+    "cases_above_general_cap": 24,
+    "http_outcomes": {
+      "execution/200": 24,
+      "session/200": 24
+    },
+    "local_loopback_jwks_fetches": 1,
+    "max_observed_estimate": 33362,
+    "old_general_reservation_cap": 32768,
+    "provider": "mock",
+    "request_cap": 48
+  },
+  "fix_commit": "7da6a89",
+  "native_mtls": {
+    "authorized_get": 200,
+    "bad_token_get": 401,
+    "out_of_scope_post": 403,
+    "upstream_calls": 1
+  },
+  "paid_calls": 0,
+  "split_requests": {
+    "after_received_501": 96,
+    "before_connection_aborted": 73,
+    "before_received_501": 23,
+    "body_arrival_intervals_seconds": [
+      0,
+      0.002,
+      0.01,
+      0.02
+    ],
+    "cases": 96,
+    "discard_deadline_seconds": 0.1,
+    "max_discard_bytes": 4096
+  },
+  "targeted_windows": {
+    "errors": 0,
+    "failures": 0,
+    "junit_sha256": "851b9b1c50cb84304c461a875e297b9e478e7897338f3a732778f442b6825137",
+    "passed": 268,
+    "seconds": 64.564,
+    "skipped": 0,
+    "tests": 268
+  },
+  "targeted_wsl_ubuntu_24_04": {
+    "errors": 0,
+    "failures": 0,
+    "junit_sha256": "b133e2b1b0603b408238d7118ab935bf4d5a53dfb8501d83b495454f0e3619dd",
+    "passed": 268,
+    "seconds": 92.841,
+    "skipped": 0,
+    "tests": 268
+  }
+}

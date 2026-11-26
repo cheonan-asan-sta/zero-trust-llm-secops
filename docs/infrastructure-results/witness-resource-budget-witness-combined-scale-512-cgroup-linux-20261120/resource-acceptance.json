@@ -1,0 +1,41 @@
+{
+  "schema": "owned-large-witness-resource-envelope-1",
+  "unit": "zt-large-witness-7e2482336830450b9e31ebd5e0faef8e.service",
+  "completed": true,
+  "production_sandbox_tested": false,
+  "unit_created_in_etc": false,
+  "paid_api_calls": 0,
+  "exit_code": 0,
+  "resources": {
+    "before": {
+      "cpu_usage_nsec": 42481000,
+      "cpu_source": "cgroup2_cpu_stat",
+      "memory_peak_bytes": 6836224,
+      "memory_source": "cgroup1_memory_peak",
+      "memory_limit_bytes": 536870912,
+      "cpu_quota_percent": 50.0,
+      "throttled_periods": 0,
+      "memory_limit_hits": 0,
+      "memory_oom_kills": 0,
+      "tasks_limit": 8
+    },
+    "after": {
+      "cpu_usage_nsec": 43263956000,
+      "cpu_source": "cgroup2_cpu_stat",
+      "memory_peak_bytes": 269701120,
+      "memory_source": "cgroup1_memory_peak",
+      "memory_limit_bytes": 536870912,
+      "cpu_quota_percent": 50.0,
+      "throttled_periods": 861,
+      "memory_limit_hits": 0,
+      "memory_oom_kills": 0,
+      "tasks_limit": 8
+    },
+    "harness_exit_code": 0
+  },
+  "source_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26",
+  "source_bytes_unchanged": true,
+  "large_fixture_checks": 8,
+  "owned_temporary_tree_removed": true,
+  "owned_unit_inactive": true
+}

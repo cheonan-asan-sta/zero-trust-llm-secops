@@ -1,0 +1,64 @@
+{
+  "schema": "witness-restore-inspection-evidence-1",
+  "date": "2026-11-20",
+  "implementation_commit": "3d8e52fb1f668f872171e54a2f4093601a50cbbd",
+  "source_sha256": {
+    "app/services/audit_witness_observer_backup.py": "467b5fd868d959d124db0d9797f246208f09e5fcf892fdede15dfaeed88fc73f",
+    "scripts/audit_witness_observer_backup.py": "27deccb965af2fd0ec4ec0e0c1522c3b647ece01eb4b4c745a50cd5263c9c37d",
+    "tests/test_witness_observer_restore_inspection.py": "ae74bb9eda7c3b5b5507599b2eb9112bf83d3891d4d37fe4df506bfe3597442f"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/witness-restore-inspection-linux-final-20261120.xml",
+      "sha256": "f1a491037122b6b38b0173ef2d8900ea142337fbcbf006f861576552d64d8177",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-restore-inspection-linux-initial-20261120.xml",
+      "sha256": "510c14c27b292fdabe180cfa3c5d18177540e01d8d2c8ebc27928fd7b16f562c",
+      "tests": 50,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-restore-inspection-windows-final-20261120.xml",
+      "sha256": "7afcf6242ad272ddfe5a7c95609531a8461a18781e5dfc55d84c1b8b1a5407ad",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-restore-inspection-windows-initial-20261120.xml",
+      "sha256": "21dfbeca65ab22b6556539fbe5f22802af95cfcc7471ffca88e8fab91553f6e8",
+      "tests": 50,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 4,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-restore-inspection-ruff-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "purpose": "Ruff at completion of inspection changes"
+    }
+  ],
+  "new_inspection_tests": 17,
+  "recovery_key_read": false,
+  "private_signing_key_read": false,
+  "collector_lease_acquired": false,
+  "live_source_checked": false,
+  "decryption_checked": false,
+  "same_host_local_only": true,
+  "detection_metrics_changed": false,
+  "paid_api_calls": 0,
+  "github_push_ci_merge": false,
+  "until_0800_goal_complete": false
+}

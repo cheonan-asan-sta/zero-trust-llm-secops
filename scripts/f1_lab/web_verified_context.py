@@ -25,6 +25,7 @@ from scripts.f1_lab.web_residual import ACCESS, INTRINSIC_NAMES, encoded_argv_re
 Identifier = Annotated[str, Field(pattern=r'^[A-Za-z0-9._-]{1,128}$')]
 SHA = Annotated[str, Field(pattern=r'^[a-f0-9]{64}$')]
 KINDS = ('authentication', 'authorization', 'runtime')
+REDIRECT_STATUSES = (301, 302, 303, 307, 308)
 
 
 def digest(value):
@@ -63,6 +64,11 @@ class WebRequest(StrictModel):
         return Window.aware(value)
 
 
+class RedirectRequest(WebRequest):
+    status: Literal[301, 302, 303, 307, 308]
+    location_sha256: SHA
+
+
 class Authentication(StrictModel):
     kind: Literal['authentication']
     result: Literal['success', 'failure', 'unknown']
@@ -72,7 +78,7 @@ class Authentication(StrictModel):
 class Authorization(StrictModel):
     kind: Literal['authorization']
     decision: Literal['allow', 'deny', 'unknown']
-    action: Literal['execute_uploaded_script']
+    action: Literal['execute_uploaded_script', 'redirect']
     policy_sha256: SHA
     policy_version: int = Field(strict=True, ge=1)
 
@@ -111,6 +117,10 @@ class WebBundle(StrictModel):
     proofs: list[ServerProof] = Field(min_length=3, max_length=3)
 
 
+class RedirectBundle(StrictModel):
+    proofs: list[ServerProof] = Field(min_length=2, max_length=2)
+
+
 class Authority(Window):
     tenant_id: Identifier
     source_id: Identifier
@@ -129,6 +139,7 @@ class Resource(StrictModel):
     resource_id: Identifier
     authorization_policy_sha256: SHA
     minimum_policy_version: int = Field(strict=True, ge=1)
+    redirect_location_sha256: SHA | None = None
 
 
 class WebRegistry(Window):
@@ -189,7 +200,7 @@ class PinnedWebRegistry:
 
 @dataclass(frozen=True)
 class WebChallenge:
-    request: WebRequest
+    request: WebRequest | RedirectRequest
     nonce: str
     owner: str
     created_at: datetime
@@ -197,7 +208,8 @@ class WebChallenge:
 
     @property
     def sha256(self):
-        return digest({'schema': 'zt-web-challenge-1', 'request': self.request.model_dump(mode='json'),
+        schema = 'zt-web-redirect-challenge-1' if isinstance(self.request, RedirectRequest) else 'zt-web-challenge-1'
+        return digest({'schema': schema, 'request': self.request.model_dump(mode='json'),
             'nonce': self.nonce, 'owner': self.owner, 'created_at': self.created_at.isoformat(),
             'expires_at': self.expires_at.isoformat()})
 
@@ -231,7 +243,8 @@ class WebTrustBridge:
 
     def issue(self, request, principal, *, now=None):
         now = datetime.now(UTC) if now is None else now
-        request = WebRequest.model_validate(request.model_dump())
+        contract = RedirectRequest if isinstance(request, RedirectRequest) else WebRequest
+        request = contract.model_validate(request.model_dump())
         with self.lock:
             self._clock(now)
             self._authorize(principal, request.tenant_id)
@@ -252,7 +265,8 @@ class WebTrustBridge:
                 request = challenge.request
                 self._authorize(principal, request.tenant_id, challenge.owner)
                 del self.pending[nonce]  # A rejected attempt cannot reuse a challenge either.
-                require(case_id == request.case_id and isinstance(raw_line, str)
+                require(not isinstance(request, RedirectRequest)
+                        and case_id == request.case_id and isinstance(raw_line, str)
                         and len(raw_line.encode()) <= MAX_ROW and digest_raw(raw_line) == request.raw_line_sha256,
                         'web_context_raw_case_binding')
                 match = ACCESS.fullmatch(raw_line.rstrip('\r\n'))
@@ -264,39 +278,9 @@ class WebTrustBridge:
                 require(0 <= request.observed_at.timestamp()-moment < 1
                         and timedelta(0) <= now-request.observed_at <= timedelta(seconds=30), 'web_context_log_time')
                 bundle = WebBundle.model_validate(bundle.model_dump())
-                registry = self.registry.current(now)
-                resources = [r for r in registry.resources if (r.tenant_id, r.server_id, r.resource_id) ==
-                             (request.tenant_id, request.server_id, request.resource_id)]
-                require(len(resources) == 1, 'web_context_resource_scope')
-                observations = {}
-                for proof in bundle.proofs:
-                    kind = proof.observation.kind
-                    require(kind not in observations and proof.tenant_id == request.tenant_id
-                            and proof.request_sha256 == challenge.sha256, 'web_context_proof_request_binding')
-                    authorities = [a for a in registry.authorities if
-                        (a.tenant_id, a.source_id, a.key_id, a.kind) ==
-                        (proof.tenant_id, proof.source_id, proof.key_id, kind)]
-                    require(len(authorities) == 1, 'web_context_authority_role')
-                    authority = authorities[0]
-                    require(authority.enabled and request.server_id in authority.server_ids
-                            and request.subject_id in authority.subject_ids and request.resource_id in authority.resource_ids,
-                            'web_context_authority_scope')
-                    require(authority.issued_at <= proof.issued_at <= now < authority.expires_at
-                            and challenge.created_at <= proof.issued_at < proof.expires_at <= challenge.expires_at
-                            and proof.expires_at <= authority.expires_at and now < proof.expires_at
-                            and request.observed_at <= proof.observed_at <= proof.issued_at,
-                            'web_context_proof_freshness')
-                    signature = base64.urlsafe_b64decode(proof.signature+'==')
-                    require(base64.urlsafe_b64encode(signature).decode().rstrip('=') == proof.signature,
-                            'web_context_signature_encoding')
-                    Ed25519PublicKey.from_public_bytes(public_bytes(authority.public_key)).verify(signature, proof_bytes(proof))
-                    observations[kind] = proof.observation
-                require(set(observations) == set(KINDS), 'web_context_complete_bundle')
+                observations, _ = self._verify(challenge, bundle.proofs, now,
+                                               kinds=set(KINDS), action='execute_uploaded_script')
                 auth, permission, runtime = (observations[k] for k in KINDS)
-                resource = resources[0]
-                require(permission.policy_sha256 == resource.authorization_policy_sha256
-                        and permission.policy_version >= resource.minimum_policy_version, 'web_context_policy_binding')
-                require(self.registry.current(now) == registry, 'web_context_registry_changed')
                 evidence_sha = digest(bundle.model_dump(mode='json'))
                 if runtime.executed is True and (permission.decision == 'deny' or auth.result == 'failure' or auth.mfa == 'failure'):
                     return WebFacts('adverse', 'web_verified_denial_or_auth_failure_with_execution', evidence_sha)
@@ -307,6 +291,70 @@ class WebTrustBridge:
                 return WebFacts('review', 'web_verified_context_requires_review', evidence_sha)
         except (ValueError, TypeError, OSError, KeyError, AttributeError, InvalidSignature, RecursionError):
             return WebFacts('unavailable', 'web_context_rejected_or_unavailable')
+
+
+    def _verify(self, challenge, proofs, now, *, kinds, action):
+        request = challenge.request
+        registry = self.registry.current(now)
+        resources = [r for r in registry.resources if (r.tenant_id, r.server_id, r.resource_id) ==
+                     (request.tenant_id, request.server_id, request.resource_id)]
+        require(len(resources) == 1, 'web_context_resource_scope')
+        observations = {}
+        for proof in proofs:
+            kind = proof.observation.kind
+            require(kind not in observations and proof.tenant_id == request.tenant_id
+                    and proof.request_sha256 == challenge.sha256, 'web_context_proof_request_binding')
+            authorities = [a for a in registry.authorities if
+                (a.tenant_id, a.source_id, a.key_id, a.kind) ==
+                (proof.tenant_id, proof.source_id, proof.key_id, kind)]
+            require(len(authorities) == 1, 'web_context_authority_role')
+            authority = authorities[0]
+            require(authority.enabled and request.server_id in authority.server_ids
+                    and request.subject_id in authority.subject_ids and request.resource_id in authority.resource_ids,
+                    'web_context_authority_scope')
+            require(authority.issued_at <= proof.issued_at <= now < authority.expires_at
+                    and challenge.created_at <= proof.issued_at < proof.expires_at <= challenge.expires_at
+                    and proof.expires_at <= authority.expires_at and now < proof.expires_at
+                    and request.observed_at <= proof.observed_at <= proof.issued_at,
+                    'web_context_proof_freshness')
+            signature = base64.urlsafe_b64decode(proof.signature+'==')
+            require(base64.urlsafe_b64encode(signature).decode().rstrip('=') == proof.signature,
+                    'web_context_signature_encoding')
+            Ed25519PublicKey.from_public_bytes(public_bytes(authority.public_key)).verify(signature, proof_bytes(proof))
+            observations[kind] = proof.observation
+        require(set(observations) == kinds, 'web_context_complete_bundle')
+        permission = observations['authorization']
+        resource = resources[0]
+        require(permission.action == action and permission.policy_sha256 == resource.authorization_policy_sha256
+                and permission.policy_version >= resource.minimum_policy_version, 'web_context_policy_binding')
+        require(self.registry.current(now) == registry, 'web_context_registry_changed')
+        return observations, resource
+
+    def check_redirect(self, nonce, bundle, request, principal, *, now=None):
+        now = datetime.now(UTC) if now is None else now
+        try:
+            request = RedirectRequest.model_validate(request.model_dump())
+            with self.lock:
+                self._clock(now)
+                challenge = self.pending.get(nonce)
+                require(challenge is not None, 'web_redirect_unknown_challenge')
+                self._authorize(principal, challenge.request.tenant_id, challenge.owner)
+                del self.pending[nonce]
+                require(isinstance(challenge.request, RedirectRequest)
+                        and challenge.request == request, 'web_redirect_response_binding')
+                bundle = RedirectBundle.model_validate(bundle.model_dump())
+                facts, resource = self._verify(challenge, bundle.proofs, now,
+                                               kinds={'authentication', 'authorization'}, action='redirect')
+                auth, policy = facts['authentication'], facts['authorization']
+                require(request.location_sha256 == resource.redirect_location_sha256, 'web_redirect_destination')
+                evidence = digest(bundle.model_dump(mode='json'))
+                if auth.result == 'failure' or auth.mfa == 'failure' or policy.decision == 'deny':
+                    return WebFacts('adverse', 'web_redirect_policy_or_auth_failure', evidence)
+                if auth.result == 'success' and auth.mfa == 'success' and policy.decision == 'allow':
+                    return WebFacts('consistent', 'web_redirect_context_consistent', evidence)
+                return WebFacts('review', 'web_redirect_context_requires_review', evidence)
+        except (ValueError, TypeError, OSError, KeyError, AttributeError, InvalidSignature, RecursionError):
+            return WebFacts('unavailable', 'web_redirect_context_rejected_or_unavailable')
 
 
 def digest_raw(value):

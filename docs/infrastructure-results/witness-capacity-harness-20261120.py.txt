@@ -1,0 +1,98 @@
+"""Real unchanged 4096-receipt boundary, all private synthetic state discarded."""
+import asyncio
+import hashlib
+import json
+import os
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+source=Path(sys.argv[1]).resolve();output=Path(sys.argv[2]).resolve()
+manifest=json.loads(Path(sys.argv[3]).read_text())
+assert os.name=='posix' and source==Path(manifest['path']).resolve()
+output.mkdir(parents=True,exist_ok=False)
+sys.path.insert(0,str(source))
+os.environ['AWS_EC2_METADATA_DISABLED']='true'
+from app.analyzers.rule_based import RuleBasedAnalyzer
+from app.models import AnalysisResult
+from app.scenarios import synthetic_events
+from app.services import audit_witness as witness
+from app.services import audit_witness_observer as observer
+from app.services.audit_transfer import AuditTransferError
+from app.services.policy import response_preview
+from app.services.sqlite_audit import SQLiteAuditStore
+from scripts.f1_lab import witness_observer_status as bridge
+
+assert witness.MAX_RECEIPTS==4096
+def altered():return [n for n,h in manifest['files'].items() if hashlib.sha256((source/n).read_bytes()).hexdigest()!=h]
+assert not altered()
+started=time.monotonic()
+result={'schema':'owned-native-witness-full-capacity-1','completed':False,'source_commit':manifest['source_commit'],'configured_max_receipts':4096,'limit_monkeypatched':False,'all_data_synthetic':True,'paid_api_calls':0,'detection_metrics_changed':False,'independent_storage_verified':False,'automatic_activation_allowed':False,'checks':[]}
+try:
+    with tempfile.TemporaryDirectory(prefix='private-witness-full-capacity-') as temporary:
+        root=Path(temporary);audit=SQLiteAuditStore(root/'audit.sqlite3');signer=root/'signer';control=root/'control'
+        event=synthetic_events()[0];assessment=RuleBasedAnalyzer().assess(event)
+        asyncio.run(audit.save(AnalysisResult(event_id=event.event_id,analyzer='rule',assessment=assessment,policy_decision=response_preview(assessment,event),latency_ms=1)))
+        before_audit=audit.path.read_bytes()
+        key_pin=witness.initialize(signer,audit.path,'actual-capacity')['public_key_sha256']
+        minimum=witness.GENESIS
+        for number in range(1,4096):
+            if time.monotonic()-started>7200 or (output/'stop.request').exists():
+                result['stopped_before_capacity']=True
+                break
+            tick=time.monotonic()
+            current=witness.observe(signer,audit.path,key_pin,expected_receipt=minimum,observation_id=f'{number:032x}')
+            assert current['receipt']['body']['number']==number and current['receipt']['body']['previous_receipt']==minimum
+            minimum=current['receipt_sha256']
+            if number%32==0:
+                (output/'progress.json').write_text(json.dumps({**result,'signed_receipts':number,'elapsed_seconds':time.monotonic()-started,'last_observation_seconds':time.monotonic()-tick},indent=2)+'\n')
+        else:
+            profile=observer.initialize(control,signer,audit.path,key_pin,minimum_receipt=minimum,interval_seconds=1,max_age_seconds=86400,capacity_warning=16)['profile_sha256']
+            assert observer.status(control,profile,minimum_receipt=minimum)['state']=='capacity_pressure'
+            actual=witness.observe
+            def lost(*args,**kwargs):
+                actual(*args,**kwargs)
+                raise OSError('test-owned lost receipt 4096 response')
+            witness.observe=lost
+            try:
+                try:observer.cycle(control,profile,minimum_receipt=minimum)
+                except OSError:pass
+                else:raise AssertionError('last response loss not reached')
+            finally:witness.observe=actual
+            signed=witness.status(signer,key_pin,minimum_receipt=minimum)
+            assert signed['receipt']['body']['number']==4096
+            before_journal=(signer/'journal.sqlite3').read_bytes()
+            recovered=observer.cycle(control,profile,minimum_receipt=minimum)
+            assert recovered['recovered'] and recovered['receipt_sha256']==signed['receipt_sha256']
+            assert (signer/'journal.sqlite3').read_bytes()==before_journal
+            result['checks'].append('last_capacity_receipt_response_loss_recovers_exact_original')
+            minimum=recovered['receipt_sha256']
+            before_control=(control/'observer.sqlite3').read_bytes()
+            for _ in range(2):
+                try:observer.cycle(control,profile,minimum_receipt=minimum)
+                except AuditTransferError as error:assert 'capacity' in str(error)
+                else:raise AssertionError('receipt 4097 admitted')
+                state=observer.status(control,profile,minimum_receipt=minimum)
+                assert state['state']=='capacity_exhausted' and not state['pending'] and state['remaining_receipts']==0
+                assert (control/'observer.sqlite3').read_bytes()==before_control
+                assert (signer/'journal.sqlite3').read_bytes()==before_journal
+            result['checks'].append('receipt_4097_rejected_twice_without_pending_or_history_change')
+            public=bridge.report(profile,minimum,state,cycle_success=False)
+            metrics=bridge.render_report({'profile_sha256':profile,'minimum_receipt':minimum},public)
+            assert 'state="capacity_exhausted"} 1' in metrics and 'secops_witness_observation_action_required 1' in metrics
+            result['checks'].append('capacity_exhaustion_remains_visible_in_public_metrics')
+            (output/'public-status.json').write_text(json.dumps(public,indent=2)+'\n')
+            (output/'metrics.txt').write_text(metrics)
+            assert audit.path.read_bytes()==before_audit
+            result['checks'].append('source_audit_bytes_unchanged')
+            result['signed_receipts']=4096;result['boundary_rejections']=2;result['boundary_reached']=True
+    result['private_fixture_removed']=not root.exists()
+    result['mutated_source_files']=altered()
+    result['source_bytes_unchanged']=not result['mutated_source_files']
+    result['completed']=bool(result.get('boundary_reached') and result['private_fixture_removed'] and result['source_bytes_unchanged'])
+finally:
+    result['elapsed_seconds']=time.monotonic()-started
+    (output/'result.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result))
+raise SystemExit(0 if result['completed'] else 2)

@@ -1,0 +1,242 @@
+{
+  "schema": "extra-workbench-review-1",
+  "date_kst": "2026-11-19",
+  "branch": "extra",
+  "implementation_commit": "6c0100fa7ad1d6d2d1c1979206371dc3d3713740",
+  "final_ui_commit": "1b8233d140457b31fb763395309bb7d52ddd79f5",
+  "backend_models_evaluation_sources_unchanged_from_parent": true,
+  "pytest": {
+    "windows": {
+      "tests": 194,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 3,
+      "passed": 191,
+      "time_seconds": 35.599,
+      "artifact": "docs/infrastructure-results/workbench-review-final-windows-20261119.xml",
+      "sha256": "3faa68154d33476a90aba1c816a9ad6d7b894f5d20e6f65917c1847dc4b35aeb",
+      "excluded": [
+        {
+          "case": "test_snapshot_symlink_and_fifo_are_rejected_without_read",
+          "reason": "POSIX symlink/FIFO file contract"
+        },
+        {
+          "case": "test_real_operator_cli_reads_then_reviews_once_and_refuses_replay",
+          "reason": "Owned native Linux worker fixture"
+        },
+        {
+          "case": "test_actual_http_review_version_survives_concurrent_writers_and_worker_loss",
+          "reason": "Owned Linux native worker fixture"
+        }
+      ]
+    },
+    "linux": {
+      "tests": 194,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 194,
+      "time_seconds": 71.986,
+      "artifact": "docs/infrastructure-results/workbench-review-final-linux-20261119.xml",
+      "sha256": "c216a33412a7fbde7866d3f1bf6c09662d1103cdd9f2d7fb3616c30843605ba1",
+      "excluded": []
+    }
+  },
+  "new_backend_unit_cases": 0,
+  "browsers": {
+    "workbench": {
+      "passed": true,
+      "checks": 32,
+      "artifact": "docs/infrastructure-results/workbench-review-browser-20261119.json",
+      "sha256": "14914560329224b9cab0e1df3e16bad6b0b9ac841244b44adffda27038d81379"
+    },
+    "dashboard_regression": {
+      "passed": true,
+      "checks": 27,
+      "artifact": "docs/infrastructure-results/workbench-dashboard-review-browser-20261119.json",
+      "sha256": "24eaa4d982c9cb184623e305ff5951e04fc59fe255931d872d807ef03be135cc"
+    }
+  },
+  "protocol": {
+    "requires_fresh_detail": true,
+    "headers": [
+      "If-Match",
+      "X-Review-Identity"
+    ],
+    "client_reviewer_in_patch_body": false,
+    "explicit_confirmation": true,
+    "read_again_after_success": true,
+    "auto_rebase_or_retry": false,
+    "conditional_backend_fallback": false
+  },
+  "connection": {
+    "same_origin_only": true,
+    "credentials_in_memory_only": true,
+    "no_browser_storage": true,
+    "redirects_followed": false,
+    "ambient_cookies_used": false,
+    "epoch_abort_and_dom_reset": true,
+    "old_multi_step_workflow_not_retargeted_to_new_credentials": true,
+    "caller_identity_fields": [
+      "subject",
+      "tenant_id",
+      "auth_method"
+    ],
+    "not_human_reading_proof": true
+  },
+  "visual_qa": {
+    "desktop": [
+      1440,
+      1080
+    ],
+    "mobile": [
+      390,
+      844
+    ],
+    "horizontal_overflow_checks_passed": true,
+    "scoped_review_fonts_and_contrast_improved": true
+  },
+  "design_detector": {
+    "runs": 1,
+    "capture_commit": "6c0100f",
+    "artifact": "docs/infrastructure-results/workbench-review-impeccable-20261119.json",
+    "findings": 149,
+    "scoped_review_contrast_fix_after_capture": true,
+    "all_warnings_cleared": false,
+    "not_full_accessibility_acceptance": true
+  },
+  "scope": {
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "docker_resources_created": 0,
+    "push": false,
+    "ci": false,
+    "merge": false,
+    "new_full_repository_run": false,
+    "actual_eight_hour_soak": false,
+    "new_llm_quality_evaluation": false,
+    "tracked_evaluation_labels_predictions_changed": false
+  },
+  "historical_synthetic_development_360": {
+    "precision_percent": 96.45,
+    "recall_percent": 90.56,
+    "f1_percent": 93.41,
+    "false_positive_rate_percent": 3.33,
+    "unchanged": true,
+    "independent_goal_qualified": false
+  },
+  "compatibility": {
+    "strict_server_default": false,
+    "server_caller_binding_optional_for_other_clients": true,
+    "anonymous_demo_readable": true,
+    "anonymous_or_nontransactional_review_disabled": true,
+    "browser_live_oidc_success_acceptance": false
+  },
+  "limitations": [
+    "Backend/API compatibility preserved; not every client is required to send caller binding.",
+    "API-key browser success and existing backend JWT/OIDC regression do not establish enterprise SSO/MFA/online revocation.",
+    "Connection changes do not roll back an already committed server operation.",
+    "Other workbench writes did not receive a new server-side intent binding.",
+    "Global legacy visual/accessibility warnings remain.",
+    "No new independent F1 evaluation, full repository run, witness/WORM or power-loss/long-soak acceptance."
+  ],
+  "sources": [
+    {
+      "path": "app/static/app.js",
+      "sha256": "683eb93704553cacb104702dbd7db33f733918ed7c9ae0932a598a6eba7e6936",
+      "normalized_lf_sha256": "c1c5372c7258b4d9d6cdd689bc236e937490546ccbc1f1822a3e36f0aeab60aa"
+    },
+    {
+      "path": "app/static/workbench.html",
+      "sha256": "4a9e279fe72767be0a8a9b4733f0186fafcab7ecd1a66be9d9e1557956ebdc21",
+      "normalized_lf_sha256": "9c96be09611992fcf4dc3b4a298f1a0091b1ff06c96aadbdc78883d334617164"
+    },
+    {
+      "path": "app/static/styles.css",
+      "sha256": "20f37e56061ce3358edae18e3328cd8a00d3b87f0b569d1181e30ee4bd69a23e",
+      "normalized_lf_sha256": "4bf2660f8e323df1f0ace1a1663ea2b067522f2b8549a1ef9ce98825424321b4"
+    },
+    {
+      "path": "app/main.py",
+      "sha256": "e416287b99b9c03667b16a6f7126181f0b8531f27ced75243438f2ecb7d7e063",
+      "normalized_lf_sha256": "5fc95c2616e5b7263c7d11963c7b363750177f3956303959966d97c84631e404"
+    },
+    {
+      "path": "app/services/audit_review_preconditions.py",
+      "sha256": "85c46854031f5c9f1bdb3397478598b2330d6c44ddb1813b67dc8597f44edd3e",
+      "normalized_lf_sha256": "85c46854031f5c9f1bdb3397478598b2330d6c44ddb1813b67dc8597f44edd3e"
+    },
+    {
+      "path": "scripts/test_workbench_review_browser.py",
+      "sha256": "df72e3451bfd8c639b195588de8c468dcb084f1a039686ccb61a260cf03e33a7",
+      "normalized_lf_sha256": "df72e3451bfd8c639b195588de8c468dcb084f1a039686ccb61a260cf03e33a7"
+    },
+    {
+      "path": "scripts/local_process_runtime.py",
+      "sha256": "c31f0fbf2aacd32c20e6a8e82a5e34eceb1419bfd3601ae8dff296d6506088b4",
+      "normalized_lf_sha256": "c31f0fbf2aacd32c20e6a8e82a5e34eceb1419bfd3601ae8dff296d6506088b4"
+    },
+    {
+      "path": "scripts/serve_dashboard_demo.py",
+      "sha256": "28241a9e7facdaa474d41c9be02c02b908ed92773bec0b1a40d984ff31cff9b0",
+      "normalized_lf_sha256": "28b435bd192aa02d55e7fdae4d6de23f22d840b0f5c1d14cefa98c17a4555871"
+    },
+    {
+      "path": "tests/dashboard_operations_fixture.py",
+      "sha256": "2693d54f5c2408c238cff5d2689d4a140afe2544281f49cfb102e91be073d610",
+      "normalized_lf_sha256": "7222b67259f45e9cfbad45d7850e7f345b0127d2f778466b3246c141f4a385a6"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/workbench-review-final-windows-20261119.xml",
+      "sha256": "3faa68154d33476a90aba1c816a9ad6d7b894f5d20e6f65917c1847dc4b35aeb",
+      "bytes": 29036
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-review-final-linux-20261119.xml",
+      "sha256": "c216a33412a7fbde7866d3f1bf6c09662d1103cdd9f2d7fb3616c30843605ba1",
+      "bytes": 28340
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-review-browser-20261119.json",
+      "sha256": "14914560329224b9cab0e1df3e16bad6b0b9ac841244b44adffda27038d81379",
+      "bytes": 4110
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-dashboard-review-browser-20261119.json",
+      "sha256": "24eaa4d982c9cb184623e305ff5951e04fc59fe255931d872d807ef03be135cc",
+      "bytes": 3287
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-review-impeccable-20261119.json",
+      "sha256": "4fbba47f4d4aa56115bae21b1cb42a74fd126e07317d4daef91efdb0f5bf61ae",
+      "bytes": 126345
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-connection-desktop-20261119.png",
+      "sha256": "e10e2e9168b424794bc65bcce2e82fd3fdb1f0134a57108b7fc857ce9dd34783",
+      "bytes": 17103
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-connection-mobile-20261119.png",
+      "sha256": "0fa638050879ef4f6d937980a0e30a783fab3e3996344bb7cbb6ad22e21da4c3",
+      "bytes": 17236
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-confirmation-desktop-20261119.png",
+      "sha256": "fcff118e78105b8091a64507c42b902ebe20d12f5ce3c1f614339d60feda3626",
+      "bytes": 47383
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-confirmation-mobile-20261119.png",
+      "sha256": "9ace2cc4e408cde8399855b2c1183213984d9e7e21fedeb42ac02b006c99a921",
+      "bytes": 47304
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-stale-20261119.png",
+      "sha256": "e001649e23e19d051115c4b0b558c8dc794d0fb1e74e3ae5d8a65e97a145f54d",
+      "bytes": 23373
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "date": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "pushed": false,
+  "ci_started": false,
+  "merged": false,
+  "model_quality_reevaluated": false,
+  "new_tests": 10,
+  "full_chain_and_existing_review_semantics_preserved": true,
+  "schema_changed": false,
+  "native_conditions": 41,
+  "benchmark_scope": "Python tracemalloc peaks and scan timings on synthetic local fixtures, not RSS or HTTP SLA",
+  "earlier_focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "52",
+    "time": "12.681",
+    "timestamp": "2026-11-19T02:02:04.852925+09:00",
+    "hostname": "희주",
+    "xml_sha256": "8d161d21188773ccffa1d2c3e93ab4346193bb3dcdd10966014c6f27c0a4503d",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\compact-audit-focused-20261119.xml"
+  },
+  "earlier_windows_fixture_failure": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "1",
+    "skipped": "0",
+    "tests": "132",
+    "time": "30.368",
+    "timestamp": "2026-11-19T02:08:13.601354+09:00",
+    "hostname": "희주",
+    "xml_sha256": "64395a5ace539ad6c8f84c5e088a4239043873aad74770edc204634f7547d74e",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\compact-audit-windows-20261119.xml"
+  },
+  "latest_focused_after_fixture_clock_correction": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "10",
+    "time": "3.708",
+    "timestamp": "2026-11-19T02:10:10.754965+09:00",
+    "hostname": "희주",
+    "xml_sha256": "6e993abae9222d5273f0114735dd8f89662fe6cd2f67c1bbb97ead09ffa41f06",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\compact-audit-windows-final-focused-20261119.xml"
+  },
+  "windows_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "132",
+    "time": "32.464",
+    "timestamp": "2026-11-19T02:10:55.183949+09:00",
+    "hostname": "희주",
+    "xml_sha256": "bc52c9a4c5555230ca7092f08b7fb2b9b58ef519d82a31b98e5079ce382acc29",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\compact-audit-windows-final-20261119.xml"
+  },
+  "linux_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "211",
+    "time": "70.257",
+    "timestamp": "2026-11-19T02:11:00.310729+09:00",
+    "hostname": "localhost",
+    "xml_sha256": "8b327a1f4300ccd3533cd421f9fbff383ced248383d055017f812a36a158fac4",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\compact-audit-linux-final-20261119.xml"
+  },
+  "benchmarks": {
+    "windows_unique": {
+      "report": "extra-compact-audit-windows-unique-20261119.json",
+      "source_report_sha256": "4fa99011d7351b929cca366438e06c2805c3f11748085f6608e6e73f899cd45e",
+      "source_database_sha256": "aaff30206381e574c9cf69d2e00bbb0d57dfd0a59d2467adb668a30c208fd448",
+      "python_peak_reduction_percent": 98.09768729280877,
+      "measurements": {
+        "materialized_compatibility_scan": {
+          "median_seconds": 0.11167270000441931,
+          "median_python_peak_bytes": 9190182
+        },
+        "compact_integrity_scan": {
+          "median_seconds": 0.08979599998565391,
+          "median_python_peak_bytes": 174826
+        }
+      }
+    },
+    "windows_reviews": {
+      "report": "extra-compact-audit-windows-reviews-20261119.json",
+      "source_report_sha256": "8091d6573ca77696adeedc00a3262bd68964a0aee4dfe5efd8cf4e98045e73bd",
+      "source_database_sha256": "80d3b3ef695ac8a2b2b7cb50b4136457cce114fe9963d1659388726033f6d8e8",
+      "python_peak_reduction_percent": 95.68969779591873,
+      "measurements": {
+        "materialized_compatibility_scan": {
+          "median_seconds": 0.15052930000820197,
+          "median_python_peak_bytes": 3215807
+        },
+        "compact_integrity_scan": {
+          "median_seconds": 0.1971721999871079,
+          "median_python_peak_bytes": 138611
+        }
+      }
+    },
+    "linux_unique": {
+      "report": "extra-compact-audit-linux-unique-20261119.json",
+      "source_report_sha256": "2659906d88139a15dcfeb5a4c83ad95a4111b4f9516118cf99fe6adcc94cbe94",
+      "source_database_sha256": "0f1cd7264bb912398fc655196f53a3f002c0c5ab8518ef78a2243513a9a9c9dc",
+      "python_peak_reduction_percent": 98.10097090162661,
+      "measurements": {
+        "materialized_compatibility_scan": {
+          "median_seconds": 0.5036214269999997,
+          "median_python_peak_bytes": 9206494
+        },
+        "compact_integrity_scan": {
+          "median_seconds": 0.4911991259999997,
+          "median_python_peak_bytes": 174834
+        }
+      }
+    },
+    "linux_reviews": {
+      "report": "extra-compact-audit-linux-reviews-20261119.json",
+      "source_report_sha256": "e16811e5ca24f981d0f0d1208f1a3707dbef8ca9f16efaa0a7b5734d6b3c1b3f",
+      "source_database_sha256": "98e173b8cfcd26e77feaba8eb977ebbbd62e36af1f7857f28f6895bf22568896",
+      "python_peak_reduction_percent": 95.70341982575877,
+      "measurements": {
+        "materialized_compatibility_scan": {
+          "median_seconds": 0.5629742380000025,
+          "median_python_peak_bytes": 3226217
+        },
+        "compact_integrity_scan": {
+          "median_seconds": 0.6992573810000025,
+          "median_python_peak_bytes": 138617
+        }
+      }
+    }
+  },
+  "native_source_run_sha256": "e56dc5a0609302117059b670cd206c73662230e4734d43bcf8ded7499cc63308",
+  "source_files": [
+    {
+      "path": "app/services/sqlite_audit.py",
+      "sha256": "aa1695924087c6c0aab47328e228b0247ce8065c7715c36a933844a1a9d7d977"
+    },
+    {
+      "path": "app/services/audit_backup.py",
+      "sha256": "de84350b9871c3d9ed4c60df0112d0800f784b9588354ab0217b75b6dc3d32e9"
+    },
+    {
+      "path": "app/services/audit_transfer.py",
+      "sha256": "9c1ae7ddf913a0db9e215ce76ea2a682762b9c7b8d9dd911edda44585004bafd"
+    },
+    {
+      "path": "scripts/benchmark_audit_integrity.py",
+      "sha256": "53585b04a1fbd1ad211eb97c49b14e7870dbb29e0a2c6e4e9fdc31469f866056"
+    },
+    {
+      "path": "tests/test_compact_audit_integrity.py",
+      "sha256": "31043343fe564c753b2994b6e3f601e6c16d0b071549614d1082538b40488190"
+    }
+  ]
+}

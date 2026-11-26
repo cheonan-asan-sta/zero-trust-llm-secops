@@ -1,0 +1,457 @@
+{
+  "schema": "extra-workbench-paging-1",
+  "date_kst": "2026-11-19",
+  "branch": "extra",
+  "source_commit": "79bdf4e788eaed2545ccecc7250bbd55c965781e",
+  "functional_commit": "d82052eefaa0ea5897608e5e3b8d9a37957ce7b6",
+  "baseline_commit": "78828d595883415ba68ff369ed23957c0c3377a4",
+  "baseline_scope": "Source inspection: recent8 results; not a newly run independent evaluation.",
+  "ui": {
+    "route": "/static/workbench.html",
+    "page_size": 12,
+    "server_filters": [
+      "risk_level",
+      "review_status"
+    ],
+    "previous_uses_saved_page_cursor": true,
+    "caller_checked_before_and_after_page": true,
+    "snapshot_metadata_checked": true,
+    "tenant_duplicate_row_shape_and_filter_checks": true,
+    "local_expiry_clears_rows": true,
+    "late_response_generation_and_epoch_guard": true,
+    "identity_errors_clear_all_old_views_and_require_explicit_reconnect": true,
+    "overview_refresh_preserves_page": true,
+    "latest_reload_is_explicit": true,
+    "detail_reads_current_version_and_binding": true,
+    "recent_results_fallback_or_auto_retry": false,
+    "credentials_persisted": false
+  },
+  "traversal": {
+    "tenant_rows": 137,
+    "unique_rows": 137,
+    "pages": 12,
+    "foreign_seed_rows": 1,
+    "finds_oldest_outside_recent_100": true
+  },
+  "pytest": {
+    "windows": {
+      "tests": 329,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 5,
+      "passed": 324,
+      "excluded": [
+        {
+          "case": "test_snapshot_symlink_and_fifo_are_rejected_without_read",
+          "reason": "POSIX symlink/FIFO file contract"
+        },
+        {
+          "case": "test_real_operator_cli_reads_then_reviews_once_and_refuses_replay",
+          "reason": "Owned native Linux worker fixture"
+        },
+        {
+          "case": "test_actual_http_review_version_survives_concurrent_writers_and_worker_loss",
+          "reason": "Owned Linux native worker fixture"
+        },
+        {
+          "case": "test_jsonl_own_view_change_requires_explicit_restart[sqlite-append]",
+          "reason": "SQLite prefix stability has a separate test"
+        },
+        {
+          "case": "test_jsonl_own_view_change_requires_explicit_restart[sqlite-review]",
+          "reason": "SQLite prefix stability has a separate test"
+        }
+      ],
+      "seconds": 97.696,
+      "artifact": "docs/infrastructure-results/workbench-paging-final-windows-20261119.xml"
+    },
+    "linux": {
+      "tests": 329,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2,
+      "passed": 327,
+      "excluded": [
+        {
+          "case": "test_jsonl_own_view_change_requires_explicit_restart[sqlite-append]",
+          "reason": "SQLite prefix stability has a separate test"
+        },
+        {
+          "case": "test_jsonl_own_view_change_requires_explicit_restart[sqlite-review]",
+          "reason": "SQLite prefix stability has a separate test"
+        }
+      ],
+      "seconds": 128.717,
+      "artifact": "docs/infrastructure-results/workbench-paging-final-linux-20261119.xml"
+    }
+  },
+  "browser": {
+    "paging": {
+      "conditions": 45,
+      "passed": true,
+      "source_commit": "79bdf4e788eaed2545ccecc7250bbd55c965781e",
+      "artifact": "docs/infrastructure-results/workbench-paging-paging-browser-20261119.json",
+      "sources": [
+        {
+          "path": "app/static/app.js",
+          "raw_runner_sha256": "6126d33d0f5068fdb60212fb653cee9d45c48f6d4cfbeb7d8547c22386d19c3e",
+          "git_normalized_lf_sha256": "7f562a376d5d44465771cfe683596bbe7081f1dd8f3394f8eea9bffa2f9576a7"
+        },
+        {
+          "path": "app/static/workbench.html",
+          "raw_runner_sha256": "1d5865d303cea8a578ed2fd9e60774304901d917e44e58a6e81c0bbc3a9d1989",
+          "git_normalized_lf_sha256": "4eda148c20de74acf1776935805530fa8a354c6eae29f55ff07b3d6905de95b5"
+        },
+        {
+          "path": "app/static/styles.css",
+          "raw_runner_sha256": "8fd1b8e821d36ec215960874ddc1a91301a2d4c7500e4cbefb04f6b0ad06b74d",
+          "git_normalized_lf_sha256": "fbeccd57c5ef2279d3faca52ab8e04bebfa72329956d83e7f47470b987e7e3ed"
+        },
+        {
+          "path": "app/main.py",
+          "raw_runner_sha256": "fea40ce2d4faea65d9959466ae03c55e0662a97c7bace11effa22c73e47ed341",
+          "git_normalized_lf_sha256": "d88c7818082e5b80885c5b209127309fa4dae85e71e2122a497c143cafa81fb8"
+        },
+        {
+          "path": "app/config.py",
+          "raw_runner_sha256": "a53dfabb0bd7f0d61563c7342759966f775be93de8a1ef4cb3a26effd6488357",
+          "git_normalized_lf_sha256": "c497ad6570a888e23a80e360e8e558acf610e67f19a3e92bcca8decc022de8d9"
+        },
+        {
+          "path": "app/services/audit_paging.py",
+          "raw_runner_sha256": "edb3bcb33b5fde81d06692a3b9fb6f3ec2d77b694a454b58369612638b18c82b",
+          "git_normalized_lf_sha256": "edb3bcb33b5fde81d06692a3b9fb6f3ec2d77b694a454b58369612638b18c82b"
+        },
+        {
+          "path": "tests/dashboard_operations_fixture.py",
+          "raw_runner_sha256": "c3b1318b20cb51ec6eb5aadc103522a1467e28c08c4b0fb8faef6a177ac13dd8",
+          "git_normalized_lf_sha256": "32151e3fbb8e18e6814c9f3f3c76030071087133e62d8516c472d85a6d08bb49"
+        },
+        {
+          "path": "scripts/test_workbench_review_browser.py",
+          "raw_runner_sha256": "7e4a8876ec2c258da9171868d20b4ead1df275594873496cbac5b40e42d53a22",
+          "git_normalized_lf_sha256": "7e4a8876ec2c258da9171868d20b4ead1df275594873496cbac5b40e42d53a22"
+        },
+        {
+          "path": "scripts/test_workbench_paging_browser.py",
+          "raw_runner_sha256": "20a95951bbbaea72602ad7c86bc7857076d120ac2c0a2fccf25efe75b275c8b4",
+          "git_normalized_lf_sha256": "20a95951bbbaea72602ad7c86bc7857076d120ac2c0a2fccf25efe75b275c8b4"
+        }
+      ],
+      "owned_servers_stopped": true
+    },
+    "review": {
+      "conditions": 34,
+      "passed": true,
+      "source_commit": "d82052eefaa0ea5897608e5e3b8d9a37957ce7b6",
+      "artifact": "docs/infrastructure-results/workbench-paging-review-browser-20261119.json",
+      "sources": [
+        {
+          "path": "app/static/app.js",
+          "raw_runner_sha256": "6126d33d0f5068fdb60212fb653cee9d45c48f6d4cfbeb7d8547c22386d19c3e",
+          "git_normalized_lf_sha256": "7f562a376d5d44465771cfe683596bbe7081f1dd8f3394f8eea9bffa2f9576a7"
+        },
+        {
+          "path": "app/static/workbench.html",
+          "raw_runner_sha256": "186063c8fb12155bb3cd008933fad76f5f148b78a9e15b169386449bd957c43d",
+          "git_normalized_lf_sha256": "f60a206e31506c5d45363d9ed2c81c693ca8bbeacf542f48d5c3eed89bcd3a97"
+        },
+        {
+          "path": "app/static/styles.css",
+          "raw_runner_sha256": "f4d38fedd2cd8d515f074fa1f98d8a0fa45832ba76fbd319ea44a2c43589dee0",
+          "git_normalized_lf_sha256": "5d551403e1f99dd6b728ef6ae43df64aab81cff950eda48be2f73fc93f6859dc"
+        },
+        {
+          "path": "app/main.py",
+          "raw_runner_sha256": "fea40ce2d4faea65d9959466ae03c55e0662a97c7bace11effa22c73e47ed341",
+          "git_normalized_lf_sha256": "d88c7818082e5b80885c5b209127309fa4dae85e71e2122a497c143cafa81fb8"
+        },
+        {
+          "path": "app/config.py",
+          "raw_runner_sha256": "a53dfabb0bd7f0d61563c7342759966f775be93de8a1ef4cb3a26effd6488357",
+          "git_normalized_lf_sha256": "c497ad6570a888e23a80e360e8e558acf610e67f19a3e92bcca8decc022de8d9"
+        },
+        {
+          "path": "tests/dashboard_operations_fixture.py",
+          "raw_runner_sha256": "c3b1318b20cb51ec6eb5aadc103522a1467e28c08c4b0fb8faef6a177ac13dd8",
+          "git_normalized_lf_sha256": "32151e3fbb8e18e6814c9f3f3c76030071087133e62d8516c472d85a6d08bb49"
+        },
+        {
+          "path": "app/services/audit_review_preconditions.py",
+          "raw_runner_sha256": "ed38a58b2c59973a6fefb1d819e9d0989d0b5c7aa338654950db48fe857bf163",
+          "git_normalized_lf_sha256": "ed38a58b2c59973a6fefb1d819e9d0989d0b5c7aa338654950db48fe857bf163"
+        },
+        {
+          "path": "scripts/test_workbench_review_browser.py",
+          "raw_runner_sha256": "7e4a8876ec2c258da9171868d20b4ead1df275594873496cbac5b40e42d53a22",
+          "git_normalized_lf_sha256": "7e4a8876ec2c258da9171868d20b4ead1df275594873496cbac5b40e42d53a22"
+        }
+      ],
+      "owned_servers_stopped": true
+    },
+    "paging_before_mobile": {
+      "conditions": 44,
+      "passed": true,
+      "source_commit": "d82052eefaa0ea5897608e5e3b8d9a37957ce7b6",
+      "artifact": "docs/infrastructure-results/workbench-paging-paging_before_mobile-browser-20261119.json",
+      "sources": [
+        {
+          "path": "app/static/app.js",
+          "raw_runner_sha256": "6126d33d0f5068fdb60212fb653cee9d45c48f6d4cfbeb7d8547c22386d19c3e",
+          "git_normalized_lf_sha256": "7f562a376d5d44465771cfe683596bbe7081f1dd8f3394f8eea9bffa2f9576a7"
+        },
+        {
+          "path": "app/static/workbench.html",
+          "raw_runner_sha256": "186063c8fb12155bb3cd008933fad76f5f148b78a9e15b169386449bd957c43d",
+          "git_normalized_lf_sha256": "f60a206e31506c5d45363d9ed2c81c693ca8bbeacf542f48d5c3eed89bcd3a97"
+        },
+        {
+          "path": "app/static/styles.css",
+          "raw_runner_sha256": "f4d38fedd2cd8d515f074fa1f98d8a0fa45832ba76fbd319ea44a2c43589dee0",
+          "git_normalized_lf_sha256": "5d551403e1f99dd6b728ef6ae43df64aab81cff950eda48be2f73fc93f6859dc"
+        },
+        {
+          "path": "app/main.py",
+          "raw_runner_sha256": "fea40ce2d4faea65d9959466ae03c55e0662a97c7bace11effa22c73e47ed341",
+          "git_normalized_lf_sha256": "d88c7818082e5b80885c5b209127309fa4dae85e71e2122a497c143cafa81fb8"
+        },
+        {
+          "path": "app/config.py",
+          "raw_runner_sha256": "a53dfabb0bd7f0d61563c7342759966f775be93de8a1ef4cb3a26effd6488357",
+          "git_normalized_lf_sha256": "c497ad6570a888e23a80e360e8e558acf610e67f19a3e92bcca8decc022de8d9"
+        },
+        {
+          "path": "app/services/audit_paging.py",
+          "raw_runner_sha256": "edb3bcb33b5fde81d06692a3b9fb6f3ec2d77b694a454b58369612638b18c82b",
+          "git_normalized_lf_sha256": "edb3bcb33b5fde81d06692a3b9fb6f3ec2d77b694a454b58369612638b18c82b"
+        },
+        {
+          "path": "tests/dashboard_operations_fixture.py",
+          "raw_runner_sha256": "c3b1318b20cb51ec6eb5aadc103522a1467e28c08c4b0fb8faef6a177ac13dd8",
+          "git_normalized_lf_sha256": "32151e3fbb8e18e6814c9f3f3c76030071087133e62d8516c472d85a6d08bb49"
+        },
+        {
+          "path": "scripts/test_workbench_review_browser.py",
+          "raw_runner_sha256": "7e4a8876ec2c258da9171868d20b4ead1df275594873496cbac5b40e42d53a22",
+          "git_normalized_lf_sha256": "7e4a8876ec2c258da9171868d20b4ead1df275594873496cbac5b40e42d53a22"
+        },
+        {
+          "path": "scripts/test_workbench_paging_browser.py",
+          "raw_runner_sha256": "68b5be4adc13110740726212b4df02225aa6e952680a3cc9d7fa685ed1ccbd50",
+          "git_normalized_lf_sha256": "68b5be4adc13110740726212b4df02225aa6e952680a3cc9d7fa685ed1ccbd50"
+        }
+      ],
+      "owned_servers_stopped": true
+    }
+  },
+  "fixture_failures": [
+    {
+      "artifact": "docs/infrastructure-results/workbench-paging-fixture-initial-20261119.json",
+      "reason": "New CRITICAL rule analysis added a second match; fixed fixture single-match assumption.",
+      "not_counted_as_pass": true
+    },
+    {
+      "artifact": "docs/infrastructure-results/workbench-paging-fixture-callback-20261119.json",
+      "reason": "Playwright second request argument replaced a default callback parameter; fixed signature.",
+      "not_counted_as_pass": true
+    },
+    {
+      "artifact": "docs/infrastructure-results/workbench-paging-fixture-race-20261119.json",
+      "reason": "Response collector captured prior caller response while UI correctly showed foreign tenant; match response credential in fixture.",
+      "not_counted_as_pass": true
+    }
+  ],
+  "test_scope": "Same329 pytest cases per OS on unchanged backend/pytest/logic sources. Mobile followup changes only HTML/CSS and browser fixture; no new whole repository run. Linux run overlaps that UI-only followup. Final UI separately tested by45 real browser conditions. Review34 and pre-mobile44 are functional-commit results, not additional unique detection cases.",
+  "test_files": [
+    "tests/test_api.py",
+    "tests/test_audit_review_client_binding.py",
+    "tests/test_audit_review_client_binding_process.py",
+    "tests/test_audit_review_identity.py",
+    "tests/test_audit_review_preconditions.py",
+    "tests/test_audit_review_wire_identity.py",
+    "tests/test_audit_review_preservation.py",
+    "tests/test_audit_query_admission.py",
+    "tests/test_audit_review_client.py",
+    "tests/test_audit_review_client_transport.py",
+    "tests/test_audit_review_client_process.py",
+    "tests/test_http_review_preconditions.py",
+    "tests/test_api_key_accounts.py",
+    "tests/test_runtime_release.py",
+    "tests/test_audit_review_policy.py",
+    "tests/test_enterprise_config.py",
+    "tests/test_audit_paging.py",
+    "tests/test_audit_paging_http.py",
+    "tests/test_dashboard_identity.py",
+    "tests/test_dashboard_audit_catalog.py"
+  ],
+  "scope": {
+    "backend_modified": false,
+    "models_prompts_rules_truth_predictions_modified": false,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "docker_resources_created": 0,
+    "push": false,
+    "ci": false,
+    "merge": false,
+    "full_repository_run": false,
+    "eight_hour_soak": false,
+    "production_config_changed": false
+  },
+  "historical_synthetic_development_360": {
+    "precision_percent": 96.45,
+    "recall_percent": 90.56,
+    "f1_percent": 93.41,
+    "false_positive_rate_percent": 3.33,
+    "unchanged": true,
+    "independent_goal_qualified": false
+  },
+  "visual_review": {
+    "desktop": [
+      1440,
+      1080
+    ],
+    "mobile": [
+      390,
+      844
+    ],
+    "final_screenshots_inspected": true,
+    "contained_mobile_table_scroll": true,
+    "mechanical_detector_executed": true,
+    "detector_warning_categories": [
+      "legacy contrast and small text",
+      "legacy kicker/decoration/background"
+    ],
+    "full_accessibility_pass_claimed": false
+  },
+  "limitations": [
+    "No full text or analyzer filter over all audit data.",
+    "Other case/session lists not paged by this change.",
+    "Local expiry timer depends on client clock; server retains final validation.",
+    "Policy rollout to all organization workers/custom writers remains separate.",
+    "No enterprise SSO, independent witness, multi-host power-loss or long soak acceptance."
+  ],
+  "sources": [
+    {
+      "path": "app/config.py",
+      "sha256": "a53dfabb0bd7f0d61563c7342759966f775be93de8a1ef4cb3a26effd6488357",
+      "normalized_lf_sha256": "c497ad6570a888e23a80e360e8e558acf610e67f19a3e92bcca8decc022de8d9"
+    },
+    {
+      "path": "app/main.py",
+      "sha256": "fea40ce2d4faea65d9959466ae03c55e0662a97c7bace11effa22c73e47ed341",
+      "normalized_lf_sha256": "d88c7818082e5b80885c5b209127309fa4dae85e71e2122a497c143cafa81fb8"
+    },
+    {
+      "path": "app/services/audit_paging.py",
+      "sha256": "edb3bcb33b5fde81d06692a3b9fb6f3ec2d77b694a454b58369612638b18c82b",
+      "normalized_lf_sha256": "edb3bcb33b5fde81d06692a3b9fb6f3ec2d77b694a454b58369612638b18c82b"
+    },
+    {
+      "path": "app/services/audit_review_preconditions.py",
+      "sha256": "ed38a58b2c59973a6fefb1d819e9d0989d0b5c7aa338654950db48fe857bf163",
+      "normalized_lf_sha256": "ed38a58b2c59973a6fefb1d819e9d0989d0b5c7aa338654950db48fe857bf163"
+    },
+    {
+      "path": "app/static/app.js",
+      "sha256": "6126d33d0f5068fdb60212fb653cee9d45c48f6d4cfbeb7d8547c22386d19c3e",
+      "normalized_lf_sha256": "7f562a376d5d44465771cfe683596bbe7081f1dd8f3394f8eea9bffa2f9576a7"
+    },
+    {
+      "path": "app/static/styles.css",
+      "sha256": "8fd1b8e821d36ec215960874ddc1a91301a2d4c7500e4cbefb04f6b0ad06b74d",
+      "normalized_lf_sha256": "fbeccd57c5ef2279d3faca52ab8e04bebfa72329956d83e7f47470b987e7e3ed"
+    },
+    {
+      "path": "app/static/workbench.html",
+      "sha256": "1d5865d303cea8a578ed2fd9e60774304901d917e44e58a6e81c0bbc3a9d1989",
+      "normalized_lf_sha256": "4eda148c20de74acf1776935805530fa8a354c6eae29f55ff07b3d6905de95b5"
+    },
+    {
+      "path": "scripts/audit_review_client.py",
+      "sha256": "67498007170045aa5cb869ce597b68038b159f2fedcc3d4f96d4a8c24a94d702",
+      "normalized_lf_sha256": "67498007170045aa5cb869ce597b68038b159f2fedcc3d4f96d4a8c24a94d702"
+    },
+    {
+      "path": "scripts/local_process_runtime.py",
+      "sha256": "c31f0fbf2aacd32c20e6a8e82a5e34eceb1419bfd3601ae8dff296d6506088b4",
+      "normalized_lf_sha256": "c31f0fbf2aacd32c20e6a8e82a5e34eceb1419bfd3601ae8dff296d6506088b4"
+    },
+    {
+      "path": "scripts/test_workbench_paging_browser.py",
+      "sha256": "20a95951bbbaea72602ad7c86bc7857076d120ac2c0a2fccf25efe75b275c8b4",
+      "normalized_lf_sha256": "20a95951bbbaea72602ad7c86bc7857076d120ac2c0a2fccf25efe75b275c8b4"
+    },
+    {
+      "path": "scripts/test_workbench_review_browser.py",
+      "sha256": "7e4a8876ec2c258da9171868d20b4ead1df275594873496cbac5b40e42d53a22",
+      "normalized_lf_sha256": "7e4a8876ec2c258da9171868d20b4ead1df275594873496cbac5b40e42d53a22"
+    },
+    {
+      "path": "tests/dashboard_operations_fixture.py",
+      "sha256": "c3b1318b20cb51ec6eb5aadc103522a1467e28c08c4b0fb8faef6a177ac13dd8",
+      "normalized_lf_sha256": "32151e3fbb8e18e6814c9f3f3c76030071087133e62d8516c472d85a6d08bb49"
+    },
+    {
+      "path": "tests/test_audit_review_policy.py",
+      "sha256": "f30e399cf94c630802421b04defb41afda2e3c2285b7e7ba28e127fb0c692fc7",
+      "normalized_lf_sha256": "f30e399cf94c630802421b04defb41afda2e3c2285b7e7ba28e127fb0c692fc7"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/workbench-paging-final-windows-20261119.xml",
+      "sha256": "4f090042848e0e6dcdd24d6de2c6a5bbccd2514ec07552dd7016024d3c244182",
+      "bytes": 49280
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-paging-final-linux-20261119.xml",
+      "sha256": "a58a07c16a965adcc0afa2caec3e3d7ac33874caf6f420a07f81aac75fafd72e",
+      "bytes": 48592
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-paging-paging-browser-20261119.json",
+      "sha256": "3f74e1cce523c3dcb9c40bb22dadcca6480964e76e59e36e5feadce143ee7438",
+      "bytes": 5749
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-paging-review-browser-20261119.json",
+      "sha256": "25c1ee4c6db537452670afdaf426d3fc1f07e8224c091b6dcf7a1a2f7945ab1e",
+      "bytes": 4690
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-paging-paging_before_mobile-browser-20261119.json",
+      "sha256": "9e651a2e1ed6d714baa7472e34e9149eeb21155825b0489e544591c9f3b79842",
+      "bytes": 5647
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-paging-fixture-initial-20261119.json",
+      "sha256": "5f38cfefdf9c4a386eb4f9d51ee644f3591495a3a9b469bad182a44d397245b1",
+      "bytes": 2205
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-paging-fixture-callback-20261119.json",
+      "sha256": "d1db5b09e9a7238925336b3939bc3a624950a5790aad99b72a1710f283452876",
+      "bytes": 2486
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-paging-fixture-race-20261119.json",
+      "sha256": "ee36bf1df1ea1aaa4cecbd33bfc8e0e9c77d3ae258147da8d89b903c73460ed9",
+      "bytes": 4964
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-paging-desktop-20261119.png",
+      "sha256": "f47519d27fe718326bc71e0d95fa26df1189c5453cedb22bd2650d27592b716e",
+      "bytes": 129001
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-paging-mobile-20261119.png",
+      "sha256": "43d565f78ccff09d5d6d858e187eedcb0a72e33e298b1d9a88ffd18cd84e41d9",
+      "bytes": 92249
+    },
+    {
+      "path": "docs/infrastructure-results/workbench-paging-expired-20261119.png",
+      "sha256": "76b1e892d867177ae5bd6c88b22553d6c2b43fdc4347269818b597ce5e08b9d5",
+      "bytes": 4727
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+
+
+
+  FAILED:
+    name: capacity_pressure,
+    alertname: C01WitnessCapacityPressure, time: 3s, 
+        exp:[
+            0:
+              Labels:{alertname="C01WitnessCapacityPressure", instance="local", job="zt-signals", severity="warning"}
+              Annotations:{}
+            ], 
+        got:[
+            0:
+              Labels:{alertname="C01WitnessCapacityPressure", instance="local", job="zt-signals", severity="warning", state="capacity_pressure"}
+              Annotations:{}
+            ]
+    name: capacity_exhausted,
+    alertname: C01WitnessCapacityPressure, time: 3s, 
+        exp:[
+            0:
+              Labels:{alertname="C01WitnessCapacityPressure", instance="local", job="zt-signals", severity="warning"}
+              Annotations:{}
+            ], 
+        got:[
+            0:
+              Labels:{alertname="C01WitnessCapacityPressure", instance="local", job="zt-signals", severity="warning", state="capacity_exhausted"}
+              Annotations:{}
+            ]

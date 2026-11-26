@@ -1,0 +1,205 @@
+{
+  "schema": "witness-capacity-state-evidence-1",
+  "implementation_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "preflight_commit": "f5d1a27",
+  "source_sha256": {
+    "app/services/audit_witness_observer.py": "98adc1f6f77744162d79fed60baa675fdaca5265ccd934cf8aebf0cdf728aec3",
+    "tests/test_audit_witness_observer.py": "7ab6d1dbee9b71a9cf05c15bb96dccaf5476d439b84ec6ac4842fce72f5a01d7",
+    "scripts/f1_lab/witness_observer_status.py": "c2b07cbd204e0602a5647df457cdb6e22be249522cab67303b7dde75fdff4674",
+    "tests/test_witness_monitor_cadence.py": "a6fbdad2dda88dbaef8c6c0afbad7111c26c28788ddcd35fb8f804e39d3ac44a",
+    "infra/observability/witness-alerts.test.yaml": "5d7e1ed227e4a02d29d1b6a89f71c874d115a09a0a551717cee536d4a3db6b9b"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/witness-capacity-grace-linux-final-20261120.log",
+      "sha256": "a54353182cb04119c833d6da462ab1c67b5a2b9eff3840aa3f6535dc21fd4636"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-grace-linux-final-20261120.xml",
+      "sha256": "6a60b6dc5179c3ad4fb585aca4a753b9efe9e74b84a4483db73520a7a8bfab39",
+      "tests": 64,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-grace-ruff-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-grace-windows-final-20261120.log",
+      "sha256": "3a24f048032efa7cff4d3a1f67cdf34a2a7286722d0f11299e3be3beef4e1b2d"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-grace-windows-final-20261120.xml",
+      "sha256": "eb7c6e7bfd76c527bbee06f3044935fd0d4a1122f3c227851eb3e365715c8bdb",
+      "tests": 64,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-grace-windows-initial-20261120.log",
+      "sha256": "e2f310c2f56fbf8b7347401b7af1513549c16c8cd6b7542852462f38434a9409"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-grace-windows-initial-20261120.xml",
+      "sha256": "820619ef5c8836c4f10abd0b891e0680f86c8ae29e33f835a009e92d6072c680",
+      "tests": 2,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-pending-linux-confirmed-20261120.log",
+      "sha256": "7e5e3d84f6cbd84abda8b7e63e27c7cb3e836f542728b8735ff7c9af55133cab"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-pending-linux-confirmed-20261120.xml",
+      "sha256": "c8220bb4e9d81da727d744636c1cf78c41437e6c9480cf09070fe3f27bcc3a29",
+      "tests": 62,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-pending-linux-expanded-20261120.log",
+      "sha256": "d787a089bbc7bad3b7340bdba5b6512b5d0d7604224c026b5602a92a5088135e"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-pending-linux-expanded-20261120.xml",
+      "sha256": "d1215c0020f9ae7c12302f478c0b431cdcd2132c5ff7b4bf43016efafa8d2212",
+      "tests": 62,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-pending-ruff-20261120.json",
+      "sha256": "edb3ba88db9898c16a55bbccbdc4dd8c48978ea23f91eb0ef89652c91e1e5e22"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-pending-ruff-final-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-pending-windows-confirmed-20261120.log",
+      "sha256": "2156fb39cb1253d20f431cf4936baf30557c20cbd803fc0056d64368b3ca737f"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-pending-windows-confirmed-20261120.xml",
+      "sha256": "5d4a6148e381524a59deb75f53312e272490b4d1831ee704c968fb6a2d8fab5a",
+      "tests": 62,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-pending-windows-expanded-20261120.log",
+      "sha256": "633fdec5b526b14f63150f5a1f833b91cd99584dcbbc46e2c01e622e723b2f10"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-pending-windows-expanded-20261120.xml",
+      "sha256": "8958819f54de0a2a0c7672410c2ed8b9cb54907545b003c6a5cf450224051ade",
+      "tests": 62,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 1,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-pending-windows-final-20261120.log",
+      "sha256": "07f27a8845d18b8d88f61b7c744d3a70042e27fcd1626a0067cb35cdce675a00"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-pending-windows-final-20261120.xml",
+      "sha256": "71e4c449fe7fb023b43eac9ea62b651a3115489dbff1fe6db958b4ee796d0fdd",
+      "tests": 0,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-pending-windows-initial-20261120.log",
+      "sha256": "10586f880bbaa96ecb84ae53f570f30e904efe59b085a60feacf17280f148e06"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-pending-windows-initial-20261120.xml",
+      "sha256": "380ac544e7cb37e4e3df64da61d758f23719b6f4605f3ad732d043da3f2de476",
+      "tests": 2,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-harness-20261120.py.txt",
+      "sha256": "ec4a7cdf42d6938bcf2226fa8b8934f4891064633b0c8d544d604eb482780318"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-extra-until0800-capacity-source-20261120.json",
+      "sha256": "a3c1285ccd9890516e713ad8aa0a4d74a2b42f4dc39cb494f765344895d9c228"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-extra-until0800-capacity-source-linux-20261120.json",
+      "sha256": "ea9ec47cdc47b9b9010a7d9418380d8ccd5e2aacbc09d181b5673ae57222beed"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-promtool-20261120.log",
+      "sha256": "8289a4919870ab5b28f5e90a86b4af3cdbd8c244516c02fca90d6e3f289a6711"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-alert-native-report-20261120.json",
+      "sha256": "7554da9408b8f404543519271992e54e2e5b6d4483dbabaef910d115e9de9e02"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-alert-native-promtool-20261120.txt",
+      "sha256": "9026d1264e8ede82b7b81c0b5def9a20d4020d8e15d29e6e8efcdfc27919b424"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-real-4096-report-20261120.json",
+      "sha256": "8124a73b66cf1fa82ec80864fd2c0e63c4b28ff26f6c894f4146f6d6b76ac431"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-real-4096-status-20261120.json",
+      "sha256": "b7af79c538a28391c5a7632a6bbb3f7fd1f86d209dd0b283e99703e7bfe1a837"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-real-4096-metrics-20261120.txt",
+      "sha256": "5732cbe541f7a02390d71bca10b7bf787417093e3cb7f6779d693100f5e4d962"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-real-4096-20261120.log",
+      "sha256": "8f3a9bb5c34a3ea65ddddad58244d88052d9ce47c1e8d791f7d0938124cf51a4"
+    }
+  ],
+  "real_4096_boundary_drill": {
+    "source_commit": "af311242e57a064f599001f33c9095335e380e23",
+    "completed": true,
+    "signed_receipts": 4096,
+    "boundary_rejections": 2,
+    "elapsed_seconds": 1611.9501942499992,
+    "limit_monkeypatched": false,
+    "private_fixture_removed": true,
+    "source_bytes_unchanged": true
+  },
+  "latest_full_regression_complete": false,
+  "goal_status": "active_until_0800",
+  "paid_api_calls": 0,
+  "detection_metrics_changed": false,
+  "controlled_rule_scenarios": 20,
+  "real_alert_flow": {
+    "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+    "checks": 22,
+    "fault_episodes": 4,
+    "local_loopback_only": true,
+    "capacity_episode_not_injected": true
+  }
+}

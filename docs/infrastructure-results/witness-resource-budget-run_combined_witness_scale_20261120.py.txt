@@ -1,0 +1,110 @@
+"""Full-sized signed fixture, NOT 4096 real collection cycles or detection cases."""
+import asyncio
+import base64
+import hashlib
+import json
+import os
+import secrets
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+source=Path(sys.argv[1]).resolve();output=Path(sys.argv[2]).resolve()
+manifest=json.loads(Path(sys.argv[3]).read_text())
+assert os.name=='posix' and source==Path(manifest['path']).resolve()
+output.mkdir(exist_ok=False,parents=True);sys.path.insert(0,str(source))
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from app.analyzers.rule_based import RuleBasedAnalyzer
+from app.models import AnalysisResult
+from app.scenarios import synthetic_events
+from app.services import audit_witness as witness
+from app.services import audit_witness_observer as observer
+from app.services import audit_witness_observer_backup as backup
+from app.services.audit_transfer import AuditTransferError, canonical
+from app.services.policy import response_preview
+from app.services.sqlite_audit import SQLiteAuditStore
+from scripts.f1_lab import witness_observer_status as bridge
+
+def audit_digest(path):
+    value=hashlib.sha256()
+    with path.open('rb') as stream:
+        for block in iter(lambda:stream.read(65536),b''):value.update(block)
+    return value.hexdigest()
+
+def altered():return [n for n,h in manifest['files'].items() if hashlib.sha256((source/n).read_bytes()).hexdigest()!=h]
+assert not altered() and witness.MAX_RECEIPTS==4096
+started=time.monotonic()
+result={'schema':'combined-source-and-control-resource-fixture-1','source_commit':manifest['source_commit'],'completed':False,'configured_max_receipts':4096,'limit_monkeypatched':False,'all_data_synthetic':True,'synthetically_signed_preload_receipts':4094,'preloaded_control_anchors':4095,'actual_observe_calls_before_preload':1,'actual_successful_collection_cycles_after_preload':1,'paid_api_calls':0,'detection_metrics_changed':False,'independent_storage_verified':False,'automatic_activation_allowed':False,'service_memory_limit_verified':False,'checks':[]}
+def check(name,condition):
+    assert condition,name
+    result['checks'].append({'name':name,'passed':True,'elapsed_seconds':time.monotonic()-started})
+    (output/'progress.json').write_text(json.dumps(result,indent=2)+'\n')
+try:
+    with tempfile.TemporaryDirectory(prefix='private-large-witness-control-') as temporary:
+        root=Path(temporary);audit=SQLiteAuditStore(root/'audit.sqlite3');signer=root/'signer';control=root/'control'
+        event=synthetic_events()[0];assessment=RuleBasedAnalyzer().assess(event)
+        from app.services.audit import _record_hash
+        base=AnalysisResult(event_id=event.event_id,analyzer='rule',assessment=assessment,policy_decision=response_preview(assessment,event),latency_ms=1)
+        previous=witness.GENESIS;payload_bytes=0
+        with audit._transaction(write=True) as con:
+            for number in range(1,100001):
+                record=base.model_copy(update={'analysis_id':f'{number:032x}','event_id':f'combined-{number:08d}'})
+                payload=record.model_dump_json();digest=_record_hash(previous,payload)
+                con.execute('INSERT INTO audit_entries VALUES (?,?,?,?)',(number,previous,digest,payload))
+                previous=digest;payload_bytes+=len(payload.encode())
+            con.execute('UPDATE audit_head SET seq=?,digest=? WHERE id=1',(100000,previous))
+        assert SQLiteAuditStore.MAX_ROWS==100000 and payload_bytes<=SQLiteAuditStore.MAX_BYTES
+        result.update(source_rows=100000,source_rows_synthetic_bulk_fixture=True,source_payload_bytes=payload_bytes,source_database_bytes=audit.path.stat().st_size)
+        audit_before=audit_digest(audit.path)
+        key_pin=witness.initialize(signer,audit.path,'large-control')['public_key_sha256']
+        profile=observer.initialize(control,signer,audit.path,key_pin,expected_receipt=witness.GENESIS)['profile_sha256']
+        first=witness.observe(signer,audit.path,key_pin,expected_receipt=witness.GENESIS,observation_id=f'{1:032x}')
+        private=Ed25519PrivateKey.from_private_bytes((signer/'private.key').read_bytes())
+        rows=[(1,canonical(first['receipt']).decode())];minimum=first['receipt_sha256']
+        for number in range(2,4096):
+            body={**first['receipt']['body'],'number':number,'previous_receipt':minimum,'observation_id':f'{number:032x}'}
+            receipt={'body':body,'signature':base64.b64encode(private.sign(witness._signature_prefix(body['schema'])+canonical(body))).decode()}
+            rows.append((number,canonical(receipt).decode()));minimum=hashlib.sha256(canonical(receipt)).hexdigest()
+        with witness._journal(signer,write=True) as con:con.executemany('INSERT INTO witness_receipts VALUES (?,?)',rows[1:])
+        with observer._database(control,write=True) as con:con.executemany('INSERT INTO anchors VALUES (?,?)',rows)
+        del private,rows
+        state=observer.status(control,profile,minimum_receipt=minimum)
+        check('full_preload_is_really_verified_before_last_collection',state['anchor_count']==4095 and state['state']=='capacity_pressure' and state['remaining_receipts']==1)
+        last=observer.cycle(control,profile,minimum_receipt=minimum);minimum=last['receipt_sha256']
+        state=observer.status(control,profile,minimum_receipt=minimum)
+        check('actual_final_collection_reaches_both_4096_ledgers',state['anchor_count']==4096 and state['state']=='capacity_exhausted' and not state['pending'])
+        held_control=(control/'observer.sqlite3').read_bytes();held_journal=(signer/'journal.sqlite3').read_bytes()
+        result['observer_database_bytes']=len(held_control);result['signer_journal_bytes']=len(held_journal)
+        try:observer.cycle(control,profile,minimum_receipt=minimum)
+        except AuditTransferError as error:assert 'capacity' in str(error)
+        else:raise AssertionError('new work admitted at full control')
+        check('full_control_rejects_new_work_without_creating_pending',(control/'observer.sqlite3').read_bytes()==held_control and (signer/'journal.sqlite3').read_bytes()==held_journal)
+        for name,query in [('middle_receipt_corrupt',"UPDATE anchors SET receipt='{}' WHERE number=2000"),('middle_anchor_missing','DELETE FROM anchors WHERE number=2000'),('held_minimum_missing','DELETE FROM anchors WHERE number=4096')]:
+            try:
+                with observer._database(control,write=True) as con:con.execute(query)
+                try:observer.cycle(control,profile,minimum_receipt=minimum)
+                except AuditTransferError:pass
+                else:raise AssertionError('corrupt large control admitted')
+                public=bridge.inspect(control,profile,minimum)
+                text=bridge.render_report({'profile_sha256':profile,'minimum_receipt':minimum},public)
+                check(name+'_fails_closed_without_signer_change','secops_witness_status_success 0' in text and (signer/'journal.sqlite3').read_bytes()==held_journal)
+            finally:(control/'observer.sqlite3').write_bytes(held_control)
+        recovery_key=secrets.token_bytes(32);package=root/'full-control.aesgcm'
+        saved=backup.backup(control,profile,minimum,package,recovery_key)
+        candidate=root/'candidate'
+        restored=backup.restore(package,candidate,saved['backup_sha256'],profile,minimum,recovery_key)
+        del recovery_key
+        proof=backup.inspect_restore(package,candidate,saved['backup_sha256'],restored['restore_receipt_sha256'],profile,minimum)
+        check('full_control_encrypted_backup_restore_and_keyless_inspection',proof['current_scope']['anchor_count']==4096 and proof['signed_snapshot_minimum_present'] and proof['decryption_checked'] is False)
+        result['encrypted_package_bytes']=package.stat().st_size
+        result['encrypted_package_sha256']=saved['backup_sha256']
+        (output/'keyless-proof.json').write_text(json.dumps(proof,indent=2)+'\n')
+        check('source_audit_bytes_unchanged',audit_digest(audit.path)==audit_before)
+    result['private_fixture_removed']=not root.exists();result['mutated_source_files']=altered();result['source_bytes_unchanged']=not result['mutated_source_files']
+    result['completed']=result['private_fixture_removed'] and result['source_bytes_unchanged']
+finally:
+    result['elapsed_seconds']=time.monotonic()-started
+    (output/'result.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result))
+raise SystemExit(0 if result['completed'] else 1)

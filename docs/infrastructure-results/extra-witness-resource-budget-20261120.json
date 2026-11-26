@@ -1,0 +1,253 @@
+{
+  "schema": "measured-witness-resource-budget-1",
+  "implementation_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26",
+  "source_sha256": {
+    "infra/systemd/secops-audit-witness@.service": "d932e78dd39284ac4c070d8268b81a3b176cfc2a2b3af4fa01c5481ac00f2161",
+    "infra/systemd/secops-audit-witness-restore-status@.service": "ae0ecf495441acb9fd56ce3fd23e41a458e3bfde8b1d90eb17326de7e238bfbc",
+    "scripts/run_witness_systemd_controls.py": "2230149d60812dbd7db0d094a4c9016a11d4055ca0970b5e608a4e14469726e7",
+    "tests/test_witness_systemd_templates.py": "73f75fdc23cbaaf8634b6df8a70429bc3ec9c6c0d796ff9fef6c157800c48759"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-combined-scale-cgroup-linux-20261120/cgroup-resources.json",
+      "sha256": "0648125be5f7a07d36bdfe4880390043ff673efe66e70a1343c64064a291851a"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-combined-scale-cgroup-linux-20261120/keyless-proof.json",
+      "sha256": "92e125185361689e54adb289e98d0bbb8319b4ad565a7f6aa4117cdece7834b9"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-combined-scale-cgroup-linux-20261120/ownership.json",
+      "sha256": "6b177e56f850ff61049b876a039b020e06d0fa18a3605c04d60aa75009b4c630"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-combined-scale-cgroup-linux-20261120/progress.json",
+      "sha256": "7e92567adcfef7849450ad25c7144ce8861d1a2e2f441849f6f82879d1b3fc73"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-combined-scale-cgroup-linux-20261120/resource-acceptance.json",
+      "sha256": "bbb9c7273c483284829019714e60803748942c94440cc4b4cd2f6671020f6cc1"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-combined-scale-cgroup-linux-20261120/result.json",
+      "sha256": "646b50093651d4ddd9bfdb1050d8ea8bbb71dc8eb1490c536df0d7b8083f3cf5"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-combined-scale-cgroup-linux-20261120/stderr.log",
+      "sha256": "a85906d476703bcbb71030c6da61babbfe8286a8398cd938b16c90972cf2d79d"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-combined-scale-cgroup-linux-20261120/stdout.log",
+      "sha256": "fc170ebadf4729c9b206a3a57d1e2f33d35196a8846280f5d45ee1dad9f49ffc"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-combined-scale-512-cgroup-linux-20261120/cgroup-resources.json",
+      "sha256": "31553742e8e6d08249157eeca5cefa697d17ba1650d1390555c3e9cd5a29cb86"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-combined-scale-512-cgroup-linux-20261120/keyless-proof.json",
+      "sha256": "eb2b1c53addb12c9c2651e69bbb11664fb0b0d434cdbfb93493f22dd8b57c82c"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-combined-scale-512-cgroup-linux-20261120/ownership.json",
+      "sha256": "2e2c37c36450bb70cf8256a516046e07618df3f1f98e4d7503404798786b6f31"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-combined-scale-512-cgroup-linux-20261120/progress.json",
+      "sha256": "229ea4a921ad547006c7891e53eeadb511e80473ab03c574ea8ee9112712a022"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-combined-scale-512-cgroup-linux-20261120/resource-acceptance.json",
+      "sha256": "54701decec75a570d582f87e94bf6460a1974e1c7344c76417a1172d2c3e131f"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-combined-scale-512-cgroup-linux-20261120/result.json",
+      "sha256": "862e7b90bfaf613a9fc1481475ecc01d76db2d8be87f0fc89a20d2bedd1b4a20"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-combined-scale-512-cgroup-linux-20261120/stderr.log",
+      "sha256": "30566ccad75990d8608175674e9733b750f5dde8a03ea76648fa62c423a7be2a"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-combined-scale-512-cgroup-linux-20261120/stdout.log",
+      "sha256": "3ef610003bf6688d20688bec3a25282f79523f1804a67cacb5b0c8450fac1e01"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-resource-budget-systemd-linux-20261120/collector-probe.log",
+      "sha256": "8f31b6230c7111c781bedbc2db8d3de3c5473eaca85c47a9445879dec6a93615"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-resource-budget-systemd-linux-20261120/ownership.json",
+      "sha256": "a5e50abb2e3e49279a8665f826e00b94ddb3789f6237ac1a1789f47523503fa1"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-resource-budget-systemd-linux-20261120/report.json",
+      "sha256": "206fa4a8bd059b54ed6a6bb6b1b565c9fc404b3b6c32e5be4a2d48acf8d417d8"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-resource-budget-systemd-linux-20261120/restore-probe.log",
+      "sha256": "1f238201ef28612c7a0cc27d4b7767038c8c3260a7578f08d3247e0efc77b5d9"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-resource-budget-systemd-linux-20261120/ztw-9a201529ffd9-collector-probe@lab.service.log",
+      "sha256": "8f31b6230c7111c781bedbc2db8d3de3c5473eaca85c47a9445879dec6a93615"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-resource-budget-systemd-linux-20261120/ztw-9a201529ffd9-collector@lab.service.log",
+      "sha256": "2bc3a68487b79f4047d48667345091c0c96da8075272d0d589cfac1ac9b65ee2"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-resource-budget-systemd-linux-20261120/ztw-9a201529ffd9-restore-probe@lab.service.log",
+      "sha256": "1f238201ef28612c7a0cc27d4b7767038c8c3260a7578f08d3247e0efc77b5d9"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-resource-budget-systemd-linux-20261120/ztw-9a201529ffd9-restore@lab.service.log",
+      "sha256": "04638a30664e982582122d2fb0536e8c127bb3eec88e30dd27f6c61f8fb09111"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-resource-budget-systemd-linux-20261120/ztw-9a201529ffd9-restore@lab.timer.log",
+      "sha256": "407e97d4b302a75b06ca563341a14a6357ce128c0c17b1d17e2970d83e51f812"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-resource-budget-systemd-linux-20261120.stdout.log",
+      "sha256": "34cc3a9fd66107fd322c2e75a756d69092e5fd5aec050c5242cb6db2fccfb4ad"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-resource-budget-systemd-linux-20261120.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-resource-budget-systemd-linux-20261120-provenance.json",
+      "sha256": "2c421222aa968598c11de868c525640279eef125ef5d6c1e1b95c93aed6138af"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-witness-resource-budget-windows-templates-20261120.xml",
+      "sha256": "0d6d5d1e0d01c8df28e3dfde6484d9cff80ec792723a589d57ffcc262df68314"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-until0800-resource-archive-origin-20261120.json",
+      "sha256": "1cf4cc11570c3b8f82edf12e26481d089bf16c954043e5c2810a04883d88ac7a"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-until0800-resource-ruff-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-prepare_combined_witness_fixture_20261120.py.txt",
+      "sha256": "2dde61ce8d2541f4f4fd655733a21cf3e4b0f559e8437eedc33d258d1b389317"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-run_combined_witness_scale_20261120.py.txt",
+      "sha256": "5dfa75ca094a190f992d56d122d3895cc94e2feebd7f970d332db4938cdd3910"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-run_resource_512_cgroup_20261120.py.txt",
+      "sha256": "df3ad304bf0f939941add9e66079009a89d276d791e81fc5380ae68094990b7c"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-run_source_scale_cgroup_20261120.py.txt",
+      "sha256": "ccbb1b1ed034cbe0fe52a6f2de9d9ffd82ffc4ca778e984f653beb8c28a9f1ad"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-run_resource_systemd_20261120.py.txt",
+      "sha256": "38c89efab703b9418508c3769622e7ec148cc8a455f8b7fd24feba9d0c7909d0"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resource-budget-verify_resource_archive_origin_20261120.py.txt",
+      "sha256": "6d89dad93817a3deebe53959e0fdb281bd51ca8f257ff860c78739e786168a36"
+    }
+  ],
+  "combined_fixture_runs": {
+    "before256": {
+      "schema": "owned-large-witness-resource-envelope-1",
+      "unit": "zt-large-witness-85e2a64bfc0e4752bec3ccb2e87a6988.service",
+      "completed": true,
+      "production_sandbox_tested": false,
+      "unit_created_in_etc": false,
+      "paid_api_calls": 0,
+      "exit_code": 0,
+      "resources": {
+        "before": {
+          "cpu_usage_nsec": 25054000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 6819840,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": 50.0,
+          "throttled_periods": 0,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 8
+        },
+        "after": {
+          "cpu_usage_nsec": 33543518000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 267689984,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": 50.0,
+          "throttled_periods": 668,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 8
+        },
+        "harness_exit_code": 0
+      },
+      "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+      "source_bytes_unchanged": true,
+      "large_fixture_checks": 8,
+      "owned_temporary_tree_removed": true,
+      "owned_unit_inactive": true
+    },
+    "after512": {
+      "schema": "owned-large-witness-resource-envelope-1",
+      "unit": "zt-large-witness-7e2482336830450b9e31ebd5e0faef8e.service",
+      "completed": true,
+      "production_sandbox_tested": false,
+      "unit_created_in_etc": false,
+      "paid_api_calls": 0,
+      "exit_code": 0,
+      "resources": {
+        "before": {
+          "cpu_usage_nsec": 42481000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 6836224,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 536870912,
+          "cpu_quota_percent": 50.0,
+          "throttled_periods": 0,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 8
+        },
+        "after": {
+          "cpu_usage_nsec": 43263956000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 269701120,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 536870912,
+          "cpu_quota_percent": 50.0,
+          "throttled_periods": 861,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 8
+        },
+        "harness_exit_code": 0
+      },
+      "source_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26",
+      "source_bytes_unchanged": true,
+      "large_fixture_checks": 8,
+      "owned_temporary_tree_removed": true,
+      "owned_unit_inactive": true
+    }
+  },
+  "actual_systemd_checks": 15,
+  "collector_limit_bytes": 536870912,
+  "restore_checker_template_limit_bytes": 268435456,
+  "restore_checker_kernel_limit_separately_measured": false,
+  "paid_api_calls": 0,
+  "detection_target_reached": false,
+  "focused_windows_template_source_commit": "c96db35c64980165c395419f8c05606b998fa49b",
+  "combined_fixture_measurement_includes_setup_and_backup": true,
+  "standalone_collector_at_combined_limits_peak_separately_measured": false
+}

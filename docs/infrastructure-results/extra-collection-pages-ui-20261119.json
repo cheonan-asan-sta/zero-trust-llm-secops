@@ -1,0 +1,230 @@
+{
+  "schema": "extra-collection-pages-ui-1",
+  "source_commit": "48520ef460d73435ddbff60a3ba8506cb8ab6818",
+  "branch": "extra",
+  "screens": [
+    "workbench cases",
+    "workbench verified_source sessions",
+    "dashboard cases",
+    "dashboard sessions"
+  ],
+  "fixture": {
+    "cases_per_primary_tenant": 27,
+    "cryptographically_signed_sessions_per_primary_tenant": 103,
+    "foreign_tenant_records_separate": true,
+    "no_signature_verification_bypass": true,
+    "case_rows_reuse_one_synthetic_incident_with_distinct_ids": true
+  },
+  "actual_http_mutations_checked": [
+    "case transition",
+    "session revoke"
+  ],
+  "client_checks": [
+    "caller before/after",
+    "unchanged snapshot/expiry/count",
+    "row ID/type/tenant",
+    "scope and generation",
+    "401/403 reset",
+    "same key subject remap before page request",
+    "late previous tenant response discarded"
+  ],
+  "pytest": {
+    "windows": {
+      "tests": 72,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 72,
+      "artifact": "docs/infrastructure-results/collection-ui-windows-20261119.xml"
+    },
+    "linux": {
+      "tests": 72,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 72,
+      "artifact": "docs/infrastructure-results/collection-ui-linux-20261119.xml"
+    }
+  },
+  "browser": {
+    "collections": {
+      "conditions": 112,
+      "passed": true,
+      "artifact": "docs/infrastructure-results/collection-pages-ui-collections-browser-20261119.json"
+    },
+    "review": {
+      "conditions": 34,
+      "passed": true,
+      "artifact": "docs/infrastructure-results/collection-pages-ui-review-browser-20261119.json"
+    },
+    "readonly": {
+      "conditions": 57,
+      "passed": true,
+      "artifact": "docs/infrastructure-results/collection-pages-ui-readonly-browser-20261119.json"
+    }
+  },
+  "initial_failure": {
+    "artifact": "docs/infrastructure-results/collection-pages-ui-initial-observer-failure-20261119.json",
+    "cause": "response observer could capture pending navigation while click awaited reload readiness",
+    "fixture_fix": "await idle before observation, bind expected credential",
+    "not_counted_as_pass": true
+  },
+  "full_project_regression_results_prepared": false,
+  "eight_hour_soak": false,
+  "paid_api_aws_docker_push_ci_merge": false,
+  "production_configuration_changed": false,
+  "model_rules_truth_predictions_modified": false,
+  "fresh_f1_evaluation": false,
+  "legacy_case_form_retained_and_labelled_recent_compatibility": true,
+  "local_casestore_multiwriter_transaction_provided": false,
+  "mechanical_design_warnings_remain": true,
+  "full_accessibility_pass_claimed": false,
+  "remaining_goal": [
+    "caller and mandatory review policy preparation",
+    "separate audit witness local implementation"
+  ],
+  "sources": [
+    {
+      "path": "app/dashboard_catalog.py",
+      "sha256": "67795cceec5327844245786736108d322137ea5bcf3784b250781f387cab629e",
+      "normalized_lf_sha256": "3984e63693bbc1007be420889579c8b1a7bd39d7624e44f4f1bd041735c846fe"
+    },
+    {
+      "path": "app/services/audit_paging.py",
+      "sha256": "5ad3c10cd481753381290d0972f7b89ca069380b2077c22d4454cdf5049280b8",
+      "normalized_lf_sha256": "5ad3c10cd481753381290d0972f7b89ca069380b2077c22d4454cdf5049280b8"
+    },
+    {
+      "path": "app/services/collection_paging.py",
+      "sha256": "41c0a82cd86683124e36e7f79b19a0eddc21bb5e8bba1f8c16dfaf05d5478810",
+      "normalized_lf_sha256": "41c0a82cd86683124e36e7f79b19a0eddc21bb5e8bba1f8c16dfaf05d5478810"
+    },
+    {
+      "path": "app/services/trusted_signals.py",
+      "sha256": "fd32049117f299818f2573017cc67f74762797aeec2d56f01152ecf8b896d4b2",
+      "normalized_lf_sha256": "9feb5bf1d007ac2504ea2ab6e8d1a49754bcf62e8768308a23ccdfbe995318d3"
+    },
+    {
+      "path": "app/services/zero_trust.py",
+      "sha256": "0076781d69e5c9281e48218db69bb0ae0d0b33ef2e73066324d934be74d87b8a",
+      "normalized_lf_sha256": "f6adff1b7d33b06f2da22638f8738abcef2842de511a2b767af15062a8115c92"
+    },
+    {
+      "path": "app/static/app.js",
+      "sha256": "9a06ce5141e3dbff17f9cf8fa58d80073245daeb43669ab75445b524cc38f797",
+      "normalized_lf_sha256": "5e90b3b0cf6dd0fc05f3de0f64a1afd8acef3d917b724e7c5737b658be32b204"
+    },
+    {
+      "path": "app/static/collection-view.js",
+      "sha256": "dff22ed271c51c6ffebb96ecb3cae2a003da38229cefeacebbcecd4b7db9d28f",
+      "normalized_lf_sha256": "dff22ed271c51c6ffebb96ecb3cae2a003da38229cefeacebbcecd4b7db9d28f"
+    },
+    {
+      "path": "app/static/dashboard.css",
+      "sha256": "7fd9607cf921081a9c88069bbd3ec653db653f25ac2e5d56704a4672e8c1666c",
+      "normalized_lf_sha256": "c1d217f715fb2281aba89bb4e71c2e4d08a0bf2cdbe43e28119b53b57a20c81e"
+    },
+    {
+      "path": "app/static/dashboard.js",
+      "sha256": "9f1f8f958108889fc5c92d1004d1be49279164c7ded2d447b4c6d566fcaa84ca",
+      "normalized_lf_sha256": "86e7d74931f1d0f402ad011002b5705a3e1ca83e723be380cad485975a8fc667"
+    },
+    {
+      "path": "app/static/index.html",
+      "sha256": "d7f7dd686d61fcb7e577176b3214ab496f83d7a17c099ba0a31a740474d9950a",
+      "normalized_lf_sha256": "93c9f8704db21b155bf957e7481418b714257397c8089e18e1ae2aafc9ae7d2d"
+    },
+    {
+      "path": "app/static/styles.css",
+      "sha256": "471997465c5194e0f6e9f93b09d9fa14dac5edd3fd73ecc2387218b11d2e955c",
+      "normalized_lf_sha256": "c8ea6f3631d55d3223c33055d9054407c9f0ef9f5f3084726b3a63e0ef9c9bab"
+    },
+    {
+      "path": "app/static/workbench.html",
+      "sha256": "c0aa13dc89db7df4316f7c1ad5eacdbe22d1404ff1d7be69f0c8cd71872d28dd",
+      "normalized_lf_sha256": "77718df4ea11a5119c864ac4936058585a4f6d63ddb2c78cbb7401d69098c654"
+    },
+    {
+      "path": "app/zero_trust_api.py",
+      "sha256": "902e5c7eca7f19d88fbe38d5a1b634609488e85b099efa85de6e1f699dd4cf23",
+      "normalized_lf_sha256": "bb47750b529a23d5dfa2ded6038f714b5f34d0f44be69c878e4b630bc5f33af9"
+    },
+    {
+      "path": "app/zero_trust_models.py",
+      "sha256": "983cf53f784be1e32056203732ab2ab60f871891a3190e727c4bdda66061723e",
+      "normalized_lf_sha256": "1a094d2d082008d9814a965b5644cc2d365c5497ff76b6a8ea9dbb6477bbf71a"
+    },
+    {
+      "path": "scripts/test_collection_pages_browser.py",
+      "sha256": "7c3b567da86b0448026e8ef7d8407ba5966f78934cad4b990f99220649466b22",
+      "normalized_lf_sha256": "687874d703e471e4f0371b9db1a32d9329f43ba7ab7d022bb855fa6bf5250db6"
+    },
+    {
+      "path": "scripts/test_workbench_review_browser.py",
+      "sha256": "322205f07333fed51ff568f862f47e1b3c7ec6eba01c4eac8337e9a30fe50187",
+      "normalized_lf_sha256": "322205f07333fed51ff568f862f47e1b3c7ec6eba01c4eac8337e9a30fe50187"
+    },
+    {
+      "path": "tests/dashboard_operations_fixture.py",
+      "sha256": "7a812d6fc3d0d5590db2cd26777051017700d15827b642690a90b17f208d0a9d",
+      "normalized_lf_sha256": "6fd1e0e8a6ecc9c4fcf09e14df1d953edb4fdb17337957c38b5e0f762f069bc3"
+    },
+    {
+      "path": "tests/test_collection_paging.py",
+      "sha256": "cfac1a7b9520943234799e2fc844cc976e9554ceb720500ffa272642c762c56b",
+      "normalized_lf_sha256": "cfac1a7b9520943234799e2fc844cc976e9554ceb720500ffa272642c762c56b"
+    },
+    {
+      "path": "tests/test_trusted_signals.py",
+      "sha256": "5cc4ba4c780ea38221502566d50c414def37ef252f39ef4db6c65d0b0e9e4b06",
+      "normalized_lf_sha256": "b983429dd823e77c94116951786e42c9af957568fb681e35264208cb38a0228a"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/collection-ui-windows-20261119.xml",
+      "sha256": "fb42c55cc92dabf964b8b4a94bd536e8f6a154ccb41f3224483002d1e5fcde2e",
+      "bytes": 9494
+    },
+    {
+      "path": "docs/infrastructure-results/collection-ui-linux-20261119.xml",
+      "sha256": "09069d770e8a027ea4d4751e5daa74c53a8b00700c310464f21fb899cced4bf3",
+      "bytes": 9497
+    },
+    {
+      "path": "docs/infrastructure-results/collection-pages-ui-collections-browser-20261119.json",
+      "sha256": "7f035b878ca9b3d92dc48baba5a61aa72619b968b1bbfec53e00de026a9a62bc",
+      "bytes": 10479
+    },
+    {
+      "path": "docs/infrastructure-results/collection-pages-ui-review-browser-20261119.json",
+      "sha256": "155053232408c28c3a3000e49a5ddf7ab3959c25a5524d4a7851535331e22070",
+      "bytes": 4690
+    },
+    {
+      "path": "docs/infrastructure-results/collection-pages-ui-readonly-browser-20261119.json",
+      "sha256": "a66b91955f854817b74e7dbe40d67397b06001f7f96cb7c715260520f6bfc00b",
+      "bytes": 5557
+    },
+    {
+      "path": "docs/infrastructure-results/collection-pages-ui-initial-observer-failure-20261119.json",
+      "sha256": "3a5b9aa166fe5f449bf2a0e07b68b7b9a9a69ba8734459a7f9acc5df5c9807b6",
+      "bytes": 6580
+    },
+    {
+      "path": "docs/infrastructure-results/collection-pages-ui-cases-mobile-20261119.png",
+      "sha256": "03126e0461699c9aba4cc0d0734f9ae85a2ea926fdbf2d7ed30d36de41f3fd07",
+      "bytes": 53881
+    },
+    {
+      "path": "docs/infrastructure-results/collection-pages-ui-signed-mobile-20261119.png",
+      "sha256": "f1a061392d2bb5993b368a14f75ad874c168dc552e971f53b945be65f71c7daa",
+      "bytes": 85053
+    },
+    {
+      "path": "docs/infrastructure-results/collection-pages-ui-sessions-desktop-20261119.png",
+      "sha256": "85ba1d29bf1cfdc2931e4d4a477a96bddcf0e0356043871c361121efe2192c7a",
+      "bytes": 109450
+    }
+  ]
+}

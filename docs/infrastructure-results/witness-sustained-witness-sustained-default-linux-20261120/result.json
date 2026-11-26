@@ -1,0 +1,38 @@
+{
+  "schema": "sustained-local-witness-watch-1",
+  "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "source_files": 2241,
+  "duration_requested_seconds": 6000,
+  "completed": false,
+  "real_8h_soak": false,
+  "independent_storage_verified": false,
+  "detection_metrics_changed": false,
+  "paid_api_calls": 0,
+  "watch_default_interval_seconds": 60,
+  "watch_default_max_age_seconds": 180,
+  "samples": 11,
+  "appended_source_rows": 2,
+  "owned_restarts": [],
+  "processes": [
+    {
+      "pid": 32507,
+      "started_elapsed_seconds": 0.11943615400014096
+    }
+  ],
+  "last_sample": {
+    "elapsed_seconds": 110.36201900199922,
+    "pid": 32507,
+    "state": "unobserved",
+    "anchor_count": 2,
+    "source_rows": 2,
+    "unobserved_rows": 1,
+    "rss_bytes": 71610368,
+    "status_success": true,
+    "action_required": false
+  },
+  "failure_type": "KeyError",
+  "failure": "'unobserved_rows'",
+  "owned_process_inactive": true,
+  "private_fixture_removed": true,
+  "elapsed_seconds": 120.42648424199979
+}

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="3.827" timestamp="2026-11-19T14:56:02.323729+09:00" hostname="희주"><testcase classname="tests.test_audit_review_policy" name="test_identity_required_policy_rejects_version_only_before_audit_read" time="0.164"><failure message="assert 200 == 428&#10; +  where 200 = &lt;Response [200 OK]&gt;.status_code">tests\test_audit_review_policy.py:41: in test_identity_required_policy_rejects_version_only_before_audit_read
+    assert response.status_code == 428
+E   assert 200 == 428
+E    +  where 200 = &lt;Response [200 OK]&gt;.status_code</failure></testcase></testsuite></testsuites>

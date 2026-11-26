@@ -1,0 +1,136 @@
+{
+  "date": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "pushed": false,
+  "ci_started": false,
+  "merged": false,
+  "model_quality_reevaluated": false,
+  "new_tests_passed": 61,
+  "new_tests_not_applicable": 2,
+  "route": "/audit/results",
+  "supported_local_backends": [
+    "sqlite",
+    "jsonl",
+    "federated_jsonl"
+  ],
+  "cloud_paging_performs_no_aws_call_and_returns501": true,
+  "cipher": "AES-256-GCM",
+  "key_derivation": "HKDF-SHA256 separate purpose keys",
+  "cursor_ttl_seconds": 900,
+  "ttl_extended_on_continuation": false,
+  "actual_independent_reader_process_resume_tested": true,
+  "actual_http_worker_cursor_resume_tested": false,
+  "native_systemd_rerun_this_phase": false,
+  "earlier_core": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "2",
+    "tests": "47",
+    "time": "8.881",
+    "timestamp": "2026-11-19T02:29:43.454181+09:00",
+    "hostname": "희주",
+    "xml_sha256": "0d0db5bf610434d90b2156eb84a5561e0b52fc4fa37d73cd120853e23afb318a",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\audit-paging-core-20261119.xml"
+  },
+  "earlier_http_header_and_test_launcher_failures": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "3",
+    "skipped": "2",
+    "tests": "61",
+    "time": "10.168",
+    "timestamp": "2026-11-19T02:33:20.596474+09:00",
+    "hostname": "희주",
+    "xml_sha256": "2e9447058f42a21e2c3de5e0c49c46a5388e4886712f983ccb579c8e1feaf4cd",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\audit-paging-focused-final-20261119.xml"
+  },
+  "corrected_earlier_focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "2",
+    "tests": "61",
+    "time": "11.130",
+    "timestamp": "2026-11-19T02:35:28.470710+09:00",
+    "hostname": "희주",
+    "xml_sha256": "bb36d428e439e5caffb658ac9130f2475c4acfbb3e41fdc73b6f229e40c4a6a2",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\audit-paging-focused-corrected-20261119.xml"
+  },
+  "before_reserved_route_fix": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "1",
+    "skipped": "0",
+    "tests": "1",
+    "time": "3.769",
+    "timestamp": "2026-11-19T02:40:23.917940+09:00",
+    "hostname": "희주",
+    "xml_sha256": "89a736e56cc1cb900330589cbf67ef240ad97eff520cd64df4668573bd64f992",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\audit-paging-route-collision-before-20261119.xml"
+  },
+  "windows_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "2",
+    "tests": "167",
+    "time": "24.461",
+    "timestamp": "2026-11-19T02:40:55.512054+09:00",
+    "hostname": "희주",
+    "xml_sha256": "02f6c83ccaeaa6492dfe9b2e1e21fa90a89ee497f59fd992707b6d3a5abe0387",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\audit-paging-windows-final-20261119.xml"
+  },
+  "linux_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "2",
+    "tests": "277",
+    "time": "82.813",
+    "timestamp": "2026-11-19T02:41:01.481909+09:00",
+    "hostname": "localhost",
+    "xml_sha256": "29c753d0da16b096d77805a0adaca906e2a4f190d61ef1038aa39407b62c6edd",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\audit-paging-linux-final-20261119.xml"
+  },
+  "source_files": [
+    {
+      "path": "app/services/audit_paging.py",
+      "sha256": "7b7c576b28c83cbbf694085b37ceda0c3e11aa7c5a298daf88c05785205029ae"
+    },
+    {
+      "path": "app/services/sqlite_audit.py",
+      "sha256": "9b99e02c7ea76a4a8b3914f7bcb1379034ae94fdc07aee88223b32f8f1c97cf6"
+    },
+    {
+      "path": "app/services/audit.py",
+      "sha256": "24276fb9dd49d5c8fd83096239281a86ddf160a30db618273c231cab53daa275"
+    },
+    {
+      "path": "app/main.py",
+      "sha256": "18af7d64dcd4dc6c165e80537abaa887ae34577a90826b487ae4b3c875e77797"
+    },
+    {
+      "path": "app/models.py",
+      "sha256": "ed374a0cdeefafd4b491fc5a2853d466a2096fcab1fd78701b6b213f34fcf7a7"
+    },
+    {
+      "path": "app/config.py",
+      "sha256": "98389a3ff7c27151c6a306a43d7baca03aad4396881bf24c6d7149d69e13ff84"
+    },
+    {
+      "path": ".env.example",
+      "sha256": "a39270b5461cb56fe070d01be9320df9ddc83bbed4b25d0f0ca1270829639e6b"
+    },
+    {
+      "path": "tests/test_audit_paging.py",
+      "sha256": "83cde0f6b490754facca43020c1b270d1d3162fe88f1dd77690e2c474a24d12e"
+    },
+    {
+      "path": "tests/test_audit_paging_http.py",
+      "sha256": "b5120350f9325db0dba0eba11b44cd7ce5bf4fd89ce29bd234c5c81a3bd8cfb7"
+    }
+  ]
+}

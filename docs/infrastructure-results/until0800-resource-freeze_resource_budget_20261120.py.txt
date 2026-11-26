@@ -1,0 +1,24 @@
+import hashlib
+import json
+import subprocess
+import tarfile
+from pathlib import Path
+
+root=Path.cwd();runtime=root/'runtime';commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+target=root.parent/f'witness-verified-source-20261120-{commit[:8]}'
+archive=runtime/f'until0800-source-{commit[:8]}.tar'
+with archive.open('xb') as stream:subprocess.run(['git','archive',commit],stdout=stream,check=True)
+target.mkdir(exist_ok=False);files={};modes={}
+with tarfile.open(archive) as bundle:
+    for item in bundle:
+        assert item.isfile() or item.isdir()
+        assert not Path(item.name).is_absolute() and '..' not in Path(item.name).parts
+        dest=target/item.name
+        if item.isdir():dest.mkdir(parents=True,exist_ok=True);continue
+        dest.parent.mkdir(parents=True,exist_ok=True);data=bundle.extractfile(item).read();dest.write_bytes(data)
+        files[item.name]=hashlib.sha256(data).hexdigest();modes[item.name]=item.mode
+manifest={'schema':'verified-source-archive-1','source_commit':commit,'archive_sha256':hashlib.sha256(archive.read_bytes()).hexdigest(),'git_checkout':False,'path':str(target),'files':files,'file_modes':modes}
+(runtime/'extra-until0800-resource-source-20261120.json').write_text(json.dumps(manifest,indent=2)+'\n',encoding='utf-8')
+source=(runtime/'run_frozen_latest_20261120.py').read_text(encoding='utf-8').replace('extra-until0800-latest-source','extra-until0800-resource-source')
+(runtime/'run_frozen_resource_20261120.py').write_text(source,encoding='utf-8')
+print(json.dumps({'commit':commit,'files':len(files),'target':str(target),'archive':str(archive)}))

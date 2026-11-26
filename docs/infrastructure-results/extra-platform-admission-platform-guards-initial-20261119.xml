@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="7" time="4.415" timestamp="2026-11-19T23:59:12.989288+09:00" hostname="희주"><testcase classname="tests.test_native_platform_admission" name="test_native_exec_refuses_non_linux_without_fork" time="0.002" /><testcase classname="tests.test_native_platform_admission" name="test_kernel_peer_cannot_authenticate_without_peer_credentials" time="0.002" /><testcase classname="tests.test_native_platform_admission" name="test_private_archive_requires_posix_identity_before_file_access[file]" time="0.002" /><testcase classname="tests.test_native_platform_admission" name="test_private_archive_requires_posix_identity_before_file_access[directory]" time="0.001" /><testcase classname="tests.test_native_platform_admission" name="test_mtls_recovery_requires_directory_durability_before_state_access[restore]" time="0.001"><failure message="scripts.app_state_recovery.RecoveryError: mtls_recovery_posix_required">tests\test_native_platform_admission.py:42: in test_mtls_recovery_requires_directory_durability_before_state_access
+    recovery.restore()
+scripts\mtls_app_recovery.py:84: in restore
+    recovery.require(os.name == "posix" and hasattr(os, "O_DIRECTORY"),
+scripts\app_state_recovery.py:56: in require
+    raise RecoveryError(code)
+E   scripts.app_state_recovery.RecoveryError: mtls_recovery_posix_required</failure></testcase><testcase classname="tests.test_native_platform_admission" name="test_mtls_recovery_requires_directory_durability_before_state_access[sync]" time="0.001"><failure message="scripts.app_state_recovery.RecoveryError: mtls_recovery_posix_required">tests\test_native_platform_admission.py:44: in test_mtls_recovery_requires_directory_durability_before_state_access
+    recovery.sync_directory("missing-not-created")
+scripts\mtls_app_recovery.py:41: in sync_directory
+    recovery.require(os.name == "posix" and hasattr(os, "O_DIRECTORY"),
+scripts\app_state_recovery.py:56: in require
+    raise RecoveryError(code)
+E   scripts.app_state_recovery.RecoveryError: mtls_recovery_posix_required</failure></testcase><testcase classname="tests.test_native_platform_admission" name="test_durable_input_is_not_silently_accepted_on_windows" time="0.013" /></testsuite></testsuites>

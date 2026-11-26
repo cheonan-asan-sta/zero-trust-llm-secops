@@ -14,7 +14,7 @@ from threading import RLock
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from fastapi import HTTPException
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, RedirectResponse
 
 from app.config import Settings, get_settings
 from app.security import Principal, Role, _api_key_principal
@@ -40,12 +40,14 @@ from scripts.f1_lab.web_verified_context import (
 
 SCRIPT = 'import hashlib,sys; data=sys.stdin.buffer.read(); print(hashlib.sha256(data).hexdigest())'
 RESOURCE = 'local-fixture-script'
+REDIRECT_RESOURCE = 'local-fixture-redirect'
+REDIRECT_PATH, REDIRECT_LOCATION = '/continue', '/account'
 ALLOW_PATH, DENY_PATH = '/media/uploads/allowed.php', '/media/uploads/denied.php'
 
 
 class LocalWebCaptureLab:
     def __init__(self, directory, baseline, *, fault_denied_execution=False, max_body_bytes=1048576,
-                 max_records=1000):
+                 max_records=1000, tenant_id='capture-lab', subject='web-user', redirect_scope=None):
         require(get_settings().app_environment in {'local','test'} and type(fault_denied_execution) is bool,
                 'web_capture_lab_local_only')
         self.directory = Path(directory)
@@ -53,13 +55,18 @@ class LocalWebCaptureLab:
         self.directory.mkdir(parents=True,mode=0o700)
         self.api_key = secrets.token_urlsafe(32)
         self.settings = Settings(_env_file=None,app_environment='local',auth_mode='api_key',
-            api_key_sha256=hashlib.sha256(self.api_key.encode()).hexdigest(),api_key_subject='web-user',
-            api_key_tenant_id='capture-lab',api_key_roles='viewer',analyzer_mode='rule',openai_api_key=None)
-        self.operator = Principal('capture-operator','capture-lab',frozenset({Role.ANALYST}),'api_key')
+            api_key_sha256=hashlib.sha256(self.api_key.encode()).hexdigest(),api_key_subject=subject,
+            api_key_tenant_id=tenant_id,api_key_roles='viewer',analyzer_mode='rule',openai_api_key=None)
+        self.operator = Principal('capture-operator',tenant_id,frozenset({Role.ANALYST}),'api_key')
         self.policy = {'action':'execute_uploaded_script','resource':RESOURCE,'version':1,'method':['GET','POST'],
             'allowed_path':ALLOW_PATH,'denied_path':DENY_PATH,'required_role':'viewer',
             'execution_scope':'local_fixed_fixture_only'}
         self.policy_sha = digest(self.policy)
+        location_sha = hashlib.sha256(REDIRECT_LOCATION.encode()).hexdigest()
+        scope = ({'path': REDIRECT_PATH, 'method': 'GET', 'required_role': 'viewer'}
+                 if redirect_scope is None else redirect_scope)
+        self.redirect_policy_sha = digest({'action': 'redirect', 'resource': REDIRECT_RESOURCE,
+            'version': 1, 'location_sha256': location_sha, 'scope': scope})
         self.session_id,self.version,self.enabled = 'service-'+secrets.token_hex(16),0,True
         self.session_lock = RLock()
         self.fault,self.executions = fault_denied_execution,0
@@ -70,22 +77,25 @@ class LocalWebCaptureLab:
         now = datetime.now(UTC)
         registry = {'schema_version':'zt-web-context-registry-1','version':1,
             'issued_at':(now-timedelta(seconds=1)).isoformat(),'expires_at':(now+timedelta(hours=1)).isoformat(),
-            'authorities':[{'tenant_id':'capture-lab','source_id':kind,'key_id':'key-1','kind':kind,
+            'authorities':[{'tenant_id':tenant_id,'source_id':kind,'key_id':'key-1','kind':kind,
                 'public_key':base64.urlsafe_b64encode(key.public_key().public_bytes(
                     serialization.Encoding.Raw,serialization.PublicFormat.Raw)).decode().rstrip('='),
-                'enabled':True,'server_ids':['local-http'],'subject_ids':['web-user'],'resource_ids':[RESOURCE],
+                'enabled':True,'server_ids':['local-http'],'subject_ids':[subject],'resource_ids':[RESOURCE,REDIRECT_RESOURCE],
                 'issued_at':(now-timedelta(seconds=1)).isoformat(),'expires_at':(now+timedelta(hours=1)).isoformat()}
                 for kind,key in keys.items()],
-            'resources':[{'tenant_id':'capture-lab','server_id':'local-http','resource_id':RESOURCE,
-                'authorization_policy_sha256':self.policy_sha,'minimum_policy_version':1}]}
+            'resources':[{'tenant_id':tenant_id,'server_id':'local-http','resource_id':RESOURCE,
+                'authorization_policy_sha256':self.policy_sha,'minimum_policy_version':1},
+                {'tenant_id':tenant_id,'server_id':'local-http','resource_id':REDIRECT_RESOURCE,
+                    'authorization_policy_sha256':self.redirect_policy_sha,'minimum_policy_version':1,
+                    'redirect_location_sha256':location_sha}]}
         registry_path = self.directory/'public-registry.json'
         registry_path.write_bytes(canonical(registry)+b'\n')
         self.bridge = WebTrustBridge(PinnedWebRegistry(registry_path,hashlib.sha256(registry_path.read_bytes()).hexdigest(),minimum_version=1))
         source = WebEvidenceLedger(self.directory/'ledger/events.sqlite',self.directory/'ledger/witness')
         source.initialize()
-        admin = Principal('capture-maintainer','capture-lab',frozenset({Role.ADMIN}),'api_key')
+        admin = Principal('capture-maintainer',tenant_id,frozenset({Role.ADMIN}),'api_key')
         manager = WebLedgerBackup(source,secrets.token_bytes(32),'bootstrap-only',
-            maintainers=frozenset({('capture-lab','capture-maintainer')}))
+            maintainers=frozenset({(tenant_id,'capture-maintainer')}))
         checkpoint_path = self.directory/'external-checkpoints/bootstrap.json'
         self.checkpoint = manager.checkpoint(checkpoint_path,admin,now=now)
         self.ledger = CheckpointedWebLedger(source.database,source.control,checkpoint_path,self.checkpoint['sha256'])
@@ -148,6 +158,16 @@ class LocalWebCaptureLab:
         raw_path = scope['raw_path']
         path = raw_path.decode('ascii')
         status = 404
+        if path == REDIRECT_PATH and scope['method'] == 'GET':
+            with self.session_lock:
+                allowed = self.enabled and self.version == version and Role.VIEWER in principal.effective_roles
+            if allowed:
+                permission = Authorization(kind='authorization', decision='allow', action='redirect',
+                    policy_sha256=self.redirect_policy_sha, policy_version=1)
+                scope['state'][STATE_KEY] = ServerObservation(principal,session,version,REDIRECT_RESOURCE,
+                    authentication,permission,runtime)
+                await RedirectResponse(REDIRECT_LOCATION,status_code=303)(scope,receive,send)
+                return
         if path in {ALLOW_PATH,DENY_PATH} and scope['method'] in {'GET','POST'}:
             resource = RESOURCE
             allowed = path == ALLOW_PATH and Role.VIEWER in principal.effective_roles

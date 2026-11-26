@@ -1,0 +1,151 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ test_cancelled_sdk_source_check_settles_without_blocking_event_loop[adapter_retry] _
+
+lab = <scripts.local_session_analysis_lab.LocalSessionAnalysisLab object at 0x0000026F6BE3DE50>
+mode = 'adapter_retry', first_response_delay = 0
+
+    @pytest.mark.parametrize(
+        "mode,first_response_delay", [
+            pytest.param("adapter_initial", 0, id="adapter_initial"),
+            pytest.param("adapter_retry", 0, id="adapter_retry"),
+            pytest.param("agent_initial", 0, id="agent_initial"),
+            pytest.param("agent_final", 0, id="agent_final"),
+            pytest.param("adapter_retry", 2.2, id="adapter_retry_slow_local_response"),
+            pytest.param("adapter_retry", 12, id="adapter_retry_response_exceeds_old_watchdog"),
+        ]
+    )
+    def test_cancelled_sdk_source_check_settles_without_blocking_event_loop(lab, mode, first_response_delay):
+        signal, context = lab.create(scenario("permitted_team"))
+        release = threading.Event()
+        notify_entered = None
+        checks = 0
+        blocking_check = 2 if mode.endswith(("retry", "final")) else 1
+    
+        def check():
+            nonlocal checks
+            checks += 1
+            if checks == blocking_check:
+                notify_entered()
+                assert release.wait(3)
+    
+        context = replace(context, verify_current=check)
+        config = Settings(
+            _env_file=None,
+            openai_api_key="local-evidence-io-placeholder",
+            openai_prompt_mode="grounded",
+            openai_max_output_tokens=2400,
+            openai_incomplete_retries=1,
+        )
+    
+        async def run():
+            nonlocal notify_entered
+            loop = asyncio.get_running_loop()
+            entered = asyncio.Event()
+            notify_entered = lambda: loop.call_soon_threadsafe(entered.set)
+            responses = (
+                [truncated_body(), valid_body()] if mode == "adapter_retry" else [final_response()]
+            )
+            async with sdk(responses, first_response_delay=first_response_delay) as (client, requests):
+                if mode.startswith("adapter"):
+                    adapter = OpenAIAnalyzer(config)
+                    await adapter._client.close()
+                    adapter._client = client
+                    task = asyncio.create_task(adapter.analyze_with_evidence(signal.event, context))
+                else:
+                    agent = EvidenceReviewAgent(config, client=client)
+                    task = asyncio.create_task(agent.review(signal.event, context, dict))
+                try:
+                    # Allow transport/parsing to finish before the callback whose
+                    # responsiveness is under test. A controlled 12s response must
+                    # not fail a cancellation test before that callback is reached.
+                    # The callback's unchanged 3s release watchdog still makes a
+                    # synchronous event-loop implementation fail, even with this
+                    # longer outer synchronization bound. No API SLA is measured.
+                    await asyncio.wait_for(entered.wait(), 30)
+                    # This only runs before release if the callback leaves the loop responsive.
+                    assert not task.done()
+                    assert len(requests) == (blocking_check - 1)
+                    task.cancel()
+                    await asyncio.sleep(0)
+                    task.cancel()
+                    await asyncio.sleep(0)
+                    assert not task.done()
+                finally:
+                    release.set()
+                    outcomes = await asyncio.gather(task, return_exceptions=True)
+                assert isinstance(outcomes[0], asyncio.CancelledError)
+                assert len(requests) == (blocking_check - 1)
+    
+>       asyncio.run(run())
+
+tests\test_async_evidence_io.py:115: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def run():
+        nonlocal notify_entered
+        loop = asyncio.get_running_loop()
+        entered = asyncio.Event()
+        notify_entered = lambda: loop.call_soon_threadsafe(entered.set)
+        responses = (
+            [truncated_body(), valid_body()] if mode == "adapter_retry" else [final_response()]
+        )
+        async with sdk(responses, first_response_delay=first_response_delay) as (client, requests):
+            if mode.startswith("adapter"):
+                adapter = OpenAIAnalyzer(config)
+                await adapter._client.close()
+                adapter._client = client
+                task = asyncio.create_task(adapter.analyze_with_evidence(signal.event, context))
+            else:
+                agent = EvidenceReviewAgent(config, client=client)
+                task = asyncio.create_task(agent.review(signal.event, context, dict))
+            try:
+                # Allow transport/parsing to finish before the callback whose
+                # responsiveness is under test. A controlled 12s response must
+                # not fail a cancellation test before that callback is reached.
+                # The callback's unchanged 3s release watchdog still makes a
+                # synchronous event-loop implementation fail, even with this
+                # longer outer synchronization bound. No API SLA is measured.
+                await asyncio.wait_for(entered.wait(), 30)
+                # This only runs before release if the callback leaves the loop responsive.
+>               assert not task.done()
+E               AssertionError: assert not True
+E                +  where True = <built-in method done of _asyncio.Task object at 0x0000026F6CFC3AC0>()
+E                +    where <built-in method done of _asyncio.Task object at 0x0000026F6CFC3AC0> = <Task finished name='Task-2' coro=<OpenAIAnalyzer.analyze_with_evidence() done, defined at C:\Users\chaeh\Desktop\�Ķ��б�...ionError('assert False\n +  where False = wait(3)\n +    where wait = <threading.Event at 0x26f6bb57f80: unset>.wait')>.done
+
+tests\test_async_evidence_io.py:102: AssertionError
+------------------------------ Captured log call ------------------------------
+WARNING  app.analyzers.openai_analyzer:openai_analyzer.py:86 LLM structured response rejected: code=response_not_completed attempt=1 retry=True diagnostics={'status': 'incomplete', 'incomplete_reason': 'max_output_tokens', 'input_tokens': 37, 'output_tokens': 11, 'refusal': False}
+============================== warnings summary ===============================
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\_pytest\config\__init__.py:1290
+  C:\Users\chaeh\Desktop\�Ķ��б�\zero-trust-llm-secops\.venv\Lib\site-packages\_pytest\config\__init__.py:1290: PytestAssertRewriteWarning: Module already imported so cannot be rewritten; anyio
+    self._mark_plugins_for_rewrite(hook, disable_autoload)
+
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\mangum\adapter.py:65
+  C:\Users\chaeh\Desktop\�Ķ��б�\zero-trust-llm-secops\.venv\Lib\site-packages\mangum\adapter.py:65: DeprecationWarning: There is no current event loop
+    asyncio.get_event_loop()
+
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\chaeh\Desktop\�Ķ��б�\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\chaeh\Desktop\�Ķ��б�\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Users\chaeh\Desktop\�Ķ��б�\tmp\extra-development-20261118\runtime\post-full-async-negative-control-20261120\negative-control.xml -
+=========================== short test summary info ===========================
+FAILED tests/test_async_evidence_io.py::test_cancelled_sdk_source_check_settles_without_blocking_event_loop[adapter_retry]
+1 failed, 4 warnings in 10.38s
+{"schema": "owned-async-test-negative-control-1", "source_commit": "8d2df526843418e50124b23808c54b9597e79008", "expected_pytest_exit_code": 1, "actual_pytest_exit_code": 1, "tests": 1, "failures": 1, "errors": 0, "in_memory_mutation": "replace settled_io with synchronous source callback", "source_file_unchanged": true, "paid_api_calls": 0, "control_rejected": true}

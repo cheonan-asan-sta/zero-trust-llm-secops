@@ -1,0 +1,411 @@
+........................................................................ [  0%]
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+.....................................................F.................. [  4%]
+..........................................................s............. [  5%]
+........................................................................ [  6%]
+......................................ss................................ [  7%]
+........................................................................ [  8%]
+..........s............................ss............................... [  8%]
+........................................................................ [  9%]
+..............................................s......................... [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+............................................ssssssssssssssssssssssssssss [ 13%]
+ssssssssssss......................................s..................... [ 13%]
+........................................................................ [ 14%]
+...............................................s........................ [ 15%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 17%]
+.......sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 18%]
+ssssssssssssssssssssss.................................................. [ 19%]
+...................................................................s.... [ 20%]
+................................................ssssssssssssssssssssssss [ 21%]
+ssss...................................................ssss............. [ 22%]
+...........................sssssssssssssssssssssssssssssssss............ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+.....................s.................................................. [ 25%]
+........................................................................ [ 26%]
+........................................ssssssss.ssssssssssss........... [ 26%]
+........................................................................ [ 27%]
+.......s................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 33%]
+ssssssssssss.............................................sssssssssssssss [ 34%]
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 35%]
+sssssssssssss............................s.............ssss............. [ 35%]
+................ss...................................................... [ 36%]
+...........ss..............................ss.sss....................... [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+....................................................................s... [ 40%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........s............................................................... [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+...........................................s............................ [ 61%]
+........................................................................ [ 62%]
+.....................................F.................................. [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+............................................................ssssssssssss [ 65%]
+ssssssssssssssssssssss.sssss............................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+......s................................................................. [ 69%]
+........................................................................ [ 70%]
+........................ssssssssssssssssssssssssssssssssssssssssssssssss [ 71%]
+sssssssssssssssssssssssssssssssssssssssssss............................. [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+...........s..................s......................................... [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+..ssss.................................................ss............... [ 84%]
+..............s......................................................... [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+..............ssssssssssssss.....sssss.................................. [ 89%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+......sssssssssssssss................................................... [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+..............ssss...............................................sss..ss [ 96%]
+.......................ssss...................ssssssss.................. [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+...........................                                              [100%]
+================================== FAILURES ===================================
+_ test_cancelled_sdk_source_check_settles_without_blocking_event_loop[adapter_retry] _
+
+fut = <coroutine object Event.wait at 0x000001B3005D34C0>, timeout = 10
+
+    async def wait_for(fut, timeout):
+        """Wait for the single Future or coroutine to complete, with timeout.
+    
+        Coroutine will be wrapped in Task.
+    
+        Returns result of the Future or coroutine.  When a timeout occurs,
+        it cancels the task and raises TimeoutError.  To avoid the task
+        cancellation, wrap it in shield().
+    
+        If the wait is cancelled, the task is also cancelled.
+    
+        If the task suppresses the cancellation and returns a value instead,
+        that value is returned.
+    
+        This function is a coroutine.
+        """
+        # The special case for timeout <= 0 is for the following case:
+        #
+        # async def test_waitfor():
+        #     func_started = False
+        #
+        #     async def func():
+        #         nonlocal func_started
+        #         func_started = True
+        #
+        #     try:
+        #         await asyncio.wait_for(func(), 0)
+        #     except asyncio.TimeoutError:
+        #         assert not func_started
+        #     else:
+        #         assert False
+        #
+        # asyncio.run(test_waitfor())
+    
+    
+        if timeout is not None and timeout <= 0:
+            fut = ensure_future(fut)
+    
+            if fut.done():
+                return fut.result()
+    
+            await _cancel_and_wait(fut)
+            try:
+                return fut.result()
+            except exceptions.CancelledError as exc:
+                raise TimeoutError from exc
+    
+        async with timeouts.timeout(timeout):
+>           return await fut
+                   ^^^^^^^^^
+
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\tasks.py:520: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <asyncio.locks.Event object at 0x000001B300519070 [set]>
+
+    async def wait(self):
+        """Block until the internal flag is true.
+    
+        If the internal flag is true on entry, return True
+        immediately.  Otherwise, block until another coroutine calls
+        set() to set the flag to true, then return True.
+        """
+        if self._value:
+            return True
+    
+        fut = self._get_loop().create_future()
+        self._waiters.append(fut)
+        try:
+>           await fut
+E           asyncio.exceptions.CancelledError
+
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\locks.py:212: CancelledError
+
+The above exception was the direct cause of the following exception:
+
+lab = <scripts.local_session_analysis_lab.LocalSessionAnalysisLab object at 0x000001B3004F5C70>
+mode = 'adapter_retry', first_response_delay = 0
+
+    @pytest.mark.parametrize(
+        "mode,first_response_delay", [
+            pytest.param("adapter_initial", 0, id="adapter_initial"),
+            pytest.param("adapter_retry", 0, id="adapter_retry"),
+            pytest.param("agent_initial", 0, id="agent_initial"),
+            pytest.param("agent_final", 0, id="agent_final"),
+            pytest.param("adapter_retry", 2.2, id="adapter_retry_slow_local_response"),
+        ]
+    )
+    def test_cancelled_sdk_source_check_settles_without_blocking_event_loop(lab, mode, first_response_delay):
+        signal, context = lab.create(scenario("permitted_team"))
+        release = threading.Event()
+        notify_entered = None
+        checks = 0
+        blocking_check = 2 if mode.endswith(("retry", "final")) else 1
+    
+        def check():
+            nonlocal checks
+            checks += 1
+            if checks == blocking_check:
+                notify_entered()
+                assert release.wait(3)
+    
+        context = replace(context, verify_current=check)
+        config = Settings(
+            _env_file=None,
+            openai_api_key="local-evidence-io-placeholder",
+            openai_prompt_mode="grounded",
+            openai_max_output_tokens=2400,
+            openai_incomplete_retries=1,
+        )
+    
+        async def run():
+            nonlocal notify_entered
+            loop = asyncio.get_running_loop()
+            entered = asyncio.Event()
+            notify_entered = lambda: loop.call_soon_threadsafe(entered.set)
+            responses = (
+                [truncated_body(), valid_body()] if mode == "adapter_retry" else [final_response()]
+            )
+            async with sdk(responses, first_response_delay=first_response_delay) as (client, requests):
+                if mode.startswith("adapter"):
+                    adapter = OpenAIAnalyzer(config)
+                    await adapter._client.close()
+                    adapter._client = client
+                    task = asyncio.create_task(adapter.analyze_with_evidence(signal.event, context))
+                else:
+                    agent = EvidenceReviewAgent(config, client=client)
+                    task = asyncio.create_task(agent.review(signal.event, context, dict))
+                try:
+                    # This is a synchronization watchdog, not a two-second SDK
+                    # parsing/host scheduling performance requirement. A callback
+                    # running on the loop still fails: release cannot arrive there.
+                    await asyncio.wait_for(entered.wait(), 10)
+                    # This only runs before release if the callback leaves the loop responsive.
+                    assert not task.done()
+                    assert len(requests) == (blocking_check - 1)
+                    task.cancel()
+                    await asyncio.sleep(0)
+                    task.cancel()
+                    await asyncio.sleep(0)
+                    assert not task.done()
+                finally:
+                    release.set()
+                    outcomes = await asyncio.gather(task, return_exceptions=True)
+                assert isinstance(outcomes[0], asyncio.CancelledError)
+                assert len(requests) == (blocking_check - 1)
+    
+>       asyncio.run(run())
+
+tests\test_async_evidence_io.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_async_evidence_io.py:96: in run
+    await asyncio.wait_for(entered.wait(), 10)
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\tasks.py:519: in wait_for
+    async with timeouts.timeout(timeout):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Timeout [expired]>
+exc_type = <class 'asyncio.exceptions.CancelledError'>
+exc_val = CancelledError(), exc_tb = <traceback object at 0x000001B301512D40>
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> Optional[bool]:
+        assert self._state in (_State.ENTERED, _State.EXPIRING)
+    
+        if self._timeout_handler is not None:
+            self._timeout_handler.cancel()
+            self._timeout_handler = None
+    
+        if self._state is _State.EXPIRING:
+            self._state = _State.EXPIRED
+    
+            if self._task.uncancel() <= self._cancelling and exc_type is exceptions.CancelledError:
+                # Since there are no new cancel requests, we're
+                # handling this.
+>               raise TimeoutError from exc_val
+E               TimeoutError
+
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\timeouts.py:115: TimeoutError
+------------------------------ Captured log call ------------------------------
+WARNING  app.analyzers.openai_analyzer:openai_analyzer.py:86 LLM structured response rejected: code=response_not_completed attempt=1 retry=True diagnostics={'status': 'incomplete', 'incomplete_reason': 'max_output_tokens', 'input_tokens': 37, 'output_tokens': 11, 'refusal': False}
+__________ test_concurrent_report_writes_publish_one_complete_report __________
+
+tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1491/test_concurrent_report_writes_0')
+
+    def test_concurrent_report_writes_publish_one_complete_report(tmp_path):
+        output = tmp_path / "pilot.json"
+        reports = [{"data": char * 100_000} for char in "abcd"]
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            tasks = [executor.submit(write_report, output, report) for report in reports]
+            for task in tasks:
+>               task.result()
+
+tests\test_m6_evaluation.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\thread.py:59: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\evaluate_m6.py:380: in write_report
+    temporary.replace(output)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1491/test_concurrent_report_writes_0/.m6-report-j_lab2ye')
+target = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1491/test_concurrent_report_writes_0/pilot.json')
+
+    def replace(self, target):
+        """
+        Rename this path to the target path, overwriting if that path exists.
+    
+        The target path may be absolute or relative. Relative paths are
+        interpreted relative to the current working directory, *not* the
+        directory of the Path object.
+    
+        Returns the new Path instance pointing to the target path.
+        """
+>       os.replace(self, target)
+E       PermissionError: [WinError 5] 액세스가 거부되었습니다: 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1491\\test_concurrent_report_writes_0\\.m6-report-j_lab2ye' -> 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1491\\test_concurrent_report_writes_0\\pilot.json'
+
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\pathlib.py:1376: PermissionError
+============================== warnings summary ===============================
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\mangum\adapter.py:65
+  C:\Users\chaeh\Desktop\파란학기\zero-trust-llm-secops\.venv\Lib\site-packages\mangum\adapter.py:65: DeprecationWarning: There is no current event loop
+    asyncio.get_event_loop()
+
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\chaeh\Desktop\파란학기\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\chaeh\Desktop\파란학기\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_pam_journal.py::test_current_trust_signature_scope_and_expiry_are_required[numeric_time]
+  C:\Users\chaeh\Desktop\파란학기\zero-trust-llm-secops\.venv\Lib\site-packages\pydantic\main.py:475: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `datetime` - serialized value may not be as expected [field_name='issued_at', input_value=1, input_type=int])
+    return self.__pydantic_serializer__.to_python(
+
+tests/test_vpn_enrollment_risk.py::test_real_tls_revocation_adds_alert_even_when_original_detector_misses[False]
+tests/test_vpn_enrollment_risk.py::test_real_tls_revocation_adds_alert_even_when_original_detector_misses[True]
+  tests\test_vpn_enrollment_risk.py:17: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @pytest.mark.parametrize('revoked', [False,True])
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Users\chaeh\Desktop\파란학기\tmp\extra-development-20261118\runtime\until0800-windows-full-d45-venv-20261120.xml -
+============================ slowest 15 durations =============================
+23.59s call     tests/test_execution_analysis_runner.py::test_runner_exercises_real_oidc_and_gateway_without_labels_in_model_input
+20.51s call     tests/test_guardduty_eventbridge.py::test_signed_import_restarts_worker_and_scopes_real_http_access
+16.88s call     tests/test_collector_maintenance_process.py::test_rotation_process_death_recovers_generation_before_accepting_new_input[sealed_rename]
+16.17s call     tests/test_collector_maintenance_process.py::test_rotation_process_death_recovers_generation_before_accepting_new_input[journal_publish]
+16.07s call     tests/test_evidence_review_evaluation.py::test_actual_oidc_paired_runner_reads_tools_and_retains_complete_denominators[execution]
+15.91s call     tests/test_collector_maintenance_process.py::test_pending_commit_with_lost_ack_survives_compaction_rotation_and_http_restart
+15.75s call     tests/test_collector_maintenance_process.py::test_rotation_process_death_recovers_generation_before_accepting_new_input[sealed_delete]
+15.53s call     tests/test_collector_maintenance_process.py::test_compaction_keeps_lifetime_counts_and_duplicate_conflict_history_over_http
+15.15s call     tests/test_collector_maintenance_process.py::test_automatic_rotation_allows_next_generation_without_reinitializing_identity
+14.99s call     tests/test_collector_maintenance_process.py::test_rotation_process_death_recovers_generation_before_accepting_new_input[sqlite_commit]
+13.51s call     tests/test_async_evidence_io.py::test_cancelled_sdk_source_check_settles_without_blocking_event_loop[adapter_retry]
+13.27s call     tests/test_http_worker_restart.py::test_actual_http_worker_cursor_resume_and_current_key_readiness
+12.57s call     tests/test_inbox_retention_process.py::test_default_hot_limit_archives_more_than_ten_thousand_receipts_then_applies_policy
+12.19s call     tests/test_execution_retention.py::test_more_than_ten_thousand_records_keep_pending_and_archived_identity
+11.40s call     tests/test_session_watchdog_process.py::test_process_death_at_journal_boundary_recovers_without_duplicate_versions[after_commit_before_output]
+=========================== short test summary info ===========================
+FAILED tests/test_async_evidence_io.py::test_cancelled_sdk_source_check_settles_without_blocking_event_loop[adapter_retry]
+FAILED tests/test_m6_evaluation.py::test_concurrent_report_writes_publish_one_complete_report
+2 failed, 8197 passed, 612 skipped, 6 warnings in 2013.32s (0:33:33)

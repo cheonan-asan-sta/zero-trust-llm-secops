@@ -1,0 +1,73 @@
+{
+  "schema": "witness-observer-evidence-1",
+  "date": "2026-11-20",
+  "branch": "extra",
+  "implementation_commit": "e6c9b12dd7fe02010e26313a9d27de7efc6aa0be",
+  "source_sha256": {
+    "app/services/audit_witness_observer.py": "01fd81a6e3fe049c37271669f28bf6464e4548dc15e18d2c8008d4c15d3529c2",
+    "scripts/audit_witness_observer.py": "88a47fad15954575ae3fd5eb700d419c6814c50fdd9403f6d57002413d59154b",
+    "tests/test_audit_witness_observer.py": "b8291ef0f9b3ab216947c38c217fe04bdb76c2dc647ce44c79d56d3dc461d873",
+    "tests/test_audit_witness_observer_process.py": "3f5023abacb7c17b7c9344645f1e34e5d48dff004b54cc58a761acab1b52ed76"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/witness-observer-linux-focused-20261120.xml",
+      "sha256": "f00977c1e47bc28f808721b353024caaa63f48a356e56ddef72041f090e9942a",
+      "tests": 104,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-observer-windows-focused-20261120.xml",
+      "sha256": "5d3ca8ae2bf044201d6f65afc2b4a32a18fd2a5a48766e12695b0d7236f29f45",
+      "tests": 104,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-observer-windows-initial-20261120.xml",
+      "sha256": "b418e0ec9c83c25b35b576c1dd8afcb5bee108cb6bd7b590fe0b274d49ca3a2c",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-observer-windows-process-fixed-20261120.xml",
+      "sha256": "fa6ef36e9a1bd14a34df21fa55a4d666a868ce1d4fae43933123025fd5baf3ef",
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-observer-windows-process-initial-20261120.xml",
+      "sha256": "c71d679d50d17ef0dc8f1d72c06811636516fce41b74ee5476d4ac44a1c5a4c2",
+      "tests": 21,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-observer-ruff-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "purpose": "Full repository Ruff, zero diagnostics"
+    }
+  ],
+  "frozen_report_identical": true,
+  "frozen_report_sha256": "8339671f4fde38688d38c70fed3da5400d5c7b48d55cff224dc1a8c16ee3d0f7",
+  "new_observer_tests": 22,
+  "full_project_regression_run": false,
+  "same_host_local_only": true,
+  "detection_metrics_changed": false,
+  "paid_api_calls": 0,
+  "github_push_ci_merge": false,
+  "until_0800_goal_complete": false
+}

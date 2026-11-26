@@ -1,0 +1,4 @@
+Starting ztw-6ca6ab2a69b3-restore-probe@lab.service - Keyless pinned audit witness restore review for lab...
+WITNESS_SANDBOX_PROBE={"schema": "local-witness-systemd-probe-1", "uid": 1, "no_new_privileges": true, "effective_capabilities": 0, "permitted_capabilities": 0, "inheritable_capabilities": 0, "database_readable": false, "database_write_open_allowed": false, "private_key_readable": false, "private_key_write_open_allowed": false, "cache_writable": true, "ipv4_socket_allowed": false, "unix_socket_allowed": true, "process_memory_syscalls_denied": {"process_vm_readv": true, "pidfd_getfd": true}, "proc_readable": false, "automatic_activation_allowed": false, "independent_storage_verified": false}
+ztw-6ca6ab2a69b3-restore-probe@lab.service: Deactivated successfully.
+Finished ztw-6ca6ab2a69b3-restore-probe@lab.service - Keyless pinned audit witness restore review for lab.

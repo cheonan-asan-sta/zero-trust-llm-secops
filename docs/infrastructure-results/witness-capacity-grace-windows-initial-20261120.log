@@ -1,0 +1,81 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_ test_known_exhaustion_is_urgent_even_during_pending_or_new_row_grace[legacy_pending] _
+
+tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1505/test_known_exhaustion_is_urgen0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023692A7FF20>
+kind = 'legacy_pending'
+
+    @pytest.mark.parametrize("kind", ["legacy_pending", "new_rows"])
+    def test_known_exhaustion_is_urgent_even_during_pending_or_new_row_grace(tmp_path, monkeypatch, kind):
+        monkeypatch.setattr(witness, "MAX_RECEIPTS", 2)
+        source, directory, profile, _ = collected(tmp_path)
+        state = observer.status(directory, profile["profile_sha256"], minimum_receipt=profile["minimum_receipt"])
+        assert state["remaining_receipts"] == 0
+        if kind == "legacy_pending":
+            # Exact old-version shape: preserve it as evidence, never drop or
+            # acknowledge it merely to improve the public state/alert.
+            pending = {"observation_id": "a" * 32, "predecessor": state["receipt_sha256"],
+                       "started_at": datetime.now(UTC).isoformat()}
+            raw = observer.canonical(pending).decode()
+            with observer._database(directory, write=True) as con:
+                con.execute("INSERT INTO pending VALUES (1,?,?)", (raw, observer.sha(raw.encode())))
+        else:
+            asyncio.run(source.save(initial(2)))
+        before = (directory / "observer.sqlite3").read_bytes()
+        value = bridge.inspect(directory, profile["profile_sha256"], profile["minimum_receipt"])
+        text = bridge.render_report(profile, value)
+        assert value["values"]["state"] == ("pending" if kind == "legacy_pending" else "unobserved")
+>       assert "observation_healthy 0" in text and "observation_action_required 1" in text
+E       AssertionError: assert ('observation_healthy 0' in '# TYPE secops_witness_bridge_enabled gauge\nsecops_witness_bridge_enabled 1\nsecops_witness_status_success 1\nsecops_...ness_unobserved_rows 0\nsecops_witness_observation_age_seconds 0.093931\nsecops_witness_pending_age_seconds 0.028145\n' and 'observation_action_required 1' in '# TYPE secops_witness_bridge_enabled gauge\nsecops_witness_bridge_enabled 1\nsecops_witness_status_success 1\nsecops_...ness_unobserved_rows 0\nsecops_witness_observation_age_seconds 0.093931\nsecops_witness_pending_age_seconds 0.028145\n')
+
+tests\test_witness_monitor_cadence.py:117: AssertionError
+_ test_known_exhaustion_is_urgent_even_during_pending_or_new_row_grace[new_rows] _
+
+tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1505/test_known_exhaustion_is_urgen1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000023692AD8140>
+kind = 'new_rows'
+
+    @pytest.mark.parametrize("kind", ["legacy_pending", "new_rows"])
+    def test_known_exhaustion_is_urgent_even_during_pending_or_new_row_grace(tmp_path, monkeypatch, kind):
+        monkeypatch.setattr(witness, "MAX_RECEIPTS", 2)
+        source, directory, profile, _ = collected(tmp_path)
+        state = observer.status(directory, profile["profile_sha256"], minimum_receipt=profile["minimum_receipt"])
+        assert state["remaining_receipts"] == 0
+        if kind == "legacy_pending":
+            # Exact old-version shape: preserve it as evidence, never drop or
+            # acknowledge it merely to improve the public state/alert.
+            pending = {"observation_id": "a" * 32, "predecessor": state["receipt_sha256"],
+                       "started_at": datetime.now(UTC).isoformat()}
+            raw = observer.canonical(pending).decode()
+            with observer._database(directory, write=True) as con:
+                con.execute("INSERT INTO pending VALUES (1,?,?)", (raw, observer.sha(raw.encode())))
+        else:
+            asyncio.run(source.save(initial(2)))
+        before = (directory / "observer.sqlite3").read_bytes()
+        value = bridge.inspect(directory, profile["profile_sha256"], profile["minimum_receipt"])
+        text = bridge.render_report(profile, value)
+        assert value["values"]["state"] == ("pending" if kind == "legacy_pending" else "unobserved")
+>       assert "observation_healthy 0" in text and "observation_action_required 1" in text
+E       AssertionError: assert ('observation_healthy 0' in '# TYPE secops_witness_bridge_enabled gauge\nsecops_witness_bridge_enabled 1\nsecops_witness_status_success 1\nsecops_...ecops_witness_remaining_receipts 0\nsecops_witness_unobserved_rows 1\nsecops_witness_observation_age_seconds 0.09899\n' and 'observation_action_required 1' in '# TYPE secops_witness_bridge_enabled gauge\nsecops_witness_bridge_enabled 1\nsecops_witness_status_success 1\nsecops_...ecops_witness_remaining_receipts 0\nsecops_witness_unobserved_rows 1\nsecops_witness_observation_age_seconds 0.09899\n')
+
+tests\test_witness_monitor_cadence.py:117: AssertionError
+============================== warnings summary ===============================
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\chaeh\Desktop\�Ķ��б�\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\chaeh\Desktop\�Ķ��б�\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\mangum\adapter.py:65
+  C:\Users\chaeh\Desktop\�Ķ��б�\zero-trust-llm-secops\.venv\Lib\site-packages\mangum\adapter.py:65: DeprecationWarning: There is no current event loop
+    asyncio.get_event_loop()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Users\chaeh\Desktop\�Ķ��б�\tmp\extra-development-20261118\runtime\witness-capacity-grace-windows-initial-20261120.xml -
+=========================== short test summary info ===========================
+FAILED tests/test_witness_monitor_cadence.py::test_known_exhaustion_is_urgent_even_during_pending_or_new_row_grace[legacy_pending]
+FAILED tests/test_witness_monitor_cadence.py::test_known_exhaustion_is_urgent_even_during_pending_or_new_row_grace[new_rows]
+2 failed, 14 deselected, 3 warnings in 10.75s

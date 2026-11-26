@@ -1,0 +1,50 @@
+"""Cross-check completed raw files; no new service run or independent cases."""
+import hashlib
+import json
+import subprocess
+from collections import Counter
+from datetime import datetime
+from pathlib import Path
+
+root=Path.cwd();runtime=root/'runtime';folder=runtime/'witness-sustained-default-linux-pending-fixed-20261120'
+report=json.loads((folder/'result.json').read_text());assert report['completed']
+logs=[];per_process={};hashes={}
+for path in sorted(folder.glob('watch-*.log')):
+    rows=[json.loads(line) for line in path.read_text().splitlines()]
+    assert rows;per_process[path.name]=len(rows);logs.extend(rows)
+    hashes[path.name]=hashlib.sha256(path.read_bytes()).hexdigest()
+samples=[json.loads(line) for line in (folder/'samples.jsonl').read_text().splitlines()]
+hashes['samples.jsonl']=hashlib.sha256((folder/'samples.jsonl').read_bytes()).hexdigest()
+hashes['result.json']=hashlib.sha256((folder/'result.json').read_bytes()).hexdigest()
+checks={
+    'reported_watch_rows_match':len(logs)==report['watch_successful_cycles'],
+    'every_completed_watch_log_reports_success':all(row['cycle_success'] is True for row in logs),
+    'actual_default_profile_in_every_log':all(row['interval_seconds']==60 and row['max_age_seconds']==180 for row in logs),
+    'three_process_segments':len(per_process)==len(report['processes'])==3,
+    'both_owned_kills_were_sigkill':len(report['owned_restarts'])==2 and all(row['exit_code']==-9 for row in report['owned_restarts']),
+    'reported_samples_match':len(samples)==report['samples'],
+    'all_sample_status_checks_succeeded':all(row['status_success'] is True and row['action_required'] is False for row in samples),
+    'sample_time_increases':all(b['elapsed_seconds']>a['elapsed_seconds'] for a,b in zip(samples,samples[1:])),
+    'source_rows_do_not_regress':all(b['source_rows']>=a['source_rows'] for a,b in zip(samples,samples[1:])),
+    'sample_anchors_do_not_regress':all(b['anchor_count']>=a['anchor_count'] for a,b in zip(samples,samples[1:])),
+    'logged_anchors_increase':all(b['anchor_count']>a['anchor_count'] for a,b in zip(logs,logs[1:])),
+    'logged_receipt_digests_unique':len({row['receipt_sha256'] for row in logs})==len(logs),
+    'explicit_final_cycle_separate':report['final_state']['anchor_count']==report['before_final_drain']['anchor_count']+1,
+    'final_source_fully_observed':report['final_state']['state']=='healthy' and report['final_state']['unobserved_rows']==0,
+    'source_and_cleanup_verified':report['source_bytes_unchanged'] and report['private_fixture_removed'] and report['owned_process_inactive'],
+}
+core=['app/services/audit_witness.py','app/services/audit_witness_observer.py','scripts/audit_witness_observer.py','scripts/f1_lab/witness_observer_status.py']
+checks['watch_backend_unchanged_in_memory_budget_revision']=not subprocess.check_output(['git','diff','--name-only','b77eceb','f6e1a0a','--',*core],text=True).strip()
+times=[datetime.fromisoformat(row['observed_at']) for row in logs]
+gaps=[(b-a).total_seconds() for a,b in zip(times,times[1:])]
+result={'schema':'completed-sustained-log-crosscheck-1','source_commit':report['source_commit'],
+        'completed':all(checks.values()),'checks':checks,'watch_logs':len(logs),'per_process_logs':per_process,
+        'samples':len(samples),'sample_states':dict(Counter(row['state'] for row in samples)),
+        'sample_unobserved_rows_missing_or_null':sum(row.get('unobserved_rows') is None for row in samples),
+        'observed_timestamp_gap_seconds':{'minimum':min(gaps),'maximum':max(gaps),'not_a_latency_sla':True},
+        'last_logged_anchor':logs[-1]['anchor_count'],'before_final_drain_anchor':report['before_final_drain']['anchor_count'],
+        'after_explicit_final_cycle_anchor':report['final_state']['anchor_count'],'raw_file_sha256':hashes,
+        'not_new_service_run':True,'not_independent_detection_cases':True,'paid_api_calls':0}
+(runtime/'witness-sustained-log-crosscheck-20261120.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps({name:result[name] for name in ['completed','watch_logs','per_process_logs','samples','sample_states','observed_timestamp_gap_seconds']}))
+assert result['completed'],checks

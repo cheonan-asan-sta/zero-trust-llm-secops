@@ -1,0 +1,159 @@
+{
+  "schema": "extra-native-http-audit-validation-1",
+  "date": "2026-11-18",
+  "branch": "extra",
+  "development_parent_commit": "1bcd2d9894d4aba018e6e11468a751b3f3571018",
+  "remote_push": false,
+  "ci_started": false,
+  "merged": false,
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "model_provider_stubbed": true,
+  "model_quality_measured": false,
+  "performance_goal_qualified": false,
+  "linux_regression": {
+    "collected": 698,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 698,
+    "seconds": 129.128,
+    "xml_sha256": "1547e3d2980e2cd6c02785b8b9d5ee6e46548a3997d8005a891a90d19e0aee87",
+    "modules": {
+      "tests.test_api": 18,
+      "tests.test_api_key_accounts": 16,
+      "tests.test_audit": 6,
+      "tests.test_audit_cancellation": 3,
+      "tests.test_audit_preflight": 3,
+      "tests.test_exec_history_binding": 49,
+      "tests.test_execution_analysis_evidence": 20,
+      "tests.test_execution_analysis_runner": 2,
+      "tests.test_grounded_prompting": 30,
+      "tests.test_native_analysis_http": 48,
+      "tests.test_native_analysis_registry": 12,
+      "tests.test_policy": 2,
+      "tests.test_service_analysis_evidence": 45,
+      "tests.test_service_caller_identity": 41,
+      "tests.test_session_analysis_evidence": 43,
+      "tests.test_shared_execution_collector": 44,
+      "tests.test_shared_execution_evidence": 43,
+      "tests.test_systemd_request_launcher": 7,
+      "tests.test_verified_caller_authority": 20,
+      "tests.test_zero_trust_operations": 28,
+      "tests.zero_trust.test_api_regressions": 73,
+      "tests.zero_trust.test_identity_regressions": 25,
+      "tests.zero_trust.test_session_proof_observations": 14,
+      "tests.zero_trust.test_session_regressions": 54,
+      "tests.zero_trust.test_signal_regressions": 52
+    }
+  },
+  "windows_focused_regression": {
+    "collected": 60,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 60,
+    "seconds": 20.83,
+    "xml_sha256": "36aeb3806e173fec9d2b1500d410d4d9e98d9b04f9a760718019024ae3751340",
+    "modules": {
+      "tests.test_native_analysis_http": 48,
+      "tests.test_native_analysis_registry": 12
+    }
+  },
+  "new_regression_cases": {
+    "total": 60,
+    "included_in_linux_and_windows_counts": true
+  },
+  "native_systemd": {
+    "conditions_passed": 24,
+    "http_conditions_included": 9,
+    "report": "extra-native-http-audit-20261118-systemd.json",
+    "source_report_sha256": "03dd9d44a65c80fea8cf287692898884688f795ddc1bb6c02fd5244cbb4d3adc",
+    "real_systemd": true,
+    "real_ptrace_exec_stop": true,
+    "transport": "tcp_loopback",
+    "human_identity_source": "local_oidc_fixture",
+    "owned_unit_private_state_temporary_dependencies_and_http_server_removed": true
+  },
+  "http_contract": {
+    "route": "POST /analysis/native-service",
+    "only_request_field": "execution_ref",
+    "registration": "trusted_in_process_function_only",
+    "reference_ttl_seconds_maximum": 30,
+    "default_capacity": 128,
+    "tenant_and_operator_bound": true,
+    "production_enabled": false,
+    "durable_or_multiworker_reference_store": false,
+    "revalidation": [
+      "resolution",
+      "before_model_after_queue",
+      "after_model",
+      "after_audit_before_delivery"
+    ],
+    "audited_reference": "sha256_not_raw_reference",
+    "audit_format": "existing_AnalysisResult_and_jsonl_hash_chain",
+    "audit_commit_is_not_delivery_or_access_approval": true
+  },
+  "static_checks": {
+    "ruff_check_app_scripts_tests": "passed",
+    "git_diff_check": "passed"
+  },
+  "historical_llm_development360_unchanged": {
+    "tp": 163,
+    "fp": 6,
+    "fn": 17,
+    "tn": 174,
+    "precision_percent": 96.45,
+    "recall_percent": 90.56,
+    "f1_percent": 93.41,
+    "conservative_false_positive_rate_percent": 3.33,
+    "not_reevaluated_in_this_change": true,
+    "independent_production_test": false
+  },
+  "source_files": [
+    {
+      "path": "app/main.py",
+      "sha256": "146ef81b555fb48086ce7ffc9a9862feeaa19412dae271c93d55f5950f5ed1ee"
+    },
+    {
+      "path": "app/native_analysis_models.py",
+      "sha256": "1c8e956d7a651d2bfc54e5567da0fc4dd69f7b74bf536f586a5fc5e6ee48cb37"
+    },
+    {
+      "path": "app/services/native_analysis_registry.py",
+      "sha256": "6c10b8296f9da09ea3f570e0740b2dadfd22793a5f7b31de407c778dbf50f946"
+    },
+    {
+      "path": "scripts/f1_lab/service_analysis_evidence.py",
+      "sha256": "0dbb2f5720269881c872fb9a66849acb32388f3ad17e8c8af07ffbb8dc8f32fa"
+    },
+    {
+      "path": "scripts/f1_lab/service_http_controls.py",
+      "sha256": "832525bc6b89dfbaecff04f827889a460f3b8de05597a0393c074a02216da5d5"
+    },
+    {
+      "path": "scripts/run_exec_history_controls.py",
+      "sha256": "f7cadd822542d9ec6275b699da6b91aed5779b1a39eec863d9668344124cbedb"
+    },
+    {
+      "path": "tests/test_native_analysis_http.py",
+      "sha256": "a3e18f30c8ef672a0c3bd6e822906b92d95dbe1f5979dcd54fd2cbe5f69524e3"
+    },
+    {
+      "path": "tests/test_native_analysis_registry.py",
+      "sha256": "93bf9e280255f6f9a8ef11b04ef3143168c08ee7f8c8d110e346d864a92677c7"
+    },
+    {
+      "path": "docs/extra-native-http-audit-20261118.md",
+      "sha256": "e909918370ddfeccc6da6fe659759e43ed1c09a35caa2003d8749ac42abe472f"
+    },
+    {
+      "path": "docs/extra-native-execution-llm-20261118.md",
+      "sha256": "b13641217a49285ed1dfffba157cb09488b6920546d3c1a538daea4b3971c6a2"
+    },
+    {
+      "path": "AI_HANDOFF.md",
+      "sha256": "dd81231f914375be5b5c2db690f7eeb9c1e6c6bfcd5f7f79431e1fdca1ef7f48"
+    }
+  ]
+}

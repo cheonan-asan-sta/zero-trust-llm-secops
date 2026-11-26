@@ -1,0 +1,131 @@
+{
+  "schema": "witness-safety-sequence-evidence-1",
+  "date": "2026-11-20",
+  "implementation_commit": "0ad59a2578480458f2c2af6e39421965050f060f",
+  "source_sha256": {
+    "scripts/run_witness_safety_sequence.py": "53189724dc1e0cb643b62474026dae13ad8cc255e5875c095de4c93a827d0ed4",
+    "tests/test_witness_safety_sequence.py": "704d5fbdaa18d04e636fa1df08b463a40d351cc008812167e34672ea480904b0",
+    "app/services/audit_witness.py": "8a7d821f0bc6fcce0dc9f2ae1faff3c03f97ad1bad41fc6d8007b930e7685300",
+    "app/services/audit_witness_observer.py": "c351db0de9d2af13b7f773121eeb04f69f8ac968a9811be53f910ce674d4da87",
+    "app/services/audit_witness_observer_backup.py": "2c23a892756b4def9f902f3345041601dbbb5178e671b175635dfffdfb276020"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/witness-safety-sequence-linux-final-20261120.xml",
+      "sha256": "bf96d1f155570854a157ced628efa4c2b1be718e6e044b63b757882f78fbbafb",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-safety-sequence-linux-final-v3-20261120.xml",
+      "sha256": "a2bfab2ec0656002659ae6b329745807105d2736816f3b09b90190c07364d49c",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-safety-sequence-linux-initial-20261120.xml",
+      "sha256": "29c4aa308f0b604df0558a1d899b101c101644610c210105a7ae1471567bdad6",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-safety-sequence-windows-final-20261120.xml",
+      "sha256": "242c615d0e59b605e6a3d946025c11e0932c4463d3324f1d00b9281af0c7b485",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-safety-sequence-windows-final-v2-20261120.xml",
+      "sha256": "f9c5ffba01f4650f328e87b08af3edf0e0b88bc5c26c8ed97fe11e8315cbdfe3",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-safety-sequence-windows-final-v3-20261120.xml",
+      "sha256": "524aaaa1e0ff08d1715209adcc815a6ccb2edc374dd7196f3203b011ad53bb60",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-safety-sequence-windows-fixed-20261120.xml",
+      "sha256": "27198558c05cb2bab746c3348fda4cb0003973bed501cbf161438305b51196dd",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-safety-sequence-windows-initial-20261120.xml",
+      "sha256": "453755baf41c3723c3ee9a31fe3c4274a8f474c1c9b224e6830186f847a37f5c",
+      "tests": 10,
+      "failures": 4,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-safety-sequence-windows-stop-initial-20261120.xml",
+      "sha256": "8f8b80bb5bfb23c0e5999cc5bf918ef3fe85f506c55858c2f2629f5640f01398",
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-safety-sequence-native-32-report.json",
+      "sha256": "b3043f7637e23ac303f490635615ba2adfd85c0ac4487b0a24dcb340cc8c15f3"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-safety-sequence-native-32-trace.jsonl",
+      "sha256": "38a3b9d4418e01e83967fc107d848376efb169aef0b55595edda77122f1c77ef"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-safety-sequence-native-sharedfs-refusal.json",
+      "sha256": "8b6a45f9000bf7a7629e18ffc68344e2c4ffef96e13f51621190e0d48ce10b3d"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-safety-sequence-ruff-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "new_driver_tests": 15,
+  "ordering_seeds": [
+    1,
+    17,
+    64,
+    20261120
+  ],
+  "native_extended_rounds": 32,
+  "native_extended_steps": 288,
+  "native_final_unobserved_rows": 2,
+  "private_fixtures_on_native_temporary_filesystem": true,
+  "cleanup_required_before_completed_report": true,
+  "operator_stop_latched": true,
+  "all_audit_data_synthetic": true,
+  "independent_acceptance": false,
+  "real_8h_soak": false,
+  "detection_metrics_changed": false,
+  "paid_api_calls": 0,
+  "github_push_ci_merge": false,
+  "until_0800_goal_complete": false
+}

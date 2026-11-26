@@ -1,0 +1,27 @@
+{
+  "before": {
+    "cpu_usage_nsec": 25912000,
+    "cpu_source": "cgroup2_cpu_stat",
+    "memory_peak_bytes": 6819840,
+    "memory_source": "cgroup1_memory_peak",
+    "memory_limit_bytes": 268435456,
+    "cpu_quota_percent": 50.0,
+    "throttled_periods": 0,
+    "memory_limit_hits": 0,
+    "memory_oom_kills": 0,
+    "tasks_limit": 8
+  },
+  "after": {
+    "cpu_usage_nsec": 28841551000,
+    "cpu_source": "cgroup2_cpu_stat",
+    "memory_peak_bytes": 236150784,
+    "memory_source": "cgroup1_memory_peak",
+    "memory_limit_bytes": 268435456,
+    "cpu_quota_percent": 50.0,
+    "throttled_periods": 575,
+    "memory_limit_hits": 0,
+    "memory_oom_kills": 0,
+    "tasks_limit": 8
+  },
+  "harness_exit_code": 0
+}

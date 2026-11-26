@@ -1,0 +1,68 @@
+{
+  "date": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "ci_started": false,
+  "merged": false,
+  "linux_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "197",
+    "time": "58.117",
+    "timestamp": "2026-11-19T00:43:59.883570+09:00",
+    "hostname": "localhost",
+    "xml_sha256": "e64ee2cac876db2d50acebcc7219d678807bf7cb579a8789c1dd96d6216fb229"
+  },
+  "windows_http_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "49",
+    "time": "17.936",
+    "timestamp": "2026-11-19T00:43:08.768537+09:00",
+    "hostname": "희주",
+    "xml_sha256": "664d211dba22bcb904667e93689a2f4a82a8b5b1dc8e46bef33c35b04cab8c1e"
+  },
+  "native_conditions": 35,
+  "new_recovery_conditions_included": 6,
+  "native_source_run_sha256": "279b35e987af5e40035d528385310335664489c4ababc5a7e9a8b38180d71271",
+  "http_worker_forced_restart_tested": false,
+  "automatic_restore_activation_allowed": false,
+  "test_harness_explicitly_selected_candidate_for_query_and_review": true,
+  "source_database_and_authorization_history_unchanged": true,
+  "model_quality_reevaluated": false,
+  "source_files": [
+    {
+      "path": "scripts/f1_lab/service_http_controls.py",
+      "sha256": "e7eb43be7e98f88974332c6f1d5cfafb9262f8ab734a0e3a1c86d2431908bece"
+    },
+    {
+      "path": "scripts/f1_lab/audit_recovery_controls.py",
+      "sha256": "da8bf9816b07ee59809badc234e4b0839c33cb7c16b705f05d498b7fe216f69d"
+    },
+    {
+      "path": "scripts/run_exec_history_controls.py",
+      "sha256": "620e4d64d1eb9e6aa3bd1ef3fa5404a5721ab60e70076858ac1d151281ba6c59"
+    },
+    {
+      "path": "tests/test_native_analysis_http.py",
+      "sha256": "fbafa9a69511de921a107ba50123c7d78422a32c341453322885b8f33d824a72"
+    },
+    {
+      "path": "docs/extra-native-audit-recovery-20261119.md",
+      "sha256": "91923f83b9a9c75dd8df0f0a368093694b086d21e8a27c49c884958236640d1b"
+    },
+    {
+      "path": "docs/extra-audit-transfer-backup-20261119.md",
+      "sha256": "206265b60ceee97d0a4a3ac157a5878357182c80acd87264023ecfdd8da4f476"
+    },
+    {
+      "path": "AI_HANDOFF.md",
+      "sha256": "c21f0c6f6ecf983941638f3b5f7ab1c980127ac0c7a7d427c3c1424fa10bf3a2"
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+"""Synthetic bulk audit fixture at actual row cap, not ingested attack cases."""
+import hashlib
+import json
+import os
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+source,output,manifest_path=map(Path,sys.argv[1:]);manifest=json.loads(manifest_path.read_text())
+assert os.name=='posix' and source.resolve()==Path(manifest['path']).resolve()
+output.mkdir(parents=True,exist_ok=False);sys.path.insert(0,str(source))
+from app.analyzers.rule_based import RuleBasedAnalyzer
+from app.models import AnalysisResult
+from app.scenarios import synthetic_events
+from app.services import audit_witness as witness
+from app.services import audit_witness_observer as observer
+from app.services.audit import _record_hash
+from app.services.audit_transfer import AuditTransferError
+from app.services.federated_audit import AuditQueryUnavailable
+from app.services.policy import response_preview
+from app.services.sqlite_audit import SQLiteAuditStore
+
+def altered():return [p for p,h in manifest['files'].items() if hashlib.sha256((source/p).read_bytes()).hexdigest()!=h]
+assert not altered() and SQLiteAuditStore.MAX_ROWS==100000
+started=time.monotonic()
+result={'schema':'witness-bulk-source-scale-1','source_commit':manifest['source_commit'],'completed':False,'checks':[],'source_rows':100000,'all_rows_synthetic_bulk_fixture':True,'not_actual_api_ingestions':True,'limits_monkeypatched':False,'paid_api_calls':0,'detection_metrics_changed':False,'independent_storage_verified':False}
+def check(name,value):
+    assert value,name
+    result['checks'].append({'name':name,'passed':True,'elapsed_seconds':time.monotonic()-started})
+    (output/'progress.json').write_text(json.dumps(result,indent=2)+'\n')
+try:
+    with tempfile.TemporaryDirectory(prefix='private-witness-source-scale-') as temporary:
+        root=Path(temporary);audit=SQLiteAuditStore(root/'audit.sqlite3');signer=root/'signer';control=root/'control'
+        event=synthetic_events()[0];assessment=RuleBasedAnalyzer().assess(event)
+        base=AnalysisResult(event_id=event.event_id,analyzer='rule',assessment=assessment,policy_decision=response_preview(assessment,event),latency_ms=1)
+        previous=witness.GENESIS;payload_bytes=0
+        with audit._transaction(write=True) as con:
+            for number in range(1,100001):
+                record=base.model_copy(update={'analysis_id':f'{number:032x}','event_id':f'bulk-{number:08d}'})
+                payload=record.model_dump_json();digest=_record_hash(previous,payload)
+                con.execute('INSERT INTO audit_entries VALUES (?,?,?,?)',(number,previous,digest,payload))
+                previous=digest;payload_bytes+=len(payload.encode())
+            con.execute('UPDATE audit_head SET seq=?,digest=? WHERE id=1',(100000,previous))
+        result.update(payload_bytes=payload_bytes,database_bytes=audit.path.stat().st_size)
+        with audit._transaction() as con:seq,digest=witness._verified_head(audit,con)
+        check('all_maximum_rows_really_validate',seq==100000 and digest==previous and payload_bytes<=SQLiteAuditStore.MAX_BYTES)
+        pin=witness.initialize(signer,audit.path,'source-row-cap')['public_key_sha256']
+        first=witness.observe(signer,audit.path,pin,expected_receipt=witness.GENESIS)
+        minimum=first['receipt_sha256']
+        check('real_signature_covers_maximum_source_head',first['receipt']['body']['head']=={'seq':100000,'digest':previous})
+        profile=observer.initialize(control,signer,audit.path,pin,expected_receipt=minimum)['profile_sha256']
+        observer.cycle(control,profile,minimum_receipt=minimum)
+        state=observer.status(control,profile,minimum_receipt=minimum)
+        check('real_collector_validates_large_source',state['state']=='healthy' and state['anchor_count']==1 and state['unobserved_rows']==0)
+        journal=(signer/'journal.sqlite3').read_bytes()
+        with audit._transaction(write=True) as con:
+            original=con.execute('SELECT payload FROM audit_entries WHERE seq=50000').fetchone()[0]
+            con.execute("UPDATE audit_entries SET payload='{}' WHERE seq=50000")
+        try:observer.cycle(control,profile,minimum_receipt=minimum)
+        except (AuditTransferError,AuditQueryUnavailable):pass
+        else:raise AssertionError('large middle corruption admitted')
+        state=observer.status(control,profile,minimum_receipt=minimum)
+        check('middle_corruption_refuses_without_signing',state['state']=='unavailable' and state['pending'] and (signer/'journal.sqlite3').read_bytes()==journal)
+        with audit._transaction(write=True) as con:con.execute('UPDATE audit_entries SET payload=? WHERE seq=50000',(original,))
+        repaired=observer.cycle(control,profile,minimum_receipt=minimum)
+        state=observer.status(control,profile,minimum_receipt=minimum)
+        check('original_pending_resumes_after_fixture_repair',repaired['recovered'] and state['state']=='healthy' and not state['pending'] and state['anchor_count']==2 and state['unobserved_rows']==0)
+        result['final_state']=state
+    result['private_fixture_removed']=not root.exists();result['source_bytes_unchanged']=not altered()
+    result['completed']=result['private_fixture_removed'] and result['source_bytes_unchanged']
+finally:
+    result['elapsed_seconds']=time.monotonic()-started
+    (output/'result.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result))

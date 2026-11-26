@@ -1,0 +1,73 @@
+{
+  "date": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "pushed": false,
+  "ci_started": false,
+  "merged": false,
+  "model_quality_reevaluated": false,
+  "real_sdk_with_mock_http_transport": true,
+  "new_tests": 9,
+  "verified_request_max_sdk_retries": 0,
+  "shared_client_retry_setting_mutated": false,
+  "native_systemd_rerun_this_phase": false,
+  "before": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "2",
+    "skipped": "0",
+    "tests": "2",
+    "time": "5.678",
+    "timestamp": "2026-11-19T01:35:03.132240+09:00",
+    "hostname": "희주",
+    "xml_sha256": "d73250ce5933c16680509368a221af60c2aa4484339093f6c598632fc942e63a",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\verified-sdk-retry-before-20261119.xml"
+  },
+  "earlier_focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "29",
+    "time": "11.115",
+    "timestamp": "2026-11-19T01:35:29.611029+09:00",
+    "hostname": "희주",
+    "xml_sha256": "4f2d4a3984f82e561fc19e24cfe6a9c5042bbb69b12a40cb175322aa6005cf7e",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\verified-sdk-retry-focused-20261119.xml"
+  },
+  "windows_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "229",
+    "time": "68.522",
+    "timestamp": "2026-11-19T01:36:39.603943+09:00",
+    "hostname": "희주",
+    "xml_sha256": "0170a82446847374cf8866004cf6f7582ebfa49d8714dd066e7247a325170a32",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\verified-sdk-retry-windows-20261119.xml"
+  },
+  "linux_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "231",
+    "time": "90.836",
+    "timestamp": "2026-11-19T01:36:45.473363+09:00",
+    "hostname": "localhost",
+    "xml_sha256": "e4d74042c49d7f685bfcee4903c2edd8b9c1db2dce7b1f835c4954dc88b428e9",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\verified-sdk-retry-linux-20261119.xml"
+  },
+  "source_files": [
+    {
+      "path": "app/analyzers/openai_analyzer.py",
+      "sha256": "ea714059cf1b16a4d6b1e821b3c5f64f88acba5494900e18af209b54681d9a1d"
+    },
+    {
+      "path": "tests/test_verified_sdk_retry_boundary.py",
+      "sha256": "f09aa11d0a644640a157ff06d14be46dc12c0ff3bdd82526d308c475c18226ab"
+    }
+  ]
+}

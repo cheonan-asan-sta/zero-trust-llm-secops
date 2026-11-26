@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:\Users\chaeh\Desktop\�Ķ��б�\tmp\extra-development-20261118\runtime\audit_witness_evidence_20261120.py", line 37, in <module>
+    if digest(head+':'+a['path'])!=a['sha256']:result['errors'].append('artifact:'+a['path'])
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\chaeh\Desktop\�Ķ��б�\tmp\extra-development-20261118\runtime\audit_witness_evidence_20261120.py", line 19, in digest
+    if len(header)!=3 or header[1]!='blob':raise ValueError('missing committed blob: '+ref)
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: missing committed blob: 0c58c372cedc6c1cc1b8cde109c46ee46b5f9098:docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/result.json

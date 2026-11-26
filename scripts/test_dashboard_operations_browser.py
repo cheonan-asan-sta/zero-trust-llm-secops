@@ -24,7 +24,7 @@ def run(args, directory, report):
     log = (args.output_dir / "server.log").open("w")
     process = subprocess.Popen([
         args.app_python, "-m", "tests.dashboard_operations_fixture", "--directory",
-        str(directory / "data"), "--port", str(port),
+        str(directory / "data"), "--port", str(port), "--sqlite-audit",
     ], cwd=ROOT, stdout=log, stderr=subprocess.STDOUT)
 
     def check(name, condition=True):
@@ -242,6 +242,17 @@ def run(args, directory, report):
             foreign.context.close()
 
             page.locator('a[href="#operations"]').click()
+            capabilities = page.request.get(base + "/dashboard/jobs/capabilities", headers=headers).json()
+            if not capabilities["enabled"]:
+                expect(page.locator("#operationMessage")).to_contain_text("호스트 작업을 사용할 수 없습니다")
+                report["excluded"] = [{"name": "POSIX host jobs", "reason": "Host job capability unavailable on this platform"}]
+                check("unsupported_host_jobs_fail_closed", page.locator("#jobRun").count() == 0)
+                check("no_credential_persistence", page.evaluate("localStorage.length === 0 && sessionStorage.length === 0")
+                      and "synthetic-requester-key" not in page.content())
+                check("no_javascript_errors", not errors)
+                check("no_external_network_calls", not external)
+                browser.close()
+                return
             expect(page.locator("#jobAction")).to_be_visible()
             page.locator("#jobAction").select_option("m6-mock")
             page.locator("#jobReason").fill("Browser acceptance mock evaluation")

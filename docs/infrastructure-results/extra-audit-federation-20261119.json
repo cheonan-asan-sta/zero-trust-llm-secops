@@ -1,0 +1,60 @@
+{
+  "date": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "ci_started": false,
+  "merged": false,
+  "linux_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "172",
+    "time": "97.257",
+    "timestamp": "2026-11-19T00:10:58.991029+09:00",
+    "hostname": "localhost",
+    "xml_sha256": "54016c1f5801543c5874ca4717bff5b936c3f71eddf52fbf5532cd6115bedece"
+  },
+  "windows_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "1",
+    "tests": "114",
+    "time": "70.956",
+    "timestamp": "2026-11-19T00:09:52.957532+09:00",
+    "hostname": "희주",
+    "xml_sha256": "ce85094f57d5861bc185ed3fa2c97af0eafd8f4e0a2b01d59edf8e2710caadbb"
+  },
+  "latest_windows_focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "13",
+    "time": "3.715",
+    "timestamp": "2026-11-19T00:12:56.442531+09:00",
+    "hostname": "희주",
+    "xml_sha256": "e06947218f4829f15c11b37a14ec6643285da36f63306fc79927ee15f7475219"
+  },
+  "scope": "federated reads, local manifest checkpoints, HTTP queries/reviews; not a global transactional writer",
+  "source_files": [
+    {
+      "path": "app/services/audit_manifest.py",
+      "sha256": "fce3f79b18d1c71491e1e6a62bbf7cea3d5591b38b27ee4d8c63c42910cd0743"
+    },
+    {
+      "path": "app/services/federated_audit.py",
+      "sha256": "a0e4ccab1f5cf4e00f7081b5cb69427daeaebe9e9d320cfb86f7050892846ec4"
+    },
+    {
+      "path": "tests/test_federated_audit.py",
+      "sha256": "d234ec55a5d60924afce55b5701181f6ec4308da216ca13ec294a594f75c6ea2"
+    },
+    {
+      "path": "docs/extra-audit-federation-20261119.md",
+      "sha256": "a5f588cbcafa830c7c93064c21cd6888b11edcc28e9b73e3a17a35d8c6c2641a"
+    }
+  ]
+}

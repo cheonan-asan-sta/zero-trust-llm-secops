@@ -1,0 +1,85 @@
+{
+  "date": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "pushed": false,
+  "ci_started": false,
+  "merged": false,
+  "model_quality_reevaluated": false,
+  "real_sdk_with_mock_http_transport": true,
+  "raw_tcp_disconnect_tested": false,
+  "native_conditions": 41,
+  "new_tests": 8,
+  "before": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "5",
+    "skipped": "0",
+    "tests": "6",
+    "time": "23.879",
+    "timestamp": "2026-11-19T01:27:35.807411+09:00",
+    "hostname": "희주",
+    "xml_sha256": "384ba1729945a391f98968435ea78d92f1078370224546730011b5d9dbea27f0",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\async-evidence-before-20261119.xml"
+  },
+  "latest_focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "8",
+    "time": "5.823",
+    "timestamp": "2026-11-19T01:30:00.510212+09:00",
+    "hostname": "희주",
+    "xml_sha256": "317e30201108b70c766cb5ba0e96ea13daeba821862b40aabf164535b43537b9",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\async-evidence-focused-final-20261119.xml"
+  },
+  "windows_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "15",
+    "tests": "240",
+    "time": "59.107",
+    "timestamp": "2026-11-19T01:30:28.723679+09:00",
+    "hostname": "희주",
+    "xml_sha256": "79b7c5c4d0901aa42eac4f17eb7c5f148b95937fd30ae7e5e8c3883d828aa761",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\async-evidence-windows-related-20261119.xml"
+  },
+  "linux_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "285",
+    "time": "99.906",
+    "timestamp": "2026-11-19T01:30:35.048302+09:00",
+    "hostname": "localhost",
+    "xml_sha256": "2ef616f61dabab418365774eeb0e060330077501a82c6b55cdad3124500c0b26",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\async-evidence-linux-related-20261119.xml"
+  },
+  "native_source_run_sha256": "99aa1d92f8421f0314356874928936df0aa8e8dabb361d9b0ccf1933c8cceeff",
+  "source_files": [
+    {
+      "path": "app/main.py",
+      "sha256": "80e9194187a039f620e097067d4636f25f9f19c484bd00587bbb1bfe69b8257d"
+    },
+    {
+      "path": "app/analyzers/openai_analyzer.py",
+      "sha256": "56149e49c90546b735dad6141472f77a532848a458c3d6af11602d01f87d2fd1"
+    },
+    {
+      "path": "app/analyzers/evidence_agent.py",
+      "sha256": "1409a39c19dcbb1625df1c6235ba0fffbb75df1f996ee7bf40cc8bd8cc2d66c6"
+    },
+    {
+      "path": "app/services/session_analysis_evidence.py",
+      "sha256": "9546a7762a26768239cb44d9635fff5f665b435826c016e370df3e8a86b19a70"
+    },
+    {
+      "path": "tests/test_async_evidence_io.py",
+      "sha256": "5ab365efb23876addc2d11993cf6979c091dfa494b33ca043fc8679a00a4e7f7"
+    }
+  ]
+}

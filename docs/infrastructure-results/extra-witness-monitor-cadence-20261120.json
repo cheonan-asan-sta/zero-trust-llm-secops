@@ -1,0 +1,93 @@
+{
+  "schema": "witness-monitor-cadence-evidence-1",
+  "date": "2026-11-20",
+  "implementation_commit": "45f1b933f7d2724c2f3bcb925b5751d6929afafd",
+  "source_sha256": {
+    "app/services/audit_witness_observer.py": "07dc125f15e26ec68c075d9b74e6ce7fe1705bf543dc27b06f950147eead0af7",
+    "infra/observability/alerts.yaml": "115e55d93cf5be9648035880f8f6221e809e02a8344a559c84720660e2837ec6",
+    "infra/observability/witness-alerts.test.yaml": "1f97cfd6670062d32128f39da99340018d082b16be23cb84f8903075b876258a",
+    "scripts/f1_lab/witness_observer_status.py": "71184e436a1442487b90443df2ffbf8a09b102ce606e5f252feaca12873aa86a",
+    "scripts/run_witness_alert_flow.py": "472a9220c752c6637b57f817c2c7f8479faeaf4e089719a0939a88d916c78d41",
+    "tests/test_witness_monitor_cadence.py": "8b9cd71d639d7608453665f997df124f5b790436a19ad5d8dba9813b6d36779d"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/witness-monitor-cadence-linux-final-20261120.xml",
+      "sha256": "cf9aff24caaee39435d297c546a909a40cafefc7fec64ba03397c2cce8961136",
+      "tests": 292,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-monitor-cadence-windows-expanded-20261120.xml",
+      "sha256": "fff73e7c6f57a20631bd7f4bda405f84c6458ba13851e6ef0fd3a1aa7208eda1",
+      "tests": 47,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-monitor-cadence-windows-final-20261120.xml",
+      "sha256": "9ed8c699f4097bddba4034779efcfe2bb788950623610a28973d0e116801e9b8",
+      "tests": 292,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 24,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-monitor-cadence-windows-first-fix-20261120.xml",
+      "sha256": "f091fb54caf2cd31f443deee1a10f44357c305c3b15f7d6f582758aa375ab92b",
+      "tests": 34,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 5,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-monitor-cadence-windows-initial-20261120.xml",
+      "sha256": "6218f96ed543bac1a095e5e5bac8a3cd65010bffd1d15ab0bbe173333116a7be",
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-monitor-cadence-rules-20261120.txt",
+      "sha256": "8289a4919870ab5b28f5e90a86b4af3cdbd8c244516c02fca90d6e3f289a6711"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-monitor-cadence-ruff-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-cadence-alert-native-report.json",
+      "sha256": "4f65b3990b84c2d4ad0697c5419ef4bfb28d1b5b80c0e542a6a24dab43583c17"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-cadence-alert-native-promtool.txt",
+      "sha256": "eee39a49c209ebcf78652b78f0e3c93bb77eca8139311b361a2dd005f334ec32"
+    }
+  ],
+  "new_cadence_tests": 14,
+  "legacy_report_v1_supported": true,
+  "producer_report_schema": "zt-witness-observer-status-2",
+  "cache_ttl_formula_seconds": "max(30,2*interval_seconds)",
+  "observation_age_policy_changed": false,
+  "signed_minimum_or_authorization_checks_relaxed": false,
+  "old_exporter_alert_fallback_retained": true,
+  "operational_alert_grace_changed": true,
+  "rule_contract_scenarios": 18,
+  "real_alert_flow_checks": 22,
+  "real_alert_episodes": 4,
+  "declared_synthetic_fixture_appends": 1,
+  "detection_metrics_changed": false,
+  "paid_api_calls": 0,
+  "github_push_ci_merge": false,
+  "same_host_local_only": true,
+  "until_0800_goal_complete": false
+}

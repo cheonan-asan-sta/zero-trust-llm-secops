@@ -1,0 +1,483 @@
+{
+  "schema": "witness-additional-boundary-evidence-1",
+  "implementation_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "source_sha256": {
+    "app/services/audit_witness.py": "8a7d821f0bc6fcce0dc9f2ae1faff3c03f97ad1bad41fc6d8007b930e7685300",
+    "app/services/audit_witness_observer.py": "98adc1f6f77744162d79fed60baa675fdaca5265ccd934cf8aebf0cdf728aec3",
+    "app/services/audit_witness_observer_backup.py": "2c23a892756b4def9f902f3345041601dbbb5178e671b175635dfffdfb276020",
+    "scripts/audit_witness_observer.py": "519e66f70a6c93c4f746662229f033dd58dacc308498ab4a89cc5dccbfce5171",
+    "scripts/f1_lab/witness_observer_status.py": "c2b07cbd204e0602a5647df457cdb6e22be249522cab67303b7dde75fdff4674",
+    "scripts/run_witness_safety_sequence.py": "53189724dc1e0cb643b62474026dae13ad8cc255e5875c095de4c93a827d0ed4"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-20261120/result.json",
+      "sha256": "b5e8f5df9a7d054e8404ccfffdd3c6653d56c62a922abcd53ba52ba242d1de16"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-20261120.log",
+      "sha256": "6fe780222caf4572427840be2ad240d6ea51012c6ca13c3f629619a962b686c3"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/45-seconds.metrics",
+      "sha256": "6585acb69ba683aff25e4d3a25e30bd73a3e144c94224ec259bb7b31208e3496"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/expired-cache.metrics",
+      "sha256": "277e9324553246afc093bc9e5d240c6c875316d9cd252d24d3a3dc98ff96d79c"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/owned-process.json",
+      "sha256": "b8d290971b88ffdb104ce40c9937339b9be87c9ab3e02bd35dbeaf24a673130e"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/progress.json",
+      "sha256": "5991b98ffd562bde3742c6c4ec08c5df69ae0daeadab36361ea44da15a773856"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/read-only-refresh-status.json",
+      "sha256": "a1fdf4e5f52e5d1280e8fc27ee65b2f5eb2d8a1c657baa4a43a7b4c596403604"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/result.json",
+      "sha256": "ad328c76883fb12571d4f964615a74a4aeed8d5517cfaead11d2c699a67ed391"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/resumed-cycle.log",
+      "sha256": "2c423c261b06ec69c345357005372f7f843759877cf649f5ae038cd35d34c347"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/stale-status.json",
+      "sha256": "ebfcf5aeebabb8bf2975ca431b9ae362610ea34b180cc8112ae5b80d76478bbd"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/stale.metrics",
+      "sha256": "c28434d1507c9358a7b69a43cd4f37b17eba63b98763db9dd7d8b64bfe17fff0"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120/watch.log",
+      "sha256": "2b73bb1370b44b63ae2e332512c4491f2d685e1a5f87b20a4a21bd41a378f280"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-default-cadence-linux-fixed-20261120.log",
+      "sha256": "004f2c6b9817e2fc13cb2257b24f583dfb82ea73dfeca1e105b250d0c448efcf"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-control-linux-20261120/keyless-proof.json",
+      "sha256": "8a88d67518dfe0aa7262d712a56beae7ca2e1aae0e7ff627428106f5cb97068a"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-control-linux-20261120/progress.json",
+      "sha256": "66b2f0e414f85b1c91fa80541d409128ee0d10b6e46de3f3e58379a3d7a3bafd"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-control-linux-20261120/result.json",
+      "sha256": "589266b87856bd560bb40fbf615a7f87e40fcc7bdf17104db8bf73aeb055fd2c"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-control-linux-20261120.log",
+      "sha256": "e6542ee55ddbf0c0d04fb84272fcf43bc04a87c8ac463b35dfddd77ddbeb586d"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-capacity-linux-20261120/result.json",
+      "sha256": "bac3b29454363e5a76f530d81f344ef8eec983f8de88ab5308afc2362a7be3e0"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-real-capacity-linux-20261120/progress.json",
+      "sha256": "aac7923b67ce40fcebab80c560d01d83984920bcb366d1bd393f5af2f6005fe2"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-first-capacity-stopped-20261120.log",
+      "sha256": "02754db72eb0da4263239f2303890460bf375ab02a3ddcec3b0082f67d0115f0"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/result.json",
+      "sha256": "e014d83d0632ed07cd37fd311afab65906db516b2c59979eb788e2cb7f59821f"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-0.log",
+      "sha256": "6814e1fb41e04d8473524b55e79e4aca8e2b8aa47b2436f6d86bb1bdb4644c8a"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-4294967295.log",
+      "sha256": "c0cbf2c1fa293caf320a60bcaed748f36cf1f4b0a85affdeffe656658f59b27f"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-17.log",
+      "sha256": "5ff102fa00f2fc0625f73c76fc150004614751b97ed28876117dcdb1974ba605"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-0/report.json",
+      "sha256": "bf2acc1b8e1de62033fdb7c1d1835d1417fb741e3276ef30d645e6f67ca8b1ca"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-0/trace.jsonl",
+      "sha256": "54261cf48553ad3b367f665a3503be7af1222107c0f9371e2e91f763fa5cab18"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-4294967295/report.json",
+      "sha256": "c12dd3de86c0c63f3adadcf1254995cae5aad915170e4da4b27e607ac6ce6369"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-4294967295/trace.jsonl",
+      "sha256": "3c12fffb35cdcc91e74dddbb04b0f6779adc00afa6d8f77057f54a5ef24b4593"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-17/report.json",
+      "sha256": "c5f2e288230ffa3ee32701a2f3991b0c243ed07ab3aa49bf0ad565dba90b4bcc"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-windows-20261120/seed-17/trace.jsonl",
+      "sha256": "a267598c6992e92687e67ac865ebcc658879d8e6489011909eb35d3036f19ed0"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/result.json",
+      "sha256": "c5f2504f535fc3fef00f57f989d2c91c93a39d44ebb41933bb0717e41c8c4704"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-0.log",
+      "sha256": "f7a2bff69d31689c98f25c00229ceff07f5dee0930703b58934bc80ee911a249"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-4294967295.log",
+      "sha256": "126cf840ec72d523c91bdfbbb03e9204b09df11f952b1ac8a405b6a5e5386122"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-17.log",
+      "sha256": "ea4633678512e60b9e94a14edf3e6541e3d6ee3fd28d53dd0cbee0f76cbdea37"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-0/report.json",
+      "sha256": "601d655ca71205874e4d771fd155c5d17af56582b97764c5f31222497e2df7e7"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-0/trace.jsonl",
+      "sha256": "513f6d97586bfdef24c66c2e267f58eb1edb635225abb5d7f48eecca4f13061c"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-4294967295/report.json",
+      "sha256": "9f0fd04c45433fbe026863841e473c9485a61f866d1bc928d2d15ff3a05c04a3"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-4294967295/trace.jsonl",
+      "sha256": "9ac5a0e89d6c8d931a1c57a8c8ba9ec9943384d28d07dfec1350bd5cbadd0bd5"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-17/report.json",
+      "sha256": "e1e3ea3e35429844d8a937d68e6f6becddccddeddb119503a2a85ba26cb43eb6"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-seed-matrix-linux-20261120/seed-17/trace.jsonl",
+      "sha256": "11a32c05aa0e34ff40df230ff63578549f2bd92053b43cfc2fed5ef299e7f433"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-harness-run_seed_matrix_20261120.py.txt",
+      "sha256": "1dc42e545c45497d0bc6e3eab27b8ccdc1edca0816461be29f6d365a9a826eaf"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-harness-run_real_witness_cadence_20261120-v1.py.txt",
+      "sha256": "56b6a9db6e4027388956b32e1661c6a87a4ea56037a61c0153765ff81ac1899e"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-harness-run_real_witness_cadence_20261120.py.txt",
+      "sha256": "aa3a8e071e907daebf6f6ca26815713ff21b3f333a1b1e1c6104c991fb50cc2e"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-harness-run_large_witness_control_20261120.py.txt",
+      "sha256": "f46ba9e71744720a9bff1b3bcc94dec3d4651a84edabf18a57d65ef147e67e94"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-harness-run_native_witness_capacity_20261120-v1.py.txt",
+      "sha256": "ec4a7cdf42d6938bcf2226fa8b8934f4891064633b0c8d544d604eb482780318"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-harness-run_native_witness_capacity_20261120.py.txt",
+      "sha256": "a58cb7ab1f06d7a18e82f38ced598c102f13eda8dec8b9f7a367f4b18dd88601"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-extra-until0800-latest-source-20261120.json",
+      "sha256": "497039172fba36b33a4084dbb69cda3a1184acc8e046b1b5f8cec83422d7fe4d"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-extra-until0800-latest-source-linux-20261120.json",
+      "sha256": "8c611a9c01e88459c58ff99483be56a963595ce8e90138f7fd789084519c4ab7"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-capacity-real-4096-report-20261120.json",
+      "sha256": "8124a73b66cf1fa82ec80864fd2c0e63c4b28ff26f6c894f4146f6d6b76ac431"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-persistent-loss-linux-20261120/after-calls.jsonl",
+      "sha256": "b56616307ca0557f155119dad16e13d03aa41bcb93c4ec4a0e842de225f9b8a2"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-persistent-loss-linux-20261120/after-recovered.log",
+      "sha256": "e08e5095cd4e110b572c8296d8660f15a9205612595d5e4f47cabcaa5a680567"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-persistent-loss-linux-20261120/after-watch.log",
+      "sha256": "c946d0b6efc6b86476b5cd95cab3ab8be821606af1eb6a6b65079054c2c7f387"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-persistent-loss-linux-20261120/before-calls.jsonl",
+      "sha256": "67017587cefcb8797d6e39e490bc8dad496bf28f658fee3eb6877caffca13d6d"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-persistent-loss-linux-20261120/before-recovered.log",
+      "sha256": "e43194aa33274df7e6d76d580864401cd12d7a5408496ba4c415f763cc9a0648"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-persistent-loss-linux-20261120/before-watch.log",
+      "sha256": "d64d36b62c3b140915b73f738091e2b4bace956374c6b0d37b8ddee7b824e6e2"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-persistent-loss-linux-20261120/result.json",
+      "sha256": "508ce179a7124f365c1363af4649f5cb0fff2981b3b52f5f62dcff0c09469c61"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-persistent-loss-linux-20261120.log",
+      "sha256": "e8c80bde2b395f6c3cc3fa23ac9cac5fe9f54212f7e7403a5c5dd021211ede5e"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-harness-run_persistent_witness_loss_20261120.py.txt",
+      "sha256": "8d5368d72376988d598f25bca0337ec95ff221cb2a0b957ce277fa03758a4bbc"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-cgroup-linux-20261120/cgroup-resources.json",
+      "sha256": "83fa592585dc71d0c51f66903cac9dd964dc37679feaa957f9968204656d266a"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-cgroup-linux-20261120/keyless-proof.json",
+      "sha256": "7a867f54f28cc6f87b6ed96dd062534daf1f5e2ce64ea40017d8347ee60af1d8"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-cgroup-linux-20261120/ownership.json",
+      "sha256": "535ac4dd4db6c6a3c68efc83aeb2cc913925d3cf6ab890321deb7c61f937ab4f"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-cgroup-linux-20261120/progress.json",
+      "sha256": "6a2f7cfe843af961d6c599da160b33b160a1be8e2524aeaeeeb1ef600fd1dc34"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-cgroup-linux-20261120/resource-acceptance.json",
+      "sha256": "2009e06342daee052a964ba1be71599f3ea36c3ddcab15797c758485aa520659"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-cgroup-linux-20261120/result.json",
+      "sha256": "fc21aba22b63e5617f4ba17800cb4ffe047d439a721632ab3b5d9c30fadcf0ee"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-cgroup-linux-20261120/stderr.log",
+      "sha256": "941bdc385450f18a97eb7e18b3d0b4db6ae5f0c733e80a7a2906a2897da66ad1"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-large-cgroup-linux-20261120/stdout.log",
+      "sha256": "906f43dc0bdb831b4297ec943a4c263ae07f77443bb56492b13146c6d8b7b847"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-run_large_witness_cgroup_20261120.py.txt",
+      "sha256": "01082bf1d570dbdfc492a450d12020566c45f3dfe9e4458ebd56dce9a8c8b641"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-20261120/cgroup-resources.json",
+      "sha256": "114474454aa0da125130a313ab27286233bde0ee7cc3fddfc82735210c102f5b"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-20261120/ownership.json",
+      "sha256": "cdde3b285addbab388cac8252e12f9b6c6ba9a718dff0252cfbdcaa15b42ef9c"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-20261120/progress.json",
+      "sha256": "8e97f17d3a83d66b682796099459c8adb3677159c057379c93cbf2808d59c8ca"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-20261120/resource-acceptance.json",
+      "sha256": "5d456810ace32f1d127f3cc7192eff44ef554aac18369156aee4221a6a75989a"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-20261120/result.json",
+      "sha256": "3cf867b24a2856cd7480a7b6dd54105eb747be4e353974408015fd39d9467d62"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-20261120/stderr.log",
+      "sha256": "699848c968ecdd63ed77a9a3d4da58286e3df9724ee76a2807e836e8c1c0f7fb"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-20261120/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-fixed-20261120/cgroup-resources.json",
+      "sha256": "2d7a587acddcc9b126164e532a22866159316627c943b2b7b1eeea7ff16a707c"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-fixed-20261120/ownership.json",
+      "sha256": "473d98a451e229611d2480d26cdde1fab1e994a04604d0f3428795157373afb3"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-fixed-20261120/progress.json",
+      "sha256": "1434ba452f18a4662610e654c98ee3bec41d8c5a54aa0e9d37475fefcad48911"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-fixed-20261120/resource-acceptance.json",
+      "sha256": "c249ecb886fa6bfde981f661ad2598827048b2fb63edbd2d9c7d1ecafbdea367"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-fixed-20261120/result.json",
+      "sha256": "e828b32885dc9f711a5a2290a323e022572c8278757248d195f32c4d167401e5"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-fixed-20261120/stderr.log",
+      "sha256": "de4b40253bfbc7afeeb05fe4c6fe82218183c4097c84bb9903b29b77ea6e3ca6"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-witness-source-scale-cgroup-linux-fixed-20261120/stdout.log",
+      "sha256": "ae6b76098a6a9ee5acb9ef31aefa3e8502d00c070ca812da47ca863354062c74"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-run_witness_source_scale_20261120-v1.py.txt",
+      "sha256": "8048342e19ba17eda3b9762cc024584c34a79e3c8b27011403597b20f660d573"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-run_witness_source_scale_20261120.py.txt",
+      "sha256": "5f374b06b23c178445fd945858c634c7a87ae81e00a2579020c142f18f411498"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-run_source_scale_cgroup_20261120-v1.py.txt",
+      "sha256": "b2cfc03f689a3b0428d4ad29188fffa9bce195f5a1fef2e3e9a7f361e04c3b6a"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-boundary-run_source_scale_cgroup_20261120.py.txt",
+      "sha256": "ccbb1b1ed034cbe0fe52a6f2de9d9ffd82ffc4ca778e984f653beb8c28a9f1ad"
+    }
+  ],
+  "real_default_cadence": {
+    "checks": 10,
+    "elapsed_seconds": 302.99831607600026,
+    "os_clock_changed": false
+  },
+  "large_control_fixture": {
+    "checks": 8,
+    "preloaded_anchors": 4095,
+    "synthetically_signed_receipts": 4094,
+    "actual_observe_before_preload": 1,
+    "actual_collection_after_preload": 1,
+    "all_4096_calls_exercised": false,
+    "service_memory_limit_verified": false
+  },
+  "matrix_source_commit": "6033a7b5f7da91c66e0ca00fa7607e4dc7517ff3",
+  "matrix_completed": {
+    "windows": true,
+    "linux": true
+  },
+  "actual_sequential_4096_drill": {
+    "completed": true,
+    "source_commit": "af311242e57a064f599001f33c9095335e380e23",
+    "witness_observations": 4096,
+    "checks": 4,
+    "not_4096_collector_cycles": true
+  },
+  "paid_api_calls": 0,
+  "detection_metrics_changed": false,
+  "goal_status": "active_until_0800",
+  "persistent_response_loss": {
+    "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+    "checks": 13,
+    "failed_watch_cycles_per_mode": 3,
+    "fault_modes": [
+      "before_sign",
+      "after_sign"
+    ],
+    "source_bytes_unchanged": true,
+    "private_fixture_removed": true,
+    "paid_api_calls": 0
+  },
+  "large_resource_envelope": {
+    "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+    "fixture_checks": 8,
+    "resources": {
+      "before": {
+        "cpu_usage_nsec": 36364000,
+        "cpu_source": "cgroup2_cpu_stat",
+        "memory_peak_bytes": 6770688,
+        "memory_source": "cgroup1_memory_peak",
+        "memory_limit_bytes": 268435456,
+        "cpu_quota_percent": 50.0,
+        "throttled_periods": 0,
+        "memory_limit_hits": 0,
+        "memory_oom_kills": 0,
+        "tasks_limit": 8
+      },
+      "after": {
+        "cpu_usage_nsec": 14835563000,
+        "cpu_source": "cgroup2_cpu_stat",
+        "memory_peak_bytes": 140496896,
+        "memory_source": "cgroup1_memory_peak",
+        "memory_limit_bytes": 268435456,
+        "cpu_quota_percent": 50.0,
+        "throttled_periods": 296,
+        "memory_limit_hits": 0,
+        "memory_oom_kills": 0,
+        "tasks_limit": 8
+      },
+      "harness_exit_code": 0
+    },
+    "source_bytes_unchanged": true,
+    "production_sandbox_tested": false,
+    "owned_unit_inactive": true,
+    "owned_temporary_tree_removed": true
+  },
+  "maximum_source_rows_resource_runs": {
+    "initial": {
+      "schema": "owned-large-witness-resource-envelope-1",
+      "unit": "zt-large-witness-8f74095cec304c5a8b3b6fe80f02ad73.service",
+      "completed": false,
+      "production_sandbox_tested": false,
+      "unit_created_in_etc": false,
+      "paid_api_calls": 0,
+      "owned_temporary_tree_removed": true,
+      "owned_unit_inactive": true
+    },
+    "fixed": {
+      "schema": "owned-large-witness-resource-envelope-1",
+      "unit": "zt-large-witness-9db404bd592a4192be59a8daad4d2bdc.service",
+      "completed": true,
+      "production_sandbox_tested": false,
+      "unit_created_in_etc": false,
+      "paid_api_calls": 0,
+      "exit_code": 0,
+      "resources": {
+        "before": {
+          "cpu_usage_nsec": 25912000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 6819840,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": 50.0,
+          "throttled_periods": 0,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 8
+        },
+        "after": {
+          "cpu_usage_nsec": 28841551000,
+          "cpu_source": "cgroup2_cpu_stat",
+          "memory_peak_bytes": 236150784,
+          "memory_source": "cgroup1_memory_peak",
+          "memory_limit_bytes": 268435456,
+          "cpu_quota_percent": 50.0,
+          "throttled_periods": 575,
+          "memory_limit_hits": 0,
+          "memory_oom_kills": 0,
+          "tasks_limit": 8
+        },
+        "harness_exit_code": 0
+      },
+      "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+      "source_bytes_unchanged": true,
+      "large_fixture_checks": 5,
+      "owned_temporary_tree_removed": true,
+      "owned_unit_inactive": true
+    }
+  }
+}

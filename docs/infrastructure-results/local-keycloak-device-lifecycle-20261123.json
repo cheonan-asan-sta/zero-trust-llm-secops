@@ -1,0 +1,196 @@
+{
+  "account_takeover_triage": {
+    "ambiguous_provider_error_factor": "unknown",
+    "environment_change_is_controlled_input": true,
+    "failed_login_retained_warning": true,
+    "failed_login_takeover": "no_signal",
+    "verified_otp_with_unknown_device": "review"
+  },
+  "alert_triage": {
+    "approved_mfa_and_scope": "cleared",
+    "cross_attempt_receipt": "needs_evidence",
+    "denied_scope": "confirmed",
+    "missing_otp_request": "confirmed",
+    "pre_auth_cancelled": "cleared",
+    "pre_auth_outage": "cleared",
+    "rejected_otp_request": "confirmed"
+  },
+  "allowed_read": true,
+  "ato_device_review": {
+    "actual_mtls_client_proof": true,
+    "actual_provider_otp_verified": true,
+    "after": {
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fn": 0,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 14,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tn": 7,
+      "tp": 7
+    },
+    "before": {
+      "accuracy": 0.5,
+      "f1": 0.0,
+      "false_positive_rate": 0.0,
+      "fn": 7,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 14,
+      "precision": null,
+      "recall": 0.0,
+      "tn": 7,
+      "tp": 0
+    },
+    "device_lifecycle": {
+      "after": {
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "false_positive_rate": 0.0,
+        "fn": 0,
+        "fp": 0,
+        "inference_errors": 0,
+        "population": 6,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tn": 3,
+        "tp": 3
+      },
+      "before": {
+        "accuracy": 0.5,
+        "f1": 0.0,
+        "false_positive_rate": 0.0,
+        "fn": 3,
+        "fp": 0,
+        "inference_errors": 0,
+        "population": 6,
+        "precision": null,
+        "recall": 0.0,
+        "tn": 3,
+        "tp": 0
+      },
+      "cases": {
+        "before_registration": {
+          "device": "unknown",
+          "http_status": 200,
+          "new_priority": false,
+          "previous_priority": false,
+          "still_reviewed": true,
+          "warning": false
+        },
+        "first_request_after_device_revocation": {
+          "device": "revoked_verified_device",
+          "http_status": 200,
+          "new_priority": true,
+          "previous_priority": false,
+          "still_reviewed": true,
+          "warning": false
+        },
+        "new_device_registered": {
+          "device": "known",
+          "http_status": 200,
+          "new_priority": false,
+          "previous_priority": false,
+          "still_reviewed": true,
+          "warning": false
+        },
+        "new_replacement_device": {
+          "device": "known",
+          "http_status": 200,
+          "new_priority": false,
+          "previous_priority": false,
+          "still_reviewed": true,
+          "warning": false
+        },
+        "old_certificate_after_reenrollment": {
+          "device": "revoked_verified_device",
+          "http_status": 200,
+          "new_priority": true,
+          "previous_priority": false,
+          "still_reviewed": true,
+          "warning": false
+        },
+        "reenrolled_device_new_certificate": {
+          "device": "known",
+          "http_status": 200,
+          "new_priority": false,
+          "previous_priority": false,
+          "still_reviewed": true,
+          "warning": false
+        },
+        "retired_device_after_replacement": {
+          "device": "revoked_verified_device",
+          "http_status": 200,
+          "new_priority": true,
+          "previous_priority": false,
+          "still_reviewed": true,
+          "warning": false
+        }
+      },
+      "keycloak_session_revocation": {
+        "admin_http_status": 204,
+        "decision_returned": false,
+        "first_request_http_status": 401,
+        "other_sessions_retained": 2,
+        "revoked_token_still_passed_signed_claims_and_otp_binding": true
+      },
+      "registry_versions": 5
+    },
+    "existing_priority_retained": 1,
+    "pinned_device_enrollment": true,
+    "rejected_replay_expiry_other_session_missing_token_missing_certificate": 5,
+    "residual_report_sha256": "2f9073b6827e9c9254bed6e81ce5180633a27444839ccd1c501f20811a554761",
+    "scope": "paired local laboratory scenarios with one real OTP session; controlled risk labels",
+    "unregistered_and_foreign_scope_remained_review": 2
+  },
+  "authority_mode": "read-only provider checks on each request",
+  "aws_calls": 0,
+  "container_removed": true,
+  "downgraded_role": 403,
+  "existing_keycloak_results_matched": true,
+  "failed_mfa_grant": false,
+  "failed_mfa_observation": "unknown",
+  "failed_mfa_policy": "DENY",
+  "finished_at": "2026-11-23T03:15:59.069044+00:00",
+  "image": "quay.io/keycloak/keycloak:26.8.0",
+  "login_history_review": {
+    "ambiguous_current_time": false,
+    "baseline_repeated_failure_warning": true,
+    "candidate_repeated_failure_warning": false,
+    "candidate_with_independent_hard_alert": true,
+    "earlier_same_account_failures": 3,
+    "earlier_same_account_successes": 1,
+    "failures_since_success": false,
+    "provider_current_result": "success",
+    "recent_prior_failures_capped": 3,
+    "same_recent_source_address": true,
+    "unattributed_login_events": 0,
+    "verified_session_match": true
+  },
+  "logout": 204,
+  "manual_revocation_file": false,
+  "mfa_correct": 200,
+  "mfa_missing": 400,
+  "mfa_wrong": 400,
+  "oidc_web_redirect": {
+    "after_logout": 401,
+    "consumed_redirect_grant": 403,
+    "denied_redirect_receipts": 0,
+    "downgraded_role": 403,
+    "evidence_state": "consistent",
+    "old_role": 401,
+    "refreshed_token_without_exact_otp_binding": 403,
+    "verified_otp_redirect": 303
+  },
+  "old_token_after_role_removal": 401,
+  "paid_api_calls": 0,
+  "pre_auth_outage_probe": "actual stopped loopback provider",
+  "refresh_after_logout": 400,
+  "regression_tests_passed": 128,
+  "remote_out_of_scope": "DENY",
+  "role_removal": 204,
+  "token_after_provider_logout": 401
+}

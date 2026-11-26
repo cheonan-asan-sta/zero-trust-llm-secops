@@ -1,0 +1,9 @@
+{
+  "schema": "owned-dependent-full-launch-1",
+  "old_source_commit": "8d2df526843418e50124b23808c54b9597e79008",
+  "old_exit_code": 0,
+  "old_finished_at": "2026-11-19T19:21:46.809573+00:00",
+  "new_source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "tag": "b77-20261120",
+  "paid_api_calls": 0
+}

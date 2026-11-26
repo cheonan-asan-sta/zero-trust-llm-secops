@@ -1,0 +1,4 @@
+# TYPE secops_witness_bridge_enabled gauge
+secops_witness_bridge_enabled 1
+secops_witness_status_success 0
+secops_witness_observation_healthy 0

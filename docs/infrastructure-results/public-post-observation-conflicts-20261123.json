@@ -1,0 +1,42 @@
+{
+  "reference_sha256": "3df29dcf51674eeabe1a8c9f2b02aa1638bae7e7f91c923cd38d8819b55ff472",
+  "source_sha256": "9c73c90ce6564ae48b14f7179cd864d037a6a130ef69c68c1626ec5d7ce4a910",
+  "views": {
+    "body_structure_model": {
+      "empirical_fpr_floor_under_native_retention": 0.6316648531011969,
+      "forced_false_positive_rows_to_preserve_native_positive": 1161,
+      "known_normal_rows": 1838,
+      "label_mixed_groups": 184,
+      "negative_rows_in_mixed": 1161,
+      "positive_rows_in_mixed": 1660,
+      "projection_groups": 15069
+    },
+    "exact_header_context": {
+      "empirical_fpr_floor_under_native_retention": 0.12023939064200218,
+      "forced_false_positive_rows_to_preserve_native_positive": 221,
+      "known_normal_rows": 1838,
+      "label_mixed_groups": 4,
+      "negative_rows_in_mixed": 221,
+      "positive_rows_in_mixed": 59,
+      "projection_groups": 18886
+    },
+    "header_shape": {
+      "empirical_fpr_floor_under_native_retention": 0.12295973884657237,
+      "forced_false_positive_rows_to_preserve_native_positive": 226,
+      "known_normal_rows": 1838,
+      "label_mixed_groups": 8,
+      "negative_rows_in_mixed": 226,
+      "positive_rows_in_mixed": 66,
+      "projection_groups": 18563
+    },
+    "request_target_and_body_with_status": {
+      "empirical_fpr_floor_under_native_retention": 0.19967355821545157,
+      "forced_false_positive_rows_to_preserve_native_positive": 367,
+      "known_normal_rows": 1838,
+      "label_mixed_groups": 3,
+      "negative_rows_in_mixed": 367,
+      "positive_rows_in_mixed": 1094,
+      "projection_groups": 17844
+    }
+  }
+}

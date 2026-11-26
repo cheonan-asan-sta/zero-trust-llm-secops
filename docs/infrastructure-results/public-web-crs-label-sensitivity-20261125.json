@@ -1,0 +1,44 @@
+{
+  "baseline_seal": "b68468c77ac2690952efd50b1121332f36399570857f675dd0bd6e364c8e9509",
+  "full_population": {
+    "casefold": {
+      "exact_0_alternative_0": 212592,
+      "exact_0_alternative_1": 68,
+      "exact_1_alternative_1": 545
+    },
+    "exact": {
+      "exact_0_alternative_0": 212660,
+      "exact_1_alternative_1": 545
+    },
+    "percent_decoded_casefold": {
+      "exact_0_alternative_0": 212563,
+      "exact_0_alternative_1": 97,
+      "exact_1_alternative_0": 5,
+      "exact_1_alternative_1": 540
+    }
+  },
+  "new_priority_only": {
+    "casefold": {
+      "exact_0_alternative_0": 3,
+      "exact_0_alternative_1": 6,
+      "exact_1_alternative_1": 22
+    },
+    "exact": {
+      "exact_0_alternative_0": 9,
+      "exact_1_alternative_1": 22
+    },
+    "percent_decoded_casefold": {
+      "exact_0_alternative_0": 2,
+      "exact_0_alternative_1": 7,
+      "exact_1_alternative_0": 1,
+      "exact_1_alternative_1": 21
+    }
+  },
+  "official_labels_changed": false,
+  "priority_seal": "ac5fef781d2e0be617bba670212454a70db69ecaa76bc837e1aeb93a625deab6",
+  "purpose": "normalization sensitivity only; not relabeling or performance credit",
+  "sources": {
+    "rows": 213205,
+    "source_sha256": "1429caba2803c3e8c90e9fb287bc04f6f8249f8bb34712b39127044e134d631f"
+  }
+}

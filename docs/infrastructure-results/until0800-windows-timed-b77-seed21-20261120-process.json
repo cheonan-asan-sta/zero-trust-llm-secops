@@ -1,0 +1,21 @@
+{
+  "pid": 53852,
+  "executable": "C:\\Users\\chaeh\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+  "arguments": [
+    "C:\\Users\\chaeh\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "-m",
+    "scripts.run_witness_safety_sequence",
+    "--directory",
+    "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\extra-development-20261118\\runtime\\until0800-windows-timed-b77-seed21-20261120-sequence",
+    "--seed",
+    "20261121",
+    "--rounds",
+    "32",
+    "--delay-seconds",
+    "23",
+    "--max-seconds",
+    "7200"
+  ],
+  "cwd": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\witness-verified-source-20261120-b77eceb3",
+  "source_commit": "b77eceb30747a0a764cf997879a124b590eef972"
+}

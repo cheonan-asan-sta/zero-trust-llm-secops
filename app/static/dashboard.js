@@ -68,7 +68,6 @@
     identity: "/auth/me",
     metrics: "/metrics",
     logs: "/results?limit=100",
-    sessions: "/zero-trust/sessions",
     signals: "/zero-trust/signals/status",
     inbox: "/zero-trust/signals/inbox"
   };
@@ -80,7 +79,8 @@
     controllers: new Set(),
     data: {},
     errors: {},
-    pageNumber: 1,
+    audit: {generation: 0, busy: false, page: null, cursors: [], index: 0,
+      error: null, identity: null, scope: null, controller: null},
     busy: false,
     detailSequence: 0,
     demo: {},
@@ -117,6 +117,20 @@
   const badge = (value, tone = "neutral") => node("span", value, `pill ${tone}`);
   const empty = (message) => node("p", message, "empty");
 
+  const sessionView = new CollectionView({prefix: "sessionPages", label: "세션 목록", body: $("sessionRows"), columns: 7,
+    url: "/zero-trust/session-pages", id: "session_id", request,
+    context: () => ({epoch: state.epoch, identity: state.data.identity}),
+    filters: () => ({decision: $("sessionFilter").value}),
+    render: rows => { state.data.sessions = rows; renderSessions(); },
+    authorityError: () => resetConnection("none", ""),
+    validate: row => typeof row.user_id === "string" && typeof row.resource_id === "string" && Object.hasOwn(decisions, row.decision) &&
+      ["ACTIVE", "STEP_UP_REQUIRED", "HELD", "REVOKED"].includes(row.status) && ["demo", "verified_source"].includes(row.signal_trust) &&
+      Number.isSafeInteger(row.version) && row.version > 0 && (!$("sessionFilter").value || row.decision === $("sessionFilter").value)});
+  const caseView = new CollectionView({prefix: "caseDashboardPages", label: "사고 목록", body: $("caseRows"), columns: 6,
+    url: "/case-pages", id: "case_id", request, context: () => ({epoch: state.epoch, identity: state.data.identity}),
+    render: renderCaseRows, authorityError: () => resetConnection("none", ""),
+    validate: row => ["NEW", "TRIAGED", "INVESTIGATING", "CONTAINED", "RESOLVED", "CLOSED"].includes(row.status) && Number.isSafeInteger(row.version) && row.version > 0 && typeof row.updated_at === "string" && Number.isFinite(Date.parse(row.updated_at))});
+
   function errorLabel(error) {
     if (error.invalidResponse) return "서버 응답 형식이 올바르지 않습니다.";
     if (error.status === 401) return "인증이 필요합니다. 연결 및 인증에서 키를 입력하세요.";
@@ -139,10 +153,19 @@
     allowDenied = false,
     method,
     timeoutMs = 12000,
-    operation = false
+    operation = false,
+    ifMatch,
+    reviewIdentity,
+    withMetadata = false,
+    signal
   } = {}) {
+    if (ifMatch !== undefined && !/^"r1-[a-f0-9]{64}"$/.test(ifMatch)) throw new Error("검토 버전을 다시 조회하세요.");
+    if (reviewIdentity !== undefined && !/^[a-f0-9]{64}$/.test(reviewIdentity)) throw new Error("검토 신원을 다시 확인하세요.");
     const epoch = state.epoch;
     const controller = new AbortController();
+    const abort = () => controller.abort();
+    if (signal?.aborted) abort();
+    else signal?.addEventListener("abort", abort, {once: true});
     state.controllers.add(controller);
     const timeout = setTimeout(() => controller.abort(), Math.min(timeoutMs, 120000));
     const headers = {
@@ -152,6 +175,8 @@
     if (state.credentialType === "bearer" && state.credential) headers.Authorization = `Bearer ${state.credential}`;
     if (body !== undefined) headers["Content-Type"] = "application/json";
     if (operation) headers["X-Dashboard-Action"] = "1";
+    if (ifMatch !== undefined) headers["If-Match"] = ifMatch;
+    if (reviewIdentity !== undefined) headers["X-Review-Identity"] = reviewIdentity;
     try {
       const response = await fetch(path, {
         method: method || (body === undefined ? "GET" : "POST"),
@@ -181,6 +206,7 @@
       }
       if (path === "/health" && response.headers.get("X-Secops-Data-Scope") === "synthetic-dashboard-demo") data.dashboard_demo = true;
       if (epoch !== state.epoch) throw new DOMException("Connection changed", "AbortError");
+      if (withMetadata) return {data, etag: response.headers.get("ETag"), reviewIdentity: response.headers.get("X-Review-Identity"), reviewMode: response.headers.get("X-Review-Mode")};
       return allowDenied ? {
         status: response.status,
         data
@@ -188,9 +214,25 @@
     } finally {
       clearTimeout(timeout);
       state.controllers.delete(controller);
+      signal?.removeEventListener("abort", abort);
     }
   }
 
+  function sameReviewIdentity(left, right) {
+    return Boolean(left && right) && ["subject", "tenant_id", "auth_method"].every((key) =>
+      typeof left[key] === "string" && left[key].length > 0 && left[key] === right[key]);
+  }
+  async function readReviewObservation(eventId) {
+    const epoch = state.epoch;
+    const before = checked("identity", await request("/auth/me"));
+    const response = await request(`/results/${encodeURIComponent(eventId)}`, {withMetadata: true});
+    const record = checked("log", response.data);
+    const after = checked("identity", await request("/auth/me"));
+    if (epoch !== state.epoch || !sameReviewIdentity(before, after)) throw new Error("조회 중 신원이 변경됐습니다. 다시 조회하세요.");
+    if (record.event_id !== eventId || record.tenant_id !== before.tenant_id || typeof record.analysis_id !== "string") throw new Error("조회 결과의 대상과 신원을 확인할 수 없습니다.");
+    const identity = Object.fromEntries(["subject", "tenant_id", "auth_method"].map((key) => [key, before[key]]));
+    return {record, identity, epoch, etag: response.etag, reviewIdentity: response.reviewIdentity, reviewMode: response.reviewMode};
+  }
   function checked(key, value) {
     const object = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
     const count = (v) => Number.isFinite(v) && v >= 0;
@@ -203,6 +245,13 @@
       metrics: () => object(value) && count(value.total_analyses) && count(value.pending_review_count) && count(value.average_latency_ms) && object(value.risk_counts) && Object.values(value.risk_counts).every(count),
       logs: () => Array.isArray(value) && value.every(log),
       log: () => log(value),
+      audit: () => object(value) && Array.isArray(value.items) && value.items.length <= 12 && value.items.every(log) &&
+        Number.isSafeInteger(value.total_matches) && value.total_matches >= 0 &&
+        /^[A-Za-z0-9_-]{1,2048}$/.test(value.page_cursor || "") &&
+        (value.next_cursor === null || (typeof value.next_cursor === "string" && /^[A-Za-z0-9_-]{1,2048}$/.test(value.next_cursor))) &&
+        /^[a-f0-9]{64}$/.test(value.snapshot_id || "") && value.historical_audit_snapshot === true &&
+        ["sqlite_prefix", "unchanged_local_view"].includes(value.snapshot_mode) &&
+        Number.isFinite(Date.parse(value.snapshot_created_at)) && Date.parse(value.snapshot_expires_at) > Date.parse(value.snapshot_created_at),
       sessions: () => Array.isArray(value) && value.every(session),
       responses: () => Array.isArray(value) && value.every(response),
       response: () => response(value),
@@ -357,24 +406,72 @@
     if (!$("detailDialog").open) $("detailDialog").showModal();
     return ++state.detailSequence;
   }
-  async function showRecord(record, type) {
-    const epoch = state.epoch;
-    const sequence = openDetail(type === "log" ? "분석 기록" : type === "session" ? "세션 이력" : "대응 요청");
+
+  async function showReplayReview(host, original, epoch, sequence) {
+    const section = node("section");
+    const status = node("p", "현재 검토 상태를 불러오고 있습니다.");
+    status.setAttribute("role", "status");
+    section.append(node("h3", "현재 검토"), status);
+    host.append(section);
+    const active = () => epoch === state.epoch && sequence === state.detailSequence && $("detailDialog").open;
     try {
-      const path = type === "log" ? `/results/${encodeURIComponent(record.event_id)}` : type === "session" ? `/zero-trust/sessions/${encodeURIComponent(record.session_id)}` : `/response/requests/${encodeURIComponent(record.request_id)}`;
-      const item = checked(type === "session" ? "sessions" : type, await request(path));
+      const observation = await readReviewObservation(original.event_id);
+      if (!active()) return;
+      if (observation.record.analysis_id !== original.analysis_id) {
+        status.textContent = "이 이벤트에 새 분석이 있습니다. 로그 탐색에서 최신 기록을 확인하세요.";
+        const link = node("a", "로그 탐색", "text-link");
+        link.href = "#logs";
+        link.addEventListener("click", () => $("detailDialog").close());
+        section.append(link);
+        return;
+      }
+      const record = observation.record;
+      status.textContent = reviews[record.review_status] || record.review_status;
+      if (record.review_updated_at) {
+        section.append(node("p", `${record.reviewer} · ${date(record.review_updated_at, true)}`));
+      }
+      if (observation.reviewMode === "conditional" && record.review_status !== "NOT_REQUIRED") {
+        window.dashboardOperations?.detailActions("log", record, section, {...observation, pinnedToReplay: true});
+      }
+    } catch {
+      if (active()) status.textContent = "현재 검토 상태를 확인할 수 없습니다. 상세 기록을 다시 열어 조회하세요.";
+    }
+  }
+
+  async function showRecord(record, type, {replay = false} = {}) {
+    const identity = state.data.identity;
+    const epoch = state.epoch;
+    const title = {log: replay ? "재전송 분석 기록" : "분석 기록", session: "세션 이력", response: "대응 요청"};
+    const sequence = openDetail(title[type]);
+    try {
+      let item, reviewObservation;
+      if (replay) {
+        item = checked("log", await request(`/dashboard/login-queue/deliveries/${encodeURIComponent(record.analysis_id)}`));
+        if (!sameReviewIdentity(identity, state.data.identity) || item.tenant_id !== identity.tenant_id ||
+            item.event_id !== record.event_id || item.analysis_id !== record.analysis_id) {
+          throw new Error("조회 결과의 대상과 신원을 확인할 수 없습니다.");
+        }
+      } else if (type === "log") {
+        reviewObservation = await readReviewObservation(record.event_id);
+        item = reviewObservation.record;
+      } else {
+        const path = type === "session" ? `/zero-trust/sessions/${encodeURIComponent(record.session_id)}` : `/response/requests/${encodeURIComponent(record.request_id)}`;
+        item = checked(type === "session" ? "sessions" : type, await request(path));
+      }
       if (epoch !== state.epoch || sequence !== state.detailSequence) return;
       const body = $("detailBody");
       body.replaceChildren();
       if (type === "log") {
         body.append(fields([
           ["이벤트 ID", item.event_id],
+          ...(replay ? [["분석 ID", item.analysis_id]] : []),
           ["분석 시각", date(item.analyzed_at, true)],
           ["위험도 / 점수", `${item.assessment.risk_level} / ${item.assessment.risk_score}`],
           ["분석기", item.analyzer],
-          ["검토 상태", reviews[item.review_status] || item.review_status],
+          [replay ? "분석 당시 검토 상태" : "검토 상태", reviews[item.review_status] || item.review_status],
           ["테넌트", item.tenant_id]
         ]));
+        if (replay) void showReplayReview(body, item, epoch, sequence);
         body.append(detailsList("판단 근거", [item.assessment.rationale, ...item.assessment.evidence]), detailsList("정책과 대응 제안", [item.policy_decision.reason, `제안: ${item.policy_decision.action} / 실행 모드: ${item.policy_decision.mode}`, "이 분석 제안만으로 외부 계정이나 기기를 차단하지 않습니다."]));
         const evidence = analysisEvidence(item);
         if (evidence) body.append(evidence);
@@ -402,10 +499,13 @@
           ["승인", `${item.approved_by.length} / ${item.required_approvals}`]
         ]), detailsList("요청 사유", [item.reason]), detailsList("검토 이력", item.reviews.map((review) => `${review.subject} / ${date(review.approved_at, true)} / ${review.reason}`)), node("p", "서로 다른 검토자 2명의 승인이 필요합니다. 실행 결과는 로컬 모의 대응입니다.", "scope-note"));
       }
-      window.dashboardOperations?.detailActions(type, item, body);
+      if (!replay) window.dashboardOperations?.detailActions(type, item, body, reviewObservation);
       body.append(rawPanel(item));
     } catch (error) {
-      if (epoch === state.epoch && sequence === state.detailSequence) $("detailBody").replaceChildren(empty(errorLabel(error)));
+      if (epoch === state.epoch && sequence === state.detailSequence) {
+        const message = replay && error.status === 404 ? "재전송에 연결된 분석 기록을 찾을 수 없습니다." : errorLabel(error);
+        $("detailBody").replaceChildren(empty(message));
+      }
     }
   }
 
@@ -444,7 +544,9 @@
   function renderLogRows(id, rows) {
     const target = $(id);
     target.replaceChildren();
-    if (!state.data.logs) return tableMessage(target, state.errors.logs ? errorLabel(state.errors.logs) : "기록을 불러오고 있습니다.", 6);
+    if (id === "logRows" && !state.audit.page) return tableMessage(target,
+      state.audit.error ? auditError(state.audit.error) : state.audit.busy ? "기록을 불러오고 있습니다." : "최신 목록 조회를 눌러 기록을 확인하세요.", 6);
+    if (id !== "logRows" && !state.data.logs) return tableMessage(target, state.errors.logs ? errorLabel(state.errors.logs) : "기록을 불러오고 있습니다.", 6);
     if (!rows.length) return tableMessage(target, "조건에 맞는 분석 기록이 없습니다.", 6);
     rows.forEach((record) => {
       const row = node("tr");
@@ -463,31 +565,117 @@
 
   function filteredLogs() {
     const query = $("logSearch").value.trim().toLocaleLowerCase();
-    return (state.data.logs || []).filter((record) =>
-      (!$("riskFilter").value || record.assessment.risk_level === $("riskFilter").value) &&
+    return (state.audit.page?.items || []).filter((record) =>
       (!$("analyzerFilter").value || record.analyzer === $("analyzerFilter").value) &&
-      (!$("reviewFilter").value || record.review_status === $("reviewFilter").value) &&
       (!query || JSON.stringify(redact(record)).toLocaleLowerCase().includes(query)));
   }
 
+  const auditScope = () => JSON.stringify([$("riskFilter").value, $("reviewFilter").value, $("auditQuery").value.trim(), $("auditAnalyzer").value]);
+  function auditError(error) {
+    if (error.status === 410) return "조회가 만료됐습니다. 최신 목록 조회를 눌러 다시 시작하세요.";
+    if ([400, 409].includes(error.status)) return "이전 조회를 이어갈 수 없습니다. 최신 목록 조회를 눌러 다시 시작하세요.";
+    if (error.status === 501) return "현재 서버는 감사 페이지 조회를 지원하지 않습니다. 관리자에게 문의하세요.";
+    if (error.identityChanged) return "조회 신원이 변경됐습니다. 연결 및 인증을 확인한 뒤 최신 목록을 다시 조회하세요.";
+    if (error.invalidResponse) return "감사 페이지 응답을 확인할 수 없습니다. 최신 목록을 다시 조회하세요.";
+    return errorLabel(error) + " 최신 목록 조회로 다시 시도하세요.";
+  }
+  function resetAudit() {
+    const audit = state.audit;
+    audit.controller?.abort();
+    audit.generation++;
+    audit.busy = false; audit.page = null; audit.error = null;
+    audit.cursors = []; audit.index = 0; audit.identity = null; audit.scope = null; audit.controller = null;
+  }
+  function auditIdentityChanged() {
+    resetAudit();
+    state.audit.error = {identityChanged: true};
+    renderLogs();
+  }
+  async function loadAuditPage(index = 0, cursor = null, exporting = false) {
+    const audit = state.audit, epoch = state.epoch;
+    const old = audit.page, scope = auditScope();
+    const identity = audit.identity;
+    const history = cursor ? [...audit.cursors] : [];
+    const localFilter = JSON.stringify([$("logSearch").value, $("analyzerFilter").value]);
+    audit.controller?.abort();
+    const controller = new AbortController(), generation = ++audit.generation;
+    audit.controller = controller; audit.busy = true; audit.page = null; audit.error = null;
+    if (!cursor) { audit.cursors = []; audit.index = 0; audit.identity = null; audit.scope = null; }
+    renderLogs();
+    const active = () => epoch === state.epoch && generation === audit.generation && scope === auditScope();
+    const invalid = () => Object.assign(new Error("Invalid audit page"), {invalidResponse: true});
+    const changed = () => Object.assign(new Error("Audit identity changed"), {identityChanged: true});
+    try {
+      const signal = controller.signal;
+      const before = checked("identity", await request("/auth/me", {signal}));
+      if (!active()) return false;
+      if (!sameReviewIdentity(before, state.data.identity) || (cursor && !sameReviewIdentity(before, identity))) throw changed();
+      const params = new URLSearchParams({limit: "12"});
+      if ($("riskFilter").value) params.set("risk_level", $("riskFilter").value);
+      if ($("reviewFilter").value) params.set("review_status", $("reviewFilter").value);
+      if ($("auditQuery").value.trim()) params.set("q", $("auditQuery").value.trim());
+      if ($("auditAnalyzer").value) params.set("analyzer", $("auditAnalyzer").value);
+      if (cursor) params.set("cursor", cursor);
+      const page = checked("audit", await request("/audit/results?" + params, {signal}));
+      if (!active()) return false;
+      const after = checked("identity", await request("/auth/me", {signal}));
+      if (!active()) return false;
+      if (!sameReviewIdentity(before, after) || !sameReviewIdentity(before, state.data.identity)) throw changed();
+      if (cursor && (!old || audit.scope !== scope || old.snapshot_id !== page.snapshot_id ||
+          old.total_matches !== page.total_matches || old.snapshot_expires_at !== page.snapshot_expires_at ||
+          old.snapshot_created_at !== page.snapshot_created_at || old.snapshot_mode !== page.snapshot_mode)) throw invalid();
+      if (cursor && index !== audit.index && page.items.some((record) => old.items.some((previous) => previous.analysis_id === record.analysis_id))) throw invalid();
+      if (page.items.length !== Math.max(0, Math.min(12, page.total_matches - index * 12)) ||
+          (page.next_cursor !== null) !== (index * 12 + page.items.length < page.total_matches) ||
+          (index > 0 && index * 12 >= page.total_matches) ||
+          new Set(page.items.map((record) => record.analysis_id)).size !== page.items.length ||
+          !page.items.every((record) => record.tenant_id === before.tenant_id && typeof record.analysis_id === "string" && record.analysis_id.length > 0 &&
+            (!$("riskFilter").value || record.assessment.risk_level === $("riskFilter").value) &&
+            (!$("reviewFilter").value || record.review_status === $("reviewFilter").value) &&
+            (!$("auditAnalyzer").value || record.analyzer === $("auditAnalyzer").value))) throw invalid();
+      history[index] = page.page_cursor;
+      if (page.next_cursor) history[index + 1] = page.next_cursor;
+      audit.cursors = history.slice(0, index + (page.next_cursor ? 2 : 1));
+      audit.page = page; audit.index = index; audit.identity = before; audit.scope = scope;
+      if (exporting) {
+        if (localFilter === JSON.stringify([$("logSearch").value, $("analyzerFilter").value])) exportAuditPage();
+        else notify("검색 조건이 변경됐습니다. 현재 결과를 확인한 뒤 다시 저장하세요.");
+      }
+      return true;
+    } catch (error) {
+      if (active()) {
+        audit.page = null; audit.cursors = []; audit.identity = null; audit.scope = null;
+        audit.error = error;
+        if (error.identityChanged || [401, 403].includes(error.status)) {
+          state.detailSequence++; $("detailDialog").close(); $("detailBody").replaceChildren();
+        }
+      }
+      return false;
+    } finally {
+      if (active()) { audit.busy = false; audit.controller = null; render(); }
+    }
+  }
+
   function renderLogs() {
-    const rows = filteredLogs();
-    const pageCount = Math.max(1, Math.ceil(rows.length / 12));
-    state.pageNumber = Math.min(state.pageNumber, pageCount);
-    text("logCount", state.data.logs ? `${rows.length}건 표시 / 조회 ${state.data.logs.length}건` : "조회 결과 없음");
-    text("pageLabel", `${state.pageNumber} / ${pageCount} 페이지`);
-    $("prevPage").disabled = state.pageNumber <= 1;
-    $("nextPage").disabled = state.pageNumber >= pageCount;
-    $("exportLogs").disabled = !state.data.logs || rows.length === 0;
-    renderLogRows("logRows", rows.slice((state.pageNumber - 1) * 12, state.pageNumber * 12));
+    const audit = state.audit, page = audit.page, rows = filteredLogs();
+    text("logCount", page ? `현재 페이지 ${rows.length}건 / 전체 조건 일치 ${num(page.total_matches)}건` : "조회 결과 없음");
+    text("pageLabel", page ? `${audit.index + 1} / ${Math.max(1, Math.ceil(page.total_matches / 12))} 페이지` : "페이지 미확인");
+    text("logSnapshot", audit.busy ? "감사 기록과 현재 조회 신원을 확인하고 있습니다." : audit.error ? auditError(audit.error) :
+      page ? `${date(page.snapshot_created_at, true)} 기준 기록입니다. 최신 목록 조회로 갱신하세요. 상세와 검토는 현재 상태를 다시 확인합니다.` : "최신 목록 조회를 눌러 시작하세요.");
+    $("logRows").setAttribute("aria-busy", String(audit.busy));
+    $("prevPage").disabled = audit.busy || !page || audit.index <= 0;
+    $("nextPage").disabled = audit.busy || !page || !page.next_cursor;
+    $("exportLogs").disabled = audit.busy || !page || rows.length === 0;
+    $("reloadAudit").disabled = audit.busy;
+    renderLogRows("logRows", rows);
     renderLogRows("recentLogs", (state.data.logs || []).slice(0, 5));
   }
 
   function renderSessions() {
     const records = state.data.sessions;
     text("metricRevoked", records ? num(records.filter((item) => item.status === "REVOKED").length) : "—");
-    text("sessionSample", records ? `/ ${records.length}건` : "");
-    text("sessionCount", records ? `최근 ${records.length}개 세션 조회` : "조회 결과 없음");
+    text("sessionSample", records ? `/ 현재 페이지 ${records.length}건` : "");
+    text("sessionCount", records ? `현재 페이지 ${records.length}개 세션 조회` : "조회 결과 없음");
     const target = $("sessionRows");
     target.replaceChildren();
     if (!records) return tableMessage(target, state.errors.sessions ? errorLabel(state.errors.sessions) : "세션을 불러오고 있습니다.", 7);
@@ -503,6 +691,19 @@
       detail.append(rowButton(record, "session"));
       row.append(decision, subject, node("td", record.resource_id, "mono"), node("td", record.signal_trust === "verified_source" ? "검증된 출처" : "합성 시연"), node("td", `v${record.version}`, "mono"), node("td", record.status, "mono"), detail);
       target.append(row);
+    });
+  }
+
+  function renderCaseRows(rows) {
+    const body = $("caseRows"); body.replaceChildren();
+    const labels = {NEW: "신규", TRIAGED: "분류 완료", INVESTIGATING: "조사 중", CONTAINED: "봉쇄 확인", RESOLVED: "해결 완료", CLOSED: "종결"};
+    rows.forEach(record => {
+      const row = node("tr"), detail = node("td"), button = node("button", "현재 상세 열기", "button secondary");
+      button.type = "button";
+      button.addEventListener("click", () => window.dashboardOperations?.open("/cases/{case_id}", "GET", {case_id: record.case_id}));
+      detail.append(button);
+      row.append(node("td", record.case_id), node("td", date(record.updated_at, true)), node("td", labels[record.status]), node("td", record.assignee || "미배정"), node("td", record.version), detail);
+      body.append(row);
     });
   }
 
@@ -696,7 +897,7 @@
       hybrid: "규칙 + OpenAI"
     } [health.analyzer_mode] || health.analyzer_mode : "—");
     text("footerVersion", health ? `v${health.version} / ${health.environment.toUpperCase()} / ${Intl.DateTimeFormat().resolvedOptions().timeZone}` : "LOCAL FRAMEWORK");
-    const errors = Object.entries(state.errors);
+    const errors = [...Object.entries(state.errors), ...(state.audit.error ? [["audit", state.audit.error]] : [])];
     const coreOkay = ["health", "identity", "metrics", "logs", "sessions"].every((key) => state.data[key]);
     text("connectionStatus", coreOkay ? (errors.length ? "일부 조회 기능 확인 필요" : "조회 API 연결됨") : "데이터 조회 확인 필요");
     $("statusDot").className = `status-dot ${coreOkay && !errors.length ? "online" : ""}`;
@@ -710,10 +911,15 @@
     renderEvidence();
     updateDemoButtons();
     window.dashboardOperations?.sync();
+    window.dashboardLoginQueue?.sync();
   }
-  async function refresh() {
+  async function refresh(options = {}) {
     if (state.busy) return;
     const epoch = state.epoch;
+    const previousIdentity = state.data.identity;
+    let identityChanged = false;
+    const reload = options.resetAudit !== false && state.page === "logs";
+    if (reload) { resetAudit(); renderLogs(); }
     state.busy = true;
     $("refresh").disabled = true;
     const urls = {
@@ -730,11 +936,18 @@
           if (epoch === state.epoch) {
             state.data[key] = result;
             delete state.errors[key];
+            if (key === "identity" && previousIdentity && !sameReviewIdentity(previousIdentity, result)) {
+              identityChanged = true;
+              auditIdentityChanged();
+              sessionView.reset();
+              caseView.reset();
+            }
           }
         } catch (error) {
           if (epoch === state.epoch) {
             delete state.data[key];
             state.errors[key] = error;
+            if (key === "identity") { resetAudit(); sessionView.reset(); caseView.reset(); state.audit.error = error; renderLogs(); }
           }
         }
       }));
@@ -746,6 +959,12 @@
       }
       text("lastUpdated", `마지막 조회 ${date(Date.now())}`);
       render();
+      if (!identityChanged && state.page === "logs" && state.data.identity && !state.audit.busy &&
+          (reload || (!state.audit.page && !state.audit.error))) await loadAuditPage();
+      if (!identityChanged && state.data.identity && !sessionView.busy &&
+          ((!sessionView.page && !sessionView.error) || (state.page === "sessions" && options.resetAudit !== false))) await sessionView.load();
+      if (!identityChanged && state.page === "cases" && state.data.identity && !caseView.busy &&
+          ((!caseView.page && !caseView.error) || options.resetAudit !== false)) await caseView.load();
     } finally {
       if (epoch === state.epoch) {
         state.busy = false;
@@ -775,6 +994,10 @@
     });
     document.title = `${name} | 천안아산역`;
     window.dashboardOperations?.navigate(state.page);
+    window.dashboardLoginQueue?.sync();
+    if (state.page === "logs" && state.data.identity) loadAuditPage();
+    if (state.page === "sessions" && state.data.identity) sessionView.load();
+    if (state.page === "cases" && state.data.identity) caseView.load();
     if (state.page === "evidence") {
       if (state.busy) state.refreshRequested = true;
       else refresh();
@@ -787,12 +1010,15 @@
     state.credentialType = type;
     state.credential = credential;
     state.data = {};
+    sessionView.reset();
+    caseView.reset();
     state.errors = {};
     state.busy = false;
     state.refreshRequested = false;
-    state.pageNumber = 1;
+    resetAudit();
     state.demo = {};
     window.dashboardOperations?.reset();
+    window.dashboardLoginQueue?.reset();
     state.detailSequence++;
     $("detailDialog").close();
     $("detailBody").replaceChildren();
@@ -892,29 +1118,46 @@
       }
     }
   }
-  $("refresh").addEventListener("click", refresh);
+  $("refresh").addEventListener("click", () => refresh());
   document.querySelector(".skip-link").addEventListener("click", (event) => {
     event.preventDefault();
     $("content").focus();
     $("content").scrollIntoView();
   });
   window.addEventListener("hashchange", navigate);
-  ["logSearch", "riskFilter", "analyzerFilter", "reviewFilter"].forEach((id) => $(id).addEventListener(id === "logSearch" ? "input" : "change", () => {
-    state.pageNumber = 1;
-    renderLogs();
-  }));
-  $("sessionFilter").addEventListener("change", renderSessions);
+  ["logSearch", "analyzerFilter"].forEach((id) => $(id).addEventListener(id === "logSearch" ? "input" : "change", renderLogs));
+  $("auditSearchForm").addEventListener("submit", (event) => { event.preventDefault(); loadAuditPage(); });
+  ["auditQuery", "auditAnalyzer"].forEach((id) => $(id).addEventListener(id === "auditQuery" ? "input" : "change", () => { resetAudit(); renderLogs(); }));
+  ["riskFilter", "reviewFilter"].forEach((id) => $(id).addEventListener("change", () => loadAuditPage()));
+  $("sessionFilter").addEventListener("change", () => sessionView.load());
   $("prevPage").addEventListener("click", () => {
-    state.pageNumber--;
-    renderLogs();
+    const audit = state.audit;
+    if (!audit.busy && audit.page && audit.index > 0) loadAuditPage(audit.index - 1, audit.cursors[audit.index - 1]);
   });
   $("nextPage").addEventListener("click", () => {
-    state.pageNumber++;
-    renderLogs();
+    const audit = state.audit;
+    if (!audit.busy && audit.page?.next_cursor) loadAuditPage(audit.index + 1, audit.page.next_cursor);
   });
+  $("reloadAudit").addEventListener("click", () => loadAuditPage());
   $("exportLogs").addEventListener("click", () => {
+    const audit = state.audit;
+    if (!audit.busy && audit.page && filteredLogs().length) loadAuditPage(audit.index, audit.page.page_cursor, true);
+  });
+  function exportAuditPage() {
+    const audit = state.audit;
+    if (!audit.page || !filteredLogs().length) return;
     const blob = new Blob([JSON.stringify({
-      scope: "current_tenant_recent_100_filtered",
+      scope: "current_tenant_audit_snapshot_page_filtered",
+      historical_audit_snapshot: true,
+      snapshot_id: audit.page.snapshot_id,
+      snapshot_created_at: audit.page.snapshot_created_at,
+      snapshot_expires_at: audit.page.snapshot_expires_at,
+      snapshot_mode: audit.page.snapshot_mode,
+      page_number: audit.index + 1,
+      total_matches: audit.page.total_matches,
+      filters: {risk_level: $("riskFilter").value, review_status: $("reviewFilter").value,
+        q: $("auditQuery").value.trim(), analyzer: $("auditAnalyzer").value,
+        page_search: $("logSearch").value, page_analyzer: $("analyzerFilter").value},
       exported_at: new Date().toISOString(),
       records: redact(filteredLogs())
     }, null, 2)], {
@@ -926,8 +1169,8 @@
     link.download = `security-logs-${new Date().toISOString().slice(0, 10)}.json`;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    notify("선택한 로그를 저장했습니다. 업무 정보가 포함되어 있으니 공유 시 확인해 주세요.");
-  });
+    notify(`현재 페이지의 검색 결과 ${filteredLogs().length}건을 저장했습니다.`);
+  }
   $("connectionButton").addEventListener("click", () => $("connectionDialog").showModal());
   $("closeConnection").addEventListener("click", () => {
     $("credential").value = "";
@@ -950,6 +1193,7 @@
   $("demoCompromise").addEventListener("click", () => runDemo("compromise"));
   const tick = () => text("clock", `${new Date().toLocaleDateString("ko-KR")} ${date(Date.now())}`);
   window.dashboardContext = {request, node, redact, rawPanel, analysisEvidence, refresh, notify, errorLabel,
+    readReviewObservation, sameReviewIdentity, openReplayAnalysis: (record) => showRecord(record, "log", {replay: true}),
     get state() { return {epoch: state.epoch, page: state.page, data: state.data}; }};
   tick();
   setInterval(tick, 1000);
@@ -957,6 +1201,6 @@
   render();
   refresh();
   setInterval(() => {
-    if ($("autoRefresh").checked && !document.hidden && !state.demo.busy && !$("connectionDialog").open) refresh();
+    if ($("autoRefresh").checked && !document.hidden && !state.demo.busy && !state.audit.busy && !$("connectionDialog").open) refresh({resetAudit: false});
   }, 10000);
 })();

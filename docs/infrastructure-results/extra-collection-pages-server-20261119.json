@@ -1,0 +1,119 @@
+{
+  "schema": "extra-collection-pages-server-1",
+  "source_commit": "dd4f3cef70bf37d7dc6b2ba134aaa1810b28bad5",
+  "stage": "server API; UI migration remains required",
+  "goal_still_active": true,
+  "routes": [
+    "/case-pages",
+    "/zero-trust/session-pages"
+  ],
+  "live_view_not_historical_transaction": true,
+  "cursor_binds": [
+    "kind/source",
+    "principal subject/tenant/auth method",
+    "limit",
+    "filters",
+    "visible row digest",
+    "offset",
+    "original900second expiry"
+  ],
+  "query_slot_held_until_cancelled_worker_settles": true,
+  "tests": {
+    "windows": {
+      "tests": 49,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 49,
+      "artifact": "docs/infrastructure-results/collection-pages-windows-20261119.xml"
+    },
+    "linux": {
+      "tests": 49,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 49,
+      "artifact": "docs/infrastructure-results/collection-pages-linux-20261119.xml"
+    },
+    "initial_fixture": {
+      "tests": 5,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 4,
+      "artifact": "docs/infrastructure-results/collection-pages-focused-20261119.xml"
+    }
+  },
+  "test_files": [
+    "tests/test_collection_paging.py",
+    "tests/test_incident_cases.py",
+    "tests/test_zero_trust_operations.py"
+  ],
+  "session_http_fixture": {
+    "sessions": 103,
+    "all_ids_visited": true,
+    "grant_token_or_hash_disclosed": false
+  },
+  "case_http_fixture": {
+    "cases": 27,
+    "actual_disk_verified": true,
+    "cached_known_prefix_checked": true,
+    "external_append_detected": true
+  },
+  "case_backend": "local CaseStore; DynamoDB paged route returns501",
+  "limits": {
+    "file_bytes": 134217728,
+    "case_envelopes": 100000,
+    "line_bytes": 2097152,
+    "visible_collection": 10000
+  },
+  "paid_api_aws_docker_push_ci_merge": false,
+  "full_project_regression": false,
+  "ui_acceptance_performed": false,
+  "eight_hour_soak": false,
+  "classification_models_labels_predictions_modified": false,
+  "sources": [
+    {
+      "path": "app/main.py",
+      "sha256": "71d154953014ee6a2265c319d3e79bb8df3856c03e7f8a56f21a5dc2145022d4",
+      "normalized_lf_sha256": "7ed2f6bf4fd781a3665df17ba58ff0cf53decab4fbd6aa860fe27d00917f7ade"
+    },
+    {
+      "path": "app/services/collection_paging.py",
+      "sha256": "41c0a82cd86683124e36e7f79b19a0eddc21bb5e8bba1f8c16dfaf05d5478810",
+      "normalized_lf_sha256": "41c0a82cd86683124e36e7f79b19a0eddc21bb5e8bba1f8c16dfaf05d5478810"
+    },
+    {
+      "path": "app/services/zero_trust.py",
+      "sha256": "0076781d69e5c9281e48218db69bb0ae0d0b33ef2e73066324d934be74d87b8a",
+      "normalized_lf_sha256": "f6adff1b7d33b06f2da22638f8738abcef2842de511a2b767af15062a8115c92"
+    },
+    {
+      "path": "app/zero_trust_api.py",
+      "sha256": "902e5c7eca7f19d88fbe38d5a1b634609488e85b099efa85de6e1f699dd4cf23",
+      "normalized_lf_sha256": "bb47750b529a23d5dfa2ded6038f714b5f34d0f44be69c878e4b630bc5f33af9"
+    },
+    {
+      "path": "tests/test_collection_paging.py",
+      "sha256": "cfac1a7b9520943234799e2fc844cc976e9554ceb720500ffa272642c762c56b",
+      "normalized_lf_sha256": "cfac1a7b9520943234799e2fc844cc976e9554ceb720500ffa272642c762c56b"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/collection-pages-windows-20261119.xml",
+      "sha256": "ad3da86a71e451914ea729508cd6826b4c739520055f0c24215db9ecefe25d50",
+      "bytes": 6881
+    },
+    {
+      "path": "docs/infrastructure-results/collection-pages-linux-20261119.xml",
+      "sha256": "360f86f1d24c46afceed8ff81a86ff4129905d29b028295142d722e05b041796",
+      "bytes": 6885
+    },
+    {
+      "path": "docs/infrastructure-results/collection-pages-focused-20261119.xml",
+      "sha256": "5f7685d42e7830bf7ffeafbe9dcf299182781086dea4dd8f320b1bcfb0d898ca",
+      "bytes": 1763
+    }
+  ]
+}

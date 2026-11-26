@@ -57,19 +57,46 @@ def unique_object(pairs):
     return result
 
 
-def load_accounts(path: Path, legacy_digest: str) -> list[ApiKeyAccount]:
+def load_authentication_json(path: Path):
     # Reopen each time so disabling a credential takes effect on the next call.
     # Never interpret a missing/malformed configured file as a legacy fallback.
-    descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    path = Path(path)
+    if not stat.S_ISREG(path.lstat().st_mode):
+        raise ValueError("account source must be a regular file")
+    flags = (
+        os.O_RDONLY
+        | getattr(os, "O_NOFOLLOW", 0)
+        | getattr(os, "O_NONBLOCK", 0)
+        | getattr(os, "O_BINARY", 0)
+    )
+    descriptor = os.open(path, flags)
     with os.fdopen(descriptor, "rb") as source:
-        if not stat.S_ISREG(os.fstat(source.fileno()).st_mode):
+        before = os.fstat(source.fileno())
+        live = path.lstat()
+        signature = lambda s: (s.st_dev, s.st_ino, s.st_size, s.st_mtime_ns)
+        if (
+            not stat.S_ISREG(before.st_mode)
+            or not stat.S_ISREG(live.st_mode)
+            or before.st_size > MAX_BYTES
+            or signature(before) != signature(live)
+        ):
             raise ValueError("account source must be a regular file")
         body = source.read(MAX_BYTES + 1)
-    if len(body) > MAX_BYTES:
-        raise ValueError("account source exceeds limit")
-    accounts = ApiKeyAccounts.model_validate(
-        json.loads(body, object_pairs_hook=unique_object)
-    ).accounts
+        after = os.fstat(source.fileno())
+        current = path.lstat()
+    if (
+        len(body) > MAX_BYTES
+        or len(body) != before.st_size
+        or not stat.S_ISREG(current.st_mode)
+        or signature(before) != signature(after)
+        or signature(after) != signature(current)
+    ):
+        raise ValueError("account source changed or exceeds limit")
+    return json.loads(body, object_pairs_hook=unique_object)
+
+
+def load_accounts(path: Path, legacy_digest: str) -> list[ApiKeyAccount]:
+    accounts = ApiKeyAccounts.model_validate(load_authentication_json(path)).accounts
     if any(account.sha256 == legacy_digest for account in accounts):
         raise ValueError("account credential conflicts with legacy identity")
     return accounts

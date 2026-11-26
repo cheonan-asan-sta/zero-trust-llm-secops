@@ -1,0 +1,40 @@
+{
+  "schema": "local-report-boundary-evidence-1",
+  "implementation_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "source_sha256": {
+    "scripts/evaluate_m6.py": "d8e346095947ac43f3194117e887f57960404219bd353a6070f67cd1266c3c7e"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/report-failure-boundaries-linux-20261120.json",
+      "sha256": "4a61967e8b5bb9b6c70247697b723ccfb59ac71c2ddcca22358ff2a81cb77b6b"
+    },
+    {
+      "path": "docs/infrastructure-results/report-failure-boundaries-windows-20261120.json",
+      "sha256": "38e86e5133592b5db83f81036376512fc34d7fb5d52632f7fb0786ee1fea0df8"
+    },
+    {
+      "path": "docs/infrastructure-results/report-failure-boundaries-windows-20261120.log",
+      "sha256": "12d40491ac2cd0339427e95302513dff520f6ffcddab35ea7e72d36596a17230"
+    },
+    {
+      "path": "docs/infrastructure-results/report-failure-boundaries-harness-20261120.py.txt",
+      "sha256": "48bf36806beb4179578e622b65e2cda96baaa9d662c344b5f6f39285f17a4b3e"
+    }
+  ],
+  "results": {
+    "linux": {
+      "checks": 4,
+      "source_bytes_unchanged": true,
+      "private_fixture_removed": true
+    },
+    "windows": {
+      "checks": 5,
+      "source_bytes_unchanged": true,
+      "private_fixture_removed": true
+    }
+  },
+  "paid_api_calls": 0,
+  "detection_metrics_changed": false,
+  "goal_status": "active_until_0800"
+}

@@ -1,0 +1,28 @@
+import hashlib
+import json
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+runtime=Path(sys.argv[1]);started=time.monotonic()
+preflight=runtime/'witness-sustained-default-linux-preflight-fixed-20261120/result.json'
+while not preflight.exists():
+    if time.monotonic()-started>360:raise TimeoutError('preflight completion deadline')
+    time.sleep(1)
+value=json.loads(preflight.read_text())
+assert value['completed'] and value['source_bytes_unchanged'] and value['owned_process_inactive']
+harness=runtime/'run_sustained_witness_watch_20261120.py'
+argv=[sys.executable,str(harness),'/home/chaehj02/witness-verified-source-20261120-b77eceb3',
+      str(runtime/'witness-sustained-default-linux-20261120'),
+      str(runtime/'extra-until0800-latest-source-linux-20261120.json'),'6000']
+with (runtime/'witness-sustained-default-linux-20261120.log').open('wb') as stream:
+    process=subprocess.Popen(argv,stdout=stream,stderr=subprocess.STDOUT)
+    (runtime/'witness-sustained-default-linux-20261120-launcher.json').write_text(json.dumps({'pid':process.pid,'command':argv,'harness_sha256':hashlib.sha256(harness.read_bytes()).hexdigest(),'preflight_completed':True},indent=2)+'\n')
+    try:code=process.wait(timeout=6300)
+    except subprocess.TimeoutExpired:
+        stop=runtime/'witness-sustained-default-linux-20261120/stop.request'
+        stop.write_text('owned launcher timeout\n')
+        code=process.wait(timeout=30)
+print(json.dumps({'exit_code':code,'preflight_completed':True}))
+raise SystemExit(code)

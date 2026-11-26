@@ -1,0 +1,77 @@
+{
+  "date": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "pushed": false,
+  "ci_started": false,
+  "merged": false,
+  "model_quality_reevaluated": false,
+  "new_tests": 16,
+  "native_conditions": 51,
+  "native_new_conditions": 2,
+  "monotonic_advance_requires_previous_file_pin": true,
+  "status_unsafe_exit_code": 3,
+  "independent_storage_verified": false,
+  "latest_live_freshness_verified": false,
+  "automatic_activation_allowed": false,
+  "focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "1",
+    "tests": "48",
+    "time": "6.592",
+    "timestamp": "2026-11-19T03:21:54.935819+09:00",
+    "hostname": "희주",
+    "xml_sha256": "9e6aa8b22b2cb5907d9f355843e5c334fda6c947b083be12db0c0b68578ac813",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\audit-checkpoint-progress-focused-20261119.xml"
+  },
+  "windows_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "1",
+    "tests": "148",
+    "time": "69.821",
+    "timestamp": "2026-11-19T03:23:03.495754+09:00",
+    "hostname": "희주",
+    "xml_sha256": "4957cd929df2b005609b9041215272839190abfc00f039a9bc7f0368ad8dcaa1",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\audit-checkpoint-progress-windows-20261119.xml"
+  },
+  "linux_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "2",
+    "tests": "233",
+    "time": "74.168",
+    "timestamp": "2026-11-19T03:23:08.960894+09:00",
+    "hostname": "localhost",
+    "xml_sha256": "f763ad9628824ab3d39f35d83e8300c49e29bf20ee272be8685137f231ac3776",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\audit-checkpoint-progress-linux-20261119.xml"
+  },
+  "native_source_run_sha256": "288caa0296d184e4a6f28276c71df424d45a05f7e73277d8663574ab881000a8",
+  "source_files": [
+    {
+      "path": "app/services/audit_checkpoint.py",
+      "sha256": "f4e571b0d3b8ddc935801823536a9d59527914316ceb7147427a6588ee28e715"
+    },
+    {
+      "path": "scripts/audit_storage.py",
+      "sha256": "e47bf9c7a7c7c73c1c01ed9cc76db8a4f6d5c561cc740e12aa6e97f07464a1f8"
+    },
+    {
+      "path": "scripts/f1_lab/audit_recovery_controls.py",
+      "sha256": "8d16667ca3fd44d012dbde2f8cfedc9258f3c5d0c950a19c2d1764e9e140d433"
+    },
+    {
+      "path": "tests/test_audit_checkpoint_progression.py",
+      "sha256": "557815252d0c5632f1401c882c74c84ecc75204914b97c4061e882420e6b6959"
+    },
+    {
+      "path": "tests/test_native_analysis_http.py",
+      "sha256": "3729e869cb3b54030555923958dd922850f395a18adee49c8b9fff0dcc25b9c3"
+    }
+  ]
+}

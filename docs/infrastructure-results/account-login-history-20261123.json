@@ -1,0 +1,190 @@
+{
+  "aws_calls": 0,
+  "candidate_adopted": false,
+  "keycloak": {
+    "alert_triage": {
+      "approved_mfa_and_scope": "cleared",
+      "cross_attempt_receipt": "needs_evidence",
+      "denied_scope": "confirmed",
+      "missing_otp_request": "confirmed",
+      "pre_auth_cancelled": "cleared",
+      "pre_auth_outage": "cleared",
+      "rejected_otp_request": "confirmed"
+    },
+    "allowed_read": true,
+    "authority_mode": "read-only provider checks on each request",
+    "container_removed": true,
+    "downgraded_role": 403,
+    "failed_mfa_grant": false,
+    "failed_mfa_observation": "unknown",
+    "failed_mfa_policy": "DENY",
+    "finished_at": "2026-11-23T02:11:08.655012+00:00",
+    "image": "quay.io/keycloak/keycloak:26.8.0",
+    "login_history_review": {
+      "ambiguous_current_time": false,
+      "baseline_repeated_failure_warning": true,
+      "candidate_repeated_failure_warning": false,
+      "candidate_with_independent_hard_alert": true,
+      "earlier_same_account_failures": 3,
+      "earlier_same_account_successes": 1,
+      "failures_since_success": false,
+      "provider_current_result": "success",
+      "recent_prior_failures_capped": 3,
+      "same_recent_source_address": true,
+      "unattributed_login_events": 0,
+      "verified_session_match": true
+    },
+    "logout": 204,
+    "manual_revocation_file": false,
+    "mfa_correct": 200,
+    "mfa_missing": 400,
+    "mfa_wrong": 400,
+    "oidc_web_redirect": {
+      "after_logout": 401,
+      "consumed_redirect_grant": 403,
+      "denied_redirect_receipts": 0,
+      "downgraded_role": 403,
+      "evidence_state": "consistent",
+      "old_role": 401,
+      "refreshed_token_without_exact_otp_binding": 403,
+      "verified_otp_redirect": 303
+    },
+    "old_token_after_role_removal": 401,
+    "paid_api_calls": 0,
+    "pre_auth_outage_probe": "actual stopped loopback provider",
+    "refresh_after_logout": 400,
+    "remote_out_of_scope": "DENY",
+    "token_after_provider_logout": 401
+  },
+  "paid_api_calls": 0,
+  "prior_web": {
+    "comparison": "existing web or CRS",
+    "fallback_unchanged": 5216,
+    "parent_prediction_sha256": "7226853e10e00f6b38f67061b4824e149e88a00897ad16e0271f441e114919c9",
+    "source": "prior independent crAPI/VAmPI capture",
+    "verified_account_history_available": 0,
+    "web_metrics_reestimated": false
+  },
+  "rba": {
+    "plan": {
+      "archive_sha256": "ca1d974e97aebfb30878a613f4ca5c793860a98ba2acb5185c9bc610d7432a33",
+      "baseline": "existing rule's 3 observed failures, projected to same account in 10 minutes",
+      "candidate": "successful current login, same recent captured source, no failures since last success",
+      "cohort": "previously fixed reserved users excluding observed probe users",
+      "familiar_ms": 86400000,
+      "observation_sha256": "c872ded91aba69b10ab354b85f1a160bf07c05b4a1dc891db955e4808818e0da",
+      "rows": 2575003,
+      "threshold": 3,
+      "truth_loaded_by_capture": false,
+      "window_ms": 600000
+    },
+    "recapture_seal_matched": true,
+    "report": {
+      "candidate_adopted": false,
+      "groups": {
+        "all": {
+          "before": {
+            "accuracy": 0.9868660347191829,
+            "f1": 0.0,
+            "false_positive_rate": 0.013124000719229725,
+            "fn": 26,
+            "fp": 33794,
+            "inference_errors": 0,
+            "population": 2575003,
+            "precision": 0.0,
+            "recall": 0.0,
+            "tn": 2541183,
+            "tp": 0
+          },
+          "candidate": {
+            "accuracy": 0.987246228450996,
+            "f1": 0.0,
+            "false_positive_rate": 0.012743803148532977,
+            "fn": 26,
+            "fp": 32815,
+            "inference_errors": 0,
+            "population": 2575003,
+            "precision": 0.0,
+            "recall": 0.0,
+            "tn": 2542162,
+            "tp": 0
+          },
+          "cleared_fp": 979,
+          "lost": 0,
+          "new_fp": 0
+        },
+        "failed_login": {
+          "before": {
+            "accuracy": 0.9580453153141498,
+            "f1": 0.0,
+            "false_positive_rate": 0.04195468468585014,
+            "fn": 0,
+            "fp": 29188,
+            "inference_errors": 0,
+            "population": 695703,
+            "precision": 0.0,
+            "recall": null,
+            "tn": 666515,
+            "tp": 0
+          },
+          "candidate": {
+            "accuracy": 0.9580453153141498,
+            "f1": 0.0,
+            "false_positive_rate": 0.04195468468585014,
+            "fn": 0,
+            "fp": 29188,
+            "inference_errors": 0,
+            "population": 695703,
+            "precision": 0.0,
+            "recall": null,
+            "tn": 666515,
+            "tp": 0
+          },
+          "cleared_fp": 0,
+          "lost": 0,
+          "new_fp": 0
+        },
+        "successful_login": {
+          "before": {
+            "accuracy": 0.9975352524876284,
+            "f1": 0.0,
+            "false_positive_rate": 0.0024509464825246347,
+            "fn": 26,
+            "fp": 4606,
+            "inference_errors": 0,
+            "population": 1879300,
+            "precision": 0.0,
+            "recall": 0.0,
+            "tn": 1874668,
+            "tp": 0
+          },
+          "candidate": {
+            "accuracy": 0.9980561911349971,
+            "f1": 0.0,
+            "false_positive_rate": 0.0019300006279020516,
+            "fn": 26,
+            "fp": 3627,
+            "inference_errors": 0,
+            "population": 1879300,
+            "precision": 0.0,
+            "recall": 0.0,
+            "tn": 1875647,
+            "tp": 0
+          },
+          "cleared_fp": 979,
+          "lost": 0,
+          "new_fp": 0
+        }
+      },
+      "seal_sha256": "1fb7392b6e8b94e389301b6f050f2dfb80ae02c57e644fa75f387ab45fd15e96",
+      "truth_scope": "publisher ATO indicator only; unmarked attempted abuse may appear among negatives",
+      "truth_sha256": "078693aab5b5c3db72b7e64f2daad25645c21036d339e418de0fb2bd89e38dda"
+    },
+    "seal": {
+      "accounts": 647026,
+      "plan_sha256": "81275a49236c9ec36b83ab1b4aa74405c27a713082b8170f86c786491ac5d190",
+      "prediction_sha256": "7bae01c7b9bb0ae4ae6e79d272ccae6bc6fd8933c207837c2831fc1bc7f98ee0"
+    }
+  },
+  "regression_tests_passed": 135
+}

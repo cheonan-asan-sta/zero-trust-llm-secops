@@ -1,0 +1,32 @@
+[Unit]
+Description=SecOps managed login analysis API for %i
+StartLimitIntervalSec=60
+StartLimitBurst=6
+
+[Service]
+Type=exec
+User=secops-login
+Group=secops-login
+WorkingDirectory=/opt/secops
+Environment=PYTHONDONTWRITEBYTECODE=1
+EnvironmentFile=/etc/secops/login-queue/%i.env
+ExecStart=/opt/secops/.venv/bin/python -m scripts.login_queue_activation /var/lib/secops-login-queue/%i/control serve-api --port ${LOGIN_QUEUE_API_PORT}
+StateDirectory=secops-login-queue/%i
+StateDirectoryMode=0700
+UMask=0077
+StandardInput=null
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

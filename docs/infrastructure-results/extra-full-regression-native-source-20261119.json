@@ -1,0 +1,7 @@
+{
+  "source_commit": "58d698a85002891707ed096248baab44736317fc",
+  "archive_sha256": "45abddb55b9fc3fe8d1f7ec7271e52d58f52a51be0d2a66cc0c841f6df00b0ab",
+  "native_checkout": "/home/chaehj02/extra-fullreg-20261119-5815c2f2",
+  "source": "Windows git archive HEAD; no dotenv or credential files copied",
+  "shared_linux_attempt": "interrupted for slow shared-filesystem I/O; not counted as completed"
+}

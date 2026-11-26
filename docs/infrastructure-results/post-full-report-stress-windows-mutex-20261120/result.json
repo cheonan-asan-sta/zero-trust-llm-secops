@@ -1,0 +1,22 @@
+{
+  "schema": "owned-atomic-report-stress-1",
+  "completed": true,
+  "source_commit": "6033a7b5f7da91c66e0ca00fa7607e4dc7517ff3",
+  "source_sha256": "26d252edc1f7f36ff142ecdc4f4bb493b79c9efc6c6027837226e612449dbf3f",
+  "workers": 4,
+  "writes_per_worker": 64,
+  "reader_complete_reports": 1411,
+  "reader_sharing_conflicts": 0,
+  "paid_api_calls": 0,
+  "detection_metrics_changed": false,
+  "reader_delete_sharing": true,
+  "successful_atomic_writes": 256,
+  "child_exit_codes": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "elapsed_seconds": 12.60899999999674,
+  "owned_processes_finished": true
+}

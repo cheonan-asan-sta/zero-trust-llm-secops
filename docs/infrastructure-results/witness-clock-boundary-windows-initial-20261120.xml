@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="3.496" timestamp="2026-11-20T02:14:52.640770+09:00" hostname="희주"><testcase classname="tests.test_witness_clock_boundary" name="test_clock_regression_after_pending_commit_does_not_persist_unacknowledgeable_receipt" time="0.228"><failure message="assert b'SQLite form...V9wCnuiCg==&quot;}' == b'SQLite form...V9wCnuiCg==&quot;}'&#10;  &#10;  At index 27 diff: b'\x05' != b'\x04'&#10;  Use -v to get more diff">tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1477/test_clock_regression_after_pe0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000026D36841280&gt;
+
+    def test_clock_regression_after_pending_commit_does_not_persist_unacknowledgeable_receipt(tmp_path, monkeypatch):
+        _, signer, _, first, directory, pin = ready(tmp_path)
+        prepared_at = datetime.now(UTC) + timedelta(seconds=10)
+        before = (signer / "journal.sqlite3").read_bytes()
+        monkeypatch.setattr(observer, "datetime", clock(prepared_at))
+        monkeypatch.setattr(witness, "datetime", clock(prepared_at - timedelta(seconds=5)))
+        with pytest.raises(AuditTransferError):
+            observer.cycle(directory, pin, minimum_receipt=first["receipt_sha256"])
+        # A refusal at the consumer is too late: the signer must not commit a
+        # receipt whose time precedes the already-durable pending intent.
+&gt;       assert (signer / "journal.sqlite3").read_bytes() == before
+E       assert b'SQLite form...V9wCnuiCg=="}' == b'SQLite form...V9wCnuiCg=="}'
+E         
+E         At index 27 diff: b'\x05' != b'\x04'
+E         Use -v to get more diff
+
+tests\test_witness_clock_boundary.py:31: AssertionError</failure></testcase></testsuite></testsuites>

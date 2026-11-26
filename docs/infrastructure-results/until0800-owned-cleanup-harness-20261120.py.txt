@@ -1,0 +1,41 @@
+"""Read-only confirmation of exact UUID-owned resources recorded by this run."""
+import json
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+runtime=Path(sys.argv[1]);checks=[];rows=[]
+folders=['witness-large-cgroup-linux-20261120','witness-source-scale-cgroup-linux-20261120',
+         'witness-source-scale-cgroup-linux-fixed-20261120','witness-combined-scale-cgroup-linux-20261120',
+         'witness-combined-scale-512-cgroup-linux-20261120','witness-resource-budget-systemd-linux-20261120']
+for name in folders:
+    value=json.loads((runtime/name/'ownership.json').read_text(encoding='utf-8'))
+    if 'unit' in value:
+        unit=value['unit'];assert re.fullmatch(r'zt-large-witness-[a-f0-9]{32}\.service',unit)
+        units=[unit];paths=[value['temporary_root']]
+        assert re.fullmatch(r'/var/tmp/zt-owned-large-resource-[a-z0-9_]+',paths[0])
+    else:
+        prefix=value['unit_prefix'];assert re.fullmatch(r'ztw-[a-f0-9]{12}',prefix)
+        units=[prefix+'-'+kind+'@lab.'+extension for kind,extension in [('collector-probe','service'),('restore-probe','service'),('collector','service'),('restore','service'),('restore','timer')]]
+        paths=[value['state_root'],value['public_source']]
+        assert re.fullmatch(r'/run/ztw-owned-[a-f0-9]{32}',paths[0])
+        assert re.fullmatch(r'/run/ztw-code-resource-[a-z0-9_]+',paths[1])
+    paths_state=[{'path':path,'exists_or_link':Path(path).exists() or Path(path).is_symlink()} for path in paths]
+    checks.append(not any(row['exists_or_link'] for row in paths_state))
+    states=[]
+    for unit in units:
+        command=subprocess.run(['systemctl','show',unit,'--property=LoadState,ActiveState,SubState'],capture_output=True,text=True,timeout=15)
+        state=dict(line.split('=',1) for line in command.stdout.splitlines() if '=' in line)
+        files=[Path('/run/systemd/system')/unit,Path('/run/systemd/transient')/unit]
+        unit_files_removed=all(not path.exists() and not path.is_symlink() for path in files)
+        passed=state.get('LoadState')=='not-found' and state.get('ActiveState')=='inactive' and unit_files_removed
+        checks.append(passed);states.append({'unit':unit,'state':state,'unit_files_removed':unit_files_removed,'passed':passed})
+    rows.append({'recorded_run':name,'recorded_paths':paths_state,'units':states})
+result={'schema':'owned-resource-postrun-read-only-check-1','completed':all(checks),'recorded_runs':len(rows),
+        'exact_owned_units_checked':sum(len(row['units']) for row in rows),'checks':len(checks),'results':rows,
+        'resources_created_or_deleted':False,'other_units_enumerated':False,'paid_api_calls':0,
+        'retained_git_archives_and_evaluation_sources':True}
+(runtime/'until0800-owned-cleanup-20261120.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({key:result[key] for key in ['completed','recorded_runs','exact_owned_units_checked','checks','resources_created_or_deleted']}))
+assert result['completed']

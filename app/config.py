@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     zero_trust_db_path: Path = Path("runtime/zero-trust.sqlite3")
     zero_trust_policy_path: Path | None = None
     behavior_context_db_path: Path | None = None
+    native_analysis_shared_config_path: Path | None = None
+    native_analysis_shared_config_sha256: str | None = Field(
+        default=None, pattern=r"^[a-f0-9]{64}$"
+    )
     # Compatibility for offline legacy fixtures; the application uses behavior_context_db_path.
     response_workflow_db_path: Path = Path("runtime/response-workflow.sqlite3")
     trusted_signal_sources_path: Path | None = None
@@ -43,7 +47,10 @@ class Settings(BaseSettings):
     signal_inbox_max_attempts: int = Field(default=3, ge=1, le=20)
     signal_inbox_lease_seconds: float = Field(default=30, gt=0, le=3600)
     signal_inbox_retry_seconds: float = Field(default=1, gt=0, le=60)
-    audit_backend: Literal["jsonl", "dynamodb"] = "jsonl"
+    audit_backend: Literal["jsonl", "dynamodb", "sqlite"] = "jsonl"
+    audit_db_path: Path | None = None
+    audit_checkpoint_path: Path | None = None
+    audit_checkpoint_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
     dynamodb_table_name: str = "zero-trust-llm-secops-audit"
     aws_region: str = "ap-northeast-2"
     auth_mode: Literal["disabled", "api_key", "oidc"] = "disabled"
@@ -55,14 +62,33 @@ class Settings(BaseSettings):
     oidc_issuer: str | None = None
     oidc_audience: str | None = None
     oidc_jwks_url: str | None = None
+    oidc_revoked_subjects_path: Path | None = None
     oidc_roles_claim: str = Field(default="roles", min_length=1, max_length=64)
     oidc_tenant_claim: str = Field(default="tenant_id", min_length=1, max_length=64)
     allowed_hosts: str = "127.0.0.1,localhost,testserver"
     api_max_body_bytes: int = Field(default=1_048_576, ge=1024, le=10_485_760)
+    authentication_max_concurrency: int = Field(default=4, ge=1, le=16)
+    authentication_queue_timeout_seconds: float = Field(
+        default=0.05, ge=0.01, le=2, allow_inf_nan=False
+    )
+    authentication_max_token_chars: int = Field(default=16384, ge=1024, le=131072)
+    evaluation_max_concurrency: int = Field(default=2, ge=1, le=4)
+    evaluation_queue_timeout_seconds: float = Field(
+        default=0.05, ge=0.01, le=2, allow_inf_nan=False
+    )
     analysis_max_concurrency: int = Field(default=8, ge=1, le=100)
     analysis_queue_timeout_seconds: float = Field(default=0.25, ge=0.01, le=10)
+    audit_query_max_concurrency: int = Field(default=2, ge=1, le=8)
+    audit_query_queue_timeout_seconds: float = Field(
+        default=0.05, ge=0.01, le=2, allow_inf_nan=False
+    )
+    audit_review_require_if_match: bool = False
+    audit_review_require_identity: bool = False
+    audit_cursor_key_path: Path | None = None
+    audit_cursor_key_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
     # Host-only control plane. Disabled unless an operator selects a private root.
     dashboard_operations_directory: Path | None = None
+    dashboard_login_queue_profile: Path | None = None
     dashboard_operations_tenant: str = "local"
     dashboard_m7_paired_directory: Path | None = None
     dashboard_live_max_usd: float = Field(default=0, ge=0, le=50, allow_inf_nan=False)
@@ -84,6 +110,25 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_enterprise_security(self) -> "Settings":
+        if (
+            self.audit_review_require_if_match or self.audit_review_require_identity
+        ) and self.audit_backend != "sqlite":
+            raise ValueError("required conditional audit reviews need sqlite backend")
+        if self.audit_review_require_identity:
+            if not self.audit_review_require_if_match:
+                raise ValueError("caller-bound reviews require AUDIT_REVIEW_REQUIRE_IF_MATCH=true")
+            if self.auth_mode == "disabled":
+                raise ValueError("caller-bound reviews require api_key or oidc authentication")
+        if (self.audit_checkpoint_path is None) != (self.audit_checkpoint_sha256 is None):
+            raise ValueError("audit checkpoint requires both path and SHA-256 pin")
+        if self.audit_checkpoint_path is not None and self.audit_backend != "sqlite":
+            raise ValueError("runtime audit checkpoint requires sqlite backend")
+        if (self.audit_cursor_key_path is None) != (self.audit_cursor_key_sha256 is None):
+            raise ValueError("audit cursors require both private key path and SHA-256 pin")
+        if (self.native_analysis_shared_config_path is None) != (
+            self.native_analysis_shared_config_sha256 is None
+        ):
+            raise ValueError("shared native analysis requires both config path and SHA-256 pin")
         if (
             self.openai_incomplete_retries
             and self.openai_retry_max_output_tokens <= self.openai_max_output_tokens

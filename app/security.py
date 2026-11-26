@@ -1,4 +1,3 @@
-import asyncio
 import hashlib
 import hmac
 import math
@@ -7,15 +6,19 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
 from functools import lru_cache
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 import jwt
 from fastapi import Depends, Header, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import InvalidTokenError, PyJWKClient, PyJWKClientConnectionError, PyJWKClientError
+from pydantic import Field
 
-from app.api_key_accounts import load_accounts
+from app.api_key_accounts import load_accounts, load_authentication_json
 from app.config import Settings, get_settings
+from app.models import StrictModel
+from app.services.authentication_admission import authentication_slot
+from app.services.settled_io import settled_io
 
 
 class Role(str, Enum):
@@ -40,6 +43,7 @@ class Principal:
     roles: frozenset[Role]
     auth_method: str
     authentication_expires_at: datetime | None = field(default=None, repr=False, compare=False)
+    oidc_session_id: str | None = field(default=None, repr=False, compare=False)
 
     @property
     def effective_roles(self) -> frozenset[Role]:
@@ -51,6 +55,37 @@ class Principal:
 
 _bearer = HTTPBearer(auto_error=False)
 _TENANT_PATTERN = re.compile(r"^[a-zA-Z0-9._-]{1,64}$")
+
+
+class RevokedOIDCSubject(StrictModel):
+    tenant_id: str = Field(pattern=_TENANT_PATTERN.pattern)
+    subject: str = Field(min_length=1, max_length=128)
+
+
+class OIDCRevocations(StrictModel):
+    schema_version: Literal["oidc-revocations-1"] = Field(alias="schema")
+    issuer: str = Field(min_length=1, max_length=2048)
+    subjects: list[RevokedOIDCSubject] = Field(max_length=1000)
+
+
+def _check_oidc_revocation(settings: Settings, principal: Principal) -> None:
+    if settings.oidc_revoked_subjects_path is None:
+        return
+    try:
+        policy = OIDCRevocations.model_validate(
+            load_authentication_json(settings.oidc_revoked_subjects_path)
+        )
+        if policy.issuer != settings.oidc_issuer:
+            raise ValueError("revocation policy issuer mismatch")
+    except (OSError, ValueError, TypeError, RecursionError) as exc:
+        raise HTTPException(
+            status_code=503, detail="OIDC revocation policy is unavailable"
+        ) from exc
+    if any(
+        (row.tenant_id, row.subject) == (principal.tenant_id, principal.subject)
+        for row in policy.subjects
+    ):
+        raise _unauthorized("Caller authority is revoked")
 
 
 @lru_cache(maxsize=8)
@@ -143,10 +178,14 @@ async def _oidc_principal(
     credentials: HTTPAuthorizationCredentials | None,
     settings: Settings,
 ) -> Principal:
-    if credentials is None or credentials.scheme.lower() != "bearer":
+    if (
+        credentials is None
+        or credentials.scheme.lower() != "bearer"
+        or len(credentials.credentials) > settings.authentication_max_token_chars
+    ):
         raise _unauthorized()
     try:
-        claims = await asyncio.to_thread(_decode_oidc_token, credentials.credentials, settings)
+        claims = await settled_io(_decode_oidc_token, credentials.credentials, settings)
         subject = claims["sub"]
         tenant_id = claims[settings.oidc_tenant_claim]
         roles = _parse_roles(claims.get(settings.oidc_roles_claim))
@@ -169,6 +208,7 @@ async def _oidc_principal(
         ValueError,
         OverflowError,
         OSError,
+        RecursionError,
     ) as exc:
         raise _unauthorized("Invalid identity token") from exc
     # Preserve claim types: coercing null, numbers or booleans creates unintended tenant IDs.
@@ -180,21 +220,26 @@ async def _oidc_principal(
         or not _TENANT_PATTERN.fullmatch(tenant_id)
     ):
         raise _unauthorized("Token identity claims are invalid")
+    session_id = claims.get("sid")
     return Principal(
         subject=subject,
         tenant_id=tenant_id,
         roles=roles,
         auth_method="oidc",
         authentication_expires_at=authentication_expires_at,
+        oidc_session_id=session_id
+        if isinstance(session_id, str) and 0 < len(session_id) <= 128
+        else None,
     )
 
 
-async def get_principal(
+async def _resolve_principal(
     request: Request,
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer)],
     api_key: Annotated[str | None, Header(alias="X-API-Key")] = None,
+    *,
+    settings: Settings,
 ) -> Principal:
-    settings = get_settings()
     if settings.auth_mode == "disabled":
         principal = Principal(
             subject="local-operator",
@@ -202,10 +247,16 @@ async def get_principal(
             roles=frozenset({Role.ADMIN}),
             auth_method="disabled",
         )
+
+        def revalidate_local_mode():
+            if get_settings().auth_mode != "disabled":
+                raise _unauthorized("Caller authentication policy changed")
+
+        request.state.authentication_revalidator = revalidate_local_mode
     elif settings.auth_mode == "api_key":
-        principal = _api_key_principal(api_key, settings)
-        # Retain only the digest in this request-local closure. Verified analyses
-        # recheck server-owned account changes at every evidence boundary.
+        principal = await settled_io(_api_key_principal, api_key, settings)
+        # Retain only the digest in this request-local closure. Analysis/audit
+        # boundaries recheck server-owned account changes without the raw key.
         digest = hashlib.sha256(api_key.encode("utf-8")).hexdigest()
 
         def revalidate_authority():
@@ -219,6 +270,72 @@ async def get_principal(
         request.state.authentication_revalidator = revalidate_authority
     else:
         principal = await _oidc_principal(credentials, settings)
+
+        def oidc_scope(value):
+            return (
+                value.oidc_issuer,
+                value.oidc_audience,
+                value.oidc_jwks_url,
+                value.oidc_roles_claim,
+                value.oidc_tenant_claim,
+                value.oidc_revoked_subjects_path,
+            )
+
+        admitted_scope = oidc_scope(settings)
+        app_state = getattr(request.scope.get("app"), "state", None)
+        authority_check = getattr(app_state, "oidc_live_authority", None)
+
+        def revalidate_oidc_scope():
+            current = get_settings()
+            if (
+                current.auth_mode != "oidc"
+                or oidc_scope(current) != admitted_scope
+                or datetime.now(UTC) >= principal.authentication_expires_at
+            ):
+                raise _unauthorized("Caller authentication policy changed or expired")
+            _check_oidc_revocation(current, principal)
+            if getattr(app_state, "oidc_live_authority", None) is not authority_check:
+                raise _unauthorized("Caller authority policy changed during request")
+            if authority_check is not None:
+                authority_check(current.oidc_issuer, principal)
+
+        request.state.authentication_revalidator = revalidate_oidc_scope
+    return principal
+
+
+async def get_principal(
+    request: Request,
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer)],
+    api_key: Annotated[str | None, Header(alias="X-API-Key")] = None,
+) -> Principal:
+    settings = get_settings()
+    mode = settings.auth_mode
+    if mode == "disabled":
+        snapshot = settings.model_copy(deep=True)
+        if snapshot.auth_mode != mode:
+            raise _unauthorized("Authentication policy changed while waiting")
+        principal = await _resolve_principal(request, credentials, api_key, settings=snapshot)
+        request.state.authentication_revalidator()
+    else:
+        # Cheap invalid input never reserves I/O capacity or reads a registry/JWKS.
+        if mode == "api_key" and (
+            not api_key or len(api_key) > 4096 or settings.api_key_sha256 is None
+        ):
+            raise _unauthorized()
+        if mode == "oidc" and (
+            credentials is None
+            or credentials.scheme.lower() != "bearer"
+            or len(credentials.credentials) > settings.authentication_max_token_chars
+        ):
+            raise _unauthorized()
+        async with authentication_slot(request, settings):
+            current = get_settings()
+            # A slow decoder must not observe half of a later mutable configuration.
+            snapshot = current.model_copy(deep=True)
+            if snapshot.auth_mode != mode:
+                raise _unauthorized("Authentication policy changed while waiting")
+            principal = await _resolve_principal(request, credentials, api_key, settings=snapshot)
+            await settled_io(request.state.authentication_revalidator)
     request.state.principal = principal
     return principal
 

@@ -10,6 +10,7 @@ import tempfile
 import time
 import uuid
 from collections import Counter, defaultdict
+from contextlib import contextmanager
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -367,6 +368,68 @@ async def mock_report(inputs, cases, contract, budget, dispatch, models, *,
     }
 
 
+def _report_mutex_kernel():
+    import ctypes
+    from ctypes import wintypes
+
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.CreateMutexW.argtypes = [wintypes.LPVOID, wintypes.BOOL, wintypes.LPCWSTR]
+    kernel.CreateMutexW.restype = wintypes.HANDLE
+    kernel.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
+    kernel.WaitForSingleObject.restype = wintypes.DWORD
+    kernel.ReleaseMutex.argtypes = [wintypes.HANDLE]
+    kernel.ReleaseMutex.restype = wintypes.BOOL
+    kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+    kernel.CloseHandle.restype = wintypes.BOOL
+    return kernel
+
+
+@contextmanager
+def _windows_report_mutex(output):
+    # Session-local coordination for cooperating writers, never authorization.
+    # Resolve the parent so aliases share a lock, without following the output
+    # symlink whose directory entry is what replace() will actually replace.
+    name = os.path.normcase(str(output.parent.resolve() / output.name))
+    name = "Local\\SecopsM6Report-" + hashlib.sha256(os.fsencode(name)).hexdigest()
+    kernel = _report_mutex_kernel()
+    handle = kernel.CreateMutexW(None, False, name)
+    if not handle:
+        raise OSError("report publication mutex creation failed")
+    acquired = False
+    try:
+        status = kernel.WaitForSingleObject(handle, 5000)
+        if status == 258:
+            raise TimeoutError("report publication mutex acquisition timed out")
+        if status not in {0, 128}:  # WAIT_OBJECT_0 / WAIT_ABANDONED
+            raise OSError("report publication mutex acquisition failed")
+        acquired = True
+        yield
+    finally:
+        try:
+            if acquired and not kernel.ReleaseMutex(handle):
+                raise OSError("report publication mutex release failed")
+        finally:
+            if not kernel.CloseHandle(handle):
+                raise OSError("report publication mutex close failed")
+
+
+def _replace_report(temporary, output):
+    """Preserve atomic publication through bounded Windows sharing conflicts.
+
+    A concurrent rename (or a scanner's open handle) may briefly deny replace.
+    Never truncate/remove the old report, retry unrelated POSIX permission errors,
+    or retry indefinitely when the target genuinely cannot be replaced.
+    """
+    for attempt in range(10):
+        try:
+            temporary.replace(output)
+            return
+        except PermissionError as error:
+            if getattr(error, "winerror", None) not in {5, 32, 33} or attempt == 9:
+                raise
+            time.sleep(min(0.01 * 2**attempt, 0.1))
+
+
 def write_report(output, report):
     output.parent.mkdir(parents=True, exist_ok=True)
     fd, name = tempfile.mkstemp(prefix=".m6-report-", dir=output.parent)
@@ -377,7 +440,11 @@ def write_report(output, report):
             stream.write("\n")
             stream.flush()
             os.fsync(stream.fileno())
-        temporary.replace(output)
+        if os.name == "nt":
+            with _windows_report_mutex(output):
+                _replace_report(temporary, output)
+        else:
+            _replace_report(temporary, output)
     finally:
         temporary.unlink(missing_ok=True)
 

@@ -1,0 +1,13 @@
+{
+  "schema": "owned-async-test-negative-control-1",
+  "source_commit": "8d2df526843418e50124b23808c54b9597e79008",
+  "expected_pytest_exit_code": 1,
+  "actual_pytest_exit_code": 1,
+  "tests": 1,
+  "failures": 1,
+  "errors": 0,
+  "in_memory_mutation": "replace settled_io with synchronous source callback",
+  "source_file_unchanged": true,
+  "paid_api_calls": 0,
+  "control_rejected": true
+}

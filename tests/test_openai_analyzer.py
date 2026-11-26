@@ -14,6 +14,7 @@ from app.config import Settings
 from app.models import SecurityAssessment
 from app.prompting import EVENT_PROMPT
 from app.scenarios import synthetic_events
+from app.services.analysis_authority import bind_analysis_authority
 
 
 def test_openai_mode_requires_api_key() -> None:
@@ -101,3 +102,36 @@ def test_openai_can_explicitly_set_processing_tier_and_temperature() -> None:
         asyncio.run(analyzer._parse_assessment(analyzer._client, event, None, 800))
     assert parse.await_args.kwargs["service_tier"] == "priority"
     assert parse.await_args.kwargs["temperature"] == 0
+
+
+def test_compact_legacy_rechecks_server_authority_after_provider_response() -> None:
+    revoked = False
+
+    async def revalidate():
+        if revoked:
+            raise PermissionError("caller withdrawn")
+
+    async def parse(*args, **kwargs):
+        nonlocal revoked
+        revoked = True
+        return Mock(spec=SecurityAssessment), None
+
+    async def run():
+        with (
+            patch("app.analyzers.openai_analyzer.AsyncOpenAI") as sdk,
+            patch(
+                "app.analyzers.openai_analyzer.parse_single_structured_response",
+                side_effect=parse,
+            ) as compact_parser,
+            bind_analysis_authority(revalidate),
+        ):
+            analyzer = OpenAIAnalyzer(
+                Settings(openai_api_key="test-placeholder", openai_compact_legacy_output=True)
+            )
+            with pytest.raises(PermissionError, match="caller withdrawn"):
+                await analyzer.analyze(synthetic_events()[0])
+            sdk.return_value.with_options.assert_called_once_with(max_retries=0)
+            compact_parser.assert_awaited_once()
+            assert compact_parser.await_args.args[0] is sdk.return_value.with_options.return_value
+
+    asyncio.run(run())

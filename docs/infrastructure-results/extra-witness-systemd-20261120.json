@@ -1,0 +1,220 @@
+{
+  "schema": "witness-systemd-controls-evidence-1",
+  "implementation_commit": "720daff9ffe24198798ecd234acd9b90604e69b3",
+  "source_sha256": {
+    "infra/systemd/secops-audit-witness-restore-status@.service": "ae0ecf495441acb9fd56ce3fd23e41a458e3bfde8b1d90eb17326de7e238bfbc",
+    "infra/systemd/secops-audit-witness-restore-status@.timer": "421390b019423ba9ee508bccd0697223992ad73e0cc7dac06e278ccfba1d8ef4",
+    "infra/systemd/secops-audit-witness.sysusers": "65f2e8ae7d8664a7bb13af2dffa6f2d8f196e41839e5bc423669f489c3939be6",
+    "infra/systemd/secops-audit-witness@.service": "1f1a9a5805c22da3b3bae16a0b4de125229853a2a30c65f91b954041956f0968",
+    "scripts/run_witness_systemd_controls.py": "68aad58dce44274780027af5264d45a8267d0236bc2f6d8efc0396a0999ebd89",
+    "scripts/witness_systemd_probe.py": "ed5f78d836c2762faf65d9cd0e65df46ae72a76e0de9109f70a884ef3ee2f967",
+    "tests/test_witness_systemd_templates.py": "234f859e465489c10e4242bff6e58a5e40de4638a1a9c59008b6b6f5bf28e81a"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/witness-systemd-code-inventory-20261120.json",
+      "sha256": "7e05b8b96300157ee3d8b366364009980b9c79527de261c96e9c57bc65a47027"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-final-20261120/collector-probe.log",
+      "sha256": "1e5754b5264b3d64c181f438cd940223e4993faace192af145eb0b2e33c48870"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-final-20261120/ownership.json",
+      "sha256": "f80837bd42f165f3541e28a8471ade867178f53fd3867681c7648e89e130b2ea"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-final-20261120/report.json",
+      "sha256": "a97791d500e7e692ac547d7210ce9b2c520936c9398c112aa3f477627e8ac09c"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-final-20261120/restore-probe.log",
+      "sha256": "fe57975a4c365be49a52eae43081a90ac27f93e4de13f53df5620f3f75bd19f7"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-final-20261120/ztw-6ca6ab2a69b3-collector-probe@lab.service.log",
+      "sha256": "1e5754b5264b3d64c181f438cd940223e4993faace192af145eb0b2e33c48870"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-final-20261120/ztw-6ca6ab2a69b3-collector@lab.service.log",
+      "sha256": "6f74a7aafc8294c2c047d131df2f2b0e0caceeafce18d0efa00cf7f1e9b47eb5"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-final-20261120/ztw-6ca6ab2a69b3-restore-probe@lab.service.log",
+      "sha256": "fe57975a4c365be49a52eae43081a90ac27f93e4de13f53df5620f3f75bd19f7"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-final-20261120/ztw-6ca6ab2a69b3-restore@lab.service.log",
+      "sha256": "7d5191b08e200d16ab2ca23e14bac56aa952dd5eedb9858f685b16cccd6d4196"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-final-20261120/ztw-6ca6ab2a69b3-restore@lab.timer.log",
+      "sha256": "a2de579238e2ec458035ac294e41b7d18efe781e6379023b51564452043601e6"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-final-20261120.stdout.txt",
+      "sha256": "fa56503e536278bc557918401e07b4811ef12bd7a6843a42c560881275e5f1f0"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-fixed-parent-20261120/collector-probe.log",
+      "sha256": "a99b686b044ce30393cd4f1f7aba879765f325f354499cd2d3de7b6b27a80679"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-fixed-parent-20261120/ownership.json",
+      "sha256": "93d76830c16560f15e9e7bf1a7d2ef7c4edc916e8084558442e17df74b96363a"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-fixed-parent-20261120/report.json",
+      "sha256": "17f98eb57d4f5b884eaf3e686c24e00f3e4784fb57878f35ecce7bf1a2514ffc"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-fixed-parent-20261120/restore-probe.log",
+      "sha256": "b11de2b00d42b9275fc90abcc0d556bbfbaa96cb2cea7f08ffa73e4d17ba5904"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-fixed-parent-20261120/ztw-1427db979cac-collector-probe@lab.service.log",
+      "sha256": "a99b686b044ce30393cd4f1f7aba879765f325f354499cd2d3de7b6b27a80679"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-fixed-parent-20261120/ztw-1427db979cac-collector@lab.service.log",
+      "sha256": "2b013ad05b83bb440cc74605178eb93bc46d844ef6a609fab49cc26b93093af8"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-fixed-parent-20261120/ztw-1427db979cac-restore-probe@lab.service.log",
+      "sha256": "b11de2b00d42b9275fc90abcc0d556bbfbaa96cb2cea7f08ffa73e4d17ba5904"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-fixed-parent-20261120/ztw-1427db979cac-restore@lab.service.log",
+      "sha256": "db57e43a44a347fc8b341b5eeab546d6e065ea899a662289e49032eb275ab9b2"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-fixed-parent-20261120.stdout.txt",
+      "sha256": "1ed8accd57c19bf7c02531e6f8c15e7c811a85d4f155fed3add6145b34bccabb"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-hybrid-20261120/collector-probe.log",
+      "sha256": "96e059cd876daf170fc0272698702eefb168bf815a3831793166b7e8fe9cd986"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-hybrid-20261120/ownership.json",
+      "sha256": "e5bd76c6393898e63d98a4214b9c503508d75e644ac8e097d19c2cabab29ebf4"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-hybrid-20261120/report.json",
+      "sha256": "b2b478447c197a003548c404debf765608aed604c13be66d471df56edefc45d9"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-hybrid-20261120/restore-probe.log",
+      "sha256": "ea709d9a4c2b9d9437eb71f5623de2f5b1a660a8e4a5ce20762f80843fd0663f"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-hybrid-20261120/ztw-7e23d12ee8fd-collector-probe@lab.service.log",
+      "sha256": "96e059cd876daf170fc0272698702eefb168bf815a3831793166b7e8fe9cd986"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-hybrid-20261120/ztw-7e23d12ee8fd-collector@lab.service.log",
+      "sha256": "854aa118ebf706f205d18e555c35938f99d25d784eb9cb88f04256bc6001d8e6"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-hybrid-20261120/ztw-7e23d12ee8fd-restore-probe@lab.service.log",
+      "sha256": "ea709d9a4c2b9d9437eb71f5623de2f5b1a660a8e4a5ce20762f80843fd0663f"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-hybrid-20261120/ztw-7e23d12ee8fd-restore@lab.service.log",
+      "sha256": "f52653f988cac347b87700abde35520d7d61b7faa82db11e7fcdf1f874aa96d6"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-hybrid-20261120/ztw-7e23d12ee8fd-restore@lab.timer.log",
+      "sha256": "b37ac023f456f71610422258181d61127333b110f74d4b9e4375b9ef71d3e096"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-hybrid-20261120.stdout.txt",
+      "sha256": "9109d94b10d86facab76b54e7b59dd5e3042927dfc34e9cbf2eabb52810559cb"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-initial-20261120/ownership.json",
+      "sha256": "eee2e1670a6b24941b1301e08efdf0cc6ac8bbfdafcdee670b8528bbd07317bf"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-initial-20261120/report.json",
+      "sha256": "fd158ef7acdcbd49b67059dfca5226fa67490ba799d6775e47537cedde193b22"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-initial-20261120.stdout.txt",
+      "sha256": "a91a448c99bcdcee193e6741cb2558d1218df769dc2a89424430f21a87d6bfff"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-timer-20261120/collector-probe.log",
+      "sha256": "5c8b3af4a881bedfb5a59b59baa7cc5d4603f04da58b96cf0cd0310308242aac"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-timer-20261120/ownership.json",
+      "sha256": "cf6d9068480e3752cc9300e066cdb8965fe7530e8009abb8fff87a490d5c5860"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-timer-20261120/report.json",
+      "sha256": "316f9624dd82b8cbc6bc5a10a338d95b373b0c9744e3e745bf201e246f57c477"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-timer-20261120/restore-probe.log",
+      "sha256": "75e646d74cc50ca693058165b36cd4c788c5be29d9b25c419928aa6fff06dab2"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-timer-20261120/ztw-b9b4716962d3-collector-probe@lab.service.log",
+      "sha256": "5c8b3af4a881bedfb5a59b59baa7cc5d4603f04da58b96cf0cd0310308242aac"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-timer-20261120/ztw-b9b4716962d3-collector@lab.service.log",
+      "sha256": "086c0b067d48b49072eeb01fb8d842ae0c41a4453e2a7984ebdf89e681e830d3"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-timer-20261120/ztw-b9b4716962d3-restore-probe@lab.service.log",
+      "sha256": "75e646d74cc50ca693058165b36cd4c788c5be29d9b25c419928aa6fff06dab2"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-timer-20261120/ztw-b9b4716962d3-restore@lab.service.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-native-timer-20261120.stdout.txt",
+      "sha256": "ec6e46a355e0e6bd77f072fc2bdbf3a2d909f91d683a9571693af10f514e2549"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-ruff-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-ruff-final-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-template-linux-final-20261120.xml",
+      "sha256": "eba827aa491f45527adb87ac2bb3473aed4182d1ed1a3f031040f077ae2ee459",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-template-windows-final-20261120.xml",
+      "sha256": "1f0d318ec59ff7aea1e6ffe5de15cf3b47ac156af5357b288895fb3ed1734b6d",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/infrastructure-results/witness-systemd-template-windows-initial-20261120.xml",
+      "sha256": "972c4827c65082afe681a059b61ebaa8454799fdc6df19b0583bf09294ebbc13",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "real_native_checks": 15,
+  "production_installation_completed": false,
+  "paid_api_calls": 0,
+  "independent_storage_verified": false,
+  "goal_status": "active_until_0800"
+}

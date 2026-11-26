@@ -3,13 +3,13 @@ from collections.abc import Callable
 from contextlib import asynccontextmanager
 from dataclasses import replace
 from datetime import UTC, datetime
-from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
 from time import perf_counter
 from typing import Annotated, Literal
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request, Response
+from fastapi import Path as RoutePath
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from mangum import Mangum
@@ -24,10 +24,13 @@ from app.behavior_context_api import behavior_context_router
 from app.config import get_settings
 from app.dashboard_api import router as dashboard_router
 from app.dashboard_jobs_api import router as dashboard_jobs_router
+from app.login_queue_api import confirmed_delivery_reference
+from app.login_queue_api import router as login_queue_router
 from app.middleware import RequestBodyLimitMiddleware, RequestContextMiddleware
 from app.models import (
     AnalysisResult,
     AssuranceSummary,
+    AuditResultPage,
     BatchAnalysisRequest,
     BatchAnalysisResult,
     ControlRecord,
@@ -35,6 +38,7 @@ from app.models import (
     CorrelationPolicy,
     CorrelationRequest,
     CorrelationResult,
+    DelayedLoginReview,
     DetectionPipelineResult,
     DetectionQualityReport,
     EvaluationRequest,
@@ -58,6 +62,7 @@ from app.models import (
     PublicReplayDataset,
     PublicReplayResult,
     PublicReplaySuiteResult,
+    RecommendedAction,
     ResponsePreviewRequest,
     ReviewStatus,
     ReviewUpdateRequest,
@@ -66,14 +71,34 @@ from app.models import (
     SecurityEvent,
     SigmaRuleSummary,
     SimulationRequest,
+    VerifiedLoginDetection,
 )
+from app.native_analysis_models import NativeServiceAnalysisRequest
 from app.response_api import response_router
 from app.scenarios import SCENARIOS, generate_events, get_scenario
 from app.security import Principal, Role, require_roles
+from app.services.account_takeover import Takeover, detect_verified_login
+from app.services.analysis_authority import bind_analysis_authority
 from app.services.assurance import get_assurance_registry
 from app.services.audit import AuditStore, create_audit_store
+from app.services.audit_paging import (
+    AuditCursorExpired,
+    AuditCursorInvalid,
+    AuditPagingUnsupported,
+    AuditSnapshotChanged,
+    create_audit_pager,
+)
+from app.services.audit_review_preconditions import (
+    parse_review_identity,
+    parse_review_if_match,
+    require_review_identity,
+    require_review_match,
+    review_etag,
+    review_identity,
+)
 from app.services.behavior_context import BehaviorContextService
 from app.services.behavior_context_store import BehaviorContextStore
+from app.services.cached_provider import single_cached_factory
 from app.services.cases import (
     ALLOWED_TRANSITIONS,
     CaseConflictError,
@@ -82,12 +107,20 @@ from app.services.cases import (
     InvalidCaseTransitionError,
     create_case_store,
 )
+from app.services.collection_paging import (
+    CollectionPage,
+    CollectionPager,
+    case_rows,
+    read_collection,
+)
 from app.services.continuous_signals import ContinuousSignalService
 from app.services.correlation import get_correlation_engine
 from app.services.detection_benchmark import BenchmarkUnavailable, get_detection_benchmark
 from app.services.detection_quality import get_detection_quality_service
 from app.services.evaluation import run_evaluation
+from app.services.evaluation_runtime import EvaluationRuntimeUnavailable, evaluation_runtime
 from app.services.execution_analysis_evidence import collect_session_execution_evidence
+from app.services.federated_audit import AuditQueryUnavailable
 from app.services.incident_quality import get_incident_quality_service
 from app.services.integration_outbox import (
     IntegrationOutboxService,
@@ -96,6 +129,15 @@ from app.services.integration_outbox import (
     OutboxNotFoundError,
     OutboxTerminalStateError,
     create_integration_outbox_store,
+)
+from app.services.login_delivery import (
+    LoginDeliveryBusy,
+    LoginDeliveryIdentity,
+    lock_login_delivery,
+)
+from app.services.native_analysis_registry import (
+    NativeAnalysisMissing,
+    create_native_analysis_registry,
 )
 from app.services.ocsf import get_ocsf_normalizer
 from app.services.policy import (
@@ -107,13 +149,30 @@ from app.services.public_detection import PublicSession, evaluate_public_session
 from app.services.public_replay import get_public_replay_service
 from app.services.response_actions import ResponseService
 from app.services.scenario_evaluator import evaluate_scenarios
-from app.services.session_analysis_evidence import VerifiedSessionContext, collect_session_evidence
+from app.services.session_analysis_evidence import (
+    LIVE_SESSION_SCOPE,
+    VerifiedSessionContext,
+    collect_session_evidence,
+)
+from app.services.settled_io import settled_io
 from app.services.sigma import get_sigma_engine
 from app.services.signal_inbox import SignalInbox
-from app.services.trusted_signals import SignalVerifier
+from app.services.sqlite_audit import AuditReviewConflict, SQLiteAuditStore
+from app.services.trusted_signals import (
+    LoginEvidenceExpired,
+    SignalRejected,
+    SignalVerifier,
+    eligible_for_delayed_login_review,
+)
 from app.services.zero_trust import POLICY_PATH, ZeroTrustOperations
 from app.zero_trust_api import install_zero_trust_error_handlers, zero_trust_router
-from app.zero_trust_models import SignedSessionSignal
+from app.zero_trust_models import (
+    LOGIN_EVIDENCE_EXPIRED,
+    LoginDeliveryReceipt,
+    LoginDeliveryRequest,
+    SignedSessionSignal,
+    VerifiedLoginAnalysisRequest,
+)
 
 settings = get_settings()
 static_dir = Path(__file__).parent / "static"
@@ -148,7 +207,10 @@ app.add_middleware(RequestContextMiddleware)
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 app.include_router(dashboard_router)
 app.include_router(dashboard_jobs_router)
+app.include_router(login_queue_router)
 audit_store = create_audit_store(settings)
+audit_pager = create_audit_pager(settings)
+collection_pager = CollectionPager(lambda: audit_pager._master())
 case_store = create_case_store(settings)
 integration_outbox_store = create_integration_outbox_store(settings)
 integration_outbox_service = IntegrationOutboxService(integration_outbox_store)
@@ -161,6 +223,7 @@ public_replay_service = get_public_replay_service()
 detection_quality_service = get_detection_quality_service()
 incident_quality_service = get_incident_quality_service()
 analysis_capacity = asyncio.Semaphore(settings.analysis_max_concurrency)
+audit_query_capacity = asyncio.Semaphore(settings.audit_query_max_concurrency)
 zero_trust_operations = (
     ZeroTrustOperations(
         settings.zero_trust_db_path,
@@ -185,7 +248,11 @@ continuous_signal_service = (
     if zero_trust_operations
     else None
 )
-app.include_router(zero_trust_router(zero_trust_operations, continuous_signal_service))
+native_analysis_registry = create_native_analysis_registry(zero_trust_operations, settings)
+app.include_router(zero_trust_router(
+    zero_trust_operations, continuous_signal_service,
+    page_service=lambda: collection_pager, page_slot=lambda: _audit_query_slot(),
+))
 install_zero_trust_error_handlers(app)
 behavior_context_service = (
     BehaviorContextService(
@@ -218,13 +285,39 @@ class AnalysisCapacityExceeded(RuntimeError):
     pass
 
 
-@lru_cache
+@app.exception_handler(AuditCursorInvalid)
+@app.exception_handler(AuditCursorExpired)
+@app.exception_handler(AuditSnapshotChanged)
+@app.exception_handler(AuditPagingUnsupported)
+async def audit_page_error(_request, error):
+    if isinstance(error, AuditPagingUnsupported):
+        status, detail = 501, "Paged reads require a local SQLite or JSONL audit backend"
+    elif isinstance(error, AuditCursorExpired):
+        status, detail = 410, "Audit cursor expired; restart from the first page"
+    elif isinstance(error, AuditSnapshotChanged):
+        status, detail = 409, "Audit snapshot changed; restart from the first page"
+    else:
+        status, detail = 400, "Invalid audit cursor or cursor scope"
+    return JSONResponse(status_code=status, content={"detail": detail})
+
+
+@app.exception_handler(AuditQueryUnavailable)
+async def audit_query_unavailable(_request, _error):
+    return JSONResponse(status_code=503, content={"detail": "Audit records temporarily unavailable"})
+
+
+@app.exception_handler(AuditReviewConflict)
+async def audit_review_conflict(_request, _error):
+    return JSONResponse(status_code=409, content={"detail": "Audit review changed; reload current record"})
+
+
+@single_cached_factory
 def get_analyzer() -> Analyzer:
     current = get_settings()
     return build_analyzer(current.analyzer_mode)
 
 
-@lru_cache
+@single_cached_factory
 def get_evidence_agent() -> EvidenceReviewAgent:
     return EvidenceReviewAgent(get_settings())
 
@@ -257,7 +350,16 @@ def liveness() -> dict:
 
 
 @app.get("/health/ready")
-def readiness() -> Response:
+async def readiness() -> Response:
+    async with _audit_query_slot():
+        store = audit_store
+        response = await settled_io(_readiness_snapshot)
+        if audit_store is not store:
+            raise AuditQueryUnavailable("audit serving store changed")
+        return response
+
+
+def _readiness_snapshot() -> Response:
     zero_trust_integrity = (
         zero_trust_operations.integrity()
         if zero_trust_operations
@@ -273,7 +375,9 @@ def readiness() -> Response:
         if behavior_context_service
         else {"ok": True, "enabled": False}
     )
-    integrity = audit_store.integrity()
+    integrity = (audit_store.writer_integrity() if isinstance(audit_store, AuditStore)
+                 else audit_store.integrity())
+    audit_paging_integrity = audit_pager.readiness()
     case_integrity = case_store.integrity()
     outbox_integrity = integration_outbox_store.integrity()
     assurance = assurance_registry.summary()
@@ -289,6 +393,7 @@ def readiness() -> Response:
     )
     ready = (
         integrity["ok"]
+        and audit_paging_integrity["ok"]
         and zero_trust_integrity["ok"]
         and inbox_integrity["ok"]
         and context_integrity["ok"]
@@ -307,6 +412,7 @@ def readiness() -> Response:
         "signal_inbox": inbox_integrity,
         "behavior_context": context_integrity,
         "audit": integrity,
+        "audit_paging": audit_paging_integrity,
         "case_management": {
             **case_integrity,
             "valid": case_integrity["ok"],
@@ -520,6 +626,26 @@ def recent_cases(
     return case_store.recent(safe_limit, principal.tenant_id, status)
 
 
+@app.get("/case-pages", response_model=CollectionPage[IncidentCase])
+async def paged_cases(
+    request: Request, principal: ViewerPrincipal,
+    limit: Annotated[int, Query(ge=1, le=100)] = 12,
+    cursor: Annotated[str | None, Query(min_length=1, max_length=2048, pattern=r"^[A-Za-z0-9_-]+$")] = None,
+    status: IncidentCaseStatus | None = None,
+):
+    store = case_store
+    source_path = getattr(store, "_path", None)
+    def load():
+        rows = case_rows(store, principal.tenant_id)
+        return [row for row in rows if status is None or row.status == status]
+    async with _audit_query_slot():
+        return await read_collection(
+            request, principal, collection_pager, load,
+            ["cases", str(source_path)], lambda: case_store is store and getattr(store, "_path", None) == source_path,
+            limit=limit, cursor=cursor, filters={"status": status},
+        )
+
+
 @app.get("/cases/{case_id}", response_model=IncidentCase)
 def case_detail(case_id: str, principal: ViewerPrincipal) -> IncidentCase:
     record = case_store.get(case_id, principal.tenant_id)
@@ -696,21 +822,173 @@ async def analyze(
     request: Request,
     principal: AnalystPrincipal,
 ) -> AnalysisResult:
-    try:
-        analyzer = get_analyzer()
-    except ValueError as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    analyzer = await _load_analysis_provider(request, principal, get_analyzer)
 
     try:
-        return await _analyze_event(event, analyzer, principal, request.state.request_id)
+        return await _analyze_event(
+            event, analyzer, principal, request.state.request_id,
+            caller_authority_check=getattr(request.state, "authentication_revalidator", None),
+        )
     except AnalysisCapacityExceeded as exc:
         raise HTTPException(
             status_code=429,
             detail="Analysis capacity is temporarily exhausted",
             headers={"Retry-After": "1"},
         ) from exc
+    except HTTPException:
+        raise
     except Exception as exc:
         raise HTTPException(status_code=502, detail="Analysis provider failed") from exc
+
+
+@app.post("/analysis/verified-login", response_model=AnalysisResult)
+async def analyze_verified_login(
+    body: VerifiedLoginAnalysisRequest, request: Request, principal: AnalystPrincipal,
+    report_expiry: bool = False,
+) -> AnalysisResult:
+    if principal.auth_method not in {"api_key", "oidc"}:
+        raise HTTPException(401, "Authenticated analyst required for verified login evidence")
+    persistence_started = False
+
+    def mark_persistence_started():
+        nonlocal persistence_started
+        persistence_started = True
+
+    try:
+        async with _analysis_slot():
+            return await _analyze_verified_login_in_slot(
+                body, request, principal, before_persist=mark_persistence_started,
+            )
+    except LoginEvidenceExpired as exc:
+        if report_expiry and not persistence_started:
+            raise HTTPException(410, LOGIN_EVIDENCE_EXPIRED) from exc
+        raise
+    except AnalysisCapacityExceeded as exc:
+        raise HTTPException(
+            429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from exc
+
+
+async def _login_evidence_guard(body, request, principal, *, delayed_at=None):
+    caller_check = getattr(request.state, "authentication_revalidator", None)
+    verifier = SignalVerifier(get_settings().trusted_signal_sources_path)
+
+    def source_digest():
+        if caller_check is not None:
+            caller_check()
+        if get_settings().trusted_signal_sources_path != verifier.registry_path:
+            raise SignalRejected("verified login registry changed")
+        now = datetime.now(UTC)
+        if delayed_at is not None:
+            return verifier.verify_delayed_login_review(body.evidence, body.event, principal, now, received_at=delayed_at)
+        return verifier.verify_login_evidence(body.evidence, body.event, principal, now)
+
+    digest = await settled_io(source_digest)
+
+    def check_evidence():
+        if source_digest() != digest:
+            raise SignalRejected("verified login source changed")
+
+    return digest, check_evidence
+
+
+async def _analyze_verified_login_in_slot(body, request, principal, *, before_persist=None, delivery=None):
+    digest, check_evidence = await _login_evidence_guard(body, request, principal)
+    finding = detect_verified_login(body.event, body.evidence, digest)
+    return await _analyze_event_in_slot(
+        body.event, RuleBasedAnalyzer(), principal, request.state.request_id,
+        caller_authority_check=check_evidence, verified_login_detection=finding,
+        before_persist=before_persist, login_delivery=delivery,
+    )
+
+
+@app.post("/analysis/login-delivery", response_model=LoginDeliveryReceipt)
+async def deliver_login(body: LoginDeliveryRequest, request: Request, principal: AnalystPrincipal):
+    if principal.auth_method not in {"api_key", "oidc"} or (
+        body.tenant_id != principal.tenant_id or body.collector_subject != principal.subject
+    ):
+        raise HTTPException(403, "Login delivery identity mismatch")
+    store = audit_store
+    if not isinstance(store, SQLiteAuditStore):
+        raise HTTPException(503, "Login delivery requires a SQLite audit store")
+    identity = LoginDeliveryIdentity.from_request(body)
+    caller_check = getattr(request.state, "authentication_revalidator", None)
+
+    def assert_audit():
+        if audit_store is not store:
+            raise AuditQueryUnavailable("login delivery audit authority changed")
+
+    async def recorded():
+        await _analysis_caller_boundary(principal, caller_check)
+        assert_audit()
+        result = await settled_io(store.login_delivery, identity.analysis_id)
+        await _analysis_caller_boundary(principal, caller_check)
+        assert_audit()
+        if result is not None and (
+            result.login_delivery_sha256 != identity.payload_sha256
+            or result.event_id != body.event.event_id
+            or result.actor_id != principal.subject or result.tenant_id != principal.tenant_id
+        ):
+            raise HTTPException(409, "Login delivery conflicts with committed event")
+        return result
+
+    def receipt(result, *, duplicate):
+        assert_audit()
+        if result.verified_login_detection is not None:
+            state = "verified"
+        else:
+            state = "missing" if body.evidence is None else "expired"
+        return LoginDeliveryReceipt(result=result, evidence_state=state, duplicate=duplicate)
+
+    async def process_delivery():
+        existing = await recorded()
+        if existing is not None:
+            return receipt(existing, duplicate=True)
+        try:
+            delayed_review = None
+            authority_guard = caller_check
+            if body.evidence is not None:
+                try:
+                    result = await _analyze_verified_login_in_slot(
+                        body, request, principal, delivery=identity, before_persist=assert_audit,
+                    )
+                except LoginEvidenceExpired:
+                    # An expiry after committing is a historical success, not a second analysis.
+                    existing = await recorded()
+                    if existing is not None:
+                        return receipt(existing, duplicate=True)
+                    received_at = datetime.now(UTC)
+                    if eligible_for_delayed_login_review(body.evidence, body.event, received_at):
+                        digest, authority_guard = await _login_evidence_guard(
+                            body, request, principal, delayed_at=received_at,
+                        )
+                        delayed_review = DelayedLoginReview(
+                            source_id=body.evidence.source_id, source_digest_sha256=digest,
+                            observed_at=body.evidence.issued_at, evidence_expired_at=body.evidence.expires_at,
+                        )
+                else:
+                    return receipt(result, duplicate=False)
+            analyzer = await _load_analysis_provider_in_slot(request, principal, get_analyzer)
+            result = await _analyze_event_in_slot(
+                body.event, analyzer, principal, request.state.request_id,
+                caller_authority_check=authority_guard, login_delivery=identity, before_persist=assert_audit,
+                delayed_login_review=delayed_review,
+            )
+        except AuditReviewConflict:
+            # SQLite arbitrates same-ID writes from independent workers.
+            existing = await recorded()
+            if existing is None:
+                raise
+            return receipt(existing, duplicate=True)
+        return receipt(result, duplicate=False)
+    try:
+        async with _analysis_slot():
+            with lock_login_delivery(store.path, identity.analysis_id):
+                return await process_delivery()
+    except (AnalysisCapacityExceeded, LoginDeliveryBusy) as exc:
+        raise HTTPException(429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}) from exc
+    except OSError as exc:
+        raise AuditQueryUnavailable("login delivery unavailable") from exc
 
 
 @app.post("/analysis/batch", response_model=BatchAnalysisResult)
@@ -719,27 +997,39 @@ async def analyze_batch(
     request: Request,
     principal: AnalystPrincipal,
 ) -> BatchAnalysisResult:
-    try:
-        analyzer = get_analyzer()
-    except ValueError as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    analyzer = await _load_analysis_provider(request, principal, get_analyzer)
 
     semaphore = asyncio.Semaphore(3)
 
     async def analyze_with_limit(event: SecurityEvent) -> AnalysisResult:
         async with semaphore:
-            return await _analyze_event(event, analyzer, principal, request.state.request_id)
+            return await _analyze_event(
+                event, analyzer, principal, request.state.request_id,
+                caller_authority_check=getattr(request.state, "authentication_revalidator", None),
+            )
 
     try:
-        results = await asyncio.gather(
-            *(analyze_with_limit(event) for event in batch_request.events)
-        )
+        tasks = [asyncio.create_task(analyze_with_limit(event)) for event in batch_request.events]
+        try:
+            results = await asyncio.gather(*tasks)
+            async with _analysis_slot():
+                await _analysis_caller_boundary(
+                    principal, getattr(request.state, "authentication_revalidator", None)
+                )
+        except BaseException:
+            for task in tasks:
+                if not task.done():
+                    task.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
+            raise
     except AnalysisCapacityExceeded as exc:
         raise HTTPException(
             status_code=429,
             detail="Analysis capacity is temporarily exhausted",
             headers={"Retry-After": "1"},
         ) from exc
+    except HTTPException:
+        raise
     except Exception as exc:
         raise HTTPException(status_code=502, detail="Batch analysis provider failed") from exc
     return BatchAnalysisResult(
@@ -753,22 +1043,34 @@ async def analyze_batch(
 def _bound_verification_context(
     signal, principal, behavior_capture_id, caller_authority_check=None
 ):
-    if zero_trust_operations is None:
+    operations = zero_trust_operations
+    captures = behavior_context_service
+    if operations is None:
         raise HTTPException(404, "Local verified-session analysis is disabled in production")
+
+    def assert_serving_stores():
+        if zero_trust_operations is not operations or (
+            behavior_capture_id is not None and behavior_context_service is not captures
+        ):
+            raise SignalRejected("verified analysis serving stores changed")
 
     # Verification errors are handled by existing signal/session handlers; never call the LLM.
     def collect_context():
+        assert_serving_stores()
         if caller_authority_check is not None:
             caller_authority_check()
         if behavior_capture_id is not None:
-            return collect_session_execution_evidence(
-                zero_trust_operations,
-                behavior_context_service,
+            collected = collect_session_execution_evidence(
+                operations,
+                captures,
                 signal,
                 principal,
                 behavior_capture_id,
             )
-        return collect_session_evidence(zero_trust_operations, signal, principal)
+        else:
+            collected = collect_session_evidence(operations, signal, principal)
+        assert_serving_stores()
+        return collected
 
     context = collect_context()
 
@@ -793,16 +1095,33 @@ async def analyze_verified_session(
         str | None, Query(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
     ] = None,
 ) -> AnalysisResult:
-    context = _bound_verification_context(
+    try:
+        async with _analysis_slot():
+            return await _analyze_verified_session_in_slot(
+                signal, request, principal, behavior_capture_id
+            )
+    except AnalysisCapacityExceeded as exc:
+        raise HTTPException(
+            429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from exc
+
+
+async def _analyze_verified_session_in_slot(
+    signal: SignedSessionSignal, request: Request, principal: Principal, behavior_capture_id: str | None,
+) -> AnalysisResult:
+    operations = zero_trust_operations
+    context = await settled_io(
+        _bound_verification_context,
         signal,
         principal,
         behavior_capture_id,
         getattr(request.state, "authentication_revalidator", None),
     )
-    try:
-        analyzer = get_analyzer()
-    except ValueError as exc:
-        raise HTTPException(503, "Verified-session analysis provider is not configured") from exc
+    if zero_trust_operations is not operations:
+        raise SignalRejected("verified analysis serving stores changed")
+    analyzer = await _load_analysis_provider_in_slot(
+        request, principal, get_analyzer, "Verified-session analysis provider is not configured"
+    )
     if get_settings().openai_prompt_mode != "grounded" or not callable(
         getattr(analyzer, "analyze_with_evidence", None)
     ):
@@ -817,11 +1136,11 @@ async def analyze_verified_session(
             result = await analyzer.analyze_with_evidence(event, context)
             # Source/key withdrawal, policy changes or revocation during a paid call
             # must not publish a result as if the original snapshot were still current.
-            context.verify_current()
+            await context.revalidate(event)
             return result
 
     try:
-        return await _analyze_event(
+        return await _analyze_event_in_slot(
             signal.event,
             BoundSessionAnalyzer(),
             principal,
@@ -837,6 +1156,79 @@ async def analyze_verified_session(
         raise HTTPException(502, "Verified-session analysis could not be completed") from exc
 
 
+@app.post("/analysis/native-service", response_model=AnalysisResult)
+async def analyze_native_service(
+    selection: NativeServiceAnalysisRequest, request: Request, principal: AnalystPrincipal,
+) -> AnalysisResult:
+    try:
+        async with _analysis_slot():
+            return await _analyze_native_service_in_slot(selection, request, principal)
+    except AnalysisCapacityExceeded as exc:
+        raise HTTPException(
+            429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from exc
+
+
+async def _analyze_native_service_in_slot(
+    selection: NativeServiceAnalysisRequest, request: Request, principal: AnalystPrincipal,
+) -> AnalysisResult:
+    """Analyze only an execution published by the trusted, process-local collector."""
+    if zero_trust_operations is None or get_settings().app_environment == "production":
+        raise HTTPException(404, "Local native service analysis is disabled in production")
+    registry = native_analysis_registry
+    if registry is None or registry.operations is not zero_trust_operations:
+        raise HTTPException(503, "Native service analysis publisher is not configured")
+    try:
+        signal, context = await settled_io(
+            registry.resolve,
+            selection.execution_ref, principal,
+            caller_authority_check=getattr(request.state, "authentication_revalidator", None),
+        )
+    except NativeAnalysisMissing as exc:
+        raise HTTPException(404, "Native execution reference unavailable") from exc
+    collected = context
+
+    def assert_serving_stores():
+        if native_analysis_registry is not registry or zero_trust_operations is not registry.operations:
+            raise SignalRejected("native analysis serving stores changed")
+
+    def verify_serving_context():
+        assert_serving_stores()
+        collected.verify_current()
+        assert_serving_stores()
+
+    context = replace(context, verify_current=verify_serving_context)
+    analyzer = await _load_analysis_provider_in_slot(
+        request, principal, get_analyzer, "Native service analysis provider is not configured"
+    )
+    if get_settings().openai_prompt_mode != "grounded" or not callable(
+        getattr(analyzer, "analyze_with_evidence", None)
+    ):
+        raise HTTPException(503, "Configure grounded OpenAI or hybrid native analysis")
+
+    class BoundNativeAnalyzer:
+        name = analyzer.name
+
+        async def analyze(self, event):
+            # Queueing and inference can outlive or withdraw any supporting authority.
+            await context.revalidate(event)
+            result = await analyzer.analyze_with_evidence(event, context)
+            await context.revalidate(event)
+            return result
+
+    try:
+        return await _analyze_event_in_slot(
+            signal.event, BoundNativeAnalyzer(), principal, request.state.request_id,
+            verification_context=context,
+        )
+    except AnalysisCapacityExceeded as exc:
+        raise HTTPException(
+            429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from exc
+    except Exception as exc:
+        raise HTTPException(502, "Native service analysis could not be completed") from exc
+
+
 @app.post("/analysis/evidence-review", response_model=AnalysisResult)
 async def analyze_evidence_review(
     signal: SignedSessionSignal,
@@ -845,6 +1237,20 @@ async def analyze_evidence_review(
     behavior_capture_id: Annotated[
         str | None, Query(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
     ] = None,
+) -> AnalysisResult:
+    try:
+        async with _analysis_slot():
+            return await _analyze_evidence_review_in_slot(
+                signal, request, principal, behavior_capture_id
+            )
+    except AnalysisCapacityExceeded as exc:
+        raise HTTPException(
+            429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from exc
+
+
+async def _analyze_evidence_review_in_slot(
+    signal: SignedSessionSignal, request: Request, principal: Principal, behavior_capture_id: str | None,
 ) -> AnalysisResult:
     current = get_settings()
     if zero_trust_operations is None:
@@ -855,19 +1261,26 @@ async def analyze_evidence_review(
         and current.analyzer_mode in {"openai", "hybrid"}
     ):
         raise HTTPException(503, "Enable grounded OpenAI evidence review explicitly")
-    context = _bound_verification_context(
+    operations = zero_trust_operations
+    context = await settled_io(
+        _bound_verification_context,
         signal,
         principal,
         behavior_capture_id,
         getattr(request.state, "authentication_revalidator", None),
     )
-    try:
-        agent = get_evidence_agent()
-    except ValueError as exc:
-        raise HTTPException(503, "Evidence review provider is not configured") from exc
+    if zero_trust_operations is not operations:
+        raise SignalRejected("verified analysis serving stores changed")
+    agent = await _load_analysis_provider_in_slot(
+        request, principal, get_evidence_agent, "Evidence review provider is not configured"
+    )
 
     def history_getter():
-        history, _ = zero_trust_operations.analysis_history(signal.session_id, principal)
+        if zero_trust_operations is not operations:
+            raise SignalRejected("verified analysis serving stores changed")
+        history, _ = operations.analysis_history(signal.session_id, principal)
+        if zero_trust_operations is not operations:
+            raise SignalRejected("verified analysis serving stores changed")
         return {
             "decisions": [
                 entry.model_dump(
@@ -908,12 +1321,12 @@ async def analyze_evidence_review(
                     RuleBasedAnalyzer().assess(event), assessment
                 )
                 self.trace["rule_baseline_preserved"] = True
-            context.verify_current()
+            await context.revalidate(event)
             return assessment
 
     bound = BoundAgent()
     try:
-        return await _analyze_event(
+        return await _analyze_event_in_slot(
             signal.event,
             bound,
             principal,
@@ -930,6 +1343,46 @@ async def analyze_evidence_review(
         raise HTTPException(502, "Evidence review could not be completed") from exc
 
 
+@asynccontextmanager
+async def _analysis_slot():
+    capacity = analysis_capacity
+    try:
+        await asyncio.wait_for(
+            capacity.acquire(),
+            timeout=settings.analysis_queue_timeout_seconds,
+        )
+    except TimeoutError as exc:
+        raise AnalysisCapacityExceeded from exc
+    try:
+        yield
+    finally:
+        capacity.release()
+
+
+async def _load_analysis_provider(request, principal, factory):
+    try:
+        async with _analysis_slot():
+            return await _load_analysis_provider_in_slot(request, principal, factory)
+    except AnalysisCapacityExceeded as error:
+        raise HTTPException(
+            429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from error
+
+
+async def _load_analysis_provider_in_slot(
+    request, principal, factory, failure_detail="Analysis provider initialization is unavailable",
+):
+    check = getattr(request.state, "authentication_revalidator", None)
+    await _analysis_caller_boundary(principal, check)
+    try:
+        provider = await settled_io(factory)
+    except Exception as error:
+        await _analysis_caller_boundary(principal, check)
+        raise HTTPException(503, failure_detail) from error
+    await _analysis_caller_boundary(principal, check)
+    return provider
+
+
 async def _analyze_event(
     event: SecurityEvent,
     analyzer: Analyzer,
@@ -938,66 +1391,156 @@ async def _analyze_event(
     verification_context: VerifiedSessionContext | None = None,
     verification_context_supplier: Callable[[], VerifiedSessionContext] | None = None,
     llm_trace_supplier: Callable[[], dict | None] | None = None,
+    caller_authority_check: Callable[[], None] | None = None,
 ) -> AnalysisResult:
-    try:
-        await asyncio.wait_for(
-            analysis_capacity.acquire(),
-            timeout=settings.analysis_queue_timeout_seconds,
+    async with _analysis_slot():
+        return await _analyze_event_in_slot(
+            event, analyzer, principal, request_id, verification_context,
+            verification_context_supplier, llm_trace_supplier, caller_authority_check,
         )
-    except TimeoutError as exc:
-        raise AnalysisCapacityExceeded from exc
-    try:
-        # A known local audit failure cannot be repaired by a paid analysis.
-        # This cached integrity state is not a probe of future disk availability.
-        with ANALYSIS_PHASE_DURATION.labels("precheck").time():
-            if isinstance(audit_store, AuditStore) and audit_store.integrity().get("ok") is False:
-                raise RuntimeError("audit log integrity check failed; refusing new analysis")
-        started = perf_counter()
-        normalized = ocsf_normalizer.normalize(event)
-        detection = sigma_engine.evaluate(normalized)
-        with ANALYSIS_PHASE_DURATION.labels("analyzer").time():
-            assessment = await analyzer.analyze(event)
-        if verification_context is not None:
-            assessment = assessment.model_copy(update={"requires_human_review": True})
-        selected_context = (
-            verification_context_supplier()
-            if verification_context_supplier
-            else verification_context
+
+
+async def _analyze_event_in_slot(
+    event: SecurityEvent,
+    analyzer: Analyzer,
+    principal: Principal,
+    request_id: str,
+    verification_context: VerifiedSessionContext | None = None,
+    verification_context_supplier: Callable[[], VerifiedSessionContext] | None = None,
+    llm_trace_supplier: Callable[[], dict | None] | None = None,
+    caller_authority_check: Callable[[], None] | None = None,
+    verified_login_detection: VerifiedLoginDetection | None = None,
+    delayed_login_review: DelayedLoginReview | None = None,
+    before_persist: Callable[[], None] | None = None,
+    login_delivery: LoginDeliveryIdentity | None = None,
+) -> AnalysisResult:
+    """Internal pipeline; its caller must hold an analysis slot throughout."""
+    # Live integrity scans must not block the event loop or release capacity
+    # while an abandoned non-cancellable filesystem thread is still running.
+    selected_audit_store = audit_store
+    await _analysis_caller_boundary(principal, caller_authority_check)
+    with ANALYSIS_PHASE_DURATION.labels("precheck").time():
+        await _analysis_audit_boundary(selected_audit_store)
+    await _analysis_caller_boundary(principal, caller_authority_check)
+    started = perf_counter()
+    normalized = ocsf_normalizer.normalize(event)
+    detection = sigma_engine.evaluate(normalized)
+    async def revalidate_caller():
+        await _analysis_caller_boundary(principal, caller_authority_check)
+
+    with bind_analysis_authority(revalidate_caller), ANALYSIS_PHASE_DURATION.labels("analyzer").time():
+        assessment = await analyzer.analyze(event)
+    if verification_context is not None:
+        assessment = assessment.model_copy(update={"requires_human_review": True})
+    selected_context = (
+        verification_context_supplier()
+        if verification_context_supplier
+        else verification_context
+    )
+    snapshot = selected_context.for_event(event) if selected_context is not None else None
+    if (
+        snapshot is not None
+        and snapshot.get("scope") == LIVE_SESSION_SCOPE
+        and event.action == "ADMIN"
+        and event.resource.required_role is None
+        and snapshot["signal"]["signature_verified"] is True
+        and snapshot["policy"]["origin"] == "server_owned_configuration"
+        and all(
+            snapshot["policy"][key] is True
+            for key in ("resource_registered", "role_permitted", "action_permitted")
         )
-        snapshot = selected_context.for_event(event) if selected_context is not None else None
-        safe_assessment = enforce_assessment_safety(assessment, event)
-        verified_controls = None
-        if snapshot is not None:
-            safe_assessment, verified_controls = enforce_verified_review_safety(
-                safe_assessment, snapshot
+    ):
+        detection = sigma_engine.evaluate(normalized, verified_admin_scope=True)
+    safe_assessment = enforce_assessment_safety(assessment, event)
+    verified_controls = None
+    if snapshot is not None:
+        safe_assessment, verified_controls = enforce_verified_review_safety(
+            safe_assessment, snapshot
+        )
+    verified_priority = (
+        verified_login_detection is not None and verified_login_detection.disposition == Takeover.PRIORITY_REVIEW
+    )
+    if verified_priority or delayed_login_review is not None:
+        updates = {"requires_human_review": True}
+        if safe_assessment.recommended_action == RecommendedAction.ALLOW:
+            updates["recommended_action"] = RecommendedAction.HOLD_FOR_REVIEW
+        safe_assessment = safe_assessment.model_copy(update=updates)
+    decision = response_preview(safe_assessment, event)
+    if delayed_login_review is not None:
+        decision = decision.model_copy(update={
+            "reason": "로그인 당시 회수된 기기와 접속 환경 변화가 관측됐습니다. "
+            "인증 근거가 만료되어 운영자 검토가 필요합니다.",
+        })
+    result = AnalysisResult(
+        **({"analysis_id": login_delivery.analysis_id} if login_delivery is not None else {}),
+        event_id=event.event_id,
+        analyzer=analyzer.name,
+        assessment=safe_assessment,
+        policy_decision=decision,
+        normalized_event=normalized,
+        detection=detection,
+        verified_login_detection=verified_login_detection,
+        delayed_login_review=delayed_login_review,
+        login_delivery_sha256=login_delivery.payload_sha256 if login_delivery is not None else None,
+        verification_context=snapshot,
+        llm_trace=llm_trace_supplier() if llm_trace_supplier else None,
+        verified_review_controls=verified_controls,
+        latency_ms=round((perf_counter() - started) * 1000, 2),
+        tenant_id=principal.tenant_id,
+        actor_id=principal.subject,
+        request_id=request_id,
+    )
+    await _analysis_caller_boundary(principal, caller_authority_check)
+    if audit_store is not selected_audit_store:
+        raise RuntimeError("analysis audit store changed; refusing persistence")
+    if before_persist is not None:
+        before_persist()
+    with ANALYSIS_PHASE_DURATION.labels("audit_write").time():
+        await selected_audit_store.save(result)
+    await _analysis_caller_boundary(principal, caller_authority_check)
+    # A full audit scan may be slow. Revalidate evidence after it, so source
+    # withdrawal/expiry during this added I/O cannot bypass the existing check.
+    await _analysis_audit_boundary(selected_audit_store, result)
+    if selected_context is not None:
+        # Audit completion may have awaited another writer. Recheck before
+        # delivery, retaining any committed historical record on rejection.
+        await selected_context.revalidate(event)
+    await _analysis_caller_boundary(principal, caller_authority_check)
+    # Keep committed history on post-commit withdrawal, but deny delivery from
+    # a replaced authority or a database below the configured minimum history.
+    if audit_store is not selected_audit_store:
+        raise RuntimeError("analysis audit store changed before delivery")
+    return result
+
+
+async def _analysis_caller_boundary(principal, check=None):
+    if check is not None:
+        await settled_io(check)
+    expiry = principal.authentication_expires_at
+    if (principal.auth_method == "oidc" and expiry is None) or (
+        expiry is not None and datetime.now(UTC) >= expiry
+    ):
+        raise HTTPException(401, "Caller authentication expired")
+    if Role.ANALYST not in principal.effective_roles:
+        raise HTTPException(403, "Insufficient role for analysis")
+
+
+async def _analysis_audit_boundary(store, expected_result=None):
+    if audit_store is not store:
+        raise RuntimeError("analysis audit store changed")
+    if isinstance(store, (AuditStore, SQLiteAuditStore)):
+        if expected_result is not None:
+            # Each local backend verifies the persisted row, not just its cache.
+            await settled_io(store.verify_saved, expected_result)
+            integrity = {"ok": True}
+        else:
+            integrity = await settled_io(
+                store.writer_integrity if isinstance(store, AuditStore) else store.integrity
             )
-        decision = response_preview(safe_assessment, event)
-        result = AnalysisResult(
-            event_id=event.event_id,
-            analyzer=analyzer.name,
-            assessment=safe_assessment,
-            policy_decision=decision,
-            normalized_event=normalized,
-            detection=detection,
-            verification_context=snapshot,
-            llm_trace=llm_trace_supplier() if llm_trace_supplier else None,
-            verified_review_controls=verified_controls,
-            latency_ms=round((perf_counter() - started) * 1000, 2),
-            tenant_id=principal.tenant_id,
-            actor_id=principal.subject,
-            request_id=request_id,
-        )
-        with ANALYSIS_PHASE_DURATION.labels("audit_write").time():
-            await audit_store.save(result)
-        if selected_context is not None:
-            # Audit completion may have awaited another writer. Recheck before
-            # delivery, retaining any committed historical record on rejection.
-            if selected_context.verify_current is not None:
-                selected_context.verify_current()
-            selected_context.for_event(event)
-        return result
-    finally:
-        analysis_capacity.release()
+        if audit_store is not store:
+            raise RuntimeError("analysis audit store changed during integrity check")
+        if integrity.get("ok") is False:
+            raise RuntimeError("audit log integrity check failed; refusing analysis delivery")
 
 
 @app.post("/response/preview", response_model=PolicyDecision)
@@ -1006,17 +1549,109 @@ def preview(request: ResponsePreviewRequest, _: AnalystPrincipal) -> PolicyDecis
 
 
 @app.post("/evaluation/run", response_model=EvaluationSummary)
-async def evaluate(request: EvaluationRequest, _: AdminPrincipal) -> EvaluationSummary:
+async def evaluate(
+    evaluation_request: EvaluationRequest, request: Request, principal: AdminPrincipal,
+) -> EvaluationSummary:
+    async def revalidate_admin():
+        await _analysis_caller_boundary(
+            principal, getattr(request.state, "authentication_revalidator", None)
+        )
+        if Role.ADMIN not in principal.effective_roles:
+            raise HTTPException(403, "Administrator role is required for evaluation")
+
+    class AuthorizedEvaluationAnalyzer:
+        def __init__(self, delegate):
+            self.delegate = delegate
+            self.name = delegate.name
+
+        async def analyze(self, event):
+            try:
+                async with _analysis_slot():
+                    await revalidate_admin()
+                    with bind_analysis_authority(revalidate_admin):
+                        try:
+                            assessment = await self.delegate.analyze(event)
+                        except Exception:
+                            await revalidate_admin()
+                            raise
+                        await revalidate_admin()
+                        return assessment
+            except AnalysisCapacityExceeded as error:
+                # Admission failure is infrastructure, not a scored model error.
+                raise HTTPException(
+                    429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+                ) from error
+
     try:
-        analyzer = build_analyzer(request.analyzer)
-    except ValueError as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
-    return await run_evaluation(analyzer, request.runs_per_scenario, request.concurrency)
+        async with evaluation_runtime(
+            request, settings, lambda: build_analyzer(evaluation_request.analyzer), revalidate_admin,
+        ) as analyzer:
+            summary = await run_evaluation(
+                AuthorizedEvaluationAnalyzer(analyzer),
+                evaluation_request.runs_per_scenario,
+                evaluation_request.concurrency,
+            )
+        # Client disposal can await transport I/O. Do not deliver using authority
+        # checked only before that additional wait.
+        async with _analysis_slot():
+            await revalidate_admin()
+        return summary
+    except EvaluationRuntimeUnavailable as error:
+        raise HTTPException(503, "Evaluation runtime is unavailable") from error
+    except AnalysisCapacityExceeded as error:
+        raise HTTPException(
+            429, "Analysis capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from error
+
+
+@asynccontextmanager
+async def _audit_query_slot():
+    capacity = audit_query_capacity
+    try:
+        await asyncio.wait_for(
+            capacity.acquire(), timeout=settings.audit_query_queue_timeout_seconds
+        )
+    except TimeoutError as error:
+        raise HTTPException(
+            503, "Audit query capacity is temporarily exhausted", headers={"Retry-After": "1"}
+        ) from error
+    try:
+        yield
+    finally:
+        capacity.release()
+
+
+async def _audit_boundary(store, principal, request):
+    if audit_store is not store:
+        raise AuditQueryUnavailable("audit serving store changed")
+    check = getattr(request.state, "authentication_revalidator", None)
+    if check is not None:
+        await settled_io(check)
+    expiry = principal.authentication_expires_at
+    if (principal.auth_method == "oidc" and expiry is None) or (
+        expiry is not None and datetime.now(UTC) >= expiry
+    ):
+        raise HTTPException(401, "Caller authentication expired")
+    if audit_store is not store:
+        raise AuditQueryUnavailable("audit serving store changed")
+
+
+async def _audit_read_in_slot(store, method, principal, request, *args):
+    """Internal: the route holds a query slot across source I/O and authorization."""
+    return await _audit_call_in_slot(store, getattr(store, method), principal, request, *args)
+
+
+async def _audit_call_in_slot(store, operation, principal, request, *args):
+    await _audit_boundary(store, principal, request)
+    value = await settled_io(operation, *args)
+    await _audit_boundary(store, principal, request)
+    return value
 
 
 @app.get("/metrics", response_model=MetricsSummary)
-def metrics(principal: ViewerPrincipal) -> MetricsSummary:
-    return audit_store.metrics(principal.tenant_id)
+async def metrics(request: Request, principal: ViewerPrincipal) -> MetricsSummary:
+    async with _audit_query_slot():
+        return await _audit_read_in_slot(audit_store, "metrics", principal, request, principal.tenant_id)
 
 
 @app.get("/internal/metrics", include_in_schema=False)
@@ -1052,14 +1687,18 @@ def assurance_control(control_id: str, _: AdminPrincipal) -> ControlRecord:
 
 
 @app.get("/results", response_model=list[AnalysisResult])
-def recent_results(
+async def recent_results(
+    request: Request,
     principal: ViewerPrincipal,
     limit: int = 20,
     review_status: ReviewStatus | None = None,
     risk_level: RiskLevel | None = None,
 ) -> list[AnalysisResult]:
     safe_limit = min(max(limit, 1), 100)
-    records = audit_store.recent(100, principal.tenant_id)
+    async with _audit_query_slot():
+        records = await _audit_read_in_slot(
+            audit_store, "recent", principal, request, 100, principal.tenant_id
+        )
     if review_status is not None:
         records = [record for record in records if record.review_status == review_status]
     if risk_level is not None:
@@ -1067,15 +1706,55 @@ def recent_results(
     return records[:safe_limit]
 
 
+@app.get("/audit/results", response_model=AuditResultPage)
+async def paged_results(
+    request: Request,
+    principal: ViewerPrincipal,
+    limit: Annotated[int, Query(ge=1, le=100)] = 20,
+    cursor: Annotated[str | None, Query(min_length=1, max_length=2048, pattern=r"^[A-Za-z0-9_-]+$")] = None,
+    review_status: ReviewStatus | None = None,
+    risk_level: RiskLevel | None = None,
+    q: Annotated[str | None, Query(max_length=256)] = None,
+    analyzer: Annotated[str | None, Query(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_.-]+$")] = None,
+) -> AuditResultPage:
+    async with _audit_query_slot():
+        store = audit_store
+        return await _audit_call_in_slot(
+            store, audit_pager.page, principal, request,
+            store, principal.tenant_id, limit, cursor, review_status, risk_level, q, analyzer,
+        )
+
+
 @app.patch("/results/{event_id}/review", response_model=AnalysisResult)
 async def update_review(
     event_id: str,
     request: ReviewUpdateRequest,
     principal: ResponderPrincipal,
+    http_request: Request,
+    response: Response,
 ) -> AnalysisResult:
-    record = audit_store.get(event_id, principal.tenant_id)
+    async with _audit_query_slot():
+        updated = await _update_review_in_slot(event_id, request, principal, http_request)
+        response.headers["ETag"] = review_etag(updated)
+        response.headers["X-Review-Identity"] = review_identity(principal)
+        return updated
+
+
+async def _update_review_in_slot(event_id, request, principal, http_request):
+    tag = parse_review_if_match(http_request.headers.getlist("if-match"))
+    expected_identity = parse_review_identity(http_request.headers.getlist("x-review-identity"))
+    require_review_identity(
+        principal, expected_identity, tag, required=settings.audit_review_require_identity,
+    )
+    store = audit_store
+    record = await _audit_read_in_slot(store, "get", principal, http_request, event_id, principal.tenant_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Result not found")
+    require_review_match(
+        record, tag,
+        required=settings.audit_review_require_if_match or settings.audit_review_require_identity,
+        transactional=isinstance(store, SQLiteAuditStore),
+    )
     if record.review_status == ReviewStatus.NOT_REQUIRED:
         raise HTTPException(status_code=409, detail="This result does not require human review")
 
@@ -1110,16 +1789,72 @@ async def update_review(
         review_updated_at=datetime.now(UTC),
     )
     updated = AnalysisResult.model_validate(payload)
-    await audit_store.save(updated)
+    await _audit_boundary(store, principal, http_request)
+    require_review_identity(
+        principal, expected_identity, tag, required=settings.audit_review_require_identity,
+    )
+    require_review_match(
+        record, tag,
+        required=settings.audit_review_require_if_match or settings.audit_review_require_identity,
+        transactional=isinstance(store, SQLiteAuditStore),
+    )
+    if isinstance(store, SQLiteAuditStore):
+        try:
+            await store.save_review(updated, record)
+        except AuditReviewConflict as error:
+            if tag is not None:
+                raise HTTPException(412, "Review version changed; reload the current result") from error
+            raise
+    else:
+        await store.save(updated)
+    # A committed historical review is retained even if delivery is now denied.
+    await _audit_boundary(store, principal, http_request)
+    if isinstance(store, (AuditStore, SQLiteAuditStore)):
+        await _audit_call_in_slot(
+            store, store.verify_saved, principal, http_request, updated
+        )
     return updated
 
 
 @app.get("/results/{event_id}", response_model=AnalysisResult)
-def result(event_id: str, principal: ViewerPrincipal) -> AnalysisResult:
-    record = audit_store.get(event_id, principal.tenant_id)
+async def result(
+    event_id: str, request: Request, principal: ViewerPrincipal, response: Response,
+) -> AnalysisResult:
+    async with _audit_query_slot():
+        store = audit_store
+        record = await _audit_read_in_slot(
+            store, "get", principal, request, event_id, principal.tenant_id
+        )
     if record is None:
         raise HTTPException(status_code=404, detail="Result not found")
+    response.headers["ETag"] = review_etag(record)
+    response.headers["X-Review-Identity"] = review_identity(principal)
+    response.headers["X-Review-Mode"] = "conditional" if isinstance(store, SQLiteAuditStore) else "unavailable"
     return record
+
+
+@app.get("/dashboard/login-queue/deliveries/{analysis_id}", response_model=AnalysisResult)
+async def replay_analysis_detail(
+    analysis_id: Annotated[str, RoutePath(pattern=r"^[a-f0-9]{64}$")],
+    request: Request, principal: ResponderPrincipal,
+) -> AnalysisResult:
+    async with _audit_query_slot():
+        store = audit_store
+        if not isinstance(store, SQLiteAuditStore):
+            raise HTTPException(503, "Login delivery requires a SQLite audit store")
+        reference = await _audit_call_in_slot(store, confirmed_delivery_reference, principal, request, principal, analysis_id)
+        profile, event_id = reference
+        record = await _audit_read_in_slot(store, "login_delivery", principal, request, analysis_id)
+        if (
+            record is None or record.event_id != event_id or record.tenant_id != principal.tenant_id
+            or record.actor_id != profile.collector_subject or record.login_delivery_sha256 is None
+        ):
+            raise HTTPException(404, "Confirmed analysis not found")
+        if reference != await _audit_call_in_slot(
+            store, confirmed_delivery_reference, principal, request, principal, analysis_id,
+        ):
+            raise HTTPException(409, "Login queue reference changed; reload the queue")
+        return record
 
 
 handler = Mangum(app, lifespan="off")

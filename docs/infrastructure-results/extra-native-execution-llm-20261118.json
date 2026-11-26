@@ -1,0 +1,130 @@
+{
+  "schema": "extra-native-execution-llm-validation-1",
+  "date": "2026-11-18",
+  "branch": "extra",
+  "development_parent_commit": "e058bcac05753a873ca00d68eb0a0533308057a2",
+  "remote_push": false,
+  "ci_started": false,
+  "merged": false,
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "model_provider_stubbed": true,
+  "model_quality_measured": false,
+  "performance_goal_qualified": false,
+  "linux_regression": {
+    "collected": 572,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 572,
+    "seconds": 95.122,
+    "xml_sha256": "935f7fedb0c14ba665a318e1ff58bb9117acd57aa96a130966914a36375e5b23",
+    "modules": {
+      "tests.test_exec_history_binding": 49,
+      "tests.test_execution_analysis_evidence": 20,
+      "tests.test_execution_analysis_runner": 2,
+      "tests.test_grounded_prompting": 30,
+      "tests.test_policy": 2,
+      "tests.test_service_analysis_evidence": 45,
+      "tests.test_service_caller_identity": 41,
+      "tests.test_session_analysis_evidence": 43,
+      "tests.test_shared_execution_collector": 44,
+      "tests.test_shared_execution_evidence": 43,
+      "tests.test_systemd_request_launcher": 7,
+      "tests.test_zero_trust_operations": 28,
+      "tests.zero_trust.test_api_regressions": 73,
+      "tests.zero_trust.test_identity_regressions": 25,
+      "tests.zero_trust.test_session_proof_observations": 14,
+      "tests.zero_trust.test_session_regressions": 54,
+      "tests.zero_trust.test_signal_regressions": 52
+    }
+  },
+  "windows_regression_before_last_eight_added_cases": {
+    "collected": 265,
+    "failures": 11,
+    "errors": 0,
+    "skipped": 2,
+    "passed": 252,
+    "seconds": 73.076,
+    "xml_sha256": "1d70e9bc10323245807367412f7bd528b0ee09219789230108d27a0be64414fa",
+    "modules": {
+      "tests.test_exec_history_binding": 49,
+      "tests.test_execution_analysis_evidence": 20,
+      "tests.test_grounded_prompting": 30,
+      "tests.test_policy": 2,
+      "tests.test_service_analysis_evidence": 37,
+      "tests.test_service_caller_identity": 41,
+      "tests.test_session_analysis_evidence": 43,
+      "tests.test_shared_execution_evidence": 43
+    }
+  },
+  "windows_failure_explanation": "11 pre-existing Linux-only fork/SIGCHLD cases; included in passing Linux suite, not reclassified as passed on Windows.",
+  "native_systemd": {
+    "conditions_passed": 15,
+    "report": "extra-native-execution-llm-20261118-systemd.json",
+    "real_systemd": true,
+    "real_ptrace_exec_stop": true,
+    "human_login_fixture": true,
+    "host_wide_audit": false,
+    "owned_unit_and_private_state_removed": true,
+    "temporary_dependencies_removed": true
+  },
+  "static_checks": {
+    "ruff_check_app_scripts_tests": "passed",
+    "git_diff_check": "passed"
+  },
+  "historical_llm_development360_unchanged": {
+    "tp": 163,
+    "fp": 6,
+    "fn": 17,
+    "tn": 174,
+    "precision_percent": 96.45,
+    "recall_percent": 90.56,
+    "f1_percent": 93.41,
+    "conservative_false_positive_rate_percent": 3.33,
+    "not_reevaluated_in_this_change": true,
+    "independent_production_test": false
+  },
+  "source_files": [
+    {
+      "path": "app/analyzers/openai_analyzer.py",
+      "sha256": "78b6bdf08006e29c02e6a384028dd2713d60c3dc98723185b95e27a76763ceff"
+    },
+    {
+      "path": "app/grounded_prompting.py",
+      "sha256": "ad6a03d534c0701a1a111083cc7c297171ba0e078f77f0dae6c9fb76f66fc28a"
+    },
+    {
+      "path": "app/services/zero_trust.py",
+      "sha256": "46442d9d4e65ba59921033bf86cfbdedc46fc0630fc087d931447f27c672bf14"
+    },
+    {
+      "path": "scripts/f1_lab/shared_execution_evidence.py",
+      "sha256": "c726e9a54c6de8d886f0e73bd4833f31cb8f6a2496f368b671faff5e28c2436a"
+    },
+    {
+      "path": "scripts/f1_lab/service_analysis_evidence.py",
+      "sha256": "1e72b21b28a07130f12b4cfbb8ec66fed86c1e52190587bc8ad7435bcc690a94"
+    },
+    {
+      "path": "scripts/f1_lab/service_analysis_controls.py",
+      "sha256": "4955524ea4c315ecf545b32880b6a44d2d9767129712dc7d03becdf08bdfbb2a"
+    },
+    {
+      "path": "scripts/run_exec_history_controls.py",
+      "sha256": "c854b4a36131cb5391eb45c632bbf9ebffa2bafe5ce7673dd3a60b739c804961"
+    },
+    {
+      "path": "tests/test_service_analysis_evidence.py",
+      "sha256": "2b46594d03d2d806dfcef9562b16c3c94026561665a44235d2821bf8404d91d9"
+    },
+    {
+      "path": "docs/extra-native-execution-llm-20261118.md",
+      "sha256": "17118c36e93302d20b6f4d5b05145e5dbba51b119fc1d4b29e060341b69768ae"
+    },
+    {
+      "path": "AI_HANDOFF.md",
+      "sha256": "9ac5fcfc595a14ea484909b3084cc8f204d6398c761a8edcf9c35c640c154309"
+    }
+  ]
+}

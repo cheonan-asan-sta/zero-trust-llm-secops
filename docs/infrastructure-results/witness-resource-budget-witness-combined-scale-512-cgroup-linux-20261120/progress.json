@@ -1,0 +1,67 @@
+{
+  "schema": "combined-source-and-control-resource-fixture-1",
+  "source_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26",
+  "completed": false,
+  "configured_max_receipts": 4096,
+  "limit_monkeypatched": false,
+  "all_data_synthetic": true,
+  "synthetically_signed_preload_receipts": 4094,
+  "preloaded_control_anchors": 4095,
+  "actual_observe_calls_before_preload": 1,
+  "actual_successful_collection_cycles_after_preload": 1,
+  "paid_api_calls": 0,
+  "detection_metrics_changed": false,
+  "independent_storage_verified": false,
+  "automatic_activation_allowed": false,
+  "service_memory_limit_verified": false,
+  "checks": [
+    {
+      "name": "full_preload_is_really_verified_before_last_collection",
+      "passed": true,
+      "elapsed_seconds": 28.673508029000004
+    },
+    {
+      "name": "actual_final_collection_reaches_both_4096_ledgers",
+      "passed": true,
+      "elapsed_seconds": 60.119113926000864
+    },
+    {
+      "name": "full_control_rejects_new_work_without_creating_pending",
+      "passed": true,
+      "elapsed_seconds": 61.69556298200041
+    },
+    {
+      "name": "middle_receipt_corrupt_fails_closed_without_signer_change",
+      "passed": true,
+      "elapsed_seconds": 63.218346154000756
+    },
+    {
+      "name": "middle_anchor_missing_fails_closed_without_signer_change",
+      "passed": true,
+      "elapsed_seconds": 64.6750130269993
+    },
+    {
+      "name": "held_minimum_missing_fails_closed_without_signer_change",
+      "passed": true,
+      "elapsed_seconds": 67.68842958499954
+    },
+    {
+      "name": "full_control_encrypted_backup_restore_and_keyless_inspection",
+      "passed": true,
+      "elapsed_seconds": 83.41512308900019
+    },
+    {
+      "name": "source_audit_bytes_unchanged",
+      "passed": true,
+      "elapsed_seconds": 83.70758796100017
+    }
+  ],
+  "source_rows": 100000,
+  "source_rows_synthetic_bulk_fixture": true,
+  "source_payload_bytes": 92500000,
+  "source_database_bytes": 136884224,
+  "observer_database_bytes": 2818048,
+  "signer_journal_bytes": 2818048,
+  "encrypted_package_bytes": 2819629,
+  "encrypted_package_sha256": "1f11c6ad1373bdc9469beccb4e7f59f3e3f19d16e59368ce5ed90617052dc8ef"
+}

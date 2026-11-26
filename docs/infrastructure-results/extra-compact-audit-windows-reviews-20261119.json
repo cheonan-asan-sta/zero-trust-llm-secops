@@ -1,0 +1,86 @@
+{
+  "completed": true,
+  "timestamp": "2026-11-18T17:06:44.160856+00:00",
+  "rows": 1024,
+  "padding_bytes_per_row": 4096,
+  "repetitions": 3,
+  "reviews_per_analysis": 2,
+  "distinct_analyses": 342,
+  "synthetic_storage_fixture_only": true,
+  "comparison": "same current verifier and fixed SQLite snapshot, two retention modes",
+  "source_database_unchanged": true,
+  "source_database_sha256": "80d3b3ef695ac8a2b2b7cb50b4136457cce114fe9963d1659388726033f6d8e8",
+  "python_version": "3.12.9",
+  "system": "Windows",
+  "python_peak_reduction_percent": 95.68969779591873,
+  "measurements": {
+    "materialized_compatibility_scan": {
+      "median_seconds": 0.15052930000820197,
+      "median_python_peak_bytes": 3215807,
+      "samples": [
+        {
+          "seconds": 0.15052930000820197,
+          "python_peak_bytes": 3216781,
+          "python_current_bytes": 46443,
+          "verified_rows": 1024,
+          "verified_payload_bytes": 5283117,
+          "verified_head": "c503fa280e51fa4cc36ec842e893c46629dd55346d5cbccfa47c66cf03e628fb"
+        },
+        {
+          "seconds": 0.15378490000148304,
+          "python_peak_bytes": 3211807,
+          "python_current_bytes": 41543,
+          "verified_rows": 1024,
+          "verified_payload_bytes": 5283117,
+          "verified_head": "c503fa280e51fa4cc36ec842e893c46629dd55346d5cbccfa47c66cf03e628fb"
+        },
+        {
+          "seconds": 0.14587020000908524,
+          "python_peak_bytes": 3215807,
+          "python_current_bytes": 45543,
+          "verified_rows": 1024,
+          "verified_payload_bytes": 5283117,
+          "verified_head": "c503fa280e51fa4cc36ec842e893c46629dd55346d5cbccfa47c66cf03e628fb"
+        }
+      ]
+    },
+    "compact_integrity_scan": {
+      "median_seconds": 0.1971721999871079,
+      "median_python_peak_bytes": 138611,
+      "samples": [
+        {
+          "seconds": 0.19454699999187142,
+          "python_peak_bytes": 138611,
+          "python_current_bytes": 23023,
+          "verified_rows": 1024,
+          "verified_payload_bytes": 5283117,
+          "verified_head": "c503fa280e51fa4cc36ec842e893c46629dd55346d5cbccfa47c66cf03e628fb"
+        },
+        {
+          "seconds": 0.19875979999778792,
+          "python_peak_bytes": 128861,
+          "python_current_bytes": 13323,
+          "verified_rows": 1024,
+          "verified_payload_bytes": 5283117,
+          "verified_head": "c503fa280e51fa4cc36ec842e893c46629dd55346d5cbccfa47c66cf03e628fb"
+        },
+        {
+          "seconds": 0.1971721999871079,
+          "python_peak_bytes": 138611,
+          "python_current_bytes": 23023,
+          "verified_rows": 1024,
+          "verified_payload_bytes": 5283117,
+          "verified_head": "c503fa280e51fa4cc36ec842e893c46629dd55346d5cbccfa47c66cf03e628fb"
+        }
+      ]
+    }
+  },
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "not_process_rss_or_service_sla": true,
+  "model_quality_measured": false,
+  "source_sha256": {
+    "sqlite_audit.py": "aa1695924087c6c0aab47328e228b0247ce8065c7715c36a933844a1a9d7d977",
+    "benchmark_audit_integrity.py": "53585b04a1fbd1ad211eb97c49b14e7870dbb29e0a2c6e4e9fdc31469f866056"
+  }
+}

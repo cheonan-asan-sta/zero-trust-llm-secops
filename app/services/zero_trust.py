@@ -54,6 +54,19 @@ def _digest(value: str) -> str:
     return hashlib.sha256(value.encode()).hexdigest()
 
 
+def matches_session_challenge(
+    previous: SessionDecision, proof: VerifiedSignal, *, mfa_succeeded: bool, now: datetime,
+) -> bool:
+    return bool(
+        previous.challenge_id
+        and proof.challenge_id == previous.challenge_id
+        and previous.challenge_expires_at
+        and previous.challenge_expires_at > now
+        and proof.issued_at > previous.evaluated_at
+        and mfa_succeeded
+    )
+
+
 def _validate_security_transition(previous, current, entry):
     if current.version <= MAX_EVALUATION_VERSION:
         if previous is not None and previous.version > MAX_EVALUATION_VERSION:
@@ -214,7 +227,7 @@ class ZeroTrustOperations:
         except JournalUnavailable:
             return {"ok": False, "mode": "local_simulation"}
 
-    def sessions(self, principal: Principal) -> list[SessionDecision]:
+    def sessions(self, principal: Principal, *, limit: int = 100) -> list[SessionDecision]:
         with self._transaction() as (_, entries, _):
             latest = {}
             for entry in entries:
@@ -222,8 +235,8 @@ class ZeroTrustOperations:
                     latest[entry["session"]["session_id"]] = entry["session"]
             return sorted(
                 (SessionDecision.model_validate(value) for value in latest.values()),
-                key=lambda value: value.evaluated_at, reverse=True,
-            )[:100]
+                key=lambda value: (value.evaluated_at, value.session_id), reverse=True,
+            )[:limit]
 
     def history(self, session_id: str, principal: Principal) -> list[SessionDecision]:
         with self._transaction() as (_, entries, _):
@@ -234,6 +247,16 @@ class ZeroTrustOperations:
             if not history:
                 raise SessionMissing(session_id)
             return history
+
+    def has_session_event(self, event_id: str, principal: Principal) -> bool:
+        """Check the validated journal for a session associated with the exact event."""
+        with self._transaction() as (_, entries, _):
+            return any(
+                entry["kind"] == "decision"
+                and entry["session"]["tenant_id"] == principal.tenant_id
+                and entry["session"]["event_id"] == event_id
+                for entry in entries
+            )
 
     def analysis_history(self, session_id: str, principal: Principal) -> tuple[list[SessionDecision], bool]:
         """Read the validated session history and current grant consumption atomically.
@@ -253,6 +276,42 @@ class ZeroTrustOperations:
                 e["kind"] == "access" and e.get("allowed") and e.get("grant_hash") == grant_hash
                 for e in entries))
             return history, consumed
+
+    def analysis_execution_access(self, session_id: str, principal: Principal,
+                                  request_sha256: str, *, expected_version: int) -> dict:
+        """Read the exact current grant's execution consumption, exposing no token/hash.
+
+        A signed broker receipt alone does not establish an application access.
+        This method never consumes, refunds, or issues a grant.
+        """
+        if (not isinstance(request_sha256, str) or len(request_sha256) != 64
+                or any(c not in "0123456789abcdef" for c in request_sha256)
+                or type(expected_version) is not int or expected_version < 1):
+            raise SessionConflict("invalid analysis execution binding")
+        with self._transaction() as (_, entries, _):
+            latest = self._latest(entries, principal.tenant_id, session_id)
+            if latest is None:
+                raise SessionMissing(session_id)
+            current = SessionDecision.model_validate(latest["session"])
+            matches = [e for e in entries if (
+                e["kind"] == "access" and e.get("allowed") is True
+                and e.get("reason_code") == "ACCESS_GRANTED"
+                and e.get("tenant_id") == principal.tenant_id
+                and e.get("operator_id") == principal.subject == current.operator_id
+                and e.get("session_id") == session_id
+                and e.get("session_version") == expected_version == current.version
+                and e.get("resource_id") == current.resource_id
+                and e.get("action") == current.action.value
+                and e.get("execution_request_sha256") == request_sha256
+                and latest.get("grant_hash") is not None
+                and e.get("grant_hash") == latest["grant_hash"]
+            )]
+            if len(matches) != 1:
+                raise SessionConflict("analysis requires exact execution-bound access consumption")
+            entry = matches[0]
+            return {key: entry[key] for key in (
+                "resource_id", "action", "session_version", "recorded_at"
+            )}
 
     def revalidate_sessions(self, *, now: datetime | None = None) -> dict[str, int]:
         """Persist proof expiry and withdrawn authority even with an empty inbox.
@@ -551,14 +610,20 @@ class ZeroTrustOperations:
                     sensitivity=resource.sensitivity,
                 )})
                 assessment = RuleBasedAnalyzer().assess(safe_event)
-                detection = get_sigma_engine().evaluate(get_ocsf_normalizer().normalize(safe_event))
+                scope_permitted = event.user.role in resource.roles and event.action in resource.actions
+                # For a verified subject the server-owned role list is stronger
+                # evidence than Sigma's comparison with the empty required_role.
+                detection = get_sigma_engine().evaluate(
+                    get_ocsf_normalizer().normalize(safe_event),
+                    verified_admin_scope=proof is not None and scope_permitted and event.action == "ADMIN",
+                )
                 matched = [match.rule_id for match in detection.matches]
                 risk = max(assessment.risk_score, max(
                     ({"critical": 75, "high": 50, "medium": 25}.get(match.level.value, 0)
                      for match in detection.matches), default=0,
                 ))
                 evidence = assessment.evidence
-                if event.user.role not in resource.roles or event.action not in resource.actions:
+                if not scope_permitted:
                     deny = True
                     reasons.append("RESOURCE_SCOPE_DENIED")
                 if resource.require_managed and not event.device.managed:
@@ -604,11 +669,8 @@ class ZeroTrustOperations:
                 reasons.append("SESSION_HISTORY_CAPACITY")
             challenge_verified = False
             if proof and previous and previous.challenge_id is not None:
-                challenge_verified = bool(
-                    previous.challenge_id and proof.challenge_id == previous.challenge_id
-                    and previous.challenge_expires_at and previous.challenge_expires_at > now
-                    and proof.issued_at > previous.evaluated_at
-                    and event.auth_context.mfa == "success"
+                challenge_verified = matches_session_challenge(
+                    previous, proof, mfa_succeeded=event.auth_context.mfa == "success", now=now,
                 )
                 if not challenge_verified:
                     step_up = True

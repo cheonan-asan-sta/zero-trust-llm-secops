@@ -1,0 +1,23 @@
+{
+  "full_suite_commit": "ff440648d39a37915064f8968709c58d167f784f",
+  "scope_only_commit": "4b4c50cfca3465d67d52197c33f65e44f6706928",
+  "changed_files": [
+    "tests/test_managed_exec_retention.py"
+  ],
+  "production_files_changed": [],
+  "all_test_function_bodies_unchanged": true,
+  "function_body_sha256": {
+    "fixture": "dfad09acce48d5df234e8b171d68700ff18baaf4c19455253c814a5c8e8a98ed",
+    "status": "1d014dea084b72f688694900d995a39bde8ff49695a95e2107434792f1d53b9f",
+    "test_complete_private_record_and_idempotent_publication": "345c6bb5c0cac14ce8865e05141164d68e1c5e00f0cf5392714bd2087b7500c2",
+    "test_tampering_never_reports_fresh_or_publishes": "96083bd658f2d4d979210a23f6d3556e1c19c710d6eecc1f2981c72f0120030e",
+    "test_no_pin_stale_restore_and_clock_regression": "e42a5a6f113a09803c862b371f5d38a6e6a8a4aca3baebb58eba1f76a937b3d2",
+    "test_stripping_managed_seal_cannot_downgrade_to_legacy_capture": "f4a5430c0425897321d3c6196f5dcadf54df0c71545a59d435a1c3fb6bb626f5",
+    "test_durable_outbox_resumes_without_execution_or_resigning": "bcbbde93ebd3193eac79d19393342b9e734fc25aabc26231ba1b82fbf65b8503",
+    "test_archive_restore_is_byte_exact_and_never_rolls_latest_back": "9236f2dc5c8a2bbc1b22ffd812b305fcd6bae53d505302f3e73c654aa3f23384",
+    "test_refuse_wrong_worker_before_sealing": "a4acc521831dd41111c30aee544ffbdd08d1bf437f0091285e1a6e40472908d6",
+    "test_current_revocation_and_pins_override_old_valid_seal": "e0976436b17c470bd12181c5eb2ba78d59d25bc139d3e26ee64a10f8f2618e90",
+    "test_private_paths_reject_links_and_unexpected_files": "ea092ca419ee2e233594670c405497dd22837d93c256972c24d6e7c5303bb279",
+    "test_operator_retry_cli_cannot_execute_and_health_cli_requires_caller_pin": "22f320cf45ad641a39a2f5dcbb55d0b24611e95eaaaf899a9f1d38779374134a"
+  }
+}

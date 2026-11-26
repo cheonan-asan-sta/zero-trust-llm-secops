@@ -1,0 +1,463 @@
+# ATO 우선 검토 미탐과 MFA·기기 등록 근거
+
+`extra` · 공개 RBA 분석과 무료 로컬 Keycloak·mTLS 시험.
+
+## 일반 ATO 검토에 남은 7건
+
+기존에 봉인한 RBA 예측과 발행자 정답을 대조해 ATO 검토에는 들어갔지만 OS 기반 우선 검토에서 빠진 7건을 찾았다. 같은 7개 계정의 선행 이력으로 당시 판정을 재현했다. 원본 주소·계정·토큰 값은 결과에 기록하지 않았다. [이전 ATO 평가](extra-rba-ato-separation-20261123.md)
+
+| 관측 | 해당 건수 |
+| --- | ---: |
+| 성공 로그인, 앞선 성공 관측, 새 주소·국가·ASN | 7/7 |
+| OS 계열 또는 기기 유형 변화 | 0/7 |
+| 브라우저 계열 변화 | 1/7 |
+| 직전 성공과 24시간 넘게 떨어짐 | 5/7 |
+| 검증 가능한 MFA·기기 등록 결과 | 0/7 |
+
+나머지 두 건은 각각 `(2분, 10분]`, `(60분, 720분]` 구간에 있었다. OS 변화 조건으로는 일곱 건을 우선 검토에 올릴 수 없었다. 공개 자료에는 이들이 실제로 어떤 인증 수단과 등록 상태의 기기를 사용했는지 없다. [RBA 출처와 제공 필드](https://zenodo.org/records/6782156)
+
+## 추가한 우선 검토 조건
+
+성공과 환경 변화가 관측된 경우에만 새 근거를 검토한다. 현재 Keycloak의 서명·발급자·수신자·만료 조건과 활성 세션을 대조하고, 실제 OTP로 발급받은 같은 토큰과 짧은 수명의 일회성 검토 요청을 사용한다. 이 요청에서 클라이언트가 mTLS로 증명한 인증서의 지문을 기존의 고정 등록부에 대조한다. 등록부의 테넌트·게이트웨이·계정·기기가 모두 맞고 해당 항목이 회수됐을 때, 검증된 MFA 성공과 함께 우선 검토로 올린다.
+
+정상 등록 기기는 같은 환경 변화에서도 일반 검토로 남는다. 등록을 확인할 수 없거나 다른 계정에 속한 인증서는 해당 계정의 회수 증거가 되지 않는다. 독립 위험 신호와 기존 우선 검토는 유지한다. 여기서 회수는 앱의 고정 기기 등록부에 있는 상태다. mTLS는 로컬 실험 키의 소유를 입증하며, 하드웨어 상태나 운영 기기 관리 시스템의 판정은 측정하지 않았다. [Keycloak 인증·이벤트 문서](https://www.keycloak.org/docs/26.8.0/server_admin/)
+
+## 비교 범위와 재현
+
+공개 RBA 전체 3,516,562건에서 인증 근거 결측 시 판정이 모두 동일함을 확인했다. 공개 성능은 ATO 일반 검토 18/40건, 기존 우선 검토 11/40건, 우선 검토 재현율 27.50%, F1 0.2148%, 오탐률 0.2899%로 유지된다. 7건의 실제 MFA·등록 상태와 성능 변화는 미측정이다.
+
+로컬 비교는 RBA에서 확인한 관측 패턴 7개를 짝지어 만들었다. 같은 환경 변화와 실제 OTP 세션을 사용하고, 서버 쪽 등록부에서 실험 기기의 승인·회수 상태를 구분했다. 회수 기기 사용을 우선 검토해야 하는 사례로 정한 통제 시험이다. 외부 ATO 발생률이나 운영 재현율을 추정하는 데 사용하지 않는다.
+
+| 동일 로컬 통제 14건 | 기존 OS 기반 우선 검토 | MFA·기기 등록 근거 추가 |
+| --- | ---: | ---: |
+| 회수 기기 우선 검토 | 0/7 | 7/7 |
+| 승인 기기 오탐 | 0/7 | 0/7 |
+| 우선 검토 재현율 | 0% | 100% |
+| 우선 검토 F1 | 0% | 100% |
+| 오탐률 | 0% | 0% |
+
+기존 우선 검토 양성으로 구성한 추가 통제 1건을 유지했다. 미등록·타 계정 인증서는 일반 검토로 남았다. 만료·재사용한 요청, 다른 실제 세션의 토큰, 토큰 누락, 인증서 누락은 우선 판정 전에 거부됐다. 기존 승인·권한 회수·로그아웃 확인도 통과했다. 첫 통합 실행에서 역할 조회용 관리자 토큰이 만료되어 조회가 401을 반환했다. 역할 조치 직전에 시험용 토큰을 발급하도록 조정해 최종 실행을 완료했다.
+
+```powershell
+python -m scripts.audit_rba_priority_residual <rba-projection> <sealed-confirmation> <new-residual.json>
+python -m scripts.run_keycloak_remote_acceptance <new-keycloak-report.json> --ato-residual <new-residual.json>
+```
+
+관련 회귀 128개와 Ruff를 통과했다. 일회성 Keycloak 컨테이너와 임시 mTLS 인증서·키를 정리했다. 유료 API·AWS·병합은 0회다. [집계와 검증 기록](infrastructure-results/rba-ato-device-review-20261123.json)
+
+[후속 공개 자료 검토](extra-public-mfa-device-evaluation-20261123.md)에서 Entra·Okta 등의 원본을 검사하고, 다른 RBA 계정군에서 인증 근거 결측 시 기존 판정을 보존하는지 확인했다.
+
+## 기기 등록·교체·재등록과 권한 회수 통합 시험
+
+로컬 Docker의 Keycloak 26.8.0에서 OTP로 실제 세션을 발급받고, 임시 CA의 기기 인증서로 mTLS 연결을 열었다. 앱 쪽 시험 등록부는 5개 버전을 차례로 발행하고 매번 SHA-256과 최저 버전을 고정했다. 교체와 권한 회수 전에 발급한 미사용 검토 요청도 포함해, 요청 처리 시점의 등록 상태를 적용하는지 확인했다. 재등록은 교체 기기의 동일한 등록 ID에 새 인증서를 등록하는 절차로 구성했다.
+
+같은 계정의 세 번째 OTP 세션을 대상으로 Keycloak 관리자 API에서 세션을 개별 회수했다. 관리자 응답 직후 같은 토큰과 활성 기기 인증서로 첫 요청을 보냈다. 기기 등록부의 회수는 ATO 우선 검토 판정으로 확인하고, Keycloak 역할·세션 회수는 접근 거부로 확인한다. 기기 상태의 근거는 로컬 앱 등록부와 mTLS이며, Keycloak은 OTP와 세션·역할 상태를 제공한다. [Keycloak 세션 관리 API](https://www.keycloak.org/docs-api/26.8.0/rest-api/index.html)
+
+| 시나리오 | 확인 결과 |
+| --- | --- |
+| 정상 신규 등록·교체·재등록 | 활성 인증서 요청 3건 모두 `200`, 우선 검토 오탐 0건 |
+| 교체한 기기의 기존 인증서 | 교체 전에 발급한 요청도 새 등록부에서 회수로 확인해 우선 검토 |
+| 기기 회수 직후 첫 요청 | 회수 전에 발급한 요청도 우선 검토 |
+| 재등록 이후 이전 인증서 | 이전 인증서는 회수 상태와 우선 검토 유지 |
+| Keycloak 세션 개별 회수 | 관리자 API `204`, 첫 요청 `401`, 검토 판정 미반환. 기존 토큰의 서명·OTP 연결은 여전히 유효했고 같은 계정의 다른 세션 2개도 유지 |
+| Keycloak 분석가 역할 회수 | 관리자 API `204`, 새 역할 부여 전 이전 토큰의 보호 리소스 및 리다이렉트 요청 `401`. 뷰어 부여 후 보호 요청 `403` |
+
+동일한 기기 전환 6건에서 기존 OS 조건은 `TP 0 / FN 3 / FP 0 / TN 3`, MFA·기기 근거를 사용한 판정은 `TP 3 / FN 0 / FP 0 / TN 3`이었다. 우선 검토 재현율과 F1은 각각 0%에서 100%로 바뀌었고 오탐률은 0%를 유지했다. 앞선 통합 시험의 14건을 재실행해 탐지 7/7건과 오탐 0/7건이 그대로 유지됨을 확인했다. 별도 OS 기반 우선 검토 1건도 유지했다. 이 수치는 로컬 통제 시나리오의 결과이며 공개 RBA 지표의 추가 측정은 없다.
+
+관련 회귀 128개와 Ruff를 통과했다. Keycloak 시험 컨테이너와 임시 인증서는 실행 후 정리했다. AWS와 유료 API는 사용하지 않았다. [기기 수명주기 시험 결과](infrastructure-results/local-keycloak-device-lifecycle-20261123.json)
+
+```powershell
+python -m scripts.run_keycloak_remote_acceptance <new-keycloak-report.json> --ato-residual <new-residual.json> --device-lifecycle
+```
+
+## 앱의 로그인 탐지에 연결
+
+신뢰된 수집기는 Keycloak에서 OTP에 성공한 원본 토큰, 서명·발급자·수신자, 활성 세션과 현재 역할을 대조한다. 같은 계정·테넌트·게이트웨이·기기 범위에서 서버가 직접 받은 mTLS 클라이언트 인증서를 고정 등록부로 검증한다. 등록 근거가 일치하면 로그인 이벤트의 정규 해시에 결합한 Ed25519 근거를 발급한다. 근거의 유효기간은 최대 30초이며 서명한 근거와 분석 결과에는 원본 토큰·개인키를 담지 않는다.
+
+인증된 분석 호출자는 이벤트와 서명 근거를 `POST /analysis/verified-login`에 제출한다. 앱은 `TRUSTED_SIGNAL_SOURCES_PATH`의 해당 테넌트에 등록한 전용 수집기와 `login_evidence_resource_ids`를 읽어 계정·기기·역할·리소스 범위 및 서명과 유효기간을 검증한다. 이 전용 키는 접근 허가에 쓰이는 세션 증명을 발급할 권한이 없다. 처리 중에도 수집기와 호출 권한을 다시 검사한다. 미등록·다른 계정의 기기에는 검증 근거를 발급하지 않으며 그 이벤트는 기존 `/analysis`로 처리할 수 있다.
+
+검증된 OTP 성공, 접속 위치 이상 신호, 회수된 기기 인증서가 함께 관측되면 `priority_review`를 `verified_login_detection`에 남기고 기존 검토 절차로 보낸다. 정상 등록 기기는 이 조건으로 우선 검토에 올라가지 않는다. 기존 Sigma 판정과 더 강한 권고는 보존한다. 새 결과는 기존 분석 API 결과와 같은 감사 저장소에 쌓인다. 이 경로는 로컬 규칙 판정으로 동작하며 조치는 기존 검토·승인 절차를 따른다.
+
+보류한 로컬 시험 사례는 기존 평가의 RBA 계정과 기기 수명주기 시험에서 사용한 Keycloak 계정과 겹치지 않도록 별도 계정으로 구성했다. 각 사례의 기대 판정을 수집 전에 정하고 HTTP 요청과 서명 근거에서 제외했다. 실제 OTP 세션·mTLS 연결에 통제된 접속 환경과 등록 상태를 조합했다.
+
+| 동일한 신규 로컬 사례 10건 | 기존 `/analysis` | 새 검증 근거 적용 |
+| --- | ---: | ---: |
+| 위협 우선 검토 | 0/4 | 4/4 |
+| 위협 미탐 | 4/4 | 0/4 |
+| 정상 및 근거 부족 대조군의 오탐 | 0/6 | 0/6 |
+| 재현율 / F1 | 0% / 0% | 100% / 100% |
+| 오탐률 | 0% | 0% |
+
+10건 모두 기존 Sigma 결과가 동일했다. 이전 Keycloak 대조군도 재실행해 위협 탐지 7/7건, 정상 오탐 0/7건, 별도 OS 기반 우선 검토 1건, 역할·세션 회수 직후 `401`을 유지했다. 새 검증 근거가 반영된 결과를 감사 저장소에서 다시 읽어 응답과 일치함을 확인했다. 다른 기기 인증서는 근거를 받지 못했고, 이벤트 바꿔치기·근거 변조·수집기 비활성화는 `401`로 거부됐다. 이번 수치는 로컬 시나리오 성능이며 공개 RBA·운영 환경 성능은 다시 측정하지 않았다.
+
+관련 회귀 394개와 Ruff를 통과했다. 통합 시험의 임시 감사 파일 초기화와 시험용 수집기 등록부 교체를 수정한 뒤 전체를 재실행했다. Keycloak 컨테이너를 정리했고 AWS와 유료 API는 사용하지 않았다. [사례 및 결과 JSON](infrastructure-results/local-keycloak-login-detection-20261123.json)
+
+```powershell
+python -m scripts.run_keycloak_remote_acceptance <new-keycloak-report.json> --ato-residual <new-residual.json> --device-lifecycle --login-detection
+```
+
+## 로그인 수집기의 자동 전달과 기본 탐지 전환
+
+mTLS 게이트웨이에서 로그인 관측을 마치면 `KeycloakLoginAnalysisCollector.collect`가 근거 수집과 제출을 이어서 처리한다. 수집기에 분석 API 주소와 분석 권한이 있는 서비스 자격 증명을 설정한다. 수집기는 기존 로그인 이벤트와 서명한 근거만 전송한다. Keycloak 토큰과 기기 개인키는 게이트웨이에서 사용한다.
+
+| 수집·전송 결과 | 처리 경로 |
+| --- | --- |
+| 근거 유효 | 자동으로 `POST /analysis/verified-login`에 제출 |
+| OTP 연결 또는 기기 등록 근거 없음 | 같은 이벤트를 기존 `POST /analysis`로 제출 |
+| 서명·범위가 유효한 근거가 감사 기록 저장 시작 전에 만료 | `report_expiry=true` 요청에 API가 `410`과 `verified_login_evidence_expired`를 반환. 수집기는 같은 이벤트를 기존 `/analysis`로 한 번 제출 |
+| 근거 변조, 호출 권한 거부, 수집기 키 철회, 응답 유실 | 오류를 그대로 처리하고 추가 분석 요청을 보내지 않음 |
+
+API는 저장을 시작한 뒤의 만료에 대해 전환 응답을 발행하지 않는다. 이미 기록된 분석이 중복 저장되는 것을 막는다. 기존 `/analysis/verified-login` 호출은 기본 설정에서 만료를 `401`로 처리한다. 일반 경로는 해당 배포에 설정된 기존 분석기를 사용한다. 이번 로컬 시험에는 규칙 분석기를 설정했다.
+
+위 재현 명령으로 Docker Keycloak과 mTLS 게이트웨이, 로컬 HTTP 분석 API를 함께 실행했다. 앞선 로그인 10건의 수동 제출 결과를 이번 자동 전달 결과와 대조했다. 8건은 검증 근거와 함께 전달됐고 2건은 근거 없음으로 기본 분석에 도착했다. 위협 우선 검토 4/4건과 정상·대조군 오탐 0/6건, 모든 기존 Sigma 판정이 이전 결과와 일치했다. 앞선 Keycloak 대조군의 탐지 7/7건과 오탐 0/7건도 유지했다.
+
+| 별도 비교 사례 | 기존 분석과 일치 | 기존 위협 판정 유지 | 새 오탐 |
+| --- | ---: | ---: | ---: |
+| 근거 없음 | 2/2 | 1/1 | 0/1 |
+| 서명 근거 만료 | 2/2 | 1/1 | 0/1 |
+
+근거가 없던 위협 사례는 Sigma의 반복 인증 실패 탐지를 유지했다. 서명 근거가 만료된 위협 사례는 기존 고위험 검토를 유지했다. 두 만료 사례는 실제 OTP와 mTLS 확인으로 서명을 받은 뒤 유효기간이 끝날 때까지 기다렸다. 변조된 만료 근거는 `401`로 거부됐으며 기본 분석을 일으키지 않았다. 네 사례 모두 자동 처리마다 감사 기록 한 건이 저장됐다. 별도 회귀에서 저장 직전과 직후의 만료는 각각 감사 기록 한 건을 남겼고, 응답 유실 시에는 추가 요청을 보내지 않았다.
+
+관련 회귀 402개와 Ruff를 통과했다. 시험 컨테이너를 정리했고 AWS·유료 API 사용은 0회였다. 이 비교는 로컬 통합 시험 결과다. [자동 전달 및 기본 탐지 비교 JSON](infrastructure-results/local-keycloak-login-autodelivery-20261123.json)
+
+## 분석 API 장애와 수집기 재시작 복구
+
+게이트웨이는 `KeycloakLoginAnalysisCollector`에 `spool_path`와 분석 API에서 인증하는 `tenant_id`, `collector_subject`를 설정하고 서비스 시작 시 `replaying()`을 실행한다. 분석 API는 `AUDIT_BACKEND=sqlite`로 같은 호스트의 영속 감사 DB를 사용한다. 큐 경로, API 주소, 인증된 수집자 식별자를 재시작 후에도 유지한다.
+
+수집기는 네트워크 호출 전에 로그인 이벤트와 원래 서명 근거를 SQLite 큐에 커밋한다. 연결 실패나 일시적인 API 오류가 발생하면 이벤트를 큐에 두고 복구 후 보낸다. 큐에 저장됐지만 서버 확인이 아직 없는 동기 요청은 `202`로 구분한다. 수집기는 API가 돌려준 테넌트·수집자·이벤트·본문 해시가 모두 큐 항목과 같은 경우에만 그 항목을 제거한다. 영구 거절된 항목은 검토를 위해 큐에 보존한다.
+
+`POST /analysis/login-delivery`는 테넌트·수집자·이벤트 ID로 분석 ID를 정하고, 같은 요청 본문에 대해 SQLite 감사 기록에서 처음 확정한 결과를 반환한다. 같은 감사 DB를 쓰는 로컬 프로세스는 파일 잠금으로 같은 분석이 동시에 시작되는 것을 막는다. 본문이 바뀐 채 같은 이벤트 ID로 재접수되면 `409`를 반환한다. 서명 근거가 빠지거나 첫 처리 전에 만료되면 기존 분석기를 사용한다. 후속 개선에서는 회수된 기기·접속 위치 이상이 함께 관측된 일부 만료 근거를 운영자 검토 이유에 기록한다. 이미 저장된 결과를 재전송할 때는 새 분석과 감사 기록을 만들지 않는다.
+
+| 실제 Keycloak·mTLS 복구 시험 | 복구 | 이벤트당 분석·감사 기록 | 기존 탐지와 오탐 |
+| --- | ---: | --- | --- |
+| API가 연결을 받지 않는 동안 큐 저장, 수집기 재초기화 후 자동 제출 | 2/2 | 각각 한 번·한 건 | 위협 1/1 검토, 정상 오탐 0/1 |
+| API가 저장한 직후 응답 유실, 큐·감사 DB 다시 열고 재제출 | 2/2 | 각각 한 번·한 건 | 위협 1/1 검토, 정상 오탐 0/1 |
+
+네 건의 동일 이벤트를 다시 제출해 원본 분석 결과가 돌아오고 분석 호출 수와 감사 기록 수가 그대로임을 확인했다. 이전 로그인 10건의 위협 우선 검토 4/4건·오탐 0/6건, 근거 누락·만료 4건, 기존 Keycloak 대조군 및 Sigma 판정도 이전 결과와 일치했다. 별도 프로세스 시험에서 큐 커밋 직후 강제 종료해도 입력 원본이 남았고, 다른 API 프로세스가 같은 감사 잠금을 획득하지 못했다.
+
+위 재현 명령으로 실행하며, 이번 결과는 한 로컬 호스트에서 영속 큐와 SQLite 감사 DB를 재사용한 범위다. 관련 회귀 459개와 Ruff를 통과했다. Docker 시험 컨테이너는 정리했고 AWS·유료 API 사용은 0회였다. [복구 및 재전송 비교 JSON](infrastructure-results/local-keycloak-login-recovery-20261123.json)
+
+## 장기 장애의 재시도 간격과 보류 항목 재접수
+
+연결 중단, 시간 초과, `408`, `429`, `5xx`가 연속되면 수집기가 같은 API에 보내는 모든 로그인 요청의 다음 시각을 늦춘다. 기본 간격은 1초부터 두 배씩 늘어나 60초에서 멈춘다. `429`·`503`에 유효한 `Retry-After`가 있으면 그 시각까지 대기하며 헤더로 설정할 수 있는 대기는 최대 1시간이다. 수집기가 재시작돼도 기존 대기 시각을 다시 읽는다. 성공 후에는 기본 50ms 간격으로 다음 이벤트를 보내며 `LoginRetryPolicy`에서 기본 간격, 상한, 시도 횟수, 복구 발송 간격을 조정할 수 있다.
+
+이벤트별 기본 시도 한도는 8회다. 시도를 소진하거나 `403`·`409` 같은 재시도로 해결되지 않는 상태를 받으면 원본을 보류한다. 응답 형식이 깨지거나 확인 정보가 이벤트와 다르면 해당 이벤트만 늦춰 다른 준비된 항목을 처리한다. 보류 목록은 이벤트 ID, 마지막 오류 코드와 HTTP 상태, 마지막 시도 시각, 시도 횟수를 보여준다. 권한이나 API 상태를 확인한 후 `requeue`로 해당 이벤트의 원본을 다시 대기열에 넣는다. 진행 중인 API 대기 시각과 서버 중복 방지 규칙은 재접수한 이벤트에도 적용한다.
+
+```powershell
+python -m scripts.login_delivery_spool <queue-db> --origin <analysis-api-origin> --tenant-id <tenant> --collector-subject <collector> status
+python -m scripts.login_delivery_spool <queue-db> --origin <analysis-api-origin> --tenant-id <tenant> --collector-subject <collector> held --limit 20
+python -m scripts.login_delivery_spool <queue-db> --origin <analysis-api-origin> --tenant-id <tenant> --collector-subject <collector> requeue <event-id>
+```
+
+대량 시험은 규칙 분석기를 사용하는 실제 로컬 HTTP API와 별도 SQLite 감사 DB를 사용했다. 장애 시간은 시험 시계로 약 19분 9초를 재현했다. 192건이 누적되는 동안 API 확인은 4회였고, 관측한 재시도 간격은 120초, 10초, 419초, 600초였다. 시험 설정은 4회 시도 한도와 복구 발송 간격 250ms였다. 수집기를 다시 초기화한 후에도 마지막 대기 시각을 지켰다. `503` 반복과 `403`으로 보류된 두 이벤트는 서비스와 권한 상태를 해결하고 각각 다시 접수했다. 서버에 기록한 직후 응답 한 건이 유실됐을 때는 기존 결과를 다시 받았다.
+
+| 동일한 로컬 192건 | 기존 `/analysis` | 대기열 복구 후 |
+| --- | ---: | ---: |
+| 위협 탐지 | 96/96 | 96/96 |
+| 정상 오탐 | 0/96 | 0/96 |
+| 오탐률 | 0% | 0% |
+| 위협 재현율·F1 | 100% | 100% |
+
+모든 이벤트의 기존 분석·Sigma 결과가 일치했다. 복구 단계에서 HTTP 요청은 실패·재전송을 포함해 194회였고, 이벤트별 분석 결과와 감사 기록은 총 192건이었다. 대기 및 보류 항목은 모두 0건이 됐다. 대량 시험은 로컬 통제 입력의 비교다.
+
+실제 Docker Keycloak·mTLS 재검증에서도 이전 10건의 위협 우선 검토 4/4건과 오탐 0/6건, 누락·만료 4건, 장애 복구 4건의 결과가 일치했다. 첫 재검증의 응답 유실 시험은 두 번째 이벤트가 먼저 대기 중이던 이벤트를 앞질러 전송된다고 가정했다. 새 큐 순서에 맞춰 두 응답 유실 사례를 별도 큐에서 실행하고 전체를 통과했다. 관련 회귀 145개와 Ruff를 통과했고 시험 컨테이너는 정리했다. AWS와 유료 API 사용은 0회였다. [대량 복구 및 Keycloak 비교 결과](infrastructure-results/local-login-queue-retry-20261123.json)
+
+```powershell
+python -m scripts.run_login_queue_recovery <output.json> --cases 192
+```
+
+## 로그인 대기열 운영 지표와 경보
+
+Linux 수집기에서 `replaying(status_path=...)`를 지정하면 5초 간격으로 공개 집계 파일을 발행한다. 수집기는 같은 SQLite 읽기 트랜잭션에서 대기·보류 건수, 가장 오래 대기하거나 보류된 시각, 다음 전송 시각을 얻는다. 대기 시간은 로그인 발생 시각 대신 처음 큐에 커밋한 시각부터 센다. 이전 버전에서 저장 시각이 없는 행은 집계에 포함하고 나이는 `unknown`으로 표시한다.
+
+공개 파일에는 원본 이벤트, 사용자·테넌트·기기 식별자, 개별 실패 사유, 토큰을 넣지 않는다. 기존 인증된 `signal_metrics_exporter`에 `--login-queue-profile`을 지정하면 발행 출처가 일치하고 30초보다 새 보고서의 집계만 노출한다. 저장소나 보고서가 없거나 손상되거나 만료되면 `secops_login_queue_status_success 0`을 내보내고 대기·보류 집계를 숨긴다. 기존 분석 API 접근 장애 중에도 큐 상태는 별도로 관측할 수 있다.
+
+프로필은 `schema`를 `zt-login-queue-metrics-profile-1`로 두고 `scope_sha256`, `status_file` 절대 경로, `max_pending_age_seconds`, `capacity_warning_records`를 지정한다. 수집기 소유의 출력 디렉터리에서 큐의 `publish-status <output>` 명령을 실행하면 프로필에 넣을 `scope_sha256`을 확인할 수 있다. 로컬 인수 기준으로 대기 120초, 경고 용량 8,000건을 사용한다. 경보는 각각 30초 동안 조건이 유지되면 발화한다.
+
+| 경보 | 발화 조건 |
+| --- | --- |
+| `C01LoginQueueStatusUnavailable` | 활성화된 큐의 현재 보고서 상태 확인 실패 |
+| `C01LoginQueueBacklog` | 대기 한도 초과 또는 대기 시각을 확인할 수 없는 항목 |
+| `C01LoginQueueHeld` | 수동 확인과 재접수가 필요한 보류 항목 |
+| `C01LoginQueueCapacityPressure` | 대기·보류 합계가 설정한 경고 용량에 도달 |
+
+로컬 Docker의 실제 Prometheus와 Alertmanager에서 경보 4종의 발화와 해제 알림을 받았다. 발화와 해제의 지문과 시작 시각이 일치했고, 보고서를 읽을 수 없을 때 대기·보류 값은 제공되지 않았다. 스크레이프와 알림 수신기의 인증을 확인했다. 첫 통합 확인 중 시험 코드의 HTTP 응답 바이트 비교를 수정해 다시 실행했다. `promtool` 3.15.1로 신규 규칙 20조건과 기존 witness 규칙을 확인했고 Linux 회귀 테스트 132개와 Ruff도 통과했다.
+
+이전과 동일한 192건을 다시 복구해 분석·Sigma 결과 192건, 위협 탐지 96/96건, 오탐 0/96건, 감사 기록 192건이 일치했다. 첫 실행 이후 구성한 감시와 경보는 로컬 집계 및 알림 경로에서 검증했다. AWS·유료 API 호출은 0회다. [경보와 복구 비교 결과](infrastructure-results/local-login-queue-status-20261123.json)
+
+## 대시보드 경보와 보류 재전송 승인
+
+대시보드의 **증거와 승인 → 로그인 대기열**에 대기·보류 건수, 가장 오래된 대기, 현재 Prometheus 경보를 표시한다. 설정한 스크레이프 대상의 경보 4종만 보여주며, 연락이 끊겼을 때는 확인 불가로 표시한다. 인증된 조회자는 자기 테넌트의 집계와 경보를 볼 수 있다. 대응 권한이 있는 운영자는 보류 항목의 마지막 오류 코드·HTTP 상태·시도 시간과 횟수, 최근 이력을 볼 수 있다.
+
+운영자는 **검토**를 열어 원인을 확인하고 원인과 조치를 기록한 뒤 **승인하고 재전송 등록**을 누른다. 승인에는 조회 당시의 보류 식별자와 버전, 인증된 호출 신원이 필요하다. 조회 후 항목이 다시 보류되거나 다른 운영자가 이미 승인했으면 서버는 최신 상태를 다시 검토하도록 응답한다. 동일한 운영자가 같은 내용으로 승인을 반복 제출하면 기존 승인을 반환한다. 보류 원인이 사라졌는지는 운영자가 확인하며, 실제 분석 완료는 수집기가 분석 API의 영속 확인 응답을 받은 뒤 표시된다.
+
+| 이력 | 기록하는 내용 |
+| --- | --- |
+| 승인·재전송 등록 | 승인 시각, 인증된 운영자, 확인 메모, 원래 보류 사유 |
+| 재시도 대기·다시 보류 | 시도 시각과 오류 코드. 다시 보류된 건은 새 검토와 승인이 필요 |
+| 분석 결과 확인 | API가 확인한 분석 ID와 기존 결과 재사용 여부 |
+
+대기열과 이력은 수집기의 동일한 영속 SQLite DB에 저장한다. 승인과 재접수, 수집기의 결과 기록과 완료 처리를 각각 하나의 트랜잭션으로 처리한다. 분석 감사 기록은 기존 분석 API의 감사 DB에 남는다. 승인 화면에는 로그인 본문, 서명 근거, 토큰을 전달하지 않는다. 대시보드 이력은 이 프로필의 단일 큐에 저장되며 최근 30건을 표시한다. 이벤트 ID를 지정하면 해당 이벤트의 최근 이력을 찾을 수 있다. 호스트 CLI로 직접 재접수한 과거 작업은 이 승인 이력의 범위 밖이다.
+
+수집기를 새 버전으로 먼저 시작해 기존 큐에 보류 식별자와 이력 테이블을 추가한다. 분석 API가 설치된 신뢰된 호스트에서 `DASHBOARD_LOGIN_QUEUE_PROFILE`을 아래 JSON 파일 경로로 설정한다. 수집기와 API 프로세스에는 동일한 큐 파일과 SQLite 보조 파일을 다룰 수 있는 로컬 권한이 필요하다. 운영자 브라우저에는 파일 권한이 필요 없다. `analysis_origin`은 끝 슬래시까지 수집기의 실제 기본 주소와 일치시킨다. Prometheus는 전용 루프백 HTTP 주소를 쓰고 실제 대상의 `job`·`instance` 라벨로 범위를 제한한다.
+
+```json
+{
+  "queue_file": "/var/lib/secops/login-queue.sqlite3",
+  "analysis_origin": "http://127.0.0.1:8000",
+  "tenant_id": "local",
+  "collector_subject": "keycloak-login-collector",
+  "prometheus_origin": "http://127.0.0.1:9090",
+  "scrape_job": "zt-signals",
+  "scrape_instance": "127.0.0.1:9101"
+}
+```
+
+| 동일한 로컬 통제 입력 192건 | 기존 분석 | 장애 후 대시보드 승인·복구 |
+| --- | ---: | ---: |
+| 위협 탐지 | 96/96 | 96/96 |
+| 정상 오탐 | 0/96 | 0/96 |
+| 정밀도·재현율·F1 | 100% | 100% |
+| 오탐률 | 0% | 0% |
+| 분석 감사 기록 | 192 | 192 |
+
+기존 비교와 동일하게 분석·Sigma 판정 192건이 일치했다. 보류된 두 건을 대시보드 API로 승인한 뒤 같은 승인을 각각 다시 제출했다. 승인 2건과 분석 결과 이력 2건이 남았으며, 분석 응답 유실 한 건을 재전송해도 감사 기록이 늘지 않았다. 별도 시험에서는 승인 후 같은 실패가 반복되면 새 보류가 생기고 이전 승인이 이를 해제하지 못하는 것을 확인했다.
+
+실제 로컬 Docker Prometheus와 Alertmanager로 경보 4종의 발화·해제와 대시보드용 경보 조회를 확인했다. Chrome의 데스크톱 및 390px 화면에서 경보, 보류 원인, 실제 승인 요청, 수집기 완료 이력, 조회자 권한 제한을 확인했다. 첫 브라우저 실행에서 공통 대시보드 초기화 순서 충돌을 수정한 뒤 재검증했다. Linux 회귀 82개와 Ruff가 통과했다. AWS·유료 API 호출은 0회였다. [대시보드 승인과 복구 검증 결과](infrastructure-results/local-login-queue-dashboard-20261123.json)
+
+```powershell
+python -m pytest -q tests/test_dashboard_login_queue.py
+python -m scripts.run_login_queue_recovery <new-output.json> --cases 192
+```
+
+## 실제 Keycloak 로그인부터 대시보드 재전송까지
+
+Keycloak 26.8.0에서 별도 시험 계정 4개로 실제 OTP 로그인을 하고 mTLS 게이트웨이에서 서명 근거를 수집했다. 로컬 분석 경로에 장애를 주입했다. 3건은 분석 API에 도달하기 전에 HTTP `503`을 받았고, 1건은 실제 API가 분석을 저장했지만 로컬 프록시가 확인 응답을 끊었다. 시험용 수집기의 시도 한도를 2회로 설정했다. 4건 모두 보류될 때까지 실제 수집기를 실행했다.
+
+수집기 SQLite의 공개 집계만 로컬 Linux 컨테이너로 넘겼다. 실제 상태 발행기·인증된 메트릭 내보내기·Prometheus를 사용했으며 `C01LoginQueueHeld`의 30초 발화 조건을 그대로 적용했다. Chrome에서 **증거와 승인 → 로그인 대기열**에 표시된 발화 경보와 보류 원인 `HTTP 503`·전송 중 연결 중단을 확인했다. 분석 경로를 복구해도 보류는 유지됐고, 대응 권한이 있는 별도 운영자가 메모를 남기고 승인한 후에 수집기가 4건을 재전송했다. 완료 이력을 브라우저에서 확인하고 Prometheus 경보 해제를 확인했다.
+
+| 같은 로컬 로그인 4건 | 유효 근거로 즉시 분석 | 경보 확인·승인 후 재전송 |
+| --- | ---: | ---: |
+| 우선 검토 대상 탐지 | 3/3 | 2/3 |
+| 우선 검토 미탐 | 0/3 | 1/3 |
+| 정상 오탐 | 0/1 | 0/1 |
+| 정밀도 | 100% | 100% |
+| 재현율 | 100% | 66.7% |
+| F1 | 100% | 80% |
+| 오탐률 | 0% | 0% |
+
+기존 Sigma 판정은 4건 모두 일치했다. 분석이 이미 저장된 응답 유실 사례는 근거가 만료된 뒤에도 원래 검증 결과와 우선 검토를 그대로 반환했다. 첫 분석 전에 근거가 만료된 `503` 사례 3건은 동일 이벤트의 기본 분석 결과와 일치했다. 이 중 정상과 기본 고위험 사례의 판정은 유지됐다. **첫 통합 시험에서는 회수 기기 근거가 있어야 우선 검토되는 1건이 근거 만료 뒤 기본 분석으로 진행되어 우선 검토에서 빠졌다.** 이 비교는 후속 개선 전의 로컬 통제 사례 4건에 한정한다.
+
+같은 승인 4건을 다시 제출해 기존 승인 ID를 돌려받았고, 원본 로그인 본문 4건을 분석 API에 다시 제출해 기존 결과를 돌려받았다. 이벤트당 실제 분석과 감사 기록은 각 1건이었다. 승인 이력 4건과 전송 결과 4건이 남았고, 중복 분석·감사·승인 기록은 0건이었다. 기존 Keycloak 로그인 10건도 재실행해 위협 우선 검토 4/4건과 정상·대조군 오탐 0/6건을 재현했다. 기존 근거 누락·만료 4건과 자동 복구 4건의 판정도 일치했다.
+
+로컬 Linux 회귀 45개와 Ruff가 통과했다. 시험용 Keycloak과 Prometheus 컨테이너를 정리했고 AWS·유료 API 호출은 0회였다. [통합 검증 결과 JSON](infrastructure-results/local-keycloak-dashboard-recovery-20261123.json)
+
+재현에는 기존 로컬 Keycloak 이미지 `quay.io/keycloak/keycloak:26.8.0`과 Prometheus 실행 파일이 포함된 캐시 이미지 `c03-f67136ddf24a-monitoring:latest`가 필요하다. 아래 명령은 앱 Python 환경에서 실행한다. Chrome 시험은 기존 브라우저 잠금 파일의 Playwright를 사용한다. `--dashboard-browser`를 생략하면 동일 흐름을 인증된 대시보드 API로 확인한다.
+
+```powershell
+python -m pip install --only-binary=:all: --require-hashes -r infra/runtime/requirements/browser.lock --target runtime/keycloak-dashboard-browser-tools
+$env:PYTHONPATH = Join-Path (Get-Location) 'runtime/keycloak-dashboard-browser-tools'
+python -m scripts.run_keycloak_remote_acceptance runtime/keycloak-dashboard-result.json --dashboard-recovery --dashboard-browser 'C:/Program Files/Google/Chrome/Application/chrome.exe'
+```
+
+## 만료된 회수 기기 근거의 우선 검토
+
+`POST /analysis/login-delivery`에서 로그인 성공 시점의 서명에 **회수된 기기와 접속 위치 이상이 함께 기록된 경우**를 처리한다. 최초 분석 전에 근거가 만료됐어도, 만료 후 1시간 미만에 도착했다면 원본 서명, 이벤트 해시, 테넌트·계정·기기·역할·리소스 범위와 현재 수집원·서명키 상태를 다시 검증한 후 운영자 우선 검토를 남긴다. API는 분석과 감사 기록 저장 경계에서도 수집원과 호출자 권한을 다시 검사한다. 등록 정보가 달라지거나 철회되면 저장을 진행할 수 없다.
+
+응답의 근거 상태는 `expired`다. 분석 감사 기록의 `delayed_login_review`에 관측·만료 시각, 수집원, 검토 사유를 남기며 분석 상세의 정책 사유에도 표시한다. 운영자 확인이 필요하고 기존의 더 강한 대응 제안은 유지한다. `/analysis/verified-login`의 30초 유효기간과 접근 권한 판단은 그대로 적용한다. 정상 기기, 위치 이상이 없는 경우나 만료 후 1시간 이상 지난 근거는 기본 분석으로 처리한다. 변조됐거나 사용 범위를 벗어난 근거와 현재 철회·만료된 키는 거부한다. 이미 확정된 과거 분석을 다시 보내면 원본 결과를 반환한다.
+
+| 같은 장애 시나리오 4건 | 이전 승인·재전송 | 만료 근거 검토 추가 후 |
+| --- | ---: | ---: |
+| 위협 우선 검토 | 2/3 | 3/3 |
+| 정상 오탐 | 0/1 | 0/1 |
+| 정밀도 | 100% | 100% |
+| 재현율 | 66.7% | 100% |
+| F1 | 80% | 100% |
+| 중복 분석·감사 기록 | 0 | 0 |
+
+위 명령으로 실제 Keycloak OTP·mTLS 로그인부터 API 장애, Prometheus 경보, Chrome에서 승인, 재전송과 경보 해제까지 다시 검증했다. 이전 미탐 1건이 우선 검토에 포함됐고 나머지 3건의 우선 검토 판정과 4건의 Sigma 결과는 모두 일치했다. 감사 4건과 승인·전송 이력 8건이 남았다. 기존 로그인 비교군 10건, 결측·만료 4건, 자동 복구 4건도 이전 판정과 일치했다. 처음 실행에서 정책 사유까지 이전과 같아야 한다던 시험 비교식을 보완해, 최종 재실행에서는 새 사유와 기존 판정을 각각 확인했다. Linux 회귀 158개와 Ruff가 통과했다. AWS·유료 API 호출은 0회였다. [개선 전후 검증 결과](infrastructure-results/local-keycloak-delayed-review-20261123.json)
+
+## 재전송 이력의 근거 상태와 검토 결과
+
+대시보드 **증거와 승인 → 로그인 대기열 → 최근 승인·재전송 이력**의 완료 행에서 분석 확인, 근거 상태, 분석 당시 검토 결과를 함께 볼 수 있다. 로그인 근거는 검증·만료·없음으로 표시한다. 회수 기기 위험으로 우선 검토에 오른 경우, 만료된 과거 관측을 사용한 건과 유효한 근거로 처음 분석한 건을 구분한다. 분석 ID와 기존 결과 재사용 여부도 같은 행에서 확인할 수 있다.
+
+수집기는 테넌트·수집자·이벤트·본문 해시가 일치하는 분석 확인 응답에서 근거 상태와 검토 결과만 추려 완료 이력에 추가한다. 수집기가 큐에서 해당 이벤트를 제거하는 트랜잭션에 이력도 저장한다. 이 값은 확인 응답의 기록이며 이후 운영자의 검토 진행 상태는 분석 기록에서 조회한다. 업그레이드 전 이력은 그대로 읽고 추가 정보가 없으면 **근거 상태 미기록**으로 표시한다.
+
+실제 Keycloak 로그인 4건을 다시 보류·승인·재전송했다. Chrome의 1440px·390px 화면에서 만료 근거로 우선 검토된 2건, 기존 검증 결과를 재사용한 우선 검토 1건, 검토가 필요 없던 정상 1건이 구분됐다.
+
+| 로컬 비교군 | 위협 탐지 | 정상 오탐 | 분석 감사 기록 | 중복 기록 |
+| --- | ---: | ---: | ---: | ---: |
+| 실제 Keycloak 장애·재전송 | 3/3 | 0/1 | 4 | 0 |
+| 192건 누적 후 복구 | 96/96 | 0/96 | 192 | 0 |
+
+두 비교군의 탐지·오탐과 감사 기록 수는 이전과 일치했다. Keycloak 승인·전송 이력은 8건이었다. Linux 회귀 159개에는 이전 SQLite 이력이 수집기 업그레이드 전후로 유지되는지 확인하는 시험을 추가했다. Ruff와 JavaScript 구문 검사도 통과했다. Keycloak과 Prometheus 시험 컨테이너는 정리했고 AWS·유료 API 호출은 0회였다. [재전송 이력 검증 결과](infrastructure-results/local-login-queue-review-history-20261123.json)
+
+## 재전송 이력에서 분석 감사 기록 열기
+
+완료 행의 **분석 기록 보기**로 재전송 확인에 연결된 분석 원본을 연다. 같은 이벤트가 다시 분석되더라도 이 화면은 완료 이력의 분석 ID를 기준으로 최초 확정 기록을 표시한다. 분석 ID, 분석 당시 검토 상태, 만료 근거에 따른 우선 검토 사유를 기존 분석 상세 화면에서 확인할 수 있다.
+
+상세 조회에는 로그인 대기열과 동일한 테넌트·대응 권한이 필요하다. 서버는 완료 이력과 감사 원본의 이벤트·분석 ID 및 수집자가 일치하는지 확인한다. 연결이 누락되거나 불일치하면 상세 기록을 반환하지 않는다. 조회는 새 분석이나 감사 기록을 생성하지 않는다.
+
+Chrome 1440px·390px에서 만료 근거로 우선 검토된 건의 분석 ID와 정책 사유를 확인했다. 새로고침하고 재인증한 뒤 같은 이력에서 동일한 원본이 열렸다. 실제 Keycloak 복구 4건 모두 이력의 상세 응답이 저장된 분석 원본과 일치했다. 위협 우선 검토 3/3건, 정상 오탐 0/1건, 분석 감사 기록 4건 및 중복 0건이 이전 결과와 일치했다. 기존 로그인 비교군 10건의 탐지 결과도 유지됐다.
+
+별도 로컬 시험에서는 같은 이벤트를 새로 분석한 뒤에도 이력이 기존 원본을 열었다. 조회자 전용 및 다른 테넌트 계정은 거부됐고, 완료 이력과 연결되지 않은 분석 ID와 불일치하는 참조에는 결과가 반환되지 않았다. Linux 회귀 160개와 기존 대시보드 검토 브라우저 검사 29개가 통과했다. AWS·유료 API 호출은 0회였다. [분석 상세 연결 검증 결과](infrastructure-results/local-login-queue-analysis-detail-20261123.json)
+
+## 재전송 분석의 현재 검토 연결
+
+재전송 분석 상세에는 **분석 당시 검토 상태**와 **현재 검토**가 함께 표시된다. 현재 분석 ID가 재전송 이력에 있는 ID와 일치하고 대응 권한과 검토 조건을 충족하면 **검토 상태 변경**으로 기존 검토 양식을 연다. 이 양식의 이벤트 ID는 고정된다. 검토자는 내용을 확인한 후 직접 저장한다.
+
+저장할 때 조회한 버전과 호출자 신원을 기존 조건부 검토 API에 전달한다. 확인 후 다른 검토가 저장되거나 새 분석이 생기면 오래된 요청은 `412`로 거부된다. 이 양식에서 자동으로 최신 분석을 다시 선택하지 않는다. 같은 이벤트에 새 분석이 이미 있으면 원본과 최신 기록이 다름을 안내하고 **로그 탐색**으로 연결한다. 원본의 분석·검토 상태는 저장 당시 그대로 보존되며, 성공한 검토 변경은 감사 이력에 별도 추가된다.
+
+실제 Keycloak 재전송 4건의 상세를 Chrome 1440px·390px에서 검증했다. 우선 검토 대상 1건을 **검토 대기 → 조사 중**으로 변경한 뒤 같은 분석 ID에 검토 변경 1건이 추가됐고, 상세에서 분석 당시 상태와 현재 상태가 함께 표시됐다. 정상 건에는 변경 버튼이 표시되지 않았다. 다른 건은 실행 확인 뒤 같은 이벤트를 새로 분석하고 저장을 시도해 `412`를 받았다. 같은 양식에서 재시도를 준비해도 새 분석으로 연결되지 않았고, 원본을 다시 열었을 때 최신 기록 안내와 **로그 탐색** 링크가 표시됐다.
+
+복구 자체의 위협 우선 검토 3/3건, 정상 오탐 0/1건, 분석 감사 기록 4건, 중복 기록 0건은 이전 결과와 같았다. 검토 저장과 이전 버전 거부를 확인하기 위해 복구 비교 뒤 검토 변경 1건과 통제용 새 분석 1건을 추가했다. Linux 검토 관련 회귀 94개와 기존 브라우저 검토 검사 29개가 통과했고, AWS·유료 API 호출은 0회였다. [현재 검토 연결 검증 결과](infrastructure-results/local-login-replay-current-review-20261123.json)
+
+## 로그인 대기열과 분석 감사 DB의 격리 복원
+
+로컬 원본 API와 수집기의 쓰기를 먼저 중단하고, 대기열 DB와 분석 감사 DB를 각각 SQLite 백업 API로 복제했다. 두 사본에서 SQLite `quick_check`와 SHA-256을 확인했다. 원본 시험 폴더를 제거한 뒤 새 폴더에 두 사본만 복원해 새 API 프로세스와 수집기를 시작했다. 복원 시험에서는 기존 분석 API 주소와 테넌트·수집기 식별자를 유지하고 대시보드 프로필의 큐 경로를 새 파일로 변경했다. 지문이 맞지 않으면 복원 파일을 쓰기 전에 중단했다.
+
+복원 직후 승인 대기 1건, 전송 대기 2건, 기존 완료·승인·실패 이력과 분석 감사 체인이 보존됐다. 이미 저장됐지만 응답을 잃었던 건은 원래 분석 결과를 재사용했다. 원본 위치에서 읽은 보류 승인 버전은 `412`로 거부됐고, 새 대기열에서 다시 검토한 뒤 승인할 수 있었다. 승인 요청을 다시 보내도 같은 승인 기록이 돌아왔다. 기존 재전송 이력의 분석 ID로 감사 원본도 다시 열었다.
+
+| 같은 로컬 통제 사례 4건 | 기존 직접 분석 | 격리 복원 후 |
+| --- | ---: | ---: |
+| 위협 탐지 | 2/2 | 2/2 |
+| 정상 오탐 | 0/2 | 0/2 |
+| 재현율·F1 | 100% | 100% |
+| 중복 분석·감사 기록 | 0 | 0 |
+
+Windows와 로컬 Linux Docker에서 같은 시험을 실행했다. 각 실행에서 기준선 4건과 대기열 처리 4건을 포함해 최종 감사 8건을 확인했다. 두 운영체제의 값은 같은 시나리오를 반복한 결과다. 최초 실행에서 하위 프로세스가 로컬 시험용 인증·대기열 설정을 읽도록 연결한 뒤 두 운영체제에서 다시 실행했다. 관련 Linux 회귀 41개와 Ruff를 통과했고 AWS·유료 API 호출은 0회였다. 시험의 범위는 **쓰기 정지 후 백업, 원본 경로 유실, 별도 로컬 프로세스 복원**이다. 실제 다중 호스트 설치와 온라인 백업·자동 전환은 별도 검증 범위다. [격리 복원 검증 결과](infrastructure-results/local-login-queue-isolated-restore-20261123.json)
+
+```powershell
+python -m scripts.run_login_queue_restore runtime/local-login-queue-isolated-restore.json
+```
+
+## 운영 중 대기열·감사 DB 암호화 백업
+
+Linux에서 `scripts.login_queue_backup` 명령으로 수집기와 API를 실행한 상태에서 두 SQLite DB를 복제한다. 수집기는 분석 결과가 감사 DB에 확정된 뒤 대기열에서 완료 처리한다. 이 순서에 맞춰 **대기열을 먼저 복제하고 감사 DB를 나중에 복제**한다. 두 복제 사이에 이미 분석된 대기 항목은 복원 후 기존 결과를 재사용한다. 완료 이력이 참조하는 분석 원본, 감사 해시 체인, 남은 이벤트의 범위와 본문 지문이 일치할 때만 백업을 발행한다.
+
+두 DB는 하나의 AES-256-GCM 암호문으로 보관하고, 복원 때 외부에 보존한 패키지 SHA-256과 인증 태그, 원래 분석 주소·테넌트·수집기 범위를 검증한다. 운영 계정만 접근하는 Linux 디렉터리 `0700`과 별도 32바이트 키 파일 `0600`을 사용한다. 현재 명령은 SQLite 원본당 64MiB까지 지원하며, 감사 DB 파일에 포함된 전체 기록을 패키지로 묶으므로 해당 파일을 읽을 권한이 있는 운영 계정에서 사용한다. 복원 목적지는 새 디렉터리로 지정한다. 두 DB를 확인하고 마지막에 `RESTORE_READY`를 남긴다.
+
+대기열 복제 이후 들어오고 감사 DB에도 확정되지 않은 이벤트는 다음 백업 범위다. 실제 운영 경로로 전환하기 전에 `verify`로 준비 표시와 두 파일의 바이트가 인증된 백업과 일치하는지 다시 확인한다. 승인과 관리 서비스 전환 절차는 아래 절을 따른다. 암호화 키는 패키지와 분리해서 보관한다.
+
+```bash
+python -m scripts.login_queue_backup backup /path/login-queue.sqlite3 /path/analysis-audit.sqlite3 /private/login-backup.bin --key-file /private/key --origin http://127.0.0.1:8000 --tenant-id local --collector-subject keycloak-login-collector
+python -m scripts.login_queue_backup restore /private/login-backup.bin <package-sha256> /private/restore-candidate --key-file /private/key --origin http://127.0.0.1:8000 --tenant-id local --collector-subject keycloak-login-collector
+python -m scripts.login_queue_backup verify /private/login-backup.bin <package-sha256> /private/restore-candidate --key-file /private/key --origin http://127.0.0.1:8000 --tenant-id local --collector-subject keycloak-login-collector
+python -m scripts.run_login_queue_restore /private/online-restore-result.json --online
+```
+
+로컬 Linux Docker에서 두 WAL DB를 복제하는 사이 실제 수집기와 API가 대기 2건을 처리하도록 했다. 그중 1건은 그 시점에 새로 감사 기록이 확정됐다. 원본 시험 폴더를 제거한 뒤 새 프로세스에서 복원하자 두 대기 이벤트가 기존 분석을 재사용했고, 남은 보류 건은 새 승인을 받은 뒤 처리됐다. 패키지 지문 오류, 재해시한 변조 암호문, 다른 범위, 최신 큐와 오래된 감사 DB 조합을 거부했다. 기존 복원 후보도 덮어쓰지 않았다. 준비 표시를 그대로 두고 복원 DB 한 바이트를 바꾼 후보는 재검증에서 거부됐다. 백업·복원·복원 재검증 명령을 모두 실행했다. 첫 시험에서 패키지 시험 폴더를 `0700`으로 생성하도록 고친 뒤 다시 실행했다.
+
+같은 통제 사례 4건에서 위협 탐지 **2/2**, 정상 오탐 **0/2**, 중복 분석·감사 기록 **0건**이었다. 이전 Windows 오프라인 복원과 Linux 회귀 41개를 다시 통과했고 AWS와 유료 API 호출은 0회였다. [온라인 백업·복원 결과](infrastructure-results/local-login-queue-online-backup-20261123.json)
+
+## 승인 후 로그인 대기열·감사 DB 전환
+
+Linux 단일 호스트에서 대기열과 분석 감사 DB를 하나의 세대로 선택한다. `approve`는 해당 세대, 후보 경로, 암호화 패키지 지문 및 운영자 메모를 제어 DB에 기록한다. `activate`는 현재 세대에 대한 승인인지 확인하고 준비 표시와 두 후보 DB를 다시 검증한다. 새 세대의 두 경로와 사용된 승인 ID는 SQLite 한 트랜잭션에 기록한다. 제어 디렉터리는 `0700`으로 유지한다. 기록의 승인자·전환자는 해당 운영 계정의 OS UID이며, 개인별 SSO 신원은 이 절차 바깥에서 관리한다.
+
+관리 API는 `serve-api`로 시작한다. 대시보드 프로필의 분석 주소·테넌트·수집기 범위를 확인한 뒤 활성 세대의 대기열과 감사 DB를 사용한다. 수집기 통합에서는 `managed_collector(control, client, **collector_options)` 컨텍스트가 이벤트 수신·전송·재전송 작업의 전체 생명주기를 감싸야 한다. API와 수집기는 같은 제어 디렉터리의 공유 잠금을 잡고, 관리 송신기는 추가 잠금으로 한 프로세스만 동작한다. 두 서비스가 중지되기 전에는 전환을 거부한다. 첫 등록 때 기존 직접 실행 서비스를 중지하고 이후 두 서비스 모두 같은 제어 디렉터리를 쓰도록 구성한다.
+
+이전 DB가 남아 있다면 서비스 종료 후 동일한 방식으로 SQLite 사본을 만들어 승인 후보와 비교한다. 차이가 있으면 운영자 승인이 있어도 최신 정지 상태에서 새로 캡처해야 한다. 이전 DB가 모두 유실돼 마지막 정상 백업으로 복구하는 경우에만 `--predecessor-unavailable`을 붙인다. 이전 DB의 WAL이나 저널 파일이 남아 있으면 전환을 중단한다. 백업에 들어가기 전 유실된 이벤트는 복원 범위에 포함되지 않는다. 이전 경로와 승인 이력은 전환 과정에서 삭제하지 않는다. 잠금의 적용 범위는 같은 Linux 호스트에서 같은 제어 디렉터리를 사용하는 관리 서비스다.
+
+```bash
+python -m scripts.login_queue_activation /private/control init /data/login-queue.sqlite3 /data/analysis-audit.sqlite3 --origin http://127.0.0.1:8000 --tenant-id local --collector-subject keycloak-login-collector
+python -m scripts.login_queue_activation /private/control approve /private/login-backup.bin <package-sha256> /private/restore-candidate --key-file /private/key --note '복원 후보와 백업 범위 확인'
+python -m scripts.login_queue_activation /private/control activate /private/login-backup.bin <approval-id> --key-file /private/key
+python -m scripts.login_queue_activation /private/control status
+python -m scripts.login_queue_activation /private/control serve-api --port 8000
+python -m scripts.run_login_queue_restore /private/activation-result.json --activation
+```
+
+네트워크를 차단한 로컬 Linux Docker에서 기존 API와 송신기를 각각 실행해 전환이 막히는 것을 확인했다. 두 번째 송신기, 최신 변경이 남은 이전 DB, 원본 DB 없이 남은 WAL, 승인 후 변경된 후보, 이전 세대 승인도 거부됐다. 원본 시험 파일이 유실된 뒤 명시적으로 승인한 세대 2로 전환했고, 새 API와 송신기가 복원된 두 DB를 사용했다. 이후 같은 내용의 정지 상태 백업으로 세대 3에 전환할 때는 이전 DB 두 파일을 보존했다.
+
+같은 로컬 통제 사례에서 전환 전후 위협 탐지는 **2/2**, 정상 오탐은 **0/2**, 중복 분석·감사는 **0건**이었다. 승인 대기 1건과 전송 대기 2건을 복원했고, 최종 감사 8건과 기존 분석 ID로 조회한 원본 기록을 확인했다. Linux 회귀 41개가 통과했고 AWS·유료 API 호출은 0회였다. [승인·전환 검증 결과](infrastructure-results/local-login-queue-activation-20261123.json)
+
+## systemd 재시작과 계획된 대기 호스트 인계
+
+`secops-login-queue-api@.service`와 `secops-login-queue-sender@.service`는 같은 `secops-login` 계정과 인스턴스별 제어 디렉터리를 사용한다. API를 중지하거나 재시작하면 송신기가 함께 중지되거나 재시작된다. 송신기는 시작 전에 `/auth/me`에서 API 키 인증, 테넌트, 수집기 주체, 분석자 역할을 확인한다. 분석 대상을 잘못 연결하면 큐를 보내기 전에 종료하고 systemd가 재시도한다. 요청 발송과 큐 집계 발행을 서비스의 주 스레드에서 실행하며, SIGTERM 후 현재 요청을 마무리하고 잠금을 놓는다.
+
+API 키 인증 인스턴스에 설치할 때 `/opt/secops`에 코드와 가상환경을 두고 인스턴스별 `/etc/secops/login-queue/<인스턴스>.env` 및 root 소유의 `<인스턴스>.analysis-key` 파일을 준비한다. 환경 파일에는 `LOGIN_QUEUE_API_PORT`, `LOGIN_QUEUE_ORIGIN`, SQLite·대시보드 프로필·인증 설정을 넣는다. 큐·감사·세션처럼 쓰기가 필요한 파일은 `/var/lib/secops-login-queue/<인스턴스>` 아래에 배치하고 같은 운영 계정으로 제어 디렉터리를 초기화한다. 대시보드 프로필은 활성 세대의 분석 주소·테넌트·수집기와 일치해야 한다. 기존 게이트웨이는 로그인 관측과 검증된 근거를 `stage_login(control, event, evidence)`로 저장한다. 이 입력 함수는 현재 세대 잠금 안에서 저장만 하며, 전송은 관리 송신기가 담당한다.
+
+송신기는 `/run/secops-login-queue-status/<인스턴스>/status.json`에 집계를 발행한다. 정지 후 이전 실행의 파일을 지우고, 새 세대에서는 새 경로에 결속된 집계를 발행한다. 외부 메트릭 내보내기를 사용하는 경우 운영자가 새 상태의 `scope_sha256`을 확인해 메트릭 프로필에도 반영한다. 이전 지문으로는 새 집계가 대신 표시되지 않는다.
+
+```bash
+systemctl start secops-login-queue-sender@<인스턴스>.service
+systemctl restart secops-login-queue-api@<인스턴스>.service
+systemctl stop secops-login-queue-api@<인스턴스>.service
+```
+
+**계획된 인계**는 기존 호스트의 저장소에 접근할 수 있을 때 사용한다. 대기 호스트에서 소유자 전용 제어 디렉터리를 만든 뒤 `prepare`로 대기 ID를 발급한다. 기존 호스트의 API와 송신기를 중지하고 최신 큐·감사 DB를 캡처·복원·승인한다. `retire`는 두 서비스가 잡은 잠금이 모두 풀렸고, 승인 후보가 현재 DB와 정확히 일치할 때만 기존 제어 DB에 영구 중지를 기록한다. 이후 기존 제어 디렉터리를 쓰는 API, 송신기, 수집 입력 및 전환 요청을 거부한다.
+
+`publish`로 기존 세대·대기 ID·승인 ID·백업 지문이 든 인계 기록을 발행한다. 작업이 중단돼도 같은 지문으로 다시 발행할 수 있다. 이미 신뢰하는 경로로 인계 지문과 대기 ID를 각각 확인한다. 암호화 백업과 복구 키는 분리해 전달한다. 대기 호스트에서 같은 패키지로 새 후보를 복원하고 `receive`로 인계 지문, 대상 ID, 패키지와 두 DB를 확인한다. 새 호스트는 기존 세대 번호에 1을 더해 시작한다. 기존 호스트의 제어 DB와 중지 이력을 함께 유지해야 하며, 중지 전 제어 DB 사본을 되돌려 기존 서비스를 시작하면 이 보호를 우회한다.
+
+```bash
+# 대기 호스트
+python -m scripts.login_queue_host_handoff /private/standby-control prepare
+# 기존 호스트
+python -m scripts.login_queue_host_handoff /private/active-control retire <approval-id> <standby-id> /private/login-backup.bin --key-file /private/key
+python -m scripts.login_queue_host_handoff /private/active-control publish /private/handoff.json
+# 대기 호스트에서 동일 패키지의 후보 복원 후 실행
+python -m scripts.login_queue_host_handoff /private/standby-control receive /private/handoff.json <receipt-sha256> /private/restore-candidate /private/login-backup.bin --key-file /private/key
+```
+
+인계는 **원본이 살아 있을 때 영구 중지부터 확정**하는 절차다. 갑자기 접근이 끊긴 원본의 격리 확인, 외부 트래픽 경로 교체, 자동 전환은 별도 작업이다. 시험 재현은 로컬 systemd 호스트에서 `python -m scripts.run_login_queue_systemd <새 결과 JSON 경로> --venv <Linux 가상환경>`을 사용한다.
+
+로컬 WSL의 실제 systemd에서 제어·저장 디렉터리가 서로 다른 두 서비스 인스턴스로 시험했다. API 재시작 때 송신기 PID도 바뀌었고, API 중지 때 송신기와 이전 상태 파일이 함께 내려갔다. 세대 2의 기존 직접 분석과 재전송 4건 비교에서 위협 탐지 **2/2**, 정상 오탐 **0/2**, 중복 감사 **0건**이었다. 계획된 인계에서는 대기 호스트가 시작되기 전에 퇴역 호스트의 재기동이 거부됐다. 같은 인계 기록의 재발행은 기존 지문을 유지했고, 다른 대기 ID·잘못된 지문·이미 수신한 세대로의 재초기화는 거부됐다. 대기 인스턴스가 세대 3에서 대기 2건을 이어 보냈고 감사 기록은 **기존 8건에서 10건**이 됐다. 두 결과를 다시 요청했을 때 기존 분석이 돌아왔고 감사 기록은 10건으로 유지됐다.
+
+첫 시험에서는 임시 systemd 유닛을 쓰는 경로에 복원 파일용 권한 검사를 잘못 적용해, 고유한 시험 유닛 파일만 생성하도록 고친 뒤 다시 실행했다. 별도 Docker 회귀 41개와 암호화 복원·활성화 통합 시험을 통과했다. AWS·유료 API 호출은 0회다. 두 서비스 인스턴스는 같은 WSL 호스트에서 검증했다. 물리적으로 분리된 호스트의 통신·전원 장애와 운영 트래픽 전환은 검증 범위에 남아 있다. [재시작·인계 검증 결과](infrastructure-results/local-login-queue-systemd-handoff-20261123.json)
+
+## 원본 호스트 장애 후 격리 확인과 대기 호스트 복구
+
+원본 호스트에서 계획된 영구 중지를 기록할 수 없는 경우에는 `scripts.login_queue_disaster_recovery`로 대기 호스트를 활성화한다. 원본과 별도의 관리 영역에 현재 원본의 고유 ID, 세대 번호, 최신 승인 백업 SHA-256, 분석 주소·테넌트·수집기 범위를 보관한다. 같은 체크포인트와 독립 관리자의 Ed25519 공개키 지문을 대기 호스트에 미리 고정한다. 서명 개인키, 암호화 백업 키, 원본 서비스 권한은 각각 분리한다.
+
+독립 관리자는 외부 전원·하이퍼바이저·플랫폼 관리 경로에서 **등록된 원본의 재기동이 계속 차단됐음**을 확인한다. 관리 기록에 원본 ID, 격리 방식, 기록 ID, 확인 시각을 남긴다. 연결 실패나 서비스의 일시 정지만 확인된 경우에는 발급을 보류한다. `issue`는 승인 직전 15분 이내의 확인을 요구하며, 고정된 원본과 백업 세대에 대해 지정 대기 ID 하나만 서명한다. 이 명령에는 관리 시스템을 직접 조작하는 동작이 없으며 운영자가 확인한 기록을 독립 승인에 결속한다.
+
+대기 호스트는 공개키 지문, 서명, 고정 체크포인트, 자체 대기 ID, 암호화 패키지와 두 DB를 확인한다. 두 DB의 새 세대와 격리 승인 기록은 같은 제어 DB 트랜잭션에 남긴다. 재해 복구로 등록한 대기 호스트는 일반 초기화와 계획 인계의 활성화 경로를 거부한다. 유실 범위는 마지막 백업 시점까지의 기록으로 결정하며, 복구 후 기존 호스트를 다시 쓰려면 오래된 큐·감사 상태와 자격 증명을 격리한 상태에서 새 역할로 재등록해야 한다. 같은 관리 영역에서 체크포인트와 발급 이력을 유지하고, 새 발급을 위해 이미 승인한 권한 저장소를 복제하거나 되돌리지 않는다.
+
+```bash
+# 원본과 분리된 관리 영역
+python -m scripts.login_queue_disaster_recovery /private/authority enroll-authority /private/checkpoint.json <checkpoint-sha256> <public-key-sha256>
+# 준비된 대기 호스트
+python -m scripts.login_queue_disaster_recovery /private/control enroll-standby /private/checkpoint.json <checkpoint-sha256> <public-key-sha256>
+# 외부 관리 경로의 원본 격리를 확인한 뒤 독립 관리 영역에서 발급
+python -m scripts.login_queue_disaster_recovery /private/authority issue /private/authority.key <standby-id> /private/fence-confirmation.json <confirmation-sha256>
+# 대기 호스트에 후보를 복원한 뒤 발급된 기록으로 활성화
+python -m scripts.login_queue_disaster_recovery /private/control receive /private/fenced-recovery.json /private/authority.pub /private/archive.bin /private/backup.key /private/candidate
+```
+
+`python -m scripts.run_login_queue_disaster <새 결과 JSON 경로>`로 캐시된 이미지에서 원본·대기·승인 프로세스를 분리해 재현한다. 실제 하이퍼바이저나 전원 관리 적용, 운영 트래픽 전환은 별도 검증 범위다.
+
+로컬 Docker에서 서로 다른 컨테이너와 루프백을 사용했다. 원본 송신기의 잠금을 확인한 뒤 원본을 강제 종료했다. 대기 호스트는 기록 없이 시작할 수 없었고, 독립 관리 경로에서 원본의 정확한 인스턴스가 제거됐으며 같은 ID로 재기동이 거부된 후에만 승인했다. 단순 접속 실패, 오래된 확인, 다른 원본, 다른 서명키, 중복 발급을 거부했다. 대기 쪽에서도 변조된 서명, 다른 대기 ID·세대, 승인 재사용을 거부했다.
+
+대기 호스트는 세대 2에서 대기 4건을 재전송했다. 원본이 이미 감사에 저장했지만 큐에 확인하지 못한 1건은 기존 결과를 반환했다. 감사 기록은 **5건에서 8건**이 됐으며 중복 분석·감사는 **0건**이었다. 같은 통제 사례에서 전후 위협 탐지 **2/2**, 정상 오탐 **0/2**를 확인했다. 첫 시험에서 시험 프로필과 초기 세대의 분석 주소 표기가 맞지 않아, 기존 시험 실행기와 같은 표기를 사용해 다시 검증했다. Linux Docker 회귀 41개와 기존 WSL systemd 계획 인계도 통과했다. AWS·유료 API 호출은 0회였다. [원본 강제 중단·격리·복구 결과](infrastructure-results/local-login-queue-disaster-20261123.json)
+
+## 격리 승인 이후 같은 NGINX 주소로 트래픽 전환
+
+`scripts.login_queue_ingress`는 별도 인입 호스트에서 NGINX의 `route.conf`를 발행한다. 관리자는 원본·대기 측의 서로 다른 전용 IPv4 주소·포트와 TLS 이름, 전용 CA 지문, mTLS 클라이언트 인증서·키 경로를 프로필에 고정한다. 재해 복구 체크포인트·승인 공개키·대기 ID·준비 확인용 공개키 지문도 같은 설정에 기록한다. 원본과 대기 모두 서버 인증서를 확인하고 클라이언트 인증서를 요구하는 별도 백엔드 리스너를 쓴다. 원본·대기 호스트의 관리 API는 이 백엔드에서만 접근하는 루프백에 둔다.
+
+프로필 JSON의 `primary`와 `standby`에는 각각 `address`, `port`, `tls_name`을 넣는다. `recovery`에는 재해 복구에 쓴 `checkpoint` 객체와 `authority_public_key_sha256`을 넣는다. 최상위에는 `standby_id`, `readiness_public_key_sha256`, `ca_file`, `ca_sha256`, `client_cert`, `client_key`를 둔다. 두 관리 호스트에 같은 체크포인트와 CA 지문을 전달하고, 개인키는 해당 프로세스가 접근하는 경로에만 둔다.
+
+인입 NGINX의 기존 인증된 HTTPS 리스너에 아래 내용을 적용한다. 관리 명령을 실행한 뒤 NGINX 검사·재적용을 거쳐야 요청 경로가 바뀐다. 상태 명령은 발행한 파일을 나타내므로 실제 요청의 응답도 확인한다.
+
+```nginx
+location ^~ /internal/login-queue-ready/ { return 404; }
+location / { include /private/ingress/route.conf; }
+```
+
+1. 원본 장애를 확인하면 `pause`를 실행한다. NGINX 설정 검사와 재적용 뒤 같은 주소에서 503을 확인한다.
+2. 원본 관리자가 별도 관리 경로에서 기존 서비스의 재기동을 차단한 증거를 발급받는다. 대기 호스트에서 백업을 검증·활성화하고 관리 API를 시작한다. API는 운영 계정 소유의 32바이트 Ed25519 개인키 파일을 `LOGIN_QUEUE_READINESS_KEY`로 읽는다.
+3. `promote`는 독립 관리자의 격리 서명과 체크포인트를 확인한다. 이어서 mTLS로 대기 호스트 인증서를 확인하고, 임의 질의에 대한 대기 API의 서명에서 방금 승인한 세대·대기 ID·인계 지문을 대조한다. 같은 세대의 준비가 확인되어야 대기 경로를 발행한다.
+4. `nginx -t`와 재적용 후, 기존 인증 정보로 같은 주소에 새 요청을 보내 정상 응답을 확인한다. 이 경로는 이전 원본에 자동 재전송하거나 되돌아가지 않는다. 준비 확인 이후의 백엔드 장애는 실패 응답으로 전달하며, 기존 실패 시 처리 경로가 재전송을 관리한다.
+
+```bash
+python -m scripts.login_queue_ingress /private/ingress enroll /private/route-profile.json <profile-sha256>
+python -m scripts.login_queue_ingress /private/ingress pause
+nginx -t && systemctl reload nginx
+python -m scripts.login_queue_ingress /private/ingress promote /private/fenced-recovery.json /private/authority.pub /private/readiness.pub
+nginx -t && systemctl reload nginx
+python -m scripts.login_queue_ingress /private/ingress status
+python -m scripts.run_login_queue_disaster <새 결과 JSON 경로> --routed
+```
+
+같은 로컬 NGINX 주소에서 실제 응답이 **200 → 503 → 200**으로 바뀌었다. 원본의 강제 종료 및 재기동 차단 뒤, 유효한 격리 승인만 있고 대기 API가 준비되기 전에는 503을 유지했다. 승인 서명을 바꾼 기록도 거부했다. 대기 API의 서명된 준비 확인 후에만 NGINX를 새 경로로 재적용했다. 백엔드는 클라이언트 인증서가 없는 연결을 거부했고, 인입 주소에는 내부 준비 확인 경로가 열리지 않았다.
+
+복구 이벤트 4건의 기존 탐지는 그대로였다. 같은 주소로 다시 보낸 기존 이벤트는 원래 분석을 반환했다. 새 이벤트를 두 번 보내자 처음에만 새 분석이 기록돼 감사 행이 **8건에서 9건**으로 늘었다. Linux Docker 회귀 41개와 Ruff를 통과했다. 초반 시험에서 Docker 전체 상태 조회 지연과 Windows 마운트의 앱 시작 지연을 확인해, 지정 대기 컨테이너 검사와 Linux 내부 코드 사본으로 재시험했다. 시험망은 단일 로컬 Docker 데몬의 격리 네트워크이고, NGINX와 백엔드 사이는 mTLS로 검증했다. 실제 두 호스트의 관리 경로와 운영 HTTPS 리스너는 별도 검증 범위다. AWS·유료 API 호출은 0회였다. [NGINX 장애 전환 검증 결과](infrastructure-results/local-login-queue-ingress-20261123.json)

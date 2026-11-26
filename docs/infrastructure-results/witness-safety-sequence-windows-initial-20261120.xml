@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="10" time="21.674" timestamp="2026-11-20T02:28:56.616530+09:00" hostname="희주"><testcase classname="tests.test_witness_safety_sequence" name="test_mixed_action_order_preserves_external_minima_and_exact_pending_recovery[1]" time="4.787"><failure message="PermissionError: [WinError 32] 다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다: 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser0\\sequence\\private-sequence-mky429lz\\review-2\\observer.sqlite3'">path = 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser0\\sequence\\private-sequence-mky429lz'
+onexc = &lt;function TemporaryDirectory._rmtree.&lt;locals&gt;.onexc at 0x0000021EF39098A0&gt;
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+&gt;                   os.unlink(fullname)
+E                   PermissionError: [WinError 32] 다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다: 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser0\\sequence\\private-sequence-mky429lz\\review-2\\observer.sqlite3'
+
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\shutil.py:633: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1482/test_mixed_action_order_preser0')
+seed = 1
+
+    @pytest.mark.parametrize("seed", [1, 17, 64, 20261120])
+    def test_mixed_action_order_preserves_external_minima_and_exact_pending_recovery(tmp_path, seed):
+        output = tmp_path / "sequence"
+&gt;       result = run(output, seed=seed)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_witness_safety_sequence.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\run_witness_safety_sequence.py:65: in run
+    with tempfile.TemporaryDirectory(prefix="private-sequence-", dir=output) as temporary:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\tempfile.py:946: in __exit__
+    self.cleanup()
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\tempfile.py:950: in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\tempfile.py:930: in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\shutil.py:781: in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\shutil.py:635: in _rmtree_unsafe
+    onexc(os.unlink, fullname, err)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+func = &lt;built-in function unlink&gt;
+path = 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser0\\sequence\\private-sequence-mky429lz\\review-2\\observer.sqlite3'
+exc = PermissionError(13, '다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다')
+
+    def onexc(func, path, exc):
+        if isinstance(exc, PermissionError):
+            if repeated and path == name:
+                if ignore_errors:
+                    return
+                raise
+    
+            try:
+                if path != name:
+                    _resetperms(_os.path.dirname(path))
+                _resetperms(path)
+    
+                try:
+&gt;                   _os.unlink(path)
+E                   PermissionError: [WinError 32] 다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다: 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser0\\sequence\\private-sequence-mky429lz\\review-2\\observer.sqlite3'
+
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\tempfile.py:905: PermissionError</failure></testcase><testcase classname="tests.test_witness_safety_sequence" name="test_mixed_action_order_preserves_external_minima_and_exact_pending_recovery[17]" time="4.821"><failure message="PermissionError: [WinError 32] 다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다: 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser1\\sequence\\private-sequence-m4vj9yjr\\control\\observer.sqlite3'">path = 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser1\\sequence\\private-sequence-m4vj9yjr'
+onexc = &lt;function TemporaryDirectory._rmtree.&lt;locals&gt;.onexc at 0x0000021EF77F76A0&gt;
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+&gt;                   os.unlink(fullname)
+E                   PermissionError: [WinError 32] 다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다: 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser1\\sequence\\private-sequence-m4vj9yjr\\control\\observer.sqlite3'
+
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\shutil.py:633: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1482/test_mixed_action_order_preser1')
+seed = 17
+
+    @pytest.mark.parametrize("seed", [1, 17, 64, 20261120])
+    def test_mixed_action_order_preserves_external_minima_and_exact_pending_recovery(tmp_path, seed):
+        output = tmp_path / "sequence"
+&gt;       result = run(output, seed=seed)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_witness_safety_sequence.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\run_witness_safety_sequence.py:65: in run
+    with tempfile.TemporaryDirectory(prefix="private-sequence-", dir=output) as temporary:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\tempfile.py:946: in __exit__
+    self.cleanup()
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\tempfile.py:950: in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\tempfile.py:930: in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\shutil.py:781: in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\shutil.py:635: in _rmtree_unsafe
+    onexc(os.unlink, fullname, err)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+func = &lt;built-in function unlink&gt;
+path = 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser1\\sequence\\private-sequence-m4vj9yjr\\control\\observer.sqlite3'
+exc = PermissionError(13, '다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다')
+
+    def onexc(func, path, exc):
+        if isinstance(exc, PermissionError):
+            if repeated and path == name:
+                if ignore_errors:
+                    return
+                raise
+    
+            try:
+                if path != name:
+                    _resetperms(_os.path.dirname(path))
+                _resetperms(path)
+    
+                try:
+&gt;                   _os.unlink(path)
+E                   PermissionError: [WinError 32] 다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다: 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser1\\sequence\\private-sequence-m4vj9yjr\\control\\observer.sqlite3'
+
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\tempfile.py:905: PermissionError</failure></testcase><testcase classname="tests.test_witness_safety_sequence" name="test_mixed_action_order_preserves_external_minima_and_exact_pending_recovery[64]" time="4.483"><failure message="PermissionError: [WinError 32] 다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다: 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser2\\sequence\\private-sequence-523x0j9o\\control\\observer.sqlite3'">path = 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser2\\sequence\\private-sequence-523x0j9o'
+onexc = &lt;function TemporaryDirectory._rmtree.&lt;locals&gt;.onexc at 0x0000021EF7945800&gt;
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+&gt;                   os.unlink(fullname)
+E                   PermissionError: [WinError 32] 다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다: 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser2\\sequence\\private-sequence-523x0j9o\\control\\observer.sqlite3'
+
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\shutil.py:633: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1482/test_mixed_action_order_preser2')
+seed = 64
+
+    @pytest.mark.parametrize("seed", [1, 17, 64, 20261120])
+    def test_mixed_action_order_preserves_external_minima_and_exact_pending_recovery(tmp_path, seed):
+        output = tmp_path / "sequence"
+&gt;       result = run(output, seed=seed)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_witness_safety_sequence.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\run_witness_safety_sequence.py:65: in run
+    with tempfile.TemporaryDirectory(prefix="private-sequence-", dir=output) as temporary:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\tempfile.py:946: in __exit__
+    self.cleanup()
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\tempfile.py:950: in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\tempfile.py:930: in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\shutil.py:781: in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\shutil.py:635: in _rmtree_unsafe
+    onexc(os.unlink, fullname, err)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+func = &lt;built-in function unlink&gt;
+path = 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser2\\sequence\\private-sequence-523x0j9o\\control\\observer.sqlite3'
+exc = PermissionError(13, '다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다')
+
+    def onexc(func, path, exc):
+        if isinstance(exc, PermissionError):
+            if repeated and path == name:
+                if ignore_errors:
+                    return
+                raise
+    
+            try:
+                if path != name:
+                    _resetperms(_os.path.dirname(path))
+                _resetperms(path)
+    
+                try:
+&gt;                   _os.unlink(path)
+E                   PermissionError: [WinError 32] 다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다: 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser2\\sequence\\private-sequence-523x0j9o\\control\\observer.sqlite3'
+
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\tempfile.py:905: PermissionError</failure></testcase><testcase classname="tests.test_witness_safety_sequence" name="test_mixed_action_order_preserves_external_minima_and_exact_pending_recovery[20261120]" time="4.521"><failure message="PermissionError: [WinError 32] 다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다: 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser3\\sequence\\private-sequence-6i8ndkn8\\control\\observer.sqlite3'">path = 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser3\\sequence\\private-sequence-6i8ndkn8'
+onexc = &lt;function TemporaryDirectory._rmtree.&lt;locals&gt;.onexc at 0x0000021EF79463E0&gt;
+
+    def _rmtree_unsafe(path, onexc):
+        def onerror(err):
+            onexc(os.scandir, err.filename, err)
+        results = os.walk(path, topdown=False, onerror=onerror, followlinks=os._walk_symlinks_as_files)
+        for dirpath, dirnames, filenames in results:
+            for name in dirnames:
+                fullname = os.path.join(dirpath, name)
+                try:
+                    os.rmdir(fullname)
+                except OSError as err:
+                    onexc(os.rmdir, fullname, err)
+            for name in filenames:
+                fullname = os.path.join(dirpath, name)
+                try:
+&gt;                   os.unlink(fullname)
+E                   PermissionError: [WinError 32] 다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다: 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser3\\sequence\\private-sequence-6i8ndkn8\\control\\observer.sqlite3'
+
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\shutil.py:633: PermissionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1482/test_mixed_action_order_preser3')
+seed = 20261120
+
+    @pytest.mark.parametrize("seed", [1, 17, 64, 20261120])
+    def test_mixed_action_order_preserves_external_minima_and_exact_pending_recovery(tmp_path, seed):
+        output = tmp_path / "sequence"
+&gt;       result = run(output, seed=seed)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_witness_safety_sequence.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\run_witness_safety_sequence.py:65: in run
+    with tempfile.TemporaryDirectory(prefix="private-sequence-", dir=output) as temporary:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\tempfile.py:946: in __exit__
+    self.cleanup()
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\tempfile.py:950: in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\tempfile.py:930: in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\shutil.py:781: in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\shutil.py:635: in _rmtree_unsafe
+    onexc(os.unlink, fullname, err)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+func = &lt;built-in function unlink&gt;
+path = 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser3\\sequence\\private-sequence-6i8ndkn8\\control\\observer.sqlite3'
+exc = PermissionError(13, '다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다')
+
+    def onexc(func, path, exc):
+        if isinstance(exc, PermissionError):
+            if repeated and path == name:
+                if ignore_errors:
+                    return
+                raise
+    
+            try:
+                if path != name:
+                    _resetperms(_os.path.dirname(path))
+                _resetperms(path)
+    
+                try:
+&gt;                   _os.unlink(path)
+E                   PermissionError: [WinError 32] 다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다: 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1482\\test_mixed_action_order_preser3\\sequence\\private-sequence-6i8ndkn8\\control\\observer.sqlite3'
+
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\tempfile.py:905: PermissionError</failure></testcase><testcase classname="tests.test_witness_safety_sequence" name="test_invalid_resource_policy_is_rejected_before_output_creation[bad0]" time="0.003" /><testcase classname="tests.test_witness_safety_sequence" name="test_invalid_resource_policy_is_rejected_before_output_creation[bad1]" time="0.002" /><testcase classname="tests.test_witness_safety_sequence" name="test_invalid_resource_policy_is_rejected_before_output_creation[bad2]" time="0.002" /><testcase classname="tests.test_witness_safety_sequence" name="test_invalid_resource_policy_is_rejected_before_output_creation[bad3]" time="0.002" /><testcase classname="tests.test_witness_safety_sequence" name="test_invalid_resource_policy_is_rejected_before_output_creation[bad4]" time="0.003" /><testcase classname="tests.test_witness_safety_sequence" name="test_invalid_resource_policy_is_rejected_before_output_creation[bad5]" time="0.002" /></testsuite></testsuites>

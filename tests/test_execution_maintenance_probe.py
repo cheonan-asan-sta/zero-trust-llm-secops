@@ -81,7 +81,7 @@ def test_strict_receipt(change):
     (b'{"operation":"observer_archive","operation":"server_archive"}', 1, "invalid_report"),
     (json.dumps(success() | {"operation": "server_archive"}).encode(), 0, "invalid_report"),
     (json.dumps(success()).encode(), 2, "command_exit"),
-])
+], ids=["empty-error", "private-error", "oversized-output", "duplicate-operation", "wrong-operation", "bad-exit"])
 def test_parent_checks_exit_scope_and_protocol(monkeypatch, output, code, category):
     def run(argv, **kwargs):
         assert argv == ["docker", "exec", "--interactive", "owned", "python", "-m",

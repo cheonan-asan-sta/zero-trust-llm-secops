@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="5.063" timestamp="2026-11-19T14:31:45.615389+09:00" hostname="희주"><testcase classname="tests.test_audit_review_client_binding" name="test_same_key_remapped_after_final_who_cannot_commit_as_another_caller" time="0.256"><failure message="assert 3 == 2">operator = namespace(client=&lt;scripts.audit_review_client.AuditReviewClient object at 0x0000023887948170&gt;, opener=&lt;test_audit_revi...ewer=None, review_note=None, review_updated_at=None), withdraw=&lt;function api.&lt;locals&gt;.withdraw at 0x000002388793ADE0&gt;))
+
+    def test_same_key_remapped_after_final_who_cannot_commit_as_another_caller(operator):
+        observed = snapshot(operator)
+        before = operator.api.store.integrity()["verified_lines"]
+    
+        def remap_after_who(response):
+            if str(response.url).endswith("/auth/me"):
+                main.settings.api_key_subject = "remapped-after-cli-check"
+            return response
+    
+        operator.opener.transform = remap_after_who
+        with pytest.raises(ReviewClientError) as failure:
+            operator.client.review(observed, "IN_REVIEW", "Must stay bound to the observed caller")
+&gt;       assert operator.api.store.integrity()["verified_lines"] == before
+E       assert 3 == 2
+
+tests\test_audit_review_client_binding.py:24: AssertionError</failure></testcase></testsuite></testsuites>

@@ -1,6 +1,7 @@
 """Exercise the stopped Docker job logic locally, without starting containers."""
 
 import json
+import os
 
 import pytest
 
@@ -49,6 +50,7 @@ def test_frozen_context_refuses_unclean_source_instead_of_ignoring_sidecars(tmp_
     assert {p.name: p.read_bytes() for p in source.iterdir() if p.is_file()} == before
 
 
+@pytest.mark.skipif(os.name != "posix", reason="Container recovery requires POSIX directory fsync")
 def test_mtls_job_retries_same_backup_and_preserves_context_after_publication_failure(
     tmp_path, recovery_clock, monkeypatch,
 ):

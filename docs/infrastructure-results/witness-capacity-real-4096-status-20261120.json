@@ -1,0 +1,23 @@
+{
+  "schema": "zt-witness-observer-status-2",
+  "profile_sha256": "12686984d385aaa07b0d998beae91517da9717178849c43a86186b8ce3171fd4",
+  "minimum_receipt": "9eee4e459e7df7278a6ccda36913812df275fd042cf40fbd8d368d02c178754f",
+  "checked_at": "2026-11-19T19:36:26.858143+00:00",
+  "values": {
+    "max_age_seconds": 86400,
+    "anchor_count": 1,
+    "live_checked": true,
+    "state": "capacity_exhausted",
+    "pending_started_at": null,
+    "capacity_warning": 16,
+    "unobserved_rows": 0,
+    "interval_seconds": 1,
+    "audit_minimum_verified": true,
+    "observed_at": "2026-11-19T19:36:23.638623+00:00",
+    "remaining_receipts": 0
+  },
+  "cycle_success": false,
+  "independent_storage_verified": false,
+  "automatic_activation_allowed": false,
+  "authorization_asserted": false
+}

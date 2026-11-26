@@ -1,0 +1,140 @@
+{
+  "schema": "extra-analysis-row-preservation-1",
+  "date_kst": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "pushed": false,
+  "ci_started": false,
+  "merged": false,
+  "new_tests": 13,
+  "native_conditions": 54,
+  "native_new_conditions": 0,
+  "before": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "2",
+    "skipped": "0",
+    "tests": "2",
+    "time": "4.110",
+    "timestamp": "2026-11-19T03:49:37.770288+09:00",
+    "hostname": "희주",
+    "passed": 0,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\analysis-row-before-20261119.xml",
+    "xml_sha256": "dfbf250f1da8a9830d6ab98092dd34007fa029a948667a1ac73981d2c4628d0d"
+  },
+  "json_type_before": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "1",
+    "skipped": "0",
+    "tests": "1",
+    "time": "6.388",
+    "timestamp": "2026-11-19T03:55:54.064002+09:00",
+    "hostname": "희주",
+    "passed": 0,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\analysis-row-json-type-before-20261119.xml",
+    "xml_sha256": "2d95309f1eba12986701a573598d3e8037c820a734c814f213fd14d122b26c02"
+  },
+  "initial_windows_regression": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "1",
+    "skipped": "3",
+    "tests": "290",
+    "time": "87.962",
+    "timestamp": "2026-11-19T03:52:03.842055+09:00",
+    "hostname": "희주",
+    "passed": 286,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\analysis-row-windows-20261119.xml",
+    "xml_sha256": "0a83d5890ff79e996e6e77486e2357e5b363d09128fda9c2fa20d06ca355cf5a"
+  },
+  "initial_linux_regression": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "1",
+    "skipped": "2",
+    "tests": "290",
+    "time": "100.373",
+    "timestamp": "2026-11-19T03:52:09.060896+09:00",
+    "hostname": "localhost",
+    "passed": 287,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\analysis-row-linux-20261119.xml",
+    "xml_sha256": "654aa126957debb9cba46ab6fdcace884d0088815fdab5d4e64f777ebb6eae85"
+  },
+  "focused_latest": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "31",
+    "time": "10.502",
+    "timestamp": "2026-11-19T03:56:15.719090+09:00",
+    "hostname": "희주",
+    "passed": 31,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\analysis-row-strict-focused-20261119.xml",
+    "xml_sha256": "3ada323200ed5167186a791f5a148993ed725636c29d3cc489ce7e317b56e912"
+  },
+  "windows_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "3",
+    "tests": "292",
+    "time": "94.436",
+    "timestamp": "2026-11-19T03:56:48.621967+09:00",
+    "hostname": "희주",
+    "passed": 289,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\analysis-row-windows-strict-20261119.xml",
+    "xml_sha256": "90a4a4b9facc6f4638446deb13b8fdc1a91e3da088d38a1c849836e19030b662"
+  },
+  "linux_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "2",
+    "tests": "292",
+    "time": "108.035",
+    "timestamp": "2026-11-19T03:56:51.095970+09:00",
+    "hostname": "localhost",
+    "passed": 290,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\analysis-row-linux-strict-20261119.xml",
+    "xml_sha256": "e8ece687dbe5da57f85abb8bc854b28957f7768b89eeb28cf139e836f4dcaca4"
+  },
+  "native_source_run_sha256": "0a12650a40949166ca7f5b1b532f5eb7d0a4d67e871b225e9419ac93648a75e1",
+  "proof_backend_scope": [
+    "sqlite",
+    "guarded_sqlite"
+  ],
+  "exact_json_row_and_full_chain_in_one_read_transaction": true,
+  "json_boolean_number_distinguished": true,
+  "json_wire_roundtrip_normalized": true,
+  "additional_full_scan_over_previous_phase": false,
+  "jsonl_proof_implemented": false,
+  "latest_live_state_verified": false,
+  "model_quality_reevaluated": false,
+  "source_files": [
+    {
+      "path": "app/main.py",
+      "sha256": "1904dded9efb3b48b62cb995069a27d81c826b8124eba38977f7430caa7b193f"
+    },
+    {
+      "path": "app/services/sqlite_audit.py",
+      "sha256": "69ea5d087e2a4a4516188ddb00e2da8de60b887f1eb65f7b0a8289e0398616b9"
+    },
+    {
+      "path": "tests/test_analysis_audit_binding.py",
+      "sha256": "ec4fa9793df85790c1989604782766ac061501f26c5563a96b546e979ff07997"
+    },
+    {
+      "path": "tests/test_analysis_row_preservation.py",
+      "sha256": "1d11d381fc2e661c295e1e87920ccaa2e1c61d460e866fdf7a9bcc98e74eae98"
+    }
+  ],
+  "limits": [
+    "SQLite observed snapshot only, no atomic cross-source transaction",
+    "JSONL/federated proof is next; remote DynamoDB not tested",
+    "row-loss fault is ASGI, native run repeats successful full pipeline",
+    "no paid model evaluation, multi-host, power-loss or postponed 8h soak"
+  ]
+}

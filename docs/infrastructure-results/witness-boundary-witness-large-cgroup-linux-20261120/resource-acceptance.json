@@ -1,0 +1,41 @@
+{
+  "schema": "owned-large-witness-resource-envelope-1",
+  "unit": "zt-large-witness-6d058e0034d544359aedc8da1f7c840c.service",
+  "completed": true,
+  "production_sandbox_tested": false,
+  "unit_created_in_etc": false,
+  "paid_api_calls": 0,
+  "exit_code": 0,
+  "resources": {
+    "before": {
+      "cpu_usage_nsec": 36364000,
+      "cpu_source": "cgroup2_cpu_stat",
+      "memory_peak_bytes": 6770688,
+      "memory_source": "cgroup1_memory_peak",
+      "memory_limit_bytes": 268435456,
+      "cpu_quota_percent": 50.0,
+      "throttled_periods": 0,
+      "memory_limit_hits": 0,
+      "memory_oom_kills": 0,
+      "tasks_limit": 8
+    },
+    "after": {
+      "cpu_usage_nsec": 14835563000,
+      "cpu_source": "cgroup2_cpu_stat",
+      "memory_peak_bytes": 140496896,
+      "memory_source": "cgroup1_memory_peak",
+      "memory_limit_bytes": 268435456,
+      "cpu_quota_percent": 50.0,
+      "throttled_periods": 296,
+      "memory_limit_hits": 0,
+      "memory_oom_kills": 0,
+      "tasks_limit": 8
+    },
+    "harness_exit_code": 0
+  },
+  "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "source_bytes_unchanged": true,
+  "large_fixture_checks": 8,
+  "owned_temporary_tree_removed": true,
+  "owned_unit_inactive": true
+}

@@ -123,14 +123,15 @@ def test_spool_failure_changes_http_ack_to_503_without_claiming_action_rollback(
     assert len(receipts(lab)) == 1  # No fabricated receipt for an unacknowledged capture.
 
 
-async def raw_asgi(messages, *, target_bytes=b'/a?b=1', max_chunks=10, wait=False):
+async def raw_asgi(messages, *, target_bytes=b'/a?b=1', max_chunks=10, wait=False,
+                   response_status=200, response_headers=()):
     captures,sent,seen = [],[],[]
     async def application(scope,receive,send):
         while True:
             item = await receive()
             seen.append(item['body'])
             if not item.get('more_body',False): break
-        await send({'type':'http.response.start','status':200,'headers':[]})
+        await send({'type':'http.response.start','status':response_status,'headers':iter(response_headers)})
         await send({'type':'http.response.body','body':b'ok'})
     values = iter(messages)
     async def receive():
@@ -207,3 +208,47 @@ def test_handler_failure_before_response_is_recorded_without_exposing_exception_
         'client':('127.0.0.1',1),'headers':[]},receive,send))
     assert sent[0]['status'] == 500 and b'private-exception-value' not in sent[-1]['body']
     assert captures[0].body_complete and captures[0].capture_state == 'application_error'
+
+
+
+@pytest.mark.parametrize(('status', 'headers', 'state'), [
+    (302, [(b'Location', b'/continue?token=private-example')], 'captured'),
+    (303, [], 'missing'),
+    (307, [(b'location', b'/first'), (b'location', b'/second')], 'ambiguous'),
+    (308, [(b'location', b'/invalid\x00target')], 'invalid'),
+    (304, [(b'location', b'/unrelated')], None),
+])
+def test_redirect_receipt_hashes_only_observed_response_location(tmp_path, status, headers, state):
+    lab = LocalWebCaptureLab(tmp_path/'lab', baseline())
+    captures, sent, _ = asyncio.run(raw_asgi(
+        [{'type': 'http.request', 'body': b'', 'more_body': False}],
+        response_status=status, response_headers=headers,
+    ))
+    assert sent[0]['status'] == status
+    assert sent[0]['headers'][:-1] == headers
+    lab.pipeline(captures[0])
+    row = receipts(lab)[0]
+    if state is None:
+        assert 'redirect' not in row
+        return
+    expected = hashlib.sha256(headers[0][1]).hexdigest() if state == 'captured' else None
+    assert row['redirect'] == {'state': state, 'location_sha256': expected}
+    assert 'private-example' not in json.dumps(row)
+    assert row['decision'] is None
+
+
+def test_live_redirect_receipt_binds_real_local_auth_and_resource_policy(tmp_path):
+    lab = LocalWebCaptureLab(tmp_path/'lab', baseline())
+    response = request(lab, method='GET', url='/continue')
+    assert response.status_code == 303 and response.headers['location'] == '/account'
+    row = receipts(lab)[0]
+    assert row['request_id'] == response.headers['x-capture-id']
+    assert row['redirect']['context_state'] == 'review'
+    assert len(row['redirect']['evidence_sha256']) == 64
+    assert row['redirect']['location_sha256'] == hashlib.sha256(b'/account').hexdigest()
+    assert '/account' not in json.dumps(row)
+    assert row['decision'] is None and lab.executions == 0
+
+    lab.revoke_session()
+    assert request(lab, method='GET', url='/continue').status_code == 401
+    assert all('redirect' not in receipt for receipt in receipts(lab) if receipt['status'] == 401)

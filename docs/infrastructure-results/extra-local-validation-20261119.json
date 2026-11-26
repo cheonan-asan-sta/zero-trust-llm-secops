@@ -1,0 +1,195 @@
+{
+  "schema": "extra-local-validation-1",
+  "date_kst": "2026-11-19",
+  "branch": "extra",
+  "production_source_commit": "3165fc1f483fc90e45543da2bc8456dc002230cf",
+  "application_changes_after_full_snapshot": false,
+  "full_native_linux": {
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\extra-final-full-native-linux-20261119.xml",
+    "sha256": "66c10c3cb49940b600060589dece659b77bf32cc740b86ef15605ca5c9cdc9c7",
+    "name": "pytest",
+    "errors": "0",
+    "failures": "2",
+    "skipped": "4",
+    "tests": "8417",
+    "time": "902.787",
+    "timestamp": "2026-11-19T07:26:20.314344+09:00",
+    "hostname": "localhost",
+    "passed": 8411,
+    "failed_nodes": [
+      {
+        "classname": "tests.test_native_analysis_http",
+        "name": "test_failures_return_no_success_and_release_capacity[corrupt]",
+        "detail": "app.services.federated_audit.AuditQueryUnavailable: audit page source unavailable"
+      },
+      {
+        "classname": "tests.test_native_analysis_http",
+        "name": "test_failures_return_no_success_and_release_capacity[write_error]",
+        "detail": "app.services.federated_audit.AuditQueryUnavailable: local audit writer integrity failed"
+      }
+    ],
+    "repository_xml": "docs/infrastructure-results/extra-final-full-native-linux-20261119.xml"
+  },
+  "windows_expanded": {
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\jsonl-query-source-windows-20261119.xml",
+    "sha256": "045d6bf5471f30cd32fac6b681c8296848d2a3d1b9eb437a88f83cf7f805c485",
+    "name": "pytest",
+    "errors": "0",
+    "failures": "2",
+    "skipped": "34",
+    "tests": "906",
+    "time": "337.068",
+    "timestamp": "2026-11-19T07:25:51.417721+09:00",
+    "hostname": "희주",
+    "passed": 870,
+    "failed_nodes": [
+      {
+        "classname": "tests.test_native_analysis_http",
+        "name": "test_failures_return_no_success_and_release_capacity[corrupt]",
+        "detail": "app.services.federated_audit.AuditQueryUnavailable: audit page source unavailable"
+      },
+      {
+        "classname": "tests.test_native_analysis_http",
+        "name": "test_failures_return_no_success_and_release_capacity[write_error]",
+        "detail": "app.services.federated_audit.AuditQueryUnavailable: local audit writer integrity failed"
+      }
+    ],
+    "repository_xml": "docs/infrastructure-results/jsonl-query-source-windows-20261119.xml"
+  },
+  "corrected_contract_linux": {
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\http-review-contract-linux-final-20261119.xml",
+    "sha256": "6032c65f4c92d67799b5a7313bf895ed42f7fe3938831b3d394f0c2014436fc8",
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "53",
+    "time": "33.419",
+    "timestamp": "2026-11-19T07:37:22.218319+09:00",
+    "hostname": "localhost",
+    "passed": 53,
+    "failed_nodes": [],
+    "repository_xml": "docs/infrastructure-results/http-review-contract-linux-final-20261119.xml"
+  },
+  "corrected_contract_windows": {
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\jsonl-read-contract-windows-final-20261119.xml",
+    "sha256": "f50b9c42ba6f7713bc917c01dda8b861ec86dac3433db59caa3f12d51abbb29b",
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "1",
+    "tests": "76",
+    "time": "39.478",
+    "timestamp": "2026-11-19T07:37:10.716188+09:00",
+    "hostname": "희주",
+    "passed": 75,
+    "failed_nodes": [],
+    "repository_xml": "docs/infrastructure-results/jsonl-read-contract-windows-final-20261119.xml"
+  },
+  "all_full_failed_nodes_rechecked_passing": true,
+  "unresolved_failed_nodes": [],
+  "fresh_full_suite_green_claimed": false,
+  "actual_tcp_review_race_and_kill_restart_tested": true,
+  "native_systemd_conditions": 54,
+  "native_source_sha256": "623633fc6c0cf3771e306af3a61e754d7c6a87676cacce4559f054d3d58ff35d",
+  "native_owned_resources_removed": true,
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "push": false,
+  "ci": false,
+  "merge": false,
+  "eight_hour_soak_executed": false,
+  "model_quality_reevaluated": false,
+  "historical_synthetic_360": {
+    "TP": 163,
+    "FP": 6,
+    "FN": 17,
+    "TN": 174,
+    "precision_percent": 96.45,
+    "recall_percent": 90.56,
+    "f1_percent": 93.41,
+    "fpr_percent": 3.33
+  },
+  "source_files": [
+    {
+      "path": "app/services/audit.py",
+      "sha256": "3c832a4e8ddfda4a2487f948520deda422883b448abde5e05660f21f00205ad4"
+    },
+    {
+      "path": "app/services/audit_wire.py",
+      "sha256": "5a9177fe5ec00a983f113ffebb118b5fb5cd3de233fd89657dcc7122db67d814"
+    },
+    {
+      "path": "app/main.py",
+      "sha256": "4f13c6adc5ec2746790b14c01e2f861067ca4548ba57895f8c52f02d5d17efdb"
+    },
+    {
+      "path": "app/services/sqlite_audit.py",
+      "sha256": "48b9e10ed3d316cb4157afed648b4a403745b5c93c850e51ec691586af31d96a"
+    },
+    {
+      "path": "tests/test_native_analysis_http.py",
+      "sha256": "5859c677040effc57221510faf60382fbfe8d82e60a6a2ea7fcffe35e31bebce"
+    },
+    {
+      "path": "tests/test_http_review_preconditions.py",
+      "sha256": "4d4eed3bc4ce2073275f9dd9c6e6c1eb7a95e7de31b434ebf09fac3ccf88da64"
+    },
+    {
+      "path": "tests/test_jsonl_query_source.py",
+      "sha256": "c33d2160bf97c15d4fa51b06415c22e9fd1b023cdfed0bf07331823afd71cbaf"
+    },
+    {
+      "path": "scripts/verify_extra_local_validation.py",
+      "sha256": "095cb752726d6f536bc64314fc276211df9a628abd1a903c1690effdf45eb4d2"
+    },
+    {
+      "path": "tests/test_local_validation_evidence.py",
+      "sha256": "0b02e98b86ca5d4391b96824f4ee90899d93383a2333f982cde87ef43939586c"
+    }
+  ],
+  "limits": [
+    "No fresh full rerun after test-only contract correction; raw full failures preserved",
+    "Windows full suite remains platform-limited; expanded and focused runs are distinct",
+    "UI adoption of conditional review and audit paging remains",
+    "Enterprise SSO/MFA, online revocation and independent WORM witness remain",
+    "No multi-host power-loss or real eight-hour soak verification",
+    "Historical synthetic development metrics are not independent operational accuracy"
+  ],
+  "cleanup": {
+    "owned_pytest_fixture_directories_removed": [
+      "/home/chaehj02/zt-extra-final-run-20261119/tmp",
+      "/home/chaehj02/zt-extra-http-review-final-run-20261119/tmp"
+    ],
+    "fixture_size_before_cleanup_approx_mib": 720,
+    "archived_raw_xml_and_sources_retained": true,
+    "docker_resources_created": false,
+    "unrelated_data_removed": false,
+    "wsl_virtual_disk_compacted": false
+  },
+  "local_bundle_checker": {
+    "command": "python -m scripts.verify_extra_local_validation",
+    "scope": "local report/XML consistency only; not independent witness or fresh full-suite result",
+    "runs": {
+      "windows": {
+        "repository_xml": "docs/infrastructure-results/local-validation-evidence-checker-20261119.xml",
+        "sha256": "ef4b7b9d39e4946b9e27a852816aeda1b5602ba32d1a6c896f1e5d9b705c4ca8",
+        "tests": 7,
+        "passed": 7,
+        "failures": 0,
+        "errors": 0
+      },
+      "linux": {
+        "repository_xml": "docs/infrastructure-results/local-validation-evidence-checker-linux-20261119.xml",
+        "sha256": "f9977b0eed09f9e3fb9c361b56ad10269bc8f6344395cd77b494c2b2b2d36d62",
+        "tests": 7,
+        "passed": 7,
+        "failures": 0,
+        "errors": 0
+      }
+    }
+  },
+  "closed_at_kst": "2026-11-19T08:00:33+09:00",
+  "closing_reason": "08:00 KST time cap reached; implementation stopped and owned jobs settled",
+  "remaining_work_completed_claimed": false
+}

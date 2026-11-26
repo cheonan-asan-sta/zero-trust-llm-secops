@@ -11,6 +11,8 @@ import http.client
 import json
 import math
 import os
+import time
+from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -18,6 +20,8 @@ from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_ope
 
 STATES = ("pending", "processing", "completed", "failed")
 MAX_BODY = 65536
+MAX_REJECTED_BODY_BYTES = 4096
+REJECTED_BODY_DEADLINE_SECONDS = 0.1
 # Matches the bounded active (100,000) plus cold (1,000,000) storage ceilings.
 MAX_RETAINED_RECORDS = 1_100_000
 
@@ -149,10 +153,46 @@ def handler(
     outbox_profile=None,
     recovery_profile=None,
     bundle_profile=None,
+    witness_profile=None,
+    witness_restore_profile=None,
+    login_queue_profile=None,
 ):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *_):
             pass
+
+        def send_error(self, code, message=None, explain=None):
+            if code == HTTPStatus.NOT_IMPLEMENTED:
+                self._discard_small_rejected_body()
+            super().send_error(code, message, explain)
+
+        def _discard_small_rejected_body(self):
+            # Closing with unread bytes can reset the connection before the 501 reaches the client.
+            lengths = self.headers.get_all("Content-Length", [])
+            if len(lengths) != 1 or "Transfer-Encoding" in self.headers or "Expect" in self.headers:
+                return
+            length = lengths[0]
+            if not length.isascii() or not length.isdecimal() or len(length) > len(str(MAX_REJECTED_BODY_BYTES)):
+                return
+            remaining = int(length)
+            if not 0 < remaining <= MAX_REJECTED_BODY_BYTES:
+                return
+            deadline = time.monotonic() + REJECTED_BODY_DEADLINE_SECONDS
+            previous_timeout = self.connection.gettimeout()
+            try:
+                while remaining:
+                    wait = deadline - time.monotonic()
+                    if wait <= 0:
+                        break
+                    self.connection.settimeout(wait)
+                    data = self.rfile.read1(remaining)
+                    if not data:
+                        break
+                    remaining -= len(data)
+            except OSError:
+                pass
+            finally:
+                self.connection.settimeout(previous_timeout)
 
         def do_GET(self):
             if not authorized(self.headers.get("Authorization"), token):
@@ -192,6 +232,18 @@ def handler(
                 from scripts.f1_lab.exec_bundle_status import metrics as bundle_metrics
 
                 body += bundle_metrics(bundle_profile).encode()
+            if witness_profile is not None:
+                from scripts.f1_lab.witness_observer_status import metrics as witness_metrics
+
+                body += witness_metrics(witness_profile).encode()
+            if witness_restore_profile is not None:
+                from scripts.f1_lab.witness_restore_status import metrics as witness_restore_metrics
+
+                body += witness_restore_metrics(witness_restore_profile).encode()
+            if login_queue_profile is not None:
+                from scripts.f1_lab.login_queue_status import metrics as login_queue_metrics
+
+                body += login_queue_metrics(login_queue_profile).encode()
             self.send_response(200)
             self.send_header("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
             self.send_header("Cache-Control", "no-store")
@@ -215,6 +267,9 @@ def main():
     parser.add_argument("--exec-outbox-profile", type=Path)
     parser.add_argument("--exec-recovery-profile", type=Path)
     parser.add_argument("--exec-bundle-profile", type=Path)
+    parser.add_argument("--witness-observer-profile", type=Path)
+    parser.add_argument("--witness-restore-profile", type=Path)
+    parser.add_argument("--login-queue-profile", type=Path)
     args = parser.parse_args()
     token = args.token_file.read_text(encoding="utf-8").strip()
     key = os.environ.get("C01_UPSTREAM_API_KEY", "")
@@ -245,6 +300,23 @@ def main():
         from scripts.f1_lab.exec_bundle_status import load_profile as bundle_profile_loader
 
         bundle_profile = bundle_profile_loader(args.exec_bundle_profile)
+    witness_profile = None
+    if args.witness_observer_profile:
+        from scripts.f1_lab.witness_observer_status import load_profile as witness_profile_loader
+
+        witness_profile = witness_profile_loader(args.witness_observer_profile)
+    witness_restore_profile = None
+    if args.witness_restore_profile:
+        from scripts.f1_lab.witness_restore_status import (
+            load_profile as witness_restore_profile_loader,
+        )
+
+        witness_restore_profile = witness_restore_profile_loader(args.witness_restore_profile)
+    login_queue_profile = None
+    if args.login_queue_profile:
+        from scripts.f1_lab.login_queue_status import load_profile as login_queue_profile_loader
+
+        login_queue_profile = login_queue_profile_loader(args.login_queue_profile)
     service = handler(
         validate_upstream(args.upstream),
         key,
@@ -255,6 +327,9 @@ def main():
         outbox_profile,
         recovery_profile,
         bundle_profile,
+        witness_profile,
+        witness_restore_profile,
+        login_queue_profile,
     )
     if args.server_tls_profile:
         from scripts.mtls_native import NativeServer

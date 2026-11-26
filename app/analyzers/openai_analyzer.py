@@ -11,15 +11,14 @@ from app.analyzers.structured_response import (
 )
 from app.config import Settings
 from app.grounded_prompting import (
-    GROUNDED_INSTRUCTIONS,
-    VERIFIED_EXECUTION_INSTRUCTIONS,
-    VERIFIED_SESSION_INSTRUCTIONS,
     grounded_input,
     grounded_output_type,
+    grounded_system_instructions,
     validate_grounded,
 )
 from app.models import SecurityAssessment, SecurityEvent
 from app.prompting import build_analysis_input
+from app.services.analysis_authority import current_analysis_authority
 from app.services.session_analysis_evidence import VerifiedSessionContext
 
 logger = logging.getLogger(__name__)
@@ -76,6 +75,10 @@ class OpenAIAnalyzer:
     async def analyze(self, event: SecurityEvent) -> SecurityAssessment:
         return await self._analyze(event)
 
+    async def close(self):
+        """Close a request-owned adapter; cached server adapters retain their lifetime."""
+        await self._client.close()
+
     async def analyze_with_evidence(
         self, event: SecurityEvent, context: VerifiedSessionContext
     ) -> SecurityAssessment:
@@ -89,9 +92,7 @@ class OpenAIAnalyzer:
         output_limit = self._max_output_tokens
         for attempt in range(self._incomplete_retries + 1):
             if context:
-                if context.verify_current:
-                    context.verify_current()
-                context.for_event(event)
+                await context.revalidate(event)
             try:
                 return await self._request_assessment(event, context, output_limit)
             except StructuredResponseFailure as error:
@@ -115,7 +116,27 @@ class OpenAIAnalyzer:
     async def _request_assessment(
         self, event: SecurityEvent, context: VerifiedSessionContext | None, output_limit: int
     ) -> SecurityAssessment:
-        assessment = await self._parse_assessment(self._client, event, context, output_limit)
+        authority = current_analysis_authority()
+        if authority is not None:
+            await authority.revalidate()
+            if context is not None:
+                # The added caller I/O must not make the source check older.
+                await context.revalidate(event)
+        # Neither evidence nor server caller policy can be checked by SDK retries.
+        # Standalone/offline calls retain their own configured retry policy.
+        client = (
+            self._client.with_options(max_retries=0)
+            if context is not None or authority is not None
+            else self._client
+        )
+        try:
+            assessment = await self._parse_assessment(client, event, context, output_limit)
+        except Exception:
+            if authority is not None:
+                await authority.revalidate()
+            raise
+        if authority is not None:
+            await authority.revalidate()
         return validate_grounded(assessment, event, context) if self._prompt_mode == "grounded" else assessment
 
     async def _parse_assessment(self, client, event, context, output_limit):
@@ -136,18 +157,7 @@ class OpenAIAnalyzer:
                 {
                     "role": "system",
                     "content": (
-                        GROUNDED_INSTRUCTIONS
-                        + (
-                            "\n"
-                            + VERIFIED_SESSION_INSTRUCTIONS
-                            + (
-                                "\n" + VERIFIED_EXECUTION_INSTRUCTIONS
-                                if "execution" in context.for_event(event)
-                                else ""
-                            )
-                            if context
-                            else ""
-                        )
+                        grounded_system_instructions(event, context)
                         if self._prompt_mode == "grounded"
                         else self._legacy_instructions
                     ),

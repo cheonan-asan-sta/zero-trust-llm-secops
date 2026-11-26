@@ -1,0 +1,54 @@
+{
+  "schema": "sustained-local-witness-watch-1",
+  "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "source_files": 2241,
+  "duration_requested_seconds": 240,
+  "completed": false,
+  "real_8h_soak": false,
+  "independent_storage_verified": false,
+  "detection_metrics_changed": false,
+  "paid_api_calls": 0,
+  "watch_default_interval_seconds": 60,
+  "watch_default_max_age_seconds": 180,
+  "samples": 23,
+  "appended_source_rows": 2,
+  "owned_restarts": [
+    {
+      "at_elapsed_seconds": 48.24079045800136,
+      "exit_code": -9,
+      "previous_anchor_count": 1
+    },
+    {
+      "at_elapsed_seconds": 144.4697567330004,
+      "exit_code": -9,
+      "previous_anchor_count": 3
+    }
+  ],
+  "processes": [
+    {
+      "pid": 32474,
+      "started_elapsed_seconds": 0.12203374300042924,
+      "exit_code": -9
+    },
+    {
+      "pid": 32484,
+      "started_elapsed_seconds": 48.25394484000026,
+      "exit_code": -9
+    },
+    {
+      "pid": 32489,
+      "started_elapsed_seconds": 144.48135689599985
+    }
+  ],
+  "last_sample": {
+    "elapsed_seconds": 230.67085595000026,
+    "pid": 32489,
+    "state": "healthy",
+    "anchor_count": 5,
+    "source_rows": 2,
+    "unobserved_rows": 0,
+    "rss_bytes": 71606272,
+    "status_success": true,
+    "action_required": false
+  }
+}

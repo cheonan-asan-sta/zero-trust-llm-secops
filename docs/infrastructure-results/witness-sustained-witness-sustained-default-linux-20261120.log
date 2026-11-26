@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/mnt/c/Users/chaeh/Desktop/파란학기/tmp/extra-development-20261118/runtime/run_sustained_witness_watch_20261120.py", line 81, in <module>
+    row={'elapsed_seconds':elapsed,'pid':process.pid,'state':state['state'],'anchor_count':state['anchor_count'],'source_rows':source_rows,'unobserved_rows':state['unobserved_rows'],'rss_bytes':rss,'status_success':True,'action_required':False}
+                                                                                                                                                             ~~~~~^^^^^^^^^^^^^^^^^^^
+KeyError: 'unobserved_rows'

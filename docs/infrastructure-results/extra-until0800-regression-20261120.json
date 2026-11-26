@@ -1,0 +1,705 @@
+{
+  "schema": "until0800-frozen-full-regression-evidence-1",
+  "implementation_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26",
+  "source_sha256": {
+    "app/services/audit_witness_observer.py": "98adc1f6f77744162d79fed60baa675fdaca5265ccd934cf8aebf0cdf728aec3",
+    "infra/observability/alerts.yaml": "115e55d93cf5be9648035880f8f6221e809e02a8344a559c84720660e2837ec6",
+    "infra/observability/witness-alerts.test.yaml": "5d7e1ed227e4a02d29d1b6a89f71c874d115a09a0a551717cee536d4a3db6b9b",
+    "infra/systemd/secops-audit-witness-restore-status@.service": "ae0ecf495441acb9fd56ce3fd23e41a458e3bfde8b1d90eb17326de7e238bfbc",
+    "infra/systemd/secops-audit-witness-restore-status@.timer": "421390b019423ba9ee508bccd0697223992ad73e0cc7dac06e278ccfba1d8ef4",
+    "infra/systemd/secops-audit-witness.sysusers": "65f2e8ae7d8664a7bb13af2dffa6f2d8f196e41839e5bc423669f489c3939be6",
+    "infra/systemd/secops-audit-witness@.service": "d932e78dd39284ac4c070d8268b81a3b176cfc2a2b3af4fa01c5481ac00f2161",
+    "scripts/evaluate_m6.py": "d8e346095947ac43f3194117e887f57960404219bd353a6070f67cd1266c3c7e",
+    "scripts/f1_lab/witness_observer_status.py": "c2b07cbd204e0602a5647df457cdb6e22be249522cab67303b7dde75fdff4674",
+    "scripts/run_witness_alert_flow.py": "472a9220c752c6637b57f817c2c7f8479faeaf4e089719a0939a88d916c78d41",
+    "scripts/run_witness_systemd_controls.py": "2230149d60812dbd7db0d094a4c9016a11d4055ca0970b5e608a4e14469726e7",
+    "scripts/witness_systemd_probe.py": "ed5f78d836c2762faf65d9cd0e65df46ae72a76e0de9109f70a884ef3ee2f967",
+    "tests/test_async_evidence_io.py": "c842a321996d9f8f2306edc83fc8038065422afd622f9d4b8efda021dae4a639",
+    "tests/test_audit_witness_observer.py": "7ab6d1dbee9b71a9cf05c15bb96dccaf5476d439b84ec6ac4842fce72f5a01d7",
+    "tests/test_m6_report_lock.py": "d022f748154d9b68911c0e0bfbd50a275ec1184b6039b9f3bf2a4c194143c1fe",
+    "tests/test_m6_report_publication.py": "c3544ad50f98cd4b98b6518956661ba277220c30ea147be2cc43873134e9a062",
+    "tests/test_witness_monitor_cadence.py": "a6fbdad2dda88dbaef8c6c0afbad7111c26c28788ddcd35fb8f804e39d3ac44a",
+    "tests/test_witness_systemd_templates.py": "73f75fdc23cbaaf8634b6df8a70429bc3ec9c6c0d796ff9fef6c157800c48759"
+  },
+  "bundles": {
+    "windows-full-d45-venv-20261120": {
+      "status": "complete",
+      "source_commit": "d45e91f725d15d820a477fb0c0dfec083a22a6c8",
+      "source_files": 2059,
+      "exit_code": 1,
+      "source_bytes_unchanged": true,
+      "timed_out": false,
+      "counts": {
+        "tests": 8811,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 612,
+        "passed": 8197
+      },
+      "case_outcome_map_sha256": "365cfe007ca5fc36efe3c450d6bc509fae1cf4a98a2ed74c86836a505b631141"
+    },
+    "linux-full-d45-20261120": {
+      "status": "complete",
+      "source_commit": "d45e91f725d15d820a477fb0c0dfec083a22a6c8",
+      "source_files": 2059,
+      "exit_code": 0,
+      "source_bytes_unchanged": true,
+      "timed_out": false,
+      "counts": {
+        "tests": 8811,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 5,
+        "passed": 8806
+      },
+      "case_outcome_map_sha256": "ff0b8fc126257142ac3b19c067f1c20355bc883364e42cb9d86423890b093e33"
+    },
+    "windows-full-8d2-20261120": {
+      "status": "complete",
+      "source_commit": "8d2df526843418e50124b23808c54b9597e79008",
+      "source_files": 2128,
+      "exit_code": 0,
+      "source_bytes_unchanged": true,
+      "timed_out": false,
+      "counts": {
+        "tests": 8842,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 613,
+        "passed": 8229
+      },
+      "case_outcome_map_sha256": "c5edc7723c2743769bf33db6dc04d46e5b34400c2c3bbdeee13d8e3c7ddc8568"
+    },
+    "linux-full-8d2-20261120": {
+      "status": "complete",
+      "source_commit": "8d2df526843418e50124b23808c54b9597e79008",
+      "source_files": 2128,
+      "exit_code": 0,
+      "source_bytes_unchanged": true,
+      "timed_out": false,
+      "counts": {
+        "tests": 8842,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 5,
+        "passed": 8837
+      },
+      "case_outcome_map_sha256": "16d2b9707bbc2395f10eb86605188a2ff68dce035487e3268fe1711f6161d62b"
+    },
+    "windows-full-b77-20261120": {
+      "status": "complete",
+      "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+      "source_files": 2241,
+      "exit_code": 0,
+      "source_bytes_unchanged": true,
+      "timed_out": false,
+      "counts": {
+        "tests": 8853,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 613,
+        "passed": 8240
+      },
+      "case_outcome_map_sha256": "98102135635ff9ff414cc1c9ca8ff30c79aad613543e12dfab3ad01be5b99223"
+    },
+    "linux-full-b77-20261120": {
+      "status": "complete",
+      "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+      "source_files": 2241,
+      "exit_code": 0,
+      "source_bytes_unchanged": true,
+      "timed_out": false,
+      "counts": {
+        "tests": 8853,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 5,
+        "passed": 8848
+      },
+      "case_outcome_map_sha256": "587fe74242a7e2c6cb845fb759adc4cddef4f24cac32dc73dac29c21e78391c9"
+    },
+    "windows-full-resource-20261120": {
+      "status": "complete",
+      "source_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26",
+      "source_files": 2498,
+      "exit_code": 0,
+      "source_bytes_unchanged": true,
+      "timed_out": false,
+      "counts": {
+        "tests": 8853,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 613,
+        "passed": 8240
+      },
+      "case_outcome_map_sha256": "98102135635ff9ff414cc1c9ca8ff30c79aad613543e12dfab3ad01be5b99223"
+    },
+    "linux-full-resource-20261120": {
+      "status": "complete",
+      "source_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26",
+      "source_files": 2498,
+      "exit_code": 0,
+      "source_bytes_unchanged": true,
+      "timed_out": false,
+      "counts": {
+        "tests": 8853,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 5,
+        "passed": 8848
+      },
+      "case_outcome_map_sha256": "587fe74242a7e2c6cb845fb759adc4cddef4f24cac32dc73dac29c21e78391c9"
+    }
+  },
+  "comparisons": [
+    {
+      "old": "windows-full-d45-venv-20261120",
+      "new": "windows-full-8d2-20261120",
+      "case_id_scheme": [
+        "classname",
+        "name"
+      ],
+      "old_passed": 8197,
+      "missing_old_passed_ids": [],
+      "old_passed_now_not_passed": [],
+      "recovered_failures": [
+        "tests.test_async_evidence_io::test_cancelled_sdk_source_check_settles_without_blocking_event_loop[adapter_retry]",
+        "tests.test_m6_evaluation::test_concurrent_report_writes_publish_one_complete_report"
+      ],
+      "new_ids": [
+        "tests.test_async_evidence_io::test_cancelled_sdk_source_check_settles_without_blocking_event_loop[adapter_retry_response_exceeds_old_watchdog]",
+        "tests.test_m6_report_publication::test_persistent_or_unrelated_denial_preserves_old_report_and_cleans_temporary[2-1]",
+        "tests.test_m6_report_publication::test_persistent_or_unrelated_denial_preserves_old_report_and_cleans_temporary[32-10]",
+        "tests.test_m6_report_publication::test_persistent_or_unrelated_denial_preserves_old_report_and_cleans_temporary[33-10]",
+        "tests.test_m6_report_publication::test_persistent_or_unrelated_denial_preserves_old_report_and_cleans_temporary[5-10]",
+        "tests.test_m6_report_publication::test_persistent_or_unrelated_denial_preserves_old_report_and_cleans_temporary[None-1]",
+        "tests.test_m6_report_publication::test_repeated_concurrent_publishers_leave_a_complete_single_report",
+        "tests.test_m6_report_publication::test_transient_sharing_conflict_keeps_previous_report_until_atomic_replace[32]",
+        "tests.test_m6_report_publication::test_transient_sharing_conflict_keeps_previous_report_until_atomic_replace[33]",
+        "tests.test_m6_report_publication::test_transient_sharing_conflict_keeps_previous_report_until_atomic_replace[5]",
+        "tests.test_witness_monitor_cadence::test_default_sixty_second_collection_remains_available_between_healthy_polls",
+        "tests.test_witness_monitor_cadence::test_healthy_cache_expires_after_two_configured_cycles_without_reusing_old_counts",
+        "tests.test_witness_monitor_cadence::test_invalid_or_inconsistent_cadence_never_extends_a_cache[-1]",
+        "tests.test_witness_monitor_cadence::test_invalid_or_inconsistent_cadence_never_extends_a_cache[0]",
+        "tests.test_witness_monitor_cadence::test_invalid_or_inconsistent_cadence_never_extends_a_cache[100]",
+        "tests.test_witness_monitor_cadence::test_invalid_or_inconsistent_cadence_never_extends_a_cache[3601]",
+        "tests.test_witness_monitor_cadence::test_invalid_or_inconsistent_cadence_never_extends_a_cache[60]",
+        "tests.test_witness_monitor_cadence::test_invalid_or_inconsistent_cadence_never_extends_a_cache[True]",
+        "tests.test_witness_monitor_cadence::test_legacy_reports_keep_their_old_bound_and_cannot_supply_new_fields",
+        "tests.test_witness_monitor_cadence::test_longest_supported_poll_cadence_uses_its_bound_and_still_expires",
+        "tests.test_witness_monitor_cadence::test_new_rows_remain_unobserved_during_normal_cadence_without_premature_critical_action",
+        "tests.test_witness_monitor_cadence::test_pending_has_a_cadence_budget_and_failed_cycles_keep_their_own_signal",
+        "tests.test_witness_monitor_cadence::test_pressure_is_distinct_from_exhaustion_without_marking_the_observation_healthy",
+        "tests.test_witness_monitor_cadence::test_v1_to_v2_cache_upgrade_keeps_same_pins_and_monotonic_checked_time",
+        "tests.test_witness_systemd_templates::test_collector_reuses_pinned_pending_state_and_protects_source_and_signing_key_writes",
+        "tests.test_witness_systemd_templates::test_controller_rejects_unsupported_identity_before_creating_output",
+        "tests.test_witness_systemd_templates::test_keyless_checker_can_write_only_aggregate_cache_and_has_no_key_argument",
+        "tests.test_witness_systemd_templates::test_nonlinux_probe_rejects_before_opening_any_file",
+        "tests.test_witness_systemd_templates::test_service_runs_without_network_capabilities_or_extra_process_inspection[secops-audit-witness-restore-status@.service]",
+        "tests.test_witness_systemd_templates::test_service_runs_without_network_capabilities_or_extra_process_inspection[secops-audit-witness@.service]",
+        "tests.test_witness_systemd_templates::test_timer_is_finite_cadence_and_never_replays_missed_checks_as_fresh"
+      ]
+    },
+    {
+      "old": "linux-full-d45-20261120",
+      "new": "linux-full-8d2-20261120",
+      "case_id_scheme": [
+        "classname",
+        "name"
+      ],
+      "old_passed": 8806,
+      "missing_old_passed_ids": [],
+      "old_passed_now_not_passed": [],
+      "recovered_failures": [],
+      "new_ids": [
+        "tests.test_async_evidence_io::test_cancelled_sdk_source_check_settles_without_blocking_event_loop[adapter_retry_response_exceeds_old_watchdog]",
+        "tests.test_m6_report_publication::test_persistent_or_unrelated_denial_preserves_old_report_and_cleans_temporary[2-1]",
+        "tests.test_m6_report_publication::test_persistent_or_unrelated_denial_preserves_old_report_and_cleans_temporary[32-10]",
+        "tests.test_m6_report_publication::test_persistent_or_unrelated_denial_preserves_old_report_and_cleans_temporary[33-10]",
+        "tests.test_m6_report_publication::test_persistent_or_unrelated_denial_preserves_old_report_and_cleans_temporary[5-10]",
+        "tests.test_m6_report_publication::test_persistent_or_unrelated_denial_preserves_old_report_and_cleans_temporary[None-1]",
+        "tests.test_m6_report_publication::test_repeated_concurrent_publishers_leave_a_complete_single_report",
+        "tests.test_m6_report_publication::test_transient_sharing_conflict_keeps_previous_report_until_atomic_replace[32]",
+        "tests.test_m6_report_publication::test_transient_sharing_conflict_keeps_previous_report_until_atomic_replace[33]",
+        "tests.test_m6_report_publication::test_transient_sharing_conflict_keeps_previous_report_until_atomic_replace[5]",
+        "tests.test_witness_monitor_cadence::test_default_sixty_second_collection_remains_available_between_healthy_polls",
+        "tests.test_witness_monitor_cadence::test_healthy_cache_expires_after_two_configured_cycles_without_reusing_old_counts",
+        "tests.test_witness_monitor_cadence::test_invalid_or_inconsistent_cadence_never_extends_a_cache[-1]",
+        "tests.test_witness_monitor_cadence::test_invalid_or_inconsistent_cadence_never_extends_a_cache[0]",
+        "tests.test_witness_monitor_cadence::test_invalid_or_inconsistent_cadence_never_extends_a_cache[100]",
+        "tests.test_witness_monitor_cadence::test_invalid_or_inconsistent_cadence_never_extends_a_cache[3601]",
+        "tests.test_witness_monitor_cadence::test_invalid_or_inconsistent_cadence_never_extends_a_cache[60]",
+        "tests.test_witness_monitor_cadence::test_invalid_or_inconsistent_cadence_never_extends_a_cache[True]",
+        "tests.test_witness_monitor_cadence::test_legacy_reports_keep_their_old_bound_and_cannot_supply_new_fields",
+        "tests.test_witness_monitor_cadence::test_longest_supported_poll_cadence_uses_its_bound_and_still_expires",
+        "tests.test_witness_monitor_cadence::test_new_rows_remain_unobserved_during_normal_cadence_without_premature_critical_action",
+        "tests.test_witness_monitor_cadence::test_pending_has_a_cadence_budget_and_failed_cycles_keep_their_own_signal",
+        "tests.test_witness_monitor_cadence::test_pressure_is_distinct_from_exhaustion_without_marking_the_observation_healthy",
+        "tests.test_witness_monitor_cadence::test_v1_to_v2_cache_upgrade_keeps_same_pins_and_monotonic_checked_time",
+        "tests.test_witness_systemd_templates::test_collector_reuses_pinned_pending_state_and_protects_source_and_signing_key_writes",
+        "tests.test_witness_systemd_templates::test_controller_rejects_unsupported_identity_before_creating_output",
+        "tests.test_witness_systemd_templates::test_keyless_checker_can_write_only_aggregate_cache_and_has_no_key_argument",
+        "tests.test_witness_systemd_templates::test_nonlinux_probe_rejects_before_opening_any_file",
+        "tests.test_witness_systemd_templates::test_service_runs_without_network_capabilities_or_extra_process_inspection[secops-audit-witness-restore-status@.service]",
+        "tests.test_witness_systemd_templates::test_service_runs_without_network_capabilities_or_extra_process_inspection[secops-audit-witness@.service]",
+        "tests.test_witness_systemd_templates::test_timer_is_finite_cadence_and_never_replays_missed_checks_as_fresh"
+      ]
+    },
+    {
+      "old": "windows-full-8d2-20261120",
+      "new": "windows-full-b77-20261120",
+      "case_id_scheme": [
+        "classname",
+        "name"
+      ],
+      "old_passed": 8229,
+      "missing_old_passed_ids": [],
+      "old_passed_now_not_passed": [],
+      "recovered_failures": [],
+      "new_ids": [
+        "tests.test_audit_witness_observer::test_lost_final_capacity_receipt_recovers_before_rejecting_further_work",
+        "tests.test_m6_report_lock::test_failed_creation_never_waits_or_closes_invalid_handle",
+        "tests.test_m6_report_lock::test_failed_wait_closes_handle_without_releasing_an_unowned_mutex[258-TimeoutError]",
+        "tests.test_m6_report_lock::test_failed_wait_closes_handle_without_releasing_an_unowned_mutex[4294967295-OSError]",
+        "tests.test_m6_report_lock::test_normal_and_abandoned_mutex_are_released_even_when_publication_raises[False-0]",
+        "tests.test_m6_report_lock::test_normal_and_abandoned_mutex_are_released_even_when_publication_raises[False-128]",
+        "tests.test_m6_report_lock::test_normal_and_abandoned_mutex_are_released_even_when_publication_raises[True-0]",
+        "tests.test_m6_report_lock::test_normal_and_abandoned_mutex_are_released_even_when_publication_raises[True-128]",
+        "tests.test_m6_report_lock::test_release_failure_still_closes_handle",
+        "tests.test_witness_monitor_cadence::test_known_exhaustion_is_urgent_even_during_pending_or_new_row_grace[legacy_pending]",
+        "tests.test_witness_monitor_cadence::test_known_exhaustion_is_urgent_even_during_pending_or_new_row_grace[new_rows]"
+      ]
+    },
+    {
+      "old": "linux-full-8d2-20261120",
+      "new": "linux-full-b77-20261120",
+      "case_id_scheme": [
+        "classname",
+        "name"
+      ],
+      "old_passed": 8837,
+      "missing_old_passed_ids": [],
+      "old_passed_now_not_passed": [],
+      "recovered_failures": [],
+      "new_ids": [
+        "tests.test_audit_witness_observer::test_lost_final_capacity_receipt_recovers_before_rejecting_further_work",
+        "tests.test_m6_report_lock::test_failed_creation_never_waits_or_closes_invalid_handle",
+        "tests.test_m6_report_lock::test_failed_wait_closes_handle_without_releasing_an_unowned_mutex[258-TimeoutError]",
+        "tests.test_m6_report_lock::test_failed_wait_closes_handle_without_releasing_an_unowned_mutex[4294967295-OSError]",
+        "tests.test_m6_report_lock::test_normal_and_abandoned_mutex_are_released_even_when_publication_raises[False-0]",
+        "tests.test_m6_report_lock::test_normal_and_abandoned_mutex_are_released_even_when_publication_raises[False-128]",
+        "tests.test_m6_report_lock::test_normal_and_abandoned_mutex_are_released_even_when_publication_raises[True-0]",
+        "tests.test_m6_report_lock::test_normal_and_abandoned_mutex_are_released_even_when_publication_raises[True-128]",
+        "tests.test_m6_report_lock::test_release_failure_still_closes_handle",
+        "tests.test_witness_monitor_cadence::test_known_exhaustion_is_urgent_even_during_pending_or_new_row_grace[legacy_pending]",
+        "tests.test_witness_monitor_cadence::test_known_exhaustion_is_urgent_even_during_pending_or_new_row_grace[new_rows]"
+      ]
+    },
+    {
+      "old": "windows-full-b77-20261120",
+      "new": "windows-full-resource-20261120",
+      "case_id_scheme": [
+        "classname",
+        "name"
+      ],
+      "old_passed": 8240,
+      "missing_old_passed_ids": [],
+      "old_passed_now_not_passed": [],
+      "recovered_failures": [],
+      "new_ids": []
+    },
+    {
+      "old": "linux-full-b77-20261120",
+      "new": "linux-full-resource-20261120",
+      "case_id_scheme": [
+        "classname",
+        "name"
+      ],
+      "old_passed": 8848,
+      "missing_old_passed_ids": [],
+      "old_passed_now_not_passed": [],
+      "recovered_failures": [],
+      "new_ids": []
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-d45-venv-20261120-completion.json",
+      "sha256": "bafbbf291c27561689bd26b73b611303d961c06b23aa65219f7e2715facef65a"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-d45-venv-20261120-environment.json",
+      "sha256": "9376adc28419f8dd88c388e3829ada46863a74a5fe183078bb6e4e935ec453a2"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-d45-venv-20261120-process.json",
+      "sha256": "1167d78971fba45b90d663f6b415968ba895e6a098bc4132bfc96cafc1ea2d51"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-d45-venv-20261120.stdout.log",
+      "sha256": "9a2ce9094d3e8be30b39b37d62f7ad92653458d2f4f0b5373e1e4c25240c9d70"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-d45-venv-20261120.xml",
+      "sha256": "2f5e8d2feb83b985076fd858ffafa3cf502709fcbf95e532b3e1e3d2a0b6cc32"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-d45-20261120-completion.json",
+      "sha256": "28e863b4b15d8423ace6e57efc28142be0a7b8e69d4cae2b1ba98394e85a4a53"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-d45-20261120-environment.json",
+      "sha256": "a5b921fbf086522d4f64c35fc727308ed2b0b72eb2123c569ae9a86fb10564eb"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-d45-20261120-process.json",
+      "sha256": "806421e3f3b4f8fce5c196f48664d7df4943135460e6956610efdf5b7e639763"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-d45-20261120.stdout.log",
+      "sha256": "12d28f8b62b9d053d255fbd71eb021c384033e75a1aa71dd8249d9feb22c802a"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-d45-20261120.xml",
+      "sha256": "e115a759f5aa7427e7d380f8de68888aa3a68e8f334db4a1aa6d1df0ed476861"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-8d2-20261120-completion.json",
+      "sha256": "7e24f945e24abbd4ea2e33874e9010e70463c3f6b46eae05086695ff0d642091"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-8d2-20261120-environment.json",
+      "sha256": "663dde22c1adaf5bfe53d6e5bdc7fa00b09a244bbaf60ec3772a5a77662c13f3"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-8d2-20261120-process.json",
+      "sha256": "6cf6d3bb934450179ab5870c14851d1d71a8e26df2e45b05d7318da6ab858490"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-8d2-20261120.stdout.log",
+      "sha256": "10552f389805637e190bf324c1528205e170d9e9eb9366fabfea5c7a4d04f268"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-8d2-20261120.xml",
+      "sha256": "8abaff6fc139528285ba116a5a2a2e532df64393564b6c590e19ca4c88be3870"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-8d2-20261120-completion.json",
+      "sha256": "6b481c93183ef5d248f723e9176a388fc5fd9edafd43c666bba796c36c805b1d"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-8d2-20261120-environment.json",
+      "sha256": "5cb865703fe1ef175e0af11053d22ed870db9c10be6c2b4d83325b7d9058660c"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-8d2-20261120-process.json",
+      "sha256": "3ed28c53ca0ea77027ad1330966bc36f1b448f9955467c6e1986f78b8e88adea"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-8d2-20261120.stdout.log",
+      "sha256": "31c3709255460cc8bfe7b62a001a61319f1745346b261ba2f7d919d974e028a7"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-8d2-20261120.xml",
+      "sha256": "208a5271b74cd4a42d0d71d5c1704fd965622cb19dab63c442dbe13427a5edb8"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-b77-20261120-completion.json",
+      "sha256": "19571d7f77c1c1c4b3560ea2b7d8a4f10c29571f95307dce110d60d5c4975c7d"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-b77-20261120-environment.json",
+      "sha256": "d4308a1ceeb5fa13d8698b7791d50331530c3f9dfc67c67e362ac2bca5e3622c"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-b77-20261120-launch.json",
+      "sha256": "fc75ec6272d387d3334bb257276a964c17bfe379cfad9376f57923a01836f870"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-b77-20261120-process.json",
+      "sha256": "77b798004aa90be6e6047265f4a1083eea18bdd5f3c390181d2fbe036a824a9a"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-b77-20261120.stdout.log",
+      "sha256": "5eae02391f6303712a94f85aa5e72dfd3eede61b2cfe06519b2296eca0a59120"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-b77-20261120.xml",
+      "sha256": "e41d6e5643737c295e90180aa075f1bfd2835d571997079cc29a8282d29e9c19"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-b77-20261120-completion.json",
+      "sha256": "bf47cb40720decf27160d063a8fc360564747f0b829e81078a3a147bf18aeda3"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-b77-20261120-environment.json",
+      "sha256": "60783975017747463584ee96bf2aaeaebc8efec244a413e8ed319c6d079a8203"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-b77-20261120-process.json",
+      "sha256": "326cdbcd68a907e50b5e20196158b2c0f5e7c2309a2d97112cab1f55402813ba"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-b77-20261120.stdout.log",
+      "sha256": "53e64a3853898cd1497b7a8084e4f609790f81e90dfc80a6320de554c3b26603"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-b77-20261120.xml",
+      "sha256": "a327f27c853ba06e99e754b9b01aee721074856a41355be648caf8e70f570314"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-resource-20261120-completion.json",
+      "sha256": "6f41d38e5b0c988e616313c27479338565ea6093be6dfd24459940db3b2826a9"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-resource-20261120-environment.json",
+      "sha256": "bf9ab921ac78cd0ca3a8745b881a30e3b69cb4b06057cda8cf164682af23bfd5"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-resource-20261120-process.json",
+      "sha256": "0ee5f238f2a2c5fa9b3cf460d6b2827fae7c0a1587df766845c5b8a769599fbc"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-resource-20261120.stdout.log",
+      "sha256": "9e9c0994429eedc9a21661173868dd6f4ba0d5f940245fa3aaa32e802e82c2eb"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-resource-20261120.xml",
+      "sha256": "6c122f128bb9bd219367140846135cf31e43f8d2b59f6192bb13fae6a4fc9e6f"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-resource-20261120-completion.json",
+      "sha256": "7e2a43e33f0fc88dd3c5278f52143888441e2e516026fb612629873968b0578a"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-resource-20261120-environment.json",
+      "sha256": "4b5d46f8c5ae356a74c496d640541ec6c507f1838549cec9dbaab273ee7624fb"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-resource-20261120-process.json",
+      "sha256": "ba8a9b410a4302f889fe2e8fed86b4cb1565b1e7dfbb8d5ac6fa90b9e148041a"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-resource-20261120.stdout.log",
+      "sha256": "dc53fb8973d821fcff0883e38056dcfc2533faf8a8171d023e7c106a6f43ed9b"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-resource-20261120.xml",
+      "sha256": "54761642b0abaf49048de751cbbc270c6e64f304f7be6c001161e690e1c59ede"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-harness-run_frozen_verification_20261120-v1.py.txt",
+      "sha256": "4b7495d0dfd821492b9c0738404b756d88daae161008e85fbe9b72348663fd4f"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-harness-run_frozen_verification_20261120.py.txt",
+      "sha256": "f88625ea46ce67596681f4aaf67ba8245718341462cc647cacd36ef0db92fda2"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-harness-run_frozen_followup_20261120.py.txt",
+      "sha256": "d5cb93eda63bfb3b82d957aacaac4558d59ca55f3777d82018eec4f570b565b0"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-harness-run_frozen_latest_20261120.py.txt",
+      "sha256": "857923d7de6422f5c22a01590e39004febf9dbed781d1b2c0f6edf205853af15"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-harness-start_latest_windows_after_8d_20261120-v1.py.txt",
+      "sha256": "c27c04e28a8158ec0ef56ff2e836839a1c006735c23d4ecd2a9c080734b633b6"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-harness-start_latest_windows_after_8d_20261120.py.txt",
+      "sha256": "0cd9635e593c99020c23530f4fe85abc93343682da98f1e8297fd7ddc3fab0f6"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-harness-start_latest_timed_after_d45_20261120-v1.py.txt",
+      "sha256": "f5f7ac28a36dd4c9447db0b00e614aeb909e2ebc9233e3b89656ca181fdadbd2"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-harness-start_latest_timed_after_d45_20261120.py.txt",
+      "sha256": "76bfa63a7ad47dcaabad3abcabf25b44a662fa9dd26263e7f7de72d615eab17c"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-harness-run_frozen_latest_timed_20261120.py.txt",
+      "sha256": "f91d9d39e3668c71c0467023246f7374766ab6fe35601fa2fb158886c7508231"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-harness-audit_witness_evidence_20261120-v1.py.txt",
+      "sha256": "c232b0bb1104df92dee258d37116617ba4d217e2b9bb9a307ea7d23431979876"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-harness-audit_witness_evidence_20261120.py.txt",
+      "sha256": "e75399c370eb4c2ad65c7fff39092845ff36c6052b5635b1052ee20713c1420e"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-until0800-windows-launcher-cp949-reproduction-20261120.log",
+      "sha256": "3f907b3b13b868276f3464d40ffa622eb3796b52cfec8a56b25d6305f35853c5"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-witness-evidence-audit-uncommitted-metadata-20261120.log",
+      "sha256": "e1003facbe2c56cd0c7309505b537873ad2dbf9f8401025e97bbcb461a0b1e9e"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-origin-until0800-archive-origin-20261120.json",
+      "sha256": "b14977ac7e81813b9c9cdf15bf50e0daafa097c4a8022001b09706d4735f76ff"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-origin-verify_archive_checkout_origin_20261120.py.txt",
+      "sha256": "7d91e812859c33c8eb40674f5abf9e6f62e23cfe046cd50ceadb9ecc4e552e5b"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-extra-until0800-source-20261120.json",
+      "sha256": "a33994f4d9d864855cd79dab1f4c15b913ea2d48a681c290591f793959fa4d04"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-extra-until0800-source-linux-20261120.json",
+      "sha256": "09fc9d177e29a56c9fc74ca558564aa2960e23bb1fcabdb8eb5797fe61b58475"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-extra-until0800-followup-source-20261120.json",
+      "sha256": "86ca7ee31113ef591080ded4efeca2c7398ac44fa7bffe3b3b690bcc65f09397"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-extra-until0800-followup-source-linux-20261120.json",
+      "sha256": "d3f308c10f5d5ef7a15c3cb925f96608f143241405f5ebdb28aaa41e346eaac8"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-extra-until0800-latest-source-20261120.json",
+      "sha256": "497039172fba36b33a4084dbb69cda3a1184acc8e046b1b5f8cec83422d7fe4d"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-extra-until0800-latest-source-linux-20261120.json",
+      "sha256": "8c611a9c01e88459c58ff99483be56a963595ce8e90138f7fd789084519c4ab7"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-resource-extra-until0800-resource-source-20261120.json",
+      "sha256": "309f6884f824f9cc3ea2682c56658c86bab67b15f2d837c5b7fd08a31f0423ae"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-resource-extra-until0800-resource-source-linux-20261120.json",
+      "sha256": "8c5fe8f48cd899af6538a8ec5f543298355b8b27fcfb73c226e54924b5d23166"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-resource-run_frozen_resource_20261120.py.txt",
+      "sha256": "e1686d4773985114b9f4638d9ac2656de43d7b5a01e634d924dba27bfeafe871"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-resource-freeze_resource_budget_20261120.py.txt",
+      "sha256": "e07e7bb4c5af2b55e700c34a3da01455e701015423d3e1ab708eaa76eeb1aa1b"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-resource-freeze_resource_linux_20261120.py.txt",
+      "sha256": "224081f70a998f1b90ddf827fdc2b5f56c59047c3aaa48fefbeeb2cb8505b27c"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/protocol.json",
+      "sha256": "8374fe61bc2ca81cd295eb2646fd22dc87a9e327b88ec7ca1912a5b5198dcbe4"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/report.json",
+      "sha256": "8339671f4fde38688d38c70fed3da5400d5c7b48d55cff224dc1a8c16ee3d0f7"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/app/analyzers/hybrid.py.txt",
+      "sha256": "9d00c6d8ec42c174e2269072b57164e54023dd31fbc4ccf8e8ff6c5b5cc1fcf2"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/app/analyzers/rule_based.py.txt",
+      "sha256": "9be78ff453f935602a2b13687a81f69ead32667daa396185db2837e008681922"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/app/config.py.txt",
+      "sha256": "a53dfabb0bd7f0d61563c7342759966f775be93de8a1ef4cb3a26effd6488357"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/app/grounded_prompting.py.txt",
+      "sha256": "ad6a03d534c0701a1a111083cc7c297171ba0e078f77f0dae6c9fb76f66fc28a"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/docs/infrastructure-results/llm-development360-20261117.json",
+      "sha256": "a39ccae9c8cc3d023b088303f0ef518dd1231ec06e972fdbc2e090f08e4ffe52"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/scripts/compare_llm_grounded.py.txt",
+      "sha256": "7f2430542e440777b1ab8e2304da1c1fc01720bbca0af714026e4cbc34a3e377"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/scripts/evaluate_llm_grounded.py.txt",
+      "sha256": "219cb6d85c970f2c23abbca488c88388f685b74a7092fd1b6a32f540e85166de"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/scripts/replay_hybrid_development.py.txt",
+      "sha256": "712701ed0f593fa0cd03191b51ee50a8375e7e5fcf81adef3fbcc24578053a64"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay/source-snapshot/scripts/retry_incomplete_evaluation.py.txt",
+      "sha256": "e2425f8110abe67a5d2f1ded183e27e32ac05b04950b3bccbf3359776a85c10b"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay-until0800-final-frozen-replay-comparison-20261120.json",
+      "sha256": "0cc85037d8effb1017b75a81fe7752b620316da23177044e55a2dbad14b6704e"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay-until0800-final-frozen-replay-20261120.stdout.log",
+      "sha256": "efc0e2493e65709aa3d11d2bf0bcd11bf467c0617e964644943e724664dc8249"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay-until0800-final-frozen-replay-20261120.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-replay-run_final_frozen_replay_20261120.py.txt",
+      "sha256": "7aa1d7f7dc479f2f3f2b821ed22e1150c289fc56d09628fa48b1df64fc53930d"
+    }
+  ],
+  "current_runtime_paths_changed_since_verified_source": [],
+  "latest_both_platforms_passed": true,
+  "cross_platform_case_mapping": {
+    "same_case_ids": 8853,
+    "passed_both": 8239,
+    "passed_linux_only": 609,
+    "passed_windows_only": 1,
+    "not_passed_on_either": [
+      "tests.test_audit_paging::test_jsonl_own_view_change_requires_explicit_restart[sqlite-append]",
+      "tests.test_audit_paging::test_jsonl_own_view_change_requires_explicit_restart[sqlite-review]",
+      "tests.test_runtime_patches::test_actual_container_runtime_security_and_provenance",
+      "tests.test_runtime_patches::test_new_offline_venv_bootstraps_patched_pip"
+    ],
+    "not_code_coverage": true,
+    "not_detection_metric": true
+  },
+  "final_frozen_replay_comparison": {
+    "schema": "final-frozen-detection-replay-comparison-1",
+    "source_commit": "f6e1a0a19aa6cff2a6f97d532935ee21a8e34e26",
+    "completed": true,
+    "compared_fields": {
+      "source_metrics": true,
+      "metrics": true,
+      "comparisons": true,
+      "development_gate_passed": true,
+      "rows": true,
+      "fresh_provider_requests": true,
+      "runtime_adoption": true,
+      "historical_metrics_replaced": true,
+      "independent_acceptance": true
+    },
+    "rows_per_variant": {
+      "rule": 360,
+      "hybrid_default": 360,
+      "hybrid_review_all": 360
+    },
+    "baseline_report_sha256": "8339671f4fde38688d38c70fed3da5400d5c7b48d55cff224dc1a8c16ee3d0f7",
+    "final_report_sha256": "8339671f4fde38688d38c70fed3da5400d5c7b48d55cff224dc1a8c16ee3d0f7",
+    "baseline_bytes_unchanged": true,
+    "provider_requests": 0,
+    "independent_acceptance": false,
+    "runtime_adoption": false,
+    "not_new_llm_measurement": true,
+    "protocol_sha256_equal": true,
+    "source_bytes_unchanged": true
+  },
+  "existing_passed_ids_retained": true,
+  "paid_api_calls": 0,
+  "goal_status": "active_until_0800",
+  "detection_target_reached": false
+}

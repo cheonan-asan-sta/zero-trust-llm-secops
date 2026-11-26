@@ -1,0 +1,73 @@
+{
+  "schema": "witness-clock-boundary-evidence-1",
+  "date": "2026-11-20",
+  "implementation_commit": "c14ef6f905c34ff6ab87ba56fca1ff891c6a8770",
+  "source_sha256": {
+    "app/services/audit_witness.py": "8a7d821f0bc6fcce0dc9f2ae1faff3c03f97ad1bad41fc6d8007b930e7685300",
+    "app/services/audit_witness_observer.py": "c351db0de9d2af13b7f773121eeb04f69f8ac968a9811be53f910ce674d4da87",
+    "scripts/audit_witness.py": "512ab0cec72dc69f4c6c3658d9bdd0ad381e4c210444ba390698e3562312fce2",
+    "tests/test_witness_clock_boundary.py": "f28df3a35c60a77fb56ae11c50202b33172bf54c16f6032cacab652dcd73d6d1"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/witness-clock-boundary-linux-final-20261120.xml",
+      "sha256": "3030d1b150ddf0c1c51309a6c919cc303b09e2f082ba8e745aa625ac4000af7d",
+      "tests": 117,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-clock-boundary-windows-collection-error-20261120.xml",
+      "sha256": "e4d3f127a6d9277fc9d0a07799fb60d512d5c51c553313413cbc8f431482f8b4",
+      "tests": 1,
+      "failures": 0,
+      "errors": 1,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-clock-boundary-windows-final-20261120.xml",
+      "sha256": "84e7d302795f9f1836cb4fa989e8d0858f11ee9ac9e9b1ba99ac4b865af3d67b",
+      "tests": 117,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 5,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-clock-boundary-windows-first-fix-20261120.xml",
+      "sha256": "43046f70460a99831917047a093156394b3e704a678eb6e45ef97ef264545f26",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-clock-boundary-windows-initial-20261120.xml",
+      "sha256": "1495c9dc617da16638d8cef7ba0d0e4fea95c84de5f88c0d5460ad621ef689c0",
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-clock-boundary-ruff-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "purpose": "Full repository Ruff zero diagnostics"
+    }
+  ],
+  "new_clock_boundary_tests": 10,
+  "controlled_clock_only": true,
+  "system_clock_modified": false,
+  "previous_poisoned_receipts_automatically_modified": false,
+  "manual_v1_default_preserved": true,
+  "signed_receipt_schema_changed": false,
+  "detection_metrics_changed": false,
+  "paid_api_calls": 0,
+  "github_push_ci_merge": false,
+  "until_0800_goal_complete": false
+}

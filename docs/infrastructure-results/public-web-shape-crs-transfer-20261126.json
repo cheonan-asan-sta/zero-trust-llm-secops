@@ -1,0 +1,291 @@
+{
+  "plan": {
+    "crs_reference_seals": {
+      "fpad": "e259f29c2425f9396c3ee14722987ec2c6888166469ea171c43c58ceba77f81b",
+      "fpad-ood": "972c9f8a0d70f5eb23b16fae4d02f654bea2db351083511d5e4904b5b3fedde3",
+      "legitimate": "bfa6808b28ff6678364f57edce6f1e5f1b7afa40d5962305b21fda6134f23769"
+    },
+    "features": "bounded body and target character shape; host used only for reporting",
+    "legitimate_development_receipt": "31a9256782117d36f0f7d31ba2b704a37e9fffa7fa93e680df9d1f666d637bc7",
+    "legitimate_holdout_receipt": "f4b349317bc39b6371c62242e68ce644d22415e319938f053dc89069e7721120",
+    "new_groups_used": 46164,
+    "new_skipped": 0,
+    "old_groups_used": 37779,
+    "old_skipped": 0,
+    "parameters": {
+      "max_features": 0.75,
+      "min_samples_leaf": 3,
+      "n_estimators": 128,
+      "n_jobs": 3,
+      "random_state": 42
+    },
+    "scikit_learn": "1.7.2",
+    "threshold": 0.95,
+    "training_sha256": "e450fd0a0de45e5ce29053b82573e703be5e30cf8e29f02a770fa27f60fef908"
+  },
+  "seal_sha256": "aadeb32ae495fb007366e0fe75c2f8bba852d56f24e27ffb829d01b384fcc513",
+  "tests": {
+    "fpad": {
+      "changes": {
+        "lost_true_positives": 428,
+        "new_true_positives": 19,
+        "resolved_false_positives": 1
+      },
+      "crs_fusion": {
+        "additional_true_positives": 5887,
+        "lost_vs_publisher_shape": 233,
+        "new_false_positives": 3
+      },
+      "results": {
+        "all": {
+          "crs_or_legitimate_model": {
+            "accuracy": 0.9770327838488609,
+            "f1": 0.9821599846537502,
+            "false_positive_rate": 0.0005368647100930566,
+            "fn": 369,
+            "fp": 3,
+            "inference_errors": 0,
+            "population": 16197,
+            "precision": 0.9997071170555502,
+            "recall": 0.9652182109529645,
+            "tn": 5585,
+            "tp": 10240
+          },
+          "crs_target": {
+            "accuracy": 0.6137556337593382,
+            "f1": 0.5818740810052132,
+            "false_positive_rate": 0.0,
+            "fn": 6256,
+            "fp": 0,
+            "inference_errors": 0,
+            "population": 16197,
+            "precision": 1.0,
+            "recall": 0.41031199924592326,
+            "tn": 5588,
+            "tp": 4353
+          },
+          "publisher_training_only": {
+            "accuracy": 0.9882076927826141,
+            "f1": 0.9909198954124079,
+            "false_positive_rate": 0.0007158196134574087,
+            "fn": 187,
+            "fp": 4,
+            "inference_errors": 0,
+            "population": 16197,
+            "precision": 0.9996163437559946,
+            "recall": 0.9823734564991988,
+            "tn": 5584,
+            "tp": 10422
+          },
+          "with_legitimate_development": {
+            "accuracy": 0.963017842810397,
+            "f1": 0.9709575757575758,
+            "false_positive_rate": 0.0005368647100930566,
+            "fn": 596,
+            "fp": 3,
+            "inference_errors": 0,
+            "population": 16197,
+            "precision": 0.9997004792332268,
+            "recall": 0.9438212838156282,
+            "tn": 5585,
+            "tp": 10013
+          }
+        }
+      },
+      "scope": {
+        "total_rows": 16197
+      }
+    },
+    "fpad-ood": {
+      "changes": {
+        "lost_true_positives": 2406,
+        "new_true_positives": 36
+      },
+      "crs_fusion": {
+        "additional_true_positives": 10794,
+        "lost_vs_publisher_shape": 1302
+      },
+      "results": {
+        "all": {
+          "crs_or_legitimate_model": {
+            "accuracy": 0.9268649669499528,
+            "f1": null,
+            "false_positive_rate": null,
+            "fn": 1549,
+            "fp": 0,
+            "inference_errors": 0,
+            "population": 21180,
+            "precision": null,
+            "recall": 0.9268649669499528,
+            "tn": 0,
+            "tp": 19631
+          },
+          "crs_target": {
+            "accuracy": 0.417233238904627,
+            "f1": null,
+            "false_positive_rate": null,
+            "fn": 12343,
+            "fp": 0,
+            "inference_errors": 0,
+            "population": 21180,
+            "precision": null,
+            "recall": 0.417233238904627,
+            "tn": 0,
+            "tp": 8837
+          },
+          "publisher_training_only": {
+            "accuracy": 0.9842776203966006,
+            "f1": null,
+            "false_positive_rate": null,
+            "fn": 333,
+            "fp": 0,
+            "inference_errors": 0,
+            "population": 21180,
+            "precision": null,
+            "recall": 0.9842776203966006,
+            "tn": 0,
+            "tp": 20847
+          },
+          "with_legitimate_development": {
+            "accuracy": 0.8723796033994334,
+            "f1": null,
+            "false_positive_rate": null,
+            "fn": 2703,
+            "fp": 0,
+            "inference_errors": 0,
+            "population": 21180,
+            "precision": null,
+            "recall": 0.8723796033994334,
+            "tn": 0,
+            "tp": 18477
+          }
+        }
+      },
+      "scope": {
+        "total_rows": 21180
+      }
+    },
+    "legitimate": {
+      "changes": {
+        "resolved_false_positives": 12526
+      },
+      "crs_fusion": {
+        "new_false_positives": 22
+      },
+      "results": {
+        "all": {
+          "crs_or_legitimate_model": {
+            "accuracy": 0.9746877491363274,
+            "f1": null,
+            "false_positive_rate": 0.0253122508636726,
+            "fn": 0,
+            "fp": 381,
+            "inference_errors": 0,
+            "population": 15052,
+            "precision": null,
+            "recall": null,
+            "tn": 14671,
+            "tp": 0
+          },
+          "crs_target": {
+            "accuracy": 0.9761493489237311,
+            "f1": null,
+            "false_positive_rate": 0.023850651076268933,
+            "fn": 0,
+            "fp": 359,
+            "inference_errors": 0,
+            "population": 15052,
+            "precision": null,
+            "recall": null,
+            "tn": 14693,
+            "tp": 0
+          },
+          "publisher_training_only": {
+            "accuracy": 0.1663566303481265,
+            "f1": null,
+            "false_positive_rate": 0.8336433696518735,
+            "fn": 0,
+            "fp": 12548,
+            "inference_errors": 0,
+            "population": 15052,
+            "precision": null,
+            "recall": null,
+            "tn": 2504,
+            "tp": 0
+          },
+          "with_legitimate_development": {
+            "accuracy": 0.9985384002125963,
+            "f1": null,
+            "false_positive_rate": 0.0014615997874036673,
+            "fn": 0,
+            "fp": 22,
+            "inference_errors": 0,
+            "population": 15052,
+            "precision": null,
+            "recall": null,
+            "tn": 15030,
+            "tp": 0
+          }
+        },
+        "unseen_host": {
+          "crs_or_legitimate_model": {
+            "accuracy": 0.9811627151672621,
+            "f1": null,
+            "false_positive_rate": 0.018837284832737902,
+            "fn": 0,
+            "fp": 232,
+            "inference_errors": 0,
+            "population": 12316,
+            "precision": null,
+            "recall": null,
+            "tn": 12084,
+            "tp": 0
+          },
+          "crs_target": {
+            "accuracy": 0.9829490094186424,
+            "f1": null,
+            "false_positive_rate": 0.017050990581357582,
+            "fn": 0,
+            "fp": 210,
+            "inference_errors": 0,
+            "population": 12316,
+            "precision": null,
+            "recall": null,
+            "tn": 12106,
+            "tp": 0
+          },
+          "publisher_training_only": {
+            "accuracy": 0.1436342968496265,
+            "f1": null,
+            "false_positive_rate": 0.8563657031503735,
+            "fn": 0,
+            "fp": 10547,
+            "inference_errors": 0,
+            "population": 12316,
+            "precision": null,
+            "recall": null,
+            "tn": 1769,
+            "tp": 0
+          },
+          "with_legitimate_development": {
+            "accuracy": 0.9982137057486197,
+            "f1": null,
+            "false_positive_rate": 0.0017862942513803184,
+            "fn": 0,
+            "fp": 22,
+            "inference_errors": 0,
+            "population": 12316,
+            "precision": null,
+            "recall": null,
+            "tn": 12294,
+            "tp": 0
+          }
+        }
+      },
+      "scope": {
+        "exact_training_overlap": 198,
+        "total_rows": 15250
+      }
+    }
+  }
+}

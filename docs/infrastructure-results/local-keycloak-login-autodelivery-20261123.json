@@ -1,0 +1,216 @@
+{
+  "aws_calls": 0,
+  "container_removed": true,
+  "existing_keycloak_control_metrics": {
+    "accuracy": 1.0,
+    "f1": 1.0,
+    "false_positive_rate": 0.0,
+    "fn": 0,
+    "fp": 0,
+    "inference_errors": 0,
+    "population": 14,
+    "precision": 1.0,
+    "recall": 1.0,
+    "tn": 7,
+    "tp": 7
+  },
+  "existing_keycloak_results_matched": true,
+  "existing_os_priority_retained": 1,
+  "fallback_by_evidence_state": {
+    "expired": {
+      "baseline_results_matched": 2,
+      "false_positives": 0,
+      "threats_retained": 1
+    },
+    "missing": {
+      "baseline_results_matched": 2,
+      "false_positives": 0,
+      "threats_retained": 1
+    }
+  },
+  "finished_at": "2026-11-23T03:43:08.906197+00:00",
+  "image": "quay.io/keycloak/keycloak:26.8.0",
+  "paid_api_calls": 0,
+  "regression_tests_passed": 402,
+  "verified_login_holdout": {
+    "after": {
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fn": 0,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 10,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tn": 6,
+      "tp": 4
+    },
+    "audit_integrity": true,
+    "before": {
+      "accuracy": 0.6,
+      "f1": 0.0,
+      "false_positive_rate": 0.0,
+      "fn": 4,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 10,
+      "precision": null,
+      "recall": 0.0,
+      "tn": 6,
+      "tp": 0
+    },
+    "cases": [
+      {
+        "automatic_delivery": "verified",
+        "case": "new_registration_office",
+        "current_human_review": false,
+        "disposition": "no_signal",
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": false,
+        "previous_human_review": false,
+        "proof_issued": true
+      },
+      {
+        "automatic_delivery": "verified",
+        "case": "approved_replacement_travel",
+        "current_human_review": false,
+        "disposition": "review",
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": false,
+        "previous_human_review": false,
+        "proof_issued": true
+      },
+      {
+        "automatic_delivery": "verified",
+        "case": "reenrolled_certificate_remote",
+        "current_human_review": false,
+        "disposition": "review",
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": false,
+        "previous_human_review": false,
+        "proof_issued": true
+      },
+      {
+        "automatic_delivery": "verified",
+        "case": "first_vpn_egress_change",
+        "current_human_review": false,
+        "disposition": "review",
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": false,
+        "previous_human_review": false,
+        "proof_issued": true
+      },
+      {
+        "automatic_delivery": "missing",
+        "case": "onboarding_certificate_not_registered",
+        "current_human_review": false,
+        "disposition": null,
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": false,
+        "previous_human_review": false,
+        "proof_issued": false
+      },
+      {
+        "automatic_delivery": "missing",
+        "case": "certificate_registered_to_another_account",
+        "current_human_review": false,
+        "disposition": null,
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": false,
+        "previous_human_review": false,
+        "proof_issued": false
+      },
+      {
+        "automatic_delivery": "verified",
+        "case": "retired_workstation_remote",
+        "current_human_review": true,
+        "disposition": "priority_review",
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": true,
+        "previous_human_review": false,
+        "proof_issued": true
+      },
+      {
+        "automatic_delivery": "verified",
+        "case": "offboarded_device_vpn",
+        "current_human_review": true,
+        "disposition": "priority_review",
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": true,
+        "previous_human_review": false,
+        "proof_issued": true
+      },
+      {
+        "automatic_delivery": "verified",
+        "case": "old_key_after_reenrollment",
+        "current_human_review": true,
+        "disposition": "priority_review",
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": true,
+        "previous_human_review": false,
+        "proof_issued": true
+      },
+      {
+        "automatic_delivery": "verified",
+        "case": "revoked_loaner_new_egress",
+        "current_human_review": true,
+        "disposition": "priority_review",
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": true,
+        "previous_human_review": false,
+        "proof_issued": true
+      }
+    ],
+    "delivery_fallback": [
+      {
+        "audit_writes": 1,
+        "baseline_assessment_and_detection_unchanged": true,
+        "case": "missing_normal",
+        "evidence_state": "missing",
+        "existing_human_review": false,
+        "existing_sigma_matches": 0,
+        "expected_warning_or_review": false
+      },
+      {
+        "audit_writes": 1,
+        "baseline_assessment_and_detection_unchanged": true,
+        "case": "missing_existing_credential_alert",
+        "evidence_state": "missing",
+        "existing_human_review": false,
+        "existing_sigma_matches": 1,
+        "expected_warning_or_review": true
+      },
+      {
+        "audit_writes": 1,
+        "baseline_assessment_and_detection_unchanged": true,
+        "case": "expired_normal",
+        "evidence_state": "expired",
+        "existing_human_review": false,
+        "existing_sigma_matches": 0,
+        "expected_warning_or_review": false
+      },
+      {
+        "audit_writes": 1,
+        "baseline_assessment_and_detection_unchanged": true,
+        "case": "expired_existing_high_risk",
+        "evidence_state": "expired",
+        "existing_human_review": true,
+        "existing_sigma_matches": 0,
+        "expected_warning_or_review": true
+      }
+    ],
+    "distinct_actual_otp_accounts": 10,
+    "guards": {
+      "altered_expired_no_fallback": 401,
+      "different_event": 401,
+      "disabled_collector": 401,
+      "expired_signal": 410,
+      "expired_strict": 401,
+      "missing_receipt": 422,
+      "modified_evidence": 401,
+      "other_mtls_credential_produced_no_proof": true
+    },
+    "scope": "disjoint local scenarios with previously unused Keycloak accounts and fixed expected review labels"
+  }
+}

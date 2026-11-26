@@ -1,0 +1,457 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "cases_full_collection_total",
+      "passed": true
+    },
+    {
+      "name": "cases_page_dom_matches_api_0",
+      "passed": true
+    },
+    {
+      "name": "cases_page_dom_matches_api_12",
+      "passed": true
+    },
+    {
+      "name": "cases_page_dom_matches_api_24",
+      "passed": true
+    },
+    {
+      "name": "cases_all_ids_visited_without_duplicates",
+      "passed": true
+    },
+    {
+      "name": "cases_last_next_disabled",
+      "passed": true
+    },
+    {
+      "name": "cases_previous_page_works",
+      "passed": true
+    },
+    {
+      "name": "cases_actual_change_refuses_stale_view",
+      "passed": true
+    },
+    {
+      "name": "cases_http_400_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "cases_http_409_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "cases_http_410_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "cases_http_501_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "cases_http_503_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "cases_invalid_snapshot_id_discarded",
+      "passed": true
+    },
+    {
+      "name": "cases_invalid_snapshot_mode_discarded",
+      "passed": true
+    },
+    {
+      "name": "cases_invalid_historical_audit_snapshot_discarded",
+      "passed": true
+    },
+    {
+      "name": "cases_invalid_page_cursor_discarded",
+      "passed": true
+    },
+    {
+      "name": "cases_no_overflow_desktop",
+      "passed": true
+    },
+    {
+      "name": "cases_no_overflow_mobile",
+      "passed": true
+    },
+    {
+      "name": "cases_http_401_requires_new_connection",
+      "passed": true
+    },
+    {
+      "name": "cases_http_403_requires_new_connection",
+      "passed": true
+    },
+    {
+      "name": "cases_same_key_remap_rejected_before_page_request",
+      "passed": true
+    },
+    {
+      "name": "cases_old_tenant_response_cannot_return",
+      "passed": true
+    },
+    {
+      "name": "cases_no_javascript_errors",
+      "passed": true
+    },
+    {
+      "name": "cases_no_external_requests",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_full_collection_total",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_page_dom_matches_api_0",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_page_dom_matches_api_12",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_page_dom_matches_api_24",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_all_ids_visited_without_duplicates",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_last_next_disabled",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_previous_page_works",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_actual_change_refuses_stale_view",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_http_400_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_http_409_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_http_410_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_http_501_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_http_503_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_invalid_snapshot_id_discarded",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_invalid_snapshot_mode_discarded",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_invalid_historical_audit_snapshot_discarded",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_invalid_page_cursor_discarded",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_no_overflow_desktop",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_no_overflow_mobile",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_http_401_requires_new_connection",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_http_403_requires_new_connection",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_same_key_remap_rejected_before_page_request",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_old_tenant_response_cannot_return",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_no_javascript_errors",
+      "passed": true
+    },
+    {
+      "name": "dashboard_cases_no_external_requests",
+      "passed": true
+    },
+    {
+      "name": "signed_full_collection_total",
+      "passed": true
+    },
+    {
+      "name": "signed_page_dom_matches_api_0",
+      "passed": true
+    },
+    {
+      "name": "signed_page_dom_matches_api_12",
+      "passed": true
+    },
+    {
+      "name": "signed_page_dom_matches_api_24",
+      "passed": true
+    },
+    {
+      "name": "signed_page_dom_matches_api_36",
+      "passed": true
+    },
+    {
+      "name": "signed_page_dom_matches_api_48",
+      "passed": true
+    },
+    {
+      "name": "signed_page_dom_matches_api_60",
+      "passed": true
+    },
+    {
+      "name": "signed_page_dom_matches_api_72",
+      "passed": true
+    },
+    {
+      "name": "signed_page_dom_matches_api_84",
+      "passed": true
+    },
+    {
+      "name": "signed_page_dom_matches_api_96",
+      "passed": true
+    },
+    {
+      "name": "signed_all_ids_visited_without_duplicates",
+      "passed": true
+    },
+    {
+      "name": "signed_last_next_disabled",
+      "passed": true
+    },
+    {
+      "name": "signed_previous_page_works",
+      "passed": true
+    },
+    {
+      "name": "signed_actual_change_refuses_stale_view",
+      "passed": true
+    },
+    {
+      "name": "signed_http_400_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "signed_http_409_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "signed_http_410_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "signed_http_501_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "signed_http_503_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "signed_invalid_snapshot_id_discarded",
+      "passed": true
+    },
+    {
+      "name": "signed_invalid_snapshot_mode_discarded",
+      "passed": true
+    },
+    {
+      "name": "signed_invalid_historical_audit_snapshot_discarded",
+      "passed": true
+    },
+    {
+      "name": "signed_invalid_page_cursor_discarded",
+      "passed": true
+    },
+    {
+      "name": "signed_no_overflow_desktop",
+      "passed": true
+    },
+    {
+      "name": "signed_no_overflow_mobile",
+      "passed": true
+    },
+    {
+      "name": "signed_http_401_requires_new_connection",
+      "passed": true
+    },
+    {
+      "name": "signed_http_403_requires_new_connection",
+      "passed": true
+    },
+    {
+      "name": "signed_same_key_remap_rejected_before_page_request",
+      "passed": true
+    },
+    {
+      "name": "signed_old_tenant_response_cannot_return",
+      "passed": true
+    },
+    {
+      "name": "signed_no_javascript_errors",
+      "passed": true
+    },
+    {
+      "name": "signed_no_external_requests",
+      "passed": true
+    },
+    {
+      "name": "dashboard_full_collection_total",
+      "passed": true
+    },
+    {
+      "name": "dashboard_page_dom_matches_api_0",
+      "passed": true
+    },
+    {
+      "name": "dashboard_page_dom_matches_api_12",
+      "passed": true
+    },
+    {
+      "name": "dashboard_page_dom_matches_api_24",
+      "passed": true
+    },
+    {
+      "name": "dashboard_page_dom_matches_api_36",
+      "passed": true
+    },
+    {
+      "name": "dashboard_page_dom_matches_api_48",
+      "passed": true
+    },
+    {
+      "name": "dashboard_page_dom_matches_api_60",
+      "passed": true
+    },
+    {
+      "name": "dashboard_page_dom_matches_api_72",
+      "passed": true
+    },
+    {
+      "name": "dashboard_page_dom_matches_api_84",
+      "passed": true
+    },
+    {
+      "name": "dashboard_page_dom_matches_api_96",
+      "passed": true
+    },
+    {
+      "name": "dashboard_all_ids_visited_without_duplicates",
+      "passed": true
+    },
+    {
+      "name": "dashboard_last_next_disabled",
+      "passed": true
+    },
+    {
+      "name": "dashboard_previous_page_works",
+      "passed": true
+    },
+    {
+      "name": "dashboard_actual_change_refuses_stale_view",
+      "passed": true
+    },
+    {
+      "name": "dashboard_http_400_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "dashboard_http_409_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "dashboard_http_410_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "dashboard_http_501_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "dashboard_http_503_clears_without_retry",
+      "passed": true
+    },
+    {
+      "name": "dashboard_invalid_snapshot_id_discarded",
+      "passed": true
+    },
+    {
+      "name": "dashboard_invalid_snapshot_mode_discarded",
+      "passed": true
+    },
+    {
+      "name": "dashboard_invalid_historical_audit_snapshot_discarded",
+      "passed": true
+    },
+    {
+      "name": "dashboard_invalid_page_cursor_discarded",
+      "passed": true
+    },
+    {
+      "name": "dashboard_no_overflow_desktop",
+      "passed": true
+    },
+    {
+      "name": "dashboard_no_overflow_mobile",
+      "passed": true
+    },
+    {
+      "name": "dashboard_http_401_requires_new_connection",
+      "passed": true
+    },
+    {
+      "name": "dashboard_http_403_requires_new_connection",
+      "passed": true
+    },
+    {
+      "name": "dashboard_same_key_remap_rejected_before_page_request",
+      "passed": true
+    },
+    {
+      "name": "dashboard_old_tenant_response_cannot_return",
+      "passed": true
+    },
+    {
+      "name": "dashboard_no_javascript_errors",
+      "passed": true
+    },
+    {
+      "name": "dashboard_no_external_requests",
+      "passed": true
+    }
+  ],
+  "paid_calls": 0,
+  "owned_servers_stopped": [
+    true
+  ]
+}

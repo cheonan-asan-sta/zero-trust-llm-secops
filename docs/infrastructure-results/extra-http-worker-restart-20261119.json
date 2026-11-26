@@ -1,0 +1,87 @@
+{
+  "date": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "ci_started": false,
+  "merged": false,
+  "linux_earlier_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "199",
+    "time": "67.113",
+    "timestamp": "2026-11-19T00:55:52.042356+09:00",
+    "hostname": "localhost",
+    "xml_sha256": "29154df1c3e5dc859c8e5370588a52768c52af97bc849aab028982072b2b8ffa"
+  },
+  "windows_latest_focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "22",
+    "time": "18.027",
+    "timestamp": "2026-11-19T00:58:26.919291+09:00",
+    "hostname": "희주",
+    "xml_sha256": "96ebffe6225d4fea3995a1900752786aeb268e971790594ec0b0ff98260282bf"
+  },
+  "linux_latest_focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "22",
+    "time": "19.019",
+    "timestamp": "2026-11-19T00:59:06.577757+09:00",
+    "hostname": "localhost",
+    "xml_sha256": "f78e78eff6bac2860e15820ffc4c2fa572cd687507092f04b0945f61fb6e103d"
+  },
+  "native_conditions": 41,
+  "new_worker_conditions_included": 6,
+  "native_source_run_sha256": "a63bb9edb8bef623cf400f2700c7c77a47c2f205fcbf2f2a288bee30c0e84154",
+  "actual_http_process_kill_tested": true,
+  "worker_pid_matches_owned_process_handle": true,
+  "wrong_bootstrap_pin_is_terminal_without_retry": true,
+  "host_reboot_power_loss_tested": false,
+  "model_quality_reevaluated": false,
+  "source_files": [
+    {
+      "path": "scripts/native_http_worker.py",
+      "sha256": "d4a4e2a3746af587af7d7caa51a3b6480f73dce61a32701aee2434690f814d34"
+    },
+    {
+      "path": "scripts/f1_lab/http_worker_controls.py",
+      "sha256": "3924c0af36621e4e1f37b4a89ae7d2a5c3f177b014b243cd0c2c2a282b56572b"
+    },
+    {
+      "path": "scripts/local_process_runtime.py",
+      "sha256": "c31f0fbf2aacd32c20e6a8e82a5e34eceb1419bfd3601ae8dff296d6506088b4"
+    },
+    {
+      "path": "scripts/run_exec_history_controls.py",
+      "sha256": "cdceec4af07978a44706cf830f1639413322471229bf3ccba178e8979b6a10c2"
+    },
+    {
+      "path": "tests/test_http_worker_restart.py",
+      "sha256": "7525006709343a168f73011a5996aa07bfc1979293997a85fdd5743940b1ea5b"
+    },
+    {
+      "path": "tests/test_sqlite_audit.py",
+      "sha256": "f4442b1e7269a849f18b1ac152d153ed54478454ad340c7ba5f0ec70031c6879"
+    },
+    {
+      "path": "docs/extra-http-worker-restart-20261119.md",
+      "sha256": "88d55d30a4cdbbcb59e3fbf6fb65209effbe7935e3fcc7066f68d64f537d41e0"
+    },
+    {
+      "path": "docs/extra-native-audit-recovery-20261119.md",
+      "sha256": "97621798488e0d9840cf466babda17a68693998ed3b7235fe0ad8e994acfb922"
+    },
+    {
+      "path": "AI_HANDOFF.md",
+      "sha256": "df677e9314de071fe6f9075b9aa4b272a48d1c4aa9d094fea47831b8e6ce127a"
+    }
+  ]
+}

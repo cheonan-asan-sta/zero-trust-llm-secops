@@ -1,0 +1,63 @@
+.........................F........                                       [100%]
+================================== FAILURES ===================================
+__________ test_concurrent_report_writes_publish_one_complete_report __________
+
+tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1494/test_concurrent_report_writes_0')
+
+    def test_concurrent_report_writes_publish_one_complete_report(tmp_path):
+        output = tmp_path / "pilot.json"
+        reports = [{"data": char * 100_000} for char in "abcd"]
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            tasks = [executor.submit(write_report, output, report) for report in reports]
+            for task in tasks:
+>               task.result()
+
+tests\test_m6_evaluation.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\thread.py:59: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\evaluate_m6.py:380: in write_report
+    temporary.replace(output)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1494/test_concurrent_report_writes_0/.m6-report-1p0c4pdq')
+target = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1494/test_concurrent_report_writes_0/pilot.json')
+
+    def replace(self, target):
+        """
+        Rename this path to the target path, overwriting if that path exists.
+    
+        The target path may be absolute or relative. Relative paths are
+        interpreted relative to the current working directory, *not* the
+        directory of the Path object.
+    
+        Returns the new Path instance pointing to the target path.
+        """
+>       os.replace(self, target)
+E       PermissionError: [WinError 5] �׼����� �źεǾ����ϴ�: 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1494\\test_concurrent_report_writes_0\\.m6-report-1p0c4pdq' -> 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1494\\test_concurrent_report_writes_0\\pilot.json'
+
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\pathlib.py:1376: PermissionError
+============================== warnings summary ===============================
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\mangum\adapter.py:65
+  C:\Users\chaeh\Desktop\�Ķ��б�\zero-trust-llm-secops\.venv\Lib\site-packages\mangum\adapter.py:65: DeprecationWarning: There is no current event loop
+    asyncio.get_event_loop()
+
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\chaeh\Desktop\�Ķ��б�\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\chaeh\Desktop\�Ķ��б�\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Users\chaeh\Desktop\�Ķ��б�\tmp\extra-development-20261118\runtime\post-full-failures-windows-initial-20261120.xml -
+=========================== short test summary info ===========================
+FAILED tests/test_m6_evaluation.py::test_concurrent_report_writes_publish_one_complete_report
+1 failed, 33 passed, 3 warnings in 11.43s

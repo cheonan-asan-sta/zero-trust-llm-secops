@@ -1,0 +1,64 @@
+"""Selected input-order trials; completed batch is not detection/branch coverage."""
+import hashlib
+import json
+import os
+import platform
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+source=Path(sys.argv[1]).resolve();output=Path(sys.argv[2]).resolve()
+manifest=json.loads(Path(sys.argv[3]).read_text(encoding='utf-8'))
+plan=json.loads(Path(sys.argv[4]).read_text(encoding='utf-8'))
+assert source==Path(manifest['path']).resolve() and manifest['source_commit']==plan['source_commit']
+output.mkdir(exist_ok=False,parents=True);sys.path.insert(0,str(source))
+from scripts.local_process_runtime import direct_python
+
+def altered():return [n for n,h in manifest['files'].items() if hashlib.sha256((source/n).read_bytes()).hexdigest()!=h]
+assert not altered()
+cache=str(output.parent/'until0800-windows-bytecode') if os.name=='nt' else '/home/chaehj02/.cache/zt-until0800-frozen-bytecode'
+env=dict(os.environ,AWS_EC2_METADATA_DISABLED='true',AWS_SHARED_CREDENTIALS_FILE=str(output/'no-cloud-credentials'),AWS_CONFIG_FILE=str(output/'no-cloud-config'),PYTHONPYCACHEPREFIX=cache)
+for name in ('OPENAI_API_KEY','AZURE_OPENAI_API_KEY','ANTHROPIC_API_KEY','C01_UPSTREAM_API_KEY','AWS_ACCESS_KEY_ID','AWS_SECRET_ACCESS_KEY','AWS_SESSION_TOKEN','AWS_SECURITY_TOKEN','AWS_PROFILE','AWS_DEFAULT_PROFILE','AWS_WEB_IDENTITY_TOKEN_FILE','AWS_ROLE_ARN','AWS_ROLE_SESSION_NAME','AWS_CONTAINER_CREDENTIALS_FULL_URI','AWS_CONTAINER_CREDENTIALS_RELATIVE_URI','AWS_CONTAINER_AUTHORIZATION_TOKEN'):env.pop(name,None)
+env['PYTHONPATH']=str(source)+os.pathsep+env.get('PYTHONPATH','')
+binary,env=direct_python(env)
+result={'schema':'owned-witness-selected-order-matrix-1','source_commit':manifest['source_commit'],'source_files':len(manifest['files']),'completed':False,'platform':platform.platform(),'selected_seeds':[s['seed'] for s in plan['selected']],'runs':[],'batch_seconds_limit':3300,'paid_api_calls':0,'detection_metrics_changed':False,'not_code_branch_coverage':True,'not_independent_evaluation_cases':True,'real_8h_soak':False}
+started=time.monotonic();covered=set();batch_steps=0
+try:
+    for item in plan['selected']:
+        seed=item['seed'];remaining=3300-(time.monotonic()-started)
+        if remaining<60 or (output/'stop.request').exists():
+            result['stopped_before_all_selected_runs']=True;break
+        target=output/f'seed-{seed}'
+        with (output/f'seed-{seed}.log').open('wb') as stream:
+            command=[binary,'-m','scripts.run_witness_safety_sequence','--directory',str(target),'--seed',str(seed),'--rounds','32','--max-seconds',str(min(900,int(remaining-30)))]
+            p=subprocess.Popen(command,cwd=source,env=env,stdout=stream,stderr=subprocess.STDOUT)
+            (output/'owned-process.json').write_text(json.dumps({'seed':seed,'pid':p.pid,'arguments':command},indent=2)+'\n',encoding='utf-8')
+            try:code=p.wait(timeout=min(960,remaining))
+            except subprocess.TimeoutExpired:
+                (target/'stop.request').write_text('stop owned order trial at watchdog',encoding='utf-8')
+                try:code=p.wait(timeout=40)
+                except subprocess.TimeoutExpired:p.kill();p.wait(timeout=10);code=124
+        report=target/('report.json' if code in {0,2} else 'failure.json')
+        value=json.loads(report.read_text(encoding='utf-8')) if report.exists() else None
+        trace=target/'trace.jsonl'
+        rows=[json.loads(line) for line in trace.read_text(encoding='utf-8').splitlines()] if trace.exists() else []
+        assert all(row['passed'] is True for row in rows)
+        for a,b,c in zip(rows,rows[1:],rows[2:]):
+            if a['round']==b['round']==c['round']:
+                covered.add((a['action'],b['action'],c['action']))
+        batch_steps+=len(rows)
+        order_sha=hashlib.sha256(json.dumps([r['action'] for r in rows]).encode()).hexdigest()
+        if code==0:assert value['completed'] and len(rows)==288 and order_sha==item['action_order_sha256']
+        result['runs'].append({'seed':seed,'pid':p.pid,'exit_code':code,'report':value,'executed_steps':len(rows),'action_order_sha256':order_sha})
+        result['batch_executed_steps']=batch_steps;result['batch_distinct_input_triples']=len(covered)
+        (output/'progress.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+        if code!=0:break
+    result['mutated_source_files']=altered();result['source_bytes_unchanged']=not result['mutated_source_files']
+    result['completed']=result['source_bytes_unchanged'] and len(result['runs'])==len(plan['selected']) and all(r['exit_code']==0 for r in result['runs'])
+    result['batch_distinct_triples']=sorted(covered)
+finally:
+    result['elapsed_seconds']=time.monotonic()-started
+    (output/'result.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({k:result[k] for k in ['completed','source_commit','elapsed_seconds']}))
+raise SystemExit(0 if result['completed'] else 2)

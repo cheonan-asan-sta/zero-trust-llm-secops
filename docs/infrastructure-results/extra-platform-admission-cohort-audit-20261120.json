@@ -1,0 +1,884 @@
+{
+  "baseline_windows_suite": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "70",
+    "skipped": "538",
+    "tests": "8604",
+    "time": "2301.655",
+    "timestamp": "2026-11-19T21:47:20.551974+09:00",
+    "hostname": "희주"
+  },
+  "final_windows_suite": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "591",
+    "tests": "8616",
+    "time": "1555.159",
+    "timestamp": "2026-11-20T00:43:06.411959+09:00",
+    "hostname": "희주"
+  },
+  "linux_full_suite": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "5",
+    "tests": "8615",
+    "time": "1163.246",
+    "timestamp": "2026-11-20T00:02:03.572133+09:00",
+    "hostname": "localhost"
+  },
+  "previously_passed_cases": 7996,
+  "previously_passed_cases_all_still_pass": true,
+  "newly_excluded_previously_passed_cases": [],
+  "original_windows_failures_disposition": {
+    "skipped": 53,
+    "passed": 17
+  },
+  "new_linux_only_exclusions": 53,
+  "all_original_70_pass_on_linux": true,
+  "store_link_case_still_passes": true,
+  "original_failure_nodes": [
+    {
+      "class": "tests.test_async_evidence_io",
+      "name": "test_cancelled_sdk_source_check_settles_without_blocking_event_loop[adapter_retry]",
+      "windows": {
+        "outcome": "passed",
+        "reason": null
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_behavior_context_mtls_recovery",
+      "name": "test_mtls_job_retries_same_backup_and_preserves_context_after_publication_failure",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Container recovery requires POSIX directory fsync"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_behavior_execution_collector",
+      "name": "test_private_feed_permissions_and_symlink_checked_before_signing",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "POSIX owner-only feed permissions; portable link test separate"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_credential_peer_service",
+      "name": "test_peer_authentication_requires_current_unit_main_pid_and_kernel_membership[valid]",
+      "windows": {
+        "outcome": "passed",
+        "reason": null
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_failed_trace_never_kills_reaped_or_unowned_pid[exec_failure]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "POSIX wait-status and fork cleanup contract"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_failed_trace_never_kills_reaped_or_unowned_pid[initial_exit]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "POSIX wait-status and fork cleanup contract"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_failed_trace_never_kills_reaped_or_unowned_pid[ownership_lost]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "POSIX wait-status and fork cleanup contract"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_failed_trace_never_kills_reaped_or_unowned_pid[timeout]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "POSIX wait-status and fork cleanup contract"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_trace_limits_fail_before_fork[-1]",
+      "windows": {
+        "outcome": "passed",
+        "reason": null
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_trace_limits_fail_before_fork[0]",
+      "windows": {
+        "outcome": "passed",
+        "reason": null
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_trace_limits_fail_before_fork[10]",
+      "windows": {
+        "outcome": "passed",
+        "reason": null
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_trace_limits_fail_before_fork[31]",
+      "windows": {
+        "outcome": "passed",
+        "reason": null
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_trace_limits_fail_before_fork[True]",
+      "windows": {
+        "outcome": "passed",
+        "reason": null
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_trace_limits_fail_before_fork[inf]",
+      "windows": {
+        "outcome": "passed",
+        "reason": null
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_history_binding",
+      "name": "test_trace_limits_fail_before_fork[nan]",
+      "windows": {
+        "outcome": "passed",
+        "reason": null
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_metrics_show_original_age_both_pending_types_and_capacity",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Actual POSIX protected public status file"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_profile_does_not_accept_invalid_limits_or_remote_paths[max_indeterminate_age_seconds-0]",
+      "windows": {
+        "outcome": "passed",
+        "reason": null
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_profile_does_not_accept_invalid_limits_or_remote_paths[max_intents-0]",
+      "windows": {
+        "outcome": "passed",
+        "reason": null
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_profile_does_not_accept_invalid_limits_or_remote_paths[max_intents-True]",
+      "windows": {
+        "outcome": "passed",
+        "reason": null
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_profile_does_not_accept_invalid_limits_or_remote_paths[max_unpublished_age_seconds-86401]",
+      "windows": {
+        "outcome": "passed",
+        "reason": null
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_profile_does_not_accept_invalid_limits_or_remote_paths[schema-old]",
+      "windows": {
+        "outcome": "passed",
+        "reason": null
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_profile_does_not_accept_invalid_limits_or_remote_paths[scope_sha256-bad]",
+      "windows": {
+        "outcome": "passed",
+        "reason": null
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_exec_recovery_status",
+      "name": "test_profile_does_not_accept_invalid_limits_or_remote_paths[status_file-relative.json]",
+      "windows": {
+        "outcome": "passed",
+        "reason": null
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_execution_continuous",
+      "name": "test_feed_rejects_unprotected_or_blocking_files[fifo]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "POSIX FIFO input"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_execution_continuous",
+      "name": "test_feed_rejects_unprotected_or_blocking_files[public]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "POSIX owner-only mode"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_execution_continuous",
+      "name": "test_feed_rejects_unprotected_or_blocking_files[symlink]",
+      "windows": {
+        "outcome": "passed",
+        "reason": null
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_execution_retention",
+      "name": "test_archived_bundle_replays_after_expiry_without_resigning_or_consuming_approval",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "POSIX durable input retirement"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_execution_retention",
+      "name": "test_failed_file_sync_never_removes_original_input",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "POSIX durable input retirement"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_execution_retention",
+      "name": "test_input_rotation_resumes_after_link_but_before_unlink",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "POSIX fsync/link/unlink recovery"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_execution_retention",
+      "name": "test_pending_receipts_and_evaluations_are_never_archived",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "POSIX durable input retirement"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_execution_retention",
+      "name": "test_rotation_refuses_replaced_symlink_and_conflicting_destination",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "POSIX durable input retirement; portable link test separate"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_archive_restore_is_byte_exact_and_never_rolls_latest_back",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_complete_private_record_and_idempotent_publication",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[authorization_disabled]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[caller_disabled]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[caller_wrong_pin]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[policy_changed]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[runtime_disabled]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_current_revocation_and_pins_override_old_valid_seal[service_wrong_pin]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_durable_outbox_resumes_without_execution_or_resigning[before_latest]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_durable_outbox_resumes_without_execution_or_resigning[before_run]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_no_pin_stale_restore_and_clock_regression",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_operator_retry_cli_cannot_execute_and_health_cli_requires_caller_pin",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[capture_link]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[latest_link]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[outbox_link]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[outbox_nested]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[outbox_same]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[run_extra_file]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_private_paths_reject_links_and_unexpected_files[run_link]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_refuse_wrong_worker_before_sealing",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_stripping_managed_seal_cannot_downgrade_to_legacy_capture",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.access_record_sha256]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.caller_ref_sha256]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.policy_sha256]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.request_sha256]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.resource_id]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.session_ref_sha256]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[app_use.session_version]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[authorization_proof.signature]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[caller_receipt.service_evidence_sha256]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[caller_receipt.signature]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[event.collection_basis]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[event.event_id]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[exit_code]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[request.command_sha256]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[request.nonce]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[runtime_proof.signature]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[sealed_at]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    },
+    {
+      "class": "tests.test_managed_exec_retention",
+      "name": "test_tampering_never_reports_fresh_or_publishes[signature]",
+      "windows": {
+        "outcome": "skipped",
+        "reason": "Native POSIX sealed-outbox storage"
+      },
+      "linux": {
+        "outcome": "passed",
+        "reason": null
+      }
+    }
+  ]
+}

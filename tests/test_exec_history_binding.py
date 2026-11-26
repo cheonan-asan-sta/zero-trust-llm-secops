@@ -1,5 +1,6 @@
 """Adversarial contract controls; actual kernel/systemd is a separate native run."""
 
+import os
 from datetime import UTC, datetime
 from types import SimpleNamespace
 
@@ -266,6 +267,7 @@ def test_trace_limits_fail_before_fork(monkeypatch, timeout):
 
 
 @pytest.mark.parametrize("stage", ["initial_exit", "exec_failure", "ownership_lost", "timeout"])
+@pytest.mark.skipif(os.name != "posix", reason="POSIX wait-status and fork cleanup contract")
 def test_failed_trace_never_kills_reaped_or_unowned_pid(monkeypatch, stage):
     import signal
     from datetime import timedelta
