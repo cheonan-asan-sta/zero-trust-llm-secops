@@ -1,0 +1,87 @@
+{
+  "date": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "pushed": false,
+  "ci_started": false,
+  "merged": false,
+  "model_quality_reevaluated": false,
+  "asgi_task_cancellation_tested": true,
+  "raw_tcp_disconnect_tested": false,
+  "native_systemd_rerun_this_phase": false,
+  "before": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "3",
+    "skipped": "0",
+    "tests": "3",
+    "time": "7.589",
+    "timestamp": "2026-11-19T01:06:21.103336+09:00",
+    "hostname": "희주",
+    "xml_sha256": "3a91c85c13f0188e36296a09da000e65f6745557dc8657f317fe738ad0a762af",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\async-audit-before-20261119.xml"
+  },
+  "focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "6",
+    "time": "3.444",
+    "timestamp": "2026-11-19T01:12:37.453558+09:00",
+    "hostname": "희주",
+    "xml_sha256": "40056d2ebd7229260111170e78af4e71f74611f9a5f9c483ca27b753d3c51543",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\async-audit-focused-20261119.xml"
+  },
+  "windows_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "1",
+    "tests": "143",
+    "time": "55.597",
+    "timestamp": "2026-11-19T01:14:06.178412+09:00",
+    "hostname": "희주",
+    "xml_sha256": "fc461397411a746214ae8a0be34aa1beee8b04f4f82e87d6266fbbd69fb7f263",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\async-audit-windows-related-20261119.xml"
+  },
+  "linux_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "205",
+    "time": "84.745",
+    "timestamp": "2026-11-19T01:14:11.525771+09:00",
+    "hostname": "localhost",
+    "xml_sha256": "f52f3d375a1589da4541aa59868e31cfd0260bbe13477ea0b48e008ec216c1a0",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\async-audit-linux-related-20261119.xml"
+  },
+  "source_files": [
+    {
+      "path": "app/main.py",
+      "sha256": "60e38fa3224b09aae9a21074ca9834a2731dbbde347c00a3b4e8ebce97f266d0"
+    },
+    {
+      "path": "app/services/settled_io.py",
+      "sha256": "edca3601b374bc8ce962af79b21be8f486764ebb0a354ae4cb565a1bf67cb330"
+    },
+    {
+      "path": "app/services/sqlite_audit.py",
+      "sha256": "5a5378ac2a3cc8d465b0acd3c791e0da6131e5dea72d6237c66897cbf7fc4f50"
+    },
+    {
+      "path": "app/services/federated_audit.py",
+      "sha256": "1192eae787ada62db139320d745b7e140ff8159151370ee7fd58cd81a5b8861f"
+    },
+    {
+      "path": "app/services/audit_manifest.py",
+      "sha256": "f6bb154e66ec6926aae8d4cfc300f11f84269a3ff29b275d8b23bf0682593531"
+    },
+    {
+      "path": "tests/test_async_audit_io.py",
+      "sha256": "bbcd47a7c98ea3567a6e219fe9a6d48912c4b4f5de6f8f9c0df832fabe6ca6cf"
+    }
+  ]
+}

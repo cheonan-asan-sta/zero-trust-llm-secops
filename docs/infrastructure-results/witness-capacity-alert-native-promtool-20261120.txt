@@ -1,0 +1,3 @@
+Checking /home/chaehj02/witness-verified-source-20261120-b77eceb3/infra/observability/alerts.yaml
+  SUCCESS: 25 rules found
+

@@ -1,0 +1,4 @@
+Starting ztw-1427db979cac-collector-probe@lab.service - Pinned local audit witness collector for lab...
+WITNESS_SANDBOX_PROBE={"schema": "local-witness-systemd-probe-1", "uid": 1, "no_new_privileges": true, "effective_capabilities": 0, "permitted_capabilities": 0, "inheritable_capabilities": 0, "database_readable": true, "database_write_open_allowed": false, "private_key_readable": true, "private_key_write_open_allowed": false, "cache_writable": true, "ipv4_socket_allowed": false, "unix_socket_allowed": true, "process_memory_syscalls_denied": {"process_vm_readv": true, "pidfd_getfd": true}, "proc_readable": false, "automatic_activation_allowed": false, "independent_storage_verified": false}
+ztw-1427db979cac-collector-probe@lab.service: Deactivated successfully.
+Finished ztw-1427db979cac-collector-probe@lab.service - Pinned local audit witness collector for lab.

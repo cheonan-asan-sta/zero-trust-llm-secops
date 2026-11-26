@@ -9,8 +9,10 @@
   </title>
   <link href="/static/favicon.svg" rel="icon"/>
   <link href="/static/dashboard.css" rel="stylesheet"/>
+  <script defer="" src="/static/collection-view.js"></script>
   <script defer="" src="/static/dashboard.js">
   </script>
+  <script defer="" src="/static/dashboard-login-queue.js"></script>
   <script defer="" src="/static/dashboard-operations.js"></script>
  </head>
  <body>
@@ -390,10 +392,15 @@
     </section>
     <section aria-label="로그 탐색" data-view="logs" hidden="">
      <div class="card">
+      <form id="auditSearchForm" class="filter-bar" aria-label="전체 감사 기록 검색">
+       <label class="search-box">전체 기록 검색<input id="auditQuery" type="search" maxlength="256" placeholder="이벤트·주체·판단 근거·검토 메모" /></label>
+       <label>전체 기록 분석기<select id="auditAnalyzer"><option value="">모든 분석기</option><option value="rule">규칙</option><option value="openai">OpenAI</option><option value="hybrid">하이브리드</option></select></label>
+       <button class="button" type="submit">전체 기록 검색</button>
+      </form>
       <div class="filter-bar">
        <label class="search-box">
         <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg>
-        <input aria-label="로그 검색" id="logSearch" placeholder="이벤트 ID, 근거, 사용자 검색" type="search"/>
+        <input aria-label="현재 페이지에서 로그 검색" id="logSearch" placeholder="현재 페이지에서 검색" type="search"/>
        </label>
        <label>
         위험도
@@ -417,7 +424,7 @@
        </label>
        <label>
         분석기
-        <select id="analyzerFilter">
+        <select id="analyzerFilter" aria-label="현재 페이지 분석기">
          <option value="">
           모든 분석기
          </option>
@@ -456,7 +463,7 @@
         </select>
        </label>
        <button class="button secondary" id="exportLogs">
-        JSON 저장
+        현재 페이지 JSON
        </button>
       </div>
       <div class="table-meta">
@@ -464,9 +471,10 @@
         불러오는 중
        </span>
        <span>
-        최근 100건에서 검색
+        전체 기록 검색은 서버 조회 / 현재 페이지 검색·분석기는 내려받은 페이지에 적용
        </span>
       </div>
+      <p class="scope-note" id="logSnapshot" role="status"></p>
       <div class="table-wrap">
        <table>
         <thead>
@@ -503,6 +511,9 @@
         </button>
         <button class="button small" id="nextPage">
          다음 →
+        </button>
+        <button class="button small" id="reloadAudit">
+         최신 목록 조회
         </button>
        </div>
       </div>
@@ -581,6 +592,50 @@
      </div>
     </section>
     <section aria-label="증거와 승인" data-view="evidence" hidden="">
+     <article class="card login-queue" aria-labelledby="loginQueueTitle">
+      <div class="card-heading">
+       <h2 id="loginQueueTitle">로그인 대기열</h2>
+       <button class="button" type="button" id="loginQueueRefresh">대기열 새로고침</button>
+      </div>
+      <div class="login-queue-body">
+       <p id="loginQueueStatus" role="status">조회 신원을 확인한 뒤 대기열을 불러옵니다.</p>
+       <dl id="loginQueueSummary" class="login-queue-summary" hidden></dl>
+       <ul id="loginQueueAlerts" class="login-queue-alerts" aria-label="현재 대기열 경보"></ul>
+       <div id="loginQueueReview" hidden>
+        <form id="loginQueueSearch" class="login-queue-search" role="search" aria-label="로그인 대기열 이벤트 검색">
+         <label for="loginQueueEventFilter">이벤트 ID</label>
+         <input id="loginQueueEventFilter" type="search" maxlength="128" />
+         <button class="button" type="submit">조회</button>
+        </form>
+        <h3>보류 항목</h3>
+        <p id="loginQueueHeldEmpty" hidden>보류 항목이 없습니다.</p>
+        <div class="table-wrap" id="loginQueueHeldTable">
+         <table><thead><tr><th scope="col">이벤트 ID</th><th scope="col">보류 원인</th><th scope="col">마지막 시도</th><th scope="col">시도 횟수</th><th scope="col">검토</th></tr></thead>
+         <tbody id="loginQueueHeldRows"></tbody></table>
+        </div>
+        <div class="login-queue-actions" id="loginQueuePager" hidden>
+         <button class="button" type="button" id="loginQueueFirst">첫 페이지</button>
+         <button class="button" type="button" id="loginQueueNext">다음 페이지</button>
+        </div>
+        <form class="login-queue-form" id="loginQueueApproval" aria-labelledby="loginQueueApprovalTitle" hidden>
+         <h3 id="loginQueueApprovalTitle">재전송 승인</h3>
+         <p id="loginQueueSelected"></p>
+         <label for="loginQueueNote">확인한 원인과 조치</label>
+         <textarea id="loginQueueNote" rows="2" minlength="3" maxlength="300" required></textarea>
+         <div class="login-queue-actions">
+          <button class="button primary" id="loginQueueApprove" type="submit">승인하고 재전송 등록</button>
+          <button class="button" id="loginQueueCancel" type="button">취소</button>
+         </div>
+        </form>
+        <h3>최근 승인·재전송 이력</h3>
+        <p id="loginQueueHistoryEmpty" hidden>승인·재전송 이력이 없습니다.</p>
+        <div class="table-wrap" id="loginQueueHistoryTable">
+         <table><thead><tr><th scope="col">처리 상태와 검토 결과</th><th scope="col">이벤트 ID</th><th scope="col">시각</th><th scope="col">승인·분석 상세</th></tr></thead>
+         <tbody id="loginQueueHistoryRows"></tbody></table>
+        </div>
+       </div>
+      </div>
+     </article>
      <div class="two-column">
       <article class="card">
        <div class="card-heading">
@@ -726,6 +781,15 @@
       <a class="button secondary" href="/static/workbench.html">
        워크벤치 열기
       </a>
+     </div>
+    </section>
+    <section data-view="cases" hidden="" aria-label="사고 목록">
+     <div class="card">
+      <div class="card-heading"><h2>사고 목록</h2><span>상세와 상태 변경은 현재 기록을 다시 확인합니다.</span></div>
+      <div class="table-wrap"><table aria-label="조회 시점의 사고 목록">
+       <thead><tr><th>사고</th><th>갱신</th><th>상태</th><th>담당자</th><th>버전</th><th></th></tr></thead>
+       <tbody id="caseRows"></tbody>
+      </table></div>
      </div>
     </section>
     <section id="operationsWorkspace" hidden="" aria-label="작업 공간"></section>

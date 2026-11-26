@@ -1,8 +1,11 @@
 import json
 import threading
 from contextlib import contextmanager
+from http.client import HTTPConnection
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from time import sleep
 from urllib.error import HTTPError
+from urllib.parse import urlsplit
 from urllib.request import ProxyHandler, Request, build_opener
 
 import pytest
@@ -201,3 +204,26 @@ def test_real_http_server_authenticates_before_reading_upstream(summary):
             opener.open(Request(server + "/metrics", data=b"{}", headers={"Authorization": "Bearer scrape-token"}), timeout=2)
         assert rejected.value.code == 501
     assert received == ["viewer-only-key"]
+
+
+def test_unsupported_post_returns_501_when_the_body_follows_the_headers(summary):
+    received = []
+    with (
+        serve(upstream(summary, received)) as origin,
+        serve(exporter.handler(origin + "/zero-trust/signals/inbox", "viewer-only-key", "scrape-token")) as server,
+    ):
+        address = urlsplit(server)
+        connection = HTTPConnection(address.hostname, address.port, timeout=2)
+        try:
+            connection.putrequest("POST", "/metrics")
+            connection.putheader("Content-Length", "2")
+            connection.putheader("Authorization", "Bearer scrape-token")
+            connection.endheaders()
+            sleep(0.01)
+            connection.send(b"{}")
+            with connection.getresponse() as rejected:
+                assert rejected.status == 501
+                rejected.read()
+        finally:
+            connection.close()
+    assert received == []

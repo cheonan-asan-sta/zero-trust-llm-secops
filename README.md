@@ -1,3 +1,24 @@
+> 2026-11-20 08:00 KST · 오전08:00까지 요청한 로컬 검증·개선 범위를 마쳤다.
+> 제품 `f6e1a0a`: Windows8240통과/613제외·Linux8848통과/5제외·실패0·양 OS2498개 파일 불변. 이전 통과 사례6구간에서 누락/실패·제외 전환0.
+> 기본 주기 장시간 시험: 실제6000.820초·watch100회·상태599표본·감사34행·SIGKILL/동일 기준 재개2회. [최종 현황](docs/extra-until-0800-20261120.md) · [전체 회귀](docs/extra-until0800-regression-20261120.md) · [지속 실행 원본](docs/extra-witness-sustained-20261120.md).
+> 기존 개발360건 F1 93.41%·탐지 목표 미달. 무료 재생 SHA256동일·새 API0. 유료/AWS/Docker 생성·업로드·CI·병합·실제8시간 soak 없음.
+
+> 2026-11-20 extra 지속 목표 완료: [플랫폼 거부 경계·SDK 취소·실제 VPN TLS 검증](docs/extra-platform-admission-20261120.md). 제품 ff44064·표시범위4b4c50c·TLS 시험217d090. 최종 Windows8,025통과/591제외·실패0; Linux 전체8,610통과/5제외, 이후 보관40/TLS25 별도 통과. 기존 Windows7,996통과 유지·기존 실패70은17통과/53 Linux전용, 해당70 Linux 모두통과. 실제 Windows 운영/SSO/독립호스트/8h/F1 달성으로 표시하지 않음. 모델·정답·예측·기존 F1 93.41% 유지, 유료/AWS/Docker/push/CI/병합 없음. 아래는 이전 기록이다.
+
+> 2026-11-19 extra 후속: [전체 회귀·Windows 실패 분류·수집기 링크 보강](docs/extra-full-regression-20261119.md). 기준58d698a Linux8,600통과/4제외, Windows7,996통과/70실패/538제외. b87c0a0 링크/경로 신원 보강 뒤 Linux영향113·Windows선택12통과. 최신 전체 재실행 통과/Windows 운영 인수로 표현하지 않음. 전체/후속 원본·환경 지문 보존, F1변경·유료·AWS·Docker·push·CI·병합·8h없음. 아래는 이전 기록.
+
+> 2026-11-19 extra: [별도 로컬 감사 검증자·서명 영수증](docs/extra-audit-witness-20261119.md) 완료. 구현64e33a9, Windows65통과/2제외·Linux67통과. [회귀 결과 정리 전 개발 목표](docs/extra-active-development-goal-20261119.md)의 네 구현 항목 완료. 최종 전체 회귀/8h soak·실제 조직 배포/독립 호스트 보관은 미완료. 미업로드·미병합·유료/AWS/Docker 없음. 아래는 이전 시점 기록이다.
+
+> 2026-11-19 extra: [남은 로컬 검토 호출 경로·필수 정책 준비](docs/extra-review-callers-20261119.md) 완료. Windows11통과/2제외·Linux21통과. 실제 조직 배포는 별도이며 [지속 목표](docs/extra-active-development-goal-20261119.md)는 별도 감사 검증자 로컬 개발로 이어진다. 미업로드·미병합.
+
+> 2026-11-19 extra: [워크벤치·대시보드의 세션/사고 페이지](docs/extra-collection-pages-ui-20261119.md) 연결 완료. 실제 브라우저112조건·기존 검토34/조회57조건·관련 Python 양 OS72건 통과. 미업로드·미병합.
+
+> 2026-11-19 extra 개발 중: [세션·사고 페이지 서버 API](docs/extra-collection-paging-20261119.md)와 양 OS49건 기능 검증 완료. UI 연결은 남았으며 [지속 목표](docs/extra-active-development-goal-20261119.md)는 활성 상태다. 미업로드·미병합.
+
+> 2026-11-19 extra: [전체 감사 기록 검색·분석기 필터](docs/extra-audit-search-20261119.md) 구현. [지속 개발 목표](docs/extra-active-development-goal-20261119.md)는 활성 상태이며 세션·사고 페이지와 별도 감사 검증자 개발을 이어간다. 로컬 검증, 미업로드·미병합.
+
+> 2026-11-19 extra 후속: [기존 워크벤치 감사 페이지·신원/조회 기준 보호](docs/extra-workbench-paging-20261119.md). [서버 검토 필수화 선택 정책](docs/extra-server-review-policy-20261119.md) — 기본 off, 실제 조직 배포 별도. [검토 CLI 서버 신원 연결·snapshot v2](docs/extra-cli-review-binding-20261119.md) — v1 파일은 새 prepare·확인 필요. [기존 워크벤치의 조회 버전·현재 신원·확인 후 검토 저장](docs/extra-workbench-review-20261119.md), [감사 페이지·동일 조회 기준 탐색](docs/extra-dashboard-paging-20261119.md), [대시보드 검토 보호](docs/extra-dashboard-review-20261119.md), [검토 CLI·HTTPS/mTLS](docs/extra-operator-review-client-20261119.md). 로컬 구현·검증이며 main/aitest 미병합. 기업 SSO·독립 성능 목표 완료와 구분한다.
+
 # zero-trust-llm-secops
 
 **2026-11-17 LLM 후속 개발:** [검증 근거 연결·전체 평가·미해결 항목](docs/llm-operation-evidence-20261117.md), [읽기 전용 근거 조회와 권고 안전 제한](docs/llm-read-only-evidence-review-20261117.md). 개발360건은 정밀도96.45%·재현율90.56%·F1 93.41%·보수 오탐률3.33%로 목표 미달이다. 작은 로컬 정책 사례의100% 결과와 구분한다. 고정47fc624 Linux7,696통과/2skip·Windows660통과/27skip·브라우저57/142검사 통과다. 실제 접근 권한은 기존 PE/PA/PEP가 판단하며 LLM 검토는 권고만 제공한다. 이번 후속 변경은 로컬 보존 상태이며 push·CI·병합·AWS 배포는 하지 않았다. 아래는 이전 시점 기록이다.
@@ -454,6 +475,18 @@ ALLOWED_HOSTS=secops.example.com
 
 OIDC 토큰은 RS256 서명, 발급자, 대상, 만료시간과 필수 사용자·테넌트·역할 클레임을 확인합니다. 역할은 `viewer`, `analyst`, `responder`, `admin`이며 조회, 분석, 검토 처리, 품질 평가 권한을 분리합니다. 서비스 연동용 API 키 모드도 제공하지만 실제 키 대신 SHA-256 해시만 설정에 보관합니다.
 
+이미 발급된 토큰까지 애플리케이션에서 즉시 차단하려면 `OIDC_REVOKED_SUBJECTS_PATH`에 운영자만 갱신할 수 있는 JSON 파일을 지정합니다. 최초에는 `subjects`를 빈 배열로 준비하고, 차단 시 발급자에 속한 테넌트와 토큰의 `sub`를 기록합니다.
+
+```json
+{
+  "schema": "oidc-revocations-1",
+  "issuer": "https://identity.example.com",
+  "subjects": [{"tenant_id": "example", "subject": "user-id-to-block"}]
+}
+```
+
+같은 디렉터리에서 새 파일을 쓴 뒤 기존 파일을 원자적으로 교체합니다. 모든 앱 인스턴스에 동일한 정책이 반영되어야 하며, 파일을 지정한 상태에서 삭제하거나 발급자가 일치하지 않으면 인증 요청은 503을 반환합니다. 앱은 새 요청과 분석 공개 직전에 정책을 다시 읽습니다. 조직 IdP의 로그아웃·권한 회수 이벤트를 이 파일에 반영하는 책임과 차단 해제 절차는 배포 환경에서 정해야 합니다.
+
 현재 구현은 기업 도입을 위한 기술 기준선입니다. 18개 통제의 요약은 조회 권한으로 볼 수 있지만, 코드·테스트 위치가 포함된 상세 증적은 관리자에게만 공개됩니다. 통제 구현률은 인증이나 규정 준수 선언이 아닙니다. v0.15의 아웃박스는 외부 전송을 기본 비활성화한 로컬 전달 상태 머신이며 실제 SIEM·ITSM으로 네트워크 요청을 보내지 않습니다. 실제 운영 전에는 조직 IdP 연결, API Gateway/WAF 기반 분산 속도 제한, 목적지별 인증·재전송·보존 정책, 장애 복구 훈련과 외부 침투시험을 완료해야 합니다.
 
 ## 빠른 시작
@@ -575,6 +608,7 @@ HYBRID_LLM_TIMEOUT_SECONDS=2.5
 | POST | `/response/preview` | 실제 조치 없는 대응 미리보기 |
 | GET | `/metrics` | 누적 분석 현황 요약 |
 | GET | `/results?limit=20` | 최근 분석 결과 목록 |
+| GET | `/audit/results?limit=20` | 검증된 로컬 감사 페이지·tenant 필터·암호화 커서 ([동작·설정·한계](docs/extra-audit-paging-20261119.md)) |
 | GET | `/results/{event_id}` | 최근 분석 결과 조회 |
 | GET | `/internal/metrics` | 관리자 전용 Prometheus 메트릭 |
 

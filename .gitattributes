@@ -6,6 +6,40 @@ docs/infrastructure-results/** text eol=lf
 # Evidence screenshots must preserve their PNG signature and compressed bytes.
 docs/infrastructure-results/*.png binary
 docs/infrastructure-results/*.zip binary
+# These raw JUnit files retain the runner's original bytes for SHA-256 evidence.
+docs/infrastructure-results/extra-final-full-native-linux-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/jsonl-query-source-windows-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/http-review-contract-linux-final-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/jsonl-read-contract-windows-final-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/local-validation-evidence-checker-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/local-validation-evidence-checker-linux-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/operator-review-client-final-windows-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/operator-review-client-final-linux-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/dashboard-review-final-windows-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/dashboard-review-final-linux-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/dashboard-review-linux-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/dashboard-review-final-pin-windows-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/dashboard-review-final-pin-linux-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/dashboard-paging-final-windows-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/dashboard-paging-final-linux-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/workbench-review-final-windows-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/workbench-review-final-linux-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/cli-binding-before-20261119.xml -text whitespace=-blank-at-eol,cr-at-eol
+docs/infrastructure-results/cli-binding-final-windows-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/cli-binding-final-linux-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/review-policy-before-instrumentation-20261119.xml -text whitespace=-blank-at-eol,cr-at-eol
+docs/infrastructure-results/review-policy-before-20261119.xml -text whitespace=-blank-at-eol,cr-at-eol
+docs/infrastructure-results/review-policy-final-windows-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/review-policy-final-linux-20261119.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/review-policy-dashboard-browser-20261119.json -text whitespace=cr-at-eol
+docs/infrastructure-results/review-policy-workbench-browser-20261119.json -text whitespace=cr-at-eol
+docs/infrastructure-results/workbench-paging-*.xml -text whitespace=cr-at-eol
+docs/infrastructure-results/workbench-paging-*.json -text whitespace=cr-at-eol
+docs/infrastructure-results/audit-search-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+docs/infrastructure-results/audit-search-*.json -text whitespace=cr-at-eol
+docs/infrastructure-results/collection-pages-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+docs/infrastructure-results/collection-pages-ui-*.json -text whitespace=cr-at-eol
+docs/infrastructure-results/collection-ui-*.xml -text whitespace=cr-at-eol
 infra/mtls/nginx-renewal.sh text eol=lf
 infra/mtls/nginx-rekey.sh text eol=lf
 infra/runtime/** text eol=lf
@@ -29,3 +63,61 @@ infra/f1-lab/native-audit/captured-v113/execution.json -text whitespace=cr-at-eo
 
 # Historical approval evidence is pinned to the original committed bytes.
 tests/fixtures/behavior_context/historical-approval.json text eol=lf
+docs/infrastructure-results/review-caller-migration-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+docs/infrastructure-results/audit-witness-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+docs/infrastructure-results/extra-full-regression-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+docs/infrastructure-results/extra-full-regression-*-environment-*.json -text whitespace=cr-at-eol
+docs/infrastructure-results/extra-full-regression-native-source-*.json -text whitespace=cr-at-eol
+docs/infrastructure-results/extra-full-ruff-*.json -text whitespace=cr-at-eol
+docs/infrastructure-results/extra-platform-admission-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+docs/infrastructure-results/extra-platform-admission-*.json -text whitespace=cr-at-eol
+docs/infrastructure-results/extra-platform-admission-*.txt -text whitespace=-blank-at-eol,cr-at-eol
+docs/infrastructure-results/witness-operations-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+docs/infrastructure-results/extra-witness-operations-baseline-*.json -text whitespace=cr-at-eol
+
+docs/infrastructure-results/witness-observer-*.xml -text whitespace=-blank-at-eol,cr-at-eol
+docs/infrastructure-results/witness-observer-ruff-20261120.json -text whitespace=cr-at-eol
+
+docs/infrastructure-results/witness-monitor-* -text whitespace=-blank-at-eol,cr-at-eol
+docs/infrastructure-results/witness-alert-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-control-backup-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-restore-inspection-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-restore-monitor-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+docs/infrastructure-results/witness-restore-alert-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-clock-boundary-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-restore-resume-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+docs/infrastructure-results/witness-resume-alert-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-safety-sequence-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-monitor-cadence-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+docs/infrastructure-results/witness-cadence-alert-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-systemd* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/post-full* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+docs/infrastructure-results/post-full*/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+docs/infrastructure-results/until0800-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+docs/infrastructure-results/witness-systemd*/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-capacity-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-boundary-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+docs/infrastructure-results/witness-boundary-*/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/until0800-*/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-order-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+docs/infrastructure-results/witness-order-*/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+docs/infrastructure-results/report-failure-boundaries-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-sustained-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+docs/infrastructure-results/witness-sustained-*/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+
+docs/infrastructure-results/witness-resource-budget-* -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+docs/infrastructure-results/witness-resource-budget-*/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol

@@ -201,7 +201,7 @@ class ServiceEvidenceJoiner:
     A copied or restored store is not a production anti-rollback authority.
     """
 
-    def __init__(self, registry, ledger, *, capacity=10000, expected_mode="systemd"):
+    def __init__(self, registry, ledger, *, capacity=10000, expected_mode="systemd", read_only=False):
         require(
             isinstance(registry, PinnedServiceRegistry)
             and type(capacity) is int
@@ -209,6 +209,8 @@ class ServiceEvidenceJoiner:
             "service_joiner_capacity",
         )
         require(expected_mode in {"systemd", "local_process_lab"}, "service_expected_mode")
+        require(type(read_only) is bool, "service_read_only_mode")
+        self.read_only = read_only
         self.registry, self.path, self.capacity, self.mode = (
             registry,
             Path(ledger),
@@ -216,6 +218,11 @@ class ServiceEvidenceJoiner:
             expected_mode,
         )
         require(self.path.parent.is_dir() and not self.path.is_symlink(), "service_ledger_path")
+        if read_only:
+            with self.connect(read_only=True) as con:
+                con.execute("SELECT identity,event,evidence,state FROM observations LIMIT 0")
+                con.execute("SELECT observed FROM clock LIMIT 0")
+            return
         with self.connect() as con:
             con.execute(
                 "CREATE TABLE IF NOT EXISTS observations (identity TEXT PRIMARY KEY, event TEXT NOT NULL, evidence TEXT NOT NULL, state TEXT NOT NULL)"
@@ -225,16 +232,36 @@ class ServiceEvidenceJoiner:
             )
 
     @contextmanager
-    def connect(self):
+    def connect(self, *, read_only=False):
+        require(read_only or not self.read_only, "service_read_only_writer_rejected")
         require(not self.path.is_symlink(), "service_ledger_link")
-        connection = sqlite3.connect(self.path, timeout=5)
+        connection = sqlite3.connect(
+            self.path.resolve().as_uri() + "?mode=ro" if read_only else self.path,
+            timeout=5,
+            uri=read_only,
+        )
         try:
+            if read_only:
+                connection.execute("PRAGMA query_only=ON")
             with connection:
                 yield connection
         finally:
             connection.close()
 
     def check(self, event, proofs, *, now=None):
+        if self.read_only:
+            return ServiceFacts("unavailable")
+        return self._check(event, proofs, now=now, record=True)
+
+    def inspect(self, event, proofs, *, now=None):
+        """Reverify an already recorded observation without inserting or advancing clocks.
+
+        An unrecorded, expired, withdrawn, or changed observation is unavailable.
+        This read cannot admit evidence or make a failed dispatch retryable.
+        """
+        return self._check(event, proofs, now=now, record=False)
+
+    def _check(self, event, proofs, *, now, record):
         now = datetime.now(UTC) if now is None else now
         try:
             Window.aware(now)
@@ -328,22 +355,27 @@ class ServiceEvidenceJoiner:
             )
             evidence = digest(sorted(signed, key=lambda v: v["observation"]["kind"]))
             identity = digest([event.tenant_id, event.server_id, event.mode, event.event_id])
-            with self.connect() as con:
-                con.execute("BEGIN IMMEDIATE")
+            with self.connect(read_only=not record) as con:
+                con.execute("BEGIN IMMEDIATE" if record else "BEGIN")
                 clock = con.execute("SELECT observed FROM clock WHERE singleton=1").fetchone()
                 require(
                     clock is None or now >= datetime.fromisoformat(clock[0]),
                     "service_clock_regression",
                 )
-                con.execute(
-                    "INSERT OR REPLACE INTO clock VALUES (1,?)", (now.astimezone(UTC).isoformat(),)
-                )
+                if record:
+                    con.execute(
+                        "INSERT OR REPLACE INTO clock VALUES (1,?)",
+                        (now.astimezone(UTC).isoformat(),),
+                    )
+                else:
+                    require(clock is not None, "service_observation_not_recorded")
                 old = con.execute(
                     "SELECT event,evidence,state FROM observations WHERE identity=?", (identity,)
                 ).fetchone()
                 if old:
                     require(old == (event.sha256, evidence, state), "service_event_collision")
                     return ServiceFacts(state, evidence, True)
+                require(record, "service_observation_not_recorded")
                 require(
                     con.execute("SELECT count(*) FROM observations").fetchone()[0] < self.capacity,
                     "service_ledger_capacity",

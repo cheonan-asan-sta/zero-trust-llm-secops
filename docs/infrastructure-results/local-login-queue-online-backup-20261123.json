@@ -1,0 +1,110 @@
+{
+  "online_linux_docker": {
+    "scope": "different loopback API processes; original disposable directory removed; no external host",
+    "source_files_absent": true,
+    "snapshot_sqlite_quick_check_passed": 2,
+    "mismatched_snapshot_blocked_before_restore": true,
+    "online_encrypted_package_sha256": "d8cd40bc2e132b1ad510be8d0fce521afc9c77b3d6a7d81bdd21f1a74937d238",
+    "wal_sources_copied_as_standalone_databases": true,
+    "live_audit_commit_between_queue_and_audit_copies": true,
+    "between_copy_commit_reused_without_new_audit": true,
+    "wrong_pin_modified_ciphertext_wrong_scope_rejected": true,
+    "newer_queue_with_older_audit_rejected": true,
+    "restore_ready_only_for_valid_pair": true,
+    "existing_restore_candidate_not_replaced": true,
+    "candidate_with_ready_marker_and_modified_database_rejected": true,
+    "initial_queue_counts": {
+      "held": 1,
+      "pending": 2
+    },
+    "pre_restore_audit_records_including_baselines": 7,
+    "final_audit_records_including_baselines": 8,
+    "restored_delivery_records": 4,
+    "restored_prior_audit_detail_matched": true,
+    "unconfirmed_commit_reused": true,
+    "old_hold_review_rejected": true,
+    "new_hold_approval_deduplicated": true,
+    "duplicate_analysis_or_audit_records": 0,
+    "before": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "tn": 2,
+      "inference_errors": 0,
+      "population": 4,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "false_positive_rate": 0,
+      "accuracy": 1
+    },
+    "after": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "tn": 2,
+      "inference_errors": 0,
+      "population": 4,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "false_positive_rate": 0,
+      "accuracy": 1
+    },
+    "aws_calls": 0,
+    "paid_api_calls": 0
+  },
+  "windows_offline_regression": {
+    "scope": "different loopback API processes; original disposable directory removed; no external host",
+    "source_files_absent": true,
+    "snapshot_sqlite_quick_check_passed": 2,
+    "mismatched_snapshot_blocked_before_restore": true,
+    "snapshot_hashes": {
+      "login-queue.sqlite3": "cd0b85d049ba59f6cca74f9ff25b64f8aa06f518e7ba0f64b277c6149e7485ea",
+      "analysis-audit.sqlite3": "2197dab0e85a82eabbe160f6b5c59f8cd1a45b013a19328e4a9513e5fb648e8b"
+    },
+    "initial_queue_counts": {
+      "held": 1,
+      "pending": 2
+    },
+    "pre_restore_audit_records_including_baselines": 6,
+    "final_audit_records_including_baselines": 8,
+    "restored_delivery_records": 4,
+    "restored_prior_audit_detail_matched": true,
+    "unconfirmed_commit_reused": true,
+    "old_hold_review_rejected": true,
+    "new_hold_approval_deduplicated": true,
+    "duplicate_analysis_or_audit_records": 0,
+    "before": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "tn": 2,
+      "inference_errors": 0,
+      "population": 4,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "false_positive_rate": 0,
+      "accuracy": 1
+    },
+    "after": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "tn": 2,
+      "inference_errors": 0,
+      "population": 4,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "false_positive_rate": 0,
+      "accuracy": 1
+    },
+    "aws_calls": 0,
+    "paid_api_calls": 0
+  },
+  "linux_regression_tests_passed": 41,
+  "backup_restore_verify_cli_passed": true,
+  "ruff_passed": true
+}

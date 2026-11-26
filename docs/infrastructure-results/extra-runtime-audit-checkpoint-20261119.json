@@ -1,0 +1,104 @@
+{
+  "schema": "extra-runtime-audit-checkpoint-1",
+  "date_kst": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "pushed": false,
+  "ci_started": false,
+  "merged": false,
+  "model_quality_reevaluated": false,
+  "new_tests": 26,
+  "native_conditions": 53,
+  "native_new_conditions": 2,
+  "windows_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "3",
+    "tests": "259",
+    "time": "84.612",
+    "timestamp": "2026-11-19T03:37:23.475618+09:00",
+    "hostname": "희주",
+    "passed": 256,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\runtime-checkpoint-windows-final-20261119.xml",
+    "xml_sha256": "8c95856769f678140aa511433bac658066770448e4fd592b536a6618cf4b05f6"
+  },
+  "linux_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "2",
+    "tests": "259",
+    "time": "83.605",
+    "timestamp": "2026-11-19T03:37:25.747222+09:00",
+    "hostname": "localhost",
+    "passed": 257,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\runtime-checkpoint-linux-final-20261119.xml",
+    "xml_sha256": "7fb5912271cdf3c2771ce85eb8a39bd5204e2e541497437c1b23b486a1197bc8"
+  },
+  "native_source_run_sha256": "466d1702a0a398cdfbd442ac4679069f314577b5f45def163ef6539249c7bbdc",
+  "native_runtime_checkpoint": {
+    "current_audit_rows": 3,
+    "current_pending_analyses": 1,
+    "cursor_resumed_over_tcp": true,
+    "key_failure_blocks_pages_and_readiness": true,
+    "original_scope_and_expiry_preserved": true,
+    "owned_cursor_key_removed": true,
+    "provider_stub_calls_third": 0,
+    "runtime_checkpoint_exact_state_recovery": true,
+    "runtime_checkpoint_pin_failure_blocks_reads": true,
+    "runtime_checkpoint_rejects_valid_database_rollback": true,
+    "snapshot_pending_analyses": 2,
+    "third_exit_code": -9
+  },
+  "runtime_guard_opt_in": true,
+  "sqlite_only": true,
+  "guarded_startup_never_initializes": true,
+  "write_checkpoint_checked_before_commit": true,
+  "checkpoint_hot_reload": false,
+  "independent_storage_verified": false,
+  "latest_live_state_verified": false,
+  "automatic_activation_allowed": false,
+  "source_files": [
+    {
+      "path": "app/config.py",
+      "sha256": "76645c61703ccd814e4750d5bfc056c276276de2aa6d1faa82618e5422b03b91"
+    },
+    {
+      "path": "app/services/audit.py",
+      "sha256": "f765d67915fa77328f113ff822ea6a33ea4b89117359738fc049fe878692aac3"
+    },
+    {
+      "path": "app/services/audit_backup.py",
+      "sha256": "8b41a6bc45d11737a5c8084babc3809cea50324acb654db43690a6b088bffdf7"
+    },
+    {
+      "path": "app/services/guarded_sqlite_audit.py",
+      "sha256": "c773deae1929744701fd7037a11be712b330d0c8f9e89c6ee29d843e98eaa458"
+    },
+    {
+      "path": "scripts/f1_lab/http_worker_controls.py",
+      "sha256": "b848d1493109e8d2bad3f5a1823bc1ad2dfac02c9829ae81329c8092d368a3c7"
+    },
+    {
+      "path": "scripts/native_http_worker.py",
+      "sha256": "144789d9a5e8bb6e882ef7c7a2dd5233f88e014f85045e72cd6e435cc5878990"
+    },
+    {
+      "path": "tests/test_http_worker_restart.py",
+      "sha256": "9a26198fd0006239420ee7711b678bf72da68c1a25284f8a06fd9b62c247e386"
+    },
+    {
+      "path": "tests/test_runtime_audit_checkpoint.py",
+      "sha256": "f902758325f6a7e08520bbd3fa156d8b78bbeaa6c322c291a73d975e3b7b381d"
+    }
+  ],
+  "limits": [
+    "fixed externally trusted minimum, not latest system state",
+    "empty seq0 has no nonempty history lineage",
+    "no atomic transaction spanning checkpoint file and SQLite",
+    "backup guard checked on copied snapshot; post-encryption external withdrawal remains follow-up",
+    "no paid model evaluation, enterprise SSO, remote WORM, multi-host or postponed 8h soak"
+  ]
+}

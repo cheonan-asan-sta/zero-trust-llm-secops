@@ -1,0 +1,28 @@
+"""One dependent local timed run, only after the older owned run exits cleanly."""
+import json
+import os
+import subprocess
+import sys
+import time
+from datetime import UTC, datetime
+from pathlib import Path
+
+runtime=Path(__file__).resolve().parent
+surface='windows' if os.name=='nt' else 'linux'
+tag='b77-seed21-20261120'
+record=runtime/f'until0800-{surface}-timed-{tag}-launcher.json'
+with record.open('x') as stream:json.dump({'schema':'owned-dependent-timed-launch-1','pid':os.getpid(),'surface':surface,'started_at':datetime.now(UTC).isoformat(),'source_commit':'b77eceb30747a0a764cf997879a124b590eef972','status':'waiting','paid_api_calls':0},stream,indent=2)
+marker=runtime/f'until0800-{surface}-timed-d45-20261120-completion.json'
+deadline=time.monotonic()+7200
+while not marker.exists():
+    if (runtime/'until0800-followup-timed.stop').exists():raise SystemExit(2)
+    if time.monotonic()>deadline:raise TimeoutError('older owned timed run did not finish')
+    time.sleep(1)
+old=json.loads(marker.read_text(encoding='utf-8'))
+assert old['source_commit']=='d45e91f725d15d820a477fb0c0dfec083a22a6c8'
+assert old['source_bytes_unchanged'] and not old['mutated_source_files'] and old['exit_code'] in {0,2}
+if (runtime/'until0800-followup-timed.stop').exists() or datetime.now(UTC)>=datetime(2026,11,19,21,0,tzinfo=UTC):
+    raise SystemExit('Not starting a two-hour run too close to the 08:00 KST boundary')
+data=json.loads(record.read_text(encoding='utf-8'));data.update(status='launching',old_exit_code=old['exit_code'],old_finished_at=old['finished_at'],new_seed=20261121)
+record.write_text(json.dumps(data,indent=2)+'\n')
+raise SystemExit(subprocess.call([sys.executable,str(runtime/'run_frozen_latest_timed_20261120.py'),'timed',tag]))

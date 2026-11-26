@@ -1,0 +1,21 @@
+{
+  "pid": 664,
+  "executable": "/home/chaehj02/team-llm-prep-venv/bin/python",
+  "arguments": [
+    "/home/chaehj02/team-llm-prep-venv/bin/python",
+    "-m",
+    "scripts.run_witness_safety_sequence",
+    "--directory",
+    "/mnt/c/Users/chaeh/Desktop/파란학기/tmp/extra-development-20261118/runtime/until0800-linux-timed-d45-20261120-sequence",
+    "--seed",
+    "20261120",
+    "--rounds",
+    "32",
+    "--delay-seconds",
+    "23",
+    "--max-seconds",
+    "7200"
+  ],
+  "cwd": "/home/chaehj02/witness-verified-source-20261120-d45e91f7",
+  "source_commit": "d45e91f725d15d820a477fb0c0dfec083a22a6c8"
+}

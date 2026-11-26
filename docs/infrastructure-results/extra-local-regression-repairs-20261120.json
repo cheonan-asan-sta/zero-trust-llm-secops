@@ -1,0 +1,406 @@
+{
+  "schema": "local-regression-repairs-evidence-1",
+  "implementation_commit": "6033a7b5f7da91c66e0ca00fa7607e4dc7517ff3",
+  "source_sha256": {
+    "scripts/evaluate_m6.py": "d8e346095947ac43f3194117e887f57960404219bd353a6070f67cd1266c3c7e",
+    "tests/test_m6_report_lock.py": "d022f748154d9b68911c0e0bfbd50a275ec1184b6039b9f3bf2a4c194143c1fe",
+    "tests/test_m6_report_publication.py": "c3544ad50f98cd4b98b6518956661ba277220c30ea147be2cc43873134e9a062",
+    "tests/test_async_evidence_io.py": "c842a321996d9f8f2306edc83fc8038065422afd622f9d4b8efda021dae4a639"
+  },
+  "first_repair_commit": "8d2df526843418e50124b23808c54b9597e79008",
+  "baseline_source_commit": "d45e91f725d15d820a477fb0c0dfec083a22a6c8",
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/post-full-async-delay-reproduction-20261120.log",
+      "sha256": "082ca9859f9044072f8398780e7132bb8eb8d8f19c20cd358a8d48fb8952c7c4"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-async-delay-reproduction-20261120.xml",
+      "sha256": "70a9ea2e407ed1be365bb72a9bdb79bb4378bcd0412c4f3fafc3ed23c3485fc6",
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-async-negative-control-20261120/negative-control.xml",
+      "sha256": "7aa7425fd23178fadd3d25eef5bb255598c08d6c14662b387f5f25244331c39e",
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-async-negative-control-20261120/result.json",
+      "sha256": "88d54f12d2a2e400f33ff1630497fd117edfe5a14862b1a831c83b737a8689c1"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-async-negative-control-20261120.log",
+      "sha256": "8a36fc6b965a74d73a6e3e652b8ca14ce424c67c4e6cb03db68d8922158f2ef0"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-failures-linux-final-20261120.log",
+      "sha256": "5126f76a344d8d7784131260aa5528af648ad37c05ae0ee44941ba37a8a2482b"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-failures-linux-final-20261120.xml",
+      "sha256": "19e02a112969c202784d471198658fbf2b91abc7630889c6809bdcc78a033f9a",
+      "tests": 63,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-failures-linux-mutex-20261120.log",
+      "sha256": "0220d5917d440ee582e3d6eea22a54c6a76113adf65f810c3b4923addfbf0eec"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-failures-linux-mutex-20261120.xml",
+      "sha256": "c76703090a9d63f7492def1cfe32f2f2bde0e01457c3ad6f39ea14e02bb95a2d",
+      "tests": 71,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-failures-mutex-ruff-20261120.json",
+      "sha256": "28dab48730dbf25089c3844c4bd6b47b0dee025c5e110563758bd09dd99c076e"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-failures-mutex-ruff-final-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-failures-ruff-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-failures-windows-final-20261120.log",
+      "sha256": "5318b48651a1ca2cf9e53504206435d79653292328718144d96b42c089f6adf7"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-failures-windows-final-20261120.xml",
+      "sha256": "f92cf92dae03845abe5f7443163c90d6245cd6254a04602024d88850a32f1163",
+      "tests": 63,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-failures-windows-initial-20261120.log",
+      "sha256": "2699af6cc6f36439c1871e23fafc3c0be1f69f8f82915907a2d83da47bc2f33f"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-failures-windows-initial-20261120.xml",
+      "sha256": "6fb92e1d5a69efcd57059debcdcb179736cb54189cf469db9259dd837e43333f",
+      "tests": 34,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-failures-windows-mutex-20261120.log",
+      "sha256": "2939a028c320b0b06d5c7782578f8c32525812d4841dc8c843e772ce5653e3c9"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-failures-windows-mutex-20261120.xml",
+      "sha256": "a363e085649390f280db449c747e32bd15ceaab530d974e80d662b93542a88f6",
+      "tests": 71,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-failures-windows-reportfix-20261120.log",
+      "sha256": "d19ad3d0ac7a04d7bda074ea299d79e8d498e4544cebec398908f8b0a562d451"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-failures-windows-reportfix-20261120.xml",
+      "sha256": "7819447e322505186fe75464bfd8796dcdf354eddaad3384efd887d527cafbd8",
+      "tests": 43,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-lock-linux-style-final-20261120.log",
+      "sha256": "071f3249271a2f6fd40d88986582c9fe1ac9ba0e1ce3d4a72c5f3d060e49548a"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-lock-linux-style-final-20261120.xml",
+      "sha256": "88158a7848727b6b9119412414cb2d9022362e87cfba4804b7d8732e04c5930e",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-lock-windows-style-final-20261120.xml",
+      "sha256": "a0a5469a4cd7651020d87fb87eb8be6f42025f09467a629f50c8bf6e54761906",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-mutex-crash-windows-20261120/owned-child.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-mutex-crash-windows-20261120/result.json",
+      "sha256": "1159def7b149d480dadeb93219db3ab599e628306bf64badca04f626124e24ae"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-linux-20261120/owned-processes.json",
+      "sha256": "0454f9f5f89ad5af304dffbb5f5892a0bc14664469860ebd0d703d9ff5f8b216"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-linux-20261120/result.json",
+      "sha256": "3dd6a77b3943271109d2ef96f2716a60321e93ae145912db586f567bf5390d6e"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-linux-20261120/worker-0.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-linux-20261120/worker-1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-linux-20261120/worker-2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-linux-20261120/worker-3.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-linux-mutex-20261120/owned-processes.json",
+      "sha256": "6e84a1625e50dba7c88546af4dff69db08f33e9ac9f1967d4b63103f1da146ac"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-linux-mutex-20261120/result.json",
+      "sha256": "7c626f050698f9f7ea7a5686aba5ce9af766d5b6c88cdc4f53428803770cb55a"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-linux-mutex-20261120/worker-0.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-linux-mutex-20261120/worker-1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-linux-mutex-20261120/worker-2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-linux-mutex-20261120/worker-3.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-20261120/owned-processes.json",
+      "sha256": "8ce9dd90eac7eed7b5f8018774582332c0804ed28abc6b9855f3e617dd5b1889"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-20261120/result.json",
+      "sha256": "6f2d5c1ec4c85591ee79abc24cefd150e86440078367cc061184a1b8bd6baae8"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-20261120/worker-0.log",
+      "sha256": "5482f6b800f30e5b81dc093e0d4f09046360bc7fd9b7bda6dfd5997b038b1e50"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-20261120/worker-1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-20261120/worker-2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-20261120/worker-3.log",
+      "sha256": "80f2fc7c280880acefd9f6f334bb7922c5561fbceaa2b5c8cd820f6536b4a535"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-mutex-20261120/owned-processes.json",
+      "sha256": "f6141ff25fa6562b1444b978f0998f765d67cfa3a522d84a75a57380c7a6a7ea"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-mutex-20261120/result.json",
+      "sha256": "44c0ba7f94329b9a9b69e564f592a5a77c3baeba7eb843123269d78d6b3c8d06"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-mutex-20261120/worker-0.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-mutex-20261120/worker-1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-mutex-20261120/worker-2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-mutex-20261120/worker-3.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-shared-delete-20261120/owned-processes.json",
+      "sha256": "22b6252afe9be80de845fe9edc8043a2c8dc2d6d739b2bae939fc49e9eb97b94"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-shared-delete-20261120/result.json",
+      "sha256": "490fc12ce75b6991fe15f8fe374411485e4dfebdee5910389958460e4d27529d"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-shared-delete-20261120/worker-0.log",
+      "sha256": "facd8610fdbe2ca8e1a118b23b957d73dedef599752f2cfa536ebc59d99cf5a1"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-shared-delete-20261120/worker-1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-shared-delete-20261120/worker-2.log",
+      "sha256": "b4a4e2e7ba38d0156b9875185bac4f9e52c3cb7fe4366961b7eebadb4a421e64"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-report-stress-windows-shared-delete-20261120/worker-3.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-d45-20261120-completion.json",
+      "sha256": "28e863b4b15d8423ace6e57efc28142be0a7b8e69d4cae2b1ba98394e85a4a53"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-d45-20261120-environment.json",
+      "sha256": "a5b921fbf086522d4f64c35fc727308ed2b0b72eb2123c569ae9a86fb10564eb"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-d45-20261120-process.json",
+      "sha256": "806421e3f3b4f8fce5c196f48664d7df4943135460e6956610efdf5b7e639763"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-d45-20261120.stdout.log",
+      "sha256": "12d28f8b62b9d053d255fbd71eb021c384033e75a1aa71dd8249d9feb22c802a"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-linux-full-d45-20261120.xml",
+      "sha256": "e115a759f5aa7427e7d380f8de68888aa3a68e8f334db4a1aa6d1df0ed476861",
+      "tests": 8811,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 5
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-d45-20261120-completion.json",
+      "sha256": "8090cccdcf61a905a475412bee5459f5818117d52e3497960188570c7ea113bb"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-d45-20261120-environment.json",
+      "sha256": "be7c11ad8d61014a0753bc8e4f7c94396905105ed03ee2927e8c9c32374c6e3b"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-d45-20261120-process.json",
+      "sha256": "e89236c834ac5c7493ca475948c05d9c13f50912e14f74eb659fbc667c233c7b"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-d45-20261120.stdout.log",
+      "sha256": "bad7fc5de5cbcc2c697c4d71ec5e66f1554b45e69e2f6755ed0f6c45b233b6c7"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-d45-20261120.xml",
+      "sha256": "547668eabf8ab28990c4ac6f0cc25d6f241befc8b251d21b980406e7e30d683b",
+      "tests": 77,
+      "failures": 0,
+      "errors": 77,
+      "skipped": 0
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-d45-venv-20261120-completion.json",
+      "sha256": "bafbbf291c27561689bd26b73b611303d961c06b23aa65219f7e2715facef65a"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-d45-venv-20261120-environment.json",
+      "sha256": "9376adc28419f8dd88c388e3829ada46863a74a5fe183078bb6e4e935ec453a2"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-d45-venv-20261120-process.json",
+      "sha256": "1167d78971fba45b90d663f6b415968ba895e6a098bc4132bfc96cafc1ea2d51"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-d45-venv-20261120.stdout.log",
+      "sha256": "9a2ce9094d3e8be30b39b37d62f7ad92653458d2f4f0b5373e1e4c25240c9d70"
+    },
+    {
+      "path": "docs/infrastructure-results/until0800-windows-full-d45-venv-20261120.xml",
+      "sha256": "2f5e8d2feb83b985076fd858ffafa3cf502709fcbf95e532b3e1e3d2a0b6cc32",
+      "tests": 8811,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 612
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-extra-until0800-source-20261120.json",
+      "sha256": "a33994f4d9d864855cd79dab1f4c15b913ea2d48a681c290591f793959fa4d04"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-extra-until0800-source-linux-20261120.json",
+      "sha256": "09fc9d177e29a56c9fc74ca558564aa2960e23bb1fcabdb8eb5797fe61b58475"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-extra-until0800-followup-source-20261120.json",
+      "sha256": "86ca7ee31113ef591080ded4efeca2c7398ac44fa7bffe3b3b690bcc65f09397"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-extra-until0800-followup-source-linux-20261120.json",
+      "sha256": "d3f308c10f5d5ef7a15c3cb925f96608f143241405f5ebdb28aaa41e346eaac8"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-extra-until0800-mutex-source-20261120.json",
+      "sha256": "2e7f159d85dc17899d05dd2eaef86d9bb71dd2ac458ad98c43c14fd411e66b3c"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-extra-until0800-mutex-source-linux-20261120.json",
+      "sha256": "c1dc368a3c9944309b6e3bdcb213b6ddf1b33e8b6c2958694a7bfd8a664f13d6"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-harness-run_frozen_verification_20261120-v1.py.txt",
+      "sha256": "4b7495d0dfd821492b9c0738404b756d88daae161008e85fbe9b72348663fd4f"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-harness-run_frozen_verification_20261120.py.txt",
+      "sha256": "f88625ea46ce67596681f4aaf67ba8245718341462cc647cacd36ef0db92fda2"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-harness-run_frozen_followup_20261120.py.txt",
+      "sha256": "d5cb93eda63bfb3b82d957aacaac4558d59ca55f3777d82018eec4f570b565b0"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-harness-report_publication_stress_20261120-v1.py.txt",
+      "sha256": "2761e9614ef7cccd2fbc402f751eb0edcedbd8a2655b1e404ee04d785e6f6cb6"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-harness-report_publication_stress_20261120-v2.py.txt",
+      "sha256": "99bac4edff679f144aac438894e23271362f6fd6d9da2688f17d9ccc8434f2a9"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-harness-report_publication_stress_20261120.py.txt",
+      "sha256": "1375911253b3b3968046c671c685809c8e445df52889bfb4aae497ff425c447b"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-harness-async_cancellation_negative_control_20261120.py.txt",
+      "sha256": "fb307278256a71de9a04ff53353845a5eb45563ed2c2e25c9b96fd984365c5ab"
+    },
+    {
+      "path": "docs/infrastructure-results/post-full-harness-report_mutex_crash_controls_20261120.py.txt",
+      "sha256": "f31a628f06609336e1068f8f1b5d1e73799e2d85837b50904a368b71c8552a40"
+    }
+  ],
+  "latest_full_regression_complete": false,
+  "goal_status": "active_until_0800",
+  "paid_api_calls": 0,
+  "detection_metrics_changed": false
+}

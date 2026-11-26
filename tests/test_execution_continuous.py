@@ -100,7 +100,11 @@ def test_malformed_new_file_does_not_starve_later_valid_input(lab, tmp_path, con
         assert connection.execute('SELECT name FROM input_files').fetchall() == [('0002.json',)]
 
 
-@pytest.mark.parametrize('kind', ['symlink', 'fifo', 'public'])
+@pytest.mark.parametrize('kind', [
+    'symlink',
+    pytest.param('fifo', marks=pytest.mark.skipif(os.name != 'posix', reason='POSIX FIFO input')),
+    pytest.param('public', marks=pytest.mark.skipif(os.name != 'posix', reason='POSIX owner-only mode')),
+])
 def test_feed_rejects_unprotected_or_blocking_files(lab, tmp_path, kind):
     directory, path = feed(tmp_path, lab.record)
     if kind == 'symlink':

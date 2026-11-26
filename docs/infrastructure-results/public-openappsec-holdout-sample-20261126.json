@@ -1,0 +1,108 @@
+{
+  "archive_entries": 692,
+  "archive_etag": "\"7f7b53e6e8d780e4d390c8070bffce88-71\"",
+  "archive_length": 1203983791,
+  "development_plan_sha256": "0a64ecf0c62f4bbf492a8399d840dfa2140445827551e67137a5ba7ac69e97ee",
+  "download_receipt_sha256": "f4b349317bc39b6371c62242e68ce644d22415e319938f053dc89069e7721120",
+  "eligible": 657,
+  "members": [
+    {
+      "bytes": 7797191,
+      "compressed_bytes": 626985,
+      "crc32": "23897d5a",
+      "name_sha256": "04a2781aabccad35ffeda67fd8ab9440d09658d51fb5cd77cc2fb78c02773105",
+      "ordinal": 1,
+      "sha256": "2eeb4d49157280dbed1c1a6b8647c55574565e8aa61a59e731bc78abed35532d"
+    },
+    {
+      "bytes": 14857478,
+      "compressed_bytes": 453400,
+      "crc32": "14b8c01c",
+      "name_sha256": "04b51f06e7ac30e728fee02a60dbebed51fb5d3ee634370963e67b1003647e07",
+      "ordinal": 2,
+      "sha256": "7b02f1e718a66576a2f3d5e75dd66d2b566e9296f8cea7cd4ae9457a814e5e6b"
+    },
+    {
+      "bytes": 8026326,
+      "compressed_bytes": 708929,
+      "crc32": "8e33bd54",
+      "name_sha256": "04bbac8d3d658ab71cb40209aa531aaf81b5f2ad37d5dd0e7e45f4440dd91b8a",
+      "ordinal": 3,
+      "sha256": "efbb5e5f1bb809326bca20d20036c36ecbc6aa8c7215f5dd0a7ab9f4ebd0983e"
+    },
+    {
+      "bytes": 14597291,
+      "compressed_bytes": 3910278,
+      "crc32": "49000dcb",
+      "name_sha256": "04c0ae456c3221cb4b50da94d4a98b460c0d34c07e315299075eba113181ddd0",
+      "ordinal": 4,
+      "sha256": "b0204354e8bcd04c6e640b5eaf0096998d66502f77e167a3ee12f3660ba20d1b"
+    },
+    {
+      "bytes": 4527828,
+      "compressed_bytes": 808058,
+      "crc32": "b9cdc23c",
+      "name_sha256": "0552582e56c3c1b1e6e38e076c1aeb3c7d4e482bbe9c5e9e6ca7ef5d41ab32f9",
+      "ordinal": 5,
+      "sha256": "a8e72bd2fb4f846b77b6482da7cfa32b9f05fe35735a3858a0ecdea3ce563a62"
+    },
+    {
+      "bytes": 1000772,
+      "compressed_bytes": 135735,
+      "crc32": "21a1aed5",
+      "name_sha256": "057e7deacd772faa1cd0a8b9747084e51a570391025f34f492caa1b3fff9cd38",
+      "ordinal": 6,
+      "sha256": "7c207ad77ecd20b73823f4cca2efd22a0840b1362383913df35283962d43e1d2"
+    },
+    {
+      "bytes": 6261253,
+      "compressed_bytes": 1640984,
+      "crc32": "f3537169",
+      "name_sha256": "05e7f46d289630e4ca6d21fca0809532b5dfcc96ee2fa4b82349c3ef5c40fdab",
+      "ordinal": 7,
+      "sha256": "8c3926897fafd435c6f4034a967405ea06059cf7321a7da3755ac20c38cabb06"
+    },
+    {
+      "bytes": 1882558,
+      "compressed_bytes": 388023,
+      "crc32": "d79b95e0",
+      "name_sha256": "06c44d69fc2773c2bd96999ff0625584100f758114e52fb69900b7bdd7a557f5",
+      "ordinal": 8,
+      "sha256": "1afb4d49cb752b1a32c606f9b35ffb9e6b6fe6fec22fc9afd2c18ecdf77ef762"
+    },
+    {
+      "bytes": 545202,
+      "compressed_bytes": 55544,
+      "crc32": "207d6f70",
+      "name_sha256": "071bc9f9d4b1da6fb786c4c34b3a7c6e157a1c85c0202e4458bb8122edd8db9c",
+      "ordinal": 9,
+      "sha256": "ac5fcd10a713c29346715e2ad987e19dd19c91e24e1f778dc1127e7eb16b7602"
+    },
+    {
+      "bytes": 6337842,
+      "compressed_bytes": 1230753,
+      "crc32": "c8c95d4c",
+      "name_sha256": "071f999f90f86e9e4479b2d562f5423c23f668744bf54761d8d1418b3ac4c3bd",
+      "ordinal": 10,
+      "sha256": "a6b71caea18363030d22e2d43400a9e590e76e271ce3965d62cf47e0b9dc93ca"
+    },
+    {
+      "bytes": 10743015,
+      "compressed_bytes": 614396,
+      "crc32": "e461f016",
+      "name_sha256": "0726f24ca3d5cd13233f94dad318c859b0b26453573ff22b4e1a5349fb13d25c",
+      "ordinal": 11,
+      "sha256": "504cbf5fc2c5cbb793ec9f9652f856389f61f58765822f70dbc4574b122201c8"
+    },
+    {
+      "bytes": 1081345,
+      "compressed_bytes": 199238,
+      "crc32": "910eda40",
+      "name_sha256": "0771c1fa07ec30e66bc0f763857ba3e525e47db55cc8de429a1aaadb38e145ce",
+      "ordinal": 12,
+      "sha256": "59de6c95043937b5846e040e30d22959d7a34f5b5bd0a79dd57c2832b2f2b826"
+    }
+  ],
+  "selection": "first 12 eligible SHA256 sorted names with capture site group absent in development and prior selections",
+  "source": "https://downloads.openappsec.io/waf-comparison-project/legitimate.zip"
+}

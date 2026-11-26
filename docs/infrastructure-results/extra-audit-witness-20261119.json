@@ -1,0 +1,75 @@
+{
+  "schema": "local-audit-witness-evidence-1",
+  "date": "2026-11-19",
+  "branch": "extra",
+  "implementation_commit": "64e33a90f7e61174d7b5403f351d2368f3f45f81",
+  "source_sha256": {
+    "app/services/audit_witness.py": "cacfcd7c0e0a7ffee9de78a1977bbd62264778a8d5636481c0195ff1cac12486",
+    "scripts/audit_witness.py": "1fccc5506dbd6eccec33f483e86a739d1223417aa7cef01557170eae6ffa7c71",
+    "tests/test_audit_witness.py": "8240986bf5df0f318812e8a23109a2b35e839a2379a2b6aebd770ffa2771460f"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/audit-witness-linux-final-20261119.xml",
+      "sha256": "e22f072fd295d531ee0a93838af50dd5f3071824a943bac27270e255aa3875c0",
+      "tests": 67,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/audit-witness-linux-focused-20261119.xml",
+      "sha256": "b28655b31a570e596d80a067d046fad693192af7b57e879f0832a176ecd3a9af",
+      "tests": 66,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/audit-witness-windows-final-20261119.xml",
+      "sha256": "1e55ddcbf18f316532b235b3469efa4a31774ebfb98dc7a4ae6bd4dc96013e67",
+      "tests": 67,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/audit-witness-windows-focused-20261119.xml",
+      "sha256": "e508897b7e1ba5c8320ac9ceced9465bd2c279e17f58a44f9b548066b710c015",
+      "tests": 66,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/audit-witness-windows-initial-20261119.xml",
+      "sha256": "9f779e2b634ac7946d6aeecfbc460d63c143ca07446c365bfd4bfa119038a33f",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    }
+  ],
+  "signing": "Ed25519; canonical JSON and domain separation",
+  "receipt_storage": "Separate local directory and SQLite journal; exact expected receipt CAS",
+  "independent_process_tested_on": [
+    "windows",
+    "linux"
+  ],
+  "independent_host_or_principal_verified": false,
+  "production_online_gate": false,
+  "automatic_collection_scheduler": false,
+  "private_keys_in_artifacts": false,
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "docker_created": 0,
+  "push_ci_merge": false,
+  "full_regression_completed": false,
+  "eight_hour_soak_completed": false,
+  "detection_metrics_changed": false
+}

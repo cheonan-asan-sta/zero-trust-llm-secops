@@ -1,6 +1,6 @@
 import asyncio
 import json
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -8,6 +8,7 @@ from app.analyzers.rule_based import RuleBasedAnalyzer
 from app.models import AnalysisResult, ReviewStatus
 from app.scenarios import synthetic_events
 from app.services.audit import AuditStore, DynamoDBAuditStore
+from app.services.federated_audit import AuditQueryUnavailable
 from app.services.policy import response_preview
 
 
@@ -34,7 +35,9 @@ def test_audit_history_survives_restart(tmp_path) -> None:
 
 def test_review_update_replaces_audit_snapshot_without_double_counting(tmp_path) -> None:
     event = synthetic_events()[4]
-    assessment = asyncio.run(RuleBasedAnalyzer().analyze(event))
+    assessment = asyncio.run(RuleBasedAnalyzer().analyze(event)).model_copy(
+        update={"requires_human_review": True}
+    )
     result = AnalysisResult(
         event_id=event.event_id,
         analyzer="rule",
@@ -52,7 +55,7 @@ def test_review_update_replaces_audit_snapshot_without_double_counting(tmp_path)
             "review_status": ReviewStatus.RESOLVED,
             "reviewer": "보안담당자",
             "review_note": "승인되지 않은 다운로드 세션을 종료했습니다.",
-            "review_updated_at": datetime.now(UTC),
+            "review_updated_at": result.analyzed_at + timedelta(seconds=1),
         }
     )
     asyncio.run(store.save(updated))
@@ -121,7 +124,8 @@ def test_audit_hash_chain_detects_tampering_and_refuses_append(tmp_path) -> None
 
     restored = AuditStore(log_path)
     assert restored.integrity()["ok"] is False
-    assert restored.get(event.event_id) is None
+    with pytest.raises(AuditQueryUnavailable):
+        restored.get(event.event_id)
     with pytest.raises(RuntimeError, match="integrity"):
         asyncio.run(restored.save(record))
 

@@ -15,13 +15,16 @@ from typing import TYPE_CHECKING
 
 from app.models import SecurityEvent
 from app.security import Principal, Role
+from app.services.settled_io import settled_io
 from app.services.trusted_signals import SignalRejected
 from app.zero_trust_models import SignedSessionSignal
 
 if TYPE_CHECKING:
     from app.services.zero_trust import ZeroTrustOperations
 
+LIVE_SESSION_SCOPE = "current_local_zero_trust_session_snapshot_not_historical_backfill"
 _TIMESTAMP_TYPE = datetime
+_REMOTE_LOGON_RULE_ID = "d1e2f3a4-b5c6-4d7e-8f90-a1b2c3d4e5f6"
 
 
 def event_digest(event: SecurityEvent) -> str:
@@ -47,6 +50,12 @@ class VerifiedSessionContext:
             raise SignalRejected("analysis evidence expired or event binding changed")
         return json.loads(self.facts_json)
 
+    async def revalidate(self, event: SecurityEvent) -> dict:
+        """Settle live source I/O, then check binding/expiry at the current time."""
+        if self.verify_current is not None:
+            await settled_io(self.verify_current)
+        return self.for_event(event)
+
 
 def collect_session_evidence(
     service: ZeroTrustOperations,
@@ -56,7 +65,7 @@ def collect_session_evidence(
     now: datetime | None = None,
 ) -> VerifiedSessionContext:
     """Collect current server policy and persisted signed-session state; writes nothing."""
-    from app.services.zero_trust import SessionConflict
+    from app.services.zero_trust import SessionConflict, matches_session_challenge
 
     now = now or datetime.now(UTC)
     if (
@@ -139,8 +148,29 @@ def collect_session_evidence(
     # This remains a snapshot, never a token that can be redeemed for access.
     if approval_usable:
         expires = min(expires, current.grant_expires_at)
+    # Match the signed response to the immediately preceding challenge. Only
+    # carry it into advisory analysis when the challenge had the same scope.
+    previous = history[-2] if len(history) >= 2 else None
+    same_scope_mfa_response = bool(
+        previous is not None
+        and previous.version + 1 == current.version
+        and previous.decision == "STEP_UP"
+        and previous.matched_rule_ids == [_REMOTE_LOGON_RULE_ID]
+        and set(previous.reason_codes) <= {"ELEVATED_RISK", "FRESH_MFA_REQUIRED"}
+        and previous.resource_id == current.resource_id
+        and previous.action == current.action
+        and previous.source_ip == current.source_ip
+        and previous.policy_digest_sha256 == current.policy_digest_sha256
+        and previous.signal_source_digest == current.signal_source_digest
+        and matches_session_challenge(
+            previous,
+            proof,
+            mfa_succeeded=signal.event.auth_context.mfa == "success",
+            now=current.evaluated_at,
+        )
+    )
     facts = {
-        "scope": "current_local_zero_trust_session_snapshot_not_historical_backfill",
+        "scope": LIVE_SESSION_SCOPE,
         "collected_at": now.isoformat(),
         "valid_until": expires.isoformat(),
         "tenant_id": principal.tenant_id,
@@ -175,7 +205,10 @@ def collect_session_evidence(
             "decision": current.decision,
             "status": current.status,
             "reason_codes": current.reason_codes,
+            "only_generic_remote_logon_rule_matched": current.matched_rule_ids
+            == [_REMOTE_LOGON_RULE_ID],
             "challenge_pending": current.challenge_id is not None,
+            "same_scope_mfa_response_verified": same_scope_mfa_response,
             "approval_currently_usable": approval_usable,
         },
         "not_an_access_grant": True,

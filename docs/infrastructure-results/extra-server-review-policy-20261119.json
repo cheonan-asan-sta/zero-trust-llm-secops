@@ -1,0 +1,293 @@
+{
+  "schema": "extra-server-review-policy-1",
+  "date_kst": "2026-11-19",
+  "branch": "extra",
+  "source_commit": "d461b5fff970284c081ea8f08651bacffd35b4be",
+  "baseline": {
+    "source_head": "904bc214471778f0f155a3ccfafb4fc43cb1201f",
+    "test_new_untracked": true,
+    "full_clean_baseline": false,
+    "previous_settings_ignored_new_flag": true,
+    "observed_status": 200,
+    "expected_status": 428,
+    "initial_harness_teardown_error_preserved": true
+  },
+  "configuration": {
+    "flag": "AUDIT_REVIEW_REQUIRE_IDENTITY",
+    "default": false,
+    "startup_requires": [
+      "AUDIT_BACKEND=sqlite",
+      "AUTH_MODE=api_key or oidc",
+      "AUDIT_REVIEW_REQUIRE_IF_MATCH=true"
+    ],
+    "production_config_modified": false,
+    "all_workers_rollout_performed": false
+  },
+  "protocol": {
+    "required_headers": [
+      "If-Match",
+      "X-Review-Identity"
+    ],
+    "missing_status": 428,
+    "malformed_or_duplicate_status": 400,
+    "mismatched_caller_status": 403,
+    "stale_status": 412,
+    "legacy_mode_unchanged": true,
+    "checks_before_lookup_and_after_final_authority_io": true,
+    "automatic_header_fill_retry_or_downgrade": false,
+    "public_digest_is_authentication_or_proof_of_reading": false
+  },
+  "pytest": {
+    "initial_instrumentation": {
+      "tests": 1,
+      "failures": 1,
+      "errors": 1,
+      "skipped": 0,
+      "passed": -1,
+      "seconds": 5.016,
+      "policy_cases": 2,
+      "cli_tcp_cases": 0,
+      "excluded": [],
+      "artifact": "docs/infrastructure-results/review-policy-before-instrumentation-20261119.xml"
+    },
+    "before": {
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 0,
+      "seconds": 3.827,
+      "policy_cases": 1,
+      "cli_tcp_cases": 0,
+      "excluded": [],
+      "artifact": "docs/infrastructure-results/review-policy-before-20261119.xml"
+    },
+    "windows": {
+      "tests": 253,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 3,
+      "passed": 250,
+      "seconds": 72.074,
+      "policy_cases": 28,
+      "cli_tcp_cases": 4,
+      "excluded": [
+        {
+          "case": "test_snapshot_symlink_and_fifo_are_rejected_without_read",
+          "reason": "POSIX symlink/FIFO file contract"
+        },
+        {
+          "case": "test_real_operator_cli_reads_then_reviews_once_and_refuses_replay",
+          "reason": "Owned native Linux worker fixture"
+        },
+        {
+          "case": "test_actual_http_review_version_survives_concurrent_writers_and_worker_loss",
+          "reason": "Owned Linux native worker fixture"
+        }
+      ],
+      "artifact": "docs/infrastructure-results/review-policy-final-windows-20261119.xml"
+    },
+    "linux": {
+      "tests": 253,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 253,
+      "seconds": 114.615,
+      "policy_cases": 28,
+      "cli_tcp_cases": 4,
+      "excluded": [],
+      "artifact": "docs/infrastructure-results/review-policy-final-linux-20261119.xml"
+    }
+  },
+  "browser": {
+    "dashboard": {
+      "conditions": 29,
+      "passed": true,
+      "required_policy": true,
+      "artifact": "docs/infrastructure-results/review-policy-dashboard-browser-20261119.json",
+      "owned_servers_stopped": true
+    },
+    "workbench": {
+      "conditions": 34,
+      "passed": true,
+      "required_policy": true,
+      "artifact": "docs/infrastructure-results/review-policy-workbench-browser-20261119.json",
+      "owned_servers_stopped": true
+    }
+  },
+  "counting": "253 same pytest cases per OS; policy28 plus CLI TCP4 (two scenarios times optional/required profiles). Browser conditions are separate and not added as independent pytest cases. Existing TLS/mTLS6 and native Linux worker/CLI regression included.",
+  "transport_scope": "New strict CLI process cases use TCP bridge into authenticated ASGI/SQLite. Real browser fixtures run separate loopback app processes. Existing native Linux worker and independent actual TLS/mTLS transport regressions retained. No new production TLS deployment acceptance.",
+  "scope": {
+    "product_ui_modified": false,
+    "models_rules_prompts_labels_predictions_modified": false,
+    "paid_api_calls": 0,
+    "aws_calls": 0,
+    "docker_resources_created": 0,
+    "push": false,
+    "ci": false,
+    "merge": false,
+    "full_repository_run": false,
+    "eight_hour_soak": false,
+    "external_enterprise_sso": false
+  },
+  "historical_synthetic_development_360": {
+    "precision_percent": 96.45,
+    "recall_percent": 90.56,
+    "f1_percent": 93.41,
+    "false_positive_rate_percent": 3.33,
+    "unchanged": true,
+    "independent_goal_qualified": false
+  },
+  "owned_resources": {
+    "browser_fixtures_stopped": true,
+    "cli_processes_bounded_and_bridge_servers_joined": true,
+    "native_worker_processes_killed_and_waited_by_fixture": true,
+    "not_a_system_wide_process_audit": true
+  },
+  "limitations": [
+    "Default remains false; no actual organization rollout.",
+    "All serving workers must require the same policy; optional workers still accept legacy requests.",
+    "Caller digest is not human identity, signature, key generation or independent witness.",
+    "Custom external writer inventory and legacy evaluation harness rollout remain.",
+    "Settings checks do not atomically serialize distributed policy changes with database commits.",
+    "No full suite, enterprise SSO, long soak or new detection quality evaluation."
+  ],
+  "test_files": [
+    "tests/test_api.py",
+    "tests/test_audit_review_client_binding.py",
+    "tests/test_audit_review_client_binding_process.py",
+    "tests/test_audit_review_identity.py",
+    "tests/test_audit_review_preconditions.py",
+    "tests/test_audit_review_wire_identity.py",
+    "tests/test_audit_review_preservation.py",
+    "tests/test_audit_query_admission.py",
+    "tests/test_audit_review_client.py",
+    "tests/test_audit_review_client_transport.py",
+    "tests/test_audit_review_client_process.py",
+    "tests/test_http_review_preconditions.py",
+    "tests/test_api_key_accounts.py",
+    "tests/test_runtime_release.py",
+    "tests/test_audit_review_policy.py",
+    "tests/test_enterprise_config.py"
+  ],
+  "sources": [
+    {
+      "path": ".env.example",
+      "sha256": "ea6e1bee99b5ccf745a73a4d01aa17010d75b2cd0c633fbec1585e84e4ebef0a",
+      "normalized_lf_sha256": "f07b96ee55c49571bc6d7e798085eb13e46507be4d4291248462997558209e83"
+    },
+    {
+      "path": "app/config.py",
+      "sha256": "a53dfabb0bd7f0d61563c7342759966f775be93de8a1ef4cb3a26effd6488357",
+      "normalized_lf_sha256": "c497ad6570a888e23a80e360e8e558acf610e67f19a3e92bcca8decc022de8d9"
+    },
+    {
+      "path": "app/main.py",
+      "sha256": "fea40ce2d4faea65d9959466ae03c55e0662a97c7bace11effa22c73e47ed341",
+      "normalized_lf_sha256": "d88c7818082e5b80885c5b209127309fa4dae85e71e2122a497c143cafa81fb8"
+    },
+    {
+      "path": "app/services/audit_review_preconditions.py",
+      "sha256": "ed38a58b2c59973a6fefb1d819e9d0989d0b5c7aa338654950db48fe857bf163",
+      "normalized_lf_sha256": "ed38a58b2c59973a6fefb1d819e9d0989d0b5c7aa338654950db48fe857bf163"
+    },
+    {
+      "path": "app/static/app.js",
+      "sha256": "683eb93704553cacb104702dbd7db33f733918ed7c9ae0932a598a6eba7e6936",
+      "normalized_lf_sha256": "c1c5372c7258b4d9d6cdd689bc236e937490546ccbc1f1822a3e36f0aeab60aa"
+    },
+    {
+      "path": "app/static/dashboard-operations.js",
+      "sha256": "02314493462b37d426728eba24b33a76b2ffbdffc84d7efa52854e1e3048f580",
+      "normalized_lf_sha256": "22618451585f9b7271350cf0bfb7f8b985b776efdb51d50af12c3245d8110ed8"
+    },
+    {
+      "path": "app/static/dashboard.js",
+      "sha256": "29c8c5a553343f660fb7c7174a91943d8ac9f92711270862b5c2b0f0aecfdec1",
+      "normalized_lf_sha256": "92f2c31b7607930097c9125759538254025ccab037072a9838b1959b37989613"
+    },
+    {
+      "path": "app/static/styles.css",
+      "sha256": "20f37e56061ce3358edae18e3328cd8a00d3b87f0b569d1181e30ee4bd69a23e",
+      "normalized_lf_sha256": "4bf2660f8e323df1f0ace1a1663ea2b067522f2b8549a1ef9ce98825424321b4"
+    },
+    {
+      "path": "app/static/workbench.html",
+      "sha256": "4a9e279fe72767be0a8a9b4733f0186fafcab7ecd1a66be9d9e1557956ebdc21",
+      "normalized_lf_sha256": "9c96be09611992fcf4dc3b4a298f1a0091b1ff06c96aadbdc78883d334617164"
+    },
+    {
+      "path": "scripts/audit_review_client.py",
+      "sha256": "67498007170045aa5cb869ce597b68038b159f2fedcc3d4f96d4a8c24a94d702",
+      "normalized_lf_sha256": "67498007170045aa5cb869ce597b68038b159f2fedcc3d4f96d4a8c24a94d702"
+    },
+    {
+      "path": "scripts/local_process_runtime.py",
+      "sha256": "c31f0fbf2aacd32c20e6a8e82a5e34eceb1419bfd3601ae8dff296d6506088b4",
+      "normalized_lf_sha256": "c31f0fbf2aacd32c20e6a8e82a5e34eceb1419bfd3601ae8dff296d6506088b4"
+    },
+    {
+      "path": "scripts/serve_dashboard_demo.py",
+      "sha256": "28241a9e7facdaa474d41c9be02c02b908ed92773bec0b1a40d984ff31cff9b0",
+      "normalized_lf_sha256": "28b435bd192aa02d55e7fdae4d6de23f22d840b0f5c1d14cefa98c17a4555871"
+    },
+    {
+      "path": "scripts/test_dashboard_review_browser.py",
+      "sha256": "2d8008902d308b75cb66caf95a88e9288e302f4b1138eb9efa9c95838f479ebd",
+      "normalized_lf_sha256": "2d8008902d308b75cb66caf95a88e9288e302f4b1138eb9efa9c95838f479ebd"
+    },
+    {
+      "path": "scripts/test_workbench_review_browser.py",
+      "sha256": "1645cf24b93888d41ab5b91b6deec75803c46af9828899bab74e2306934823fd",
+      "normalized_lf_sha256": "1645cf24b93888d41ab5b91b6deec75803c46af9828899bab74e2306934823fd"
+    },
+    {
+      "path": "tests/dashboard_operations_fixture.py",
+      "sha256": "c3b1318b20cb51ec6eb5aadc103522a1467e28c08c4b0fb8faef6a177ac13dd8",
+      "normalized_lf_sha256": "32151e3fbb8e18e6814c9f3f3c76030071087133e62d8516c472d85a6d08bb49"
+    },
+    {
+      "path": "tests/test_audit_review_client_binding_process.py",
+      "sha256": "fa53ddf6db4b94960f095ad3cdefd7a999197f8f513ad2517481cbf2b6cbd7e4",
+      "normalized_lf_sha256": "fa53ddf6db4b94960f095ad3cdefd7a999197f8f513ad2517481cbf2b6cbd7e4"
+    },
+    {
+      "path": "tests/test_audit_review_policy.py",
+      "sha256": "f30e399cf94c630802421b04defb41afda2e3c2285b7e7ba28e127fb0c692fc7",
+      "normalized_lf_sha256": "f30e399cf94c630802421b04defb41afda2e3c2285b7e7ba28e127fb0c692fc7"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/review-policy-before-instrumentation-20261119.xml",
+      "sha256": "10ad4e45b3c6836c03031460ca93b009668f6ad79919ec107aa57bf491d04f40",
+      "bytes": 11785
+    },
+    {
+      "path": "docs/infrastructure-results/review-policy-before-20261119.xml",
+      "sha256": "bf49c7eb1128e2b97600d226121cd6aa798561e56f8e9221ae6b893f294b3476",
+      "bytes": 731
+    },
+    {
+      "path": "docs/infrastructure-results/review-policy-final-windows-20261119.xml",
+      "sha256": "4266a50cc1680bd1a6007eaf590088a6b2ef456bb38b90ec1213492e470f535b",
+      "bytes": 38126
+    },
+    {
+      "path": "docs/infrastructure-results/review-policy-final-linux-20261119.xml",
+      "sha256": "f8c571b23c395f6d0e71c2b7470aed0e31c542f5ea006e2ac0a6f6a0b95d9d2f",
+      "bytes": 37430
+    },
+    {
+      "path": "docs/infrastructure-results/review-policy-dashboard-browser-20261119.json",
+      "sha256": "353599386df21137d7c4c80ed0cc8b76b19e621473d6366ceead6e1c5fe32424",
+      "bytes": 3724
+    },
+    {
+      "path": "docs/infrastructure-results/review-policy-workbench-browser-20261119.json",
+      "sha256": "019e5b2eb8b8d9e7715e014355dbc20795481af8c70085af42bd79dd0a13a6d3",
+      "bytes": 4690
+    }
+  ]
+}

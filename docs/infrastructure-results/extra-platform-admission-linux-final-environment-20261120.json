@@ -1,0 +1,15 @@
+{
+  "python": "3.12.3",
+  "platform": "Linux",
+  "openssl": "OpenSSL 3.0.13 30 Jan 2024",
+  "packages": {
+    "pytest": "8.4.2",
+    "fastapi": "0.162.0",
+    "starlette": "1.10.0",
+    "httpx": "0.28.1",
+    "openai": "2.54.0",
+    "cryptography": "50.0.2",
+    "pydantic": "2.14.2",
+    "pydantic-settings": "2.16.2"
+  }
+}

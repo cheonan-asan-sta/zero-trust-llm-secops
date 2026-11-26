@@ -1,0 +1,36 @@
+{
+  "schema": "frozen-hybrid-routing-replay-1",
+  "source_kind": "committed_published_results",
+  "regenerated_inputs_sha256": "fce731785e465486b62fbc92236648dd008471d9ef4f9516ac60b8a1a6d84a13",
+  "source_file_sha256": {
+    "published_results.json": "a39ccae9c8cc3d023b088303f0ef518dd1231ec06e972fdbc2e090f08e4ffe52"
+  },
+  "source_pins": {
+    "scripts/replay_hybrid_development.py": "712701ed0f593fa0cd03191b51ee50a8375e7e5fcf81adef3fbcc24578053a64",
+    "app/analyzers/hybrid.py": "9d00c6d8ec42c174e2269072b57164e54023dd31fbc4ccf8e8ff6c5b5cc1fcf2",
+    "app/analyzers/rule_based.py": "9be78ff453f935602a2b13687a81f69ead32667daa396185db2837e008681922",
+    "app/config.py": "a53dfabb0bd7f0d61563c7342759966f775be93de8a1ef4cb3a26effd6488357",
+    "app/grounded_prompting.py": "ad6a03d534c0701a1a111083cc7c297171ba0e078f77f0dae6c9fb76f66fc28a",
+    "scripts/retry_incomplete_evaluation.py": "e2425f8110abe67a5d2f1ded183e27e32ac05b04950b3bccbf3359776a85c10b",
+    "scripts/compare_llm_grounded.py": "7f2430542e440777b1ab8e2304da1c1fc01720bbca0af714026e4cbc34a3e377",
+    "scripts/evaluate_llm_grounded.py": "219cb6d85c970f2c23abbca488c88388f685b74a7092fd1b6a32f540e85166de",
+    "docs/infrastructure-results/llm-development360-20261117.json": "a39ccae9c8cc3d023b088303f0ef518dd1231ec06e972fdbc2e090f08e4ffe52"
+  },
+  "cases_sha256": "de6ecc654b55450a9b5636dd29f08742c056e9be43c6458aabecf000a407775f",
+  "source_model": "gpt-5.4-mini-2026-03-17",
+  "cases": 360,
+  "variants": [
+    "rule",
+    "hybrid_default",
+    "hybrid_review_all"
+  ],
+  "confidence_threshold": 0.85,
+  "configured_hybrid_timeout_seconds": 2.5,
+  "live_timeouts_or_cancellation_replayed": false,
+  "source_format_failure": "existing hybrid rule fallback; preserve source error separately",
+  "source_UNKNOWN": "pass the actual structured UNKNOWN through the existing merge; never force a label",
+  "development_gate": "no lost TP, no new FP, non-decreasing F1, at least one correction vs standalone frozen LLM",
+  "runtime_adoption": false,
+  "fresh_provider_requests": 0,
+  "independent_acceptance": false
+}

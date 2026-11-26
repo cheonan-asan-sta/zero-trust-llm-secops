@@ -1,0 +1,84 @@
+{
+  "schema": "witness-control-backup-evidence-1",
+  "date": "2026-11-20",
+  "implementation_commit": "c05c87abd6d37e4e70733850a14c09c047fb5127",
+  "source_sha256": {
+    "app/services/audit_witness_observer.py": "aa0b491f70a4e70b63f073862e4ead8442520a969e702a5b4218edb749005baa",
+    "app/services/audit_witness_observer_backup.py": "9bdb5dc38b967ae8d1aaede0ce8fdf7588abc645cb6c042d5e7f61dab5f8e8e4",
+    "scripts/audit_witness_observer_backup.py": "f688f29bfd7b40bc8832402605c4716e704cf1e1973bc245d383e1b28da659dc",
+    "tests/test_witness_observer_backup.py": "cd3d63ad138001748f87ae6c844e7f38e32596a1ac4720108596ffaee6999c6d",
+    "tests/test_witness_observer_restore_process.py": "5f6e3ba61aa5991709453ad4d7033c07d020f637e25648ac42f46b2c4381a2a1"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/witness-control-backup-linux-final-20261120.xml",
+      "sha256": "78ac99e2cd96eb8fcfa558f28a8c3e73b1f698148987008c5aaa1803a278b436",
+      "tests": 123,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-control-backup-linux-focused-20261120.xml",
+      "sha256": "1b06959719dda3348ee1d0907264043f4b8c430db95d5a2fe14a58066221424b",
+      "tests": 115,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-control-backup-windows-final-20261120.xml",
+      "sha256": "70d88a644bbf3cd8a3f98ee519675c797a69fb7b7d16981c850bb2d6c8bd2d52",
+      "tests": 119,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 10,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-control-backup-windows-focused-20261120.xml",
+      "sha256": "ebfee0c72eca0437295f350dafabb8485df08cc9962fc3300139b3d96abf712d",
+      "tests": 115,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 10,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-control-backup-windows-initial-20261120.xml",
+      "sha256": "17d00af437513c97a2507748f97bff2df90fe2c64e7251df53823b9e9760f1fe",
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-control-backup-windows-signed-payload-20261120.xml",
+      "sha256": "b16f3e69cb4c771568013800193d041b49e345fcde6c3bf40b779f1e6ede09e9",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-control-backup-ruff-final-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "purpose": "Full repository Ruff, zero diagnostics"
+    }
+  ],
+  "new_backup_tests": 30,
+  "new_actual_process_loss_tests": 4,
+  "private_signing_key_included": false,
+  "private_plaintext_staging_used": true,
+  "automatic_activation_allowed": false,
+  "same_host_local_only": true,
+  "real_8h_soak": false,
+  "detection_metrics_changed": false,
+  "paid_api_calls": 0,
+  "github_push_ci_merge": false,
+  "until_0800_goal_complete": false
+}

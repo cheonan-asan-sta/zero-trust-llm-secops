@@ -1,0 +1,4 @@
+Running as unit: zt-large-witness-6d058e0034d544359aedc8da1f7c840c.service; invocation ID: 2d538361a3a947dead160c90b2ebea5d
+Finished with result: success
+Main processes terminated with: code=exited/status=0
+Service runtime: 30.240s

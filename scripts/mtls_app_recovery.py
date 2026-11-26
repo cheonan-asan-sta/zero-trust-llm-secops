@@ -38,6 +38,8 @@ def phase(public=PUBLIC):
 
 
 def sync_directory(path):
+    recovery.require(os.name == "posix" and hasattr(os, "O_DIRECTORY"),
+                     "mtls_recovery_posix_required")
     descriptor = os.open(path, os.O_RDONLY | os.O_DIRECTORY)
     try:
         os.fsync(descriptor)
@@ -79,6 +81,8 @@ def frozen_source(source, frozen):
 
 def restore(*, authority=Path("/authority"), source=Path("/source"), registry=REGISTRY,
             public=PUBLIC, destination=Path("/restored")):
+    recovery.require(os.name == "posix" and hasattr(os, "O_DIRECTORY"),
+                     "mtls_recovery_posix_required")
     recovery.local_only()
     recovery.require(phase(public) == {"phase": "maintenance"}, "mtls_recovery_not_fenced")
     store = _store(authority, source, registry)

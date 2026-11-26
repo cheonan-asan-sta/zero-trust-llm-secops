@@ -115,7 +115,7 @@ class LocalSessionAnalysisLab:
     def save_registry(self):
         self.registry_path.write_bytes(json.dumps(self.registry).encode())
 
-    def sign(self, event, session_id, expected_version=0):
+    def sign(self, event, session_id, expected_version=0, *, challenge_id=None):
         now = datetime.now(UTC)
         unsigned = SignedSessionSignal(
             session_id=session_id,
@@ -126,6 +126,7 @@ class LocalSessionAnalysisLab:
             key_id="ephemeral-key",
             issued_at=now,
             expires_at=now + timedelta(seconds=120),
+            challenge_id=challenge_id,
             signature="A" * 86,
         )
         signature = (
@@ -133,12 +134,16 @@ class LocalSessionAnalysisLab:
         )
         return unsigned.model_copy(update={"signature": signature})
 
-    def create(self, scenario):
+    def create(self, scenario, *, evidence_event_id=None):
         name, _, resource, role, mfa, managed, action = scenario
         nonce = secrets.token_hex(12)
         event = SecurityEvent.model_validate(
             {
-                "event_id": "event-" + nonce,
+                "event_id": (
+                    evidence_event_id
+                    if evidence_event_id and name != "revoked_request"
+                    else "event-" + nonce
+                ),
                 "timestamp": datetime.now(UTC),
                 "user": {"user_id": "local-user", "role": role, "active": True},
                 "device": {
@@ -176,7 +181,7 @@ class LocalSessionAnalysisLab:
             )
             event = event.model_copy(
                 update={
-                    "event_id": "event-" + secrets.token_hex(12),
+                    "event_id": evidence_event_id or "event-" + secrets.token_hex(12),
                     "timestamp": datetime.now(UTC),
                 }
             )

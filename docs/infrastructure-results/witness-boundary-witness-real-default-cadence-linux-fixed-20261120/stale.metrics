@@ -1,0 +1,21 @@
+# TYPE secops_witness_bridge_enabled gauge
+secops_witness_bridge_enabled 1
+secops_witness_status_success 1
+secops_witness_observation_healthy 0
+secops_witness_observation_action_required 1
+secops_witness_collection_interval_seconds 60
+secops_witness_anchor_count 3
+secops_witness_state{state="healthy"} 0
+secops_witness_state{state="offline"} 0
+secops_witness_state{state="uninitialized"} 0
+secops_witness_state{state="pending"} 0
+secops_witness_state{state="stale"} 1
+secops_witness_state{state="unobserved"} 0
+secops_witness_state{state="clock_regression"} 0
+secops_witness_state{state="witness_advanced"} 0
+secops_witness_state{state="capacity_pressure"} 0
+secops_witness_state{state="capacity_exhausted"} 0
+secops_witness_state{state="unavailable"} 0
+secops_witness_remaining_receipts 4092
+secops_witness_unobserved_rows 0
+secops_witness_observation_age_seconds 181.020923

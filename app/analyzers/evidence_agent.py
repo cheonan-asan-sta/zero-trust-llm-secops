@@ -22,6 +22,7 @@ from app.grounded_prompting import (
     grounded_output_type,
     validate_grounded,
 )
+from app.services.settled_io import settled_io
 
 AGENT_INSTRUCTIONS = """
 You may request the read-only evidence functions when necessary before a structured assessment.
@@ -115,9 +116,7 @@ class EvidenceReviewAgent:
             )
         task[0]["content"] = json.dumps(inventory, ensure_ascii=False, sort_keys=True)
         for round_index in range(3):
-            if context.verify_current:
-                context.verify_current()
-            context.for_event(event)
+            await context.revalidate(event)
             partial = replace(
                 context, facts_json=json.dumps(visible, ensure_ascii=False, sort_keys=True).encode()
             )
@@ -161,8 +160,7 @@ class EvidenceReviewAgent:
                     and "read_bound_execution_evidence" not in retrieved
                 ):
                     raise EvidenceReviewRejected("required_execution_evidence_not_retrieved")
-                if context.verify_current:
-                    context.verify_current()
+                await context.revalidate(event)
                 assessment = validate_grounded(response.output_parsed, event, partial)
                 return (
                     assessment,
@@ -196,13 +194,12 @@ class EvidenceReviewAgent:
                 raise EvidenceReviewRejected("invalid_tool_arguments") from None
             if type(arguments) is not dict or arguments:
                 raise EvidenceReviewRejected("tool_arguments_must_be_empty")
-            if context.verify_current:
-                context.verify_current()
-            context.for_event(event)
+            await context.revalidate(event)
             if call.name == "read_bound_execution_evidence":
                 data = {"execution": full["execution"]}
             else:
-                data = {"history": history_getter()}
+                data = {"history": await settled_io(history_getter)}
+                await context.revalidate(event)
             previous_paths = evidence_catalog(event, partial)
             visible.update(data)
             retrieved.add(call.name)

@@ -1,0 +1,5 @@
+Started ztw-b9b4716962d3-collector@lab.service - Pinned local audit witness collector for lab.
+{"schema": "local-audit-witness-observer-1", "state": "healthy", "healthy": true, "anchor_verified": true, "live_checked": true, "audit_minimum_verified": true, "signing_capability_checked": false, "receipt_sha256": "24b405989d8f838c36fe98b9e3c9b8c46600c46a332061e87e0bd289f144d5be", "age_seconds": 0.003261, "observed_at": "2026-11-19T18:19:00.644742+00:00", "pending_started_at": null, "max_age_seconds": 10, "interval_seconds": 1, "capacity_warning": 0, "pending": false, "anchor_count": 2, "independent_storage_verified": false, "automatic_activation_allowed": false, "unobserved_rows": 0, "remaining_receipts": 4093, "recovered": false, "cycle_success": true}
+Stopping ztw-b9b4716962d3-collector@lab.service - Pinned local audit witness collector for lab...
+ztw-b9b4716962d3-collector@lab.service: Deactivated successfully.
+Stopped ztw-b9b4716962d3-collector@lab.service - Pinned local audit witness collector for lab.

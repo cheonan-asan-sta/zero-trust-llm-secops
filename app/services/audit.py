@@ -3,6 +3,9 @@ import hashlib
 import hmac
 import json
 import math
+import os
+import stat
+import threading
 from pathlib import Path
 from typing import Protocol
 
@@ -26,16 +29,25 @@ class AuditRepository(Protocol):
 
 
 class AuditStore:
-    def __init__(self, path: Path) -> None:
+    MAX_BYTES = 128 * 1024 * 1024
+    MAX_ROWS = 100000
+    MAX_ROW_BYTES = 2 * 1024 * 1024
+    _local_review_history = True
+
+    def __init__(self, path: Path, *, strict_reads: bool = False) -> None:
+        self._strict_reads = strict_reads
         self._path = path
         self._records: dict[tuple[str, str], AnalysisResult] = {}
         self._history: list[AnalysisResult] = []
         self._history_positions: dict[str, int] = {}
         self._lock = asyncio.Lock()
+        self._disk_lock = threading.RLock()
+        self._prefix_hasher = hashlib.sha256()
         self._last_hash = "0" * 64
         self._integrity_ok = True
         self._verified_lines = 0
         self._legacy_lines = 0
+        self._page_seen_file = path.exists()
         self._load_existing()
 
     async def save(self, record: AnalysisResult) -> None:
@@ -66,16 +78,38 @@ class AuditStore:
                 raise cancelled
 
     def get(self, event_id: str, tenant_id: str = "local") -> AnalysisResult | None:
-        return self._records.get((tenant_id, event_id))
+        _records, latest = self._verified_read_view()
+        return latest.get((tenant_id, event_id))
 
     def recent(self, limit: int = 20, tenant_id: str = "local") -> list[AnalysisResult]:
-        records = [record for record in self._history if record.tenant_id == tenant_id]
+        records = [
+            record for record in self._verified_read_view()[0] if record.tenant_id == tenant_id
+        ]
         return list(reversed(records[-limit:]))
 
     def metrics(self, tenant_id: str = "local") -> MetricsSummary:
         return _summarize(
-            [record for record in self._history if record.tenant_id == tenant_id]
+            [record for record in self._verified_read_view()[0] if record.tenant_id == tenant_id]
         )
+
+    def _verified_read_view(self):
+        # Rebuild returned models from current disk bytes. A validated prefix
+        # alone cannot make caller-mutated cached Python objects authoritative.
+        latest = {}
+
+        def observe(record, _hashed):
+            key = (record.tenant_id, record.event_id)
+            previous = latest.get(key)
+            if (
+                previous is None
+                or previous.analysis_id == record.analysis_id
+                or record.analyzed_at >= previous.analyzed_at
+            ):
+                latest[key] = record
+
+        with self._disk_lock:
+            records, _metadata = self._check_writer_view(include_records=True, row_observer=observe)
+        return records, latest
 
     def integrity(self) -> dict[str, bool | int | str]:
         return {
@@ -85,19 +119,138 @@ class AuditStore:
             "legacy_lines": self._legacy_lines,
         }
 
+    def verify_saved(self, expected):
+        from app.services.audit_wire import analysis_wire
+        from app.services.federated_audit import AuditQueryUnavailable
+
+        expected = AnalysisResult.model_validate_json(expected.model_dump_json())
+        expected_wire = analysis_wire(expected)
+        found = False
+
+        def observe(record, hashed):
+            nonlocal found
+            if hashed and record.analysis_id == expected.analysis_id:
+                found = found or analysis_wire(record) == expected_wire
+
+        # Reopen bounded disk data, never the writer's cached result objects.
+        self._saved_view(observe)
+        if not found:
+            raise AuditQueryUnavailable("returned analysis is not preserved in its writer shard")
+
+    def _saved_view(self, observe):
+        from app.services.audit_paging import _jsonl_view
+
+        return _jsonl_view(
+            self,
+            row_observer=observe,
+            allow_legacy_prefix=True,
+            validate_review_transitions=self._local_review_history,
+        )
+
+    def _check_writer_view(self, *, include_records=False, row_observer=None):
+        from app.services.audit_paging import _jsonl_view
+        from app.services.federated_audit import AuditQueryUnavailable
+
+        metadata = {}
+        # Ownership is byte/prefix equality, independent of cross-file review state.
+        records = _jsonl_view(
+            self,
+            allow_legacy_prefix=True,
+            metadata=metadata,
+            validate_review_transitions=self._local_review_history,
+            row_observer=row_observer,
+        )
+        if (
+            metadata["head"] != self._last_hash
+            or metadata["verified"] != self._verified_lines
+            or metadata["legacy"] != self._legacy_lines
+            or metadata["fingerprint"] != self._prefix_hasher.hexdigest()
+        ):
+            raise AuditQueryUnavailable("owned audit writer differs from its loaded prefix")
+        return (records, metadata) if include_records else metadata
+
+    def writer_integrity(self):
+        from app.services.federated_audit import AuditQueryUnavailable
+
+        with self._disk_lock:
+            result = self.integrity()
+            try:
+                if result["ok"]:
+                    self._check_writer_view()
+                verified = result["ok"]
+            except AuditQueryUnavailable:
+                verified = False
+            return {**result, "ok": verified, "writer_head_verified": verified}
+
     def _load_existing(self) -> None:
+        if self._path.is_symlink():
+            self._integrity_ok = False
+            if self._strict_reads:
+                raise OSError("audit bootstrap link rejected")
+            return
         if not self._path.exists():
+            if self._strict_reads:
+                raise OSError("required audit shard missing")
             return
 
         try:
-            lines = self._path.read_text(encoding="utf-8").splitlines()
+            if not stat.S_ISREG(self._path.lstat().st_mode):
+                self._integrity_ok = False
+                if self._strict_reads:
+                    raise OSError("audit bootstrap regular file required")
+                return
+            flags = (
+                os.O_RDONLY
+                | getattr(os, "O_NOFOLLOW", 0)
+                | getattr(os, "O_BINARY", 0)
+                | getattr(os, "O_NONBLOCK", 0)
+            )
+            with os.fdopen(os.open(self._path, flags), "rb") as stream:
+                before = os.fstat(stream.fileno())
+                live = self._path.lstat()
+                signature = lambda s: (s.st_dev, s.st_ino, s.st_size, s.st_mtime_ns)
+                if (
+                    not stat.S_ISREG(before.st_mode)
+                    or not stat.S_ISREG(live.st_mode)
+                    or before.st_size > self.MAX_BYTES
+                    or signature(before) != signature(live)
+                ):
+                    self._integrity_ok = False
+                    if self._strict_reads:
+                        raise OSError("audit bootstrap file rejected")
+                    return
+                raw = stream.read(self.MAX_BYTES + 1)
+                after = os.fstat(stream.fileno())
+                current = self._path.lstat()
+            if (
+                len(raw) > self.MAX_BYTES
+                or len(raw) != before.st_size
+                or not stat.S_ISREG(current.st_mode)
+                or signature(before) != signature(after)
+                or signature(after) != signature(current)
+            ):
+                self._integrity_ok = False
+                if self._strict_reads:
+                    raise OSError("audit bootstrap changed during read")
+                return
+            self._prefix_hasher.update(raw)
+            lines = raw.decode("utf-8").splitlines()
         except OSError:
+            if self._strict_reads:
+                raise
             return
 
         expected_previous_hash = "0" * 64
+        count = 0
         for line in lines:
             if not line.strip():
                 continue
+            count += 1
+            if count > self.MAX_ROWS or len(line.encode("utf-8")) > self.MAX_ROW_BYTES:
+                self._integrity_ok = False
+                if self._strict_reads:
+                    raise OSError("audit bootstrap row capacity exceeded")
+                return
             try:
                 value = json.loads(line)
             except (TypeError, ValueError):
@@ -152,7 +305,15 @@ class AuditStore:
             self._records[record_key] = record
 
     def _append_jsonl(self, record: AnalysisResult) -> None:
+        with self._disk_lock:
+            self._append_jsonl_locked(record)
+
+    def _append_jsonl_locked(self, record: AnalysisResult) -> None:
+        from app.services.audit_paging import _file_signature
+        from app.services.federated_audit import AuditQueryUnavailable
+
         self._path.parent.mkdir(parents=True, exist_ok=True)
+        metadata = self._check_writer_view()
         payload = record.model_dump_json()
         record_hash = _record_hash(self._last_hash, payload)
         envelope = {
@@ -161,10 +322,60 @@ class AuditStore:
             "record_hash": record_hash,
             "payload": payload,
         }
-        with self._path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(envelope, ensure_ascii=False, separators=(",", ":")) + "\n")
+        encoded = (json.dumps(envelope, ensure_ascii=False, separators=(",", ":")) + "\n").encode(
+            "utf-8"
+        )
+        if (
+            len(encoded) > self.MAX_ROW_BYTES
+            or metadata["size"] + len(encoded) > self.MAX_BYTES
+            or metadata["verified"] + metadata["legacy"] >= self.MAX_ROWS
+        ):
+            raise AuditQueryUnavailable("audit append capacity exceeded")
+        flags = (
+            os.O_WRONLY
+            | os.O_APPEND
+            | getattr(os, "O_NOFOLLOW", 0)
+            | getattr(os, "O_BINARY", 0)
+            | getattr(os, "O_NONBLOCK", 0)
+        )
+        if metadata["signature"] is None:
+            flags |= os.O_CREAT | os.O_EXCL
+        fd = os.open(self._path, flags, 0o600)
+        try:
+            before = os.fstat(fd)
+            live = self._path.lstat()
+            if (
+                not stat.S_ISREG(before.st_mode)
+                or not stat.S_ISREG(live.st_mode)
+                or _file_signature(before) != _file_signature(live)
+                or (
+                    metadata["signature"] is not None
+                    and _file_signature(before) != metadata["signature"]
+                )
+                or before.st_size != metadata["size"]
+            ):
+                raise AuditQueryUnavailable("audit append target changed before write")
+            remaining = memoryview(encoded)
+            while remaining:
+                written = os.write(fd, remaining)
+                if written <= 0:
+                    raise OSError("audit append made no progress")
+                remaining = remaining[written:]
+            os.fsync(fd)
+            after = os.fstat(fd)
+            current = self._path.lstat()
+            if (
+                after.st_size != metadata["size"] + len(encoded)
+                or not stat.S_ISREG(current.st_mode)
+                or _file_signature(after) != _file_signature(current)
+            ):
+                raise AuditQueryUnavailable("audit append target changed during write")
+        finally:
+            os.close(fd)
+        self._prefix_hasher.update(encoded)
         self._last_hash = record_hash
         self._verified_lines += 1
+        self._page_seen_file = True
 
 
 class DynamoDBAuditStore:
@@ -232,9 +443,36 @@ class DynamoDBAuditStore:
 
 
 def create_audit_store(settings: Settings) -> AuditRepository:
+    if settings.audit_backend == "sqlite":
+        from app.services.sqlite_audit import SQLiteAuditStore
+
+        path = settings.audit_db_path or settings.audit_log_path.with_suffix(".sqlite3")
+        if path.resolve() in {
+            settings.zero_trust_db_path.resolve(),
+            settings.audit_log_path.resolve(),
+        }:
+            raise ValueError("audit database must be separate from policy and JSONL sources")
+        if settings.audit_checkpoint_path is not None:
+            from app.services.guarded_sqlite_audit import GuardedSQLiteAuditStore
+
+            return GuardedSQLiteAuditStore.open_guarded(
+                path, settings.audit_checkpoint_path, settings.audit_checkpoint_sha256
+            )
+        return SQLiteAuditStore(path)
     if settings.audit_backend == "dynamodb":
         return DynamoDBAuditStore(settings.dynamodb_table_name, settings.aws_region)
-    return AuditStore(settings.audit_log_path)
+    path = settings.audit_log_path
+    if (
+        settings.native_analysis_shared_config_path is not None
+        and settings.app_environment != "production"
+    ):
+        # Each local worker owns its hash-chain writer. Sharing native references
+        # must not make independent JSONL writers fork the same audit chain.
+        path = path.with_name(f"{path.stem}.worker-{os.getpid()}{path.suffix}")
+        from app.services.federated_audit import FederatedAuditStore
+
+        return FederatedAuditStore(path, settings.audit_log_path)
+    return AuditStore(path)
 
 
 def _parse_items(items: list[dict], tenant_id: str) -> list[AnalysisResult]:

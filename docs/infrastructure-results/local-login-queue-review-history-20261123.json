@@ -1,0 +1,197 @@
+{
+  "bulk_recovery": {
+    "after": {
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fn": 0,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 192,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tn": 96,
+      "tp": 96
+    },
+    "analysis_and_sigma_matched": 192,
+    "analysis_audit_records": 192,
+    "aws_calls": 0,
+    "before": {
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fn": 0,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 192,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tn": 96,
+      "tp": 96
+    },
+    "dashboard_approval_and_delivery_history_records": 4,
+    "dashboard_approvals": 2,
+    "duplicate_approvals_reused": 2,
+    "events_at_peak": 192,
+    "final_queue": {
+      "held": 0,
+      "pending": 0
+    },
+    "held_resolved": [
+      {
+        "attempts": 4,
+        "code": "http_503"
+      },
+      {
+        "attempts": 1,
+        "code": "http_403"
+      }
+    ],
+    "lost_ack_replayed": 1,
+    "outage_clock_seconds": 1150,
+    "outage_requests": 4,
+    "outage_retry_intervals_seconds": [
+      120,
+      10,
+      420,
+      600
+    ],
+    "paid_api_calls": 0,
+    "recovery_minimum_spacing_seconds": 0.25,
+    "recovery_requests": 194,
+    "scope": "controlled normal and credential-alert inputs, real local HTTP analysis, simulated outage clock"
+  },
+  "container_removed": true,
+  "dashboard_recovery": {
+    "after_approval": {
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fn": 0,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 4,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tn": 1,
+      "tp": 3
+    },
+    "analysis_and_audit_duplicates": 0,
+    "analysis_audit_rows": 4,
+    "approval_and_delivery_history_rows": 8,
+    "aws_calls": 0,
+    "browser_history_viewports_px": [
+      1440,
+      390
+    ],
+    "cases": [
+      {
+        "after_priority": false,
+        "analysis_audit_rows": 1,
+        "analysis_runs": 1,
+        "approval_history_rows": 2,
+        "case": "dashboard_outage_normal",
+        "evidence_state": "expired",
+        "expected_priority": false,
+        "fresh_priority": false,
+        "held_cause": "http_503",
+        "historical_review": false,
+        "history_evidence_state": "expired",
+        "history_review_kind": "not_required",
+        "result_matches_applicable_baseline": true,
+        "sigma_equal": true,
+        "worker_reused_committed_result": false
+      },
+      {
+        "after_priority": true,
+        "analysis_audit_rows": 1,
+        "analysis_runs": 1,
+        "approval_history_rows": 2,
+        "case": "dashboard_outage_existing_high_risk",
+        "evidence_state": "expired",
+        "expected_priority": true,
+        "fresh_priority": true,
+        "held_cause": "http_503",
+        "historical_review": true,
+        "history_evidence_state": "expired",
+        "history_review_kind": "expired_device_priority",
+        "result_matches_applicable_baseline": true,
+        "sigma_equal": true,
+        "worker_reused_committed_result": false
+      },
+      {
+        "after_priority": true,
+        "analysis_audit_rows": 1,
+        "analysis_runs": 1,
+        "approval_history_rows": 2,
+        "case": "dashboard_outage_device_only",
+        "evidence_state": "expired",
+        "expected_priority": true,
+        "fresh_priority": true,
+        "held_cause": "http_503",
+        "historical_review": true,
+        "history_evidence_state": "expired",
+        "history_review_kind": "expired_device_priority",
+        "result_matches_applicable_baseline": true,
+        "sigma_equal": true,
+        "worker_reused_committed_result": false
+      },
+      {
+        "after_priority": true,
+        "analysis_audit_rows": 1,
+        "analysis_runs": 1,
+        "approval_history_rows": 2,
+        "case": "dashboard_lost_receipt_device_only",
+        "evidence_state": "verified",
+        "expected_priority": true,
+        "fresh_priority": true,
+        "held_cause": "transport_interrupted",
+        "historical_review": false,
+        "history_evidence_state": "verified",
+        "history_review_kind": "verified_priority",
+        "result_matches_applicable_baseline": true,
+        "sigma_equal": true,
+        "worker_reused_committed_result": true
+      }
+    ],
+    "dashboard_approval_mode": "chrome",
+    "duplicate_approvals_reused": 4,
+    "fresh_verified_baseline": {
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fn": 0,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 4,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tn": 1,
+      "tp": 3
+    },
+    "held_alert_fired_and_cleared": "C01LoginQueueHeld",
+    "keycloak_mfa_and_mtls": 4,
+    "paid_api_calls": 0,
+    "prometheus_read_as_dashboard_reviewer": true
+  },
+  "existing_login_holdout_metrics": {
+    "accuracy": 1.0,
+    "f1": 1.0,
+    "false_positive_rate": 0.0,
+    "fn": 0,
+    "fp": 0,
+    "inference_errors": 0,
+    "population": 10,
+    "precision": 1.0,
+    "recall": 1.0,
+    "tn": 6,
+    "tp": 4
+  },
+  "finished_at": "2026-11-23T07:18:10.290589+00:00",
+  "keycloak_image": "quay.io/keycloak/keycloak:26.8.0",
+  "legacy_queue_history_preserved": true,
+  "linux_regression_tests_passed": 159,
+  "matches_previous_bulk_metrics_and_audit": true,
+  "matches_previous_keycloak_metrics_and_audit": true,
+  "ruff_and_js_syntax_passed": true
+}

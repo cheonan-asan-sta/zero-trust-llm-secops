@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="34" time="11.412" timestamp="2026-11-20T03:32:42.226724+09:00" hostname="희주"><testcase classname="tests.test_async_evidence_io" name="test_cancelled_sdk_source_check_settles_without_blocking_event_loop[adapter_initial]" time="0.388" /><testcase classname="tests.test_async_evidence_io" name="test_cancelled_sdk_source_check_settles_without_blocking_event_loop[adapter_retry]" time="1.619" /><testcase classname="tests.test_async_evidence_io" name="test_cancelled_sdk_source_check_settles_without_blocking_event_loop[agent_initial]" time="0.049" /><testcase classname="tests.test_async_evidence_io" name="test_cancelled_sdk_source_check_settles_without_blocking_event_loop[agent_final]" time="0.184" /><testcase classname="tests.test_async_evidence_io" name="test_cancelled_sdk_source_check_settles_without_blocking_event_loop[adapter_retry_slow_local_response]" time="2.504" /><testcase classname="tests.test_async_evidence_io" name="test_cancelled_agent_history_read_settles_before_review_finishes" time="0.058" /><testcase classname="tests.test_async_evidence_io" name="test_authority_withdrawn_during_history_read_stops_next_sdk_call" time="0.058" /><testcase classname="tests.test_async_evidence_io" name="test_sdk_source_cancellation_retains_real_analysis_slot_until_settled[False]" time="0.380" /><testcase classname="tests.test_async_evidence_io" name="test_sdk_source_cancellation_retains_real_analysis_slot_until_settled[True]" time="0.323" /><testcase classname="tests.test_m6_evaluation" name="test_candidates_share_identical_blind_development_cases_and_aggregate_separately" time="0.049" /><testcase classname="tests.test_m6_evaluation" name="test_timeout_retries_once_and_remains_unknown_in_conservative_recall" time="0.009" /><testcase classname="tests.test_m6_evaluation" name="test_request_limit_is_shared_across_models_and_preserves_unattempted_cases" time="0.008" /><testcase classname="tests.test_m6_evaluation" name="test_invalid_or_unknown_response_is_never_counted_as_normal[wrong_case-response_error]" time="0.009" /><testcase classname="tests.test_m6_evaluation" name="test_invalid_or_unknown_response_is_never_counted_as_normal[unknown_evidence-response_error]" time="0.009" /><testcase classname="tests.test_m6_evaluation" name="test_invalid_or_unknown_response_is_never_counted_as_normal[malformed-response_error]" time="0.009" /><testcase classname="tests.test_m6_evaluation" name="test_invalid_or_unknown_response_is_never_counted_as_normal[duplicate_field-response_error]" time="0.010" /><testcase classname="tests.test_m6_evaluation" name="test_invalid_or_unknown_response_is_never_counted_as_normal[transport-response_error]" time="0.009" /><testcase classname="tests.test_m6_evaluation" name="test_invalid_or_unknown_response_is_never_counted_as_normal[forbidden_field-response_error]" time="0.009" /><testcase classname="tests.test_m6_evaluation" name="test_invalid_or_unknown_response_is_never_counted_as_normal[abstain-abstained]" time="0.009" /><testcase classname="tests.test_m6_evaluation" name="test_runner_enforces_an_async_dispatch_deadline" time="0.039" /><testcase classname="tests.test_m6_evaluation" name="test_cost_cap_retains_the_reservation_of_an_unreconciled_timeout" time="0.007" /><testcase classname="tests.test_m6_evaluation" name="test_cli_writes_an_offline_report_without_git[0]" time="0.061" /><testcase classname="tests.test_m6_evaluation" name="test_cli_writes_an_offline_report_without_git[2]" time="0.059" /><testcase classname="tests.test_m6_evaluation" name="test_explanations_are_checked_separately_from_classification" time="0.010" /><testcase classname="tests.test_m6_evaluation" name="test_wall_limit_blocks_dispatch_before_reservation" time="0.007" /><testcase classname="tests.test_m6_evaluation" name="test_concurrent_report_writes_publish_one_complete_report" time="0.012"><failure message="PermissionError: [WinError 5] 액세스가 거부되었습니다: 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1494\\test_concurrent_report_writes_0\\.m6-report-1p0c4pdq' -&gt; 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1494\\test_concurrent_report_writes_0\\pilot.json'">tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1494/test_concurrent_report_writes_0')
+
+    def test_concurrent_report_writes_publish_one_complete_report(tmp_path):
+        output = tmp_path / "pilot.json"
+        reports = [{"data": char * 100_000} for char in "abcd"]
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            tasks = [executor.submit(write_report, output, report) for report in reports]
+            for task in tasks:
+&gt;               task.result()
+
+tests\test_m6_evaluation.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\thread.py:59: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\evaluate_m6.py:380: in write_report
+    temporary.replace(output)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1494/test_concurrent_report_writes_0/.m6-report-1p0c4pdq')
+target = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1494/test_concurrent_report_writes_0/pilot.json')
+
+    def replace(self, target):
+        """
+        Rename this path to the target path, overwriting if that path exists.
+    
+        The target path may be absolute or relative. Relative paths are
+        interpreted relative to the current working directory, *not* the
+        directory of the Path object.
+    
+        Returns the new Path instance pointing to the target path.
+        """
+&gt;       os.replace(self, target)
+E       PermissionError: [WinError 5] 액세스가 거부되었습니다: 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1494\\test_concurrent_report_writes_0\\.m6-report-1p0c4pdq' -&gt; 'C:\\Users\\chaeh\\AppData\\Local\\Temp\\pytest-of-chaeh\\pytest-1494\\test_concurrent_report_writes_0\\pilot.json'
+
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\pathlib.py:1376: PermissionError</failure></testcase><testcase classname="tests.test_m6_evaluation" name="test_m7_candidates_receive_identical_ordered_development_observations" time="0.050" /><testcase classname="tests.test_m6_evaluation" name="test_m7_failure_and_request_budget_accounting_keeps_all_sessions" time="0.007" /><testcase classname="tests.test_m6_evaluation" name="test_m7_rejects_substituted_evaluation_split_even_if_file_hash_matches" time="0.078" /><testcase classname="tests.test_m6_evaluation" name="test_m7_cli_writes_the_development_report" time="0.247" /><testcase classname="tests.test_m6_evaluation" name="test_m7_cli_cannot_overwrite_pilot_artifacts[development.jsonl]" time="0.208" /><testcase classname="tests.test_m6_evaluation" name="test_m7_cli_cannot_overwrite_pilot_artifacts[evaluation.jsonl]" time="0.204" /><testcase classname="tests.test_m6_evaluation" name="test_m7_cli_cannot_overwrite_pilot_artifacts[labels.jsonl]" time="0.192" /><testcase classname="tests.test_m6_evaluation" name="test_m7_cli_cannot_overwrite_pilot_artifacts[manifest.json]" time="0.177" /></testsuite></testsuites>

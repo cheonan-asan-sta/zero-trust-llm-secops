@@ -1,0 +1,25 @@
+"""Start one latest Windows full suite after the owned older suite finishes."""
+import json
+import os
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+assert os.name=='nt'
+runtime=Path(__file__).resolve().parent
+marker=runtime/'until0800-windows-full-d45-venv-20261120-completion.json'
+# The retry above is historical. Wait specifically for the still-running 8d2
+# follow-up, never for an unrelated/global Python process or another task.
+marker=runtime/'until0800-windows-full-8d2-20261120-completion.json'
+deadline=time.monotonic()+7200
+while not marker.exists():
+    if time.monotonic()>deadline:raise TimeoutError('owned older full verification did not complete')
+    time.sleep(1)
+old=json.loads(marker.read_text(encoding='utf-8'))
+assert old['source_commit']=='8d2df526843418e50124b23808c54b9597e79008'
+assert old['source_bytes_unchanged'] and not old['mutated_source_files']
+record={'schema':'owned-dependent-full-launch-1','old_source_commit':old['source_commit'],'old_exit_code':old['exit_code'],'old_finished_at':old['finished_at'],'new_source_commit':'b77eceb30747a0a764cf997879a124b590eef972','tag':'b77-20261120','paid_api_calls':0}
+with (runtime/'until0800-windows-full-b77-20261120-launch.json').open('x') as stream:json.dump(record,stream,indent=2)
+code=subprocess.call([sys.executable,str(runtime/'run_frozen_latest_20261120.py'),'full','b77-20261120'])
+raise SystemExit(code)

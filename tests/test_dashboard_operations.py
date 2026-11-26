@@ -41,10 +41,18 @@ def test_catalog_covers_business_writes_and_matches_actual_contracts():
     metadata = catalog(app)
     specification = app.openapi()["paths"]
     covered = {(item[3], item[2].lower()) for item in OPERATIONS}
+    # The collector owns login submissions. The dedicated panel owns approval and
+    # binds each submission to the held item and authenticated review identity.
+    dedicated_writes = {
+        ("/analysis/verified-login", "post"),
+        ("/analysis/login-delivery", "post"),
+        ("/dashboard/login-queue/approvals", "post"),
+    }
     writes = {(path, method) for path, methods in specification.items()
               for method in methods if method in {"post", "put", "patch", "delete"}
               and not path.startswith("/dashboard/jobs")}
-    assert writes <= covered
+    assert dedicated_writes <= writes and not dedicated_writes & covered
+    assert writes <= covered | dedicated_writes
     assert len(metadata["operations"]) == len(covered)
     assert all(p["in"] in {"query", "path"} for op in metadata["operations"]
                for p in op["parameters"])

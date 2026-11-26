@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:\Users\chaeh\Desktop\�Ķ��б�\tmp\extra-development-20261118\runtime\start_latest_windows_after_8d_20261120.py", line 19, in <module>
+    old=json.loads(marker.read_text())
+                   ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\pathlib.py", line 1028, in read_text
+    return f.read()
+           ^^^^^^^^
+UnicodeDecodeError: 'cp949' codec can't decode byte 0xed in position 187: illegal multibyte sequence

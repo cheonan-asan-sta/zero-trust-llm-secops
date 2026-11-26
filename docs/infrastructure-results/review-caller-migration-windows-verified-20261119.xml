@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="2" tests="13" time="14.415" timestamp="2026-11-19T17:15:36.752566+09:00" hostname="희주"><testcase classname="tests.test_local_review_intent" name="test_harness_reviews_exact_observed_record_under_required_policy" time="0.130" /><testcase classname="tests.test_local_review_intent" name="test_harness_expected_record_mismatch_never_writes" time="0.064" /><testcase classname="tests.test_local_review_intent" name="test_snapshot_does_not_rebind_retry_or_overwrite[caller]" time="0.076" /><testcase classname="tests.test_local_review_intent" name="test_snapshot_does_not_rebind_retry_or_overwrite[version]" time="0.119" /><testcase classname="tests.test_local_review_intent" name="test_snapshot_does_not_rebind_retry_or_overwrite[withdraw]" time="0.074" /><testcase classname="tests.test_local_review_intent" name="test_required_policy_rejects_legacy_unbound_write" time="0.064" /><testcase classname="tests.test_local_review_intent" name="test_actual_recovery_harness_can_review_under_required_policy" time="0.063"><failure message="app.services.sqlite_audit.AuditReviewConflict: review update requires expected current record">api = namespace(client=&lt;starlette.testclient.TestClient object at 0x000001A3C4EA98E0&gt;, store=&lt;app.services.sqlite_audit.SQLi...iewer=None, review_note=None, review_updated_at=None), withdraw=&lt;function api.&lt;locals&gt;.withdraw at 0x000001A3C4EBFBA0&gt;)
+tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1443/test_actual_recovery_harness_c0')
+
+    def test_actual_recovery_harness_can_review_under_required_policy(api, tmp_path):
+        strict()
+        contextual = api.first.model_copy(
+            update={"verification_context": {"local_recovery_fixture": True}}
+        )
+&gt;       asyncio.run(api.store.save(contextual))
+
+tests\test_local_review_intent.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+app\services\sqlite_audit.py:184: in save
+    await settled_io(self._write, record.model_copy(deep=True))
+app\services\settled_io.py:7: in settled_io
+    return await settled_awaitable(asyncio.to_thread(function, *args, **kwargs))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\services\settled_io.py:16: in settled_awaitable
+    result = await asyncio.shield(worker)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\threads.py:25: in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\thread.py:59: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;app.services.sqlite_audit.SQLiteAuditStore object at 0x000001A3C4EAB7A0&gt;
+record = AnalysisResult(analysis_id='44e68c51353143e087368c406cac4345', event_id='audit-cancel-1', analyzer='rule', assessment=..._id='legacy', review_status=&lt;ReviewStatus.PENDING: 'PENDING'&gt;, reviewer=None, review_note=None, review_updated_at=None)
+expected = None
+
+    def _write(self, record, expected=None):
+        record = AnalysisResult.model_validate(record.model_dump(mode="json"))
+        with self._transaction(write=True) as con:
+            records, seq, previous, size = self._read(con)
+            old = records.get(record.analysis_id)
+            if old is None and record.review_updated_at is not None:
+                raise AuditReviewConflict("review requires an existing analysis")
+            if expected is not None:
+                latest = self._latest(records, record.event_id, record.tenant_id)
+                if (
+                    old is None
+                    or latest is None
+                    or not analysis_values_equal(old, expected)
+                    or not analysis_values_equal(latest, expected)
+                    or not self._review_fits(old, record)
+                ):
+                    raise AuditReviewConflict("audit review changed; reload current record")
+            elif old is not None:
+                if analysis_values_equal(old, record):
+                    return
+&gt;               raise AuditReviewConflict("review update requires expected current record")
+E               app.services.sqlite_audit.AuditReviewConflict: review update requires expected current record
+
+app\services\sqlite_audit.py:171: AuditReviewConflict</failure></testcase><testcase classname="tests.test_audit_review_client_binding_process" name="test_real_cli_sends_bound_intent_and_server_rejects_post_check_remap[False-False]" time="2.425" /><testcase classname="tests.test_audit_review_client_binding_process" name="test_real_cli_sends_bound_intent_and_server_rejects_post_check_remap[False-True]" time="2.360" /><testcase classname="tests.test_audit_review_client_binding_process" name="test_real_cli_sends_bound_intent_and_server_rejects_post_check_remap[True-False]" time="2.341" /><testcase classname="tests.test_audit_review_client_binding_process" name="test_real_cli_sends_bound_intent_and_server_rejects_post_check_remap[True-True]" time="2.344" /><testcase classname="tests.test_audit_review_client_process" name="test_real_operator_cli_reads_then_reviews_once_and_refuses_replay[optional]" time="0.000"><skipped type="pytest.skip" message="Owned native Linux worker fixture">C:\Users\chaeh\Desktop\파란학기\tmp\extra-development-20261118\tests\test_audit_review_client_process.py:18: Owned native Linux worker fixture</skipped></testcase><testcase classname="tests.test_audit_review_client_process" name="test_real_operator_cli_reads_then_reviews_once_and_refuses_replay[caller_bound]" time="0.000"><skipped type="pytest.skip" message="Owned native Linux worker fixture">C:\Users\chaeh\Desktop\파란학기\tmp\extra-development-20261118\tests\test_audit_review_client_process.py:18: Owned native Linux worker fixture</skipped></testcase></testsuite></testsuites>

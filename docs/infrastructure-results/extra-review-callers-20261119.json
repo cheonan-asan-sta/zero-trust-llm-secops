@@ -1,0 +1,87 @@
+{
+  "schema": "local-review-callers-evidence-1",
+  "date": "2026-11-19",
+  "branch": "extra",
+  "implementation_commit": "ab2dbfc36216f2a2c67a0f43aea1380bae938ba2",
+  "source_sha256": {
+    "scripts/local_review_intent.py": "9ed1357e935b45c49a3caf624823ba230001d00f3cf84df2397aa34a0a52d89b",
+    "scripts/f1_lab/audit_recovery_controls.py": "c8d82217df25e440fe67c55e3c3f0f03ee3d10f1e359bdfca39fa4b6813a958e",
+    "scripts/f1_lab/http_worker_controls.py": "2d0976c91258642063b6ca0d566eecd73377eabaeb58a882f87f018391637239",
+    "scripts/native_http_worker.py": "2249e9cd0de7e83a0d1a1afbf0cc0b746fb4ba6092c2259f22bc25bf7ab1e8b9",
+    "tests/test_local_review_intent.py": "6194cbf4dd0f19aaf8fac64348b8242a0290505ff61f7c4c6aec60858c137259",
+    "tests/test_audit_review_client_process.py": "e17403783734796e8c8abd43df1e8003c435915cda49752f885b4188357929b1"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/review-caller-migration-linux-20261119.xml",
+      "sha256": "013a16cf81a73c696cc18ef10f6f27dda2938e07baf9db410b74dcb82549f357",
+      "tests": 20,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/review-caller-migration-linux-complete-20261119.xml",
+      "sha256": "c3f6bde6ce08d5ddaef80c78b1c39e5ee78491dd06411b2e9ff1cdf5ed5b9686",
+      "tests": 21,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/review-caller-migration-linux-final-20261119.xml",
+      "sha256": "bb8a364b1474fa054bb02f665c7afc7e9ae70678ce0f376853daa02d1f9e553f",
+      "tests": 21,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/review-caller-migration-windows-20261119.xml",
+      "sha256": "7f7b8d6b3556e0d6c614f9c81e39864c01fb7a6ff03862676ebb3e74d3da0f87",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/review-caller-migration-windows-complete-20261119.xml",
+      "sha256": "9a45f7fbdc460e8c54b7017346cfc30fe89ee9c2983cec5eb75a1d7067a1c740",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/review-caller-migration-windows-final-20261119.xml",
+      "sha256": "f813e31a5695297d31b3ec175885260628049f6f08310081876b9c848015f558",
+      "tests": 13,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 2,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/review-caller-migration-windows-verified-20261119.xml",
+      "sha256": "0dcd8290fa89b5c99118733dbc89039c71a509835eeb8ab4fb3912afd604170a",
+      "tests": 13,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 2,
+      "final": false
+    }
+  ],
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "docker_created": 0,
+  "push_ci_merge": false,
+  "production_policy_changed": false,
+  "external_client_inventory_complete": false,
+  "full_regression_completed": false,
+  "detection_metrics_changed": false
+}

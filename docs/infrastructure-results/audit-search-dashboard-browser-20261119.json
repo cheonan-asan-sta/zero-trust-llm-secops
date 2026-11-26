@@ -1,0 +1,446 @@
+{
+  "schema": "dashboard-paging-browser-1",
+  "synthetic": true,
+  "paid_calls": 0,
+  "passed": true,
+  "checks": [
+    {
+      "name": "isolated_rule_sqlite_server",
+      "passed": true
+    },
+    {
+      "name": "first_page_is_bounded_and_not_recent_window",
+      "passed": true
+    },
+    {
+      "name": "explicit_filter_and_export_scope",
+      "passed": true
+    },
+    {
+      "name": "next_and_back_keep_original_snapshot",
+      "passed": true
+    },
+    {
+      "name": "historical_review_is_not_silently_rebased",
+      "passed": true
+    },
+    {
+      "name": "export_is_one_revalidated_snapshot_page",
+      "passed": true
+    },
+    {
+      "name": "export_preserves_snapshot_under_new_writes",
+      "passed": true
+    },
+    {
+      "name": "historical_list_detail_reads_current_review",
+      "passed": true
+    },
+    {
+      "name": "explicit_reload_starts_new_snapshot",
+      "passed": true
+    },
+    {
+      "name": "server_filter_finds_match_older_than_recent100",
+      "passed": true
+    },
+    {
+      "name": "risk_filter_applied_before_limit",
+      "passed": true
+    },
+    {
+      "name": "review_filter_is_server_wide",
+      "passed": true
+    },
+    {
+      "name": "browser_traverses_all_records_once_including_older100",
+      "passed": true
+    },
+    {
+      "name": "last_page_has_no_next",
+      "passed": true
+    },
+    {
+      "name": "local_search_does_not_claim_whole_dataset",
+      "passed": true
+    },
+    {
+      "name": "no_horizontal_overflow_desktop",
+      "passed": true
+    },
+    {
+      "name": "no_horizontal_overflow_mobile",
+      "passed": true
+    },
+    {
+      "name": "periodic_refresh_preserves_page_without_restarting_snapshot",
+      "passed": true
+    },
+    {
+      "name": "late_filter_response_cannot_replace_current_scope",
+      "passed": true
+    },
+    {
+      "name": "edit_during_export_cannot_download_old_filter",
+      "passed": true
+    },
+    {
+      "name": "http_400_clears_rows_without_retry",
+      "passed": true
+    },
+    {
+      "name": "http_409_clears_rows_without_retry",
+      "passed": true
+    },
+    {
+      "name": "http_410_clears_rows_without_retry",
+      "passed": true
+    },
+    {
+      "name": "http_501_clears_rows_without_retry",
+      "passed": true
+    },
+    {
+      "name": "http_503_clears_rows_without_retry",
+      "passed": true
+    },
+    {
+      "name": "malformed_or_changed_snapshot_id_fails_closed",
+      "passed": true
+    },
+    {
+      "name": "malformed_or_changed_snapshot_expires_at_fails_closed",
+      "passed": true
+    },
+    {
+      "name": "malformed_or_changed_page_cursor_fails_closed",
+      "passed": true
+    },
+    {
+      "name": "malformed_or_changed_total_matches_fails_closed",
+      "passed": true
+    },
+    {
+      "name": "malformed_or_changed_historical_audit_snapshot_fails_closed",
+      "passed": true
+    },
+    {
+      "name": "mixed_tenant_page_is_not_displayed",
+      "passed": true
+    },
+    {
+      "name": "repeated_rows_cannot_masquerade_as_next_page",
+      "passed": true
+    },
+    {
+      "name": "same_key_identity_remap_blocks_cached_export",
+      "passed": true
+    },
+    {
+      "name": "connection_switch_discards_old_page_and_cursor",
+      "passed": true
+    },
+    {
+      "name": "no_browser_credential_or_cursor_persistence",
+      "passed": true
+    },
+    {
+      "name": "no_javascript_errors",
+      "passed": true
+    },
+    {
+      "name": "no_external_requests",
+      "passed": true
+    },
+    {
+      "name": "all_page_requests_bounded",
+      "passed": true
+    }
+  ],
+  "source_sha256": {
+    "app/models.py": "062312bc15acff326b5364b839dbf574a83d83669e9b3574490622c457270b8f",
+    "app/services/audit_paging.py": "5ad3c10cd481753381290d0972f7b89ca069380b2077c22d4454cdf5049280b8",
+    "app/static/dashboard.js": "25d349619f67d44e7015b4ae739057df1b0c812ad790cd243da39eb4708627e7",
+    "app/static/index.html": "bdb690849500e0b14b16952597da20144e4620e298add55af1440862bc804910",
+    "tests/dashboard_operations_fixture.py": "c3b1318b20cb51ec6eb5aadc103522a1467e28c08c4b0fb8faef6a177ac13dd8",
+    "scripts/test_dashboard_paging_browser.py": "29f832c23921f46b70c5df260a63d873b37345e1370bf7d657dff83e1937a8d2"
+  },
+  "network_tail": [
+    {
+      "event": "response",
+      "path": "/auth/me",
+      "request": 2518353501536,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/audit/results",
+      "request": 2518351236320,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/audit/results",
+      "request": 2518351236320,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/auth/me",
+      "request": 2518353360128,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/auth/me",
+      "request": 2518353360128,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/auth/me",
+      "request": 2518353506432,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/auth/me",
+      "request": 2518353506432,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/audit/results",
+      "request": 2518353507584,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/audit/results",
+      "request": 2518353507584,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/auth/me",
+      "request": 2518353509888,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/auth/me",
+      "request": 2518353509888,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/auth/me",
+      "request": 2518353494768,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/auth/me",
+      "request": 2518353494768,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/audit/results",
+      "request": 2518353497216,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/audit/results",
+      "request": 2518353497216,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/auth/me",
+      "request": 2518353501440,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/auth/me",
+      "request": 2518353501440,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/auth/me",
+      "request": 2518353497984,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/auth/me",
+      "request": 2518353497984,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/audit/results",
+      "request": 2518353494528,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/audit/results",
+      "request": 2518353494528,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/auth/me",
+      "request": 2518353659040,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/auth/me",
+      "request": 2518353659040,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/auth/me",
+      "request": 2518353662880,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/auth/me",
+      "request": 2518353662880,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/auth/me",
+      "request": 2518353672384,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/auth/me",
+      "request": 2518353672384,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/audit/results",
+      "request": 2518353500624,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/audit/results",
+      "request": 2518353500624,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/auth/me",
+      "request": 2518353665424,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/auth/me",
+      "request": 2518353665424,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/auth/me",
+      "request": 2518353873088,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/auth/me",
+      "request": 2518353873088,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/audit/results",
+      "request": 2518353872176,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/audit/results",
+      "request": 2518353872176,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/auth/me",
+      "request": 2518353664080,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/auth/me",
+      "request": 2518353664080,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/auth/me",
+      "request": 2518353875584,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/auth/me",
+      "request": 2518353875584,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/auth/me",
+      "request": 2518353667200,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/auth/me",
+      "request": 2518353667200,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/audit/results",
+      "request": 2518353660960,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/audit/results",
+      "request": 2518353660960,
+      "status": 200
+    },
+    {
+      "event": "request",
+      "path": "/auth/me",
+      "request": 2518353494288,
+      "status": null
+    },
+    {
+      "event": "response",
+      "path": "/auth/me",
+      "request": 2518353494288,
+      "status": 200
+    }
+  ],
+  "export_race_state": {
+    "held_requests": 1,
+    "status": "2026. 11. 19. 16:29:52 \uae30\uc900 \uae30\ub85d\uc785\ub2c8\ub2e4. \ucd5c\uc2e0 \ubaa9\ub85d \uc870\ud68c\ub85c \uac31\uc2e0\ud558\uc138\uc694. \uc0c1\uc138\uc640 \uac80\ud1a0\ub294 \ud604\uc7ac \uc0c1\ud0dc\ub97c \ub2e4\uc2dc \ud655\uc778\ud569\ub2c8\ub2e4.",
+    "page": "1 / 12 \ud398\uc774\uc9c0"
+  },
+  "owned_server_stopped": true
+}

@@ -35,6 +35,7 @@ def complete(lab, tmp_path, *, bundle=False):
     return collector, directory, path
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX durable input retirement")
 def test_archived_bundle_replays_after_expiry_without_resigning_or_consuming_approval(lab, tmp_path):
     collector, directory, path = complete(lab, tmp_path, bundle=True)
     before = path.read_bytes()
@@ -62,6 +63,7 @@ def test_archived_bundle_replays_after_expiry_without_resigning_or_consuming_app
         restarted.capture_one(directory)
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX durable input retirement")
 def test_pending_receipts_and_evaluations_are_never_archived(lab, tmp_path):
     directory, _ = continuous.feed(tmp_path, continuous.bundle(lab))
     real = continuous.context_transport(lab, [])
@@ -103,6 +105,7 @@ os._exit(73)
     assert lab.collector().status()["archived_records"] == 1
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX fsync/link/unlink recovery")
 def test_input_rotation_resumes_after_link_but_before_unlink(lab, tmp_path, monkeypatch):
     collector, directory, path = complete(lab, tmp_path)
     collector.compact()
@@ -122,6 +125,7 @@ def test_input_rotation_resumes_after_link_but_before_unlink(lab, tmp_path, monk
     assert not path.exists()
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX durable input retirement")
 def test_failed_file_sync_never_removes_original_input(lab, tmp_path, monkeypatch):
     collector, directory, path = complete(lab, tmp_path)
     collector.compact()
@@ -140,6 +144,7 @@ def test_failed_file_sync_never_removes_original_input(lab, tmp_path, monkeypatc
     assert lab.collector().retire_inputs(directory) == 1
 
 
+@pytest.mark.skipif(os.name != "posix", reason="POSIX durable input retirement; portable link test separate")
 def test_rotation_refuses_replaced_symlink_and_conflicting_destination(lab, tmp_path):
     collector, directory, path = complete(lab, tmp_path)
     collector.compact()

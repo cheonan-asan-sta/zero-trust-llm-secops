@@ -1,0 +1,26 @@
+import hashlib
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+root=Path.cwd();runtime=root/'runtime';manifest=json.loads((runtime/'extra-until0800-resource-source-20261120.json').read_text(encoding='utf-8'));source=Path(manifest['path'])
+before=runtime/'continued-baseline-20261120-0114/report.json';before_bytes=before.read_bytes();baseline=json.loads(before_bytes)
+output=runtime/'until0800-final-frozen-replay-20261120'
+env=dict(os.environ,AWS_EC2_METADATA_DISABLED='true',PYTHONPATH=str(source),PYTHONPYCACHEPREFIX=str(runtime/'until0800-windows-bytecode'),PYTHONUTF8='1')
+for name in list(env):
+    if 'API_KEY' in name or name.startswith(('AWS_ACCESS','AWS_SECRET','AWS_SESSION','AWS_PROFILE','AWS_DEFAULT_PROFILE','AWS_WEB_IDENTITY','AWS_ROLE','AWS_CONTAINER')):env.pop(name,None)
+env['AWS_SHARED_CREDENTIALS_FILE']=str(runtime/'no-cloud-credentials');env['AWS_CONFIG_FILE']=str(runtime/'no-cloud-config')
+process=subprocess.run([sys.executable,'-m','scripts.replay_hybrid_development','--directory',str(output)],cwd=source,env=env,capture_output=True,text=True,encoding='utf-8',timeout=180)
+(runtime/'until0800-final-frozen-replay-20261120.stdout.log').write_text(process.stdout,encoding='utf-8')
+(runtime/'until0800-final-frozen-replay-20261120.stderr.log').write_text(process.stderr,encoding='utf-8')
+assert process.returncode==0,process.stderr
+after=json.loads((output/'report.json').read_text(encoding='utf-8'))
+keys=['source_metrics','metrics','comparisons','development_gate_passed','rows','fresh_provider_requests','runtime_adoption','historical_metrics_replaced','independent_acceptance']
+equal={name:baseline[name]==after[name] for name in keys}
+result={'schema':'final-frozen-detection-replay-comparison-1','source_commit':manifest['source_commit'],'completed':all(equal.values()),'compared_fields':equal,'rows_per_variant':{name:len(rows) for name,rows in after['rows'].items()},'baseline_report_sha256':hashlib.sha256(before_bytes).hexdigest(),'final_report_sha256':hashlib.sha256((output/'report.json').read_bytes()).hexdigest(),'baseline_bytes_unchanged':before.read_bytes()==before_bytes,'provider_requests':after['fresh_provider_requests'],'independent_acceptance':False,'runtime_adoption':False,'not_new_llm_measurement':True,'protocol_sha256_equal':baseline['protocol_sha256']==after['protocol_sha256']}
+result['source_bytes_unchanged']=all(hashlib.sha256((source/name).read_bytes()).hexdigest()==h for name,h in manifest['files'].items())
+(runtime/'until0800-final-frozen-replay-comparison-20261120.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+assert result['completed'] and result['baseline_bytes_unchanged'] and result['source_bytes_unchanged'] and result['provider_requests']==0
+print(json.dumps(result))

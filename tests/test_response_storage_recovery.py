@@ -28,7 +28,7 @@ def seed(directory):
     plans = {}
     for tenant in ("a", "b"):
         for state in ("PENDING", "APPROVED", "REJECTED", "SIMULATED"):
-            record = AnalysisResult(event_id=f"event-{state}", analysis_id=f"analysis-{state}",
+            record = AnalysisResult(event_id=f"event-{state}", analysis_id=f"analysis-{tenant}-{state}",
                 tenant_id=tenant, analyzer="rule", latency_ms=1,
                 assessment=SecurityAssessment(risk_score=90, risk_level="HIGH",
                     violation_type="PRIVILEGE_ESCALATION", rationale="권한 불일치가 확인되었습니다.",

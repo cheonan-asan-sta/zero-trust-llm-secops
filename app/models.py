@@ -1158,6 +1158,33 @@ class VerifiedReviewControls(StrictModel):
         return self
 
 
+class VerifiedLoginDetection(StrictModel):
+    disposition: Literal["no_signal", "review", "priority_review"]
+    mfa_verified: Literal[True] = True
+    device_state: Literal["known", "revoked_verified_device"]
+    source_id: str = Field(pattern=r"^[A-Za-z0-9._-]{1,64}$")
+    source_digest_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    observed_at: datetime
+
+
+class DelayedLoginReview(StrictModel):
+    reason: Literal["expired_revoked_device_observation"] = "expired_revoked_device_observation"
+    source_id: str = Field(pattern=r"^[A-Za-z0-9._-]{1,64}$")
+    source_digest_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    observed_at: datetime
+    evidence_expired_at: datetime
+
+    @model_validator(mode="after")
+    def validate_observation_window(self) -> Self:
+        if (
+            self.observed_at.utcoffset() is None
+            or self.evidence_expired_at.utcoffset() is None
+            or not 0 < (self.evidence_expired_at - self.observed_at).total_seconds() <= 30
+        ):
+            raise ValueError("delayed login review requires the original bounded observation window")
+        return self
+
+
 class AnalysisResult(StrictModel):
     analysis_id: str = Field(default_factory=lambda: uuid4().hex)
     event_id: str
@@ -1166,6 +1193,9 @@ class AnalysisResult(StrictModel):
     policy_decision: PolicyDecision
     normalized_event: NormalizedSecurityEvent | None = None
     detection: SigmaDetectionResult | None = None
+    verified_login_detection: VerifiedLoginDetection | None = None
+    delayed_login_review: DelayedLoginReview | None = None
+    login_delivery_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
     verification_context: dict[str, object] | None = None
     llm_trace: dict[str, object] | None = None
     verified_review_controls: VerifiedReviewControls | None = None
@@ -1182,6 +1212,12 @@ class AnalysisResult(StrictModel):
     @model_serializer(mode="wrap")
     def omit_absent_verification_context(self, handler):
         value = handler(self)
+        if self.verified_login_detection is None:
+            value.pop("verified_login_detection", None)
+        if self.delayed_login_review is None:
+            value.pop("delayed_login_review", None)
+        if self.login_delivery_sha256 is None:
+            value.pop("login_delivery_sha256", None)
         if self.verification_context is None:
             value.pop("verification_context", None)
         if self.llm_trace is None:
@@ -1209,6 +1245,14 @@ class AnalysisResult(StrictModel):
 
     @model_validator(mode="after")
     def validate_review_metadata(self) -> Self:
+        if self.delayed_login_review is not None and (
+            self.login_delivery_sha256 is None
+            or self.verified_login_detection is not None
+            or self.verification_context is not None
+            or not self.policy_decision.requires_human_review
+            or self.policy_decision.action == RecommendedAction.ALLOW
+        ):
+            raise ValueError("delayed login observations require an operator review on a durable delivery")
         active_statuses = {
             ReviewStatus.IN_REVIEW,
             ReviewStatus.RESOLVED,
@@ -1230,6 +1274,18 @@ class AnalysisResult(StrictModel):
         ):
             raise ValueError("review_updated_at must include a timezone")
         return self
+
+
+class AuditResultPage(StrictModel):
+    items: list[AnalysisResult] = Field(max_length=100)
+    total_matches: int = Field(ge=0)
+    page_cursor: str = Field(min_length=1, max_length=2048, pattern=r"^[A-Za-z0-9_-]+$")
+    next_cursor: str | None = Field(default=None, max_length=2048)
+    snapshot_id: str = Field(pattern=r"^[a-f0-9]{64}$")
+    snapshot_created_at: datetime
+    snapshot_expires_at: datetime
+    snapshot_mode: Literal["sqlite_prefix", "unchanged_local_view"]
+    historical_audit_snapshot: Literal[True] = True
 
 
 class ReviewUpdateRequest(StrictModel):

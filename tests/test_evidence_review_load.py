@@ -20,6 +20,7 @@ from app.config import Settings
 from app.models import SecurityAssessment
 from app.security import Principal, Role
 from app.services.audit import AuditStore
+from app.services.authentication_admission import AuthenticationAdmission
 from app.services.trusted_signals import canonical_signal
 from app.zero_trust_models import SignedSessionSignal
 from scripts.local_oidc_authority import LocalOIDCAuthority
@@ -43,6 +44,11 @@ def test_concurrent_tenants_backpressure_and_cancellation_recover_without_state_
             openai_evidence_agent_enabled=True,
             analysis_max_concurrency=4,
             analysis_queue_timeout_seconds=0.02,
+            # This test isolates analysis backpressure. Initial authentication
+            # has its own bounded 503/cancellation tests; do not let that new
+            # earlier limit replace the 32 analysis arrivals exercised here.
+            authentication_max_concurrency=16,
+            authentication_queue_timeout_seconds=2,
         )
         lab = LocalSessionAnalysisLab(tmp_path / "authority")
         seed, _ = lab.create(next(s for s in SCENARIOS if s[0] == "permitted_team"))
@@ -144,6 +150,9 @@ def test_concurrent_tenants_backpressure_and_cancellation_recover_without_state_
         }.items():
             monkeypatch.setattr(main, name, value)
         monkeypatch.setattr(security, "get_settings", lambda: config)
+        monkeypatch.setattr(
+            main.app.state, "_authentication_admission", AuthenticationAdmission(16), raising=False
+        )
         assert security.get_principal not in main.app.dependency_overrides
         bodies = []
         try:

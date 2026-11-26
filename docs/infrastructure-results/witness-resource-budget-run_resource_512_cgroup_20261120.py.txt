@@ -1,0 +1,77 @@
+"""Owned transient unit: resource envelope only, not production sandbox acceptance."""
+import json
+import os
+import pwd
+import shutil
+import subprocess
+import sys
+import tempfile
+import uuid
+from pathlib import Path
+
+source, manifest, harness, output = map(Path, sys.argv[1:])
+output.mkdir(parents=True, exist_ok=False)
+unit = 'zt-large-witness-' + uuid.uuid4().hex + '.service'
+user = pwd.getpwnam('chaehj02')
+root = Path(tempfile.mkdtemp(prefix='zt-owned-large-resource-', dir='/var/tmp'))
+root.chmod(0o755)
+work = root / 'work'
+work.mkdir(mode=0o700)
+os.chown(work, user.pw_uid, user.pw_gid)
+worker = root / 'worker.py'
+worker.write_text('''import json,runpy,sys
+from pathlib import Path
+source,manifest,harness,output=sys.argv[1:]
+sys.path.insert(0,source)
+from scripts.systemd_resources import snapshot
+before=snapshot()
+sys.argv=[harness,source,output,manifest]
+code=0
+try:runpy.run_path(harness,run_name="__main__")
+except SystemExit as error:code=error.code or 0
+except BaseException:
+    code=1
+    raise
+finally:
+    Path(output,"cgroup-resources.json").write_text(json.dumps({"before":before,"after":snapshot(),"harness_exit_code":code},indent=2)+"\\n")
+raise SystemExit(code)
+''')
+worker.chmod(0o644)
+result = {'schema':'owned-large-witness-resource-envelope-1', 'unit':unit,
+          'completed':False, 'production_sandbox_tested':False,
+          'unit_created_in_etc':False, 'paid_api_calls':0}
+try:
+    command = ['systemd-run','--unit='+unit,'--wait','--pipe','--collect',
+               '--property=User=chaehj02','--property=Group='+str(user.pw_gid),
+               '--property=MemoryMax=512M','--property=CPUQuota=50%',
+               '--property=TasksMax=8','--property=RuntimeMaxSec=600',
+               '--property=NoNewPrivileges=yes','--property=CapabilityBoundingSet=',
+               '--property=PrivateNetwork=yes','--property=RestrictAddressFamilies=AF_UNIX',
+               '--setenv=AWS_EC2_METADATA_DISABLED=true','--setenv=PYTHONDONTWRITEBYTECODE=1',
+               '/home/chaehj02/team-llm-prep-venv/bin/python',str(worker),str(source),
+               str(manifest),str(harness),str(work/'result')]
+    (output/'ownership.json').write_text(json.dumps({'unit':unit,'temporary_root':str(root),'command':command},indent=2)+'\n')
+    process = subprocess.run(command,capture_output=True,text=True,timeout=630)
+    (output/'stdout.log').write_text(process.stdout)
+    (output/'stderr.log').write_text(process.stderr)
+    for path in ((work/'result').iterdir() if (work/'result').is_dir() else []):
+        if path.is_file():shutil.copyfile(path,output/path.name)
+    resources=json.loads((output/'cgroup-resources.json').read_text())
+    large=json.loads((output/'result.json').read_text())
+    after=resources['after']
+    result.update(exit_code=process.returncode,resources=resources,
+                  source_commit=large['source_commit'],source_bytes_unchanged=large.get('source_bytes_unchanged',False),
+                  large_fixture_checks=len(large['checks']))
+    assert process.returncode==0 and large['completed'] and resources['harness_exit_code']==0
+    assert after['memory_limit_bytes']==512*1024*1024 and after['cpu_quota_percent']==50 and after['tasks_limit']==8
+    assert after['memory_peak_bytes'] < after['memory_limit_bytes']
+    assert after['memory_oom_kills']==0 and (after['memory_limit_hits'] is None or after['memory_limit_hits'] >= 0)
+    result['completed']=True
+finally:
+    subprocess.run(['systemctl','stop',unit],capture_output=True,timeout=20)
+    subprocess.run(['systemctl','reset-failed',unit],capture_output=True,timeout=20)
+    shutil.rmtree(root)
+    result['owned_temporary_tree_removed']=not root.exists()
+    result['owned_unit_inactive']=subprocess.run(['systemctl','is-active','--quiet',unit],timeout=20).returncode!=0
+    (output/'resource-acceptance.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result))

@@ -1,0 +1,97 @@
+{
+  "date": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "ci_started": false,
+  "merged": false,
+  "linux_earlier_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "177",
+    "time": "55.608",
+    "timestamp": "2026-11-19T00:32:20.320051+09:00",
+    "hostname": "localhost",
+    "xml_sha256": "6e878be54642e77dc269cb55a990e252be06ea66c95b6aa308fc6cab11b3cf1c"
+  },
+  "windows_earlier_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "40",
+    "time": "9.359",
+    "timestamp": "2026-11-19T00:31:41.085131+09:00",
+    "hostname": "희주",
+    "xml_sha256": "2e1cff6b838091fff400f0878d0d6d2cfc3e6e7261c0429f00de64a27436a2dd"
+  },
+  "linux_latest_focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "42",
+    "time": "13.970",
+    "timestamp": "2026-11-19T00:35:15.595132+09:00",
+    "hostname": "localhost",
+    "xml_sha256": "637744a1d0b266da1eea5981f4e05769996ed6ea1693276bf45ecbee6fda5f39"
+  },
+  "windows_latest_focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "42",
+    "time": "10.839",
+    "timestamp": "2026-11-19T00:35:10.216294+09:00",
+    "hostname": "희주",
+    "xml_sha256": "7f09e3fcd21e8a8ce35c485c1545fb113d3df912263923a8dc431b9ee30e878b"
+  },
+  "new_transfer_backup_cases": 22,
+  "source_data_modified": false,
+  "live_database_overwritten": false,
+  "automatic_activation_allowed": false,
+  "snapshot_api": "SQLite online backup, read-only source, 30-second copy deadline",
+  "encryption": "streaming AES-256-GCM with 64KiB chunks, authenticated manifest",
+  "source_inventory_pin_required": true,
+  "restore_package_pin_required": true,
+  "latest_trusted_head_optional_but_required_for_freshness_claim": true,
+  "external_rollback_anchor_deployed": false,
+  "model_quality_reevaluated": false,
+  "source_files": [
+    {
+      "path": "app/services/sqlite_audit.py",
+      "sha256": "3e7185fd927a55e04568fc05e98776e6810585f577e818eddf12a99bb2a64c1d"
+    },
+    {
+      "path": "app/services/audit_transfer.py",
+      "sha256": "ad2d6cc19cd10af25c9a65ca0cacef32d8b5481781225e19f87f1e506bf3f909"
+    },
+    {
+      "path": "app/services/audit_backup.py",
+      "sha256": "bdf0c842eefa68b2c06d23a38437aa9d64f7d46cab875b95d623d02ff44733a7"
+    },
+    {
+      "path": "scripts/audit_storage.py",
+      "sha256": "dfd8dd87d836b034936cb9227d5834b6ccbd07f488f9e6f4806a1c8c25ea4afa"
+    },
+    {
+      "path": "tests/test_audit_transfer.py",
+      "sha256": "bb45f25f69956607d4eb9bffc1a80565cb28dad8a6301672a71ae11fe119be7c"
+    },
+    {
+      "path": "docs/extra-audit-transfer-backup-20261119.md",
+      "sha256": "9c331a7be494269148c2bbee6945f4162c0bcde6167640f8d04786c31ada4a98"
+    },
+    {
+      "path": "docs/extra-transactional-audit-20261119.md",
+      "sha256": "e3b27f8222c8b78a151449fd271bf0e949eeae23a8dc608045fb0148487760f0"
+    },
+    {
+      "path": "AI_HANDOFF.md",
+      "sha256": "8fdd0b6db7405dd398e0963acc1d4d97d036fbc829cd8c925eea5242880bc0e1"
+    }
+  ]
+}

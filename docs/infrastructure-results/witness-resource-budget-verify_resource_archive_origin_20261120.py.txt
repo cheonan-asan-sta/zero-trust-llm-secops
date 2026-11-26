@@ -1,0 +1,38 @@
+"""Compare every tested archive file with its pinned Git blob/strict CRLF form."""
+import hashlib
+import json
+import subprocess
+from pathlib import Path
+
+root=Path.cwd();runtime=root/'runtime'
+windows=json.loads((runtime/'extra-until0800-resource-source-20261120.json').read_text(encoding='utf-8'))
+linux=json.loads((runtime/'extra-until0800-resource-source-linux-20261120.json').read_text(encoding='utf-8'))
+assert windows['files']==linux['files'] and windows['archive_sha256']==linux['archive_sha256']
+commit=windows['source_commit'];source=Path(windows['path'])
+tracked=set(subprocess.check_output(['git','ls-tree','-r','-z','--name-only',commit]).decode('utf-8').split('\0'))-{''}
+result={'schema':'tested-archive-git-checkout-origin-1','source_commit':commit,'source_files':len(windows['files']),
+        'archive_sha256':windows['archive_sha256'],'windows_linux_expected_file_maps_equal':True,
+        'same_bytes':0,'strict_lf_to_crlf_checkout':0,'errors':[],
+        'git_only_files':sorted(tracked-set(windows['files'])),'archive_only_files':sorted(set(windows['files'])-tracked),
+        'normalization_is_diagnostic_only':True,'tested_files_modified':False,'details':[],'paid_api_calls':0}
+process=subprocess.Popen(['git','cat-file','--batch'],stdin=subprocess.PIPE,stdout=subprocess.PIPE)
+try:
+    for name,expected in windows['files'].items():
+        assert '\n' not in name
+        process.stdin.write((commit+':'+name+'\n').encode('utf-8'));process.stdin.flush()
+        header=process.stdout.readline().split();assert len(header)==3 and header[1]==b'blob'
+        git_bytes=process.stdout.read(int(header[2]));assert process.stdout.read(1)==b'\n'
+        tested=(source/name).read_bytes();actual=hashlib.sha256(tested).hexdigest()
+        if actual!=expected:result['errors'].append('tested-file-mutated:'+name);continue
+        if tested==git_bytes:
+            result['same_bytes']+=1
+        elif b'\r\n' not in git_bytes and git_bytes.replace(b'\n',b'\r\n')==tested:
+            result['strict_lf_to_crlf_checkout']+=1
+            result['details'].append({'path':name,'git_blob_sha256':hashlib.sha256(git_bytes).hexdigest(),'tested_archive_sha256':actual,'relation':'strict-LF-to-CRLF'})
+        else:result['errors'].append('unexpected-checkout-content:'+name)
+finally:
+    process.stdin.close();process.wait(timeout=10)
+result['completed']=not result['errors'] and not result['git_only_files'] and not result['archive_only_files']
+(runtime/'until0800-resource-archive-origin-20261120.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({k:result[k] for k in ['completed','source_files','same_bytes','strict_lf_to_crlf_checkout','git_only_files','archive_only_files','errors']}))
+raise SystemExit(0 if result['completed'] else 1)

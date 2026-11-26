@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "<string>", line 11, in <module>
+  File "C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-8d2df526\scripts\evaluate_m6.py", line 397, in write_report
+    _replace_report(temporary, output)
+  File "C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-8d2df526\scripts\evaluate_m6.py", line 379, in _replace_report
+    temporary.replace(output)
+  File "C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\pathlib.py", line 1376, in replace
+    os.replace(self, target)
+PermissionError: [WinError 5] 액세스가 거부되었습니다: 'C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\extra-development-20261118\\runtime\\post-full-report-stress-windows-shared-delete-20261120\\.m6-report-es5kic_q' -> 'C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\extra-development-20261118\\runtime\\post-full-report-stress-windows-shared-delete-20261120\\report.json'

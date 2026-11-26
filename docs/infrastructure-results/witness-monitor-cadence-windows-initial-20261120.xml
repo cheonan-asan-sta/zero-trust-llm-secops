@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="4.196" timestamp="2026-11-20T02:53:26.474698+09:00" hostname="희주"><testcase classname="tests.test_witness_monitor_cadence" name="test_default_sixty_second_collection_remains_available_between_healthy_polls" time="0.374"><failure message="AssertionError: assert 'secops_witness_status_success 1' in '# TYPE secops_witness_bridge_enabled gauge\nsecops_witness_bridge_enabled 1\nsecops_witness_status_success 0\nsecops_witness_observation_healthy 0\n'">tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1488/test_default_sixty_second_coll0')
+
+    def test_default_sixty_second_collection_remains_available_between_healthy_polls(tmp_path):
+        source, signer, key_pin, first = ready(tmp_path)
+        directory = tmp_path / "control"
+        pin = observer.initialize(directory, signer, source.path, key_pin,
+                                  expected_receipt=first["receipt_sha256"])["profile_sha256"]
+        observer.cycle(directory, pin, minimum_receipt=first["receipt_sha256"])
+        value = bridge.inspect(directory, pin, first["receipt_sha256"])
+        profile = {"profile_sha256": pin, "minimum_receipt": first["receipt_sha256"]}
+        now = datetime.fromisoformat(value["checked_at"]) + timedelta(seconds=45)
+        text = bridge.render_report(profile, value, now=now)
+&gt;       assert "secops_witness_status_success 1" in text
+E       AssertionError: assert 'secops_witness_status_success 1' in '# TYPE secops_witness_bridge_enabled gauge\nsecops_witness_bridge_enabled 1\nsecops_witness_status_success 0\nsecops_witness_observation_healthy 0\n'
+
+tests\test_witness_monitor_cadence.py:21: AssertionError</failure></testcase></testsuite></testsuites>

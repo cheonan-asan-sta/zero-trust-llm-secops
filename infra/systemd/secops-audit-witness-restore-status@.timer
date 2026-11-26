@@ -1,0 +1,13 @@
+[Unit]
+Description=Periodic keyless audit witness restore check for %i
+
+[Timer]
+OnBootSec=20s
+OnUnitInactiveSec=15s
+AccuracySec=1s
+RandomizedDelaySec=1s
+Persistent=no
+Unit=secops-audit-witness-restore-status@%i.service
+
+[Install]
+WantedBy=timers.target

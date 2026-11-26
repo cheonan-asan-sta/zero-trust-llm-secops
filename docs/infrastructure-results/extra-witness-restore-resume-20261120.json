@@ -1,0 +1,78 @@
+{
+  "schema": "witness-restore-resume-evidence-1",
+  "date": "2026-11-20",
+  "implementation_commit": "b276924d5fdd74ebc2a9991ee96761fd109b73cb",
+  "source_sha256": {
+    "app/services/audit_witness_observer_backup.py": "2c23a892756b4def9f902f3345041601dbbb5178e671b175635dfffdfb276020",
+    "scripts/audit_witness_observer_backup.py": "4f2de5127631db5337c3bf3bb18820a295fcd185043b6511eaa2511345b02582",
+    "tests/test_witness_restore_resume.py": "6dedc74bfa0bc8104a940105a34ea1c661ad69d6b39f6a6e27cebcf25731bd39",
+    "app/services/audit_witness.py": "8a7d821f0bc6fcce0dc9f2ae1faff3c03f97ad1bad41fc6d8007b930e7685300",
+    "app/services/audit_witness_observer.py": "c351db0de9d2af13b7f773121eeb04f69f8ac968a9811be53f910ce674d4da87"
+  },
+  "artifacts": [
+    {
+      "path": "docs/infrastructure-results/witness-restore-resume-linux-final-20261120.xml",
+      "sha256": "08dd67ce99e9bbdcb564fa886bc6af92ca1820a48066bca660261ef692bdb1b1",
+      "tests": 278,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-restore-resume-linux-initial-20261120.xml",
+      "sha256": "5242cfa39151042b5999cc0c1c90db7fa1bd6bd657dec86e6a8bf21c10dd2ffd",
+      "tests": 67,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-restore-resume-windows-final-20261120.xml",
+      "sha256": "93defdcee573cca7b1125431bbe1531aaf7861bd33daa8b9ee1bfc63014974b0",
+      "tests": 278,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 23,
+      "final": true
+    },
+    {
+      "path": "docs/infrastructure-results/witness-restore-resume-windows-initial-20261120.xml",
+      "sha256": "1e7962ee44cdd5dba38cf1e148c98f67fc6ba6fd2165ca5dae8f710d07f8efa9",
+      "tests": 67,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 4,
+      "final": false
+    },
+    {
+      "path": "docs/infrastructure-results/witness-restore-resume-ruff-20261120.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resume-alert-native-report.json",
+      "sha256": "ec8fc8d9d22a03c03424dc014edb890e26afb13e37fad72b34046203b03062e4",
+      "purpose": "Actual four-fault flow after clock and restore changes"
+    },
+    {
+      "path": "docs/infrastructure-results/witness-resume-alert-native-promtool.txt",
+      "sha256": "eee39a49c209ebcf78652b78f0e3c93bb77eca8139311b361a2dd005f334ec32",
+      "purpose": "Actual four-fault flow after clock and restore changes"
+    }
+  ],
+  "new_resume_tests": 22,
+  "explicit_resume_only": true,
+  "existing_files_overwritten": false,
+  "original_started_at_preserved": true,
+  "completed_candidates_restarted": false,
+  "system_services_changed": false,
+  "real_alert_flow_checks": 18,
+  "real_alert_episodes": 4,
+  "same_host_local_only": true,
+  "real_8h_soak": false,
+  "detection_metrics_changed": false,
+  "paid_api_calls": 0,
+  "github_push_ci_merge": false,
+  "until_0800_goal_complete": false
+}

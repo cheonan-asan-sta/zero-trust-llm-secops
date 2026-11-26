@@ -1,0 +1,57 @@
+{
+  "aws_calls": 0,
+  "candidate_adopted": false,
+  "kreonet": {
+    "fallback_verified": true,
+    "fixture_predictions_sha256": "312ae102c40a345a31cbe81f54bac201d12c2ba128ac6c51d309ee3e25531f3c",
+    "frozen_scores_reproduced": 2695,
+    "hypothetical_model_alerts": {
+      "F1": 0.7058823529411765,
+      "FN": 0,
+      "FNR": 0.0,
+      "FP": 40,
+      "FPR": 0.8333333333333334,
+      "TN": 8,
+      "TP": 48,
+      "precision": 0.5454545454545454,
+      "recall": 1.0,
+      "unknown_or_error": 0
+    },
+    "known_rule_decisions_preserved": true,
+    "prior_rules": {
+      "F1": 0.5,
+      "FN": 32,
+      "FNR": 0.6666666666666666,
+      "FP": 0,
+      "FPR": 0.0,
+      "TN": 48,
+      "TP": 16,
+      "precision": 1.0,
+      "recall": 0.3333333333333333,
+      "unknown_or_error": 0
+    },
+    "replay_sha256": "753dd800239d022056997aec41395cb5c0b0816dfc9cea03ef72980132a72a50",
+    "scope": "frozen public-source candidate scores and 96 auxiliary local validation scenarios"
+  },
+  "paid_api_calls": 0,
+  "rba": {
+    "accuracy": 0.9970169543161267,
+    "authoritative_evidence_coverage": 0,
+    "byte_identical_scoring_report": true,
+    "f1": 0.0030852294639413806,
+    "false_positive_rate": 0.0029784572491564306,
+    "fn": 4,
+    "fp": 2581,
+    "inference_errors": 0,
+    "lost_true_positives": 0,
+    "new_false_positives": 0,
+    "population": 866564,
+    "precision": 0.0015473887814313346,
+    "recall": 0.5,
+    "replay_sha256": "b1ec8f723dacd37b3e037cc5c15626d9deac8e0b1c15686f7009e2056b2af84a",
+    "rows_changed": 0,
+    "scope": "score frozen predictions without authoritative MFA or device evidence",
+    "tn": 863975,
+    "tp": 4
+  }
+}

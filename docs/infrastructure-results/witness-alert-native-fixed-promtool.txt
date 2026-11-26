@@ -1,0 +1,3 @@
+Checking /home/chaehj02/extra-platform-full-20261120-8cb3c47e/infra/observability/alerts.yaml
+  SUCCESS: 23 rules found
+

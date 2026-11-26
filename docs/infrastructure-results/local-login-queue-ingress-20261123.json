@@ -1,0 +1,61 @@
+{
+  "aws_calls": 0,
+  "ingress": {
+    "audit_records_after_new_request_replayed": 9,
+    "backend_without_client_certificate_rejected": true,
+    "duplicate_delivery_reused": true,
+    "final_route": "standby",
+    "new_login_delivery_recorded_once": true,
+    "paused_http_status": 503,
+    "primary_before_outage_http_status": 200,
+    "readiness_path_hidden_behind_ingress": true,
+    "route_bound_to_fence_receipt_sha256": "2d998d25ba35d0d82c4b535921a3607361b4cad4bc1af22181d1e96c4c47eab9",
+    "standby_behind_same_ingress_http_status": 200,
+    "tampered_fence_receipt_refused": true,
+    "unready_standby_kept_maintenance_route": true,
+    "upstream_mtls_name_and_client_certificate_verified": true
+  },
+  "off_host_authority_rejected_unreachable_wrong_source_stale_and_duplicate_confirmation": true,
+  "paid_api_calls": 0,
+  "recovery": {
+    "after": {
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fn": 0,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 4,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tn": 2,
+      "tp": 2
+    },
+    "before": {
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fn": 0,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 4,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tn": 2,
+      "tp": 2
+    },
+    "duplicate_analysis_or_audit_records": 0,
+    "final_audit_records": 8,
+    "generation": 2,
+    "invalid_signature_different_standby_and_checkpoint_rejected": true,
+    "pre_replay_audit_records": 5,
+    "receipt_replay_rejected": true,
+    "restored_pending_events": 4
+  },
+  "scope": "separate Docker container processes and loopbacks on one local Docker daemon",
+  "source_exact_instance_cannot_restart": true,
+  "source_sender_held_original_lease": true,
+  "source_terminated_without_planned_handoff": true,
+  "without_fence_activation_blocked": true,
+  "wrong_signing_key_could_not_consume_authority_decision": true
+}

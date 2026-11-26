@@ -1,0 +1,53 @@
+[Unit]
+Description=Pinned local audit witness collector for %i
+StartLimitIntervalSec=60
+StartLimitBurst=6
+
+[Service]
+Type=simple
+User=secops-witness
+Group=secops-witness
+WorkingDirectory=/opt/secops
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=AWS_EC2_METADATA_DISABLED=true
+EnvironmentFile=/etc/secops/audit-witness/%i.conf
+ExecStart=/opt/secops/.venv/bin/python -m scripts.audit_witness_observer watch --directory /var/lib/secops-audit-witness/%i/control --profile-sha256 ${WITNESS_PROFILE_SHA256} --minimum-receipt ${WITNESS_MINIMUM_RECEIPT} --status-file /var/cache/secops-audit-witness/%i/observer.json
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=10
+UMask=0077
+StandardInput=null
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+RestrictNamespaces=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+SystemCallFilter=~ptrace process_vm_readv process_vm_writev pidfd_getfd
+SystemCallErrorNumber=EPERM
+InaccessiblePaths=/proc
+ReadOnlyPaths=/var/lib/secops-audit /var/lib/secops-audit-witness/%i/signer/private.key /var/lib/secops-audit-witness/%i/signer/public.key
+ReadWritePaths=/var/lib/secops-audit-witness/%i/control /var/lib/secops-audit-witness/%i/signer /var/cache/secops-audit-witness/%i
+CPUQuota=50%
+# Local combined row/control-cap fixture peaked near 256M; allow measured headroom.
+MemoryMax=512M
+TasksMax=8
+
+[Install]
+WantedBy=multi-user.target
+
+# Operator provisions exact profile/minimum pins and directories first. This
+# template never initializes state, adopts a latest receipt, restores a DB,
+# creates cloud resources, or changes authorization. One trusted signing UID
+# owns the signer and collector state; this is not independent-host custody.

@@ -1,0 +1,155 @@
+{
+  "aws_calls": 0,
+  "container_removed": true,
+  "existing_keycloak_control_metrics": {
+    "accuracy": 1.0,
+    "f1": 1.0,
+    "false_positive_rate": 0.0,
+    "fn": 0,
+    "fp": 0,
+    "inference_errors": 0,
+    "population": 14,
+    "precision": 1.0,
+    "recall": 1.0,
+    "tn": 7,
+    "tp": 7
+  },
+  "existing_keycloak_results_matched": true,
+  "existing_os_priority_retained": 1,
+  "finished_at": "2026-11-23T03:32:21.645341+00:00",
+  "image": "quay.io/keycloak/keycloak:26.8.0",
+  "paid_api_calls": 0,
+  "regression_tests_passed": 394,
+  "role_removal_first_access": 401,
+  "session_revocation_first_access": 401,
+  "verified_login_holdout": {
+    "after": {
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fn": 0,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 10,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tn": 6,
+      "tp": 4
+    },
+    "audit_integrity": true,
+    "before": {
+      "accuracy": 0.6,
+      "f1": 0.0,
+      "false_positive_rate": 0.0,
+      "fn": 4,
+      "fp": 0,
+      "inference_errors": 0,
+      "population": 10,
+      "precision": null,
+      "recall": 0.0,
+      "tn": 6,
+      "tp": 0
+    },
+    "cases": [
+      {
+        "case": "new_registration_office",
+        "current_human_review": false,
+        "disposition": "no_signal",
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": false,
+        "previous_human_review": false,
+        "proof_issued": true
+      },
+      {
+        "case": "approved_replacement_travel",
+        "current_human_review": false,
+        "disposition": "review",
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": false,
+        "previous_human_review": false,
+        "proof_issued": true
+      },
+      {
+        "case": "reenrolled_certificate_remote",
+        "current_human_review": false,
+        "disposition": "review",
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": false,
+        "previous_human_review": false,
+        "proof_issued": true
+      },
+      {
+        "case": "first_vpn_egress_change",
+        "current_human_review": false,
+        "disposition": "review",
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": false,
+        "previous_human_review": false,
+        "proof_issued": true
+      },
+      {
+        "case": "onboarding_certificate_not_registered",
+        "current_human_review": false,
+        "disposition": null,
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": false,
+        "previous_human_review": false,
+        "proof_issued": false
+      },
+      {
+        "case": "certificate_registered_to_another_account",
+        "current_human_review": false,
+        "disposition": null,
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": false,
+        "previous_human_review": false,
+        "proof_issued": false
+      },
+      {
+        "case": "retired_workstation_remote",
+        "current_human_review": true,
+        "disposition": "priority_review",
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": true,
+        "previous_human_review": false,
+        "proof_issued": true
+      },
+      {
+        "case": "offboarded_device_vpn",
+        "current_human_review": true,
+        "disposition": "priority_review",
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": true,
+        "previous_human_review": false,
+        "proof_issued": true
+      },
+      {
+        "case": "old_key_after_reenrollment",
+        "current_human_review": true,
+        "disposition": "priority_review",
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": true,
+        "previous_human_review": false,
+        "proof_issued": true
+      },
+      {
+        "case": "revoked_loaner_new_egress",
+        "current_human_review": true,
+        "disposition": "priority_review",
+        "existing_sigma_matches_unchanged": true,
+        "expected_priority": true,
+        "previous_human_review": false,
+        "proof_issued": true
+      }
+    ],
+    "distinct_actual_otp_accounts": 10,
+    "guards": {
+      "different_event": 401,
+      "disabled_collector": 401,
+      "missing_receipt": 422,
+      "modified_evidence": 401,
+      "other_mtls_credential_produced_no_proof": true
+    },
+    "scope": "disjoint local scenarios with previously unused Keycloak accounts and fixed expected review labels"
+  }
+}

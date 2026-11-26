@@ -1,0 +1,244 @@
+{
+  "default_content_cutoff": 5,
+  "reports": {
+    "fpad": {
+      "any_matching_content_rule": {
+        "accuracy": 0.6137556337593382,
+        "f1": 0.5818740810052132,
+        "false_positive_rate": 0.0,
+        "fn": 6256,
+        "fp": 0,
+        "inference_errors": 0,
+        "population": 16197,
+        "precision": 1.0,
+        "recall": 0.41031199924592326,
+        "tn": 5588,
+        "tp": 4353
+      },
+      "removed": {},
+      "weighted_minimum_5": {
+        "accuracy": 0.6137556337593382,
+        "f1": 0.5818740810052132,
+        "false_positive_rate": 0.0,
+        "fn": 6256,
+        "fp": 0,
+        "inference_errors": 0,
+        "population": 16197,
+        "precision": 1.0,
+        "recall": 0.41031199924592326,
+        "tn": 5588,
+        "tp": 4353
+      }
+    },
+    "fpad-ood": {
+      "any_matching_content_rule": {
+        "accuracy": 0.417233238904627,
+        "f1": null,
+        "false_positive_rate": null,
+        "fn": 12343,
+        "fp": 0,
+        "inference_errors": 0,
+        "population": 21180,
+        "precision": null,
+        "recall": 0.417233238904627,
+        "tn": 0,
+        "tp": 8837
+      },
+      "removed": {},
+      "weighted_minimum_5": {
+        "accuracy": 0.417233238904627,
+        "f1": null,
+        "false_positive_rate": null,
+        "fn": 12343,
+        "fp": 0,
+        "inference_errors": 0,
+        "population": 21180,
+        "precision": null,
+        "recall": 0.417233238904627,
+        "tn": 0,
+        "tp": 8837
+      }
+    },
+    "openappsec-holdout-shape-crs/target": {
+      "any_matching_content_rule": {
+        "accuracy": 0.9764590163934426,
+        "f1": null,
+        "false_positive_rate": 0.02354098360655738,
+        "fn": 0,
+        "fp": 359,
+        "inference_errors": 0,
+        "population": 15250,
+        "precision": null,
+        "recall": null,
+        "tn": 14891,
+        "tp": 0
+      },
+      "removed": {},
+      "weighted_minimum_5": {
+        "accuracy": 0.9764590163934426,
+        "f1": null,
+        "false_positive_rate": 0.02354098360655738,
+        "fn": 0,
+        "fp": 359,
+        "inference_errors": 0,
+        "population": 15250,
+        "precision": null,
+        "recall": null,
+        "tn": 14891,
+        "tp": 0
+      }
+    },
+    "openappsec-holdout-shape-crs/target_body": {
+      "any_matching_content_rule": {
+        "accuracy": 0.9499016393442623,
+        "f1": null,
+        "false_positive_rate": 0.0500983606557377,
+        "fn": 0,
+        "fp": 764,
+        "inference_errors": 0,
+        "population": 15250,
+        "precision": null,
+        "recall": null,
+        "tn": 14486,
+        "tp": 0
+      },
+      "removed": {},
+      "weighted_minimum_5": {
+        "accuracy": 0.9499016393442623,
+        "f1": null,
+        "false_positive_rate": 0.0500983606557377,
+        "fn": 0,
+        "fp": 764,
+        "inference_errors": 0,
+        "population": 15250,
+        "precision": null,
+        "recall": null,
+        "tn": 14486,
+        "tp": 0
+      }
+    },
+    "openappsec-legitimate-crs-v1/target": {
+      "any_matching_content_rule": {
+        "accuracy": 0.9942577791572903,
+        "f1": null,
+        "false_positive_rate": 0.005742220842709708,
+        "fn": 0,
+        "fp": 74,
+        "inference_errors": 0,
+        "population": 12887,
+        "precision": null,
+        "recall": null,
+        "tn": 12813,
+        "tp": 0
+      },
+      "removed": {},
+      "weighted_minimum_5": {
+        "accuracy": 0.9942577791572903,
+        "f1": null,
+        "false_positive_rate": 0.005742220842709708,
+        "fn": 0,
+        "fp": 74,
+        "inference_errors": 0,
+        "population": 12887,
+        "precision": null,
+        "recall": null,
+        "tn": 12813,
+        "tp": 0
+      }
+    },
+    "openappsec-legitimate-crs-v1/target_body": {
+      "any_matching_content_rule": {
+        "accuracy": 0.9615116008380539,
+        "f1": null,
+        "false_positive_rate": 0.03848839916194615,
+        "fn": 0,
+        "fp": 496,
+        "inference_errors": 0,
+        "population": 12887,
+        "precision": null,
+        "recall": null,
+        "tn": 12391,
+        "tp": 0
+      },
+      "removed": {},
+      "weighted_minimum_5": {
+        "accuracy": 0.9615116008380539,
+        "f1": null,
+        "false_positive_rate": 0.03848839916194615,
+        "fn": 0,
+        "fp": 496,
+        "inference_errors": 0,
+        "population": 12887,
+        "precision": null,
+        "recall": null,
+        "tn": 12391,
+        "tp": 0
+      }
+    },
+    "pkdd/target": {
+      "any_matching_content_rule": {
+        "accuracy": 0.8231245011971269,
+        "f1": 0.6285355122564424,
+        "false_positive_rate": 0.03322354288987541,
+        "fn": 1541,
+        "fp": 232,
+        "inference_errors": 0,
+        "population": 10024,
+        "precision": 0.8660508083140878,
+        "recall": 0.49325879644853665,
+        "tn": 6751,
+        "tp": 1500
+      },
+      "removed": {},
+      "weighted_minimum_5": {
+        "accuracy": 0.8231245011971269,
+        "f1": 0.6285355122564424,
+        "false_positive_rate": 0.03322354288987541,
+        "fn": 1541,
+        "fp": 232,
+        "inference_errors": 0,
+        "population": 10024,
+        "precision": 0.8660508083140878,
+        "recall": 0.49325879644853665,
+        "tn": 6751,
+        "tp": 1500
+      }
+    },
+    "pkdd/target_body": {
+      "any_matching_content_rule": {
+        "accuracy": 0.8281125299281724,
+        "f1": 0.6445223849804003,
+        "false_positive_rate": 0.034942002004868966,
+        "fn": 1479,
+        "fp": 244,
+        "inference_errors": 0,
+        "population": 10024,
+        "precision": 0.8648947951273532,
+        "recall": 0.5136468267017429,
+        "tn": 6739,
+        "tp": 1562
+      },
+      "removed": {},
+      "weighted_minimum_5": {
+        "accuracy": 0.8281125299281724,
+        "f1": 0.6445223849804003,
+        "false_positive_rate": 0.034942002004868966,
+        "fn": 1479,
+        "fp": 244,
+        "inference_errors": 0,
+        "population": 10024,
+        "precision": 0.8648947951273532,
+        "recall": 0.5136468267017429,
+        "tn": 6739,
+        "tp": 1562
+      }
+    }
+  },
+  "scope": "offline sum of unique matched content-rule severities only, no running WAF block decision",
+  "severity_weights": {
+    "CRITICAL": 5,
+    "ERROR": 4,
+    "NOTICE": 2,
+    "WARNING": 3
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "alert_triage": {
+    "approved_mfa_and_scope": "cleared",
+    "cross_attempt_receipt": "needs_evidence",
+    "denied_scope": "confirmed",
+    "missing_otp_request": "confirmed",
+    "pre_auth_cancelled": "cleared",
+    "pre_auth_outage": "cleared",
+    "rejected_otp_request": "confirmed"
+  },
+  "allowed_read": true,
+  "authority_mode": "read-only provider checks on each request",
+  "container_removed": true,
+  "downgraded_role": 403,
+  "failed_mfa_grant": false,
+  "failed_mfa_observation": "unknown",
+  "failed_mfa_policy": "DENY",
+  "finished_at": "2026-11-23T01:15:39.482860+00:00",
+  "image": "quay.io/keycloak/keycloak:26.8.0",
+  "logout": 204,
+  "manual_revocation_file": false,
+  "mfa_correct": 200,
+  "mfa_missing": 400,
+  "mfa_wrong": 400,
+  "oidc_web_redirect": {
+    "after_logout": 401,
+    "consumed_redirect_grant": 403,
+    "denied_redirect_receipts": 0,
+    "downgraded_role": 403,
+    "evidence_state": "consistent",
+    "old_role": 401,
+    "refreshed_token_without_exact_otp_binding": 403,
+    "verified_otp_redirect": 303
+  },
+  "old_token_after_role_removal": 401,
+  "paid_api_calls": 0,
+  "pre_auth_outage_probe": "actual stopped loopback provider",
+  "refresh_after_logout": 400,
+  "remote_out_of_scope": "DENY",
+  "token_after_provider_logout": 401
+}

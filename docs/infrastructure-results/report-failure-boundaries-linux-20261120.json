@@ -1,0 +1,35 @@
+{
+  "schema": "owned-report-failure-boundaries-1",
+  "completed": true,
+  "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "paid_api_calls": 0,
+  "detection_metrics_changed": false,
+  "all_data_synthetic": true,
+  "checks": [
+    {
+      "name": "unsupported_object_after_valid_prefix",
+      "old_report_intact": true,
+      "temporary_removed": true,
+      "passed": true
+    },
+    {
+      "name": "invalid_unicode_encoding",
+      "old_report_intact": true,
+      "temporary_removed": true,
+      "passed": true
+    },
+    {
+      "name": "file_fsync_failure",
+      "old_report_intact": true,
+      "temporary_removed": true,
+      "passed": true
+    },
+    {
+      "name": "unicode_path_and_utf8_report_recover_after_all_faults",
+      "passed": true
+    }
+  ],
+  "private_fixture_removed": true,
+  "source_bytes_unchanged": true,
+  "test_dependencies_restored": true
+}

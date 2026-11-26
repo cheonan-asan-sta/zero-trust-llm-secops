@@ -1,0 +1,13 @@
+................................................................         [100%]
+=============================== warnings summary ===============================
+../team-llm-prep-venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /home/chaehj02/team-llm-prep-venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../team-llm-prep-venv/lib/python3.12/site-packages/mangum/adapter.py:65
+  /home/chaehj02/team-llm-prep-venv/lib/python3.12/site-packages/mangum/adapter.py:65: DeprecationWarning: There is no current event loop
+    asyncio.get_event_loop()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /mnt/c/Users/chaeh/Desktop/파란학기/tmp/extra-development-20261118/runtime/witness-capacity-grace-linux-final-20261120.xml -
+64 passed, 2 warnings in 27.91s

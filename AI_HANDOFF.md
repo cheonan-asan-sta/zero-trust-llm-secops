@@ -1,3 +1,105 @@
+> 2026-11-20 08:00 KST · 오전08:00까지 요청한 로컬 검증·개선 범위를 마쳤다.
+> 제품 `f6e1a0a`: Windows8240통과/613제외·Linux8848통과/5제외·실패0·양 OS2498개 파일 불변. 이전 통과 사례6구간에서 누락/실패·제외 전환0.
+> 기본 주기 장시간 시험: 실제6000.820초·watch100회·상태599표본·감사34행·SIGKILL/동일 기준 재개2회. [최종 현황](docs/extra-until-0800-20261120.md) · [전체 회귀](docs/extra-until0800-regression-20261120.md) · [지속 실행 원본](docs/extra-witness-sustained-20261120.md).
+> 기존 개발360건 F1 93.41%·탐지 목표 미달. 무료 재생 SHA256동일·새 API0. 유료/AWS/Docker 생성·업로드·CI·병합·실제8시간 soak 없음.
+> 이번 로컬 목표와 프로젝트 전체 목표를 구분한다. 외부SSO·독립 호스트/WORM·실제8시간 soak·컨테이너 이미지 전용2검사·4096개 이후 운영 및 탐지 목표/독립 평가는 잔여 사항이다. 새 지속 목표가 필요하면 사용자의 다음 지시를 따른다.
+
+> 2026-11-20 extra 지속 목표 완료: [플랫폼 거부 경계·SDK 취소·실제 VPN TLS 검증](docs/extra-platform-admission-20261120.md). 제품 ff44064·표시범위4b4c50c·TLS 시험217d090. 최종 Windows8,025통과/591제외·실패0; Linux 전체8,610통과/5제외, 이후 보관40/TLS25 별도 통과. 기존 Windows7,996통과 유지·기존 실패70은17통과/53 Linux전용, 해당70 Linux 모두통과. 실제 Windows 운영/SSO/독립호스트/8h/F1 달성으로 표시하지 않음. 모델·정답·예측·기존 F1 93.41% 유지, 유료/AWS/Docker/push/CI/병합 없음. 아래는 이전 기록이다.
+
+> 2026-11-19 extra 후속: [전체 회귀·Windows 실패 분류·수집기 링크 보강](docs/extra-full-regression-20261119.md). 기준58d698a Linux8,600통과/4제외, Windows7,996통과/70실패/538제외. b87c0a0 링크/경로 신원 보강 뒤 Linux영향113·Windows선택12통과. 최신 전체 재실행 통과/Windows 운영 인수로 표현하지 않음. 전체/후속 원본·환경 지문 보존, F1변경·유료·AWS·Docker·push·CI·병합·8h없음. 아래는 이전 기록.
+
+> 2026-11-19 extra: [별도 로컬 감사 검증자·서명 영수증](docs/extra-audit-witness-20261119.md) 완료. 구현64e33a9, Windows65통과/2제외·Linux67통과. [회귀 결과 정리 전 개발 목표](docs/extra-active-development-goal-20261119.md)의 네 구현 항목 완료. 최종 전체 회귀/8h soak·실제 조직 배포/독립 호스트 보관은 미완료. 미업로드·미병합·유료/AWS/Docker 없음. 아래는 이전 시점 기록이다.
+
+> 2026-11-19 extra: [남은 검토 호출자·필수 정책 준비](docs/extra-review-callers-20261119.md) 완료. 구현 ab2dbfc, Windows11통과/2제외·Linux21통과. 최초 실패 보존, 실제 조직 배포 미완료. 지속 목표는 별도 감사 검증자 로컬 구현으로 진행. push/CI/병합/유료/AWS/Docker/전체회귀/8h soak 없음. 아래는 이전 기록이다.
+
+> 활성 목표 진행: 48520ef 공통 collection-view.js로 워크벤치 사례/서명 세션·대시보드 사례/세션4경로 연결. 실제 서명 검증103세션/27사고 순회, 실제 변경409·401/403·키 remap·이전tenant응답 폐기 포함112조건. 기존 review34/read57·Win/Linux72개 pass. [UI근거](docs/extra-collection-pages-ui-20261119.md)·[활성목표](docs/extra-active-development-goal-20261119.md). 다음은 기존 audit review caller2개 harness의 headers 이전/필수정책 준비, 별도 witness 로컬 구현. 캐시형 CaseStore 다중 writer 쓰기 지원을 추가한 것은 아니므로 운영 공유 writer로 배포하지 않는다. paid/AWS/Docker/push/CI/merge/전체회귀결과정리/8h0. 아래는 이전 기록.
+
+> 활성 목표 진행: dd4f3ce 세션/사고 목록의 live-view 페이지 서버 API 추가. /case-pages·/zero-trust/session-pages, 주체/tenant/조건/limit/지문/만료 binding, 변경409·전후 신원/저장소 확인·취소 worker 슬롯 유지. 실제 사고 파일 hash/prefix 검증, 세션103건 전체 순회. Windows/Linux 각각49pass. 화면 연결은 미완료이며 다음 필수 단계다. [서버 계약/검증](docs/extra-collection-paging-20261119.md)·[활성 목표](docs/extra-active-development-goal-20261119.md). paid/AWS/Docker/push/CI/merge/전체회귀정리/8h0. 아래는 이전 기록.
+
+> 활성 목표 진행: 400d742 전체 감사 q/analyzer 검색을 서버 cursor scope 및 두 UI에 연결. NFKC/casefold literal·256자/512UTF8bytes·현재 tenant 제한, 기존 dashboard 페이지내 필터 유지. Windows/Linux 각각83pass/skip2, 이후 추가 wire3 양쪽pass. 실제 새 UI18·workbench45·dashboard38조건pass. [검색 근거](docs/extra-audit-search-20261119.md)·[남은 목표](docs/extra-active-development-goal-20261119.md). 다음은 session/case pagination, caller/policy 준비, 별도 witness 로컬 구현. goal active, 전체 회귀 결과 정리/실제8h 제외. paid/AWS/Docker/push/CI/merge0. 아래는 이전 기록.
+
+> 2026-11-19 extra 워크벤치 감사 페이지 후속: 기능d82052e·모바일79bdf4e. /results?limit=8 제거→/audit/results?limit=12, 위험도/검토 서버 필터·현재/다음 cursor·동일 snapshot/만료 유지. 전후 who·행/tenant/중복/범위 검증, 지연 응답/신원 변경 시 이전 화면/검토 폐기·명시적 재연결, 오류/만료 시 행/이동 비움·fallback/자동 재시도0. 개요는 페이지 보존/최신 목록은 명시적 갱신·열기는 현재 상세/ETag/binding. 합성137건12페이지 중복0·최종 실제 브라우저45조건; 기능기준 검토34·Win324/skip5·Linux327/skip2. backend/모델/정답 변경0·F1 93.41% 유지·유료/AWS/Docker/push/CI/병합/새전체회귀/8h soak0. [계약·원본·화면·남은 범위](docs/extra-workbench-paging-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 extra 서버 검토 정책 후속: d461b5f. AUDIT_REVIEW_REQUIRE_IDENTITY=true 선택 설정 추가, SQLite+인증+REQUIRE_IF_MATCH 필요. 두 헤더 누락428·I/O 중 정책 강화 재검사·기존403/412/CAS/이력 보존. 기본 false/운영 설정 보존·실제 조직 모든 writer/worker 배포 미완료. 새 정책28건 포함 Win250/skip3·Linux253통과; CLI TCP는 선택/필수 프로필4건; 필수 모드 실제 dashboard29/workbench34조건 통과. 제품UI/모델/정답 변경0·F1 93.41% 유지·paid/AWS/Docker/push/CI/병합/전체회귀/8h soak0. [계약·원본·client 목록·적용 순서](docs/extra-server-review-policy-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 extra CLI 서버 caller binding 후속: a293c80. 최종 who 직후 같은 키 subject 변경 시 예전 CLI는 잘못된 주체로 commit(새 재현1실패), 현재는 관측 If-Match + X-Review-Identity로 서버403·감사 행 유지. snapshot v2의 binding/mode와 응답 binding 확인, v1 거부·자동 변환/기존 파일 수정0·새 prepare 후 다시 확인 필요. 신규26건 포함 Windows217통과/skip3·Linux220통과. 실제 CLI subprocess/TCP bridge와 기존 native worker/TLS 회귀 구분. 서버/UI/모델/정답 변경0·기존 합성 개발F1 93.41% 유지·paid/AWS/Docker/push/CI/병합/전체회귀/8h soak0. [원본·사용·한계](docs/extra-cli-review-binding-20261119.md). 알려진 UI2개+CLI 이전 완료, custom client 목록/서버 필수화 정책·워크벤치 페이지·기업 신원·독립 성능 인수는 남음. 아래는 이전 시점 기록이다.
+
+> 2026-11-19 extra 기존 워크벤치 후속: frontend 6c0100f·검토 영역 대비 1b8233d. API 키/OIDC 입력 메모리 유지·목록 캐시 대신 상세+전후 who·관측 ETag와 서버 caller binding·현재 신원 reviewer 고정·명시적 확인 후 PATCH. stale412·동일 키 subject 변경·응답 유실·입력/대상/연결 경합 자동 우회/재시도0. 인증 변경 시 이전 DOM·세션 허용·진행 요청 초기화, 이전 분석을 새 키로 이어 보내지 않음. 실제 workbench32·기존 dashboard review27조건·Win191/skip3·Linux194 통과. 익명 시연 조회 유지/검토 불가·backend/모델/평가 원본 변경0·F1 93.41% 유지·paid/AWS/Docker/push/CI/병합/8h soak0. [원본·사용·한계](docs/extra-workbench-review-20261119.md). 두 UI 검토 이전 완료, CLI 서버 binding/워크벤치 페이지 이전·기업 신원·독립 성능/장기 인수는 남음. 아래는 이전 시점 기록이다.
+
+> 2026-11-19 extra 감사 페이지 후속: app/server 57b1590·지연 browser fixture 72610d0. 로그 탐색을 /audit/results?limit=12로 연결. 현재 위치 page_cursor로 첫 페이지도 같은 snapshot 재조회·위험도/검토 전체 서버 필터·검색/분석기는 현재 페이지. 전후 caller 확인·epoch/generation 폐기·저장 전 재검증·오류/만료 자동 fallback/retry0. 신규 backend7건 포함Win233/skip25·Linux256/skip2, 실제 browser 신규38·검토27·조회57·Linux 운영146조건 통과. 합성 tenant-a137건12페이지 중복 없는 순회. 분류기·평가 원본·정답·모델지표 F1 93.41% 유지·유료/AWS/Docker/push/CI/병합/8h soak0. 공통 글자/대비 경고는 남음. [원본·설정·한계](docs/extra-dashboard-paging-20261119.md). legacy workbench/전체 자유검색·기업 SSO·독립 witness/평가·장기 인수는 후속. 아래는 이전 시점 기록이다.
+
+> 2026-11-19 extra 대시보드 후속: app/server 구현 `bef9a97`·브라우저 fixture 보강 `bd1cb17`. 조회 당시 ETag/tenant/subject/auth method를 확인·PATCH If-Match+서버 caller binding·SQLite CAS로 연결. 상세 snapshot을 준비 시 최신 버전으로 자동 교체하지 않음. 신원 변경/입력 revision/연결 epoch 폐기·412/응답 유실 자동 재시도0. 신규 신원16건 포함Windows206통과/skip23·Linux229통과. 신규 실제 브라우저27·기존 Linux 운영146·조회57조건 통과. legacy workbench/다른 client 이전·audit cursor 소비는 남음·strict 기본false. 유료/AWS/push/CI/병합/8h soak·새 모델 성능 평가 없음·F1 93.41% 유지. [현재 구현·원본·한계](docs/extra-dashboard-review-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 08:00 이후 extra 후속: 운영자 감사 검토 CLI 추가(c0a8108). prepare snapshot→명시적 review, origin/tenant/subject/auth method/ETag 연결, HTTPS 검증·선택 mTLS·redirect/proxy 금지, 불확실 commit/412 자동 재시도 없음. 서버/모델/UI·strict 기본값 변경0. 신규46건 포함Windows157통과/skip3·Linux160통과. 실제 TLS6·실제 Linux CLI/별도HTTP worker 인수 포함. 새 전체 저장소/유료/AWS/push/CI/병합/8h soak 없음·F1 93.41% 유지. [사용법·원본·한계](docs/extra-operator-review-client-20261119.md). UI와 audit cursor 연결·독립 witness·기업 SSO·장기 시험은 후속. 아래는 이전 시점 기록이다.
+
+> 2026-11-19 최종 로컬 인수: app 구현3165fc1 그대로. Linux 전체8411통과/2실패/4제외 원본 보존. 두 실패는 손상 JSONL 빈 목록 기대값으로 테스트만 수정; 동일 노드 포함Linux53통과·Windows75통과/1제외. 신규 실제TCP 16동시 If-Match 단일성공·stale412·소유worker kill/restart 인수 통과. 최신 systemd54조건·소유자원 정리 확인. 새 전체 재실행 성공으로 표현하지 않음. 유료/AWS/push/CI/병합0·8h soak 미실행·모델지표 그대로. [현재 상태](docs/extra-development-status-20261119.md), [검증 원본·한계](docs/extra-local-validation-20261119.md). 08:00 KST 시간 상한으로 마감. 결과 묶음 검산 명령과 변경 탐지7건을 Windows/Linux 각각 검증했고 약720MiB 소유 pytest fixture를 정리했다. 원본 XML6개·소스·보고서는 보존. 미완료 목록은 현재 상태 문서를 따른다. 아래는 이전 시점 기록이다.
+
+> 2026-11-19 JSONL 현재 조회: 목록/상세/통계가 디스크 전체 검증·known writer prefix·fresh 모델을 사용. cache/반환 객체 변경 배제·초기 빈 source와 유실 구분·읽기 오류503/slot 유지. JSON 값 비교는1/1.0 호환/불리언 별도이며 exact response proof/ETag는 엄격한 wire 유지. 기존 중첩 bool→number는 별도 거부 test. 변경 전12실패→신규24건 포함focused80·관련128/skip3 통과. 직전 전체Linux8388/1실패/skip4 원본 보존·최신 전체 재검증 예정. paid/AWS/push/CI/병합0·새 F1 없음·08:00 KST 목표 active. [검증·한계](docs/extra-jsonl-query-source-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 감사 검토 묶음: 정확한 자기 review 행 proof/query slot·canonical JSON core/CAS/이관·SQLite If-Match 선택 지원/strict opt-in·JSONL 조건부 묵시 fallback 금지·catalog/RBAC 정합성. 전역 analysis ID 충돌 거부는 유지하고 legacy unit fixture ID만 고유화. 분석 부하 시험 인증 layer 분리/생산 기본 유지·과대 protocol input 유지/pytest ID 축약. 신규45건 포함Windows76·이전 복원121/skip2·probe35/skip2 통과. 기준 전체 결과의 실패/오류를 보존했고 최신 전체 재검증 예정. paid/AWS/push/CI/병합0·새 F1 없음·08:00 KST 목표 active. [검증·한계](docs/extra-audit-review-boundary-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 통합 읽기 순서: [extra 개발 현황·종료된 시험·남은 범위](docs/extra-development-status-20261119.md)를 추가하고 최초 HTTP/federation/공동 writer 보고서에 후속 링크를 표시했다. 과거 시점의 미구현 문장을 현재 상태와 구분하며 SQLite 공동 writer와 JSONL 전역 원자성도 구분한다. 전체 코드 회귀는25adf8c 기준 Windows/Linux 실행 중이며 종료된 관련 묶음과 합산하지 않는다. paid/AWS/push/CI/병합0·목표 active. 아래는 이전 시점 기록이다.
+
+> 2026-11-19 Hybrid 주입 소유권: falsey adapter를 None과 구별해 추가 OpenAI 생성 금지·주입 객체 유지·외부 소유 close 금지. 수정 전2실패→신규2건 포함Windows51통과. 전체 Windows/Linux 회귀 진행 중(원본 XML 별도 보관). paid/AWS/push/CI/병합0·새 F1 없음·08:00 KST 목표 active. [검증·한계](docs/extra-hybrid-adapter-ownership-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 cached provider: 공용 analysis admission 안에서 첫 생성 settled_io·생성 전/후 현재 caller·반복 취소 worker settle·analyzer/agent cache lookup+construction 직렬화·실패 cache 금지·취소 후 성공 객체 cache 소유·기존 검증 경로의 slot/503 계약 유지. 변경 전4실패→신규20건 포함Win732/skip20·Linux750/skip2·최신 systemd54조건 통과. SQLite process 쓰기/commit 전후 kill·checkpoint/backup 회귀 확대. paid/AWS/push/CI/병합0·새 F1 없음·08:00 KST 목표 active. [검증·한계](docs/extra-cached-provider-setup-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 평가 자원: bounded job 전체 수명·setup settled_io·취소된 constructor 결과 소유/정리·반복 취소 중 async close settle·정리 후 admin 확인·OpenAI/자체 생성 Hybrid close·주입 adapter/캐시 수명 유지·응답 상세 비공개. 변경 전2실패→신규24건 포함Win623/skip19·Linux640/skip2·최신 systemd54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·batch 반복 취소 후속·08:00 KST 목표 active. [검증·한계](docs/extra-evaluation-runtime-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 평가 API: 사례별 공용 analysis slot·현재 admin 검증·Task-local SDK authority·summary 전달 재검증·fatal/반복 취소 시 sibling settle·포화를 model error로 점수화 금지. 변경 전3실패→신규19건 포함Win599/skip19·Linux616/skip2·최신 systemd54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·evaluation setup/client 종료 후속·08:00 KST 목표 active. [검증·한계](docs/extra-evaluation-authority-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 초기 인증 I/O: 앱별 bounded admission·API key/JWKS settled_io·취소 후 실제 worker 완료까지 lease 유지·포화503/Retry-After·frozen settings·최종 신원 확인·loopback 실제 JWKS 지연/취소 검증. 변경 전2실패→신규30건 포함Win575/skip19·Linux592/skip2·최신 systemd54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·별도 evaluation 경계 후속·08:00 KST 목표 active. [검증·한계](docs/extra-authentication-admission-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 caller SDK 경계: analyzer 동안 Task-local authority·OpenAI 요청별 SDK retries0·응답/오류 후 caller 확인·명시적 token retry 재검증·공용 client/standalone 설정 유지·owner 종료/취소 시 상속 child guard 닫기. 추가 caller I/O 뒤 verified source refresh. 변경 전7실패→신규20건 포함Win538/skip4·Linux540/skip2·최신 systemd54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·초기 인증 I/O admission/별도 evaluation 경계 후속·목표 active. [검증·한계](docs/extra-caller-sdk-retry-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 일반/배치 호출 신원: request-local digest callback·slot 이후/모델 전/저장 전후/전달 전 재검증·OIDC 만료/loaded scope·disabled 전환·401/403/503 보존·batch 실패 형제 cancel/settle. API계정파일 FD/path 안정성·Windows flag 보완. 변경 전8실패→신규41건 포함Win472/skip4·Linux474/skip2·실제 TCP 계정 철회1건·최신 systemd54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·ordinary SDK retry/초기 auth I/O admission 후속·목표 active. [검증·한계](docs/extra-analysis-caller-boundary-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 JSONL writer 경계: 로드 bytes 지문/head/count와 live파일을 모델 전/readiness/append 전에 확인·FD/path 전후 대조·짧은 write 완료/file fsync 후 cache 승격·기존 prefix 변경 거부. bootstrap byte/row/regular/FIFO 상한·cross-file review 병합 의미 유지. 변경 전7실패→신규27건 포함Win414/skip4·Linux416/skip2·기존 TCP2건 강화·최신 systemd54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·일반 분석 호출 계정 철회/만료 경계 후속·목표 active. [검증·한계](docs/extra-jsonl-writer-boundary-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 JSONL 응답 보존: cached history 대신 bounded disk 전체 체인/원래 hashed 행 확인·federation inventory와 자기 writer 확인·다른 shard 복사본 대체 거부·legacy prefix 호환/witness 제외·parse 뒤 stat 확인. 자기 append/검증 RLock으로 정상 batch 경합 보완. 신규25건 포함Win388/skip3·Linux389/skip2·실제 JSONL HTTP2건·최신 systemd54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·plain JSONL preflight/append head 검증 후속·목표 active. [검증·한계](docs/extra-jsonl-row-preservation-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 SQLite 응답 행 보존: verify_saved가 전체 compact chain과 같은 read transaction에서 반환할 JSON 행을 확인·최소 기준 이상 구 DB라도 방금 행 없으면 거부. 최신 동일 event/검토 공존 허용·wire tuple/key 정상화·bool/number 구분. 신규13건 포함Win289/skip3·Linux290/skip2·최신 실제 systemd54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·JSONL/federated 보존 확인 후속·목표 active. [검증·한계](docs/extra-analysis-row-preservation-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 분석 감사 경계: 선택 store 고정·preflight 전후/저장 전/전달 전 동일성·commit 후 로컬 integrity 재검증·추가 scan 뒤 source 검증 유지·backup 암호화 후 복사본 재검증. 변경 전7실패→신규13건 포함Win223/skip1·Linux224·실제 systemd/HTTP54조건 통과. paid/AWS/push/CI/병합0·새 F1 없음·최소 기준 이후 방금 저장한 analysis 자체의 보존 확인 후속·목표 active. [결과·한계](docs/extra-analysis-audit-boundary-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 runtime checkpoint: SQLite 선택형 path/pin·기존 DB만 RO 시작·매 scan 전후 전체 체인/최소 prefix 확인·commit 전 철회 rollback·복사 snapshot backup에도 유지. 신규26건 포함 Win256/skip3·Linux257/skip2·실제 systemd/HTTP3worker53조건 통과. 정상 구 DB/변조 checkpoint 거부·정확한 상태 복구·유료API/AWS/push/CI/병합0·새 F1 없음·분석 중 변화/backup 게시 경계 후속·목표 active. [설정·검증·한계](docs/extra-runtime-audit-checkpoint-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 checkpoint 단조 갱신: checkpoint-advance 이전 file/pin 필수·동일 read transaction의 prefix 확인·정상 구 DB/다른 chain 거부. readonly checkpoint-status4상태/unsafe exit3. 신규16건 포함Win147/skip1·Linux231/skip2·실제 systemd51조건 통과. source/권한 불변·유료API/AWS/push/CI/병합0·새 F1 없음·선택형 runtime checkpoint guard 후속·목표 active. [명령·시험·한계](docs/extra-audit-checkpoint-progression-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 checkpoint 보관: readonly head/private JSON export·외부 SHA pin load·backup/restore 최소 prefix 연결. 오래된 정상/다른 체인 거부·새 후보만 생성·최신 live/독립보관은 false 명시. 신규32건 포함Win141/skip1·Linux225/skip2·최신 systemd49조건 통과. source/권한 불변·유료API/AWS/push/CI/병합0·새 F1 없음·단조 checkpoint 갱신/상태비교 후속·목표 active. [절차·시험·한계](docs/extra-audit-checkpoint-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 HTTP cursor 인수: 실제 worker3개 kill/wait·고정 private key/pin으로 TCP cursor 재개·PENDING 과거2/현재1 분리·원래 scope/expiry 유지·third 모델0. 키 오류 page/readiness503/live200·시험 key 제거·부모 앱 env/dotenv 격리. 신규5건 포함Win159/skip2·Linux244/skip2·최신 실제 systemd47조건 통과. 유료API/AWS/push/CI/병합0·새 F1 없음·복원 checkpoint 후속·목표 active. [인수·설정·한계](docs/extra-http-cursor-recovery-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 감사 페이지: GET /audit/results·전체 tenant 필터·AES-GCM/HKDF900초 cursor·고정 private key/pin 선택. SQLite 역사 prefix/현재 전체 검증, JSONL 자기 view 변경409. 기존 event_id=page 호환. 신규61/skip2 포함Win165/skip2·Linux275/skip2 통과·실제 별도 reader 재개 확인. HTTP worker cursor 재개는 다음·유료API/AWS/push/CI/병합0·새 F1 없음·목표 active. [API·키·일관성·한계](docs/extra-audit-paging-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 감사 integrity 메모리: 전체 모델 대신 마지막 검증 행 위치 유지·동일 snapshot에서 이전 review 재조회·전체 체인/전이/모델 동등성 유지. 신규10건 포함Win132·Linux211·최신 실제 systemd/worker/복원41조건 통과. 합성1024행 Python peak98.1%/검토다수95.7% 절감, 검토다수 시간24~31% 증가도 기록. 유료API/AWS/push/CI/병합0·F1 변경 없음·페이지/checkpoint 후속·목표 active. [측정·재현·한계](docs/extra-compact-audit-integrity-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 감사 query 보강: 목록/상세/통계/검토 저장/readiness 공통 제한 기본2·503/Retry-After·취소 I/O settle·고정 store와 API 키/OIDC expiry 재확인. 커밋 후 철회/취소는 이력 보존·성공 전달 거부. 신규21건 포함Win175·Linux242·최신 실제 systemd/worker/복원41조건 통과. 유료API/AWS/push/CI/병합0·F1 변경 없음·대규모 검증 메모리/페이지/checkpoint 후속·목표 active. [설정·시험·한계](docs/extra-audit-query-admission-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 session/agent 진입 제한: 두 API 최초 근거 수집 전 슬롯 획득·source I/O settle·운영/캡처 store 고정 및 전후 동일성 확인·agent 이력도 고정 store 조회. 변경 전8실패→신규10건 포함Win223/skip15·Linux285 통과. 대기 중 source 철회/초기 store 교체401·모델0·유료API/AWS/push/CI/병합0·F1 변경 없음·감사 조회 부하/페이지/복원 checkpoint 후속·목표 active. [구현·시험·한계](docs/extra-analysis-source-admission-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 SDK 자동 retry 경계: 첫500/timeout 후 source 철회에도 SDK가 재요청하는2실패를 재현. 검증 context 요청별 max_retries=0, cached client 설정 불변·일반 retry/명시적 검증 retry 유지. 신규9건 포함Win229·Linux231 통과. 유료API/AWS/push/CI/병합0·F1 변경 없음·초기 session/agent 근거 수집 진입 제한 후속·목표 active. [동작·시험·한계](docs/extra-verified-sdk-retry-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 SDK 근거 I/O: context.revalidate로 source callback 완료/실패까지 취소 대기·현재 expiry/binding 확인. adapter 최초/재시도·agent 반복/최종·서버 이력 읽기를 보강. 신규8건·Win225/skip15·Linux285·최신 실제 systemd/worker/감사 복원41조건 통과. 유료API/AWS/push/CI/병합0·새 F1 평가 없음·초기 session/agent route 진입 제한과 SDK 자동 재시도 경계 후속·목표 active. [결과·한계](docs/extra-async-evidence-io-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 native 진입 제한: 실행 근거 resolve 전 슬롯 획득·취소 중 source I/O 완료까지 유지·route 검증 offload·source 확인 전후 serving store 동일성 확인. Win최신59건·Linux208건·최신 실제 systemd/HTTP worker 종료 재기동/감사 복원41조건 통과. 대기 중 철회는 조회404·모델0. SDK 내부 동기 callback은 후속 범위·유료API/AWS/push/CI/병합0·목표 active. [구현·검증·한계](docs/extra-native-admission-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 감사 I/O 취소 후속: 동기 무결성 조회의 event loop 정지와 취소 시 조기 슬롯 반환을 재현(변경 전3실패). 시작한 디스크 작업 완료까지 슬롯 유지·SQLite writer/연합 등록 보호. 신규6건·Linux205건·Windows142/skip1 통과. ASGI task 취소이며 TCP단절은 미검증·새 F1 평가 없음·유료API/AWS/push/CI/병합0·오전08:00 목표 active. [구현·결과·한계](docs/extra-async-audit-io-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 HTTP worker 종료/재기동: 실제 독립 HTTP 프로세스의 PID를 소유 handle과 대조해 kill/wait하고 새 worker가 같은 SQLite 감사·공유 참조를 재검증. 원래 만료 전 철회 차단·권한/실행 이력 불변·실제 native41조건 통과. Linux 관련199건·최신 Win/Linux각22건. Windows venv PID 보완·provider stub/유료API AWS0·push/CI/병합 없음·오전08:00 목표 active. [인수·설정·한계](docs/extra-http-worker-restart-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 native 감사 복구 인수: 실제 systemd/ptrace→공유 참조→TCP HTTP→SQLite 감사→암호화 백업/복원 후보 조회·검토35조건 통과. Linux 관련197건·Windows49건 통과. 후보 검토 후 원본 DB/권한 이력 불변·오래된/변조 백업 거부. provider는 stub·유료/AWS0·push/CI/병합 없음·오전08:00 목표 active. [검증과 한계](docs/extra-native-audit-recovery-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 감사 이관/백업 후속: 고정 source 목록 해시·원래 검토 이력을 검증해 새 SQLite로 이관. AES-256-GCM 스트리밍 온라인 backup·외부 package/head pin·새 경로 restore·활성화 금지 CLI 추가. 최신 Win/Linux 각각42건(동일22개 신규+20개 writer) 통과·이전 Linux 확대177건. 원본/실사용 DB/설정 보존·유료API/AWS/push/CI/병합 없음·오전08:00 목표 active. [설정·시험·한계](docs/extra-audit-transfer-backup-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-19 오전 개발 진행: extra 선택형 SQLite 공동 감사 writer/전역 chain/head 검증·검토 CAS·HTTP409·프로세스 commit 전후 강제종료 복구 추가. Linux 관련177건·Windows 최신 집중20건 통과. 기본 backend 유지·과거 자료 자동 이관 없음·유료API/AWS/push/CI/병합 없음. 오전08:00 목표 active. [구현과 검증](docs/extra-transactional-audit-20261119.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-18 extra 공유 참조 후속: 선택적 AES-256-GCM/로컬 SQLite 참조 저장소와 고정 설정 bootstrap 추가. 원래 만료 내 새 reader 프로세스 재검증·다른 프로세스의 철회 지속·source ledger 초기화부터 읽기 전용. 공유 모드 JSONL은 worker별 파일이며 통합 조회는 다음 작업. Linux744건(신규43건 포함)·Windows102/skip1·실제 systemd/독립 reader/TCP HTTP29조건 통과. 유료API/AWS0·F1 새 평가 없음·push/CI/병합 없음. [구현·설정·검증·남은 범위](docs/extra-shared-native-analysis-20261118.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-18 extra HTTP 후속: 서버가 검증·등록한 실행 참조로 POST /analysis/native-service 분석과 기존 해시 체인 감사를 연결. 동일 호출자/tenant, 모델 전후·감사 저장 후 재검증, 소비된 grant 재발급 방지. Linux698건(신규60건 포함)·Windows신규60건·실제 systemd+TCP HTTP24조건 통과. 유료/API AWS0·새 F1 측정 없음·push/CI/병합 없음. 참조는 프로세스 메모리이며 재시작/다른 worker에서는 소멸. [구현·검증·운영 한계](docs/extra-native-http-audit-20261118.md). 아래는 이전 시점 기록이다.
+
+> 2026-11-18 extra 후속: main PR #91(e058bca)에서 분기한 로컬 개발. 실제 systemd 실행·서명된 호출자 영수증·정확한 앱 grant 소비를 읽기 전용으로 연결해 LLM 입력에 추가. Linux 관련 회귀572건(신규45건 포함), 실제 systemd15조건 통과. 유료/AWS0·새 모델 F1 측정 없음·push/CI/병합 없음. [구현·결과·범위](docs/extra-native-execution-llm-20261118.md). 아래는 이전 시점 기록이다.
+
 > 2026-11-17 오후 후속: 개발360건 TP163/FP6/FN17/TN174·F1 93.41%·목표 미달 유지. 전체 수치 후보는 악화, 다운로드60건 후보는 개선0으로 모두 런타임 미채택. 선택적 LLM 근거 조회는 실제 실행/MFA 사례의 탐지 유지·inline으로 agent 요청24→12. 불완전 근거의 ALLOW 권고를 서버에서 HOLD로 제한하고 원래 권고 보존; 분류/F1 변경0. 취소 도중 JSONL 감사 경합·검토 중 호출 계정 변경·감사 후 철회 시 전달 거부도 재현/수정. 로그 지시문6종의 실제12회는 판정 유지. 유료1,071회/$4.87398975추정·미확인0·고정47fc624 Linux7,696/skip2·Windows660/skip27 통과·CI/push/병합/AWS 없음. [모든 결과·한계](docs/llm-operation-evidence-20261117.md) 아래는 이전 시점 기록이다.
 
 > 2026-11-17 검증 근거 연결: 서버 정책·서명·현재 세션/회수·승인 소비를 읽는 /analysis/verified-session 구현. 새 로컬12개×2반복에서 FN4→0, 최종 F1 44.44→92.31/100%(검증 오류1 포함). 과거 TP 유지·FN2 잔여, FP0/1 변동. 실제 API266회·확인 사용량 추정$1.152008+미확인1건 예약$0.028229·Win/Linux 각각442건 통과. 실제 기업SSO/독립95%/배포 완료 아님·기본 모드 유지·로컬만 저장. [검증 방법·모든 결과·한계](docs/llm-verified-session-evidence-20261117.md) 아래는 이전 시점 기록이다.

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="1" failures="1" skipped="0" tests="1" time="5.016" timestamp="2026-11-19T14:55:38.550883+09:00" hostname="희주"><testcase classname="tests.test_audit_review_policy" name="test_identity_required_policy_rejects_version_only_before_audit_read" time="0.146"><failure message="Failed: missing caller read audit">api = namespace(client=&lt;starlette.testclient.TestClient object at 0x000001F64E36AF00&gt;, store=&lt;app.services.sqlite_audit.SQLi...iewer=None, review_note=None, review_updated_at=None), withdraw=&lt;function api.&lt;locals&gt;.withdraw at 0x000001F64EB93880&gt;)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001F64EB958B0&gt;
+
+    def test_identity_required_policy_rejects_version_only_before_audit_read(api, monkeypatch):
+        enable(api, monkeypatch)
+        headers = observed(api)
+        del headers["X-Review-Identity"]
+        monkeypatch.setattr(api.store, "get", lambda *_: pytest.fail("missing caller read audit"))
+&gt;       response = api.client.patch(URL + "/review", headers=headers, json=BODY)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_audit_review_policy.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:618: in patch
+    return super().patch(
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\httpx\_client.py:1218: in patch
+    return self.request(
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:455: in request
+    return super().request(
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\httpx\_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\httpx\_client.py:914: in send
+    response = self._send_handling_auth(
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\httpx\_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\httpx\_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\httpx\_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:354: in handle_request
+    raise exc
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:351: in handle_request
+    portal.call(self.app, scope, receive, send)
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\anyio\from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\anyio\from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+app\middleware.py:117: in __call__
+    await self.app(scope, receive, send_with_headers)
+app\middleware.py:69: in __call__
+    await self.app(scope, limited_receive, tracked_send)
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\middleware\trustedhost.py:51: in __call__
+    await self.app(scope, receive, send)
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\routing.py:670: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\routing.py:2734: in app
+    await route.handle(scope, receive, send)
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\routing.py:1281: in handle
+    await super().handle(scope, receive, send)
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\routing.py:280: in handle
+    await self.app(scope, receive, send)
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\routing.py:158: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\routing.py:144: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\routing.py:706: in app
+    raw_response = await run_endpoint_function(
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\routing.py:352: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\main.py:1470: in update_review
+    updated = await _update_review_in_slot(event_id, request, principal, http_request)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\main.py:1481: in _update_review_in_slot
+    record = await _audit_read_in_slot(store, "get", principal, http_request, event_id, principal.tenant_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\main.py:1376: in _audit_read_in_slot
+    return await _audit_call_in_slot(store, getattr(store, method), principal, request, *args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\main.py:1381: in _audit_call_in_slot
+    value = await settled_io(operation, *args)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\services\settled_io.py:7: in settled_io
+    return await settled_awaitable(asyncio.to_thread(function, *args, **kwargs))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\services\settled_io.py:16: in settled_awaitable
+    result = await asyncio.shield(worker)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\threads.py:25: in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\thread.py:59: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+_ = ('audit-cancel-1', 'local')
+
+&gt;   monkeypatch.setattr(api.store, "get", lambda *_: pytest.fail("missing caller read audit"))
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: missing caller read audit
+
+tests\test_audit_review_policy.py:32: Failed</failure></testcase><testcase classname="tests.test_audit_review_policy" name="test_identity_required_policy_rejects_version_only_before_audit_read" time="0.001"><error message="failed on teardown with &quot;RuntimeError: This portal is not running&quot;">tmp_path = WindowsPath('C:/Users/chaeh/AppData/Local/Temp/pytest-of-chaeh/pytest-1425/test_identity_required_policy_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001F64EB958B0&gt;
+
+    @pytest.fixture
+    def api(tmp_path, monkeypatch):
+        key = "local-audit-query-placeholder"
+        config = Settings(
+            _env_file=None,
+            auth_mode="api_key",
+            api_key_sha256=hashlib.sha256(key.encode()).hexdigest(),
+            api_key_subject="local-auditor",
+            api_key_tenant_id="local",
+            api_key_roles="responder",
+            audit_query_queue_timeout_seconds=0.01,
+        )
+        store = SQLiteAuditStore(tmp_path / "query.sqlite3")
+        first = record(1)
+        first = first.model_copy(
+            update={
+                "assessment": first.assessment.model_copy(update={"requires_human_review": True}),
+                "review_status": ReviewStatus.PENDING,
+            }
+        )
+        asyncio.run(store.save(first))
+        asyncio.run(store.save(record(2).model_copy(update={"tenant_id": "other"})))
+        capacity = asyncio.Semaphore(1)
+        monkeypatch.setattr(main, "audit_query_capacity", capacity, raising=False)
+        monkeypatch.setattr(main, "audit_store", store)
+        monkeypatch.setattr(main, "settings", config)
+        monkeypatch.setattr(security, "get_settings", lambda: config)
+    
+        def withdraw():
+            config.api_key_sha256 = SecretStr(hashlib.sha256(b"rotated-local-query-key").hexdigest())
+    
+&gt;       with TestClient(main.app) as client:
+             ^^^^^^^^^^^^^^^^^^^^
+
+tests\test_audit_query_admission.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:709: in __exit__
+    self.exit_stack.close()
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\contextlib.py:618: in close
+    self.__exit__(None, None, None)
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\contextlib.py:610: in __exit__
+    raise exc_details[1]
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\contextlib.py:478: in _exit_wrapper
+    callback(*args, **kwds)
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:702: in wait_shutdown
+    portal.call(self.wait_shutdown)
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\anyio\from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\anyio\from_thread.py:382: in start_task_soon
+    self._check_running()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;anyio.from_thread.BlockingPortal object at 0x000001F64EB960F0&gt;
+
+    def _check_running(self) -&gt; None:
+        if self._event_loop_thread_id is None:
+&gt;           raise RuntimeError("This portal is not running")
+E           RuntimeError: This portal is not running
+
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\anyio\from_thread.py:216: RuntimeError</error></testcase></testsuite></testsuites>

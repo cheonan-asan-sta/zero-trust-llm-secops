@@ -1,0 +1,884 @@
+
+=================================== ERRORS ====================================
+__________ ERROR collecting tests/test_analysis_source_admission.py ___________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_analysis_source_admission.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_analysis_source_admission.py:12: in <module>
+    from test_execution_analysis_evidence import execution_lab as execution_lab  # noqa: PLC0414
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_execution_analysis_evidence.py:16: in <module>
+    from tests import test_behavior_context_integration as context_cases
+E   ImportError: cannot import name 'test_behavior_context_integration' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+____________ ERROR collecting tests/test_apparmor_causal_intent.py ____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_apparmor_causal_intent.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_apparmor_causal_intent.py:8: in <module>
+    from tests.test_apparmor_noop import event
+E   ModuleNotFoundError: No module named 'tests.test_apparmor_noop'
+____________ ERROR collecting tests/test_apparmor_status_notice.py ____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_apparmor_status_notice.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_apparmor_status_notice.py:13: in <module>
+    from tests.test_apparmor_noop import event
+E   ModuleNotFoundError: No module named 'tests.test_apparmor_noop'
+_________ ERROR collecting tests/test_approval_recovery_processes.py __________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_approval_recovery_processes.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_approval_recovery_processes.py:12: in <module>
+    from tests import test_behavior_context_recovery as recovery_cases
+E   ImportError: cannot import name 'test_behavior_context_recovery' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+______________ ERROR collecting tests/test_async_evidence_io.py _______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_async_evidence_io.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_async_evidence_io.py:11: in <module>
+    from test_evidence_review_agent import final_response, tool_response
+tests\test_evidence_review_agent.py:17: in <module>
+    from tests import test_execution_analysis_evidence as execution_cases
+E   ImportError: cannot import name 'test_execution_analysis_evidence' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+_______________ ERROR collecting tests/test_audit_preflight.py ________________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_audit_preflight.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_audit_preflight.py:13: in <module>
+    from tests.test_audit_cancellation import record
+E   ModuleNotFoundError: No module named 'tests.test_audit_cancellation'
+____________ ERROR collecting tests/test_backup_recovery_status.py ____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_backup_recovery_status.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_backup_recovery_status.py:17: in <module>
+    from tests.test_capture_backup import restore, setup
+E   ModuleNotFoundError: No module named 'tests.test_capture_backup'
+__________ ERROR collecting tests/test_behavior_context_recovery.py ___________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_behavior_context_recovery.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_behavior_context_recovery.py:37: in <module>
+    from tests import test_behavior_context_integration as context_cases
+E   ImportError: cannot import name 'test_behavior_context_integration' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+________ ERROR collecting tests/test_behavior_execution_integration.py ________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_behavior_execution_integration.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_behavior_execution_integration.py:10: in <module>
+    from tests import test_behavior_context_integration as context_cases
+E   ImportError: cannot import name 'test_behavior_context_integration' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+_______________ ERROR collecting tests/test_caller_sdk_retry.py _______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_caller_sdk_retry.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_caller_sdk_retry.py:14: in <module>
+    from test_openai_incomplete_retry import truncated_body, valid_body
+tests\test_openai_incomplete_retry.py:17: in <module>
+    from tests.test_structured_response import envelope
+E   ModuleNotFoundError: No module named 'tests.test_structured_response'
+_______________ ERROR collecting tests/test_capture_archive.py ________________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_capture_archive.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_capture_archive.py:19: in <module>
+    from tests.test_collector_freshness import envelope
+E   ModuleNotFoundError: No module named 'tests.test_collector_freshness'
+________________ ERROR collecting tests/test_capture_backup.py ________________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_capture_backup.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_capture_backup.py:17: in <module>
+    from tests.test_capture_archive import fixture as capture_fixture
+E   ModuleNotFoundError: No module named 'tests.test_capture_archive'
+_________ ERROR collecting tests/test_collector_provider_delivery.py __________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_collector_provider_delivery.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_collector_provider_delivery.py:11: in <module>
+    from tests.test_collector_provider_ha import configured
+E   ModuleNotFoundError: No module named 'tests.test_collector_provider_ha'
+____________ ERROR collecting tests/test_collector_provider_ha.py _____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_collector_provider_ha.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_collector_provider_ha.py:28: in <module>
+    from tests.test_collector_freshness import envelope, repin
+E   ModuleNotFoundError: No module named 'tests.test_collector_freshness'
+______________ ERROR collecting tests/test_collector_schedule.py ______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_collector_schedule.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_collector_schedule.py:12: in <module>
+    from tests.test_collector_freshness import envelope, fixture
+E   ModuleNotFoundError: No module named 'tests.test_collector_freshness'
+___________ ERROR collecting tests/test_collector_status_bridge.py ____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_collector_status_bridge.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_collector_status_bridge.py:14: in <module>
+    from tests.test_collector_freshness import envelope, fixture
+E   ModuleNotFoundError: No module named 'tests.test_collector_freshness'
+______________ ERROR collecting tests/test_context_retention.py _______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_context_retention.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_context_retention.py:19: in <module>
+    from tests import test_behavior_context_recovery as integration
+E   ImportError: cannot import name 'test_behavior_context_recovery' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+_______________ ERROR collecting tests/test_database_backup.py ________________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_database_backup.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_database_backup.py:12: in <module>
+    from tests.reviewer_credentials import assert_reviewer_isolation
+E   ModuleNotFoundError: No module named 'tests.reviewer_credentials'
+_________ ERROR collecting tests/test_database_recovery_checkpoint.py _________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_database_recovery_checkpoint.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_database_recovery_checkpoint.py:11: in <module>
+    from tests.reviewer_credentials import assert_reviewer_isolation
+E   ModuleNotFoundError: No module named 'tests.reviewer_credentials'
+_________ ERROR collecting tests/test_database_transport_rotation.py __________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_database_transport_rotation.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_database_transport_rotation.py:14: in <module>
+    from tests.reviewer_credentials import assert_reviewer_isolation
+E   ModuleNotFoundError: No module named 'tests.reviewer_credentials'
+_________________ ERROR collecting tests/test_dns_capture.py __________________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_dns_capture.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_dns_capture.py:9: in <module>
+    from tests.test_f1_pcap_initial import pcap
+E   ModuleNotFoundError: No module named 'tests.test_f1_pcap_initial'
+________ ERROR collecting tests/test_download_arithmetic_evaluation.py ________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_download_arithmetic_evaluation.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_download_arithmetic_evaluation.py:19: in <module>
+    from tests.test_incomplete_evaluation_provenance import source as replay_fixture
+E   ModuleNotFoundError: No module named 'tests.test_incomplete_evaluation_provenance'
+_____________ ERROR collecting tests/test_evaluation_authority.py _____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_evaluation_authority.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_evaluation_authority.py:13: in <module>
+    from test_caller_sdk_retry import local_adapter
+tests\test_caller_sdk_retry.py:14: in <module>
+    from test_openai_incomplete_retry import truncated_body, valid_body
+tests\test_openai_incomplete_retry.py:17: in <module>
+    from tests.test_structured_response import envelope
+E   ModuleNotFoundError: No module named 'tests.test_structured_response'
+__________ ERROR collecting tests/test_evaluation_evidence_freeze.py __________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_evaluation_evidence_freeze.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_evaluation_evidence_freeze.py:8: in <module>
+    from tests import test_runtime_release
+E   ImportError: cannot import name 'test_runtime_release' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+______________ ERROR collecting tests/test_evaluation_runtime.py ______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_evaluation_runtime.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_evaluation_runtime.py:11: in <module>
+    from test_caller_sdk_retry import local_adapter
+tests\test_caller_sdk_retry.py:14: in <module>
+    from test_openai_incomplete_retry import truncated_body, valid_body
+tests\test_openai_incomplete_retry.py:17: in <module>
+    from tests.test_structured_response import envelope
+E   ModuleNotFoundError: No module named 'tests.test_structured_response'
+____________ ERROR collecting tests/test_evidence_review_agent.py _____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_evidence_review_agent.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_evidence_review_agent.py:17: in <module>
+    from tests import test_execution_analysis_evidence as execution_cases
+E   ImportError: cannot import name 'test_execution_analysis_evidence' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+_________ ERROR collecting tests/test_evidence_review_concurrency.py __________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_evidence_review_concurrency.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_evidence_review_concurrency.py:15: in <module>
+    from tests.test_evidence_review_agent import tool_response
+E   ModuleNotFoundError: No module named 'tests.test_evidence_review_agent'
+_____________ ERROR collecting tests/test_evidence_review_load.py _____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_evidence_review_load.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_evidence_review_load.py:28: in <module>
+    from tests.test_structured_response import envelope
+E   ModuleNotFoundError: No module named 'tests.test_structured_response'
+______________ ERROR collecting tests/test_exec_bundle_backup.py ______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_exec_bundle_backup.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_exec_bundle_backup.py:23: in <module>
+    from tests.test_managed_exec_retention import fixture
+E   ModuleNotFoundError: No module named 'tests.test_managed_exec_retention'
+_______________ ERROR collecting tests/test_exec_bundle_cli.py ________________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_exec_bundle_cli.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_exec_bundle_cli.py:9: in <module>
+    from tests.test_exec_bundle_backup import interrupted, setup
+E   ModuleNotFoundError: No module named 'tests.test_exec_bundle_backup'
+______________ ERROR collecting tests/test_exec_bundle_status.py ______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_exec_bundle_status.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_exec_bundle_status.py:14: in <module>
+    from tests.test_exec_bundle_backup import interrupted, restore, save, setup
+E   ModuleNotFoundError: No module named 'tests.test_exec_bundle_backup'
+_________ ERROR collecting tests/test_exec_bundle_status_delivery.py __________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_exec_bundle_status_delivery.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_exec_bundle_status_delivery.py:14: in <module>
+    from tests.test_exec_bundle_status import fixture, profile
+E   ModuleNotFoundError: No module named 'tests.test_exec_bundle_status'
+_________________ ERROR collecting tests/test_exec_intent.py __________________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_exec_intent.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_exec_intent.py:13: in <module>
+    from tests.test_managed_exec_retention import fixture
+E   ModuleNotFoundError: No module named 'tests.test_managed_exec_retention'
+_____________ ERROR collecting tests/test_exec_outbox_recovery.py _____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_exec_outbox_recovery.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_exec_outbox_recovery.py:18: in <module>
+    from tests.test_managed_exec_retention import fixture as execution_fixture
+E   ModuleNotFoundError: No module named 'tests.test_managed_exec_retention'
+______________ ERROR collecting tests/test_exec_outbox_status.py ______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_exec_outbox_status.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_exec_outbox_status.py:17: in <module>
+    from tests.test_exec_outbox_recovery import pending
+E   ModuleNotFoundError: No module named 'tests.test_exec_outbox_recovery'
+____________ ERROR collecting tests/test_exec_recovery_delivery.py ____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_exec_recovery_delivery.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_exec_recovery_delivery.py:16: in <module>
+    from tests.test_managed_exec_retention import fixture
+E   ModuleNotFoundError: No module named 'tests.test_managed_exec_retention'
+___________ ERROR collecting tests/test_exec_recovery_inventory.py ____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_exec_recovery_inventory.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_exec_recovery_inventory.py:17: in <module>
+    from tests.test_managed_exec_retention import fixture
+E   ModuleNotFoundError: No module named 'tests.test_managed_exec_retention'
+_________ ERROR collecting tests/test_execution_analysis_evidence.py __________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_execution_analysis_evidence.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_execution_analysis_evidence.py:16: in <module>
+    from tests import test_behavior_context_integration as context_cases
+E   ImportError: cannot import name 'test_behavior_context_integration' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+_____________ ERROR collecting tests/test_execution_continuous.py _____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_execution_continuous.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_execution_continuous.py:15: in <module>
+    from tests import test_behavior_execution_collector as existing
+E   ImportError: cannot import name 'test_behavior_execution_collector' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+_________ ERROR collecting tests/test_execution_maintenance_probe.py __________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_execution_maintenance_probe.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_execution_maintenance_probe.py:19: in <module>
+    from tests import test_execution_retention as retention
+E   ImportError: cannot import name 'test_execution_retention' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+________ ERROR collecting tests/test_execution_maintenance_quiesce.py _________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_execution_maintenance_quiesce.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_execution_maintenance_quiesce.py:9: in <module>
+    from tests.test_execution_maintenance_probe import PRIVATE, success
+E   ModuleNotFoundError: No module named 'tests.test_execution_maintenance_probe'
+_____________ ERROR collecting tests/test_execution_retention.py ______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_execution_retention.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_execution_retention.py:18: in <module>
+    from tests import test_execution_continuous as continuous
+E   ImportError: cannot import name 'test_execution_continuous' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+___________ ERROR collecting tests/test_execution_risk_evidence.py ____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_execution_risk_evidence.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_execution_risk_evidence.py:14: in <module>
+    from tests.test_service_caller_identity import callbacks, fixture
+E   ModuleNotFoundError: No module named 'tests.test_service_caller_identity'
+___________ ERROR collecting tests/test_extra_aitest_integration.py ___________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_extra_aitest_integration.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_extra_aitest_integration.py:16: in <module>
+    from tests import test_response_actions as canonical_cases
+E   ImportError: cannot import name 'test_response_actions' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+_____________ ERROR collecting tests/test_f1_observations_only.py _____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_f1_observations_only.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_f1_observations_only.py:6: in <module>
+    from tests.test_f1_native_stream import FIXTURE_LIMITS, digest, fixture
+E   ModuleNotFoundError: No module named 'tests.test_f1_native_stream'
+______________ ERROR collecting tests/test_f1_packet_members.py _______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_f1_packet_members.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_f1_packet_members.py:15: in <module>
+    from tests.test_f1_pcap_initial import frame, pcap
+E   ModuleNotFoundError: No module named 'tests.test_f1_pcap_initial'
+____________ ERROR collecting tests/test_f1_rotation_selection.py _____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_f1_rotation_selection.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_f1_rotation_selection.py:6: in <module>
+    from tests.test_f1_transfer_evaluation import frozen_fixture
+E   ModuleNotFoundError: No module named 'tests.test_f1_transfer_evaluation'
+____________ ERROR collecting tests/test_f1_transfer_evaluation.py ____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_f1_transfer_evaluation.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_f1_transfer_evaluation.py:15: in <module>
+    from tests.test_f1_native_stream import FIXTURE_LIMITS
+E   ModuleNotFoundError: No module named 'tests.test_f1_native_stream'
+__________ ERROR collecting tests/test_f1_vpn_initial_frame_link.py ___________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_f1_vpn_initial_frame_link.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_f1_vpn_initial_frame_link.py:11: in <module>
+    from tests.test_f1_pcap_initial import frame, pcap
+E   ModuleNotFoundError: No module named 'tests.test_f1_pcap_initial'
+____________ ERROR collecting tests/test_journal_service_stage.py _____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_journal_service_stage.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_journal_service_stage.py:7: in <module>
+    from tests.test_vpn_protocol_stage import fixture
+E   ModuleNotFoundError: No module named 'tests.test_vpn_protocol_stage'
+____________ ERROR collecting tests/test_live_execution_context.py ____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_live_execution_context.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_live_execution_context.py:14: in <module>
+    from tests.test_pam_journal import build, configured, row
+E   ModuleNotFoundError: No module named 'tests.test_pam_journal'
+___________ ERROR collecting tests/test_openai_incomplete_retry.py ____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_openai_incomplete_retry.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_openai_incomplete_retry.py:17: in <module>
+    from tests.test_structured_response import envelope
+E   ModuleNotFoundError: No module named 'tests.test_structured_response'
+_________________ ERROR collecting tests/test_pam_journal.py __________________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_pam_journal.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_pam_journal.py:17: in <module>
+    from tests.test_shared_execution_evidence import bundle
+E   ModuleNotFoundError: No module named 'tests.test_shared_execution_evidence'
+_____________ ERROR collecting tests/test_pam_journal_delivery.py _____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_pam_journal_delivery.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_pam_journal_delivery.py:14: in <module>
+    from tests.test_pam_journal import build, configured
+E   ModuleNotFoundError: No module named 'tests.test_pam_journal'
+____________ ERROR collecting tests/test_pam_observation_backup.py ____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_pam_observation_backup.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_pam_observation_backup.py:14: in <module>
+    from tests.test_pam_journal import build
+E   ModuleNotFoundError: No module named 'tests.test_pam_journal'
+__________ ERROR collecting tests/test_pam_observation_checkpoint.py __________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_pam_observation_checkpoint.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_pam_observation_checkpoint.py:12: in <module>
+    from tests.test_pam_journal import build, row
+E   ModuleNotFoundError: No module named 'tests.test_pam_journal'
+____________ ERROR collecting tests/test_pam_observation_ledger.py ____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_pam_observation_ledger.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_pam_observation_ledger.py:17: in <module>
+    from tests.test_pam_journal import build, row
+E   ModuleNotFoundError: No module named 'tests.test_pam_journal'
+_____________ ERROR collecting tests/test_persistent_authority.py _____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_persistent_authority.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_persistent_authority.py:20: in <module>
+    from tests.reviewer_credentials import assert_reviewer_isolation
+E   ModuleNotFoundError: No module named 'tests.reviewer_credentials'
+______________ ERROR collecting tests/test_rekey_mtls_runtime.py ______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_rekey_mtls_runtime.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_rekey_mtls_runtime.py:14: in <module>
+    from tests.reviewer_credentials import assert_reviewer_isolation
+E   ModuleNotFoundError: No module named 'tests.reviewer_credentials'
+_______________ ERROR collecting tests/test_response_actions.py _______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_response_actions.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_response_actions.py:28: in <module>
+    from tests import test_behavior_context_integration as context_cases
+E   ImportError: cannot import name 'test_behavior_context_integration' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+__________ ERROR collecting tests/test_response_api_key_identity.py ___________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_response_api_key_identity.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_response_api_key_identity.py:11: in <module>
+    from tests import test_response_actions as cases
+E   ImportError: cannot import name 'test_response_actions' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+______________ ERROR collecting tests/test_response_identity.py _______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_response_identity.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_response_identity.py:14: in <module>
+    from tests import test_response_actions as response_cases
+E   ImportError: cannot import name 'test_response_actions' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+______________ ERROR collecting tests/test_response_processes.py ______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_response_processes.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_response_processes.py:11: in <module>
+    from tests import test_response_actions as response_cases
+E   ImportError: cannot import name 'test_response_actions' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+______________ ERROR collecting tests/test_response_recovery.py _______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_response_recovery.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_response_recovery.py:7: in <module>
+    from tests import test_response_actions as response_cases
+E   ImportError: cannot import name 'test_response_actions' from 'tests' (C:\Users\chaeh\AppData\Local\Programs\Python\Python312\Lib\site-packages\tests\__init__.py)
+_________ ERROR collecting tests/test_reviewer_runtime_acceptance.py __________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_reviewer_runtime_acceptance.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_reviewer_runtime_acceptance.py:7: in <module>
+    from tests.reviewer_credentials import assert_reviewer_isolation
+E   ModuleNotFoundError: No module named 'tests.reviewer_credentials'
+_______________ ERROR collecting tests/test_scanner_transfer.py _______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_scanner_transfer.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_scanner_transfer.py:17: in <module>
+    from tests.test_f1_rotated_transfer import freezer_fixture
+E   ModuleNotFoundError: No module named 'tests.test_f1_rotated_transfer'
+__________ ERROR collecting tests/test_shared_dns_capture_intake.py ___________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_shared_dns_capture_intake.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_shared_dns_capture_intake.py:12: in <module>
+    from tests.test_dns_capture import frame, runtime
+E   ModuleNotFoundError: No module named 'tests.test_dns_capture'
+_______________ ERROR collecting tests/test_shared_dns_stage.py _______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_shared_dns_stage.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_shared_dns_stage.py:8: in <module>
+    from tests.test_shared_dns_capture_intake import make_lab, run
+E   ModuleNotFoundError: No module named 'tests.test_shared_dns_capture_intake'
+___________ ERROR collecting tests/test_shared_dns_transactions.py ____________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_shared_dns_transactions.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_shared_dns_transactions.py:14: in <module>
+    from tests.test_dns_capture import runtime
+E   ModuleNotFoundError: No module named 'tests.test_dns_capture'
+__________ ERROR collecting tests/test_shared_execution_collector.py __________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_shared_execution_collector.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_shared_execution_collector.py:14: in <module>
+    from tests.test_shared_execution_evidence import bundle
+E   ModuleNotFoundError: No module named 'tests.test_shared_execution_evidence'
+__________ ERROR collecting tests/test_verified_caller_authority.py ___________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_verified_caller_authority.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_verified_caller_authority.py:24: in <module>
+    from tests.test_structured_response import envelope
+E   ModuleNotFoundError: No module named 'tests.test_structured_response'
+_________ ERROR collecting tests/test_verified_sdk_retry_boundary.py __________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_verified_sdk_retry_boundary.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_verified_sdk_retry_boundary.py:10: in <module>
+    from test_openai_incomplete_retry import valid_body
+tests\test_openai_incomplete_retry.py:17: in <module>
+    from tests.test_structured_response import envelope
+E   ModuleNotFoundError: No module named 'tests.test_structured_response'
+_____________ ERROR collecting tests/test_vpn_attack_evidence.py ______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_vpn_attack_evidence.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_vpn_attack_evidence.py:14: in <module>
+    from tests.test_vpn_protocol_review import (
+E   ModuleNotFoundError: No module named 'tests.test_vpn_protocol_review'
+______________ ERROR collecting tests/test_vpn_control_review.py ______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_vpn_control_review.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_vpn_control_review.py:12: in <module>
+    from tests.test_vpn_protocol_review import (
+E   ModuleNotFoundError: No module named 'tests.test_vpn_protocol_review'
+_____________ ERROR collecting tests/test_vpn_enrollment_risk.py ______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_vpn_enrollment_risk.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_vpn_enrollment_risk.py:14: in <module>
+    from tests.test_vpn_gateway_collector import CLAIMS, connected
+E   ModuleNotFoundError: No module named 'tests.test_vpn_gateway_collector'
+_______________ ERROR collecting tests/test_vpn_issuer_stage.py _______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_vpn_issuer_stage.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_vpn_issuer_stage.py:12: in <module>
+    from tests.test_vpn_protocol_stage import fixture
+E   ModuleNotFoundError: No module named 'tests.test_vpn_protocol_stage'
+______________ ERROR collecting tests/test_web_scanner_replay.py ______________
+ImportError while importing test module 'C:\Users\chaeh\Desktop\파란학기\tmp\witness-verified-source-20261120-d45e91f7\tests\test_web_scanner_replay.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_web_scanner_replay.py:11: in <module>
+    from tests.test_web_scanner_review import observation
+E   ModuleNotFoundError: No module named 'tests.test_web_scanner_review'
+============================== warnings summary ===============================
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\mangum\adapter.py:65
+  C:\Users\chaeh\Desktop\파란학기\zero-trust-llm-secops\.venv\Lib\site-packages\mangum\adapter.py:65: DeprecationWarning: There is no current event loop
+    asyncio.get_event_loop()
+
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\chaeh\Desktop\파란학기\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\chaeh\Desktop\파란학기\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Users\chaeh\Desktop\파란학기\tmp\extra-development-20261118\runtime\until0800-windows-full-d45-20261120.xml -
+=========================== short test summary info ===========================
+ERROR tests/test_analysis_source_admission.py
+ERROR tests/test_apparmor_causal_intent.py
+ERROR tests/test_apparmor_status_notice.py
+ERROR tests/test_approval_recovery_processes.py
+ERROR tests/test_async_evidence_io.py
+ERROR tests/test_audit_preflight.py
+ERROR tests/test_backup_recovery_status.py
+ERROR tests/test_behavior_context_recovery.py
+ERROR tests/test_behavior_execution_integration.py
+ERROR tests/test_caller_sdk_retry.py
+ERROR tests/test_capture_archive.py
+ERROR tests/test_capture_backup.py
+ERROR tests/test_collector_provider_delivery.py
+ERROR tests/test_collector_provider_ha.py
+ERROR tests/test_collector_schedule.py
+ERROR tests/test_collector_status_bridge.py
+ERROR tests/test_context_retention.py
+ERROR tests/test_database_backup.py
+ERROR tests/test_database_recovery_checkpoint.py
+ERROR tests/test_database_transport_rotation.py
+ERROR tests/test_dns_capture.py
+ERROR tests/test_download_arithmetic_evaluation.py
+ERROR tests/test_evaluation_authority.py
+ERROR tests/test_evaluation_evidence_freeze.py
+ERROR tests/test_evaluation_runtime.py
+ERROR tests/test_evidence_review_agent.py
+ERROR tests/test_evidence_review_concurrency.py
+ERROR tests/test_evidence_review_load.py
+ERROR tests/test_exec_bundle_backup.py
+ERROR tests/test_exec_bundle_cli.py
+ERROR tests/test_exec_bundle_status.py
+ERROR tests/test_exec_bundle_status_delivery.py
+ERROR tests/test_exec_intent.py
+ERROR tests/test_exec_outbox_recovery.py
+ERROR tests/test_exec_outbox_status.py
+ERROR tests/test_exec_recovery_delivery.py
+ERROR tests/test_exec_recovery_inventory.py
+ERROR tests/test_execution_analysis_evidence.py
+ERROR tests/test_execution_continuous.py
+ERROR tests/test_execution_maintenance_probe.py
+ERROR tests/test_execution_maintenance_quiesce.py
+ERROR tests/test_execution_retention.py
+ERROR tests/test_execution_risk_evidence.py
+ERROR tests/test_extra_aitest_integration.py
+ERROR tests/test_f1_observations_only.py
+ERROR tests/test_f1_packet_members.py
+ERROR tests/test_f1_rotation_selection.py
+ERROR tests/test_f1_transfer_evaluation.py
+ERROR tests/test_f1_vpn_initial_frame_link.py
+ERROR tests/test_journal_service_stage.py
+ERROR tests/test_live_execution_context.py
+ERROR tests/test_openai_incomplete_retry.py
+ERROR tests/test_pam_journal.py
+ERROR tests/test_pam_journal_delivery.py
+ERROR tests/test_pam_observation_backup.py
+ERROR tests/test_pam_observation_checkpoint.py
+ERROR tests/test_pam_observation_ledger.py
+ERROR tests/test_persistent_authority.py
+ERROR tests/test_rekey_mtls_runtime.py
+ERROR tests/test_response_actions.py
+ERROR tests/test_response_api_key_identity.py
+ERROR tests/test_response_identity.py
+ERROR tests/test_response_processes.py
+ERROR tests/test_response_recovery.py
+ERROR tests/test_reviewer_runtime_acceptance.py
+ERROR tests/test_scanner_transfer.py
+ERROR tests/test_shared_dns_capture_intake.py
+ERROR tests/test_shared_dns_stage.py
+ERROR tests/test_shared_dns_transactions.py
+ERROR tests/test_shared_execution_collector.py
+ERROR tests/test_verified_caller_authority.py
+ERROR tests/test_verified_sdk_retry_boundary.py
+ERROR tests/test_vpn_attack_evidence.py
+ERROR tests/test_vpn_control_review.py
+ERROR tests/test_vpn_enrollment_risk.py
+ERROR tests/test_vpn_issuer_stage.py
+ERROR tests/test_web_scanner_replay.py
+!!!!!!!!!!!!!!!!!! Interrupted: 77 errors during collection !!!!!!!!!!!!!!!!!!!
+3 warnings, 77 errors in 21.45s

@@ -1,0 +1,16 @@
+{
+  "schema": "owned-real-default-witness-cadence-1",
+  "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "completed": false,
+  "interval_seconds": 60,
+  "max_age_seconds": 180,
+  "os_clock_changed": false,
+  "thresholds_changed": false,
+  "paid_api_calls": 0,
+  "real_8h_soak": false,
+  "independent_storage_verified": false,
+  "automatic_activation_allowed": false,
+  "checks": [],
+  "owned_process_finished": true,
+  "elapsed_seconds": 0.15052832899982604
+}

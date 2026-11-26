@@ -1,0 +1,291 @@
+{
+  "baseline_alarms_preserved_by_construction": true,
+  "cohorts": {
+    "PKDD_Linux": {
+      "different_from_current": {
+        "no_change": {},
+        "skip_single_932370": {},
+        "skip_top_pair": {
+          "removed_false_positives": 1
+        }
+      },
+      "excluded_training_overlap": 0,
+      "measured": {
+        "no_change": {
+          "accuracy": 0.833998403830806,
+          "f1": 0.6608234814512841,
+          "false_positive_rate": 0.034942002004868966,
+          "fn": 1420,
+          "fp": 244,
+          "inference_errors": 0,
+          "population": 10024,
+          "precision": 0.8691689008042895,
+          "recall": 0.533048339362052,
+          "tn": 6739,
+          "tp": 1621
+        },
+        "skip_single_932370": {
+          "accuracy": 0.833998403830806,
+          "f1": 0.6608234814512841,
+          "false_positive_rate": 0.034942002004868966,
+          "fn": 1420,
+          "fp": 244,
+          "inference_errors": 0,
+          "population": 10024,
+          "precision": 0.8691689008042895,
+          "recall": 0.533048339362052,
+          "tn": 6739,
+          "tp": 1621
+        },
+        "skip_top_pair": {
+          "accuracy": 0.834098164405427,
+          "f1": 0.6609582059123343,
+          "false_positive_rate": 0.034798797078619506,
+          "fn": 1420,
+          "fp": 243,
+          "inference_errors": 0,
+          "population": 10024,
+          "precision": 0.8696351931330472,
+          "recall": 0.533048339362052,
+          "tn": 6740,
+          "tp": 1621
+        }
+      },
+      "predictions_sha256": {
+        "target": "811480846b543d102a36b78d3d2b845bccc00224c32c541d45ec0dcb68f0ac99",
+        "target_body": "a9fbf428b181754c7b158a30f410ca5646810a656a7880170ea34800fa5e324d"
+      },
+      "rows": 10024
+    },
+    "PKDD_Windows": {
+      "different_from_current": {
+        "no_change": {},
+        "skip_single_932370": {},
+        "skip_top_pair": {
+          "removed_false_positives": 1
+        }
+      },
+      "excluded_training_overlap": 0,
+      "measured": {
+        "no_change": {
+          "accuracy": 0.8281125299281724,
+          "f1": 0.6445223849804003,
+          "false_positive_rate": 0.034942002004868966,
+          "fn": 1479,
+          "fp": 244,
+          "inference_errors": 0,
+          "population": 10024,
+          "precision": 0.8648947951273532,
+          "recall": 0.5136468267017429,
+          "tn": 6739,
+          "tp": 1562
+        },
+        "skip_single_932370": {
+          "accuracy": 0.8281125299281724,
+          "f1": 0.6445223849804003,
+          "false_positive_rate": 0.034942002004868966,
+          "fn": 1479,
+          "fp": 244,
+          "inference_errors": 0,
+          "population": 10024,
+          "precision": 0.8648947951273532,
+          "recall": 0.5136468267017429,
+          "tn": 6739,
+          "tp": 1562
+        },
+        "skip_top_pair": {
+          "accuracy": 0.8282122905027933,
+          "f1": 0.6446553858852662,
+          "false_positive_rate": 0.034798797078619506,
+          "fn": 1479,
+          "fp": 243,
+          "inference_errors": 0,
+          "population": 10024,
+          "precision": 0.8653739612188366,
+          "recall": 0.5136468267017429,
+          "tn": 6740,
+          "tp": 1562
+        }
+      },
+      "predictions_sha256": {
+        "target": "ad1b37a86738efdd76f6c9e5e8024e7b62223e4249e86eaa3d49da890d59a526",
+        "target_body": "6aee851542973c23f3fea95c8073be97df80bca6f7fdf33bcba38ab3eef431b6"
+      },
+      "rows": 10024
+    },
+    "SR-BH_Windows": {
+      "different_from_current": {
+        "no_change": {},
+        "skip_single_932370": {
+          "removed_false_positives": 6,
+          "removed_true_positives": 119
+        },
+        "skip_top_pair": {
+          "removed_false_positives": 6,
+          "removed_true_positives": 1470
+        }
+      },
+      "measured": {
+        "no_change": {
+          "accuracy": 0.48744438193627576,
+          "f1": 0.6057435090479937,
+          "false_positive_rate": 0.003264417845484222,
+          "fn": 10016,
+          "fp": 6,
+          "inference_errors": 0,
+          "population": 19553,
+          "precision": 0.9992212848799481,
+          "recall": 0.43460344340953994,
+          "tn": 1832,
+          "tp": 7699
+        },
+        "skip_single_932370": {
+          "accuracy": 0.48166521761366543,
+          "f1": 0.5993279304210318,
+          "false_positive_rate": 0.0,
+          "fn": 10135,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 19553,
+          "precision": 1.0,
+          "recall": 0.427885972339825,
+          "tn": 1838,
+          "tp": 7580
+        },
+        "skip_top_pair": {
+          "accuracy": 0.41257096097785506,
+          "f1": 0.5202973605078517,
+          "false_positive_rate": 0.0,
+          "fn": 11486,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 19553,
+          "precision": 1.0,
+          "recall": 0.3516229184307084,
+          "tn": 1838,
+          "tp": 6229
+        }
+      },
+      "predictions_sha256": {
+        "target": "21ba5a407d9ae6dcdb4af2ecb6c039c4819b6ef4aa84c7b4e67c9248bc580729",
+        "target_body": "f3894a6da8321389ae7e5a8f7ebad6a795c3392477db7440c735e6e4d8cefa16"
+      },
+      "rows": 19553
+    },
+    "crAPI_VAmPI_Windows": {
+      "different_from_current": {
+        "no_change": {},
+        "skip_single_932370": {},
+        "skip_top_pair": {
+          "removed_true_positives": 8
+        }
+      },
+      "measured": {
+        "no_change": {
+          "accuracy": 0.46817484662576686,
+          "f1": 0.08448844884488449,
+          "false_positive_rate": 0.0,
+          "fn": 2774,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 5216,
+          "precision": 1.0,
+          "recall": 0.04410751206064783,
+          "tn": 2314,
+          "tp": 128
+        },
+        "skip_single_932370": {
+          "accuracy": 0.46817484662576686,
+          "f1": 0.08448844884488449,
+          "false_positive_rate": 0.0,
+          "fn": 2774,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 5216,
+          "precision": 1.0,
+          "recall": 0.04410751206064783,
+          "tn": 2314,
+          "tp": 128
+        },
+        "skip_top_pair": {
+          "accuracy": 0.4666411042944785,
+          "f1": 0.07941760423560557,
+          "false_positive_rate": 0.0,
+          "fn": 2782,
+          "fp": 0,
+          "inference_errors": 0,
+          "population": 5216,
+          "precision": 1.0,
+          "recall": 0.04135079255685734,
+          "tn": 2314,
+          "tp": 120
+        }
+      },
+      "predictions_sha256": {
+        "target": "40913ceb7cfaccd49fe057d361e2976e789e96653c58b8a40801b9ffc5c49377",
+        "target_body": "1d0d51c583878b12a3cdb4f2e87c482d9bd2c70894b29dccdd82baeb1a3f3011"
+      },
+      "rows": 5216
+    },
+    "openappsec_Windows": {
+      "different_from_current": {
+        "no_change": {},
+        "skip_single_932370": {
+          "removed_false_positives": 409
+        },
+        "skip_top_pair": {
+          "removed_false_positives": 750
+        }
+      },
+      "excluded_training_overlap": 827,
+      "measured": {
+        "no_change": {
+          "accuracy": 0.9636210162233385,
+          "f1": null,
+          "false_positive_rate": 0.036378983776661454,
+          "fn": 0,
+          "fp": 1767,
+          "inference_errors": 0,
+          "population": 48572,
+          "precision": null,
+          "recall": null,
+          "tn": 46805,
+          "tp": 0
+        },
+        "skip_single_932370": {
+          "accuracy": 0.9720415053940542,
+          "f1": null,
+          "false_positive_rate": 0.02795849460594581,
+          "fn": 0,
+          "fp": 1358,
+          "inference_errors": 0,
+          "population": 48572,
+          "precision": null,
+          "recall": null,
+          "tn": 47214,
+          "tp": 0
+        },
+        "skip_top_pair": {
+          "accuracy": 0.9790620110351643,
+          "f1": null,
+          "false_positive_rate": 0.02093798896483571,
+          "fn": 0,
+          "fp": 1017,
+          "inference_errors": 0,
+          "population": 48572,
+          "precision": null,
+          "recall": null,
+          "tn": 47555,
+          "tp": 0
+        }
+      },
+      "predictions_sha256": {
+        "target": "eca3a19d110155ae583107d8c8ef1b556ad20010109023b9c0328bc311201fe9",
+        "target_body": "78f557dedd02c84fec05d5bb62645f38db45cbe6d6851eb8478b36d8c08755ad"
+      },
+      "rows": 48572
+    }
+  },
+  "not_adopted": true,
+  "scope": "retrospective concentration check on the same stored data; no exclusions deployed"
+}

@@ -1,0 +1,119 @@
+{
+  "existing_hybrid": {
+    "F1": 0.7809110629067245,
+    "FN": 0,
+    "FNR": 0.0,
+    "FP": 101,
+    "FPR": 0.5611111111111111,
+    "TN": 79,
+    "TP": 180,
+    "precision": 0.6405693950177936,
+    "recall": 1.0,
+    "unknown_or_error": 1
+  },
+  "hybrid_with_existing_rule_false_positives_by_domain": {
+    "credential": {
+      "llm_labeled_legitimate": 20,
+      "model_not_called_by_default": 10,
+      "rule_false_positive": 20,
+      "rule_false_positive_without_evidence": 0
+    },
+    "device": {
+      "llm_labeled_legitimate": 18,
+      "model_not_called_by_default": 10,
+      "rule_false_positive": 20,
+      "rule_false_positive_without_evidence": 0
+    },
+    "exfiltration": {
+      "llm_labeled_legitimate": 10,
+      "model_not_called_by_default": 0,
+      "rule_false_positive": 10,
+      "rule_false_positive_without_evidence": 0
+    },
+    "lateral": {
+      "llm_labeled_legitimate": 17,
+      "model_not_called_by_default": 10,
+      "rule_false_positive": 20,
+      "rule_false_positive_without_evidence": 0
+    },
+    "privilege": {
+      "llm_labeled_legitimate": 20,
+      "model_not_called_by_default": 12,
+      "rule_false_positive": 20,
+      "rule_false_positive_without_evidence": 2
+    },
+    "remote": {
+      "llm_labeled_legitimate": 10,
+      "model_not_called_by_default": 10,
+      "rule_false_positive": 10,
+      "rule_false_positive_without_evidence": 2
+    }
+  },
+  "independent_acceptance": false,
+  "paid_api_calls": 0,
+  "replay_sha256": "222b345ac1c9a23bd902fd778e53031ee3a17d8a2f93c9f8ac8116bdaf9e39d4",
+  "review_disagreements_by_domain": {
+    "credential": {
+      "legitimate": 20
+    },
+    "device": {
+      "legitimate": 18
+    },
+    "exfiltration": {
+      "legitimate": 11
+    },
+    "lateral": {
+      "legitimate": 18
+    },
+    "privilege": {
+      "legitimate": 20
+    },
+    "remote": {
+      "legitimate": 10,
+      "threat": 17
+    }
+  },
+  "rule_and_llm_pair_counts": {
+    "rule_False_llm_False_legitimate": 79,
+    "rule_False_llm_None_legitimate": 1,
+    "rule_True_llm_False_legitimate": 95,
+    "rule_True_llm_False_threat": 13,
+    "rule_True_llm_None_legitimate": 1,
+    "rule_True_llm_None_threat": 4,
+    "rule_True_llm_True_legitimate": 4,
+    "rule_True_llm_True_threat": 163
+  },
+  "rule_and_model_consensus_conservative": {
+    "F1": 0.7342342342342343,
+    "FN": 17,
+    "FNR": 0.09444444444444444,
+    "FP": 101,
+    "FPR": 0.5611111111111111,
+    "TN": 79,
+    "TP": 163,
+    "precision": 0.6174242424242424,
+    "recall": 0.9055555555555556,
+    "unknown_or_error": 114
+  },
+  "runtime_adoption": false,
+  "same_case_delta_vs_existing_hybrid": {
+    "corrected_FP_ids": 0,
+    "lost_TP_ids": 17,
+    "new_FP_ids": 0,
+    "recovered_TP_ids": 0
+  },
+  "scope": "published synthetic development rows; offline disagreement diagnostics only",
+  "source_metrics": {
+    "F1": 0.9340974212034384,
+    "FN": 17,
+    "FNR": 0.09444444444444444,
+    "FP": 6,
+    "FPR": 0.03333333333333333,
+    "TN": 174,
+    "TP": 163,
+    "precision": 0.9644970414201184,
+    "recall": 0.9055555555555556,
+    "unknown_or_error": 6
+  },
+  "source_sha256": "a39ccae9c8cc3d023b088303f0ef518dd1231ec06e972fdbc2e090f08e4ffe52"
+}

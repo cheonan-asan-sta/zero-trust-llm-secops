@@ -1,0 +1,35 @@
+{
+  "best_recall_at_5pct_fpr": null,
+  "lowest_fpr_preserving_all_prior_true_positives": {
+    "f1": 0.0248506705736504,
+    "false_positive_rate": 0.16225900498448229,
+    "fn": 104,
+    "fp": 34506,
+    "lost_previous_tp": 0,
+    "precision": 0.01261910893638939,
+    "recall": 0.8091743119266055,
+    "threshold": 1.0,
+    "tn": 178154,
+    "tp": 441
+  },
+  "max_f1_any_threshold": {
+    "f1": 0.0248506705736504,
+    "false_positive_rate": 0.16225900498448229,
+    "fn": 104,
+    "fp": 34506,
+    "lost_previous_tp": 0,
+    "precision": 0.01261910893638939,
+    "recall": 0.8091743119266055,
+    "threshold": 1.0,
+    "tn": 178154,
+    "tp": 441
+  },
+  "predictions_sha256": "0ff00845c917ce0bbbebdb558f593e4e1c7d3fe8cbfa485183a3c5740973b8d0",
+  "prior_tp": 441,
+  "qualifying_thresholds": 0,
+  "rows": 213205,
+  "scope": "diagnostic on reused corpus, no threshold modified",
+  "scores": 6,
+  "seal_sha256": "94dd390a0d5bd792e7571d1e09d2bafb54834b22aae5e9a5b97f9aa37673786d",
+  "source_sha256": "1429caba2803c3e8c90e9fb287bc04f6f8249f8bb34712b39127044e134d631f"
+}

@@ -27,6 +27,10 @@ from scripts.f1_lab.shared_execution_evidence import (
 )
 from scripts.run_exec_history_controls import setup_app
 
+# The sealed outbox uses POSIX UID/mode/no-follow and directory durability.
+# Windows must reject this native storage contract, never emulate it as trusted.
+native_storage = pytest.mark.skipif(os.name != "posix", reason="Native POSIX sealed-outbox storage")
+
 
 def fixture(tmp_path):
     lab = setup_app(tmp_path / "control", "fixture.service")
@@ -118,6 +122,7 @@ def status(f, raw, **kwargs):
     )
 
 
+@native_storage
 def test_complete_private_record_and_idempotent_publication(tmp_path):
     f = fixture(tmp_path)
     gate, result, published, raw = f.execute()
@@ -162,6 +167,7 @@ def test_complete_private_record_and_idempotent_publication(tmp_path):
         "event.collection_basis",
     ],
 )
+@native_storage
 def test_tampering_never_reports_fresh_or_publishes(tmp_path, field):
     f = fixture(tmp_path)
     _, _, _, raw = f.execute()
@@ -197,6 +203,7 @@ def test_tampering_never_reports_fresh_or_publishes(tmp_path, field):
     assert error.value is not None and (f.root / "latest.json").read_bytes() == raw
 
 
+@native_storage
 def test_no_pin_stale_restore_and_clock_regression(tmp_path):
     f = fixture(tmp_path)
     _, _, _, raw = f.execute()
@@ -221,6 +228,7 @@ def test_no_pin_stale_restore_and_clock_regression(tmp_path):
     assert (f.root / "latest.json").read_bytes() == raw
 
 
+@native_storage
 def test_stripping_managed_seal_cannot_downgrade_to_legacy_capture(tmp_path):
     f = fixture(tmp_path)
     _, _, _, raw = f.execute()
@@ -238,6 +246,7 @@ def test_stripping_managed_seal_cannot_downgrade_to_legacy_capture(tmp_path):
 
 
 @pytest.mark.parametrize("point", ["before_run", "before_latest"])
+@native_storage
 def test_durable_outbox_resumes_without_execution_or_resigning(tmp_path, monkeypatch, point):
     f = fixture(tmp_path)
     original = retention.atomic_capture
@@ -258,6 +267,7 @@ def test_durable_outbox_resumes_without_execution_or_resigning(tmp_path, monkeyp
     assert (f.root / "latest.json").read_bytes() == raw and len(f.launches) == 1
 
 
+@native_storage
 def test_archive_restore_is_byte_exact_and_never_rolls_latest_back(tmp_path):
     f = fixture(tmp_path)
     records = [f.execute() for _ in range(3)]
@@ -276,6 +286,7 @@ def test_archive_restore_is_byte_exact_and_never_rolls_latest_back(tmp_path):
     capture_parts(json.loads(records[0][3]))
 
 
+@native_storage
 def test_refuse_wrong_worker_before_sealing(tmp_path):
     f = fixture(tmp_path)
     gate, result, _, _ = f.execute()
@@ -300,6 +311,7 @@ def test_refuse_wrong_worker_before_sealing(tmp_path):
         "service_wrong_pin",
     ],
 )
+@native_storage
 def test_current_revocation_and_pins_override_old_valid_seal(tmp_path, change):
     f = fixture(tmp_path)
     _, _, _, raw = f.execute()
@@ -343,14 +355,14 @@ def test_current_revocation_and_pins_override_old_valid_seal(tmp_path, change):
 @pytest.mark.parametrize(
     "kind",
     [
-        "outbox_nested",
-        "outbox_same",
-        "outbox_link",
+        pytest.param("outbox_nested", marks=native_storage),
+        pytest.param("outbox_same", marks=native_storage),
+        pytest.param("outbox_link", marks=native_storage),
         "store_link",
-        "run_link",
-        "capture_link",
-        "latest_link",
-        "run_extra_file",
+        pytest.param("run_link", marks=native_storage),
+        pytest.param("capture_link", marks=native_storage),
+        pytest.param("latest_link", marks=native_storage),
+        pytest.param("run_extra_file", marks=native_storage),
     ],
 )
 def test_private_paths_reject_links_and_unexpected_files(tmp_path, kind):
@@ -394,6 +406,7 @@ def test_private_paths_reject_links_and_unexpected_files(tmp_path, kind):
             )
 
 
+@native_storage
 def test_operator_retry_cli_cannot_execute_and_health_cli_requires_caller_pin(tmp_path):
     f = fixture(tmp_path)
     gate, _, _, raw = f.execute()

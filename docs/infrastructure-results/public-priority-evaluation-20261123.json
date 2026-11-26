@@ -1,0 +1,325 @@
+{
+  "archive_member_receipts": [
+    {
+      "member": "organization-x/log/apache2/web-access.log",
+      "rows": 3872,
+      "sha256": "664633b1ab919bb4b10494cb10ada2805538a0ca73ba82cd3436bf060c265de3"
+    },
+    {
+      "member": "organization-x/log/apache2/web-access.log.1",
+      "rows": 17757,
+      "sha256": "8c53158fe70762fe9a00b6f1120cac5af07884a8cbedbf3a124dec196e182ee3"
+    },
+    {
+      "member": "organization-x/log/apache2/web-access.log.10.gz",
+      "rows": 8954,
+      "sha256": "279e44342490894d56e5d7a076490426baf2181de0064c034745eefa79673129"
+    },
+    {
+      "member": "organization-x/log/apache2/web-access.log.11.gz",
+      "rows": 18245,
+      "sha256": "71fab01ab6011dfcb44e62159f05c7bf04f9560e0f2c089a3ca0dd0ce3cb4916"
+    },
+    {
+      "member": "organization-x/log/apache2/web-access.log.12.gz",
+      "rows": 23342,
+      "sha256": "4a9ee846f8d34b5b1e825288ef5855cef0b24122b900f9616fd9e31fb92313b9"
+    },
+    {
+      "member": "organization-x/log/apache2/web-access.log.13.gz",
+      "rows": 18562,
+      "sha256": "5bb0e0bbd3c9801596b3fcce9876d99acd0956385316166f7568e9b78d7b799a"
+    },
+    {
+      "member": "organization-x/log/apache2/web-access.log.14.gz",
+      "rows": 19467,
+      "sha256": "227133108bb4cdd72a410b797016529d48522f34f719c7b28680262e3a2174c0"
+    },
+    {
+      "member": "organization-x/log/apache2/web-access.log.2.gz",
+      "rows": 8693,
+      "sha256": "39b2c000b08b2ceaf9fc4fa87aa74eb34d06d46d801e8aa9ffddecb86ea3b842"
+    },
+    {
+      "member": "organization-x/log/apache2/web-access.log.3.gz",
+      "rows": 8205,
+      "sha256": "8735cb0e539efb451ad9c3dc06a9e5ab21ed0c479419c65d1ac40e9f4dcd3866"
+    },
+    {
+      "member": "organization-x/log/apache2/web-access.log.4.gz",
+      "rows": 11739,
+      "sha256": "ed139f08cdf30d647c41acc7fd08af05f5a0f559908dc0d012bb9debb6f57906"
+    },
+    {
+      "member": "organization-x/log/apache2/web-access.log.5.gz",
+      "rows": 14413,
+      "sha256": "59e8a671f337a4b6edc539123efa0cc39a26bb3c8d5675f0a4a07574d17e78c0"
+    },
+    {
+      "member": "organization-x/log/apache2/web-access.log.6.gz",
+      "rows": 16793,
+      "sha256": "303ac998ace95b5e810e61aa20ec84b0b0a5e148d33873af243eda850c39ec1b"
+    },
+    {
+      "member": "organization-x/log/apache2/web-access.log.7.gz",
+      "rows": 16766,
+      "sha256": "a12be1542b01f6e8ac1c534c46089b3ef9a9d5cb0c6394f81e00cef392055e7e"
+    },
+    {
+      "member": "organization-x/log/apache2/web-access.log.8.gz",
+      "rows": 16875,
+      "sha256": "670d542cf2bbfdd06bc26e7ebc4c75fbb189d75b6028fc898217b2b13fc95fd7"
+    },
+    {
+      "member": "organization-x/log/apache2/web-access.log.9.gz",
+      "rows": 9522,
+      "sha256": "e64fae808540df62ff36cc9d564d9f096c5b7ef3afe89255de2fb672c550e082"
+    }
+  ],
+  "aws_calls": 0,
+  "capture_seconds": 65.234,
+  "cross_member_exact_overlap": 0,
+  "decisions_changed": 0,
+  "keycloak_docker": {
+    "alert_triage": {
+      "approved_mfa_and_scope": "cleared",
+      "cross_attempt_receipt": "needs_evidence",
+      "denied_scope": "confirmed",
+      "missing_otp_request": "confirmed",
+      "pre_auth_cancelled": "cleared",
+      "pre_auth_outage": "cleared",
+      "rejected_otp_request": "confirmed"
+    },
+    "allowed_read": true,
+    "authority_mode": "read-only provider checks on each request",
+    "container_removed": true,
+    "downgraded_role": 403,
+    "failed_mfa_grant": false,
+    "failed_mfa_observation": "unknown",
+    "failed_mfa_policy": "DENY",
+    "finished_at": "2026-11-23T00:21:49.133720+00:00",
+    "image": "quay.io/keycloak/keycloak:26.8.0",
+    "logout": 204,
+    "manual_revocation_file": false,
+    "mfa_correct": 200,
+    "mfa_missing": 400,
+    "mfa_wrong": 400,
+    "old_token_after_role_removal": 401,
+    "paid_api_calls": 0,
+    "pre_auth_outage_probe": "actual stopped loopback provider",
+    "refresh_after_logout": 400,
+    "remote_out_of_scope": "DENY",
+    "token_after_provider_logout": 401
+  },
+  "method_status_by_outcome": {
+    "fn": {
+      "GET 3xx": 15,
+      "GET 4xx": 78,
+      "HEAD 4xx": 1,
+      "POST 3xx": 1,
+      "POST 4xx": 9
+    },
+    "fp": {
+      "DELETE 4xx": 8,
+      "GET 2xx": 514,
+      "GET 3xx": 15228,
+      "GET 4xx": 3064,
+      "GET 5xx": 4,
+      "HEAD 3xx": 4287,
+      "HEAD 4xx": 5,
+      "OPTIONS 3xx": 1,
+      "PATCH 4xx": 4,
+      "POST 2xx": 10151,
+      "POST 3xx": 166,
+      "POST 4xx": 1032,
+      "POST 5xx": 7,
+      "PUT 4xx": 35
+    },
+    "tn": {
+      "DELETE 4xx": 1,
+      "GET 2xx": 90513,
+      "GET 3xx": 52204,
+      "GET 4xx": 880,
+      "GET 5xx": 4,
+      "HEAD 2xx": 40,
+      "HEAD 3xx": 26083,
+      "HEAD 4xx": 8,
+      "OPTIONS 2xx": 17,
+      "PATCH 4xx": 2,
+      "POST 2xx": 7747,
+      "POST 3xx": 224,
+      "POST 4xx": 415,
+      "POST 5xx": 5,
+      "PUT 4xx": 11
+    },
+    "tp": {
+      "GET 2xx": 1,
+      "GET 3xx": 40,
+      "GET 4xx": 239,
+      "HEAD 3xx": 4,
+      "HEAD 4xx": 135,
+      "POST 3xx": 1,
+      "POST 4xx": 21
+    }
+  },
+  "paid_api_calls": 0,
+  "physical_rows": 213205,
+  "plan": {
+    "archive_sha256": "1429caba2803c3e8c90e9fb287bc04f6f8249f8bb34712b39127044e134d631f",
+    "candidate_commit": "85eeb464abf1de1184a3abf02a22d6e697f74535",
+    "evaluator_sha256": "59b3e13a0ab7b216b419003088807ee81672379aaca93214d9605af41b5204fb",
+    "history": "event time within each physical member",
+    "label_modes": [
+      "publisher",
+      "strict"
+    ],
+    "members": [
+      "organization-x/log/apache2/web-access.log",
+      "organization-x/log/apache2/web-access.log.1",
+      "organization-x/log/apache2/web-access.log.10.gz",
+      "organization-x/log/apache2/web-access.log.11.gz",
+      "organization-x/log/apache2/web-access.log.12.gz",
+      "organization-x/log/apache2/web-access.log.13.gz",
+      "organization-x/log/apache2/web-access.log.14.gz",
+      "organization-x/log/apache2/web-access.log.2.gz",
+      "organization-x/log/apache2/web-access.log.3.gz",
+      "organization-x/log/apache2/web-access.log.4.gz",
+      "organization-x/log/apache2/web-access.log.5.gz",
+      "organization-x/log/apache2/web-access.log.6.gz",
+      "organization-x/log/apache2/web-access.log.7.gz",
+      "organization-x/log/apache2/web-access.log.8.gz",
+      "organization-x/log/apache2/web-access.log.9.gz"
+    ],
+    "model_pins": {
+      "heads": {
+        "path": "infra\\f1-lab\\frozen-vpn-control-v114\\heads.json",
+        "sha256": "4ebbcb6bb5fce286e80beeedbc18139d566d00998575487a867f129330344075"
+      },
+      "policy": {
+        "path": "infra\\f1-lab\\frozen-vpn-control-v114\\policy.json",
+        "sha256": "c39db63f29cf2524963378b05a9b419ab0a8858066fb8c02a703eb317fb7c0c0"
+      },
+      "vpn": {
+        "path": "infra\\f1-lab\\frozen-vpn-control-v114\\vpn.json",
+        "sha256": "c1ff27423e63ba607a80fc7dd891ff473baccd7f11853fb3eaba10e9e37b48b6"
+      },
+      "web": {
+        "path": "infra\\f1-lab\\frozen-vpn-control-v114\\web.json",
+        "sha256": "21318fa61f830ae1d03d47de1a01acf2c40ae19ebaf769923e3d575613f74f38"
+      }
+    },
+    "source": "https://zenodo.org/records/20001206",
+    "threshold": 0.95,
+    "unit": "physical Apache web access row"
+  },
+  "prediction_sha256": "62fd7968be166a06f7b2036f32aca7a75dd686eb1700b77aba6e341d3963b563",
+  "publisher_mode": {
+    "after": {
+      "accuracy": 0.8376679721394902,
+      "f1": 0.0248506705736504,
+      "false_positive_rate": 0.16225900498448229,
+      "fn": 104,
+      "fp": 34506,
+      "inference_errors": 0,
+      "population": 213205,
+      "precision": 0.01261910893638939,
+      "recall": 0.8091743119266055,
+      "tn": 178154,
+      "tp": 441
+    },
+    "before": {
+      "accuracy": 0.8376679721394902,
+      "f1": 0.0248506705736504,
+      "false_positive_rate": 0.16225900498448229,
+      "fn": 104,
+      "fp": 34506,
+      "inference_errors": 0,
+      "population": 213205,
+      "precision": 0.01261910893638939,
+      "recall": 0.8091743119266055,
+      "tn": 178154,
+      "tp": 441
+    },
+    "candidate_commit": "85eeb464abf1de1184a3abf02a22d6e697f74535",
+    "lost_true_positives": 0,
+    "matching": "case-sensitive literal AND per rule; OR across rules",
+    "mode": "publisher",
+    "new_false_positives": 0,
+    "publisher_distinct_rule_ids": 12,
+    "publisher_filter_sha256": "f5969561028676b97e3be3a72e8c73b05e646c97fbf79c932af0726ab3cf2767",
+    "publisher_rules_used": 39,
+    "rule_match_counts": {
+      "api_call": 6,
+      "cross_site_scripting": 16,
+      "dir_scan": 136,
+      "file_inclusion": 9,
+      "path_traversal": 7,
+      "rce_shell": 199,
+      "remote_code": 86,
+      "shell_execution": 8,
+      "sql_injection_attempt": 106
+    },
+    "seal_sha256": "819c579d84e09bf64b87e7305585b6df16323c5bc2dab2445378fbd9ea95a3c2",
+    "source": "https://zenodo.org/records/20001206"
+  },
+  "regression": {
+    "authentication_and_kreonet": {
+      "passed": 44,
+      "skipped": 1
+    },
+    "native_context": {
+      "passed": 7,
+      "skipped": 0
+    },
+    "publisher_repeated_id_and_seal": {
+      "passed": 1,
+      "skipped": 0
+    },
+    "web_transfer_shared_audit_vpn": {
+      "passed": 240,
+      "skipped": 4
+    }
+  },
+  "scope": "offline frozen native web detector; publisher pattern-derived labels",
+  "strict_sensitivity_mode": {
+    "after": {
+      "accuracy": 0.8360873337867311,
+      "f1": 0.0,
+      "false_positive_rate": 0.16391266621326891,
+      "fn": 0,
+      "fp": 34947,
+      "inference_errors": 0,
+      "population": 213205,
+      "precision": 0.0,
+      "recall": null,
+      "tn": 178258,
+      "tp": 0
+    },
+    "before": {
+      "accuracy": 0.8360873337867311,
+      "f1": 0.0,
+      "false_positive_rate": 0.16391266621326891,
+      "fn": 0,
+      "fp": 34947,
+      "inference_errors": 0,
+      "population": 213205,
+      "precision": 0.0,
+      "recall": null,
+      "tn": 178258,
+      "tp": 0
+    },
+    "candidate_commit": "85eeb464abf1de1184a3abf02a22d6e697f74535",
+    "lost_true_positives": 0,
+    "matching": "case-sensitive literal AND per rule; OR across rules",
+    "mode": "strict",
+    "new_false_positives": 0,
+    "publisher_distinct_rule_ids": 1,
+    "publisher_filter_sha256": "f5969561028676b97e3be3a72e8c73b05e646c97fbf79c932af0726ab3cf2767",
+    "publisher_rules_used": 2,
+    "rule_match_counts": {},
+    "seal_sha256": "819c579d84e09bf64b87e7305585b6df16323c5bc2dab2445378fbd9ea95a3c2",
+    "source": "https://zenodo.org/records/20001206"
+  },
+  "unique_exact_rows": 211201,
+  "within_member_exact_repetitions": 2004
+}

@@ -97,3 +97,53 @@ groups:
         for: 2s
         labels:
           severity: warning
+      - alert: C01WitnessStatusUnavailable
+        expr: secops_witness_bridge_enabled == 1 and on(job,instance) secops_witness_status_success == 0
+        for: 2s
+        labels:
+          severity: critical
+      - alert: C01WitnessObservationNotHealthy
+        expr: secops_witness_bridge_enabled == 1 and on(job,instance) secops_witness_status_success == 1 and on(job,instance) (secops_witness_observation_action_required == 1 or (secops_witness_observation_healthy == 0 unless on(job,instance) secops_witness_observation_action_required))
+        for: 2s
+        labels:
+          severity: critical
+      - alert: C01WitnessCapacityPressure
+        expr: secops_witness_state{state=~"capacity_pressure|capacity_exhausted"} == 1
+        for: 2s
+        labels:
+          severity: warning
+      - alert: C01WitnessCollectionFailed
+        expr: secops_witness_bridge_enabled == 1 and on(job,instance) secops_witness_status_success == 1 and on(job,instance) secops_witness_last_cycle_success == 0
+        for: 2s
+        labels:
+          severity: critical
+      - alert: C01WitnessRestoreVerificationUnavailable
+        expr: secops_witness_restore_bridge_enabled == 1 and on(job,instance) secops_witness_restore_status_success == 0
+        for: 2s
+        labels:
+          severity: critical
+      - alert: C01WitnessRestoreReviewOverdue
+        expr: secops_witness_restore_bridge_enabled == 1 and on(job,instance) secops_witness_restore_status_success == 1 and on(job,instance) secops_witness_restore_recent == 0
+        for: 2s
+        labels:
+          severity: warning
+      - alert: C01LoginQueueStatusUnavailable
+        expr: secops_login_queue_bridge_enabled == 1 and on(job,instance) secops_login_queue_status_success == 0
+        for: 30s
+        labels:
+          severity: critical
+      - alert: C01LoginQueueBacklog
+        expr: secops_login_queue_bridge_enabled == 1 and on(job,instance) secops_login_queue_status_success == 1 and on(job,instance) secops_login_queue_pending_attention == 1
+        for: 30s
+        labels:
+          severity: warning
+      - alert: C01LoginQueueHeld
+        expr: secops_login_queue_bridge_enabled == 1 and on(job,instance) secops_login_queue_status_success == 1 and on(job,instance) secops_login_queue_held > 0
+        for: 30s
+        labels:
+          severity: warning
+      - alert: C01LoginQueueCapacityPressure
+        expr: secops_login_queue_bridge_enabled == 1 and on(job,instance) secops_login_queue_status_success == 1 and on(job,instance) secops_login_queue_capacity_pressure == 1
+        for: 30s
+        labels:
+          severity: warning

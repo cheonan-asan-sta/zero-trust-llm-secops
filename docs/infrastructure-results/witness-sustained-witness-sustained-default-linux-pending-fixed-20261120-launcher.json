@@ -1,0 +1,13 @@
+{
+  "pid": 32613,
+  "command": [
+    "/home/chaehj02/team-llm-prep-venv/bin/python",
+    "/mnt/c/Users/chaeh/Desktop/\ud30c\ub780\ud559\uae30/tmp/extra-development-20261118/runtime/run_sustained_witness_watch_20261120.py",
+    "/home/chaehj02/witness-verified-source-20261120-b77eceb3",
+    "/mnt/c/Users/chaeh/Desktop/\ud30c\ub780\ud559\uae30/tmp/extra-development-20261118/runtime/witness-sustained-default-linux-pending-fixed-20261120",
+    "/mnt/c/Users/chaeh/Desktop/\ud30c\ub780\ud559\uae30/tmp/extra-development-20261118/runtime/extra-until0800-latest-source-linux-20261120.json",
+    "6000"
+  ],
+  "harness_sha256": "453536a088a89d00163e1a0dc35b53781122c5bf6da97fcc5f50ef160473c1ef",
+  "preflight_completed": true
+}

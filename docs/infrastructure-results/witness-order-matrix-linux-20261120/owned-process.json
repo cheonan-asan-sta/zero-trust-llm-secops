@@ -1,0 +1,17 @@
+{
+  "seed": 121,
+  "pid": 31255,
+  "arguments": [
+    "/home/chaehj02/team-llm-prep-venv/bin/python",
+    "-m",
+    "scripts.run_witness_safety_sequence",
+    "--directory",
+    "/mnt/c/Users/chaeh/Desktop/\ud30c\ub780\ud559\uae30/tmp/extra-development-20261118/runtime/witness-order-matrix-linux-20261120/seed-121",
+    "--seed",
+    "121",
+    "--rounds",
+    "32",
+    "--max-seconds",
+    "900"
+  ]
+}

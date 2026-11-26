@@ -1,0 +1,81 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "workbench_old_record_found_by_server",
+      "passed": true
+    },
+    {
+      "name": "workbench_combined_analyzer_filter",
+      "passed": true
+    },
+    {
+      "name": "workbench_all_server_matches",
+      "passed": true
+    },
+    {
+      "name": "workbench_search_scope_retained_across_pages",
+      "passed": true
+    },
+    {
+      "name": "workbench_edit_discards_old_page",
+      "passed": true
+    },
+    {
+      "name": "workbench_wrong_analyzer_response_rejected",
+      "passed": true
+    },
+    {
+      "name": "workbench_no_page_overflow_desktop",
+      "passed": true
+    },
+    {
+      "name": "workbench_no_page_overflow_mobile",
+      "passed": true
+    },
+    {
+      "name": "workbench_no_javascript_errors",
+      "passed": true
+    },
+    {
+      "name": "dashboard_old_record_found_by_server",
+      "passed": true
+    },
+    {
+      "name": "dashboard_combined_analyzer_filter",
+      "passed": true
+    },
+    {
+      "name": "dashboard_all_server_matches",
+      "passed": true
+    },
+    {
+      "name": "dashboard_search_scope_retained_across_pages",
+      "passed": true
+    },
+    {
+      "name": "dashboard_edit_discards_old_page",
+      "passed": true
+    },
+    {
+      "name": "dashboard_wrong_analyzer_response_rejected",
+      "passed": true
+    },
+    {
+      "name": "dashboard_no_page_overflow_desktop",
+      "passed": true
+    },
+    {
+      "name": "dashboard_no_page_overflow_mobile",
+      "passed": true
+    },
+    {
+      "name": "dashboard_no_javascript_errors",
+      "passed": true
+    }
+  ],
+  "paid_calls": 0,
+  "owned_servers_stopped": [
+    true
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "schema": "sustained-local-witness-watch-1",
+  "source_commit": "b77eceb30747a0a764cf997879a124b590eef972",
+  "source_files": 2241,
+  "duration_requested_seconds": 240,
+  "completed": false,
+  "real_8h_soak": false,
+  "independent_storage_verified": false,
+  "detection_metrics_changed": false,
+  "paid_api_calls": 0,
+  "watch_default_interval_seconds": 60,
+  "watch_default_max_age_seconds": 180,
+  "samples": 0,
+  "appended_source_rows": 1,
+  "owned_restarts": [],
+  "processes": [
+    {
+      "pid": 32457,
+      "started_elapsed_seconds": 0.11543665200042597
+    }
+  ],
+  "failure_type": "AssertionError",
+  "failure": "",
+  "elapsed_seconds": 10.13964767700054
+}

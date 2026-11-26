@@ -1,0 +1,68 @@
+{
+  "aws_api_calls": 0,
+  "kreonet": {
+    "canonical_rows_sha256": "cda6bb7c6e9ec68793400ab0eaeebc24c91300a6539103a0605669d8350a6be6",
+    "equal_decision_rows": 96,
+    "hypothetical_model_alerts": {
+      "F1": 0.7058823529411765,
+      "FN": 0,
+      "FNR": 0.0,
+      "FP": 40,
+      "FPR": 0.8333333333333334,
+      "TN": 8,
+      "TP": 48,
+      "precision": 0.5454545454545454,
+      "recall": 1.0,
+      "unknown_or_error": 0
+    },
+    "linux_prediction_file_sha256": "17f9d8e9e5dff010aa678dafcb32098d11e823060e6e94ff301363b4d129e15f",
+    "prior_rules": {
+      "F1": 0.5,
+      "FN": 32,
+      "FNR": 0.6666666666666666,
+      "FP": 0,
+      "FPR": 0.0,
+      "TN": 48,
+      "TP": 16,
+      "precision": 1.0,
+      "recall": 0.3333333333333333,
+      "unknown_or_error": 0
+    },
+    "published_scores_reproduced_on_each_os": 2695,
+    "windows_prediction_file_sha256": "312ae102c40a345a31cbe81f54bac201d12c2ba128ac6c51d309ee3e25531f3c"
+  },
+  "linux_ml_dependencies": {
+    "cloudpickle": "3.1.3",
+    "joblib": "1.6.0",
+    "numpy": "2.5.5",
+    "scikit-learn": "1.7.2",
+    "scipy": "1.18.1",
+    "threadpoolctl": "3.8.0"
+  },
+  "normal_web": {
+    "frozen_crs_inputs_in_both_shape_replays": true,
+    "predictions_sha256": "4f8d94fde4b30886151e54c1af77fa705734d9785af49470e1f5d2db8e1f7e66",
+    "same_report": true,
+    "source_requests": 49399,
+    "windows_and_linux_shape_retrained_independently": true
+  },
+  "paid_api_calls": 0,
+  "supplemental_tests": {
+    "kreonet-linux-with-model": {
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 2,
+      "xml_filename": "kreonet-calibration-linux-with-model-20261126.xml",
+      "xml_sha256": "78e7d36d124744e53ab13c9aa99fdcc638b8fbc7680568f1bf1054d9da714cde"
+    },
+    "loopback-worm-windows": {
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 17,
+      "xml_filename": "local-worm-exact-version-20261126.xml",
+      "xml_sha256": "ae91f61662b21a129daca6dd7d29fe51a4d782ea1d7ee24d3ec111a5b26d12d1"
+    }
+  }
+}

@@ -1,0 +1,53 @@
+"""Verify committed evidence bytes and the current follow-up document links."""
+import hashlib
+import json
+import re
+import subprocess
+from pathlib import Path
+
+root=Path.cwd()
+head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+manifests=sorted((root/'docs/infrastructure-results').glob('extra-witness*-20261120.json'))
+manifests.append(root/'docs/infrastructure-results/extra-local-regression-repairs-20261120.json')
+result={'schema':'committed-witness-evidence-audit-1','review_commit':head,'source_hash_checks':0,'artifact_hash_checks':0,'document_links_checked':0,'errors':[],'manifests':[],'paid_api_calls':0}
+process=subprocess.Popen(['git','cat-file','--batch'],stdin=subprocess.PIPE,stdout=subprocess.PIPE)
+
+def digest(ref):
+    assert '\n' not in ref
+    process.stdin.write((ref+'\n').encode());process.stdin.flush()
+    header=process.stdout.readline().decode().strip().split()
+    if len(header)!=3 or header[1]!='blob':raise ValueError('missing committed blob: '+ref)
+    remaining=int(header[2]);h=hashlib.sha256()
+    while remaining:
+        piece=process.stdout.read(min(remaining,1024*1024))
+        assert piece
+        h.update(piece);remaining-=len(piece)
+    assert process.stdout.read(1)==b'\n'
+    return h.hexdigest()
+
+try:
+    for path in manifests:
+        m=json.loads(path.read_text(encoding='utf-8'))
+        result['manifests'].append(path.name)
+        for name,expected in m.get('source_sha256',{}).items():
+            result['source_hash_checks']+=1
+            if digest(m['implementation_commit']+':'+name)!=expected:result['errors'].append('source:'+name)
+        for a in m.get('artifacts',[]):
+            result['artifact_hash_checks']+=1
+            if digest(head+':'+a['path'])!=a['sha256']:result['errors'].append('artifact:'+a['path'])
+finally:
+    process.stdin.close();process.wait(timeout=10)
+
+docs=sorted((root/'docs').glob('extra-witness*-20261120.md'))
+docs += [root/'docs/extra-local-regression-repairs-20261120.md',root/'docs/extra-until-0800-20261120.md']
+for path in docs:
+    for href in re.findall(r'\[[^\]]*\]\(([^)]+)\)',path.read_text(encoding='utf-8')):
+        if href.startswith(('http:','https:','mailto:','#')):continue
+        href=href.split('#')[0]
+        target=(path.parent/href).resolve()
+        result['document_links_checked']+=1
+        if not target.exists():result['errors'].append('link:'+path.name+':'+href)
+result['completed']=not result['errors']
+(root/'runtime/witness-evidence-audit-20261120.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({k:result[k] for k in ['completed','source_hash_checks','artifact_hash_checks','document_links_checked','errors']}))
+raise SystemExit(0 if result['completed'] else 1)

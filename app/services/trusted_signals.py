@@ -4,7 +4,7 @@ import base64
 import hashlib
 import json
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
@@ -20,11 +20,30 @@ from app.continuous_signal_models import (
     SignedContinuousSignal,
 )
 from app.security import Principal, Role
-from app.zero_trust_models import SignedSessionSignal, TrustedSignalRegistry
+from app.zero_trust_models import (
+    SignedAuthAttemptReceipt,
+    SignedLoginEvidence,
+    SignedSessionSignal,
+    TrustedSignalRegistry,
+)
+
+DELAYED_LOGIN_REVIEW_WINDOW = timedelta(hours=1)
+
+
+def eligible_for_delayed_login_review(proof, event, received_at):
+    return (
+        proof.device_state == "revoked_verified_device"
+        and event.network.location_anomaly is True
+        and proof.expires_at <= received_at < proof.expires_at + DELAYED_LOGIN_REVIEW_WINDOW
+    )
 
 
 class SignalRejected(ValueError):
     pass
+
+
+class LoginEvidenceExpired(SignalRejected):
+    """The login receipt was authentic and in scope, but its lifetime ended."""
 
 
 class SignalRegistryUnavailable(RuntimeError):
@@ -41,6 +60,16 @@ def canonical_signal(signal: SignedSessionSignal) -> bytes:
 def canonical_observation(signal: SignedContinuousSignal) -> bytes:
     """Domain-separated by the signed zt-observation-1 schema, not a session proof."""
     payload = signal.model_dump(mode="json", exclude={"signature"})
+    return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()
+
+
+def canonical_auth_attempt(receipt: SignedAuthAttemptReceipt) -> bytes:
+    payload = receipt.model_dump(mode="json", exclude={"signature"})
+    return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()
+
+
+def canonical_login_evidence(proof: SignedLoginEvidence) -> bytes:
+    payload = proof.model_dump(mode="json", exclude={"signature"})
     return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()
 
 
@@ -145,7 +174,13 @@ class SignalVerifier:
             raise SignalRejected("source or tenant rejected")
         # Observation collectors have deliberately narrower claim authority. They
         # cannot switch schemas to assert device health, MFA and a complete session.
-        if source.observation_kinds or source.behavior_scopes or source.execution_scopes:
+        if (
+            source.observation_kinds
+            or source.behavior_scopes
+            or source.execution_scopes
+            or source.auth_attempt_resource_ids
+            or source.login_evidence_resource_ids
+        ):
             raise SignalRejected("observation-only source cannot assert a full session")
         key = next((item for item in source.keys if item.key_id == signal.key_id), None)
         if key is None or not key.enabled or not key.not_before <= now < key.not_after:
@@ -174,6 +209,85 @@ class SignalVerifier:
             expires_at=signal.expires_at, issued_at=signal.issued_at,
             challenge_id=signal.challenge_id, input_digest=hashlib.sha256(payload).hexdigest(),
         )
+
+    def verify_auth_attempt(self, receipt, event, principal, now):
+        """Verify only the separately scoped, short-lived gateway receipt."""
+        from app.services.session_analysis_evidence import event_digest
+
+        source = self._sources().get((principal.tenant_id, receipt.source_id))
+        if (
+            source is None
+            or not source.enabled
+            or receipt.tenant_id != principal.tenant_id
+            or event.resource.resource_id not in source.auth_attempt_resource_ids
+            or event.user.user_id not in source.user_ids
+            or event.device.device_id not in source.device_ids
+            or event.user.role not in source.roles
+            or receipt.event_digest_sha256 != event_digest(event)
+        ):
+            raise SignalRejected("authentication attempt receipt scope or binding rejected")
+        key = next((item for item in source.keys if item.key_id == receipt.key_id), None)
+        if (
+            key is None
+            or not key.enabled
+            or not key.not_before <= receipt.issued_at <= now < receipt.expires_at <= key.not_after
+            or not 0 <= (receipt.issued_at - event.timestamp).total_seconds() <= 60
+        ):
+            raise SignalRejected("authentication attempt receipt freshness rejected")
+        try:
+            signature = base64.urlsafe_b64decode(receipt.signature + "==")
+            if base64.urlsafe_b64encode(signature).decode().rstrip("=") != receipt.signature:
+                raise ValueError("noncanonical signature")
+            public = serialization.load_pem_public_key(key.public_key_pem.encode())
+            public.verify(signature, canonical_auth_attempt(receipt))
+        except (InvalidSignature, TypeError, ValueError) as exc:
+            raise SignalRejected("authentication attempt receipt signature rejected") from exc
+        return hashlib.sha256(source.model_dump_json().encode()).hexdigest()
+
+    def verify_login_evidence(self, proof, event, principal, now):
+        digest = self._verify_login_observation(proof, event, principal, now)
+        if now >= proof.expires_at:
+            raise LoginEvidenceExpired("verified login evidence expired")
+        return digest
+
+    def verify_delayed_login_review(self, proof, event, principal, now, *, received_at):
+        """Authenticate a past risk observation for review without renewing its proof."""
+        if received_at > now or not eligible_for_delayed_login_review(proof, event, received_at):
+            raise SignalRejected("delayed login review scope or time window rejected")
+        return self._verify_login_observation(proof, event, principal, now)
+
+    def _verify_login_observation(self, proof, event, principal, now):
+        from app.services.session_analysis_evidence import event_digest
+
+        source = self._sources().get((principal.tenant_id, proof.source_id))
+        if (
+            source is None or not source.enabled or proof.tenant_id != principal.tenant_id
+            or event.resource.resource_id not in source.login_evidence_resource_ids
+            or event.user.user_id not in source.user_ids
+            or event.device.device_id not in source.device_ids
+            or event.user.role not in source.roles
+            or event.action != "LOGIN" or event.ground_truth is not None
+            or event.auth_context.authentication_result != "success" or event.auth_context.mfa != "success"
+            or proof.event_digest_sha256 != event_digest(event)
+        ):
+            raise SignalRejected("login evidence source scope or event binding rejected")
+        key = next((item for item in source.keys if item.key_id == proof.key_id), None)
+        if (
+            key is None or not key.enabled
+            or not key.not_before <= proof.issued_at <= now < key.not_after
+            or proof.expires_at > key.not_after
+            or not 0 <= (proof.issued_at - event.timestamp).total_seconds() <= 30
+        ):
+            raise SignalRejected("login evidence freshness rejected")
+        try:
+            signature = base64.urlsafe_b64decode(proof.signature + "==")
+            if base64.urlsafe_b64encode(signature).decode().rstrip("=") != proof.signature:
+                raise ValueError("noncanonical signature")
+            public = serialization.load_pem_public_key(key.public_key_pem.encode())
+            public.verify(signature, canonical_login_evidence(proof))
+        except (InvalidSignature, ValueError, TypeError) as exc:
+            raise SignalRejected("login evidence signature rejected") from exc
+        return hashlib.sha256(source.model_dump_json().encode()).hexdigest()
 
     def verify_behavior_capture(
         self, capture: SignedBehaviorCapture, principal: Principal, now: datetime,

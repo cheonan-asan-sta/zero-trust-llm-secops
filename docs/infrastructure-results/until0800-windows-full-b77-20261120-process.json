@@ -1,0 +1,14 @@
+{
+  "pid": 3440,
+  "executable": "C:\\Users\\chaeh\\Desktop\\파란학기\\zero-trust-llm-secops\\.venv\\Scripts\\python.exe",
+  "arguments": [
+    "C:\\Users\\chaeh\\Desktop\\파란학기\\zero-trust-llm-secops\\.venv\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "--durations=15",
+    "--junitxml=C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\extra-development-20261118\\runtime\\until0800-windows-full-b77-20261120.xml"
+  ],
+  "cwd": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\witness-verified-source-20261120-b77eceb3",
+  "source_commit": "b77eceb30747a0a764cf997879a124b590eef972"
+}

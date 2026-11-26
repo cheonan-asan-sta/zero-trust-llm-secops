@@ -71,6 +71,11 @@ class Manifest(StrictModel):
 
 
 def private_file(path, maximum):
+    require(
+        os.name == "posix" and all(hasattr(os, name) for name in
+            ("geteuid", "O_NOFOLLOW", "O_NONBLOCK", "O_CLOEXEC")),
+        "capture_backup_posix_required",
+    )
     path = Path(path)
     fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC)
     with os.fdopen(fd, "rb") as stream:
@@ -102,6 +107,7 @@ def pinned(path, expected, maximum):
 
 
 def private_directory(path):
+    require(os.name == "posix" and hasattr(os, "geteuid"), "capture_backup_posix_required")
     path = Path(path)
     info = path.lstat()
     require(

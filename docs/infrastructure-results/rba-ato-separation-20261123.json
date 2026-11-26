@@ -1,0 +1,191 @@
+{
+  "aws_calls": 0,
+  "candidate_adopted": false,
+  "confirmation": {
+    "plan": {
+      "accounts": 861603,
+      "candidate_sha256": "d3d657d12f57d91e14b03012396f0b4cd4f2ab54111a7273b2b6bff950afcb84",
+      "channels": [
+        "prior_combined",
+        "separate_warning",
+        "ato_review",
+        "profile_priority_proxy"
+      ],
+      "observations_sha256": "8df7230ccf8daec3215b0acd6daf9ac61a8b8504f3ba697aaecd89a982026506",
+      "projection": {
+        "archive_sha256": "ca1d974e97aebfb30878a613f4ca5c793860a98ba2acb5185c9bc610d7432a33",
+        "bucket_first": 0,
+        "bucket_last": 19,
+        "probe_sha256": "a3fd499deae8427f5558b57b06f45ad1af34ec9219b1041ed874b63364044f40",
+        "rows": 3516562
+      },
+      "rule": {
+        "any_of": [
+          64
+        ],
+        "name": "operating_system",
+        "window_index": 5
+      },
+      "truth_read_by_capture": false,
+      "verified_device_available": false,
+      "verified_mfa_available": false
+    },
+    "report": {
+      "ato_positives_kept_in_review_instead_of_priority": 7,
+      "candidate_adopted": false,
+      "groups": {
+        "ato_review": {
+          "accuracy": 0.9942332880808017,
+          "f1": 0.0017720895889736647,
+          "false_positive_rate": 0.005760521333294659,
+          "fn": 22,
+          "fp": 20257,
+          "inference_errors": 0,
+          "population": 3516562,
+          "precision": 0.0008877928483353884,
+          "recall": 0.45,
+          "tn": 3496265,
+          "tp": 18
+        },
+        "prior_combined": {
+          "accuracy": 0.9816272256823568,
+          "f1": 0.0005568876169850723,
+          "false_positive_rate": 0.018366727124130035,
+          "fn": 22,
+          "fp": 64587,
+          "inference_errors": 0,
+          "population": 3516562,
+          "precision": 0.0002786162061759926,
+          "recall": 0.45,
+          "tn": 3451935,
+          "tp": 18
+        },
+        "profile_priority_proxy": {
+          "accuracy": 0.9970931836265079,
+          "f1": 0.002147598594299102,
+          "false_positive_rate": 0.0028986026534172115,
+          "fn": 29,
+          "fp": 10193,
+          "inference_errors": 0,
+          "population": 3516562,
+          "precision": 0.0010780086240689925,
+          "recall": 0.275,
+          "tn": 3506329,
+          "tp": 11
+        },
+        "separate_warning": {
+          "accuracy": 0.9873825628554252,
+          "f1": 0.0,
+          "false_positive_rate": 0.012606205790835377,
+          "fn": 40,
+          "fp": 44330,
+          "inference_errors": 0,
+          "population": 3516562,
+          "precision": 0.0,
+          "recall": 0.0,
+          "tn": 3472192,
+          "tp": 0
+        }
+      },
+      "lost_existing_detections_across_both_channels": 0,
+      "mfa_or_device_authoritative_metrics_measured": false,
+      "new_priority_false_positives_outside_broad_ato_review": 0,
+      "previously_cleared_repeated_warnings_on_unmarked_rows": 1460,
+      "restored_previously_cleared_false_positives": 0,
+      "seal_sha256": "49bf71ed0dcd1bbbdba2353d37fded9a5effe0931f2014f06426553b486b332e",
+      "truth_sha256": "d7464e8082962ec804b2f24e8ae1a80d9268446324e59d7c2ae633337d0f593d",
+      "warning_or_review_changes_against_prior_combined": 0
+    },
+    "seal": {
+      "plan_sha256": "364387bc37d53d0067f79e0b0bac245ac8e28b0b9d022da764ba4733f2457d7b",
+      "prediction_sha256": "8267553cc60fa7b9ea8f34e7aebf22cbdbe0cfcd528a91e600fb252c608a9203"
+    }
+  },
+  "frozen_candidate": {
+    "candidate": {
+      "broad_fp": 29949,
+      "broad_tp": 27,
+      "fp": 15209,
+      "rule": {
+        "any_of": [
+          64
+        ],
+        "name": "operating_system",
+        "window_index": 5
+      },
+      "tp": 15
+    },
+    "confirmation_scope": "account hash buckets 0 through 19 except probe accounts",
+    "profile_proxy_only": true,
+    "selection": "prefer preserving all broad positives, then at least half, then best F1 among broad positives and profile false positives",
+    "source_seals": {
+      "holdout": "64ba6ea3e4f07b070fadbf4b85842eb099f13c0436d0c3d3eb1d27f75e9df056",
+      "reviewed": "b5001af17bba0c537f834de4db970f8d679a3ccac1676c248315f687aac47561"
+    }
+  },
+  "frozen_candidate_sha256": "d3d657d12f57d91e14b03012396f0b4cd4f2ab54111a7273b2b6bff950afcb84",
+  "local_keycloak": {
+    "account_takeover_triage": {
+      "ambiguous_provider_error_factor": "unknown",
+      "environment_change_is_controlled_input": true,
+      "failed_login_retained_warning": true,
+      "failed_login_takeover": "no_signal",
+      "verified_otp_with_unknown_device": "review"
+    },
+    "alert_triage": {
+      "approved_mfa_and_scope": "cleared",
+      "cross_attempt_receipt": "needs_evidence",
+      "denied_scope": "confirmed",
+      "missing_otp_request": "confirmed",
+      "pre_auth_cancelled": "cleared",
+      "pre_auth_outage": "cleared",
+      "rejected_otp_request": "confirmed"
+    },
+    "allowed_read": true,
+    "authority_mode": "read-only provider checks on each request",
+    "container_removed": true,
+    "downgraded_role": 403,
+    "failed_mfa_grant": false,
+    "failed_mfa_observation": "unknown",
+    "failed_mfa_policy": "DENY",
+    "finished_at": "2026-11-23T02:30:38.501051+00:00",
+    "image": "quay.io/keycloak/keycloak:26.8.0",
+    "login_history_review": {
+      "ambiguous_current_time": false,
+      "baseline_repeated_failure_warning": true,
+      "candidate_repeated_failure_warning": false,
+      "candidate_with_independent_hard_alert": true,
+      "earlier_same_account_failures": 3,
+      "earlier_same_account_successes": 1,
+      "failures_since_success": false,
+      "provider_current_result": "success",
+      "recent_prior_failures_capped": 3,
+      "same_recent_source_address": true,
+      "unattributed_login_events": 0,
+      "verified_session_match": true
+    },
+    "logout": 204,
+    "manual_revocation_file": false,
+    "mfa_correct": 200,
+    "mfa_missing": 400,
+    "mfa_wrong": 400,
+    "oidc_web_redirect": {
+      "after_logout": 401,
+      "consumed_redirect_grant": 403,
+      "denied_redirect_receipts": 0,
+      "downgraded_role": 403,
+      "evidence_state": "consistent",
+      "old_role": 401,
+      "refreshed_token_without_exact_otp_binding": 403,
+      "verified_otp_redirect": 303
+    },
+    "old_token_after_role_removal": 401,
+    "paid_api_calls": 0,
+    "pre_auth_outage_probe": "actual stopped loopback provider",
+    "refresh_after_logout": 400,
+    "remote_out_of_scope": "DENY",
+    "token_after_provider_logout": 401
+  },
+  "paid_api_calls": 0,
+  "regression_tests_passed": 43
+}

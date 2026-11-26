@@ -1,0 +1,108 @@
+"""Owned local verification process; logs no credentials and never runs CI."""
+
+import hashlib
+import importlib.metadata
+import json
+import os
+import platform
+import re
+import signal
+import subprocess
+import sys
+import time
+from datetime import UTC, datetime
+from pathlib import Path
+
+runtime = Path(__file__).resolve().parent
+mode, tag = sys.argv[1:]
+assert mode in {"full", "timed"} and re.fullmatch(r"[a-z0-9-]{1,64}", tag)
+surface = "windows" if os.name == "nt" else "linux"
+manifest_path = runtime / ("extra-until0800-followup-source-20261120.json" if os.name == "nt"
+                           else "extra-until0800-followup-source-linux-20261120.json")
+manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+source = Path(manifest["path"])
+prefix = runtime / f"until0800-{surface}-{mode}-{tag}"
+
+
+def hashes():
+    changed = []
+    for name, expected in manifest["files"].items():
+        with (source / name).open("rb") as stream:
+            actual = hashlib.file_digest(stream, "sha256").hexdigest()
+        if actual != expected:
+            changed.append(name)
+    return changed
+
+
+def save(suffix, value):
+    with Path(str(prefix) + suffix).open("x", encoding="utf-8") as stream:
+        json.dump(value, stream, ensure_ascii=False, indent=2)
+        stream.write("\n")
+
+
+assert not hashes(), "Frozen source verification failed before execution"
+env = dict(os.environ)
+removed = ("OPENAI_API_KEY", "AZURE_OPENAI_API_KEY", "ANTHROPIC_API_KEY", "C01_UPSTREAM_API_KEY",
+           "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN", "AWS_SECURITY_TOKEN",
+           "AWS_PROFILE", "AWS_DEFAULT_PROFILE", "AWS_WEB_IDENTITY_TOKEN_FILE", "AWS_ROLE_ARN",
+           "AWS_ROLE_SESSION_NAME", "AWS_CONTAINER_CREDENTIALS_FULL_URI", "AWS_CONTAINER_CREDENTIALS_RELATIVE_URI",
+           "AWS_CONTAINER_AUTHORIZATION_TOKEN")
+for key in removed:
+    env.pop(key, None)
+env.update(AWS_EC2_METADATA_DISABLED="true", AWS_SHARED_CREDENTIALS_FILE=str(runtime / "no-cloud-credentials"),
+           AWS_CONFIG_FILE=str(runtime / "no-cloud-config"), PYTHONUNBUFFERED="1", PYTHONUTF8="1")
+if os.name == "nt":
+    binary = sys.executable if mode == "full" else sys._base_executable
+    env["PYTHONPATH"] = os.pathsep.join((str(source), str(Path(sys.prefix) / "Lib/site-packages")))
+    env["PYTHONPYCACHEPREFIX"] = str(runtime / "until0800-windows-bytecode")
+else:
+    binary = sys.executable
+    env["PYTHONPATH"] = str(source)
+    env["PYTHONPYCACHEPREFIX"] = "/home/chaehj02/.cache/zt-until0800-frozen-bytecode"
+if mode == "full":
+    argv = [binary, "-m", "pytest", "-q", "--durations=15", "--junitxml=" + str(prefix) + ".xml"]
+else:
+    argv = [binary, "-m", "scripts.run_witness_safety_sequence", "--directory", str(prefix) + "-sequence",
+            "--seed", "20261120", "--rounds", "32", "--delay-seconds", "23", "--max-seconds", "7200"]
+metadata = {"schema": "owned-frozen-local-verification-1", "source_commit": manifest["source_commit"],
+            "source_files": len(manifest["files"]), "source_path": str(source), "git_checkout": False,
+            "platform": platform.platform(), "python": sys.version, "mode": mode, "tag": tag,
+            "started_at": datetime.now(UTC).isoformat(),
+            "harness_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+            "provider_credentials_removed_from_environment": list(removed),
+            "shared_cloud_credentials_disabled": True,
+            "packages": {name: importlib.metadata.version(name) for name in
+                         ("pytest", "fastapi", "pydantic", "cryptography", "openai", "boto3")}}
+save("-environment.json", metadata)
+started = time.monotonic()
+with Path(str(prefix) + ".stdout.log").open("xb") as stream:
+    kwargs = {"creationflags": subprocess.CREATE_NO_WINDOW} if os.name == "nt" else {"start_new_session": True}
+    process = subprocess.Popen(argv, cwd=source, env=env, stdout=stream, stderr=subprocess.STDOUT, **kwargs)
+    save("-process.json", {"pid": process.pid, "executable": binary, "arguments": argv,
+                           "cwd": str(source), "source_commit": manifest["source_commit"]})
+    timed_out = False
+    try:
+        code = process.wait(timeout=7500 if mode == "timed" else 7200)
+    except subprocess.TimeoutExpired:
+        timed_out = True
+        if os.name == "nt":
+            subprocess.run(["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                           capture_output=True, check=False, timeout=20)
+        else:
+            os.killpg(process.pid, signal.SIGTERM)
+        try:
+            process.wait(timeout=20)
+        except subprocess.TimeoutExpired:
+            if os.name != "nt":
+                os.killpg(process.pid, signal.SIGKILL)
+            process.kill()
+            process.wait(timeout=10)
+        code = 124
+changed = hashes()
+completion = {**metadata, "finished_at": datetime.now(UTC).isoformat(),
+              "elapsed_seconds": time.monotonic() - started, "exit_code": code, "timed_out": timed_out,
+              "mutated_source_files": changed, "source_bytes_unchanged": not changed}
+save("-completion.json", completion)
+print(json.dumps({k: completion[k] for k in
+                  ("mode", "tag", "source_commit", "elapsed_seconds", "exit_code", "timed_out", "source_bytes_unchanged")}))
+raise SystemExit(code if not changed else 3)

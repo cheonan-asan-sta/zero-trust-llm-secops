@@ -1,0 +1,64 @@
+{
+  "schema": "extra-hybrid-adapter-ownership-1",
+  "date_kst": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "pushed": false,
+  "ci_started": false,
+  "merged": false,
+  "new_tests": 2,
+  "before": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "2",
+    "skipped": "0",
+    "tests": "2",
+    "time": "3.519",
+    "timestamp": "2026-11-19T06:10:33.884164+09:00",
+    "hostname": "희주",
+    "passed": 0,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\hybrid-adapter-ownership-before-20261119.xml",
+    "xml_sha256": "201f29c6f8ed02f0485757f39ea23b845b9b78e72e2fb0163e51a643b88f4191",
+    "test_files": [
+      "tests/test_hybrid_adapter_ownership.py"
+    ]
+  },
+  "windows_focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "51",
+    "time": "14.189",
+    "timestamp": "2026-11-19T06:10:56.420649+09:00",
+    "hostname": "희주",
+    "passed": 51,
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\hybrid-adapter-ownership-focused-20261119.xml",
+    "xml_sha256": "d2aeb9a1dd24f47487a35ebe10ef9a18af38fb84773c4d638cc9ded3b6e91b48",
+    "test_files": [
+      "tests/test_caller_sdk_retry.py",
+      "tests/test_evaluation_runtime.py",
+      "tests/test_hybrid_adapter_ownership.py",
+      "tests/test_hybrid_analyzer.py"
+    ]
+  },
+  "explicit_none_controls_creation_and_ownership": true,
+  "falsey_injected_adapter_replaced": false,
+  "injected_adapter_closed_by_hybrid": false,
+  "model_quality_reevaluated": false,
+  "source_files": [
+    {
+      "path": "app/analyzers/hybrid.py",
+      "sha256": "9d00c6d8ec42c174e2269072b57164e54023dd31fbc4ccf8e8ff6c5b5cc1fcf2"
+    },
+    {
+      "path": "tests/test_hybrid_adapter_ownership.py",
+      "sha256": "4d191898b1084aa8191020ab8593075fe9c05509e8ec1b4b38ef72e94dca1d19"
+    }
+  ],
+  "limits": [
+    "full Windows/Linux regression tracked separately",
+    "no new paid API or native systemd conditions"
+  ]
+}

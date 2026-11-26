@@ -1,0 +1,105 @@
+{
+  "schema": "extra-analysis-audit-boundary-1",
+  "date_kst": "2026-11-19",
+  "branch": "extra",
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "pushed": false,
+  "ci_started": false,
+  "merged": false,
+  "new_tests": 13,
+  "native_conditions": 54,
+  "native_new_conditions": 1,
+  "before": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "7",
+    "skipped": "0",
+    "tests": "10",
+    "time": "4.529",
+    "timestamp": "2026-11-19T03:42:22.694189+09:00",
+    "hostname": "희주",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\analysis-audit-boundary-before-20261119.xml",
+    "xml_sha256": "de3997b33d05fa857e61e00243b5edb512a05c713f75324a7e22d1010784d469"
+  },
+  "focused": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "57",
+    "time": "10.257",
+    "timestamp": "2026-11-19T03:44:41.764153+09:00",
+    "hostname": "희주",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\analysis-audit-boundary-focused-20261119.xml",
+    "xml_sha256": "86943bca309f088c55698a62f7db05d1861728f4fb86be69ba999baa886e235a"
+  },
+  "windows_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "1",
+    "tests": "224",
+    "time": "85.323",
+    "timestamp": "2026-11-19T03:45:35.120895+09:00",
+    "hostname": "희주",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\analysis-audit-boundary-windows-20261119.xml",
+    "xml_sha256": "a84577362a86e5bb36cd11c9e4880b21e21717ac321d934e046d9b5b3caee32c"
+  },
+  "linux_latest_related": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "224",
+    "time": "90.275",
+    "timestamp": "2026-11-19T03:45:41.021738+09:00",
+    "hostname": "localhost",
+    "source_xml": "C:\\Users\\chaeh\\Desktop\\파란학기\\tmp\\analysis-audit-boundary-linux-20261119.xml",
+    "xml_sha256": "e76f3d8ee24073f7bde127f96bd0bb34e056e6e8baba950a9054abe79643d8a2"
+  },
+  "native_source_run_sha256": "a4ffb89fe6a5796be8cff2ec1d3a5c1e72d0a57ed7c9c9347f6e0a1ef1776641",
+  "native_checkpoint_failure_model_calls": 0,
+  "selected_audit_store_fixed_through_delivery": true,
+  "postcommit_local_integrity_rechecked": true,
+  "committed_records_preserved_on_withdrawal": true,
+  "source_revalidation_after_added_scan": true,
+  "backup_copied_snapshot_revalidated_before_publish": true,
+  "exact_response_analysis_still_persisted_verified": false,
+  "atomic_cross_source_snapshot": false,
+  "latest_live_state_verified": false,
+  "model_quality_reevaluated": false,
+  "source_files": [
+    {
+      "path": "app/main.py",
+      "sha256": "3fd1e0aa0a9a3062dddb7bb0f6da3b27624dc5dea24c57995c360a20c25b0029"
+    },
+    {
+      "path": "app/services/audit_backup.py",
+      "sha256": "5f74336c38246c4749570bc39cd0c5f92b7ef922a2d162492b0fe23106e8db52"
+    },
+    {
+      "path": "scripts/f1_lab/http_worker_controls.py",
+      "sha256": "edf9c302f92c0fe356db4365fa31e0db331668375eb3cc2ab947956610335200"
+    },
+    {
+      "path": "tests/test_analysis_audit_binding.py",
+      "sha256": "38fa3b893ff681eaa1dd3d1e5f2f1a420b071feffae19c04ddb194823be2586d"
+    },
+    {
+      "path": "tests/test_guarded_backup_publication.py",
+      "sha256": "3c1d5d0867c10134b340451439be512792f5d8ffa9e8d1bbfac7e7332ce15a44"
+    },
+    {
+      "path": "tests/test_http_worker_restart.py",
+      "sha256": "d75919b98c254c1ae70c7b77beccb1219732d584344eb39c686619e270d7f868"
+    }
+  ],
+  "limits": [
+    "additional full scan is O(rows), no SLA measured",
+    "a fixed minimum alone cannot prove a newly saved row still exists",
+    "JSONL integrity retains cached-state semantics",
+    "no atomic transaction spanning external sources",
+    "no paid model evaluation or 8h soak"
+  ]
+}

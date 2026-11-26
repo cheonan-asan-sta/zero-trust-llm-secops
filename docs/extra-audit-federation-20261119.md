@@ -1,0 +1,25 @@
+# 감사 기록 통합 조회 개발 기록
+
+> 후속 현황: [SQLite 공동 writer](extra-transactional-audit-20261119.md), [검증 이관/암호화 복원](extra-audit-transfer-backup-20261119.md), [compact scan](extra-compact-audit-integrity-20261119.md), [페이지 조회](extra-audit-paging-20261119.md)를 추가했다. 아래 남은 항목은 최초 federation 시점 기록이다. JSONL 여러 파일의 전역 원자적 스냅샷은 여전히 보장하지 않으며 공동 트랜잭션은 별도 SQLite backend다. [현재 통합 현황](extra-development-status-20261119.md).
+
+2026-11-19 오전 08:00 KST까지의 로컬 개발 목표. extra 기준이며 push/CI/병합/유료 API/AWS 실행은 하지 않는다. 8시간 연속 시험은 별도 보류 상태를 유지한다.
+
+첫 구현은 공유 native 모드에서 기존 감사 파일과 worker별 파일을 조회 시 다시 검증해 `/results`, 개별 결과, metrics에 통합하는 `FederatedAuditStore`다. 쓰기는 각 프로세스의 기존 파일을 유지한다. tenant 격리, analysis ID 중복 제거, 더 최신의 검토 이력 반영을 지원한다. 서로 다른 분석 내용이 같은 ID를 쓰거나 동일 시각 검토 이력이 충돌하면 조회를 거부한다.
+
+최대 128파일·합계 128MiB로 읽기 범위를 제한한다. 발견된 파일 손상/접근 오류·검증 중 파일/목록 변경은 부분 결과로 숨기지 않는다. API 조회 오류는 일반화된 503으로 응답한다. 로컬 writer의 알려진 손상이나 발견한 shard 손상은 기존 모델 호출 전 감사 점검에서도 차단된다.
+
+후속으로 SQLite manifest에 writer의 파일명을 쓰기 전에 등록하고, 전체 검증 뒤 파일 크기·내용 SHA-256을 checkpoint로 기록한다. 이전 prefix의 삭제·축소·내용 교체를 재시작한 reader도 거부한다. 현재 reader가 manifest를 잃으면 빈 DB를 재생성해 조회하지 않는다. 다만 manifest와 파일을 함께 rollback하거나, 등록/발견 전에 삭제된 과거 legacy 파일을 검출하는 원격 증명은 아니다.
+
+HTTP에서 다른 worker의 결과·metrics를 조회하고 검토 변경을 기록한 뒤 새 reader에서 확인하는 시험도 통과했다. 파일 누락 시 같은 HTTP 조회는 일반화된 503을 반환한다.
+
+관련 Linux172건, Windows113통과·POSIX권한1skip. 이 확대 묶음 뒤 추가한 두 시험과 파일 교체 감지 보완까지 포함한 최신 집중 시험은 Windows13건 통과다. 서로 겹치는 수를 합산하지 않는다. 초기57/18건은 앞선 단계 결과다. 검증 요약은 [결과 JSON](infrastructure-results/extra-audit-federation-20261119.json)에 기록한다. 기존 지표나 F1은 새로 측정하지 않았다.
+
+계속할 항목:
+
+- 여러 프로세스에서 실제 기록을 쓰는 인수와 동시 검토 변경 충돌 처리
+- manifest 자체의 신뢰 앵커/복원 검증. 알려진 파일 누락은 검사하지만 manifest와 파일 전체의 rollback 방어는 아니다.
+- 파일 전체를 읽는 비용과 결과 페이지 처리 보강
+- 여러 파일의 전역 원자적 스냅샷과 공동 감사 writer는 아직 미구현
+- 장애·복원 시험과 기존 shared/native 회귀를 묶어 최종 검증
+
+프로세스별 chain 검증은 원격 WORM/rollback 방어가 아니다. 조회 시 동시 append를 감지하면 일시 거부할 수 있으며 현재 writer의 파일 경로와 기존 감사 원본은 보존한다.

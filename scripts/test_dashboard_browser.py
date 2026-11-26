@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from urllib.error import URLError
 from urllib.request import urlopen
@@ -28,6 +29,16 @@ def run(args, directory, report):
         sock.bind(("127.0.0.1", 0))
         port = sock.getsockname()[1]
     base = f"http://127.0.0.1:{port}"
+    fixture_time = datetime.now(UTC)
+
+    def audit_page(rows):
+        return {
+            "items": rows, "total_matches": len(rows), "page_cursor": "synthetic-page-cursor",
+            "next_cursor": None, "snapshot_id": "b" * 64,
+            "snapshot_created_at": fixture_time.isoformat(),
+            "snapshot_expires_at": (fixture_time + timedelta(minutes=15)).isoformat(),
+            "snapshot_mode": "unchanged_local_view", "historical_audit_snapshot": True,
+        }
     log = (args.output_dir / "server.log").open("w")
     command = [
         args.app_python, "-m", "scripts.serve_dashboard_demo", "--seed",
@@ -86,17 +97,17 @@ def run(args, directory, report):
             expect(page.locator("#logRows tr")).to_have_count(12)
             page.locator("#nextPage").click()
             expect(page.locator("#pageLabel")).to_have_text("2 / 2 페이지")
-            check("bounded_recent_logs_pagination")
+            check("verified_audit_logs_pagination")
             page.locator("#riskFilter").select_option("CRITICAL")
             critical = metrics["risk_counts"].get("CRITICAL", 0)
-            expect(page.locator("#logCount")).to_have_text(f"{critical}건 표시 / 조회 24건")
+            expect(page.locator("#logCount")).to_have_text(f"현재 페이지 {min(12, critical)}건 / 전체 조건 일치 {critical}건")
             page.locator("#logSearch").fill("no-such-synthetic-event")
             expect(page.locator("#logRows")).to_contain_text("조건에 맞는 분석 기록이 없습니다")
             page.locator("#logSearch").fill("")
             page.locator("#riskFilter").select_option("")
             page.locator("#reviewFilter").select_option("PENDING")
             pending = metrics["pending_review_count"]
-            expect(page.locator("#logCount")).to_have_text(f"{pending}건 표시 / 조회 24건")
+            expect(page.locator("#logCount")).to_have_text(f"현재 페이지 {min(12, pending)}건 / 전체 조건 일치 {pending}건")
             check("risk_search_and_review_filters")
             if not pending:
                 page.locator("#reviewFilter").select_option("")
@@ -108,8 +119,9 @@ def run(args, directory, report):
             page.locator("#closeDetail").click()
             with page.expect_download() as downloaded:
                 page.locator("#exportLogs").click()
-            exported = json.loads(Path(downloaded.value.path()).read_text())
-            check("filtered_json_export", len(exported["records"]) == (pending or 24)
+            exported = json.loads(Path(downloaded.value.path()).read_text(encoding="utf-8"))
+            check("filtered_page_json_export", len(exported["records"]) == min(12, pending or 24)
+                  and exported["scope"] == "current_tenant_audit_snapshot_page_filtered"
                   and (not pending or all(row["review_status"] == "PENDING"
                                           for row in exported["records"])))
             page.locator("#reviewFilter").select_option("")
@@ -154,8 +166,8 @@ def run(args, directory, report):
             record["grant_token"] = "SYNTHETIC_SECRET_MUST_NOT_EXPORT"
             record["event_id"] = "hostile-fixture"
             record["analyzed_at"] = "2025-01-02T12:34:56+00:00"
-            logs_pattern = "**/results?limit=100"
-            page.route(logs_pattern, lambda route: route.fulfill(json=[record]))
+            logs_pattern = "**/audit/results?*"
+            page.route(logs_pattern, lambda route: route.fulfill(json=audit_page([record])))
             page.route("**/results/hostile-fixture", lambda route: route.fulfill(json=record))
             page.locator("#refresh").click()
             expect(page.locator("#refresh")).to_be_enabled()
@@ -170,7 +182,7 @@ def run(args, directory, report):
             page.locator("#closeDetail").click()
             with page.expect_download() as downloaded:
                 page.locator("#exportLogs").click()
-            exported = Path(downloaded.value.path()).read_text()
+            exported = Path(downloaded.value.path()).read_text(encoding="utf-8")
             check("token_fields_redacted_from_export", "SYNTHETIC_SECRET" not in exported
                   and "[REDACTED]" in exported)
             page.unroute(logs_pattern)
@@ -218,7 +230,7 @@ def run(args, directory, report):
                 "verified_session.caller.bearer",
             ]
             active_evidence = {"record": evidence_record}
-            page.route(logs_pattern, lambda route: route.fulfill(json=[active_evidence["record"]]))
+            page.route(logs_pattern, lambda route: route.fulfill(json=audit_page([active_evidence["record"]])))
             page.route(
                 "**/results/verified-evidence-fixture",
                 lambda route: route.fulfill(json=active_evidence["record"]),
@@ -342,9 +354,9 @@ def run(args, directory, report):
             expect(page.locator("#notice")).to_contain_text("서버 응답 형식")
             check("malformed_metrics_not_presented_as_zero")
             page.unroute("**/metrics")
-            page.route(logs_pattern, lambda route: route.fulfill(json=[]))
+            page.route(logs_pattern, lambda route: route.fulfill(json=audit_page([])))
             page.locator("#refresh").click()
-            expect(page.locator("#logCount")).to_have_text("0건 표시 / 조회 0건")
+            expect(page.locator("#logCount")).to_have_text("현재 페이지 0건 / 전체 조건 일치 0건")
             expect(page.locator("#notice")).to_be_hidden()
             check("successful_empty_result_distinct_from_failure")
             page.unroute(logs_pattern)
@@ -359,20 +371,20 @@ def run(args, directory, report):
                 key = route.request.headers.get("x-api-key")
                 observed_headers.append(key == test_key)
                 if key == test_key:
-                    route.fulfill(json=[])
+                    route.fulfill(json=audit_page([]))
                 else:
                     held.append(route)
 
             page.route(logs_pattern, tenant_route)
-            with page.expect_request(lambda request: "/results?limit=100" in request.url):
+            with page.expect_request(lambda request: "/audit/results?" in request.url):
                 page.locator("#refresh").click()
             page.locator("#connectionButton").click()
             page.locator("#credential").fill(test_key)
             page.get_by_role("button", name="적용하고 조회").click()
-            expect(page.locator("#logCount")).to_have_text("0건 표시 / 조회 0건")
+            expect(page.locator("#logCount")).to_have_text("현재 페이지 0건 / 전체 조건 일치 0건")
             for route in held:
                 try:
-                    route.fulfill(json=[record])
+                    route.fulfill(json=audit_page([record]))
                 except BrowserError:
                     pass  # Aborted fetches cannot be fulfilled on every browser.
             expect(page.locator("#logRows")).not_to_contain_text("hostile-fixture")

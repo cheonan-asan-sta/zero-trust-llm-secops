@@ -1,0 +1,67 @@
+# Witness 실제 시간·대용량·장애 순서 추가 검증
+
+2026-11-20 · 오전08:00 지속 목표 진행 중. 제품 소스b77eceb의 경계 검증과 이전6033 소스의 추가 순서 시험을 구분했다. 이 결과는 독립 공격 표본이나 F1 평가가 아니다.
+
+## 실제 기본 시간 경계
+
+고정b77eceb에서 기본60초 수집·180초 신선도 설정을 바꾸지 않고 실제 watch CLI를3회 실행했다. 운영체제 시계를 바꾸거나 가짜 now를 주입하지 않았다. 302.998초에 걸친10조건이 통과했다.
+
+| 시점/조건 | 관측 |
+|---|---|
+| 첫 게시45초 뒤 | 캐시 정상·healthy1 유지. 기본 주기 전에30초 TTL로 오경보하던 경계 확인 |
+| 실제 수집3회 | 서명 시각 간격59.998763초·60.000008초. 처리/스케줄 차이를 포함한 값이며 SLA 시험은 아님 |
+| 게시 종료 후 마지막 cache checked_at+121초 | 120초 게시 예산 만료로 status_success0 |
+| 같은 서명을 새로 조회/게시 | 원래 observed_at 보존. 아직180초 안이면 신선도 정상 |
+| 마지막 서명 observed_at+181초 | fresh checked_at이어도 stale·healthy0·action_required1 |
+| 실제 CLI 재수집 | 새 서명 뒤에만 정상 회복. profile/외부 최소 pin 유지, 원본 감사 bytes 동일 |
+
+프로세스 종료·비공개 fixture 삭제·추적2241개 소스 bytes 불변도 확인했다. 캐시가 최신이라는 사실과 원본 관측이 최신이라는 사실을 구분한다. 실제8시간 soak나 독립 호스트 인수 결과는 아니다.
+
+## 대용량 서명 기록의 백업·복원
+
+같은b77 소스에서 **4096회 순차 witness 관측·서명 시험과 구분되는** 별도 저장 규모 fixture를 만들었다. 실제 첫 observe의 유효한 scope/head를 바탕으로4094개 영수증을 시험용 키로 서명하고, 총4095개 확인 기록을 SQLite에 미리 넣었다. 실제 마지막 collector cycle1회가 양쪽 기록을4096개로 완성했다. 번호/서명/이전 digest/외부 최소 기준은 실제 검증 코드로 읽었다. 상수4096은 바꾸지 않았다.
+
+8조건 통과: 대용량 전부 검증 후 마지막 수집, 가득 찬 상태의 새 작업 거부, 중간 영수증 변조 거부, 중간 행 삭제 거부, 외부 최소 영수증 누락 거부, 암호화 백업·복원·키 없는 점검, 원본 감사 bytes 보존을 확인했다. 각 거부에서 signer journal은 바뀌지 않았다. 마지막 점검 함수에는 복원용 키를 넘기지 않았다. 복원과 같은 프로세스에서 수행한 함수 검증이며 별도 OS 계정의 키 격리 결과로 대신하지 않는다.
+
+확인 DB와 signer journal은 각각2,818,048bytes, 암호화 package는2,819,629bytes였다. 복원 후보는4096개 anchor와 서명한 최소 기준을 검증했다. 비공개 fixture/키/복원 후보는 정상 정리했다. 이 시험은 systemd256MiB 제한에서 대용량을 실행한 결과가 아니다. 그 서비스 권한 시험과도 구분한다.
+
+## 추가 난수 시드 순서
+
+기존6033a7b 고정 소스에서 시드0·4294967295·17을 각각32회, 회당9종 장애/작업 순서로 실행했다. 시드는 작업 순서만 정하며 키/nonce를 고정하지 않는다. 실제 CLI 응답 유실 복구·감사/확인 DB rollback 거부·암호화 복원 후보 handoff·신선도 조건을 별도 카운터 모델과 비교한다.
+
+| OS | 상태 |
+|---|---|
+| Windows | 3시드×288단계 완료·추적 소스2129개 불변 |
+| Linux | 3시드×288단계 완료·추적 소스2129개 불변 |
+
+각 단계는9종 작업의 반복이고 독립 평가 사례864개로 세지 않는다. 마지막 source 행이 새로 추가돼 unobserved로 끝나면 그 사실을 정상 보존하며 healthy로 바꾸지 않는다. 이 소스에는 이후 용량 선행 거부/경보 보완이 없으므로 최신 전체 인수로 합치지 않는다. 최신b77 전체 회귀/시간 간격 시험은 별도로 진행한다.
+
+## 반복 응답 유실 뒤 같은 작업 재개
+
+고정b77eceb에서 별도 프로세스의 watch3회를 모두 서명 전/서명 후 응답 유실로 만드는 두 모드를 시험했다. 소스를 수정하지 않고 자식 프로세스의 함수에만 장애 wrapper를 넣었다. 두 모드의13조건이 통과했다. 각 watch의 종료1과3개 실패 기록은 의도한 장애 증거이며 성공으로 덮지 않았다.
+
+세 번 모두 같은 pending ID/원래 시작 시각을 유지했다. 서명 전 모드는 journal 변경0, 서명 후 모드는 첫1회만 서명하고 뒤2회는 같은 서명/시각을 재사용했다. 이어 수정하지 않은 실제 cycle CLI로 재개해 하나의 anchor만 확인했고, 서명 후 모드는 journal bytes도 동일했다. 공개 실패/비정상 상태·원본 감사 bytes·비공개 fixture 정리·추적2241개 소스 불변도 확인했다. 이 시험에서 보존한 watch 로그의 과거 실패 기록은 그대로다. 제어 DB에 각 실패 시도별 서명 영수증을 저장했다거나 운영 journal의 원격 보존까지 검증한 것으로 설명하지 않는다.
+
+## 검증 도구 수정 기록
+
+초기 기본 시간 시험에서 initialize 인수명을 minimum_receipt로 잘못 써 TypeError가 발생했다. 동일 인수명을 쓴 첫 긴 용량 시험도 끝에서 실패할 수 있어 cooperative stop으로 중단했다. 이 실행은815.328초·completed:false·비공개 fixture 삭제/추적 소스 불변으로 남겼다. 제품 소스는 고치지 않고 도구에서 expected_receipt로 바로잡았다. 수정한 긴 용량 도구는 같은 초기화 helper를 먼저 실제 실행해 사전 확인하고 다시 시작했다. 수정한 별도af311242 도구는1611.950초에4096회 순차 witness 관측·서명과 경계4조건을 완료했다. 마지막 서명 응답 유실을 원래 bytes로 회수하고4097번째 요청2회는 거부했다. 상수 변경 없이 비공개 fixture 정상 삭제·추적2215개 파일 불변을 확인했다. 감사 행1개의 반복 관측이며 독립 공격4096건 또는 주기 collector4096회 검증은 아니다. 위 preload control4096개 규모 시험과 구분한다.
+
+원본·실행기 원문(.py.txt)·소스별 SHA256: [검증 명세](infrastructure-results/extra-witness-boundary-acceptance-20261120.json). 진행 중 전체 목표는 [목표 현황](extra-until-0800-20261120.md), 실제 용량 시험은 [용량 상태](extra-witness-capacity-20261120.md)를 참고한다. 초기 실패/중단 원본을 보존했고 결과 수를 유리하게 합산하지 않았다.
+
+유료 API·AWS·Docker 생성·업로드·CI·병합은 없다. 기존 LLM 개발360건 F1 93.41%는 그대로 목표 미달이다. 이번 시험은 탐지 성능이나 실제 기업SSO·독립 저장소·무기한 운영을 증명하지 않는다.
+
+## 대용량 fixture의 실제 자원 제한 추가 확인
+
+같은b77/추적2241개 파일의 대용량4096 서명 control fixture를 별도 비루트 transient systemd unit에서 다시 실행했다. MemoryMax256MiB·CPUQuota50%·TasksMax8을 실제 자기 cgroup 값으로 확인했고, 8개 검증 조건이 통과했다. 최대 메모리140,496,896bytes(약134MiB), memory limit hit0·OOM kill0·CPU throttled period296이었다. 시스템 전체 메모리 수치를 가져온 것이 아니다. 이 단일 fixture의 결과를 모든 최대 입력의 메모리 상한이나 처리량 보증으로 해석하지 않는다.
+
+기존 계정chaehj02를 사용했으며 새 계정이나/etc 설정을 만들지 않았다. NoNewPrivileges·빈 capability·private network도 사용했지만 전체 운영 sandbox 템플릿을 재현한 시험은 아니므로 그 인수와 구분한다. 앞의 preload4094개+실제 관측 경계 방식 그대로이며 실제 collector4096회로 바꾸어 설명하지 않는다. 원본 harness의 service_memory_limit_verified:false 표기는 최초 도구의 범위를 나타내므로 편집하지 않았고, 별도 cgroup-resources/resource-acceptance 원본에서 추가 확인을 연결했다. 비공개 fixture·소유 transient unit/임시 트리 정리와 제품 소스 불변을 확인했다.
+
+## 감사 원본 행 한도의 별도 자원 검증
+
+서명 control4096개와 별도로 감사 원본 MAX_ROWS의 실제 설정100,000행도 확인했다. 유효한 서로 다른 analysis ID를 갖는 합성 payload/해시 체인을 단일 fixture DB에 bulk 적재했다. 실제 API 수집10만 회·독립 공격10만 건은 아니며 한도 상수도 바꾸지 않았다. payload92,100,000bytes·DB136,884,224bytes였고, MAX_BYTES256MiB까지 채운 시험은 아니다.
+
+같은b77·추적2241개 파일에서 실제 full chain 검증·head100000 서명·collector 확인·중간50000행 손상 거부·동일 pending ID 재개5조건을 통과했다. 임시 시험 unit은256MiB/CPU50%/Tasks8이며 최대 메모리236,150,784bytes(약225MiB), limit hit0·OOM kill0·throttle575였다. 이 한 입력의 결과이며 모든 최대 크기 payload/대용량 control과의 조합까지 보증하지 않는다. 기존 서명 control4096개 fixture와 이 원본 행 규모 시험을 합쳐 한 번에 실행한 것처럼 표시하지 않는다.
+
+손상 주입 후 서명 journal은 그대로였고 pending이 남았다. 시험 부모가 원래 알고 있던 fixture payload를 되돌린 뒤 같은 observation ID로 새 서명/anchor를 만들었다. 제품에 자동 원본 복구 기능을 추가한 것이 아니다. 첫 도구는 recovered:true를 기대해 실패했다. 실제 recovered는 이미 만들어진 서명의 replay 여부이며 이번에는 손상 때문에 서명 전에 거부했으므로 false가 맞다. 마지막 anchor의 observation ID가 저장된 pending과 같은지 직접 대조하고 false도 명시적으로 확인하도록 단언을 보완했다.
+
+최초 실패/도구v1도 보존했다. 초기 자원 wrapper의 finally가 일반 예외를 harness_exit_code0으로 남겼으나 실제 systemd 종료는1·completed:false였고 성공으로 집계하지 않았다. 또한 부모가 실패 결과에 없는 source_bytes_unchanged를 읽어 KeyError를 냈다. wrapper가 일반 예외를1로 기록하고 실패 필드 누락을 false로 처리하도록 보완했으며, 제품 소스는 바꾸지 않았다. 수정 실행의 실제 종료0·원본 검증 완료·비공개 fixture/소유 unit 정리·추적 소스 불변을 확인했다.

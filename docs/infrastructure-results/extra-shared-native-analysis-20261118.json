@@ -1,0 +1,184 @@
+{
+  "schema": "extra-shared-native-analysis-validation-1",
+  "date": "2026-11-18",
+  "branch": "extra",
+  "development_parent_commit": "43cf3b122c73c1d14583a84684fbf291f9a52cec",
+  "remote_push": false,
+  "ci_started": false,
+  "merged": false,
+  "paid_api_calls": 0,
+  "aws_calls": 0,
+  "model_provider_stubbed": true,
+  "model_quality_measured": false,
+  "performance_goal_qualified": false,
+  "linux_regression": {
+    "collected": 744,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 744,
+    "seconds": 150.936,
+    "xml_sha256": "c392bc3b7960977289c9f1ce5b0be84bd3668abe0638c56e22a98d6c902db95d",
+    "modules": {
+      "tests.test_api": 18,
+      "tests.test_api_key_accounts": 16,
+      "tests.test_audit": 6,
+      "tests.test_audit_cancellation": 3,
+      "tests.test_audit_preflight": 3,
+      "tests.test_enterprise_config": 3,
+      "tests.test_exec_history_binding": 49,
+      "tests.test_execution_analysis_evidence": 20,
+      "tests.test_execution_analysis_runner": 2,
+      "tests.test_grounded_prompting": 30,
+      "tests.test_native_analysis_http": 48,
+      "tests.test_native_analysis_registry": 12,
+      "tests.test_policy": 2,
+      "tests.test_service_analysis_evidence": 45,
+      "tests.test_service_caller_identity": 41,
+      "tests.test_session_analysis_evidence": 43,
+      "tests.test_shared_execution_collector": 44,
+      "tests.test_shared_execution_evidence": 43,
+      "tests.test_shared_native_analysis": 43,
+      "tests.test_systemd_request_launcher": 7,
+      "tests.test_verified_caller_authority": 20,
+      "tests.test_zero_trust_operations": 28,
+      "tests.zero_trust.test_api_regressions": 73,
+      "tests.zero_trust.test_identity_regressions": 25,
+      "tests.zero_trust.test_session_proof_observations": 14,
+      "tests.zero_trust.test_session_regressions": 54,
+      "tests.zero_trust.test_signal_regressions": 52
+    }
+  },
+  "windows_regression": {
+    "collected": 103,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1,
+    "passed": 102,
+    "seconds": 46.721,
+    "xml_sha256": "4316618812e60d1614545d1931f54153ba661e2606a542c411d8bb7a70554058",
+    "modules": {
+      "tests.test_native_analysis_http": 48,
+      "tests.test_native_analysis_registry": 12,
+      "tests.test_shared_native_analysis": 43
+    }
+  },
+  "windows_skip": "POSIX private key permission contract; passed on Linux",
+  "new_shared_regression_cases": 43,
+  "native_acceptance": {
+    "conditions_passed": 29,
+    "new_shared_conditions_included": 5,
+    "report": "extra-shared-native-analysis-20261118-systemd.json",
+    "source_report_sha256": "dc8934c6675595cce2e9a40ddd93d49b0bf9cc9789fea038a40400da64f18615",
+    "real_systemd": true,
+    "real_ptrace_exec_stop": true,
+    "transport": "tcp_loopback",
+    "independent_reader_probe_processes": 3,
+    "http_server_forced_restart_tested": false,
+    "human_identity_source": "local_oidc_fixture",
+    "owned_unit_private_state_temporary_dependencies_and_http_server_removed": true
+  },
+  "shared_store_contract": {
+    "backend": "local_sqlite",
+    "encryption": "AES-256-GCM",
+    "default_capacity": 128,
+    "maximum_capacity": 1024,
+    "maximum_bundle_bytes": 65536,
+    "maximum_original_proof_age_seconds": 30,
+    "reference_stored_as": "sha256",
+    "owner_stored_as": "sha256_tenant_subject",
+    "signed_nonce_and_signatures": "encrypted_bundle_only",
+    "raw_tokens_private_signing_keys_and_callbacks_persisted": false,
+    "key_reloaded_and_pin_checked_per_read": true,
+    "current_authority_revalidated_per_worker": true,
+    "startup_configuration_pin_required": true,
+    "memory_backend_automatic_fallback_on_shared_failure": false,
+    "http_source_ledger_opened_read_only": true,
+    "audit_jsonl_writer": "per_process_shard",
+    "unified_audit_query_implemented": false,
+    "multi_host_network_filesystem_failover_verified": false,
+    "remote_database_rollback_protection": false
+  },
+  "static_checks": {
+    "ruff_check_app_scripts_tests": "passed",
+    "git_diff_check": "passed"
+  },
+  "historical_llm_development360_unchanged": {
+    "tp": 163,
+    "fp": 6,
+    "fn": 17,
+    "tn": 174,
+    "precision_percent": 96.45,
+    "recall_percent": 90.56,
+    "f1_percent": 93.41,
+    "conservative_false_positive_rate_percent": 3.33,
+    "not_reevaluated_in_this_change": true,
+    "independent_production_test": false
+  },
+  "source_files": [
+    {
+      "path": "app/config.py",
+      "sha256": "b7ccadd5579bd51284210b4303fcf4dad0b2c68ee3179cbde4de6568fdd1a641"
+    },
+    {
+      "path": "app/main.py",
+      "sha256": "825605363494b7755d68d73403f254a12ea0fd35d20a034cfed6cfd268e4f425"
+    },
+    {
+      "path": "app/services/audit.py",
+      "sha256": "7f39c22f452221b1ecd6d00c9a5dca36fa4ff9af3ef9bb1115ae94b548acd51f"
+    },
+    {
+      "path": "app/services/native_analysis_registry.py",
+      "sha256": "734bcb43c5a308e6beae7bf3e41d0cdd3f89a849038a5b935cb7ce436de1c153"
+    },
+    {
+      "path": "app/services/shared_native_analysis.py",
+      "sha256": "08d914a34ae11c600da1d7aeb7e06c19ed7122adc72eb083e205787a19ad5799"
+    },
+    {
+      "path": "scripts/f1_lab/service_analysis_evidence.py",
+      "sha256": "f23ffdd2330365865de7262d29dcc1394a6146a95b660d0d2bbf7900628ba123"
+    },
+    {
+      "path": "scripts/f1_lab/service_http_controls.py",
+      "sha256": "2b625b53156131603c3b6445d29c7421cb7511a8b1799bec6ff12a14735a7d4f"
+    },
+    {
+      "path": "scripts/f1_lab/shared_execution_evidence.py",
+      "sha256": "5344b640f4d74ef51dcd26601abd25c18673ee57fa54f1b5d9549d53cc63b4d9"
+    },
+    {
+      "path": "scripts/f1_lab/shared_native_controls.py",
+      "sha256": "c182ebef35665445f64687d1466558387dc906920b7d4cd4c1525eba8464e947"
+    },
+    {
+      "path": "scripts/f1_lab/shared_service_analysis.py",
+      "sha256": "ef35f4aba6929aa7f721c49057c59f5ff18f2d8df327051d005a779656a171f1"
+    },
+    {
+      "path": "scripts/probe_shared_native_analysis.py",
+      "sha256": "0cc81a2b8cdc879dccf194948213d84485f4765789a8c78615749d04c403da2e"
+    },
+    {
+      "path": "scripts/run_exec_history_controls.py",
+      "sha256": "5a1b2a31bced366c86f24508f59c8522dc7351940b14d4f184142c2cb2a8933a"
+    },
+    {
+      "path": "tests/test_shared_native_analysis.py",
+      "sha256": "085866b65e155cccff524477b0a7769f186523bb30a919fef0736e836397d184"
+    },
+    {
+      "path": "docs/extra-shared-native-analysis-20261118.md",
+      "sha256": "32f0bdb40a0c2bb7b51b0cddd389544135882d524f8c9767ea4c2350a3f8ba15"
+    },
+    {
+      "path": "docs/extra-native-http-audit-20261118.md",
+      "sha256": "fcc90a811158f47a2673512696322f453c4f824dd6f210dcd522bed360d52a5f"
+    },
+    {
+      "path": "AI_HANDOFF.md",
+      "sha256": "e2b813e2304fba793304f4f1f0dbbffc0a66f90f05c230f2059056d3f2587d0e"
+    }
+  ]
+}

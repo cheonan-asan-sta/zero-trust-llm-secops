@@ -1,0 +1,220 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ test_cancelled_sdk_source_check_settles_without_blocking_event_loop[adapter_retry_response_exceeds_old_watchdog] _
+
+fut = <coroutine object Event.wait at 0x00000185C700C4A0>, timeout = 10
+
+    async def wait_for(fut, timeout):
+        """Wait for the single Future or coroutine to complete, with timeout.
+    
+        Coroutine will be wrapped in Task.
+    
+        Returns result of the Future or coroutine.  When a timeout occurs,
+        it cancels the task and raises TimeoutError.  To avoid the task
+        cancellation, wrap it in shield().
+    
+        If the wait is cancelled, the task is also cancelled.
+    
+        If the task suppresses the cancellation and returns a value instead,
+        that value is returned.
+    
+        This function is a coroutine.
+        """
+        # The special case for timeout <= 0 is for the following case:
+        #
+        # async def test_waitfor():
+        #     func_started = False
+        #
+        #     async def func():
+        #         nonlocal func_started
+        #         func_started = True
+        #
+        #     try:
+        #         await asyncio.wait_for(func(), 0)
+        #     except asyncio.TimeoutError:
+        #         assert not func_started
+        #     else:
+        #         assert False
+        #
+        # asyncio.run(test_waitfor())
+    
+    
+        if timeout is not None and timeout <= 0:
+            fut = ensure_future(fut)
+    
+            if fut.done():
+                return fut.result()
+    
+            await _cancel_and_wait(fut)
+            try:
+                return fut.result()
+            except exceptions.CancelledError as exc:
+                raise TimeoutError from exc
+    
+        async with timeouts.timeout(timeout):
+>           return await fut
+                   ^^^^^^^^^
+
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\tasks.py:520: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <asyncio.locks.Event object at 0x00000185C6FFDDF0 [set]>
+
+    async def wait(self):
+        """Block until the internal flag is true.
+    
+        If the internal flag is true on entry, return True
+        immediately.  Otherwise, block until another coroutine calls
+        set() to set the flag to true, then return True.
+        """
+        if self._value:
+            return True
+    
+        fut = self._get_loop().create_future()
+        self._waiters.append(fut)
+        try:
+>           await fut
+E           asyncio.exceptions.CancelledError
+
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\locks.py:212: CancelledError
+
+The above exception was the direct cause of the following exception:
+
+lab = <scripts.local_session_analysis_lab.LocalSessionAnalysisLab object at 0x00000185C6FFE420>
+mode = 'adapter_retry', first_response_delay = 12
+
+    @pytest.mark.parametrize(
+        "mode,first_response_delay", [
+            pytest.param("adapter_initial", 0, id="adapter_initial"),
+            pytest.param("adapter_retry", 0, id="adapter_retry"),
+            pytest.param("agent_initial", 0, id="agent_initial"),
+            pytest.param("agent_final", 0, id="agent_final"),
+            pytest.param("adapter_retry", 2.2, id="adapter_retry_slow_local_response"),
+            pytest.param("adapter_retry", 12, id="adapter_retry_response_exceeds_old_watchdog"),
+        ]
+    )
+    def test_cancelled_sdk_source_check_settles_without_blocking_event_loop(lab, mode, first_response_delay):
+        signal, context = lab.create(scenario("permitted_team"))
+        release = threading.Event()
+        notify_entered = None
+        checks = 0
+        blocking_check = 2 if mode.endswith(("retry", "final")) else 1
+    
+        def check():
+            nonlocal checks
+            checks += 1
+            if checks == blocking_check:
+                notify_entered()
+                assert release.wait(3)
+    
+        context = replace(context, verify_current=check)
+        config = Settings(
+            _env_file=None,
+            openai_api_key="local-evidence-io-placeholder",
+            openai_prompt_mode="grounded",
+            openai_max_output_tokens=2400,
+            openai_incomplete_retries=1,
+        )
+    
+        async def run():
+            nonlocal notify_entered
+            loop = asyncio.get_running_loop()
+            entered = asyncio.Event()
+            notify_entered = lambda: loop.call_soon_threadsafe(entered.set)
+            responses = (
+                [truncated_body(), valid_body()] if mode == "adapter_retry" else [final_response()]
+            )
+            async with sdk(responses, first_response_delay=first_response_delay) as (client, requests):
+                if mode.startswith("adapter"):
+                    adapter = OpenAIAnalyzer(config)
+                    await adapter._client.close()
+                    adapter._client = client
+                    task = asyncio.create_task(adapter.analyze_with_evidence(signal.event, context))
+                else:
+                    agent = EvidenceReviewAgent(config, client=client)
+                    task = asyncio.create_task(agent.review(signal.event, context, dict))
+                try:
+                    # This is a synchronization watchdog, not a two-second SDK
+                    # parsing/host scheduling performance requirement. A callback
+                    # running on the loop still fails: release cannot arrive there.
+                    await asyncio.wait_for(entered.wait(), 10)
+                    # This only runs before release if the callback leaves the loop responsive.
+                    assert not task.done()
+                    assert len(requests) == (blocking_check - 1)
+                    task.cancel()
+                    await asyncio.sleep(0)
+                    task.cancel()
+                    await asyncio.sleep(0)
+                    assert not task.done()
+                finally:
+                    release.set()
+                    outcomes = await asyncio.gather(task, return_exceptions=True)
+                assert isinstance(outcomes[0], asyncio.CancelledError)
+                assert len(requests) == (blocking_check - 1)
+    
+>       asyncio.run(run())
+
+tests\test_async_evidence_io.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_async_evidence_io.py:97: in run
+    await asyncio.wait_for(entered.wait(), 10)
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\tasks.py:519: in wait_for
+    async with timeouts.timeout(timeout):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Timeout [expired]>
+exc_type = <class 'asyncio.exceptions.CancelledError'>
+exc_val = CancelledError(), exc_tb = <traceback object at 0x00000185C3495AC0>
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> Optional[bool]:
+        assert self._state in (_State.ENTERED, _State.EXPIRING)
+    
+        if self._timeout_handler is not None:
+            self._timeout_handler.cancel()
+            self._timeout_handler = None
+    
+        if self._state is _State.EXPIRING:
+            self._state = _State.EXPIRED
+    
+            if self._task.uncancel() <= self._cancelling and exc_type is exceptions.CancelledError:
+                # Since there are no new cancel requests, we're
+                # handling this.
+>               raise TimeoutError from exc_val
+E               TimeoutError
+
+..\..\..\..\AppData\Local\Programs\Python\Python312\Lib\asyncio\timeouts.py:115: TimeoutError
+------------------------------ Captured log call ------------------------------
+WARNING  app.analyzers.openai_analyzer:openai_analyzer.py:86 LLM structured response rejected: code=response_not_completed attempt=1 retry=True diagnostics={'status': 'incomplete', 'incomplete_reason': 'max_output_tokens', 'input_tokens': 37, 'output_tokens': 11, 'refusal': False}
+============================== warnings summary ===============================
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\mangum\adapter.py:65
+  C:\Users\chaeh\Desktop\�Ķ��б�\zero-trust-llm-secops\.venv\Lib\site-packages\mangum\adapter.py:65: DeprecationWarning: There is no current event loop
+    asyncio.get_event_loop()
+
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\chaeh\Desktop\�Ķ��б�\zero-trust-llm-secops\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+..\..\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\chaeh\Desktop\�Ķ��б�\zero-trust-llm-secops\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\Users\chaeh\Desktop\�Ķ��б�\tmp\extra-development-20261118\runtime\post-full-async-delay-reproduction-20261120.xml -
+=========================== short test summary info ===========================
+FAILED tests/test_async_evidence_io.py::test_cancelled_sdk_source_check_settles_without_blocking_event_loop[adapter_retry_response_exceeds_old_watchdog]
+1 failed, 3 warnings in 17.11s

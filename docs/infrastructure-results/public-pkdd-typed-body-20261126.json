@@ -1,0 +1,49 @@
+{
+  "direct_lost_true_positives": 0,
+  "modes": {
+    "preserved_target_or_body": {
+      "accuracy": 0.8281125299281724,
+      "f1": 0.6445223849804003,
+      "false_positive_rate": 0.034942002004868966,
+      "fn": 1479,
+      "fp": 244,
+      "inference_errors": 0,
+      "population": 10024,
+      "precision": 0.8648947951273532,
+      "recall": 0.5136468267017429,
+      "tn": 6739,
+      "tp": 1562
+    },
+    "target": {
+      "accuracy": 0.8231245011971269,
+      "f1": 0.6285355122564424,
+      "false_positive_rate": 0.03322354288987541,
+      "fn": 1541,
+      "fp": 232,
+      "inference_errors": 0,
+      "population": 10024,
+      "precision": 0.8660508083140878,
+      "recall": 0.49325879644853665,
+      "tn": 6751,
+      "tp": 1500
+    },
+    "target_body": {
+      "accuracy": 0.8281125299281724,
+      "f1": 0.6445223849804003,
+      "false_positive_rate": 0.034942002004868966,
+      "fn": 1479,
+      "fp": 244,
+      "inference_errors": 0,
+      "population": 10024,
+      "precision": 0.8648947951273532,
+      "recall": 0.5136468267017429,
+      "tn": 6739,
+      "tp": 1562
+    }
+  },
+  "new_false_positives": 12,
+  "new_true_positives": 62,
+  "observed_body_included": 480,
+  "seal_sha256": "e4698ec0f447b1db6aa097810d0b487374db9c631c7665a30ecbe79a2d1f9d98",
+  "source_role": "fresh for this frozen body mode; already evaluated with the shape candidate"
+}
