@@ -4,7 +4,7 @@ import argparse
 import ipaddress
 import re
 from collections import defaultdict
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 from scripts.evaluate_local_remote_holdout import fingerprint, git, read, write
@@ -19,8 +19,8 @@ from scripts.f1_lab.web_residual import WebResidualRefinement
 SOURCE = "https://databasesample.com/datasets/nginx-and-apache-access-log-tables-with-attack-annotations"
 PUBLISHER_SHA = "42f840b5dfd0f92a5b6dea339bc2077927f2ac0f8bcc2a536c39c3ae95b0d0c7"
 POPULATION = 791
-# The publisher supplies wall-clock times without a timezone or UTC claim.
-SOURCE_CLOCK_ORIGIN = datetime(1970, 1, 1)  # noqa: DTZ001
+# A fixed offset for relative arithmetic. The source's actual timezone is unknown.
+SOURCE_CLOCK_ORIGIN = datetime(1970, 1, 1, tzinfo=UTC)
 FIELDS = (
     "virtual_host_id", "client_ip", "method", "path", "status", "response_bytes", "requested_at",
 )
@@ -54,7 +54,7 @@ def prepare(source, output):
 
 def access_record(row):
     try:
-        stamp = datetime.strptime(row["requested_at"], "%Y-%m-%d %H:%M:%S")  # noqa: DTZ007
+        stamp = datetime.strptime(row["requested_at"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=UTC)
         client = str(ipaddress.ip_address(row["client_ip"]))
         method, target, status, size = (row[k] for k in ("method", "path", "status", "response_bytes"))
         if (
